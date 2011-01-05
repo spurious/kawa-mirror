@@ -1,3 +1,11 @@
+2011-01-04  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (stxdef): Add @anchor.
+	(stxref): New macro.
+	(...): Use stxref macro for syntax cross-references.
+
+	* kawa.texi (Top): Tweak my personal URL.
+
 2010-12-28  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Ports): New variable *print-xml-indent*.

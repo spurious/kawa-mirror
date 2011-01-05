@@ -24,7 +24,11 @@
 
 @macro stxdef{NAME}
 @findex @i{\NAME\}
-@var{\NAME\} @code{::=}
+@anchor{meta-\NAME\}@var{\NAME\} @code{::=}
+@end macro
+
+@macro stxref{NAME}
+@ref{meta-\NAME\, @var{\NAME\}}
 @end macro
 
 @macro stxlit{TEXT}
@@ -147,7 +151,7 @@ For copyright information on the software and documentation,
 see @ref{License}.
 
 The author of Kawa is
-@uref{http://www.bothner.com/per/,Per Bothner}
+@uref{http://per.bothner.com/,Per Bothner}
 @email{per@@bothner.com}.
 Thanks to @uref{http://www.brainfood.com/,Brainfood}
 and @uref{http://www.mercedsystems.com/,Merced Systems} for support in
@@ -1633,7 +1637,7 @@ For example, @code{#x1A} and @code{#X1a} are equivalent.  The identifier
 @subsection Formal account
 
 @noindent
-@meta{Interlexeme space} may occur on either side of any lexeme, but not
+@var{Interlexeme-space} may occur on either side of any lexeme, but not
 within a lexeme.
 
 @meta{Identifier}s, @code{.}, @meta{number}s, @meta{character}s, and
@@ -1644,14 +1648,14 @@ of the input.
 @c language: @code{@{ @}}
 
 @display
-@stxdef{lexeme} @var{identifier} | @var{boolean} | @var{number}
+@stxdef{lexeme} @stxref{identifier} | @var{boolean} | @var{number}
          | @var{character} | @var{string}
          | @stxlit{(} |  @stxlit{)} |  @stxlit{[} |  @stxlit{]} |  @stxlit{#(}
 @c | #vu8( |
          | @stxlit{'} | @stxlit{`} | @stxlit{,} | @stxlit{,@@} | @stxlit{.}
          | @stxlit{#'} |  @stxlit{#`} |  @stxlit{#,} |  @stxlit{#,@@}
 @stxdef{delimiter} @stxlit{(} |  @stxlit{)} |  @stxlit{[} | @stxlit{]} | @stxlit{"} | @stxlit{}; | @stxlit{#}
-         | @var{whitespace}
+         | @stxref{whitespace}
 @end display
 
 ((UNFINISHED))
@@ -1681,12 +1685,12 @@ character of Scheme.
          | @var{carriage-return} @var{next-line} | @var{line-separator}
 @stxdef{comment}  @stxlit{;} all subsequent characters up to a @var{line-ending}
                 or @var{paragraph-separator}
-         | @var{nested comment}
-         | @stxlit{#;} @var{interlexeme-space} @var{datum}
-@stxdef{nested-comment}  @stxlit{#|} @var{comment-text} @var{comment-cont}* @stxlit{|#}
+         | @stxref{nested-comment}
+         | @stxlit{#;} @stxref{interlexeme-space} @stxref{datum}
+@stxdef{nested-comment}  @stxlit{#|} @stxref{comment-text} @stxref{comment-cont}* @stxlit{|#}
 @stxdef{comment-text} character sequence not containing @stxlit{#|} or @stxlit{|#}
-@stxdef{comment-cont} @var{nested-comment} @var{comment-text}
-@stxdef{atmosphere} @var{whitespace} | @var{comment}
+@stxdef{comment-cont} @stxref{nested-comment} @stxref{comment-text}
+@stxdef{atmosphere} @stxref{whitespace} | @stxref{comment}
 @stxdef{interlexeme-space} @var{atmosphere}*
 @end display
 
@@ -1736,31 +1740,31 @@ Block comments may be indicated with properly nested @code{#|} and
 @subsection Identifiers
 
 @display
-@stxdef{identifier} @var{initial} @var{subsequent}*
-         | @var{peculiar-identifier}
-@stxdef{initial}  @var{constituent} | @var{special-initial}
-         | @var{inline-hex-escape}
+@stxdef{identifier} @stxref{initial} @stxref{subsequent}*
+         | @stxref{peculiar-identifier}
+@stxdef{initial} @stxref{constituent} | @stxref{special-initial}
+         | @stxref{inline-hex-escape}
 @stxdef{letter} @stxlit{a} | @stxlit{b} | @stxlit{c} | ... | @stxlit{z}
          | @stxlit{A} | @stxlit{B} | @stxlit{C} | ... | @stxlit{Z}
-@stxdef{constituent} @var{letter}
+@stxdef{constituent} @stxref{letter}
          | @i{any character whose Unicode scalar value is greater than
              127, and whose category is Lu, Ll, Lt, Lm, Lo, Mn,
              Nl, No, Pd, Pc, Po, Sc, Sm, Sk, So, or Co}
 @stxdef{special-initial} @stxlit{!} | @stxlit{$} | @stxlit{%} | @stxlit{&} | @stxlit{*} | @stxlit{/} | @stxlit{<} | @stxlit{=}
          | @stxlit{>} | @stxlit{?} | @stxlit{^} | @stxlit{_} | @stxlit{~}
-@stxdef{subsequent} @var{initial} | @var{digit}
+@stxdef{subsequent} @stxref{initial} | @stxref{digit}
          | @i{any character whose category is Nd, Mc, or Me}
-         | @var{special-subsequent}
+         | @stxref{special-subsequent}
 @stxdef{digit} @stxlit{0} | @stxlit{1} | @stxlit{2} | @stxlit{3} | @stxlit{4} | @stxlit{5} | @stxlit{6} | @stxlit{7} | @stxlit{8} | @stxlit{9}
-@stxdef{hex-digit} @var{digit}
+@stxdef{hex-digit} @stxref{digit}
          | @stxlit{a} | @stxlit{A} | @stxlit{b} | @stxlit{B} | @stxlit{c} | @stxlit{C} | @stxlit{d} | @stxlit{D} | @stxlit{e} | @stxlit{E} | @stxlit{f} | @stxlit{F}
 @stxdef{special-subsequent} @stxlit{+} | @stxlit{-} | @stxlit{.} | @stxlit{@@}
-@stxdef{escape-sequence} @var{inline-hex-escape}
-         | @stxlit{\\}@var{character-except-x}
-         | @var{multi-escape-sequence}
-@stxdef{inline-hex-escape} @stxlit{\\x}@var{hex-scalar-value}@stxlit{;}
-@stxdef{hex-scalar-value} @var{hex-digit}+
-@stxdef{multi-escape-sequence} @stxlit{|}@var{character-except-vbar}...@stxlit{|}
+@stxdef{escape-sequence} @stxref{inline-hex-escape}
+         | @stxlit{\\}@stxref{character-except-x}
+         | @stxref{multi-escape-sequence}
+@stxdef{inline-hex-escape} @stxlit{\\x}@stxref{hex-scalar-value}@stxlit{;}
+@stxdef{hex-scalar-value} @stxref{hex-digit}+
+@stxdef{multi-escape-sequence} @stxlit{|}@stxref{character-except-vbar}...@stxlit{|}
 @stxdef{character-except-vbar} @i{any character except @code{|}}
 @stxdef{character-except-x} @i{any character except @code{x}}
 @stxdef{peculiar-identifier} @stxlit{+} | @stxlit{-} | @stxlit{...} | @stxlit{->} @var{subsequent}*
@@ -1827,27 +1831,27 @@ various kinds of lexemes defined in the grammar in section ``Lexical
 Syntax'':
 
 @display
-@stxdef{datum} @meta{defining-datum}
-         | @meta{nondefining-datum}
-         | @meta{defined-datum}
+@stxdef{datum} @stxref{defining-datum}
+         | @stxref{nondefining-datum}
+         | @stxref{defined-datum}
 
-@stxdef{defining-datum} @stxlit{#}@meta{indexnum}@stxlit{=}@meta{nondefining-datum}
+@stxdef{defining-datum} @stxlit{#}@stxref{indexnum}@stxlit{=}@stxref{nondefining-datum}
 @stxdef{defined-datum} @stxlit{#}@var{indexnum}@stxlit{#}
-@stxdef{nondefining-datum} @meta{lexeme-datum}
-         | @meta{compound-datum}
-@stxdef{indexnum} @var{digit-10}+
+@stxdef{nondefining-datum} @stxref{lexeme-datum}
+         | @stxref{compound-datum}
+@stxdef{indexnum} @stxref{digit}+
 
 @stxdef{lexeme-datum} @meta{boolean} | @meta{number}
-         | @meta{character} | @meta{string} | @meta{symbol}
+         | @meta{character} | @meta{string} | @stxref{symbol}
 @stxdef{symbol} @var{identifier}
-@stxdef{compound-datum} @meta{list} | @meta{vector} | @meta{uniform-vector} | @meta{xml-literal}
-@stxdef{list} @stxlit{(}@meta{datum}*@stxlit{)}
-         | @stxlit{(}@meta{datum}+ @stxlit{.} @meta{datum}@stxlit{)}
-         | @meta{abbreviation}
-@stxdef{abbreviation} @meta{abbrev-prefix} @meta{datum}
+@stxdef{compound-datum} @stxref{list} | @stxref{vector} | @stxref{uniform-vector} | @stxref{xml-literal}
+@stxdef{list} @stxlit{(}@stxref{datum}*@stxlit{)}
+         | @stxlit{(}@stxref{datum}+ @stxlit{.} @stxref{datum}@stxlit{)}
+         | @stxref{abbreviation}
+@stxdef{abbreviation} @stxref{abbrev-prefix} @stxref{datum}
 @stxdef{abbrev-prefix} @stxlit{'} | @stxlit{`} | @stxlit{,} | @stxlit{,@@}
          | @stxlit{#'} | @stxlit{#`}
-@stxdef{vector} @stxlit{#(}@meta{datum}*@stxlit{)}
+@stxdef{vector} @stxlit{#(}@stxref{datum}*@stxlit{)}
 @stxdef{uniform-vector} TODO
 @end display
 @c FIXME: add to abbrev-prefix: @stxlit{#,} | @stxlit{#,@@}
@@ -2755,11 +2759,11 @@ Kawa borrows the extended formal argument list of DSSSL,
 and Kawa allows you to declare the type of the parameter.
 
 @display
-@stxdef{lambda-expression} @stxlit{(lambda} @var{formals} [@var{rtype}] @var{body}@stxlit{)}
+@stxdef{lambda-expression} @stxlit{(lambda} @stxref{formals} [@var{rtype}] @var{body}@stxlit{)}
 @end display
 where
 @display
-@stxdef{formals} @stxlit{(}@var{formal-arguments}@stxlit{)} | @var{rest-arg}
+@stxdef{formals} @stxlit{(}@stxref{formal-arguments}@stxlit{)} | @stxref{rest-arg}
 @end display
 You can of course also use the extended format in a @code{define}:
 @example
@@ -2767,14 +2771,14 @@ You can of course also use the extended format in a @code{define}:
 @end example
 @display
 @stxdef{formal-arguments}
-    @var{req-opt-args} (@var{rest-key-args} | @stxlit{.} @var{rest-arg})
+    @stxref{req-opt-args} (@stxref{rest-key-args} | @stxlit{.} @stxref{rest-arg})
 @end display
 @display
-@stxdef{req-opt-args} @var{req-arg} ... [@stxlit{#!optional} @var{opt-arg} ...]
-@stxdef{rest-key-args} [@stxlit{#!rest} @var{rest-arg}] [@stxlit{#!key} @var{key-arg} ...]
+@stxdef{req-opt-args} @stxref{req-arg} ... [@stxlit{#!optional} @stxref{opt-arg} ...]
+@stxdef{rest-key-args} [@stxlit{#!rest} @stxref{rest-arg}] [@stxlit{#!key} @stxref{key-arg} ...]
 @stxdef{req-arg}  @var{variable} [@stxlit{::} @var{type}] | @stxlit{(}@var{variable} [[@stxlit{::}] @var{type}] @stxlit{)}
-@stxdef{opt-arg} @var{arg-with-default}
-@stxdef{key-arg} @var{arg-with-default}
+@stxdef{opt-arg} @stxref{arg-with-default}
+@stxdef{key-arg} @stxref{arg-with-default}
 @stxdef{arg-with-default} @var{variable} [@stxlit{::} @var{type}]
     | @stxlit{(} @var{variable} [@stxlit{::} @var{type} [@var{initializer}] | @var{initializer} [[@stxlit{::}] @var{type}]] @stxlit{)}
 @stxdef{rest-arg} @var{variable}
@@ -7178,12 +7182,8 @@ efficient, and it is easier to access it from Java code.
 The syntax of @code{define-class} are mostly compatible with that
 in the Guile and Stk dialects of Scheme.
 
-@deffn Syntax define-class name @stxlit{(}supers ...@stxlit{)} option-pair* field-or-method-decl ...
-@deffnx Syntax define-simple-class name @stxlit{(}supers ...@stxlit{)} option-pair* field-or-method-decl ...
-@display
-@stxdef{option-pair} @var{option-keyword} @var{option-value}
-@stxdef{field-or-method-decl} @var{field-decl} | @var{method-decl}
-@end display
+@deffn Syntax define-class name @stxlit{(}supers ...@stxlit{)} @stxref{option-pair}* @stxref{field-or-method-decl} ...
+@deffnx Syntax define-simple-class name @stxlit{(}supers ...@stxlit{)}  @stxref{option-pair}*  @stxref{field-or-method-decl} ...
 
 Defines a new class named @var{name}.  If @code{define-simple-class} is
 used, creates a normal Java class named @var{name} in the current package.
@@ -7192,6 +7192,10 @@ type is named @code{xyz}.)  For @code{define-class} the implementation is
 unspecified.  In most cases, the compiler creates a class pair,
 consisting of a Java interface and a Java implementation class.
 @end deffn
+@display
+@stxdef{option-pair} @var{option-keyword} @var{option-value}
+@stxdef{field-or-method-decl} @stxref{field-decl} | @stxref{method-decl}
+@end display
 
 @subsection General class properties
 
@@ -7254,11 +7258,12 @@ not recommended) write a period at the end of the @var{cname}.
 @subsection Declaring fields
 
 @display
-@stxdef{field-decl} @stxlit{(}@var{fname} [@stxlit{::} @var{ftype}] @var{option-pair}*@stxlit{)}
+@stxdef{field-decl} @stxlit{(}@stxref{field-name} [@stxlit{::} @var{ftype}] @stxref{option-pair}*@stxlit{)}
+@stxdef{field-name} @stxref{identifier}
 @end display
 
 Each @var{field-decl} declares a instance "slot" (field)
-with the given @var{fname}. 
+with the given @var{field-name}. 
 By default it is publicly visible, but you can specify
 a different visiblity with the @code{access:} specifier.
  If @var{ftype} is specified it is the
@@ -7307,10 +7312,10 @@ For now this is synonymous with @var{init-form:}, but that may change
 @item @stxlit{init-keyword:} @code{@var{name}:}
 A keyword that that can be used to initialize instance in @code{make} calls.
 For now, this is ignored, and @var{name} should be the same as the
-field's @var{fname}.
+field's @var{field-name}.
 @end table
 
-The @var{fname} can be left out.  That indicates a "dummy slot",
+The @var{field-name} can be left out.  That indicates a "dummy slot",
 which is useful for initialization not tied to a specific field.
 In this example, @code{x} is the only actual field.  It is first
 initialized to 10, but if @code{(some-condition)} is true
@@ -7326,7 +7331,8 @@ then its value is doubled.
 @subsection Declaring methods
 
 @display
-@stxdef{method-decl} @stxlit{((}@var{method-name} @var{formal-arguments} @stxlit{)} @stxlit{::} @var{rtype}] @var{option-pair}* @var{body}@stxlit{)}
+@stxdef{method-decl} @stxlit{((}@stxref{method-name} @stxref{formal-arguments} @stxlit{)} @stxlit{::} @var{rtype}] @stxref{option-pair}* @var{body}@stxlit{)}
+@stxdef{method-name} @stxref{identifier}
 @end display
 
 Each @var{method-decl} declares a method,
@@ -7466,10 +7472,9 @@ but you can get the same effect using a @code{synchronized} expression:
 Returns a new instance of an anonymous (inner) class.
 The syntax is similar to @code{define-class}.
 @display
-@stxdef{field-or-method-decl} @var{field-decl} | @var{method-decl}
-@stxdef{field-decl} @stxlit{(}@var{fname} [[[@stxlit{::}] @var{ftype}] @var{finit}]@stxlit{)}
+@stxdef{object-field-or-method-decl} @stxref{object-field-decl} | @stxref{method-decl}
+@stxdef{object-field-decl} @stxlit{(}@stxref{field-name} [[[@stxlit{::}] @var{ftype}] @var{finit}]@stxlit{)}
     | @stxlit{(}@var{fname} [@stxlit{::} @var{ftype}] [@var{option-keyword} @var{option-value}]*@stxlit{)}
-@stxdef{method-decl} @stxlit{((}@var{method-name} @var{formal-arguments}@stxlit{)} [[@stxlit{::}] @var{rtype}] @var{body}@stxlit{)}
 @end display
 
 Returns a new instance of a unique (anonymous) class.
@@ -8527,7 +8532,7 @@ Making use of so-called ``SAM-conversion'' (@pxref{SAM-conversion})
 The general case allows for a mix of
 constructor arguments, property keywords, and child values:
 @display
-@var{class-type} @var{constructor-value}... @var{property-initializer}... @var{child-value}...
+@var{class-type} @stxref{constructor-value}... @stxref{property-initializer}... @stxref{child-value}...
 @stxdef{constructor-value} @var{expression}
 @stxdef{property-initializer} @var{keyword} @var{expression}
 @stxdef{child-value} @var{expression}
@@ -9391,22 +9396,22 @@ but there some rarely used forms (processing-instructions,
 comments, and CDATA section) we'll cover later.
 
 @display
-@stxdef{xml-literal} @stxlit{#}@var{xml-constructor}
-@stxdef{xml-constructor} @var{xml-element-constructor}
-  | @var{xml-PI-constructor}
-  | @var{xml-comment-constructor}
-  | @var{xml-CDATA-constructor}
+@stxdef{xml-literal} @stxlit{#}@stxref{xml-constructor}
+@stxdef{xml-constructor} @stxref{xml-element-constructor}
+  | @stxref{xml-PI-constructor}
+  | @stxref{xml-comment-constructor}
+  | @stxref{xml-CDATA-constructor}
 @end display
 
 @subsection Element constructors
 
 @display
 @stxdef{xml-element-constructor}
-    @stxlit{<}@var{QName} @var{xml-attribute}*@stxlit{>}@var{xml-element-datum}...@stxlit{</}@var{QName} @stxlit{>}
-  | @stxlit{<}@var{xml-name-form} @var{xml-attribute}*@stxlit{>}@var{xml-element-datum}...@stxlit{</>}
-  | @stxlit{<}@var{xml-name-form} @var{xml-attribute}*@stxlit{/>}
-@stxdef{xml-name-form} @var{QName}
-  | @var{xml-enclosed-expression}
+    @stxlit{<}@stxref{QName} @stxref{xml-attribute}*@stxlit{>}@stxref{xml-element-datum}...@stxlit{</}@stxref{QName} @stxlit{>}
+  | @stxlit{<}@stxref{xml-name-form} @stxref{xml-attribute}*@stxlit{>}@stxref{xml-element-datum}...@stxlit{</>}
+  | @stxlit{<}@var{xml-name-form} @stxref{xml-attribute}*@stxlit{/>}
+@stxdef{xml-name-form} @stxref{QName}
+  | @stxref{xml-enclosed-expression}
 @stxdef{xml-enclosed-expression}
     @stxlitlbrace{}@var{expression}@stxlit{@}}
   | @stxlit{(}@var{expression}...@stxlit{)}
@@ -9457,15 +9462,15 @@ and need to be escaped.
 @display
 @stxdef{xml-element-datum}
     any character except @code{&}, or @code{<}.
-  | @var{xml-constructor}
-  | @var{xml-escaped}
+  | @stxref{xml-constructor}
+  | @stxref{xml-escaped}
 @stxdef{xml-escaped}
-    @stxlit{&}@var{xml-enclosed-expression}
-  | @stxlit{&}@var{xml-entity-name}@stxlit{;}
-  | @var{xml-character-reference}
+    @stxlit{&}@stxref{xml-enclosed-expression}
+  | @stxlit{&}@stxref{xml-entity-name}@stxlit{;}
+  | @stxref{xml-character-reference}
 @stxdef{xml-character-reference}
-    @stxlit{&#}@var{decimal-digit}+@stxlit{;}
-  | @stxlit{&#x}@var{hex-digit}+@stxlit{;}
+    @stxlit{&#}@stxref{digit}+@stxlit{;}
+  | @stxlit{&#x}@stxref{hex-digit}+@stxlit{;}
 @end display
 
 Here is an example shows both hex and decimal character references:
@@ -9473,6 +9478,9 @@ Here is an example shows both hex and decimal character references:
 #<p>A&#66;C&#x44;E</p>  @result{}  <p>ABCDE</p>
 @end example
 
+@display
+@stxdef{xml-entity-name} @stxref{identifier}
+@end display
 Currently, the only supported values for @var{xml-entity-name}
 are the builtin XML names @code{lt}, @code{gt}, @code{amp},
 @code{quot}, and @code{apos}, which stand for the characters
@@ -9487,16 +9495,16 @@ The following two expressions are equivalent:
 
 @display
 @stxdef{xml-attribute}
-    @var{xml-name-form}@stxlit{=}@var{xml-attribute-value}
+    @stxref{xml-name-form}@stxlit{=}@stxref{xml-attribute-value}
 @stxdef{xml-attribute-value}
-    @stxlit{"}@var{quot-attribute-datum}*@stxlit{"}
-  | @stxlit{'}@var{apos-attribute-datum}*@stxlit{'}
+    @stxlit{"}@stxref{quot-attribute-datum}*@stxlit{"}
+  | @stxlit{'}@stxref{apos-attribute-datum}*@stxlit{'}
 @stxdef{quot-attribute-datum}
     any character except @code{"}, @code{&}, or @code{<}.
-  | @var{xml-escaped}
+  | @stxref{xml-escaped}
 @stxdef{apos-attribute-datum}
     any character except @code{'}, @code{&}, or @code{<}.
-  | @var{xml-escaped}
+  | @stxref{xml-escaped}
 @end display
 
 If the @var{xml-name-form} is either @code{xmlns} or
@@ -9512,10 +9520,10 @@ The lexical syntax for a QName is either a simple identifier,
 or a (prefix,local-name) pair:
 
 @display
-@stxdef{QName} @var{xml-local-part}
-   | @var{xml-prefix}@stxlit{:}@var{xml-local-part}
-@stxdef{xml-local-part} @var{identifier}
-@stxdef{xml-prefix} @var{identifier}
+@stxdef{QName} @stxref{xml-local-part}
+   | @stxref{xml-prefix}@stxlit{:}@stxref{xml-local-part}
+@stxdef{xml-local-part} @stxref{identifier}
+@stxdef{xml-prefix} @stxref{identifier}
 @end display
 
 An @var{xml-prefix} is an alias for a namespace-uri,
@@ -9525,8 +9533,8 @@ can use a @dfn{namespace declaration attribute}:
 
 @display
 @stxdef{xml-namespace-declaration-attribute}
-    @stxlit{xmlns:}@var{xml-prefix}@stxlit{=}@var{xml-attribute-value}
-  | @stxlit{xmlns=}@var{xml-attribute-value}
+    @stxlit{xmlns:}@stxref{xml-prefix}@stxlit{=}@stxref{xml-attribute-value}
+  | @stxlit{xmlns=}@stxref{xml-attribute-value}
 @end display
 
 The former declares @var{xml-prefix} as a namespace alias for
@@ -9556,7 +9564,7 @@ instructions or annotations to an XML processor (or tool).
 type constructor.)
 
 @display
-@stxdef{xml-PI-constructor} @stxlit{<?}@var{xml-PI-target} @var{xml-PI-content}@stxlit{?>}
+@stxdef{xml-PI-constructor} @stxlit{<?}@stxref{xml-PI-target} @stxref{xml-PI-content}@stxlit{?>}
 @stxdef{xml-PI-target} @var{NCname} (i.e. a simple (non-compound) identifier)
 @stxdef{xml-PI-content} any characters, not containing @code{?>}.
 @end display
@@ -9579,7 +9587,7 @@ but are usually ignored by programs.
 (Alternatively, you can use the @code{comment} type constructor.)
 
 @display
-@stxdef{xml-comment-constructor} @stxlit{<!--}@var{xml-comment-content}@stxlit{-->}
+@stxdef{xml-comment-constructor} @stxlit{<!--}@stxref{xml-comment-content}@stxlit{-->}
 @stxdef{xml-comment-content} any characters, not containing @code{--}.
 @end display
 
@@ -9589,7 +9597,7 @@ A @code{CDATA} section can be used to avoid excessive use of
 @var{xml-entity-ref} such as @code{&amp;} in element content.
 
 @display
-@stxdef{xml-CDATA-constructor} @stxlit{<![CDATA[}@var{xml-CDATA-content}@stxlit{]]>}
+@stxdef{xml-CDATA-constructor} @stxlit{<![CDATA[}@stxref{xml-CDATA-content}@stxlit{]]>}
 @stxdef{xml-CDATA-content} any characters, not containing @code{]]>}.
 @end display
 

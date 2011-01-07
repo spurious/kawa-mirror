@@ -78,6 +78,7 @@ public class PrimType extends Type {
       case 'J':  cname = "java.lang.Long";      break;
       case 'F':  cname = "java.lang.Float";     break;
       case 'D':  cname = "java.lang.Double";    break;
+      case 'V':  cname = "java.lang.Void";    break;
       default:   cname = null; // Should never happen.
       }
     return ClassType.make(cname);

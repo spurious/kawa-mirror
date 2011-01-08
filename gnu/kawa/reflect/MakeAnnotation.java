@@ -203,9 +203,14 @@ public class MakeAnnotation extends ProcedureN
             else
               val = Type.make((Class) val);
           }
-        else if (val instanceof Enum)
+        else if (((ClassType) type).isSubclass("java.lang.Enum"))
           {
             kind = 'e';
+          }
+        else if (((ClassType) type).implementsInterface(classAnnotation))
+          {
+            kind = '@';
+            val = (AnnotationEntry) Proxy.getInvocationHandler(val);
           }
         break;
       case '[':

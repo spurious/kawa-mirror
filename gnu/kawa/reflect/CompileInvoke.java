@@ -139,11 +139,21 @@ public class CompileInvoke
                       }
                   }
               }
+            Expression xa = arg;
             arg = visitor.visit(arg, elementType);
             if (! (arg instanceof QuoteExp))
               constantValue = null;
             else if (constantValue != null)
-              Array.set(constantValue, index, arg.valueIfConstant());
+              {
+                try
+                  {
+                    Array.set(constantValue, index, arg.valueIfConstant());
+                  }
+                catch (Throwable ex)
+                  {
+                    constantValue = null;
+                  }
+              }
             begin.add(new ApplyExp(new ArraySet(elementType),
                                    new Expression[] {
                                      new ReferenceExp(adecl),

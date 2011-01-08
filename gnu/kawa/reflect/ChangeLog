@@ -1,5 +1,8 @@
 2011-01-07  Per Bothner  <per@bothner.com>
 
+	* CompileInvoke.java (validateApplyInvoke): Guard against
+	Array.set failures.
+
 	* MakeAnnotation.java (asAnnotationValue): Handle nested annotation
 	value.
 

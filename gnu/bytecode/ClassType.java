@@ -470,6 +470,12 @@ public class ClassType extends ObjectType
     else access_flags &= ~Access.INTERFACE|Access.ABSTRACT;
   }
 
+  public final boolean isFinal ()
+  { return (getModifiers() & Access.FINAL) != 0; }
+
+  public final boolean isAnnotation ()
+  { return (getModifiers() & Access.ANNOTATION) != 0; }
+
   public ClassType () { }
 
   public ClassType (String class_name)
@@ -1295,9 +1301,11 @@ public class ClassType extends ObjectType
     if (cother == toStringType)
       return this == Type.javalangObjectType ? 1 : -1;
     if (this.isInterface())
-      return cother == Type.javalangObjectType ? -1 : -2;
+      return isAnnotation() || cother.isFinal() ? -3
+        : cother == Type.javalangObjectType ? -1 : -2;
     if (cother.isInterface())
-      return this == Type.javalangObjectType ? 1 : -2;
+      return cother.isAnnotation() || isFinal() ? -3
+        : this == Type.javalangObjectType ? 1 : -2;
     return -3;
   }
 

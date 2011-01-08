@@ -1,3 +1,10 @@
+2011-01-08  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Primitive expression syntax): New node.
+	Various updates to improve syntax definitions and cross-references.
+
+	* kawa.texi (Annotations): New node.
+
 2011-01-04  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (stxdef): Add @anchor.

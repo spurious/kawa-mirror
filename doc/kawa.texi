@@ -1520,6 +1520,7 @@ re-define a global definition), and there must be no assignments
 * Lexical syntax::
 * Datum syntax::
 * Hash-prefixed forms::
+* Primitive expression syntax::
 * Syntax and conditional compilation::
 @end menu
 
@@ -1711,8 +1712,8 @@ or representation of a number object.
 A semicolon (@code{;}) indicates the start of a line comment.  The
 comment continues to the end of the line on which the semicolon appears.
 
-Another way to indicate a comment is to prefix a @meta{datum} (cf.
-section ``Formal account'') with @code{#;}, possibly with
+Another way to indicate a comment is to prefix a @stxref{datum}
+with @code{#;}, possibly with
 @meta{interlexeme-space} before the @meta{datum}.  The comment consists
 of the comment prefix @code{#;} and the @meta{datum} together.  This
 notation is useful for ``commenting out'' sections of code.
@@ -1973,6 +1974,133 @@ The follow named constructor forms are supported:
 @item @stxlit{#,(namespace} @var{uri} [@var{prefix}]@stxlit{)}
 @item @stxlit{#,(duration} @var{duration}@stxlit{)}
 @end table
+
+@node Primitive expression syntax
+@section Primitive expression syntax
+
+@display
+@stxdef{expression} @stxref{literal-value} | @stxref{variable-reference}
+  | @stxref{procedure-call} | TODO
+@end display
+
+@subsection Constant literals
+
+@display
+@stxdef{literal-value} @var{number} | @meta{boolean} | @meta{character} | @meta{string}
+@end display
+An expression consisting of a representation of a number object, a
+boolean, a character, or a string evaluates ``to itself''.
+
+@example
+145932          @result{}  145932
+#t              @result{}  #t
+"abc"           @result{}  "abc"
+@end example
+@c #vu8(2 24 123)  @result{} #vu8(2 24 123)
+
+@subsection Variable references
+
+@display
+@stxdef{variable-reference} @stxref{identifier}
+@end display
+An expression consisting of a variable is a variable reference if it is
+not a macro use (see below).  The value of the variable reference is the
+value stored in the location to which the variable is bound.  It is a
+syntax violation to reference an unbound variable.
+
+The following example examples assumes the base library has been
+imported:
+
+@example
+(define x 28)
+x   @result{}  28
+@end example
+
+@subsection Procedure calls
+
+@display
+@stxdef{procedure-call} @stxlit{(}@stxref{operator} @stxref{operand} @dots{})
+@stxdef{operator} @stxref{expression}
+@stxdef{operand} @stxref{expression}
+@end display
+
+A procedure call consists of expressions for the procedure to be called
+and the arguments to be passed to it, with enclosing parentheses.  A
+form in an expression context is a procedure call if @meta{operator} is
+not an identifier bound as a syntactic keyword.
+
+When a procedure call is evaluated, the operator and operand expressions
+are evaluated (in an unspecified order) and the resulting procedure is
+passed the resulting arguments.
+
+@example
+(+ 3 4)                @result{}  7
+((if #f + *) 3 4)      @result{}  12
+@end example
+
+@subsection Macros
+
+Libraries and top--level programs can define and use new kinds of
+derived expressions and definitions called @emph{syntactic abstractions}
+or @emph{macros}.  A syntactic abstraction is created by binding a
+keyword to a @emph{macro transformer} or, simply, @emph{transformer}.
+
+The transformer determines how a use of the macro (called a @emph{macro
+use}) is transcribed into a more primitive form.
+
+Most macro uses have the form:
+
+@example
+(@meta{keyword} @meta{datum} @dots{})
+@end example
+@noindent
+where @meta{keyword} is an identifier that uniquely determines the kind
+of form.  This identifier is called the @emph{syntactic keyword}, or
+simply @emph{keyword}.  The number of @meta{datum}s and the syntax of
+each depends on the syntactic abstraction.
+
+Macro uses can also take the form of improper lists, singleton
+identifiers, or @func{set!} forms, where the second subform of the
+@func{set!} is the keyword:
+
+@example
+(@meta{keyword} @meta{datum} @dots{} . @meta{datum})
+@meta{keyword}
+(set! @meta{keyword} @meta{datum})
+@end example
+
+The @func{define-syntax}, @func{let-syntax} and @func{letrec-syntax}
+forms create bindings for keywords, associate them with macro
+transformers, and control the scope within which they are visible.
+
+The @func{syntax-rules} and @func{identifier-syntax} forms create
+transformers via a pattern language.  Moreover, the @func{syntax-case}
+form allows creating transformers via arbitrary Scheme code.
+
+Keywords occupy the same name space as variables.  That is, within the
+same scope, an identifier can be bound as a variable or keyword, or
+neither, but not both, and local bindings of either kind may shadow
+other bindings of either kind.
+
+Macros defined using @func{syntax-rules} and @func{identifier-syntax}
+are ``hygienic'' and ``referentially transparent'' and thus preserve
+Scheme's lexical scoping.
+
+@itemize
+@item 
+If a macro transformer inserts a binding for an identifier (variable or
+keyword) not appearing in the macro use, the identifier is in effect
+renamed throughout its scope to avoid conflicts with other identifiers.
+
+@item 
+If a macro transformer inserts a free reference to an identifier, the
+reference refers to the binding that was visible where the transformer
+was specified, regardless of any local bindings that may surround the
+use of the macro.
+@end itemize
+
+Macros defined using the @func{syntax-case} facility are also hygienic
+unless @func{datum->syntax} is used.
 
 @node Syntax and conditional compilation, , Hash-prefixed forms, Syntax
 @section Syntax and conditional compilation
@@ -2566,7 +2694,7 @@ self-evaluating and therefore do not need to be quoted in expressions.
 They are used mainly for specifying keyword arguments.
 
 @display
-@stxdef{keyword} @var{identifier}@stxlit{:}
+@stxdef{keyword} @stxref{identifier}@stxlit{:}
 @end display
 
 A keyword is a single token; therefore no whitespace is allowed between
@@ -2759,7 +2887,9 @@ Kawa borrows the extended formal argument list of DSSSL,
 and Kawa allows you to declare the type of the parameter.
 
 @display
-@stxdef{lambda-expression} @stxlit{(lambda} @stxref{formals} [@var{rtype}] @var{body}@stxlit{)}
+@stxdef{lambda-expression} @stxlit{(lambda} @stxref{formals} @stxref{opt-return-type} @var{body}@stxlit{)}
+@stxdef{return-type} @stxref{type}
+@stxdef{opt-return-type} [[@stxlit{::}] @stxref{type}]
 @end display
 where
 @display
@@ -6936,6 +7066,11 @@ types that the compiler can evaluate at compile-time.
 More specifically, it only allows simple @dfn{type names}
 that map to primitive Java types or java classes.
 
+@display
+@stxdef{type} @stxref{expression}
+@stxdef{opt-type-specifier} [@stxlit{::} @stxref{type}]
+@end display
+
 @menu
 * Standard Types::
 * Declaring Types of Variables::
@@ -7142,6 +7277,7 @@ The Kawa module system is based on the features of the Java class system.
 * Defining new classes::
 * Anonymous classes::
 * Enumerations::          Enumeration types
+* Annotations::
 * Module classes::        Modules and how they are compiled to classes
 * Record types::          Defining Record Types
 * Dynamic records::       Creating New Record Types On-the-fly
@@ -7182,8 +7318,8 @@ efficient, and it is easier to access it from Java code.
 The syntax of @code{define-class} are mostly compatible with that
 in the Guile and Stk dialects of Scheme.
 
-@deffn Syntax define-class name @stxlit{(}supers ...@stxlit{)} @stxref{option-pair}* @stxref{field-or-method-decl} ...
-@deffnx Syntax define-simple-class name @stxlit{(}supers ...@stxlit{)}  @stxref{option-pair}*  @stxref{field-or-method-decl} ...
+@deffn Syntax define-class name @stxlit{(}supers ...@stxlit{)} (@stxref{annotation}|@stxref{option-pair})* @stxref{field-or-method-decl} ...
+@deffnx Syntax define-simple-class name @stxlit{(}supers ...@stxlit{)} (@stxref{annotation}|@stxref{option-pair})*  @stxref{field-or-method-decl} ...
 
 Defines a new class named @var{name}.  If @code{define-simple-class} is
 used, creates a normal Java class named @var{name} in the current package.
@@ -7258,20 +7394,25 @@ not recommended) write a period at the end of the @var{cname}.
 @subsection Declaring fields
 
 @display
-@stxdef{field-decl} @stxlit{(}@stxref{field-name} [@stxlit{::} @var{ftype}] @stxref{option-pair}*@stxlit{)}
+@stxdef{field-decl} @stxlit{(}@stxref{field-name} (@stxref{annotation} | @stxref{opt-type-specifier} | @stxref{field-option})*@stxlit{)}
 @stxdef{field-name} @stxref{identifier}
+@stxdef{field-option} @stxref{keyword} @stxref{expression}
+@end display
+
+As a matter of style the following order is suggested, though this not enforced:
+@display
+@stxlit{(}@stxref{field-name} @stxref{annotation}* @stxref{opt-type-specifier} @stxref{field-option}*@stxlit{)}
 @end display
 
 Each @var{field-decl} declares a instance "slot" (field)
 with the given @var{field-name}. 
 By default it is publicly visible, but you can specify
 a different visiblity with the @code{access:} specifier.
- If @var{ftype} is specified it is the
-type of the slot.  The following @var{option-keyword}s are implemented:
+The following @var{field-option} @var{keyword}s are implemented:
 @table @asis
-@item @stxlit{type:} @var{ftype}
-Specifies that @var{ftype} is the type of (the values of) the field.
-Equivalent to @samp{:: @var{ftype}}.
+@item @stxlit{type:} @stxref{type}
+Specifies that @var{type} is the type of (the values of) the field.
+Equivalent to @samp{:: @var{type}}.
 @item @stxlit{allocation:} @var{kind}
 If @var{kind} is @code{'class} or @code{'static} a single slot is shared
 between all instances of the class (and its sub-classes).
@@ -7331,8 +7472,10 @@ then its value is doubled.
 @subsection Declaring methods
 
 @display
-@stxdef{method-decl} @stxlit{((}@stxref{method-name} @stxref{formal-arguments} @stxlit{)} @stxlit{::} @var{rtype}] @stxref{option-pair}* @var{body}@stxlit{)}
+@stxdef{method-decl} @stxlit{((}@stxref{method-name} @stxref{formal-arguments}@stxlit{)}
+    (@stxref{annotation} | @stxref{opt-return-type} | @stxref{option-pair})* [@stxref{deprecated-return-specifier}] @var{body}@stxlit{)}
 @stxdef{method-name} @stxref{identifier}
+@stxdef{deprecated-return-specifier} @stxref{identifier}
 @end display
 
 Each @var{method-decl} declares a method,
@@ -7341,7 +7484,8 @@ which is by default public and non-static, and whose name is @var{method-name}.
 Java method name, it is mapped to something reasonable.
 For example @code{foo-bar?} is mapped to @code{isFooBar}.)
 The types of the method arguments can be specified in the
-@var{formal-arguments}.  The return type can be specified by @var{rtype},
+@var{formal-arguments}.  The return type can be specified by
+a @var{opt-return-type}, @var{deprecated-return-specifier},
 or is otherwise the type of the @var{body}.
 Currently, the @var{formal-arguments} cannot contain optional, rest,
 or keyword parameters.  (The plan is to allow optional parameters,
@@ -7473,8 +7617,8 @@ Returns a new instance of an anonymous (inner) class.
 The syntax is similar to @code{define-class}.
 @display
 @stxdef{object-field-or-method-decl} @stxref{object-field-decl} | @stxref{method-decl}
-@stxdef{object-field-decl} @stxlit{(}@stxref{field-name} [[[@stxlit{::}] @var{ftype}] @var{finit}]@stxlit{)}
-    | @stxlit{(}@var{fname} [@stxlit{::} @var{ftype}] [@var{option-keyword} @var{option-value}]*@stxlit{)}
+@stxdef{object-field-decl} @stxlit{(}@stxref{field-name} (@stxref{annotation} | @stxref{opt-type-specifier} | @stxref{field-option})*  [@stxref{object-init}]} @stxlit{)}
+@stxdef{object-init} @stxref{expression}
 @end display
 
 Returns a new instance of a unique (anonymous) class.
@@ -7492,12 +7636,11 @@ This is roughly equivalent to:
 A @var{field-decl} is as for @code{define-class}, except
 that we also allow an abbreviated syntax.
 Each @var{field-decl} declares a public instance field.
-If @var{ftype} is given, it specifies the type of the field.
-If @var{finit} is given, it is an expression whose value
+If @var{object-finit} is given, it is an expression whose value
 becomes the initial value of the field.
-The @var{finit} is evaluated at the same time as the @code{object}
+The @var{object-init} is evaluated at the same time as the @code{object}
 expression is evaluated,
-in a scope where all the @var{fname}s are visible.
+in a scope where all the @var{field-name}s are visible.
 
 A @var{method-decl} is as for @code{define-class}.
 @end deffn
@@ -7583,6 +7726,84 @@ Unfortunately, this is not compatible with standard Java enums.
 R6RS enums are simple symbols, which means you cannot distinguish
 two enum values from different enumeration types if they have the
 same value, nor from a vanilla symbol.  That makes them less useful.)
+
+@node Annotations
+@section Annotations of declarations
+
+The Java platform lets you associate with each declaration zero or more
+@uref{http://download.oracle.com/javase/1.5.0/docs/guide/language/annotations.html, annotations}.
+They provide an extensible mechanism to associate properties
+with declarations.
+Kawa support for annotations is not complete (the most important
+functionality missing is being able to declare annotation types),
+but is fairly functional.
+Here is a simple example illustring use of
+@uref{http://jcp.org/en/jsr/detail?id=222,JAXB annotations}:
+an @code{XmlRootElement} annotation on a class,
+and an @code{XmlElement} annotation on a field:
+@example
+(define-alias XmlRootElement javax.xml.bind.annotation.XmlRootElement)
+(define-alias XmlElement javax.xml.bind.annotation.XmlElement)
+(define-simple-class Bib ( ) (@@XmlRootElement name: "bib")
+  (books (@@XmlElement name: "book" type: Book) ::java.util.ArrayList))
+(define-simple-class Book () ...)
+@end example
+
+This is the general syntax:
+@display
+@stxdef{annotation} @stxlit{(@@}@stxref{annotation-typename} @stxref{annotations-element-values}@stxlit{)}
+@stxdef{annotations-element-values} @stxref{annotation-element-value}
+  | @stxref{annotation-element-pair} ...
+@stxdef{annotation-element-pair} @stxref{keyword} @stxref{annotation-element-value}
+@stxdef{annotation-element-value} @stxref{expression}
+@stxdef{annotation-typename} @stxref{expression}
+@end display
+
+An @var{annotations-element-values} consisting of just
+a single @var{annotation-element-value} is equivalent to an
+@var{annotation-element-pair} with a keyword of @code{value:}.
+
+Each @var{keyword} must correspond to the name of
+an element (a zero-argument method) in the annotation type.
+The corresponding @var{annotation-element-value} must be compatible with the
+element type (return type of the method) of the annotation type.
+
+Allowed element types are of the following kinds:
+@itemize @bullet
+@item
+Primitive types, where the @var{annotation-element-value} must
+be number or boolean coercible to the element type.
+@item
+Strings, where the @var{annotation-element-value} is normally a string literal.
+@item
+Classes, where the @var{annotation-element-value} is normally
+a classname.
+@item
+Enumeration types. The value usually has the form @code{@var{ClassName}:@var{enumFieldname}}.
+@item
+Nested annotation types, where the  @var{annotation-element-value} must
+be a compatible @var{annotation} value.
+@item
+An array of one of the allowable types.
+An array constructor expression works, but using the
+square bracket syntax is recommended.
+@end itemize
+
+Annotations are usually used in declarations,
+where they are required to be ``constant-folded'' to compile-time
+constant annotation values.
+This is so they can be written to class files.
+However, in other contexts an annotation can be used as an expression
+with general sub-expressions evaluated at run-time:
+@example
+(define bk-name "book")
+(define be (@XmlElement name: bk-name type: Book))
+(be:name) @result{} "book"
+@end example
+(This may have limited usefulness:  There are some bugs, including
+lack of support for default values for annotation elements.
+These bugs can be fixed if someone reports a need for
+runtime construction of annotation values.)
 
 @node Module classes
 @section Modules and how they are compiled to classes
@@ -8533,9 +8754,9 @@ The general case allows for a mix of
 constructor arguments, property keywords, and child values:
 @display
 @var{class-type} @stxref{constructor-value}... @stxref{property-initializer}... @stxref{child-value}...
-@stxdef{constructor-value} @var{expression}
-@stxdef{property-initializer} @var{keyword} @var{expression}
-@stxdef{child-value} @var{expression}
+@stxdef{constructor-value} @stxref{expression}
+@stxdef{property-initializer} @stxref{keyword} @stxref{expression}
+@stxdef{child-value} @stxref{expression}
 @end display
 
 First an object is constructed with the @var{constructor-value} arguments
@@ -9413,8 +9634,8 @@ comments, and CDATA section) we'll cover later.
 @stxdef{xml-name-form} @stxref{QName}
   | @stxref{xml-enclosed-expression}
 @stxdef{xml-enclosed-expression}
-    @stxlitlbrace{}@var{expression}@stxlit{@}}
-  | @stxlit{(}@var{expression}...@stxlit{)}
+    @stxlitlbrace{}@stxref{expression}@stxlit{@}}
+  | @stxlit{(}@stxref{expression}...@stxlit{)}
 @end display
 
 The first @var{xml-element-constructor} variant uses a literal @var{QName},

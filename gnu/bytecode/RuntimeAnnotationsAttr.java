@@ -103,7 +103,9 @@ public class RuntimeAnnotationsAttr extends Attribute
     dst.println(numEntries);
     for (int i = 0;  i < numEntries;  i++)
       {
+        dst.printSpaces(2);
         entries[i].print(2, dst);
+        dst.println();
       }
   }
 

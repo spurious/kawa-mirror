@@ -159,17 +159,16 @@ implements java.lang.reflect.InvocationHandler
 
   public void print (int indentation, ClassTypeWriter dst)
   {
-    dst.printSpaces(indentation);
     dst.printOptionalIndex(annotationTypeIndex);
     dst.print('@');
     String cname = annotationType != null ? annotationType.getSignature()
       : ((CpoolUtf8) dst.ctype.constants.getPoolEntry(annotationTypeIndex)).getString();
     Type.printSignature(cname, 0, cname.length(), dst);
     int count = elementsValue.size();
-    dst.println();
     indentation += 2;
     for (Map.Entry<String,Value> e : elementsValue.entrySet())
       {
+        dst.println();
         String key = e.getKey();
         Value val = e.getValue();
         dst.printSpaces(indentation);
@@ -177,7 +176,6 @@ implements java.lang.reflect.InvocationHandler
         dst.print(key);
         dst.print(" => ");
         val.print(indentation, dst);
-        dst.println();
       }
   }
 
@@ -348,8 +346,6 @@ implements java.lang.reflect.InvocationHandler
         Type.printSignature(cname, 0, cname.length(), out);
         break;
       case '@': // annotation type
-        out.println();
-        out.printSpaces(indentation + 2);
         ((AnnotationEntry) value).print(indentation + 2, out);
         break;
       case '[': // array

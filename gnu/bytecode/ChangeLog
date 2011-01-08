@@ -1,5 +1,11 @@
 2011-01-07  Per Bothner  <per@bothner.com>
 
+	* AnnotationEntry.java (print): Don't print initial identation
+	or final newline here.
+	* RuntimeAnnotationsAttr.java (print): Do it here instead.
+	* AnnotationEntry.java (Value.print): Thus we can avoid excess
+	whitespace when printing nested annotation values.
+
 	* ClassType.java (isFinal, isAnnotation): New convenience methods.
 	(compare): More precide results when comparing annotation type
 	or final class versus interface.

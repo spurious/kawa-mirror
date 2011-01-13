@@ -1,3 +1,7 @@
+2011-01-13  Jamison Hope <jrh@theptrgroup.com>
+
+	* srfi95.scm (%sort-vector): Fix return type.
+
 2010-12-27  Per Bothner  <per@bothner.com>
 
 	* numbers.scm (real-valued?, rational-valued?, integer-valued?): New.

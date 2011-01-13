@@ -193,7 +193,7 @@
       ((null? sorted) seq)
     (set! (seq i) (car sorted))))  
 
-(define (%sort-vector (seq :: gnu.lists.Sequence) less? #!optional (key #f)) :: void
+(define (%sort-vector (seq :: gnu.lists.Sequence) less? #!optional (key #f)) :: vector
   (let* ((dim (seq:size))
 		(newra (make-vector dim)))
     (do ((sorted (%sort-list (rank-1-array->list seq) less? key)

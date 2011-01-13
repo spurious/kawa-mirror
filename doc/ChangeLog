@@ -1,3 +1,8 @@
+2011-01-13  Per Bothner  <per@bothner.com>
+
+	* kawa.texi: Fix various errors.
+	(Annotations): Add link to blog article about JAXP example.
+
 2011-01-08  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Primitive expression syntax): New node.

@@ -1888,7 +1888,7 @@ for @code{(quasisyntax @meta{datum})}.
 @end table
 
 
-@node Hash-prefixed forms, Syntax and conditional compilation, Datum syntax, Syntax
+@node Hash-prefixed forms
 @section Hash-prefixed forms
 
 A number of different special forms are indicated by an
@@ -2102,7 +2102,7 @@ use of the macro.
 Macros defined using the @func{syntax-case} facility are also hygienic
 unless @func{datum->syntax} is used.
 
-@node Syntax and conditional compilation, , Hash-prefixed forms, Syntax
+@node Syntax and conditional compilation
 @section Syntax and conditional compilation
 
 Kawa supports most of the @code{syntax-case} feature.
@@ -7617,7 +7617,7 @@ Returns a new instance of an anonymous (inner) class.
 The syntax is similar to @code{define-class}.
 @display
 @stxdef{object-field-or-method-decl} @stxref{object-field-decl} | @stxref{method-decl}
-@stxdef{object-field-decl} @stxlit{(}@stxref{field-name} (@stxref{annotation} | @stxref{opt-type-specifier} | @stxref{field-option})*  [@stxref{object-init}]} @stxlit{)}
+@stxdef{object-field-decl} @stxlit{(}@stxref{field-name} (@stxref{annotation} | @stxref{opt-type-specifier} | @stxref{field-option})*  [@stxref{object-init}] @stxlit{)}
 @stxdef{object-init} @stxref{expression}
 @end display
 
@@ -7749,7 +7749,10 @@ and an @code{XmlElement} annotation on a field:
 (define-simple-class Book () ...)
 @end example
 
-This is the general syntax:
+@uref{http://per.bothner.com/blog/2011/Using-JAXB-annotations, This tutorial}
+explains the JAXB example in depth.
+
+Here is the syntax:
 @display
 @stxdef{annotation} @stxlit{(@@}@stxref{annotation-typename} @stxref{annotations-element-values}@stxlit{)}
 @stxdef{annotations-element-values} @stxref{annotation-element-value}
@@ -7761,7 +7764,7 @@ This is the general syntax:
 
 An @var{annotations-element-values} consisting of just
 a single @var{annotation-element-value} is equivalent to an
-@var{annotation-element-pair} with a keyword of @code{value:}.
+@var{annotation-element-pair} with a @code{value:} keyword.
 
 Each @var{keyword} must correspond to the name of
 an element (a zero-argument method) in the annotation type.
@@ -7797,7 +7800,7 @@ However, in other contexts an annotation can be used as an expression
 with general sub-expressions evaluated at run-time:
 @example
 (define bk-name "book")
-(define be (@XmlElement name: bk-name type: Book))
+(define be (@@XmlElement name: bk-name type: Book))
 (be:name) @result{} "book"
 @end example
 (This may have limited usefulness:  There are some bugs, including

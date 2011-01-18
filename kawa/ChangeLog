@@ -1,3 +1,16 @@
+2011-01-17  Per Bothner  <per@bothner.com>
+
+	* lang/Eval.java (evalBody): Use language#getCompilation to allocate
+	proper Compilation class, rather than hardwiring in Translator.
+	* lang/Translator.java (makeApply, checkDefaultBinding): New
+	overridable methods, replace LispLanguage methods.
+	* standard/SchemeCompilation.java: Change to extend Translator.
+	(applyFieldDecl): New field.
+	(makeApply, checkDefaultBinding): New methods, moved here from Scheme.
+	* Scheme.java (applyFieldDecl): Remove field.
+	(makeApply, checkDefaultBinding): Removed methods.
+	* set_b.java: Trivial update.
+
 2011-01-03  Per Bothner  <per@bothner.com>
 
 	* standard/Scheme.java (initScheme): Declare $bracket-apply$ and

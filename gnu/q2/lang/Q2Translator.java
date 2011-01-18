@@ -113,4 +113,17 @@ public class Q2Translator extends Translator
     else
       return rewrite(partitioned, function);
   }
+
+  public Expression makeApply (Expression func, Expression[] args)
+  {
+    /*
+    if (func instanceof QuoteExp
+	&& ((QuoteExp) func).getValue() instanceof Procedure)
+      return super.makeApply(func, args);
+    */
+    Expression[] exps = new Expression[args.length+1];
+    exps[0] = func;
+    System.arraycopy(args, 0, exps, 1, args.length);
+    return new ApplyExp(Q2Apply.q2Apply, exps);
+  }
 }

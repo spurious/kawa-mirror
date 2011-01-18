@@ -1,3 +1,10 @@
+2011-01-17  Per Bothner  <per@bothner.com>
+
+	* Map.java (applyFieldDecl): Remove field.
+	(<init>): Don't pass applyFieldDecl.
+	* CompileMisc.java (validateApplyMap): Get applyFieldDecl from
+	SchemeCompilation instead of from Map.
+
 2011-01-03  Per Bothner  <per@bothner.com>
 
 	* CompilationHelpers.java (typeList): Field moved to Compilation. 

@@ -74,10 +74,7 @@ public class Q2 extends Scheme
     return lexer;
   }
 
-  public Compilation getCompilation (Lexer lexer, SourceMessages messages, NameLookup lexical)
-  {
-    return new Q2Translator(this, messages, lexical);
-  }
+  public String getCompilationClass () { return "gnu.q2.lang.Q2Translator"; }
 
   /*
   public Consumer getOutputConsumer(java.io.Writer out)
@@ -95,19 +92,6 @@ public class Q2 extends Scheme
   public Expression makeBody(Expression[] exps)
   {
     return new ApplyExp(gnu.kawa.functions.AppendValues.appendValues, exps);
-  }
-
-  public Expression makeApply (Expression func, Expression[] args)
-  {
-    /*
-    if (func instanceof QuoteExp
-	&& ((QuoteExp) func).getValue() instanceof Procedure)
-      return super.makeApply(func, args);
-    */
-    Expression[] exps = new Expression[args.length+1];
-    exps[0] = func;
-    System.arraycopy(args, 0, exps, 1, args.length);
-    return new ApplyExp(Q2Apply.q2Apply, exps);
   }
 
   public Procedure getPrompter()

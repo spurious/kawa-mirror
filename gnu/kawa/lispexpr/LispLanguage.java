@@ -46,10 +46,7 @@ public abstract class LispLanguage extends Language
     return new LispReader(inp, messages);
   }
 
-  public Compilation getCompilation (Lexer lexer, SourceMessages messages, NameLookup lexical)
-  {
-    return new Translator(this, messages, lexical);
-  }
+  public String getCompilationClass () { return "kawa.lang.Translator"; }
 
   public boolean parse (Compilation comp, int options)
     throws java.io.IOException, gnu.text.SyntaxException
@@ -160,11 +157,6 @@ public abstract class LispLanguage extends Language
     return new BeginExp (exps);
   }
 
-  public Expression makeApply (Expression func, Expression[] args)
-  {
-    return new ApplyExp(func, args);
-  }
-
   public boolean selfEvaluatingSymbol (Object obj)
   {
     return obj instanceof Keyword;
@@ -183,12 +175,4 @@ public abstract class LispLanguage extends Language
     return (Symbol) sym;
   }
 
-  /** If a symbol is lexically unbound, look for a default binding.
-   * The default implementation does nothing.
-   * @return null if no binidng, or an Expression.
-   */
-  public Expression checkDefaultBinding (Symbol name, Translator tr)
-  {
-    return null;
-  }
 }

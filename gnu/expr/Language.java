@@ -10,6 +10,7 @@ import gnu.text.Lexer;
 import gnu.text.SourceMessages;
 import gnu.kawa.reflect.*;
 import java.io.*;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import gnu.kawa.lispexpr.ClassNamespace; // FIXME
 
@@ -449,9 +450,31 @@ public abstract class Language
 
   public abstract Lexer getLexer(InPort inp, SourceMessages messages);
 
-  public Compilation getCompilation (Lexer lexer, SourceMessages messages, NameLookup lexical)
+  public String getCompilationClass () { return "gnu.expr.Compilation"; }
+
+  private Constructor<Compilation> compilationClassConstructor;
+
+  public final Compilation getCompilation (SourceMessages messages, NameLookup lexical)
   {
-    return new Compilation(this, messages, lexical);
+    // Use reflection on the class named by getCompilationClass, rather than
+    // just allocation the instance directly in our subclasses. The reason is
+    // improved separability between compile-time code and run-time code.
+    try
+      {
+        if (compilationClassConstructor == null)
+          {
+            Class<Compilation> compilationClass = (Class<Compilation>)
+              Class.forName(getCompilationClass(), true,
+                            getClass().getClassLoader());
+            compilationClassConstructor = compilationClass.getConstructor
+              (Language.class, SourceMessages.class, NameLookup.class);
+          }
+        return compilationClassConstructor.newInstance(this, messages, lexical);
+      }
+    catch (Exception ex)
+      {
+        throw WrappedException.wrapIfNeeded(ex);
+      }
   }
 
   /** Flag to tell parse that expression will be evaluated immediately.
@@ -515,7 +538,7 @@ public abstract class Language
                           ? NameLookup.getInstance(getEnvironment(), this)
                           : new NameLookup(this));
     boolean immediate = (options & PARSE_IMMEDIATE) != 0;
-    Compilation tr = getCompilation(lexer, messages, lexical);
+    Compilation tr = getCompilation(messages, lexical);
     if (requirePedantic)
       tr.pedantic = true;
     if (! immediate)

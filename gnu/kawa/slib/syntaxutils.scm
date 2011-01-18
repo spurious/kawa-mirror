@@ -69,12 +69,13 @@
 
 ;; Take a Sexp and return the expanded Expression tree.
 (define (rewrite-form exp #!key 
-		      (lang (gnu.expr.Language:getDefaultLanguage))
+		      (lang ::gnu.expr.Language (gnu.expr.Language:getDefaultLanguage))
 		      (env (interaction-environment))) :: <gnu.expr.Expression>
   (define-alias C <gnu.expr.Compilation>)
   (let* ((namelookup (<gnu.expr.NameLookup>:getInstance env lang))
 	 (messages (<gnu.text.SourceMessages>))
-	 (translator (<kawa.lang.Translator> lang messages namelookup))
+	 (translator ::kawa.lang.Translator
+                     (lang:getCompilation messages namelookup))
 	 (module (! pushNewModule translator (as <String> #!null)))
 	 (saved-comp (C:set-save-current translator)))
     (try-finally

@@ -1,3 +1,8 @@
+2011-01-17  Per Bothner  <per@bothner.com>
+
+	* syntaxutils.scm (rewrite-form): Call Language#getCompilation rather
+	than hard-wiring in call the Translator constructor.
+
 2011-01-03  Per Bothner  <per@bothner.com>
 
 	* enums.scm (%define-enum): Inline use of symbol-append.

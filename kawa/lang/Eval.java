@@ -76,7 +76,7 @@ public class Eval extends Procedure1or2
       {
  	if (env != saveGlobalEnv)
 	  Environment.setCurrent(env);
-	Translator tr = new Translator(language, messages,
+	Translator tr = (Translator) language.getCompilation(messages,
                                        NameLookup.getInstance(env, language));
         tr.immediate = true;
         // The state value BODY_PARSED-1 causes require#importDefinitions

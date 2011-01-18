@@ -6,6 +6,7 @@ import gnu.kawa.reflect.*;
 import gnu.kawa.lispexpr.LangObjType;
 import gnu.lists.LList;
 import kawa.standard.Scheme;
+import kawa.standard.SchemeCompilation;
 
 public class CompileMisc implements Inlineable
 {
@@ -487,7 +488,8 @@ public class CompileMisc implements Inlineable
     if (! procSafeForMultipleEvaluation)
       proc = new ReferenceExp(procDecl);
     doArgs[0] = proc;
-    Expression doit = visitor.visitApplyOnly(new ApplyExp(new ReferenceExp(mproc.applyFieldDecl), doArgs), null);
+    Expression applyFunc = new ReferenceExp(SchemeCompilation.applyFieldDecl);
+    Expression doit = visitor.visitApplyOnly(new ApplyExp(applyFunc, doArgs), null);
     if (collect)
       {
 	Expression[] consArgs = new Expression[2];

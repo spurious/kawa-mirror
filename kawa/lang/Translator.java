@@ -413,7 +413,12 @@ public class Translator extends Compilation
         // FIXME don't copy the args array in makeExp ...
         return CompileNamedPart.makeExp(part1, part2);
       }
-    return ((LispLanguage) getLanguage()).makeApply(func, args);
+    return makeApply(func, args);
+  }
+
+  public Expression makeApply (Expression func, Expression[] args)
+  { 
+    return new ApplyExp(func, args);
   }
 
   public Namespace namespaceResolvePrefix (Expression context)
@@ -760,8 +765,7 @@ public class Translator extends Compilation
               }
             else if (loc == null || ! loc.isBound())
               {
-                Expression e
-                  = ((LispLanguage) getLanguage()).checkDefaultBinding(symbol, this);
+                Expression e = checkDefaultBinding(symbol, this);
                 if (e != null)
                   return e;
               }
@@ -803,6 +807,15 @@ public class Translator extends Compilation
       return QuoteExp.abstractExp;
     else
       return QuoteExp.getInstance(Quote.quote(exp, this), this);
+  }
+
+  /** If a symbol is lexically unbound, look for a default binding.
+   * The default implementation does nothing.
+   * @return null if no binidng, or an Expression.
+   */
+  public Expression checkDefaultBinding (Symbol name, Translator tr)
+  {
+    return null;
   }
 
   public static void setLine(Expression exp, Object location)

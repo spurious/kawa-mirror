@@ -49,7 +49,7 @@ public class set_b extends Syntax
         int skip = 0;
         Expression func = aexp.getFunction();
         if (args.length > 0 && func instanceof ReferenceExp
-            && ((ReferenceExp) func).getBinding() == Scheme.applyFieldDecl)
+            && ((ReferenceExp) func).getBinding() == SchemeCompilation.applyFieldDecl)
           {
             skip = 1;
             nargs--;

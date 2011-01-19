@@ -1,3 +1,7 @@
+2011-01-19  Per Bothner  <per@bothner.com>
+
+	* ClassMethods.java: Update isValidJavaName call.
+
 2011-01-07  Per Bothner  <per@bothner.com>
 
 	* CompileInvoke.java (validateApplyInvoke): Guard against

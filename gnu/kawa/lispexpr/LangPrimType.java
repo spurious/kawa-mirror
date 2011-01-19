@@ -107,7 +107,7 @@ public class LangPrimType extends PrimType implements TypeValue
     switch (sig1)
       {
       case 'Z':
-	language.emitCoerceToBoolean(code);
+        Compilation.getCurrent().emitCoerceToBoolean();
 	break;
       case 'C':
 	// We handle char specially, because Kawa does not use standard
@@ -148,10 +148,11 @@ public class LangPrimType extends PrimType implements TypeValue
     switch (sig1)
       {
       case 'Z':
+        Compilation comp = Compilation.getCurrent();
 	code.emitIfIntNotZero();
-	language.emitPushBoolean(true, code);
+	comp.emitPushBoolean(true);
 	code.emitElse();
-	language.emitPushBoolean(false, code);
+	comp.emitPushBoolean(false);
 	code.emitFi();
 	break;
       case 'C':

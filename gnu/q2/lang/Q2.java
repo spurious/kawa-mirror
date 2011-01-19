@@ -89,10 +89,7 @@ public class Q2 extends Scheme
     Language.setDefaults(new Q2());
   }
 
-  public Expression makeBody(Expression[] exps)
-  {
-    return new ApplyExp(gnu.kawa.functions.AppendValues.appendValues, exps);
-  }
+  public boolean appendBodyValues () { return true; }
 
   public Procedure getPrompter()
   {

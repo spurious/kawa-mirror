@@ -1,3 +1,7 @@
+2011-01-19  Per Bothner  <per@bothner.com>
+
+	* classes-to-skip-for-runtime: Add more classes to skip.
+
 2010-12-26  Jamison Hope  <jrh@theptrgroup.com>
 
 	* build.xml: Set includeantruntime on javac commands - mostly to false.

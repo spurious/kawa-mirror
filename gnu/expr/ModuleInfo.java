@@ -4,7 +4,6 @@
 package gnu.expr;
 import gnu.mapping.*;
 import gnu.bytecode.*;
-import gnu.kawa.reflect.FieldLocation;
 import gnu.text.*;
 import java.util.*;
 import gnu.kawa.util.AbstractWeakHashTable;
@@ -215,7 +214,7 @@ public class ModuleInfo
     for (Declaration fdecl = mod.firstDecl();
          fdecl != null;  fdecl = fdecl.nextDecl())
       {
-        makeDeclInModule2(mod, fdecl);
+        mod.makeDeclInModule2(fdecl);
       }
     return mod;
   }
@@ -279,39 +278,6 @@ public class ModuleInfo
     if (inst instanceof Runnable)
       ((Runnable) inst).run();
     return inst;
-  }
-
-  static void makeDeclInModule2 (ModuleExp mod, Declaration fdecl)
-  {
-    Object fvalue = fdecl.getConstantValue();
-    if (fvalue instanceof FieldLocation)
-      {
-	FieldLocation floc = (FieldLocation) fvalue;
-        Declaration vdecl = floc.getDeclaration();
-        ReferenceExp fref = new ReferenceExp(vdecl);
-        fdecl.setAlias(true);
-        fref.setDontDereference(true);
-        fdecl.setValue(fref);
-        if (vdecl.isProcedureDecl())
-          fdecl.setProcedureDecl(true);
-        if (vdecl.getFlag(Declaration.IS_SYNTAX))
-          fdecl.setSyntax();
-        if (! fdecl.getFlag(Declaration.STATIC_SPECIFIED))
-          {
-            ClassType vtype = floc.getDeclaringClass();
-            String vname = vtype.getName();
-            for (Declaration xdecl = mod.firstDecl();
-                 xdecl != null;  xdecl = xdecl.nextDecl())
-              {
-                if (vname.equals(xdecl.getType().getName())
-                    && xdecl.getFlag(Declaration.MODULE_REFERENCE))
-                  {
-                    fref.setContextDecl(xdecl);
-                    break;
-                  }
-              }
-          }
-      }
   }
 
   public int getState () { return comp == null ? Compilation.CLASS_WRITTEN : comp.getState(); }

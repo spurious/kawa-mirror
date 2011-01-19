@@ -1,3 +1,8 @@
+2011-01-19  Per Bothner  <per@bothner.com>
+
+	* BRL.java (makeBody): Remove method.
+	(appendBodyValues): New method.
+
 2010-08-19  Per Bothner  <per@bothner.com>
 
 	* BRL.java: Update to use new Environment-setting methods.

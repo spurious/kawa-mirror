@@ -812,7 +812,7 @@ public class ClassExp extends LambdaExp
    */
   public static String slotToMethodName(String prefix, String sname)
   {
-    if (! Compilation.isValidJavaName(sname))
+    if (! Language.isValidJavaName(sname))
       sname = Compilation.mangleName(sname, false);
     int slen = sname.length();
     StringBuffer sbuf = new StringBuffer(slen+3);

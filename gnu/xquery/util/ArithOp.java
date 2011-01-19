@@ -9,7 +9,6 @@ import java.math.*;
 import gnu.math.*;
 
 public class ArithOp extends Procedure1or2
-  implements Inlineable
 {
   char op;
 
@@ -215,16 +214,5 @@ public class ArithOp extends Procedure1or2
           }
       }
     throw new UnsupportedOperationException(getName());
-  }
-
-  public void compile (ApplyExp exp, Compilation comp, Target target)
-  {
-    // FUTURE
-    ApplyExp.compile(exp, comp, target);
-  }
-
-  public Type getReturnType (Expression[] args)
-  {
-    return Type.pointer_type;
   }
 }

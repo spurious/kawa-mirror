@@ -1271,8 +1271,19 @@ public class Translator extends Compilation
 	  return new ApplyExp(gnu.kawa.functions.AppendValues.appendValues,
 			      exps);
 	else
-	  return ((LispLanguage) getLanguage()).makeBody(exps);
+	  return makeBody(exps);
       }
+  }
+
+  public boolean appendBodyValues () { return false; }
+
+  /** Combine a <body> consisting of a list of expression. */
+  public Expression makeBody(Expression[] exps)
+  {
+    if (appendBodyValues())
+      return new ApplyExp(gnu.kawa.functions.AppendValues.appendValues, exps);
+    else
+      return new BeginExp (exps);
   }
 
   /** Storage used by noteAccess and processAccesses. */

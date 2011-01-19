@@ -7,7 +7,7 @@ import java.math.*;
 
 /** This implements the numeric comparison relations: {@code <}, {@code <=}, etc. */
 
-public class NumberCompare extends ProcedureN implements Inlineable
+public class NumberCompare extends ProcedureN
 {
   Language language;
 
@@ -102,7 +102,8 @@ public class NumberCompare extends ProcedureN implements Inlineable
     proc.setName(name);
     proc.flags = flags;
     proc.setProperty(Procedure.validateApplyKey,
-                     "gnu.kawa.functions.CompileArith:validateApplyNumberCompare");
+                     "gnu.kawa.functions.CompileMisc:validateApplySimpleBoolean");
+    Procedure.compilerKey.set(proc, "*gnu.kawa.functions.CompileMisc:forNumberCompare");
     return proc;
   }
 
@@ -233,135 +234,5 @@ public class NumberCompare extends ProcedureN implements Inlineable
     //  if (args.length < 2)
     //  throw new WrongArguments(this.name(),2,"(< x1 x2 ...)");
     return getLanguage().booleanObject(applyN(flags, args));
-  }
-
-  public void compile (ApplyExp exp, Compilation comp, Target target)
-  {
-    Expression[] args = exp.getArgs();
-    if (args.length == 2)
-      {
-	Expression arg0 = args[0];
-	Expression arg1 = args[1];
-	int kind0 = classify(arg0);
-	int kind1 = classify(arg1);
-	CodeAttr code = comp.getCode();
-	if (kind0 > 0 && kind1 > 0
-            && kind0 <= Arithmetic.REALNUM_CODE && kind1 <= Arithmetic.REALNUM_CODE
-	    // Don't optimize if both operands are fractions. FIXME???
-	    && (kind0 != Arithmetic.RATNUM_CODE || kind1 != Arithmetic.RATNUM_CODE))
-	  {
-	    if (! (target instanceof ConditionalTarget))
-	      {
-		IfExp.compile(exp, QuoteExp.trueExp, QuoteExp.falseExp,
-			      comp, target);
-		return;
-	      }
-	    int mask = flags;
-	    if (mask == TRUE_IF_NEQ)
-	      mask = TRUE_IF_GRT|TRUE_IF_LSS;
-	    if (kind0 <= Arithmetic.INTNUM_CODE && kind1 <= Arithmetic.INTNUM_CODE
-		&& (kind0 > Arithmetic.LONG_CODE || kind1 > Arithmetic.LONG_CODE))
-	      {
-		Type[] ctypes = new Type[2];
-		ctypes[0] = Arithmetic.typeIntNum;
-		if (kind1 <= Arithmetic.LONG_CODE)
-		  {
-		    ctypes[1] = Type.longType;
-		  }
-		else if (kind0 <= Arithmetic.LONG_CODE
-			 // Simple check to avoid re-ordering side-effects.
-			 && (arg0 instanceof QuoteExp
-			     || arg1 instanceof QuoteExp
-			     || arg0 instanceof ReferenceExp
-			     || arg1 instanceof ReferenceExp))
-		  {
-		    ctypes[1] = Type.longType;
-		    args = new Expression[2];
-		    args[0] = arg1;
-		    args[1] = arg0;
-		    if (mask != TRUE_IF_EQU && mask != TRUE_IF_GRT+TRUE_IF_LSS)
-		      mask ^= TRUE_IF_GRT|TRUE_IF_LSS;
-		  }
-		else
-		  ctypes[1] = Arithmetic.typeIntNum;
-		Method cmeth
-		  = Arithmetic.typeIntNum.getMethod("compare", ctypes);
-		PrimProcedure compare = new PrimProcedure(cmeth);
-		arg0 = new ApplyExp(compare, args);
-		arg1 = new QuoteExp(IntNum.zero());
-		kind0 = kind1 = Arithmetic.INT_CODE;
-	      }
-	    Type commonType;
-	    if (kind0 <= Arithmetic.INT_CODE && kind1 <= Arithmetic.INT_CODE)
-	      commonType = Type.intType;
-	    else if (kind0 <= Arithmetic.LONG_CODE && kind1 <= Arithmetic.LONG_CODE)
-	      commonType = Type.longType;
-	    else
-	      commonType = Type.doubleType;
-	    StackTarget subTarget = new StackTarget(commonType);
-	    ConditionalTarget ctarget = (ConditionalTarget) target;
-	    
-	    int opcode;
-	    if (arg0 instanceof QuoteExp && ! (arg1 instanceof QuoteExp))
-	      {
-		Expression tmp = arg1; arg1 = arg0; arg0 = tmp;
-		if (mask != TRUE_IF_EQU && mask != TRUE_IF_GRT+TRUE_IF_LSS)
-		  mask ^= TRUE_IF_GRT|TRUE_IF_LSS;
-	      }
-	    Label label1 = ctarget.trueBranchComesFirst ? ctarget.ifFalse : ctarget.ifTrue;
-	    if (ctarget.trueBranchComesFirst)
-	      mask ^= TRUE_IF_GRT|TRUE_IF_LSS|TRUE_IF_EQU;
-	    switch (mask)
-	      {
-	      case TRUE_IF_GRT:  opcode = 157 /*ifgt*/;  break;
-	      case TRUE_IF_EQU:  opcode = 153 /*ifeq*/;  break;
-	      case TRUE_IF_LSS:  opcode = 155 /*iflt*/;  break;
-	      case TRUE_IF_GRT|TRUE_IF_LSS:  opcode = 154 /*ifne*/;  break;
-	      case TRUE_IF_GRT|TRUE_IF_EQU:  opcode = 156 /*ifge*/;  break;
-	      case TRUE_IF_LSS|TRUE_IF_EQU:  opcode = 158 /*ifle*/;  break;
-	      default:
-		opcode = 0;
-	      }
-	    arg0.compile(comp, subTarget);
-	    Object value;
-	    if (kind0 <= Arithmetic.INT_CODE && kind1 <= Arithmetic.INT_CODE
-		&& arg1 instanceof QuoteExp
-		&& (value = ((QuoteExp) arg1).getValue()) instanceof IntNum
-		&& ((IntNum) value).isZero())
-	      {
-		code.emitGotoIfCompare1(label1, opcode);
-	      }
-	    else
-	      {
-		arg1.compile(comp, subTarget);
-		code.emitGotoIfCompare2(label1, opcode);
-	      }
-	    ctarget.emitGotoFirstBranch(code);
-	    return;
-	  }
-      }
-    ApplyExp.compile(exp, comp, target);
-  }
-
-  static int classify (Expression exp)
-  {
-    Type type = exp.getType();
-    int kind = Arithmetic.classifyType(type);
-    Object value;
-    if (kind == Arithmetic.INTNUM_CODE && exp instanceof QuoteExp
-	&& (value = ((QuoteExp) exp).getValue()) instanceof IntNum)
-      {
-	int ilength = ((IntNum) value).intLength();
-	if (ilength < 32)
-	  return Arithmetic.INT_CODE;
-	if (ilength < 64)
-	  return Arithmetic.LONG_CODE;
-      }
-    return kind;
-  }
-
-  public Type getReturnType (Expression[] args)
-  {
-    return Type.booleanType;
   }
 }

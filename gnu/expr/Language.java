@@ -350,7 +350,7 @@ public abstract class Language
    */
   protected void defProcStFld(String name, String cname)
   {
-    defProcStFld(name, cname, Compilation.mangleNameIfNeeded(name));
+    defProcStFld(name, cname, mangleNameIfNeeded(name));
   }
 
   /** Enter a named function into the current environment. */
@@ -446,6 +446,127 @@ public abstract class Language
     if (dot >= 0)
       name = name.substring(dot+1);
     return name;
+  }
+
+  public static String mangleNameIfNeeded (String name)
+  {
+    if (name == null || isValidJavaName(name))
+      return name;
+    else
+      return mangleName(name, 0);
+  }
+
+  public static boolean isValidJavaName(String name)
+  {
+    int len = name.length();
+    if (len == 0 || ! Character.isJavaIdentifierStart(name.charAt(0)))
+      return false;
+    for (int i = len;  --i > 0; )
+      if (! Character.isJavaIdentifierPart(name.charAt(i)))
+	return false;
+    return true;
+  }
+
+  /** Convert a string to a safe Java identifier.
+   * @param kind -1 - non-reversible;
+   *  0: reversible, except that '$' is not mapped;
+   *  1: reversible
+   */
+  public static String mangleName (String name, int kind)
+  {
+    boolean reversible = kind >= 0;
+    int len = name.length ();
+    if (len == 6 && name.equals("*init*")) // Constructor methods.
+      return "<init>";
+    StringBuffer mangled = new StringBuffer (len);
+    boolean upcaseNext = false;
+    for (int i = 0;  i < len;  i++)
+      {
+	char ch = name.charAt(i);
+	if (upcaseNext)
+	  {
+	    ch = Character.toTitleCase(ch);
+	    upcaseNext = false;
+	  }
+	if (Character.isDigit(ch))
+	  {
+	    if (i == 0)
+	      mangled.append("$N");
+	    mangled.append(ch);
+	  }
+	else if (Character.isLetter(ch) || ch == '_')
+	  mangled.append(ch);
+	else if (ch == '$')
+	  mangled.append(kind > 1 ? "$$" : "$");
+	else
+	  {
+	    switch (ch)
+	      {
+	      case '+':  mangled.append("$Pl");  break;
+	      case '-':
+		if (reversible)
+		  mangled.append("$Mn");
+		else
+		  {
+		    char next = i + 1 < len ? name.charAt(i+1) : '\0';
+		    if (next == '>')
+		      {
+			mangled.append("$To$");
+			i++;
+		      }
+		    else if (! Character.isLowerCase(next))
+		      mangled.append("$Mn");
+		  }
+		break;
+	      case '*':  mangled.append("$St");  break;
+	      case '/':  mangled.append("$Sl");  break;
+	      case '=':  mangled.append("$Eq");  break;
+	      case '<':  mangled.append("$Ls");  break;
+	      case '>':  mangled.append("$Gr");  break;
+	      case '@':  mangled.append("$At");  break;
+	      case '~':  mangled.append("$Tl");  break;
+	      case '%':  mangled.append("$Pc");  break;
+	      case '.':  mangled.append("$Dt");  break;
+	      case ',':  mangled.append("$Cm");  break;
+	      case '(':  mangled.append("$LP");  break;
+	      case ')':  mangled.append("$RP");  break;
+	      case '[':  mangled.append("$LB");  break;
+	      case ']':  mangled.append("$RB");  break;
+	      case '{':  mangled.append("$LC");  break;
+	      case '}':  mangled.append("$RC");  break;
+	      case '\'': mangled.append("$Sq");  break;
+	      case '"':  mangled.append("$Dq");  break;
+	      case '&':  mangled.append("$Am");  break;
+	      case '#':  mangled.append("$Nm");  break;
+	      case '?':
+		char first = mangled.length() > 0 ? mangled.charAt(0) : '\0';
+		if (! reversible
+		    && i + 1 == len && Character.isLowerCase(first))
+		  {
+		    mangled.setCharAt(0, Character.toTitleCase(first));
+		    mangled.insert(0, "is");
+		  }
+		else
+		  mangled.append("$Qu");
+		break;
+	      case '!':  mangled.append("$Ex");  break;
+	      case ':':  mangled.append("$Cl");  break;
+	      case ';':  mangled.append("$SC");  break;
+	      case '^':  mangled.append("$Up");  break;
+	      case '|':  mangled.append("$VB");  break;
+	      default:
+		mangled.append('$');
+		mangled.append(Character.forDigit ((ch >> 12) & 15, 16));
+		mangled.append(Character.forDigit ((ch >>  8) & 15, 16));
+		mangled.append(Character.forDigit ((ch >>  4) & 15, 16));
+		mangled.append(Character.forDigit ((ch      ) & 15, 16));
+	      }
+	    if (! reversible)
+	      upcaseNext = true;
+	  }
+      }
+    String mname = mangled.toString ();
+    return mname.equals(name) ? name : mname;
   }
 
   public abstract Lexer getLexer(InPort inp, SourceMessages messages);
@@ -827,25 +948,6 @@ public abstract class Language
   public boolean hasNamespace (Declaration decl, int namespace)
   {
     return (getNamespaceOf(decl) & namespace) != 0;
-  }
-
-  public void emitPushBoolean(boolean value, CodeAttr code)
-  {
-    code.emitGetStatic(value ? Compilation.trueConstant
-		       : Compilation.falseConstant);
-  }
-
-  /** Generate code to test if an object is considered true.
-   * Assume the object has been pushed on the JVM stack.
-   * Generate code to push true or false as appropriate. */
-  public void emitCoerceToBoolean(CodeAttr code)
-  {
-    emitPushBoolean(false, code);
-    code.emitIfNEq();
-    code.emitPushInt(1);
-    code.emitElse();
-    code.emitPushInt(0);
-    code.emitFi();
   }
 
   public Object coerceFromObject(Class clas, Object obj)

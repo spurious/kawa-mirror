@@ -186,6 +186,7 @@ KAWA_COMPILER = $(CLASSPATH_ENV) $(JAVA) kawa.repl -d $(top_builddir) \
 
 java_sources = \
   Lisp2.java \
+  Lisp2Compilation.java \
   defvar.java \
   defun.java \
   function.java \

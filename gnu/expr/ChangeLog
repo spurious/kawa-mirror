@@ -1,3 +1,16 @@
+2011-01-19  Per Bothner  <per@bothner.com>
+
+	More changes to separate compile-time from run-time code.
+	* Language.java (emitPushBoolean, emitCoerceToBoolean): Move from here
+	* Compilation.java (emitPushBoolean, emitCoerceToBoolean): ... to here.
+	* Compilation.java (mangleNameIfNeeded, isValidJavaName, mangleName):
+	Move from here ...
+	* Language.java (mangleNameIfNeeded, isValidJavaName, mangleName):
+	... to here.
+	* ClassExp.java (slotToMethodName): Update accordingly.
+	* ModuleExp.java (makeDeclInModule2): Move from here ...
+	* ModuleInfo.java (makeDeclInModule2): ... to here.
+
 2011-01-17  Per Bothner  <per@bothner.com>
 
 	* Language.java (getCompilationClass): New method.

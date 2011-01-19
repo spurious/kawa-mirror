@@ -494,7 +494,7 @@ public class Scheme extends LispLanguage
       defProcStFld("logop", "kawa.lib.numbers");
       defProcStFld("bitwise-bit-set?", "kawa.lib.numbers");
       defProcStFld("logbit?", "kawa.lib.numbers",
-                   Compilation.mangleNameIfNeeded("bitwise-bit-set?"));
+                   Language.mangleNameIfNeeded("bitwise-bit-set?"));
       defProcStFld("logtest", "kawa.lib.numbers");
       defProcStFld("bitwise-bit-count", "kawa.lib.numbers");
       defProcStFld("logcount", "kawa.lib.numbers");
@@ -502,7 +502,7 @@ public class Scheme extends LispLanguage
       defProcStFld("bitwise-copy-bit-field", "kawa.lib.numbers");
       defProcStFld("bitwise-bit-field", "kawa.lib.numbers");
       defProcStFld("bit-extract", "kawa.lib.numbers",
-                   Compilation.mangleNameIfNeeded("bitwise-bit-field"));
+                   Language.mangleNameIfNeeded("bitwise-bit-field"));
       defProcStFld("bitwise-length", "kawa.lib.numbers");
       defProcStFld("integer-length", "kawa.lib.numbers", "bitwise$Mnlength");
       defProcStFld("bitwise-first-bit-set", "kawa.lib.numbers");
@@ -1158,6 +1158,11 @@ public class Scheme extends LispLanguage
   {
     return Namespace.EmptyNamespace.getSymbol(ident);
   }
+
+  /** Should the values of body/block be appended as multiple values?
+   * Otherwise, just return the result of the final expression.
+   */
+  public boolean appendBodyValues () { return false; }
 
   public ReadTable createReadTable ()
   {

@@ -265,7 +265,7 @@ public class ClassMethods extends Procedure2
 	  nam = ((Symbol) name).getName();
 	else
 	  return null;
-	if (Compilation.isValidJavaName(nam))
+	if (Language.isValidJavaName(nam))
 	  return nam;
 	return Compilation.mangleName(nam, reversible);
       }

@@ -4,6 +4,7 @@ include $(top_srcdir)/Make-rules
 
 java_sources = \
   Lisp2.java \
+  Lisp2Compilation.java \
   defvar.java \
   defun.java \
   function.java \

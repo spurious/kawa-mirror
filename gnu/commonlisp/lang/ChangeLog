@@ -1,3 +1,11 @@
+2011-01-19  Per Bothner  <per@bothner.com>
+
+	* Lisp2Compilation.java: New class.
+	(emitPushBoolean): New method, moved from Lisp2.java.
+	* Makefile.am: Update accordingly.
+	* Lisp2.java (emitPushBoolean): Removed method.
+	(getCompilationClass): New method.
+
 2010-08-19  Per Bothner  <per@bothner.com>
 
 	* CommonLisp.java: Update to use new Environment-setting methods.

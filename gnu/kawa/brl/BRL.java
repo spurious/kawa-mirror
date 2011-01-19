@@ -78,6 +78,8 @@ public class BRL extends Scheme
   public boolean isBrlCompatible() { return brlCompatible; }
   public void setBrlCompatible(boolean compat) {  brlCompatible = compat; }
 
+  public boolean appendBodyValues () { return ! isBrlCompatible(); }
+
   public gnu.text.Lexer getLexer(InPort inp, gnu.text.SourceMessages messages)
   {
     Compilation.defaultCallConvention = Compilation.CALL_WITH_CONSUMER;
@@ -97,13 +99,6 @@ public class BRL extends Scheme
   public static void registerEnvironment()
   {
     Language.setDefaults(getKrlInstance());
-  }
-
-  public Expression makeBody(Expression[] exps)
-  {
-    if (isBrlCompatible())
-      return super.makeBody(exps);
-    return new ApplyExp(gnu.kawa.functions.AppendValues.appendValues, exps);
   }
 
   public ReadTable createReadTable ()

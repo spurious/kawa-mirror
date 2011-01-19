@@ -1,4 +1,5 @@
 package gnu.q2.lang;
+import kawa.standard.SchemeCompilation;
 import gnu.expr.*;
 import gnu.text.*;
 import gnu.lists.*;
@@ -6,7 +7,7 @@ import gnu.mapping.Symbol;
 import kawa.lang.*;
 import java.util.Stack;
 
-public class Q2Translator extends Translator
+public class Q2Translator extends SchemeCompilation
 {
   public Q2Translator (Language language, SourceMessages messages, NameLookup lexical)
   {

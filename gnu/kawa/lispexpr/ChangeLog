@@ -1,3 +1,10 @@
+2011-01-19  Per Bothner  <per@bothner.com>
+
+	* LispLanguage.java (makeBody): Remove method - now in Translator.
+	(defSntxStFld): mangleNameIfNeeded is now in super-class.
+	* LangPrimType.java: emitPushBoolean and emitCoerceToBoolean are
+	now in Compilation, not Language.
+
 2011-01-17  Per Bothner  <per@bothner.com>
 
 	* LispLanguage.java (getCompilationClass): New method.

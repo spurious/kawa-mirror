@@ -30,14 +30,6 @@ public abstract class Lisp2 extends LispLanguage
     if (b) return TRUE; else return FALSE;
   }
 
-  public void emitPushBoolean(boolean value, CodeAttr code)
-  {
-    if (value)
-      code.emitGetStatic(ClassType.make("gnu.commonlisp.lang.Lisp2").getDeclaredField("TRUE"));
-    else
-      code.emitGetStatic(Compilation.scmListType.getDeclaredField("Empty"));
-  }
-
   public Object noValue()
   {
     return FALSE;
@@ -162,6 +154,8 @@ public abstract class Lisp2 extends LispLanguage
     tab.setInitialColonIsKeyword(true);
     return tab;
   }
+
+   public String getCompilationClass () { return "gnu.kawa.lispexpr.Lisp2Compilation"; }
 }
 
 class Lisp2ReadTable extends ReadTable

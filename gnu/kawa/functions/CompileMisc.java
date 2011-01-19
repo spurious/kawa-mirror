@@ -1,6 +1,7 @@
 package gnu.kawa.functions;
 import gnu.bytecode.*;
 import gnu.mapping.*;
+import gnu.math.*;
 import gnu.expr.*;
 import gnu.kawa.reflect.*;
 import gnu.kawa.lispexpr.LangObjType;
@@ -12,6 +13,9 @@ public class CompileMisc implements Inlineable
 {
   static final int CONVERT = 2;
   static final int NOT = 3;
+  static final int EQ = 4;
+  static final int NUMBER_COMPARE = 5;
+  static final int NUMBER_PREDICATE = 6;
   int code;
   Procedure proc;
 
@@ -31,6 +35,21 @@ public class CompileMisc implements Inlineable
     return new CompileMisc((Procedure) proc, NOT);
   }
 
+  public static CompileMisc forEq(Object proc)
+  {
+    return new CompileMisc((Procedure) proc, EQ);
+  }
+
+  public static CompileMisc forNumberCompare(Object proc)
+  {
+    return new CompileMisc((Procedure) proc, NUMBER_COMPARE);
+  }
+
+  public static CompileMisc forNumberPredicate(Object proc)
+  {
+    return new CompileMisc((Procedure) proc, NUMBER_PREDICATE);
+  }
+
   public void compile (ApplyExp exp, Compilation comp, Target target)
   {
     switch (code)
@@ -40,6 +59,15 @@ public class CompileMisc implements Inlineable
         return;
       case NOT:
         compileNot((Not) proc, exp, comp, target);
+        return;
+      case EQ:
+        compileEq(exp.getArgs(), comp, target, ((IsEq) proc).language);
+        return;
+      case NUMBER_COMPARE:
+        compileNumberCompare((NumberCompare) proc, exp, comp, target);
+        return;
+      case NUMBER_PREDICATE:
+        compileNumberPredicate((NumberPredicate) proc, exp, comp, target);
         return;
       default: throw new Error();
       }
@@ -81,7 +109,7 @@ public class CompileMisc implements Inlineable
     return exp;
   }
 
-  public static Expression validateApplyNot
+  public static Expression validateApplySimpleBoolean
   (ApplyExp exp, InlineCalls visitor, Type required, Procedure proc)
   {
     exp.visitArgs(visitor);
@@ -287,6 +315,201 @@ public class CompileMisc implements Inlineable
         QuoteExp falseExp = QuoteExp.getInstance(language.booleanObject(false));
 	IfExp.compile(arg, falseExp, trueExp, comp, target);
       }
+  }
+
+  public static void compileEq (Expression[] args, Compilation comp,
+			      Target target, Language language)
+  {
+    CodeAttr code = comp.getCode();
+    args[0].compile(comp, Target.pushObject);
+    args[1].compile(comp, Target.pushObject);
+    if (target instanceof ConditionalTarget)
+      {
+	ConditionalTarget ctarget = (ConditionalTarget) target;
+	if (ctarget.trueBranchComesFirst)
+	  code.emitGotoIfNE(ctarget.ifFalse);
+	else
+	  code.emitGotoIfEq(ctarget.ifTrue);
+	ctarget.emitGotoFirstBranch(code);
+      }
+    else
+      {
+	Type type;
+	code.emitIfEq();
+	if (target.getType() instanceof ClassType)
+	  {
+	    Object trueValue = language.booleanObject(true);
+	    Object falseValue = language.booleanObject(false);
+	    comp.compileConstant(trueValue, Target.pushObject);
+	    code.emitElse();
+	    comp.compileConstant(falseValue, Target.pushObject);
+	    if (trueValue instanceof Boolean && falseValue instanceof Boolean)
+	      type = Compilation.scmBooleanType;
+	    else
+	      type = Type.pointer_type;
+	  }
+	else
+	  {
+	    code.emitPushInt(1);
+	    code.emitElse();
+	    code.emitPushInt(0);
+	    type = language.getTypeFor(Boolean.TYPE);
+	  }
+	code.emitFi();
+	target.compileFromStack(comp, type);
+      }
+  }
+
+  public static void compileNumberCompare (NumberCompare proc, ApplyExp exp, Compilation comp, Target target)
+  {
+    Expression[] args = exp.getArgs();
+    if (args.length == 2)
+      {
+	Expression arg0 = args[0];
+	Expression arg1 = args[1];
+	int kind0 = classifyForNumCompare(arg0);
+	int kind1 = classifyForNumCompare(arg1);
+	CodeAttr code = comp.getCode();
+	if (kind0 > 0 && kind1 > 0
+            && kind0 <= Arithmetic.REALNUM_CODE && kind1 <= Arithmetic.REALNUM_CODE
+	    // Don't optimize if both operands are fractions. FIXME???
+	    && (kind0 != Arithmetic.RATNUM_CODE || kind1 != Arithmetic.RATNUM_CODE))
+	  {
+	    if (! (target instanceof ConditionalTarget))
+	      {
+		IfExp.compile(exp, QuoteExp.trueExp, QuoteExp.falseExp,
+			      comp, target);
+		return;
+	      }
+	    int mask = proc.flags;
+	    if (mask == NumberCompare.TRUE_IF_NEQ)
+	      mask = NumberCompare.TRUE_IF_GRT|NumberCompare.TRUE_IF_LSS;
+	    if (kind0 <= Arithmetic.INTNUM_CODE && kind1 <= Arithmetic.INTNUM_CODE
+		&& (kind0 > Arithmetic.LONG_CODE || kind1 > Arithmetic.LONG_CODE))
+	      {
+		Type[] ctypes = new Type[2];
+		ctypes[0] = Arithmetic.typeIntNum;
+		if (kind1 <= Arithmetic.LONG_CODE)
+		  {
+		    ctypes[1] = Type.longType;
+		  }
+		else if (kind0 <= Arithmetic.LONG_CODE
+			 // Simple check to avoid re-ordering side-effects.
+			 && (arg0 instanceof QuoteExp
+			     || arg1 instanceof QuoteExp
+			     || arg0 instanceof ReferenceExp
+			     || arg1 instanceof ReferenceExp))
+		  {
+		    ctypes[1] = Type.longType;
+		    args = new Expression[2];
+		    args[0] = arg1;
+		    args[1] = arg0;
+		    if (mask != NumberCompare.TRUE_IF_EQU && mask != NumberCompare.TRUE_IF_GRT+NumberCompare.TRUE_IF_LSS)
+		      mask ^= NumberCompare.TRUE_IF_GRT|NumberCompare.TRUE_IF_LSS;
+		  }
+		else
+		  ctypes[1] = Arithmetic.typeIntNum;
+		Method cmeth
+		  = Arithmetic.typeIntNum.getMethod("compare", ctypes);
+		PrimProcedure compare = new PrimProcedure(cmeth);
+		arg0 = new ApplyExp(compare, args);
+		arg1 = new QuoteExp(IntNum.zero());
+		kind0 = kind1 = Arithmetic.INT_CODE;
+	      }
+	    Type commonType;
+	    if (kind0 <= Arithmetic.INT_CODE && kind1 <= Arithmetic.INT_CODE)
+	      commonType = Type.intType;
+	    else if (kind0 <= Arithmetic.LONG_CODE && kind1 <= Arithmetic.LONG_CODE)
+	      commonType = Type.longType;
+	    else
+	      commonType = Type.doubleType;
+	    StackTarget subTarget = new StackTarget(commonType);
+	    ConditionalTarget ctarget = (ConditionalTarget) target;
+	    
+	    int opcode;
+	    if (arg0 instanceof QuoteExp && ! (arg1 instanceof QuoteExp))
+	      {
+		Expression tmp = arg1; arg1 = arg0; arg0 = tmp;
+		if (mask != NumberCompare.TRUE_IF_EQU && mask !=NumberCompare. TRUE_IF_GRT+NumberCompare.TRUE_IF_LSS)
+		  mask ^= NumberCompare.TRUE_IF_GRT|NumberCompare.TRUE_IF_LSS;
+	      }
+	    Label label1 = ctarget.trueBranchComesFirst ? ctarget.ifFalse : ctarget.ifTrue;
+	    if (ctarget.trueBranchComesFirst)
+	      mask ^= NumberCompare.TRUE_IF_GRT|NumberCompare.TRUE_IF_LSS|NumberCompare.TRUE_IF_EQU;
+	    switch (mask)
+	      {
+	      case NumberCompare.TRUE_IF_GRT:  opcode = 157 /*ifgt*/;  break;
+	      case NumberCompare.TRUE_IF_EQU:  opcode = 153 /*ifeq*/;  break;
+	      case NumberCompare.TRUE_IF_LSS:  opcode = 155 /*iflt*/;  break;
+	      case NumberCompare.TRUE_IF_GRT|NumberCompare.TRUE_IF_LSS:  opcode = 154 /*ifne*/;  break;
+	      case NumberCompare.TRUE_IF_GRT|NumberCompare.TRUE_IF_EQU:  opcode = 156 /*ifge*/;  break;
+	      case NumberCompare.TRUE_IF_LSS|NumberCompare.TRUE_IF_EQU:  opcode = 158 /*ifle*/;  break;
+	      default:
+		opcode = 0;
+	      }
+	    arg0.compile(comp, subTarget);
+	    Object value;
+	    if (kind0 <= Arithmetic.INT_CODE && kind1 <= Arithmetic.INT_CODE
+		&& arg1 instanceof QuoteExp
+		&& (value = ((QuoteExp) arg1).getValue()) instanceof IntNum
+		&& ((IntNum) value).isZero())
+	      {
+		code.emitGotoIfCompare1(label1, opcode);
+	      }
+	    else
+	      {
+		arg1.compile(comp, subTarget);
+		code.emitGotoIfCompare2(label1, opcode);
+	      }
+	    ctarget.emitGotoFirstBranch(code);
+	    return;
+	  }
+      }
+    ApplyExp.compile(exp, comp, target);
+  }
+
+  static int classifyForNumCompare (Expression exp)
+  {
+    Type type = exp.getType();
+    int kind = Arithmetic.classifyType(type);
+    Object value;
+    if (kind == Arithmetic.INTNUM_CODE && exp instanceof QuoteExp
+	&& (value = ((QuoteExp) exp).getValue()) instanceof IntNum)
+      {
+	int ilength = ((IntNum) value).intLength();
+	if (ilength < 32)
+	  return Arithmetic.INT_CODE;
+	if (ilength < 64)
+	  return Arithmetic.LONG_CODE;
+      }
+    return kind;
+  }
+
+  public static void compileNumberPredicate (NumberPredicate proc, ApplyExp exp, Compilation comp, Target target)
+  {
+    Expression[] args = exp.getArgs();
+    int op = proc.op;
+    if (args.length == 1 && (op == NumberPredicate.ODD || op == NumberPredicate.EVEN))
+      {
+	Expression arg0 = args[0];
+        int kind = Arithmetic.classifyType(arg0.getType());
+        if (kind <= Arithmetic.INTNUM_CODE)
+          {
+            PrimType wtype = Type.intType;
+            Target wtarget = StackTarget.getInstance(wtype);
+            CodeAttr code = comp.getCode();
+            if (op == NumberPredicate.EVEN)
+              code.emitPushInt(1);
+            arg0.compile(comp, wtarget);
+            code.emitPushInt(1);
+            code.emitAnd();
+            if (op == NumberPredicate.EVEN)
+              code.emitSub(Type.intType);
+            target.compileFromStack(comp, Type.booleanType);
+            return;
+          }
+      }
+   ApplyExp.compile(exp, comp, target);
   }
 
   public static Expression validateApplyCallCC

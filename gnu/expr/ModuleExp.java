@@ -5,6 +5,7 @@ import gnu.mapping.Location; // As opposed to gnu.bytecode.Location
 import gnu.text.*;
 import java.io.*;
 import gnu.kawa.reflect.StaticFieldLocation;
+import gnu.kawa.reflect.FieldLocation;
 import java.net.URL;
 
 /**
@@ -554,6 +555,39 @@ public class ModuleExp extends LambdaExp
                      +" - old name: "+comp.mainClass.getName());
       }
     return clas;
+  }
+
+  void makeDeclInModule2 (Declaration fdecl)
+  {
+    Object fvalue = fdecl.getConstantValue();
+    if (fvalue instanceof FieldLocation)
+      {
+	FieldLocation floc = (FieldLocation) fvalue;
+        Declaration vdecl = floc.getDeclaration();
+        ReferenceExp fref = new ReferenceExp(vdecl);
+        fdecl.setAlias(true);
+        fref.setDontDereference(true);
+        fdecl.setValue(fref);
+        if (vdecl.isProcedureDecl())
+          fdecl.setProcedureDecl(true);
+        if (vdecl.getFlag(Declaration.IS_SYNTAX))
+          fdecl.setSyntax();
+        if (! fdecl.getFlag(Declaration.STATIC_SPECIFIED))
+          {
+            ClassType vtype = floc.getDeclaringClass();
+            String vname = vtype.getName();
+            for (Declaration xdecl = firstDecl();
+                 xdecl != null;  xdecl = xdecl.nextDecl())
+              {
+                if (vname.equals(xdecl.getType().getName())
+                    && xdecl.getFlag(Declaration.MODULE_REFERENCE))
+                  {
+                    fref.setContextDecl(xdecl);
+                    break;
+                  }
+              }
+          }
+      }
   }
 
   public void writeExternal(ObjectOutput out) throws IOException

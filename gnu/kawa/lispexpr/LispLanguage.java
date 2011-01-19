@@ -148,13 +148,7 @@ public abstract class LispLanguage extends Language
 
   protected void defSntxStFld(String name, String cname)
   {
-    defSntxStFld(name, cname, Compilation.mangleNameIfNeeded(name));
-  }
-
-  /** Combine a <body> consisting of a list of expression. */
-  public Expression makeBody(Expression[] exps)
-  {
-    return new BeginExp (exps);
+    defSntxStFld(name, cname, mangleNameIfNeeded(name));
   }
 
   public boolean selfEvaluatingSymbol (Object obj)

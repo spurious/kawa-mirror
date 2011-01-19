@@ -546,16 +546,6 @@ public class CompileArith implements Inlineable
     return exp;
   }
 
-  public static Expression validateApplyNumberCompare
-  (ApplyExp exp, InlineCalls visitor, Type required, Procedure proc)
-  {
-    exp.visitArgs(visitor);
-    Expression folded = exp.inlineIfConstant(proc, visitor);
-    if (folded != exp)
-      return folded;
-    return exp;
-  }
-
   public int primitiveOpcode ()
   {
     switch (op)
@@ -597,16 +587,5 @@ public class CompileArith implements Inlineable
         prev = inlined != null ? inlined : next;
       }
     return prev;
-  }
-
-  public static Expression validateApplyNumberPredicate
-  (ApplyExp exp, InlineCalls visitor, Type required, Procedure proc)
-  {
-    NumberPredicate nproc = (NumberPredicate) proc;
-    int op = nproc.op;
-    Expression[] args = exp.getArgs();
-    args[0] = visitor.visit(args[0], LangObjType.integerType);
-    exp.setType(Type.booleanType);
-    return exp;
   }
 }

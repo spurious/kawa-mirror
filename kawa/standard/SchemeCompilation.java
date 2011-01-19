@@ -30,6 +30,14 @@ public class SchemeCompilation extends Translator
     return new ApplyExp(new ReferenceExp(applyFieldDecl), exps);
   }
 
+  /** Should the values of body/block be appended as multiple values?
+   * Otherwise, just return the result of the final expression.
+   */
+  public boolean appendBodyValues ()
+  {
+    return ((Scheme) getLanguage()).appendBodyValues();
+  }
+
   public static final kawa.repl repl;
 
   public static final Lambda lambda = new kawa.lang.Lambda();

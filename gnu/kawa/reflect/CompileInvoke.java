@@ -65,6 +65,10 @@ public class CompileInvoke
         margsLength = nargs - 2;
         argsStartIndex = 3;
         objIndex = 1;
+        if (type0 == null)
+          comp.error('e', "unknown class for invoke-special", arg0);
+        else if (! (type instanceof ClassType) || ((ClassType) type).isInterface())
+          comp.error('e', "invalid class for invoke-special", arg0);
       }
     else
       {

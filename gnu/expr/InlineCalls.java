@@ -388,7 +388,26 @@ public class InlineCalls extends ExpExpVisitor<Type>
       {
         firstDecl.setType(comp.mainClass);
       }
-    return visitScopeExp(exp, required);
+    visitScopeExp(exp, required);
+    if (exp.isClassMethod() && "*init*".equals(exp.getName()))
+      {
+        Expression bodyFirst = exp.getBodyFirstExpression();
+        ClassType calledInit = exp.checkForInitCall(bodyFirst);
+        ClassExp cexp = (ClassExp) exp.outer;
+        ClassType superClass = cexp.instanceType.getSuperclass();
+        if (calledInit != null)
+          {
+            if (calledInit != cexp.instanceType && calledInit != superClass)
+              comp.error('e', "call to <init> for not this or super class");
+          }
+        else if (superClass != null)
+          {
+            if (superClass.getDeclaredMethod("<init>", 0) == null)
+              comp.error('e', ("super class "+superClass.getName()
+                               +" does not have a default constructor"));
+          }
+      }
+    return exp;
   }
 
   protected Expression visitTryExp (TryExp exp, Type required)

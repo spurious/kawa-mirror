@@ -1,3 +1,8 @@
+2011-01-24  Per Bothner  <per@bothner.com>
+
+	* CompileInvoke.java (validateApplyInvoke): Report error if
+	invoke-special on unknown or invalid type.
+
 2011-01-19  Per Bothner  <per@bothner.com>
 
 	* ClassMethods.java: Update isValidJavaName call.

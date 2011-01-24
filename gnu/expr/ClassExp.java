@@ -523,34 +523,13 @@ public class ClassExp extends LambdaExp
                   }
 
                 // Extract "first" expression to see if it is special.
-                Expression bodyFirst = child.body;
-                while (bodyFirst instanceof BeginExp)
-                  {
-                    BeginExp bbody = (BeginExp) bodyFirst;
-                    if (bbody.length == 0)
-                      bodyFirst = null;
-                    else
-                      bodyFirst = bbody.exps[0];
-                  }
-
+                Expression bodyFirst = child.getBodyFirstExpression();
                 // See if bodyFirst is a this(...) or super(...) call.
-                ClassType calledInit = null;
-                Object value;  Expression exp;
-                if (bodyFirst instanceof ApplyExp
-                    && (exp = ((ApplyExp) bodyFirst).func) instanceof QuoteExp
-                    && (value = ((QuoteExp) exp).getValue()) instanceof PrimProcedure)
-                  {
-                    PrimProcedure pproc = (PrimProcedure) value;
-                    if (pproc.isSpecial()
-                        && ("<init>".equals(pproc.method.getName())))
-                      calledInit = pproc.method.getDeclaringClass();
-                  }
+                ClassType calledInit = checkForInitCall(bodyFirst);
                 ClassType superClass = instanceType.getSuperclass();
                 if (calledInit != null)
                   {
                     bodyFirst.compileWithPosition(comp, Target.Ignore);
-                    if (calledInit != instanceType && calledInit != superClass)
-                      comp.error('e', "call to <init> for not this or super class");
                   }
                 else if (superClass != null)
                   {
@@ -741,19 +720,16 @@ public class ClassExp extends LambdaExp
     CodeAttr code = comp.getCode();
     Method superConstructor
       = superClass.getDeclaredMethod("<init>", 0);
-    if (superConstructor == null)
-      comp.error('e', "super class does not have a default constructor");
-    else
+    // InlineCalls.visitLambdaExp catches the missing superConstructor case.
+    assert superConstructor != null;
+    code.emitPushThis();
+    if (superClass.hasOuterLink() && lexp instanceof ClassExp)
       {
-        code.emitPushThis();
-        if (superClass.hasOuterLink() && lexp instanceof ClassExp)
-          {
-            ClassExp clExp = (ClassExp) lexp;
-            Expression superExp = clExp.supers[clExp.superClassIndex];
-            loadSuperStaticLink(superExp, superClass, comp);
-          }
-        code.emitInvokeSpecial(superConstructor);
+        ClassExp clExp = (ClassExp) lexp;
+        Expression superExp = clExp.supers[clExp.superClassIndex];
+        loadSuperStaticLink(superExp, superClass, comp);
       }
+    code.emitInvokeSpecial(superConstructor);
   }
 
   public void print (OutPort out)

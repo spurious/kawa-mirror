@@ -1,5 +1,12 @@
 2011-01-24  Per Bothner  <per@bothner.com>
 
+	* LambdaExp.java (getBodyFirstExpression, checkForInitCall):
+	New methods, based on logic from ClassExp.
+	* InlineCalls.java (visitLambdaExp): Check for some errors in *init*
+	methods here, rather than in ClassExp#compile.
+	* ClassExp.java (compileMembers, invokeDefaultSuperConstructor):
+	Simplify/update accordingly.
+
 	* Compilation.java (makeQuoteExp): New convenience method.
 
 2011-01-19  Per Bothner  <per@bothner.com>

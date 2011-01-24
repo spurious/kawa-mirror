@@ -1960,6 +1960,43 @@ public class LambdaExp extends ScopeExp
     if (rtype != null)
       setReturnType(rtype);
   }
+
+  /** Get the first expression/statement in the body.
+   * It dives down into {@code BeginExp}s.
+   * Used to check for {@code invoke-special} calls in {@code @init} methods.
+   */
+  public Expression getBodyFirstExpression ()
+  {
+    Expression bodyFirst = body;
+    while (bodyFirst instanceof BeginExp)
+      {
+        BeginExp bbody = (BeginExp) bodyFirst;
+        if (bbody.length == 0)
+          bodyFirst = null;
+        else
+          bodyFirst = bbody.exps[0];
+      }
+    return bodyFirst;
+  }
+
+  /** Check if argument is a this(...) or super(...) initializtion.
+   * If so, return return the corresponding this or super class.
+   */
+  public ClassType checkForInitCall (Expression bodyFirst)
+  {
+    ClassType calledInit = null;
+    Object value;  Expression exp;
+    if (bodyFirst instanceof ApplyExp
+        && (exp = ((ApplyExp) bodyFirst).func) instanceof QuoteExp
+        && (value = ((QuoteExp) exp).getValue()) instanceof PrimProcedure)
+      {
+        PrimProcedure pproc = (PrimProcedure) value;
+        if (pproc.isSpecial()
+            && ("<init>".equals(pproc.method.getName())))
+          calledInit = pproc.method.getDeclaringClass();
+      }
+    return calledInit;
+  }
 }
 
 class Closure extends MethodProc

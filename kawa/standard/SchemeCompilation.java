@@ -60,12 +60,12 @@ public class SchemeCompilation extends Translator
     Namespace namespace = symbol.getNamespace();
     String local = symbol.getLocalPart();
     if (namespace instanceof XmlNamespace)
-      return QuoteExp.getInstance(((XmlNamespace) namespace).get(local));
+      return makeQuoteExp(((XmlNamespace) namespace).get(local));
     if (namespace.getName() == Scheme.unitNamespace.getName())
       {
         Object val = Unit.lookup(local);
         if (val != null)
-          return QuoteExp.getInstance(val);
+          return makeQuoteExp(val);
       }
     String name = symbol.toString();
     int len = name.length();
@@ -241,7 +241,7 @@ public class SchemeCompilation extends Translator
                     IntNum uexp = (IntNum) vec.elementAt(2*i+1);
                     if (uexp.longValue() != 1)
                       uref = new ApplyExp(expt.expt,
-                                          new Expression[] { uref , QuoteExp.getInstance(uexp) });
+                                          new Expression[] { uref , makeQuoteExp(uexp) });
                     units[i] = uref;
                   }
                 Expression unit;
@@ -250,7 +250,7 @@ public class SchemeCompilation extends Translator
                 else
                   unit = new ApplyExp(MultiplyOp.$St, units);
                 return new ApplyExp(MultiplyOp.$St,
-                                    new Expression[] { QuoteExp.getInstance(num),
+                                    new Expression[] { makeQuoteExp(num),
                                                        unit });
               }
           }
@@ -293,7 +293,7 @@ public class SchemeCompilation extends Translator
             // while standard type/classes are Class.  FIXME.
             while (--rank >= 0)
               type = gnu.bytecode.ArrayType.make(type);
-            return QuoteExp.getInstance(type);
+            return makeQuoteExp(type);
           }
         else
           {
@@ -317,14 +317,14 @@ public class SchemeCompilation extends Translator
                   type = gnu.bytecode.ArrayType.make(type);
                 clas = type.getReflectClass();
               }
-            return QuoteExp.getInstance(clas);
+            return makeQuoteExp(clas);
           }
       }
     catch (ClassNotFoundException ex)
       {
         Package pack = gnu.bytecode.ArrayClassLoader.getContextPackage(name);
         if (pack != null)
-          return QuoteExp.getInstance(pack);
+          return makeQuoteExp(pack);
       }
     catch (Throwable ex)
       {

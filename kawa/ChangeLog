@@ -1,3 +1,8 @@
+2011-01-24  Per Bothner  <per@bothner.com>
+
+	* standard/SchemeCompilation.java: Update new Compilation#makeQuoteExp.
+	This adds line number information to the resulting QuoteExp-s.
+
 2011-01-19  Per Bothner  <per@bothner.com>
 
 	* lang/Translator.java (appendBodyValues): New method.

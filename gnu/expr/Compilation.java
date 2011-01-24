@@ -2684,6 +2684,11 @@ public class Compilation implements SourceLocator
     return loopRepeat(args);
   }
 
+  public QuoteExp makeQuoteExp (Object value)
+  {
+    return QuoteExp.getInstance(value, this);
+  }
+
   /**
    * Convenience method to make an Expression that coerces a value.
    * @param value to be coerced

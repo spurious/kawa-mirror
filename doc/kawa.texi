@@ -865,7 +865,7 @@ The following options are useful if you want to debug or understand
 how Kawa works.
 @table @code
 @item --debug-dump-zip
-Normally, when Kawa loads a soyrce file, or evaluates a non-trivial expression,
+Normally, when Kawa loads a source file, or evaluates a non-trivial expression,
 it generates new internal Java classes but does not write them out.  This
 option asks it to write out generated classes in a @samp{.zip} archive
 whose name has the prefix @samp{kawa-zip-dump-}.
@@ -973,8 +973,10 @@ the initial two lines, which would confuse it terribly.
 
 An alternative interface runs the Java read-eval-print-loop
 inside a new window. This is in some ways nicer.  One reason
-is that it provides better editing.  You can also create
-new windows.  They can either have different top-level
+is that it provides better editing.
+(Mouse selection, arrow keys, and ``standard'' control keys should all work.)
+
+You can also create new windows.  They can either have different top-level
 environments or they can share environments.  To try it, do:
 @example
 java kawa.repl -w
@@ -1056,7 +1058,8 @@ For example, to byte-compile a file @samp{foo.scm} do:
 (compile-file "foo.scm" "foo")
 @end example
 
-This will create @samp{foo.zip}, which contains byte-compiled "j-code".
+This will create @samp{foo.zip}, which contains
+byte-compiled JVM @code{.class} files.
 You can move this file around, without worrying about class paths.
 To load the compiled file, you can later @code{load} the
 named file, as in either @code{(load "foo")} or @code{(load "foo.zip")}.
@@ -7323,7 +7326,7 @@ in the Guile and Stk dialects of Scheme.
 
 Defines a new class named @var{name}.  If @code{define-simple-class} is
 used, creates a normal Java class named @var{name} in the current package.
-(If @var{name} has the form @code{<xyx>} the Java implementation
+(If @var{name} has the form @code{<xyz>} the Java implementation
 type is named @code{xyz}.)  For @code{define-class} the implementation is
 unspecified.  In most cases, the compiler creates a class pair,
 consisting of a Java interface and a Java implementation class.
@@ -7458,6 +7461,9 @@ field's @var{field-name}.
 
 The @var{field-name} can be left out.  That indicates a "dummy slot",
 which is useful for initialization not tied to a specific field.
+In Java terms this is an instance or static initializer, i.e., a
+block of code executed when a new instance is created or the class is loaded.
+
 In this example, @code{x} is the only actual field.  It is first
 initialized to 10, but if @code{(some-condition)} is true
 then its value is doubled.
@@ -7578,7 +7584,7 @@ of 2-dimensional points does not really make sense.)
   ((*init*) #!void)
   ((scale (factor ::double)) ::2d-vector
    ;; Note we cannot override the return type to 3d-vector
-   ;; because Kawa doesn't yet support covariant rteurn typesk.
+   ;; because Kawa doesn't yet support covariant return types.
    (3d-vector
      x: (* factor x)
      y: (* factor (this):y) ;; Alternative syntax.

@@ -1,3 +1,8 @@
+2011-01-24  Per Bothner  <per@bothner.com>
+
+	* kawa.texi: Various minor fixes and improvements suggested by
+	Savannah bug #32224: "Doc Typos/Clarifications".
+
 2011-01-13  Per Bothner  <per@bothner.com>
 
 	* kawa.texi: Fix various errors.

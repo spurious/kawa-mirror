@@ -1,5 +1,8 @@
 2011-01-24  Per Bothner  <per@bothner.com>
 
+	* repl.java (internalError): Write out existing messages before
+	reporting exception.
+
 	* standard/SchemeCompilation.java: Update new Compilation#makeQuoteExp.
 	This adds line number information to the resulting QuoteExp-s.
 

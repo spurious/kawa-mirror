@@ -800,6 +800,8 @@ public class repl extends Procedure0or1
 
   static void internalError (Throwable ex, Compilation comp, Object arg)
   {
+    try { comp.getMessages().checkErrors(System.err, 50); }
+    catch (Throwable e) { }
     StringBuffer sbuf = new StringBuffer();
     if (comp != null)
       {

@@ -85,7 +85,7 @@
     (values (car pair) (cdr pair))))
 
 (define (hashtable-equivalence-function  (ht :: hashtable)) :: procedure
-  (ht:equivalenceFunction ht))
+  ht:equivalenceFunction)
 
 (define (hashtable-hash-function  (ht :: hashtable))
   (let ((hasher (ht:hashFunction ht)))
@@ -94,8 +94,8 @@
 	#f
 	hasher)))
 
-(define (hashtable-mutable? (ht :: hashtable)) :: bbolean
-  (ht:mutable))
+(define (hashtable-mutable? (ht :: hashtable)) :: boolean
+  ht:mutable)
 
 ;; FIXME is supposed to always terminate, but that is not guaranteed.
 (define (equal-hash key)

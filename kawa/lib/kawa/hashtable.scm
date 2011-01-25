@@ -31,12 +31,12 @@
    (set! equivalenceFunction eq)
    (set! hashFunction h))
   ((*init* (ht :: hashtable) (mutable :: boolean))
-    (invoke-special hashtable (this)
-		    (ht:equivalenceFunction)
-		    (ht:hashFunction)
-		    (+ (ht:size) 100))
+    (invoke-special hashtable (this) '*init*
+                    ht:equivalenceFunction
+                    ht:hashFunction
+                    (if mutable (+ (ht:size) 100) (ht:size)))
     (putAll ht)
-    (set! this:mutable mutable))
+    (set! (this):mutable mutable))
   ((hash key) :: int
    (hashFunction key))
   ((matches value1 value2) :: <boolean>

@@ -1,5 +1,10 @@
 2011-01-24  Per Bothner  <per@bothner.com>
 
+	* lang/Quote.java (expand_pair): Change handling of prefixed names
+	with unknow prefix to also handle prefixes bound to classes.
+
+	* repl.java: Micro-optimize indexOf("=") to indexOf('=').
+
 	* repl.java (internalError): Write out existing messages before
 	reporting exception.
 

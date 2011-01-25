@@ -668,7 +668,7 @@ public class repl extends Procedure0or1
 	    else
 	      {
 		// See if arg is a valid Compilation option, and if so set it.
-		int eq = name.indexOf("=");
+		int eq = name.indexOf('=');
 		String opt_value;
 		if (eq < 0)
 		  opt_value = null;

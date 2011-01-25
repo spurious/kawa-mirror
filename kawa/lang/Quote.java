@@ -123,9 +123,9 @@ public class Quote extends Syntax
               cdr = new ApplyExp(quoteType.getDeclaredMethod("makeSymbol", 2),
                                  new Expression[] { QuoteExp.getInstance(ns),
                                                     part2 });
-            else if (part1 instanceof ReferenceExp
+            else if (p1.getCar() instanceof SimpleSymbol
                      && part2 instanceof QuoteExp)
-              cdr = tr.getGlobalEnvironment().getSymbol(((ReferenceExp) part1).getName() + ':' + ((QuoteExp) part2).getValue().toString());
+              cdr = tr.getGlobalEnvironment().getSymbol(p1.getCar().toString() + ':' + ((QuoteExp) part2).getValue().toString());
             else if ((combinedName = CompileNamedPart.combineName(part1, part2)) != null)
               cdr = tr.getGlobalEnvironment().getSymbol(combinedName);
             else

@@ -1,4 +1,4 @@
-(test-begin "numbers" 1858)
+(test-begin "numbers" 1866)
 
 (test-equal 7 (+ 3 4))
 (test-equal 3 (+ 3))
@@ -434,5 +434,16 @@
 (test-equal "java.math.BigDecimal" (invoke (invoke 12.5l2 'getClass) 'getName))
 (test-equal "gnu.math.DFloNum" (invoke (invoke 12.5e2 'getClass) 'getName))
 (test-equal "gnu.math.DFloNum" (invoke (invoke 12.5 'getClass) 'getName))
+
+(test-assert (= 0.0s0 0.0s0))
+(test-assert (eqv? 0.0s0 0.0s0))
+(test-assert (equal? 0.0s0 0.0s0))
+(test-assert (= 0.0s0 0.0d0))
+(test-eqv #f (eqv? 0.0s0 0.0d0))
+(test-eqv #f (equal? 0.0s0 0.0d0))
+(test-assert (= java.lang.Double:POSITIVE_INFINITY 
+                java.lang.Float:POSITIVE_INFINITY))
+(test-eqv #f (equal? java.lang.Double:POSITIVE_INFINITY 
+                     java.lang.Float:POSITIVE_INFINITY))
 
 (test-end)

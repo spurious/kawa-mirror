@@ -1,3 +1,8 @@
+2011-01-24  Helmut Eller  <eller.helmut@gmail.com>
+	    Per Bothner  <per@bothner.com>
+
+	* num-test.scm: Some new tests.
+
 2011-01-03  Per Bothner  <per@bothner.com>
 
 	* jaxb-annotations3.scm: Use new bracket syntax.

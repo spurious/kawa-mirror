@@ -1,3 +1,7 @@
+2011-01-24  Per Bothner  <per@bothner.com>
+
+	* CompilationHelpers.java (nonNumeric): Fix Numeric -> Number.
+
 2011-01-19  Per Bothner  <per@bothner.com>
 
 	More changes to separate compile-time from run-time code.

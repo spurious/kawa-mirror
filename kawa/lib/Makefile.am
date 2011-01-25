@@ -23,7 +23,7 @@ java_SCM_ALWAYS =\
   uniform.scm \
   arrays.scm \
   system.scm \
-  kawa/hashtable.scm kawa/regex.scm rnrs/hashtables.scm \
+  kawa/hashtable.scm kawa/regex.scm rnrs/hashtables.scm rnrs/lists.scm \
   srfi95.scm rnrs/unicode.scm rnrs/sorting.scm rnrs/programs.scm \
   trace.scm
 

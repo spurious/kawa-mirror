@@ -1,3 +1,7 @@
+2011-01-24  Jamison Hope <jrh@theptrgroup.com>
+
+	* build.xml (lib-scm):  Add rnrs/lists.scm.
+
 2011-01-19  Per Bothner  <per@bothner.com>
 
 	* classes-to-skip-for-runtime: Add more classes to skip.

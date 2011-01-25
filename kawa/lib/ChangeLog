@@ -1,3 +1,8 @@
+2011-01-24  Jamison Hope <jrh@theptrgroup.com>
+
+	* rnrs/lists.scm: Added the (rnrs lists (6)) library.
+	* Makefile.am: Update accordingly.
+
 2011-01-17  Jamison Hope <jrh@theptrgroup.com>
 
 	* kawa/hashtable.scm: Fix various small bugs.

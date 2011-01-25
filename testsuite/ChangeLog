@@ -1,3 +1,7 @@
+2011-01-24  Jamison Hope  <jrh@theptrgroup.com>
+
+	* lib-test.scm: New tests for rnrs/lists functions.
+
 2011-01-24  Helmut Eller  <eller.helmut@gmail.com>
 	    Per Bothner  <per@bothner.com>
 

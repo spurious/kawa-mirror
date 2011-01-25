@@ -459,6 +459,7 @@
         <include name="rnrs/sorting.scm"/>
         <include name="rnrs/unicode.scm"/>
         <include name="rnrs/programs.scm"/>
+        <include name="rnrs/lists.scm"/>
       </fileset>
 
   <target name="lib-scm-classes" 

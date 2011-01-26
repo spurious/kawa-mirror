@@ -1050,7 +1050,6 @@ public class Compilation implements SourceLocator
 
     module.type = type;
     addClass(type);
-    getConstructor(mainClass, module);
   }
 
   public final Method getConstructor (LambdaExp lexp)
@@ -2041,9 +2040,11 @@ public class Compilation implements SourceLocator
 	    code.emitNew(moduleClass);
 	    code.emitDup(moduleClass);
 	    code.emitInvokeSpecial(moduleClass.constructor);
+            // The $instance field needs to be Public so
+            // ModuleContext.findInstance can find it.
 	    moduleInstanceMainField
 	      = moduleClass.addField("$instance", moduleClass,
-				     Access.STATIC|Access.PUBLIC|Access.FINAL);
+				     Access.STATIC|Access.PUBLIC);
 	    code.emitPutStatic(moduleInstanceMainField);
 	  }
         Initializer init;

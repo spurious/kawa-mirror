@@ -1,3 +1,10 @@
+2011-01-25  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (addMainClass): Don't call getConstructor, which
+	can caus problems if USE_DEFINED_CLASS with an explicit constructor.
+	(generateBytecode): Don't make $instance field be final, since the
+	field might be in moduleClass, but initialized in mainClass.
+
 2011-01-24  Per Bothner  <per@bothner.com>
 
 	* LambdaExp.java (getBodyFirstExpression, checkForInitCall):

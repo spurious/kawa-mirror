@@ -341,18 +341,13 @@ public class InlineCalls extends ExpExpVisitor<Type>
     int n = exp.inits.length;
     for (int i = 0; i < n; i++, decl = decl.nextDecl())
       {
-	Expression init0 = exp.inits[i];
+	Expression init = exp.inits[i];
         boolean typeSpecified = decl.getFlag(Declaration.TYPE_SPECIFIED);
-        Type dtype = typeSpecified && init0 != QuoteExp.undefined_exp ? decl.getType() : null;
-	Expression init = visit(init0, dtype);
+        Type dtype = typeSpecified && init != QuoteExp.undefined_exp ? decl.getType() : null;
+        init = visit(init, dtype);
 	exp.inits[i] = init;
-	Expression dvalue = decl.value;
-	if (dvalue == init0)
-	  {
-	    decl.value = dvalue = init;
-	    if (! typeSpecified)
-	      decl.setType(dvalue.getType());
-	  }
+        if (! typeSpecified && decl.getValueRaw() == init)
+          decl.setType(init.getType());
       }
 
     if (exitValue == null)
@@ -455,7 +450,7 @@ public class InlineCalls extends ExpExpVisitor<Type>
                       comp.error('e', "annotation "+ae.getAnnotationType().getName()+" allowed on methods", before);
                     if (decl.isClassField() && !ae.hasTarget(ElementType.FIELD))
                       comp.error('e', "annotation "+ae.getAnnotationType().getName()+" not allowed on fields", before);
-                    if (decl.value instanceof ClassExp
+                    if (decl.getValue() instanceof ClassExp
                         && !ae.hasTarget(ElementType.TYPE)
                         && !ae.hasTarget(ElementType.FIELD))
                       comp.error('e', "annotation "+ae.getAnnotationType().getName()+" not allowed on classes", before);

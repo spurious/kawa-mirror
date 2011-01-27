@@ -103,7 +103,7 @@ public class fluid_let extends Syntax
             if (value == null)
               value = new ReferenceExp(name);
             inits[i] = value;
-            decl.noteValue(null);
+            decl.noteValueUnknown();
             bindings = bind_pair.getCdr();
           }
         finally

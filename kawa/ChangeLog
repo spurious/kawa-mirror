@@ -1,3 +1,13 @@
+2011-01-27  Per Bothner  <per@bothner.com>
+
+	* lang/Lambda.java: Update to use new Declaration.ValueSource methods.
+	* standard/let.java: Likewise.
+	* standard/define_alias.java: Likewise.
+	* standard/object.java: Likewise.
+	* standard/fluid_let.java: Likewise.
+	* standard/set_b.java: Likewise.
+	* standard/define.java: Likewise.  Some re-writing needed.
+
 2011-01-24  Per Bothner  <per@bothner.com>
 
 	* lang/Quote.java (expand_pair): Change handling of prefixed names

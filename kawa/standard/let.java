@@ -121,7 +121,7 @@ public class let extends Syntax
 	inits[i] = tr.rewrite_car (init, syntax);
 	if (init.getCdr() != LList.Empty)
 	  return tr.syntaxError("junk after declaration of "+name);
-	decl.noteValue (inits[i]);
+        decl.noteValueFromLet(let, i);
 	bindings = bind_pair.getCdr();
       }
 

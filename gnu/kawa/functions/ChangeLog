@@ -1,3 +1,7 @@
+2011-01-27  Per Bothner  <per@bothner.com>
+
+	* GetModuleClass.java: Update to use new Declaration#noteValueUnknown.
+
 2011-01-24  Per Bothner  <per@bothner.com>
 
 	* CompilationHelpers.java (nonNumeric): Fix Numeric -> Number.

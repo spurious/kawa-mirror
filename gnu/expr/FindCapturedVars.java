@@ -487,9 +487,10 @@ public class FindCapturedVars extends ExpExpVisitor<Void>
 
   void capture (Declaration containing, Declaration decl)
   {
-    if (decl.isAlias() && decl.value instanceof ReferenceExp)
+    Expression dvalue;
+    if (decl.isAlias() && (dvalue = decl.getValue()) instanceof ReferenceExp)
       {
-	ReferenceExp rexp = (ReferenceExp) decl.value;
+	ReferenceExp rexp = (ReferenceExp) dvalue;
 	Declaration orig = rexp.binding;
 	if (orig != null
 	    && (containing == null || ! orig.needsContext()))

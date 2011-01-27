@@ -137,10 +137,11 @@ public class ApplyExp extends Expression
         ReferenceExp func_ref = (ReferenceExp) exp_func;
         owner = func_ref.contextDecl();
         Declaration func_decl = func_ref.binding;
+        Expression dvalue;
         while (func_decl != null && func_decl.isAlias()
-               && func_decl.value instanceof ReferenceExp)
+               && (dvalue = func_decl.getValueRaw()) instanceof ReferenceExp)
           {
-            func_ref = (ReferenceExp) func_decl.value;
+            func_ref = (ReferenceExp) dvalue;
             if (owner != null || func_decl.needsContext() || func_ref.binding == null)
               break;
             func_decl = func_ref.binding;

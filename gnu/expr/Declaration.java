@@ -1,4 +1,4 @@
-// Copyright (c) 2003, 2009, 2010  Per M.A. Bothner.
+// Copyright (c) 2003, 2009, 2010, 2011  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.expr;
@@ -176,9 +176,10 @@ public class Declaration
     if (target instanceof IgnoreTarget)
       return;
     Declaration owner = access == null ? null : access.contextDecl();
-    if (isAlias() && value instanceof ReferenceExp)
+    Expression dvalue = getValueRaw();
+    if (isAlias() && dvalue instanceof ReferenceExp)
       {
-        ReferenceExp rexp = (ReferenceExp) value;
+        ReferenceExp rexp = (ReferenceExp) dvalue;
         Declaration orig = rexp.binding;
         if (orig != null
             && ((flags & ReferenceExp.DONT_DEREFERENCE) == 0
@@ -232,6 +233,7 @@ public class Declaration
     else
       {
         Object val;
+        Expression value = getValueRaw();
         if (field != null)
           {
             comp.usedClass(field.getDeclaringClass());
@@ -361,74 +363,6 @@ public class Declaration
 	else
 	  code.emitPutStatic(field);
       }
-  }
-
-  /** If non-null, the single expression used to set this variable.
-   * If the variable can be set more than once, then value is null. */
-  protected Expression value = QuoteExp.undefined_exp;
-
-  /** The value of this <code>Declaration</code>, if known.
-   * Usually the expression used to initialize the <code>Declaration</code>,
-   * or null if the <code>Declaration</code> can be assigned a different
-   * value after initialization.  Note that this is the semantic value: If the
-   * <code>INDIRECT_LOCATION</code> is set, then <code>getValue</code> is the
-   * value <em>after</em> de-referencing the resulting <code>Location</code>.
-   * An exception is if <code>isAlias()</code>; in that case
-   * <code>getValue()</code> is an expression yielding a <code>Location</code>
-   * which needs to be de-referenced to get this <code>Declaration</code>'s
-   * actual value.
-   */
-  public final Expression getValue()
-  {
-    if (value == QuoteExp.undefined_exp)
-      {
-        if (field != null
-            && ((field.getModifiers() & Access.STATIC+Access.FINAL)
-                == Access.STATIC+Access.FINAL)
-            && ! isIndirectBinding())
-          {
-            try
-              {
-                value = new QuoteExp(field.getReflectField().get(null));
-              }
-            catch (Throwable ex)
-              {
-              }
-          }
-      }
-    else if (value instanceof QuoteExp && getFlag(TYPE_SPECIFIED)
-             && value.getType() != type)
-      {
-        try
-          {
-            Object val = ((QuoteExp) value).getValue();
-            Type t = getType();
-            value = new QuoteExp(t.coerceFromObject(val), t);
-          }
-        catch (Throwable ex)
-          {
-          }
-      }
-    return value;
-  }
-
-  /** Set the value associated with this Declaration.
-   * Most code should use noteValue instead. */
-  public final void setValue(Expression value) { this.value = value; }
-
-  /** If getValue() is a constant, return the constant value, otherwise null. */
-  public final Object getConstantValue()
-  {
-    Object v = getValue();
-    if (! (v instanceof QuoteExp) || v == QuoteExp.undefined_exp)
-      return null;
-    return ((QuoteExp) v).getValue();
-  }
-
-  public final boolean hasConstantValue ()
-  {
-    Object v = getValue();
-    return (v instanceof QuoteExp) && v != QuoteExp.undefined_exp;
   }
 
   boolean shouldEarlyInit ()
@@ -706,7 +640,7 @@ public class Declaration
     // This is a kludge.  Ideally, we should do some data-flow analysis.
     // But at least it makes sure require'd variables are not initialized.
     return ! ignorable()
-      && ! (value == QuoteExp.nullExp && base != null);
+      && ! (getValueRaw() == QuoteExp.nullExp && base != null);
   }
 
   public boolean isStatic()
@@ -737,23 +671,6 @@ public class Declaration
    * The applications are chained using their nextCall fields.
    * The chain is not built if STATIC_SPECIFIED. */
   public ApplyExp firstCall;
-
-  public void noteValue (Expression value)
-  {
-    // We allow assigning a real value after undefined ...
-    if (this.value == QuoteExp.undefined_exp)
-      {
-	if (value instanceof LambdaExp)
-	  ((LambdaExp) value).nameDecl = this;
-	this.value = value;
-      }
-    else if (this.value != value)
-      {
-	if (this.value instanceof LambdaExp) 
-	  ((LambdaExp) this.value).nameDecl = null;
-	this.value = null;
-      }
-  }
 
   protected Declaration()
   {
@@ -1231,5 +1148,197 @@ public class Declaration
           }
       }
     return null;
+  }
+
+  ValueSource values[];
+  int nvalues;
+  static final ValueSource unknownValueInstance =
+    new ValueSource(ValueSource.UNKNOWN_KIND, null, 0);
+  static final ValueSource[] unknownValueValues = { unknownValueInstance };
+
+  /** The value of this <code>Declaration</code>, if known.
+   * Usually the expression used to initialize the <code>Declaration</code>,
+   * or null if the <code>Declaration</code> can be assigned a different
+   * value after initialization.  Note that this is the semantic value: If the
+   * <code>INDIRECT_LOCATION</code> is set, then <code>getValue</code> is the
+   * value <em>after</em> de-referencing the resulting <code>Location</code>.
+   * An exception is if <code>isAlias()</code>; in that case
+   * <code>getValue()</code> is an expression yielding a <code>Location</code>
+   * which needs to be de-referenced to get this <code>Declaration</code>'s
+   * actual value.
+   */
+  public final Expression getValue()
+  {
+    if (nvalues == 0)
+      {
+        if (field != null
+            && ((field.getModifiers() & Access.STATIC+Access.FINAL)
+                == Access.STATIC+Access.FINAL)
+            && ! isIndirectBinding())
+          {
+            try
+              {
+                Expression value = new QuoteExp(field.getReflectField().get(null));
+                noteValue(value);
+                return value;
+              }
+            catch (Throwable ex)
+              {
+              }
+          }
+        return QuoteExp.undefined_exp;
+      }
+    if (nvalues == 1)
+      {
+        Expression value = values[0].getValue();
+         if (value instanceof QuoteExp && getFlag(TYPE_SPECIFIED)
+             && value.getType() != type)
+           {
+             try
+               {
+                 Object val = ((QuoteExp) value).getValue();
+                 Type t = getType();
+                 value = new QuoteExp(t.coerceFromObject(val), t);
+                 values[0] = new ValueSource(ValueSource.GENERAL_KIND,
+                                             value, 0);
+               }
+             catch (Throwable ex)
+               {
+               }
+           }
+        return value;
+      }
+    return null;
+  }
+
+  public Expression getValueRaw ()
+  {
+    if (nvalues == 0)
+      return QuoteExp.undefined_exp;
+    if (nvalues == 1)
+      return values[0].getValue();
+    return null;
+  }
+
+  /** Set the value associated with this Declaration.
+   * Most code should use noteValue instead. */
+  public final void setValue(Expression value)
+  {
+    values = null;
+    nvalues = 0;
+    noteValue(value);
+  }
+
+  /** If getValue() is a constant, return the constant value, otherwise null. */
+  public final Object getConstantValue()
+  {
+    Object v = getValue();
+    if (! (v instanceof QuoteExp) || v == QuoteExp.undefined_exp)
+      return null;
+    return ((QuoteExp) v).getValue();
+  }
+
+  public final boolean hasConstantValue ()
+  {
+    Object v = getValue();
+    return (v instanceof QuoteExp) && v != QuoteExp.undefined_exp;
+  }
+
+  public void noteValue (Expression value)
+  {
+    checkNameDecl(value);
+    if (value == null)
+      noteValueUnknown();
+    else
+      noteValue(new ValueSource(ValueSource.GENERAL_KIND, value, 0));
+  }
+
+  public void noteValue (ValueSource value)
+  {
+    if (values == null)
+      values = new ValueSource[4];
+    else if (nvalues >= values.length)
+      {
+        ValueSource[] tmp = new ValueSource[2 * nvalues];
+        System.arraycopy(values, 0, tmp, 0, nvalues);
+        values = tmp;
+      }
+    values[nvalues++] = value;
+  }
+
+  public void noteValueConstant (Object value)
+  {
+    noteValue(new QuoteExp(value));
+  }
+
+  public void noteValueUnknown ()
+  {
+    checkNameDecl(null);
+    values = unknownValueValues;
+    nvalues = 1;
+  }
+
+  public void noteValueFromSet (SetExp setter)
+  { 
+    checkNameDecl(setter.new_value);
+    noteValue(new ValueSource(ValueSource.SET_RHS_KIND, setter, 0));
+  }
+
+  public void noteValueFromLet (LetExp letter, int index)
+  {
+    Expression init = letter.inits[index];
+    if (init == QuoteExp.undefined_exp)
+      return;
+    checkNameDecl(init);
+    noteValue(new ValueSource(ValueSource.LET_INIT_KIND, letter, index));
+  }
+
+  private void checkNameDecl (Expression value)
+  {
+    if (nvalues == 1 && values[0].kind == ValueSource.GENERAL_KIND)
+      {
+        Expression old = values[0].base;
+        if (old == value)
+          return;
+        if (old instanceof LambdaExp)
+          ((LambdaExp) old).nameDecl = null;
+      }
+    if (nvalues == 0 && value instanceof LambdaExp)
+      ((LambdaExp) value).nameDecl = this;
+  }
+
+  public static class ValueSource
+  {
+    static final int UNKNOWN_KIND = 0;
+    static final int GENERAL_KIND = 1;
+    static final int SET_RHS_KIND = 2;
+    static final int LET_INIT_KIND = 3;
+    int kind;
+    Expression base;
+    int index;
+
+    ValueSource (int kind, Expression base, int index)
+    {
+      this.kind = kind;
+      this.base = base;
+      this.index = index;
+    }
+
+    public Expression getValue ()
+    {
+      switch (kind) 
+        {
+        case UNKNOWN_KIND:
+          return null;
+        case GENERAL_KIND:
+          return base;
+        case SET_RHS_KIND:
+          return ((SetExp) base).new_value;
+        case LET_INIT_KIND:
+          return ((LetExp) base).inits[index];
+        default:
+          throw new Error();
+        }
+    }
   }
 }

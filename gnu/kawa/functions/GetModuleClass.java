@@ -53,7 +53,7 @@ public class GetModuleClass extends ProcedureN
         if (init != null)
           {
             BindingInitializer.create(decl, init, comp);
-            decl.setValue(null);
+            decl.noteValueUnknown();
           }
       }
     else

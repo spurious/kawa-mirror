@@ -624,7 +624,7 @@ public class object extends Syntax
         Declaration decl = (Declaration) d;
         SetExp sexp = new SetExp(decl, initValue);
         sexp.setLocation(decl);
-        decl.noteValue(null);
+        decl.noteValueUnknown();
         initValue = sexp;
       }
     else

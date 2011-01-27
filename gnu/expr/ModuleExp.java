@@ -323,7 +323,7 @@ public class ModuleExp extends LambdaExp
                             if (! decl.isIndirectBinding())
                               decl.setValue(QuoteExp.getInstance(value));
                             else if (! decl.isAlias() || ! (dvalue instanceof ReferenceExp))
-                              decl.setValue(null);
+                              decl.noteValueUnknown();
                           }
 			if (decl.isIndirectBinding())
                           env.addLocation(sym, property, (Location) value);
@@ -337,7 +337,7 @@ public class ModuleExp extends LambdaExp
                                                     fld.getName());
 			loc.setDeclaration(decl);
 			env.addLocation(sym, property, loc);
-			decl.setValue(null);
+			decl.noteValueUnknown();
 		      }
 		  }
 	      }

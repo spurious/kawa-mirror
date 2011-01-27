@@ -2586,7 +2586,14 @@ public class Compilation implements SourceLocator
     for (Declaration decl = let.firstDecl();
 	 decl != null;
 	 decl = decl.nextDecl())
-      inits[i++] = decl.getValue();
+      {
+        Declaration.ValueSource sval = decl.values[0];
+        assert decl.nvalues==1 && sval.kind==Declaration.ValueSource.GENERAL_KIND;
+        inits[i] = sval.base;
+        sval.kind = Declaration.ValueSource.LET_INIT_KIND;
+        sval.base = let;
+        sval.index = i++;
+      }
     let.inits = inits;
     lexical.push(let);
   }

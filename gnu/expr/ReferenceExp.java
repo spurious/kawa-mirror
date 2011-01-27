@@ -83,10 +83,11 @@ public class ReferenceExp extends AccessExp
     throws Throwable
   {
     Object value;
+    Expression dvalue;
     if (binding != null && binding.isAlias() && ! getDontDereference()
-        && binding.value instanceof ReferenceExp)
+        && (dvalue = binding.getValueRaw()) instanceof ReferenceExp)
       {
-        ReferenceExp rexp = (ReferenceExp) binding.value;
+        ReferenceExp rexp = (ReferenceExp) dvalue;
         if (rexp.getDontDereference() && rexp.binding != null)
           {
             Expression v = rexp.binding.getValue();
@@ -97,7 +98,7 @@ public class ReferenceExp extends AccessExp
                 return;
               }
           }
-        value = binding.value.eval(ctx);
+        value = dvalue.eval(ctx);
       }
     else if (binding != null && binding.field != null
              && binding.field.getDeclaringClass().isExisting()
@@ -120,12 +121,12 @@ public class ReferenceExp extends AccessExp
     // This isn't just an optimization - it's needed for evaluating procedural
     // macros (e.g. syntax-case) defined in a not-yet-compiled module.
     else if (binding != null
-        && (binding.value instanceof QuoteExp
-            || binding.value instanceof LambdaExp)
-        && binding.value != QuoteExp.undefined_exp
+        && ((dvalue = binding.getValue()) instanceof QuoteExp
+            || dvalue instanceof LambdaExp)
+        && dvalue != QuoteExp.undefined_exp
         && (! getDontDereference() || binding.isIndirectBinding()))
       {
-        value = binding.value.eval(ctx);
+        value = dvalue.eval(ctx);
       }
     else if (binding == null
              || (binding.context instanceof ModuleExp
@@ -239,14 +240,7 @@ public class ReferenceExp extends AccessExp
       {
         Expression value = decl.getValue();
         if (value != null && value != QuoteExp.undefined_exp)
-          {
-            // Kludge to guard against cycles.
-            // Not verified if it is really needed, but just in case ...
-            Expression save = decl.value;
-            decl.value = null;
-            type = value.getType();
-            decl.value = save;
-          }
+          type = value.getType();
       }
     if (type == Type.toStringType)
       type = Type.javalangStringType;

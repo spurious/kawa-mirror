@@ -212,15 +212,7 @@ public class LetExp extends ScopeExp
     Declaration decl = firstDecl();
     for (int i = 0; i < inits.length; i++, decl = decl.nextDecl())
       {
-        Expression init0 = inits[i];
-        if (init0 == null)
-          throw new Error("null1 init for "+this+" i:"+i+" d:"+decl);
-        Expression init = visitor.visitAndUpdate(init0, d);
-        if (init == null)
-          throw new Error("null2 init for "+this+" was:"+init0);
-        inits[i] = init;
-        if (decl.value == init0)
-          decl.value = init;
+        inits[i] = visitor.visitAndUpdate(inits[i], d);
       }
   }
 

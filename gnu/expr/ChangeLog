@@ -1,3 +1,27 @@
+2011-01-27  Per Bothner  <per@bothner.com>
+
+	* Declaration.java: Re-write handling of the 'value' Expression.
+	There is now an array of ValueSource objects, so there can be multiple
+	possible setters remembered, with some useful indirection.
+	Preliminary work for supporting Single-Static-Assignment analysis.
+	(value): Removed field.
+	(nvalues, values): New fields.
+	(getValue, NoteValue, setValue): Re-written.
+	(class ValueSource): New static member class.
+	(getValueraw, noteValueConstant, noteValueUnknown,
+	noteValueFromSet, noteValueFromLet, checkNameDecl): New methods.
+	* ApplyExp.java: Update to use new methods.
+	* ModuleInfo.java: Likewise.
+	* ModuleExp.java: Likewise.
+	* FindCapturedVars.java: Likewise.
+	* ReferenceExp.java: Likewise.
+	* SetExp.java (setNewValue): New method.
+	* ExpVisitor.java (visitSetExp): Simplify - don't need to update
+	declaration's value because new indirection does it automatically.
+	* LetExp.java (visitInitializers): Likewise.
+	* InlineCalls.java (visitLetExp): Likewise.
+	* Compilation.java (letEnter): Update to use ValueSource.
+
 2011-01-25  Per Bothner  <per@bothner.com>
 
 	* Compilation.java (addMainClass): Don't call getConstructor, which

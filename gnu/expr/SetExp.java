@@ -43,6 +43,7 @@ public class SetExp extends AccessExp
 
   /** Get the Expression for calculating the new ("right-hand") value. */
   public final Expression getNewValue() { return new_value; }
+  public void setNewValue(Expression newValue) { this.new_value = newValue; }
 
   public static final int DEFINING_FLAG = NEXT_AVAIL_FLAG;
   public static final int GLOBAL_FLAG = NEXT_AVAIL_FLAG << 1;

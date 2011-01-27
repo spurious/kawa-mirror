@@ -73,7 +73,7 @@ public class define_alias extends Syntax
             tr.push(decl);
             SetExp sexp = new SetExp(decl, arg);
             tr.setLineOf(sexp);
-            decl.noteValue(arg);
+            decl.noteValueFromSet(sexp);
             sexp.setDefining (true);
             forms.addElement(sexp);
             return true;

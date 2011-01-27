@@ -112,21 +112,7 @@ public class ExpVisitor<R,D>
   protected R visitSetExp (SetExp exp, D d)
   {
     Declaration decl = exp.binding;
-    boolean updateNeeded = decl != null && decl.value == exp.new_value;
     exp.new_value = visitSetExpValue(exp.new_value, d, exp.getBinding());
-    /*
-    R r = visit(exp.new_value, d);
-    exp.new_value = update(exp.new_value, r);
-    R ret = defaultValue(exp, d);
-    */
-    // If the Declaration's value was that of our new_value,
-    // and we modified/simplified the latter, update the former as well.
-    if (updateNeeded && exp.isDefining())
-      {
-        decl.value = exp.new_value;
-        if (exp.new_value instanceof LambdaExp)
-          ((LambdaExp) exp.new_value).nameDecl = decl;
-      }
     return defaultValue(exp, d);
   }
 

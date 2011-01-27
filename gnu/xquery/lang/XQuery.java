@@ -121,7 +121,7 @@ public class XQuery extends Language
 	LambdaExp lexp = new LambdaExp(3);
 	Declaration dotDecl = lexp.addDeclaration(XQParser.DOT_VARNAME);
 	dotDecl.setFlag(Declaration.IS_SINGLE_VALUE);
-	dotDecl.noteValue (null);  // Does not have a known value.
+	dotDecl.noteValueUnknown();
 	lexp.addDeclaration(XQParser.POSITION_VARNAME, Type.intType);
 	lexp.addDeclaration(XQParser.LAST_VARNAME, Type.intType);
 	tr.push(lexp);

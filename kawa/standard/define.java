@@ -77,6 +77,7 @@ public class define extends Syntax
       decl.setFlag(Declaration.IS_CONSTANT);
     decl.setFlag(Declaration.IS_SINGLE_VALUE);
 
+    Expression value;
     if ((options & 2) != 0)
       {
 	LambdaExp lexp = new LambdaExp();
@@ -94,8 +95,11 @@ public class define extends Syntax
 	Object realBody = lambda.rewriteAttrs(lexp, body, tr);
 	if (realBody != body)
 	  p2 = new Pair(p2.getCar(), new Pair(p3.getCar(), new Pair(formals, realBody)));
-	decl.noteValue(lexp);
+        value = lexp;
       }
+    else
+      value = null;
+    SetExp sexp = new SetExp(decl, value);
 
     if (defs instanceof ModuleExp && ! makePrivate
         && (! Compilation.inlineOk || tr.sharedModuleDefs()))
@@ -108,7 +112,7 @@ public class define extends Syntax
       }
 
     st = Translator.makePair(st, this,
-			     Translator.makePair(p1, decl, p2));
+			     Translator.makePair(p1, sexp, p2));
     Translator.setLine(decl, p1);
 
     tr.formStack.addElement(st);
@@ -120,13 +124,14 @@ public class define extends Syntax
     Pair p2 = (Pair) p1.getCdr();
     Pair p3 = (Pair) p2.getCdr();
     Pair p4 = (Pair) p3.getCdr();
-    Object name = Translator.stripSyntax(p1.getCar());
+    Object name = p1.getCar();
     int options = ((Number) Translator.stripSyntax(p2.getCar())).intValue();
     boolean makePrivate = (options & 4) != 0;
 
-    if (! (name instanceof Declaration))
+    if (! (name instanceof SetExp))
       return tr.syntaxError(getName(options) + " is only allowed in a <body>");
-    Declaration decl = (Declaration) name;
+    SetExp sexp = (SetExp) name;
+    Declaration decl = sexp.getBinding();
 
     if (decl.getFlag(Declaration.TYPE_SPECIFIED))
       {
@@ -138,24 +143,24 @@ public class define extends Syntax
           }
       }
 
-    Expression value;
+    boolean unknownValue;
     if ((options & 2) != 0)
       {
-	LambdaExp lexp = (LambdaExp) decl.getValue();
+        LambdaExp lexp = (LambdaExp) sexp.getNewValue();
 	Object body = p4.getCdr();
 	lambda.rewriteBody(lexp, body, tr);
-	value = lexp;
-        if (! Compilation.inlineOk)
-          decl.noteValue(null);
+        unknownValue = ! Compilation.inlineOk;
       }
     else
       {
-	value = tr.rewrite (p4.getCar());
-	decl.noteValue((decl.context instanceof ModuleExp && ! makePrivate
-			&& decl.getCanWrite())
-		        ? null : value);
+        unknownValue = decl.context instanceof ModuleExp && ! makePrivate && decl.getCanWrite();
+	sexp.setNewValue(tr.rewrite (p4.getCar()));
       }
-    SetExp sexp = new SetExp(decl, value);
+    if (unknownValue)
+      decl.noteValueUnknown();
+    else
+      decl.noteValueFromSet(sexp);
+
     sexp.setDefining (true);
     if (makePrivate && ! (tr.currentScope() instanceof ModuleExp))
       tr.error('w', "define-private not at top level "

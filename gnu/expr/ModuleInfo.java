@@ -202,7 +202,7 @@ public class ModuleInfo
                 Object fvalue = (flags & Access.STATIC) == 0 ? null
                   : rclass.getField(fld.getName()).get(null);
                 fdecl = language.declFromField(mod, fvalue, fld);
-                fdecl.noteValue(null);
+                fdecl.noteValueUnknown();
               }
 	  }
 	catch (Exception ex)

@@ -1974,7 +1974,7 @@ public class XQParser extends Lexer
 	Declaration dotDecl = lexp.addDeclaration(DOT_VARNAME);
 	dotDecl.setFlag(Declaration.IS_SINGLE_VALUE);
         dotDecl.setType(NodeType.anyNodeTest);
-	dotDecl.noteValue (null);  // Does not have a known value.
+	dotDecl.noteValueUnknown();
 	lexp.addDeclaration(POSITION_VARNAME, LangPrimType.intType);
 	lexp.addDeclaration(LAST_VARNAME, LangPrimType.intType);
 	comp.push(lexp);
@@ -2128,7 +2128,7 @@ public class XQParser extends Lexer
 	    lexp.addDeclaration(POSITION_VARNAME, Type.intType);
 	    lexp.addDeclaration(LAST_VARNAME, Type.intType);
 	    comp.push(lexp);
-	    dot.noteValue(null);
+	    dot.noteValueUnknown();
 	    Expression cond = parseExprSequence(']', false);
             if (curToken == EOF_TOKEN)
               eofError("missing ']' - unexpected end-of-file");
@@ -3386,14 +3386,14 @@ public class XQParser extends Lexer
       decl.setTypeExp(type);
     if (isFor)
       {
-	decl.noteValue (null);  // Does not have a known value.
+	decl.noteValueUnknown();
 	decl.setFlag(Declaration.IS_SINGLE_VALUE);
       }
     if (posDecl != null)
       {
 	sc.addDeclaration(posDecl);
 	posDecl.setType(LangPrimType.intType);
-	posDecl.noteValue(null);
+	posDecl.noteValueUnknown();
 	posDecl.setFlag(Declaration.IS_SINGLE_VALUE);
       }
     Expression body;
@@ -3494,7 +3494,7 @@ public class XQParser extends Lexer
     
     LambdaExp lexp = new LambdaExp(1);
     lexp.addDeclaration(decl);
-    decl.noteValue (null);  // Does not have a known value.
+    decl.noteValueUnknown();
     decl.setFlag(Declaration.IS_SINGLE_VALUE);
     decl.setTypeExp(parseOptionalTypeDeclaration());
 

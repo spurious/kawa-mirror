@@ -285,7 +285,7 @@ class CharMap extends AbstractWeakHashTable<Char,Char>
 	 node != null;  node = node.next)
       {
         Char val = node.getValue();
-        if (val.intValue() == key)
+        if (val != null && val.intValue() == key)
           return val;
       }
     Char val = new Char(key);

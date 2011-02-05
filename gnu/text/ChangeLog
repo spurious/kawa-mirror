@@ -1,3 +1,8 @@
+2011-02-04  Jamison Hope  <jrh@theptrgroup.com>
+
+	* Char.java (CharMap.get): The return from getValue might return null,
+	because it's a weak reference.
+
 2010-11-27  Per Bothner  <per@bothner.com>
 
 	* WriterManager.java (register): Fix thinko.

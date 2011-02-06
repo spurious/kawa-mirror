@@ -1,3 +1,11 @@
+2011-02-05  Per Bothner  <per@bothner.com>
+
+	* standard/require.java (scanForDefinitions): Handle the case
+	(require CNAME "FILE") where CNAME doesn't (yet) exist.  Before it
+	would work only when using angle-bracket syntax, which forces a
+	ClassType - but a plain CNAME doesn't.  So check for a null result
+	from getTypeFor.
+
 2011-01-27  Per Bothner  <per@bothner.com>
 
 	* lang/Lambda.java: Update to use new Declaration.ValueSource methods.

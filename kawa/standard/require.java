@@ -172,7 +172,12 @@ public class require extends Syntax
     else if (name instanceof Symbol && ! tr.selfEvaluatingSymbol(name))
       {
         type = tr.getLanguage().getTypeFor(tr.rewrite(name, false));
-        if (type instanceof ClassType && args.getCdr() instanceof Pair)
+        String cname = null;
+        if (type instanceof ClassType)
+          cname = type.getName();
+        else if (type == null && name instanceof SimpleSymbol)
+          cname = ((SimpleSymbol) name).getName();
+        if (cname != null && args.getCdr() instanceof Pair)
           {
             name = ((Pair) args.getCdr()).getCar();
             if
@@ -189,7 +194,7 @@ public class require extends Syntax
                     tr.error('e', "malformed URL: "+sourceName);
                     return false;
                   }
-                return importDefinitions(type.getName(), info, null,
+                return importDefinitions(cname, info, null,
                                          forms, defs, tr);
               }
 	  }

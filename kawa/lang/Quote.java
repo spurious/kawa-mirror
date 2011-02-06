@@ -129,12 +129,7 @@ public class Quote extends Syntax
             else if ((combinedName = CompileNamedPart.combineName(part1, part2)) != null)
               cdr = tr.getGlobalEnvironment().getSymbol(combinedName);
             else
-              {
-                Object save = tr.pushPositionOf(pair);
-                tr.error('e', "'"+p1.getCar()+"' is not a valid prefix");
-                tr.popPositionOf(save);
-                cdr = sym;
-              }
+              cdr = pair;
             break;
           }
         else if (depth < 0)

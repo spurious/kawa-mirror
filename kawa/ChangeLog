@@ -1,3 +1,8 @@
+2011-02-06  Per Bothner  <per@bothner.com>
+
+	* lang/Quote.java (expand_pair): If quoting EXP:NAME just quitely
+	return the (non-standard) SEXPR-representation without complaining.
+
 2011-02-05  Per Bothner  <per@bothner.com>
 
 	* lang/Macro.java (hygienic): Replace boolean with ..

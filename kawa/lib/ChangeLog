@@ -1,3 +1,7 @@
+2011-02-06  Per Bothner  <per@bothner.com>
+
+	* syntax.scm (try-finally, synchronized): Fix error in last change.
+
 2011-02-04  Per Bothner  <per@bothner.com>
 
 	* prim_syntax.scm (if): Change to use define-rewrite-syntax.  This

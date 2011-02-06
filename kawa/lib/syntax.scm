@@ -30,19 +30,21 @@
 				  ((when cond exp ...)
 				   (if (not cond) (begin exp ...)))))
 
-(define-rewrite-syntax (try-finally x)
-  (syntax-case x ()
-	       ((_ try-part finally-part)
-		(make <gnu.expr.TryExp>
-		  (syntax->expression (syntax try-part))
-		  (syntax->expression (syntax finally-part))))))
+(define-rewrite-syntax try-finally
+  (lambda (x)
+    (syntax-case x ()
+      ((_ try-part finally-part)
+       (make <gnu.expr.TryExp>
+         (syntax->expression (syntax try-part))
+         (syntax->expression (syntax finally-part)))))))
 
-(define-rewrite-syntax (synchronized x)
-  (syntax-case x ()
-	       ((_ object . body)
-		(make <gnu.expr.SynchronizedExp>
-		  (syntax->expression (syntax object))
-		  (syntax-body->expression (syntax body))))))
+(define-rewrite-syntax synchronized
+  (lambda (x)
+    (syntax-case x ()
+      ((_ object . body)
+       (make <gnu.expr.SynchronizedExp>
+         (syntax->expression (syntax object))
+         (syntax-body->expression (syntax body)))))))
 
 (define (identifier-list? obj) ::boolean
   (and (>= (kawa.lang.Translator:listLength obj) 0)

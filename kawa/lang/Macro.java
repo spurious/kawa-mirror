@@ -11,7 +11,20 @@ public class Macro extends Syntax implements Printable, Externalizable
 
   Object instance;
 
-  private boolean hygienic = true;
+  public static final int HYGIENIC = 1;
+  /** If this flag is set, then don't expand during the scan-body phase. */
+  public static final int SKIP_SCAN_FORM = 2;
+  private int flags = HYGIENIC;
+
+  public final void setFlags(int flags) { this.flags = flags; }
+  public final boolean isHygienic() { return (flags & HYGIENIC) != 0; }
+  public final void setHygienic (boolean hygienic)
+  {
+    if (hygienic)
+      flags |= HYGIENIC;
+    else
+      flags &= ~HYGIENIC;
+  }
 
   private ScopeExp capturedScope;
 
@@ -43,7 +56,7 @@ public class Macro extends Syntax implements Printable, Externalizable
   public static Macro makeNonHygienic (Object name, Procedure expander)
   {
     Macro mac = new Macro(name, expander);
-    mac.hygienic = false;
+    mac.setHygienic(false);
     return mac;
   }
 
@@ -51,7 +64,16 @@ public class Macro extends Syntax implements Printable, Externalizable
 				       Object instance)
   {
     Macro mac = new Macro(name, expander);
-    mac.hygienic = false;
+    mac.setHygienic(false);
+    mac.instance = instance;
+    return mac;
+  }
+
+  public static Macro makeSkipScanForm (Object name, Procedure expander,
+				       Object instance)
+  {
+    Macro mac = new Macro(name, expander);
+    mac.flags = HYGIENIC|SKIP_SCAN_FORM;
     mac.instance = instance;
     return mac;
   }
@@ -69,9 +91,6 @@ public class Macro extends Syntax implements Printable, Externalizable
     return mac;
   }
 
-  public final boolean isHygienic() { return hygienic; }
-  public final void setHygienic (boolean hygienic) {this.hygienic = hygienic;}
-
   public Macro ()
   {
   }
@@ -81,7 +100,7 @@ public class Macro extends Syntax implements Printable, Externalizable
   {
     name = old.name;
     expander = old.expander;
-    hygienic = old.hygienic;
+    flags = old.flags;
   }
 
   public Macro(Object name, Procedure expander)
@@ -158,7 +177,7 @@ public class Macro extends Syntax implements Printable, Externalizable
 	      ((Expression) exp).eval(tr.getGlobalEnvironment());
 	  }
 	Object result;
-	if (! hygienic)
+	if (! isHygienic())
 	  {
 	    form = Quote.quote(form, tr);
 	    int nargs = Translator.listLength(form);
@@ -194,6 +213,11 @@ public class Macro extends Syntax implements Printable, Externalizable
 
   public void scanForm (Pair st, ScopeExp defs, Translator tr)
   {
+    if ((flags & SKIP_SCAN_FORM) != 0)
+      {
+        super.scanForm(st, defs, tr);
+        return;
+      }
     String save_filename = tr.getFileName();
     int save_line = tr.getLineNumber();
     int save_column = tr.getColumnNumber();

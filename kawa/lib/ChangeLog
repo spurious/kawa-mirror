@@ -1,3 +1,10 @@
+2011-02-04  Per Bothner  <per@bothner.com>
+
+	* prim_syntax.scm (if): Change to use define-rewrite-syntax.  This
+	defers expansion and hence name lookup until the rewrite phase.
+	(try-catch): Likewise.
+	* syntax.scm (try-finally, synchronized): Likewise.
+
 2011-01-24  Jamison Hope <jrh@theptrgroup.com>
 
 	* rnrs/lists.scm: Added the (rnrs lists (6)) library.

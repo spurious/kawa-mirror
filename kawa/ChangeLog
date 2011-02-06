@@ -1,5 +1,15 @@
 2011-02-05  Per Bothner  <per@bothner.com>
 
+	* lang/Macro.java (hygienic): Replace boolean with ..
+	(flag): new bit mask.
+	(HYGIENIC): New constant.
+	(SKIP_SCAN_FORM): New constant.
+	(makeSkipScanForm): New factory method.
+	(scanForm): Just call super, rather than expanding, if SKIP_SCAN_FORM.
+	* standard/define_syntax.java (flags): New field.
+	(define_rewrite_syntax): New static.
+	* standard/Scheme.java (initScheme): Define define-rewrite-syntax.
+
 	* standard/require.java (scanForDefinitions): Handle the case
 	(require CNAME "FILE") where CNAME doesn't (yet) exist.  Before it
 	would work only when using angle-bracket syntax, which forces a

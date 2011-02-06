@@ -571,6 +571,8 @@ public class Scheme extends LispLanguage
       defSntxStFld("syntax-case", "kawa.standard.syntax_case", "syntax_case");
       defSntxStFld("%define-syntax", "kawa.standard.define_syntax",
                    "define_syntax");
+      defSntxStFld("define-rewrite-syntax", "kawa.standard.define_syntax",
+                   "define_rewrite_syntax");
       defSntxStFld("syntax", "kawa.standard.syntax", "syntax");
       defSntxStFld("quasisyntax", "kawa.standard.syntax", "quasiSyntax");
       defProcStFld("syntax-object->datum", "kawa.lib.std_syntax");

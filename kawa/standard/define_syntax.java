@@ -10,21 +10,31 @@ import gnu.lists.*;
 
 public class define_syntax extends Syntax
 {
+  int flags;
+
   public static final define_syntax define_macro
     = new define_syntax("%define-macro", false);
 
   public static final define_syntax define_syntax
     = new define_syntax("%define-syntax", true);
 
+  public static final define_syntax define_rewrite_syntax
+    = new define_syntax("define-rewrite-syntax", Macro.HYGIENIC|Macro.SKIP_SCAN_FORM);
+
   public define_syntax ()
   {
-    this.hygienic = true;
+    flags = Macro.HYGIENIC;
+  }
+
+  public define_syntax (Object name, int flags)
+  {
+    super(name);
+    this.flags = flags;
   }
 
   public define_syntax (Object name, boolean hygienic)
   {
-    super(name);
-    this.hygienic = hygienic;
+    this(name, hygienic ? Macro.HYGIENIC : 0);
   }
 
   static ClassType typeMacro = ClassType.make("kawa.lang.Macro");
@@ -32,14 +42,15 @@ public class define_syntax extends Syntax
     = new PrimProcedure(typeMacro.getDeclaredMethod("make", 3));
   static PrimProcedure makeNonHygienic
     = new PrimProcedure(typeMacro.getDeclaredMethod("makeNonHygienic", 3));
+  static PrimProcedure makeSkipScanForm
+    = new PrimProcedure(typeMacro.getDeclaredMethod("makeSkipScanForm", 3));
   static PrimProcedure setCapturedScope
     = new PrimProcedure(typeMacro.getDeclaredMethod("setCapturedScope", 1));
   static {
     makeHygienic.setSideEffectFree();
     makeNonHygienic.setSideEffectFree();
+    makeSkipScanForm.setSideEffectFree();
   }
-
-  boolean hygienic;
 
   public Expression rewriteForm (Pair form, Translator tr)
   {
@@ -89,7 +100,7 @@ public class define_syntax extends Syntax
 
     Macro savedMacro = tr.currentMacroDefinition;
     Macro macro = Macro.make(decl);
-    macro.setHygienic(hygienic);
+    macro.setFlags(flags);
     tr.currentMacroDefinition = macro;
     Expression rule = tr.rewrite_car((Pair) p, syntax);
     tr.currentMacroDefinition = savedMacro;
@@ -101,7 +112,9 @@ public class define_syntax extends Syntax
     args[0] = new QuoteExp(name);
     args[1] = rule;
     args[2] = ThisExp.makeGivingContext(defs);
-    rule = new ApplyExp(hygienic ? makeHygienic : makeNonHygienic,
+    rule = new ApplyExp((flags & Macro.SKIP_SCAN_FORM) != 0 ? makeSkipScanForm
+                        : (flags & Macro.HYGIENIC) != 0 ? makeHygienic
+                        : makeNonHygienic,
 			args);
     decl.noteValue(rule);
     decl.setProcedureDecl(true);

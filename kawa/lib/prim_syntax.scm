@@ -65,7 +65,7 @@
     ((syntax-body->expression x)
      (kawa.lang.SyntaxForms:rewriteBody x))))
 
-(%define-syntax if
+(define-rewrite-syntax if
   (lambda (x)
     (syntax-case x ()
 		 ((_ test then)
@@ -85,7 +85,7 @@
 		  (syntax-error (syntax rest)
 				"too few expressions for 'if'")))))
 
-(%define-syntax try-catch
+(define-rewrite-syntax try-catch
   (lambda (x)
     (syntax-case x ()
 		 ((_ try-part (var type . catch-body) ...)

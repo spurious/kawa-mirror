@@ -20,7 +20,7 @@
 ;; The 'if' primitive in version takes an arbitary number of 'else'
 ;; expressions, in contrast to the Scheme and CommonLisp definitions.
 
-(%define-syntax if
+(define-rewrite-syntax if
   (lambda (x)
     (syntax-case x ()
 		 ((_ test then)

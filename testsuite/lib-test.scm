@@ -1,4 +1,4 @@
-(test-begin "libs" 126)
+(test-begin "libs" 212)
 
 (import (srfi :2 and-let*))
 
@@ -55,8 +55,8 @@
             (symbol-parts (symbol "loc5" (namespace "uri5" "pre"))))
 (test-equal '("abc:def" "" "")
 	    (symbol-parts '|abc:def|))
-;(test-equal '("abc:def" "" "")
-;	    (symbol-parts 'abc:def))
+(test-equal '("abc:def" "" "")
+	    (symbol-parts 'abc:def))
 
 (require 'xml)
 
@@ -359,5 +359,299 @@
 (test-equal 1 (cons* 1))
 
 (test-end "rnrs-lists")
+
+(test-begin "char-sets" 85)
+
+(import (srfi :14 char-sets))
+(import (rnrs sorting))
+
+; char-set=
+(test-equal #t (char-set=))
+(test-equal #t (char-set= char-set:full))
+(test-equal #t (char-set= char-set:full char-set:full))
+(test-equal #f (char-set= char-set:empty char-set:full))
+(test-equal #t (char-set= char-set:empty (char-set)))
+; char-set<=
+(test-equal #t (char-set<=))
+(test-equal #t (char-set<= char-set:empty))
+(test-equal #t (char-set<= char-set:empty char-set:full))
+(test-equal #t (char-set<= char-set:empty char-set:lower-case
+                           char-set:full))
+; char-set-hash
+(test-equal #t (= (char-set-hash char-set:empty)
+                  (char-set-hash (char-set))))
+(test-equal #t (<= 0 (char-set-hash char-set:lower-case 50) 49))
+; char-set-cursor, char-set-ref, char-set-cursor-next,
+; end-of-char-set?
+(define cs (char-set #\H #\e #\l #\l #\o #\, #\W #\o #\r #\l #\d))
+(test-equal '(#\, #\H #\W #\d #\e #\l #\o #\r)
+            (list-sort char<?
+                       (let lp ((cur (char-set-cursor cs)) (ans '()))
+                         (if (end-of-char-set? cur) ans
+                             (lp (char-set-cursor-next cs cur)
+                                 (cons (char-set-ref cs cur) ans))))))
+(test-equal #t (end-of-char-set? (char-set-cursor char-set:empty)))
+; char-set-fold
+(test-equal '(#\, #\H #\W #\d #\e #\l #\o #\r)
+            (list-sort char<? (char-set-fold cons '() cs)))
+(test-equal 0 (char-set-fold (lambda (c i) (+ i 1)) 0 char-set:empty))
+(test-equal 128 (char-set-fold (lambda (c i) (+ i 1)) 0 char-set:ascii))
+; char-set-unfold, char-set-unfold!
+(define abc (char-set #\a #\b #\c))
+(test-equal #t (char-set= abc (char-set-unfold
+                               null? car cdr '(#\a #\b #\c))))
+(test-equal #t (char-set= abc (char-set-unfold
+                               null? car cdr '(#\a #\c)
+                               (char-set #\b))))
+(test-equal #t (char-set= abc (char-set-unfold!
+                               null? car cdr '(#\a #\c)
+                               (char-set #\b))))
+; also testing the definition of char-set:full
+(test-equal #t (char-set= char-set:full
+                          (char-set-unfold
+                           (lambda (i) (> i #x10FFFF))
+                           integer->char
+                           (lambda (i) (+ i 1))
+                           0)))
+; char-set-for-each is only useful for side-effects, so no test
+; provided
+; char-set-map
+(test-equal #t (char-set= abc (char-set-map char-downcase
+                                            (char-set #\A #\B #\C))))
+; char-set-copy
+(test-equal #t (equal? char-set:empty (char-set-copy char-set:empty)))
+(test-equal '(#\, #\H #\W #\d #\e #\l #\o #\r)
+            (list-sort char<? (char-set-fold cons '()
+                                             (char-set-copy cs))))
+; list->char-set, list->char-set!
+(test-equal #t (char-set= abc (list->char-set '(#\a #\b #\c))))
+(test-equal #t (char-set= abc (list->char-set '(#\a)
+                                              (char-set #\b #\c))))
+(test-equal #t (char-set= abc (list->char-set! '(#\a)
+                                               (char-set #\b #\c))))
+; string->char-set, string->char-set!
+(test-equal #t (char-set= abc (string->char-set "abc")))
+(test-equal #t (char-set= abc (string->char-set "ab"
+                                                (char-set #\c))))
+(test-equal #t (char-set= abc (string->char-set! "ab"
+                                                 (char-set #\c))))
+; char-set-filter and the meanings of some standard character sets
+(test-equal #t (char-set=
+                char-set:empty
+                (char-set-filter (lambda (c) #f) char-set:full)))
+(test-equal #t (char-set=
+                char-set:ascii
+                (char-set-filter
+                 (lambda (c) (> 128 (char->integer c)))
+                 char-set:full)))
+(test-equal #t (char-set=
+                char-set:iso-control
+                (char-set-filter
+                 (lambda (c) (java.lang.Character:isISOControl
+                              (char->integer c))) char-set:full)))
+(test-equal #t (char-set=
+                char-set:lower-case
+                (char-set-filter
+                 (lambda (c) (java.lang.Character:lower-case?
+                              (char->integer c))) char-set:full)))
+(test-equal #t (char-set=
+                char-set:upper-case
+                (char-set-filter
+                 (lambda (c) (java.lang.Character:upper-case?
+                              (char->integer c))) char-set:full)))
+(test-equal #t (char-set=
+                char-set:letter
+                (char-set-filter
+                 (lambda (c) (java.lang.Character:letter?
+                              (char->integer c))) char-set:full)))
+(test-equal #t (char-set=
+                char-set:digit
+                (char-set-filter
+                 (lambda (c) (java.lang.Character:digit?
+                              (char->integer c))) char-set:full)))
+(test-equal
+ #t (char-set=
+     char-set:punctuation
+     (char-set-filter
+      (lambda (c)
+        (let ((type ::byte (java.lang.Character:get-type
+                            (char->integer c))))
+          (or (= type java.lang.Character:CONNECTOR_PUNCTUATION)
+              (= type java.lang.Character:DASH_PUNCTUATION)
+              (= type java.lang.Character:START_PUNCTUATION)
+              (= type java.lang.Character:END_PUNCTUATION)
+              (= type java.lang.Character:INITIAL_QUOTE_PUNCTUATION)
+              (= type java.lang.Character:FINAL_QUOTE_PUNCTUATION)
+              (= type java.lang.Character:OTHER_PUNCTUATION))))
+      char-set:full)))
+(test-equal
+ #t (char-set=
+     char-set:symbol
+     (char-set-filter
+      (lambda (c)
+        (let ((type ::byte (java.lang.Character:get-type
+                            (char->integer c))))
+          (or (= type java.lang.Character:MATH_SYMBOL)
+              (= type java.lang.Character:CURRENCY_SYMBOL)
+              (= type java.lang.Character:MODIFIER_SYMBOL)
+              (= type java.lang.Character:OTHER_SYMBOL))))
+      char-set:full)))
+; char-set-filter!
+(test-equal #t (char-set= (char-set #\a #\b #\c)
+                          (char-set-filter!
+                           char-lower-case?
+                           (char-set #\b #\c #\D #\E #\F)
+                           (char-set #\a))))
+; ucs-range->char-set, ucs-range->char-set!
+(test-equal #t (char-set= char-set:ascii (ucs-range->char-set 0 128)))
+(test-equal
+ #t (char-set= char-set:full
+               (ucs-range->char-set! 100 (+ 1 #x10FFFF) #f
+                                     (ucs-range->char-set 0 100))))
+; ->char-set
+(define csa ::char-set (char-set #\a))
+(test-equal #t (char-set= csa (->char-set (char-set #\a))))
+(test-equal #t (char-set= csa (->char-set #\a)))
+(test-equal #t (char-set= csa (->char-set "a")))
+; char-set->list, char-set->string -- order is not guaranteed
+(test-equal '(#\a #\b #\c) (list-sort char<? (char-set->list abc)))
+(test-equal "a" (char-set->string csa))
+(test-equal #t (let ((s ::String (char-set->string abc)))
+                 (or (string=? s "abc") (string=? s "acb")
+                     (string=? s "bac") (string=? s "bca")
+                     (string=? s "cab") (string=? s "cba"))))
+; char-set-size, char-set-count
+(test-equal 1 (char-set-size csa))
+(test-equal 0 (char-set-size char-set:empty))
+(test-equal 3 (char-set-size abc))
+(test-equal 2 (char-set-size (char-set #\A #\z)))
+(test-equal (char-set-size char-set:letter)
+            (char-set-count (lambda (c) #t) char-set:letter))
+(test-equal 1 (char-set-count char-lower-case? (char-set #\A #\z)))
+; char-set-contains?, char-set-every, char-set-any
+(test-equal #f (char-set-contains? char-set:upper-case #\a))
+
+(test-equal #t (char-set-contains?
+                char-set:full
+                (integer->char (remainder
+                                (abs ((java.util.Random):nextInt))
+                                (+ 1 #x10FFFF)))))
+
+(test-equal #f (char-set-any char-upper-case? char-set:lower-case))
+(test-equal #t (char-set-every char-upper-case? char-set:upper-case))
+; char-set-adjoin, char-set-adjoin!
+(test-equal #t (char-set= abc
+                          (char-set-adjoin (char-set #\a) #\b #\c)))
+(test-equal #t (char-set= abc
+                          (char-set-adjoin! (char-set #\a) #\b #\c)))
+; char-set-delete, char-set-delete!
+(test-equal #t (char-set=
+                abc
+                (char-set-delete (string->char-set "fdbaec")
+                                 #\d #\e #\f)))
+; char-set-complement, char-set-complement!
+(test-equal #t (char-set= char-set:full
+                          (char-set-complement char-set:empty)))
+(test-equal #t (char-set= char-set:empty
+                          (char-set-complement! (char-set-complement
+                                                 char-set:empty))))
+; char-set-union, char-set-union!, meanings of standard derived sets
+(test-equal #t (char-set= char-set:empty (char-set-union)))
+(test-equal #t (char-set= abc (char-set-union abc)))
+(test-equal #t (char-set= char-set:letter+digit
+                          (char-set-union char-set:letter
+                                          char-set:digit)))
+(test-equal #t (char-set= char-set:graphic
+                          (char-set-union char-set:letter+digit
+                                          char-set:punctuation
+                                          char-set:symbol)))
+(test-equal #t (char-set= char-set:printing
+                          (char-set-union char-set:graphic
+                                          char-set:whitespace)))
+(test-equal #t (char-set= abc (char-set-union! (char-set #\a)
+                                               (char-set #\b)
+                                               (char-set #\c))))
+(test-equal
+ #t
+ (char-set= char-set:full
+            (char-set-union char-set:letter
+                            (char-set-complement char-set:letter))))
+; char-set-intersection, char-set-intersection!
+(test-equal #t (char-set= char-set:full (char-set-intersection)))
+(test-equal #t (char-set= char-set:graphic
+                          (char-set-intersection char-set:graphic)))
+(test-equal
+ #t
+ (char-set= char-set:empty
+            (char-set-intersection abc (char-set-complement abc))))
+(test-equal
+ #t
+ (char-set= (string->char-set "aeiou")
+            (char-set-intersection
+             char-set:lower-case
+             (string->char-set "abcdefghijklmnopqrstuvwxyz")
+             (string->char-set
+              "oNLY VoWeLS aRe LoWeR CaSe iN THiS, You See?"))))
+(test-equal
+ #t
+ (char-set= (string->char-set "aeiou")
+            (char-set-intersection!
+             (string->char-set "abcdefghijklmnopqrstuvwxyz")
+             (string->char-set
+              "oNLY VoWeLS aRe LoWeR CaSe iN THiS, You See?"))))
+; char-set-difference, char-set-difference!
+(test-equal
+ #t
+ (char-set= abc
+            (char-set-difference (string->char-set "abcde")
+                                 (string->char-set "de"))))
+(test-equal
+ #t
+ (char-set= abc
+            (char-set-difference! (string->char-set "abcde")
+                                  (string->char-set "de"))))
+(test-equal
+ #t
+ (char-set= char-set:letter
+            (char-set-difference char-set:letter+digit
+                                 char-set:digit)))
+; char-set-xor, char-set-xor!
+(test-equal #t (char-set= char-set:empty (char-set-xor)))
+(test-equal
+ #t (char-set= abc (char-set-xor (char-set #\a)
+                                 (char-set #\b)
+                                 (char-set #\c))))
+(test-equal
+ #t (char-set= abc (char-set-xor! (char-set #\a)
+                                  (char-set #\b)
+                                  (char-set #\c))))
+(test-equal #t (char-set= abc (char-set-xor abc abc abc)))
+(test-equal #t (char-set= (string->char-set "adz")
+                          (char-set-xor! (string->char-set "abcd")
+                                         (string->char-set "bc")
+                                         (char-set #\z))))
+(test-equal #t (char-set= (string->char-set "abde")
+                          (char-set-xor abc
+                                        (string->char-set "cde"))))
+; char-set-diff+intersection, char-set-diff+intersection!
+(test-equal '((#\a) (#\b #\c))
+            (call-with-values
+                (lambda ()
+                  (char-set-diff+intersection
+                   (string->char-set "abc") (string->char-set "bc")))
+              (lambda (diff intersection)
+                (list (list-sort char<? (char-set->list diff))
+                      (list-sort char<? (char-set->list
+                                         intersection))))))
+(test-equal '((#\a) (#\b #\c))
+            (call-with-values
+                (lambda ()
+                  (char-set-diff+intersection!
+                   (string->char-set "abc") (string->char-set "bc")))
+              (lambda (diff intersection)
+                (list (list-sort char<? (char-set->list diff))
+                      (list-sort char<? (char-set->list
+                                         intersection))))))
+(test-end)
 
 (test-end)

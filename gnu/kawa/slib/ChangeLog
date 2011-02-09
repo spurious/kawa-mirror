@@ -1,3 +1,8 @@
+2011-02-08  Jamison Hope  <jrh@theptrgroup.com>
+
+	* srfi14.scm: New implementation of SRFI-14.
+	* Makefile.am: Update accordingly.
+
 2011-01-17  Per Bothner  <per@bothner.com>
 
 	* syntaxutils.scm (rewrite-form): Call Language#getCompilation rather

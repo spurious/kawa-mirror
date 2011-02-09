@@ -492,6 +492,7 @@
         <include name="srfi1.scm"/>
         <include name="srfi2.scm"/>
         <include name="srfi13.scm"/>
+        <include name="srfi14.scm"/>
         <include name="srfi34.scm"/>
         <include name="conditions.scm"/>
         <include name="srfi37.scm"/>

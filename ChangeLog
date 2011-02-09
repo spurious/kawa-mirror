@@ -1,3 +1,7 @@
+2011-02-08  Jamison Hope <jrh@theptrgroup.com>
+
+	*  build.xml (slib-scm): Add srfi14.scm.
+
 2011-01-24  Jamison Hope <jrh@theptrgroup.com>
 
 	* build.xml (lib-scm):  Add rnrs/lists.scm.

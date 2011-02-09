@@ -31,7 +31,7 @@ public class ImportFromLibrary extends Syntax
     { "9", "records", BUILTIN },
     { "11", "let-values", BUILTIN },
     { "13", "strings", "gnu.kawa.slib.srfi13" },
-    { "14", "char-sets", MISSING },
+    { "14", "char-sets", "gnu.kawa.slib.srfi14" },
     { "16", "case-lambda", BUILTIN },
     { "17", "generalized-set!", BUILTIN },
     { "18", "multithreading", MISSING },

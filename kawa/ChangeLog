@@ -1,3 +1,8 @@
+2011-02-08  Jamison Hope <jrh@theptrgroup.com>
+
+	* standard/require.java (featureMap): Add srfi-14.
+	* standard/ImportFromLibrary.java (SRFI97Map):  Add srfi-14.
+
 2011-02-06  Per Bothner  <per@bothner.com>
 
 	* lang/Quote.java (expand_pair): If quoting EXP:NAME just quitely

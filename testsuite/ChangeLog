@@ -1,3 +1,7 @@
+2011-02-08  Jamison Hope  <jrh@theptrgroup.com>
+
+	* lib-test.scm: New tests for srfi-14.
+
 2011-01-24  Jamison Hope  <jrh@theptrgroup.com>
 
 	* lib-test.scm: New tests for rnrs/lists functions.

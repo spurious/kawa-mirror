@@ -76,6 +76,10 @@ public class IfFeature
         if (name == "in-servlet")
           return (mflags & ModuleContext.IN_SERVLET) != 0;
       }
+    /* #ifdef JAVA6 */
+    if (name == "java-6")
+      return true;
+    /* #endif */
 
     String provide_name = ("%provide%"+name).intern();
     Compilation comp = Compilation.getCurrent();

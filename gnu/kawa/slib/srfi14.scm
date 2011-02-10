@@ -122,8 +122,22 @@
 ;;; char-set? and char-set:* are implicitly provided by the char-set
 ;;; class.
 
+(define-alias reflectArray java.lang.reflect.Array)
 (define-alias Arrays java.util.Arrays)
 (define-alias Character java.lang.Character)
+
+(define-syntax array-copy
+  (syntax-rules ()
+    ((_ orig len)
+     (cond-expand
+      (java-6 (Arrays:copy-of orig len))
+      (else
+       (let* ((cls ::java.lang.Class
+                   (*:get-component-type (*:get-class orig)))
+              (arr (reflectArray:new-instance cls len))
+              (cp-len (min len (reflectArray:get-length orig))))
+         (java.lang.System:arraycopy orig 0 arr 0 cp-len)
+         arr))))))
 
 ;;; The largest valid Unicode code point.
 (define *highest-code-point* ::int #x10FFFF)
@@ -943,7 +957,7 @@ other character set is guaranteed not to be altered."
    "Return a character set containing the given characters."
    (if (> characters:length 0)
        (let ((chars ::character[]
-                    (Arrays:copy-of characters characters:length)))
+                    (array-copy characters characters:length)))
          (Arrays:sort chars)
          (let ((first-pt ::int ((chars 0):int-value)))
            (let loop ((index ::int 1)
@@ -975,7 +989,7 @@ other character set is guaranteed not to be altered."
   ((clone) ::char-set
    (let ((copy ::char-set (invoke-special object (this) 'clone)))
      (set! copy:inversion-list
-           (Arrays:copy-of inversion-list inversion-list-size))
+           (array-copy inversion-list inversion-list-size))
      (set! copy:immutable? #f)
      (set! copy:name #!null)
      copy))
@@ -1087,8 +1101,8 @@ other character set is guaranteed not to be altered."
           (set! inversion-list-size (+ 1 inversion-list-size)))
          (else                          ; must realloc
           (set! inversion-list
-                (Arrays:copy-of inversion-list
-                                (+ 1  (* inversion-list-size 2))))
+                (array-copy inversion-list
+                            (+ 1  (* inversion-list-size 2))))
           (set! inversion-list-size (+ 1 inversion-list-size))))
    (this))
 

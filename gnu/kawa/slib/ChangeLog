@@ -1,3 +1,7 @@
+2011-02-10  Jamison Hope  <jrh@theptrgroup.com>
+
+	* srfi14.scm: Fix Java-6 dependency.
+
 2011-02-08  Jamison Hope  <jrh@theptrgroup.com>
 
 	* srfi14.scm: New implementation of SRFI-14.

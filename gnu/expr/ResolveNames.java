@@ -4,7 +4,10 @@
 package gnu.expr;
 
 /** This resolves references to lexical Declarations.
- * So far it is only used for XQuery, which overrides it. */
+ * So far it is only used for XQuery, which overrides it.
+ * Lisp-family languages get similar functionality through the 2-phase
+ * scan/rewrite framework.
+ */
 
 public class ResolveNames extends ExpExpVisitor<Void>
 {

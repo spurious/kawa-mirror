@@ -104,15 +104,9 @@ public class ExpVisitor<R,D>
   protected R visitObjectExp (ObjectExp exp, D d) { return visitClassExp(exp, d); }
   protected R visitModuleExp (ModuleExp exp, D d) { return visitLambdaExp(exp, d); }
 
-  protected Expression visitSetExpValue (Expression new_value, D d, Declaration decl)
-  {
-    return visitAndUpdate(new_value, d);
-  }
-
   protected R visitSetExp (SetExp exp, D d)
   {
-    Declaration decl = exp.binding;
-    exp.new_value = visitSetExpValue(exp.new_value, d, exp.getBinding());
+    exp.new_value = visitAndUpdate(exp.new_value, d);
     return defaultValue(exp, d);
   }
 

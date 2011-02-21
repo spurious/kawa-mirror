@@ -1,3 +1,11 @@
+2011-02-20  Per Bothner  <per@bothner.com>
+
+	* InlineCalls.java (visitSetExp): Inline super.visitSetExp and
+	visitSetExpValue.
+	(visitSetExpValue): Remove no-longer-needed method.
+	* ExpVisitor.java (visitSetExp): Inline visitSetExpValue.
+	(visitSetExpValue): Remove no-longer-needed method.
+
 2011-01-27  Per Bothner  <per@bothner.com>
 
 	* Declaration.java: Re-write handling of the 'value' Expression.

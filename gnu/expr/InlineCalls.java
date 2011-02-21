@@ -413,12 +413,6 @@ public class InlineCalls extends ExpExpVisitor<Type>
       return super.visitTryExp(exp, required);
   }
 
-  protected Expression visitSetExpValue (Expression new_value, Type required,
-                                         Declaration decl)
-  {
-    return visit(new_value, decl == null || decl.isAlias() ? null : decl.type);
-  }
-
   boolean processingAnnotations;
   /** If currently processing an annotation belonging to a declaration.
    * In this case expressions must resolve to constants,
@@ -468,7 +462,7 @@ public class InlineCalls extends ExpExpVisitor<Type>
   protected Expression visitSetExp (SetExp exp, Type required)
   {
     Declaration decl = exp.getBinding();
-    super.visitSetExp(exp, required);
+    exp.new_value = visit(exp.new_value, decl == null || decl.isAlias() ? null : decl.type);
     if (! exp.isDefining() && decl != null && decl.isClassMethod())
       comp.error('e', "can't assign to method "+decl.getName(), exp);
     if (decl != null && decl.getFlag(Declaration.TYPE_SPECIFIED))

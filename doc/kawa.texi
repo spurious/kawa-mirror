@@ -24,21 +24,28 @@
 
 @macro stxdef{NAME}
 @findex @i{\NAME\}
-@anchor{meta-\NAME\}@var{\NAME\} @code{::=}
+@anchor{meta-\NAME\}@var{\NAME\} @t{::=}
 @end macro
 
+@ifnotinfo
 @macro stxref{NAME}
 @ref{meta-\NAME\, @var{\NAME\}}
 @end macro
+@end ifnotinfo
+@ifinfo
+@macro stxref{NAME}
+@var{\NAME\}
+@end macro
+@end ifinfo
 
 @macro stxlit{TEXT}
-@code{@b{\TEXT\}}
+@t{@b{\TEXT\}}
 @end macro
 @macro stxlitlbrace
-@code{@b{@{}}
+@t{@b{@{}}
 @end macro
 @macro stxlitat
-@code{@b{@@}}
+@t{@b{@@}}
 @end macro
 
 @macro arbno{THING}

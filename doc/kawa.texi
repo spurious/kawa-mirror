@@ -1854,7 +1854,7 @@ Syntax'':
 
 @stxdef{lexeme-datum} @meta{boolean} | @meta{number}
          | @meta{character} | @meta{string} | @stxref{symbol}
-@stxdef{symbol} @var{identifier}
+@stxdef{symbol} @stxref{identifier}
 @stxdef{compound-datum} @stxref{list} | @stxref{vector} | @stxref{uniform-vector} | @stxref{xml-literal}
 @stxdef{list} @stxlit{(}@stxref{datum}*@stxlit{)}
          | @stxlit{(}@stxref{datum}+ @stxlit{.} @stxref{datum}@stxlit{)}
@@ -7328,17 +7328,18 @@ efficient, and it is easier to access it from Java code.
 The syntax of @code{define-class} are mostly compatible with that
 in the Guile and Stk dialects of Scheme.
 
-@deffn Syntax define-class name @stxlit{(}supers ...@stxlit{)} (@stxref{annotation}|@stxref{option-pair})* @stxref{field-or-method-decl} ...
-@deffnx Syntax define-simple-class name @stxlit{(}supers ...@stxlit{)} (@stxref{annotation}|@stxref{option-pair})*  @stxref{field-or-method-decl} ...
+@deffn Syntax define-class @stxref{class-name} @stxlit{(}supers ...@stxlit{)} (@stxref{annotation}|@stxref{option-pair})* @stxref{field-or-method-decl} ...
+@deffnx Syntax define-simple-class @stxref{class-name} @stxlit{(}supers ...@stxlit{)} (@stxref{annotation}|@stxref{option-pair})*  @stxref{field-or-method-decl} ...
 
-Defines a new class named @var{name}.  If @code{define-simple-class} is
-used, creates a normal Java class named @var{name} in the current package.
-(If @var{name} has the form @code{<xyz>} the Java implementation
+Defines a new class named @var{class-name}.  If @code{define-simple-class} is
+used, creates a normal Java class named @var{class-name} in the current package.
+(If @var{class-name} has the form @code{<xyz>} the Java implementation
 type is named @code{xyz}.)  For @code{define-class} the implementation is
 unspecified.  In most cases, the compiler creates a class pair,
 consisting of a Java interface and a Java implementation class.
 @end deffn
 @display
+@stxdef{class-name} @stxref{identifier}
 @stxdef{option-pair} @var{option-keyword} @var{option-value}
 @stxdef{field-or-method-decl} @stxref{field-decl} | @stxref{method-decl}
 @end display

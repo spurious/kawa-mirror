@@ -1,3 +1,7 @@
+2011-02-23  Per Bothner  <per@bothner.com>
+
+	* kawa.texi: Some minor syntax-definition fixes.
+
 2011-02-22  Per Bothner  <per@bothner.com>
 
 	* kawa.texi: Change some macros so the result looks less confusing

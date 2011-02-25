@@ -2323,7 +2323,8 @@ The matching of each @var{formals} to values is as for the matching of
 @var{formals} to arguments in a @code{lambda} expression, and it is an
 error for an @var{expression} to return a number of values that does not
 match its corresponding @var{formals}.
-@example(let-values (((a b . c) (values 1 2 3 4)))
+@example
+(let-values (((a b . c) (values 1 2 3 4)))
   (list a b c))            @result{} (1 2 (3 4)) 
 
 (let ((a 'a) (b 'b) (x 'x) (y 'y))
@@ -2361,6 +2362,12 @@ is equivalent to:
 @end example
 For example:
 @example
+(receive a (values 1 2 3 4)
+  (reverse a)) @result{} (4 3 2 1)
+
+(receive (a b . c) (values 1 2 3 4)
+  (list a b c))            @result{} (1 2 (3 4)) 
+
 (let ((a 'a) (b 'b) (x 'x) (y 'y))
   (receive (a b) (values x y)
     (receive (x y) (values a b)
@@ -4846,61 +4853,61 @@ evaluates to a two-dimensionsal array of @code{<double>}:
 
 Uniform vectors are vectors whose elements are of the same numeric type.
 The are defined by @uref{http://srfi.schemers.org/srfi-4/srfi-4.html,SRFI-4}.
-However, the type names (such as @code{<s8vector>}) are a Kawa extension.
+However, the type names (such as @code{s8vector}) are a Kawa extension.
 
-@defvar <s8vector>
+@deffn Type s8vector
 The type of uniform vectors where each element can contain
-a signed 8-bit integer.  Represented using an array of @code{<byte>}.
-@end defvar
+a signed 8-bit integer.  Represented using an array of @code{byte}.
+@end deffn
 
-@defvar <u8vector>
+@deffn Type u8vector
 The type of uniform vectors where each element can contain
 an unsigned 8-bit integer.  Represented using an array of @code{<byte>},
 but each element is treated as if unsigned.
-@end defvar
+@end deffn
 
-@defvar <s16vector>
+@deffn Type s16vector
 The type of uniform vectors where each element can contain
-a signed 16-bit integer.  Represented using an array of @code{<short>}.
-@end defvar
+a signed 16-bit integer.  Represented using an array of @code{short}.
+@end deffn
 
-@defvar <u16vector>
+@deffn Type u16vector
 The type of uniform vectors where each element can contain
-an unsigned 16-bit integer.  Represented using an array of @code{<short>},
+an unsigned 16-bit integer.  Represented using an array of @code{short},
 but each element is treated as if unsigned.
-@end defvar
+@end deffn
 
-@defvar <s32vector>
+@deffn Type s32vector
 The type of uniform vectors where each element can contain
-a signed 32-bit integer.  Represented using an array of @code{<int>}.
-@end defvar
+a signed 32-bit integer.  Represented using an array of @code{int}.
+@end deffn
 
-@defvar <u32vector>
+@deffn Type u32vector
 The type of uniform vectors where each element can contain
-an unsigned 32-bit integer.  Represented using an array of @code{<int>},
+an unsigned 32-bit integer.  Represented using an array of @code{int},
 but each element is treated as if unsigned.
-@end defvar
+@end deffn
 
-@defvar <s64vector>
+@deffn Type s64vector
 The type of uniform vectors where each element can contain
-a signed 64-bit integer.  Represented using an array of @code{<long>}.
-@end defvar
+a signed 64-bit integer.  Represented using an array of @code{long}.
+@end deffn
 
-@defvar <u64vector>
+@deffn Type u64vector
 The type of uniform vectors where each element can contain
-an unsigned 64-bit integer.  Represented using an array of @code{<long>},
+an unsigned 64-bit integer.  Represented using an array of @code{long},
 but each element is treated as if unsigned.
-@end defvar
+@end deffn
 
-@defvar <f32vector>
+@deffn Type f32vector
 The type of uniform vectors where each element can contain
-a 32-bit floating-point real.  Represented using an array of @code{<float>}.
-@end defvar
+a 32-bit floating-point real.  Represented using an array of @code{float}.
+@end deffn
 
-@defvar <f64vector>
+@deffn Type f64vector
 The type of uniform vectors where each element can contain
-a 64-bit floating-point real.  Represented using an array of @code{<double>}.
-@end defvar
+a 64-bit floating-point real.  Represented using an array of @code{double}.
+@end deffn
 
 @deffn Procedure s8vector? value
 @deffnx Procedure u8vector? value
@@ -4930,16 +4937,16 @@ having room for @var{n} elements.
 Initialize each element to @var{value} if it is specified; zero otherwise.
 @end deffn
 
-@deffn Procedure s8vector value ...
-@deffnx Procedure u8vector value ...
-@deffnx Procedure s16vector value ..
-@deffnx Procedure u16vector value ...
-@deffnx Procedure s32vector value ...
-@deffnx Procedure u32vector value ...
-@deffnx Procedure s64vector value ...
-@deffnx Procedure u64vector value ...
-@deffnx Procedure f32vector value ...
-@deffnx Procedure f64vector value ...
+@deffn Constructor s8vector value ...
+@deffnx Constructor u8vector value ...
+@deffnx Constructor s16vector value ..
+@deffnx Constructor u16vector value ...
+@deffnx Constructor s32vector value ...
+@deffnx Constructor u32vector value ...
+@deffnx Constructor s64vector value ...
+@deffnx Constructor u64vector value ...
+@deffnx Constructor f32vector value ...
+@deffnx Constructor f64vector value ...
 Create a new uniform vector of the specified type,
 whose length is the number of @var{value}s specified,
 and initialize it using those @var{value}s.
@@ -5019,12 +5026,12 @@ must be numbers coercible the new vector's element type.
 Each uniform array type is implemented as an @dfn{underlying Java array},
 and a length field.
 The underlying type is
-@code{byte[]} for @code{<u8vector>} or @code{<s8vector>};
-@code{short[]} for @code{<u16vector>} or @code{<u16vector>};
-@code{int[]} for @code{<u32vector>} or @code{<s32vector>};
-@code{long[]} for @code{<u64vector>} or @code{<s64vector>};
-@code{<float[]} for @code{<f32vector>}; and
-@code{<double[]} for @code{<f32vector>}.
+@code{byte[]} for @code{u8vector} or @code{s8vector};
+@code{short[]} for @code{u16vector} or @code{u16vector};
+@code{int[]} for @code{u32vector} or @code{s32vector};
+@code{long[]} for @code{u64vector} or @code{s64vector};
+@code{float[]} for @code{f32vector}; and
+@code{double[]} for @code{f32vector}.
 The length field allows a uniform array to only use the
 initial part of the underlying array.  (This can be used
 to support Common Lisp's fill pointer feature.)
@@ -5037,8 +5044,8 @@ Scheme function for this, but you can use the @code{setSize} method:
 If you have a Java array, you can create a uniform vector
 sharing with the Java array:
 @example
-(define arr :: <byte[]> ((primitive-array-new <byte>) 10))
-(define vec :: <u8vector> (make <u8vector> arr))
+(define arr :: byte[] ((primitive-array-new byte) 10))
+(define vec :: u8vector (make u8vector arr))
 @end example
 At this point @code{vec} uses @code{arr} for its underlying storage,
 so changes to one affect the other.
@@ -5238,7 +5245,7 @@ Example:
   (hashtable-set! h 2 'two)
   (hashtable-set! h 3 'three)
   (hashtable-entries h))
-=> #(1 2 3) #(one two three) ; two return values
+@result{} #(1 2 3) #(one two three) ; two return values
 @end example
 
 @noindent
@@ -5490,7 +5497,7 @@ returns the resulting hash table. This function may modify
 
 The Kawa implementation always calls these hash functions with a single
 parameter, and expects the result to be within the entire
-(32-bit signed) @code{<int>} range, for compatibility with
+(32-bit signed) @code{int} range, for compatibility with
 standard @code{hashCode} methods.
 
 @deffn Procedure hash object [ bound ] → integer
@@ -5880,7 +5887,7 @@ passed to the parameter object, and an unspecified value is returned.
 @end example
 @end deffn
 
-@deffn Syntax parameterize ((expr1 expr2) ...) <body>
+@deffn Syntax parameterize ((expr1 expr2) ...) @stxref{body}
 The expressions @var{expr1} and @var{expr2} are evaluated in an
 unspecified order. The value of the @var{expr1} expressions must be
 parameter objects. For each @var{expr1} expression and in an
@@ -5889,9 +5896,9 @@ binding of the parameter object @var{expr1} to a new location whose
 content is the result of the call @code{(@var{converter} @var{val})},
 where @var{val} is the value of @var{expr2} and @var{converter} is the
 conversion procedure of the parameter object. The resulting dynamic
-environment is then used for the evaluation of @var{<body>} (which
+environment is then used for the evaluation of @var{body} (which
 refers to the R5RS grammar nonterminal of that name). The result(s) of
-the parameterize form are the result(s) of the @var{<body>}.
+the parameterize form are the result(s) of the @var{body}.
 
 @example
 (radix)                                              @result{}  2
@@ -10806,9 +10813,9 @@ by specifying @code{--output-format scheme} on the Kawa command line,
 or by using the @code{unescaped-data} function.
 @item
 Various Scheme syntax forms, including @code{lambda},
-take a @code{<body>}, which is a list of one or more declarations and
-expressions.  In normal Scheme and in BRL the value of a @code{<body>}
-is the value of the last expression.  In KRL the value of a @code{<body>}
+take a @stxref{body}, which is a list of one or more declarations and
+expressions.  In normal Scheme and in BRL the value of a @var{body}
+is the value of the last expression.  In KRL the value of a @var{body}
 is the concatenation of all the values of the expressions,
 as if using @code{values-append}.
 @item

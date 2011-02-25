@@ -47,6 +47,9 @@ public class Scheme extends LispLanguage
   public static final Apply apply;
   public static final ApplyToArgs applyToArgs;
 
+  private static final String[] uniformVectorTags =
+    {"s8", "s16", "s32", "s64", "u8", "u16", "u32", "u64", "f32", "f64" };
+
   static {
     // (null-environment)
     nullEnvironment = Environment.make("null-environment");
@@ -724,90 +727,19 @@ public class Scheme extends LispLanguage
       defProcStFld("array-set!", "gnu.kawa.functions.ArraySet", "arraySet");
       defProcStFld("share-array", "kawa.lib.arrays");
 
-      defProcStFld("s8vector?", "kawa.lib.uniform");
-      defProcStFld("make-s8vector", "kawa.lib.uniform");
-      defProcStFld("s8vector", "kawa.lib.uniform");
-      defProcStFld("s8vector-length", "kawa.lib.uniform");
-      defProcStFld("s8vector-ref", "kawa.lib.uniform");
-      defProcStFld("s8vector-set!", "kawa.lib.uniform");
-      defProcStFld("s8vector->list", "kawa.lib.uniform");
-      defProcStFld("list->s8vector", "kawa.lib.uniform");
-      defProcStFld("u8vector?", "kawa.lib.uniform");
-      defProcStFld("make-u8vector", "kawa.lib.uniform");
-      defProcStFld("u8vector", "kawa.lib.uniform");
-      defProcStFld("u8vector-length", "kawa.lib.uniform");
-      defProcStFld("u8vector-ref", "kawa.lib.uniform");
-      defProcStFld("u8vector-set!", "kawa.lib.uniform");
-      defProcStFld("u8vector->list", "kawa.lib.uniform");
-      defProcStFld("list->u8vector", "kawa.lib.uniform");
-
-      defProcStFld("s16vector?", "kawa.lib.uniform");
-      defProcStFld("make-s16vector", "kawa.lib.uniform");
-      defProcStFld("s16vector", "kawa.lib.uniform");
-      defProcStFld("s16vector-length", "kawa.lib.uniform");
-      defProcStFld("s16vector-ref", "kawa.lib.uniform");
-      defProcStFld("s16vector-set!", "kawa.lib.uniform");
-      defProcStFld("s16vector->list", "kawa.lib.uniform");
-      defProcStFld("list->s16vector", "kawa.lib.uniform");
-      defProcStFld("u16vector?", "kawa.lib.uniform");
-      defProcStFld("make-u16vector", "kawa.lib.uniform");
-      defProcStFld("u16vector", "kawa.lib.uniform");
-      defProcStFld("u16vector-length", "kawa.lib.uniform");
-      defProcStFld("u16vector-ref", "kawa.lib.uniform");
-      defProcStFld("u16vector-set!", "kawa.lib.uniform");
-      defProcStFld("u16vector->list", "kawa.lib.uniform");
-      defProcStFld("list->u16vector", "kawa.lib.uniform");
-
-      defProcStFld("s32vector?", "kawa.lib.uniform");
-      defProcStFld("make-s32vector", "kawa.lib.uniform");
-      defProcStFld("s32vector", "kawa.lib.uniform");
-      defProcStFld("s32vector-length", "kawa.lib.uniform");
-      defProcStFld("s32vector-ref", "kawa.lib.uniform");
-      defProcStFld("s32vector-set!", "kawa.lib.uniform");
-      defProcStFld("s32vector->list", "kawa.lib.uniform");
-      defProcStFld("list->s32vector", "kawa.lib.uniform");
-      defProcStFld("u32vector?", "kawa.lib.uniform");
-      defProcStFld("make-u32vector", "kawa.lib.uniform");
-      defProcStFld("u32vector", "kawa.lib.uniform");
-      defProcStFld("u32vector-length", "kawa.lib.uniform");
-      defProcStFld("u32vector-ref", "kawa.lib.uniform");
-      defProcStFld("u32vector-set!", "kawa.lib.uniform");
-      defProcStFld("u32vector->list", "kawa.lib.uniform");
-      defProcStFld("list->u32vector", "kawa.lib.uniform");
-
-      defProcStFld("s64vector?", "kawa.lib.uniform");
-      defProcStFld("make-s64vector", "kawa.lib.uniform");
-      defProcStFld("s64vector", "kawa.lib.uniform");
-      defProcStFld("s64vector-length", "kawa.lib.uniform");
-      defProcStFld("s64vector-ref", "kawa.lib.uniform");
-      defProcStFld("s64vector-set!", "kawa.lib.uniform");
-      defProcStFld("s64vector->list", "kawa.lib.uniform");
-      defProcStFld("list->s64vector", "kawa.lib.uniform");
-      defProcStFld("u64vector?", "kawa.lib.uniform");
-      defProcStFld("make-u64vector", "kawa.lib.uniform");
-      defProcStFld("u64vector", "kawa.lib.uniform");
-      defProcStFld("u64vector-length", "kawa.lib.uniform");
-      defProcStFld("u64vector-ref", "kawa.lib.uniform");
-      defProcStFld("u64vector-set!", "kawa.lib.uniform");
-      defProcStFld("u64vector->list", "kawa.lib.uniform");
-      defProcStFld("list->u64vector", "kawa.lib.uniform");
-
-      defProcStFld("f32vector?", "kawa.lib.uniform");
-      defProcStFld("make-f32vector", "kawa.lib.uniform");
-      defProcStFld("f32vector", "kawa.lib.uniform");
-      defProcStFld("f32vector-length", "kawa.lib.uniform");
-      defProcStFld("f32vector-ref", "kawa.lib.uniform");
-      defProcStFld("f32vector-set!", "kawa.lib.uniform");
-      defProcStFld("f32vector->list", "kawa.lib.uniform");
-      defProcStFld("list->f32vector", "kawa.lib.uniform");
-      defProcStFld("f64vector?", "kawa.lib.uniform");
-      defProcStFld("make-f64vector", "kawa.lib.uniform");
-      defProcStFld("f64vector", "kawa.lib.uniform");
-      defProcStFld("f64vector-length", "kawa.lib.uniform");
-      defProcStFld("f64vector-ref", "kawa.lib.uniform");
-      defProcStFld("f64vector-set!", "kawa.lib.uniform");
-      defProcStFld("f64vector->list", "kawa.lib.uniform");
-      defProcStFld("list->f64vector", "kawa.lib.uniform");
+      for (int i = uniformVectorTags.length;  --i >= 0; )
+        {
+          String tag = uniformVectorTags[i];
+          defAliasStFld(tag+"vector", "gnu.kawa.lispexpr.LangObjType",
+                        tag+"vectorType");
+          defProcStFld(tag+"vector?", "kawa.lib.uniform");
+          defProcStFld("make-"+tag+"vector", "kawa.lib.uniform");
+          defProcStFld(tag+"vector-length", "kawa.lib.uniform");
+          defProcStFld(tag+"vector-ref", "kawa.lib.uniform");
+          defProcStFld(tag+"vector-set!", "kawa.lib.uniform");
+          defProcStFld(tag+"vector->list", "kawa.lib.uniform");
+          defProcStFld("list->"+tag+"vector", "kawa.lib.uniform");
+        }
 
       defSntxStFld("cut", "gnu.kawa.slib.cut");
       defSntxStFld("cute", "gnu.kawa.slib.cut");
@@ -1025,16 +957,13 @@ public class Scheme extends LispLanguage
 	types.put ("class-type", LangObjType.typeClassType);
 	types.put ("class", LangObjType.typeClass);
 
-        types.put ("s8vector", ClassType.make("gnu.lists.S8Vector"));
-        types.put ("u8vector", ClassType.make("gnu.lists.U8Vector"));
-        types.put ("s16vector", ClassType.make("gnu.lists.S16Vector"));
-        types.put ("u16vector", ClassType.make("gnu.lists.U16Vector"));
-        types.put ("s32vector", ClassType.make("gnu.lists.S32Vector"));
-        types.put ("u32vector", ClassType.make("gnu.lists.U32Vector"));
-        types.put ("s64vector", ClassType.make("gnu.lists.S64Vector"));
-        types.put ("u64vector", ClassType.make("gnu.lists.U64Vector"));
-        types.put ("f32vector", ClassType.make("gnu.lists.F32Vector"));
-        types.put ("f64vector", ClassType.make("gnu.lists.F64Vector"));
+        for (int i = uniformVectorTags.length;  --i >= 0; )
+          {
+            String tag = uniformVectorTags[i];
+            String cname = "gnu.lists."+tag.toUpperCase()+"Vector";
+            types.put(tag+"vector", ClassType.make(cname));
+          }
+
         types.put ("document", ClassType.make("gnu.kawa.xml.KDocument"));
         types.put ("readtable", ClassType.make("gnu.kawa.lispexpr.ReadTable"));
       }

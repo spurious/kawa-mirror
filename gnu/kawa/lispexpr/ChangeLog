@@ -1,3 +1,9 @@
+2011-02-24  Per Bothner  <per@bothner.com>
+
+	* LangObjType.java (s8vectorType, u8vectorType, s16vectorType,
+	u16vectorType, s32vectorType, u32vectorType, s64vectorType,
+	u32vectorType, f32vectorType, f64vectorType): New LangObjType statics.
+
 2011-01-19  Per Bothner  <per@bothner.com>
 
 	* LispLanguage.java (makeBody): Remove method - now in Translator.

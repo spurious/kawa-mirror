@@ -32,7 +32,17 @@ public class LangObjType extends ObjectType implements TypeValue
   private static final int STRING_TYPE_CODE = 14;
   private static final int REGEX_TYPE_CODE = 15;
   private static final int DFLONUM_TYPE_CODE = 16;
-  private static final int PROCEDURE_TYPE_CODE = 17;
+  private static final int S8VECTOR_TYPE_CODE = 17;
+  private static final int U8VECTOR_TYPE_CODE = 18;
+  private static final int S16VECTOR_TYPE_CODE = 19;
+  private static final int U16VECTOR_TYPE_CODE = 20;
+  private static final int S32VECTOR_TYPE_CODE = 21;
+  private static final int U32VECTOR_TYPE_CODE = 22;
+  private static final int S64VECTOR_TYPE_CODE = 23;
+  private static final int U64VECTOR_TYPE_CODE = 24;
+  private static final int F32VECTOR_TYPE_CODE = 25;
+  private static final int F64VECTOR_TYPE_CODE = 26;
+  private static final int PROCEDURE_TYPE_CODE = 27;
 
   public static final LangObjType pathType =
     new LangObjType("path", "gnu.text.Path",
@@ -81,6 +91,46 @@ public class LangObjType extends ObjectType implements TypeValue
   public static final LangObjType constVectorType =
     new LangObjType("constant-vector", "gnu.lists.ConstVector",
                     CONST_VECTOR_TYPE_CODE);
+
+  public static final LangObjType s8vectorType =
+    new LangObjType("s8vector", "gnu.lists.S8Vector",
+                    S8VECTOR_TYPE_CODE);
+
+  public static final LangObjType u8vectorType =
+    new LangObjType("u8vector", "gnu.lists.U8Vector",
+                    U8VECTOR_TYPE_CODE);
+
+  public static final LangObjType s16vectorType =
+    new LangObjType("s16vector", "gnu.lists.S16Vector",
+                    S16VECTOR_TYPE_CODE);
+
+  public static final LangObjType u16vectorType =
+    new LangObjType("u16vector", "gnu.lists.U16Vector",
+                    U16VECTOR_TYPE_CODE);
+
+  public static final LangObjType s32vectorType =
+    new LangObjType("s32vector", "gnu.lists.S32Vector",
+                    S32VECTOR_TYPE_CODE);
+
+  public static final LangObjType u32vectorType =
+    new LangObjType("u32vector", "gnu.lists.U32Vector",
+                    U32VECTOR_TYPE_CODE);
+
+  public static final LangObjType s64vectorType =
+    new LangObjType("s64vector", "gnu.lists.S64Vector",
+                    S64VECTOR_TYPE_CODE);
+
+  public static final LangObjType u64vectorType =
+    new LangObjType("u64vector", "gnu.lists.U64Vector",
+                    U64VECTOR_TYPE_CODE);
+
+  public static final LangObjType f32vectorType =
+    new LangObjType("f32vector", "gnu.lists.F32Vector",
+                    F32VECTOR_TYPE_CODE);
+
+  public static final LangObjType f64vectorType =
+    new LangObjType("f64vector", "gnu.lists.F64Vector",
+                    F64VECTOR_TYPE_CODE);
 
   public static final LangObjType regexType =
     new LangObjType("regex", "java.util.regex.Pattern",
@@ -224,6 +274,16 @@ public class LangObjType extends ObjectType implements TypeValue
       case STRING_TYPE_CODE:
       case LIST_TYPE_CODE:
       case VECTOR_TYPE_CODE:
+      case S8VECTOR_TYPE_CODE:
+      case U8VECTOR_TYPE_CODE:
+      case S16VECTOR_TYPE_CODE:
+      case U16VECTOR_TYPE_CODE:
+      case S32VECTOR_TYPE_CODE:
+      case U32VECTOR_TYPE_CODE:
+      case S64VECTOR_TYPE_CODE:
+      case U64VECTOR_TYPE_CODE:
+      case F32VECTOR_TYPE_CODE:
+      case F64VECTOR_TYPE_CODE:
       case CONST_VECTOR_TYPE_CODE:
       case REGEX_TYPE_CODE:
         implementationType.emitIsInstance(comp.getCode());
@@ -394,6 +454,16 @@ public class LangObjType extends ObjectType implements TypeValue
         return typeLangObjType.getDeclaredMethod("coerceDFloNum", 1);
       case VECTOR_TYPE_CODE:
       case CONST_VECTOR_TYPE_CODE:
+      case S8VECTOR_TYPE_CODE:
+      case U8VECTOR_TYPE_CODE:
+      case S16VECTOR_TYPE_CODE:
+      case U16VECTOR_TYPE_CODE:
+      case S32VECTOR_TYPE_CODE:
+      case U32VECTOR_TYPE_CODE:
+      case S64VECTOR_TYPE_CODE:
+      case U64VECTOR_TYPE_CODE:
+      case F32VECTOR_TYPE_CODE:
+      case F64VECTOR_TYPE_CODE:
       case STRING_TYPE_CODE:
       case LIST_TYPE_CODE:
       case REGEX_TYPE_CODE:
@@ -512,6 +582,16 @@ public class LangObjType extends ObjectType implements TypeValue
         return coerceDFloNum(obj);
       case VECTOR_TYPE_CODE:
       case CONST_VECTOR_TYPE_CODE:
+      case S8VECTOR_TYPE_CODE:
+      case U8VECTOR_TYPE_CODE:
+      case S16VECTOR_TYPE_CODE:
+      case U16VECTOR_TYPE_CODE:
+      case S32VECTOR_TYPE_CODE:
+      case U32VECTOR_TYPE_CODE:
+      case S64VECTOR_TYPE_CODE:
+      case U64VECTOR_TYPE_CODE:
+      case F32VECTOR_TYPE_CODE:
+      case F64VECTOR_TYPE_CODE:
       case LIST_TYPE_CODE:
       case REGEX_TYPE_CODE:
         // optimize?
@@ -614,6 +694,16 @@ public class LangObjType extends ObjectType implements TypeValue
       {
       case CONST_VECTOR_TYPE_CODE:
       case VECTOR_TYPE_CODE:
+      case S8VECTOR_TYPE_CODE:
+      case U8VECTOR_TYPE_CODE:
+      case S16VECTOR_TYPE_CODE:
+      case U16VECTOR_TYPE_CODE:
+      case S32VECTOR_TYPE_CODE:
+      case U32VECTOR_TYPE_CODE:
+      case S64VECTOR_TYPE_CODE:
+      case U64VECTOR_TYPE_CODE:
+      case F32VECTOR_TYPE_CODE:
+      case F64VECTOR_TYPE_CODE:
       case STRING_TYPE_CODE:
       case LIST_TYPE_CODE:
       case REGEX_TYPE_CODE:

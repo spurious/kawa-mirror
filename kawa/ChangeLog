@@ -1,3 +1,9 @@
+2011-02-24  Per Bothner  <per@bothner.com>
+
+	* standard/Scheme.java: Change s8vector, u8vector, s16vector, u16vector,
+	s32vector, u32vector, s64vector, u64vector, f32vector, f44vector to
+	refer to LangObjType instances, not constructor instances.
+
 2011-02-10  Jamison Hope <jrh@theptrgroup.com>
 	    Per Bothner  <per@bothner.com>
 

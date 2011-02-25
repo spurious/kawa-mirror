@@ -1531,6 +1531,7 @@ re-define a global definition), and there must be no assignments
 * Datum syntax::
 * Hash-prefixed forms::
 * Primitive expression syntax::
+* Bodies::
 * Syntax and conditional compilation::
 @end menu
 
@@ -2112,6 +2113,51 @@ use of the macro.
 Macros defined using the @func{syntax-case} facility are also hygienic
 unless @func{datum->syntax} is used.
 
+@node Bodies
+@section Bodies
+
+The @meta{body} of a @func{lambda}, @func{let}, @func{let*},
+@func{let-values}, @func{let*-values}, @func{letrec}, or @func{letrec*}
+expression, or that of a definition with a body consists of zero or more
+definitions or expressions followed by a final expression.
+(Standard Scheme requires that all definitions precede all expressions.)
+
+@example
+@stxdef{body} @stxref{statement} ... @stxref{expression}
+@stxdef{statement} @var{definition} | @stxref{expression}
+@end example
+
+Each identifier defined by a definition is local to the @meta{body}.
+That is, the identifier is bound, and the region of the binding is the
+entire @meta{body}.
+Example:
+
+@example
+(let ((x 5))
+  (define foo (lambda (y) (bar x y)))
+  (define bar (lambda (a b) (+ (* a b) a)))
+  (foo (+ x 3)))
+@result{} 45
+@end example
+
+When @func{begin}, @func{let-syntax}, or @func{letrec-syntax} forms
+occur in a body prior to the first expression, they are spliced into the
+body.  Some or all of the body, including portions wrapped in
+@func{begin}, @func{let-syntax}, or @func{letrec-syntax} forms, may be
+specified by a macro use.
+
+An expanded @meta{body} containing variable definitions can always be
+converted into an equivalent @func{letrec*} expression.  For example,
+the @func{let} expression in the above example is equivalent to
+
+@example
+(let ((x 5))
+  (letrec* ((foo (lambda (y) (bar x y)))
+            (bar (lambda (a b) (+ (* a b) a))))
+    (foo (+ x 3))))
+@end example
+
+
 @node Syntax and conditional compilation
 @section Syntax and conditional compilation
 
@@ -2263,9 +2309,8 @@ when passed some values, calls the @var{receiver} procedure
 with those values as arguments.
 @end deffn
 
-@deffn Syntax let-values @stxlit{((}formals expression@stxlit{)} ...@stxlit{)} body
-Each @var{formals} should be a formal arguments list as for a @code{lambda},
-cf section 4.1.4 of the R5RS.
+@deffn Syntax let-values @stxlit{((}@stxref{formals} @stxref{expression}@stxlit{)} ...@stxlit{)} @stxref{body}
+Each @var{formals} should be a formal arguments list as for a @code{lambda}.
 
 The @var{expression}s are evaluated in the current environment, the
 variables of the @var{formals} are bound to fresh locations, the return
@@ -2278,8 +2323,7 @@ The matching of each @var{formals} to values is as for the matching of
 @var{formals} to arguments in a @code{lambda} expression, and it is an
 error for an @var{expression} to return a number of values that does not
 match its corresponding @var{formals}.
-@example
-(let-values (((a b . c) (values 1 2 3 4)))
+@example(let-values (((a b . c) (values 1 2 3 4)))
   (list a b c))            @result{} (1 2 (3 4)) 
 
 (let ((a 'a) (b 'b) (x 'x) (y 'y))
@@ -2289,10 +2333,10 @@ match its corresponding @var{formals}.
 @end example
 @end deffn
 
-@deffn Syntax let*-values @stxlit{((}formals expression@stxlit{)} ...@stxlit{)} body
+@deffn Syntax let*-values @stxlit{((}@stxref{formals} @stxref{expression}@stxlit{)} ...@stxlit{)} @stxref{body}
 
 Each @var{formals} should be a formal arguments list as for a
-@code{lambda} expression, cf section 4.1.4 of the R5RS.
+@code{lambda} expression.
 
 @code{let*-values} is similar to @code{let-values}, but the bindings are
 performed sequentially from left to right, and the region of a binding
@@ -2308,35 +2352,20 @@ visible, and so on.
 @end example
 @end deffn
 
-@deffn Syntax receive formals expression body
-The @var{formals}, @var{expression}, and @var{body} are as described in R5RS.
-Specifically, @var{formals} can have any of three forms:
-@table @samp
-@item (@var{variable1} ... @var{variablen})
-The environment in which the receive-expression is evaluated is extended
-by binding @var{variable1}, ..., @var{variablen} to fresh locations. The
-@var{expression} is evaluated, and its values are stored into those
-locations. (It is an error if @var{expression} does not have exactly @var{n}
-values.)
-@item @var{variable}
-The environment in which the receive-expression is evaluated is extended
-by binding @var{variable} to a fresh location. The @var{expression} is
-evaluated, its values are converted into a newly allocated list, and the
-list is stored in the location bound to @var{variable}.
-@item (@var{variable1} ... @var{variablen} . @var{variablen+1})
-The environment in which the receive-expression is evaluated is extended
-by binding @var{variable1}, ..., @var{variablen+1} to fresh
-locations. The @var{expression} is evaluated. Its first @var{n} values
-are stored into the locations bound to @var{variable1}
-... @var{variablen}. Any remaining values are converted into a newly
-allocated list, which is stored into the location bound to
-@var{variablen+1} (It is an error if @var{expression} does not have at
-least @var{n} values.)
-@end table
-
-In any case, the expressions in @var{body} are evaluated sequentially in the
-extended environment. The results of the last expression in the body are
-the values of the receive-expression.
+@deffn Syntax receive @stxref{formals} @stxref{expression} @stxref{body}
+This convenience
+form (from @uref{http://srfi.schemers.org/srfi-8/srfi-8.html, SRFI-8})
+is equivalent to:
+@example
+(let-values ((@var{formals} @var{expression})) @var{body})
+@end example
+For example:
+@example
+(let ((a 'a) (b 'b) (x 'x) (y 'y))
+  (receive (a b) (values x y)
+    (receive (x y) (values a b)
+      (list a b x y))))    @result{} (x y x y)
+@end example
 @end deffn
 
 @deffn Procedure values-append arg1 ...
@@ -2897,7 +2926,7 @@ Kawa borrows the extended formal argument list of DSSSL,
 and Kawa allows you to declare the type of the parameter.
 
 @display
-@stxdef{lambda-expression} @stxlit{(lambda} @stxref{formals} @stxref{opt-return-type} @var{body}@stxlit{)}
+@stxdef{lambda-expression} @stxlit{(lambda} @stxref{formals} @stxref{opt-return-type} @stxref{body}@stxlit{)}
 @stxdef{return-type} @stxref{type}
 @stxdef{opt-return-type} [[@stxlit{::}] @stxref{type}]
 @end display
@@ -6725,6 +6754,7 @@ control directive characters. Lowercase characters represent control
 directive parameter descriptions.
 
 @table @asis
+@cindex ~a
 @item @code{~A}
 Any (print as @code{display} does).
 @table @asis
@@ -6733,6 +6763,7 @@ left pad.
 @item @code{~@var{mincol},@var{colinc},@var{minpad},@var{padchar}A}
 full padding.
 @end table
+@cindex ~s
 @item @code{~S}
 S-expression (print as @code{write} does).
 @table @asis
@@ -6742,6 +6773,7 @@ left pad.
 full padding.
 @end table
 
+@cindex ~c
 @item @code{~C}
 Character.
 @table @asis
@@ -6755,6 +6787,7 @@ prints a character as emacs does (eg. @code{^C} for ASCII 03).
 @subsection Formatting Integers
 
 @table @asis
+@cindex ~d
 @item @code{~D}
 Decimal.
 @table @asis
@@ -6765,6 +6798,7 @@ print comma separated.
 @item @code{~@var{mincol},@var{padchar},@var{commachar},@var{commawidth}D}
 padding.
 @end table
+@cindex ~x
 @item @code{~X}
 Hexadecimal.
 @table @asis
@@ -6775,6 +6809,7 @@ print comma separated.
 @item @code{~@var{mincol},@var{padchar},@var{commachar},@var{commawidth}X}
 padding.
 @end table
+@cindex ~o
 @item @code{~O}
 Octal.
 @table @asis
@@ -6785,6 +6820,7 @@ print comma separated.
 @item @code{~@var{mincol},@var{padchar},@var{commachar},@var{commawidth}O}
 padding.
 @end table
+@cindex ~b
 @item @code{~B}
 Binary.
 @table @asis
@@ -6795,6 +6831,7 @@ print comma separated.
 @item @code{~@var{mincol},@var{padchar},@var{commachar},@var{commawidth}B}
 padding.
 @end table
+@cindex ~r
 @item @code{~@var{n}R}
 Radix @var{n}.
 @table @asis
@@ -6809,6 +6846,7 @@ print a number as an ``old fashioned'' Roman numeral.
 print a number as an ordinal English number.
 @item @code{~R}
 print a number as a cardinal English number.
+@cindex ~p
 @item @code{~P}
 Plural.
 @table @asis
@@ -6827,6 +6865,7 @@ as @code{~@@P but jumps 1 argument backward.}
 @subsection Formatting real numbers
 
 @table @asis
+@cindex ~f
 @item @code{~F}
 Fixed-format floating-point (prints a flonum like @var{mmm.nnn}).
 @table @asis
@@ -6837,6 +6876,7 @@ If the number is positive a plus sign is printed.
 @end table
 
 @table @asis
+@cindex ~e
 @item @code{~E}
 Exponential floating-point (prints a flonum like @var{mmm.nnn}@code{E}@var{ee})
 @table @asis
@@ -6847,6 +6887,7 @@ If the number is positive a plus sign is printed.
 @end table
 
 @table @asis
+@cindex ~g
 @item @code{~G}
 General floating-point (prints a flonum either fixed or exponential).
 @table @asis
@@ -6861,6 +6902,7 @@ and @var{digits} is unspecified.
 @end table
 
 @table @asis
+@cindex ~$
 @item @code{~$}
 Dollars floating-point (prints a flonum in fixed with signs separated).
 @table @asis
@@ -6877,30 +6919,35 @@ The sign appears before the padding.
 @subsection Miscellaneous formatting operators
 
 @table @asis
+@cindex ~%
 @item @code{~%}
 Newline.
 @table @asis
 @item @code{~@var{n}%}
 print @var{n} newlines.
 @end table
+@cindex ~&
 @item @code{~&}
 print newline if not at the beginning of the output line.
 @table @asis
 @item @code{~@var{n}&}
 prints @code{~&} and then @var{n-1} newlines.
 @end table
+@cindex ~|
 @item @code{~|}
 Page Separator.
 @table @asis
 @item @code{~@var{n}|}
 print @var{n} page separators.
 @end table
+@cindex ~~
 @item @code{~~}
 Tilde.
 @table @asis
 @item @code{~@var{n}~}
 print @var{n} tildes.
 @end table
+@cindex ~@i{newline}
 @item @code{~}<newline>
 Continuation Line.
 @table @asis
@@ -6909,6 +6956,7 @@ newline is ignored, white space left.
 @item @code{~@@}<newline>
 newline is left, white space ignored.
 @end table
+@cindex ~t
 @item @code{~T}
 Tabulation.
 @table @asis
@@ -6917,12 +6965,14 @@ relative tabulation.
 @item @code{~@var{colnum},@var{colinc}T}
 full tabulation.
 @end table
+@cindex ~?
 @item @code{~?}
 Indirection (expects indirect arguments as a list).
 @table @asis
 @item @code{~@@?}
 extracts indirect arguments from format arguments.
 @end table
+@cindex ~(
 @item @code{~(@var{str}~)}
 Case conversion (converts by @code{string-downcase}).
 @table @asis
@@ -6933,6 +6983,7 @@ converts by @code{string-capitalize-first}.
 @item @code{~:@@(@var{str}~)}
 converts by @code{string-upcase}.
 @end table
+@cindex ~*
 @item @code{~*}
 Argument Jumping (jumps 1 argument forward).
 @table @asis
@@ -6950,12 +7001,14 @@ jumps to the @var{n}th argument (beginning from 0)
 @item @code{~[@var{str0}~;@var{str1}~;...~;@var{strn}~]}
 Conditional Expression (numerical clause conditional).
 @table @asis
+@cindex ~[
 @item @code{~@var{n}[}
 take argument from @var{n}.
 @item @code{~@@[}
 true test conditional.
 @item @code{~:[}
 if-else-then conditional.
+@cindex ~;
 @item @code{~;}
 clause separator.
 @item @code{~:;}
@@ -6966,6 +7019,7 @@ Iteration (args come from the next argument (a list)).
 @table @asis
 @item @code{~@var{n}@{}
 at most @var{n} iterations.
+@cindex ~@{
 @item @code{~:@{}
 args from next arg (a list of lists).
 @item @code{~@@@{}
@@ -6973,6 +7027,7 @@ args from the rest of arguments.
 @item @code{~:@@@{}
 args from the rest args (lists).
 @end table
+@cindex ~^
 @item @code{~^}
 Up and out.
 @table @asis
@@ -7487,7 +7542,7 @@ then its value is doubled.
 
 @display
 @stxdef{method-decl} @stxlit{((}@stxref{method-name} @stxref{formal-arguments}@stxlit{)}
-    (@stxref{annotation} | @stxref{opt-return-type} | @stxref{option-pair})* [@stxref{deprecated-return-specifier}] @var{body}@stxlit{)}
+    (@stxref{annotation} | @stxref{opt-return-type} | @stxref{option-pair})* [@stxref{deprecated-return-specifier}] @stxref{body}@stxlit{)}
 @stxdef{method-name} @stxref{identifier}
 @stxdef{deprecated-return-specifier} @stxref{identifier}
 @end display

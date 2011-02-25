@@ -1,3 +1,9 @@
+2011-02-24  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Bodies): New section.
+	(Multiple values): Some improvements.
+	(Format): Add index references.
+
 2011-02-23  Per Bothner  <per@bothner.com>
 
 	* kawa.texi: Some minor syntax-definition fixes.

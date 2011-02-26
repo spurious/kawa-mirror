@@ -1,3 +1,7 @@
+2011-02-25  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Character sets): New section.
+
 2011-02-24  Per Bothner  <per@bothner.com>
 
 	* kawa.texi: Various tweaks.

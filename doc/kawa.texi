@@ -1453,6 +1453,8 @@ using @code{let-values} and @code{let*-value} - @pxref{Multiple values}.
 @uref{http://srfi.schemers.org/srfi-13/srfi-13.html, SRFI 13}: String Library.
 Needs some polishing.
 @item
+@uref{http://srfi.schemers.org/srfi-14/srfi-14.html, SRFI 14}: Character-set Library.
+@item
 @uref{http://srfi.schemers.org/srfi-16/srfi-16.html, SRFI 16}: Syntax for procedures of variable arity,
 using @uref{http://srfi.schemers.org/srfi-16/srfi-16.html, @code{case-lambda}}.
 @item
@@ -1472,6 +1474,8 @@ using @uref{http://srfi.schemers.org/srfi-16/srfi-16.html, @code{case-lambda}}.
 @item
 @uref{http://srfi.schemers.org/srfi-39/srfi-39.html, SRFI 39}:
 @xref{Parameter objects}.
+@item
+@uref{http://srfi.schemers.org/srfi-41/srfi-41.html, SRFI 41}: Streams.
 @item
 @uref{http://srfi.schemers.org/srfi-62/srfi-62.html, SRFI 62}: S-expression comments.
 @item
@@ -2265,6 +2269,8 @@ Examples:
 The second example assumes that @code{command-line} is an alias for some
 feature which gives access to command line arguments. Note that an error
 will be signaled at macro-expansion time if this feature is not present.
+
+You can use @code{java-6} to check for Java 6.
 @end deffn
 
 @anchor{include}
@@ -3874,12 +3880,13 @@ a library call is needed, but run-time type dispatch is avoided.
 
 @menu
 * Characters::
+* Character sets::
 * Strings::
 * Unicode::              Unicode character classes and conversions
 * Regular expressions::
 @end menu
 
-@node Characters, Strings, , Characters and text
+@node Characters
 @section Characters
 
 @emph{Characters} are objects that represent Unicode scalar values.
@@ -3950,7 +3957,39 @@ according to their Unicode scalar values.
 @end example
 @end deffn
 
-@node Strings, Unicode, Characters, Characters and text
+@node Character sets
+@section Character sets
+
+Sets of characters are useful for text-processing code,
+including parsing, lexing, and pattern-matching.
+@uref{http://srfi.schemers.org/srfi-14/srfi-14.html, SRFI 14} specifies
+a @code{char-set} type for such uses.  Some examples:
+
+@example
+(import (srfi :14 char-sets))
+(define vowel (char-set #\a #\e #\i #\o #\u))
+(define vowely (char-set-adjoin vowel #\y))
+(char-set-contains? vowel #\y) @result{}  #f
+(char-set-contains? vowely #\y) @result{}  #t
+@end example
+
+See the @uref{http://srfi.schemers.org/srfi-14/srfi-14.html, SRFI 14 specification} for details.
+
+@deffn Type char-set
+The type of character sets.
+In Kawa @code{char-set} is a type that can be used in type specifiers:
+@example
+(define vowely ::char-set (char-set-adjoin vowel #\y))
+@end example
+@end deffn
+
+Kawa uses @uref{http://www.ibm.com/developerworks/linux/library/l-cpinv.html,inversion lists} for an efficient implementation, using Java @code{int} arrays
+to represents character ranges (inversions).
+The @code{char-set-contains?} function uses binary search,
+so it takes time proportional to the logarithm of the number of inversions.
+Other operations may take time proportional to the number of inversions.
+
+@node Strings
 @section Strings
 
 Strings are sequences of characters.  The @emph{length} of a string is

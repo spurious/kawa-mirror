@@ -1,3 +1,9 @@
+2011-02-25  Jamison Hope  <jrh@theptrgroup.com>
+
+	* srfi13.scm: Fixes to allows compilation without warnings.
+	(check-arg, char-cased?): New procedures.
+	(:optional, let-optionals*): New syntax.
+
 2011-02-10  Jamison Hope  <jrh@theptrgroup.com>
 
 	* srfi14.scm: Fix Java-6 dependency.

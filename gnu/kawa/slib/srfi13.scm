@@ -111,6 +111,44 @@
 ;;; Enough introductory blather. On to the source code. (But see the end of
 ;;; the file for further notes on porting & performance tuning.)
 
+;;; Require SRFI-14 for char-sets
+(require 'srfi-14 "srfi14.scm")
+
+;;; check-arg taken from comments above
+(define-private (check-arg pred val proc)
+  (if (pred val) val (error "Bad arg" val pred proc)))
+
+;;; [:optional and let-optionals* are derived from their usage here
+;;; and are most likely missing functionality present in more general
+;;; implementations. -JRH]
+(define-syntax :optional
+  (syntax-rules ()
+    ((_ rest-list default pred?)
+     (if (null? rest-list) default
+         (let ((x (car rest-list)))
+           (if (pred? x) x default))))))
+
+(define-syntax (let-optionals* form)
+  (syntax-case form ()
+    ((_ rest-arg () e ...) #`(let () e ...))
+    ((_ rest-arg (rest) e ...) (identifier? (syntax rest))
+     #`(let ((rest rest-arg)) e ...))
+    ((_ rest-arg ((var default) bindings ...) e ...)
+     (identifier? (syntax var))
+     #`(let-optionals* rest-arg ((var default #t) bindings ...) e ...))
+    ((_ rest-arg ((var default expr) bindings ...) e ...)
+     (identifier? (syntax var))
+     #`(let ((var (if (not (null? rest-arg)) (car rest-arg) default)))
+         (when (not expr) (set! var default))
+         (let-optionals*
+          (if (not (null? rest-arg)) (cdr rest-arg) rest-arg)
+          (bindings ...) e ...)))
+    ((_ rest-arg ((vars proc)) e ...)
+     #`(receive vars (proc rest-arg) e ...))))
+
+(define-private (char-cased? (c ::character)) ::boolean
+  (not (char=? (char-upcase c) (char-downcase c))))
+
 
 ;;; Support for START/END substring specs
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

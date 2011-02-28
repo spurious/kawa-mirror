@@ -1,3 +1,10 @@
+2011-02-27  Per Bothner  <per@bothner.com>
+
+	* SlotGet.java (lookupMember): Also check for member classes.
+	(apply2): If second arg is a ClassType, return it.
+	* CompileReflect.java (validateApplySlotGet): If lookupMember
+	returned a static member class, return that.
+
 2011-01-24  Per Bothner  <per@bothner.com>
 
 	* CompileInvoke.java (validateApplyInvoke): Report error if

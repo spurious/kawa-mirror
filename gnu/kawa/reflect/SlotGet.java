@@ -53,6 +53,10 @@ public class SlotGet extends Procedure2
         fname = ((gnu.bytecode.Field) arg2).getName();
         name = Compilation.demangleName(fname, true);
       }
+    else if (arg2 instanceof gnu.bytecode.ClassType)
+      {
+        return arg2;
+      }
     else if (arg2 instanceof gnu.bytecode.Method)
       {
         String mname = ((gnu.bytecode.Method) arg2).getName();
@@ -211,21 +215,23 @@ public class SlotGet extends Procedure2
   public static Member
   lookupMember (ObjectType clas, String name, ClassType caller)
   {
-    gnu.bytecode.Field field
-      = clas.getField(Compilation.mangleNameIfNeeded(name), -1);
-    if (field != null)
+    String mname = Compilation.mangleNameIfNeeded(name);
+    Member member = clas.getField(mname, -1);
+    if (member == null && clas instanceof ClassType)
+      member = ((ClassType) clas).getDeclaredClass(mname);
+    if (member != null)
       {
         if (caller == null)
           caller = Type.pointer_type;
-        if (caller.isAccessible(field, clas))
-          return field;
+        if (caller.isAccessible(member, clas))
+          return member;
       }
 
     // Try looking for a method "getFname" instead:
     String getname = ClassExp.slotToMethodName("get", name);
     gnu.bytecode.Method method = clas.getMethod(getname, Type.typeArray0);
     if (method == null)
-      return field;
+      return member;
     else
       return method;
   }

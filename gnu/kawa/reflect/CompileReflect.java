@@ -183,6 +183,17 @@ public class CompileReflect
 	      return new ErrorExp( "method "+method +" is not accessible here", 
                                    comp);
           }
+        else if (part instanceof ClassType && ((ClassType) part).getStaticFlag())
+          {
+            Object result = part;
+            if (arg0.valueIfConstant() instanceof Class)
+              {
+                Class cls = ((ClassType) part).getReflectClass();
+                if (cls != null)
+                  result = cls;
+              }
+            return QuoteExp.getInstance(result);
+          }
         if (part != null)
           {
             Expression[] nargs

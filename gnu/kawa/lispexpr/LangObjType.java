@@ -259,13 +259,6 @@ public class LangObjType extends ObjectType implements TypeValue
     return implementationType;
   }
 
-  static PrimProcedure makePathProc =
-    new PrimProcedure("gnu.text.Path", "valueOf", 1);
-  static PrimProcedure makeFilepathProc =
-    new PrimProcedure("gnu.text.FilePath", "makeFilePath", 1);
-  static PrimProcedure makeURIProc =
-    new PrimProcedure("gnu.text.URIPath", "makeURI", 1);
-
   public void emitIsInstance(Variable incoming,
 			     Compilation comp, Target target)
   {
@@ -725,11 +718,11 @@ public class LangObjType extends ObjectType implements TypeValue
     switch (typeCode)
       {
       case PATH_TYPE_CODE:
-        return makePathProc;
+        return new PrimProcedure("gnu.text.Path", "valueOf", 1);
       case FILEPATH_TYPE_CODE:
-        return makeFilepathProc;
+        return new PrimProcedure("gnu.text.FilePath", "makeFilePath", 1);
       case URI_TYPE_CODE:
-        return makeURIProc;
+        return new PrimProcedure("gnu.text.URIPath", "makeURI", 1);
       case VECTOR_TYPE_CODE:
         return new PrimProcedure("gnu.lists.FVector", "make", 1);
       case LIST_TYPE_CODE:

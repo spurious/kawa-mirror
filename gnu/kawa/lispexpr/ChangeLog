@@ -1,3 +1,9 @@
+2011-03-01  Per Bothner  <per@bothner.com>
+
+	* LangObjType.java (makePathProc, makeFilepathProc, makeURIProc):
+	Remove static fields, to avoid needs reflection during startup.
+	(getConstructor): Instead create PrimProcedure objects on-the-fly.
+
 2011-02-24  Per Bothner  <per@bothner.com>
 
 	* LangObjType.java (s8vectorType, u8vectorType, s16vectorType,

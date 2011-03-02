@@ -1,3 +1,10 @@
+2011-03-02  Per Bothner  <per@bothner.com>
+
+	* ObjectType.java (getContextClassLoader): Remove special hack for
+	getting system ClassLoader (rather than context ClassLoader) on Android
+	- it causes problems with newer versions of Android and isn't needed.
+	It's unclear if the hack is still needed for older Android versions.
+
 2011-01-07  Per Bothner  <per@bothner.com>
 
 	* AnnotationEntry.java (print): Don't print initial identation

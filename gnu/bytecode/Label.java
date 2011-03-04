@@ -87,13 +87,10 @@ public class Label {
           {
             stackTypes[i] = mergeTypes(stackTypes[i], stack[i]);
           }
-        int min = usedLocals < localTypes.length ? usedLocals : localTypes.length ;
-        for (int i = 0; i < min; i++)
+        for (int i = 0; i < localTypes.length;  i++)
           {
-            mergeLocalType(i, locals[i]);
+            mergeLocalType(i, i < usedLocals ? locals[i] : null);
           }
-        for (int i = usedLocals; i < localTypes.length;  i++)
-          localTypes[i] = null;
       }
   }
 

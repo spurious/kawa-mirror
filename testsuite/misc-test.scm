@@ -1,4 +1,4 @@
-(test-init "Miscellaneous" 204)
+(test-init "Miscellaneous" 205)
 
 ;;; DSSSL spec example 11
 (test '(3 4 5 6) (lambda x x) 3 4 5 6)
@@ -960,3 +960,19 @@
      (loop))
    (e java.lang.Exception 
       (e:printStackTrace))))
+
+;; Savannah bug #32657: Verification error with JDK7
+(begin
+  (define (foo-savannah-32657) ()
+    (let ((x (bar-savannah-32657))
+          (fail (lambda () (error "fail"))))
+      (if (instance? x <pair>)
+          (let ((y :: <pair> x))
+            (let ((z (y:getCar)))
+              (if (eq? (y:getCdr) '())
+                  z
+                  (fail))))
+          (fail))))
+  (define (bar-savannah-32657) ::<list>
+    (list 1))
+  (test 1 'savannah-32657 (foo-savannah-32657)))

@@ -160,8 +160,7 @@ public class ModuleExp extends LambdaExp
       }
     catch (Throwable ex)
       {
-	comp.getMessages()
-          .error('f', "internal compile error - caught "+ex, ex);
+        messages.error('f', "internal compile error - caught "+ex, ex);
         throw new SyntaxException(messages);
       }
   }

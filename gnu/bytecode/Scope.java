@@ -125,7 +125,6 @@ public class Scope
   public void noteStartFunction(CodeAttr code)
   {
     setStartPC(code);
-    start.setTypes(code);
   }
 
   /**

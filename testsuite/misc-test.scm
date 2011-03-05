@@ -1,4 +1,4 @@
-(test-init "Miscellaneous" 205)
+(test-init "Miscellaneous" 206)
 
 ;;; DSSSL spec example 11
 (test '(3 4 5 6) (lambda x x) 3 4 5 6)
@@ -960,6 +960,26 @@
      (loop))
    (e java.lang.Exception 
       (e:printStackTrace))))
+
+;; Savannah bug #32656: ArrayIndexOutOfBoundsException in mergeLocalType
+(test 2 'savannah-32656
+      (letrec ((f (lambda (x)
+                    (case x
+                      ((0) (f x))
+                      ((1) (g x))
+                      ((2) (h x)))))
+               (g (lambda (x)
+                    (case x
+                      ((0) (f x))
+                      ((1) (g x))
+                      ((2) (h x)))))
+               (h (lambda (x)
+                    (case x
+                      ((0) (f x))
+                      ((1) (g x))
+                      ((2) ;(h x)
+                       x)))))
+        (f 2)))
 
 ;; Savannah bug #32657: Verification error with JDK7
 (begin

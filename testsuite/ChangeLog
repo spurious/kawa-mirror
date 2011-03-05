@@ -1,5 +1,10 @@
 2011-03-04  Helmut Eller  <eller.helmut@gmail.com>
 
+	* misc-test.scm: New test for Savannah bug #32656
+	"ArrayIndexOutOfBoundsException in mergeLocalType".
+
+2011-03-04  Helmut Eller  <eller.helmut@gmail.com>
+
 	* misc-test.scm: New test for Savannah bug #32657
 	"Verification error with JDK7".
 

@@ -1,5 +1,9 @@
 2011-03-04  Per Bothner  <per@bothner.com>
 
+	* Label.java (mergeLocalType): Check length of old localTypes array.
+	This fixes Savannah bug #32656 "ArrayIndexOutOfBoundsException in
+	mergeLocalType".
+
 	* Label.java (setTypes): If the new local variable array is shorter
 	than the old one, call mergeLocalType so notifyTypeChangeListeners
 	gets called.

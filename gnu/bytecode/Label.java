@@ -113,11 +113,16 @@ public class Label {
 
   private void mergeLocalType (int varnum, Type newType)
   {
-    Type oldLocal = localTypes[varnum];
-    Type newLocal = mergeTypes(oldLocal, newType);
-    localTypes[varnum] = newLocal;
-    if (newLocal != oldLocal)
-      notifyTypeChangeListeners(varnum, newLocal);
+    if (varnum < localTypes.length)
+      {
+        Type oldLocal = localTypes[varnum];
+        Type newLocal = mergeTypes(oldLocal, newType);
+        if (newLocal != oldLocal)
+          {
+            localTypes[varnum] = newLocal;
+            notifyTypeChangeListeners(varnum, newLocal);
+          }
+      }
   }
 
   private void notifyTypeChangeListeners (int varnum, Type newType)

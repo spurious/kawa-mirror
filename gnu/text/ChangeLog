@@ -1,3 +1,11 @@
+2011-03-04  Per Bothner  <per@bothner.com>
+
+	* SourceMessages.java (getCount): New public method.
+	(adjustDisplayMax, skipDisplayMessage): New internal methods.
+	(printAll): Use new methods for more useful cutoff when there
+	are too messages.
+	* SyntaxException.java (getMessage): Likewise.
+
 2011-02-04  Jamison Hope  <jrh@theptrgroup.com>
 
 	* Char.java (CharMap.get): The return from getValue might return null,

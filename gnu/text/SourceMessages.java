@@ -44,6 +44,18 @@ public class SourceMessages implements SourceLocator
   /** Get the number of errors (not counting warnings). */
   public int getErrorCount() { return errorCount; }
 
+  /** Get number of diagnostics whose severity is one of the characters in the argument. */
+  public int getCount (String severities)
+  {
+    int count = 0;
+    for (SourceError err = firstError; err != null;  err = err.next)
+      {
+        if (severities.indexOf(err.severity) >= 0)
+          count++;
+      }
+    return count;
+  }
+
   /** Clear the error count (only). */
   public void clearErrors() { errorCount = 0; }
 
@@ -183,23 +195,55 @@ public class SourceMessages implements SourceLocator
     error(err);
   }
 
+  /** Return {@code 2*(max_non_fatal_messages_to_display)+(should_warnings_be_skipped?1:0)}.
+   * @param max maximum total messages to display
+   */
+  int adjustDisplayMax (int max)
+  {
+    int count = getCount("iwef");
+    boolean skipWarnings = false;
+    if (count > max)
+      {
+        skipWarnings = true;
+        max = max - getCount("f");
+      }
+    return (max << 1) | (skipWarnings?1:0);
+  }
+
+  boolean skipDisplayMessage (int max, SourceError error)
+  {
+    char severity = error.severity;
+    if (max <= 0 && severity != 'f')
+      return true;
+    boolean skipWarnings = (max & 1) != 0;
+    if (skipWarnings && (severity == 'i' || severity == 'w'))
+      return true;
+    return false;
+  }
+
   /** Print all the error messages to a PrintStream. */
   public void printAll(java.io.PrintStream out, int max)
   {
-    for (SourceError err = firstError;
-	 err != null && --max >= 0;  err = err.next)
+    max = adjustDisplayMax(max);
+    for (SourceError err = firstError;  err != null;  err = err.next)
       {
+        if (skipDisplayMessage(max, err))
+          continue;
 	err.println(out);
+        max -= 2;
       }
   }
 
   /** Print all the error messages to a PrintWriter. */
   public void printAll(java.io.PrintWriter out, int max)
   {
-    for (SourceError err = firstError;
-	 err != null && --max >= 0;  err = err.next)
+    max = adjustDisplayMax(max);
+    for (SourceError err = firstError;  err != null;  err = err.next)
       {
+        if (skipDisplayMessage(max, err))
+          continue;
 	err.println(out);
+        max -= 2;
       }
   }
 

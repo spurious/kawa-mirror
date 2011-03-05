@@ -1,3 +1,8 @@
+2011-03-04  Per Bothner  <per@bothner.com>
+
+	* InlineCalls.java (maybeInline): Don't used obsolete
+	Methodhandle.invokeExact syntax.
+
 2011-02-20  Per Bothner  <per@bothner.com>
 
 	* InlineCalls.java (visitSetExp): Inline super.visitSetExp and

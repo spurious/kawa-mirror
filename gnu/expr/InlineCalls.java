@@ -487,8 +487,8 @@ public class InlineCalls extends ExpExpVisitor<Type>
   }
 
   /* #ifdef use:java.dyn */
-  // static final java.dyn.MethodType validateApplyMType =
-  //   java.dyn.MethodType.make(gnu.expr.Expression.class,
+  // static final MethodType validateApplyMType =
+  //   MethodType.methodType(gnu.expr.Expression.class,
   //                            gnu.expr.ApplyExp.class,
   //                            gnu.expr.InlineCalls.class,
   //                            gnu.bytecode.Type.class,
@@ -551,7 +551,7 @@ public class InlineCalls extends ExpExpVisitor<Type>
           {
             /* #ifdef use:java.dyn */
             // if (inliner instanceof MethodHandle)
-            //   return ((MethodHandle) inliner).<Expression>invokeExact(exp, this, required, proc);
+            //   return (Expression) ((MethodHandle) inliner).invokeExact(exp, this, required, proc);
             /* #endif */
             Object[] vargs = new Object[] { exp, this, required, proc };
             if (inliner instanceof Procedure)

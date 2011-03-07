@@ -1,3 +1,8 @@
+2011-03-07  Helmut Eller  <eller.helmut@gmail.com>
+
+	* misc-test.scm: New test for Savannah bug #32678
+	"set! and endless loop".
+
 2011-03-04  Helmut Eller  <eller.helmut@gmail.com>
 
 	* misc-test.scm: New test for Savannah bug #32656

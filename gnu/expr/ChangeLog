@@ -1,3 +1,11 @@
+2011-03-07  Per Bothner  <per@bothner.com>
+
+	* SetExp.java (checkReachable): New method.
+	(compile): Use it.
+	* StackTarget.java (compileFromStack0): Do nothing if not
+	reachableHere.
+	Fixes Savannah bug#32678 "set! and endless loop".
+
 2011-03-04  Per Bothner  <per@bothner.com>
 
 	* InlineCalls.java (maybeInline): Don't used obsolete

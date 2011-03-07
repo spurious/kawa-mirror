@@ -26,9 +26,9 @@ public class StackTarget extends Target
 
   static boolean compileFromStack0(Compilation comp, Type stackType, Type type)
   {
-    if (type == stackType)
-      return true;
     CodeAttr code = comp.getCode();
+    if (type == stackType || ! code.reachableHere())
+      return true;
     if (stackType.isVoid())
       {
 	comp.compileConstant (Values.empty);

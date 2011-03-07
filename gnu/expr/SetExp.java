@@ -268,6 +268,8 @@ public class SetExp extends AccessExp
             else
               {
                 new_value.compile(comp, decl);
+                if (! checkReachable(comp))
+                  return;
                 if (needValue)
                   {
                     code.emitDup(type);  // dup or dup2
@@ -299,6 +301,8 @@ public class SetExp extends AccessExp
               decl.loadOwningObject(owner, comp);
             type = field.getType();
 	    new_value.compile(comp, decl);
+            if (! checkReachable(comp))
+              return;
             comp.usedClass(field.getDeclaringClass());
             if (field.getStaticFlag())
               {
@@ -328,6 +332,14 @@ public class SetExp extends AccessExp
       target.compileFromStack(comp, getType());
     else
       comp.compileConstant(Values.empty, target);
+  }
+
+  boolean checkReachable (Compilation comp)
+  {
+    boolean reachable = comp.getCode().reachableHere();
+    if (! reachable)
+      comp.error('w', "expression never finishes", new_value);
+    return reachable;
   }
 
   /** "Failure" return value of canUseInc. */

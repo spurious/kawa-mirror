@@ -1362,6 +1362,8 @@ public class CodeAttr extends Attribute implements AttrContainer
 
   public void emitStore (Variable var)
   {
+    if (! reachableHere())
+      return;
     int offset = var.offset;
     if (offset < 0 || !var.isSimple ())
       throw new Error ("attempting to store in unassigned "+var
@@ -1467,6 +1469,8 @@ public class CodeAttr extends Attribute implements AttrContainer
 
   public void emitInvokeMethod (Method method, int opcode)
   {
+    if (! reachableHere())
+      return;
     reserve(opcode == 185 ? 5 : 3);
     int arg_count = method.arg_types.length;
     boolean is_invokestatic = opcode == 184;
@@ -2074,6 +2078,8 @@ public class CodeAttr extends Attribute implements AttrContainer
 
   final void emitRawReturn ()
   {
+    if (! reachableHere())
+      return;
     if (getMethod().getReturnType().size == 0)
       {
 	reserve(1);
@@ -2261,6 +2267,7 @@ public class CodeAttr extends Attribute implements AttrContainer
     ClassType type = var == null ? null : (ClassType) var.getType();
     try_stack.try_type = type;
     addHandler(try_stack.start_try, try_stack.end_try, type);
+    setReachable(true);
     if (var != null)
       emitStore(var);
   }

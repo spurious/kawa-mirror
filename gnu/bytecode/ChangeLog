@@ -1,3 +1,11 @@
+2011-03-07  Per Bothner  <per@bothner.com>
+
+	* CodeAttr.java (emitStore): Do nothing if not reachableHere().
+	(emitInvokeMethod): Likewise.
+	(emitRawReturn): Likewise.
+	(emitCatchStart): Note we're reachable at the handler.
+	Fixes Savannah bug#32678 "set! and endless loop".
+
 2011-03-04  Per Bothner  <per@bothner.com>
 
 	* Scope.java (noteStartFunction): Don't call setTypes on start address,

@@ -1,4 +1,4 @@
-(test-init "Miscellaneous" 206)
+(test-init "Miscellaneous" 207)
 
 ;;; DSSSL spec example 11
 (test '(3 4 5 6) (lambda x x) 3 4 5 6)
@@ -996,3 +996,15 @@
   (define (bar-savannah-32657) ::<list>
     (list 1))
   (test 1 'savannah-32657 (foo-savannah-32657)))
+
+;; Savannah bug ##32678: set! and endless loop
+(define (foo-savannah-32678 x)
+  (let ((fail 0)
+	(result #!null))
+    (if (instance? x pair)
+	(set! result (do () (#f)))
+	(set! fail -1))
+    (if (= fail 0) 
+	result 
+	#f)))
+(test #f foo-savannah-32678 123)

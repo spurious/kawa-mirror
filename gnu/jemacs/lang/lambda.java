@@ -79,6 +79,7 @@ public class lambda extends Lambda
 	    Declaration decl = let.addDeclaration(arg.getSymbol());
             decl.setCanWrite(true);
 	    decl.setFluid(true);
+            decl.setFlag(Declaration.IS_DYNAMIC); // Turn off warning.
 	    decl.setIndirectBinding(true);
 	    inits[i] = new ReferenceExp(arg);
 	    decl.noteValue(inits[i]);

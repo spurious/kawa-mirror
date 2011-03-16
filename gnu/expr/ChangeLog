@@ -1,5 +1,8 @@
 2011-03-16  Per Bothner  <per@bothner.com>
 
+	* FindCapturedVars.java (visitFluidLetExp): Don't warnUndefinedVariable
+	if IS_DYNAMIC flag is set.
+
 	* SetExp.java (checkReachable): More informative warning text.
 
 2011-03-07  Per Bothner  <per@bothner.com>

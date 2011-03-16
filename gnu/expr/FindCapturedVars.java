@@ -174,7 +174,8 @@ public class FindCapturedVars extends ExpExpVisitor<Void>
           {
             Object name = decl.getSymbol();
             Declaration bind = allocUnboundDecl(name, false);
-            maybeWarnNoDeclarationSeen(name, comp, exp);
+            if (! decl.getFlag(Declaration.IS_DYNAMIC))
+              maybeWarnNoDeclarationSeen(name, comp, exp);
             capture(bind);
             decl.base = bind;
           }

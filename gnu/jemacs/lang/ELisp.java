@@ -132,9 +132,9 @@ public class ELisp extends Lisp2
     defun("unwind-protect", new gnu.commonlisp.lang.UnwindProtect());
     defun("save-excursion", new gnu.jemacs.lang.SaveExcursion(false));
     defun("save-current-buffer", new gnu.jemacs.lang.SaveExcursion(true));
-    defun("let", new kawa.standard.fluid_let(false, nilExpr));
+    defun("let", new kawa.standard.fluid_let(false, false, nilExpr));
     defun("%let", kawa.standard.let.let);
-    defun("let*", new kawa.standard.fluid_let(true, nilExpr));
+    defun("let*", new kawa.standard.fluid_let(true, false, nilExpr));
     defProcStFld("concat", "kawa.lib.strings", "string$Mnappend");
     Procedure not = new gnu.kawa.functions.Not(this);
     defun("not", not);

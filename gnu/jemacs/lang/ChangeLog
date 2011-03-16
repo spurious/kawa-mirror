@@ -1,3 +1,9 @@
+2011-03-16  Per Bothner  <per@bothner.com>
+
+	* ELisp.java: Update fluid_let constructor calls.
+	* lambda.java (rewriteBody): Set IS_DYNAMIC on fluid variable,
+	to suppress warning.
+
 2011-02-05  Per Bothner  <per@bothner.com>
 
 	* MiscOps.scm (if): Update to use define-rewrite-syntax.

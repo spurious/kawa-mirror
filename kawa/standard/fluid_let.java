@@ -22,10 +22,13 @@ public class fluid_let extends Syntax
    * Null means use the existing binding. */
   Expression defaultInit;
 
-  public fluid_let(boolean star, Expression defaultInit)
+  boolean warnIfUndefined;
+
+  public fluid_let(boolean star, boolean warnIfUndefined, Expression defaultInit)
   {
     this.star = star;
     this.defaultInit = defaultInit;
+    this.warnIfUndefined = warnIfUndefined;
   }
 
   public fluid_let()
@@ -97,6 +100,8 @@ public class fluid_let extends Syntax
                 found.setFluid(true);
                 found.setCanWrite(true);
               }
+            else if (! warnIfUndefined)
+              decl.setFlag(Declaration.IS_DYNAMIC);
             decl.setCanWrite(true);
             decl.setFluid(true);
             decl.setIndirectBinding(true);

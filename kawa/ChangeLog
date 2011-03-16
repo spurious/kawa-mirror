@@ -1,5 +1,8 @@
 2011-03-16  Per Bothner  <per@bothner.com>
 
+	* standard/fluid_let.java (warnIfUndefined): New field.
+	(rewrite): Set IS_DYNAMIC unless warnIfUndefined.
+
 	* standard/IfFeature.java (isProvide): New convenience method.
 	(PROVIDE_PREFIX): New constant.
 	(hasFeature): Use PROVIDE_PREFIX.

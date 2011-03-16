@@ -1,6 +1,7 @@
 package kawa.standard;
 import kawa.lang.*;
 import gnu.expr.*;
+import gnu.mapping.Symbol;
 import gnu.mapping.SimpleSymbol;
 
 public class IfFeature
@@ -81,11 +82,17 @@ public class IfFeature
       return true;
     /* #endif */
 
-    String provide_name = ("%provide%"+name).intern();
-    Compilation comp = Compilation.getCurrent();
-    Declaration decl = comp.lookup(provide_name, -1);
+    Symbol provide_symbol = Symbol.valueOf(PROVIDE_PREFIX+name);
+    Declaration decl = Compilation.getCurrent().lookup(provide_symbol, -1);
     if (decl!=null && ! decl.getFlag(Declaration.IS_UNKNOWN))
       return true;
     return false;
+  }
+
+  public static final String PROVIDE_PREFIX = "%provide%";
+
+  public static boolean isProvide (Declaration decl)
+  {
+    return decl.getName().startsWith(PROVIDE_PREFIX);
   }
 }

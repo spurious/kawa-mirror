@@ -1156,6 +1156,8 @@ public class Translator extends Compilation
                 if (pair.getCar() != pendingForm)
                   pair = makePair(pair, pendingForm, pair.getCdr());
                 pendingForm = new Pair(kawa.standard.begin.begin, pair);
+                if (list != LList.Empty)
+                  formStack.add(new Pair(kawa.standard.begin.begin, list));
                 return LList.Empty;
               }
 	    int fsize = formStack.size();
@@ -1359,7 +1361,7 @@ public class Translator extends Compilation
 		    decl.setPrivate(false);
 		  }
 	      }
-	    else
+	    else if (! kawa.standard.IfFeature.isProvide(decl))
 	      decl.setPrivate(true);
 	  }
 	if (moduleStatic)

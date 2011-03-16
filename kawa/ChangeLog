@@ -1,3 +1,15 @@
+2011-03-16  Per Bothner  <per@bothner.com>
+
+	* standard/IfFeature.java (isProvide): New convenience method.
+	(PROVIDE_PREFIX): New constant.
+	(hasFeature): Use PROVIDE_PREFIX.
+	Fix bug where we'd lookup using a String rather than a Symbol.
+	* lang/Translator.java (finishModule): The magic provide declarations
+	need to be exported.
+
+	* lang/Translator.java (scanBody): If a require form causes parsing to
+	be suspended, we need to push back forms popped from the formStack.
+
 2011-02-24  Per Bothner  <per@bothner.com>
 
 	* standard/Scheme.java: Change s8vector, u8vector, s16vector, u16vector,

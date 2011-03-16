@@ -1,3 +1,7 @@
+2011-03-16  Per Bothner  <per@bothner.com>
+
+	* SetExp.java (checkReachable): More informative warning text.
+
 2011-03-07  Per Bothner  <per@bothner.com>
 
 	* SetExp.java (checkReachable): New method.

@@ -338,7 +338,7 @@ public class SetExp extends AccessExp
   {
     boolean reachable = comp.getCode().reachableHere();
     if (! reachable)
-      comp.error('w', "expression never finishes", new_value);
+      comp.error('w', "'"+getSymbol()+"' can never be set because expression never finishes", new_value);
     return reachable;
   }
 

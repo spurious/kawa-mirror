@@ -792,10 +792,7 @@ public class XQResolveNames extends ResolveNames
                   Expression base = getBaseUriExpr();
                   Expression uri = args.length > 0 ? args[0]
                     : QuoteExp.voidExp;
-                  ApplyExp aexp
-                    = new ApplyExp(meth, new Expression[]{ uri, base });
-                  aexp.setType(NodeType.documentNodeTest);
-                  return aexp;
+                  return new ApplyExp(meth, new Expression[]{ uri, base });
                 }
               case DOC_BUILTIN:
               case DOC_AVAILABLE_BUILTIN:

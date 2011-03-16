@@ -109,7 +109,7 @@ public abstract class ModuleBody extends Procedure0
    * Thus if you start up AWT, the JVM will wait for the AWT to finish,
    * even if there are no other non-daemon threads.
    * So call exitIncrement() each time a Freme is created,
-   * and call exitDecrement() a Frame is closed. */
+   * and call exitDecrement() when a Frame is closed. */
   public static synchronized void exitDecrement()
   {
     int counter = exitCounter;

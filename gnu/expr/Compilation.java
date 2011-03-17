@@ -2571,10 +2571,16 @@ public class Compilation implements SourceLocator
 
   public Declaration letVariable (Object name, Type type, Expression init)
   {
-    LetExp let = (LetExp) current_scope;
-    Declaration decl = let.addDeclaration(name, type);
-    decl.noteValue(init);
+    Declaration decl = new Declaration(name, type);
+    letVariable(decl, init);
     return decl;
+  }
+
+  public void letVariable (Declaration decl, Expression init)
+  {
+    LetExp let = (LetExp) current_scope;
+    let.add(decl);
+    decl.noteValue(init);
   }
 
   public void letEnter ()

@@ -3335,13 +3335,12 @@ public class XQParser extends Lexer
     getRawToken();
 
     Expression type = parseOptionalTypeDeclaration();
-    ScopeExp sc;
-    Expression[] inits = new Expression[1];
+    LambdaExp lexp = null;
     Declaration posDecl = null;
     if (isFor)
       {
 	boolean sawAt = match("at");
-	LambdaExp lexp = new LambdaExp(sawAt ? 2 : 1);
+	lexp = new LambdaExp(sawAt ? 2 : 1);
 	if (sawAt)
 	  {
 	    getRawToken();
@@ -3353,7 +3352,6 @@ public class XQParser extends Lexer
 	    if (posDecl == null)
 	      syntaxError("missing Variable after 'at'");
 	  }
-	sc = lexp;
 	if (match("in"))
 	  getRawToken();
 	else
@@ -3362,6 +3360,7 @@ public class XQParser extends Lexer
 	      getRawToken();
 	    syntaxError("missing 'in' in 'for' clause");
 	  }
+        comp.push(lexp);
       }
     else
       {
@@ -3373,25 +3372,28 @@ public class XQParser extends Lexer
 	      getRawToken();
 	    syntaxError("missing ':=' in 'let' clause");
 	  }
-	LetExp let = new LetExp(inits);
-	sc = let;
+        comp.letStart();
       }
-    inits[0] = parseExprSingle();
-    if (type != null && ! isFor) // FIXME - for now
-      inits[0] = Compilation.makeCoercion(inits[0], type);
-    popNesting(saveNesting);
-    comp.push(sc);
-    sc.addDeclaration(decl);
-    if (type != null)
-      decl.setTypeExp(type);
+    Expression init = parseExprSingle();
     if (isFor)
       {
+        lexp.addDeclaration(decl);
 	decl.noteValueUnknown();
 	decl.setFlag(Declaration.IS_SINGLE_VALUE);
       }
+    else
+      {
+        if (type != null) // FIXME - for now
+          init = Compilation.makeCoercion(init, type);
+        comp.letVariable(decl, init);
+        comp.letEnter();
+      }
+    if (type != null)
+      decl.setTypeExp(type);
+    popNesting(saveNesting);
     if (posDecl != null)
       {
-	sc.addDeclaration(posDecl);
+	lexp.addDeclaration(posDecl);
 	posDecl.setType(LangPrimType.intType);
 	posDecl.noteValueUnknown();
 	posDecl.setFlag(Declaration.IS_SINGLE_VALUE);
@@ -3463,21 +3465,18 @@ public class XQParser extends Lexer
           body = new IfExp(booleanValue(cond), body, QuoteExp.voidExp);
 	maybeSetLine(body, bodyLine, bodyColumn);
       }
-    comp.pop(sc);
     if (isFor)
       {
-	LambdaExp lexp = (LambdaExp) sc;
+        comp.pop(lexp);
 	lexp.body = body;
-	Expression[] args = { sc, inits[0]};  // SIC
+	Expression[] args = { lexp, init};  // SIC
 	return new ApplyExp(makeFunctionExp("gnu.kawa.functions.ValuesMap",
 					    lexp.min_args == 1 ? "valuesMap"
 					    : "valuesMapWithPos"),
 			    args);
       }
     else
-      ((LetExp) sc).setBody(body);
-    return sc;
-
+      return comp.letDone(body);
   }
 
   /** Parse a some- or an every-expression.

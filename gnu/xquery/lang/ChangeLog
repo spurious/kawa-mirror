@@ -1,5 +1,8 @@
 2011-03-16  Per Bothner  <per@bothner.com>
 
+	* XQParser.java (parseFLWRInner): If !isFor, use the Compilation
+	helper methods letStart, letVariable, letEnter, and letDone.
+
 	* XQResolveNames.java (visitApplyExp): Remove setting of
 	incorrect return type for COLLECTION_BUILTIN.
 

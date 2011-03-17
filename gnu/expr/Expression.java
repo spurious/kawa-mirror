@@ -270,22 +270,11 @@ public abstract class Expression extends Procedure0
   /** Helper method to create a `while' statement. */
   public static Expression makeWhile(Object cond, Object body, Compilation parser)
   {
-    Expression[] inits = new Expression[1];
-    LetExp let = new LetExp(inits);
-    String fname = "%do%loop";
-    Declaration fdecl = let.addDeclaration(fname);
-    Expression recurse = new ApplyExp(new ReferenceExp(fdecl), noExpressions);
-    LambdaExp lexp = new LambdaExp();
-    parser.push(lexp);
-    lexp.body = new IfExp(parser.parse(cond),
-			  new BeginExp(parser.parse(body), recurse),
-			  QuoteExp.voidExp);
-    lexp.setName(fname);
-    parser.pop(lexp);
-    inits[0] = lexp;
-    fdecl.noteValue(lexp);
-    let.setBody(new ApplyExp(new ReferenceExp(fdecl), noExpressions));
-    return let;
+    parser.loopStart();
+    parser.loopEnter();
+    parser.loopCond(parser.parse(cond));
+    parser.loopBody(parser.parse(body));
+    return parser.loopRepeat();
   }
   
   /** Copies the current location. */

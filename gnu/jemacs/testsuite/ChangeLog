@@ -1,3 +1,7 @@
+2011-03-16  Per Bothner  <per@bothner.com>
+
+	* lang-test.el: Add test for 'while'.
+
 2007-01-23  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (KAWA): Use bin's kawa.sh directly.

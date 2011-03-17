@@ -1,5 +1,10 @@
 2011-03-16  Per Bothner  <per@bothner.com>
 
+	* Expression.java (makeWhile): Rewrite to make use of the Compilation
+	loopStart..loopRepeat methods.
+	* Compilation.java (loopStart): Initialize exprStack here
+	rather than in loopVariable.
+
 	* FindCapturedVars.java (visitFluidLetExp): Don't warnUndefinedVariable
 	if IS_DYNAMIC flag is set.
 

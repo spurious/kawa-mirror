@@ -1,5 +1,5 @@
 ;(load "/home/bothner/kawa-bin/testsuite/testing.zip")
-(test-init "elisp language" 23)
+(test-init "elisp language" 24)
 
 (setq y 100)
 (defun foo1 (x)
@@ -46,3 +46,10 @@
 (integer-format-test-2 "[        002d][    ffffffd3]" "[%12.4x]" 45 neg45)
 ;; Harbison&Steele (4th ed) have a typo here.
 (integer-format-test-2 "[0x002d      ][0xffffffd3  ]" "[%-#12.4x]" 45 neg45)
+
+(setq i 0)
+(setq j 1)
+(while (< i 6)
+  (setq i (+ i 1))
+  (setq j (* j i)))
+(test 720 'while-test-1 j)

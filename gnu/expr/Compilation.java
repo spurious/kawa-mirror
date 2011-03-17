@@ -2616,6 +2616,8 @@ public class Compilation implements SourceLocator
    * (We could make this implied by the first loopVaribale call ???) */
   public void loopStart()
   {
+    if (exprStack == null)
+      exprStack = new Stack<Expression>();
     LambdaExp loopLambda = new LambdaExp();
     Expression[] inits = { loopLambda };
     LetExp let = new LetExp(inits);
@@ -2633,8 +2635,6 @@ public class Compilation implements SourceLocator
     checkLoop();
     LambdaExp loopLambda = (LambdaExp) current_scope;
     Declaration decl = loopLambda.addDeclaration(name, type);
-    if (exprStack == null)
-      exprStack = new Stack<Expression>();
     exprStack.push(init);
     loopLambda.min_args++;
     return decl;

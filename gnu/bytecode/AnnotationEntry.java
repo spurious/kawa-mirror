@@ -32,10 +32,10 @@ implements java.lang.reflect.InvocationHandler
     return ((Retention) retention).value();
   }
 
-  /** Is there is a @Target meta-annotation that includes {@var etype}?.
-   * If the annotationType has no @Target meta-annotation, return true,
+  /** Is there is a {@code @Target} meta-annotation that includes the parameter?
+   * If the annotationType has no {@code @Target} meta-annotation, return true,
    * since in that case the annotation type is allowed in all contexts.
-   * If etype==null, return false iff there is a @Target meta-annotation.
+   * If {@code etype==null}, return false iff there is a {@code @Target} meta-annotation.
    */
   public boolean hasTarget (ElementType etype)
   {

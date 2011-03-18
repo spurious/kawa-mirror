@@ -1,3 +1,7 @@
+2011-03-18  Per Bothner  <per@bothner.com>
+
+	* Makefile.am: Changes to make use of RunTestScript.
+
 2010-11-14  Per Bothner  <per@bothner.com>
 
 	New directory.

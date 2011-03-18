@@ -1,3 +1,13 @@
+2011-03-18  Per Bothner  <per@bothner.com>
+
+	Support --diagnostic-strip-directories command-line option.
+	* SourceError.java (toString): Add uperload that takes stripDirectories
+	parameter.
+	(println): Likewise.
+	* SourceMessages.java (stripDirectories): New field.
+	(stripDirectoriesDefault): New static field.
+	(printAll, toString): Use it.
+
 2011-03-04  Per Bothner  <per@bothner.com>
 
 	* SourceMessages.java (getCount): New public method.

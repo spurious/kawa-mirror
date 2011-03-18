@@ -29,6 +29,9 @@ public class SourceMessages implements SourceLocator
   int current_line;
   int current_column;
 
+  public static boolean stripDirectoriesDefault = false;
+  public boolean stripDirectories = stripDirectoriesDefault;
+
   /** If true, print out stack trace with any warning. */
   public static boolean debugStackTraceOnWarning = false;
 
@@ -229,7 +232,7 @@ public class SourceMessages implements SourceLocator
       {
         if (skipDisplayMessage(max, err))
           continue;
-	err.println(out);
+	err.println(out, stripDirectories);
         max -= 2;
       }
   }
@@ -242,7 +245,7 @@ public class SourceMessages implements SourceLocator
       {
         if (skipDisplayMessage(max, err))
           continue;
-	err.println(out);
+	err.println(out, stripDirectories);
         max -= 2;
       }
   }
@@ -259,7 +262,7 @@ public class SourceMessages implements SourceLocator
     for (SourceError err = firstError;
 	 err != null && --max >= 0;  err = err.next)
       {
-	buffer.append(err);
+	buffer.append(err.toString(stripDirectories));
 	buffer.append('\n');
       }
     return buffer.toString();

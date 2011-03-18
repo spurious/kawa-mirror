@@ -590,6 +590,8 @@ public class repl extends Procedure0or1
 	  {
             SourceMessages.debugStackTraceOnWarning = true;
 	  }
+        else if (arg.equals("--diagnostic-strip-directories"))
+          SourceMessages.stripDirectoriesDefault = true;
 	else if (arg.equals("--module-nonstatic")
                  || arg.equals("--no-module-static"))
 	  {

@@ -1,4 +1,5 @@
 package gnu.text;
+import java.io.File;
 
 /** Represents an error message from processing a "source" file.
  */
@@ -71,8 +72,25 @@ public class SourceError
    * followed by the message.  Warning messages are indicated as such. */
   public String toString()
   {
+    return toString(false);
+  }
+
+  /** Convert the error to a String.
+   * The String starts with filename, line and option column,
+   * followed by the message.  Warning messages are indicated as such. */
+  public String toString(boolean stripDirectories)
+  {
     StringBuffer buffer = new StringBuffer ();
-    buffer.append (filename == null ? "<unknown>" : filename);
+    String fname;
+    if (filename == null)
+      fname = "<unknown>";
+    else
+      {
+        fname = filename;
+        if (stripDirectories)
+          fname = new File(fname).getName();
+      }
+    buffer.append(fname);
     if (line > 0 || column > 0)
       {
 	buffer.append (':');
@@ -122,9 +140,9 @@ public class SourceError
     out.print(this);
   }
 
-  public void println(java.io.PrintWriter out)
+  public void println(java.io.PrintWriter out, boolean stripDirectories)
   {
-    String line = toString();
+    String line = toString(stripDirectories);
     for (;;)
       {
         int nl = line.indexOf('\n');
@@ -136,7 +154,7 @@ public class SourceError
     out.println(line);
   }
 
-  public void println(java.io.PrintStream out)
+  public void println(java.io.PrintStream out, boolean stripDirectories)
   {
     String line = toString();
     for (;;)

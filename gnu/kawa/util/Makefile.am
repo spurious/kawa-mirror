@@ -10,6 +10,7 @@ java_sources = \
   IdentityHashTable.java \
   HashNode.java \
   RangeTable.java \
+  RunTestScript.java \
   WeakHashNode.java \
   WeakIdentityHashMap.java
 

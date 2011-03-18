@@ -1,3 +1,8 @@
+2011-03-18  Per Bothner  <per@bothner.com>
+
+	* RunTestScript.java: New class, for simple one-file test cases.
+	* Makefile.am: Update accordingly.
+
 2010-11-29  Per Bothner  <per@bothner.com>
 
 	* PreProcess.java: Add "use:javax.lang.model" as a separate feature

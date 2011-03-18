@@ -67,6 +67,11 @@ public class Q2 extends Scheme
     defSntxStFld(":=", "gnu.q2.lang.Operator", "ASSIGN");
   }
 
+  public String getName()
+  {
+    return "Q2";
+  }
+
   public gnu.text.Lexer getLexer(InPort inp, gnu.text.SourceMessages messages)
   {
     Compilation.defaultCallConvention = Compilation.CALL_WITH_CONSUMER;

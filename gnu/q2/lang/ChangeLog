@@ -1,3 +1,7 @@
+2011-03-18  Per Bothner  <per@bothner.com>
+
+	* Q2.java (getName): New method.
+
 2011-01-19  Per Bothner  <per@bothner.com>
 
 	* Q2.java (makeBody): Remove method.

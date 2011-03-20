@@ -1,3 +1,8 @@
+2011-03-20  Benny Tsai <benny.tsai@gmail.com>
+
+	* PreProcess.java: Fix handling of Windows line-ending.
+	I.e. drop special handling of '\r' - just treat it as space, like '\t'.
+
 2011-03-18  Per Bothner  <per@bothner.com>
 
 	* RunTestScript.java: New class, for simple one-file test cases.

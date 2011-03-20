@@ -86,11 +86,6 @@ public class PreProcess
 	    System.arraycopy(buf, 0, nbuf, 0, len);
 	    buf = nbuf;
 	  }
-	if (c == '\n' && len > 0 && buf[len-1] == '\r')
-	  {
-	    buf[len++] = (byte) c;
-	    continue;
-	  }
 	if (commentAt >= 0 && dataStart < 0 && changedLine <= 0
 	    && c != '\r' && c != '\n'
 	    && (commentAt == curIndent
@@ -157,13 +152,13 @@ public class PreProcess
 	  }
 	buf[len] = (byte) c;
 	len++;
-	if (c == '\r' || c == '\n')
+	if (c == '\n')
 	  {
 	    int firstNonSpace = -1;
 	    int lastNonSpace = 0;
 	    for (int i = lineStart; i < len-1; i++)
 	      {
-		if (buf[i] != ' ' && buf[i] != '\t')
+		if (buf[i] != ' ' && buf[i] != '\t' && buf[i] != '\r')
 		  {
 		    lastNonSpace = i;
 		    if (firstNonSpace < 0)

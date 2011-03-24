@@ -1,3 +1,9 @@
+2011-03-23  Per Bothner  <per@bothner.com>
+
+	* CompileInvoke.java (validateApplyInvoke): Use letStart/letVariable
+	etc methods instead of creating LetExp directly.
+	* Invoke.java (makeInvokeStatic): Change to have varargs interface.
+
 2011-02-27  Per Bothner  <per@bothner.com>
 
 	* SlotGet.java (lookupMember): Also check for member classes.

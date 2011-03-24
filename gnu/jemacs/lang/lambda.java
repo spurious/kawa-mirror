@@ -85,7 +85,7 @@ public class lambda extends Lambda
 	    decl.noteValue(inits[i]);
 	  }
 	tr.push(let);
-	let.body = tr.rewrite_body (body);
+	let.setBody(tr.rewrite_body(body));
 	tr.pop(let);
 	lexp.body = let;
       }

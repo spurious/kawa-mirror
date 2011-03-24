@@ -1,3 +1,11 @@
+2011-03-23  Per Bothner  <per@bothner.com>
+
+	* LetExp.java (body): Make field be package-private.
+	* Compilation.java (letVariable): Don't noteValue if the
+	value if the special QuoteExp.undefined_exp.
+	(letEnter): Handle the case above.
+	* Compilation.java (letDone): Call letEnter if not yet done.
+
 2011-03-16  Per Bothner  <per@bothner.com>
 
 	* Compilation.java (letVariable(Declaratiom,Expression)):

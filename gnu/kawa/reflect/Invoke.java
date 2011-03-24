@@ -294,7 +294,7 @@ public class Invoke extends ProcedureN
    * @return an ApplyExp representing the call
    */
   public static synchronized
-  ApplyExp makeInvokeStatic(ClassType type, String name, Expression[] args)
+  ApplyExp makeInvokeStatic(ClassType type, String name, Expression... args)
   {
     PrimProcedure method = getStaticMethod(type, name, args);
     if (method == null)

@@ -1,3 +1,9 @@
+2011-03-23  Per Bothner  <per@bothner.com>
+
+	* CompileMisc.java (validateApplyValuesFilter): Use letStart/letVariable
+	etc methods instead of creating LetExp directly.
+	(validateApplyRelativeStep): Likewise.
+
 2010-09-16  Per Bothner  <per@bothner.com>
 
 	* CompileMisc.java: Update validateApply methods, which no longer

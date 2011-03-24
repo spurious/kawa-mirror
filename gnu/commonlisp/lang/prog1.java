@@ -30,11 +30,12 @@ public class prog1 extends Syntax
       }
     else
       {
-	Expression[] inits = new Expression[1];
-	LetExp let = new LetExp(inits);
+        tr.letStart();
 	Expression[] body = new Expression[nexps];
 	Pair pair = (Pair) obj;
-	inits[0] = tr.rewrite(pair.getCar());
+	Declaration decl = new Declaration((Object) null);
+        tr.letVariable(decl, tr.rewrite(pair.getCar()));
+        tr.letEnter();
 	obj = pair.getCdr();
 	for (int i = 0;  i < nexps-1;  i++)
 	  {
@@ -42,11 +43,9 @@ public class prog1 extends Syntax
 	    body[i] = tr.rewrite(pair.getCar());
 	    obj = pair.getCdr();
 	  }
-	Declaration decl = let.addDeclaration((Object) null);
 	body[nexps-1] = new ReferenceExp(decl);
-	let.body = BeginExp.canonicalize(body);
 	tr.mustCompileHere();
-	return let;
+	return tr.letDone(BeginExp.canonicalize(body));
       }
   }
 }

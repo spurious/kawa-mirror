@@ -117,9 +117,8 @@ public class CompileInvoke
         alloc.setType(type);
         if (lengthSpecified && args.length == 3)
           return alloc;
-        LetExp let = new LetExp(new Expression[] { alloc });
-        Declaration adecl = let.addDeclaration((String) null, type);
-        adecl.noteValue(alloc);
+        comp.letStart();
+        Declaration adecl = comp.letVariable((String) null, type, alloc);
         BeginExp begin = new BeginExp();
         int index = 0;
         for (int i = lengthSpecified ? 3 : 1; i < args.length;  i++)
@@ -166,7 +165,7 @@ public class CompileInvoke
             index++;
           }
         begin.add(new ReferenceExp(adecl));
-        let.body = begin;
+        LetExp let = comp.letDone(begin);
         if (constantValue != null)
           return new QuoteExp(constantValue, type);
         return let;
@@ -307,9 +306,8 @@ public class CompileInvoke
                     e = ae;
                     if (sargs < args.length)
                       {
-                        LetExp let = new LetExp(new Expression[] { e });
-                        Declaration adecl = let.addDeclaration((String) null, ctype);
-                        adecl.noteValue(e);
+                        comp.letStart();
+                        Declaration adecl = comp.letVariable((String) null, ctype, e);
                         BeginExp begin = new BeginExp();
                         for (int i = sargs;  i < args.length;  i++)
                           {
@@ -323,8 +321,7 @@ public class CompileInvoke
                                                     null));
                           }
                         begin.add(new ReferenceExp(adecl));
-                        let.body = begin;
-                        e = let;
+                        e = comp.letDone(begin);
                       }
                   }
                 return visitor.checkType(e.setLine(exp), required);

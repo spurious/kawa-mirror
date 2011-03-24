@@ -141,7 +141,7 @@ public class syntax_case extends Syntax
 	    = SyntaxPattern.getLiteralsList(form.getCar(), null, tr);
 	obj = form.getCdr();
 
-	let.body = rewriteClauses(obj, work, tr);
+	let.setBody(rewriteClauses(obj, work, tr));
 	tr.pop(let);
 
 	Method allocVars = ClassType.make("kawa.lang.SyntaxPattern")

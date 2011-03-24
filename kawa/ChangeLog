@@ -1,3 +1,11 @@
+2011-03-23  Per Bothner  <per@bothner.com>
+
+	* standard/let.java (rewrite): Use letStart/letVariable
+	etc methods instead of creating LetExp directly.
+	* lang/Translator.java: Use new LetExp#setBody method.
+	* fluid_let.java: Likewise.
+	* standard/syntax_case.java: Likewise.
+
 2011-03-18  Per Bothner  <per@bothner.com>
 
 	* repl.java (processArgs): New --diagnostic-strip-directories option.

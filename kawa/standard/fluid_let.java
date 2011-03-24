@@ -117,10 +117,8 @@ public class fluid_let extends Syntax
           }
       }
     tr.push(let);
-    if (star && bindings != LList.Empty)
-      let.body = rewrite (bindings, body, tr);
-    else
-      let.body = tr.rewrite_body(body);
+    let.setBody(star && bindings != LList.Empty ? rewrite (bindings, body, tr)
+                : tr.rewrite_body(body));
     tr.pop(let);
     return let;
   }

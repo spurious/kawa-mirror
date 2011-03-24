@@ -97,7 +97,7 @@ public class CompileMisc
 
     exp.setType(args[0].getType());
 
-    Compilation parser = visitor.getCompilation();
+    Compilation comp = visitor.getCompilation();
 
     Declaration dotArg = lexp2.firstDecl();
     Declaration posArg = dotArg.nextDecl();
@@ -118,7 +118,7 @@ public class CompileMisc
         return exp;
       }
 
-    parser.letStart();
+    comp.letStart();
     Expression seq = args[0];
     Type seqType;
     Method sizeMethod;
@@ -133,8 +133,8 @@ public class CompileMisc
         seq = new ApplyExp(SortNodes.sortNodes, new Expression [] {seq});
         sizeMethod = CoerceNodes.typeNodes.getDeclaredMethod("size", 0);
       }
-    Declaration sequence = parser.letVariable("sequence", seqType, seq);
-    parser.letEnter();
+    Declaration sequence = comp.letVariable("sequence", seqType, seq);
+    comp.letEnter();
 
     Expression pred = lexp2.body;
     Type predType = lexp2.body.getType();
@@ -155,11 +155,12 @@ public class CompileMisc
 			 new Expression[] {
 			   init,
 			   new QuoteExp(IntNum.one())});
-        LetExp let = new LetExp(new Expression[] { init });
+        
+        comp.letStart();
         lexp2.replaceFollowing(dotArg, posIncoming);
-        let.add(posArg);
-        let.body = pred;
-        pred = let;
+        comp.letVariable(posArg, init);
+        comp.letEnter();
+        pred = comp.letDone(pred);
       }
 
     pred = new IfExp(pred,
@@ -178,11 +179,11 @@ public class CompileMisc
                                        new Expression[] {
                                          new ReferenceExp(sequence)});
 
-    LetExp let2 = new LetExp(new Expression[] { lastInit });
-    let2.add(lastArg);
-    let2.body = gnu.kawa.functions.CompileMisc.validateApplyValuesMap(doMap, visitor, required, ValuesMap.valuesMapWithPos);
+    comp.letStart();
+    comp.letVariable(lastArg, lastInit);
+    LetExp let2 = comp.letDone(gnu.kawa.functions.CompileMisc.validateApplyValuesMap(doMap, visitor, required, ValuesMap.valuesMapWithPos));
 
-    return parser.letDone(let2);
+    return comp.letDone(let2);
   }
 
   public static Expression validateApplyRelativeStep
@@ -254,13 +255,15 @@ public class CompileMisc
 
         Method sizeMethod = typeNodes.getDeclaredMethod("size", 0);
         Expression lastInit
-          =  new ApplyExp(sizeMethod,
-                          new Expression[] {new ReferenceExp(sequence)});
-        LetExp lastLet = new LetExp(new Expression[] { lastInit });
-        lastLet.addDeclaration(lastArg);
-        lastLet.body = new ApplyExp(exp.getFunction(),
+          = new ApplyExp(sizeMethod,
+                         new Expression[] {new ReferenceExp(sequence)});
+        comp.letStart();
+        comp.letVariable(lastArg, lastInit);
+        comp.letEnter();
+        LetExp lastLet =
+          comp.letDone(new ApplyExp(exp.getFunction(),
                                     new Expression[] { new ReferenceExp(sequence),
-                                                       lexp2 });
+                                                       lexp2 }));
         return comp.letDone(lastLet);
       }
 

@@ -21,53 +21,35 @@ public class SaveExcursion extends Syntax
 
   public Expression rewrite (Object obj, Translator tr)
   {
-    Expression[] inits1 = new Expression[1];
-    inits1[0] = Invoke.makeInvokeStatic(typeBuffer, "getCurrent",
-					Expression.noExpressions);
-    LetExp let1 = new LetExp(inits1);
-    Declaration savedBuffer = let1.addDeclaration(null, typeBuffer);
-    savedBuffer.noteValue(inits1[0]);
-    Declaration savedPointMark;
-    LetExp let2;
-    tr.push(let1);
+    tr.letStart();
+    Declaration savedBuffer =
+      tr.letVariable(null, typeBuffer,
+                     Invoke.makeInvokeStatic(typeBuffer, "getCurrent"));
+    tr.letEnter();
     if (bufferOnly)
       {
-	savedPointMark = null;
-	let2 = let1;
+        Expression body = tr.rewrite_body(obj);
+        Expression finalizer =
+          Invoke.makeInvokeStatic(typeBuffer, "setBuffer",
+                                  new ReferenceExp(savedBuffer));
+        return tr.letDone(new TryExp(body, finalizer));
       }
     else
       {
-	Expression[] inits2 = new Expression[1];
-	let2 = new LetExp(inits2);
-	savedPointMark = let2.addDeclaration(null, Type.longType);
-	Expression[] args = new Expression[1];
-	args[0] = new ReferenceExp(savedBuffer);
-	inits2[0] = Invoke.makeInvokeStatic(typeSaveExcursion,
-					   "savePointMark", args);
-	savedBuffer.noteValue(inits2[0]);
-	tr.push(let2);
-      }
-    Expression body = tr.rewrite_body(obj);
-    Expression finalizer;
-    if (bufferOnly)
-      {
-	Expression[] args = new Expression[1];
-	args[0] = new ReferenceExp(savedBuffer);
-	finalizer = Invoke.makeInvokeStatic(typeBuffer, "setBuffer", args);
-      }
-    else
-      {
-	tr.pop(let2);
-	let1.body = let2;
-	Expression[] args = new Expression[2];
-	args[0] = new ReferenceExp(savedBuffer);
-	args[1] = new ReferenceExp(savedPointMark);
+        tr.letStart();
+	Declaration savedPointMark =
+          tr.letVariable(null, Type.longType,
+                         Invoke.makeInvokeStatic(typeSaveExcursion, "savePointMark",
+                                                 new ReferenceExp(savedBuffer)));
+        tr.letEnter();
+        Expression body = tr.rewrite_body(obj);
+        Expression finalizer;
 	finalizer = Invoke.makeInvokeStatic(typeSaveExcursion,
-					   "restoreBufferPointMark", args);
+					   "restoreBufferPointMark",
+                                            new ReferenceExp(savedBuffer),
+                                            new ReferenceExp(savedPointMark));
+        return tr.letDone(tr.letDone(new TryExp(body, finalizer)));
       }
-    tr.pop(let1);
-    let2.body = new TryExp(body, finalizer);
-    return let1;
   }
 
   /** Save point and (in the future) mark of a buffer.

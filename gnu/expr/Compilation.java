@@ -2580,7 +2580,8 @@ public class Compilation implements SourceLocator
   {
     LetExp let = (LetExp) current_scope;
     let.add(decl);
-    decl.noteValue(init);
+    if (init != QuoteExp.undefined_exp)
+      decl.noteValue(init);
   }
 
   public void letEnter ()
@@ -2593,12 +2594,19 @@ public class Compilation implements SourceLocator
 	 decl != null;
 	 decl = decl.nextDecl())
       {
-        Declaration.ValueSource sval = decl.values[0];
-        assert decl.nvalues==1 && sval.kind==Declaration.ValueSource.GENERAL_KIND;
-        inits[i] = sval.base;
-        sval.kind = Declaration.ValueSource.LET_INIT_KIND;
-        sval.base = let;
-        sval.index = i++;
+        Expression init;
+        if (decl.nvalues == 0)
+          init = QuoteExp.undefined_exp;
+        else
+          {
+            Declaration.ValueSource sval = decl.values[0];
+            assert decl.nvalues==1 && sval.kind==Declaration.ValueSource.GENERAL_KIND;
+            init = sval.base;
+            sval.kind = Declaration.ValueSource.LET_INIT_KIND;
+            sval.base = let;
+            sval.index = i;
+          }
+        inits[i++] = init;
       }
     let.inits = inits;
     lexical.push(let);
@@ -2607,6 +2615,8 @@ public class Compilation implements SourceLocator
   public LetExp letDone (Expression body)
   {
     LetExp let = (LetExp) current_scope;
+    if (let.inits == null)
+      letEnter();
     let.body = body;
     pop(let);
     return let;

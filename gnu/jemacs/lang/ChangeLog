@@ -1,3 +1,9 @@
+2011-03-23  Per Bothner  <per@bothner.com>
+
+	* lambda.java (rewriteBody): Use letStart/letVariable
+	etc methods instead of creating LetExp directly.
+	* SaveExcursion.java (rewrite): Likewise.
+
 2011-03-16  Per Bothner  <per@bothner.com>
 
 	* ELisp.java: Update fluid_let constructor calls.

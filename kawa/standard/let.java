@@ -29,7 +29,7 @@ public class let extends Syntax
       return tr.syntaxError("bindings not a proper list");
       
     Expression[] inits = new Expression[decl_count];
-    LetExp let = new LetExp (inits);
+    Declaration[] decls = new Declaration[decl_count];
     Stack renamedAliases = null;
     int renamedAliasesCount = 0;
     SyntaxForm syntaxRest = null;
@@ -67,7 +67,8 @@ public class let extends Syntax
 	if (! (name instanceof Symbol))
 	  return tr.syntaxError("variable "+name+" in let binding is not a symbol: "+obj);
 
-	Declaration decl = let.addDeclaration(name);
+	Declaration decl = new Declaration(name);
+        decls[i] = decl;
         decl.setFlag(Declaration.IS_SINGLE_VALUE);
 	if (templateScope != null)
 	  {
@@ -118,19 +119,20 @@ public class let extends Syntax
 	  }
 	else
 	  return tr.syntaxError("let binding for '"+name+"' is improper list");
-	inits[i] = tr.rewrite_car (init, syntax);
+        inits[i] = tr.rewrite_car (init, syntax);
 	if (init.getCdr() != LList.Empty)
 	  return tr.syntaxError("junk after declaration of "+name);
-        decl.noteValueFromLet(let, i);
 	bindings = bind_pair.getCdr();
       }
 
     for (int i = renamedAliasesCount;  --i >= 0; )
       tr.pushRenamedAlias((Declaration) renamedAliases.pop());
 
-    tr.push(let);
-    let.body = tr.rewrite_body(body);
-    tr.pop(let);
+    tr.letStart();
+    for (int i = 0; i < decl_count;  i++)
+      tr.letVariable(decls[i], inits[i]);
+    tr.letEnter();
+    LetExp let = tr.letDone(tr.rewrite_body(body));
     tr.popRenamedAlias(renamedAliasesCount);
 
     return let;

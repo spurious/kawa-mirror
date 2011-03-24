@@ -1224,7 +1224,7 @@ public class Translator extends Compilation
 	setLineOf(body);
 	if (ndecls == 0)
 	  return body;
-	defs.body = body;
+	defs.setBody(body);
 	setLineOf(defs);
 	return defs;
       }

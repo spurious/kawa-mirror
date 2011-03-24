@@ -10,7 +10,7 @@ import gnu.mapping.*;
 public class LetExp extends ScopeExp
 {
   public Expression[] inits;
-  public Expression body;
+  Expression body;
 
   public LetExp (Expression[] i) { inits = i; }
 

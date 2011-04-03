@@ -1,3 +1,7 @@
+2011-04-03  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (XQTS_JAVA_FLAGS): Increase memory to 120m.
+
 2010-10-05  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (XQTS_JAVA_FLAGS): Increase a skosh more.

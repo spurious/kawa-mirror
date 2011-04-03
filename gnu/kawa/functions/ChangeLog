@@ -1,3 +1,10 @@
+2011-04-03  Per Bothner  <per@bothner.com>
+
+	* CompilationHelpers.java (validateApplyToArgs): Modify incoming
+	ApplyExp in-place using new setFuncArgs.  This helps a future
+	Declaration.SourceValue kind that points to an ApplyExp, since
+	the former still points to the latter after optimzing ApplyToArgs.
+
 2011-01-27  Per Bothner  <per@bothner.com>
 
 	* GetModuleClass.java: Update to use new Declaration#noteValueUnknown.

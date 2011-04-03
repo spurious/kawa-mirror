@@ -30,12 +30,26 @@ public class ApplyExp extends Expression
   public final Expression[] getArgs() { return args; }
   public final int getArgCount() { return args.length; }
   public void setFunction(Expression func) { this.func = func; }
+  public void setFunction(Procedure proc) { this.func = new QuoteExp(proc); }
   public void setArgs(Expression[] args) { this.args = args; }
   public Expression getArg(int i) { return args[i]; }
   public void setArg(int i, Expression arg) { args[i] = arg; }
   public final boolean isTailCall() { return getFlag(TAILCALL); }
   public final void setTailCall(boolean tailCall)
   { setFlag(tailCall, TAILCALL); }
+
+  public ApplyExp setFuncArgs (Expression func, Expression[] args)
+  {
+    setFunction(func);
+    setArgs(args);
+    setFlag(false, Expression.VALIDATED);
+    return this;
+  }
+
+  public ApplyExp setFuncArgs (Procedure proc, Expression[] args)
+  {
+    return setFuncArgs(new QuoteExp(proc), args);
+  }
 
   /** If getFunction() is constant, return its value; otherwise null. */
   public final Object getFunctionValue()
@@ -45,12 +59,11 @@ public class ApplyExp extends Expression
 
   public ApplyExp (Expression f, Expression[] a) { func = f; args = a; }
 
-  public ApplyExp (Procedure p, Expression[] a) { func = new QuoteExp(p); args = a; }
+  public ApplyExp (Procedure p, Expression[] a) { this(new QuoteExp(p), a); }
 
   public ApplyExp (Method m, Expression[] a)
   {
-    func = new QuoteExp(new PrimProcedure(m));
-    args = a;
+    this(new QuoteExp(new PrimProcedure(m)), a);
   }
 
   protected boolean mustCompile () { return false; }
@@ -437,7 +450,7 @@ public class ApplyExp extends Expression
     out.writeSpaceFill();
     printLineColumn(out);
     func.print(out);
-    for (int i = 0; i < args.length; ++i)
+    for (int i = 0; args != null && i < args.length; ++i)
       {
 	out.writeSpaceLinear();
 	args[i].print(out);

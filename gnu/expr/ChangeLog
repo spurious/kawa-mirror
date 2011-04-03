@@ -1,5 +1,8 @@
 2011-04-03  Per Bothner  <per@bothner.com>
 
+	* ApplyExp.java (setFunction, setFuncArgs, <init>): New convenience
+	methods to make it easier to modify an ApplyExp in-place.
+
 	* Compilation.java (walkModule): Do PushApply before InlineCalls.
 	(isApplyFunction): New method.
 	* PushApply.java (visitApplyExp): Because PushApply is now done before

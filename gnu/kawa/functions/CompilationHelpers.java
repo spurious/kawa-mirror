@@ -42,7 +42,8 @@ public class CompilationHelpers
               {
                 Expression[] rargs = new Expression[nargs];
                 System.arraycopy(args, 1, rargs, 0, nargs);
-                return visitor.visit(new ApplyExp(proc, rargs).setLine(exp), required);
+                exp.setFuncArgs(proc, rargs);
+                return visitor.visit(exp, required);
               }
             proc = visitor.visit(proc, null);
             args[0] = proc;
@@ -54,9 +55,8 @@ public class CompilationHelpers
           {
             Expression[] rargs = new Expression[nargs];
             System.arraycopy(args, 1, rargs, 0, nargs);
-            ApplyExp nexp = new ApplyExp(proc, rargs);
-            nexp.setLine(exp);
-            return proc.validateApply(nexp, visitor, required, null);
+            exp.setFuncArgs(proc, rargs);
+            return proc.validateApply(exp, visitor, required, null);
           }
 
         ClassType ctype;
@@ -66,12 +66,13 @@ public class CompilationHelpers
         else if (ptype.isSubtype(Compilation.typeType)
                  || language.getTypeFor(proc,false) != null)
           {
-            result = new ApplyExp(Invoke.make, args);
+            result = exp.setFuncArgs(Invoke.make, args);
           }
         else if (ptype instanceof ArrayType)
           {
             Type elementType = ((ArrayType) ptype).getComponentType();
-            result = new ApplyExp(new ArrayGet(elementType), args);
+            exp.setFuncArgs(new ArrayGet(elementType), args);
+            result = exp;
           }
         else if (ptype instanceof ClassType
                  && (ctype = (ClassType) ptype).isSubclass(Compilation.typeList)
@@ -81,7 +82,7 @@ public class CompilationHelpers
             // typeList.getDeclaredMethod("get", 1) to see if we make a
             // a virtual call rather than an interface call.
             Method get = ctype.getMethod("get", new Type[] { Type.intType  });
-            result = new ApplyExp(get, args);
+            result = exp.setFuncArgs(new PrimProcedure(get), args);
           }
         if (result != null)
           {

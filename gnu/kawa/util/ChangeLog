@@ -1,3 +1,7 @@
+2011-04-03  Per Bothner  <per@bothner.com>
+
+	* RunTestScript.java (checkOutput): Fix thinko.
+
 2011-03-20  Benny Tsai <benny.tsai@gmail.com>
 
 	* PreProcess.java: Fix handling of Windows line-ending.

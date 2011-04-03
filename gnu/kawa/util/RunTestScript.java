@@ -190,7 +190,7 @@ public class RunTestScript implements Runnable
           }
         if (i >= expectedOut.size())
           fail("more "+source+" than expected: '"+line+"'");
-        if (! Pattern.matches(expectedOut.get(i), line))
+        else if (! Pattern.matches(expectedOut.get(i), line))
           fail(source+" line "+(i+1)+": expected: '"+expectedOut.get(i)
                +"' actual: '"+line+"'");
         i++;

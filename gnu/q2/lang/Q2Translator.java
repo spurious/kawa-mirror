@@ -115,7 +115,7 @@ public class Q2Translator extends SchemeCompilation
       return rewrite(partitioned, function);
   }
 
-  public Expression makeApply (Expression func, Expression[] args)
+  public ApplyExp makeApply (Expression func, Expression[] args)
   {
     /*
     if (func instanceof QuoteExp

@@ -1,5 +1,8 @@
 2011-04-03  Per Bothner  <per@bothner.com>
 
+	* lang/Translator.java (makeApply): Make return type more precise.
+	* standard/SchemeCompilation.java (makeApply): Likewise.
+
 	* standard/syntax_case.java: Use more-precise noteValueFromLet.
 
 	* standard/define.java (rewriteForm): Use rewrite_car, so we

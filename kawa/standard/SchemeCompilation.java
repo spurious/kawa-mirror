@@ -22,7 +22,7 @@ public class SchemeCompilation extends Translator
   public static final Declaration applyFieldDecl =
     Declaration.getDeclarationFromStatic("kawa.standard.Scheme", "applyToArgs");
 
-  public Expression makeApply (Expression func, Expression[] args)
+  public ApplyExp makeApply (Expression func, Expression[] args)
   {
     Expression[] exps = new Expression[args.length+1];
     exps[0] = func;

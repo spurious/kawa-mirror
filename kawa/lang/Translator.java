@@ -416,7 +416,7 @@ public class Translator extends Compilation
     return makeApply(func, args);
   }
 
-  public Expression makeApply (Expression func, Expression[] args)
+  public ApplyExp makeApply (Expression func, Expression[] args)
   { 
     return new ApplyExp(func, args);
   }

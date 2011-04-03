@@ -133,7 +133,7 @@ public class syntax_case extends Syntax
 
         form = (Pair) obj;
         linits[0] = tr.rewrite(form.getCar());
-	work.inputExpression.noteValue(linits[0]); 
+	work.inputExpression.noteValueFromLet(let, 0);
         obj = form.getCdr();
 
 	form = (Pair) obj;
@@ -153,7 +153,7 @@ public class syntax_case extends Syntax
 	else
 	    args[1] = new ReferenceExp(matchArrayOuter);
 	linits[1] = new ApplyExp(allocVars, args);
-	matchArray.noteValue(linits[1]);
+	matchArray.noteValueFromLet(let, 1);
 	tr.matchArray = matchArrayOuter;
 	return let;
       }

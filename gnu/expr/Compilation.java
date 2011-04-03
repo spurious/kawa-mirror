@@ -2639,7 +2639,7 @@ public class Compilation implements SourceLocator
     LetExp let = new LetExp(inits);
     String fname = "%do%loop";
     Declaration fdecl = let.addDeclaration(fname);
-    fdecl.noteValue(loopLambda);
+    fdecl.noteValueFromLet(let, 0);
     loopLambda.setName(fname);
     let.outer = current_scope;
     loopLambda.outer = let;

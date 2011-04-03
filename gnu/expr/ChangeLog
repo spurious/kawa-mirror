@@ -1,3 +1,7 @@
+2011-04-03  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (loopStart): Use more-precise noteValueFromLet.
+
 2011-04-02  Per Bothner  <per@bothner.com>
 
 	* Expression.java (type): New field - cache for getType.

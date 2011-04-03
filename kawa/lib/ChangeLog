@@ -1,3 +1,9 @@
+2011-04-03  Per Bothner  <per@bothner.com>
+
+	* misc_syntax.scm (provide): Use quasisyntax abbreviation.
+
+	* strings.scm (list->string): Minor cleanups.
+
 2011-02-06  Per Bothner  <per@bothner.com>
 
 	* syntax.scm (try-finally, synchronized): Fix error in last change.

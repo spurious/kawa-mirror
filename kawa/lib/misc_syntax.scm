@@ -3,14 +3,15 @@
 (define-syntax (provide form)
   (syntax-case form ()
     ((provide 'feature)
-     (cons (syntax define-constant)
-	   (cons (datum->syntax-object
-		  form
-		  (string->symbol
-		   (string-append "%provide%"
-				  (symbol->string
-				   (syntax-object->datum (syntax feature))))))
-		 (syntax (:: <int> 123)))))
+     #`(define-constant
+         ,(datum->syntax-object
+           form
+           (string->symbol
+            (string-append "%provide%"
+                           (symbol->string
+                            (syntax-object->datum (syntax feature))))))
+         ;; The value doesn't matter.
+         ::int 123))
     ((_ . rest)
      (syntax-error form "provide requires a quoted feature-name"))))
 

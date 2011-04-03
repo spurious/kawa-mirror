@@ -53,14 +53,14 @@
 	result
 	(loop (make <pair> (string-ref str i) result) i))))
 
-(define (list->string (list :: <list>)) :: <string>
-  (let* ((len :: <int> (length list))
-	 (result :: <string> (make <gnu.lists.FString> len)))
-    (do ((i :: <int> 0 (+ i 1)))
+(define (list->string (lst ::list)) ::string
+  (let* ((len ::int (length lst))
+	 (result ::string (make gnu.lists.FString len)))
+    (do ((i ::int 0 (+ i 1)))
 	((>= i len) result)
-      (let ((pair :: <pair> list))
+      (let ((pair ::pair lst))
 	(string-set! result i pair:car)
-	(set! list pair:cdr)))))
+	(set! lst pair:cdr)))))
 
 (define (string-copy (str <string>)) :: <gnu.lists.FString>
   (make <gnu.lists.FString> str))

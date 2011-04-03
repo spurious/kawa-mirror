@@ -1,5 +1,7 @@
 2011-04-03  Per Bothner  <per@bothner.com>
 
+	* Q2Translator.java (isApplyFunction): New method.
+
 	* Q2Translator.java (makeApply): Make return type more precise.
 
 2011-03-18  Per Bothner  <per@bothner.com>

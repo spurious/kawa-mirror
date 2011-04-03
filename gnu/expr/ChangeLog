@@ -1,5 +1,10 @@
 2011-04-03  Per Bothner  <per@bothner.com>
 
+	* Compilation.java (walkModule): Do PushApply before InlineCalls.
+	(isApplyFunction): New method.
+	* PushApply.java (visitApplyExp): Because PushApply is now done before
+	ApplyToArgs is optimized away, we have to check for it here.
+
 	* Compilation.java (loopStart): Use more-precise noteValueFromLet.
 
 2011-04-02  Per Bothner  <per@bothner.com>

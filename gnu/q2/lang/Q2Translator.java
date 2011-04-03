@@ -127,4 +127,9 @@ public class Q2Translator extends SchemeCompilation
     System.arraycopy(args, 0, exps, 1, args.length);
     return new ApplyExp(Q2Apply.q2Apply, exps);
   }
+
+  public boolean isApplyFunction (Expression exp)
+  {
+    return exp.valueIfConstant() == Q2Apply.q2Apply;
+  }
 }

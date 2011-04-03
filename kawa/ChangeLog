@@ -1,5 +1,7 @@
 2011-04-03  Per Bothner  <per@bothner.com>
 
+	* standard/SchemeCompilation.java (isApplyFunction): New method.
+
 	* lang/Translator.java (makeApply): Make return type more precise.
 	* standard/SchemeCompilation.java (makeApply): Likewise.
 

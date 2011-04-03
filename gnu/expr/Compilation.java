@@ -492,6 +492,11 @@ public class Compilation implements SourceLocator
     return inlineOk;
   }
 
+  public boolean isApplyFunction (Expression exp)
+  {
+    return false;
+  }
+
   public void compileConstant (Object value, Target target)
   {
     if (target instanceof IgnoreTarget)
@@ -900,8 +905,8 @@ public class Compilation implements SourceLocator
 	dout.flush();
       }
 
+    PushApply.pushApply(mexp, this);
     InlineCalls.inlineCalls(mexp, this);
-    PushApply.pushApply(mexp);
     ChainLambdas.chainLambdas(mexp, this);
     FindTailCalls.findTailCalls(mexp, this);
   }

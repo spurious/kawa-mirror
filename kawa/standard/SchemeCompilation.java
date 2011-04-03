@@ -30,6 +30,12 @@ public class SchemeCompilation extends Translator
     return new ApplyExp(new ReferenceExp(applyFieldDecl), exps);
   }
 
+  public boolean isApplyFunction (Expression exp)
+  {
+    return exp instanceof ReferenceExp
+      && ((ReferenceExp) exp).getBinding() == applyFieldDecl;
+  }
+
   /** Should the values of body/block be appended as multiple values?
    * Otherwise, just return the result of the final expression.
    */

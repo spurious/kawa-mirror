@@ -9,9 +9,10 @@ package gnu.expr;
 
 public class PushApply extends ExpVisitor<Expression,Void>
 {
-  public static void pushApply (Expression exp)
+  public static void pushApply (Expression exp, Compilation comp)
   {
     PushApply visitor = new PushApply();
+    visitor.setContext(comp);
     visitor.visit(exp, null);
   }
 
@@ -28,26 +29,38 @@ public class PushApply extends ExpVisitor<Expression,Void>
   protected Expression visitApplyExp(ApplyExp exp, Void ignored)
   {
     Expression func = exp.func;
+    boolean isApplyFunc = getCompilation().isApplyFunction(func)
+      && exp.getArgCount() > 0;
+    if (isApplyFunc)
+      {
+        func = exp.getArg(0);
+      }
     if (func instanceof LetExp
         && ! (func instanceof FluidLetExp)) // [APPLY-LET]
       {
-	// Optimize ((let (...) body) . args) to (let (...) (body . args)).
+	// Optimize ((let (...) body) . args) to (let (...) (body . args))
+        // or (APPLY (let (...) body) . args) to (let (...) (APPLY body . args))
 	LetExp let = (LetExp) func;
 	Expression body = let.body;
 	let.body = exp;
-	exp.func = body;
-        let.type = null;
+        if (isApplyFunc)
+          exp.args[0] = body;
+        else
+          exp.func = body;
 	return visit(let, ignored);
       }
     if (func instanceof BeginExp)  // [APPLY-BEGIN]
       {
-	// Optimize ((begin ... last) . args) to (begin ... (last . args)).
+	// Optimize ((begin ... last) . args) to (begin ... (last . args))
+        // or (APPLY (begin ... last) . args) to (begin ... (APPLY last . args))
 	BeginExp begin = (BeginExp) func;
 	Expression[] stmts = begin.exps;
 	int last_index = begin.exps.length - 1;
-	exp.func = stmts[last_index];
-	stmts[last_index] = exp;
-        begin.type = null;
+        if (isApplyFunc)
+          exp.args[0] = stmts[last_index];
+        else
+          exp.func = stmts[last_index];
+        stmts[last_index] = exp;
 	return visit(begin, ignored);
       }
     exp.visitChildren(this, ignored);

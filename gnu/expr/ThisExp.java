@@ -89,7 +89,7 @@ public class ThisExp extends ReferenceExp
     return visitor.visitThisExp(this, d);
   }
 
-  public final gnu.bytecode.Type getType()
+  protected final gnu.bytecode.Type calculateType()
   {
     if (binding != null)
       return binding.getType();

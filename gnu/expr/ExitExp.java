@@ -80,7 +80,7 @@ public class ExitExp extends Expression
     out.endLogicalBlock(")");
   }
 
-  public Type getType()
+  protected Type calculateType()
   {
     return Type.neverReturnsType;
   }

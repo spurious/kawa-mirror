@@ -1048,7 +1048,7 @@ public class Compilation implements SourceLocator
       type.addInterface(typeRunnable);
     type.setSuper(sup);
 
-    module.type = type;
+    module.compiledType = type;
     addClass(type);
   }
 
@@ -1944,7 +1944,7 @@ public class Compilation implements SourceLocator
 	generateConstructor(moduleClass, null);
       }
 
-    curClass = module.type;
+    curClass = module.compiledType;
     int arg_count;
     LambdaExp saveLambda = curLambda;
     curLambda = module;
@@ -1985,7 +1985,7 @@ public class Compilation implements SourceLocator
     code = getCode();
     // if (usingCPStyle())   code.addParamLocals();
 
-    thisDecl = method.getStaticFlag() ? null : module.declareThis(module.type);
+    thisDecl = method.getStaticFlag() ? null : module.declareThis(module.compiledType);
     module.closureEnv = module.thisVariable;
     module.heapFrame = module.isStatic() ? null : module.thisVariable;
     module.allocChildClasses(this);

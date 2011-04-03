@@ -20,12 +20,9 @@ public class QuoteExp extends Expression
   public static final int EXPLICITLY_TYPED = Expression.NEXT_AVAIL_FLAG;
   public static final int SHARED_CONSTANT = EXPLICITLY_TYPED << 1;
 
-  protected Type type;
   public final gnu.bytecode.Type getRawType() { return type; }
-  public final gnu.bytecode.Type getType()
+  protected final gnu.bytecode.Type calculateType()
   {
-    if (type != null)
-      return type;
     if (value == Values.empty)
       return Type.voidType;
     else if (value == null)

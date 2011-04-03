@@ -36,6 +36,7 @@ public class PushApply extends ExpVisitor<Expression,Void>
 	Expression body = let.body;
 	let.body = exp;
 	exp.func = body;
+        let.type = null;
 	return visit(let, ignored);
       }
     if (func instanceof BeginExp)  // [APPLY-BEGIN]
@@ -46,6 +47,7 @@ public class PushApply extends ExpVisitor<Expression,Void>
 	int last_index = begin.exps.length - 1;
 	exp.func = stmts[last_index];
 	stmts[last_index] = exp;
+        begin.type = null;
 	return visit(begin, ignored);
       }
     exp.visitChildren(this, ignored);

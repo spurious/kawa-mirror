@@ -280,7 +280,7 @@ public class Declaration
                 && (cl = (ClassExp) context).isMakingClassPair())
               {
                 String getName = ClassExp.slotToMethodName("get", getName());
-                Method getter = cl.type.getDeclaredMethod(getName, 0);
+                Method getter = cl.compiledType.getDeclaredMethod(getName, 0);
                 cl.loadHeapFrame(comp);
                 code.emitInvoke(getter);
               }

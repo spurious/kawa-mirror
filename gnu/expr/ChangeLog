@@ -1,3 +1,25 @@
+2011-04-02  Per Bothner  <per@bothner.com>
+
+	* Expression.java (type): New field - cache for getType.
+	(getType): Make final - use cache and calculateType.
+	(calculateType): New method.
+	* BeginExp.java (getType): Replace by calculateType.
+	* ClassExp.java: Likewise.
+	* ExitExp.java: Likewise.
+	* IfExp.java: Likewise.
+	* LambdaExp.java: Likewise.
+	* LetExp.java: Likewise.
+	* ObjectExp.java: Likewise.
+	* ReferenceExp.java: Likewise.
+	* SetExp.java: Likewise.
+	* ThisExp.java: Likewise.
+	* TryExp.java: Likewise.
+	* LambdaExp.java (type): Field renamed to ...
+	(compiledType): new field name.
+	* ApplyExp.java (type): Use inherited field instead.
+	* QuoteExp.java: Likewise.
+	* PushApply.java (visitApplyExp): Reset type field in re-used objects.
+
 2011-03-23  Per Bothner  <per@bothner.com>
 
 	* LetExp.java (body): Make field be package-private.

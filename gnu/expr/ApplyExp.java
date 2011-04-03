@@ -507,9 +507,6 @@ public class ApplyExp extends Expression
       }
   }
 
-  /** Cache for getType(). */
-  protected Type type;
-
   public final gnu.bytecode.Type getTypeRaw()
   {
     return type;
@@ -550,13 +547,9 @@ public class ApplyExp extends Expression
     return afunc;
   }
 
-  public final gnu.bytecode.Type getType()
+  protected gnu.bytecode.Type calculateType()
   {
-    if (type != null)
-      return type;
     Expression afunc = derefFunc(func);
-    // In case of cycles.
-    type = Type.objectType;
     if (afunc instanceof QuoteExp)
       {
         Object value = ((QuoteExp) afunc).getValue();

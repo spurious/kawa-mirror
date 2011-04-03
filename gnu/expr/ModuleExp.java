@@ -496,8 +496,8 @@ public class ModuleExp extends LambdaExp
    */
   public ClassType classFor (Compilation comp)
   {
-    if (type != null && type != Compilation.typeProcedure)
-      return (ClassType) type;
+    if (compiledType != null && compiledType != Compilation.typeProcedure)
+      return (ClassType) compiledType;
     String mname = getName();
     String className = getFileName();
     Path path = null;
@@ -592,12 +592,12 @@ public class ModuleExp extends LambdaExp
   public void writeExternal(ObjectOutput out) throws IOException
   {
     String name = null;
-    if (type != null && type != Compilation.typeProcedure
-	&& ! type.isExisting())
+    if (compiledType != null && compiledType != Compilation.typeProcedure
+	&& ! compiledType.isExisting())
       // The class is (presumably) one we're currently generating.
       // At run-time it may be loaded by a non-system ClassLoader.
       // Thus compiling the class literal needs to use loadClassRef.
-      out.writeObject(type);
+      out.writeObject(compiledType);
     else
       {
 	if (name == null)
@@ -614,8 +614,8 @@ public class ModuleExp extends LambdaExp
     Object name = in.readObject();
     if (name instanceof ClassType)
       {
-	type = (ClassType) name;
-	setName(type.getName());
+	compiledType = (ClassType) name;
+	setName(compiledType.getName());
       }
     else
       setName((String) name);

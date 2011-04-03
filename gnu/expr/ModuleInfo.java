@@ -146,7 +146,7 @@ public class ModuleInfo
           return comp.mainLambda;
         ClassType ctype = ClassType.make(className);
         m = new ModuleExp();
-        m.type = ctype;
+        m.compiledType = ctype;
         m.setName(ctype.getName());
         m.flags |= ModuleExp.LAZY_DECLARATIONS;
         m.info = this;

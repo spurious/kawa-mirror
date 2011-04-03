@@ -198,7 +198,7 @@ public class BeginExp extends Expression
     out.endLogicalBlock(")");
   }
 
-  public gnu.bytecode.Type getType()
+  protected gnu.bytecode.Type calculateType()
   {
     return exps[length - 1].getType();
   }

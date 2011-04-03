@@ -256,8 +256,8 @@ public class InlineCalls extends ExpExpVisitor<Type>
         if (dval instanceof ClassExp && processingAnnotations())
           {
             ClassExp cval = (ClassExp) dval;
-            if (cval.type != null)
-              return new QuoteExp(cval.type, required);
+            if (cval.compiledType != null)
+              return new QuoteExp(cval.compiledType, required);
           }
         if (! exp.isProcedureName() && decl.isClassMethod())
           {

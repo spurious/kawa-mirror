@@ -110,7 +110,7 @@ public class TryExp extends Expression
       finally_clause = visitor.visitAndUpdate(finally_clause, d);
   }
 
-  public gnu.bytecode.Type getType()
+  protected gnu.bytecode.Type calculateType()
   {
     if (catch_clauses == null)
       return try_clause.getType();

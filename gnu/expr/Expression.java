@@ -351,8 +351,20 @@ public abstract class Expression extends Procedure0
 
   public boolean isStableSourceLocation() { return true; }
 
+  protected Type type;
+
   /** Return the Type used to represent the values of this Expression. */
-  public Type getType()
+  public final Type getType()
+  {
+    if (type == null)
+      {
+        type = Type.objectType; // to guard against cycles
+        type = calculateType();
+      }
+    return type;
+  }
+
+  protected Type calculateType ()
   {
     return Type.pointer_type;
   }

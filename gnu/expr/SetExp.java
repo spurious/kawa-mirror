@@ -284,7 +284,7 @@ public class SetExp extends AccessExp
 	  {
 	    String setName = ClassExp.slotToMethodName("set", decl.getName());
 	    ClassExp cl = (ClassExp) decl.context;
-	    Method setter = cl.type.getDeclaredMethod(setName, 1);
+	    Method setter = cl.compiledType.getDeclaredMethod(setName, 1);
 	    cl.loadHeapFrame(comp);
 	    new_value.compile(comp, decl);
 	    if (needValue)
@@ -408,7 +408,7 @@ public class SetExp extends AccessExp
     return BAD_SHORT;
   }
 
-  public final gnu.bytecode.Type getType()
+  protected final gnu.bytecode.Type calculateType ()
   {
     return ! getHasValue() ? Type.voidType
       : binding == null ? Type.pointer_type : binding.getType();

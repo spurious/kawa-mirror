@@ -197,7 +197,7 @@ public class LetExp extends ScopeExp
     popScope(code);
   }
 
-  public final gnu.bytecode.Type getType()
+  protected final gnu.bytecode.Type calculateType()
   {
     return body.getType();
   }

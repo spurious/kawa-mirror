@@ -267,28 +267,29 @@ public class LambdaExp extends ScopeExp
 
   public final boolean variable_args () { return max_args < 0; }
 
-  ClassType type = Compilation.typeProcedure;
+  ClassType compiledType = Compilation.typeProcedure;
 
   /** Return the ClassType of the Procedure this is being compiled into. */
   protected ClassType getCompiledClassType(Compilation comp)
   {
-    if (type == Compilation.typeProcedure)
+    if (compiledType == Compilation.typeProcedure)
       throw new Error("internal error: getCompiledClassType");
-    return type;
+    return compiledType;
   }
 
-  public Type getType()
+  protected Type calculateType()
   {
-    return type;
+    return compiledType;
   }
 
   /** The ClassType generated for this class.
    * Only used for ClassExp (which overrides this method) or ModuleExp.
    */
-  public ClassType getClassType() { return type; }
+  public ClassType getClassType() { return compiledType; }
 
   public void setType (ClassType type)
   {
+    this.compiledType = type;
     this.type = type;
   }
 
@@ -433,7 +434,7 @@ public class LambdaExp extends ScopeExp
 	Variable parentFrame = parent.heapFrame != null ?  parent.heapFrame
 	  : parent.closureEnv;
 	if (isClassMethod() && ! "*init*".equals(getName()))
-          closureEnv = declareThis(type);
+          closureEnv = declareThis(compiledType);
 	else if (parent.heapFrame == null && ! parent.getNeedsStaticLink()
 		 && ! (parent instanceof ModuleExp))
 	  closureEnv = null;

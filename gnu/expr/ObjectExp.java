@@ -8,7 +8,7 @@ public class ObjectExp extends ClassExp
     super(true, new ClassType());
   }
 
-  public Type getType() { return type; }
+  protected Type calculateType() { return compiledType; }
 
   protected <R,D> R visit (ExpVisitor<R,D> visitor, D d)
   {
@@ -19,9 +19,9 @@ public class ObjectExp extends ClassExp
   {
     compileMembers(comp);
     CodeAttr code = comp.getCode();
-    code.emitNew(type);
+    code.emitNew(compiledType);
     code.emitDup(1);
-    Method init = Compilation.getConstructor(type, this);
+    Method init = Compilation.getConstructor(compiledType, this);
     if (closureEnvField != null)
       {
 	LambdaExp caller = outerLambda();

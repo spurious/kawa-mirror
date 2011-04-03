@@ -149,7 +149,7 @@ public class IfExp extends Expression
       else_clause = visitor.visitAndUpdate(else_clause, d);
   }
 
-  public gnu.bytecode.Type getType()
+  protected gnu.bytecode.Type calculateType()
   {
     Type t1 = then_clause.getType();
     Type t2 = else_clause == null ? Type.voidType : else_clause.getType();

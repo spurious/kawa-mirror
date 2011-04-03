@@ -25,7 +25,7 @@ public class ClassExp extends LambdaExp
   boolean explicitInit;
 
   /** The class of instances of this class.
-   * Same as super.type unless isMakingClassPair(), in which case super.type
+   * Same as compiledType unless isMakingClassPair(), in which case super.type
    * is an interface, and instanceType is a class implementing the interface.
    * Using an interface plus a class gives us true multiple inheritance. */
   ClassType instanceType;
@@ -35,7 +35,7 @@ public class ClassExp extends LambdaExp
   /** True if we should make a pair of an interface and a class. */
   public boolean isMakingClassPair()
   {
-    return type != instanceType;
+    return compiledType != instanceType;
   }
 
   /** The ClassType generated for this class.
@@ -43,16 +43,16 @@ public class ClassExp extends LambdaExp
    * (viewed as an expression) is a class/type object, so getType returns
    * the type of a type.
    */
-  public Type getType()
+  protected Type calculateType()
   { return simple ? Compilation.typeClass : Compilation.typeClassType; }
 
   /** The ClassType generated for this class.
    */
-  public ClassType getClassType() { return type; }
+  public ClassType getClassType() { return compiledType; }
 
   public void setClassType(ClassType type)
   {
-    this.type = type;
+    this.compiledType = type;
     this.instanceType = type;
   }
 
@@ -88,7 +88,7 @@ public class ClassExp extends LambdaExp
 
   public void compilePushClass (Compilation comp, Target target)
   {
-    ClassType new_class = type;
+    ClassType new_class = compiledType;
 
     gnu.bytecode.CodeAttr code = comp.getCode();
     comp.loadClassRef(new_class);
@@ -129,7 +129,7 @@ public class ClassExp extends LambdaExp
 
   protected ClassType getCompiledClassType(Compilation comp)
   {
-    return type;
+    return compiledType;
   }
 
   public void setTypes(Compilation comp)
@@ -178,17 +178,17 @@ public class ClassExp extends LambdaExp
             || (nameDecl != null && nameDecl.isPublic())))
       {
         PairClassType ptype = new PairClassType();//(PairClassType) type;
-        type = ptype;
+        compiledType = ptype;
         ptype.setInterface(true);
         ptype.instanceType = instanceType;
-        ClassType[] interfaces = { type };
+        ClassType[] interfaces = { compiledType };
         // Can do better.  FIXME.
         instanceType.setSuper(Type.pointer_type);
         instanceType.setInterfaces(interfaces);
       }
     else if (getFlag(INTERFACE_SPECIFIED))
       instanceType.setInterface(true);
-    type.setSuper(superType == null ? Type.pointer_type : superType);
+    compiledType.setSuper(superType == null ? Type.pointer_type : superType);
 
     ClassType[] interfaces;
     if (j == nsupers)
@@ -198,14 +198,14 @@ public class ClassExp extends LambdaExp
 	interfaces = new ClassType[j];
 	System.arraycopy(superTypes, 0, interfaces, 0, j);
       }
-    type.setInterfaces(interfaces);
+    compiledType.setInterfaces(interfaces);
 
-    if (type.getName() == null)
-      type.setName(getClassName(comp));
-    comp.addClass(type);
+    if (compiledType.getName() == null)
+      compiledType.setName(getClassName(comp));
+    comp.addClass(compiledType);
     if (isMakingClassPair())
       {
-        instanceType.setName(type.getName()+"$class");
+        instanceType.setName(compiledType.getName()+"$class");
         comp.addClass(instanceType);
       }
   }
@@ -308,10 +308,10 @@ public class ClassExp extends LambdaExp
 	      {
 		flags |= Access.ABSTRACT;
 		Type ftype = decl.getType().getImplementationType();
-		type.addMethod(slotToMethodName("get", decl.getName()),
+		compiledType.addMethod(slotToMethodName("get", decl.getName()),
 			       flags, Type.typeArray0, ftype);
 		Type[] stypes = { ftype };
-		type.addMethod(slotToMethodName("set",decl.getName()),
+		compiledType.addMethod(slotToMethodName("set",decl.getName()),
 			       flags, stypes, Type.voidType);
 	      }
 	    else
@@ -339,7 +339,7 @@ public class ClassExp extends LambdaExp
             explicitInit = true;
             if (child.isAbstract())
               comp.error('e', "*init* method cannot be abstract", child);
-            if (type instanceof PairClassType)
+            if (compiledType instanceof PairClassType)
               comp.error('e', "'*init*' methods only supported for simple classes");
           }
         // Setting child.outer isn't normally needed.  The exception is
@@ -351,9 +351,9 @@ public class ClassExp extends LambdaExp
              && child.nameDecl != null // only if error
              && ! child.nameDecl.getFlag(Declaration.STATIC_SPECIFIED))
 	    || ! isMakingClassPair())
-	  child.addMethodFor(type, comp, null);
+	  child.addMethodFor(compiledType, comp, null);
 	if (isMakingClassPair())
-	  child.addMethodFor(instanceType, comp, type);
+	  child.addMethodFor(instanceType, comp, compiledType);
       }
     if (! explicitInit && ! instanceType.isInterface())
       Compilation.getConstructor(instanceType, this);
@@ -448,11 +448,11 @@ public class ClassExp extends LambdaExp
         LambdaExp outer = outerLambda();
         Member enclosing = null;
         if (outer instanceof ClassExp)
-          enclosing = outer.type;
+          enclosing = outer.compiledType;
         else if (outer != null && ! (outer instanceof ModuleExp))
           enclosing = saveMethod;
         else if (outer instanceof ModuleExp && ! getFlag(IS_PACKAGE_MEMBER))
-          enclosing = outer.type;
+          enclosing = outer.compiledType;
         if (enclosing != null)
           {
             new_class.setEnclosingMember(enclosing);
@@ -461,12 +461,12 @@ public class ClassExp extends LambdaExp
           }
         if (instanceType != new_class)
           {
-            instanceType.setEnclosingMember(type);
-            type.addMemberClass(instanceType);
+            instanceType.setEnclosingMember(compiledType);
+            compiledType.addMemberClass(instanceType);
           }
               
-	usedSuperClasses(type, comp);
-	if (type != instanceType)
+	usedSuperClasses(compiledType, comp);
+	if (compiledType != instanceType)
 	  usedSuperClasses(instanceType, comp);
 
 	String filename = getFileName();
@@ -480,7 +480,7 @@ public class ClassExp extends LambdaExp
 	CodeAttr code;
 
         if (nameDecl != null)
-          nameDecl.compileAnnotations(type, ElementType.TYPE);
+          nameDecl.compileAnnotations(compiledType, ElementType.TYPE);
         for (Declaration decl = firstDecl(); decl != null;
              decl = decl.nextDecl())
           {
@@ -573,7 +573,7 @@ public class ClassExp extends LambdaExp
           }
         else
           {
-            methods = type.getAbstractMethods();
+            methods = compiledType.getAbstractMethods();
             nmethods = methods.length;
           }
 	for (int i = 0;  i < nmethods;  i++)
@@ -623,7 +623,7 @@ public class ClassExp extends LambdaExp
 	    else
 	      {
 		Vector vec = new Vector();
-		getImplMethods(type, mname, ptypes, vec);
+		getImplMethods(compiledType, mname, ptypes, vec);
 		if (vec.size() != 1)
 		  {
 		    // FIXME - need better error message!
@@ -668,7 +668,7 @@ public class ClassExp extends LambdaExp
     try
 
       {
-	comp.curClass = type;
+	comp.curClass = compiledType;
 	return visitor.visitClassExp(this, d);
       }
     finally
@@ -692,7 +692,7 @@ public class ClassExp extends LambdaExp
               {
                 Declaration firstParam = child.firstDecl();
                 if (firstParam != null && firstParam.isThisParameter())
-                  firstParam.setType(type);
+                  firstParam.setType(compiledType);
               }
             visitor.visitLambdaExp(child, d);
           }

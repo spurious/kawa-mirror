@@ -221,7 +221,7 @@ public class ReferenceExp extends AccessExp
     ps.print(")");
   }
 
-  public gnu.bytecode.Type getType()
+  protected gnu.bytecode.Type calculateType()
   {
     Declaration decl = binding;
     if (decl == null || decl.isFluid())

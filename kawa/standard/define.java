@@ -154,7 +154,7 @@ public class define extends Syntax
     else
       {
         unknownValue = decl.context instanceof ModuleExp && ! makePrivate && decl.getCanWrite();
-	sexp.setNewValue(tr.rewrite (p4.getCar()));
+	sexp.setNewValue(tr.rewrite_car(p4, false));
       }
     if (unknownValue)
       decl.noteValueUnknown();

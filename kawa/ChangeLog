@@ -1,3 +1,8 @@
+2011-04-03  Per Bothner  <per@bothner.com>
+
+	* standard/define.java (rewriteForm): Use rewrite_car, so we
+	can pass though line number information.
+
 2011-03-23  Per Bothner  <per@bothner.com>
 
 	* standard/let.java (rewrite): Use letStart/letVariable

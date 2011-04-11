@@ -1,3 +1,11 @@
+2011-04-10  Per Bothner  <per@bothner.com>
+
+	* emacs.scm (read-dialog): Simplify.
+
+	* emacs.scm (erase-buffer): Add missing parentheses.
+
+	* emacs.scm (process?): Fix thinko.
+
 2010-08-19  Per Bothner  <per@bothner.com>
 
 	* ReplMode.java: Use new Future.make factory method.

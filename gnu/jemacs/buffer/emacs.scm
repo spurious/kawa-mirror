@@ -24,7 +24,7 @@
 ;;; MINIBUFFERS
 
 (define (read-dialog prompt) :: <string>
-  (invoke (as <frame> (window-frame)) 'ask prompt))
+  ((window-frame):ask prompt))
 
 (define read-from-minibuffer read-dialog)
 
@@ -449,7 +449,7 @@
   (let ((buffer :: <buffer> (current-buffer)))
     (invoke buffer 'insertAll args #!null)))
 
-(define (erase-buffer #!optional buffer '())
+(define (erase-buffer #!optional (buffer '()))
   (let ((buf :: <buffer> (if (eq? buffer '()) (current-buffer)
                              (get-buffer buffer))))
     (invoke buf 'removeAll)))
@@ -482,7 +482,7 @@
 ;;; PROCESSES
 
 (define (process? obj)
-  (instance? x <process>))
+  (instance? obj <process>))
 
 (define (process-send-string (process :: <process>) string)
   (invoke process 'writeToInferior string))
@@ -620,4 +620,3 @@
     (try-finally
      (set symbol value)
      (<buffer>:setCurrent save))))
-  

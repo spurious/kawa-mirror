@@ -10151,7 +10151,7 @@ web application with the following in the
 </web-app>
 @end example
 This creates a web application where all URLs
-are handled by the @code{gnu.kawa.servlet.KawaPageServlet} servelet class,
+are handled by the @code{gnu.kawa.servlet.KawaPageServlet} servlet class,
 which is included in the Kawa jar file.
 The @code{KawaPageServlet} class handles the searching
 and compiling described in this page.

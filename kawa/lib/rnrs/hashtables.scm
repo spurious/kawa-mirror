@@ -29,11 +29,11 @@
   (make hashtable eqv? hash-for-eqv hashtable:DEFAULT_INITIAL_SIZE))
 
 (define (make-hashtable
+	 (hash-function :: <procedure>)
 	 (comparison :: <procedure>)
-	 (hash :: <procedure>)
 	 #!optional (size :: <int> hashtable:DEFAULT_INITIAL_SIZE))
   :: hashtable
-  (make hashtable comparison hash size))
+  (make hashtable comparison hash-function size))
 
 (define (hashtable? obj) :: <boolean>
   (instance? obj hashtable))

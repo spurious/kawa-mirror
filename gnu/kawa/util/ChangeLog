@@ -1,3 +1,8 @@
+2011-04-10  Per Bothner  <per@bothner.com>
+
+	* PreProcess.java: Change 'use:java.dyn' feature name to
+	'use:java.lang.invoke' to match recent JSR-292 changes.
+
 2011-04-03  Per Bothner  <per@bothner.com>
 
 	* RunTestScript.java (checkOutput): Fix thinko.

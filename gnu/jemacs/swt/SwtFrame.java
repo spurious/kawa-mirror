@@ -56,6 +56,12 @@ public class SwtFrame extends EFrame
     return false;
   }
 
+  public void showAboutMessage () 
+  {
+    Shell shell = new Shell();
+    MessageDialog.openInformation(shell, "Information", aboutMessage());
+  }
+
   /**
    * @see gnu.jemacs.buffer.EFrame#ask(java.lang.String)
    */

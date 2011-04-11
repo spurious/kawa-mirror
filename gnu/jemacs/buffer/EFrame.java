@@ -81,6 +81,13 @@ public abstract class EFrame
   
   public abstract String ask(String prompt);
 
+  public String aboutMessage ()
+  {
+    return "JEmacs is written by Per Bothner <per@bothner.com>.";
+  }
+
+  public abstract void showAboutMessage ();
+
   public String toString()
   {
     StringBuffer sbuf = new StringBuffer(100);

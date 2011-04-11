@@ -159,6 +159,9 @@
 (define (set-buffer buffer)
   (invoke-static <buffer> 'setCurrent buffer))
 
+(define (about-jemacs)
+  ((window-frame):showAboutMessage))
+
 ;; Emacs returns an Emacs string, not a Java string. 
 (define (buffer-name #!optional (buffer (current-buffer)))
   ((primitive-virtual-method <buffer> "getName"

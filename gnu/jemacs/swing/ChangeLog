@@ -1,3 +1,7 @@
+2011-04-10  Shad Gregory <captshadg@gmail.com>
+
+	* SwingFrame.java (showAboutMessage): New method.
+
 2008-05-25  Per Bothner  <per@bothner.com>
 
 	* SwingBuffer.java (insert): Rename to insertChar and change char->int.

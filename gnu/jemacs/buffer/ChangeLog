@@ -1,3 +1,11 @@
+2011-04-10  Shad Gregory <captshadg@gmail.com>
+	    Per Bothner  <per@bothner.com>
+
+	* emacs.scm (about-jemacs): New function.
+	* EFrame.java (aboutMessage): New method.
+	(showAboutMessage): New abstract method.
+	This fixes Savannah bug#16307 (Failure on "Help").
+
 2011-04-10  Per Bothner  <per@bothner.com>
 
 	* emacs.scm (read-dialog): Simplify.

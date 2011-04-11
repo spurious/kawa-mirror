@@ -90,7 +90,7 @@ public abstract class Type
             else
               {
                 ClassType cl = new ClassType(name);
-                cl.flags |= ClassType.EXISTING_CLASS;
+                cl.setExisting(true);
                 type = cl;
               }
             map.put(name, type);
@@ -139,7 +139,7 @@ public abstract class Type
                     && type.reflectClass != null))
               {
                 ClassType cl = new ClassType(name);
-                cl.flags |= ClassType.EXISTING_CLASS;
+                cl.setExisting(true);
                 type = cl;
                 mapNameToType.put(name, type);
               }

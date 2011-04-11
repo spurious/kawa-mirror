@@ -1,3 +1,8 @@
+2011-04-10  Per Bothner  <per@bothner.com>
+
+	* Type.java (getType, make): Use setExisting method.
+	* ObjectType.java (getReflectClass): Likewise.
+
 2011-03-07  Per Bothner  <per@bothner.com>
 
 	* CodeAttr.java (emitStore): Do nothing if not reachableHere().

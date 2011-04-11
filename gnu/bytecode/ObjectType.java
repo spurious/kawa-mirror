@@ -120,7 +120,7 @@ public class ObjectType extends Type
       {
 	if (reflectClass == null)
           reflectClass = getContextClass(getInternalName().replace('/', '.'));
-        flags |= EXISTING_CLASS;
+        setExisting(true);
       }
     catch (java.lang.ClassNotFoundException ex)
       {

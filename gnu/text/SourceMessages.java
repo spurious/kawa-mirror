@@ -80,7 +80,7 @@ public class SourceMessages implements SourceLocator
   {
     if (error.severity == 'f')
       errorCount = 1000;
-    else if (error.severity != 'w')
+    else if (error.severity != 'w' && error.severity != 'i')
       errorCount++;
     if ((SourceMessages.debugStackTraceOnError
          && (error.severity == 'e' || error.severity == 'f'))

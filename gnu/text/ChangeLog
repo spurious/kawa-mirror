@@ -1,3 +1,8 @@
+2011-04-10  Per Bothner  <per@bothner.com>
+
+	* SourceError.java (toString): Support new 'i' severity.
+	* SourceMessages.java (error): Likewise.
+
 2011-03-18  Per Bothner  <per@bothner.com>
 
 	Support --diagnostic-strip-directories command-line option.

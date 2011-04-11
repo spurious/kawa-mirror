@@ -11,8 +11,8 @@ public class SourceError
   /** Used to chain to the "next" message. */
   public SourceError next;
 
-  /** The seriousness of the error - one of 'w' (for warning),
-   * 'e' (for error), or 'f' (for fatal error). */
+  /** The seriousness of the error - one of 'i' (for informational),
+   * 'w' (for warning), 'e' (for error), or 'f' (for fatal error). */
   public char severity;
 
   /** The name or URL of the file containing the error. */
@@ -104,6 +104,8 @@ public class SourceError
     buffer.append (": ");
     if (severity == 'w')
       buffer.append("warning - ");
+    else if (severity == 'i')
+      buffer.append("note - ");
     buffer.append (message);
     if (code != null)
       {

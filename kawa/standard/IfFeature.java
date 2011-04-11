@@ -13,6 +13,7 @@ public class IfFeature
 	SyntaxForm sf = (SyntaxForm) form;
 	form = sf.getDatum();
       }
+    form = ((Translator) Compilation.getCurrent()).namespaceResolve(form);
     if (form instanceof String || form instanceof SimpleSymbol)
       return hasFeature(form.toString());
     return false;  // FIXME - return error
@@ -81,6 +82,21 @@ public class IfFeature
     if (name == "java-6")
       return true;
     /* #endif */
+
+    String classExistsPrefix = "class-exists:";
+    if (name.startsWith(classExistsPrefix))
+      {
+        name = name.substring(classExistsPrefix.length());
+        try
+          {
+            Class.forName(name, false, IfFeature.class.getClassLoader());
+            return true;
+          }
+        catch (ClassNotFoundException ex)
+          {
+            return false;
+          }
+      }
 
     Symbol provide_symbol = Symbol.valueOf(PROVIDE_PREFIX+name);
     Declaration decl = Compilation.getCurrent().lookup(provide_symbol, -1);

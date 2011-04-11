@@ -2271,6 +2271,9 @@ feature which gives access to command line arguments. Note that an error
 will be signaled at macro-expansion time if this feature is not present.
 
 You can use @code{java-6} to check for Java 6.
+
+You can use @code{class-exists:@var{ClassName}} to check
+if @code{@var{ClassName}} exists.
 @end deffn
 
 @anchor{include}

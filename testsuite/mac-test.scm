@@ -1,4 +1,4 @@
-(test-init "macros" 102)
+(test-init "macros" 104)
 
 (test 'ok 'letxx (let ((xx #f)) (cond (#t xx 'ok))))
 
@@ -197,6 +197,11 @@
   (define third caddr))
  (else))
 (test 'z third '(x y z))
+
+(test 1 'test-class-exists-1
+      (cond-expand (class-exists:java.lang.StringBuilder 1) (else 0)))
+(test 0 'test-class-exists-2
+      (cond-expand (class-exists:java.lang.StringMunger 1) (else 0)))
 
 (define-syntax or-with-keyword-test
   (syntax-rules (default-value:)

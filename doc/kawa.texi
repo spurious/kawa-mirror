@@ -8520,13 +8520,10 @@ and the name is not otherwise lexically bound.
 
 You can also for the @var{container} use an expression that
 evalutes to a type or class.  Most commonly you'd use
-a class identifier:
+a class identifier, but you could also evaluate an
+expression at run-time (in which case Kawa may have to use slower reflection):
 @example
-(<java.lang.Math>:sqrt 9.0) @result{} 3.0
-@end example
-or even (though Kawa does not promise to compile this efficiently):
-@example
-(let ((math <java.lang.Math>)) math:sqrt 9.0) @result{} 3.0
+(let ((math java.lang.Math)) math:sqrt 9.0) @result{} 3.0
 @end example
 
 @subsection Using a namespace prefix
@@ -8560,7 +8557,7 @@ The part of the name before the colon is a namespace alias (in
 this case @code{Int32}), and the part of the name after the colon is the
 method name.  For example:
 @example
-(Int32:toHexString 255) @result{} ff
+(Int32:toHexString 255) @result{} "ff"
 @end example
 This invokes the static method @code{toHexString} in the
 Java class @code{java.lang.Integer}, passing it the argument @code{255},
@@ -8648,10 +8645,10 @@ If you prefer, you can instead use the following functions.
 (@pxref{Low-level Method invocation}.)
 
 @deffn Procedure invoke-static class name args ...
-The @var{class} can be a @code{<java.lang.Class>}, a
-@code{<gnu.bytecode.ClassType>}, or a @code{<symbol>} or @code{<string>}
-that names a Java class.  The @var{name} can be @code{<symbol>} or
-@code{<string>} that names one or more methods in the Java class.
+The @var{class} can be a @code{java.lang.Class}, a
+@code{gnu.bytecode.ClassType}, or a @code{symbol} or @code{string}
+that names a Java class.  The @var{name} can be @code{symbol} or
+@code{string} that names one or more methods in the Java class.
 
 Any accessible methods (static or instance) in the specified @var{class}
 (or its super-classes) that match "@var{name}" or "@var{name}$V" collectively
@@ -8663,9 +8660,9 @@ the first actual argument is used as the @code{this} argument.  If there are
 no applicable methods (or no methods at all!), or there is no "best"
 method, @code{WrongType} is thrown.
 
-An example (derived from the Skij FAQ):
+An example:
 @example
-(invoke-static <java.lang.Thread> 'sleep 100)
+(invoke-static java.lang.Thread 'sleep 100)
 @end example
 
 The behavior of interpreted code and compiled code is not
@@ -8704,22 +8701,22 @@ at run-time to find the correct method.  This is much slower,
 so the compiler will print a warning.  To avoid a waning, you can
 use a type declaration, or insert a cast:
 @example
-(invoke (as <java.util.Date> my-date) 'setDate cur-date)
+(invoke (as java.util.Date my-date) 'setDate cur-date)
 @end example
 or
 @example
-(let ((my-date :: <java.util.Date> (calculate-date))
-      (cur-date :: <int> (get-cur-date)))
+(let ((my-date ::java.util.Date (calculate-date))
+      (cur-date ::int (get-cur-date)))
   (invoke my-date 'setDate cur-date))
 @end example
 @end deffn
 
 @deffn Procedure invoke-special class receiver-object name arg ...
-The @var{class} can be a @code{<java.lang.Class>}, a
-@code{<gnu.bytecode.ClassType>}, or a @code{<symbol>} or @code{<string>}
+The @var{class} can be a @code{java.lang.Class}, a
+@code{gnu.bytecode.ClassType}, or a @code{symbol} or @code{string}
 that names a Java class.  
-The @var{name} can be @code{<symbol>} or
-@code{<string>} that names one or more methods in the Java class.
+The @var{name} can be @code{symbol} or
+@code{string} that names one or more methods in the Java class.
 
 This procedure is very similar to @code{invoke} and @code{invoke-static}
 and invokes the specified method, ignoring any methods in subclasses
@@ -9755,7 +9752,7 @@ comments, and CDATA section) we'll cover later.
 @stxdef{xml-name-form} @stxref{QName}
   | @stxref{xml-enclosed-expression}
 @stxdef{xml-enclosed-expression}
-    @stxlitlbrace{}@stxref{expression}@stxlit{@}}
+    @stxlitlbrace{}@stxref{expression}@stxlitat{}
   | @stxlit{(}@stxref{expression}...@stxlit{)}
 @end display
 
@@ -11026,6 +11023,19 @@ There is no direct equivalent to Java's @code{import PackageOrTypeName.*}
 You can also use @code{define-namespace} to introduce an abbreviation or
 renaming of a class name, but as a matter of style @code{define-alias}
 is preferred.
+
+@subsubsection How do I refer to a Java member (nested) class?
+
+Consider the Java SE member class @code{javax.swing.text.AbstractDocument.Content}.
+Using the Java syntax doesn't work in Kawa.
+Inside you should use Kawa's colon operator:
+@example
+javax.swing.text.AbstractDocument:Content
+@end example
+Alternatively, you can use the internal JVM class name:
+@example
+javax.swing.text.AbstractDocument$Content
+@end example
 
 @node Community, License, FAQs, Top
 @chapter The Kawa Community

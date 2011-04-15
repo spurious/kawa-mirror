@@ -1,3 +1,9 @@
+2011-04-15  Per Bothner  <per@bothner.com>
+
+	* kawa.texi: Various minor tweaks, fixes, and updates.
+
+	* kawa.texi (FAQs): New question about inner class.
+
 2011-04-14  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Ideas and tasks): New section.

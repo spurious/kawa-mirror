@@ -7,8 +7,6 @@ public class InheritingEnvironment extends SimpleEnvironment
 {
   int numInherited;
   Environment[] inherited;
-  Namespace[] namespaceMap;
-  Object[] propertyMap;
   int baseTimestamp;
 
   public InheritingEnvironment (String name, Environment parent)
@@ -47,28 +45,6 @@ public class InheritingEnvironment extends SimpleEnvironment
       {
 	Symbol sym = name;
 	Object prop = property;
-	if (namespaceMap != null && namespaceMap.length > 2*i)
-	  {
-	    Object srcNamespace = namespaceMap[2*i];
-	    Object dstNamespace = namespaceMap[2*i+1];
-	    if (srcNamespace != null || dstNamespace != null)
-	      {
-		if (name.getNamespace() != dstNamespace)
-		  continue;
-		sym = Symbol.make(srcNamespace, name.getName());
-	      }
-	  }
-	if (propertyMap != null && propertyMap.length > 2*i)
-	  {
-	    Object srcProperty = propertyMap[2*i];
-	    Object dstProperty = propertyMap[2*i+1];
-	    if (srcProperty != null || dstProperty != null)
-	      {
-		if (property != dstProperty)
-		  continue;
-		prop = srcProperty;
-	      }
-	  }
 	NamedLocation loc = inherited[i].lookup(sym, prop, hash);
 	if (loc != null && loc.isBound())
 	  {

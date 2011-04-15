@@ -1,3 +1,9 @@
+2011-04-14  Per Bothner  <per@bothner.com>
+
+	* InheritingEnvironment.java (namespaceMap, propertyMap): Remove
+	fields - which are never actually set or used.
+	(lookupInherited): Skip unused namespaceMap/propertyMap translation.
+
 2010-11-27  Per Bothner  <per@bothner.com>
 
 	* OutPort.java (finalizeAction): New field.

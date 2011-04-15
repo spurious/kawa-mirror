@@ -11035,6 +11035,7 @@ is preferred.
 * Mailing lists::        Where to discuss changes, etc
 * Support::              Technical support for Kawa
 * Projects::             Projects using Kawa
+* Ideas and tasks::      Ideas and tasks for contributing to Kawa
 @end menu
 
 @node Reporting bugs, Mailing lists, , Community
@@ -11098,7 +11099,7 @@ time will be prorated and refunded.
 
 Per is also available for development projects.
 
-@node Projects, , Support, Community
+@node Projects
 @section Projects using Kawa
 
 Google's @uref{http://appinventor.googlelabs.com/,App Inventor for Android}
@@ -11174,6 +11175,166 @@ packages to generate Java bytecode.
 You can find more about Nice at @uref{http://nice.sourceforge.net}.
 For more information feel free to contact
 Daniel Bonniot @email{bonniot@@users.sf.net}).
+
+@node Ideas and tasks
+@section Ideas and tasks for contributing to Kawa
+
+Kawa (like other Free Software projects) has no lack of tasks and projects
+to work on.  Here are some ideas.
+
+@subsection Compiler should use class-file reading instead of reflection
+The Kawa compiler currently uses reflection to determine properties
+(such as exported function definitions) from referenced classes.
+It would be better to read class files.
+This should not be too difficult, since the gnu.bytecode library
+abstracts over class information read by reflection or class reading.
+
+@subsection Make use of Java-7 MethodHandles
+Java 7 will support MethodHandles which are meant to provide better
+performance (ultimately) for dynamic languages.
+See @uref{http://jcp.org/en/jsr/detail?id=292,JSR 292}
+amd the @uref{http://openjdk.java.net/projects/mlvm/,Da Vinci Machine Project}. 
+MethodHandles will be used to compile lambdas in Java 8.
+Kawa can already be compiled to use Methodhandles, but only in
+one unimportant way.  There much more to be done.  For example we
+can start by optimizing arithmetic when the types are unknown
+at compile-time.  They could make implementing
+generic functions (multimethods) more efficient.
+At some point we want to compile lambdas in the same way
+as the experimental Java 8 branch does. This can potenitally
+be more efficient than Kawa's current mechanism.
+
+@subsection R6RS libraries and syntax
+Kawa supports most of the functionality of R6RS libraries,
+as well as the R6RS library @code{import} form.  However,
+it does not support actual R6RS library definition syntax.
+This needs to be added.
+In a related matter, Kawa supports most of the functionality of
+@code{syntax-case}, but some pieces are missing, and no
+doubt some of it is incorrect.  Adding the missing pieces
+and testing for correctness of corner cases is needed.
+@uref{http://lists.r6rs.org/pipermail/r6rs-discuss/2007-October/003387.html,Andre van Tonder's R6RS expander} may be helpful.
+
+@subsection Optimize switches (case)
+
+Implement @code{SwitchExp} as a new class extending @code{Expression},
+and compile it using the existing @code{gnu.bytecode.SwitchState}.
+Use it to optimize Scheme's @code{case} form.
+
+(This is a fairly small starter project.)
+
+@subsection Parameterized types
+Add support for parameterized types to Kawa.  Currently, you can
+declare a variable as having type @samp{list}.  It would be useful
+to declare it to have type @samp{list[string]} (or whatever syntax
+makes most sense).  This should build on and be compatible with Java generics.
+(However, it might be better to have wild-carding be associated with
+declarations, as in Scala, rather than uses.)  This involves adding
+syntax, an appropriate internal repesentation, changing core sequence-based
+types to use generics, type checking/inference, reading and writing
+the appropriate information from/to class files.
+
+@subsection Full continuations
+Add support for full continuations, which is the major
+feature missing for Kawa to qualify as a ``true Scheme''.
+One way to implement continuations is to add a add that converts
+the abstract syntax tree to continuation-pass-style, and then
+exhand the existing full-tail-call support to manage a stack.
+There are other ways to solve the problem.
+This may benefit from @ref{task-faster-tailcalls,Faster tailcalls}.
+
+@anchor{task-faster-tailcalls}
+@subsection Faster tailcalls
+Make @code{--full-tailcalls} run faster.
+This may depend on (or incorporate)
+@ref{task-TreeList-optimization,TreeList-optimization}. 
+
+@anchor{task-TreeList-optimization}
+@subsection TreeList-optimization
+The @uref{http://www.gnu.org/software/kawa/api/gnu/lists/TreeList.html,TreeList} class is a data structure for ``flattened'' trees.  It is used for
+XML-style nodes, for multiple values, and for the full-tail-call API.
+The basic concept is fine, but it could do with some re-thinking
+to make make random-access indexing fast.  Also, support for updating
+is insufficient.  (This needs someone into designing and hacking on
+low-level data-structures, along with lots of profiling and testing.)
+
+@subsection Lazy evaluation
+Add support for lazy evaluation and implicit futures.
+Kawa alread has @code{delay} (which creates a lazily-calculated value)
+and @code{future} (which creates a child thread to calculate a value).
+The function @code{force} takes either of these and waits until the
+result is calculated.  Using these would be much more pleasant if
+the cmpiler could as @code{force} as needed automatically.
+This involves run-time changes, compiler changes, as well as
+optimizations (and type specifiers) to minimize unneeded @code{force} calls.
+
+@anchor{task-REPL-improvements}
+@subsection REPL console and other REPL improvement
+Improvements to the read-eval-print console.
+In addition to a traditional Swing console,
+it would be useful to support using a web browser as a a remote terminal,
+possibly using web-sockets.
+(This allows ``printing'' HTML-expressions, which can be a useful way
+to learn and experiment with web technologies.)
+See @uref{http://per.bothner.com/blog/2007/ReplPane/, here} for an article
+on the existing Swing REPL, along with some to-do items.
+Being able to hide and show different parts of the output might be nice.
+Being able to link from error messages to source might be nice.
+Better handling of redefinitions is discussed 
+@uref{http://per.bothner.com/blog/2009/REPL-for-JavaFX/, here in the context of JavaXF Script}; this is a general REPL issue, mostly independent of the GUI for it.
+
+@subsection XQuery-1.1-functionality
+It would be nice to update the XQuery (Qexo) support
+to @uref{http://www.w3.org/TR/xquery-30/,XQuery 1.1}.
+
+@subsection XQuery-updates
+It would be nice to support @uref{http://www.w3.org/TR/xquery-update-10/, XQuery updates}.  This depends on @ref{task-TreeList-optimization,TreeList-optimization}. 
+
+@anchor{task-common-lisp}
+@subsection Common Lisp support
+Kawa supports a small subset of the Common Lisp language, but it supports
+a much larger subset of core Common Lisp concepts and data structure, some
+designed with Common Lisp functionality in mind.  Examples include
+packages, arrays, expanded function declarations, type specifications,
+and format.  A lot could be done to improve the Common Lisp support
+with modest effort.  Some Common Lisp features could also be useful
+for Scheme: Documentation strings (or markup) as Java annotations,
+better MOP-like introspection, and generic methods a la defmethod
+(i.e. with multiple definition statements, possibly in separate files,
+as opposed to the current make-procedure) all come to mind.
+Being able to run some existing Common Lisp code bases with
+at most modest changes should be the goal.
+One such package to start with might be a
+@uref{http://aperiodic.net/phil/archives/Geekery/notes-on-lisp-testing-frameworks.html,existing test framework}, perhaps
+@uref{http://common-lisp.net/project/bese/FiveAM.html, FivaAM}.
+Full Common Lisp compatibility is nice, but let's walk before we can run.
+
+@subsection JEmacs improvements
+A lot of work is needed to make
+@uref{http://jemacs.sourceforge.net/,JEmacs} useful.
+One could try to import a useful package and see what works and what fails.
+Or one may look at basic editing primitives.
+Enhancements may be needed to core Emacs Lisp language primitives
+(enhancing @ref{task-common-lisp, Common Lisp support} may help),
+or to the display engine.
+
+@subsection Improved IDE integration
+There is some Kawa support for Eclipse (Schemeway), and possibly
+other IDEs (NetBeans, IntelliJ).  But many improvements are
+desirable.
+@ref{task-REPL-improvements, REPL improvements} may be a component of this.
+
+@subsection Output formatting and pretty printing
+Kawa's @code{write} should support back-references, as in
+@uref{http://srfi.schemers.org/srfi-38/srfi-38.html,SRFI-38}.
+This isn't difficult, but requires understanding and modifying the
+existing pretty-printer data structures.  One you figured that out,
+it would be nice to integrate the pretty-printer with the REPL,
+so that window re-sizing re-breaks the output lines.
+It would be nice to enhance the pretty-printer to handle
+variable-width fonts and other ``rich'' text.
+Figuring out how to make the output formatter more flexible,
+more efficient, and more customizable are also desirable.
 
 @node License, Overall Index, Community, Top
 @chapter License

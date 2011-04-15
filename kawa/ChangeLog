@@ -1,3 +1,8 @@
+2011-04-15  Charles Turner <chturne@gmail.com>
+
+	* ReplPane.java (enter): Moved method ...
+	* ReplDocument.java (enter): .. to here.
+
 2011-04-10  Per Bothner  <per@bothner.com>
 
 	* standard/IfFeature.java (hasFeature): Add support for

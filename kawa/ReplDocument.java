@@ -10,6 +10,7 @@ import gnu.kawa.swingviews.SwingContent;
 import gnu.text.Path;
 import gnu.expr.Language;
 import gnu.expr.ModuleBody;
+import gnu.lists.CharBuffer;
 import gnu.mapping.*;
 
 /** A Swing document that implements a read-eval-print-loop. */
@@ -19,8 +20,7 @@ public class ReplDocument extends DefaultStyledDocument
 {
   //public static javax.swing.text.html.StyleSheet styles
   // = new javax.swing.text.html.StyleSheet();
-  public static javax.swing.text.StyleContext styles
-  = new javax.swing.text.StyleContext();
+  public static StyleContext styles = new javax.swing.text.StyleContext();
   static public Style defaultStyle = styles.addStyle("default",null);
   public static Style inputStyle = styles.addStyle("input", null);
   public static Style redStyle = styles.addStyle("red", null);
@@ -33,7 +33,7 @@ public class ReplDocument extends DefaultStyledDocument
     StyleConstants.setBold(inputStyle, true);
   }
 
-  /** The pane, in any, that contains this document and has focus. */
+  /** The pane, if any, that contains this document and has focus. */
   JTextPane pane;
   int paneCount;
 
@@ -57,12 +57,14 @@ public class ReplDocument extends DefaultStyledDocument
 
   int length = 0;
 
-  public ReplDocument (Language language, Environment penvironment, boolean shared)
+  public ReplDocument (Language language, Environment penvironment,
+                       boolean shared)
   {
     this(new SwingContent(), language, penvironment, shared);
   }
 
-  private ReplDocument (SwingContent content, Language language, Environment penvironment, final boolean shared)
+  private ReplDocument (SwingContent content, Language language,
+                        Environment penvironment, final boolean shared)
   {
     super(content, styles);
     this.content = content;
@@ -73,14 +75,19 @@ public class ReplDocument extends DefaultStyledDocument
     this.language = language;
 
     in_r = new gnu.text.QueueReader() {
-        public void checkAvailable() {
-          checkingPendingInput(); };
+        @Override
+        public void checkAvailable()
+        {
+          checkingPendingInput();
+        };
     };
     out_stream = new ReplPaneOutPort(this, "/dev/stdout", defaultStyle);
     err_stream = new ReplPaneOutPort(this, "/dev/stderr", redStyle);
     in_p = new GuiInPort(in_r, Path.valueOf("/dev/stdin"),
                          out_stream, this);
+
     thread = Future.make(new kawa.repl(language) {
+        @Override
         public Object apply0 ()
         {
           Environment env = Environment.getCurrent();
@@ -93,9 +100,84 @@ public class ReplDocument extends DefaultStyledDocument
             });
           return Values.empty;
         }
-      },
-                         penvironment, in_p, out_stream, err_stream);
+      }, penvironment, in_p, out_stream, err_stream);
     thread.start();
+  }
+
+    void enter ()
+  {
+    // In the future we might handle curses-like applicatons, which
+    // outputMark may be moved backwards.  In that case the normal
+    // case is that caret position >= outputMark and all the intervening
+    // text has style inputStyle, in which case we do:
+    // Find the first character following outputMark that is either
+    // - the final newline in the buffer (in which case insert a newline
+    //   at the end and treat as the following case);
+    // - a non-final newline (in which case pass the intervening text
+    //   and the following newline are stuffed into the in queue,
+    //   and the outputMark is set after the newline);
+    // - a character whose style is not inputStyle is seen (in which
+    //   case the intervening text plus a final newline are stuffed
+    //   into the 'in' queue, and the outputMark is moved to just
+    //   before the non-inputStyle character).
+    // In the second case, if there is more input following the newline,
+    // we defer the rest until the inferior requests a new line.  This
+    // is so any output and prompt can get properly interleaved.
+    // For now, since we don't support backwards movement, we don't
+    // check for inputStyle, in this case.
+
+    // Otherwise, we do similar to Emacs shell mode:
+    // Select the line containing the caret, stripping of any
+    // characters that have prompt style, and add a newline.
+    // That should be sent to the inferior, and copied it before outputMark.
+
+    int pos = pane.getCaretPosition();
+    CharBuffer b = content.buffer;
+    int len = b.length() - 1; // Ignore final newline.
+    endMark = -1;
+    if (pos >= outputMark)
+      {
+        int lineAfterCaret = b.indexOf('\n', pos);
+        if (lineAfterCaret == len)
+          {
+            if (len > outputMark && b.charAt(len-1) == '\n')
+              lineAfterCaret--;
+            else
+              insertString(len, "\n", null);
+          }
+        endMark = lineAfterCaret;
+        // Note we don't actually send the input line to the inferior
+        // directly.  That happens in ReplDocument.checkingPendingInput,
+        // which is invoked by the inferior thread when it is woken up here.
+        // We do it this way to handle interleaving prompts and other output
+        // with multi-line input, including type-ahead.
+        synchronized (in_r)
+          {
+            in_r.notifyAll();
+          }
+        if (pos <= lineAfterCaret)
+          pane.setCaretPosition(lineAfterCaret+1);
+      }
+    else
+      {
+        int lineBefore = pos == 0 ? 0 : 1 + b.lastIndexOf('\n', pos-1);
+        Element el = getCharacterElement(lineBefore);
+        int lineAfter = b.indexOf('\n', pos);
+        // Strip initial prompt:
+        if (el.getAttributes().isEqual(ReplDocument.promptStyle))
+          lineBefore = el.getEndOffset();
+        String str;
+        if (lineAfter < 0)
+          str = b.substring(lineBefore, len)+'\n';
+        else
+          str = b.substring(lineBefore, lineAfter+1);
+        pane.setCaretPosition(outputMark);
+        write(str, ReplDocument.inputStyle);
+
+	if (in_r != null) {
+	  in_r.append(str, 0, str.length());
+	}
+      }
   }
 
   /** Delete old text, prior to line containing outputMark. */
@@ -120,6 +202,7 @@ public class ReplDocument extends DefaultStyledDocument
       }
   }
 
+  @Override
   public void insertString(int pos, String str, AttributeSet style)
   {
     try
@@ -182,8 +265,8 @@ public class ReplDocument extends DefaultStyledDocument
                 in_r.append(b, inputStart, lineAfter+1);
                 in_r.notifyAll();
               }
-	}
-        }
+            }
+          }
       }
     });
   }
@@ -198,7 +281,6 @@ public class ReplDocument extends DefaultStyledDocument
       }
     else
       pane = null;
-    pane = source instanceof ReplPane ? (ReplPane) source : null;
   }
 
   public void focusLost(FocusEvent e)
@@ -282,7 +364,7 @@ public class ReplDocument extends DefaultStyledDocument
             if (vec.get(i) == listener)
               vec.remove(i);
           }
-        if (vec.size() == 0)
+        if (vec.isEmpty())
           closeListeners = null;
       }
   }

@@ -17,7 +17,8 @@ public abstract class AccessExp extends Expression
 
   public final String getName()
   {
-    return symbol instanceof Symbol ? ((Symbol) symbol).getName()
+    return symbol == null ? null
+      : symbol instanceof Symbol ? ((Symbol) symbol).getName()
       : symbol.toString();
   }
 

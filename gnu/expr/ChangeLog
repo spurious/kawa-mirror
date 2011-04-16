@@ -1,3 +1,7 @@
+2011-04-15  Per Bothner  <per@bothner.com>
+
+	* AccessExp.java (getName): Check for null symbol field.
+
 2011-04-10  Per Bothner  <per@bothner.com>
 
 	* InlineCalls.java: Update java.dyn to java.lang.invoke to

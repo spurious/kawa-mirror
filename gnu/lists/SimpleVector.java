@@ -234,14 +234,14 @@ public abstract class SimpleVector<E> extends AbstractSequence<E>
   public void add(int index, E o)
   {
     checkCanWrite();
-    int newSize = size + 1;
-    size = newSize;
+    int oldSize = size;
+    int newSize = oldSize + 1;
     int length = getBufferLength();
     if (newSize > length)
       setBufferLength(length < 16 ? 16 : 2 * length);
     this.size = newSize;
-    if (size != index)
-      shift(index, index + 1, size - index);
+    if (oldSize != index)
+      shift(index, index + 1, oldSize - index);
     set(index, o);
   }
 

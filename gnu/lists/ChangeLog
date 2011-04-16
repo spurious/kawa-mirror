@@ -1,3 +1,7 @@
+2011-04-15  Per Bothner  <per@bothner.com>
+
+	* SimpleVector.java (add): Fix off-by-one bug, reported by Jamison Hope.
+
 2011-01-03  Per Bothner  <per@bothner.com>
 
 	* SimpleVector.java (checkCanWrite): New method.

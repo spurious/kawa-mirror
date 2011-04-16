@@ -66,4 +66,13 @@ public class PushApply extends ExpVisitor<Expression,Void>
     exp.visitChildren(this, ignored);
     return exp;
   }
+
+  protected Expression visitClassExp (ClassExp exp, Void ignored)
+  {
+    // Allocate class fields and methods.  Ideally, setting field and method
+    // types should be deferred until InlineClass, when we do type inferencing.
+    // But doing it just before InlineCalls works tolerably enough for now.
+    exp.declareParts(getCompilation());
+    return visitLambdaExp(exp, ignored);
+  }
 }

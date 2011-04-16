@@ -1,5 +1,8 @@
 2011-04-15  Per Bothner  <per@bothner.com>
 
+	* PushApply.java (visitClassExp): New method.
+	See kawa/ChangeLog entry for standard/object.java.
+
 	* AccessExp.java (getName): Check for null symbol field.
 
 2011-04-10  Per Bothner  <per@bothner.com>

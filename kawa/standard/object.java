@@ -584,7 +584,6 @@ public class object extends Syntax
     if (oexp.clinitMethod != null)
       oexp.clinitMethod.outer = oexp;
     tr.pop(oexp);
-    oexp.declareParts(tr);
   }
 
   private static void rewriteInit (Object d, ClassExp oexp, Pair initPair,

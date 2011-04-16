@@ -1,3 +1,14 @@
+2011-04-15  Per Bothner  <per@bothner.com>
+
+	* standard/object.java (rewriteClassDef): Don't call declareParts
+	here, instead do it later in PushApply.  The problem is that
+	declareParts allocates fields and methods eagerly and prematurely
+	sets the type based on the Declaration's types.  Ideally, setting
+	the field type should be done in InlineCalls, when we do type
+	inferencing.  But at least waiting until PushApply avoids the
+	problem of try to infer the type based on the value setters, which
+	may not all have been seen yet during the rewrite phase.
+
 2011-04-15  Charles Turner <chturne@gmail.com>
 
 	* ReplPane.java (enter): Moved method ...

@@ -456,6 +456,7 @@ public class FindCapturedVars extends ExpExpVisitor<Void>
 	  decl.setFlag(Declaration.STATIC_SPECIFIED);
 	decl.setCanRead(true);
 	decl.setCanWrite(true);
+        decl.noteValueUnknown();
         // Setting IS_SINGLE_VALUE unconditionally is a kludge.
         // It is OK for Scheme/Lisp, since a variable can't be
         // bound to multiple value.  It is OK for XQuery, since we

@@ -1,5 +1,10 @@
 2011-04-15  Per Bothner  <per@bothner.com>
 
+	* Compilation.java (letVariable): Use setValue rather than noteValue.
+
+	* FindCapturedVars.java (allocUnboundDecl): Note that the new
+	declaration's value is unknown.
+
 	* PushApply.java (visitClassExp): New method.
 	See kawa/ChangeLog entry for standard/object.java.
 

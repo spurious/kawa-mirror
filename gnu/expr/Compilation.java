@@ -2586,7 +2586,11 @@ public class Compilation implements SourceLocator
     LetExp let = (LetExp) current_scope;
     let.add(decl);
     if (init != QuoteExp.undefined_exp)
-      decl.noteValue(init);
+      {
+        // Use setValue rather than noteValue in case the declaration was
+        // re-purposed from some other context, like a function parameter.
+        decl.setValue(init);
+      }
   }
 
   public void letEnter ()

@@ -1,5 +1,8 @@
 2011-04-15  Per Bothner  <per@bothner.com>
 
+	* standard/SchemeCompilation.java (checkDefaultBinding): Note that
+	function parameter's value is unknown.
+
 	* standard/object.java (rewriteClassDef): Don't call declareParts
 	here, instead do it later in PushApply.  The problem is that
 	declareParts allocates fields and methods eagerly and prematurely

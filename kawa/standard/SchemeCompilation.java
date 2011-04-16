@@ -98,6 +98,7 @@ public class SchemeCompilation extends Translator
                 LambdaExp lexp = new LambdaExp(1);
                 lexp.setSymbol(symbol);
                 Declaration param = lexp.addDeclaration((Object) null);
+                param.noteValueUnknown();
                 lexp.body = new ApplyExp(Scheme.instanceOf,
                                          new Expression[] {
                                            new ReferenceExp(param), texp, });

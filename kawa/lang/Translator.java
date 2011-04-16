@@ -4,6 +4,7 @@ import gnu.expr.*;
 import gnu.kawa.reflect.*;
 import gnu.bytecode.Type;
 import gnu.bytecode.ClassType;
+import gnu.bytecode.Field;
 import gnu.bytecode.ArrayClassLoader;
 import gnu.bytecode.ZipLoader;
 import gnu.text.SourceMessages;
@@ -726,10 +727,10 @@ public class Translator extends Compilation
                         // A kludge - we get a bunch of testsuite failures
                         // if we don't inline $lookup$.  FIXME.
                         && (decl != getNamedPartDecl
-                            && ! ("objectSyntax".equals(floc.getMemberName())
-                                  // Another kludge to support "object" as a
-                                  // type specifier.
-                                  && "kawa.standard.object".equals(floc. getDeclaringClass().getName()))))
+                            // Another kludge to support "object" as a
+                            // type specifier.
+                            && ! isObjectSyntax(floc.getDeclaringClass(),
+                                                floc.getMemberName())))
                       decl = null;
                     else if (immediate)
                       {
@@ -784,8 +785,10 @@ public class Translator extends Compilation
             // A special kludge to deal with the overloading between the
             // object macro and object as being equivalent to java.lang.Object.
             // A cleaner solution would be to use an identifier macro.
-            if (! function
-                && decl.getConstantValue() instanceof kawa.standard.object)
+            Field dfield = decl.field;
+            if (! function && dfield != null
+                && isObjectSyntax(dfield.getDeclaringClass(),
+                                  dfield.getName()))
               return QuoteExp.getInstance(Object.class);
 
             if (decl.getContext() instanceof PatternScope)
@@ -1527,5 +1530,11 @@ public class Translator extends Compilation
       }
     push(decl);
     return decl;
+  }
+
+  static boolean isObjectSyntax (ClassType declaringClass, String fieldName)
+  {
+    return "objectSyntax".equals(fieldName)
+      &&  "kawa.standard.object".equals(declaringClass.getName());
   }
 }

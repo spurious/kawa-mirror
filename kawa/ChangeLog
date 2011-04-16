@@ -1,3 +1,9 @@
+2011-04-16  Per Bothner  <per@bothner.com>
+
+	* lang/Translator.java (rewrite): Change checking for "object" ambiguity
+	by using field name, rather than prematurely calling getConstantValue.
+	(isObjectSyntax): New helper method.
+
 2011-04-15  Per Bothner  <per@bothner.com>
 
 	* standard/SchemeCompilation.java (checkDefaultBinding): Note that

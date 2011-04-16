@@ -107,9 +107,9 @@ public abstract class EWindow
   /** Link a new window after this. */
   protected final void linkSibling (EWindow window, boolean horizontal)
   {
+    EWindow next = nextWindow;
     this.nextWindow = window;
     window.prevWindow = this;
-    EWindow next = nextWindow;
     window.nextWindow = next;
     // next is non-null, since the order is cyclic.
     next.prevWindow = window;
@@ -191,13 +191,13 @@ public abstract class EWindow
 
   public void deleteOtherWindows()
   {
-    for (EWindow cur = frame.getFirstWindow(); cur != null; )
+    for (EWindow cur = getNextWindow(true); cur != this; )
       {
         EWindow next = cur.getNextWindow(true);
-        if (cur != this)
-          cur.deleteNoValidate();
+        cur.deleteNoValidate();
         cur = next;
       }
+    requestFocus();
     frame.validate();
   }
 

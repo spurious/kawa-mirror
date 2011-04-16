@@ -1,3 +1,10 @@
+2011-04-15  Per Bothner  <per@bothner.com>
+	    Shad Gregory <captshadg@gmail.com>
+
+	* EWindow.java (linkSibling): Fix thinko.
+	(deleteOtherWindows): Fix logic error.
+	This fixes Savannah bug#33019 (C-x1 produces a nullpointer exception).
+
 2011-04-10  Shad Gregory <captshadg@gmail.com>
 	    Per Bothner  <per@bothner.com>
 

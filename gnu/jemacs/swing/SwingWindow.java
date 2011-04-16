@@ -120,7 +120,8 @@ implements java.awt.event.FocusListener,
   public void setSelected()
   {
     super.setSelected();
-    select(jtextpane.getCaret());
+    if (jtextpane != null)
+      select(jtextpane.getCaret());
   }
 
   public int getPoint()

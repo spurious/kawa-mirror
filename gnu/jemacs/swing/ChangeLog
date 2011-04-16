@@ -1,3 +1,9 @@
+2011-04-15  Per Bothner  <per@bothner.com>
+
+	* SwingWindow.java (setSelected): Check if jtextpane is null.
+	It is possible to get a spurious (and transient) focusGained (which
+	call setSelected) on the deleted window after a deleteOtherWindows.
+
 2011-04-10  Shad Gregory <captshadg@gmail.com>
 
 	* SwingFrame.java (showAboutMessage): New method.

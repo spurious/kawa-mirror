@@ -63,14 +63,10 @@ public class CompileArith implements Inlineable
     ArithOp aproc = (ArithOp) proc;
     int op = aproc.op;
     exp.visitArgs(visitor);
- 
+
     Expression[] args = exp.getArgs();
     if (args.length > 2)
       return pairwise(proc, exp.getFunction(), args, visitor);
-
-    Expression folded = exp.inlineIfConstant(proc, visitor);
-    if (folded != exp)
-      return folded;
 
     int rkind = 0;
     if (args.length == 2 || args.length == 1)
@@ -101,6 +97,10 @@ public class CompileArith implements Inlineable
         rkind = adjustReturnKind(rkind, op);
         exp.setType(Arithmetic.kindType(rkind));
       }
+
+    Expression folded = exp.inlineIfConstant(proc, visitor);
+    if (folded != exp)
+      return folded;
 
     // Inlining may yield PrimProcedure instructions of bytecode instructions
     // which we don't know how to interpret (yet).

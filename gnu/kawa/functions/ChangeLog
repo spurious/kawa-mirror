@@ -1,3 +1,8 @@
+2011-04-16  Per Bothner  <per@bothner.com>
+
+	* CompileArith.java (validateApplyArithOp): Do type tweaking for
+	'int/long OP constant' before constant-folding.
+
 2011-04-03  Per Bothner  <per@bothner.com>
 
 	* CompilationHelpers.java (validateApplyToArgs): Modify incoming

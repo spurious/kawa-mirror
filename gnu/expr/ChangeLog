@@ -1,3 +1,21 @@
+2011-04-17  Per Bothner  <per@bothner.com>
+
+	* Declaration.java (<init>): Don't setType if given type is null.
+	(printInfo): Get raw type field rather than calling getType.
+	(hasUnknownValue): New function.
+
+	* Declaration.java (getValue): Only get value from field if class
+	exists already.
+
+	* Declaration.java (getValue): Remove special case to coerce constant
+	value to specified type - it doesn't seem to do anything.
+
+	* Declaration.java (noteValue, noteValueConstant, noteValueFromSet,
+	noteValueFromLet): Do nothing if value is unknownValueValues.
+
+	* Declaration (class ValueSource):  New kind constant APPLY_KIND.
+	(ValueSource.getValue): Handle APPLY_KIND.
+
 2011-04-15  Per Bothner  <per@bothner.com>
 
 	* Compilation.java (letVariable): Use setValue rather than noteValue.

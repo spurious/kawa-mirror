@@ -690,7 +690,8 @@ public class Declaration
   public Declaration (Object name, Type type)
   {
     setName(name);
-    setType(type);
+    if (type != null)
+      setType(type);
   }
 
   public Declaration (Object name, Field field)
@@ -905,13 +906,13 @@ public class Declaration
     if (ignorable())
       sbuf.append("(ignorable)");
     Expression tx = typeExp;
-    Type t = getType();
+    Type t = type;
     if (tx != null && ! (tx instanceof QuoteExp))
       {
 	sbuf.append("::");
         sbuf.append(tx);
       }
-    else if (type != null && t != Type.pointer_type)
+    else if (t != null && t != Type.pointer_type)
       {
 	sbuf.append("::");
 	sbuf.append(t.getName());
@@ -1156,6 +1157,8 @@ public class Declaration
     new ValueSource(ValueSource.UNKNOWN_KIND, null, 0);
   static final ValueSource[] unknownValueValues = { unknownValueInstance };
 
+  public boolean hasUnknownValue () { return values == Declaration.unknownValueValues; }
+
   /** The value of this <code>Declaration</code>, if known.
    * Usually the expression used to initialize the <code>Declaration</code>,
    * or null if the <code>Declaration</code> can be assigned a different
@@ -1172,6 +1175,7 @@ public class Declaration
     if (nvalues == 0)
       {
         if (field != null
+            && field.getDeclaringClass().isExisting()
             && ((field.getModifiers() & Access.STATIC+Access.FINAL)
                 == Access.STATIC+Access.FINAL)
             && ! isIndirectBinding())
@@ -1189,25 +1193,7 @@ public class Declaration
         return QuoteExp.undefined_exp;
       }
     if (nvalues == 1)
-      {
-        Expression value = values[0].getValue();
-         if (value instanceof QuoteExp && getFlag(TYPE_SPECIFIED)
-             && value.getType() != type)
-           {
-             try
-               {
-                 Object val = ((QuoteExp) value).getValue();
-                 Type t = getType();
-                 value = new QuoteExp(t.coerceFromObject(val), t);
-                 values[0] = new ValueSource(ValueSource.GENERAL_KIND,
-                                             value, 0);
-               }
-             catch (Throwable ex)
-               {
-               }
-           }
-        return value;
-      }
+      return values[0].getValue();
     return null;
   }
 
@@ -1249,12 +1235,14 @@ public class Declaration
     checkNameDecl(value);
     if (value == null)
       noteValueUnknown();
-    else
+    else if (values != unknownValueValues)
       noteValue(new ValueSource(ValueSource.GENERAL_KIND, value, 0));
   }
 
-  public void noteValue (ValueSource value)
+  void noteValue (ValueSource value)
   {
+    if (values == unknownValueValues)
+      throw new InternalError();
     if (values == null)
       values = new ValueSource[4];
     else if (nvalues >= values.length)
@@ -1268,7 +1256,10 @@ public class Declaration
 
   public void noteValueConstant (Object value)
   {
-    noteValue(new QuoteExp(value));
+    if (values != unknownValueValues)
+      {
+        noteValue(new QuoteExp(value));
+      }
   }
 
   public void noteValueUnknown ()
@@ -1279,18 +1270,28 @@ public class Declaration
   }
 
   public void noteValueFromSet (SetExp setter)
-  { 
-    checkNameDecl(setter.new_value);
-    noteValue(new ValueSource(ValueSource.SET_RHS_KIND, setter, 0));
+  {
+    if (values != unknownValueValues)
+      {
+        checkNameDecl(setter.new_value);
+        noteValue(new ValueSource(ValueSource.SET_RHS_KIND, setter, 0));
+      }
   }
 
   public void noteValueFromLet (LetExp letter, int index)
   {
     Expression init = letter.inits[index];
-    if (init == QuoteExp.undefined_exp)
-      return;
-    checkNameDecl(init);
-    noteValue(new ValueSource(ValueSource.LET_INIT_KIND, letter, index));
+    if (init != QuoteExp.undefined_exp && values != unknownValueValues)
+      {
+        checkNameDecl(init);
+        noteValue(new ValueSource(ValueSource.LET_INIT_KIND, letter, index));
+      }
+  }
+
+  public void noteValueFromApply (ApplyExp app, int index)
+  {
+    if (values != unknownValueValues)
+      noteValue(new ValueSource(ValueSource.APPLY_KIND, app, index));
   }
 
   private void checkNameDecl (Expression value)
@@ -1313,9 +1314,10 @@ public class Declaration
     static final int GENERAL_KIND = 1;
     static final int SET_RHS_KIND = 2;
     static final int LET_INIT_KIND = 3;
-    int kind;
-    Expression base;
-    int index;
+    static final int APPLY_KIND = 4;
+    public int kind;
+    public Expression base;
+    public int index;
 
     ValueSource (int kind, Expression base, int index)
     {
@@ -1336,6 +1338,15 @@ public class Declaration
           return ((SetExp) base).new_value;
         case LET_INIT_KIND:
           return ((LetExp) base).inits[index];
+        case APPLY_KIND:
+          ApplyExp app = (ApplyExp) base;
+          int i = index;
+          // If a function is called via an apply-function, the latter
+          // might distribute a multiple-valued argument among multiple
+          // parameters.  Punt on that for now.
+          if (Compilation.getCurrent().isApplyFunction(app.getFunction()))
+            return null;
+          return app.getArg(i);
         default:
           throw new Error();
         }

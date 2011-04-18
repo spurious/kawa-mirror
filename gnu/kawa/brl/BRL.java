@@ -26,7 +26,6 @@ public class BRL extends Scheme
     krl_instance = new BRL(brlEnvironment);
     brl_instance = new BRL(brlEnvironment);
     brl_instance.setBrlCompatible(true);
-    brl_instance.defaultReadTable.setInitialColonIsKeyword(true);
     Environment saveEnv = Environment.setSaveCurrent(brlEnvironment);
     try
       {
@@ -104,6 +103,8 @@ public class BRL extends Scheme
   public ReadTable createReadTable ()
   {
     ReadTable rt = super.createReadTable();
+    if (isBrlCompatible())
+      rt.setInitialColonIsKeyword(true);
     rt.setBracketMode(1);
     rt.set(']', brlReader);
     return rt;

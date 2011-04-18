@@ -63,6 +63,9 @@ public abstract class Language
   static String[][] languages =
   {
     { "scheme", ".scm", ".sc", "kawa.standard.Scheme" },
+    { "r5rs", ".scm", "kawa.standard.Scheme" },
+    { "r6rs", ".scm", "kawa.standard.Scheme" },
+    { "r7rs", ".scm", "kawa.standard.Scheme" },
     { "krl", ".krl", "gnu.kawa.brl.BRL" },
     { "brl", ".brl", "gnu.kawa.brl.BRL" },
     { "emacs", "elisp", "emacs-lisp", ".el", "gnu.jemacs.lang.ELisp" },

@@ -392,7 +392,7 @@ public class LispReader extends Lexer
   protected boolean validPostfixLookupStart (int ch, ReadTable rtable)
       throws java.io.IOException
   {
-    if (ch < 0 || ch == ':' || ch == rtable.postfixLookupOperator)
+    if (ch < 0 || ch == rtable.postfixLookupOperator)
       return false;
     if (ch == ',')
       return true;

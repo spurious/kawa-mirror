@@ -36,7 +36,7 @@ public abstract class LispLanguage extends Language
   static { getNamedPartLocation.setProcedure(); }
 
   /** The default <code>ReadTable</code> for this language. */
-  public ReadTable defaultReadTable = createReadTable();
+  protected ReadTable defaultReadTable;
 
   /** Create a fresh <code>ReadTable</code> appropriate for this language. */
   public abstract ReadTable createReadTable ();

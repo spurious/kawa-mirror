@@ -1,5 +1,7 @@
 2011-04-17  Per Bothner  <per@bothner.com>
 
+	* Language.java (languages): Add "r5rs", "r6rs", and "r5rs".
+
 	* Declaration.java (<init>): Don't setType if given type is null.
 	(printInfo): Get raw type field rather than calling getType.
 	(hasUnknownValue): New function.

@@ -1,3 +1,13 @@
+2011-04-17  Per Bothner  <per@bothner.com>
+
+	* standard/Scheme.java: Add support for switchable Scheme dialects,
+	specifically ones that follow r5rs, r6rs, or r7rs.
+	(r5rsInstance, r6rsInstance, r7rsInstance): 	New fields.
+	(FOLLOW_R5RS, FOLLOW_R5RS, FOLLOW_R5RS): New constants.
+	(getR5rsInstance, getR6rsInstance, getR7rsInstance): New methods.
+	(getName): Update accordingly.
+	(createReadTable): Some changes for standard Scheme.
+
 2011-04-16  Per Bothner  <per@bothner.com>
 
 	* lang/Translator.java (rewrite): Change checking for "object" ambiguity

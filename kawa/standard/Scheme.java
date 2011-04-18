@@ -26,7 +26,18 @@ public class Scheme extends LispLanguage
   protected static final SimpleEnvironment kawaEnvironment;
 
   public static LangPrimType booleanType;
+
+  public static final int FOLLOW_R5RS = 5;
+  public static final int FOLLOW_R6RS = 6;
+  public static final int FOLLOW_R7RS = 7;
+
   public static final Scheme instance;
+  private static Scheme r5rsInstance;
+  private static Scheme r6rsInstance;
+  private static Scheme r7rsInstance;
+  int standardToFollow;
+
+  public int getStandardToFollow() { return standardToFollow; }
 
   public static final gnu.kawa.reflect.InstanceOf instanceOf;
   public static final Not not;
@@ -100,6 +111,34 @@ public class Scheme extends LispLanguage
   public static Scheme getInstance()
   {
     return instance;
+  }
+
+  private static Scheme newStandardInstance (int standardToFollow)
+  {
+    Scheme instance = new Scheme(kawaEnvironment);
+    instance.standardToFollow = standardToFollow;
+    return instance;
+  }
+
+  public static synchronized Scheme getR5rsInstance()
+  {
+    if (r5rsInstance == null)
+      r5rsInstance = newStandardInstance(FOLLOW_R5RS);
+    return r5rsInstance;
+  }
+
+  public static synchronized Scheme getR6rsInstance()
+  {
+    if (r6rsInstance == null)
+      r6rsInstance = newStandardInstance(FOLLOW_R6RS);
+    return r6rsInstance;
+  }
+
+  public static synchronized Scheme getR7rsInstance()
+  {
+    if (r7rsInstance == null)
+      r7rsInstance = newStandardInstance(FOLLOW_R7RS);
+    return r7rsInstance;
   }
 
   public static Environment builtin ()
@@ -805,7 +844,17 @@ public class Scheme extends LispLanguage
 
   public String getName()
   {
-    return "Scheme";
+    switch (standardToFollow)
+      {
+      case FOLLOW_R5RS:
+        return "Scheme-r5rs";
+      case FOLLOW_R6RS:
+        return "Scheme-r6rs";
+      case FOLLOW_R7RS:
+        return "Scheme-r7rs";
+      default:
+        return "Scheme";
+      }
   }
 
   public String getCompilationClass () { return "kawa.standard.SchemeCompilation"; }
@@ -1098,7 +1147,7 @@ public class Scheme extends LispLanguage
   public ReadTable createReadTable ()
   {
     ReadTable tab = ReadTable.createInitial();
-    tab.postfixLookupOperator = ':';
+    int std =  standardToFollow;
     ReaderDispatch dispatchTable = (ReaderDispatch) tab.lookup('#');
     dispatchTable.set('\'', new ReaderQuote(asSymbol("syntax")));
     dispatchTable.set('`', new ReaderQuote(asSymbol("quasisyntax")));
@@ -1109,7 +1158,14 @@ public class Scheme extends LispLanguage
     tab.putReaderCtor("symbol", ClassType.make("gnu.mapping.Symbol"));
     tab.putReaderCtor("namespace", ClassType.make("gnu.mapping.Namespace"));
     tab.putReaderCtorFld("duration", "kawa.lib.numbers", "duration");
-    tab.setFinalColonIsKeyword(true);
+    if (std == FOLLOW_R5RS || std == FOLLOW_R6RS || std == FOLLOW_R7RS)
+      {
+      }
+    else
+      {
+        tab.postfixLookupOperator = ':';
+        tab.setFinalColonIsKeyword(true);
+      }
     return tab;
   }
 

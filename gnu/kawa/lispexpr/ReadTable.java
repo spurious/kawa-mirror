@@ -22,7 +22,7 @@ public class ReadTable extends RangeTable
   /** Default value to pass to setBracketMode() unless overridden. */
   public static int defaultBracketMode = -2;
 
-  /** A character such that PreOpWord -> ($lookup$ Pre 'Word), if > 0. */
+  /** A character X such that PreXWord -> ($lookup$ Pre 'Word), if > 0. */
   public char postfixLookupOperator = (char) (-1);
 
   /** True if ":IDENTIFIER" should be treated as a keyword. */
@@ -200,7 +200,18 @@ public class ReadTable extends RangeTable
       {
 	Language language = Language.getDefaultLanguage();
 	if (language instanceof LispLanguage)
-	  table = ((LispLanguage) language).defaultReadTable;
+          {
+            LispLanguage llanguage = (LispLanguage) language;
+            synchronized (llanguage)
+              {
+                table = llanguage.defaultReadTable;
+                if (table == null)
+                  {
+                    table = llanguage.createReadTable();
+                    llanguage.defaultReadTable = table;
+                  }
+              }
+          }
 	else
 	  table = ReadTable.createInitial();
 	current.set(table);

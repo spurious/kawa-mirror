@@ -5,10 +5,12 @@ package gnu.expr;
 import gnu.bytecode.*;
 import gnu.mapping.*;
 import gnu.text.SourceLocator;
+import gnu.math.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.lang.reflect.Proxy;
 import java.lang.annotation.ElementType;
+import gnu.kawa.functions.*;
 
 /**
  * The static information associated with a local variable binding.
@@ -75,9 +77,95 @@ public class Declaration
   public final Type getType()
   {
     if (type == null)
-      setType(Type.objectType);
+      {
+        Type t = Type.objectType;
+        type = t;  // To protect against possible cycles.
+        if (! hasUnknownValue() && nvalues > 0)
+          {
+            int arithCount = 0;
+            for (int i = 0;  i < nvalues;  i++)
+              {
+                Expression vi = values[i].getValue();
+                boolean arithOp = false;
+                if (vi != null && ! (vi.getFlag(Expression.VALIDATED)))
+                  {
+                    // Special handling of arithmetic assignments like
+                    // '(set! D (+ D V))', where D is this Declaration.
+                    // We can then use the type of V, instead of the unknown
+                    // type of (+ D V), to inductively determine the type of D.
+                    Expression oparg = checkArithStepOp(vi);
+                    if (oparg != null)
+                      {
+                        // oparg is the expression D above.
+                        arithOp = true;
+                        arithCount++;
+                        vi = oparg;
+                      }
+                  }
+                Declaration d;
+                if ((vi != null && vi.getFlag(Expression.VALIDATED))
+                    || vi instanceof LambdaExp
+                    || vi instanceof QuoteExp
+                    || (vi instanceof ReferenceExp
+                        && (d = ((ReferenceExp) vi).getBinding()) != null
+                        && d.type != null))
+                  {
+                    Type vt = vi.getType();
+                    if (i == 0)
+                      t = vt;
+                    else if (arithOp)
+                      t = CompileArith.combineType(t, vt);
+                    else
+                      t = Language.unionType(t, vt);
+                  }
+                else
+                  { 
+                    t = Type.objectType;
+                    break;
+                  }
+              }
+          }
+        setType(t);
+      }
     return type;
   }
+
+  private Expression checkArithStepOp (Expression exp)
+  {
+    if (! (exp instanceof ApplyExp))
+      return null;
+    ApplyExp aexp = (ApplyExp) exp;
+    Expression func = aexp.getFunction();
+    Compilation comp = Compilation.getCurrent();
+    boolean isApplyFunc = comp.isApplyFunction(func);
+    if (aexp.getArgCount() == (isApplyFunc ? 3 : 2))
+      {
+        if (isApplyFunc)
+          func = aexp.getArg(0);
+        Declaration fdecl;
+        if (func instanceof ReferenceExp
+            && (fdecl = ((ReferenceExp) func).getBinding()) != null
+            && fdecl.getValue() != null)
+          {
+            Object proc = fdecl.getValue().valueIfConstant();
+            if (proc instanceof AddOp || proc instanceof MultiplyOp)
+              {
+                Expression arg1 = aexp.getArg(isApplyFunc ? 1 : 0);
+                Expression arg2 = aexp.getArg(isApplyFunc ? 2 : 1);
+                if (arg1 instanceof ReferenceExp
+                    && ((ReferenceExp) arg1).getBinding() == this)
+                  return arg2;
+                if (arg2 instanceof ReferenceExp
+                    && ((ReferenceExp) arg2).getBinding() == this)
+                  return arg1;
+              }
+          }
+      }
+    return null;
+  }
+
+  public Expression getTypeExpRaw () { return typeExp; }
+
   public final void setType(Type type)
   {
     this.type = type;
@@ -98,8 +186,6 @@ public class Declaration
     this.type = t;
     if (var != null) var.setType(t);
   }
-
-  public Expression getTypeExpRaw () { return typeExp; }
 
   public final void setType (Expression typeExp, Type type)
   {
@@ -470,6 +556,7 @@ public class Declaration
     ENUM_ACCESS|FINAL_ACCESS;
   public static final long METHOD_ACCESS_FLAGS = PRIVATE_ACCESS
     |PROTECTED_ACCESS|PUBLIC_ACCESS|PACKAGE_ACCESS|FINAL_ACCESS;
+  public static final long MAYBE_UNINITIALIZED_ACCESS = 0x800000000l;
 
   protected long flags = IS_SIMPLE;
 
@@ -616,6 +703,11 @@ public class Declaration
     return symbol == ThisExp.THIS_NAME;
   }
 
+  public boolean mayBeAccessedUninitialized ()
+  {
+    return getFlag(MAYBE_UNINITIALIZED_ACCESS);
+  }
+
   /** True if we never need to access this declaration. */
   // rename to isAccessed?
   public boolean ignorable()
@@ -656,6 +748,8 @@ public class Declaration
   {
     return decl == null || decl.getFlag(IS_UNKNOWN);
   }
+
+  int numReferences;
 
   /** List of ApplyExp where this declaration is the function called.
    * The applications are chained using their nextCall fields.
@@ -1239,6 +1333,17 @@ public class Declaration
     return (v instanceof QuoteExp) && v != QuoteExp.undefined_exp;
   }
 
+  public LambdaExp getLambdaValue ()
+  {
+    if (! isAlias() && nvalues == 1)
+      {
+        Expression val = values[0].getValue();
+        if (val != null && val.getClass() == LambdaExp.class)
+          return (LambdaExp) val;
+      }
+    return null;
+  }
+
   public void noteValue (Expression value)
   {
     checkNameDecl(value);
@@ -1283,6 +1388,7 @@ public class Declaration
     if (values != unknownValueValues)
       {
         checkNameDecl(setter.new_value);
+        setter.valueIndex = nvalues;
         noteValue(new ValueSource(ValueSource.SET_RHS_KIND, setter, 0));
       }
   }

@@ -17,6 +17,9 @@ public class SetExp extends AccessExp
   /** The new value to assign to the variable. */
   Expression new_value;
 
+  /** Index into {@code values} array of binding. */
+  int valueIndex;
+
   public SetExp (Object symbol, Expression val)
   { this.symbol = symbol;  new_value = val; }
 

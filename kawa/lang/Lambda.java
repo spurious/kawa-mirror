@@ -332,7 +332,6 @@ public class Lambda extends Syntax
 	else if (mode == restKeyword)
 	  decl.setType(LangObjType.listType);
         decl.setFlag(Declaration.IS_SINGLE_VALUE);
-	decl.noteValueUnknown();
 	addParam(decl, templateScope, lexp, tr);
 	tr.popPositionOf(savePos);
       }

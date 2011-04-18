@@ -1,5 +1,40 @@
 2011-04-18  Per Bothner  <per@bothner.com>
 
+	Implement a data-flow framework, similar to Single Static Assignment.
+	* VarValueTracker.java: New class.  Keep track of variable "values".
+	* Makefile.am: Update accordingly.
+	* Declaration.java (getType): More sophistcated computations.
+	If there are multiple possible values, take their union.
+	However, use a special case for arithmetic assignments like
+	'(set! D (+ D V))' where D is the current Declaration.  In that case
+	we can use the type of V, instead of the unknown type of (+ D V),
+	to inductively determine the type of D.
+	(MAYBE_UNINITIALIZED_ACCESS): New flag.
+	(mayBeAccessedUninitialized): New method.
+	(numReferences): New field.
+	(getLambdaValue): New convenience method.
+	* LambdaExp.java (siblingReferences): New field.
+	* PushApply.java (visitReferenceExp): Build siblingReferences chain.
+	* SetExp.java (valueIndex): New field.
+	* Declaration.java (noteValueFromSet): Set valueIndex field.
+	* LetExp.java (compile, store_rest): Check if declaration
+	mayBeAccessedUninitialized, in which case we need to initialize
+	it to undefined_exp.
+	* ReferenceExp.java (siblingReferencesNext): New field.
+	(calculateType): No longer need to look at type of declaration's value,
+	since that is now handled by Declaration#getType.
+	* InlineCalls.java (valueTracker): New VarValueTracker field.
+	(visitReferenceExp): Check and warn if variable might be uninitialized.
+	(visitIfExp): Handle data-flow fork-join.
+	(visitModuleExp, visitLambdaExp): Set currentLambda.
+	(visitRemainingDeclaredLambdas): New method.
+	(visitLetExp, visitSetExp): Note variable setting for data-flow.
+	Defer visiting a define LambdaExp.
+	(visitLambdaExp): Do some preliminary data-flow from call-sites.
+	(inlineCall): Update value source.
+
+2011-04-18  Per Bothner  <per@bothner.com>
+
 	* Declaration.java (addCaller, clearClassList): New methods.
 	* ScopeExp.java (clearCallList): New method.
 	* FindTailCalls.java (visitApplyExp): Use addCaller method.

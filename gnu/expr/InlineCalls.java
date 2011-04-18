@@ -1,4 +1,4 @@
-// Copyright (c) 2010  Per M.A. Bothner.
+// Copyright (c) 2010, 2011  Per M.A. Bothner.
 // This is free software; for terms and warranty disclaimer see ../../COPYING.
 
 package gnu.expr;
@@ -9,9 +9,11 @@ import gnu.kawa.functions.Convert;
 import gnu.kawa.util.IdentityHashTable;
 import gnu.mapping.*;
 import gnu.math.IntNum;
+import gnu.math.BitOps;
 import gnu.text.Char;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
+import java.util.HashMap;
 import java.lang.reflect.Proxy;
 import java.lang.annotation.ElementType;
 /* #ifdef use:java.lang.invoke */
@@ -41,6 +43,8 @@ public class InlineCalls extends ExpExpVisitor<Type>
   {
     setContext(comp);
   }
+
+  VarValueTracker valueTracker = new VarValueTracker(this);
 
   public Expression visit (Expression exp, Type required)
   {
@@ -236,18 +240,41 @@ public class InlineCalls extends ExpExpVisitor<Type>
   protected Expression visitReferenceExp (ReferenceExp exp, Type required)
   {
     Declaration decl = exp.getBinding();
+    if (decl != null)
+      {
+        IntNum vals = valueTracker.declValueUsage.get(decl);
+        if (vals != null)
+          {
+            if (VarValueTracker.maybeUninitialized(vals)
+                && ! decl.getFlag(Declaration.MAYBE_UNINITIALIZED_ACCESS))
+              {
+                comp.error('w', "variable '"+exp.getName()+"' may be uninitialized here", exp);
+                decl.setFlag(Declaration.MAYBE_UNINITIALIZED_ACCESS);
+              }
+          }
+      }
     if (decl != null && decl.field == null && ! decl.getCanWrite())
       {
+        LambdaExp lval = decl.getLambdaValue();
+        if (lval != null)
+          valueTracker.checkUninitializedVariables(lval, exp, null);
         Expression dval = decl.getValue();
+        if (dval instanceof LambdaExp && ! exp.getDontDereference() && ! (dval instanceof ClassExp) && ! dval.getFlag(Expression.VALIDATED))
+          {
+            visit(dval, null);
+          }
         if (dval instanceof QuoteExp && dval != QuoteExp.undefined_exp)
           return visitQuoteExp((QuoteExp) dval, required);
+        // We don't want to visit the body of a named function yet.
+        if (decl.nvalues == 1 && decl.values[0].kind == Declaration.ValueSource.APPLY_KIND)
+          dval = null;
         if (dval instanceof ReferenceExp && ! decl.isAlias())
           {
             ReferenceExp rval = (ReferenceExp) dval;
             Declaration rdecl = rval.getBinding();
             Type dtype = decl.getType();
             if (rdecl != null && ! rdecl.getCanWrite()
-                && (dtype == null || dtype == Type.pointer_type
+                && (dtype == null || dtype == Type.objectType
                     // We could also allow (some) widening conversions.
                     || dtype == rdecl.getType())
                 && ! rval.getDontDereference())
@@ -262,7 +289,7 @@ public class InlineCalls extends ExpExpVisitor<Type>
         if (! exp.isProcedureName() && decl.isClassMethod())
           {
             // FIXME.  This shouldn't be that hard to fix.  For example,
-            // we could treat reference to a one-argument method foo as if
+            // we could treat a reference to a one-argument method foo as if it
             // were (lambda (x) (foo x)).  Or we could treat it as (this):foo.
             // However, it's a little tricky handling the general case.
             // (What about overloading?  Varargs methods?  Static methods?)  
@@ -287,10 +314,13 @@ public class InlineCalls extends ExpExpVisitor<Type>
           }
       }
     exp.test = test;
+    VarValueTracker.forkPush(this);
     if (exitValue == null)
       exp.then_clause = visit(exp.then_clause, required);
+    valueTracker.forkNext();
     if (exitValue == null && exp.else_clause != null)
       exp.else_clause = visit(exp.else_clause, required);
+    VarValueTracker.forkPop(this);
     if (test instanceof QuoteExp)
       {
         boolean truth = comp.getLanguage().isTrue(((QuoteExp) test).getValue());
@@ -335,19 +365,60 @@ public class InlineCalls extends ExpExpVisitor<Type>
     return exp;
   }
 
+  /** Visit any named functions that haven't been visit yet.
+   * This should be called at the end of a LetExp or ModuleExp.
+   */
+  protected void visitRemainingDeclaredLambdas (ScopeExp exp)
+  {
+    for (Declaration decl = exp.firstDecl(); decl != null;
+         decl = decl.nextDecl())
+      {
+        Expression value = decl.getValueRaw();
+        if (value instanceof LambdaExp)
+          visit(value, null);
+      }
+  }
+
+  protected Expression visitModuleExp (ModuleExp exp, Type required)
+  {
+    LambdaExp saveLambda = currentLambda;
+    currentLambda = exp;
+    try
+      {
+        super.visitModuleExp(exp, required);
+      }
+    finally
+      {
+        currentLambda = saveLambda;
+      }
+    visitRemainingDeclaredLambdas(exp);
+    return exp;
+  }
+
   protected Expression visitLetExp (LetExp exp, Type required)
   {
+    if (! (exp instanceof CatchClause) && ! (exp instanceof FluidLetExp))
+      valueTracker.noteUnitialized(exp);
+
     Declaration decl = exp.firstDecl();
     int n = exp.inits.length;
     for (int i = 0; i < n; i++, decl = decl.nextDecl())
       {
 	Expression init = exp.inits[i];
+        if (decl.nvalues > 0
+            && decl.values[0].kind == Declaration.ValueSource.LET_INIT_KIND
+            && decl.values[0].index == i
+            && decl.values[0].base == exp)
+          {
+            valueTracker.noteSet(decl, IntNum.make(~0));
+          }
         boolean typeSpecified = decl.getFlag(Declaration.TYPE_SPECIFIED);
         Type dtype = typeSpecified && init != QuoteExp.undefined_exp ? decl.getType() : null;
-        init = visit(init, dtype);
+        if (init instanceof LambdaExp && ! (init instanceof ClassExp) && decl.getValueRaw() == init)
+          ; // defer
+        else
+          init = visit(init, dtype);
 	exp.inits[i] = init;
-        if (! typeSpecified && decl.getValueRaw() == init)
-          decl.setType(init.getType());
       }
 
     if (exitValue == null)
@@ -372,6 +443,7 @@ public class InlineCalls extends ExpExpVisitor<Type>
             // other inits can cause side-effects.  Probably not worth it.
           }
       }
+    visitRemainingDeclaredLambdas(exp);
     return exp;
   }
 
@@ -383,7 +455,56 @@ public class InlineCalls extends ExpExpVisitor<Type>
       {
         firstDecl.setType(comp.mainClass);
       }
-    visitScopeExp(exp, required);
+    if (exp.getClass() == LambdaExp.class)
+      {
+        Declaration ldecl = exp.nameDecl;
+        boolean unknownCalls = true;
+        if (ldecl != null && ! exp.isClassMethod()
+            && (ldecl.isPrivate() || ! (ldecl.context instanceof ModuleExp)))
+          {
+            int countApply = 0;
+            for (ApplyExp app = ldecl.firstCall; app != null;
+                 app = app.nextCall)
+              countApply++;
+            if (countApply == ldecl.numReferences)
+              {
+                // Some preliminary data-flow from a set of known call sites.
+                // This isn't fully implemented yet.
+                unknownCalls = false;
+                for (ApplyExp app = ldecl.firstCall; app != null;
+                     app = app.nextCall)
+                  {
+                    Expression func = app.getFunction();
+                    int nargs = app.getArgCount();
+                    int i = 0;
+                    for (Declaration p = firstDecl; p != null;
+                         p = p.nextDecl(), i++)
+                      {
+                        if (! p.hasUnknownValue())
+                          p.noteValueFromApply(app, i);
+                      }
+                  }
+              }
+          }
+        if (unknownCalls)
+          {
+            for (Declaration p = firstDecl; p != null;  p = p.nextDecl())
+              {
+                if (! p.isThisParameter())
+                  p.noteValueUnknown();
+              }
+          }
+      }
+    LambdaExp saveLambda = currentLambda;
+    currentLambda = exp;
+    try
+      {
+        visitScopeExp(exp, required);
+      }
+    finally
+      {
+        currentLambda = saveLambda;
+      }
     if (exp.isClassMethod() && "*init*".equals(exp.getName()))
       {
         Expression bodyFirst = exp.getBodyFirstExpression();
@@ -462,7 +583,16 @@ public class InlineCalls extends ExpExpVisitor<Type>
   protected Expression visitSetExp (SetExp exp, Type required)
   {
     Declaration decl = exp.getBinding();
-    exp.new_value = visit(exp.new_value, decl == null || decl.isAlias() ? null : decl.type);
+    if (decl != null && decl.values != Declaration.unknownValueValues
+        && exp.valueIndex >= 0)
+      {
+        IntNum setterMask = IntNum.make(~exp.valueIndex);
+        valueTracker.noteSet(decl, setterMask);
+      }
+    if (decl != null && decl.getLambdaValue() != null)
+      ; // defer
+    else 
+      exp.new_value = visit(exp.new_value, decl == null || decl.isAlias() ? null : decl.type);
     if (! exp.isDefining() && decl != null && decl.isClassMethod())
       comp.error('e', "can't assign to method "+decl.getName(), exp);
     if (decl != null && decl.getFlag(Declaration.TYPE_SPECIFIED))
@@ -640,8 +770,11 @@ public class InlineCalls extends ExpExpVisitor<Type>
               }
             if (! varArgs)
               {
-                if ( ! param.getCanWrite())
-                  param.setValue(cargs[i]);
+                if ( ! param.getCanWrite()) {
+                  param.nvalues = 0;
+                  param.values = null;
+                  param.noteValueFromLet(let, i);
+                }
               }
             prev = param;
             param = next;

@@ -57,6 +57,13 @@ public class CompileArith implements Inlineable
     return false;
   }
 
+  public static Type combineType (Type t1, Type t2)
+  {
+    int kind1 = Arithmetic.classifyType(t1);
+    int kind2 = Arithmetic.classifyType(t2);
+    return Arithmetic.kindType(CompileArith.getReturnKind2(kind1, kind2));
+  }
+
   public static Expression validateApplyArithOp
   (ApplyExp exp, InlineCalls visitor, Type required, Procedure proc)
   {
@@ -410,6 +417,11 @@ public class CompileArith implements Inlineable
   {
     if (op >= ASHIFT_GENERAL && op <= LSHIFT_RIGHT)
       return kind1;
+    return getReturnKind2(kind1, kind2);
+  }
+
+  private static int getReturnKind2 (int kind1, int kind2)
+  {
     return kind1 <= 0 || (kind1 > kind2 && kind2 > 0) ? kind1 : kind2;
   }
 

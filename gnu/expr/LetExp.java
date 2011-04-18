@@ -151,7 +151,10 @@ public class LetExp extends ScopeExp
 		    decl.pushIndirectBinding(comp);
 		  }
 	      }
-            decl.compileStore(comp);
+            if (initialized
+                || decl.isIndirectBinding()
+                || decl.mayBeAccessedUninitialized())
+              decl.compileStore(comp);
 	  }
       }
   }
@@ -182,7 +185,8 @@ public class LetExp extends ScopeExp
           decl.allocateVariable(code);
         // Compare logic in store_rest.
 	if (! needsInit
-	    || (decl.isIndirectBinding() && init == QuoteExp.undefined_exp))
+            || (init == QuoteExp.undefined_exp
+                && (decl.isIndirectBinding() || ! decl.mayBeAccessedUninitialized())))
 	  varTarget = Target.Ignore;
 	else
 	  {

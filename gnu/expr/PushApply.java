@@ -73,6 +73,34 @@ public class PushApply extends ExpVisitor<Expression,Void>
     return exp;
   }
 
+  protected Expression visitReferenceExp (ReferenceExp exp, Void ignored)
+  {
+    Declaration decl = exp.getBinding();
+    if (decl != null)
+      {
+        decl.numReferences++;
+        // Figure out the innerLambda, which is the LambdaExp (if any)
+        // between the declaration and the current context.
+        if (decl.context instanceof LetExp)
+          {
+            LambdaExp innerLambda = getCurrentLambda();
+            for (ScopeExp sc = innerLambda; sc != null; sc = sc.outer)
+              {
+                if (sc == decl.context)
+                  {
+                    // Chain on to innerLambda.siblingReferences list.
+                    exp.siblingReferencesNext = innerLambda.siblingReferences;
+                    innerLambda.siblingReferences = exp;
+                    break;
+                  }
+                if (sc instanceof LambdaExp)
+                  innerLambda = (LambdaExp) sc;
+              }
+          }
+      }
+    return super.visitReferenceExp(exp, ignored);
+  }
+
   protected Expression visitClassExp (ClassExp exp, Void ignored)
   {
     // Allocate class fields and methods.  Ideally, setting field and method

@@ -4,6 +4,7 @@
 package gnu.expr;
 import gnu.bytecode.*;
 import gnu.mapping.*;
+import gnu.math.IntNum;
 
 /**
  * This class represents a variable reference (an identifier).
@@ -21,6 +22,9 @@ public class ReferenceExp extends AccessExp
   public static final int PREFER_BINDING2 = NEXT_AVAIL_FLAG << 2;
   /** Flag indicates a reference to a type name. */
   public static final int TYPE_NAME = NEXT_AVAIL_FLAG << 3;
+
+  /** Links in list headed by {@see LambdaExp#siblingReferences}. */
+  ReferenceExp siblingReferencesNext;
 
   /* If true, must have binding.isIndirectBinding().  Don't dereference it. */
   public final boolean getDontDereference()
@@ -236,12 +240,6 @@ public class ReferenceExp extends AccessExp
       }
     decl = Declaration.followAliases(decl);
     Type type = decl.getType();
-    if (type == null || type == Type.pointer_type)
-      {
-        Expression value = decl.getValue();
-        if (value != null && value != QuoteExp.undefined_exp)
-          type = value.getType();
-      }
     if (type == Type.toStringType)
       type = Type.javalangStringType;
     return type;

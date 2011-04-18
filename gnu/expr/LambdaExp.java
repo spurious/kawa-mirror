@@ -37,6 +37,13 @@ public class LambdaExp extends ScopeExp
     * All the Declarations are allocated in the current heapFrame. */
   Declaration capturedVars;
 
+  /** Linked link of references to sibling declarations.
+   * Chained using {@see ReferenceExp#siblingReferencesNext} links.
+   * I.e. References to declarations external to this LambdaExp,
+   * but local to the outer LambdaExp.
+   */
+  ReferenceExp siblingReferences;
+
   public void capture (Declaration decl)
   {
     if (decl.isSimple())

@@ -77,6 +77,7 @@ java_sources = \
   ThisExp.java \
   TryExp.java \
   TypeValue.java \
+  VarValueTracker.java \
   $(JAVAX_SCRIPT_USED)
 
 EXTRA_DIST = package.html $(JAVAX_SCRIPT_EXTRA)

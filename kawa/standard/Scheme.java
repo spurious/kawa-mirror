@@ -645,7 +645,7 @@ public class Scheme extends LispLanguage
       defProcStFld("create-directory", "kawa.lib.files");
       defProcStFld("->pathname", "kawa.lib.files");
       define("port-char-encoding", Boolean.TRUE);
-      define("symbol-read-case", "P");
+      define("symbol-read-case", "");
 
       defProcStFld("system", "kawa.lib.system");
       defProcStFld("make-process", "kawa.lib.system");
@@ -939,6 +939,15 @@ public class Scheme extends LispLanguage
   public AbstractFormat getFormat(boolean readable)
   {
     return readable ? writeFormat : displayFormat;
+  }
+
+  public LispReader getLexer(InPort inp, SourceMessages messages)
+  {
+    LispReader reader = super.getLexer(inp, messages);
+    if (reader.getReadCase() == '\0'
+        && standardToFollow == FOLLOW_R5RS)
+      reader.setReadCase('D');
+    return reader;
   }
 
   public int getNamespaceOf (Declaration decl)

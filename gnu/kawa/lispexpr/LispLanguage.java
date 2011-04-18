@@ -41,7 +41,7 @@ public abstract class LispLanguage extends Language
   /** Create a fresh <code>ReadTable</code> appropriate for this language. */
   public abstract ReadTable createReadTable ();
 
-  public Lexer getLexer(InPort inp, SourceMessages messages)
+  public LispReader getLexer(InPort inp, SourceMessages messages)
   {
     return new LispReader(inp, messages);
   }

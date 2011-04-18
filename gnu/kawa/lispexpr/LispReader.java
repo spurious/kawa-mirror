@@ -61,31 +61,39 @@ public class LispReader extends Lexer
       } while (commentNesting > 0);
   }
 
+  char readCase = lookupReadCase();
+
   /** Get specification of how symbols should be case-folded.
-    * @return Either 'P' (means preserve case), 'U' (upcase),
+    * @return Either '\0' (unspecified - defaults to preserve case),
+    * 'P' (means preserve case), 'U' (upcase),
     * 'D' (downcase), or 'I' (invert case).
     */
-  static char getReadCase()
+  public char getReadCase () { return readCase; }
+  public void setReadCase(char readCase) { this.readCase = readCase; }
+
+  static char lookupReadCase()
   {
-    char read_case;
     try
       {
 	String read_case_string
 	  = Environment.getCurrent().get("symbol-read-case", "P").toString();
-	read_case = read_case_string.charAt(0);
-	if (read_case == 'P') ;
-	else if (read_case == 'u')
-	  read_case = 'U';
-	else if (read_case == 'd' || read_case == 'l' || read_case == 'L')
-	  read_case = 'D';
-	else if (read_case == 'i')
-	  read_case = 'I';
+        if (read_case_string.length() > 0)
+          {
+            char read_case = read_case_string.charAt(0);
+            if (read_case == 'P') ;
+            else if (read_case == 'u')
+              read_case = 'U';
+            else if (read_case == 'd' || read_case == 'l' || read_case == 'L')
+              read_case = 'D';
+            else if (read_case == 'i')
+              read_case = 'I';
+            return read_case;
+          }
       }
     catch (Exception ex)
       {
-	read_case = 'P';
       }
-    return read_case;
+    return '\0';
   }
 
   public Object readValues (int ch,  ReadTable rtable)
@@ -1247,6 +1255,16 @@ public class LispReader extends Lexer
       return Special.abstractSpecial;
     if (name.equals("null"))
       return null;
+    if (name.equals("fold-case"))
+      {
+        reader.readCase = 'D';
+        return Values.empty;
+      }
+    if (name.equals("no-fold-case"))
+      {
+        reader.readCase = 'P';
+        return Values.empty;
+      }
     reader.error("unknown named constant #!"+name);
     return null;
   }

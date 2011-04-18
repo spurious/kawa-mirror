@@ -79,7 +79,7 @@ public class BRL extends Scheme
 
   public boolean appendBodyValues () { return ! isBrlCompatible(); }
 
-  public gnu.text.Lexer getLexer(InPort inp, gnu.text.SourceMessages messages)
+  public gnu.kawa.lispexpr.LispReader getLexer(InPort inp, gnu.text.SourceMessages messages)
   {
     Compilation.defaultCallConvention = Compilation.CALL_WITH_CONSUMER;
     BRLRead lexer = new BRLRead(inp, messages);

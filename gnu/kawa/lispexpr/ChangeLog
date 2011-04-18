@@ -1,5 +1,13 @@
 2011-04-17  Per Bothner  <per@bothner.com>
 
+	* LispLanguage.java (getLexer): Change to more specific return type.
+	* LispReader.java (readCase): New field.
+	(getReadCase): Changed to just return the value of the readCase field.
+	(loookupReadCase): Lookup value of symbol-read-case.
+	(setReadCase): New method.
+	(readSpecial): Handle special tokens '#!fold-case' and
+	'#!no-fold-case' by setting readCase.
+
 	* LispLanguage.java (defaultReadTable): Make protected.
 	Don't initialize here, but do it lazily.
 	* ReadTable.java (getCurrent): In needed, initialize defaultReadTable.

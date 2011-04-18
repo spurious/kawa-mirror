@@ -72,7 +72,7 @@ public class Q2 extends Scheme
     return "Q2";
   }
 
-  public gnu.text.Lexer getLexer(InPort inp, gnu.text.SourceMessages messages)
+  public LispReader getLexer(InPort inp, gnu.text.SourceMessages messages)
   {
     Compilation.defaultCallConvention = Compilation.CALL_WITH_CONSUMER;
     Q2Read lexer = new Q2Read(inp, messages);

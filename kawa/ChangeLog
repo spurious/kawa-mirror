@@ -1,5 +1,9 @@
 2011-04-17  Per Bothner  <per@bothner.com>
 
+	* standard/Scheme.java (initScheme): Initialize symbol-read-case"
+	to the empty string, not "P".
+	(getLexer): New method.  If FOLLOW_R5RS, default read-case to 'D'.
+
 	* standard/Scheme.java: Add support for switchable Scheme dialects,
 	specifically ones that follow r5rs, r6rs, or r7rs.
 	(r5rsInstance, r6rsInstance, r7rsInstance): 	New fields.

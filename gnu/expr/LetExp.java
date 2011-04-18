@@ -117,6 +117,16 @@ public class LetExp extends ScopeExp
   }
   */
 
+  /** Does this variable need to be initialized or is default ok
+   */
+  static boolean needsInit(Declaration decl)
+  {
+    // This is a kludge.  Ideally, we should do some data-flow analysis.
+    // But at least it makes sure require'd variables are not initialized.
+    return ! decl.ignorable()
+      && ! (decl.getValueRaw() == QuoteExp.nullExp && decl.base != null);
+  }
+
   /* Recursive helper routine, to store the values on the stack
    * into the variables in vars, in reverse order. */
   void store_rest (Compilation comp, int i, Declaration decl)
@@ -124,12 +134,13 @@ public class LetExp extends ScopeExp
     if (decl != null)
       {
 	store_rest (comp, i+1, decl.nextDecl());
-	if (decl.needsInit())
+	if (needsInit(decl))
 	  {
+            boolean initialized = inits[i] != QuoteExp.undefined_exp;
 	    if (decl.isIndirectBinding())
 	      {
 		CodeAttr code = comp.getCode();
-		if (inits[i] == QuoteExp.undefined_exp)
+		if (! initialized)
 		  {
 		    Object name = decl.getSymbol();
 		    comp.compileConstant(name, Target.pushObject);
@@ -166,9 +177,10 @@ public class LetExp extends ScopeExp
       {
 	Target varTarget;
 	Expression init = inits[i];
-        boolean needsInit = decl.needsInit();
+        boolean needsInit = needsInit(decl);
 	if (needsInit && decl.isSimple())
           decl.allocateVariable(code);
+        // Compare logic in store_rest.
 	if (! needsInit
 	    || (decl.isIndirectBinding() && init == QuoteExp.undefined_exp))
 	  varTarget = Target.Ignore;

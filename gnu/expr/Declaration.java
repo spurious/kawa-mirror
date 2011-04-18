@@ -633,16 +633,6 @@ public class Declaration
     return ! lexp.isHandlingTailCalls() || lexp.getInlineOnly();
   }
 
-  /** Does this variable need to be initialized or is default ok
-   */
-  public boolean needsInit()
-  {
-    // This is a kludge.  Ideally, we should do some data-flow analysis.
-    // But at least it makes sure require'd variables are not initialized.
-    return ! ignorable()
-      && ! (getValueRaw() == QuoteExp.nullExp && base != null);
-  }
-
   public boolean isStatic()
   {
     if (field != null)

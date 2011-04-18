@@ -199,3 +199,15 @@
 		  #f
 		  (even? (- n2 1))))))
     (even? x)))
+
+(define (constant-propagation1)
+  (define x :: int 6)
+  (define x2 (* x 2))
+  (+ x x2))
+
+(define (factorial-infer1 (x ::int))
+  ;; The type of r should be inferred as integer.
+  (define r 1)
+  (do ((i ::int 1 (+ i 1)))
+      ((> i x) r)
+    (set! r (* r i))))

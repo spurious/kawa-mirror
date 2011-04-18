@@ -1,3 +1,12 @@
+2011-04-18  Per Bothner  <per@bothner.com>
+
+	* uninit1.scm: New test, for uninitialized variable accesses.
+	* inlining-test.scm (constant-propagation1, factorial-infer1):
+	New tests.
+	* inlining.expected: Update accordingly.
+	* Makefile.am: Update accordingly.
+	* binarytrees.scm (test): Use internal define, which is now optimized.
+
 2011-04-10  Per Bothner  <per@bothner.com>
 
 	* mac-test.scm: Add tests for cond-expand feature class-exists:NAME.

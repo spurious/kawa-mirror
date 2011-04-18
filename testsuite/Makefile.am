@@ -41,12 +41,17 @@ check-no-inline:
 check1:  check-num check-arr check-lib \
   check-srfi-16 check-srfi-64 check-srfi-69 \
   check-format check-ppfile check-text check-regex scribble.class \
+  check-run-test-scripts \
   check-annotations1 check-annotations2\
   check-binarytrees check-chameneosredux check-fannkuch check-fannkuchredux check-fasta \
   check-knucleotide check-mandelbrot check-meteor check-nbody \
   check-nsieve check-pidigits check-regexdna check-revcomp \
   check-spectralnorm check-threadring
 check2:  check-scm check-misc check-mac check-obj check-polytype
+
+check-run-test-scripts:
+	CLASSPATH=$(top_builddir) $(JAVA) gnu.kawa.util.RunTestScript \
+	  `for test in $(SCRIPTS_TO_RUN); do echo $(srcdir)/$$test; done`
 
 testing.zip: $(srcdir)/testing.scm
 	$(KAWA) -e '(compile-file "'$(srcdir)/testing.scm'" "testing.zip")'
@@ -476,7 +481,8 @@ inlining.log: InliningTest.class cycle1.class cycle2.class \
 	setCar getHome setHome isPair isEmpty castToPair newPair tohex \
 	makeIarr lengthIarr getIarr setIarr varargs \
 	factoriali1 factoriali2 factoriall1 plusLambda1 firstNegative \
-	inlineTwoCalls inlineTwoFunctions checkEven >inlining.log
+	inlineTwoCalls inlineTwoFunctions checkEven \
+	constantPropagation1 factorialInfer1 >inlining.log
 	$(LIST_CODE_SIZE) cycle1.class isIsEven >>inlining.log
 	$(LIST_CODE_SIZE) cycle2.class isIsOdd >>inlining.log
 	$(LIST_CODE_SIZE) binarytrees.class bottomUpTree test >>inlining.log
@@ -536,6 +542,7 @@ check-sva31180:
 	  else echo FAIL check-sva31180; fi
 
 CLEANFILES = tmp* *.log testing.zip revcomp-input.txt knucleotide-input.txt regexdna-input.txt *.class HelloCgiK HelloCgiS
+SCRIPTS_TO_RUN = uninit1.scm
 EXTRA_DIST = testing.scm test.scm num-test.scm mac-test.scm mac1.scm \
   classes1.scm classes2.scm SimpleB.java obj-test.scm arr-test.scm \
   lib-test.scm srfi-64-test.scm srfi-69-test.scm text-test.scm regex-test.scm \
@@ -564,4 +571,5 @@ EXTRA_DIST = testing.scm test.scm num-test.scm mac-test.scm mac1.scm \
   regexdna.scm regexdna-output.txt \
   revcomp.scm revcomp-2.scm revcomp-output.txt \
   spectralnorm.scm spectralnorm-output.txt \
-  threadring.scm threadring-output.txt
+  threadring.scm threadring-output.txt \
+  $(SCRIPTS_TO_RUN)

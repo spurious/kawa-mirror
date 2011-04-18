@@ -1,5 +1,11 @@
 2011-04-18  Per Bothner  <per@bothner.com>
 
+	* Declaration.java (addCaller, clearClassList): New methods.
+	* ScopeExp.java (clearCallList): New method.
+	* FindTailCalls.java (visitApplyExp): Use addCaller method.
+	(visitLetExp, visitLambdaExp): Call clearCallList.
+	* PushApply.java (visitApplyExp): Use addCaller method.
+
 	* Declarations.java (needsInit) Moved method ...
 	* LetExp.java (needsInit): ... to here.
 	(compile, store_rest): Update accordingly.

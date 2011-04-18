@@ -269,6 +269,12 @@ public abstract class ScopeExp extends Expression
     return n;
   }
 
+  public void clearCallList ()
+  {
+    for (Declaration decl = firstDecl(); decl != null; decl = decl.nextDecl())
+      decl.clearCallList();
+  }
+
   public static int nesting (ScopeExp sc)
   {
     int n = 0;

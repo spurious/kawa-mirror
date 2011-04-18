@@ -59,12 +59,11 @@ public class FindTailCalls extends ExpExpVisitor<Expression>
         if (binding != null)
           {
             // No point in building chain if STATIC_SPECIFIED, and it can
-            // lead to memory leaks.  At least if interactive calls cam
+            // lead to memory leaks.  At least if interactive calls can
             // resolve to previously-compiled Declarations (as in XQuery).
             if (! binding.getFlag(Declaration.STATIC_SPECIFIED))
               {
-                exp.nextCall = binding.firstCall;
-                binding.firstCall = exp;
+                binding.addCaller(exp);
               }
             Compilation comp = getCompilation();
             binding.setCanCall();
@@ -182,6 +181,7 @@ public class FindTailCalls extends ExpExpVisitor<Expression>
 
   protected Expression visitLetExp (LetExp exp, Expression returnContinuation)
   {
+    exp.clearCallList();
     visitLetDecls(exp);
     exp.body = exp.body.visit(this, returnContinuation);
     postVisitDecls(exp);
@@ -225,6 +225,7 @@ public class FindTailCalls extends ExpExpVisitor<Expression>
 
   protected Expression visitLambdaExp (LambdaExp exp, Expression returnContinuation)
   {
+    exp.clearCallList();
     visitLambdaExp (exp, true);
     return exp;
   }

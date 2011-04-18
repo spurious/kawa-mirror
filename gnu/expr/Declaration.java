@@ -662,6 +662,25 @@ public class Declaration
    * The chain is not built if STATIC_SPECIFIED. */
   public ApplyExp firstCall;
 
+  /** Add a call to the list headed by {@code firstCall}. */
+  public void addCaller (ApplyExp exp)
+  {
+    exp.nextCall = firstCall;
+    firstCall = exp;
+  }
+
+  /** Clear the list of callers headed by {@code firstCall}. */
+  public void clearCallList ()
+  {
+    for (ApplyExp exp = firstCall; exp != null; )
+      {
+        ApplyExp next = exp.nextCall;
+        exp.nextCall = null;
+        exp = next;
+      }
+    firstCall = null;
+  }
+
   protected Declaration()
   {
   }

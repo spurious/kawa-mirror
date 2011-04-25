@@ -1,3 +1,8 @@
+2011-04-25  Per Bothner  <per@bothner.com>
+
+	* Lisp2Compilation.java: Fix package to gnu.commonlisp.lang.
+	* Lisp2.java (getCompilationClass): Update accordingly.
+
 2011-03-23  Per Bothner  <per@bothner.com>
 
 	* prog1.java (rewrite): Use letStart/letVariable/letDone methods.

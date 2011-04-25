@@ -1,4 +1,4 @@
-package gnu.kawa.lispexpr;
+package gnu.commonlisp.lang;
 import kawa.lang.*;
 import gnu.bytecode.*;
 import gnu.expr.*;

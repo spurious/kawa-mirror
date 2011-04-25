@@ -155,7 +155,7 @@ public abstract class Lisp2 extends LispLanguage
     return tab;
   }
 
-   public String getCompilationClass () { return "gnu.kawa.lispexpr.Lisp2Compilation"; }
+   public String getCompilationClass () { return "gnu.commonlisp.lang.Lisp2Compilation"; }
 }
 
 class Lisp2ReadTable extends ReadTable

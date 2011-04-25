@@ -1,3 +1,9 @@
+2011-04-25  Charles Turner  <chturne@gmail.com>
+	    Per Bothner  <per@bothner.com>
+
+	* WrongType.java (getMessage): Retrieve types from the
+	currently default language.
+
 2011-04-14  Per Bothner  <per@bothner.com>
 
 	* InheritingEnvironment.java (namespaceMap, propertyMap): Remove

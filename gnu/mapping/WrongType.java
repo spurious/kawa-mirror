@@ -3,6 +3,7 @@
 
 package gnu.mapping;
 import gnu.bytecode.Type;
+import gnu.expr.Language;
 
 /** Exception thrown when a procedure parameter has the wrong type. */
 
@@ -146,6 +147,7 @@ public class WrongType extends WrappedException
     return wex;
   }
 
+  @Override
   public String getMessage()
   {
     StringBuffer sbuf = new StringBuffer(100);
@@ -168,7 +170,7 @@ public class WrongType extends WrappedException
       }
     if (argValue != null)
       {
-	sbuf.append(" (");
+	sbuf.append(" '");
 	String argString = argValue.toString();
 	if (argString.length() > 50)
 	  {
@@ -177,7 +179,7 @@ public class WrongType extends WrappedException
 	  }
 	else
 	  sbuf.append(argString);
-	sbuf.append(")");
+	sbuf.append("'");
       }
     if (procname != null && number != ARG_DESCRIPTION)
       {
@@ -189,7 +191,11 @@ public class WrongType extends WrappedException
     if (argValue != null)
       {
 	sbuf.append(" (");
-	sbuf.append(argValue.getClass().getName());
+        Class wrongClass = argValue.getClass();
+        Language currentLang = Language.getDefaultLanguage();
+        String wrongClassname = currentLang == null ? wrongClass.getName()
+          : currentLang.formatType(currentLang.getTypeFor(wrongClass));
+        sbuf.append(wrongClassname);
 	sbuf.append(")");
       }
     Object expectType = expectedType;

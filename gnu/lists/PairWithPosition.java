@@ -8,7 +8,7 @@ public class PairWithPosition extends ImmutablePair
   implements gnu.text.SourceLocator
 {
   String filename;
-  /** An encoding of lineNumber+(columnNumber<<20).
+  /** An encoding of {@code (lineNumber << 12) + columnNumber}.
    * Note if columnNumber is unspecified (0), then position is lineNumber. */
   int position;
 

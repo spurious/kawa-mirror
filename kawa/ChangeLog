@@ -1,3 +1,11 @@
+2011-04-25  Charles Turner <chturne@gmail.com>
+	    Per Bothner  <per@bothner.com>
+
+	* standard/Scheme.java (getTypeMap): New "empty-list" type,
+	for improved error messages.
+	* standard/module_static.java (scanForDefinitions): Fix type
+	inconsistency.
+
 2011-04-18  Per Bothner  <per@bothner.com>
 
 	* lang/Lambda.java (rewriteFormals): Don't need to noteValueUnknown

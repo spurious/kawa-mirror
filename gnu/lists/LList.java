@@ -25,7 +25,7 @@ public class LList extends ExtSequence
   /** Do not use - only public for serialization! */
   public LList () { }
 
-  static public final LList Empty = new LList ();
+  static public final EmptyList Empty = EmptyList.emptyList;
 
   /**
    * A safe function to count the length of a list.

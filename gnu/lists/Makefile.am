@@ -17,6 +17,7 @@ java_sources = \
   Consumable.java \
   Convert.java \
   ElementPredicate.java \
+  EmptyList.java \
   EofClass.java \
   ExtPosition.java \
   ExtSequence.java \

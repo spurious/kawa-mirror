@@ -34,8 +34,9 @@ public class module_static extends Syntax
              && st.getCar() instanceof Pair
              && tr.matches((st = (Pair) st.getCar()).getCar(), Scheme.quote_sym))
       {
-        if ((st = (Pair)st.getCdr()) != LList.Empty
-            && st.getCar() instanceof SimpleSymbol
+        Object cdr = st.getCdr();
+        if (cdr != LList.Empty
+            && (st = (Pair) cdr).getCar() instanceof SimpleSymbol
             && st.getCar().toString() == "init-run")
           {
             // (module-static 'init-run) implies (module-static #t)

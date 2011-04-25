@@ -1003,6 +1003,7 @@ public class Scheme extends LispLanguage
 	types.put ("character", ClassType.make("gnu.text.Char"));
 	types.put ("vector", LangObjType.vectorType);
 	types.put ("string", LangObjType.stringType);
+        types.put ("empty-list", ClassType.make("gnu.lists.EmptyList"));
 	types.put ("list", LangObjType.listType);
 	types.put ("function", ClassType.make("gnu.mapping.Procedure"));
 	types.put ("procedure", LangObjType.procedureType);

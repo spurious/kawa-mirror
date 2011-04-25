@@ -1,3 +1,11 @@
+2011-04-25  Charles Turner <chturne@gmail.com>
+	    Per Bothner  <per@bothner.com>
+
+	* LList.java: Give a class identity to the Empty field
+	for type information
+	* EmptyList.java (new): New class that identifies empty lists.
+	* Makefile.am: Update accordingly.
+
 2011-04-15  Per Bothner  <per@bothner.com>
 
 	* SimpleVector.java (add): Fix off-by-one bug, reported by Jamison Hope.

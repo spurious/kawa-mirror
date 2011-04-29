@@ -1,3 +1,7 @@
+2011-04-29  Per Bothner  <per@bothner.com>
+
+	* inlining-test.scm (factorial-infer2): New method - currently unused.
+
 2011-04-18  Per Bothner  <per@bothner.com>
 
 	* uninit1.scm: New test, for uninitialized variable accesses.

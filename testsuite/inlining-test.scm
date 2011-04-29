@@ -211,3 +211,8 @@
   (do ((i ::int 1 (+ i 1)))
       ((> i x) r)
     (set! r (* r i))))
+
+;; FUTURE - would like to infer type of r as integer
+(define (factorial-infer2 (x ::int))
+  (do ((i ::int 1 (+ i 1)) (r 1 (* r i)))
+      ((> i x) r)))

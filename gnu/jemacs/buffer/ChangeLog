@@ -1,3 +1,9 @@
+2011-05-01  Shad Gregory <captshadg@gmail.com>
+	    Per Bothner  <per@bothner.com>
+
+	* Marker.java (repeatChar): New static method.
+	(insertChar): Make use of repeatChar.
+
 2011-04-15  Per Bothner  <per@bothner.com>
 	    Shad Gregory <captshadg@gmail.com>
 

@@ -105,14 +105,8 @@ public class SwtBuffer extends Buffer
   public void insertChar(int ch, int count, Object style)
   {
     // TODO: Handle styles !
-    char[] charr = new char[count];
-    
-    for (int i = 0; i < charr.length; i++)
-    {
-      charr[i] = ch;
-    }
-    
-    bufferContent.replaceTextRange(getDot(), 0, new String(charr));
+    String str = Marker.repeatChar(ch, count);
+    bufferContent.replaceTextRange(getDot(), 0, str);
     setDot(getDot() + 1);
   }
 

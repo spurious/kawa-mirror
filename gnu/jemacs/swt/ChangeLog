@@ -1,3 +1,11 @@
+2011-05-01  Shad Gregory <captshadg@gmail.com>
+	  Per Bothner  <per@bothner.com>
+
+	* SwtBuffer.java (insertChar): Use Marker#repeatChar.
+	* SwtCharBuffer.java (gapReserve): Fix to override correct method.
+	These fix Savannah bug#33140 "ant task jemacs-swt-classes does
+	not build successfully".
+
 2011-04-26  Shad Gregory <captshadg@gmail.com>
 
 	* SwtFrame.java (setMenuHelper): Fix bit-rot - use getCar/getCdr

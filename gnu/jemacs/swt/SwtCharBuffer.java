@@ -78,10 +78,10 @@ public class SwtCharBuffer extends GapVector implements CharSequence
   /**
    * @see gnu.lists.GapVector#gapReserve(int)
    */
-  protected void gapReserve(int size)
+  protected void gapReserve(int where, int needed)
   {
     int oldGapSize = gapEnd - gapStart;
-    super.gapReserve(size);
+    super.gapReserve(where, needed);
     int newGapSize = gapEnd - gapStart;
     if (newGapSize > oldGapSize)   // It never shrinks
     {

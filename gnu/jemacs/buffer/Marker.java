@@ -120,12 +120,8 @@ public final class Marker extends SeqPosition
     setDot(point);
   }
 
-  /** Insert count copies of ch at the current position. */
-  public void insertChar (int ch, int count, Object style)
+  public static final String repeatChar (int ch, int n)
   {
-    if (count <= 0)
-      return;
-    int n = count > 500 ? 500 : count;
     char[] cbuf;
     if (ch >= 0x10000)
       {
@@ -147,7 +143,16 @@ public final class Marker extends SeqPosition
             cbuf[i] = (char) ch;
           }
       }
-    String str = new String(cbuf);
+    return new String(cbuf);
+  }
+
+  /** Insert count copies of ch at the current position. */
+  public void insertChar (int ch, int count, Object style)
+  {
+    if (count <= 0)
+      return;
+    int n = count > 500 ? 500 : count;
+    String str = repeatChar(ch, n);
     for (;;)
       {
 	insert(str, style);
@@ -157,7 +162,7 @@ public final class Marker extends SeqPosition
 	if (count < 500)
 	  {
 	    n = count;
-	    str = new String(cbuf, 0, ch >= 0x10000 ? 2*n : n);
+	    str = str.substring(0, ch >= 0x10000 ? 2*n : n);
 	  }
       }
   }

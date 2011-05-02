@@ -775,8 +775,11 @@ public class Declaration
     firstCall = null;
   }
 
-  protected Declaration()
+  public Declaration (Object name, Type type)
   {
+    setName(name);
+    if (type != null)
+      setType(type);
   }
 
   public Declaration (Variable var)
@@ -787,14 +790,7 @@ public class Declaration
 
   public Declaration (Object name)
   {
-    setName(name);
-  }
-
-  public Declaration (Object name, Type type)
-  {
-    setName(name);
-    if (type != null)
-      setType(type);
+    this(name, (Type) null);
   }
 
   public Declaration (Object name, Field field)

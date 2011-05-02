@@ -2571,7 +2571,7 @@ public class Compilation implements SourceLocator
 
   public void letStart ()
   {
-    pushScope(new LetExp(null));
+    pushScope(new LetExp());
   }
 
   public Declaration letVariable (Object name, Type type, Expression init)
@@ -2585,46 +2585,30 @@ public class Compilation implements SourceLocator
   {
     LetExp let = (LetExp) current_scope;
     let.add(decl);
-    if (init != QuoteExp.undefined_exp)
-      {
-        // Use setValue rather than noteValue in case the declaration was
-        // re-purposed from some other context, like a function parameter.
-        decl.setValue(init);
-      }
+    decl.setInitValue(init);
   }
 
   public void letEnter ()
   {
     LetExp let = (LetExp) current_scope;
-    int ndecls = let.countDecls();
-    Expression[] inits = new Expression[ndecls];
-    int i = 0;
+    // Set a flag which letDone uses to check if letEnter has been called.
+    let.setFlag(Expression.VALIDATED);
     for (Declaration decl = let.firstDecl();
-	 decl != null;
-	 decl = decl.nextDecl())
+	 decl != null;  decl = decl.nextDecl())
       {
-        Expression init;
-        if (decl.nvalues == 0)
-          init = QuoteExp.undefined_exp;
-        else
-          {
-            Declaration.ValueSource sval = decl.values[0];
-            assert decl.nvalues==1 && sval.kind==Declaration.ValueSource.GENERAL_KIND;
-            init = sval.base;
-            sval.kind = Declaration.ValueSource.LET_INIT_KIND;
-            sval.base = let;
-            sval.index = i;
-          }
-        inits[i++] = init;
+        Expression init = decl.getInitValue();
+        if (init != QuoteExp.undefined_exp)
+          decl.noteValueFromLet(let);
       }
-    let.inits = inits;
     lexical.push(let);
   }
 
   public LetExp letDone (Expression body)
   {
     LetExp let = (LetExp) current_scope;
-    if (let.inits == null)
+    if (let.getFlag(Expression.VALIDATED))
+      let.setFlag(false, Expression.VALIDATED);
+    else
       letEnter();
     let.body = body;
     pop(let);
@@ -2644,11 +2628,11 @@ public class Compilation implements SourceLocator
     if (exprStack == null)
       exprStack = new Stack<Expression>();
     LambdaExp loopLambda = new LambdaExp();
-    Expression[] inits = { loopLambda };
-    LetExp let = new LetExp(inits);
+    LetExp let = new LetExp();
     String fname = "%do%loop";
     Declaration fdecl = let.addDeclaration(fname);
-    fdecl.noteValueFromLet(let, 0);
+    fdecl.setInitValue(loopLambda);
+    fdecl.noteValueFromLet(let);
     loopLambda.setName(fname);
     let.outer = current_scope;
     loopLambda.outer = let;

@@ -400,14 +400,11 @@ public class InlineCalls extends ExpExpVisitor<Type>
     if (! (exp instanceof CatchClause) && ! (exp instanceof FluidLetExp))
       valueTracker.noteUnitialized(exp);
 
-    Declaration decl = exp.firstDecl();
-    int n = exp.inits.length;
-    for (int i = 0; i < n; i++, decl = decl.nextDecl())
+    for (Declaration decl = exp.firstDecl(); decl != null; decl = decl.nextDecl())
       {
-	Expression init = exp.inits[i];
+	Expression init = decl.getInitValue();
         if (decl.nvalues > 0
             && decl.values[0].kind == Declaration.ValueSource.LET_INIT_KIND
-            && decl.values[0].index == i
             && decl.values[0].base == exp)
           {
             valueTracker.noteSet(decl, IntNum.make(~0));
@@ -418,7 +415,7 @@ public class InlineCalls extends ExpExpVisitor<Type>
           ; // defer
         else
           init = visit(init, dtype);
-	exp.inits[i] = init;
+	decl.setInitValue(init);
       }
 
     if (exitValue == null)
@@ -429,9 +426,9 @@ public class InlineCalls extends ExpExpVisitor<Type>
         Declaration d = ref.getBinding();
         if (d != null && d.context == exp && ! ref.getDontDereference())
           {
-            if (n == 1)
+            if (exp.firstDecl() == d && d.nextDecl() == null) // Single decl
               {
-                Expression init = exp.inits[0];
+                Expression init = d.getInitValue();
                 Expression texp = d.getTypeExp();
                 // Note this optimization does yield worse error messages
                 // than using CheckedTarget.  FIXME.
@@ -747,10 +744,11 @@ public class InlineCalls extends ExpExpVisitor<Type>
             System.arraycopy(args, 0, xargs, 1, args.length);
             cargs = new Expression[] { new ApplyExp(Invoke.make, xargs) };
           }
-        LetExp let = new LetExp(cargs);
+        LetExp let = new LetExp();
         for (Declaration param = lexp.firstDecl(); param != null; i++)
           {
             Declaration next = param.nextDecl();
+            param.setInitValue(cargs[i]);
             if (makeCopy)
               {
                 Declaration ldecl = let.addDeclaration(param.symbol, param.type);
@@ -773,7 +771,7 @@ public class InlineCalls extends ExpExpVisitor<Type>
                 if ( ! param.getCanWrite()) {
                   param.nvalues = 0;
                   param.values = null;
-                  param.noteValueFromLet(let, i);
+                  param.noteValueFromLet(let);
                 }
               }
             prev = param;

@@ -121,7 +121,7 @@
                 (i 0 (+ i 1)))
                ((eq? decl #!null))
              (pack (list (! get-symbol decl)
-                         (unrewrite ((@ inits exp) i))))))
+                         (unrewrite (! getInitValue decl))))))
      ,(unrewrite (@ body exp))))
 
 (define (unrewrite-quote (exp <gnu.expr.QuoteExp>))

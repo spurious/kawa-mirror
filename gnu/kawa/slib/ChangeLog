@@ -1,3 +1,7 @@
+2011-05-02  Per Bothner  <per@bothner.com>
+
+	* syntaxutils.scm (unrewrite-let): Update for new LetExp representation.
+
 2011-02-25  Jamison Hope  <jrh@theptrgroup.com>
 
 	* srfi13.scm: Fixes to allows compilation without warnings.

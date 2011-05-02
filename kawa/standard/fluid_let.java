@@ -47,8 +47,7 @@ public class fluid_let extends Syntax
   public Expression rewrite (Object bindings, Object body, Translator tr)
   {
     int decl_count = star ? 1 : LList.length (bindings);
-    Expression[] inits = new Expression[decl_count];
-    FluidLetExp let = new FluidLetExp (inits);
+    FluidLetExp let = new FluidLetExp();
     for (int i = 0; i < decl_count; i++)
       {
 	Pair bind_pair = (Pair) bindings;
@@ -107,7 +106,7 @@ public class fluid_let extends Syntax
             decl.setIndirectBinding(true);
             if (value == null)
               value = new ReferenceExp(name);
-            inits[i] = value;
+            decl.setInitValue(value);
             decl.noteValueUnknown();
             bindings = bind_pair.getCdr();
           }

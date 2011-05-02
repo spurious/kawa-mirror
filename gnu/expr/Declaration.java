@@ -85,7 +85,7 @@ public class Declaration
             int arithCount = 0;
             for (int i = 0;  i < nvalues;  i++)
               {
-                Expression vi = values[i].getValue();
+                Expression vi = values[i].getValue(this);
                 boolean arithOp = false;
                 if (vi != null && ! (vi.getFlag(Expression.VALIDATED)))
                   {
@@ -1250,6 +1250,14 @@ public class Declaration
     return null;
   }
 
+  /** Get the "initial value" expression.
+   * This is used for the initializing value in a LetExp,
+   * (FUTURE) the default value, or for pattern-matching.
+   */
+  public Expression getInitValue() { return initValue; }
+  public void setInitValue(Expression init) { this.initValue = init; }
+  private Expression initValue;
+
   ValueSource values[];
   int nvalues;
   static final ValueSource unknownValueInstance =
@@ -1292,7 +1300,7 @@ public class Declaration
         return QuoteExp.undefined_exp;
       }
     if (nvalues == 1)
-      return values[0].getValue();
+      return values[0].getValue(this);
     return null;
   }
 
@@ -1301,7 +1309,7 @@ public class Declaration
     if (nvalues == 0)
       return QuoteExp.undefined_exp;
     if (nvalues == 1)
-      return values[0].getValue();
+      return values[0].getValue(this);
     return null;
   }
 
@@ -1333,7 +1341,7 @@ public class Declaration
   {
     if (! isAlias() && nvalues == 1)
       {
-        Expression val = values[0].getValue();
+        Expression val = values[0].getValue(this);
         if (val != null && val.getClass() == LambdaExp.class)
           return (LambdaExp) val;
       }
@@ -1389,13 +1397,13 @@ public class Declaration
       }
   }
 
-  public void noteValueFromLet (LetExp letter, int index)
+  public void noteValueFromLet (LetExp letter)
   {
-    Expression init = letter.inits[index];
+    Expression init = getInitValue();
     if (init != QuoteExp.undefined_exp && values != unknownValueValues)
       {
         checkNameDecl(init);
-        noteValue(new ValueSource(ValueSource.LET_INIT_KIND, letter, index));
+        noteValue(new ValueSource(ValueSource.LET_INIT_KIND, letter, 0));
       }
   }
 
@@ -1437,7 +1445,7 @@ public class Declaration
       this.index = index;
     }
 
-    public Expression getValue ()
+    Expression getValue (Declaration decl)
     {
       switch (kind) 
         {
@@ -1448,7 +1456,7 @@ public class Declaration
         case SET_RHS_KIND:
           return ((SetExp) base).new_value;
         case LET_INIT_KIND:
-          return ((LetExp) base).inits[index];
+          return decl.getInitValue();
         case APPLY_KIND:
           ApplyExp app = (ApplyExp) base;
           int i = index;

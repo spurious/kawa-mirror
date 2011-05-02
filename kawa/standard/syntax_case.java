@@ -79,12 +79,6 @@ public class syntax_case extends Syntax
 	Expression tryMatch
 	  = new ApplyExp(new PrimProcedure(Pattern.matchPatternMethod, language), args);
 
-	int newVarCount = varCount - outerVarCount;
-	Expression[] inits = new Expression[newVarCount];
-	for (int i = newVarCount;  --i >= 0; )
-	  inits[i] = QuoteExp.undefined_exp;
-	clauseScope.inits = inits;
-
 	Expression output;
 	pair = (Pair) tail;
 	if (pair.getCdr() == LList.Empty)
@@ -112,6 +106,10 @@ public class syntax_case extends Syntax
       }
   }
 
+  private static final Method allocVars =
+    ClassType.make("kawa.lang.SyntaxPattern")
+    .getDeclaredMethod("allocVars", 2);
+
   public Expression rewriteForm (Pair form, Translator tr)
   {
     syntax_case_work work = new syntax_case_work();
@@ -119,43 +117,42 @@ public class syntax_case extends Syntax
     Object obj = form.getCdr();
     if (obj instanceof Pair && ((Pair)obj).getCdr() instanceof Pair)
       {
-	Expression[] linits = new Expression[2];
-	LetExp let = new LetExp(linits);
-	work.inputExpression = let.addDeclaration((String) null);
+        tr.letStart();
+        form = (Pair) obj;
+        work.inputExpression = tr.letVariable(null, null, tr.rewrite(form.getCar()));
+	work.inputExpression.setCanRead(true);
 
+        tr.letEnter();
+	LetExp let2 = new LetExp();
 	Declaration matchArrayOuter = tr.matchArray;
-	Declaration matchArray = let.addDeclaration((String) null);
+	Declaration matchArray = let2.addDeclaration((String) null);
 	matchArray.setType(Compilation.objArrayType);
 	matchArray.setCanRead(true);
 	tr.matchArray = matchArray;
-	work.inputExpression.setCanRead(true);
-	tr.push(let);
 
-        form = (Pair) obj;
-        linits[0] = tr.rewrite(form.getCar());
-	work.inputExpression.noteValueFromLet(let, 0);
         obj = form.getCdr();
 
 	form = (Pair) obj;
 	work.literal_identifiers
 	    = SyntaxPattern.getLiteralsList(form.getCar(), null, tr);
 	obj = form.getCdr();
-
-	let.setBody(rewriteClauses(obj, work, tr));
-	tr.pop(let);
-
-	Method allocVars = ClassType.make("kawa.lang.SyntaxPattern")
-	    .getDeclaredMethod("allocVars", 2);
-	Expression[] args = new Expression[2];
-	args[0] = new QuoteExp(IntNum.make(work.maxVars));
-	if (matchArrayOuter == null)
-	    args[1] = QuoteExp.nullExp;
-	else
-	    args[1] = new ReferenceExp(matchArrayOuter);
-	linits[1] = new ApplyExp(allocVars, args);
-	matchArray.noteValueFromLet(let, 1);
-	tr.matchArray = matchArrayOuter;
-	return let;
+        try
+          {
+            tr.push(let2);
+            let2.setBody(rewriteClauses(obj, work, tr));
+            Expression[] args = new Expression[] {
+              new QuoteExp(IntNum.make(work.maxVars)),
+              (matchArrayOuter == null ? QuoteExp.nullExp
+               : new ReferenceExp(matchArrayOuter))};
+            matchArray.setInitValue(new ApplyExp(allocVars, args));
+            matchArray.noteValueUnknown();
+            tr.pop(let2);
+            return tr.letDone(let2);
+          }
+        finally
+          {
+            tr.matchArray = matchArrayOuter;
+          }
       }
     return tr.syntaxError("insufficiant arguments to syntax-case");
   }

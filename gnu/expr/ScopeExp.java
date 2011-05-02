@@ -260,15 +260,6 @@ public abstract class ScopeExp extends Expression
     return n;
   }
 
-  public int countNonDynamicDecls ()
-  {
-    int n = 0;
-    for (Declaration decl = firstDecl(); decl != null; decl = decl.nextDecl())
-      if (! decl.getFlag(Declaration.IS_DYNAMIC))
-        n++;
-    return n;
-  }
-
   public void clearCallList ()
   {
     for (Declaration decl = firstDecl(); decl != null; decl = decl.nextDecl())

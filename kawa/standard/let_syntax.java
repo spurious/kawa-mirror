@@ -35,12 +35,11 @@ public class let_syntax extends Syntax
       return tr.syntaxError("bindings not a proper list");
     Stack renamedAliases = null;
     int renamedAliasesCount = 0;
-    Expression[] inits = new Expression[decl_count];
     Declaration[] decls = new Declaration[decl_count];
     Macro[] macros = new Macro[decl_count];
     Pair[] transformers = new Pair[decl_count];
     SyntaxForm[] trSyntax = new SyntaxForm[decl_count];
-    LetExp let = new LetExp (inits);
+    LetExp let = new LetExp();
     SyntaxForm listSyntax = null;
     for (int i = 0; i < decl_count; i++)
       {
@@ -98,7 +97,7 @@ public class let_syntax extends Syntax
         macro.setCapturedScope(bindingSyntax != null ? bindingSyntax.getScope()
                                : recursive ? let : tr.currentScope());
         decls[i] = decl;
-	inits[i] = QuoteExp.nullExp;
+	decl.setInitValue(QuoteExp.nullExp);
 	bindings = bind_pair.getCdr();
       }
     if (recursive)
@@ -109,8 +108,8 @@ public class let_syntax extends Syntax
         Macro macro = macros[i];
 	tr.currentMacroDefinition = macro;
         Expression value = tr.rewrite_car(transformers[i], trSyntax[i]);
-        inits[i] = value;
         Declaration decl = decls[i];
+        decl.setInitValue(value);
         macro.expander = value;
         decl.noteValue(new QuoteExp(macro));
         if (value instanceof LambdaExp)

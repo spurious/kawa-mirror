@@ -1,3 +1,7 @@
+2011-05-02  Per Bothner  <per@bothner.com>
+
+	* lambda.java (rewriteBody): Update for new LetExp/FluidLtExp api.
+
 2011-03-23  Per Bothner  <per@bothner.com>
 
 	* lambda.java (rewriteBody): Use letStart/letVariable

@@ -9,20 +9,18 @@ import gnu.mapping.*;
 
 public class LetExp extends ScopeExp
 {
-  public Expression[] inits;
   Expression body;
 
-  public LetExp (Expression[] i) { inits = i; }
+  public LetExp () { }
 
   public Expression getBody() { return body; }
   public void setBody(Expression body) { this.body = body; }
 
   protected boolean mustCompile () { return false; }
 
-  protected Object evalVariable (int i, CallContext ctx) throws Throwable
+  protected Object evalVariable (Declaration decl, CallContext ctx) throws Throwable
   {
-    Expression init = inits[i];
-    return init.eval(ctx);
+    return decl.getInitValue().eval(ctx);
   }
 
   public void apply (CallContext ctx) throws Throwable
@@ -53,9 +51,9 @@ public class LetExp extends ScopeExp
         for (Declaration decl = firstDecl(); decl != null;
              decl = decl.nextDecl(), i++)
           {
-            if (inits[i] == QuoteExp.undefined_exp)
+            if (decl.getInitValue() == QuoteExp.undefined_exp)
               continue;
-            Object value = evalVariable(i, ctx);
+            Object value = evalVariable(decl, ctx);
             Type type = decl.type;
             if (type != null && type != Type.pointer_type)
               value = type.coerceFromObject(value);
@@ -136,7 +134,7 @@ public class LetExp extends ScopeExp
 	store_rest (comp, i+1, decl.nextDecl());
 	if (needsInit(decl))
 	  {
-            boolean initialized = inits[i] != QuoteExp.undefined_exp;
+            boolean initialized = decl.getInitValue() != QuoteExp.undefined_exp;
 	    if (decl.isIndirectBinding())
 	      {
 		CodeAttr code = comp.getCode();
@@ -175,11 +173,10 @@ public class LetExp extends ScopeExp
 
     /* Compile all the initializations, leaving the results
        on the stack (in reverse order).  */
-    Declaration decl = firstDecl();
-    for (int i = 0; i < inits.length; i++, decl = decl.nextDecl())
+    for (Declaration decl = firstDecl(); decl != null; decl = decl.nextDecl())
       {
 	Target varTarget;
-	Expression init = inits[i];
+	Expression init = decl.getInitValue();
         boolean needsInit = needsInit(decl);
 	if (needsInit && decl.isSimple())
           decl.allocateVariable(code);
@@ -225,10 +222,9 @@ public class LetExp extends ScopeExp
 
   public <R,D> void visitInitializers (ExpVisitor<R,D> visitor, D d)
   {
-    Declaration decl = firstDecl();
-    for (int i = 0; i < inits.length; i++, decl = decl.nextDecl())
+    for (Declaration decl = firstDecl(); decl != null; decl = decl.nextDecl())
       {
-        inits[i] = visitor.visitAndUpdate(inits[i], d);
+        decl.setInitValue(visitor.visitAndUpdate(decl.getInitValue(), d));
       }
   }
 
@@ -259,7 +255,8 @@ public class LetExp extends ScopeExp
 	  out.writeSpaceFill();
 	out.startLogicalBlock("(", false, ")");
 	decl.printInfo(out);
-	if (inits != null)
+        Expression init = decl.getInitValue();
+	if (init != null)
 	  {
 	    out.writeSpaceFill();
 	    out.print('=');
@@ -268,12 +265,10 @@ public class LetExp extends ScopeExp
 	    //out.print ("<artificial>");
 	    //else
 	    {
-	      if (i >= inits.length)
-		out.print("<missing init>");
-	      else if (inits[i] == null)
+	      if (init == null)
 		out.print("<null>");
 	      else
-		inits[i].print(out);
+		init.print(out); // 
 	      i++;
 	    }
 	  }

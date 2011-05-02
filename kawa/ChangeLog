@@ -1,3 +1,16 @@
+2011-05-02  Per Bothner  <per@bothner.com>
+
+	* lang/TemplateScope.java: Remove no-longer-needed super-calls.
+	* lang/PatternScope.java: Likewise.
+	* lang/Translator.java (rewrite_body): Update for new LetExp API.
+	* standard/fluid_let.java: Likewise.
+	* standard/let_syntax.java: Likewise.
+	* lang/SyntaxPattern.java (translate): Note that pattern declarations
+	are initialized to Undefined here, instead of ...
+	* standard/syntax_case.java (rewriteClauses): No longer do it here.
+	(allocVars): Make static.
+	(rewriteForm): Update.
+
 2011-04-25  Charles Turner <chturne@gmail.com>
 	    Per Bothner  <per@bothner.com>
 

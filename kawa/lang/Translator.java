@@ -1205,7 +1205,7 @@ public class Translator extends Compilation
     // NOTE we have both a rewrite_body and a rewriteBody.
     // This is confusing, at the least.  FIXME.
     Object saved = pushPositionOf(exp);
-    LetExp defs = new LetExp(null);
+    LetExp defs = new LetExp();
     int first = formStack.size();
     defs.outer = current_scope;
     current_scope = defs;
@@ -1214,14 +1214,15 @@ public class Translator extends Compilation
         LList list = scanBody(exp, defs, true);
 	if (list.isEmpty())
 	  formStack.add(syntaxError ("body with no expressions"));
-	int ndecls = defs.countNonDynamicDecls();
-	if (ndecls != 0)
-	  {
-	    Expression[] inits = new Expression[ndecls];
-	    for (int i = ndecls;  --i >= 0; )
-	      inits[i] = QuoteExp.undefined_exp;
-	    defs.inits = inits;
-	  }
+        int ndecls = 0;
+        for (Declaration decl = defs.firstDecl(); decl != null; decl = decl.nextDecl())
+          {
+            if (! decl.getFlag(Declaration.IS_DYNAMIC))
+              {
+                ndecls++;
+                decl.setInitValue(QuoteExp.undefined_exp);
+              }
+          }
         rewriteBody(list);
 	Expression body = makeBody(first, null);
 	setLineOf(body);

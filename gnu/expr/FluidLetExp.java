@@ -12,7 +12,7 @@ import gnu.mapping.*;
 
 public class FluidLetExp extends LetExp
 {
-  public FluidLetExp (Expression[] i) { super(i); }
+  public FluidLetExp () { }
 
   protected boolean mustCompile () { return true; }
 
@@ -33,7 +33,7 @@ public class FluidLetExp extends LetExp
     Variable ctx = scope.addVariable(code, Compilation.typeCallContext, null);
     comp.loadCallContext();
     code.emitStore(ctx);
-    Variable[] save = new Variable[inits.length];
+    Variable[] save = new Variable[countDecls()];
     
     Declaration decl = firstDecl();
     doInits(decl, 0, save, comp, ctx);
@@ -41,7 +41,7 @@ public class FluidLetExp extends LetExp
     body.compileWithPosition(comp, ttarg);
     code.emitFinallyStart();
     
-    for (int i = 0; i < inits.length; i++, decl = decl.nextDecl())
+    for (int i = 0; decl != null; i++, decl = decl.nextDecl())
       {
 	decl.load(null, ReferenceExp.DONT_DEREFERENCE,
 		  comp, Target.pushObject);
@@ -59,7 +59,7 @@ public class FluidLetExp extends LetExp
   private void doInits (Declaration decl, int i, Variable[] save,
 			Compilation comp, Variable ctx)
   {
-    if (i >= inits.length)
+    if (decl == null)
       return;
     CodeAttr code = comp.getCode();
     save[i] = code.addLocal(Type.pointer_type);
@@ -68,7 +68,7 @@ public class FluidLetExp extends LetExp
 		   comp, Target.pushObject);
     code.emitDup();
     code.emitStore(decl.getVariable());
-    inits[i].compile(comp, Target.pushObject);
+    decl.getInitValue().compile(comp, Target.pushObject);
     doInits(decl.nextDecl(), i+1, save, comp, ctx);
     code.emitInvokeVirtual(Compilation.typeLocation
 			   .getDeclaredMethod("setWithSave", 1));

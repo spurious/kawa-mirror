@@ -163,10 +163,9 @@ public class FindTailCalls extends ExpExpVisitor<Expression>
   void visitLetDecls (LetExp exp)
   {
     Declaration decl = exp.firstDecl();
-    int n = exp.inits.length; 
-    for (int i = 0;  i < n;  i++, decl = decl.nextDecl())
+    for (int i = 0;  decl != null;  i++, decl = decl.nextDecl())
       {
-        Expression init = visitSetExp(decl, exp.inits[i]);
+        Expression init = visitSetExp(decl, decl.getInitValue());
         // Optimize letrec-like forms.
         if (init == QuoteExp.undefined_exp)
           {
@@ -175,7 +174,7 @@ public class FindTailCalls extends ExpExpVisitor<Expression>
                 || (value != init && value instanceof QuoteExp))
               init = value;
           }
-        exp.inits[i] = init;
+        decl.setInitValue(init);
       }
   }
 

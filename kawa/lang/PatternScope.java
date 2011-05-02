@@ -26,12 +26,13 @@ public class PatternScope extends LetExp
 
   public PatternScope ()
   {
-    super(null);
   }
 
   public static PatternScope push (Translator tr)
   {
     PatternScope newScope = new PatternScope();
+    // The actual declarations of newScope will be added later,
+    // in SyntaxPattern#translate.
     PatternScope oldScope = tr.patternScope;
     newScope.previousSyntax = oldScope;
     tr.patternScope = newScope;

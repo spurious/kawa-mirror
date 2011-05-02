@@ -12,13 +12,6 @@ public class CatchClause extends LetExp
 
   public CatchClause ()
   {
-    super(new Expression[] { QuoteExp.voidExp });
-  }
-
-  public CatchClause (Object name, ClassType type)
-  {
-    this();
-    addDeclaration (name, type);
   }
 
   /** "Convert" a <code>LambdaExp</code> to a <code>CatchClause</code>. */
@@ -26,6 +19,7 @@ public class CatchClause extends LetExp
   {
     this();
     Declaration decl = lexp.firstDecl();
+    decl.setInitValue(QuoteExp.voidExp);
     lexp.remove(null, decl);
     add(decl);
     body = lexp.body;
@@ -39,7 +33,8 @@ public class CatchClause extends LetExp
 
   protected boolean mustCompile () { return false; }
 
-  protected Object evalVariable (int i, CallContext ctx) throws Throwable
+  protected Object evalVariable (Declaration decl, CallContext ctx)
+    throws Throwable
   {
     // This is the Throwable caught and set by TryExpr.apply.
     return ctx.value1;

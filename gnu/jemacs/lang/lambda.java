@@ -70,8 +70,7 @@ public class lambda extends Lambda
 
     if (fluidBindings && decl_count > 0)
       {
-	Expression[] inits = new Expression[decl_count];
-	let = new FluidLetExp (inits);
+	let = new FluidLetExp();
 	i = 0;
 	for (Declaration arg = lexp.firstDecl();  arg != null;
 	     arg = arg.nextDecl(), i++)
@@ -81,8 +80,9 @@ public class lambda extends Lambda
 	    decl.setFluid(true);
             decl.setFlag(Declaration.IS_DYNAMIC); // Turn off warning.
 	    decl.setIndirectBinding(true);
-	    inits[i] = new ReferenceExp(arg);
-	    decl.noteValue(inits[i]);
+	    Expression init = new ReferenceExp(arg);
+            decl.setInitValue(init);
+	    decl.noteValue(init);
 	  }
 	tr.push(let);
 	let.setBody(tr.rewrite_body(body));

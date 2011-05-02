@@ -1,5 +1,23 @@
 2011-05-01  Per Bothner  <per@bothner.com>
 
+	* Declaration.java (initValue): Field new,
+	(getInitValue, setInitValue): New methods.
+	(ValueSource.getValue): Take declaration parameter. Make non-public.
+	* LetExp.java (init): Remove field.  Instead use Declaration's
+	initValue field.
+	(<init>): Update to not take init array.
+	(evalVariable): Take declarations rather than index.
+	(apply, store_rest, compile, visitInitializers, print): Update.
+	* Compilation.java (letStart, letVariable, letEnter, loopStart):
+	Update for new LetExp representation.
+	(letEnter, letDone): Change how to detect if letEnter has been called.
+	* FindTailCalls.java (visitLetExp): Update for LetExp changes.
+	* FindCapturedVars.java (visitLetExp): Likewise.
+	* InlineCalls.java (visitLetExp, inlineCall): Likewise.
+	* CatchClause.java: Update to match super-class changes.
+	* FluidLetExp.java: Likewise.
+	* ScopeExp.java (countNonDynamicDecls): Remove no-longer-used method.
+
 	* Declaration.java (<init>): Remove unused protected constructor.
 	Implement others in terms of (Object,Type)-taking constructor.
 

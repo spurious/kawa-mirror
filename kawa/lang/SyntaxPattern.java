@@ -372,6 +372,7 @@ public class SyntaxPattern extends Pattern implements Externalizable
 	    int n = (nesting << 1) + (matchCar ? 1 : 0);
 	    patternScope.patternNesting.append((char) n);
             Declaration decl = patternScope.addDeclaration(pattern);
+            decl.setInitValue(QuoteExp.undefined_exp);
             decl.setLocation(tr);
 	    tr.push(decl);
 	    addInt(program, (i << 3) | (matchCar ? MATCH_ANY_CAR : MATCH_ANY));

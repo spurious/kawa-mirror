@@ -195,13 +195,11 @@ public class FindCapturedVars extends ExpExpVisitor<Void>
 	// a field with the declaration (see LambdaExp.allocFieldField),
 	// since assigning the nullExp can clobber the field after it has
 	// been initialized with a ModuleMethod.
-	Expression[] inits = exp.inits;
-	int len = inits.length;
 	Expression[] exps = ((BeginExp) exp.body).exps;
 	int init_index = 0;
 	Declaration decl = exp.firstDecl();
 	for (int begin_index = 0;
-	     begin_index < exps.length && init_index < len;
+	     begin_index < exps.length && decl != null;
 	     begin_index++)
 	  {
 	    Expression st = exps[begin_index];
@@ -209,7 +207,7 @@ public class FindCapturedVars extends ExpExpVisitor<Void>
 	      {
 		SetExp set = (SetExp) st;
 		if (set.binding == decl
-		    && inits[init_index] == QuoteExp.nullExp
+		    && decl.getInitValue() == QuoteExp.nullExp
 		    && set.isDefining())
 		  {
 		    Expression new_value = set.new_value;
@@ -217,7 +215,7 @@ public class FindCapturedVars extends ExpExpVisitor<Void>
 			 || new_value instanceof LambdaExp)
 			&& decl.getValue() == new_value)
 		      {
-			inits[init_index] = new_value;
+			decl.setInitValue(new_value);
 			exps[begin_index] = QuoteExp.voidExp;
 		      }
 		    init_index++;

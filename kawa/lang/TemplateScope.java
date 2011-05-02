@@ -20,12 +20,10 @@ public class TemplateScope extends LetExp implements Externalizable
 
   public TemplateScope ()
   {
-    super(null);
   }
 
   public TemplateScope (ScopeExp outer)
   {
-    super(null);
     this.outer = outer;
   }
 

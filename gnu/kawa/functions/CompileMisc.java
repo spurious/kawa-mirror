@@ -668,37 +668,29 @@ public class CompileMisc implements Inlineable
     // so inside loop, since that turns a "read" info a "call", which
     // may allow better inlining.
     boolean procSafeForMultipleEvaluation = ! proc.side_effects();
+    Compilation comp = visitor.getCompilation();
 
     // First an outer (let ((%proc PROC)) L2), where PROC is args[0].
-    Expression[] inits1 = new Expression[1];
-    inits1[0] = proc;
-    LetExp let1 = new LetExp(inits1);
-    Declaration procDecl
-      = let1.addDeclaration("%proc", Compilation.typeProcedure);
-    procDecl.noteValue(args[0]);
+    comp.letStart();
+    Declaration procDecl = comp.letVariable("%proc", Compilation.typeProcedure,
+                                            proc);
 
     // Then an inner L2=(let ((%loop (lambda (argi ...) ...))) (%loop ...))
-    Expression[] inits2 = new Expression[1];
-    LetExp let2 = new LetExp(inits2);
-    let1.setBody(let2);
+    comp.letStart();
     LambdaExp lexp = new LambdaExp(collect ? nargs + 1 : nargs);
-    inits2[0] = lexp;
-    Declaration loopDecl = let2.addDeclaration("%loop");
-    loopDecl.noteValue(lexp);
+    Declaration loopDecl = comp.letVariable("%loop", null, lexp);
+    comp.letEnter();
 
     // Finally an inner L3=(let ((parg1 (as <pair> arg1)) ...) ...)
-    Expression[] inits3 = new Expression[nargs];
-    LetExp let3 = new LetExp(inits3);
-
+    comp.letStart();
     Declaration[] largs = new Declaration[nargs];
     Declaration[] pargs = new Declaration[nargs];
     for (int i = 0;  i < nargs;  i++)
       {
 	String argName = "arg"+i;
 	largs[i] = lexp.addDeclaration(argName);
-	pargs[i] = let3.addDeclaration(argName, Compilation.typePair);
-	inits3[i] = new ReferenceExp(largs[i]);
-	pargs[i].noteValue(inits3[i]);
+	pargs[i] = comp.letVariable(argName, Compilation.typePair,
+                                    new ReferenceExp(largs[i]));
       }
     Declaration resultDecl = collect ? lexp.addDeclaration("result") : null;
     Expression[] doArgs = new Expression[1+nargs];
@@ -722,9 +714,7 @@ public class CompileMisc implements Inlineable
 						 "make", consArgs);
       }
     Expression rec = visitor.visitApplyOnly(new ApplyExp(new ReferenceExp(loopDecl), recArgs), null);
-    lexp.body = collect ? rec : new BeginExp(doit, rec);
-    let3.setBody(lexp.body);
-    lexp.body = let3;
+    lexp.body = comp.letDone(collect ? rec : new BeginExp(doit, rec));
     Expression[] initArgs = new Expression[collect ? nargs + 1 : nargs];
     QuoteExp empty = new QuoteExp(LList.Empty);
     for (int i = nargs;  --i >= 0; )
@@ -750,7 +740,8 @@ public class CompileMisc implements Inlineable
 	body = Invoke.makeInvokeStatic(Compilation.scmListType,
 				       "reverseInPlace", reverseArgs);
       }
-    let2.setBody(body);
+    LetExp let2 = comp.letDone(body);
+    LetExp let1 = comp.letDone(let2);
 
     if (procSafeForMultipleEvaluation)
       return let2;

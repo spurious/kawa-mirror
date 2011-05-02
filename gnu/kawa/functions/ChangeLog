@@ -1,6 +1,7 @@
-2011-04-18  Per Bothner  <per@bothner.com>
+2011-05-02  Per Bothner  <per@bothner.com>
 
-	* 
+	* CompileMisc.java (validateApplyMap): Use the letStart/letVariable/etc
+	methods for creating LetExps.
 
 2011-04-16  Per Bothner  <per@bothner.com>
 

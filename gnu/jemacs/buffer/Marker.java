@@ -1,6 +1,7 @@
 package gnu.jemacs.buffer;
 import gnu.lists.*;
 import gnu.mapping.*;
+import gnu.expr.*;
 
 public final class Marker extends SeqPosition
 {
@@ -31,6 +32,97 @@ public final class Marker extends SeqPosition
     this.buffer = buffer;
   }
 
+  public String evalLastSexp()
+  {
+    int leftparen = 0;
+    int rightparen = 0;
+    int quotecount = 0;
+    Language language = Language.getDefaultLanguage();
+    StringBuilder sb = new StringBuilder();
+    boolean inString = false;
+    boolean inParen = false;
+    boolean inNumber = false;
+    boolean inOther = false;
+    boolean skipChar = false;
+    boolean numberFinished = false;
+    boolean finished = false;
+    if (this.buffer.getDot() == 0)
+      {
+        return "End of file during parsing";
+      }
+    for (int i=buffer.getDot()-1; i >= 0; i--)
+      {
+        char c = buffer.charAt(i);
+        if (Character.isWhitespace(c) && !inParen)
+          {
+            finished = true;
+          }
+        else if (c == '\"' && !inParen && !inNumber)
+          {
+            if (i > 0)
+              {
+                if (buffer.charAt(i-1) != '\\')
+                  {
+                    quotecount++;
+                    inString = !inString;
+                  }
+              }
+            else
+              {
+                quotecount++;
+                inString = !inString;
+              }
+          }
+        else if (Character.isDigit(c) && !inParen && !inString)
+          {
+            inNumber = false;
+          }
+        else if (inNumber && Character.isWhitespace(c))
+          {
+            inNumber = false;
+            numberFinished = true;
+          }
+        else if (c == ')')
+          {
+            if (inOther)
+              {
+                finished = true;
+                inOther = false;
+                skipChar = true;
+              }
+            else
+              {
+                rightparen++;
+                inParen = true;
+              }
+          }
+        else if (c == '(')
+          {
+            leftparen++;
+          }
+        else if (!inParen && !inString)
+          {
+            inOther = true;
+          }
+        if (!skipChar)
+          sb.insert(0,c);
+        if  ((quotecount == 2) || (rightparen != 0 && rightparen == leftparen) | i == 0 || numberFinished || finished)
+          {
+            try
+              {
+                return language.eval(sb.toString()).toString();
+              }
+            catch (Throwable ex)
+              {
+                return "Lisp error: " + ex;
+              }
+          }
+      }
+    return "";
+  }
+
+
+
   public int getOffset()
   {
     if (buffer == null)
@@ -48,6 +140,11 @@ public final class Marker extends SeqPosition
   public Buffer getBuffer()
   {
     return buffer;
+  }
+
+  public void setBuffer(Buffer buf)
+  {
+    this.buffer = buf;
   }
 
   public void setDot(int newPosition)

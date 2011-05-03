@@ -1,3 +1,7 @@
+2011-05-02  Shad Gregory <captshadg@gmail.com>
+
+	* SwingFrame.java (showInfoMessage): New method.
+
 2011-04-15  Per Bothner  <per@bothner.com>
 
 	* SwingWindow.java (setSelected): Check if jtextpane is null.

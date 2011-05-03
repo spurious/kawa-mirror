@@ -1,3 +1,10 @@
+2011-05-02  Shad Gregory <captshadg@gmail.com>
+
+	* EFrame.java (showInfoMessage): New method.
+	* Marker.java (evalLastSexp): New method.
+	* emacs.scm (message, eval-last-sexp): New methods.
+	(global-map): Map "\C-x\C-e" to eval-last-sexp.
+
 2011-05-01  Shad Gregory <captshadg@gmail.com>
 	    Per Bothner  <per@bothner.com>
 

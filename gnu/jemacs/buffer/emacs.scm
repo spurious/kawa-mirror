@@ -23,6 +23,9 @@
 
 ;;; MINIBUFFERS
 
+(define (message msg) :: <string>
+  ((window-frame):showInfoMessage msg) msg)
+
 (define (read-dialog prompt) :: <string>
   ((window-frame):ask prompt))
 
@@ -142,6 +145,10 @@
 
 ;;; BUFFERS
 
+(define (eval-last-sexp #!optional (marker :: <marker> (make-marker)))
+  (invoke marker 'setBuffer (current-buffer))
+  (message
+   (invoke marker 'evalLastSexp)))
 (define (pop-to-buffer buffer
 		       #!optional (not-this-window-p :: <boolean>)
 		       (on-frame :: <frame> #!null))
@@ -523,6 +530,7 @@
 (define-key global-map "\C-f" forward-char)
 (define-key global-map "\C-x\C-w" write-file)
 (define-key global-map "\C-x\C-s" save-buffer)
+(define-key global-map "\C-x\C-e" eval-last-sexp)
 (define-key global-map "\C-x0" delete-window)
 (define-key global-map "\C-x1" delete-other-windows)
 (define-key global-map "\C-x2" split-window-vertically)

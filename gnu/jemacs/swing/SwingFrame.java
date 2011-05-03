@@ -60,6 +60,11 @@ public class SwingFrame extends EFrame
     JOptionPane.showMessageDialog(jframe, aboutMessage());
   }
 
+  public void showInfoMessage(String msg) 
+  {
+    JOptionPane.showMessageDialog(jframe, msg);
+  }
+
   public String ask(String prompt)
   {
     String result = JOptionPane.showInputDialog(jframe, prompt);

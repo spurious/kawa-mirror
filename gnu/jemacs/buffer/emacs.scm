@@ -24,7 +24,8 @@
 ;;; MINIBUFFERS
 
 (define (message msg) :: <string>
-  ((window-frame):showInfoMessage msg) msg)
+  ((window-frame):showInfoMessage msg)
+  msg)
 
 (define (read-dialog prompt) :: <string>
   ((window-frame):ask prompt))

@@ -1,3 +1,9 @@
+2011-05-13  Per Bothner  <per@bothner.com>
+
+	* lang/Lambda.java (rewriteWrite): Skip the initial pass to count
+	formals - instead just use use a sinle pass.
+	Also, make more robust for some errors.
+
 2011-05-02  Per Bothner  <per@bothner.com>
 
 	* lang/TemplateScope.java: Remove no-longer-needed super-calls.

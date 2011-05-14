@@ -5,6 +5,7 @@ import gnu.lists.*;
 import gnu.bytecode.Type;
 import gnu.kawa.functions.Convert;
 import gnu.kawa.lispexpr.LangObjType;
+import java.util.ArrayList;
 
 /**
  * The Syntax transformer that re-writes the lambda builtin.
@@ -75,117 +76,16 @@ public class Lambda extends Syntax
         if (filename != null && line > 0)
           lexp.setSourceLocation(filename, line);
       }
-    /* Count formals, while checking that the syntax is OK. */
     Object bindings = formals;
     int opt_args = -1;
     int rest_args = -1;
     int key_args = -1;
     Pair pair;
-    for (; ;  bindings = pair.getCdr())
-      {
-	if (bindings instanceof SyntaxForm)
-	  {
-	    SyntaxForm sf = (SyntaxForm) bindings;
-	    // FIXME
-	    bindings = sf.getDatum();
-	  }
-	if (! (bindings instanceof Pair))
-	  break;
-	pair = (Pair) bindings;
-        // An initial pass to count the parameters.
-	Object pair_car = pair.getCar();
-	if (pair_car instanceof SyntaxForm)
-	  pair_car = ((SyntaxForm) pair_car).getDatum();
-	if (pair_car == optionalKeyword)
-	  {
-	    if (opt_args >= 0)
-	      {
-		tr.syntaxError ("multiple "+optionalKeyword+" in parameter list");
-		return;
-	      }
-	    else if (rest_args >= 0 || key_args >= 0)
-	      {
-		tr.syntaxError (optionalKeyword.toString()+" after " + restKeyword + " or " + keyKeyword);
-		return;
-	      }
-	    opt_args = 0;
-	  }
-	else if (pair_car == restKeyword)
-	  {
-	    if (rest_args >= 0)
-	      {
-		tr.syntaxError ("multiple " + restKeyword
-                                + " in parameter list");
-		return;
-	      }
-	    else if (key_args >= 0)
-	      {
-		tr.syntaxError (restKeyword.toString()
-                                + " after " + keyKeyword);
-		return;
-	      }
-	    rest_args = 0;
-	  }
-	else if (pair_car == keyKeyword)
-	  {
-	    if (key_args >= 0)
-	      {
-		tr.syntaxError ("multiple " + keyKeyword
-                                + " in parameter list");
-		return;
-	      }
-	    key_args = 0;
-	  }
-        else if (tr.matches(pair.getCar(), "::") && pair.getCdr() instanceof Pair)
-          pair = (Pair) pair.getCdr();
-	else if (key_args >= 0)
-	  key_args++;
-	else if (rest_args >= 0)
-	  rest_args++;
-	else if (opt_args >= 0)
-	  opt_args++;
-	else
-	  lexp.min_args++;
-	bindings = pair.getCdr();
-      }
-    if (bindings instanceof Symbol)
-      {
-	if (opt_args >= 0 || key_args >= 0 || rest_args >= 0)
-	  {
-	    tr.syntaxError ("dotted rest-arg after " + optionalKeyword
-                            +", " + restKeyword + ", or " + keyKeyword);
-	    return;
-	  }
-	rest_args = 1;
-      }
-    else if (bindings != LList.Empty)
-      {
-	tr.syntaxError ("misformed formals in lambda");
-	return;
-      }
-    if (rest_args > 1)
-      {
-	tr.syntaxError ("multiple " + restKeyword + " parameters");
-        return;
-      }
-    if (opt_args < 0)
-      opt_args = 0;
-    if (rest_args < 0)
-      rest_args = 0;
-    if (key_args < 0)
-      key_args = 0;
-    if (rest_args > 0)
-      lexp.max_args = -1;
-    else   // Is this useful?
-      lexp.max_args = lexp.min_args + opt_args + 2 * key_args;
-    if (opt_args + key_args > 0)
-      lexp.defaultArgs = new Expression[opt_args + key_args];
-    if (key_args > 0)
-      lexp.keywords = new Keyword[key_args];
-
     bindings = formals;
-    opt_args = 0;
-    key_args = 0;
+    opt_args = -1;
+    key_args = -1;
+    ArrayList<Expression> defaultArgs = null;
+    ArrayList<Keyword> keywords = null;
     Object mode = null;
     for (; ;  bindings = pair.getCdr())
       {
@@ -197,9 +97,9 @@ public class Lambda extends Syntax
 	    // as well as the cdr - i.e. the remaining bindings.
 	    templateScopeRest = sf.getScope();
 	  }
-	TemplateScope templateScope = templateScopeRest;
 	if (! (bindings instanceof Pair))
 	  break;
+	TemplateScope templateScope = templateScopeRest;
 	pair = (Pair) bindings;
 	Object pair_car = pair.getCar();
 	if (pair_car instanceof SyntaxForm)
@@ -208,6 +108,39 @@ public class Lambda extends Syntax
 	    pair_car = sf.getDatum();
 	    templateScope = sf.getScope();
 	  }
+	if (pair_car == optionalKeyword)
+	  {
+	    if (opt_args >= 0)
+              tr.syntaxError ("multiple "+optionalKeyword+" keywords in parameter list");
+	    else if (rest_args >= 0 || key_args >= 0)
+              tr.syntaxError (optionalKeyword.toString()+" after " + restKeyword + " or " + keyKeyword);
+	    opt_args = 0;
+	  }
+	else if (pair_car == restKeyword)
+	  {
+	    if (rest_args >= 0)
+              tr.syntaxError ("multiple " + restKeyword
+                              + " keywords in parameter list");
+	    else if (key_args >= 0)
+              tr.syntaxError (restKeyword.toString()
+                              + " after " + keyKeyword);
+	    rest_args = 0;
+	  }
+	else if (pair_car == keyKeyword)
+	  {
+	    if (key_args >= 0)
+              tr.syntaxError ("multiple " + keyKeyword
+                              + " keywords in parameter list");
+	    key_args = 0;
+	  }
+	else if (key_args >= 0)
+	  key_args++;
+	else if (rest_args >= 0)
+	  rest_args++;
+	else if (opt_args >= 0)
+	  opt_args++;
+	else
+	  lexp.min_args++;
 	if (pair_car == optionalKeyword
 	    || pair_car == restKeyword || pair_car == keyKeyword)
 	  {
@@ -222,7 +155,7 @@ public class Lambda extends Syntax
 	if (tr.matches(pair_car, "::"))
 	  {
 	    tr.syntaxError("'::' must follow parameter name");
-	    return;
+            break;
 	  }
         pair_car = tr.namespaceResolve(pair_car);
 	if (pair_car instanceof Symbol)
@@ -231,11 +164,12 @@ public class Lambda extends Syntax
             if (pair.getCdr() instanceof Pair
                 && tr.matches((p = (Pair) pair.getCdr()).getCar(), "::"))
               {
-                if (! (pair.getCdr() instanceof Pair))
+                if (! (p.getCdr() instanceof Pair))
                   {
                     tr.syntaxError("'::' not followed by a type specifier"
                                    + " (for parameter '" + name + "')");
-                    return;
+                    bindings = LList.Empty;
+                    break;
                   }
                 p = (Pair) p.getCdr();
                 typeSpecPair = p;
@@ -264,7 +198,7 @@ public class Lambda extends Syntax
 		      {
 			tr.syntaxError("'::' not followed by a type specifier"
 				       + " (for parameter '" + name + "')");
-			return;
+                        break;
 		      }
 		    p = (Pair) p.getCdr();
 		    typeSpecPair = p;
@@ -276,7 +210,7 @@ public class Lambda extends Syntax
 		      {
 			tr.syntaxError("improper list in specifier for parameter '"
 				       + name + "')");
-			return;
+                        break;
 		      }
 		  }
 		if (p != null && mode != null)
@@ -290,7 +224,7 @@ public class Lambda extends Syntax
 		      {
 			tr.syntaxError("improper list in specifier for parameter '"
 				       + name + "')");
-			return;
+                        break;
 		      }
 		  }
 		if (p != null)
@@ -299,14 +233,14 @@ public class Lambda extends Syntax
 		      {
 			tr.syntaxError("duplicate type specifier for parameter '"
 				       + name + '\'');
-			return;
+                        break;
 		      }
 		    typeSpecPair = p;
 		    if (p.getCdr() != LList.Empty)
 		      {
 			tr.syntaxError("junk at end of specifier for parameter '"
 				       + name + '\''+" after type "+p.getCar());
-			return;
+			break;
 		      }
 		  }
 	      }
@@ -314,14 +248,20 @@ public class Lambda extends Syntax
 	if (name == null)
 	  {
 	    tr.syntaxError ("parameter is neither name nor (name :: type) nor (name default)"+": "+pair);
-	    return;
+            break;
 	  }
 	if (mode == optionalKeyword || mode == keyKeyword)
-	  lexp.defaultArgs[opt_args++] = new LangExp(defaultValue);
-	if (mode == keyKeyword)
-	  lexp.keywords[key_args++]
-	    = Keyword.make(name instanceof Symbol ? ((Symbol) name).getName()
-			   : name.toString());
+          {
+            if (defaultArgs == null)
+              defaultArgs = new ArrayList<Expression>();
+            defaultArgs.add(new LangExp(defaultValue));
+            if (mode == keyKeyword)
+              {
+                if (keywords == null)
+                  keywords = new ArrayList<Keyword>();
+              keywords.add(Keyword.make(name instanceof Symbol ? ((Symbol) name).getName() : name.toString()));
+              }
+      }
 	Declaration decl = new Declaration(name);
 	Translator.setLine(decl, bindings);
 	if (typeSpecPair != null)
@@ -343,12 +283,44 @@ public class Lambda extends Syntax
       }
     if (bindings instanceof Symbol)
       {
-	Declaration decl = new Declaration(bindings);
-        decl.setType(LangObjType.listType);
-        decl.setFlag(Declaration.IS_SINGLE_VALUE);
-	decl.noteValueUnknown();
-	addParam(decl, templateScopeRest, lexp, tr);
+	if (opt_args >= 0 || key_args >= 0 || rest_args >= 0)
+	  {
+	    tr.syntaxError ("dotted rest-arg after " + optionalKeyword
+                            +", " + restKeyword + ", or " + keyKeyword);
+	  }
+        else
+          {
+            rest_args = 1;
+            Declaration decl = new Declaration(bindings);
+            decl.setType(LangObjType.listType);
+            decl.setFlag(Declaration.IS_SINGLE_VALUE);
+            decl.noteValueUnknown();
+            addParam(decl, templateScopeRest, lexp, tr);
+          }
       }
+    else if (bindings != LList.Empty)
+      {
+	tr.syntaxError ("misformed formals in lambda");
+      }
+    if (rest_args > 1)
+      {
+	tr.syntaxError ("multiple " + restKeyword + " parameters");
+        rest_args = 1;
+      }
+    if (opt_args < 0)
+      opt_args = 0;
+    if (rest_args < 0)
+      rest_args = 0;
+    if (key_args < 0)
+      key_args = 0;
+    if (rest_args > 0)
+      lexp.max_args = -1;
+    else   // Is this useful?
+      lexp.max_args = lexp.min_args + opt_args + 2 * key_args;
+    if (defaultArgs != null)
+      lexp.defaultArgs = defaultArgs.toArray(new Expression[defaultArgs.size()]);
+    if (keywords != null)
+      lexp.keywords = keywords.toArray(new Keyword[keywords.size()]);
   }
 
   private static void addParam (Declaration decl, ScopeExp templateScope,

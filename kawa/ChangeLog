@@ -1,3 +1,8 @@
+2011-06-07  Per Bothner  <per@bothner.com>
+
+	* lang/Promise.java: Make thread-safe - hopefully.
+	Handle the case where expression returns null or an actual Throwable.
+
 2011-05-13  Per Bothner  <per@bothner.com>
 
 	* lang/Lambda.java (rewriteWrite): Skip the initial pass to count

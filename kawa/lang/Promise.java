@@ -11,8 +11,9 @@ public class Promise implements Printable
 {
   Procedure thunk;
 
-  /** The result - or null if it is not ready. */
-  Object result;
+  /** The result - or UNBOUND if it is not ready. */
+  private volatile Object result = Location.UNBOUND;
+  private Throwable throwable;
 
   /** Create a new Promise that will evaluate thunk when forced. */
   public Promise (Procedure thunk)
@@ -22,11 +23,28 @@ public class Promise implements Printable
 
   public Object force () throws Throwable
   {
-    if (result == null)
+    // Doesn't reliably work on JDK4 or earlier, but works on JDK5 or later.
+    // http://www.cs.umd.edu/~pugh/java/memoryModel/DoubleCheckedLocking.html
+    if (result == Location.UNBOUND)
       {
-	Object x = thunk.apply0 ();
-	if (result == null)
-	  result = x;
+        synchronized (this)
+          {
+            if (result == Location.UNBOUND && throwable == null)
+              {
+                try
+                  {
+                    Object x = thunk.apply0 ();
+                    if (result == Location.UNBOUND)
+                      result = x;
+                  }
+                catch (Throwable ex)
+                  {
+                    throwable = ex;
+                  }
+              }
+            if (throwable != null)
+              throw throwable;
+          }
       }
     return result;
   }
@@ -46,12 +64,27 @@ public class Promise implements Printable
 
   public void print (Consumer out)
   {
-    if (result == null)
-      out.write("#<promise - not forced yet>");
+    Object r = result;
+    if (r == Location.UNBOUND)
+      {
+        synchronized (this)
+          {
+            if (throwable != null)
+              {
+                out.write("#<promise - force threw a ");
+                out.write(throwable.getClass().getName());
+                out.write('>');
+              }
+            else
+              out.write("#<promise - not forced yet>");
+          }
+      }
+    else if (r == null)
+      out.write("#<promise - forced to null>");
     else
       {
 	out.write("#<promise - forced to a ");
-	out.write(result.getClass().getName());
+	out.write(r.getClass().getName());
 	out.write ('>');
       }
   }

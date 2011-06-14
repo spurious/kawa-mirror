@@ -1,3 +1,8 @@
+2011-06-14  Per Bothner  <per@bothner.com>
+
+	* misc.scm: Update package for class Promise.
+	* std_syntax.scm: Likewise.
+
 2011-04-10  Per Bothner  <per@bothner.com>
 
 	* rnrs/hashtables.scm (make-hashtable): Fix order of parameters

@@ -1,3 +1,7 @@
+2011-06-14  Per Bothner  <per@bothner.com>
+
+	* Promise.java: Moved here from kawa.lang.
+
 2011-04-25  Charles Turner  <chturne@gmail.com>
 	    Per Bothner  <per@bothner.com>
 

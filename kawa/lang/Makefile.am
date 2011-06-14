@@ -32,7 +32,6 @@ AutoloadSyntax.java \
 CompileFile.java \
 SyntaxForm.java \
 SyntaxForms.java \
-Promise.java \
 Record.java GetFieldProc.java SetFieldProc.java RecordConstructor.java \
 $(EXCEPTIONS)
 

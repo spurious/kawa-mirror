@@ -96,7 +96,7 @@
    (after)))
 
 (define (force arg)
-  (kawa.lang.Promise:force arg))
+  (gnu.mapping.Promise:force arg))
 
 ;;; The one-argument case is a standard DSSSL procedure.
 ;;; The multi-argument extension matches Guile.

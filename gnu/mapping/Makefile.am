@@ -37,6 +37,7 @@ java_sources=\
   Procedure4.java \
   ProcedureN.java \
   ProcLocation.java \
+  Promise.java \
   PropertyKey.java \
   PropertyLocation.java \
   PropertySet.java \

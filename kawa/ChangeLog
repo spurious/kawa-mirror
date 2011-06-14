@@ -1,3 +1,7 @@
+2011-06-14  Per Bothner  <per@bothner.com>
+
+	* lang/Promise.java: Moved from here to gnu.mapping.
+
 2011-06-07  Per Bothner  <per@bothner.com>
 
 	* lang/Promise.java: Make thread-safe - hopefully.

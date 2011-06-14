@@ -236,7 +236,7 @@
 
 (define-syntax delay (syntax-rules ()
 				   ((delay expression)
-				    (make <kawa.lang.Promise> (lambda () expression)))))
+				    (make gnu.mapping.Promise (lambda () expression)))))
 
 (define-syntax define-procedure
   (syntax-rules (:: <gnu.expr.GenericProc>)

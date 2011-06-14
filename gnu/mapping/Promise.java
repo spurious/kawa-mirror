@@ -1,5 +1,4 @@
-package kawa.lang;
-import gnu.mapping.*;
+package gnu.mapping;
 import gnu.text.Printable;
 import gnu.lists.Consumer;
 

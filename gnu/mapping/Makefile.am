@@ -14,6 +14,7 @@ java_sources=\
   InheritingEnvironment.java \
   InPort.java \
   KeyPair.java \
+  Lazy.java \
   LazyPropertyKey.java \
   Location.java \
   LocationEnumeration.java \

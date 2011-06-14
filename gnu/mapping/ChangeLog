@@ -1,5 +1,14 @@
 2011-06-14  Per Bothner  <per@bothner.com>
 
+	* Lazy.java: New interface.
+	* Makefile.am: Update accordingly.
+	* Promise.java: Implement Lazy.
+	(force): Change to use Lazy.  Force repeatedly.
+	* Future.java: Implement Lazy.
+	* RunnableClosure.java: Make generic.
+
+2011-06-14  Per Bothner  <per@bothner.com>
+
 	* Promise.java: Moved here from kawa.lang.
 
 2011-04-25  Charles Turner  <chturne@gmail.com>

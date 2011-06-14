@@ -1,24 +1,24 @@
 package gnu.mapping;
 
-public class Future extends Thread
+public class Future<T> extends Thread implements Lazy<T>
                     // FUTURE: implements java.util.concurrent.Future
 {
-  public RunnableClosure closure;
+  public RunnableClosure<T> closure;
 
   public Future (Procedure action, CallContext parentContext)
   {
-    closure = new RunnableClosure (action, parentContext);
+    closure = new RunnableClosure<T> (action, parentContext);
   }
 
   public Future (Procedure action,
 		 InPort in, OutPort out, OutPort err)
   {
-    closure = new RunnableClosure (action, in, out, err);
+    closure = new RunnableClosure<T> (action, in, out, err);
   }
 
   public Future (Procedure action)
   {
-    closure = new RunnableClosure(action);
+    closure = new RunnableClosure<T>(action);
   }
 
   public static Future make (Procedure action, Environment penvironment,
@@ -44,7 +44,7 @@ public class Future extends Thread
     closure.run();
   }
 
-  public Object waitForResult ()  throws Throwable
+  public T force ()  throws Throwable
   {
     try
       {

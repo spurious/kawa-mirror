@@ -1,6 +1,7 @@
 (module-static #f)
 (module-export my-factorial list-length-2 deldup call-to-first
 	       date mod1-v5 <simpleAux> 
+               counter counter-macro
 	       test1-import0 mod0-v1 mod0-v2 mod0-v3 mod0-f1 mod0-m1
 	       namespace-syntax-test make-array make-array-fun mA)
 (require <module0>)
@@ -63,3 +64,7 @@
     ((_ type forms ...)
      (define-simple-class type ()
        forms ...))))
+
+;; Andre van Tonder <andre@het.brown.edu> example in posting 2011-04-19.
+(define counter (let ((n 0)) (lambda () (set! n (+ n 1)) n)))
+(define-syntax counter-macro (syntax-rules () ((_) (counter))))

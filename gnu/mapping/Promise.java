@@ -6,7 +6,7 @@ import gnu.lists.Consumer;
  * @author Per Bothner
  */
 
-public class Promise implements Printable
+public class Promise<T> implements Printable, Lazy<T>
 {
   Procedure thunk;
 
@@ -20,7 +20,7 @@ public class Promise implements Printable
     this.thunk = thunk;
   }
 
-  public Object force () throws Throwable
+  public T force () throws Throwable
   {
     // Doesn't reliably work on JDK4 or earlier, but works on JDK5 or later.
     // http://www.cs.umd.edu/~pugh/java/memoryModel/DoubleCheckedLocking.html
@@ -45,20 +45,29 @@ public class Promise implements Printable
               throw throwable;
           }
       }
-    return result;
+    return (T) result;
   }
 
-  public static Object force (Object arg) throws Throwable
+  public static Object force (Object arg)
   {
-    if (arg instanceof Promise)
-      return ((Promise) arg).force();
-    if (arg instanceof gnu.mapping.Future)
-      return ((gnu.mapping.Future) arg).waitForResult();
-    /* #ifdef JAVA5 */
-    if (arg instanceof java.util.concurrent.Future<?>)
-      return ((java.util.concurrent.Future<?>) arg).get();
-    /* #endif */
-    return arg;
+    for (;;)
+      {
+        try
+          {
+            if (arg instanceof gnu.mapping.Lazy)
+              arg = ((gnu.mapping.Lazy) arg).force();
+            /* #ifdef JAVA5 */
+            else if (arg instanceof java.util.concurrent.Future<?>)
+              arg = ((java.util.concurrent.Future<?>) arg).get();
+            /* #endif */
+            else
+              return arg;
+          }
+        catch (Throwable ex)
+          {
+            throw WrappedException.wrapIfNeeded(ex);
+          }
+      }
   }
 
   public void print (Consumer out)

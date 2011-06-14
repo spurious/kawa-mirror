@@ -4,7 +4,7 @@
     <configuration>
         <general-data xmlns="http://www.netbeans.org/ns/freeform-project/1">
             <!-- Do not use Project Properties customizer when editing this file manually. -->
-            <name>Kawa</name>
+            <name>Kawa3</name>
             <properties/>
             <folders>
                 <source-folder>
@@ -102,9 +102,8 @@
                         <property name="spaces-per-tab" value="4"/>
                         <property name="tab-size" value="8"/>
                         <property name="indent-shift-width" value="4"/>
-                        <property name="expand-tabs" value="true"/>
                         <property name="text-limit-width" value="80"/>
-                        <property name="text-line-wrap" value="none"/>
+                        <property name="expand-tabs" value="true"/>
                     </node>
                 </node>
                 <node name="text">
@@ -112,16 +111,19 @@
                         <node name="CodeStyle">
                             <node name="project">
                                 <property name="blankLinesAfterClassHeader" value="0"/>
-                                <property name="wrapExtendsImplementsKeyword" value="WRAP_IF_LONG"/>
+                                <property name="redundantIfBraces" value="LEAVE_ALONE"/>
                                 <property name="indent-shift-width" value="2"/>
                                 <property name="text-limit-width" value="80"/>
-                                <property name="text-line-wrap" value="none"/>
-                                <property name="wrapThrowsKeyword" value="WRAP_ALWAYS"/>
-                                <property name="spaces-per-tab" value="2"/>
+                                <property name="alignMultilineArrayInit" value="true"/>
                                 <property name="spaceBeforeMethodDeclParen" value="true"/>
-                                <property name="wrapExtendsImplementsList" value="WRAP_IF_LONG"/>
+                                <property name="spaces-per-tab" value="2"/>
+                                <property name="alignMultilineMethodParams" value="true"/>
+                                <property name="alignMultilineImplements" value="true"/>
+                                <property name="placeElseOnNewLine" value="true"/>
                                 <property name="tab-size" value="8"/>
                                 <property name="classDeclBracePlacement" value="NEW_LINE"/>
+                                <property name="continuationIndentSize" value="4"/>
+                                <property name="otherBracePlacement" value="NEW_LINE"/>
                                 <property name="expand-tabs" value="true"/>
                                 <property name="methodDeclBracePlacement" value="NEW_LINE"/>
                             </node>
@@ -129,7 +131,6 @@
                     </node>
                 </node>
             </module>
-            <module name="org-netbeans-modules-projectimport-eclipse-core"/>
         </preferences>
     </configuration>
 </project>

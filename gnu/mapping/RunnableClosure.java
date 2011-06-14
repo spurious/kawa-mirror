@@ -1,13 +1,13 @@
 package gnu.mapping;
 
-public class RunnableClosure
+public class RunnableClosure<T>
   implements
   /* #ifdef JAVA5 */
-  java.util.concurrent.Callable<Object>,
+  java.util.concurrent.Callable<T>,
   /* #endif */
   Runnable
 {
-  Object result;
+  T result;
   CallContext context;
 
   // These are only used to when we need to override the parents' in/out/err
@@ -75,7 +75,7 @@ public class RunnableClosure
 	  OutPort.setOutDefault(out);
 	if (err != null)
 	  OutPort.setErrDefault(err);
-	result = action.apply0 ();
+	result = (T) action.apply0 ();
       }
     catch (Throwable ex)
       {
@@ -94,7 +94,7 @@ public class RunnableClosure
     return result;
   }
 
-  public Object call()
+  public T call()
     throws Exception
   {
     run();

@@ -3,7 +3,7 @@
 ;(define test-image
 ;  (image-read "http://nelsoncove.us/NC-USGS-topo.jpg"))
 (define test-image
-  (image-read "file:///home/pics/NelsonCove/NC-USGS-topo.jpg"))
+  (image-read "file:///home/pics/web/NelsonCove/NC-USGS-topo.jpg"))
 ;(define test-image
 ;  (image-read "file:///home/pics/NelsonCove/NC-USGS-topo.jpg"))
 

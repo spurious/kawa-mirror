@@ -1,3 +1,10 @@
+2011-06-15  Per Bothner  <per@bothner.com>
+
+	* ApplyExp.java (RETURN_ARG0): New flag.
+	(calculateType): Handle RETURN_ARG0.
+	(checkSupportedReturnArg0): New method used for consistency checking.
+	* PrimProcedure.java
+
 2011-05-01  Per Bothner  <per@bothner.com>
 
 	* Declaration.java (initValue): Field new,

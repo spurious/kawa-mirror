@@ -454,7 +454,7 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
    *   pass a link to a closure environment, which was pushed by our caller.)
    *   If thisType==null, no special handling of args[0] or argTypes[0].
    */
-  private void compileArgs(Expression[] args, int startArg, Type thisType, Compilation comp)
+  private void compileArgs(Expression[] args, int startArg, Type thisType, Compilation comp, boolean returnArg0)
  {
     boolean variable = takesVarArgs();
     String name = getName();
@@ -525,6 +525,8 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
 	  source == null ? CheckedTarget.getInstance(argTypeForTarget, name, i+1)
 	  : CheckedTarget.getInstance(argTypeForTarget, source, i);
 	args[startArg+i].compileNotePosition(comp, target, args[startArg+i]);
+        if (returnArg0 && startArg+i == 0)
+          code.emitDup();
         if (createVarargsNow)
           {
             // Wrap final argument in array if not already an array:
@@ -631,8 +633,8 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
       }
     else if (takesTarget() && method.getStaticFlag())
       startArg = 1;
-
-    compileArgs(args, startArg, thisType, comp);
+    boolean returnArg0 = exp.getFlag(ApplyExp.RETURN_ARG0);
+    compileArgs(args, startArg, thisType, comp, returnArg0);
 
     if (method == null)
       {
@@ -641,7 +643,7 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
       }
     else
       {
-        compileInvoke(comp, method, target,
+        compileInvoke(comp, method, returnArg0 ? Target.Ignore : target,
                       exp.isTailCall(), op_code, stackType);
       }
   }

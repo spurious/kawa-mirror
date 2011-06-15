@@ -306,22 +306,18 @@ public class CompileInvoke
                     e = ae;
                     if (sargs < args.length)
                       {
-                        comp.letStart();
-                        Declaration adecl = comp.letVariable((String) null, ctype, e);
-                        BeginExp begin = new BeginExp();
                         for (int i = sargs;  i < args.length;  i++)
                           {
-                            Expression[]  iargs = {
-                              new ReferenceExp(adecl),
+                            Expression[] iargs = {
+                              e,
                               QuoteExp.getInstance("add"),
                               args[i]
                             };
-                            begin.add(visitor.visit(new ApplyExp(Invoke.invoke,
-                                                                 iargs),
-                                                    null));
+                            ae = new ApplyExp(Invoke.invoke, iargs);
+                            ae.setFlag(ApplyExp.RETURN_ARG0);
+                            e = visitor.visit(ae, null);
+                            ApplyExp.checkSupportedReturnArg0(e, comp);
                           }
-                        begin.add(new ReferenceExp(adecl));
-                        e = comp.letDone(begin);
                       }
                   }
                 return visitor.checkType(e.setLine(exp), required);
@@ -474,6 +470,7 @@ public class CompileInvoke
                 margs[dst] = args[src];
               }
             ApplyExp e = new ApplyExp(method, margs);
+            e.setFlag(exp.getFlag(ApplyExp.RETURN_ARG0), ApplyExp.RETURN_ARG0);
             e.setLine(exp);
             return visitor.visitApplyOnly(e, required);
           }

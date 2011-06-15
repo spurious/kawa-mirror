@@ -19,6 +19,9 @@ public class ApplyExp extends Expression
   public static final int TAILCALL = NEXT_AVAIL_FLAG;
   public static final int INLINE_IF_CONSTANT = NEXT_AVAIL_FLAG << 1;
   public static final int MAY_CONTAIN_BACK_JUMP = NEXT_AVAIL_FLAG << 2;
+  /** If this flag is set, the return value is the first argument.
+   * Note! This is currently only supported if the function is a PrimProcedure. */
+  public static final int RETURN_ARG0 = NEXT_AVAIL_FLAG << 3; 
 
   /** Containing LambdaExp. */
   LambdaExp context;
@@ -121,6 +124,8 @@ public class ApplyExp extends Expression
 
   public void compile (Compilation comp, Target target)
   {
+    if (getFlag(ApplyExp.RETURN_ARG0))
+      checkSupportedReturnArg0(this, comp);
     compile(this, comp, target, true);
   }
 
@@ -562,6 +567,8 @@ public class ApplyExp extends Expression
 
   protected gnu.bytecode.Type calculateType()
   {
+    if (getFlag(RETURN_ARG0))
+      return args[0].getType();
     Expression afunc = derefFunc(func);
     if (afunc instanceof QuoteExp)
       {
@@ -638,6 +645,18 @@ public class ApplyExp extends Expression
 				" throws " + ex);
 	return this;
       }
+  }
+
+  /** Check that RETURN_ARG0 flag is used in a supported way. */
+  public static void checkSupportedReturnArg0 (Expression exp, Compilation comp)
+  {
+    if (exp instanceof ApplyExp && exp.getFlag(ApplyExp.RETURN_ARG0))
+      {
+        ApplyExp aexp = (ApplyExp) exp;
+        if (aexp.getFunction().valueIfConstant() instanceof PrimProcedure)
+          return;
+      }
+    comp.error('e', "internal error - unxepected return_arg0");
   }
 
   public String toString ()

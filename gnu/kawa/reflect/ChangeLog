@@ -1,3 +1,8 @@
+2011-06-15  Per Bothner  <per@bothner.com>
+
+	* CompileInvoke.java (validateApplyInvoke): Use new ApplyExp.RETURN_ARG0
+	flag to optimize some object initialization.
+
 2011-03-23  Per Bothner  <per@bothner.com>
 
 	* CompileInvoke.java (validateApplyInvoke): Use letStart/letVariable

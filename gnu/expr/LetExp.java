@@ -115,48 +115,6 @@ public class LetExp extends ScopeExp
   }
   */
 
-  /** Does this variable need to be initialized or is default ok
-   */
-  static boolean needsInit(Declaration decl)
-  {
-    // This is a kludge.  Ideally, we should do some data-flow analysis.
-    // But at least it makes sure require'd variables are not initialized.
-    return ! decl.ignorable()
-      && ! (decl.getValueRaw() == QuoteExp.nullExp && decl.base != null);
-  }
-
-  /* Recursive helper routine, to store the values on the stack
-   * into the variables in vars, in reverse order. */
-  void store_rest (Compilation comp, int i, Declaration decl)
-  {
-    if (decl != null)
-      {
-	store_rest (comp, i+1, decl.nextDecl());
-	if (needsInit(decl))
-	  {
-            boolean initialized = decl.getInitValue() != QuoteExp.undefined_exp;
-	    if (decl.isIndirectBinding())
-	      {
-		CodeAttr code = comp.getCode();
-		if (! initialized)
-		  {
-		    Object name = decl.getSymbol();
-		    comp.compileConstant(name, Target.pushObject);
-		    code.emitInvokeStatic(BindingInitializer.makeLocationMethod(name));
-		  }
-		else
-		  {
-		    decl.pushIndirectBinding(comp);
-		  }
-	      }
-            if (initialized
-                || decl.isIndirectBinding()
-                || decl.mayBeAccessedUninitialized())
-              decl.compileStore(comp);
-	  }
-      }
-  }
-
   public void compile (Compilation comp, Target target)
   {
     gnu.bytecode.CodeAttr code = comp.getCode();
@@ -177,12 +135,18 @@ public class LetExp extends ScopeExp
       {
 	Target varTarget;
 	Expression init = decl.getInitValue();
-        boolean needsInit = needsInit(decl);
+        boolean initialized = init != QuoteExp.undefined_exp;
+        // Does this variable need to be initialized or is the default ok?
+        // This is a kludge.  Ideally, we should do some data-flow analysis.
+        // But at least it makes sure require'd variables are not initialized.
+        boolean needsInit =  ! decl.ignorable()
+          && ! (decl.getValueRaw() == QuoteExp.nullExp && decl.base != null);
+
 	if (needsInit && decl.isSimple())
           decl.allocateVariable(code);
-        // Compare logic in store_rest.
+
 	if (! needsInit
-            || (init == QuoteExp.undefined_exp
+            || (! initialized
                 && (decl.isIndirectBinding() || ! decl.mayBeAccessedUninitialized())))
 	  varTarget = Target.Ignore;
 	else
@@ -199,12 +163,30 @@ public class LetExp extends ScopeExp
 	      }
 	  }
 	init.compileWithPosition (comp, varTarget);
+
+        if (needsInit)
+          {
+	    if (decl.isIndirectBinding())
+	      {
+		if (! initialized)
+		  {
+		    Object name = decl.getSymbol();
+		    comp.compileConstant(name, Target.pushObject);
+		    code.emitInvokeStatic(BindingInitializer.makeLocationMethod(name));
+		  }
+		else
+		  {
+		    decl.pushIndirectBinding(comp);
+		  }
+	      }
+            if (initialized
+                || decl.isIndirectBinding()
+                || decl.mayBeAccessedUninitialized())
+              decl.compileStore(comp);
+          }
       }
 
     code.enterScope(getVarScope());
-
-    /* Assign the initial values to the proper variables, in reverse order. */
-    store_rest (comp, 0, firstDecl());
 
     body.compileWithPosition(comp, target);
     popScope(code);

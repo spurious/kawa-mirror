@@ -1,5 +1,10 @@
 2011-06-15  Per Bothner  <per@bothner.com>
 
+	* LetExp.java (compile): Re-write to store initial values eagerly in
+	left-to-right order, rather than saving on stack and then popping all.
+	This is simpler, plus may aid future pattern-matching.
+	(compile_rest, needsInit): Removed methods.
+
 	* ApplyExp.java (RETURN_ARG0): New flag.
 	(calculateType): Handle RETURN_ARG0.
 	(checkSupportedReturnArg0): New method used for consistency checking.

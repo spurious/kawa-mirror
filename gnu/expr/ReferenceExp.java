@@ -22,6 +22,7 @@ public class ReferenceExp extends AccessExp
   public static final int PREFER_BINDING2 = NEXT_AVAIL_FLAG << 2;
   /** Flag indicates a reference to a type name. */
   public static final int TYPE_NAME = NEXT_AVAIL_FLAG << 3;
+  public static final int ALLOCATE_ON_STACK_LAST = NEXT_AVAIL_FLAG << 4;
 
   /** Links in list headed by {@see LambdaExp#siblingReferences}. */
   ReferenceExp siblingReferencesNext;

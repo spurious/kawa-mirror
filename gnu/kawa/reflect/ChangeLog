@@ -1,5 +1,9 @@
 2011-06-15  Per Bothner  <per@bothner.com>
 
+	* CompileInvoke.java (validateApplyInvoke): Revert previous change
+	using RETURN_ARG.  Instead use a normal LetExp, but mark temporary
+	variable with ALLOCATE_ON_STACK flag.
+
 	* CompileInvoke.java (validateApplyInvoke): Use new ApplyExp.RETURN_ARG0
 	flag to optimize some object initialization.
 

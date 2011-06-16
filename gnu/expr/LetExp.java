@@ -179,7 +179,11 @@ public class LetExp extends ScopeExp
 		    decl.pushIndirectBinding(comp);
 		  }
 	      }
-            if (initialized
+            if (decl.getFlag(Declaration.ALLOCATE_ON_STACK))
+              {
+                decl.evalIndex = code.getSP();
+              }
+            else if (initialized
                 || decl.isIndirectBinding()
                 || decl.mayBeAccessedUninitialized())
               decl.compileStore(comp);

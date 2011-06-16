@@ -1,5 +1,18 @@
 2011-06-15  Per Bothner  <per@bothner.com>
 
+	Revert RETURN_ARG0 support.  Instead, use a new way of getting the
+	samecode, by having Declaration#load emit a dup with the new
+	ALLOCATE_ON_STACK flag is set.  This is simpler, reduces the risk
+	of compile-time stack-overflow, has a simpler consistency check,
+	and has the potential of recovery to a regular Let variable when the
+	the assumptions of using ALLOCATE_ON_STACK aren't satisfied.
+	* Declaration.java (ALLOCATE_ON_STACK): Ne flag.
+	(load): Handle ALLOCATE_ON_STACK case.
+	* LetExp.java (compile): Handle an ALLOCATE_ON_STACK variable.
+	* ReferenceExp.java (ALLOCATE_ON_STACK_LAST): New flag.
+	* ApplyExp.java: Revert RETURN_ARG0 support.
+	* PrimProcedure.java: Likewise.
+
 	* LetExp.java (compile): Re-write to store initial values eagerly in
 	left-to-right order, rather than saving on stack and then popping all.
 	This is simpler, plus may aid future pattern-matching.

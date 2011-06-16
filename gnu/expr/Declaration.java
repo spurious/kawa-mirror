@@ -285,6 +285,14 @@ public class Declaration
           }
       }
     CodeAttr code = comp.getCode();
+    if (getFlag(ALLOCATE_ON_STACK))
+      {
+        if (code.getSP() != evalIndex)
+          throw new InternalError("allocate-on-stack mismatch");
+        if (! access.getFlag(ReferenceExp.ALLOCATE_ON_STACK_LAST))
+          code.emitDup();
+        return;
+      }
     Type rtype = getType();
     if (! isIndirectBinding()
         && (flags & ReferenceExp.DONT_DEREFERENCE) != 0)
@@ -557,6 +565,13 @@ public class Declaration
   public static final long METHOD_ACCESS_FLAGS = PRIVATE_ACCESS
     |PROTECTED_ACCESS|PUBLIC_ACCESS|PACKAGE_ACCESS|FINAL_ACCESS;
   public static final long MAYBE_UNINITIALIZED_ACCESS = 0x800000000l;
+  /** Allocate variable on JVM stack as an optimization.
+   * This means load is implemented as a dup instruction.
+   * (This is no faster on decent JVMs, but the bytecode is more compact.)
+   * Note this may cause an InternalError if this is loaded when the
+   * JVM stack has grown since the variable was initialized.
+   */
+  public static final long ALLOCATE_ON_STACK = 0x1000000000l;
 
   protected long flags = IS_SIMPLE;
 

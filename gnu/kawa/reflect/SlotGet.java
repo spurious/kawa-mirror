@@ -208,7 +208,7 @@ public class SlotGet extends Procedure2
     SlotSet.apply(isStatic, obj, (String) name, value);
   }
 
-  /** Get a named property - field or 'get' accessor method.
+  /** Get a named property - field or member class or 'get' accessor method.
    * @param clas the class type declaring the property.
    * @param name the source (unmangled) name of the property.
    */

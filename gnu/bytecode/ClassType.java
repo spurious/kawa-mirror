@@ -928,6 +928,10 @@ public class ClassType extends ObjectType
     return result;
   }
 
+  /** Looks for a method matching the name and types.
+   * Note looks for an exact match, unless a type is null,
+   * not necessarily the best match.
+   */
   public synchronized Method getMethod(String name, Type[] arg_types)
   {
     ClassType cl = this;

@@ -9,16 +9,9 @@ public class SlotSet extends Procedure3 implements Inlineable
   /** True if this is a "static-field" operation. */
   boolean isStatic;
 
-  /** Return value is the first argument, rather than void.
-   * Only if non-static. */
-  boolean returnSelf;
-
   public static final SlotSet set$Mnfield$Ex = new SlotSet("set-field!", false);
   public static final SlotSet set$Mnstatic$Mnfield$Ex
   = new SlotSet("set-static-field!", true);
-  public static final SlotSet setFieldReturnObject
-    = new SlotSet("set-field-return-object!", false);
-  static { setFieldReturnObject.returnSelf = true; }
 
   public SlotSet(String name, boolean isStatic)
   {
@@ -126,7 +119,7 @@ public class SlotSet extends Procedure3 implements Inlineable
   public Object apply3 (Object obj, Object fname, Object value)
   {
     apply(isStatic, obj, fname, value);
-    return returnSelf ? obj : Values.empty;
+    return Values.empty;
   }
 
   static final Type[] type1Array = new Type[1];
@@ -249,13 +242,8 @@ public class SlotSet extends Procedure3 implements Inlineable
 	    args[0].compile(comp,
 			    isStaticField ? Target.Ignore
 			    : Target.pushValue(ctype));
-	    if (returnSelf)
-	      comp.getCode().emitDup(ctype.getImplementationType());
 	    compileSet(this, ctype, args[2], part, comp);
-	    if (returnSelf)
-	      target.compileFromStack(comp, ctype);
-	    else
-	      comp.compileConstant(Values.empty, target);
+            comp.compileConstant(Values.empty, target);
 	    return;
 	  }
       }

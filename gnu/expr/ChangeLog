@@ -1,3 +1,10 @@
+2011-06-16  Per Bothner  <per@bothner.com>
+
+	* Declaration.java (load): Generalize ALLOCATE_ON_STACK to handle
+	targets other than StackTarget, plus stack growth by one.
+	* ReferenceExp.java (compile): Disable compileWrite optimization
+	if ALLOCATE_ON_STACK is set.
+
 2011-06-15  Per Bothner  <per@bothner.com>
 
 	Revert RETURN_ARG0 support.  Instead, use a new way of getting the

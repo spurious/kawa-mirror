@@ -260,9 +260,7 @@ public class CompileReflect
     boolean isStatic = sproc.isStatic;
     if (isStatic && visitor.getCompilation().mustCompile)
       exp = inlineClassName (exp, 0, visitor);
-    exp.setType(sproc.returnSelf && exp.getArgCount() == 3
-                ? exp.getArg(0).getType()
-                : Type.voidType);
+    exp.setType(Type.voidType);
     return exp;
   }
 

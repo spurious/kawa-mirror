@@ -165,6 +165,7 @@ public class ReferenceExp extends AccessExp
   public void compile (Compilation comp, Target target)
   {
     if (! (target instanceof ConsumerTarget)
+        || binding.getFlag(Declaration.ALLOCATE_ON_STACK)
         || ! ((ConsumerTarget) target).compileWrite(this, comp))
       binding.load(this, flags, comp, target);
   }

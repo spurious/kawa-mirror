@@ -283,6 +283,10 @@ public class CompileInvoke
                 Expression e = ae;
                 if (args.length > 0)
                   {
+                    comp.letStart();
+                    Declaration adecl = comp.letVariable((String) null, ctype, e);
+                    adecl.setFlag(Declaration.ALLOCATE_ON_STACK);
+                    BeginExp begin = new BeginExp();
                     for (int i = 0;  i < slots.length;  i++)
                       {
                         Object slot = slots[i];
@@ -296,20 +300,18 @@ public class CompileInvoke
                         if (stype != null)
                           stype = iproc.language.getLangTypeFor(stype);
                         Expression arg = visitor.visit(args[keywordStart + 2 * i + 1], stype);
+                        ReferenceExp aref = new ReferenceExp(adecl);
                         Expression[] sargs
-                          = { ae, new QuoteExp(slot), arg};
-                        ae = new ApplyExp(SlotSet.setFieldReturnObject, sargs);
+                          = { visitor.visit(aref, null), new QuoteExp(slot), arg};
+                        ae = new ApplyExp(SlotSet.set$Mnfield$Ex, sargs);
                         ae.setType(ctype);
+                        begin.add(ae);
                       }
                     int sargs = keywordStart == args.length ? 1
                       : 2 * slots.length + keywordStart;
                     e = ae;
                     if (sargs < args.length)
                       {
-                        comp.letStart();
-                        Declaration adecl = comp.letVariable((String) null, ctype, e);
-                        adecl.setFlag(Declaration.ALLOCATE_ON_STACK);
-                        BeginExp begin = new BeginExp();
                         for (int i = sargs;  i < args.length;  i++)
                           {
                             Expression[] iargs = {
@@ -321,11 +323,11 @@ public class CompileInvoke
                                                                  iargs),
                                                     null));
                           }
-                        ReferenceExp aref = new ReferenceExp(adecl);
-                        aref.setFlag(ReferenceExp.ALLOCATE_ON_STACK_LAST);
-                        begin.add(aref);
-                        e = comp.letDone(begin);
                       }
+                    ReferenceExp aref = new ReferenceExp(adecl);
+                    aref.setFlag(ReferenceExp.ALLOCATE_ON_STACK_LAST);
+                    begin.add(aref);
+                    e = comp.letDone(begin);
                   }
                 return visitor.checkType(e.setLine(exp), required);
               }

@@ -1,3 +1,11 @@
+2011-06-16  Per Bothner  <per@bothner.com>
+
+	* CompileInvoke.java (validateApplyInvoke): Use ALLOCATE_ON_STACK
+	instead of SlotSet.setFieldReturnObject.
+	* SlotSet.java (returnSelf, setFieldReturnObject): Remove fields.
+	(apply3, compile) Remove support for returnSelf option.
+	* CompileReflect.java (validateApplySlotSet): Likewise.
+
 2011-06-15  Per Bothner  <per@bothner.com>
 
 	* CompileInvoke.java (validateApplyInvoke): Revert previous change

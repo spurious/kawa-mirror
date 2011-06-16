@@ -285,14 +285,6 @@ public class Declaration
           }
       }
     CodeAttr code = comp.getCode();
-    if (getFlag(ALLOCATE_ON_STACK))
-      {
-        if (code.getSP() != evalIndex)
-          throw new InternalError("allocate-on-stack mismatch");
-        if (! access.getFlag(ReferenceExp.ALLOCATE_ON_STACK_LAST))
-          code.emitDup();
-        return;
-      }
     Type rtype = getType();
     if (! isIndirectBinding()
         && (flags & ReferenceExp.DONT_DEREFERENCE) != 0)
@@ -323,6 +315,21 @@ public class Declaration
           }
         code.emitInvokeStatic(meth);
         rtype = ltype;
+      }
+    else if (getFlag(ALLOCATE_ON_STACK))
+      {
+        int SP = code.getSP();
+        if (access.getFlag(ReferenceExp.ALLOCATE_ON_STACK_LAST))
+          ;
+        else if (SP == evalIndex)
+          code.emitDup();
+        else if (SP == evalIndex+1)
+          {
+            code.emitSwap();
+            code.emitDupX();
+          }
+        else
+          throw new InternalError("allocate-on-stack mismatch");
       }
     else
       {

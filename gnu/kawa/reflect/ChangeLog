@@ -1,9 +1,19 @@
 2011-06-16  Per Bothner  <per@bothner.com>
 
+	* CompileReflect.java (makeSetterCall): New method.
+	(validateApplySlotSet): Rerite to do lookup, type inference
+	and error checking here, rather than at code-generation time.
+	* CompileInvoke.java (validateApplyInvoke): A Method returned from
+	checkKeywords isn't necessarily applicable or the best match.
+	Thus use CompileReflect.makeSetterCall for proper typing.
+	* SlotSet.java (compile): Simplify, since lookup now done earlier.
+	(compileSet): Remove method.
+
 	* CompileInvoke.java (validateApplyInvoke): Use ALLOCATE_ON_STACK
 	instead of SlotSet.setFieldReturnObject.
 	* SlotSet.java (returnSelf, setFieldReturnObject): Remove fields.
 	(apply3, compile) Remove support for returnSelf option.
+
 	* CompileReflect.java (validateApplySlotSet): Likewise.
 
 2011-06-15  Per Bothner  <per@bothner.com>

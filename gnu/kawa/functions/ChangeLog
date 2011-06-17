@@ -1,3 +1,8 @@
+2011-06-16  Per Bothner  <per@bothner.com>
+
+	* CompileNamedPart.java (validateSetNamedPart): Delegate checking to
+	makeSetterCall.
+
 2011-05-02  Per Bothner  <per@bothner.com>
 
 	* CompileMisc.java (validateApplyMap): Use the letStart/letVariable/etc

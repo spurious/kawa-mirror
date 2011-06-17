@@ -145,10 +145,15 @@ public class CompileNamedPart
   public static Expression validateSetNamedPart
   (ApplyExp exp, InlineCalls visitor, Type required, Procedure proc)
   {
-    exp.visitArgs(visitor);
     Expression[] args = exp.getArgs();
     if (args.length != 3 || ! (args[1] instanceof QuoteExp))
-      return exp;
+      {
+        exp.visitArgs(visitor);
+        return exp;
+      }
+    args[0] = visitor.visit(args[0], null);
+    args[1] = visitor.visit(args[1], null);
+
     Expression context = args[0];
     String mname = ((QuoteExp) args[1]).getValue().toString();
     Type type = context.getType();
@@ -165,18 +170,18 @@ public class CompileNamedPart
       }
     else if (type instanceof ClassType)
       {
-        Object part = SlotSet.lookupMember((ClassType) type, mname, caller);
+        Member part = SlotSet.lookupMember((ClassType) type, mname, caller);
         if (part != null)
-          {
-            // FIXME: future kludge to avoid re-doing SlotGet.getField.
-            // args = new Expression[] { context, new QuoteExp(part) });
-            exp = new ApplyExp(SlotSet.set$Mnfield$Ex, args);
-          }
+          return visitor.visit(CompileReflect.makeSetterCall(args[0], part, args[2]), Type.voidType);
       }
-    if (exp != original)
-      exp.setLine(original);
     exp.setType(Type.voidType);
-    return exp;
+    if (exp == original)
+      {
+        args[2] = visitor.visit(args[2], null);
+        return exp;
+      }
+    exp.setLine(original);
+    return visitor.visit(exp, required);
   }
 
   public static Expression makeExp (Expression clas, Expression member)

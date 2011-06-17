@@ -290,26 +290,12 @@ public class CompileInvoke
                     for (int i = 0;  i < slots.length;  i++)
                       {
                         Object slot = slots[i];
-                        Type stype;
-                        if (slot instanceof Method)
-                          stype = ((Method) slot).getParameterTypes()[0];
-                        else if (slot instanceof Field)
-                          stype = ((Field) slot).getType();
-                        else
-                          stype = null;
-                        if (stype != null)
-                          stype = iproc.language.getLangTypeFor(stype);
-                        Expression arg = visitor.visit(args[keywordStart + 2 * i + 1], stype);
                         ReferenceExp aref = new ReferenceExp(adecl);
-                        Expression[] sargs
-                          = { visitor.visit(aref, null), new QuoteExp(slot), arg};
-                        ae = new ApplyExp(SlotSet.set$Mnfield$Ex, sargs);
-                        ae.setType(ctype);
-                        begin.add(ae);
+                        Expression arg = args[keywordStart + 2 * i + 1];
+                        begin.add(visitor.visit(CompileReflect.makeSetterCall(aref, (Member) slot, arg), Type.voidType));
                       }
                     int sargs = keywordStart == args.length ? 1
                       : 2 * slots.length + keywordStart;
-                    e = ae;
                     if (sargs < args.length)
                       {
                         for (int i = sargs;  i < args.length;  i++)
@@ -488,7 +474,13 @@ public class CompileInvoke
   }
 
   /** Return an array if args (starting with start) is a set of
-   * (keyword, value)-value pairs. */
+   * (keyword, value)-value pairs.
+   * The array elements are either: a Field, a "setXxx" Method,
+   * a "addXxx" Method, or a String if there is no matching member.
+   * If an element is a Method, it is not necessarily applicable or
+   * the best match, so you should only use the method name to verify
+   * there is a matching method.
+   */
   static Object[] checkKeywords(ObjectType type, Expression[] args,
                                 int start, ClassType caller)
   {

@@ -251,13 +251,60 @@ public class CompileReflect
   public static Expression validateApplySlotSet
   (ApplyExp exp, InlineCalls visitor, Type required, Procedure proc)
   {
-    exp.visitArgs(visitor);
+    Expression[] args = exp.getArgs();
     SlotSet sproc = (SlotSet) proc;
-    // Unlike, for SlotGet, we do the field-lookup at compile time
-    // rather than inline time.  The main reason is that optimizing
-    // (set! CLASS-OR-OBJECT:FIELD-NAME VALUE) is tricky, since (currently)
-    // afte we've inlined setter, this method doesn't get called.
     boolean isStatic = sproc.isStatic;
+    args[0] = visitor.visit(args[0], null);
+    args[1] = visitor.visit(args[1], null);
+    Type type = isStatic ? kawa.standard.Scheme.exp2Type(args[0])
+      : args[0].getType();
+    Object val1 = args[1].valueIfConstant();
+    String name = null;
+    Compilation comp = visitor.getCompilation();
+    ClassType caller = comp.curClass != null ? comp.curClass : comp.mainClass;
+    if (val1 instanceof String
+        || val1 instanceof FString
+        || val1 instanceof SimpleSymbol)
+      {
+        name = val1.toString();
+        if (type instanceof ClassType)
+          {
+            ClassType ctype = (ClassType) type;
+
+            Member part = SlotSet.lookupMember(ctype, name, caller);
+            if (part == null)
+              {
+                if (type != Type.pointer_type && comp.warnUnknownMember())
+                  comp.error('w', "no slot `"+name+"' in "+ctype.getName());
+              }
+            else
+              {
+                return visitor.visit(makeSetterCall(args[0], part, args[2]), Type.voidType);
+              }
+          }
+      }
+    else if (val1 instanceof Member)
+      {
+        Member part = (Member) val1;
+        name = part.getName();
+        ClassType ctype = part.getDeclaringClass();
+        if (caller != null
+            && ! caller.isAccessible(part, ctype))
+                  return new ErrorExp("slot '"+name
+                                      +"' in "+ctype.getName()
+                                      +" not accessible here", comp);
+        if (part instanceof Field)
+          {
+            Field field = (Field) part;
+            boolean isStaticField = field.getStaticFlag();
+            Type ftype = comp.getLanguage().getLangTypeFor(((Field) val1).getType());
+              if (isStatic && ! isStaticField)
+                return new ErrorExp("cannot access non-static field `" + name
+                                    + "' using `" + proc.getName() + '\'', comp);
+            args[2] = visitor.visit(args[2], ftype);
+          }
+      }
+    args[2] = visitor.visit(args[2], null);
     if (isStatic && visitor.getCompilation().mustCompile)
       exp = inlineClassName (exp, 0, visitor);
     exp.setType(Type.voidType);
@@ -280,5 +327,23 @@ public class CompileReflect
 	  }
       }
     return exp;
+  }
+
+ public static Expression makeSetterCall (Expression receiver, Object slot, Expression newValue)
+  {
+    Procedure p;
+    if (slot instanceof Field)
+      {
+        p = SlotSet.set$Mnfield$Ex;
+      }
+    else
+      {
+        // Slot may be result from SlotSet#lookupMember, which does
+        // not handle overload resolution.  Use Invoke to handle that.
+        slot = ((Member) slot).getName();
+        p = Invoke.invoke;
+      }
+    Expression[] sargs = { receiver, new QuoteExp(slot), newValue};
+    return new ApplyExp(p, sargs);
   }
 }

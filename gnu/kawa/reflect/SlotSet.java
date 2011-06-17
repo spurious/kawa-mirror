@@ -40,7 +40,7 @@ public class SlotSet extends Procedure3 implements Inlineable
     Class clas;
     if (member instanceof String
         || member instanceof FString
-        || member instanceof Symbol) {
+        || member instanceof SimpleSymbol) {
       name = member.toString();
       fname = gnu.expr.Compilation.mangleNameIfNeeded(name);
       clas = isStatic ? SlotGet.coerceToClass(obj) : obj.getClass();
@@ -124,6 +124,14 @@ public class SlotSet extends Procedure3 implements Inlineable
 
   static final Type[] type1Array = new Type[1];
 
+  /** Get a setter property - field or 'set' accessor method.
+   * @param clas the class type declaring the property.
+   * @param name the source (unmangled) name of the property.
+   * Note if a method is returned it may not be the most specific/appropriate,
+   * since we don't take the setter value into account here.
+   * Therefore it is best to just use the method name, and do a second lookup
+   * that takes arguments into account, as in CompileReflect#makeSetterCall.
+   */
   public static Member
   lookupMember (ObjectType clas, String name, ClassType caller)
   {
@@ -145,104 +153,34 @@ public class SlotSet extends Procedure3 implements Inlineable
       return method;
   }
 
-  static void compileSet(Procedure thisProc, ObjectType ctype,
-                         Expression valArg, Object part, Compilation comp)
-  {
-    CodeAttr code = comp.getCode();
-    Language language = comp.getLanguage();
-    boolean isStatic
-      = thisProc instanceof SlotSet && ((SlotSet) thisProc).isStatic;
-    if (part instanceof gnu.bytecode.Field)
-      {
-        gnu.bytecode.Field field = (gnu.bytecode.Field) part;
-        boolean isStaticField = field.getStaticFlag();
-	Type ftype = language.getLangTypeFor(field.getType());
-        if (isStatic && ! isStaticField)
-          comp.error('e', ("cannot access non-static field `" + field.getName()
-                           + "' using `" + thisProc.getName() + '\''));
-        valArg.compile(comp, CheckedTarget.getInstance(ftype));
-        if (isStaticField)
-          code.emitPutStatic(field); 
-        else
-          code.emitPutField(field);
-        return;
-      }
-    if (part instanceof gnu.bytecode.Method)
-      {
-        gnu.bytecode.Method method = (gnu.bytecode.Method) part;
-        boolean isStaticMethod = method.getStaticFlag();
-        if (isStatic && ! isStaticMethod)
-          comp.error('e', "cannot call non-static getter method `"
-                     + method.getName() + "' using `"
-                     + thisProc.getName() + '\'');
-        Type[] setArgTypes = method.getParameterTypes();
-        valArg.compile(comp, CheckedTarget.getInstance(language.getLangTypeFor(setArgTypes[0])));
-        if (isStaticMethod)
-          code.emitInvokeStatic(method);
-        else
-          code.emitInvoke(method);
-        if (! method.getReturnType().isVoid())
-          code.emitPop(1);
-        return;
-      }
-  }
-
   public void compile (ApplyExp exp, Compilation comp, Target target)
   {
     Expression[] args = exp.getArgs();
     int nargs = args.length;
-    if (nargs != 3)
-      {
-        String msg = nargs < 3 ? "too few" : "too many";
-        comp.error('e', msg + " arguments to `"+getName()+'\'');
-        comp.compileConstant(null, target);
-        return;
-      }
     Expression arg0 = args[0];
     Expression arg1 = args[1];
     Expression value = args[2];
     Type type = isStatic ? kawa.standard.Scheme.exp2Type(arg0)
       : arg0.getType();
-    Member part = null;
     if (type instanceof ObjectType && arg1 instanceof QuoteExp)
       {
         Object val1 = ((QuoteExp) arg1).getValue();
         ObjectType ctype = (ObjectType) type;
-	String name;
-        ClassType caller = comp.curClass != null ? comp.curClass
-          : comp.mainClass;
-        if (val1 instanceof String
-            || val1 instanceof FString
-            || val1 instanceof Symbol)
+	if (val1 instanceof Field)
 	  {
-            name = val1.toString();
-	    part = lookupMember(ctype, name, caller);
-	    if (part == null && type != Type.pointer_type
-                && comp.warnUnknownMember())
-	      comp.error('w', "no slot `"+name+"' in "+ctype.getName());
-	  }
-	else if (val1 instanceof Member)
-	  {
-	    // Inlining (make <type> field: value) creates calls to
-	    // setFieldReturnObject whose 2nd arg is a Field or Method.
-            part = (Member) val1;
-            name = part.getName();
-	  }
-        else
-          name = null;
-
-	if (part != null)
-	  {
-	    int modifiers = part.getModifiers();
+            Field field = (Field) val1;
+            CodeAttr code = comp.getCode();
+	    int modifiers = field.getModifiers();
 	    boolean isStaticField = (modifiers & Access.STATIC) != 0;
-	    if (caller != null && ! caller.isAccessible(part, ctype))
-	      comp.error('e', "slot '"+name
-                         +"' in "+part.getDeclaringClass().getName()
-			 +" not accessible here");
 	    args[0].compile(comp,
 			    isStaticField ? Target.Ignore
 			    : Target.pushValue(ctype));
-	    compileSet(this, ctype, args[2], part, comp);
+            Type ftype = comp.getLanguage().getLangTypeFor(field.getType());
+            args[2].compile(comp, CheckedTarget.getInstance(ftype));
+            if (isStaticField)
+              code.emitPutStatic(field); 
+            else
+              code.emitPutField(field);
             comp.compileConstant(Values.empty, target);
 	    return;
 	  }

@@ -907,14 +907,15 @@ public class ClassType extends ObjectType
     return null;
   }
 
-  /** Get a method with matching name and number of arguments. */
-  public synchronized Method getDeclaredMethod(String name, int argCount)
+  synchronized Method getDeclaredMethod(String name, boolean mustBeStatic, int argCount)
   {
     Method result = null;
     int needOuterLinkArg = "<init>".equals(name) && hasOuterLink() ? 1 : 0;
     for (Method method = getDeclaredMethods();
 	 method != null;  method = method.next)
       {
+        if (mustBeStatic && ! method.getStaticFlag())
+          continue;
 	if (name.equals(method.getName())
 	    && argCount + needOuterLinkArg == method.getParameterTypes().length)
 	  {
@@ -926,6 +927,17 @@ public class ClassType extends ObjectType
 	  }
       }
     return result;
+  }
+  /** Get a method with matching name and number of arguments. */
+  public Method getDeclaredMethod(String name, int argCount)
+  {
+    return getDeclaredMethod(name, false, argCount);
+  }
+
+  /** Get a static method with matching name and number of arguments. */
+  public Method getDeclaredStaticMethod(String name, int argCount)
+  {
+    return getDeclaredMethod(name, true, argCount);
   }
 
   /** Looks for a method matching the name and types.

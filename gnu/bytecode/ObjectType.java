@@ -183,11 +183,14 @@ public class ObjectType extends Type
     return Type.objectType.getMethods(filter, searchSupers, result);
   }
 
-  public int compare(Type other)
-  {
-    // Assume this == nullType.
-    return other == nullType ? 0 : -1;
-  }
+    public int compare(Type other) {
+	if (this == other)
+	    return 0;
+	else if (this == nullType)
+	    return -1;
+	else
+	    return -3;
+    }
 
   /* #ifdef JAVA5 */
   @SuppressWarnings("unchecked")

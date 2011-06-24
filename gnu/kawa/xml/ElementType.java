@@ -18,7 +18,7 @@ implements TypeValue, Externalizable, ElementPredicate
 
   Symbol qname;
 
-  public static final ElementType anyElement = make(null, null);
+    public static final ElementType anyElement = make((String) null, (String) null);
 
   /** An element type for match by name.
    * @param localName if null matches any local name; otherwise must

@@ -79,10 +79,17 @@ public class Field extends Location
   void assign_constants (ClassType classfile)
   {
     ConstantPool constants = classfile.constants;
+    String signature = type.getSignature();
+    String genericSignature = getType().getGenericSignature();
+    if (genericSignature != null && ! genericSignature.equals(signature))
+      {
+        SignatureAttr attr = new SignatureAttr(genericSignature);
+        attr.addToFrontOf(this);
+      }
     if (name_index == 0 && name != null)
       name_index = constants.addUtf8(name).index;
     if (signature_index == 0 && type != null)
-      signature_index = constants.addUtf8(type.getSignature()).index;
+      signature_index = constants.addUtf8(signature).index;
     Attribute.assignConstants(this, classfile);
   }
 
@@ -136,7 +143,7 @@ public class Field extends Location
     ConstantPool cpool = ctype.constants;
     if (cpool == null)
       ctype.constants = cpool = new ConstantPool();
-    char sig1 = getType().getSignature().charAt(0);
+    char sig1 = type.getSignature().charAt(0);
     CpoolEntry entry;
     switch (sig1)
       {

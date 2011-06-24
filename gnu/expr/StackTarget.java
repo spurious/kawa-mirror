@@ -51,8 +51,8 @@ public class StackTarget extends Target
         type.emitConvertFromPrimitive(stackType, code);
 	stackType = code.topType();
       }
-    return ! CodeAttr.castNeeded(stackType.getImplementationType(),
-                                 type.getImplementationType());
+    return ! CodeAttr.castNeeded(stackType.getRawType(),
+                                 type.getRawType());
   }
 
   public static void convert(Compilation comp, Type stackType, Type targetType)

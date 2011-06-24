@@ -1,4 +1,4 @@
-// Copyright (c) 1997, 1998, 1999, 2001, 2002, 2004, 2005, 2008, 2009  Per M.A. Bothner.
+// Copyright (c) 1997, 1998, 1999, 2001, 2002, 2004, 2005, 2008, 2009, 2011  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.bytecode;
@@ -615,7 +615,7 @@ public class ClassType extends ObjectType
         java.lang.reflect.Field field = fields[i];
         if ("this$0".equals(field.getName()))
           flags |= HAS_OUTER_LINK;
-        addField(field.getName(), Type.make(field.getType()),
+        addField(field.getName(), Type.make(field.getType(), field.getGenericType()),
                  field.getModifiers());
       }
     flags |= ADD_FIELDS_DONE;

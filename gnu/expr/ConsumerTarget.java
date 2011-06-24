@@ -204,7 +204,7 @@ public class ConsumerTarget extends Target
       {
         // Optimization to avoid a 'swap'.
         comp.getCode().emitLoad(this.consumer);
-        Target starget = StackTarget.getInstance(implType);
+        Target starget = StackTarget.getInstance(stackType);
         exp.compile(comp, starget);
         compileFromStack(comp, implType, 1);
         return true;

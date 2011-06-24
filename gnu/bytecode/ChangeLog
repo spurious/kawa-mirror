@@ -1,3 +1,20 @@
+2011-06-20  Per Bothner  <bothner@kuling.bothner.com>
+
+	Start of support for parameterized (generic) types.
+	* ParameterizedType.java: New class, extends ObjectType.
+	* Makefile.am: Update accordingly.
+	* Field.java (assign_constants): Generate Signature attribute if needed.
+	* CodeAttr.java (castNeeded): Use getRawType, not
+	getImplementationType, since later may be a ParameterizedType.
+	* Location.java (getSignature): Likewise get signature of raw typw.
+	* Type.java (genericSignature): New field.
+	(getGenericSignature, setGenericSignature,
+	getMaybeGenericSignature): New methods.
+	(make): New non-public method to map java.lang.reflect.Type
+	to gnu.bytecode.Type.
+	(make): Try former method, but fall back to using Class if that fails.
+	* ClassType.java (addField): Use new 2-argument make method.
+
 2011-06-19  Per Bothner  <bothner@kuling.bothner.com>
 
 	* ClassType.java (getDeclaredStaticMethod): New method.

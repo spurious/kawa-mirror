@@ -27,6 +27,7 @@ Method.java \
 CodeAttr.java ConstantValueAttr.java \
 LineNumbersAttr.java LocalVarsAttr.java InnerClassesAttr.java \
 MiscAttr.java \
+ParameterizedType.java \
 PrimType.java \
 RuntimeAnnotationsAttr.java \
 Scope.java \

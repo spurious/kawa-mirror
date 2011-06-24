@@ -44,7 +44,7 @@ public class Location {
     this.type = type;
   }
 
-  public final String getSignature () { return type.getSignature (); }
+    public final String getSignature () { return type.getRawType().getSignature (); }
 
   public void setSignature (int signature_index, ConstantPool constants)
   {

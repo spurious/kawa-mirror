@@ -13,6 +13,7 @@ public abstract class Type
 /* #endif */
 {
   String signature;
+  String genericSignature;
   // Fully-qualified name (in external format, i.e. using '.' to separate).
   String this_name;
   /**
@@ -24,7 +25,8 @@ public abstract class Type
 
   protected Type () { }
 
-  /** The type used to implement types not natively understood by the JVM.
+  /** Return Java-level implementation type.
+   * The type used to implement types not natively understood by the JVM.
 
    * Usually, the identity function.  However, a language might handle
    * union types or template types or type expressions calculated at
@@ -36,12 +38,20 @@ public abstract class Type
     return this;
   }
 
-  /** If this is a type alias, get the aliased type.
-   */
-  public Type getRealType ()
-  {
-    return this;
-  }
+    /** Return JVM-level implementation type. */
+    public Type getRawType() {
+	Type t = getImplementationType();
+	if (t != this)
+	    t = t.getRawType();
+	return t;
+    }
+
+    /** If this is a type alias, get the aliased type.
+     * This is semi-deprecated.
+     */
+    public Type getRealType() {
+	return this;
+    }
 
   public boolean isExisting()
   {
@@ -109,6 +119,62 @@ public abstract class Type
     map.put(clas, type);
   }
 
+    /** Try to map java.lang.reflect.Type to gnu.bytecode.Type.
+     * If we can't handle that, resolve the Class instead.
+     */
+    public static Type make(Class reflectClass, java.lang.reflect.Type type) {
+	Type t = make(type);
+	return t != null ? t : make(reflectClass);
+    }
+
+    /** Resolve a java.lang.reflect.Type to gnu.bytecode.Type.
+     * Handles simple parameterized types, but does not handle type variables.
+     * @return a translated Type, or null for unhandled types.
+     */
+    static Type make(java.lang.reflect.Type type) {
+	if (type instanceof Class)
+	    return make((Class) type);
+	if (type instanceof java.lang.reflect.GenericArrayType)
+	    return null;
+	if (type instanceof java.lang.reflect.ParameterizedType) {
+	    java.lang.reflect.ParameterizedType ptype
+		= (java.lang.reflect.ParameterizedType) type;
+	    java.lang.reflect.Type typeArguments[]
+		= ptype.getActualTypeArguments();
+	    Type rt = Type.make(ptype.getRawType());
+	    if (rt instanceof ClassType) {
+		ClassType rawType = (ClassType) rt;
+		int nargs = typeArguments.length;
+		Type[] typeArgumentTypes = new Type[nargs];
+		char[] bounds = new char[nargs];
+		for (int i = 0;  i < nargs;  i++) {
+		    java.lang.reflect.Type ti = typeArguments[i];
+		    if (ti instanceof java.lang.reflect.WildcardType) {
+			java.lang.reflect.WildcardType wi =
+			    (java.lang.reflect.WildcardType) ti;
+			java.lang.reflect.Type[] lower = wi.getLowerBounds();
+			java.lang.reflect.Type[] upper = wi.getUpperBounds();
+			if (lower.length + upper.length != 1)
+			    return null;
+			if (lower.length == 1) {
+			    bounds[i] = '-';
+			    ti = Type.make(lower[i]);
+			}
+			if (upper.length == 1) {
+			    bounds[i] = '+';
+			    ti = Type.make(upper[i]);
+			}
+		    }
+		    typeArgumentTypes[i] = Type.make(ti);
+		}
+		ParameterizedType ret = new ParameterizedType(rawType, typeArgumentTypes);
+		ret.setTypeArgumentBounds(bounds);
+		return ret;
+	    }
+	}
+	return null;
+    }
+
   public synchronized static Type make(Class reflectClass)
   {
     Type type;
@@ -149,8 +215,14 @@ public abstract class Type
     return type;
   }
 
-  public String getSignature () { return signature; }
-  protected void setSignature(String sig) { this.signature = sig; }
+    public String getSignature() { return signature; }
+    protected void setSignature(String sig) { this.signature = sig; }
+    public String getGenericSignature() { return genericSignature; }
+    protected void setGenericSignature(String sig) { this.genericSignature = sig; }
+    public String getMaybeGenericSignature() {
+	String s = getGenericSignature();
+	return s != null ? s : getSignature();
+    }
 
   Type (String nam, String sig) {
     this_name = nam;

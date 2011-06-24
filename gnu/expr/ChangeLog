@@ -1,3 +1,12 @@
+2011-06-21  Per Bothner  <bothner@kuling.bothner.com>
+
+	*  ConsumerTarget.java (compileWrite): Use stackType,
+	which might be a ParameterizedType.
+	* Language.java (declFromField): Use getLangTypeFor(Type) method,
+	which handles parameterized types.
+	* StackTarget.java (compileFromStack0): Use raw types to determine if
+	casting is needed
+
 2011-06-16  Per Bothner  <per@bothner.com>
 
 	* Declaration.java (load): Generalize ALLOCATE_ON_STACK to handle

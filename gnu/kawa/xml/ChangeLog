@@ -1,3 +1,7 @@
+2011-06-23  Per Bothner  <bothner@kuling.bothner.com>
+
+	* ElementType.java (anyElement): Add casts to disambiguate.
+
 2010-11-26  Per Bothner  <per@bothner.com>
 
 	* ElementType.java: Update, since Symbol constructor is now protected.

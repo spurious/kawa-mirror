@@ -1,3 +1,10 @@
+2011-06-23  Per Bothner  <bothner@kuling.bothner.com>
+
+	* Lazy.java (force): Rename to getValue;
+	* Future.java (force): Likewise
+	* Promise.java (force): Likewise.
+	(static force): Update to use getValue method interface Lazy.
+
 2011-06-14  Per Bothner  <per@bothner.com>
 
 	* Lazy.java: New interface.

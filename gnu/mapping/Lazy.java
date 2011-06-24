@@ -2,5 +2,5 @@ package gnu.mapping;
 
 public interface Lazy<T>
 {
-    public T force() throws Throwable;
+    public T getValue() throws Throwable;
 }

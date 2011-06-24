@@ -20,7 +20,7 @@ public class Promise<T> implements Printable, Lazy<T>
     this.thunk = thunk;
   }
 
-  public T force () throws Throwable
+  public T getValue () throws Throwable
   {
     // Doesn't reliably work on JDK4 or earlier, but works on JDK5 or later.
     // http://www.cs.umd.edu/~pugh/java/memoryModel/DoubleCheckedLocking.html
@@ -55,7 +55,7 @@ public class Promise<T> implements Printable, Lazy<T>
         try
           {
             if (arg instanceof gnu.mapping.Lazy)
-              arg = ((gnu.mapping.Lazy) arg).force();
+              arg = ((gnu.mapping.Lazy) arg).getValue();
             /* #ifdef JAVA5 */
             else if (arg instanceof java.util.concurrent.Future<?>)
               arg = ((java.util.concurrent.Future<?>) arg).get();

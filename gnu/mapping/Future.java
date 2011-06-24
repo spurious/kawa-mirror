@@ -44,7 +44,7 @@ public class Future<T> extends Thread implements Lazy<T>
     closure.run();
   }
 
-  public T force ()  throws Throwable
+  public T getValue ()  throws Throwable
   {
     try
       {

@@ -1,6 +1,14 @@
+2011-06-23  Per Bothner  <bothner@kuling.bothner.com>
+
+	* ModuleExp.java (evalModule): If evalModule1 reports an error,
+	then pop any possibly new and erroneous declarations.
+	This may fix Savannah bug #32209 "Class verification errors when
+	reloading source files" - at least it fixes Charles Turner's
+	simple test-case.
+
 2011-06-21  Per Bothner  <bothner@kuling.bothner.com>
 
-	*  ConsumerTarget.java (compileWrite): Use stackType,
+	* ConsumerTarget.java (compileWrite): Use stackType,
 	which might be a ParameterizedType.
 	* Language.java (declFromField): Use getLangTypeFor(Type) method,
 	which handles parameterized types.

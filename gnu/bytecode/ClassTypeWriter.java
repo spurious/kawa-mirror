@@ -99,7 +99,7 @@ public class ClassTypeWriter extends PrintWriter
   public void printAttributes (AttrContainer container)
   {
     for (Attribute attr = container.getAttributes();
-	 attr != null;  attr = attr.next)
+	 attr != null;  attr = attr.getNext())
       {
 	attr.print(this);
       }

@@ -21,7 +21,7 @@ public abstract class Attribute
   public final void setContainer(AttrContainer container)
   { this.container = container; }
 
-  Attribute next;
+  private Attribute next;
   /** Get the next Attribute belonging to getContainer(). */
   public final Attribute getNext() { return next; }
   /** Set the next Attribute in the chain belonging to getContainer(). */

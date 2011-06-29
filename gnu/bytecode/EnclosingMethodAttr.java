@@ -25,7 +25,7 @@ public class EnclosingMethodAttr extends Attribute
 
   public static EnclosingMethodAttr getFirstEnclosingMethod (Attribute attr)
   {
-    for (; ; attr = attr.next)
+    for (; ; attr = attr.getNext())
       {
         if (attr == null || attr instanceof EnclosingMethodAttr)
           return (EnclosingMethodAttr) attr;

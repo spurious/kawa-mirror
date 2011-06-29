@@ -24,7 +24,7 @@ public class InnerClassesAttr  extends Attribute
 
   public static InnerClassesAttr getFirstInnerClasses (Attribute attr)
   {
-    for (; ; attr = attr.next)
+    for (; ; attr = attr.getNext())
       {
         if (attr == null || attr instanceof InnerClassesAttr)
           return (InnerClassesAttr) attr;

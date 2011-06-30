@@ -202,7 +202,10 @@ public class ClassExp extends LambdaExp
 
     if (compiledType.getName() == null)
       compiledType.setName(getClassName(comp));
-    comp.addClass(compiledType);
+
+    // Don't add class twice - i.e. if ModuleExp.USE_DEFINED_CLASS is set.
+    if (compiledType != comp.mainClass)
+	comp.addClass(compiledType);
     if (isMakingClassPair())
       {
         instanceType.setName(compiledType.getName()+"$class");

@@ -1,3 +1,8 @@
+2011-06-29  Per Bothner  <bothner@kuling.bothner.com>
+
+	* ClassMethods.java (removeRedundantMethods): Handle TypeVariable.
+	(getMethods): Handle lookup in a ParameterizedType.
+
 2011-06-16  Per Bothner  <per@bothner.com>
 
 	* CompileReflect.java (makeSetterCall): New method.

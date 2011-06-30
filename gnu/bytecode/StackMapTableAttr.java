@@ -56,7 +56,8 @@ public class StackMapTableAttr extends MiscAttr
   {
     if (type == null)
       return 0; // ITEM_Top
-    else if (type instanceof UninitializedType)
+    type = type.getRawType();
+    if (type instanceof UninitializedType)
       {
         UninitializedType utype = (UninitializedType) type;
         Label label = utype.label;

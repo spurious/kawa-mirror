@@ -259,6 +259,22 @@ public class Method implements AttrContainer, Member {
     return buf.toString();
   }
 
+  public static String makeGenericSignature (Type arg_types[], Type return_type)
+  {
+    /* #ifdef JAVA5 */
+    StringBuilder buf = new StringBuilder(100);
+    /* #else */
+    // StringBuffer buf = new StringBuffer(100);
+    /* #endif */
+    int args_count = arg_types.length; 
+    buf.append('(');
+    for (int i = 0; i < args_count; i++)
+      buf.append (arg_types[i].getMaybeGenericSignature());
+    buf.append(')');
+    buf.append(return_type.getMaybeGenericSignature());
+    return buf.toString();
+  }
+
   String signature;
 
   public String getSignature ()
@@ -311,8 +327,15 @@ public class Method implements AttrContainer, Member {
     ConstantPool constants = getConstants();
     if (name_index == 0 && name != null)
       name_index = constants.addUtf8(name).index;
+    String signature = getSignature();
+    String genericSignature = makeGenericSignature(arg_types, return_type);
     if (signature_index == 0)
-      signature_index = constants.addUtf8(getSignature()).index;
+	signature_index = constants.addUtf8(signature).index;
+    if (genericSignature != null && ! genericSignature.equals(signature))
+      {
+        SignatureAttr attr = new SignatureAttr(genericSignature);
+        attr.addToFrontOf(this);
+      }
     Attribute.assignConstants(this, classfile);
   }
 

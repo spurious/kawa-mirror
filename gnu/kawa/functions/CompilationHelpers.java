@@ -59,7 +59,10 @@ public class CompilationHelpers
             return proc.validateApply(exp, visitor, required, null);
           }
 
-        ClassType ctype;
+        ClassType ctype = ptype instanceof ClassType ? (ClassType) ptype
+	    : ptype instanceof ParameterizedType
+	    ? ((ParameterizedType) ptype).getRawType()
+	    : null;
         ApplyExp result = null;
         if (CompileReflect.checkKnownClass(ptype, comp) < 0)
           ; // This might be more cleanly handled at the type specifier. FIXME
@@ -74,15 +77,17 @@ public class CompilationHelpers
             exp.setFuncArgs(new ArrayGet(elementType), args);
             result = exp;
           }
-        else if (ptype instanceof ClassType
-                 && (ctype = (ClassType) ptype).isSubclass(Compilation.typeList)
+        else if (ctype != null
+		 && ctype.isSubclass(Compilation.typeList)
                  && nargs == 1)
           {
             // We search for a "get(int)" method, rather than just using
             // typeList.getDeclaredMethod("get", 1) to see if we make a
             // a virtual call rather than an interface call.
             Method get = ctype.getMethod("get", new Type[] { Type.intType  });
-            result = exp.setFuncArgs(new PrimProcedure(get), args);
+	    ParameterizedType prtype = ptype instanceof ParameterizedType ?
+		((ParameterizedType) ptype) : null;
+            result = exp.setFuncArgs(new PrimProcedure(get, 'V', language, prtype), args);
           }
         if (result != null)
           {

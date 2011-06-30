@@ -383,6 +383,24 @@ public class ClassType extends ObjectType
     SourceFileAttr.setSourceFile(this, name);
   }
 
+    TypeVariable[] typeParameters;
+
+    public TypeVariable[] getTypeParameters() {
+	TypeVariable[] params = typeParameters;
+	if (params == null && (flags & EXISTING_CLASS) != 0
+	    && getReflectClass() != null) {
+	    java.lang.reflect.TypeVariable[] rparams
+		= reflectClass.getTypeParameters();
+	    int nparams = rparams.length;
+	    params = new TypeVariable[nparams];
+	    for (int i = 0;  i < nparams;  i++) {
+		params[i] = TypeVariable.make(rparams[i]);
+	    }
+	    typeParameters = params;
+	}
+	return params;
+    }
+
   /**
    * Set the superclass of the is class.
    * @param name name of super class, or null if this is "Object".
@@ -679,11 +697,12 @@ public class ClassType extends ObjectType
   {
     int modifiers = method.getModifiers();
     Class[] paramTypes = method.getParameterTypes();
+    java.lang.reflect.Type[] gparamTypes = method.getGenericParameterTypes();
     int j = paramTypes.length;
     Type[] args = new Type[j];
     while (--j >= 0)
-      args[j] = Type.make(paramTypes[j]);
-    Type rtype = Type.make(method.getReturnType());
+	args[j] = Type.make(paramTypes[j], gparamTypes[j]);
+    Type rtype = Type.make(method.getReturnType(), method.getGenericReturnType());
     return addMethod(method.getName(), modifiers, args, rtype);
   }
 

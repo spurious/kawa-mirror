@@ -1,3 +1,8 @@
+2011-06-29  Per Bothner  <bothner@kuling.bothner.com>
+
+	* BracketApply.java (rewrite): Parse TYPE[ARGS] like Java's TYPE<ARGS>.
+	I.e. create a ParameterizedType value.
+
 2011-04-17  Per Bothner  <per@bothner.com>
 
 	* LispLanguage.java (getLexer): Change to more specific return type.

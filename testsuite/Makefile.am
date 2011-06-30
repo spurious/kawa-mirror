@@ -481,8 +481,8 @@ inlining.log: InliningTest.class cycle1.class cycle2.class \
 	setCar getHome setHome isPair isEmpty castToPair newPair tohex \
 	makeIarr lengthIarr getIarr setIarr varargs \
 	factoriali1 factoriali2 factoriall1 plusLambda1 firstNegative \
-	inlineTwoCalls inlineTwoFunctions checkEven \
-	constantPropagation1 factorialInfer1 >inlining.log
+	inlineTwoCalls inlineTwoFunctions checkEven constantPropagation1 \
+	factorialInfer1 getFromVector1 getFromVector2 >inlining.log
 	$(LIST_CODE_SIZE) cycle1.class isIsEven >>inlining.log
 	$(LIST_CODE_SIZE) cycle2.class isIsOdd >>inlining.log
 	$(LIST_CODE_SIZE) binarytrees.class bottomUpTree test >>inlining.log

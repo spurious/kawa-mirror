@@ -698,20 +698,24 @@ public abstract class Language
     return Type.make(clas);
   }
 
-  public final Type getLangTypeFor (Type type)
-  {
-    if (type.isExisting())
-      {
-        Class clas = type.getReflectClass();
-        if (clas != null)
-          return getTypeFor(clas);
-      }
-    return type;
-  }
+    public final Type getLangTypeFor (Type type) {
+	if (type instanceof TypeVariable) {
+	    return getLangTypeFor(((TypeVariable) type).getRawType());
+	}
+	if (type.isExisting()) {
+	    Class clas = type.getReflectClass();
+	    if (clas != null)
+		return getTypeFor(clas);
+	}
+	return type;
+    }
 
   public String formatType (Type type)
   {
-    return type.getName();
+    String s = type.getName();
+    if (s == null)
+      s = type.toString();
+    return s;
   }
 
   public static Type string2Type (String name)

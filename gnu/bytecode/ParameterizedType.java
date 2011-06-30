@@ -9,7 +9,7 @@ public class ParameterizedType extends ObjectType
     Type[] typeArgumentTypes;
     char[] typeArgumentBounds;
 
-    public Type getRawType() {
+    public ClassType getRawType() {
         return rawType;
     }
 
@@ -39,6 +39,8 @@ public class ParameterizedType extends ObjectType
     }
 
     public char getTypeArgumentBound(int index) {
+	if (typeArgumentBounds == null || index >= typeArgumentBounds.length)
+	    return '\0';
         return typeArgumentBounds[index];
     }
 
@@ -60,15 +62,24 @@ public class ParameterizedType extends ObjectType
             int n = typeArgumentTypes.length;
 	    for (int i = 0;  i < n; i++) {
 		char bound = getTypeArgumentBound(i);
-		if (bound != '\0')
-		    buf.append(bound);
-		buf.append(getTypeArgumentType(i).getMaybeGenericSignature());
+		Type tt = getTypeArgumentType(i);
+		if (bound == '+' && tt == Type.objectType)
+		    buf.append('*');
+		else {
+		    if (bound != '\0')
+			buf.append(bound);
+		    buf.append(tt.getMaybeGenericSignature());
+		}
 	    }
             buf.append(">;");
 	    s = buf.toString();
 	    super.setGenericSignature(s);
         }
 	return s;
+    }
+
+    public void emitCoerceFromObject (CodeAttr code) {
+	getRawType().emitCoerceFromObject(code);
     }
 
     /** @Override */

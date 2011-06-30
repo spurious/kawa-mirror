@@ -313,10 +313,25 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
 
   public PrimProcedure(Method method, Language language)
   {
-    this(method, '\0', language);
+    this(method, '\0', language, null);
   }
 
-  public PrimProcedure(Method method, char mode, Language language)
+
+    static Type resolveTypeVariable(TypeVariable tvar, ParameterizedType parameterizedType ) {
+	if (parameterizedType != null) {
+	    TypeVariable[] tparams = parameterizedType.getRawType().getTypeParameters();
+	    int nparams = tparams.length;
+	    for (int i = 0;  i < nparams;  i++) {
+		if (tvar.getName().equals(tparams[i].getName())) {
+		    return parameterizedType.getTypeArgumentType(i);
+		}
+	    }
+	}
+	return tvar.getRawType();
+    }
+
+    public PrimProcedure(Method method, char mode, Language language,
+			 ParameterizedType parameterizedType)
   {
     this.mode = mode;
 
@@ -330,7 +345,11 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
     for (int i = nTypes;  --i >= 0; )
       {
 	Type javaType = pTypes[i];
-	Type langType = language.getLangTypeFor(javaType);
+	Type langType = javaType;
+	if (langType instanceof TypeVariable) {
+	    langType = resolveTypeVariable((TypeVariable) langType, parameterizedType);
+	}
+	langType = language.getLangTypeFor(langType);
 	if (javaType != langType)
 	  {
 	    if (argTypes == null)
@@ -349,7 +368,11 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
       retType = Type.objectType;
     else
       {
-        retType = language.getLangTypeFor(method.getReturnType());
+	retType = method.getReturnType();
+	if (retType instanceof TypeVariable) {	
+	    retType = resolveTypeVariable((TypeVariable) retType, parameterizedType);
+	}
+        retType = language.getLangTypeFor(retType);
 
         // Kludge - toStringType doesn't have methods.
         // It shouldn't be used as the "type" of anything -
@@ -603,6 +626,8 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
     Expression[] args = exp.getArgs();
     gnu.bytecode.CodeAttr code = comp.getCode();
     Type stackType = retType;
+    if (method != null && method.getReturnType() instanceof TypeVariable)
+	stackType = method.getReturnType().getRawType();
     int startArg = 0;
     if (isConstructor())
       {
@@ -743,7 +768,6 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
     boolean varArgs = takesVarArgs();
     if (index < lenTypes && ! varArgs)
       return argTypes[index];
-    // if (! varArgs) ERROR;
     Type restType = argTypes[lenTypes - 1];
     if (restType instanceof ArrayType)
       return ((ArrayType) restType).getComponentType();
@@ -1044,7 +1068,6 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
     buf.append(')');
     return buf.toString();
   }
-
 
   public String toString()
   {

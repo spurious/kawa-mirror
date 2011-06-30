@@ -216,3 +216,8 @@
 (define (factorial-infer2 (x ::int))
   (do ((i ::int 1 (+ i 1)) (r 1 (* r i)))
       ((> i x) r)))
+
+(define (get-from-vector1 x::gnu.lists.FVector[java.lang.Integer] i::int)
+  (x:get i))
+(define (get-from-vector2 x::gnu.lists.FVector[java.lang.Integer] i::int)
+  (x i))

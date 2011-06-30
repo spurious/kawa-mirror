@@ -156,13 +156,13 @@ public abstract class Type
 			java.lang.reflect.Type[] upper = wi.getUpperBounds();
 			if (lower.length + upper.length != 1)
 			    return null;
-			if (lower.length == 1) {
+			else if (lower.length == 1) {
 			    bounds[i] = '-';
-			    ti = Type.make(lower[i]);
+			    ti = lower[0];
 			}
-			if (upper.length == 1) {
+			else /* if (upper.length == 1) */ {
 			    bounds[i] = '+';
-			    ti = Type.make(upper[i]);
+			    ti = upper[0];
 			}
 		    }
 		    typeArgumentTypes[i] = Type.make(ti);
@@ -171,6 +171,9 @@ public abstract class Type
 		ret.setTypeArgumentBounds(bounds);
 		return ret;
 	    }
+	}
+	if (type instanceof java.lang.reflect.TypeVariable) {
+	    return TypeVariable.make((java.lang.reflect.TypeVariable) type);
 	}
 	return null;
     }

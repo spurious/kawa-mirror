@@ -1,3 +1,9 @@
+2011-06-29  Per Bothner  <bothner@kuling.bothner.com>
+
+	* inlining-test.scm (get-from-vector1, get-from-vector2): New functions.
+	* Makefile.am: Test for new methods.
+	* inlining.expected: Update accordingly.
+
 2011-04-29  Per Bothner  <per@bothner.com>
 
 	* inlining-test.scm (factorial-infer2): New method - currently unused.

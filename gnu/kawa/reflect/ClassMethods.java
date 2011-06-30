@@ -70,7 +70,13 @@ public class ClassMethods extends Procedure2
 	  int k;
 	  for (k = tlen;  --k >= 0;  )
 	    {
-	      if (types1[k] != types2[k])
+	      Type pt1 = types1[k];
+	      Type pt2 = types2[k];
+	      if (pt1 instanceof TypeVariable)
+		  pt1 = ((TypeVariable) pt1).getRawType();
+	      if (pt2 instanceof TypeVariable)
+		  pt2 = ((TypeVariable) pt2).getRawType();
+	      if (pt1 != pt2)
 		break;
 	    }
 	  if (k >= 0)
@@ -103,7 +109,17 @@ public class ClassMethods extends Procedure2
                                            mode == 'P' ? null : dtype);
     boolean named_class_only = mode == 'P' || "<init>".equals(mname);
     Vector methods = new Vector();
-    dtype.getMethods(filter, named_class_only ? 0 : 2, methods);
+    ParameterizedType ptype;
+    ObjectType rtype;
+    if (dtype instanceof ParameterizedType) {
+	ptype = (ParameterizedType) dtype;
+	rtype = ptype.getRawType();
+    }
+    else {
+	ptype = null;
+	rtype = dtype;
+    }
+    rtype.getMethods(filter, named_class_only ? 0 : 2, methods);
     if (! named_class_only &&
         // If not redundant (i.e. not a normal ClassType), also search Object.
         ! (dtype instanceof ClassType && ! ((ClassType) dtype).isInterface()))
@@ -126,7 +142,7 @@ public class ClassMethods extends Procedure2
               method = new Method(method, (ClassType) itype);
             }
         }
-      PrimProcedure pproc = new PrimProcedure(method, mode, language);
+      PrimProcedure pproc = new PrimProcedure(method, mode, language, ptype);
       result[count++] = pproc;
     }
     return result;

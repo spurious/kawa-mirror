@@ -85,6 +85,8 @@ InliningTest.inlineTwoFunctions(java.lang.Object)java.lang.Object: 23 bytes
 InliningTest.checkEven(int)java.lang.Object: 34 bytes
 InliningTest.constantPropagation1()int: 3 bytes
 InliningTest.factorialInfer1(int)java.lang.Object: 25 bytes
+InliningTest.getFromVector1(gnu.lists.FVector,int)java.lang.Integer: 9 bytes
+InliningTest.getFromVector2(gnu.lists.FVector,int)java.lang.Integer: 9 bytes
 cycle1.isIsEven(int)boolean: 17 bytes
 cycle2.isIsOdd(int)boolean: 17 bytes
 binarytrees.bottomUpTree(int,int)binarytrees$TreeNode: 60 bytes

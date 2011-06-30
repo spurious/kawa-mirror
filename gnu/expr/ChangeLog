@@ -1,5 +1,14 @@
 2011-06-29  Per Bothner  <bothner@kuling.bothner.com>
 
+	* Language.java (getLangTypeFor): If type is a TypeVariable,
+	use getRawType result instead.
+	(formatTpe): If name is null, use toString.
+	* PrimProcedure.java (resolveTypeVariable): New helper method.
+	(<init>): Resolve TypeVariables against ParameterizedType.
+	(compile): If method's return type is TypeVariable, use raw type.
+
+2011-06-29  Per Bothner  <bothner@kuling.bothner.com>
+
 	* ClassExp.java (setTypes): Fix error where the same type was added
 	twice if ModuleExp.USE_DEFINED_CLASS is set.
 

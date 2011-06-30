@@ -39,6 +39,7 @@ Type.java \
 UninitializedType.java \
 Variable.java \
 VarEnumerator.java \
+TypeVariable.java \
 ZipArchive.java \
 ZipLoader.java \
 ArrayClassLoader.java \

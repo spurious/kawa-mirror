@@ -1,5 +1,23 @@
 2011-06-29  Per Bothner  <bothner@kuling.bothner.com>
 
+	Improved support for parameterized types.
+	* TypeVariable.java: New class, extends ObjectType.
+	* Makefile.am: Update accordingly.
+	* Type.java (make(java.lang.reflect.Type)): Handle TypeVariable.
+	Fix thinko.
+	*  StackMapTableAttr.java (encodeVerificationType): Use getRawType.
+	* ClassType.java (getTypeParameters): New method.
+	(addMethod): Make use of getGenericParameterTypes etc to set types
+	according to generic Java types.
+	* Method.java (makeGenericSignature): New method.
+	(assignConstants): Also emit Signature attribute if appropriate.
+	* ParameterizedType.java (getRawType): Refine to return a ClassType.
+	(getTypeArgumentBound): Make more robust.
+	(getGenericSignature): A tweak to emit a '*' wildcard.
+	(emitCoerceFromObject): New method.
+
+2011-06-29  Per Bothner  <bothner@kuling.bothner.com>
+
 	* Attribute.java (next): Make private.
 	* ClassTypeWriter.java (printAttributes): Use getNext method.
 	* InnerClassesAttr.java (getFirstInnerClasses): Likewise.

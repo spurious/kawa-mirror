@@ -131,7 +131,7 @@ public abstract class MethodProc extends ProcedureN
       return null;
     int num1 = proc1.numParameters();
     int num2 = proc2.numParameters();
-    int limit = num1 > num2 ? num1 : num2;
+    int limit = num1 < num2 ? num1 : num2;
     if (max1 != max2)
       {
         if (max1 < 0)

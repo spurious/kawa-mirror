@@ -27,10 +27,20 @@ public abstract class MethodProc extends ProcedureN
     for (int i = argCount;  --i >= 0; )
       {
         Type ptype = getParameterType(i);
+	boolean toStringTypeHack = ptype == Type.toStringType;
+	// Treat Type.toString as if it might need a narrowing cast, even
+	// though it always succeeds, so as to prefer methods that don't
+	// require the toString converstion.
+	if (toStringTypeHack)
+	    ptype = Type.javalangStringType;
         int code = ptype.compare(argTypes[i]);
-        if (code == -3)
-          return -1;
-        if (code < 0)
+        if (code == -3) {
+	  if (toStringTypeHack)
+	    result = 0;
+	  else
+	    return -1;
+	}
+        else if (code < 0)
           result = 0;
       }
     return result;

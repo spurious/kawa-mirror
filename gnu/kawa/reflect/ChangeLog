@@ -1,3 +1,8 @@
+2011-07-04  Per Bothner  <bothner@kuling.bothner.com>
+
+	* CompileInvoke.java (validateApplyInvoke): Complain if an object
+	constructor has post-keyword "children" arguments, but no add method.
+
 2011-06-29  Per Bothner  <bothner@kuling.bothner.com>
 
 	* ClassMethods.java (removeRedundantMethods): Handle TypeVariable.

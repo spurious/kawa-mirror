@@ -1,3 +1,8 @@
+2011-07-04  Per Bothner  <bothner@kuling.bothner.com>
+
+	* MethodProc.java (isApplicable): Add special hack for
+	Type.toStringType.
+
 2011-06-29  Per Bothner  <bothner@kuling.bothner.com>
 
 	* MethodProc.java (mostSpecific): Fix thinko.  (Not 100% sure this

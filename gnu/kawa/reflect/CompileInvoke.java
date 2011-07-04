@@ -318,8 +318,12 @@ public class CompileInvoke
                 return visitor.checkType(e.setLine(exp), required);
               }
           }
-        int okCount, maybeCount;
-        if (numCode >= 0)
+        int okCount = 0, maybeCount = 0;
+	if (kind == 'N' && tailArgs > 0)
+	  {
+	    comp.error('w', "args following keyword args but no 'add' method");
+	  }
+        else if (numCode >= 0)
           {
             for (int i = 1;  i < nargs; i++)
               {
@@ -363,11 +367,6 @@ public class CompileInvoke
                                         margsLength, argsStartIndex, objIndex);
             okCount = (int) (num >> 32);
             maybeCount = (int) num;
-          }
-        else
-          {
-            okCount = 0;
-            maybeCount = 0;
           }
         int nmethods = methods.length;
         if (okCount + maybeCount == 0 && kind == 'N')

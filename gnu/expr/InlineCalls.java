@@ -61,13 +61,14 @@ public class InlineCalls extends ExpExpVisitor<Type>
   {
     Type expType = exp.getType();
     boolean incompatible;
-    if (required instanceof ClassType && ((ClassType) required).isInterface()
+    if ((required instanceof ClassType || required instanceof ParameterizedType)
         && expType.isSubtype(Compilation.typeProcedure)
         && ! expType.isSubtype(required))
       {
         if (exp instanceof LambdaExp)
           {
-            Method amethod = ((ClassType) required).checkSingleAbstractMethod();
+            ClassType reqraw = required instanceof ParameterizedType ? ((ParameterizedType) required).getRawType() : (ClassType) required;
+            Method amethod = reqraw.checkSingleAbstractMethod();
             if (amethod != null)
               {
                 LambdaExp lexp = (LambdaExp) exp;

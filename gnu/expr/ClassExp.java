@@ -141,13 +141,17 @@ public class ClassExp extends LambdaExp
     for (int i = 0;  i < nsupers;  i++)
       {
 	Type st = Language.getDefaultLanguage().getTypeFor(supers[i]);
-	if (! (st instanceof ClassType))
+        ClassType t;
+        if (st instanceof ClassType)
+            t = (ClassType) st;
+        else if (st instanceof ParameterizedType)
+            t = ((ParameterizedType) st).getRawType();
+        else
           {
             comp.setLine(supers[i]);
             comp.error('e', "invalid super type");
             continue;
           }
-	ClassType t = (ClassType) st;
 	int modifiers;
 	try
 	  {

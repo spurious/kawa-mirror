@@ -216,10 +216,18 @@ public class Quote extends Syntax
             rest = pair.getCdr();
             if (rest instanceof Pair)
               {
-                pair = (Pair) rest;
-                continue;
+                IdentityHashMap map = (IdentityHashMap) seen;
+                Object old = map.get(rest);
+                if (old == null)
+                  {
+                    map.put(rest, WORKING);
+                    pair = (Pair) rest;
+                    continue;
+                  }
               }
             cdr = expand(rest, depth, syntax, seen, tr);
+            if (cdr == rest)
+              return list;
             break;
           }
         cdr = expand (pair.getCdr(), depth, syntax, seen, tr);
@@ -281,8 +289,10 @@ public class Quote extends Syntax
     return result;
   }
 
+  // Note in 'seen' map that datum is currently being expanded.
   private static final Object WORKING = new String("(working)");
-  private static final Object CYCLE = new String("(cycle)");
+  // Note in 'seen' map that datum is used multiple times, partly in cycle.
+  private static final Object SHARED = new String("(shared)");
 
   /** Backquote-expand a template.
    * @param template the quasiquoted template to expand
@@ -301,15 +311,16 @@ public class Quote extends Syntax
     Object old = map.get(template);
     if (old == WORKING)
       {
-        map.put(template, CYCLE);
-        return old;
+        map.put(template, SHARED);
+        return template;
       }
-    else if (old == CYCLE)
+    else if (old == SHARED)
       {
-        return old;
+        return template;
       }
     else if (old != null)
       return old;
+    map.put(template, WORKING);
     /* #endif */
     Object result;
     if (template instanceof Pair)
@@ -397,7 +408,7 @@ public class Quote extends Syntax
     else
       result = template;
     /* #ifdef use:java.util.IdentityHashMap */ 
-    if (template != result && map.get(template) == CYCLE)
+    if (template != result && map.get(template) == SHARED)
       tr.error('e', "cycle in non-literal data");
     map.put(template, result);
     /* #endif */

@@ -1,3 +1,7 @@
+2011-07-11  Per Bothner  <per@bothner.com>
+
+	* lang/Quote.java: Tweaks and fixes to actually handle cyclic values.
+
 2011-06-14  Per Bothner  <per@bothner.com>
 
 	* lang/Promise.java: Moved from here to gnu.mapping.

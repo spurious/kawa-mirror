@@ -5,7 +5,7 @@ package gnu.kawa.lispexpr;
 import gnu.text.*;
 import gnu.mapping.Values;
 
-public class ReaderParens extends ReadTableEntry
+public final class ReaderParens extends ReadTableEntry
 {
   char open;
   char close;
@@ -54,19 +54,26 @@ public class ReaderParens extends ReadTableEntry
     this.command = command;
   }
 
- /** Read a list (possibly improper) of zero or more Scheme forms.
+  /** Read a list (possibly improper) of zero or more Scheme forms.
    * Assumes '(' has been read.
    */
-  public Object read (Lexer in, int ch, int count)
+    public Object read (Lexer in, int ch, int count, int sharingIndex)
     throws java.io.IOException, SyntaxException
   {
-    Object r = readList((LispReader) in, ch, count, close);
+    Object p = null;
     if (command != null)
       {
         LineBufferedReader port = in.getPort();
         int startLine = port.getLineNumber();
         int startColumn = port.getColumnNumber();
-        Object p = ((LispReader) in).makePair(command, startLine, startColumn);
+        p = ((LispReader) in).makePair(command, startLine, startColumn);
+        ((LispReader) in).bindSharedObject(sharingIndex, p);
+	sharingIndex = -1;
+      }
+
+    Object r = readList((LispReader) in, ch, count, close, sharingIndex);
+    if (command != null)
+      {
         ((LispReader) in).setCdr(p, r);
         r = p;
       }
@@ -74,7 +81,7 @@ public class ReaderParens extends ReadTableEntry
   }
 
   public static Object readList (LispReader lexer,
-				 int ch, int count, int close)
+				 int ch, int count, int close, int sharingIndex)
     throws java.io.IOException, SyntaxException
   {
     LineBufferedReader port = lexer.getPort();
@@ -137,7 +144,13 @@ public class ReaderParens extends ReadTableEntry
 	      }
 	    else
 	      entry = readTable.lookup(ch);
-	    Object value = lexer.readValues(ch, entry, readTable);
+	    Object first = null;
+	    if (! sawDot && last == null)
+	      {
+		first = lexer.makePair(null, startLine, startColumn-1);
+		lexer.bindSharedObject(sharingIndex, first);
+	      }
+	    Object value = lexer.readValues(ch, entry, readTable, -1);
 	    if (value == Values.empty)
 	      continue;
             value = lexer.handlePostfix(value, readTable, line, column);
@@ -163,10 +176,12 @@ public class ReaderParens extends ReadTableEntry
 	      {
 		if (last == null)
 		  {
-		    line = startLine;
-		    column = startColumn-1;
+		    lexer.setCar(first, value);
+		    value = first;
+		    sharingIndex = -1;
 		  }
-		value = lexer.makePair(value, line, column);
+		else
+		  value = lexer.makePair(value, line, column);
 	      }
 	    if (last == null)
 	      list = value;
@@ -174,7 +189,7 @@ public class ReaderParens extends ReadTableEntry
 	      lexer.setCdr(last, value);
 	    last = value;
 	  }
-	return list;
+	return lexer.bindSharedObject(sharingIndex, list);
       }
     finally
       {

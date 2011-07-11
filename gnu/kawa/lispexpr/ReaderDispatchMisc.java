@@ -172,34 +172,22 @@ public class ReaderDispatchMisc extends ReadTableEntry
           in.error("a non-empty list starting with a symbol must follow #,");
 	return Boolean.FALSE;
       case '=':
-        Object object = reader.readObject();
-        if (in instanceof LispReader)
-          {
-            LispReader lin = (LispReader) in;
-            GeneralHashTable<Integer,Object> map = lin.sharedStructureTable;
-            if (map == null)
-              {
-                map = new GeneralHashTable<Integer,Object>();
-                lin.sharedStructureTable = map;
-              }
-            map.put(Integer.valueOf(count), object);
-          }
-        return object;
+	return reader.readObjectWithSharing(count);
       case '#':
         if (in instanceof LispReader)
           {
-            LispReader lin = (LispReader) in;
-            GeneralHashTable<Integer,Object> map = lin.sharedStructureTable;
+            GeneralHashTable<Integer,Object> map
+                = ((LispReader) in).sharedStructureTable;
             if (map != null)
               {
                 Integer key = Integer.valueOf(count);
-                object = map.get(key, in);
+                Object object = map.get(key, in);
                 if (object != in)
                   return object;
               }
           }
         in.error("an unrecognized #n# back-reference was read");
-	return Values.empty;
+	return Boolean.FALSE;
       default:
 	in.error("An invalid #-construct was read.");
 	return Values.empty;

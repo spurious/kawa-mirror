@@ -38,10 +38,13 @@ public abstract class ReadTableEntry
     return ReadTable.TERMINATING_MACRO;
   }
 
-  public Object read (Lexer in, int ch, int count)
-    throws java.io.IOException, SyntaxException
-  {
-    throw new Error("invalid character");
-  }
+    protected Object read (Lexer in, int ch, int count)
+        throws java.io.IOException, SyntaxException {
+        throw new Error("invalid character");
+    }
 
+    public Object read (Lexer in, int ch, int count, int sharingIndex)
+	throws java.io.IOException, SyntaxException {
+	return ((LispReader) in).bindSharedObject(sharingIndex, read(in, ch, count));
+    }
 }

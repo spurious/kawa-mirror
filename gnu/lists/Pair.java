@@ -35,6 +35,7 @@ public class Pair extends LList implements Externalizable
   public void setCdr(Object cdr) { this.cdr = cdr; }
 
   /** May go away soon. */
+  public void setCarBackdoor (Object car) { this.car = car; }
   public void setCdrBackdoor (Object cdr) { this.cdr = cdr; }
 
   public int size()

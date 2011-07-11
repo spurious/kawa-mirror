@@ -879,7 +879,7 @@ public class Scheme extends LispLanguage
       {
 	LispReader lexer = (LispReader)
 	  Language.getDefaultLanguage().getLexer(port, messages);
-	Object body = ReaderParens.readList(lexer, 0, 1, -1);
+	Object body = ReaderParens.readList(lexer, 0, 1, -1, -1);
         if (messages.seenErrors())
           throw new gnu.text.SyntaxException(messages);
 	return Eval.evalBody(body, env, messages);

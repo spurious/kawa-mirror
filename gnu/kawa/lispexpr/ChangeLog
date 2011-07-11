@@ -1,3 +1,17 @@
+2011-07-11  Per Bothner  <per@bothner.com>
+
+	Support reading cyclic lists and vectors using SRFI-38 #N= notation.
+	* LispReader.java (bindSharedObject): New helper method.
+	(readValues): Take extra sharingIndex parameter.
+	(readObjectWithSharing, setCar): New methods.
+	* ReadTableEntry.java (read(Lexer,int,int,int)): New method,
+	takes sharingIndex.
+	* ReaderDispatchMisc.java (read): Use readObjectWithSharing.
+	* ReaderParens.java: Handle self-referential lists.
+	* ReaderVector.java: Handle self-referential vectors.
+	* ReaderDispatch.java: Update to new APIs.
+	* ReaderXmlElement.java: Likewise.
+
 2011-06-29  Per Bothner  <bothner@kuling.bothner.com>
 
 	* BracketApply.java (rewrite): Parse TYPE[ARGS] like Java's TYPE<ARGS>.

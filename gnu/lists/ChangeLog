@@ -1,3 +1,9 @@
+2011-07-11  Per Bothner  <per@bothner.com>
+
+	* ConstVector.java (<init>): New default constructor.
+	(setDataBackDoor): New method used by LispReader.
+	* Pair.java (setCarBackdoor): New method used by LispReader.
+
 2011-04-25  Charles Turner <chturne@gmail.com>
 	    Per Bothner  <per@bothner.com>
 

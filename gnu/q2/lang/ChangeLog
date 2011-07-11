@@ -1,3 +1,7 @@
+2011-07-11  Per Bothner  <per@bothner.com>
+
+	* Q2Read.java (readIndentCommand): Use updated LispReader API.
+
 2011-04-03  Per Bothner  <per@bothner.com>
 
 	* Q2Translator.java (isApplyFunction): New method.

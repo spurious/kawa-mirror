@@ -1,5 +1,9 @@
 2011-07-11  Per Bothner  <per@bothner.com>
 
+	* standard/Scheme.java (eval): Use updated LispReader API.
+
+2011-07-11  Per Bothner  <per@bothner.com>
+
 	* lang/Quote.java: Tweaks and fixes to actually handle cyclic values.
 
 2011-06-14  Per Bothner  <per@bothner.com>

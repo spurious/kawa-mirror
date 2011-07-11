@@ -117,7 +117,7 @@ public class ReaderXmlElement extends ReadTableEntry
                   reader.eofError("unexpected EOF in list starting here",//FIXME
                                  startLine + 1, startColumn);
                 ReadTableEntry entry = readTable.lookup(ch);
-                Object value = reader.readValues(ch, entry, readTable);
+                Object value = reader.readValues(ch, entry, readTable, -1);
                 if (value == Values.empty)
                   continue;
                 value = reader.handlePostfix(value, readTable, line, column);

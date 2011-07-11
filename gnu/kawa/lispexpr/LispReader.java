@@ -27,6 +27,27 @@ public class LispReader extends Lexer
 
   GeneralHashTable<Integer,Object> sharedStructureTable;
 
+    /** Bind value to index in sharingStructuretable.
+     * @param value The object being defined.
+     * @param sharingIndex Back-reference index.
+     *   I.e. the value N in a @code{#N=} form.  If negative, do nothing.
+     * @return The value unchanged.
+     */
+    public Object bindSharedObject(int sharingIndex, Object value) {
+	if (sharingIndex >= 0) {
+	    GeneralHashTable<Integer,Object> map = sharedStructureTable;
+	    if (map == null) {
+		map = new GeneralHashTable<Integer,Object>();
+		sharedStructureTable = map;
+	    }
+	    Integer key = Integer.valueOf(sharingIndex);
+	    if (map.get(key, this) != this)
+              error('w', "a duplicate #n= definition was read");
+	    map.put(key, value);
+	}
+	return value;
+    }
+
   /** Read a #|...|#-style comment (which may contain other nested comments).
     * Assumes the initial "#|" has already been read.
     */
@@ -96,14 +117,15 @@ public class LispReader extends Lexer
     return '\0';
   }
 
-  public Object readValues (int ch,  ReadTable rtable)
+    public Object readValues (int ch,  ReadTable rtable, int sharingIndex)
       throws java.io.IOException, SyntaxException
   {
-    return readValues(ch, rtable.lookup(ch), rtable);
+    return readValues(ch, rtable.lookup(ch), rtable, sharingIndex);
   }
 
-  /** May return zero or multiple values. */
-  public Object readValues (int ch, ReadTableEntry entry, ReadTable rtable)
+  /** May return zero or multiple values.
+   * Returns no values if looking at whitespace or a comment. */
+  public Object readValues (int ch, ReadTableEntry entry, ReadTable rtable, int sharingIndex)
       throws java.io.IOException, SyntaxException
   {
     // Step numbers refer to steps in section 2.2 of the HyperSpec.
@@ -112,6 +134,7 @@ public class LispReader extends Lexer
 
     seenEscapes = false;
     int kind = entry.getKind();
+    Object result;
     switch (kind)
       {
       case ReadTable.ILLEGAL:
@@ -125,14 +148,14 @@ public class LispReader extends Lexer
 	return Values.empty;
       case ReadTable.TERMINATING_MACRO:
       case ReadTable.NON_TERMINATING_MACRO:
-	return entry.read(this, ch, -1);
+	  return entry.read(this, ch, -1, sharingIndex);
       case ReadTable.CONSTITUENT:
       case ReadTable.SINGLE_ESCAPE: // Step 5:
       case ReadTable.MULTIPLE_ESCAPE: // Step 6:
       default:  // 
-	break;
+	  result = readAndHandleToken(ch, startPos, rtable);
       }
-    return readAndHandleToken(ch, startPos, rtable);
+    return bindSharedObject(sharingIndex, result);
   }
 
   protected Object readAndHandleToken(int ch, int startPos, ReadTable rtable)
@@ -242,7 +265,7 @@ public class LispReader extends Lexer
         String uri = new String(tokenBuffer, lbrace, rbrace-lbrace);
         ch = read(); // skip ':' - previously peeked.
         ch = read();
-        Object rightOperand = readValues(ch, rtable.lookup(ch), rtable);
+        Object rightOperand = readValues(ch, rtable.lookup(ch), rtable, -1);
         if (! (rightOperand instanceof SimpleSymbol))
           error("expected identifier in symbol after '{URI}:'");
         // FIXME should allow "compound keyword" - for attribute names
@@ -368,9 +391,13 @@ public class LispReader extends Lexer
       }
   }
 
-  public Object readObject ()
-      throws java.io.IOException, SyntaxException
-  {
+    public Object readObject () throws java.io.IOException, SyntaxException {
+	return readObjectWithSharing(-1);
+    }
+
+    public Object readObjectWithSharing (int sharingIndex)
+	throws java.io.IOException, SyntaxException
+    {
     char saveReadState = ((InPort) port).readState;
     int startPos = tokenBufferLength;
     ((InPort) port).readState = ' ';
@@ -384,10 +411,11 @@ public class LispReader extends Lexer
 	    int ch = port.read();
 	    if (ch < 0)
 	      return Sequence.eofValue; // FIXME
-            Object value = readValues(ch, rtable);
+            Object value = readValues(ch, rtable, sharingIndex);
 	    if (value == Values.empty)
 	      continue;
-	    return handlePostfix(value, rtable, line, column);
+	    value = handlePostfix(value, rtable, line, column);
+	    return value;
 	  }
       }
     finally
@@ -422,7 +450,7 @@ public class LispReader extends Lexer
         if (ch == '[' && rtable.defaultBracketMode == -2)
           {
             port.read();
-            Object lst = ReaderParens.readList(this, ch, 1, ']');
+            Object lst = ReaderParens.readList(this, ch, 1, ']', -1);
             value = PairWithPosition.make(value, lst,
                                           port.getName(), line+1, column+1);
             value = PairWithPosition.make(LispLanguage.bracket_apply_sym, value,
@@ -439,7 +467,7 @@ public class LispReader extends Lexer
                 break;
               }
             ch = port.read();
-            Object rightOperand = readValues(ch, rtable.lookup(ch), rtable);
+            Object rightOperand = readValues(ch, rtable.lookup(ch), rtable, -1);
             value = LList.list2(value,
                                 LList.list2(rtable.makeSymbol(LispLanguage.quasiquote_sym), rightOperand));
             value = PairWithPosition.make(LispLanguage.lookup_sym, value,
@@ -1127,6 +1155,11 @@ public class LispReader extends Lexer
       return Pair.make(car, cdr);
   }
 
+  protected void setCar (Object pair, Object car)
+  {
+    ((Pair) pair).setCarBackdoor(car);
+  }
+
   protected void setCdr (Object pair, Object cdr)
   {
     ((Pair) pair).setCdrBackdoor(cdr);
@@ -1292,7 +1325,7 @@ public class LispReader extends Lexer
         reader.error("invalid uniform vector syntax");
         return null;
       }
-    Object list = ReaderParens.readList(reader, '(', -1, ')');
+    Object list = ReaderParens.readList(reader, '(', -1, ')', -1);
     int len = LList.listLength(list, false);
     if (len < 0)
       {

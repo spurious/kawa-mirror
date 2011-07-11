@@ -68,7 +68,7 @@ public class BRLRead extends LispReader
 		else
 		  {
 		    nesting++;
-		    Object value = readValues(ch, ReadTable.getCurrent());
+		    Object value = readValues(ch, ReadTable.getCurrent(), -1);
 		    if (value != Values.empty)
 		      {
 			if (value == gnu.expr.QuoteExp.voidExp)

@@ -17,13 +17,13 @@ public class ReaderVector extends ReadTableEntry
     this.close = close;
   }
 
-  public Object read (Lexer in, int ch, int count)
+  public Object read (Lexer in, int ch, int count, int sharingIndex)
     throws java.io.IOException, SyntaxException
   {
-    return readVector((LispReader) in, in.getPort(), count, close);
+    return readVector((LispReader) in, in.getPort(), count, close, sharingIndex);
   }
 
-  public static FVector readVector(LispReader lexer, LineBufferedReader port, int count, char close)
+    public static FVector readVector(LispReader lexer, LineBufferedReader port, int count, char close, int sharingIndex)
     throws java.io.IOException, SyntaxException
   {
     char saveReadState = ' ';
@@ -35,6 +35,9 @@ public class ReaderVector extends ReadTableEntry
      try
        {
 	 java.util.Vector vec = new java.util.Vector();
+         ConstVector result = new ConstVector();
+         lexer.bindSharedObject(sharingIndex, result);
+
          ReadTable rtable = ReadTable.getCurrent();
 	 for (;;)
 	   {
@@ -43,7 +46,7 @@ public class ReaderVector extends ReadTableEntry
 	       lexer.eofError("unexpected EOF in vector");
 	     if (ch == close)
 	       break;
-	     Object value = lexer.readValues(ch, rtable);
+	     Object value = lexer.readValues(ch, rtable, -1);
 	     if (value instanceof Values)
 	       {
 		 Object[] values = ((Values) value).getValues();
@@ -60,7 +63,9 @@ public class ReaderVector extends ReadTableEntry
 	   }
 	 Object[] objs = new Object[vec.size()];
 	 vec.copyInto(objs);
-	 return new ConstVector(objs);
+         result.setDataBackDoor(objs);
+	 return result;
+
        }
      finally
        {

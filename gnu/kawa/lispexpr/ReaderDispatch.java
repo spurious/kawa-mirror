@@ -72,7 +72,7 @@ public class ReaderDispatch extends ReadTableEntry
     return tab;
   }
 
-  public Object read (Lexer in, int ch, int count)
+  public Object read (Lexer in, int ch, int count, int sharingIndex)
     throws java.io.IOException, SyntaxException
   {
     count = -1;
@@ -100,6 +100,6 @@ public class ReaderDispatch extends ReadTableEntry
                  "invalid dispatch character '"+((char) ch)+'\'');
 	return Values.empty;
       }
-    return entry.read(in, ch, count);
+    return entry.read(in, ch, count, sharingIndex);
   }
 }

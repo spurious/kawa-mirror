@@ -6,6 +6,10 @@ import java.util.*;
 
 public class ConstVector<E> extends FVector<E>
 {
+  public ConstVector ()
+  {
+  }
+
   public ConstVector (Object[] data)
   {
     super(data);
@@ -29,5 +33,11 @@ public class ConstVector<E> extends FVector<E>
   protected void checkCanWrite ()
   {
     throw new UnsupportedOperationException();
+  }
+
+  public void setDataBackDoor(Object[] data)
+  {
+    this.data = data;
+    this.size = data.length;
   }
 }

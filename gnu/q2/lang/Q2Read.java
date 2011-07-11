@@ -159,7 +159,7 @@ public class Q2Read extends LispReader
         ch = port.read();
         if (ch < 0)
           break;
-        Object val = readValues(ch, rtable);
+        Object val = readValues(ch, rtable, -1);
         prev = val;
         if (val != Values.empty)
           rresult = makePair(val, rresult, line, column);

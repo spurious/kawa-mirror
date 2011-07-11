@@ -412,7 +412,7 @@
 (set! v '("abc" "aa" "zy" ""))
 (java.util.Collections:sort v)
 (test-assert "sort-v-7" (equal? '("" "aa" "abc" "zy") v))
-(set! v #((b 3) (a 1) (b 2) (a 2) (b -1) (a)))
+(set! v (vector '(b 3) '(a 1) '(b 2) '(a 2) '(b -1) '(a)))
 (java.util.Collections:sort v)
 (test-equal "sort-v-8" #((a) (a 1) (a 2) (b -1) (b 2) (b 3)) v)
 

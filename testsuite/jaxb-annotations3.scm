@@ -71,7 +71,7 @@
 (adjust-prices bb 1.1)
 (bb:books:add
  (Book year: "2006"
-       title: "JavaScript: The Definitive Guide (5th edtion)"
+       title: "JavaScript: The Definitive Guide (5th edition)"
        authors: [(Author last: "Flanagan" first: "David")]
        publisher: "O'Reilly"
        price: (BigDecimal "49.99")))

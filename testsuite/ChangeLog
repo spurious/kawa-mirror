@@ -1,3 +1,11 @@
+2011-07-11  Per Bothner  <per@bothner.com>
+
+	* num-test.scm: Cannot sort in-place a constant-vector, so
+	use vector function instead.
+
+	* jaxb-annotations3.scm: Fix typo.
+	* jaxb-annotations3.expected: Update accordingly.
+
 2011-06-29  Per Bothner  <bothner@kuling.bothner.com>
 
 	* inlining-test.scm (get-from-vector1, get-from-vector2): New functions.

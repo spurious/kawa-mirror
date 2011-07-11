@@ -30,7 +30,7 @@
     <price>142.94</price>
   </book>
   <book year="2006">
-    <title>JavaScript: The Definitive Guide (5th edtion)</title>
+    <title>JavaScript: The Definitive Guide (5th edition)</title>
     <author><last>Flanagan</last><first>David</first></author>
     <publisher>O'Reilly</publisher>
     <price>49.99</price>

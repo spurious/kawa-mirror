@@ -69,6 +69,7 @@ java_sources = \
   ReferenceExp.java \
   ScopeExp.java \
   SetExp.java \
+  SourceName.java \
   Special.java \
   StackTarget.java \
   Symbols.java \

@@ -892,6 +892,17 @@ public abstract class Language
           }
 	fdname = Compilation.demangleName(fname, true).intern();
       }
+    try
+      {
+        SourceName sourceName = fld.getReflectField().getAnnotation(SourceName.class);
+        if (sourceName != null)
+          {
+            fdname = Symbol.valueOf(sourceName.name(), sourceName.uri(), sourceName.prefix());
+          }
+      }
+    catch (Throwable ex)
+      {
+      }
     if (fdname instanceof String)
       {
         String uri = mod.getNamespaceUri();

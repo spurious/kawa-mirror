@@ -1115,7 +1115,9 @@ public class Declaration
       ftype = Compilation.typeLocation;
     if (! ignorable())
       {
-        String fname = getName();
+        String dname = getName();
+        String fname = dname;
+        boolean haveName = fname != null;
         int nlength;
         if (fname==null)
           {
@@ -1126,15 +1128,56 @@ public class Declaration
           {
             fname = Compilation.mangleNameIfNeeded(fname);
             if (getFlag(IS_UNKNOWN))
-              fname = UNKNOWN_PREFIX + fname;
+              {
+                fname = UNKNOWN_PREFIX + fname;
+                haveName = false;
+              }
             if (external_access && ! getFlag(Declaration.MODULE_REFERENCE))
-              fname = PRIVATE_PREFIX + fname;
-            nlength = fname.length();
+              {
+                fname = PRIVATE_PREFIX + fname; 
+                haveName = false;
+              }
+           nlength = fname.length();
           }
         int counter = 0;
         while (frameType.getDeclaredField(fname) != null)
           fname = fname.substring(0, nlength) + '$' + (++ counter);
         field = frameType.addField (fname, ftype, fflags);
+        if (haveName)
+          {
+            Object fsymbol = getSymbol();
+            String uri, prefix;
+            boolean haveUri, havePrefix; 
+            // If name is a non-simple Symbol (i.e. with uri or prefix)
+            // or the field name doesn't demangle to name, then emit
+            // a SourceName annotation so we can recover the correct name.
+            if (fsymbol instanceof Symbol)
+              {
+                uri = ((Symbol) fsymbol).getNamespaceURI();
+                prefix = ((Symbol) fsymbol).getPrefix();
+                if (uri == null)
+                  uri = "";
+                haveUri = ! "".equals(uri);
+                havePrefix = ! "".equals(prefix);
+              }
+            else
+              {
+                uri = prefix = "";
+                haveUri = havePrefix = false;
+              }
+            // FIXME should optimize if uri == module.getNamespaceUri()
+            if (haveUri || havePrefix
+                || ! Compilation.demangleName(fname, true).equals(dname))
+              {
+                AnnotationEntry ae = new AnnotationEntry(ClassType.make("gnu.expr.SourceName"));
+                ae.addMember("name", dname, Type.javalangStringType);
+                if (haveUri)
+                  ae.addMember("uri", uri, Type.javalangStringType);
+                if (havePrefix)
+                  ae.addMember("prefix", prefix, Type.javalangStringType);
+                RuntimeAnnotationsAttr.maybeAddAnnotation(field, ae);
+              }
+          }
         if (value instanceof QuoteExp)
           {
             Object val = ((QuoteExp) value).getValue();

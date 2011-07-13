@@ -1,3 +1,13 @@
+2011-07-12  Per Bothner  <per@bothner.com>
+
+	* SourceName.java: New annotation interface.
+	* Makefile.am: Update accordingly.
+	* Declaration.java (makeField): If name is a non-simple Symbol (i.e.
+	with uri or prefix) or field name doesn't demangle to name, then
+	emit a SourceName annotation so we can recover the name.
+	* Language.java (declFromField): Check if field has a SourceName
+	annotation; if so use that to set the Declaration's name.
+
 2011-07-09  Per Bothner  <per@bothner.com>
 
 	* ClassExp.java (setTypes): Handle ParameterizedType in super-type.

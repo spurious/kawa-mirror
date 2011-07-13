@@ -77,6 +77,9 @@ public class Namespace
     return EmptyNamespace;
   }
 
+  /** Return Namespace with the given name (namespace-URI).
+   *  Create it if needed.
+   */
   public static Namespace valueOf (String name)
   {
     if (name == null)
@@ -92,6 +95,15 @@ public class Namespace
 	return ns;
       }
   }
+
+    /** Return Namespace with the given name (namespace-URI), if it exists.
+     * Return null if no such namespace exists.
+     */
+    public static Namespace valueOfNoCreate(String name) {
+        if (name == null)
+            name = "";
+        return (Namespace) nsTable.get(name);
+    }
 
   public static Namespace valueOf (String uri, String prefix)
   {

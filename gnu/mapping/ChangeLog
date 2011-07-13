@@ -1,3 +1,7 @@
+2011-07-13  Per Bothner  <per@bothner.com>
+
+	* Namespace.java (valueOfNoCreate): New static method.
+
 2011-07-04  Per Bothner  <bothner@kuling.bothner.com>
 
 	* MethodProc.java (isApplicable): Add special hack for

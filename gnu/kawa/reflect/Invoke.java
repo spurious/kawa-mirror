@@ -208,7 +208,7 @@ public class Invoke extends ProcedureN
             if (err == 0)
               return vars.runUntilValue();
 
-            MethodProc vproc = ClassMethods.apply((ClassType) dtype, "valueOf",
+            MethodProc vproc = ClassMethods.apply(dtype, "valueOf",
                                                   '\0', language);
             if (vproc != null)
               {
@@ -243,7 +243,7 @@ public class Invoke extends ProcedureN
           i = 1;
         if (i != args.length)
           {
-            MethodProc aproc = ClassMethods.apply((ClassType) dtype, "add",
+            MethodProc aproc = ClassMethods.apply(dtype, "add",
                                               '\0', language);
             if (aproc == null)
               throw MethodProc.matchFailAsException(err, proc, args);

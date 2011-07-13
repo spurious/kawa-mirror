@@ -1,3 +1,8 @@
+2011-07-13  Per Bothner  <per@bothner.com>
+
+	* Invoke.java (applyN): Remove two ClassType casts, so the code will
+	also work for other types, such as LangObjType.
+
 2011-07-12  Per Bothner  <per@bothner.com>
 
 	* MakeAnnotation.java (asAnnotation): Moved to

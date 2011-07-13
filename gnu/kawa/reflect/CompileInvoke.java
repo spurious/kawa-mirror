@@ -45,19 +45,19 @@ public class CompileInvoke
     if (kind == 'V' || kind == '*')      // Invoke virtual
       {
         margsLength = nargs - 1;
-        argsStartIndex = 2;
+        argsStartIndex = 2; // Skip receiver and method name.
         objIndex = 0;
       }
     else if (kind == 'N')                // make new
       {
         margsLength = nargs;
-        argsStartIndex = 0;
+        argsStartIndex = 0; // Include class specifier
         objIndex = -1;
       }
     else if (kind == 'S' || kind == 's') // Invoke static
       {
         margsLength = nargs - 2;
-        argsStartIndex = 2;
+        argsStartIndex = 2; // Skip class and method name.
         objIndex = -1;
       }
     else if (kind == 'P')                // Invoke special
@@ -201,121 +201,53 @@ public class CompileInvoke
             comp.error('w', "unknown class: " + type.getName());
             return exp;
           }
-        int index = -1;
-        Object[] slots;
-        boolean usingConstVector = false;
-        if (kind == 'N' && type == LangObjType.constVectorType)
-          {
-            Method defcons;
-            ClassType creq;
-            if (tailArgs == 0 && required instanceof ClassType
-                && (creq = (ClassType) required).isSubclass(Compilation.typeList)
-                && (defcons = creq.getDefaultConstructor()) != null)
-              {
-                ctype = creq;
-                type = ctype;
-                usingConstVector = true;
-                keywordStart = args.length;
-                numCode = 1;
-                tailArgs = nargs - 1;
-                methods[0] = new PrimProcedure(defcons, iproc.language);
-                arg0 = new QuoteExp(ctype.getReflectClass());
-              }
-            else
-              {
-                Expression[] xargs = new Expression[nargs];
-                System.arraycopy(args, 1, xargs, 1, nargs-1);
-                xargs[0] = new QuoteExp(Compilation.objArrayType);
-                return visitor.visit(new ApplyExp(iproc,
-                                                  new Expression[] {
-                                                    new QuoteExp(Compilation.typeConstVector),
-                                                    new ApplyExp(exp.getFunction(), xargs).setLine(exp)}).setLine(exp), required);
-              }
-          }
 
-        if (kind == 'N'
-            && ((tailArgs > 0 && numCode > 0) // Have keywords
-                || (numCode == MethodProc.NO_MATCH_TOO_MANY_ARGS
-                    // There is a default constructor.
-                    && (ClassMethods.selectApplicable(methods,
-                                                      new Type[] { Compilation.typeClassType })
-                        >> 32) == 1))
-            && (((slots = checkKeywords(ctype, args, keywordStart, caller))
-                 .length * 2 == tailArgs && numCode > 0)
-                || ClassMethods.selectApplicable(ClassMethods.getMethods(ctype, "add", 'V', null, iproc.language), 2) > 0))
+        if (kind == 'N')
           {
-            StringBuffer errbuf = null;
-            for (int i = 0;  i < slots.length;  i++)
+            boolean usingConstVector = false;
+            if (type == LangObjType.constVectorType)
               {
-                if (slots[i] instanceof String)
+                Method defcons;
+                ClassType creq;
+                if (tailArgs == 0 && required instanceof ClassType
+                    && (creq = (ClassType) required).isSubclass(Compilation.typeList)
+                    && (defcons = creq.getDefaultConstructor()) != null)
                   {
-                    if (errbuf == null)
-                      {
-                        errbuf = new StringBuffer();
-                        errbuf.append("no field or setter ");
-                      }
-                    else
-                      errbuf.append(", ");
-                    errbuf.append('`');
-                    errbuf.append(slots[i]);
-                    errbuf.append('\'');
-                  }
-              }
-            if (errbuf != null)
-              {
-                errbuf.append(" in class ");
-                errbuf.append(type.getName());
-                comp.error('w', errbuf.toString());
-                return exp;
-              }
-            else
-              {
-                ApplyExp ae;
-                if (keywordStart < args.length)
-                  {
-                    Expression[] xargs = new Expression[keywordStart];
-                    System.arraycopy(args, 0, xargs, 0, keywordStart);
-                    ae = (ApplyExp) visitor.visit(new ApplyExp(exp.getFunction(), xargs), ctype);
+                    ctype = creq;
+                    type = ctype;
+                    usingConstVector = true;
+                    keywordStart = 1;
+                    numCode = MethodProc.NO_MATCH_TOO_MANY_ARGS;
+                    tailArgs = nargs-1;
+                    methods[0] = new PrimProcedure(defcons, iproc.language);
+                    arg0 = new QuoteExp(ctype.getReflectClass());
                   }
                 else
-                  ae = new ApplyExp(methods[0], new Expression[] { arg0 });
-                ae.setType(ctype);
-                Expression e = ae;
-                if (args.length > 0)
                   {
-                    comp.letStart();
-                    Declaration adecl = comp.letVariable((String) null, ctype, e);
-                    adecl.setFlag(Declaration.ALLOCATE_ON_STACK);
-                    BeginExp begin = new BeginExp();
-                    for (int i = 0;  i < slots.length;  i++)
-                      {
-                        Object slot = slots[i];
-                        ReferenceExp aref = new ReferenceExp(adecl);
-                        Expression arg = args[keywordStart + 2 * i + 1];
-                        begin.add(visitor.visit(CompileReflect.makeSetterCall(aref, (Member) slot, arg), Type.voidType));
-                      }
-                    int sargs = keywordStart == args.length ? 1
-                      : 2 * slots.length + keywordStart;
-                    if (sargs < args.length)
-                      {
-                        for (int i = sargs;  i < args.length;  i++)
-                          {
-                            Expression[] iargs = {
-                              new ReferenceExp(adecl),
-                              QuoteExp.getInstance("add"),
-                              args[i]
-                            };
-                            begin.add(visitor.visit(new ApplyExp(Invoke.invoke,
-                                                                 iargs),
-                                                    null));
-                          }
-                      }
-                    ReferenceExp aref = new ReferenceExp(adecl);
-                    aref.setFlag(ReferenceExp.ALLOCATE_ON_STACK_LAST);
-                    begin.add(aref);
-                    e = comp.letDone(begin);
+                    Expression[] xargs = new Expression[nargs];
+                    System.arraycopy(args, 1, xargs, 1, nargs-1);
+                    xargs[0] = new QuoteExp(Compilation.objArrayType);
+                    return visitor.visit(new ApplyExp(iproc,
+                                                      new Expression[] {
+                                                          new QuoteExp(Compilation.typeConstVector),
+                                                          new ApplyExp(exp.getFunction(), xargs).setLine(exp)}).setLine(exp), required);
                   }
-                return visitor.checkType(e.setLine(exp), required);
+              }
+
+            CompileBuildObject builder = CompileBuildObject.make(exp, visitor, required, keywordStart, ctype, caller);
+            if (tailArgs > 0 && numCode > 0) // Have keywords
+              return builder.build();
+            if (usingConstVector)
+              {
+                builder.setDefaultConstructor(methods[0]);  
+                return builder.build();
+              }
+            if (numCode == MethodProc.NO_MATCH_TOO_MANY_ARGS
+                && builder.hasDefaultConstructor()
+                && builder.hasAddChildMethod())
+              {
+                builder.keywordStart = 1;
+                return builder.build();
               }
           }
         int okCount = 0, maybeCount = 0;
@@ -379,6 +311,7 @@ public class CompileInvoke
             okCount = (int) (num >> 32);
             maybeCount = (int) num;
           }
+        int index = -1;
         if (okCount + maybeCount == 0)
           {
             if (kind == 'P' || comp.warnInvokeUnknownMethod())
@@ -470,41 +403,6 @@ public class CompileInvoke
       }
     exp.visitArgs(visitor);
     return exp;
-  }
-
-  /** Return an array if args (starting with start) is a set of
-   * (keyword, value)-value pairs.
-   * The array elements are either: a Field, a "setXxx" Method,
-   * a "addXxx" Method, or a String if there is no matching member.
-   * If an element is a Method, it is not necessarily applicable or
-   * the best match, so you should only use the method name to verify
-   * there is a matching method.
-   */
-  static Object[] checkKeywords(ObjectType type, Expression[] args,
-                                int start, ClassType caller)
-  {
-    int len = args.length;
-    int npairs = 0;
-    while (start + 2 * npairs + 1 < len
-           && args[start + 2 * npairs].valueIfConstant() instanceof Keyword)
-      npairs++;
-    Object[] fields = new Object[npairs];
-    for (int i = 0;  i < npairs;  i++)
-      {
-        Object value = args[start + 2 * i].valueIfConstant();
-        String name = ((Keyword) value).getName();
-        // Look for field name for a "set" method.
-        Member slot = SlotSet.lookupMember(type, name, caller);
-        if (slot == null)
-          {
-            // Look for for an "add" method.
-            // For example: (define b (JButton action-listener: ...))
-            // maps to: (define b ...) (b:addActionListener ...)
-            slot = type.getMethod(ClassExp.slotToMethodName("add", name), SlotSet.type1Array);
-          }
-        fields[i] = slot != null ? (Object) slot : (Object) name;
-      }
-    return fields;
   }
 
   private static String getMethodName(Expression[] args, char kind)

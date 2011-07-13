@@ -10,6 +10,7 @@ java_sources = \
   ClassMemberLocation.java \
   ClassMethods.java \
   CompileArrays.java \
+  CompileBuildObject.java \
   CompileInvoke.java \
   CompileReflect.java \
   FieldLocation.java \

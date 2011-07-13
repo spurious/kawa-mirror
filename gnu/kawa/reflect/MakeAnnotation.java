@@ -62,9 +62,6 @@ public class MakeAnnotation extends ProcedureN
   }
 
 
-  static final ClassType classAnnotation =
-    ClassType.make("java.lang.annotation.Annotation");
-
   public static Expression validate
   (ApplyExp exp, InlineCalls visitor, Type required, Procedure proc)
   {
@@ -92,7 +89,7 @@ public class MakeAnnotation extends ProcedureN
     AnnotationEntry aentry = null;
     if (annotationType != null)
       {
-        if (annotationType.implementsInterface(classAnnotation))
+        if (annotationType.implementsInterface(Type.javalangannotationAnnotationType))
           aentry = new AnnotationEntry(annotationType);
         else
           messages.error('e', annotationType.getName()+" is not an annotation type");
@@ -156,8 +153,7 @@ public class MakeAnnotation extends ProcedureN
           {
             try
               {
-                AnnotationEntry.Value val = asAnnotationValue(arg, eltype);
-                aentry.addMember(name, val);
+                aentry.addMember(name, arg, eltype);
               }
             catch (Throwable ex)
               {
@@ -177,62 +173,6 @@ public class MakeAnnotation extends ProcedureN
       }
     else
       return exp;
-  }
-
-  public static AnnotationEntry.Value asAnnotationValue (Object val, Type type)
-  {
-    String sig = type.getSignature();
-    char kind = sig.charAt(0);
-    switch (kind)
-      {
-      case 'B': val= ((Number) val).byteValue();  break;
-      case 'S': val= ((Number) val).shortValue();  break;
-      case 'I': val= ((Number) val).intValue();  break;
-      case 'J': val = ((Number) val).longValue();  break;
-      case 'L':
-        if (sig.equals("Ljava/lang/String;"))
-          {
-            kind = 's';
-            val = (String) val;
-          }
-        else if (sig.equals("Ljava/lang/Class;"))
-          {
-            kind = 'c';
-            if (val instanceof Type)
-              val = (Type) val;
-            else
-              val = Type.make((Class) val);
-          }
-        else if (((ClassType) type).isSubclass("java.lang.Enum"))
-          {
-            kind = 'e';
-          }
-        else if (((ClassType) type).implementsInterface(classAnnotation))
-          {
-            kind = '@';
-            val = (AnnotationEntry) Proxy.getInvocationHandler(val);
-          }
-        break;
-      case '[':
-        Type eltype = ((ArrayType) type).getComponentType();
-        List<AnnotationEntry.Value> alist = new ArrayList<AnnotationEntry.Value>();
-        if (val instanceof List<?>)
-          {
-            List<?> lst = (List<?>) val;
-            int len = lst.size();
-            for (int i = 0;  i < len; i++)
-              alist.add(asAnnotationValue(lst.get(i), eltype));
-          }
-        else
-          {
-            int len = Array.getLength(val);
-            for (int i = 0;  i < len; i++)
-              alist.add(asAnnotationValue(Array.get(val, i), eltype));
-          }
-        val = alist;
-        break;
-      }
-    return new AnnotationEntry.Value(kind, type, val);
   }
 
   public Object applyN (Object[] args)
@@ -276,7 +216,7 @@ public class MakeAnnotation extends ProcedureN
         if (method == null)
           throw new IllegalArgumentException("no annotation element named '"+name+'\'');
         Type eltype = method.getReturnType();
-        aentry.addMember(name, asAnnotationValue(arg, eltype));
+        aentry.addMember(name, AnnotationEntry.asAnnotationValue(arg, eltype));
       }
     return Proxy.newProxyInstance(aclass.getClassLoader(),
                                   new Class[] { aclass }, aentry);

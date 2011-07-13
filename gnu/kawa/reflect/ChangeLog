@@ -1,3 +1,8 @@
+2011-07-12  Per Bothner  <per@bothner.com>
+
+	* MakeAnnotation.java (asAnnotation): Moved to
+	gnu/bytecode/AnnotationEntry.java.
+
 2011-07-04  Per Bothner  <bothner@kuling.bothner.com>
 
 	* CompileInvoke.java (validateApplyInvoke): Complain if an object

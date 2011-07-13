@@ -627,6 +627,8 @@ public abstract class Type
     = ClassType.make("java.lang.Boolean");
   public static final ClassType javalangThrowableType
     = ClassType.make("java.lang.Throwable");
+  public static final ClassType javalangannotationAnnotationType
+    = ClassType.make("java.lang.annotation.Annotation");
   public static final Type[] typeArray0 = new Type[0];
   public static final Method toString_method
     = objectType.getDeclaredMethod("toString", 0);

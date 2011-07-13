@@ -4,6 +4,7 @@
 package gnu.bytecode;
 import java.util.*;
 import java.lang.reflect.Array;
+import java.lang.reflect.Proxy;
 import java.lang.annotation.*;
 /* #ifdef use:javax.lang.model */
 import javax.lang.model.element.*;
@@ -73,6 +74,68 @@ implements java.lang.reflect.InvocationHandler
   {
     elementsValue.put(name, value);
   }
+
+  public void addMember(String name, Object value, Type type)
+  {
+      elementsValue.put(name, asAnnotationValue(value, type));
+  }
+
+  public static Value asAnnotationValue(Object val, Type type)
+  {
+    String sig = type.getSignature();
+    char kind = sig.charAt(0);
+    switch (kind)
+      {
+      case 'B': val= ((Number) val).byteValue();  break;
+      case 'S': val= ((Number) val).shortValue();  break;
+      case 'I': val= ((Number) val).intValue();  break;
+      case 'J': val = ((Number) val).longValue();  break;
+      case 'L':
+        if (sig.equals("Ljava/lang/String;"))
+          {
+            kind = 's';
+            val = (String) val;
+          }
+        else if (sig.equals("Ljava/lang/Class;"))
+          {
+            kind = 'c';
+            if (val instanceof Type)
+              val = (Type) val;
+            else
+              val = Type.make((Class) val);
+          }
+        else if (((ClassType) type).isSubclass("java.lang.Enum"))
+          {
+            kind = 'e';
+          }
+        else if (((ClassType) type).implementsInterface(Type.javalangannotationAnnotationType))
+          {
+            kind = '@';
+            val = (AnnotationEntry) Proxy.getInvocationHandler(val);
+          }
+        break;
+      case '[':
+        Type eltype = ((ArrayType) type).getComponentType();
+        List<AnnotationEntry.Value> alist = new ArrayList<AnnotationEntry.Value>();
+        if (val instanceof List<?>)
+          {
+            List<?> lst = (List<?>) val;
+            int len = lst.size();
+            for (int i = 0;  i < len; i++)
+              alist.add(asAnnotationValue(lst.get(i), eltype));
+          }
+        else
+          {
+            int len = Array.getLength(val);
+            for (int i = 0;  i < len; i++)
+              alist.add(asAnnotationValue(Array.get(val, i), eltype));
+          }
+        val = alist;
+        break;
+      }
+    return new AnnotationEntry.Value(kind, type, val);
+  }
+
 
   /* #ifdef JAVA5 */
   @SuppressWarnings("unchecked")

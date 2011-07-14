@@ -1,3 +1,9 @@
+2011-07-14  Per Bothner  <per@bothner.com>
+
+	* ClassExp.java (checkDefaultSuperConstructor): New method.
+	* InlineCalls.java (visitLambdaExp): Use checkDefaultSuperConstructor.
+	(visitClassExp): New method.  Call checkDefaultSuperConstructor.
+
 2011-07-12  Per Bothner  <per@bothner.com>
 
 	* SourceName.java: New annotation interface.

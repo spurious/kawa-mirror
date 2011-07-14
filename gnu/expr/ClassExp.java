@@ -720,6 +720,13 @@ public class ClassExp extends LambdaExp
     code.emitCheckcast(superClass.getOuterLinkType());
   }
 
+  void checkDefaultSuperConstructor(ClassType superClass, Compilation comp)
+  {
+    if (superClass.getDeclaredMethod("<init>", 0) == null)
+      comp.error('e', ("super class "+superClass.getName()
+                       +" does not have a default constructor"));
+  }
+
   static void invokeDefaultSuperConstructor (ClassType superClass,
                                              Compilation comp,
                                              LambdaExp lexp)
@@ -727,7 +734,8 @@ public class ClassExp extends LambdaExp
     CodeAttr code = comp.getCode();
     Method superConstructor
       = superClass.getDeclaredMethod("<init>", 0);
-    // InlineCalls.visitLambdaExp catches the missing superConstructor case.
+    // InlineCalls catches the missing superConstructor case, using
+    // checkDefaultSuperConstructor.
     assert superConstructor != null;
     code.emitPushThis();
     if (superClass.hasOuterLink() && lexp instanceof ClassExp)

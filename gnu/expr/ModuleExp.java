@@ -534,7 +534,7 @@ public class ModuleExp extends LambdaExp
             && (parent = parentPath.toString()).length() > 0 // Probably redundant.
             && parent.indexOf("..") < 0)
           {
-            parent = parent.replaceAll(System.getProperty("file.separator"), "/");
+            parent = parent.replace(System.getProperty("file.separator"), "/");
             if (parent.startsWith("./"))
               parent = parent.substring(2);
             className = parent.equals(".") ? className

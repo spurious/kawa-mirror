@@ -23,11 +23,11 @@ TEXI2PDF = texi2pdf
 
 man_MANS = kawa.1 qexo.1
 kawa.1: $(srcdir)/kawa.man
-	nroff -man $(srcdir)/kawa.man | col -b > kawa1.tmp
+	nroff -man $(srcdir)/kawa.man > kawa1.tmp
 	mv kawa1.tmp kawa.1
 
 qexo.1: $(srcdir)/qexo.man
-	nroff -man $(srcdir)/qexo.man | col -b > qexo1.tmp
+	nroff -man $(srcdir)/qexo.man > qexo1.tmp
 	mv qexo1.tmp qexo.1
 
 ../kawa-doc-$(VERSION).tar.gz: kawa/index.html kawa.pdf

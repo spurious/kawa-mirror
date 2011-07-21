@@ -1,3 +1,8 @@
+2011-07-21  Per Bothner  <per@bothner.com>
+
+	* kawa.1: Don't pipe nroff output through col.  It produces bad output.
+	It also adds a needless dependency, which is a hassle for cygwin.
+
 2011-04-15  Per Bothner  <per@bothner.com>
 
 	* kawa.texi: Various minor tweaks, fixes, and updates.

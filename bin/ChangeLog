@@ -1,3 +1,7 @@
+2011-07-21  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (kawa.sh): Fix so it works on Cygwin.
+
 2009-09-25  Per Bothner  <per@bothner.com>
 
 	* Makefile.am: add explicit definitions of binPROGRAMS_INSTALL;

@@ -94,12 +94,12 @@ if WITH_GCJ_NO_DBTOOL
 	echo 'exec $$thisdir/kawa-bin "$$@"' >>tmp
 else
 	echo 'if test -f $$thisdir/../$(KAWAJAR)' >>tmp
-	echo 'then KAWALIB=$${KAWALIB-$$thisdir/../$(KAWAJAR)}' >>tmp
+	echo 'then KAWALIB=$${KAWALIB-"`$(CYGPATH_W) "$$thisdir/../$(KAWAJAR)"`"}' >>tmp
 	echo 'else KAWALIB=$${KAWALIB-$(KAWALIB)}; fi' >>tmp
-	echo 'CLASSPATH=$${KAWALIB}:$${CLASSPATH-$(CLASSPATH)}' >>tmp
+	echo 'CLASSPATH="$${KAWALIB}$(CLASSPATH_SEPARATOR)$${CLASSPATH-$(CLASSPATH)}"' >>tmp
 	echo 'export CLASSPATH' >>tmp
 	if JAVA=`which $(JAVA)`; then true; else JAVA=$(JAVA); fi; \
-	  echo 'exec $${JAVA-'$${JAVA}'} kawa.repl "$$@"' >>tmp
+	  echo 'exec $${JAVA-"'$${JAVA}'"} kawa.repl "$$@"' >>tmp
 endif
 endif
 	chmod +x tmp

@@ -33,7 +33,6 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-target_triplet = @target@
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(top_srcdir)/Make-rules ChangeLog
 subdir = kawa
@@ -96,6 +95,7 @@ BYTECODE_VERSION = @BYTECODE_VERSION@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
+CLASSPATH_SEPARATOR = @CLASSPATH_SEPARATOR@
 CPPFLAGS = @CPPFLAGS@
 CXX = @CXX@
 CXXDEPMODE = @CXXDEPMODE@
@@ -196,17 +196,14 @@ sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 srcdir = @srcdir@
 sysconfdir = @sysconfdir@
-target = @target@
 target_alias = @target_alias@
-target_cpu = @target_cpu@
-target_os = @target_os@
-target_vendor = @target_vendor@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 SUFFIXES = .java .class .scm .el .lisp
 javadir = $(datadir)/java/$(subdir)
-CLASSPATH_ENV = CLASSPATH=$(JAVAROOT)@pathsep@$(srcdir)@filesep@$(JAVAROOT)@pathsep@@conf_classpath@$$CLASSPATH
+CLASSPATH = $(JAVAROOT)$(CLASSPATH_SEPARATOR)$(srcdir)@filesep@$(JAVAROOT)$(CLASSPATH_SEPARATOR)@conf_classpath@$$CLASSPATH
+CLASSPATH_ENV = CLASSPATH=$(CLASSPATH)
 JAVAROOT = $(top_builddir)
 JAR = fastjar
 #GCJFLAGS = -gdwarf-2 -O
@@ -221,7 +218,7 @@ java_Java = $(java_BUILT) $(java_sources)
 GCJ_DEPS = $(java_Java) $(EXTRA_GCJ_DEPS)
 DISTFILES = $(DIST_COMMON)  $(java_sources) $(java_SCM) $(TEXINFOS) $(EXTRA_DIST)
 CLEANFILES = $(java_BUILT) *.class *.stamp *.jar $(PACKAGE_OFILE) $(EXTRA_CLEAN)
-KAWA_COMPILER = $(CLASSPATH_ENV) $(JAVA) kawa.repl -d $(top_builddir) \
+KAWA_COMPILER = $(JAVA) -classpath "$(CLASSPATH)" kawa.repl -d $(top_builddir) \
   -P `echo $(PACKAGE_FNAME)|sed -e s/-/./g`.
 
 SUBDIRS = lang standard lib
@@ -594,7 +591,7 @@ $(PACKAGE_OFILE):  $(GCJ_DEPS)
 @WITH_LIBTOOL_FALSE@	$(CLASSPATH_ENV) $(GCJ) $(GCJFLAGS) -c -fPIC *.class -o $(PACKAGE_OFILE)
 
 java-classes.stamp: $(java_Java)
-	$(CLASSPATH_ENV) $(JAVAC) -d $(JAVAROOT) $(JAVACFLAGS) $?
+	$(JAVAC) -d $(JAVAROOT) -classpath "$(CLASSPATH)" $(JAVACFLAGS) $?
 	echo timestamp > java-classes.stamp
 	echo timestamp > $(TO_TOPDIR)/kawa-jar.stamp
 

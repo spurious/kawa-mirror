@@ -3,7 +3,7 @@ AC_INIT([kawa],[1.11]) dnl Also update build.xml.
 AC_CONFIG_SRCDIR([doc/kawa.texi])
 
 AM_MAINTAINER_MODE
-AC_CANONICAL_TARGET([])
+AC_CANONICAL_HOST
 
 AM_INIT_AUTOMAKE
 
@@ -195,7 +195,11 @@ AM_CONDITIONAL(WITH_LIBTOOL, test "$with_libtool" = "yes")
 JEMACS_VERSION=`echo $VERSION | sed  -e 's/^1/0/'`
 BYTECODE_VERSION="$VERSION"
 
-pathsep=':'
+pathsep="$PATH_SEPARATOR"
+case ${host} in
+  *-*-mingw*|*-*-cygwin*) CLASSPATH_SEPARATOR=";" ;;
+  *) CLASSPATH_SEPARATOR="$PATH_SEPARATOR"
+esac
 filesep='/'
 
 case ${with_servlet} in
@@ -221,6 +225,7 @@ XQTS_PATH=${with_XQTS:XQTS}
 AC_SUBST(XQTS_PATH)
 AC_SUBST(SAX2_PREPROCESS)
 AC_SUBST(conf_classpath)
+AC_SUBST(CLASSPATH_SEPARATOR)
 AC_SUBST(pathsep)
 AC_SUBST(filesep)
 

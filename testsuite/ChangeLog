@@ -1,5 +1,11 @@
 2011-07-21  Per Bothner  <per@bothner.com>
 
+	* Makefile.am: Various changes to make (most of) the tests work on
+	Cygwin - make use of CLASSPATH_SEPARATOR; quote path strings
+	in case of spaces or semi-colons.
+	(DIFF): New variable, so we can run diff with --strip-trailing-cr.
+	* HelloCgiS.scm: Minor tweak to match expected output.
+
 	* Makefile.am (check-text): Specify port-char-encoding to be UTF-8,
 	since text-test.scm contains non-Ascii characters.
 

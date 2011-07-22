@@ -1,5 +1,12 @@
 2011-07-21  Per Bothner  <per@bothner.com>
 
+	Add support for using configure+make (autotools) on Cygwin.
+	* configure.in: Use AC_CANONICAL_HOST, not AC_CANONICAL_TARGET.
+	(CLASSPATH_SEPARATOR): New substitution variable.
+	* Make-rules (CLASSPATH): New variable.  Make Cygwin-safe.
+	(java-classes.stamp): Use -classpath option rather than CLASSPATH.
+	(KAWA_COMPILER): Likewise.
+
 	* Makefile.am (kawa-@VERSION@.jar, kawart-@VERSION@.jar):
 	Instead of using fnd output directly in command line (which might
 	thus come too large, especially on cygwin), use file-list file.

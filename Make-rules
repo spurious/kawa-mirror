@@ -1,7 +1,8 @@
 SUFFIXES = .java .class .scm .el .lisp
 
 javadir=$(datadir)/java/$(subdir)
-CLASSPATH_ENV = CLASSPATH=$(JAVAROOT)@pathsep@$(srcdir)@filesep@$(JAVAROOT)@pathsep@@conf_classpath@$$CLASSPATH
+CLASSPATH = $(JAVAROOT)$(CLASSPATH_SEPARATOR)$(srcdir)@filesep@$(JAVAROOT)$(CLASSPATH_SEPARATOR)@conf_classpath@$$CLASSPATH
+CLASSPATH_ENV = CLASSPATH=$(CLASSPATH)
 JAVAROOT = $(top_builddir)
 GCJ = gcj
 JAR = fastjar
@@ -33,11 +34,11 @@ else
 endif
 
 java-classes.stamp: $(java_Java)
-	$(CLASSPATH_ENV) $(JAVAC) -d $(JAVAROOT) $(JAVACFLAGS) $?
+	$(JAVAC) -d $(JAVAROOT) -classpath "$(CLASSPATH)" $(JAVACFLAGS) $?
 	echo timestamp > java-classes.stamp
 	echo timestamp > $(TO_TOPDIR)/kawa-jar.stamp
 
-KAWA_COMPILER = $(CLASSPATH_ENV) $(JAVA) kawa.repl -d $(top_builddir) \
+KAWA_COMPILER = $(JAVA) -classpath "$(CLASSPATH)" kawa.repl -d $(top_builddir) \
   -P `echo $(PACKAGE_FNAME)|sed -e s/-/./g`.
 
 scm-classes.stamp: $(java_SCM)

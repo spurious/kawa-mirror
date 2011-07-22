@@ -1,3 +1,11 @@
+2011-07-21  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (kawa-@VERSION@.jar, kawart-@VERSION@.jar):
+	Instead of using fnd output directly in command line (which might
+	thus come too large, especially on cygwin), use file-list file.
+	(classes.list, classes-rt.list): New helper files and targets.
+	(-MOSTLYCLEANFILES): Update accordingly.
+
 2011-02-08  Jamison Hope <jrh@theptrgroup.com>
 
 	*  build.xml (slib-scm): Add srfi14.scm.

@@ -39,13 +39,17 @@ if WITH_JAVAX_SCRIPT
 META_INF_FILES = $(META_ScriptEngineFactory)
 endif
 
-kawa-@VERSION@.jar: ./kawa-jar.stamp $(META_INF_FILES)
-	$(JAR) cmf $(srcdir)/jar-manifest $@ $(META_INF_FILES)\
-	    `find gnu kawa -name '*.class' -print`
+classes.list: ./kawa-jar.stamp
+	find gnu kawa -name '*.class' -print >classes.list
 
-kawart-@VERSION@.jar: ./kawa-jar.stamp $(srcdir)/classes-to-skip-for-runtime
-	$(JAR) cf $@ \
-	  `find gnu kawa -name '*.class' -print | grep -v -f $(srcdir)/classes-to-skip-for-runtime`
+classes-rt.list: ./kawa-jar.stamp $(srcdir)/classes-to-skip-for-runtime 
+	find gnu kawa -name '*.class' -print | grep -v -f $(srcdir)/classes-to-skip-for-runtime >classes-rt.list
+
+kawa-@VERSION@.jar: ./kawa-jar.stamp $(META_INF_FILES) classes.list
+	$(JAR) cmf $(srcdir)/jar-manifest $@ $(META_INF_FILES) @classes.list
+
+kawart-@VERSION@.jar: ./kawa-jar.stamp classes-rt.list
+	$(JAR) cf $@ @classes-rt.list
 
 $(META_ScriptEngineFactory): Makefile
 	echo 'kawa.standard.SchemeScriptEngineFactory #Scheme' >tmp.ScriptEngineFactory
@@ -109,7 +113,7 @@ EXTRA_DIST = debian/control debian/rules debian/changelog debian/dirs \
   gnu/jemacs/jar-manifest gnu/jemacs/status.html \
   kawa/Version.java jar-manifest Make-rules classes-to-skip-for-runtime
 
-MOSTLYCLEANFILES = tmp *.o kawa1$(exeext) *.stamp
+MOSTLYCLEANFILES = tmp *.o kawa1$(exeext) *.stamp classes.list classes-rt.list
 CLEANFILES = *.jar kawa/Version.java $(META_ScriptEngineFactory)
 
 HTML_HOME = $$HOME/public_html

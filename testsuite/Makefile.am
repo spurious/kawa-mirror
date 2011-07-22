@@ -82,7 +82,7 @@ check-srfi-69:
 	$(KAWA) $(OPTIONS) "$(srcdir)/srfi-69-test.scm"
 
 check-text:
-	$(KAWA) $(OPTIONS) "$(srcdir)/text-test.scm"
+	$(KAWA) $(OPTIONS) -e '(set! port-char-encoding "UTF-8")' -f "$(srcdir)/text-test.scm"
 
 check-regex:
 	$(KAWA) $(OPTIONS) "$(srcdir)/regex-test.scm"

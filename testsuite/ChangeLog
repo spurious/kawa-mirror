@@ -1,3 +1,8 @@
+2011-07-21  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (check-text): Specify port-char-encoding to be UTF-8,
+	since text-test.scm contains non-Ascii characters.
+
 2011-07-11  Per Bothner  <per@bothner.com>
 
 	* num-test.scm: Cannot sort in-place a constant-vector, so

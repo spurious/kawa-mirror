@@ -1,3 +1,7 @@
+2011-07-24  Per Bothner  <per@bothner.com>
+
+	* InlineCalls.java (visitLambdaExp): Adjust for this-parameter.
+
 2011-07-21  Per Bothner  <per@bothner.com>
 
 	* ModuleExp.java (classFor): Fix thinko - use String.replace rather

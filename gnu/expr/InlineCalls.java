@@ -474,9 +474,11 @@ public class InlineCalls extends ExpExpVisitor<Type>
                   {
                     Expression func = app.getFunction();
                     int nargs = app.getArgCount();
+                    Declaration p = firstDecl;
+                    if (p != null && p.isThisParameter())
+                        p = p.nextDecl();
                     int i = 0;
-                    for (Declaration p = firstDecl; p != null;
-                         p = p.nextDecl(), i++)
+                    for (; p != null; p = p.nextDecl(), i++)
                       {
                         if (! p.hasUnknownValue())
                           p.noteValueFromApply(app, i);

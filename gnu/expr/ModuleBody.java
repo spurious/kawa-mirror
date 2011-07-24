@@ -7,7 +7,7 @@ import gnu.kawa.reflect.ClassMemberLocation;
  * Class for the dummy top-level function of a module.
  */
 
-public abstract class ModuleBody extends Procedure0
+public abstract class ModuleBody extends Procedure0 implements RunnableModule
 {
   public void apply (CallContext ctx)  throws Throwable
   {
@@ -128,6 +128,12 @@ public abstract class ModuleBody extends Procedure0
   /** This is invoked by main when ModuleBody is compiled with --main. */
   public final void runAsMain ()
   {
+    runAsMain(this);
+  }
+
+  /** This is invoked by main when ModuleBody is compiled with --main. */
+  public static void runAsMain (RunnableModule module)
+  {
     boolean registered = gnu.text.WriterManager.instance.registerShutdownHook();
     try
       {
@@ -136,13 +142,14 @@ public abstract class ModuleBody extends Procedure0
 	  {
 	    OutPort out = OutPort.outDefault();
 	    ctx.consumer = kawa.Shell.getOutputConsumer(out);
-	    run(ctx);
+	    module.run(ctx);
 	    ctx.runUntilDone();
 	    out.freshLine();
 	  }
 	else
 	  {
-	    run();
+            ctx.consumer = VoidConsumer.instance;
+            module.run(ctx);
 	    ctx.runUntilDone();
 	  }
         if (! registered)

@@ -1,5 +1,12 @@
 2011-07-24  Per Bothner  <per@bothner.com>
 
+	Support for main module that has module-extends.
+	*  RunnableModule.java: New interface.
+	* Makefile.am: Update accordingly.
+	* ModuleBody.java (runAsMain): Add static method.
+	* Compilation.java (typeRunnableModule): New static field.
+	(generateBytecode): Some tweaks when generating "run" method.
+
 	* InlineCalls.java (visitLambdaExp): Adjust for this-parameter.
 
 2011-07-21  Per Bothner  <per@bothner.com>

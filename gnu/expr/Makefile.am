@@ -67,6 +67,7 @@ java_sources = \
   ProcInitializer.java \
   PushApply.java \
   ReferenceExp.java \
+  RunnableModule.java \
   ScopeExp.java \
   SetExp.java \
   SourceName.java \

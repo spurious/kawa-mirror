@@ -241,6 +241,7 @@ public class Compilation implements SourceLocator
   public static final ClassType typeConstVector = ClassType.make("gnu.lists.ConstVector");
   public static final ArrayType objArrayType = ArrayType.make(typeObject);
   static public ClassType typeRunnable = ClassType.make("java.lang.Runnable");
+  static public ClassType typeRunnableModule = ClassType.make("gnu.expr.RunnableModule");
   public static ClassType typeType = ClassType.make("gnu.bytecode.Type");
   public static ClassType typeObjectType
     = ClassType.make("gnu.bytecode.ObjectType");
@@ -1051,6 +1052,7 @@ public class Compilation implements SourceLocator
       }
     if (makeRunnable())
       type.addInterface(typeRunnable);
+    type.addInterface(typeRunnableModule);
     type.setSuper(sup);
 
     module.compiledType = type;
@@ -1954,20 +1956,20 @@ public class Compilation implements SourceLocator
     LambdaExp saveLambda = curLambda;
     curLambda = module;
     Type[] arg_types;
-    if (module.isHandlingTailCalls())
+    if (module.isHandlingTailCalls()) // Is this ever false?
       {
 	arg_count = 1;
 	arg_types = new Type[1];
 	arg_types[0] = typeCallContext;
       }
     else if (module.min_args != module.max_args || module.min_args > 4)
-      {
+      { // Likely dead code.
 	arg_count = 1;
 	arg_types = new Type[1];
 	arg_types[0] = new ArrayType (typeObject);
       }
     else
-      {
+      { // Likely dead code.
 	arg_count = module.min_args;
 	arg_types = new Type[arg_count];
 	for (int i = arg_count;  --i >= 0; )
@@ -2066,8 +2068,8 @@ public class Compilation implements SourceLocator
 	  }
 	code.emitReturn();
 
-	if (moduleClass != mainClass
-	    && ! staticModule && ! generateMain && ! immediate)
+	if (moduleClass != mainClass && ! staticModule
+            && curClass.getSuperclass().getDeclaredMethod("run", 0) == null)
 	  {
 	    // Compare the run methods in ModuleBody.
 	    method = curClass.addMethod("run", Access.PUBLIC,
@@ -2184,7 +2186,13 @@ public class Compilation implements SourceLocator
 	    code.emitDup(curClass);
 	    code.emitInvokeSpecial(curClass.constructor);
 	  }
-	code.emitInvokeVirtual(typeModuleBody.getDeclaredMethod("runAsMain", 0));
+        Method runAsMainMethod = null;
+        ClassType superClass = curClass.getSuperclass();
+        if (superClass != typeModuleBody)
+           runAsMainMethod = superClass.getDeclaredMethod("runAsMain", 0);
+        if (runAsMainMethod == null)
+            runAsMainMethod = typeModuleBody.getDeclaredMethod("runAsMain", 1);
+        code.emitInvoke(runAsMainMethod);
 	code.emitReturn();
       }
 

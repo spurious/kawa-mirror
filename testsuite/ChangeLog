@@ -1,3 +1,9 @@
+2011-07-24  Per Bothner  <per@bothner.com>
+
+	* moduleM.scm: New test, for main/runable module with module-extends.
+	* moduleM.expected: Expected output.
+	* Makefile.am: Update accordingly.
+
 2011-07-21  Per Bothner  <per@bothner.com>
 
 	* Makefile.am: Various changes to make (most of) the tests work on

@@ -215,7 +215,7 @@ EXTRA_DIST = package.html
 SUFFIXES = .java .class .scm .el .lisp
 javadir = $(datadir)/java/$(subdir)
 CLASSPATH = $(JAVAROOT)$(CLASSPATH_SEPARATOR)$(srcdir)@filesep@$(JAVAROOT)$(CLASSPATH_SEPARATOR)@conf_classpath@$$CLASSPATH
-CLASSPATH_ENV = CLASSPATH=$(CLASSPATH)
+CLASSPATH_ENV = CLASSPATH="$(CLASSPATH)"
 JAVAROOT = $(top_builddir)
 JAR = fastjar
 #GCJFLAGS = -gdwarf-2 -O

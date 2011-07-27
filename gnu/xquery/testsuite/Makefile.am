@@ -50,7 +50,7 @@ maketab1.class:  maketab1.xql
 # Should not run $(JAVA) when built --with-gcj, as that runs
 # interpreter gij.  Instead, should compile to native.
 check-maketab1:  maketab1.class
-	CLASSPATH=.:$(KAWALIB) $(JAVA) maketab1 >tmp2
+	CLASSPATH=".$(CLASSPATH_SEPARATOR)$(KAWALIB)" $(JAVA) maketab1 >tmp2
 	@if diff -b $(srcdir)/tab.html tmp2; then echo '# maketab1 test passes'; else echo FAIL maketab1 test; fi
 
 # FIXME - this does not do the correct thing
@@ -61,7 +61,7 @@ multab.class:  multab.xql
 	$(KAWA) --main --xquery -C $<
 
 check-multab:  multab.class
-	CLASSPATH=.:$(KAWALIB) $(JAVA) multab \
+	CLASSPATH=".$(CLASSPATH_SEPARATOR)$(KAWALIB)" $(JAVA) multab \
 	  max=10 caption="Multiplication table " out:xml-indent=pretty >tmpmul
 	@if diff -b $(srcdir)/expectedmul.xml tmpmul; then echo '# multab test passes'; else echo FAIL multab test; fi
 
@@ -69,7 +69,7 @@ descend.class:  descend.xql
 	$(KAWA) --main --xquery -C $<
 
 check-descend:  descend.class
-	CLASSPATH=.:$(KAWALIB) $(JAVA) descend >tmpdesc
+	CLASSPATH=".$(CLASSPATH_SEPARATOR)$(KAWALIB)" $(JAVA) descend >tmpdesc
 	@if diff -b $(srcdir)/expdescend.xml tmpdesc; then echo '# descend test passes'; else echo FAIL descend test; fi
 
 check-xsltest1:
@@ -92,7 +92,7 @@ check-format-users:
 usemod.class: usemod.xql ./Mod1/mod1.class ./Mod2/mod2.class ./Mod2/mod2a.class
 	$(CLASSPATH_ENV) $(KAWA) --main -C $<
 check-mod: usemod.class
-	CLASSPATH=.:$(KAWALIB) $(JAVA) usemod >tmp-usemod
+	CLASSPATH=".$(CLASSPATH_SEPARATOR)$(KAWALIB)" $(JAVA) usemod >tmp-usemod
 	@if diff -b $(srcdir)/usemod.exp tmp-usemod; \
 	  then echo '# usemod test passes'; \
 	  else echo FAIL usemod test; fi

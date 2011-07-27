@@ -83,6 +83,11 @@ public class ParameterizedType extends ObjectType
     }
 
     /** @Override */
+    public String getName() {
+        return toString();
+    }
+
+    /** @Override */
     public String toString() {
 	StringBuilder buf = new StringBuilder();
 	buf.append(rawType);

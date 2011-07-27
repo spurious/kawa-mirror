@@ -386,7 +386,7 @@ public abstract class Type
     return null;
   }
 
-  public final String getName ()
+  public String getName ()
   {
     return this_name;
   }

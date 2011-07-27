@@ -1,3 +1,8 @@
+2011-07-27  Per Bothner  <per@bothner.com>
+
+	* ParameterizedType.java (getName): Call toString().
+	* Type.java (getName): Make non-final.
+
 2011-07-12  Per Bothner  <per@bothner.com>
 
 	* Type.java (javalangannotationAnnotationType): New static field.

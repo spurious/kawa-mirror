@@ -75,6 +75,7 @@ gnu/kawa/functions/CompileTimeContinuation.class
 gnu/kawa/functions/GetNamedExp.class
 gnu/kawa/functions/SetArrayExp.class
 gnu/kawa/functions/SetListExp.class
+gnu/kawa/javafx/GroupObjectBuilder*.class
 gnu/kawa/lispexpr/DefineNamespace.class
 gnu/kawa/lispexpr/Lisp2Compilation.class
 gnu/kawa/reflect/CompileArrays.class

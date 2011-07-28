@@ -1,0 +1,7 @@
+2011-07-27  Per Bothner  <per@bothner.com>
+
+	New directory.  Experimental support for using JavaFX 2.x.
+
+	* defs.scm: New file.  Various definitions.
+	* GroupObjectBuilder.scm: New file.
+	* Makefile.am: New file.

@@ -1,5 +1,11 @@
 2011-07-27  Per Bothner  <per@bothner.com>
 
+	* configure.in: add support for JavaFX 2.x.
+	(--with-javafx): New command-line flag.
+	(WITH_JAVAFX): New conditional.
+	* Makefile.am (JAVAFX_SUBDIRS): New macro.
+	* classes-to-skip-for-runtime: Add some classes.
+
 	* Make-rules (CLASSPATH_ENV): Add quotes.
 
 2011-07-21  Per Bothner  <per@bothner.com>

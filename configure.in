@@ -31,6 +31,9 @@ AC_ARG_WITH(servlet,
 AC_ARG_WITH(android,
   AS_HELP_STRING(--with-android@<:@=android.jar@:>@,Build for the Android platform))
 
+AC_ARG_WITH(javafx,
+  AS_HELP_STRING(--with-javafx@<:@=javafx_home@:>@,Enable support for JavaFX))
+
 AC_ARG_WITH(XQTS,
   AS_HELP_STRING(--with-XQTS@<:@=XQTS-path@:>@,Support XQuery Test Suite))
 
@@ -183,6 +186,8 @@ AM_CONDITIONAL(ENABLE_XML, test "$enable_xml" = "yes")
 AM_CONDITIONAL(ENABLE_SERVLET,
   test "$enable_servlet" != "" -a "$enable_servlet" != "no")
 AM_CONDITIONAL(WITH_SWING, test "$with_swing" != "no")
+AM_CONDITIONAL(WITH_JAVAFX,
+  test "$with_javafx" != "" -a "$with_javafx" != "no")
 AM_CONDITIONAL(WITH_SWT, test "$with_swt" = "yes")
 AM_CONDITIONAL(WITH_AWT, test "$with_awt" != "no")
 AM_CONDITIONAL(WITH_SAX2, test "$with_sax2" != "no")
@@ -208,11 +213,17 @@ case ${with_servlet} in
   "") ;;
   *) conf_classpath=${with_servlet}${pathsep}$conf_classpath ;;
 esac
+case ${with_javafx} in
+  yes) ;;
+  no) ;;
+  "") ;;
+  *) conf_classpath=${with_javafx}/rt/lib/jfxrt.jar${CLASSPATH_SEPARATOR}$conf_classpath ;;
+esac
 case ${with_android} in
   yes) ;;
   no) ;;
   "") ;;
-  *) conf_classpath=${with_android}${pathsep}$conf_classpath ;;
+  *) conf_classpath=${with_android}${CLASSPATH_SEPARATOR}$conf_classpath ;;
 esac
 
 case ${with_sax2} in
@@ -281,5 +292,6 @@ AC_CONFIG_FILES([Makefile gnu/bytecode/Makefile gnu/math/Makefile
   gnu/kawa/ant/Makefile
   gnu/kawa/models/Makefile gnu/kawa/swingviews/Makefile
   gnu/kawa/swtviews/Makefile gnu/kawa/echo2/Makefile gnu/kawa/android/Makefile
+  gnu/kawa/javafx/Makefile
   doc/Makefile testsuite/Makefile bin/Makefile])
 AC_OUTPUT

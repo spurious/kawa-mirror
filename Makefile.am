@@ -4,7 +4,7 @@ SUBDIRS = doc testsuite gnu/bytecode gnu/math gnu/lists gnu/text \
   gnu/mapping $(XML_SUBDIRS) gnu/expr \
   gnu/kawa/util gnu/kawa/reflect gnu/kawa/functions gnu/kawa/lispexpr \
   gnu/kawa/models gnu/kawa/swingviews gnu/kawa/swtviews \
-  kawa gnu/kawa/slib gnu/commonlisp gnu/q2 gnu/ecmascript \
+  kawa gnu/kawa/slib gnu/commonlisp gnu/q2 gnu/ecmascript $(JAVAFX_SUBDIRS) \
   gnu/kawa/servlet $(ECHO2_SUBDIRS) $(SAX_SUBDIR) gnu/kawa/ant \
   $(JEMACS_SUBDIRS) $(XQUERY_SUBDIR) $(BRL_SUBDIRS) $(ANDROID_SUBDIRS) bin
 if ENABLE_JEMACS
@@ -28,6 +28,9 @@ ECHO2_SUBDIRS = gnu/kawa/echo2
 endif
 if WITH_ANDROID
 ANDROID_SUBDIRS = gnu/kawa/android
+endif
+if WITH_JAVAFX
+JAVAFX_SUBDIRS = gnu/kawa/javafx
 endif
 javadir=$(datadir)/java
 
@@ -126,7 +129,7 @@ JAVADOC_PACKAGES = \
   gnu.kawa.xslt gnu.kawa.sax gnu.commonlisp.lang gnu.q2.lang \
   gnu.kawa.models gnu.kawa.swingviews gnu.kawa.swtviews gnu.kawa.echo2 \
   gnu.jemacs.lang gnu.jemacs.buffer gnu.jemacs.swing gnu.jemacs.swt \
-  gnu.kawa.android
+  gnu.kawa.android gnu.kawa.javafx
 
 JAVADOC = javadoc
 JAVADOC_FLAGS = -use

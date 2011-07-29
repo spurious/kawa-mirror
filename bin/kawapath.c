@@ -6,6 +6,7 @@
 #ifndef GCJ_COMPILED
 const char *kawalib = KAWALIB;
 const char *kawajar = KAWAJAR;
+const char *extrapath = EXTRAPATH;
 
 char *
 get_classpath(const char *progname)
@@ -55,17 +56,19 @@ get_classpath(const char *progname)
   
   classpath = getenv ("CLASSPATH");
   if (classpath == NULL)
+    classpath = ".";
+  int extra_length = strlen (extrapath);
+  const char *extra_sep;
+  if (extra_length > 0 && extrapath[extra_length-1] == ':')
     {
-      char *buf = malloc (strlen (path) + 20);
-      sprintf (buf, "CLASSPATH=.:%s", path);
-      classpath = buf;
+      extra_length--;
+      extra_sep = ":";
     }
   else
-    {
-      char *buf = malloc (strlen (path) + strlen (classpath) + 20);
-      sprintf (buf, "CLASSPATH=%s:%s", classpath, path);
-      classpath = buf;
-    }
-  return classpath;
+    extra_sep = "";
+  char *buf = malloc (strlen (path) + strlen (classpath) + extra_length + strlen (extra_sep) + 12);
+  sprintf (buf, "CLASSPATH=%s:%s%s%.*s",
+           classpath, path, extra_sep, extra_length, extrapath);
+  return buf;
 }
 #endif

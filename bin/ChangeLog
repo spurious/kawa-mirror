@@ -1,3 +1,8 @@
+2011-07-29  Per Bothner  <per@bothner.com>
+
+	* kawapath.c: Add EXTRAPATH to runtime classpath.
+	* Makefile.am: Pass conf_classpath as EXTRAPATH.
+
 2011-07-21  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (kawa.sh): Fix so it works on Cygwin.

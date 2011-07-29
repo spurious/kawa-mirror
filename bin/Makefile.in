@@ -217,7 +217,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 KAWAJAR = kawa-$(VERSION).jar
 KAWALIB = $(datadir)/java/$(KAWAJAR)
-WITHOUT_GCJ_DEFS = -DJAVA='"$(JAVA)"' -DKAWALIB='"$(KAWALIB)"' -DKAWAJAR='"$(KAWAJAR)"'
+WITHOUT_GCJ_DEFS = -DJAVA='"$(JAVA)"' -DKAWALIB='"$(KAWALIB)"' -DKAWAJAR='"$(KAWAJAR)"' -DEXTRAPATH='"$(conf_classpath)"'
 @ENABLE_KAWA_FRONTEND_TRUE@KAWAPROGS_KAWA = kawa
 KAWASCRIPTS_KAWA = kawa.sh
 noinst_SCRIPTS = kawa.sh

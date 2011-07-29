@@ -1,3 +1,8 @@
+2011-07-28  Per Bothner  <per@bothner.com>
+
+	* build.xml: Add support for enable-javafx and javax.home properties,
+	to build Kawa with JavaFX support.
+
 2011-07-27  Per Bothner  <per@bothner.com>
 
 	* configure.in: add support for JavaFX 2.x.

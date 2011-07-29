@@ -61,7 +61,8 @@
   <target name="classes" 
           depends="java-classes, lib-scm-classes
           , slib-scm-classes, commonlisp-scm-classes, brl-classes
-          , xml-classes, servlet-classes, jemacs-classes, android-classes" />
+          , xml-classes, servlet-classes, jemacs-classes, android-classes
+          , javafx-classes" />
   
   <!-- 
      These are the files that are Kawa.    
@@ -142,6 +143,26 @@
 
     <property name="enable-android" value="false"/>
 
+    <property name="javafx.home" value=""/>
+    <property name="enable-javafx" value="false"/>
+    <condition property="do.enable.javafx">
+      <or>
+        <istrue value="${enable-javafx}"/>
+        <not><equals arg1="${javafx.home}" arg2=""/></not>
+      </or>
+    </condition>
+    <condition property="-use.javafx.home">
+      <and>
+        <not><equals arg1="${javafx.home}" arg2=""/></not>
+        <istrue value="${do.enable.javafx}"/>
+      </and>
+    </condition>
+
+    <path id="build.classpath">
+      <pathelement path="${java.class.path}"/>
+      <fileset dir="${javafx.home}"><include name="rt/lib/jfxrt.jar" if="-use.javafx.home"/></fileset>
+    </path>
+
     <!-- If javax.servlet.http.HttpServlet is in the classpath, then we'll
          compile Kawa' servlet interface, unless you override enable-servlet.
 
@@ -171,6 +192,7 @@
         enable-xml=${enable-xml}
         enable-servlet=${enable-servlet}
         enable-android=${enable-android}
+        enable-javafx=${do.enable.javafx}
     </echo>
 
     <!-- 
@@ -569,6 +591,29 @@
 	    prefix="gnu.kawa.brl."  modulestatic="run" language="scheme">
       <fileset dir="${src.dir}/gnu/kawa/brl"> 
         <include name="progfun.scm"/>
+      </fileset>
+    </kawac>
+  </target>
+
+  <target name="javafx-classes"
+          depends="build-settings, java-classes" 
+          if="${do.enable.javafx}">
+    <javac srcdir="${src.dir}"
+           destdir="${build.classes}"
+           debug="${debug}"
+           deprecation="${deprecation}"
+           optimize="${optimize}"
+           classpathref="build.classpath"
+	   includeantruntime="false">
+      <include name="gnu/kawa/javafx/"/>
+    </javac>
+    <kawac failonerror="true" destdir="${build.classes}"
+           classpathref="build.classpath"
+           prefix="gnu.kawa.javafx."  modulestatic="run" language="scheme">
+      <fileset dir="${src.dir}/gnu/kawa/javafx"> 
+        <include name="defs.scm"/>
+        <include name="GroupObjectBuilder.scm"/>
+        <include name="MakeScene.scm"/>
       </fileset>
     </kawac>
   </target>

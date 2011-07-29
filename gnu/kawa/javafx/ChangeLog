@@ -1,3 +1,9 @@
+2011-07-28  Per Bothner  <per@bothner.com>
+
+	* defs.scm (MakeScene): Move MakeScene helper class to separate file.
+	* MakeScene.scm: New file.
+	* Makefile.ma: Update accordingly.
+
 2011-07-27  Per Bothner  <per@bothner.com>
 
 	New directory.  Experimental support for using JavaFX 2.x.

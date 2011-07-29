@@ -4,7 +4,7 @@ include $(top_srcdir)/Make-rules
 
 java_sources=
 
-java_SCM = GroupObjectBuilder.scm defs.scm
+java_SCM = GroupObjectBuilder.scm MakeScene.scm defs.scm
 
 EXTRA_DIST = defs.scm
 GCJ_INPUTS = defs*.class

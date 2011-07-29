@@ -34,7 +34,7 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
-	$(top_srcdir)/Make-rules
+	$(top_srcdir)/Make-rules ChangeLog
 subdir = gnu/kawa/javafx
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.in
@@ -182,7 +182,7 @@ KAWA_COMPILER = $(JAVA) -classpath "$(CLASSPATH)" kawa.repl -d $(top_builddir) \
   -P `echo $(PACKAGE_FNAME)|sed -e s/-/./g`.
 
 java_sources = 
-java_SCM = GroupObjectBuilder.scm defs.scm
+java_SCM = GroupObjectBuilder.scm MakeScene.scm defs.scm
 EXTRA_DIST = defs.scm
 GCJ_INPUTS = defs*.class
 EXTRA_GCJ_DEPS = scm-classes.stamp

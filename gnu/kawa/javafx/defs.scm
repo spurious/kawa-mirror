@@ -28,49 +28,14 @@
 (define-alias Insets javafx.geometry.Insets)
 (define-alias Orientation javafx.geometry.Orientation)
 
-(define-simple-class MakeScene ()
-  (title ::java.lang.String)
-  (builder access: 'private ::javafx.builders.SceneBuilder)
-  (group access: 'private ::javafx.scene.Group)
-  (root access: 'private ::javafx.scene.Parent)
-  ((*init*)
-   (set! builder (javafx.builders.SceneBuilder:create)))
-  ((setTitle x::java.lang.String) (set! title x))
-  ((setCamera x::javafx.scene.Camera)::void (builder:camera x))
-  ((setDepthBuffer x::boolean)::void (builder:depthBuffer x))
-  ((setCursor x::javafx.scene.Cursor)::void (builder:root x))
-  ((setEventDispatcher x::javafx.event.EventDispatcher)::void (builder:eventDispatcher x))
-  ((setFill x::javafx.scene.paint.Paint)::void (builder:fill x))
-  ((setWidth x::double)::void (builder:width x))
-  ((setHeight x::double)::void (builder:height x))
-  ((setRoot r::javafx.scene.Parent)::void
-   (if (not (eq? group #!null))
-       (primitive-throw (java.lang.IllegalArgumentException "setting root after adding children")))
-   (set! root r))
-  ((getGroup)::javafx.scene.Group
-   (cond ((eq? group #!null)
-          (if (not (eq? root #!null))
-              (primitive-throw (java.lang.IllegalArgumentException "adding childre after setting root")))
-          (set! group (javafx.scene.Group))))
-   group)
-  ((add n::javafx.scene.Node)
-   ((getGroup):children:add n))
-  ((setNodes n::java.util.List)::void
-   (let ((ch (getGroup):children))
-     ;;(ch:addAll n))
-     (let ((k (n:size)))
-       (do ((i ::int 0 (+ i 1))) ((= i k))
-         (ch:add (n:get i))))))
-  ((build)::javafx.scene.Scene
-   (builder:root (if (eq? root #!null) (getGroup) root))
-   (builder:build)))
-
 (define-syntax-case javafx-application ()
   ((javafx-application)
    #`(begin
        (module-extends KawaJavafxApplication)
        (define (,(datum->syntax-object #'javafx-application 'javafx-stage))::javafx.stage.Stage ;; FIXME
          (this):*stage*))))
+
+(require gnu.kawa.javafx.MakeScene)
 
 (define-syntax-case javafx-scene (javafx-stage)
   ((javafx-scene . args)

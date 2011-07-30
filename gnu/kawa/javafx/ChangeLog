@@ -1,3 +1,7 @@
+2011-07-30  Per Bothner  <per@bothner.com>
+
+	* defs.scm: Remove some debugging print-outs.
+
 2011-07-28  Per Bothner  <per@bothner.com>
 
 	* defs.scm (MakeScene): Move MakeScene helper class to separate file.

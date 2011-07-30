@@ -57,13 +57,10 @@
   ((run-scene)::void #!void)
   ((run ctx::gnu.mapping.CallContext)::void #!abstract)
   ((run)::void
-   (format #t "KawaJavafxApplication.run started~%~!")
    (javafx.application.Application:launch ((this):getClass) gnu.expr.ApplicationMainSupport:commandLineArgArray))
   ((runAsMain)::void
-   (format #t "KawaJavafxApplication.runAsMain started~%~!")
    (javafx.application.Application:launch ((this):getClass) gnu.expr.ApplicationMainSupport:commandLineArgArray))
   ((start (stage ::javafx.stage.Stage))::void
-   (format #t "start started~%~!")
    (set! *stage* stage)
    (let ((ctx (gnu.mapping.CallContext:getInstance)))
      ((this):run ctx)

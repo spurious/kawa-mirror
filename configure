@@ -580,6 +580,8 @@ CLASSPATH_SEPARATOR
 conf_classpath
 SAX2_PREPROCESS
 XQTS_PATH
+ON_WINDOWS_FALSE
+ON_WINDOWS_TRUE
 WITH_LIBTOOL_FALSE
 WITH_LIBTOOL_TRUE
 ENABLE_KAWA_FRONTEND_FALSE
@@ -4352,8 +4354,14 @@ case "$JAVA_SOURCE" in
   6compat5) JAVACFLAGS="${JAVACFLAGS} -target 1.5" ;;
 esac
 
-# Partly for compatibility (--enable/--disable-servlet was the old option);
+pathsep="$PATH_SEPARATOR"
+case ${host} in
+  *-*-mingw*|*-*-cygwin*) CLASSPATH_SEPARATOR=";" ;;
+  *) CLASSPATH_SEPARATOR="$PATH_SEPARATOR"
+esac
+filesep='/'
 
+# Partly for compatibility (--enable/--disable-servlet was the old option);
 # partly to allow --with-servlet=path-to-jar --disable-servlet.
 # we essentially default enable-servlet to with-servlet. But we don't
 # want to clutter up configure --help with --enable-servlet.
@@ -4519,16 +4527,17 @@ else
   WITH_LIBTOOL_FALSE=
 fi
 
+ if test "$CLASSPATH_SEPARATOR" = ";"; then
+  ON_WINDOWS_TRUE=
+  ON_WINDOWS_FALSE='#'
+else
+  ON_WINDOWS_TRUE='#'
+  ON_WINDOWS_FALSE=
+fi
+
 
 JEMACS_VERSION=`echo $VERSION | sed  -e 's/^1/0/'`
 BYTECODE_VERSION="$VERSION"
-
-pathsep="$PATH_SEPARATOR"
-case ${host} in
-  *-*-mingw*|*-*-cygwin*) CLASSPATH_SEPARATOR=";" ;;
-  *) CLASSPATH_SEPARATOR="$PATH_SEPARATOR"
-esac
-filesep='/'
 
 case ${with_servlet} in
   yes) ;;
@@ -4838,6 +4847,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${WITH_LIBTOOL_TRUE}" && test -z "${WITH_LIBTOOL_FALSE}"; then
   as_fn_error $? "conditional \"WITH_LIBTOOL\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${ON_WINDOWS_TRUE}" && test -z "${ON_WINDOWS_FALSE}"; then
+  as_fn_error $? "conditional \"ON_WINDOWS\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 

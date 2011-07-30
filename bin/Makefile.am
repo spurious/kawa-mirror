@@ -5,7 +5,12 @@ WITHOUT_GCJ_DEFS = -DJAVA='"$(JAVA)"' -DKAWALIB='"$(KAWALIB)"' -DKAWAJAR='"$(KAW
 if ENABLE_KAWA_FRONTEND
 KAWAPROGS_KAWA = kawa
 endif
+if ON_WINDOWS
+# kawa.sh is still needed for 'make check', even on Windows.
+KAWASCRIPTS_KAWA = kawa.bat kawa.sh
+else
 KAWASCRIPTS_KAWA = kawa.sh
+endif
 noinst_SCRIPTS = kawa.sh
 
 if WITH_GCJ
@@ -34,7 +39,7 @@ bin_PROGRAMS = $(KAWAPROGS_KAWA) $(KAWAPROGS_KAWA_BIN) cgi-servlet
 kawa_SOURCES = kawa.c kawapath.c
 cgi_servlet_SOURCES = cgi-servlet.c kawapath.c
 kawa_bin_SOURCES =
-CLEANFILES = qexo kawa$(EXEEXT) kawa.sh kawa-bin$(EXEEXT) gckawa tmp *.stamp *.so *.la
+CLEANFILES = qexo kawa$(EXEEXT) kawa.sh kawa.bat kawa-bin$(EXEEXT) gckawa tmp *.stamp *.so *.la
 
 READLINE_INCLUDE_PATH =
 READLINE_LIB_PATH =
@@ -114,6 +119,11 @@ gckawa: Makefile
 	echo 'exec gcj $(EXTRA_GCJFLAGS) "$$@" -L$(libdir) $(LDFLAGS_DBTOOL) -lkawa' >>tmp
 	chmod +x tmp
 	mv tmp gckawa
+
+kawa.bat: $(srcdir)/kawa.bat.in
+	sed -e 's|%DEFAULT_KAWA_VERSION%|$(VERSION)|' \
+	    -e 's|%DEFAULT_EXTRA_PATH%|'`echo '$(conf_classpath)'| sed -e 's|[\]|\\\\|g' -e 's|\&|\\&|g'`'|' \
+	  <$(srcdir)/kawa.bat.in > kawa.bat
 
 qexo:
 	echo '#!/bin/sh' >tmp

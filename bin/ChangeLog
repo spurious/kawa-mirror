@@ -1,3 +1,8 @@
+2011-07-30  Per Bothner  <per@bothner.com>
+
+	* kawa.bat.in: New file - input template for kawa.bat, for Windows.
+	* Makefile.am: New rules to make kawa.bat.
+
 2011-07-29  Per Bothner  <per@bothner.com>
 
 	* kawapath.c: Add EXTRAPATH to runtime classpath.

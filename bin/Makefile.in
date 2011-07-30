@@ -219,7 +219,9 @@ KAWAJAR = kawa-$(VERSION).jar
 KAWALIB = $(datadir)/java/$(KAWAJAR)
 WITHOUT_GCJ_DEFS = -DJAVA='"$(JAVA)"' -DKAWALIB='"$(KAWALIB)"' -DKAWAJAR='"$(KAWAJAR)"' -DEXTRAPATH='"$(conf_classpath)"'
 @ENABLE_KAWA_FRONTEND_TRUE@KAWAPROGS_KAWA = kawa
-KAWASCRIPTS_KAWA = kawa.sh
+@ON_WINDOWS_FALSE@KAWASCRIPTS_KAWA = kawa.sh
+# kawa.sh is still needed for 'make check', even on Windows.
+@ON_WINDOWS_TRUE@KAWASCRIPTS_KAWA = kawa.bat kawa.sh
 noinst_SCRIPTS = kawa.sh
 @WITH_GCJ_FALSE@bin_SCRIPTS = qexo $(KAWASCRIPTS_KAWA)
 @WITH_GCJ_TRUE@bin_SCRIPTS = gckawa qexo $(KAWASCRIPTS_KAWA)
@@ -234,7 +236,7 @@ noinst_SCRIPTS = kawa.sh
 kawa_SOURCES = kawa.c kawapath.c
 cgi_servlet_SOURCES = cgi-servlet.c kawapath.c
 kawa_bin_SOURCES = 
-CLEANFILES = qexo kawa$(EXEEXT) kawa.sh kawa-bin$(EXEEXT) gckawa tmp *.stamp *.so *.la
+CLEANFILES = qexo kawa$(EXEEXT) kawa.sh kawa.bat kawa-bin$(EXEEXT) gckawa tmp *.stamp *.so *.la
 READLINE_INCLUDE_PATH = 
 READLINE_LIB_PATH = 
 kawa_EXTRA_LIBS = -lncurses  # For Linux
@@ -629,6 +631,12 @@ gckawa: Makefile
 	echo 'exec gcj $(EXTRA_GCJFLAGS) "$$@" -L$(libdir) $(LDFLAGS_DBTOOL) -lkawa' >>tmp
 	chmod +x tmp
 	mv tmp gckawa
+
+# FIXME the sed command assumes no funny characters in conf_classpath.
+kawa.bat: $(srcdir)/kawa.bat.in
+	sed -e 's|%DEFAULT_KAWA_VERSION%|$(VERSION)|' \
+	    -e 's|%DEFAULT_EXTRA_PATH%|'`echo '$(conf_classpath)'| sed -e 's|[\]|\\\\|g' -e 's|\&|\\&|g'`'|' \
+	  <$(srcdir)/kawa.bat.in > kawa.bat
 
 qexo:
 	echo '#!/bin/sh' >tmp

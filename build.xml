@@ -54,9 +54,9 @@
   -->
   <property name="preprocess.overwrite" value="false"/>
 
-  <target name="all" depends="classes, jar"/>
+  <target name="all" depends="select-java-auto, classes, jar, kawa.bat"/>
 
-  <target name="default" depends="select-java-auto, classes, jar"/>
+  <target name="default" depends="all"/>
 
   <target name="classes" 
           depends="java-classes, lib-scm-classes
@@ -158,6 +158,10 @@
       </and>
     </condition>
 
+    <path id="pextra.classpath">
+      <fileset dir="${javafx.home}"><include name="rt/lib/jfxrt.jar" if="-use.javafx.home"/></fileset>
+    </path>
+    <property name="extra.classpath" refid="pextra.classpath"/>
     <path id="build.classpath">
       <pathelement path="${java.class.path}"/>
       <fileset dir="${javafx.home}"><include name="rt/lib/jfxrt.jar" if="-use.javafx.home"/></fileset>
@@ -170,6 +174,10 @@
          So test for a class that is new for the 2.3 API. -->
     <condition property="enable-servlet" else="false">
       <available classname="javax.servlet.Filter"/>
+    </condition>
+
+    <condition property="isWindows">
+      <os family="windows" />
     </condition>
   
     <condition property="preprocess-xml" value="+enable:XML" else="-enable:XML">
@@ -732,6 +740,15 @@
     </jar>
   </target>
 
+  <target name="kawa.bat" depends="build-settings" if="isWindows">
+    <copy file="bin/kawa.bat.in" toFile="bin/kawa.bat">
+      <filterset begintoken="%" endtoken="%">
+        <filter token="DEFAULT_KAWA_VERSION" value="${version}"/>
+        <filter token="DEFAULT_EXTRA_PATH" value="${extra.classpath};"/>
+      </filterset>
+    </copy>
+  </target>
+
   <!--
     These clean targets are split up for when
     get build-tools doesn't work in NetBeans.
@@ -743,6 +760,7 @@
     <delete>
        <fileset refid="build.classes"/>
        <fileset refid="build.preprocessed"/>
+       <fileset file="bin/kawa.bat"/>
     </delete>
   </target>
 

@@ -1,3 +1,8 @@
+2011-07-30  Per Bothner  <per@bothner.com>
+
+	* configure.in (ON_WINDOWS): New automake-conditional.
+	* build.xml: Rules for building kawa.bat on Windows.
+
 2011-07-28  Per Bothner  <per@bothner.com>
 
 	* build.xml: Add support for enable-javafx and javax.home properties,

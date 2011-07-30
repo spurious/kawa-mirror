@@ -189,7 +189,7 @@ EXTRA_DIST = testing.scm test.scm num-test.scm mac-test.scm mac1.scm \
   MyFunc.java MyModule.java MyDate.java MyTimestamp.java \
   misc-test.scm polytype.scm formatst.scm scribble.scm moduleFT.scm \
   module0.scm module1.scm module1a.scm module2.scm module3.scm included-1.scm \
-  HelloCgiK.krl HelloCgiS.scm HelloCgiX.xql \
+  moduleM.scm moduleM.expected HelloCgiK.krl HelloCgiS.scm HelloCgiX.xql \
   cycleb1.scm cycleb2.scm cycleb.expected \
   ppfile.out scribble.html.in $(EXTRA_LOAD_REQUIRE_DIST) \
   MySAXApp.java MySAXApp.expected r5rs_pitfall.scm \
@@ -490,28 +490,28 @@ scribble.class: $(srcdir)/scribble.scm
 moduleFT.class: $(srcdir)/moduleFT.scm
 	CLASSPATH=".$(CLASSPATH_SEPARATOR)$$CLASSPATH" $(KAWA) --full-tailcalls -C $(srcdir)/moduleFT.scm
 
-moduleM0.class: moduleM.scm SimpleB.class
-	$(KAWA) -T moduleM0 -C moduleM.scm
+moduleM0.class: $(srcdir)/moduleM.scm SimpleB.class
+	$(KAWA) -T moduleM0 -C $(srcdir)/moduleM.scm
 moduleM1.class: moduleM.scm SimpleB.class
-	$(KAWA) -T moduleM1 --main -C moduleM.scm
+	$(KAWA) -T moduleM1 --main -C $(srcdir)/moduleM.scm
 check-moduleM-immediate: SimpleB.class
 	CLASSPATH=".$(CLASSPATH_SEPARATOR).." $(JAVA) kawa.repl $(srcdir)/moduleM.scm > moduleM-immediate.log
-	@if $(DIFF) moduleM.expected moduleM-immediate.log; \
+	@if $(DIFF) $(srcdir)/moduleM.expected moduleM-immediate.log; \
 	  then echo '# moduleM-immediate test passes'; \
 	  else echo FAIL moduleM-immediate test; fi
 check-moduleM-run: moduleM0.class
 	CLASSPATH=".$(CLASSPATH_SEPARATOR).." $(JAVA) kawa.repl moduleM0 > moduleM-run.log
-	@if $(DIFF) moduleM.expected moduleM-run.log; \
+	@if $(DIFF) $(srcdir)/moduleM.expected moduleM-run.log; \
 	  then echo '# moduleM-run test passes'; \
 	  else echo FAIL moduleM-run test; fi
 check-moduleM-main-app: moduleM1.class
 	CLASSPATH=".$(CLASSPATH_SEPARATOR).." $(JAVA) moduleM1 > moduleM-main-app.log
-	@if $(DIFF) moduleM.expected moduleM-main-app.log; \
+	@if $(DIFF) $(srcdir)/moduleM.expected moduleM-main-app.log; \
 	  then echo '# moduleM-main-app test passes'; \
 	  else echo FAIL moduleM-main-app test; fi
 check-moduleM-main-run: moduleM1.class
 	CLASSPATH=".$(CLASSPATH_SEPARATOR).." $(JAVA) kawa.repl moduleM1 > moduleM-main-run.log
-	@if $(DIFF) moduleM.expected moduleM-main-run.log; \
+	@if $(DIFF) $(srcdir)/moduleM.expected moduleM-main-run.log; \
 	  then echo '# moduleM-main-run test passes'; \
 	  else echo FAIL moduleM-main-run test; fi
 check-moduleM: check-moduleM-immediate check-moduleM-run check-moduleM-main-app check-moduleM-main-run

@@ -1,3 +1,7 @@
+2011-07-30  Per Bothner  <per@bothner.com>
+
+	* Makefile.am: Various cleanups for testing moduleM.scm.
+
 2011-07-24  Per Bothner  <per@bothner.com>
 
 	* moduleM.scm: New test, for main/runable module with module-extends.

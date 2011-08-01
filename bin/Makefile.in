@@ -615,7 +615,7 @@ kawa.sh:
 @ENABLE_KAWA_FRONTEND_FALSE@@WITH_GCJ_NO_DBTOOL_FALSE@	echo 'if test -f $$thisdir/../$(KAWAJAR)' >>tmp
 @ENABLE_KAWA_FRONTEND_FALSE@@WITH_GCJ_NO_DBTOOL_FALSE@	echo 'then KAWALIB=$${KAWALIB-"`$(CYGPATH_W) "$$thisdir/../$(KAWAJAR)"`"}' >>tmp
 @ENABLE_KAWA_FRONTEND_FALSE@@WITH_GCJ_NO_DBTOOL_FALSE@	echo 'else KAWALIB=$${KAWALIB-$(KAWALIB)}; fi' >>tmp
-@ENABLE_KAWA_FRONTEND_FALSE@@WITH_GCJ_NO_DBTOOL_FALSE@	echo 'CLASSPATH="$${KAWALIB}$(CLASSPATH_SEPARATOR)$${CLASSPATH-$(CLASSPATH)}"' >>tmp
+@ENABLE_KAWA_FRONTEND_FALSE@@WITH_GCJ_NO_DBTOOL_FALSE@	echo 'CLASSPATH="$${KAWALIB}$(CLASSPATH_SEPARATOR)$(conf_classpath)$${CLASSPATH-$(CLASSPATH)}"' >>tmp
 @ENABLE_KAWA_FRONTEND_FALSE@@WITH_GCJ_NO_DBTOOL_FALSE@	echo 'export CLASSPATH' >>tmp
 @ENABLE_KAWA_FRONTEND_FALSE@@WITH_GCJ_NO_DBTOOL_FALSE@	if JAVA=`which $(JAVA)`; then true; else JAVA=$(JAVA); fi; \
 @ENABLE_KAWA_FRONTEND_FALSE@@WITH_GCJ_NO_DBTOOL_FALSE@	  echo 'exec $${JAVA-"'$${JAVA}'"} kawa.repl "$$@"' >>tmp
@@ -632,7 +632,6 @@ gckawa: Makefile
 	chmod +x tmp
 	mv tmp gckawa
 
-# FIXME the sed command assumes no funny characters in conf_classpath.
 kawa.bat: $(srcdir)/kawa.bat.in
 	sed -e 's|%DEFAULT_KAWA_VERSION%|$(VERSION)|' \
 	    -e 's|%DEFAULT_EXTRA_PATH%|'`echo '$(conf_classpath)'| sed -e 's|[\]|\\\\|g' -e 's|\&|\\&|g'`'|' \

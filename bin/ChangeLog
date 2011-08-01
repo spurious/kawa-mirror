@@ -1,3 +1,8 @@
+2011-08-01  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (kawa.sh): Add conf_classpath to classpath,
+	in the no-kawa-frontend case.
+
 2011-07-30  Per Bothner  <per@bothner.com>
 
 	* kawa.bat.in: New file - input template for kawa.bat, for Windows.

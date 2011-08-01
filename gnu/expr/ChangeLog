@@ -1,3 +1,8 @@
+2011-08-01  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (generateBytecode): Make code to relativize source
+	path names a bit more robust - specifically for Windows.
+
 2011-07-24  Per Bothner  <per@bothner.com>
 
 	Support for main module that has module-extends.

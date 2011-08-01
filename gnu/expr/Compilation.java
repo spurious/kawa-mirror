@@ -2263,16 +2263,15 @@ public class Compilation implements SourceLocator
                 {
                   // If the source path was relative, emit it as relative.
                   // But make it relative to the compilation directory,
-                  // to allows sources to be moved along with binaries.
-                  char sep = File.separatorChar;
-                  String path = manager.getCompilationDirectory();
-                  path = path + mainPrefix.replace('.', sep);
-                  path = Path.toURL(path).toString();
+                  // to allow sources to be moved along with binaries.
+                  String path = Path.toURL(manager.getCompilationDirectory())
+                      + mainPrefix.replace('.', '/');
                   int plen = path.length();
-                  if (plen > 0 && path.charAt(plen-1) != sep)
-                    path = path + sep;
-                  moduleSource
-                    = Path.relativize(mi.getSourceAbsPathname(), path);
+                  if (plen > 0 && path.charAt(plen-1) != '/')
+                    path = path + '/';
+                  String sourcePath =
+                      Path.toURL(mi.getSourceAbsPathname()).toString();
+                  moduleSource = Path.relativize(sourcePath, path);
                 }
               catch (Throwable ex)
                 {

@@ -13,7 +13,7 @@ public abstract class Path
 implements javax.tools.FileObject
 /* #endif */
 {
-  /** This is equivalent to the System {@code "user.dir} property.
+  /** This is equivalent to the System {@code "user.dir"} property.
    * However, the getProperty is tracked dynamically and resolved
    * as needed.  */
   public static final FilePath userDirPath =

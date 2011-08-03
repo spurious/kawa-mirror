@@ -56,7 +56,6 @@ public class StackMapTableAttr extends MiscAttr
   {
     if (type == null)
       return 0; // ITEM_Top
-    type = type.getRawType();
     if (type instanceof UninitializedType)
       {
         UninitializedType utype = (UninitializedType) type;
@@ -70,7 +69,7 @@ public class StackMapTableAttr extends MiscAttr
       return 5; // ITEM_Null
     else
       {
-        type = type.getImplementationType();
+        type = type.getRawType();
         if (type instanceof PrimType)
           {
             switch (type.signature.charAt(0))

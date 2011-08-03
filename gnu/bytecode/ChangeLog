@@ -1,3 +1,9 @@
+2011-08-03  Per Bothner  <per@bothner.com>
+
+	* StackMapTableAttr.java (encodeVerificationType): Fix handling of
+	UninitializedType - which was broken when parameterized types were
+	added.  This fixes Savannah bug #33916 "Build error with Java7".
+
 2011-07-27  Per Bothner  <per@bothner.com>
 
 	* ParameterizedType.java (getName): Call toString().

@@ -1,3 +1,11 @@
+2011-08-03  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Source distribution): Note need for make variables
+	READLINE_INCLUDE_PATH and READLINE_LIB_PATH on OS/X.
+
+	* kawa.texi (Source distribution): Update to note you can use
+	configure+make on Cygwin.
+
 2011-07-21  Per Bothner  <per@bothner.com>
 
 	* kawa.1: Don't pipe nroff output through col.  It produces bad output.

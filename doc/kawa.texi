@@ -334,9 +334,9 @@ choose whichever is most convenient for you.
 
 One method uses the traditional GNU @code{configure} script,
 followed by running @code{make}.  This works well on Unix-like
-systems, such as GNU/Linux.  It does not work well under
-Microsoft Windows. (Even when using the CygWin Unix-emulation
-package there are some problems with file paths.)
+systems, such as GNU/Linux.
+You can also use this method on Microsoft Windows,
+as long as use @uref{http://www.cygwin.org/. Cygwin}.
 
 The other method uses the @code{ant} command, a Java-based
 build system released by Apache's Jakarta project.  This uses
@@ -420,6 +420,14 @@ make JAVA=kaffe
 
 It has been reported that parallel make doesn't work,
 so don't use the @code{-j2} or above options.
+
+If you configured with @code{--enable-kawa-frontend}, you
+may need to specify @code{READLINE_INCLUDE_PATH} or @code{READINE_LIB_PATH}.
+For example on OS/X you need to do:
+@example
+make READLINE_INCLUDE_PATH=-I/usr/local/unix/readline/include \
+     READLINE_LIB_PATH=-L/usr/local/unix/readline/lib
+@end example
 
 You can now test the system by running Kawa in place:
 @example

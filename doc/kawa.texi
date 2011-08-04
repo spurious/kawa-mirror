@@ -11432,7 +11432,7 @@ Search for the word @code{copyright} in these directories.
 
 Some code has been converted from other languages, with permission.
 This includes the @code{rationalize} method
-in @code{gnu/math/RatNum.java}, based on an algorith of Alan Bawden,
+in @code{gnu/math/RatNum.java}, based on an algorithm of Alan Bawden,
 as expressed by Marc Feeley in C-Gambit.
 The concepts and algorithm of @code{gnu/text/PrettyWriter.java}
 are converted from SBCL, which is in the public domain.

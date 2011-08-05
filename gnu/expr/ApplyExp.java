@@ -78,17 +78,19 @@ public class ApplyExp extends Expression
     ((Procedure) proc).checkN(vals, ctx);
   }
 
-  public static void compileToArray(Expression[] args, Compilation comp)
+  private static void compileToArray(Expression[] args, int start, Compilation comp)
   {
     CodeAttr code = comp.getCode();
-    if (args.length == 0)
+    int argslength = args.length;
+    int nargs = argslength - start;
+    if (nargs == 0)
       {
 	code.emitGetStatic(Compilation.noArgsField);
 	return;
       }
-    code.emitPushInt(args.length);
+    code.emitPushInt(nargs);
     code.emitNewArray(Type.pointer_type);
-    for (int i = 0; i < args.length; ++i)
+    for (int i = start; i < argslength; ++i)
       {
 	Expression arg = args[i];
 	if (comp.usingCPStyle()
@@ -198,6 +200,13 @@ public class ApplyExp extends Expression
     gnu.bytecode.CodeAttr code = comp.getCode();
     Method method;
 
+    // Check for tail-recursion.
+    boolean tail_recurse
+      = exp.isTailCall()
+      && func_lambda != null && func_lambda == comp.curLambda
+      // No keyword or optional arguments.
+      && func_lambda.defaultArgs == null;
+
     if (func_lambda != null)
       {
 	if ((func_lambda.max_args >= 0 && args_length > func_lambda.max_args)
@@ -209,6 +218,7 @@ public class ApplyExp extends Expression
         // Mostly duplicates logic with LambdaExp.validateApply.
         // See comment there.
 	if (comp.inlineOk(func_lambda)
+            && ! tail_recurse
 	    && (conv <= Compilation.CALL_WITH_CONSUMER
 		|| (conv == Compilation.CALL_WITH_TAILCALLS
 		    && ! exp.isTailCall()))
@@ -294,16 +304,10 @@ public class ApplyExp extends Expression
 	return;
       }
     */
-
-    // Check for tail-recursion.
-    boolean tail_recurse
-      = exp.isTailCall()
-      && func_lambda != null && func_lambda == comp.curLambda;
-
     if (func_lambda != null && func_lambda.getInlineOnly() && !tail_recurse
 	&& func_lambda.min_args == args_length)
       {
-        pushArgs(func_lambda, exp.args, null, comp);
+        pushArgs(func_lambda, exp.args, exp.args.length, null, comp);
         if (func_lambda.getFlag(LambdaExp.METHODS_COMPILED))
           {
             popParams(code, func_lambda, null, false);
@@ -343,7 +347,7 @@ public class ApplyExp extends Expression
 	  }
 	else
 	  {
-	    compileToArray (exp.args, comp);
+            compileToArray (exp.args, 0, comp);
 	    comp.loadCallContext();
 	    code.emitInvoke(Compilation.typeProcedure
 			    .getDeclaredMethod("checkN", 2));
@@ -370,19 +374,22 @@ public class ApplyExp extends Expression
       exp_func.compile (comp, new StackTarget(Compilation.typeProcedure));
 
     boolean toArray
-      = (tail_recurse ? func_lambda.min_args != func_lambda.max_args
+      = (tail_recurse ? func_lambda.max_args < 0
          : args_length > 4);
     int[] incValues = null; // Increments if we can use iinc.
-    if (toArray)
+    if (tail_recurse)
       {
-	compileToArray(exp.args, comp);
-	method = Compilation.applyNmethod;
-      }
-    else if (tail_recurse)
-      {
-        incValues = new int[exp.args.length];
-        pushArgs(func_lambda, exp.args, incValues, comp);
+        int fixed = func_lambda.min_args;
+        incValues = new int[fixed];
+        pushArgs(func_lambda, exp.args, fixed, incValues, comp);
+        if (toArray)
+          compileToArray(exp.args, fixed, comp);
         method = null;
+      }
+    else if (toArray)
+      {
+        compileToArray(exp.args, 0, comp);
+	method = Compilation.applyNmethod;
       }
     else
       {
@@ -459,11 +466,11 @@ public class ApplyExp extends Expression
   }
 
   /** Only used for inline- and tail-calls. */
-  private static void pushArgs (LambdaExp lexp, Expression[] args,
+  private static void pushArgs (LambdaExp lexp,
+                                Expression[] args, int args_length,
                                 int[] incValues, Compilation comp)
   {
     Declaration param = lexp.firstDecl();
-    int args_length = args.length;
     for (int i = 0; i < args_length; ++i)
       {
         Expression arg = args[i];
@@ -488,27 +495,19 @@ public class ApplyExp extends Expression
       vars = vars.nextVar();
     if (vars != null && vars.getName() == "$ctx")
       vars = vars.nextVar();
-    if (vars != null && vars.getName() == "argsArray")
-      {
-	if (toArray)
-	  {
-	    popParams (code, 0, 1, null, decls, vars);
-	    return;
-	  }
-        vars = vars.nextVar();
-      }
-    popParams (code, 0, lexp.min_args, incValues, decls, vars);
+    popParams (code, 0, lexp.min_args, toArray, incValues, decls, vars);
   }
 
   // Recursive helper function.
-  private static void popParams (CodeAttr code, int paramNo, int count,
+  private static void popParams (CodeAttr code, int paramNo,
+                                 int count, boolean toArray,
                                  int[] incValues,
                                  Declaration decl, Variable vars)
   {
     if (count > 0)
       {
         count--;
-	popParams (code, paramNo+1, count, incValues, decl.nextDecl(),
+	popParams (code, paramNo+1, count, toArray, incValues, decl.nextDecl(),
                    decl.getVariable() == null ? vars : vars.nextVar());
         if (! decl.ignorable())
           {
@@ -518,6 +517,8 @@ public class ApplyExp extends Expression
               code.emitStore(vars);
           }
       }
+    else if (toArray)
+      code.emitStore(vars); // rest array
   }
 
   public final gnu.bytecode.Type getTypeRaw()

@@ -1,3 +1,9 @@
+2011-08-04  Per Bothner  <per@bothner.com>
+
+	* inlining-test.scm (top-level-recurse1, top-level-recurse2): New tests.
+	* inlining.expected: Update accordingly.
+	* Makefile.am: Likewise.
+
 2011-07-30  Per Bothner  <per@bothner.com>
 
 	* Makefile.am: Various cleanups for testing moduleM.scm.

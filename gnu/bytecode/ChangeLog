@@ -1,3 +1,7 @@
+2011-08-04  Per Bothner  <per@bothner.com>
+
+	* CodeAttr.java (emitInc): If increment is zero, do nothing.
+
 2011-08-03  Per Bothner  <per@bothner.com>
 
 	* StackMapTableAttr.java (encodeVerificationType): Fix handling of

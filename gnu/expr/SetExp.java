@@ -349,12 +349,23 @@ public class SetExp extends AccessExp
   public static final int BAD_SHORT = 0x10000;
 
   /* Check if we can use the 'iinc' instruction.
+   * Also, if the {@code rhs} is the same as (i.e. a reference to)
+   * {@code target}, return zero, to indicate a possible no-op.
+   * I.e. we treat {@code target=target} as if it were
+   * {@code target=target+0} - even is {@code tragte} is non-numeric.
    * @return return increment, or BAD_SHORT.
    */
   public static int canUseInc (Expression rhs, Declaration target)
   {
     ApplyExp aexp;
     Variable var = target.getVariable();
+    if (target.isSimple()
+        && rhs instanceof ReferenceExp)
+      {
+        ReferenceExp rexp = (ReferenceExp) rhs;
+        if (rexp.binding == target && ! rexp.getDontDereference())
+          return 0;
+      }
   body:
     if (target.isSimple()
         && var.getType().getImplementationType().promote() == Type.intType

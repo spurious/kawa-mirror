@@ -1,3 +1,11 @@
+2011-08-04  Per Bothner  <per@bothner.com>
+
+	* ApplyExp.java: Optimize tail-recursion even in module-level functions.
+	Also fix some issue is tail-recusive varargs functions.
+	This fixes Savannah bug #33946] "Missed oppurtunity for tail call".
+	* SetExp.java (canUseInc): Treat TARGET=TARGET as equivalent to
+	TARGET=TARGET+0 - even if TARGET is non-numeric.
+
 2011-08-01  Per Bothner  <per@bothner.com>
 
 	* Compilation.java (generateBytecode): Make code to relativize source

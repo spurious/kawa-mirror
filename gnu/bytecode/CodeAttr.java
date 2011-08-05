@@ -1380,6 +1380,10 @@ public class CodeAttr extends Attribute implements AttrContainer
   }
 
 
+  /** Emit an instruction to increment a variable by some amount.
+   * If the increment is zero, do nothing.
+   * The variable must contain an integral value - except if increment is zero.
+   */
   public void emitInc (Variable var, short inc)
   {
     if (var.dead ())
@@ -1388,12 +1392,15 @@ public class CodeAttr extends Attribute implements AttrContainer
     if (offset < 0 || !var.isSimple ())
       throw new Error ("attempting to increment unassigned variable"+var.getName()
 		       +" simple:"+var.isSimple()+", offset: "+offset);
+
+    if (inc == 0)
+      return;
+
     reserve(6);
     if (var.getType().getImplementationType().promote() != Type.intType)
       throw new Error("attempting to increment non-int variable");
 
     boolean wide = offset > 255 || inc > 255 || inc < -256;
-
     if (wide)
     {
       put1(196); // wide

@@ -141,6 +141,14 @@
 (define (varargs3 argtypes)
   (invoke gnu.math.IntNum 'getMethod "valueOf" argtypes))
 
+
+(define (top-level-recurse1 x::pair)
+  (set-car! x 123) 
+  (top-level-recurse1 x))
+
+(define (top-level-recurse2 a b)
+  (top-level-recurse2 b a))
+
 (define-namespace xx "XX")
 (define xx:two 222)
 (define list-two (list 'xx:Two))

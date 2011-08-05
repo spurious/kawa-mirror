@@ -227,18 +227,18 @@ A ready-to-run @code{.jar} archive of the pre-compiled classes is in
 @subsection Getting the development sources using SVN
 
 The Kawa sources are managed using a
-@uref{http://subversion.tigris.org/,Subversion (svn)} repository.
+@uref{http://subversion.apache.org/,Subversion (svn)} repository.
 If you want the very latest version grab
-@uref{http://subversion.tigris.org/project_packages.html,an svn client},
+@uref{http://subversion.apache.org/download/,an svn client},
 and then check out the source using this command:
 @example
 svn -q checkout svn://sourceware.org/svn/kawa/trunk kawa
 @end example
 
-If you're beyond a firewall or HTTP proxy, you can edit
+If you're behind a firewall or HTTP proxy, you can edit
 @code{http-proxy-host} and @code{http-proxy-port}
 in @code{~/.subversion/servers} as described
-@uref{http://subversion.tigris.org/faq.html#proxy, here},.
+@uref{http://subversion.apache.org/faq.html#proxy, here},.
 and then do:
 @example
 svn -q checkout http://sourceware.org/svn/kawa/trunk kawa

@@ -4564,7 +4564,7 @@ case ${with_sax2} in
   *) SAX2_PREPROCESS=""
 esac
 
-XQTS_PATH=${with_XQTS:XQTS}
+XQTS_PATH=${with_XQTS:-XQTS}
 
 
 

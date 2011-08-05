@@ -233,7 +233,7 @@ case ${with_sax2} in
   *) SAX2_PREPROCESS=""
 esac
 
-XQTS_PATH=${with_XQTS:XQTS}
+XQTS_PATH=${with_XQTS:-XQTS}
 AC_SUBST(XQTS_PATH)
 AC_SUBST(SAX2_PREPROCESS)
 AC_SUBST(conf_classpath)

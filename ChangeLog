@@ -1,3 +1,7 @@
+2011-08-04  Per Bothner  <per@bothner.com>
+
+	* configure.in (with_XQTS): Fix setter to be Posix-compatible.
+
 2011-07-30  Per Bothner  <per@bothner.com>
 
 	* configure.in (ON_WINDOWS): New automake-conditional.

@@ -235,11 +235,14 @@ and then check out the source using this command:
 svn -q checkout svn://sourceware.org/svn/kawa/trunk kawa
 @end example
 
-If you're behind a firewall or HTTP proxy, you can edit
+Some corporate firewalls may block outgoing Subversion
+connections.  If that case you should be able to access the
+Kawa Subversion repository using HTTP.  (If you need
+to use an HTTP proxy, you can edit
 @code{http-proxy-host} and @code{http-proxy-port}
 in @code{~/.subversion/servers} as described
-@uref{http://subversion.apache.org/faq.html#proxy, here},.
-and then do:
+@uref{http://subversion.apache.org/faq.html#proxy, here}.)
+Use this command instead:
 @example
 svn -q checkout http://sourceware.org/svn/kawa/trunk kawa
 @end example

@@ -1546,6 +1546,7 @@ re-define a global definition), and there must be no assignments
 * Datum syntax::
 * Hash-prefixed forms::
 * Primitive expression syntax::
+* Colon notation:: Property access using colon notation
 * Bodies::
 * Syntax and conditional compilation::
 @end menu

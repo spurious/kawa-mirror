@@ -1876,15 +1876,20 @@ Syntax'':
 @stxdef{list} @stxlit{(}@stxref{datum}*@stxlit{)}
          | @stxlit{(}@stxref{datum}+ @stxlit{.} @stxref{datum}@stxlit{)}
          | @stxref{abbreviation}
-@stxdef{abbreviation} @stxref{abbrev-prefix} @stxref{datum}
-@stxdef{abbrev-prefix} @stxlit{'} | @stxlit{`} | @stxlit{,} | @stxlit{,@@}
-         | @stxlit{#'} | @stxlit{#`}
 @stxdef{vector} @stxlit{#(}@stxref{datum}*@stxlit{)}
 @stxdef{uniform-vector} TODO
 @end display
 @c FIXME: add to abbrev-prefix: @stxlit{#,} | @stxlit{#,@@}
 
 @subsection Abbreviations
+
+@display
+@stxdef{abbreviation} @stxref{r6rs-abbreviation} | @stxref{kawa-abbreviation}
+@stxdef{r6rs-abbreviation} @stxref{abbrev-prefix} @stxref{datum}
+@stxdef{abbrev-prefix} @stxlit{'} | @stxlit{`} | @stxlit{,} | @stxlit{,@@}
+         | @stxlit{#'} | @stxlit{#`}
+@stxdef{kawa-abbreviation} XXX
+@end display
 
 The following are abbreviations:
 
@@ -1902,10 +1907,20 @@ for @code{(unquote @meta{datum})},
 for @code{(unquote-splicing @meta{datum})},
 
 @item @stxlit{#'}@meta{datum}     
-for @code{(syntax @meta{datum})}, and
+for @code{(syntax @meta{datum})}
 
 @item @stxlit{#`}@meta{datum}     
 for @code{(quasisyntax @meta{datum})}.
+
+@item @meta{datum1}@stxlit{:}@meta{datum2}
+for @code{($lookup$ @meta{datum1} (quasiquote @meta{datum2}))}
+@xref{Colon notation}.
+
+@item @stxlit{[}@meta{expression} ...@stxlit{]}
+for @code{($bracket-list$ @meta{expression} ...)}
+
+@item @meta{operator}@stxlit{[}@meta{expression} ...@stxlit{]}
+for @code{($bracket-apply$ @meta{operator} @meta{expression} ...)}
 
 @c FIXME
 @c @item @stxlit{#,}@meta{datum}     

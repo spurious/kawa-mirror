@@ -1,5 +1,7 @@
 2011-08-07  Per Bothner  <per@bothner.com>
 
+	* kawa.texi (Datum syntax/Abbreviations): Add Kawa abbreviations.
+
 	* kawa.texi (Colon-notation): New section.
 
 	* kawa.texi (Bodies): Clarification.

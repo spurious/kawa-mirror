@@ -2128,6 +2128,71 @@ use of the macro.
 Macros defined using the @func{syntax-case} facility are also hygienic
 unless @func{datum->syntax} is used.
 
+@node Colon notation
+@section Property access using colon notation
+
+The @dfn{colon notation} accesses named parts (properties) of a value.
+It is used to get and set fields, call methods, construct compound symbols,
+and more.
+Evaluating the form @code{@var{owner}:@var{property}}
+evaluates the @code{@var{owner}} then it extracts the named @code{@var{property}} of the result.
+
+@display
+@stxdef{property-access-abbreviation} @stxref{property-owner-expression}@stxlit{:}@stxref{property-name}
+@stxdef{property-owner-expression} @stxref{expression}
+@stxdef{property-name} @stxref{identifier} | @stxlit{,}@stxref{expression}
+@end display
+
+The @var{property-name} is usually a literal name,
+but it can be an unquoted @var{expression} (i.e. following a @code{,}),
+in which case the name is evaluated at run-time.
+No separators are allowed on either side of the colon.
+
+The input syntax @code{@var{exp}:@var{part}} is translated by
+the Scheme reader to the internal representation @code{($lookup$ @var{exp} (quasiquote @var{part}))}.
+
+@subsection Part lookup rules
+
+Evaluation proceeds as follows.
+First @var{property-owner-expression} is
+evaluated to yield a @var{owner} object.
+Evaluating the @var{property-name} yields a @var{part} name,
+which is a symbol: Either
+the literal @var{identifier}, or the result of evaluating the
+property-name @var{expression}.
+If the @var{expression} evaluates to a string, it is converted to
+a simple symbol, as if using @code{string->symbol}.
+
+@itemize
+@item
+If the @var{owner} implements @code{gnu.mappingHasNamedParts},
+then the result is the same as @code{(invoke @var{owner} 'get @var{part})}.
+
+As a special case of this rule, if @var{owner} is a
+@code{gnu.mapping.Namespace}, then the result is the
+@ref{Namespaces,compound symbol in that namespace}.
+@item
+If @var{owner} is a @code{java.lang.Class} or a @code{gnu.bytecode.ObjectType},
+the result is the static member named @var{part}
+(i.e. a static field, method, or member class).
+@item
+If @var{owner} is a @code{java.lang.Package} object, we get the member
+class or sub-package named @var{part}.
+@item
+Otherwise, we look for a named member (instance member or field).
+
+Note you can't use colon notation to invoke instance methods
+of a @code{Class}, because it will match a previous rule.
+@end itemize
+
+If the colon form is on the left-hand-side of an assignment (@code{set!}),
+then the named part is modified as appropriate.
+
+@c We will look into examples and details below.
+@c @subsection The @code{HasNamedParts} case
+@c @subsection Static parts of classes and packages
+@c @subsection Instance parts
+
 @node Bodies
 @section Bodies
 
@@ -2161,8 +2226,10 @@ body.  Some or all of the body, including portions wrapped in
 @func{begin}, @func{let-syntax}, or @func{letrec-syntax} forms, may be
 specified by a macro use.
 
-An expanded @meta{body} containing variable definitions can always be
-converted into an equivalent @func{letrec*} expression.  For example,
+An expanded @meta{body} containing variable definitions can be
+converted into an equivalent @func{letrec*} expression.
+(If there is a definition following expressions you may need to
+convert the expressions to dummy definitions.)     For example,
 the @func{let} expression in the above example is equivalent to
 
 @example

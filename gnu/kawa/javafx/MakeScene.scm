@@ -2,11 +2,11 @@
 
 (define-simple-class MakeScene ()
   (title ::java.lang.String)
-  (builder access: 'private ::javafx.builders.SceneBuilder)
+  (builder access: 'private ::javafx.scene.SceneBuilder)
   (group access: 'private ::javafx.scene.Group)
   (root access: 'private ::javafx.scene.Parent)
   ((*init*)
-   (set! builder (javafx.builders.SceneBuilder:create)))
+   (set! builder (javafx.scene.SceneBuilder:create)))
   ((setTitle x::java.lang.String) (set! title x))
   ((setCamera x::javafx.scene.Camera)::void (builder:camera x))
   ((setDepthBuffer x::boolean)::void (builder:depthBuffer x))

@@ -1,3 +1,8 @@
+2011-08-17  Per Bothner  <per@bothner.com>
+
+	* CompileBuildObject.java (make): Use Compilation#lookup as it is
+	more general/robust than ScopeExp#lookup.
+
 2011-07-13  Per Bothner  <per@bothner.com>
 
 	Refactoring for "object building" to make support custom bulders.

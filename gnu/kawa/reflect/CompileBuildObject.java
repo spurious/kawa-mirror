@@ -58,7 +58,7 @@ public class CompileBuildObject {
             if (sym != null)
               {
                 ModuleExp mexp = comp.getModule();
-                Declaration builderDecl = mexp.lookup(sym);
+                Declaration builderDecl = comp.lookup(sym, Language.VALUE_NAMESPACE);
                 if (builderDecl != null)
                   {
                     Object val = builderDecl.getValue().valueIfConstant();

@@ -46,7 +46,7 @@
        (invoke (,(datum->syntax-object #'javafx-scene 'javafx-stage)) 'setScene scene)
        (if (not (eq? title #!null))
            (set! stage:title title))
-       (invoke stage 'setVisible #t)
+       (invoke stage 'show)
        scene)))
 
 (define-simple-class KawaJavafxApplication

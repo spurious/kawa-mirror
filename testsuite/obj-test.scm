@@ -1,4 +1,4 @@
-(test-init "Objects" 136)
+(test-init "Objects" 137)
 
 ;; Force procedure to be applied without being inlined:
 (define-syntax force-eval
@@ -192,6 +192,9 @@
 	(set3-mod0-v2 (+ 100 v2))
 	(list v2 (get3-mod0-v2))))
 (test 25 'test-mod2-v5  mod2-v5)
+
+;; Test for Savannah bug #34004: Nullpointer exception in compiler
+(test 1 check-thunk)
 
 (test '(1 2) 'counter-test-result counter-test-result)
 

@@ -2,7 +2,7 @@
 
 (require <module1>)
 
-(module-export dvar-test-1 factorial-4 check-fluid-let *VAR*
+(module-export dvar-test-1 factorial-4 check-fluid-let *VAR* check-thunk
 	       namespace-syntax-call list-length-4 my-compare
 	       test3-import1 get3-mod0-v2 set3-mod0-v2 counter-test-result
 	       pa-new pa-getter pa-setter pa-length iarr-set mB test1-import0)
@@ -88,3 +88,11 @@
   (let* ((a (counter-macro))
          (b (counter)))
     (list a b)))
+
+;; Test for Savannah bug #34004: Nullpointer exception in compiler
+(define (call-thunk thunk::procedure)
+  (thunk))
+(define (call-call-thunk x)
+  (call-thunk (lambda () x)))
+(define (check-thunk)
+  (call-call-thunk 1))

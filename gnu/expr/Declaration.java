@@ -366,8 +366,7 @@ public class Declaration
             return;
           }
         else if (value != QuoteExp.undefined_exp && ignorable()
-                 && ! (value instanceof LambdaExp
-                       && ((LambdaExp) value).outer instanceof ModuleExp))
+                 && ! (value instanceof LambdaExp))
           {
             value.compile(comp, target);
             return;

@@ -1,3 +1,10 @@
+2011-08-24  Per Bothner  <per@bothner.com>
+	    Helmut Eller  <eller.helmut@gmail.com>
+
+	* module3.scm (check-thunk): New test for Savannah bug #34004:
+	"Nullpointer exception in compiler".
+	* obj-test.scm: Call check-thunk.
+
 2011-08-04  Per Bothner  <per@bothner.com>
 
 	* inlining-test.scm (top-level-recurse1, top-level-recurse2): New tests.

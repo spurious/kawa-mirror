@@ -1,3 +1,10 @@
+2011-08-25  Per Bothner  <per@bothner.com>
+
+	* Language.java (eval): Generate a unique module name, so we get
+	unique class names, so usedClass will work.
+	(getEvalCounter): New method.
+	(env_counter): Remove unused field.
+
 2011-08-24  Per Bothner  <per@bothner.com>
 
 	* Declaration.java (load): Tweak a questionable optimization:

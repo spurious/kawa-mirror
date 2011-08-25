@@ -1083,6 +1083,7 @@ public abstract class Language
     try
       {
 	Compilation comp = parse(port, messages, PARSE_FOR_EVAL);
+	comp.getModule().setName("atEvalLevel$" + getEvalCounter());
 	ModuleExp.evalModule(getEnvironment(), ctx, comp, null, null);
       }
     finally
@@ -1094,7 +1095,8 @@ public abstract class Language
 				 + messages.toString(20));
   }
 
-  static protected int env_counter = 0;
+  static private int evalCounter;
+  static protected synchronized int getEvalCounter() { return ++evalCounter; }
 
   public void runAsApplication (String[] args)
   {

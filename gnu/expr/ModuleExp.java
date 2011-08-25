@@ -35,15 +35,6 @@ public class ModuleExp extends LambdaExp
 
   static int lastZipCounter;
 
-  /** Numeric identifier for this interactive "command".
-   * Incremented by Shell.run, and used to set the module name,
-   * and maybe the name of the --debug-dump-zip output file.
-   * We increment and use this counter purely to ease debugging.
-   * (Since each module gets its own ClassLoader, they don't
-   * need to be named differently, and it doesn't matter
-   * if there is a race condition on the counter.) */
-  public static int interactiveCounter;
-
   /** Compile to a class for immediate evaluation.
    * Return null on error, if so errors go to comp.getMessages().
    */
@@ -69,10 +60,10 @@ public class ModuleExp extends LambdaExp
 	if (dumpZipPrefix != null)
 	  {
 	    StringBuffer zipname = new StringBuffer(dumpZipPrefix);
-            
+            ModuleManager manager = ModuleManager.getInstance();
             lastZipCounter++;
-	    if (interactiveCounter > lastZipCounter)
-	      lastZipCounter = interactiveCounter;
+	    if (manager.interactiveCounter > lastZipCounter)
+	      lastZipCounter = manager.interactiveCounter;
             zipname.append(lastZipCounter);
 	    zipname.append(".zip");
 	    java.io.FileOutputStream zfout

@@ -261,8 +261,7 @@ public class Shell
 		  break;
 		if (sawError)
 		  continue;
-		comp.getModule().setName("atInteractiveLevel$"
-					 + (++ModuleExp.interactiveCounter));
+		comp.setInteractiveName();
 
 		// Skip whitespace, in case (read-char) or similar is called:
 		int ch;

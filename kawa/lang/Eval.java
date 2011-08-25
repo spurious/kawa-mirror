@@ -14,8 +14,6 @@ public class Eval extends Procedure1or2
   public static final Eval eval = new Eval();
   static { eval.setName("eval"); }
 
-  final static String evalFunctionName = "atEvalLevel$";
-
   public static void eval (Object sexpr, Environment env, CallContext ctx)
     throws Throwable
   {
@@ -99,7 +97,7 @@ public class Eval extends Procedure1or2
 
 	if (body instanceof PairWithPosition)
 	  mod.setFile(((PairWithPosition) body).getFileName());
-	mod.setName(evalFunctionName + (++ModuleExp.interactiveCounter));
+	tr.setEvalName();
 	ModuleExp.evalModule(env, ctx, tr, null, null);
 	if (messages.seenErrors())
 	  throw new RuntimeException("invalid syntax in eval form:\n"

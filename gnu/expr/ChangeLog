@@ -1,5 +1,20 @@
 2011-08-25  Per Bothner  <per@bothner.com>
 
+	Clean up and refactor code for genarating interactive class names.
+	Make the int counters non static fields of ModuleManager.
+	* ModuleManager.java (interactiveCounter, evalCounter,
+	interactiveClassPrefix, evalClassPrefix): New fields.
+	(getNewInteractiveName, getNewEvalName): New fields.
+	* Compilation.java (setModuleName, setInteractiveName,
+	setEvalName): New methods.
+	* Language.java (eval): Improve prior fix to use setEvalName.
+	(getEvalCounter): Remove method.
+	* KawaScriptEngine.java (compile): Use new setInteractiveName.
+	* ModuleExp.java (interactiveCounter): Remove field.
+	(evalToClass): Use ModuleManager#interactiveCounter instead.
+
+2011-08-25  Per Bothner  <per@bothner.com>
+
 	* Language.java (eval): Generate a unique module name, so we get
 	unique class names, so usedClass will work.
 	(getEvalCounter): New method.

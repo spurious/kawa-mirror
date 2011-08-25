@@ -1083,7 +1083,7 @@ public abstract class Language
     try
       {
 	Compilation comp = parse(port, messages, PARSE_FOR_EVAL);
-	comp.getModule().setName("atEvalLevel$" + getEvalCounter());
+        comp.setEvalName();
 	ModuleExp.evalModule(getEnvironment(), ctx, comp, null, null);
       }
     finally
@@ -1094,9 +1094,6 @@ public abstract class Language
       throw new RuntimeException("invalid syntax in eval form:\n"
 				 + messages.toString(20));
   }
-
-  static private int evalCounter;
-  static protected synchronized int getEvalCounter() { return ++evalCounter; }
 
   public void runAsApplication (String[] args)
   {

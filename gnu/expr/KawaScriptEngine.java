@@ -100,8 +100,7 @@ public class KawaScriptEngine extends AbstractScriptEngine
         if (messages.seenErrors())
           throw new SyntaxException(messages);
         ModuleExp mexp = comp.getModule();
-        mexp.setName("atInteractiveLevel$"
-                     + (++ModuleExp.interactiveCounter));
+        comp.setInteractiveName();
         String filename = (String) get(ScriptEngine.FILENAME);
         java.net.URL url = port.getPath().toURL();
         Writer errorWriter = context.getErrorWriter();

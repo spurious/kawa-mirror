@@ -5,8 +5,8 @@ import gnu.bytecode.ClassType;
 import gnu.text.*;
 
 /** A database of known modules as represented by {@link ModuleInfo}.
- * Current there is only a single global instanceof {@code ModuleManager};
- * in the future each different "applications" may have their own.
+ * Currently there is only a single global instance of {@code ModuleManager};
+ * in the future each different "application" may have their own.
  */
 
 public class ModuleManager
@@ -32,6 +32,30 @@ public class ModuleManager
   /** For now assumes a single global ModuleManager.
    * Later, might have multiple managers. */
   public static ModuleManager getInstance() { return instance; }
+
+    int interactiveCounter;
+
+    int evalCounter;
+
+    public String interactiveClassPrefix = "atInteractiveLevel$";
+    public String evalClassPrefix = "atEvalLevel$";
+
+    /** Used to generate unique class names for interactive REPLs and loads.
+     * This is incremented from Shell.run.
+     * Unique class names are essential for {@link Compilation#usedClass}.
+     * They're also desirable for debugging.
+     */
+    public synchronized String getNewInteractiveName() {
+        return interactiveClassPrefix + (++interactiveCounter);
+    }
+
+    /** Used to generate unique class names for other evals.
+     * Equivalent in functionality to getNewInteractiveName, but with
+     * a different prefix, for better user-friendliness.
+     */
+    public synchronized String getNewEvalName() {
+        return evalClassPrefix + (++evalCounter);
+    }
 
   public static final long LAST_MODIFIED_CACHE_TIME = 1000;
   /** Number millseconds before we re-check file's modified time. */

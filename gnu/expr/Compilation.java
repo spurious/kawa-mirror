@@ -2484,6 +2484,21 @@ public class Compilation implements SourceLocator
       loader.addClass((ClassType) type);
   }
 
+    /** Set moudle name - which sets name of generated class. */
+    public void setModuleName(String name) {
+        getModule().setName(name);
+    }
+
+    /** Generate and set unique module name suitable for an interactive session. */
+    public void setInteractiveName() {
+        setModuleName(ModuleManager.getInstance().getNewInteractiveName());
+    }
+
+    /** Generate and set unique module name suitable for a call to eval. */
+    public void setEvalName() {
+        setModuleName(ModuleManager.getInstance().getNewEvalName());
+    }
+
   public SourceMessages getMessages() { return messages; }
   public void setMessages (SourceMessages messages)
   { this.messages = messages; }

@@ -1,3 +1,9 @@
+2011-08-27  Per Bothner  <per@bothner.com>
+
+	* LitTable.java (emit): Specify "make" parameter types
+	so we get the correct method.  This fixes Savannah bug #34005
+	"ambiguous call to getDeclaredMethod("make", 1)".
+
 2011-08-25  Per Bothner  <per@bothner.com>
 
 	Clean up and refactor code for genarating interactive class names.

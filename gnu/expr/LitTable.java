@@ -599,9 +599,8 @@ public class LitTable implements ObjectOutput
 	// non-existing, because the corresponding reflective Class
 	// needs to be loaded using the correct ClassLoader.
 	comp.loadClassRef((ClassType) literal.value);
-        Method meth = Compilation.typeType.getDeclaredMethod("valueOf", 1);
-        if (meth == null)
-          meth = Compilation.typeType.getDeclaredMethod("make", 1);
+        Method meth = Compilation.typeType
+            .getDeclaredMethod("make", new Type[]{Type.javalangClassType});
 	code.emitInvokeStatic(meth);
 	code.emitCheckcast(Compilation.typeClassType);
 	store(literal, ignore, code);

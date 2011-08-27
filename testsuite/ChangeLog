@@ -1,3 +1,10 @@
+2011-08-27  Helmut Eller  <eller.helmut@gmail.com>
+	    Per Bothner  <per@bothner.com>
+
+	* sva34005.scm: New testcase for Savannah bug #34005
+	"ambiguous call to getDeclaredMethod("make", 1)".
+	* Makefile.am: Update accordingly.
+
 2011-08-24  Per Bothner  <per@bothner.com>
 	    Helmut Eller  <eller.helmut@gmail.com>
 

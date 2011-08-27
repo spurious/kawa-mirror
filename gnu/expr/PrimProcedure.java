@@ -494,7 +494,9 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
     // or if the last argument already is an array we can use it as is.
     // The tricky part is we sometimes have to distinguish these cases
     // at run-time, in which case we set createVarargsArrayIfNeeded.
-    boolean createVarargsArrayIfNeeded = false;
+    // FIXME This is needless and unreliable complexity.  We should by default
+    // create a varargs array - even if the actual argument is an array.
+   boolean createVarargsArrayIfNeeded = false;
     if (variable && (method.getModifiers() & Access.VARARGS) != 0
         && nargs > 0 && argTypes.length > 0
         && nargs == arg_count + (is_static ? 0 : 1))

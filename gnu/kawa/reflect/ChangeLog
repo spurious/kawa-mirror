@@ -2,6 +2,7 @@
 
 	* CompileReflect.java (inlineClassName): Don't inline if
 	checkKnownClass returns -1.
+	This fixes Savannah bug#34003 "Unknown class confuses inliner".
 
 2011-08-17  Per Bothner  <per@bothner.com>
 

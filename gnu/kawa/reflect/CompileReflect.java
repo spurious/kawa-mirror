@@ -43,13 +43,15 @@ public class CompileReflect
 	Type type = language.getTypeFor(args[carg]);
 	if (! (type instanceof Type))
 	  return exp;
-        checkKnownClass(type, comp);
-	Expression[] nargs = new Expression[args.length];
-	System.arraycopy(args, 0, nargs, 0, args.length);
-	nargs[carg] = new QuoteExp(type);
-	ApplyExp nexp = new ApplyExp(exp.getFunction(), nargs);
-        nexp.setLine(exp);
-        return nexp;
+        if (checkKnownClass(type, comp) >= 0)
+          {
+            Expression[] nargs = new Expression[args.length];
+            System.arraycopy(args, 0, nargs, 0, args.length);
+            nargs[carg] = new QuoteExp(type);
+            ApplyExp nexp = new ApplyExp(exp.getFunction(), nargs);
+            nexp.setLine(exp);
+            return nexp;
+          }
       }
     return exp;
   }

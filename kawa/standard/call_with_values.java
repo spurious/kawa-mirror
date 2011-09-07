@@ -19,7 +19,7 @@ public class call_with_values extends Procedure2
 
   public Object apply2 (Object producer, Object consumer) throws Throwable
   {
-    return callWithValues((Procedure) producer,
+    return callWithValues(LangObjType.coerceToProcedure(producer),
                           LangObjType.coerceToProcedure(consumer));
   }
 
@@ -27,7 +27,7 @@ public class call_with_values extends Procedure2
   {
     Procedure.checkArgCount(this, 2);
     Object[] args = ctx.getArgs();
-    Object values = ((Procedure) args[0]).apply0 ();
+    Object values = LangObjType.coerceToProcedure(args[0]).apply0();
     Procedure consumer = LangObjType.coerceToProcedure(args[1]);
     if (values instanceof Values)
       {

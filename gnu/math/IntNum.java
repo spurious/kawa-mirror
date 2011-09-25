@@ -1119,12 +1119,12 @@ public class IntNum extends RatNum implements Externalizable
 
   public static long shift (long x, int count)
   {
-    if (count >= 32)
+    if (count >= 64)
       return 0;
     if (count >= 0)
       return x << count;
     count = -count;
-    if (count >= 32)
+    if (count >= 64)
         return x < 0 ? -1 : 0;
     return x >> count;
   }

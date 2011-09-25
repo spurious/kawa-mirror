@@ -254,6 +254,7 @@ public abstract class Buffer extends AbstractSequence implements CharSeq
     return 1 + getDot();
   }
 
+  /** Set the current position (point) (0-origin). */
   public void setDot(int i)
   {
     if (i > maxDot())
@@ -261,6 +262,7 @@ public abstract class Buffer extends AbstractSequence implements CharSeq
     pointMarker.set(this, i);
   }
 
+  /** Set the current position (point) (1-origin). */
   public final void setPoint(int i)
   {
     setDot(i - 1);

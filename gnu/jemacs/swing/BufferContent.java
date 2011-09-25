@@ -49,9 +49,10 @@ public class BufferContent extends gnu.kawa.swingviews.SwingContent
    * If COUNT is negative, search backwards for the -COUNTth instance;
    *   END must be <= START.
    * If COUNT is zero, do anything you please; run rogue, for all I care.
+   * START and END are both 0-origin.
    *
    * If we find COUNT instances, SHORTAGE is zero, and return the
-   * position after the COUNTth match.  Note that for reverse motion
+   * (0-origin) position after the COUNTth match.  Note that for reverse motion
    * this is not the same as the usual convention for Emacs motion commands.
 
    * If we don't find COUNT instances before reaching END, set SHORTAGE

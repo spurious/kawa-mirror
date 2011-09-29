@@ -31,7 +31,7 @@ public class LList extends ExtSequence
    * A safe function to count the length of a list.
    * @param obj the putative list to measure
    * @param allowOtherSequence if a non-List Sequence is seen, allow that
-   * @return the length, or -1 for a circular list, or -2 for an improper list
+   * @return the length, or -1 for a circular list, or -2 for a dotted list
    */
   static public int listLength(Object obj, boolean allowOtherSequence)
   {

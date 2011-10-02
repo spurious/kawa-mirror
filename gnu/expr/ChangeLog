@@ -1,3 +1,15 @@
+2011-10-01  Jamison Hope  <jrh@theptrgroup.com>
+
+	Add support for native methods.
+	* Special.java (nativeSpecial): New constant.
+	* QuoteExp.java (nativeExp): New constant.
+	* LambdaExp.java (isNative): New method.
+	(addMethodFor): Set NATIVE flag on method if isNative().
+	(compileAsMethod): Do nothing if isNative().
+	(getReturnType, setCoercedReturnType, setCoercedReturnValue):
+	Skip if native.
+	* ClassExp.java (compileMembers): Skip if native.
+
 2011-08-27  Per Bothner  <per@bothner.com>
 
 	* LitTable.java (emit): Specify "make" parameter types

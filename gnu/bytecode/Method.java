@@ -110,6 +110,11 @@ public class Method implements AttrContainer, Member {
     return (access_flags & Access.ABSTRACT) != 0;
   }
 
+  public final boolean isNative()
+  {
+    return (access_flags & Access.NATIVE) != 0;
+  }
+
   public int getModifiers ()
   {
     return access_flags;

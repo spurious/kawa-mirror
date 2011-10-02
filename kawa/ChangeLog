@@ -1,3 +1,7 @@
+2011-10-01  Jamison Hope  <jrh@theptrgroup.com>
+
+	* lang/Translator.java (rewrite): Map #!native to QuoteExp.nativeExp.
+
 2011-09-06  Per Bothner  <per@bothner.com>
 
 	* standard/call_with_values.java (apply, apply2): Use

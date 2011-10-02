@@ -248,6 +248,11 @@ public class LambdaExp extends ScopeExp
     return body == QuoteExp.abstractExp;
   }
 
+  public boolean isNative ()
+  {
+    return body == QuoteExp.nativeExp;
+  }
+
   /** Specify the calling convention used for this function.
    * @return One of the CALL_WITH_xxx values in Compilation. */
   public int getCallConvention ()
@@ -909,6 +914,8 @@ public class LambdaExp extends ScopeExp
       }
     if (ctype.isInterface() || isAbstract())
       mflags |= Access.ABSTRACT;
+    if (isNative())
+      mflags |= Access.NATIVE;
 
     // If a class method has unspecified parameter types, see if we
     // can "inherit" the parameter types from an inherited method.
@@ -1500,7 +1507,7 @@ public class LambdaExp extends ScopeExp
 
   void compileAsMethod (Compilation comp)
   {
-    if ((flags & METHODS_COMPILED) != 0 || isAbstract())
+    if ((flags & METHODS_COMPILED) != 0 || isAbstract() || isNative())
       return;
     flags |= METHODS_COMPILED;
     if (primMethods == null)
@@ -1928,7 +1935,7 @@ public class LambdaExp extends ScopeExp
       {
 	returnType = Type.objectType;  // To guards against cycles.
 	// body may not be set if define scan'd but not yet rewrit'ten.
-	if (body != null && ! isAbstract())
+	if (body != null && ! isAbstract() && ! isNative())
 	  returnType = body.getType();
       }
     return returnType;
@@ -1946,7 +1953,8 @@ public class LambdaExp extends ScopeExp
     if (returnType != null
         && returnType != Type.objectType
         && returnType != Type.voidType
-        && body != QuoteExp.abstractExp)
+        && body != QuoteExp.abstractExp
+        && body != QuoteExp.nativeExp)
       {
         Expression value = body;
 	body = Compilation.makeCoercion(value, returnType);
@@ -1958,7 +1966,7 @@ public class LambdaExp extends ScopeExp
   public final void setCoercedReturnValue (Expression type,
 					    Language language)
   {
-    if (! isAbstract())
+    if (! isAbstract() && ! isNative())
       {
         Expression value = body;
         body = Compilation.makeCoercion(value, type);

@@ -51,6 +51,7 @@ public class QuoteExp extends Expression
 
   static public QuoteExp undefined_exp =  makeShared(Special.undefined);
   static public QuoteExp abstractExp = makeShared(Special.abstractSpecial);
+  static public QuoteExp nativeExp = makeShared(Special.nativeSpecial);
   static public QuoteExp voidExp = makeShared(Values.empty, Type.voidType);
   static public QuoteExp trueExp = makeShared(Boolean.TRUE);
   static public QuoteExp falseExp = makeShared(Boolean.FALSE);

@@ -497,7 +497,7 @@ public class ClassExp extends LambdaExp
 	for (LambdaExp child = firstChild;  child != null;
              child = child.nextSibling)
 	  {
-            if (child.isAbstract())
+            if (child.isAbstract() || child.isNative())
               continue;
 	    Method save_method = comp.method;
 	    LambdaExp save_lambda = comp.curLambda;

@@ -1,3 +1,7 @@
+2011-10-01  Jamison Hope  <jrh@theptrgroup.com>
+
+	* LispReader.java (readSpecial): Handle #!native.
+
 2011-07-11  Per Bothner  <per@bothner.com>
 
 	Support reading cyclic lists and vectors using SRFI-38 #N= notation.

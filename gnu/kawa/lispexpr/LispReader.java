@@ -1286,6 +1286,8 @@ public class LispReader extends Lexer
       return Special.undefined;
     if (name.equals("abstract"))
       return Special.abstractSpecial;
+    if (name.equals("native"))
+      return Special.nativeSpecial;
     if (name.equals("null"))
       return null;
     if (name.equals("fold-case"))

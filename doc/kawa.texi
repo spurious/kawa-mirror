@@ -7685,8 +7685,9 @@ then its value is doubled.
 
 @display
 @stxdef{method-decl} @stxlit{((}@stxref{method-name} @stxref{formal-arguments}@stxlit{)}
-    (@stxref{annotation} | @stxref{opt-return-type} | @stxref{option-pair})* [@stxref{deprecated-return-specifier}] @stxref{body}@stxlit{)}
+    (@stxref{annotation} | @stxref{opt-return-type} | @stxref{option-pair})* [@stxref{deprecated-return-specifier}] @stxref{method-body}@stxlit{)}
 @stxdef{method-name} @stxref{identifier}
+@stxdef{method-body} @stxref{body} | @stxlit{#!abstract} | @stxlit{#!native}
 @stxdef{deprecated-return-specifier} @stxref{identifier}
 @end display
 
@@ -7728,7 +7729,7 @@ The scope of the @var{body} of a method includes the @var{field-decl}s
 and @var{field-decl}s of the body, including those inherited from
 superclasses and implemented interfaces.
 
-If the @var{body} is the special form @code{#!abstract},
+If the @var{method-body} is the special form @code{#!abstract},
 then the method is abstract.  This means the method must
 be overridden in a subclass, and you're not allowed to
 create an instance of the enclosing class.
@@ -7737,6 +7738,9 @@ create an instance of the enclosing class.
 (define-simple-class Searchable () interface: #t
   ((search value) :: boolean #!abstract))
 @end example
+
+If the @var{method-body} is the special form @code{#!native},
+then the method is native, implemented using @uref{http://en.wikipedia.org/wiki/Java_Native_Interface,JNI}.
 
 The special @var{method-name} @samp{*init*} can be used to name
 a non-default constructor (only if @var{make-interface} discussed above

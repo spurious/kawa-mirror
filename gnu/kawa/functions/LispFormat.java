@@ -58,10 +58,10 @@ public class LispFormat extends CompoundFormat
 		stack.push(paramFromList);
 		ch = format[i++];
 	      }
-	    else if (ch == '-' || Character.digit(ch, 10) >= 0)
+	    else if (ch == '-' || ch == '+' || Character.digit(ch, 10) >= 0)
 	      {
 		boolean neg = (ch == '-');
-		if (neg)
+		if (neg || ch == '+')
 		  ch = format[i++];
 		int val = 0;
 		int start = i;

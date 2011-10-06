@@ -1,3 +1,8 @@
+2011-10-06  Per Bothner  <per@bothner.com>
+
+	* standard/object.java (scanClassDef): Add an extra needed call to
+	Translator#stripSyntax.
+
 2011-10-01  Jamison Hope  <jrh@theptrgroup.com>
 
 	* lang/Translator.java (rewrite): Map #!native to QuoteExp.nativeExp.

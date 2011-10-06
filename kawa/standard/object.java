@@ -177,9 +177,7 @@ public class object extends Syntax
                   args = ((SyntaxForm) args).getDatum();
 		pair = (Pair) args;
 		Pair keyPair = pair;
-		Object key = pair.getCar();
-                while (key instanceof SyntaxForm)
-                  key = ((SyntaxForm) key).getDatum();
+		Object key = Translator.stripSyntax(pair.getCar());
 		Object savedPos2 = tr.pushPositionOf(pair);
 		args = pair.getCdr();
 		if ((key == coloncolon || key instanceof Keyword)
@@ -187,7 +185,7 @@ public class object extends Syntax
 		  {
 		    nKeywords++;
 		    pair = (Pair) args;
-		    Object value = pair.getCar();
+		    Object value = Translator.stripSyntax(pair.getCar());
 		    args = pair.getCdr();
 		    if (key == coloncolon || key == typeKeyword)
 		      typePair = pair;

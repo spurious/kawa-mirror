@@ -1,3 +1,7 @@
+2011-09-24  Jamison Hope  <jrh@theptrgroup.com>
+
+	* build.xml (-maybe-select-java7): New target.
+
 2011-08-04  Per Bothner  <per@bothner.com>
 
 	* configure.in (with_XQTS): Fix setter to be Posix-compatible.

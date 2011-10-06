@@ -83,6 +83,11 @@ public class IfFeature
       return true;
     /* #endif */
 
+    /* #ifdef JAVA7 */
+    // if (name == "java-7")
+    //  return true;
+    /* #endif */
+
     String classExistsPrefix = "class-exists:";
     if (name.startsWith(classExistsPrefix))
       {

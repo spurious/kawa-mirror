@@ -1,4 +1,4 @@
-(test-begin "libs" 212)
+(test-begin "libs" 215)
 
 (import (srfi :2 and-let*))
 
@@ -360,7 +360,7 @@
 
 (test-end "rnrs-lists")
 
-(test-begin "char-sets" 85)
+(test-begin "char-sets" 88)
 
 (import (srfi :14 char-sets))
 (import (rnrs sorting))
@@ -450,26 +450,41 @@
                  (lambda (c) (java.lang.Character:isISOControl
                               (char->integer c))) char-set:full)))
 (test-equal #t (char-set=
+                char-set:title-case
+                (char-set-filter
+                 (lambda (c) (java.lang.Character:title-case?
+                              (char->integer c))) char-set:full)))
+
+; Some of these tests only succeed on Java 7, which supports
+; Unicode 6. On earlier Javas, the java.lang.Character predicates will
+; disagree with the char-set definitions.
+(define-syntax expect-fail-unless-unicode-6
+  (syntax-rules ()
+    ((expect-fail-unless-unicode-6 count)
+     (cond-expand ((or java-7 class-exists:java.util.concurrent.TransferQueue))
+                  (else (test-expect-fail count))))))
+(expect-fail-unless-unicode-6 8)
+(test-equal #t (char-set=               ; only on Java 7
                 char-set:lower-case
                 (char-set-filter
                  (lambda (c) (java.lang.Character:lower-case?
                               (char->integer c))) char-set:full)))
-(test-equal #t (char-set=
+(test-equal #t (char-set=               ; only on Java 7
                 char-set:upper-case
                 (char-set-filter
                  (lambda (c) (java.lang.Character:upper-case?
                               (char->integer c))) char-set:full)))
-(test-equal #t (char-set=
+(test-equal #t (char-set=               ; only on Java 7
                 char-set:letter
                 (char-set-filter
                  (lambda (c) (java.lang.Character:letter?
                               (char->integer c))) char-set:full)))
-(test-equal #t (char-set=
+(test-equal #t (char-set=               ; only on Java 7
                 char-set:digit
                 (char-set-filter
                  (lambda (c) (java.lang.Character:digit?
                               (char->integer c))) char-set:full)))
-(test-equal
+(test-equal                             ; only on Java 7
  #t (char-set=
      char-set:punctuation
      (char-set-filter
@@ -484,7 +499,7 @@
               (= type java.lang.Character:FINAL_QUOTE_PUNCTUATION)
               (= type java.lang.Character:OTHER_PUNCTUATION))))
       char-set:full)))
-(test-equal
+(test-equal                             ; only on Java 7
  #t (char-set=
      char-set:symbol
      (char-set-filter
@@ -496,6 +511,34 @@
               (= type java.lang.Character:MODIFIER_SYMBOL)
               (= type java.lang.Character:OTHER_SYMBOL))))
       char-set:full)))
+(test-equal                             ; only on Java 7
+ #t (char-set=
+     char-set:whitespace
+     (char-set-filter
+      (lambda (c)
+        (or (char=? c #\u0009)
+            (char=? c #\u000a)
+            (char=? c #\u000b)
+            (char=? c #\u000c)
+            (char=? c #\u000d)
+            (let ((type ::byte (java.lang.Character:get-type
+                                (char->integer c))))
+              (or (= type java.lang.Character:SPACE_SEPARATOR)
+                  (= type java.lang.Character:LINE_SEPARATOR)
+                  (= type java.lang.Character:PARAGRAPH_SEPARATOR)))))
+      char-set:full)))
+(test-equal                             ; only on Java 7
+ #t (char-set=
+     char-set:blank
+     (char-set-filter
+      (lambda (c)
+        (or (char=? c #\u0009)
+            (let ((type ::byte (java.lang.Character:get-type
+                                (char->integer c))))
+              (= type java.lang.Character:SPACE_SEPARATOR))))
+      char-set:full)))
+
+
 ; char-set-filter!
 (test-equal #t (char-set= (char-set #\a #\b #\c)
                           (char-set-filter!
@@ -538,6 +581,8 @@
                                 (+ 1 #x10FFFF)))))
 
 (test-equal #f (char-set-any char-upper-case? char-set:lower-case))
+
+(expect-fail-unless-unicode-6 1)
 (test-equal #t (char-set-every char-upper-case? char-set:upper-case))
 ; char-set-adjoin, char-set-adjoin!
 (test-equal #t (char-set= abc

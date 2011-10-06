@@ -1,3 +1,8 @@
+2011-09-24  Jamison Hope  <jrh@theptrgroup.com>
+
+	* srfi14.scm: Update character sets to match Unicode 6 and the
+	Java-7 java.lang.Character predicates.
+
 2011-05-02  Per Bothner  <per@bothner.com>
 
 	* syntaxutils.scm (unrewrite-let): Update for new LetExp representation.

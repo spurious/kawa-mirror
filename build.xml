@@ -349,6 +349,9 @@
   <target name="-maybe-select-java6" if="has-java6">
     <antcall target="select-java6"/>
   </target>
+  <target name="-maybe-select-java7" if="has-java7">
+    <antcall target="select-java7"/>
+  </target>
   <target name="-maybe-select-android" if="${enable-android}">
     <antcall target="select-android"/>
   </target>
@@ -363,11 +366,13 @@
     <available property="has-java4" classname="java.lang.CharSequence"/>
     <available property="has-java5" classname="java.lang.Appendable"/>
     <available property="has-java6" classname="javax.script.AbstractScriptEngine"/>
+    <available property="has-java7" classname="java.lang.invoke.MethodHandle"/>
     <antcall target="-maybe-select-java1"/>
     <antcall target="-maybe-select-java2"/>
     <antcall target="-maybe-select-java4"/>
     <antcall target="-maybe-select-java5"/>
     <antcall target="-maybe-select-java6"/>
+    <antcall target="-maybe-select-java7"/>
   </target>
   
   <!-- 

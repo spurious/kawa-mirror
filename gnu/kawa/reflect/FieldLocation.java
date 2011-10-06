@@ -52,6 +52,7 @@ public class FieldLocation extends ClassMemberLocation
   {
     String fname = getMemberName();
     gnu.bytecode.Field fld = getDeclaringClass().getDeclaredField(fname);
+    if (fld == null) throw new RuntimeException("No field found for "+this);
     int fflags = fld.getModifiers();
     Type ftype = fld.getType();
     if (ftype.isSubtype(Compilation.typeLocation))

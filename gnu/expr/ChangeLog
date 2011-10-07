@@ -1,3 +1,8 @@
+2011-10-07  Per Bothner  <per@bothner.com>
+
+	* QuoteExp.java (calculateType): If value is a Class, return a
+	ParameterizedType, as in Java.
+
 2011-10-01  Jamison Hope  <jrh@theptrgroup.com>
 
 	Add support for native methods.

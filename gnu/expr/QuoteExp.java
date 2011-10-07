@@ -1,6 +1,7 @@
 package gnu.expr;
 import gnu.mapping.*;
 import gnu.bytecode.Type;
+import gnu.bytecode.ParameterizedType;
 import gnu.text.SourceLocator;
 import gnu.kawa.reflect.MakeAnnotation;
 
@@ -27,6 +28,8 @@ public class QuoteExp extends Expression
       return Type.voidType;
     else if (value == null)
       return Type.nullType;
+    else if (value instanceof Class)
+      return new ParameterizedType(Type.javalangClassType, Type.make((Class) value));
     else if (this == undefined_exp)
       return Type.pointer_type;
     else

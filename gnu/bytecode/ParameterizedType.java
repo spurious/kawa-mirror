@@ -13,6 +13,10 @@ public class ParameterizedType extends ObjectType
         return rawType;
     }
 
+    public Class getReflectClass() {
+        return rawType.getReflectClass();
+    }
+
     public Type[] getTypeArgumentTypes() {
         return typeArgumentTypes;
     }

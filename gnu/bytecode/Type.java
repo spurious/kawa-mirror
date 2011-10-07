@@ -26,11 +26,11 @@ public abstract class Type
   protected Type () { }
 
   /** Return Java-level implementation type.
-   * The type used to implement types not natively understood by the JVM.
-
+   * The type used to implement types not natively understood by the JVM
+   * or the Java language.
    * Usually, the identity function.  However, a language might handle
    * union types or template types or type expressions calculated at
-   * run time.  In that case return the type used at the JVM level,
+   * run time.  In that case return the type used at the Java level,
    * and known at compile time.
    */
   public Type getImplementationType()

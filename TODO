@@ -2,6 +2,8 @@ Document:
   in-http-server and in-servlet cond-expand options.
   meta-arg \\
 
+Use Parboiled as parser library?  https://github.com/sirthias/parboiled/wiki
+
 Before Kawa 1.12:
 - Jemacs type ctrl-C --> TooLongAction
 - Make Values constructors be private, so we can make Values be abstract.

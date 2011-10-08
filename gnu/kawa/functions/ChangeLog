@@ -1,3 +1,10 @@
+2011-10-08  Charles Turner  <chturne@gmail.com>
+
+	* DisplayFormat.java (writeObject, writeList): Modified to print
+	shared structures when requested.
+	(isInteresting): New method to augment SRFI-38
+	(checkSharing): New field, used to toggle shared printing.
+
 2011-10-02  Charles Turner  <chturne@gmail.com>
 
 	* LispFormat.java:  (<init>): Allow '+' in numeric format parameters.

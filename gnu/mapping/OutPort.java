@@ -122,6 +122,11 @@ public class OutPort extends PrintConsumer implements Printable
     errLocation.set(e);
   }
 
+  public PrettyWriter getPrettyWriter ()
+  {
+    return bout;
+  }
+
   public static OutPort openFile(Object fname)
     throws java.io.IOException
   {
@@ -201,6 +206,7 @@ public class OutPort extends PrintConsumer implements Printable
 
   public AbstractFormat objectFormat;
 
+  @Override
   public void print(int v)
   {
     if (numberFormat == null)
@@ -209,6 +215,7 @@ public class OutPort extends PrintConsumer implements Printable
       print(numberFormat.format((long) v));
   }
 
+  @Override
   public void print(long v)
   {
     if (numberFormat == null)
@@ -217,6 +224,7 @@ public class OutPort extends PrintConsumer implements Printable
       print(numberFormat.format(v));
   }
 
+  @Override
   public void print(double v)
   {
     if (numberFormat == null)
@@ -225,6 +233,7 @@ public class OutPort extends PrintConsumer implements Printable
       print(numberFormat.format(v));
   }
 
+  @Override
   public void print(float v)
   {
     if (numberFormat == null)
@@ -233,6 +242,7 @@ public class OutPort extends PrintConsumer implements Printable
       print(numberFormat.format((double) v));
   }
 
+  @Override
   public void print(boolean v)
   {
     if (objectFormat == null)
@@ -241,11 +251,13 @@ public class OutPort extends PrintConsumer implements Printable
       objectFormat.writeBoolean(v, this);
   }
 
+  @Override
   public void print(String v)
   {
     write(v == null ? "(null)" : v);
   }
 
+  @Override
   public void print(Object v)
   {
     if (objectFormat != null)
@@ -267,6 +279,7 @@ public class OutPort extends PrintConsumer implements Printable
     out.write('>');
   }
 
+  @Override
   public void startElement (Object type)
   {
     if (objectFormat != null)
@@ -278,6 +291,7 @@ public class OutPort extends PrintConsumer implements Printable
       }
   }
 
+  @Override
   public void endElement ()
   {
     if (objectFormat != null)
@@ -288,6 +302,7 @@ public class OutPort extends PrintConsumer implements Printable
 
   /** Write a attribute for the current element.
    * This is only allowed immediately after a startElement. */
+  @Override
   public void startAttribute (Object attrType)
   {
     if (objectFormat != null)
@@ -301,6 +316,7 @@ public class OutPort extends PrintConsumer implements Printable
   }
 
   /** No more attributes in this element. */
+  @Override
   public void endAttribute()
   {
     if (objectFormat != null)
@@ -365,6 +381,7 @@ public class OutPort extends PrintConsumer implements Printable
     unregisterRef = null;
   }
 
+  @Override
   public void close()
   {
     try

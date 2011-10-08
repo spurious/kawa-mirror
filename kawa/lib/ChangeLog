@@ -1,3 +1,9 @@
+2011-10-08  Charles Turner  <chturne@gmail.com>
+
+	* ports.scm (write, write-with-shared-structure): write was
+	modified slightly for SRFI-38, write-w-s-s is a new procedure that
+	calls the appropiate Java methods for shared structure printing.
+
 2011-06-14  Per Bothner  <per@bothner.com>
 
 	* misc.scm: Update package for class Promise.

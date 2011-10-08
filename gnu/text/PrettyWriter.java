@@ -2,6 +2,7 @@
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.text;
+import gnu.kawa.util.IntHashTable;
 import java.io.*;
 import gnu.mapping.ThreadLocation;
 import gnu.lists.LList;
@@ -10,18 +11,82 @@ import gnu.lists.LList;
  *
  * This code is transcribed from pprint.lisp in Steel Bank Common Lisp,
  * which is again based on the code in CMU Common Lisp.
+ * Modifications have been made to accommodate shared structures, as described
+ * in SRFI-38.
+ *
+ * @author Per Bothner
+ * @author Charles Turner
+ */
+
+/** 
+ * The pretty printer (hereafter PP) is responsible for formatting the results 
+ * of evaluating expressions so that the human user can easily read them. The PP
+ * may also be responsible for choosing where to break lines so that the output 
+ * looks reasonable.
+ * 
+ * Raw text that has not yet been written out is stored in the "buffer" array,
+ * while information about the structure of the text is stored in a queue of
+ * "formatting tokens" (see below) called queueInts. A circular queue is used
+ * when the PP is not dealing with shared structures, and a linear array is used
+ * when it is. This only effects how the formatting tokens are enqueued into the
+ * structure, and how the structure is dynamically expanded.
+ * 
+ * Formatting tokens are simply contiguous chunks of the queue. All tokens have
+ * a type and a size. For example, there is a formatting token called
+ * QITEM_NEWLINE_TYPE whose size is specified by QITEM_NEWLINE_SIZE. The size
+ * includes these type and size bits. The tokens use the space allocated to them
+ * in different ways. For example, the tab token uses two of its chunks (ints)
+ * to specify at which column it was entered, and to which column it should
+ * expand to.
+ * 
+ * The tokens are buffered by a display formatter. The display formatter walks
+ * the structure to be printed emitting these tokens when it finds it has to,
+ * as well as the actual characters to be printed! Remember, the formatting
+ * tokens are distinct from the actual characters written, they just control how the
+ * characters are displayed. To accommodate this dichotomy, the character buffer
+ * holds the actual characters as they appear to the display formatter, the queue 
+ * holds the formatting tokens plus a mapping that specifies which character in 
+ * the buffer they end at.
+ * 
+ * Once the display formatter has finished walking the expression to be printed,
+ * the formatting queue is walked by the "destructive" methods, i.e., the ones
+ * that actually flush the buffer to the output port. As mentioned above, each
+ * token encodes the position it references in the character buffer, so we use
+ * this information to work our way through the buffer, occasionally modifying
+ * the buffer to look pretty (dictated by the formatting tokens). Examples of
+ * such modifications include changing a space character to a newline character
+ * so that the line will prettily fit on the specified line width, or more
+ * drastically, remove a shared object of the expression and replacing
+ * it will print-circle notation.
+ * 
+ * Once everything has been flushed, the initial conditions are reset ready for
+ * the next printing.
  */
 
 public class PrettyWriter extends java.io.Writer
 {
   protected Writer out;
 
+  /**
+   * Construct a PrettyWriter with {@code prettyPrintingMode = 1}
+   * @param out The output to write to
+   * @see #prettyPrintingMode
+   */
   public PrettyWriter(java.io.Writer out)
   {
     this.out = out;
     prettyPrintingMode = 1;
   }
 
+  /**
+   * Construct a PrettyWriter which breaks on a given line length.
+   * If {@code lineLength} is strictly greater than one, 
+   * {@code prettyPrintingMode} is set to 1, otherwise it's set to 0.
+   *
+   * @param out The output to write to
+   * @param lineLength The column width lines should break on
+   * @see #prettyPrintingMode #lineLength
+   */
   public PrettyWriter(java.io.Writer out, int lineLength)
   {
     this.out = out;
@@ -29,6 +94,12 @@ public class PrettyWriter extends java.io.Writer
     prettyPrintingMode = lineLength > 1 ? 1 : 0;
   }
 
+  /**
+   * Construct a PrettyWriter.
+   * @param out The output port to write to
+   * @param prettyPrintingMode If {@code true} then {@code prettyPrintingMode = 1}
+   *        otherwise {@code prettyPrintingMode = 0}
+   */
   public PrettyWriter(java.io.Writer out, boolean prettyPrintingMode)
   {
     this.out = out;
@@ -37,7 +108,33 @@ public class PrettyWriter extends java.io.Writer
 
   /** Line length we should format to. */
   int lineLength = 80;
+
+  /**
+   * If the right-hand-side margin is less than or equal to this value, the
+   * miser printing mode is entered. This is compact style of printing where
+   * line breaks are taken at every inter-token space.
+   * (1
+   *  2
+   *  3) is an example of a miser-style printing.
+   */
   int miserWidth = 40;
+
+  /**
+   * This variable is used to determine how the queueInts array should be
+   * expanded. When printing with shared structure, we don't want a circular
+   * queue, since we rely on being able to reference formatting tokens in
+   * previous queue slots. When the queue has wrapped and expanded several times,
+   * keeping track of such references is a nightmare.
+   */
+  boolean sharing = false;
+
+  /**
+   * When the display formatter has written a back-reference, we know for certain
+   * that print-circle notation has been emitted.
+   * This variable is used to avoid the expensive resolveBackReferences method 
+   * from running in the case that we have a non-recursive object.
+   */
+  boolean reallySharing = false;
 
   public static ThreadLocation lineLengthLoc
     = new ThreadLocation("line-length");
@@ -46,9 +143,44 @@ public class PrettyWriter extends java.io.Writer
   public static ThreadLocation indentLoc
     = new ThreadLocation("indent");
 
+  /**
+   * Whether to resolve shared structures is dependent on the out:print-circle
+   * command line switch being set true. The PrettyWriter uses a different
+   * data structure to resolve back-references when we're emitting print-circle
+   * notation.
+   */
+  public static ThreadLocation isSharing 
+    = new ThreadLocation("print-circle");
+
   /** The current pretty-printing mode.
    * See setPrettyPrintingMode for valid values. */
   int prettyPrintingMode;
+  
+  private IntHashTable idhash;
+
+  public void initialiseIDHash ()
+  {
+    Object share = isSharing.get(null);
+    idhash = new IntHashTable();
+  }
+
+  public void clearIDHash()
+  {
+    idhash.clear();
+  }
+  
+  public int IDHashLookup(Object obj) {
+    if (idhash == null) initialiseIDHash();
+    return idhash.lookup(obj);
+  }
+
+  public int IDHashGetFromIndex(int index) {
+    return idhash.getFromIndex(index);
+  }
+
+  public int IDHashPutAtIndex(Object obj, int value, int index) {
+    return idhash.putAtIndex(obj, value, index);
+  }
 
   /** Control pretty-printing mode.
    * @param mode the value 0 disables pretty-printing;
@@ -58,6 +190,8 @@ public class PrettyWriter extends java.io.Writer
    */
   public void setPrettyPrintingMode (int mode)
   { prettyPrintingMode = mode; }
+
+  public void setSharing (boolean sharing) {this.sharing = sharing; }
 
   /** Return pretty-printing mode.
    * @return 0, 1, 2, as described for {@link #setPrettyPrintingMode(int)}.
@@ -105,16 +239,34 @@ public class PrettyWriter extends java.io.Writer
   //   POSN - some position in the stream of characters cycling through
   //          the output buffer.
 
+  /**
+   * Return the adjusted index into the {@link #buffer}. The position is adjusted
+   * such this index will point to data that has not already been printed.
+   * @param index The index into the {@link #buffer}
+   * @return The adjusted index accounting for already written data
+   */
   private int indexPosn (int index)
   {
     return index + bufferOffset;
   }
 
+  /**
+   * Return the "real" index to {@link #buffer} which may index data already 
+   * written. Useful for QITEM_POSN's
+   * @param posn The adjusted index into the {@link #buffer}
+   * @return  The "real" index into the {@link #buffer}
+   * @see #indexPosn(int)
+   */
   private int posnIndex (int posn)
   {
     return posn - bufferOffset;
   }
 
+  /**
+   * Returns the index of a QITEM position relative to the output buffer
+   * @param posn The QITEM position to be processed
+   * @return The position of this QITEM relative to the {@link #buffer}
+   */
   private int posnColumn (int posn)
   {
     return indexColumn(posnIndex(posn));
@@ -178,16 +330,26 @@ public class PrettyWriter extends java.io.Writer
   /** Number of startLogicalBlock - number of endLogicalBlock. */
   public int pendingBlocksCount;
 
-  /** The first it QITEM contains it type code and size.
-   * The type code is one of the QITEM_XXX_TYPE values below.
-   * The size is the corresponding QITEM_XXX_SIZE value below,
-   * except for the case of QITEM_NOP_TYPE (which is used as a filler). */
+  /**
+   * The queue types and respective sizes are packed into a 32-bit integer.
+   *
+   * The most-significant 16-bits of a QITEM defines the type code. This type
+   * code is defined by one of the QITEM_.+_TYPE fields below.
+   * The least significant 8-bits of QITEM defines the type size. This size
+   * is defined by one of the QITEM_.+_SIZE fields below.
+   * Bits (8, 16] are currently used to store flags for their respective queue
+   * types
+   * The only exception to this rule is QITEM_NOP_TYPE, which acts as a marker
+   * for when there isn't enough space in the rest of the buffer.
+   */
+
+  /** The first it QITEM contains it type code and size. */
   static final int QITEM_TYPE_AND_SIZE = 0;
   private int getQueueType(int index) { return queueInts[index] & 0xFF; }
   private int getQueueSize(int index) { return queueInts[index] >> 16; }
-  /** Relative offset of POSN field of a QITEM> */
+  /** Relative offset of POSN field of a QITEM. */
   static final int QITEM_POSN = 1;
-  /** Size of "base part" of a QITEM. */
+  /** Size of "base part" of a QITEM. The type and size packing, plus the position */
   static final int QITEM_BASE_SIZE = 2;
 
   /** A dummy queue item used at the high end of the queue buffer
@@ -246,6 +408,81 @@ public class PrettyWriter extends java.io.Writer
   static final int QITEM_TAB_COLNUM = QITEM_BASE_SIZE + 1;
   static final int QITEM_TAB_COLINC = QITEM_BASE_SIZE + 2;
 
+  /**
+   * Position markers are used to "name" shared parts of an expression. 
+   * For instance in #1=(a #1# c), #1= is the position marker.
+   * The GROUP_TYPE is used as a bit mask to determine from the type+size
+   * packing whether this position marker is grouping a sub-object. See the
+   * PAIR_END_TYPE comments below for a more detailed description of this.
+   */
+  static final int QITEM_POSNMARKER_TYPE = 7;
+  static final int QITEM_POSNMARKER_GROUP_TYPE = 8;
+  static final int QITEM_POSNMARKER_SIZE = QITEM_BASE_SIZE + 1;
+  static final int QITEM_POSNMARKER_LOC = QITEM_BASE_SIZE;
+
+  /**
+   * Represents a back reference to a value defined by a previous QITEM_POSNMARKER
+   * @param posn The index into the {@link #queueInts} array of the position
+   * marker
+   * @return true if the position marker has been referenced.
+   */
+  static final int QITEM_BACKREF_TYPE = 8;
+  static final int QITEM_BACKREF_SIZE = QITEM_BASE_SIZE + 1;
+  static final int QITEM_BACKREF_TARGET = QITEM_BASE_SIZE;
+
+  /**
+   * Pair end types are also linked to position markers. If the position
+   * marker is found to be grouping (i.e. that it references a non-initial
+   * sublist) the printer must emit an extra closing parenthesis so that the
+   * position marker correctly points to referenced sublist.
+   * 
+   * '(a *b c d*)..
+   * 
+   * For instance, if the '(b c d) sublist was found to be a reference, we would
+   * need to add extra parenthesis around the sublist like so,
+   * 
+   * '(a . #N=(b c d))...
+   * 
+   * These types deal with the closing parenthesis of such cases.
+   */
+  static final int QITEM_PAIR_END_TYPE = 9;
+  static final int QITEM_PAIR_END_SIZE = QITEM_BASE_SIZE + 1;
+  static final int QITEM_PAIR_END_REF = QITEM_BASE_SIZE;
+
+  /**
+   * When performing a shared structure printing, with a prettyPrintingMode of
+   * zero, the only queueItem tokens contained in the string are newline tokens.
+   * This isn't enough for the back-reference resolver. This token is appended
+   * to the end of an s-exp so that the resolver will be able consume all of the
+   * expression.
+   */
+  static final int QITEM_EOE_TYPE = 10;
+  static final int QITEM_EOE_SIZE = QITEM_BASE_SIZE;
+
+  /**
+   * To determine whether the position maker should group what it references.
+   * This is necessary when the CDR of a non-initial pair has been found to be
+   * referenced. We explout some unused space in the queue item
+   * type+size packing to accomodate this information.
+   * @param posn The position marker under test
+   * @return true if this position marker should group
+   */
+  private boolean posnMarkerIsGrouping (int posn)
+  {
+    return ((queueInts[posn] >> QITEM_POSNMARKER_GROUP_TYPE) & 1) != 0;
+  }
+
+  /**
+   * To determine whether a position marker has been referenced
+   * @param posn The index into the {@link #queueInts} array of the position
+   * marker
+   * @return true if the position marker has been referenced.
+   */
+  private boolean posnMarkerActive (int posn)
+  {
+    return queueInts[posn + QITEM_POSNMARKER_LOC] != 0;
+  }
+
   private int getSectionColumn()
   {
     return blocks[blockDepth+BLOCK_SECTION_COLUMN];
@@ -300,6 +537,16 @@ public class PrettyWriter extends java.io.Writer
     wordEndSeen = false;
   }
 
+  /**
+   * Write a character to the buffer. If we're pretty printing and the character
+   * is a space character, two cases arise. If the character is a newline, then
+   * enqueue a NEWLINE_LITERAL, which has to used. If the character is a space,
+   * then we may at our discretion place a newline there if the printing
+   * requires that we do so. Note that this doesn't mean we *will* print
+   * a newline, just that we can. For other characters, we just populate the
+   * buffer.
+   * @param ch The character to write.
+   */
   public void write (int ch)
   {
     wordEndSeen = false;
@@ -322,6 +569,14 @@ public class PrettyWriter extends java.io.Writer
     write(str, 0, str.length());
   }
 
+  /**
+   * Write a (sub)string to the output buffer. Newlines and spaces are handled,
+   * and appropriate formatting token emitted in such cases.
+   * 
+   * @param str The string to use
+   * @param start Where to start in the string
+   * @param count The number of character to write from the string
+   */
   public void write (String str, int start, int count)
   {
     wordEndSeen = false;
@@ -404,6 +659,75 @@ public class PrettyWriter extends java.io.Writer
       }
   }
 
+  /**
+   * A position marker is queued for every Scheme object that *could* refer
+   * to itself (or other parts of the structure). 
+   * Currently, this applies only to vectors and lists. For each
+   * such object, the printer records it. All position markers are assumed
+   * inactive (i.e. not back-referenced) until proven otherwise. Some position
+   * markers are required to group new sublists, the grouping variable
+   * notes this.
+   * @return Integer The index in {@link #queueItems} where this marker resides
+   *                 it's used for back-reference lookup.
+   * @see #writeBackReference(java.lang.Integer)
+   */
+  public int writePositionMarker (boolean grouping)
+  {
+    int result = enqueue(QITEM_POSNMARKER_TYPE, QITEM_POSNMARKER_SIZE);
+    // A zero implies we haven't assigned this position marker a count yet
+    queueInts[result + QITEM_POSNMARKER_LOC] = 0;
+    // Are we marking a non-initial sublist?
+    queueInts[result] |= (grouping ? 1 : 0) << QITEM_POSNMARKER_GROUP_TYPE;
+    // Return the index of this position marker in the queueInts
+    //log("POSNMARK: @"+result);
+    return result;
+  }
+
+  /**
+   * Enqueue a back-reference token to the formatting queue.
+   *
+   * When the display formatter has detected that an object is referring to an
+   * "enclosing" object, a back-reference is queued. This makes the printer
+   * emit suitable notation to demonstrate the shared structure. The position
+   * marker this back-reference references is made active. If the structure
+   * to be printed was really sharing before, it is after this method.
+   * @param posn The index in the {@link #queueInts} array of the referenced
+   * position marker.
+   */
+  public void writeBackReference (int posn)
+  {
+    if (!reallySharing)
+      reallySharing = true;
+    int result = enqueue(QITEM_BACKREF_TYPE, QITEM_BACKREF_SIZE);
+    //log("BACKREF: @"+result+" references "+posn);
+    queueInts[result + QITEM_BACKREF_TARGET] = posn;
+    // The position marker this references is now active.
+    queueInts[posn + QITEM_POSNMARKER_LOC] = 1;
+  }
+
+  /**
+   * Enqueue a pair-end token to the formatting queue.
+   *
+   * When a position marker is grouping it creates a new sublist, which of
+   * course needs a closing parenthesis that's not originally present in the
+   * structure to be printed. This token informs the back reference resolver
+   * to emit an extra closing parenthesis so that the reader will be happy.
+   *
+   * @param posn The index in the {@link #queueInts} array of the referenced
+   * position marker.
+   */
+  public void writePairEnd (Integer posn)
+  {
+    int result = enqueue(QITEM_PAIR_END_TYPE, QITEM_PAIR_END_SIZE);
+    //log("PAIREND: @"+result+" referencing: "+posn+" queueSize="+queueSize);
+    queueInts[result + QITEM_PAIR_END_REF] = posn;
+  }
+
+  public void writeEndOfExpression ()
+  {
+    enqueue(QITEM_EOE_TYPE, QITEM_EOE_SIZE);    
+  }
+
   private void pushLogicalBlock(int column,
 				int perLineEnd,
 				int prefixLength, int suffixLength,
@@ -425,6 +749,12 @@ public class PrettyWriter extends java.io.Writer
     blocks[blockDepth + BLOCK_SECTION_START_LINE] = sectionStartLine;
   }
   
+  /**
+   * 
+   * @param column the column of the output port where this block starts
+   * @param prefix the block's prefix
+   * @param suffix the block's suffix
+   */
   void reallyStartLogicalBlock(int column, String prefix, String suffix)
   {
     int perLineEnd = getPerLinePrefixEnd();
@@ -518,48 +848,105 @@ public class PrettyWriter extends java.io.Writer
       }
   }
 
+  /**
+   * Enqueue a formatting token into {@link #queueInts}. 
+   *
+   * The kind and size parameters are packed into a 32-bit integer and then stored in the
+   * QITEM_TYPE_AND_SIZE offset of this token's computed base address. If the
+   * {@link #queueInts} array is not big enough to hold the new token, two cases
+   * arise. If we're not handling a shared structure, the queue is expanded, and
+   * the old formatting tokens are moved to the high end of the queue, leaving
+   * new space at the front. If we are handling shared structure, the queue
+   * size is double, and we continue to enqueue items from the old queueSize.
+   * 
+   * @param kind The type of formatting token
+   * @param size The size of this formatting token
+   * @return The address of the token in {@link #queueInts}
+   */
   public int enqueue (int kind, int size)
   {
     int oldLength = queueInts.length;
     int endAvail = oldLength - queueTail - queueSize;
-    if (endAvail > 0 && size > endAvail)
+    // If there are 5 int's left at the end of the queue, and we need to
+    // enqueue an item of size 7, the we don't "bend" the item around the
+    // queue, we just place a dummy formatting token that consumes the rest
+    // of this end, and start again from the beginning.
+    if (endAvail > 0 && size > endAvail && !sharing)
       enqueue(QITEM_NOP_TYPE, endAvail);
     if (queueSize + size > oldLength)
       {
-	int newLength = enoughSpace(oldLength, size);
-	int[] newInts = new int[newLength];
-	String[] newStrings = new String[newLength];
-	int queueHead = queueTail + queueSize - oldLength;
-	if (queueHead > 0)
-	  { // Wraps around.
-	    System.arraycopy(queueInts, 0, newInts, 0, queueHead);
-	    System.arraycopy(queueStrings, 0, newStrings, 0, queueHead);
-	  }
-	int part1Len = oldLength - queueTail;
-	int deltaLength = newLength - oldLength;
-	System.arraycopy(queueInts, queueTail,
-			 newInts, queueTail + deltaLength,
-			 part1Len);
-	System.arraycopy(queueStrings, queueTail,
-			 newStrings, queueTail + deltaLength,
-			 part1Len);
-	queueInts = newInts;
-	queueStrings = newStrings;
-	if (currentBlock >= queueTail)
-	  currentBlock += deltaLength;
-	queueTail += deltaLength;
+        int newLength = oldLength;
+        int enough = enoughSpace(oldLength, size);
+
+        int[] newInts;
+        String[] newStrings;
+
+        if (sharing) // then do a linear array expansion
+          {
+            newLength = oldLength;
+            do
+              {
+                newLength <<= 1;
+              } while (newLength < enough);
+
+            //log("sharing expand: oldLength="+oldLength+" newLength="+newLength+" queueTail="+queueTail);
+            
+            newInts = new int[newLength];
+            newStrings = new String[newLength];
+
+            System.arraycopy(queueInts, 0, newInts, 0, queueSize);
+            System.arraycopy(queueStrings, 0, newStrings, 0, queueStrings.length);
+          }
+        else // shift the old items to the top, and insert from the front of a doubled array
+          {            
+            newLength = enough;
+            newInts = new int[newLength];
+            newStrings = new String[newLength];
+            
+            //log("non-sharing expand: oldLength="+oldLength+" newLength="+newLength+" queueTail="+queueTail);
+            
+            int queueHead = queueTail + queueSize - oldLength;
+            if (queueHead > 0)
+              { // Wraps around.
+                System.arraycopy(queueInts, 0, newInts, 0, queueHead);
+                System.arraycopy(queueStrings, 0, newStrings, 0, queueHead);
+              }
+            int part1Len = oldLength - queueTail;
+            int deltaLength = newLength - oldLength;
+            System.arraycopy(queueInts, queueTail,
+                             newInts, queueTail + deltaLength,
+                             part1Len);
+            System.arraycopy(queueStrings, queueTail,
+                             newStrings, queueTail + deltaLength,
+                             part1Len);
+
+            if (currentBlock >= queueTail)
+              currentBlock += deltaLength;
+            queueTail += deltaLength;
+          }
+        queueInts = newInts;
+        queueStrings = newStrings;
       }
     int addr = queueTail + queueSize;
-    if (addr >= queueInts.length)
+    // Wrap around if we're using a circular queue
+    if (!sharing && addr >= queueInts.length)
       addr -= queueInts.length;
     queueInts[addr + QITEM_TYPE_AND_SIZE] = kind | (size << 16);
-    if (size > 1)
+    if (size > 1) // then it's not a NOP, so needs a position
       queueInts[addr + QITEM_POSN] = indexPosn(bufferFillPointer);
     //log("enqueue "+itemKindString(kind)+" size:"+size+" at:"+queueSize+enqueueExtraLog); enqueueExtraLog = "";
     queueSize += size;
     return addr;
   }
 
+  /**
+   * Enqueue a newline formatting token. 
+   *
+   * A pass is made through the formatting tokens up to this one, where section 
+   * sizes are computed. If we're not sharing, then a tentative output is done 
+   * when the current buffer cannot fit on one line.
+   * @param kind The type of newline to enqueue
+   */
   public void enqueueNewline (int kind)
   {
     wordEndSeen = false;
@@ -592,12 +979,13 @@ public class PrettyWriter extends java.io.Writer
 	todo -= size;
 	entry += size;
       }
-    maybeOutput (kind == NEWLINE_LITERAL || kind == NEWLINE_MANDATORY, false);
+    if (!sharing) //!!
+      maybeOutput (kind == NEWLINE_LITERAL || kind == NEWLINE_MANDATORY, false);
   }
 
   public final void writeBreak(int kind)
   {
-    if (prettyPrintingMode > 0)
+    if (prettyPrintingMode > 0 || sharing) //!!
       enqueueNewline(kind);
   }
 
@@ -864,7 +1252,15 @@ public class PrettyWriter extends java.io.Writer
   }
 
   // stuff to do the actual outputting
-
+  
+  /**
+   * Make sure we can write into the buffer without overflowing it. 
+   *
+   * If the current {@link #bufferFillPointer} is greater than the line length, 
+   * do a tentative output.
+   * @param want How much space we need
+   * @return The amount of space available, possible after flushes or expansion
+   */
   int ensureSpaceInBuffer (int want)
   {
     char[] buffer = this.buffer;
@@ -873,7 +1269,7 @@ public class PrettyWriter extends java.io.Writer
     int available = length - fillPtr;
     if (available > 0)
       return available;
-    else if (prettyPrintingMode > 0 && fillPtr > lineLength)
+    else if (prettyPrintingMode > 0 && fillPtr > lineLength && !sharing)
       {
 	if (! maybeOutput(false, false))
 	  outputPartialLine();
@@ -890,6 +1286,15 @@ public class PrettyWriter extends java.io.Writer
       }
   }
 
+  /**
+   *
+   * @param forceNewlines is true if we're printing a "literal" newline or if
+   *                      the printer has decided that we need to force a
+   *                      newline for a sensible formatting.
+   * @param flushing is true when the buffer is actually written to the output
+   *                 port. This occurs on {@link #flush()} operations for instance.
+   * @return true if something has been output, false otherwise.
+   */
   boolean maybeOutput(boolean forceNewlines, boolean flushing)
   {
     boolean outputAnything = false;
@@ -1178,6 +1583,145 @@ public class PrettyWriter extends java.io.Writer
     bufferOffset += count;
   }
 
+  /**
+   * Walk through the queue, emitting print circle notation as described in
+   * SRFI-38. 
+   *
+   * For each position marker encountered, if the position marker
+   * has been referenced, emit the #N= notation. For each back-reference, find
+   * the corresponding position marker and emit the #N# notation. A Gap Buffer
+   * is employed to facilitate amortised linear buffer insertion when emitting
+   * the new print-circle notation. The method populates the rest of the buffer
+   * contents by using the QITEM_POSN information in SRFI-38 unrelated formatting
+   * tokens. When the print-circle notation has been emitted, future QITEM_POSN's
+   * need to be updated, this is achieved by maintaining a delta variable that
+   * records how many extra characters have been emitted to the output buffer.
+   */
+  public void resolveBackReferences ()
+  {
+    if (!reallySharing)
+      return;
+    int posnMarkerCount = 1;
+    GapBuffer gbuffer = new GapBuffer(buffer, buffer.length);
+    // The delta variable records how many extra characters have been emitted
+    // to the {@link #buffer}.
+    int delta = 0;
+    // Used to compute the relative delta of an SRFI-38 specific token.
+    int oldDelta;
+    int newBufferIndex;
+    int relativeAddress;   
+
+    //log ("resolveBackReferences: Starting at tail = "+queueTail);
+    int tail = queueTail;
+    int todo = queueSize;
+    while (todo > 0)
+      {
+	if (tail >= queueInts.length) // then wrap around
+	  tail = 0;
+
+	int next = tail;
+	int type = getQueueType(next);
+
+	switch (type)
+	  {
+	  case QITEM_POSNMARKER_TYPE:
+	    oldDelta = delta;
+	    // A position marker is active if it has been back-referenced.
+	    if (posnMarkerActive(next))
+	      {
+		if (posnMarkerIsGrouping(next))
+		  {
+		    gbuffer.add('.');
+		    gbuffer.add(' ');
+		    delta += 2;
+		  }
+		gbuffer.add('#');
+		// Set this position markers reference count if it hasn't been set
+		// before. Note: all position marker default to a count of one.
+		if (queueInts[next + QITEM_POSNMARKER_LOC] == 1)
+		  {
+		    queueInts[next + QITEM_POSNMARKER_LOC] = posnMarkerCount++;
+		  }
+		// The index that the referenced position marker resides in
+		int reference = queueInts[next + QITEM_POSNMARKER_LOC];
+		// The reference could be of arbitrary magnitude, it's typically
+		// a unit digit however.
+		delta += gbuffer.add(reference);
+		gbuffer.add('=');
+		delta += 2; // For the '#' and '=' characters
+
+		if (posnMarkerIsGrouping(next))
+		  {
+		    gbuffer.add('(');
+		    delta++;
+		    // XXX Should we start a new logical block? Doesn't look great if
+		    // you try it...
+		  }
+
+		// Compute the *relative* position of this QITEM
+		//log("POSN-MARKER: queueInts[" + next + " + " + QITEM_POSN + "] = " + (delta - oldDelta));
+		queueInts[next + QITEM_POSN] += delta - oldDelta;
+	      }
+	    break;
+	  case QITEM_BACKREF_TYPE:
+	    oldDelta = delta;
+	    // The index that the referenced position marker resides in
+	    relativeAddress = queueInts[next + QITEM_BACKREF_TARGET];
+	    //log("RESOLVE-BACKREF: rel=" + relativeAddress + " @:" + next + "(" + (next + relativeAddress) + ")");
+	    // The count refers to the N digit in #N= notation. Starts at one.
+	    int count = queueInts[relativeAddress + QITEM_POSNMARKER_LOC];
+	    gbuffer.add('#');
+	    // The reference could be of arbitrary magnitude, it's typically
+	    // a unit digit however.
+	    delta += gbuffer.add(count);
+	    gbuffer.add('#');
+	    delta += 2; // For the '=' and '#' characters
+			// New characters have been added, so this items output position must
+			// change.
+	    queueInts[next + QITEM_POSN] += delta - oldDelta;
+	    break;
+	  case QITEM_PAIR_END_TYPE:
+	    relativeAddress = queueInts[next + QITEM_PAIR_END_REF];
+	    //log("RESOLVE-PAIREND: rel=" + relativeAddress + "@:" + next + "(" + (next + relativeAddress) + ")");
+	    if (posnMarkerActive(relativeAddress))
+	      {
+		newBufferIndex = posnIndex(queueInts[next + QITEM_POSN]);
+		gbuffer.addUpTo(newBufferIndex);
+		gbuffer.add(')');
+		delta++;
+		queueInts[next + QITEM_POSN] += 1;
+	      }
+	    break;
+	  case QITEM_EOE_TYPE:
+	    newBufferIndex = posnIndex(queueInts[next + QITEM_POSN]);
+	    gbuffer.addUpTo(newBufferIndex);
+	    queueInts[next + QITEM_POSN] += delta;
+	    break;
+	  default:
+	    // The QITEM_POSN offset will return the position this QITEM occupies
+	    // in the output buffer. Since this QITEM is not SRFI-38 specific, the
+	    // printer must output all characters up to this token into the new
+	    // buffer.
+	    newBufferIndex = posnIndex(queueInts[next + QITEM_POSN]);
+	    gbuffer.addUpTo(newBufferIndex);
+	    // Now update the token position information with the current delta.
+	    queueInts[next + QITEM_POSN] += delta;
+	    break;
+	  }
+	int size = getQueueSize(tail);
+	// "Dequeue" this token
+	todo -= size;
+	// Point to the next token
+	tail = next + size;
+      }
+    // The delta variable records how many extra characters have been emitted.
+    // The bufferFillPointer points to the end of the characters to be flushed
+    bufferFillPointer += delta;
+    // The Gap Buffer will remove its gap and present the newly created buffer.
+    buffer = gbuffer.restoreBuffer();
+    posnMarkerCount = 1;
+  }
+
   public void forcePrettyOutput () throws IOException
   {
     maybeOutput(false, true);
@@ -1187,7 +1731,7 @@ public class PrettyWriter extends java.io.Writer
     bufferStartColumn = getColumnNumber();
     out.write(buffer, 0, bufferFillPointer);
     bufferFillPointer = 0;
-    queueSize = 0;
+    queueSize = queueTail = bufferOffset = 0;
   }
 
   public void flush()
@@ -1257,7 +1801,102 @@ public class PrettyWriter extends java.io.Writer
     queueSize = 0;
     pendingBlocksCount = 0;
   }
+  
+  private static final class GapBuffer
+  {
+    char[] buffer;
+    char[] existingBuffer;
+    int point;
+    int existingIndex;
+    int gapSize;
 
+    public GapBuffer (char[] existing, int startSize)
+    {
+      this.buffer = new char[startSize];
+      this.point = 0;
+      this.existingIndex = 0;
+      this.existingBuffer = existing;
+    }
+
+    /**
+     * The point represents where new characters will be buffered.
+     * @return The index that represents where new characters will be buffered.
+     */
+    public int getPoint ()
+    {
+      return point;
+    }
+
+    /**
+     * Add a character to the buffer.
+     * @param ch The character to add
+     */
+    public void add (char ch)
+    {
+      if (point + 1 >= buffer.length)
+	{
+	  expandBuffer(1);
+	}
+      buffer[point++] = ch;
+    }
+
+    /**
+     * Add a non-negative integer to the buffer.
+     * @param i The non-negative integer to add
+     * @return The number of digits in the integer
+     */
+    public int add (int i)
+    {
+      int ndigits = 1;
+      if (i >= 10)
+	{	  
+	  ndigits += add(i / 10);
+	  i %= 10;
+	}
+      add((char)('0' + i));
+      return ndigits;
+    }
+
+    /**
+     * Copy the next {@code n} characters from the existing buffer to the gap buffer.
+     * @param n The number of characters to copy.
+     */
+    public void addUpTo (int n)
+    {
+      if (point + n >= buffer.length)
+	{
+	  expandBuffer(n);
+	}
+      while (existingIndex < n)
+	{
+	  buffer[point++] = existingBuffer[existingIndex++];
+	}
+    }
+
+    /**
+     * @return The buffer with the gap removed
+     */
+    public char[] restoreBuffer ()
+    {
+      char[] retBuffer = new char[buffer.length];
+      System.arraycopy(buffer, 0, retBuffer, 0, point);
+      return retBuffer;
+    }
+
+    private void expandBuffer (int minimum)
+    {
+      int newLength = buffer.length;
+      do
+	{
+	  newLength <<= 1;
+	} while (newLength < minimum);
+
+      char[] newBuffer = new char[newLength];
+      System.arraycopy(buffer, 0, newBuffer, 0, point);
+      buffer = newBuffer;
+    }
+  }
+  
   /*
   public static PrintWriter log;
   static {

@@ -104,9 +104,24 @@
 (define (char-ready? #!optional (port (current-input-port)))
   (invoke-static <kawa.standard.char_ready_p> 'ready port))
 
-(define (write value #!optional (out (current-output-port))) :: <void>
-  (*:format (kawa.standard.Scheme:.writeFormat) value out))
+(define (write value #!optional (out ::output-port (current-output-port))) ::void
+  (if *print-circle*
+      (write-with-shared-structure value out)
+      (*:format (kawa.standard.Scheme:.writeFormat) value out)))
 
+(define (write-with-shared-structure 
+	 value #!optional (out ::output-port (current-output-port))) ::void
+  (let ((pretty-out (out:getPrettyWriter)))
+    (pretty-out:initialiseIDHash)
+    (pretty-out:setSharing #t)
+    (try-finally
+     (*:format (kawa.standard.Scheme:.sharedWriteFormat) value out)
+     (pretty-out:setSharing #f))
+    (pretty-out:clearIDHash)
+    (pretty-out:writeEndOfExpression)
+    (pretty-out:resolveBackReferences)
+    (pretty-out:flush)))
+    
 (define (display value #!optional (out (current-output-port))) :: <void>
   (*:format (kawa.standard.Scheme:.displayFormat) value out))
 

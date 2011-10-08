@@ -1,3 +1,25 @@
+2011-10-08  Charles Turner  <chturne@gmail.com>
+
+	* PrettyWriter.java (isSharing, sharing, reallySharing)
+	(referenceCount): New fields to augment shared
+	(new QITEM's): Extentions to the queue types
+	for shared structure printing.
+	(writePositionMarker, writeBackReference, writePairEnd)
+	(writeEndOfExpression): New methods to enqueue the SRFI-38
+	specific queue items.
+	(enqueue): Modified to use two data structures depending on
+	whether we're printing shared structures or not.
+	(ensureSpaceInBuffer): Modified slightly to avoid screwing up back
+	references for SRFI-38.
+	(resolveBackReferences): New method to repopulate the output
+	buffer with SRFI-38 formatting tokens.
+	(forcePrettyOutput): Modified slightly to reset some variables
+	pertaining to the printing of shared structures.
+	(GapBuffer): New static member class to	provide efficient buffer
+	modifications in resolveBackReferences.
+	(idhash, initialiseIDHash, clearIDHash, IDHash*): New fields and
+	methods to detect shared structures.
+
 2011-04-10  Per Bothner  <per@bothner.com>
 
 	* SourceError.java (toString): Support new 'i' severity.

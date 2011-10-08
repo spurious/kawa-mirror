@@ -1,3 +1,8 @@
+2011-10-08  Charles Turner  <chturne@gmail.com>
+
+	* srfi-38-test.scm: New tests for the SRFI-38 extension.
+	* Makefile.am: Updated accordingly
+
 2011-09-24  Jamison Hope  <jrh@theptrgroup.com>
 	    Per Bothner  <per@bothner.com>
 

@@ -8,6 +8,7 @@ java_sources = \
   FixupHtmlToc.java \
   GeneralHashTable.java \
   IdentityHashTable.java \
+  IntHashTable.java \
   HashNode.java \
   RangeTable.java \
   RunTestScript.java \

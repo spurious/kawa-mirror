@@ -1,3 +1,8 @@
+2011-10-08  Charles Turner  <chturne@gmail.com>
+
+	* OutPort.java (getPrettyWriter): New getter.
+	* OutPort.java: various @Override annotations.
+
 2011-07-13  Per Bothner  <per@bothner.com>
 
 	* Namespace.java (valueOfNoCreate): New static method.

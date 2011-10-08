@@ -1,3 +1,9 @@
+2011-10-08  Per Bothner  <per@bothner.com>
+
+	* standard/Sheme.java (initScheme): Define write-with-shared-structure.
+	Define *print-circle* alias.
+	(sharedWriteFormat): New static field.
+
 2011-09-24  Jamison Hope  <jrh@theptrgroup.com>
 
 	* standard/IfFeature.java: New "java-7" feature.

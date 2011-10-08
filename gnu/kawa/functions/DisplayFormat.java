@@ -14,6 +14,7 @@ import gnu.kawa.xml.KNode;
 import gnu.xml.XMLPrinter;
 /* #endif */
 import gnu.kawa.xml.XmlNamespace;
+import gnu.text.PrettyWriter;
 import gnu.text.Printable;
 /* #ifdef use:java.util.regex */
 import java.util.regex.*;
@@ -31,6 +32,9 @@ public class DisplayFormat extends AbstractFormat
    * The default is no; otherwise we follow Common Lisp conventions. */
   public static final ThreadLocation outRadix
     = new ThreadLocation("out-radix");
+
+  /** This field is set true by Scheme when it creates a shared write format */
+  public boolean checkSharing = false;
 
   /** Create a new instance.
    * @param readable if output should be formatted so it could be read
@@ -66,12 +70,14 @@ public class DisplayFormat extends AbstractFormat
   char language;
 
   public boolean getReadableOutput () { return readable; }
-
+  
+  @Override
   public void writeBoolean(boolean v, Consumer out)
   {
     write (language == 'S' ? (v ? "#t" : "#f") : (v ? "t" : "nil"), out);
   }
 
+  @Override
   public void write (int v, Consumer out)
   {
     if (! getReadableOutput ())
@@ -90,30 +96,93 @@ public class DisplayFormat extends AbstractFormat
       }
   }
 
+  /**
+   * Format a list.
+   * 
+   * Try to find shared structures in a list. To accomplish this, each subobject
+   * is hashed to the idhash, which is used later to determine whether we've seen
+   * a subobject before. There is an added complication when you consider cases
+   * like this:
+   * 
+   * '((b . #1=(a . z)) 3)
+   * 
+   * It is not known in advance that the printer will have to emit an extra
+   * ')' after the '(a . z) pair. Every time we CDR further into the list, we
+   * push a position marker onto a stack. Once we've examined the tail of this
+   * sublist, we pop all the posn markers off and tell the pretty printer that
+   * it might have to emit an extra ')' if the corresponding posn marker 
+   * becomes active.
+   * 
+   * @param value The list on which the method CDR's, termination occurs when
+   * this becomes a non-pair or the empty list
+   * @param out The output port that is responsible for the pretty printing
+   */
   public void writeList(LList value, OutPort out)
   {
+    PrettyWriter pout = out.getPrettyWriter();
+    // The stack of position markers, populated by CDR'ing further into the list.
+    int[] posnStack = null;
+    int stackTail = 0;
     Object list = value;
     out.startLogicalBlock("(", false, ")");
+    
     while (list instanceof Pair)
       {
-	if (list != value)
-	  out.writeSpaceFill();
 	Pair pair = (Pair) list;
 	writeObject(pair.getCar(), (Consumer) out);
 	list = pair.getCdr();
+        if (list == LList.Empty)
+          break;
+        out.writeSpaceFill();
+        if (! (list instanceof Pair))
+	  {
+	    out.write(". ");
+	    writeObject(LList.checkNonList(list), (Consumer) out);
+	    break;
+	  }
+	if (checkSharing)
+	  {
+	    
+	    int hashIndex = pout.IDHashLookup(list);
+	    int posn = pout.IDHashGetFromIndex(hashIndex);
+	    if (posn == -1)
+	      // Then this is a new (sub)object to be marked
+	      {
+		// writePositionMarker will return the index to which is was enqueued
+		posn = pout.writePositionMarker(true);
+		if (posnStack == null) 
+		  posnStack = new int[128]; // should be plently for most cases.
+		else if (stackTail >= posnStack.length)
+		  {
+		    int[] newStack = new int[posnStack.length << 1];
+		    System.arraycopy(posnStack, 0, newStack, 0, stackTail);
+		    posnStack = newStack;
+		  }
+		posnStack[stackTail++] = posn;
+		// Mark (hash) this object
+		pout.IDHashPutAtIndex(list, posn, hashIndex);
+	      }
+	    else
+	      {
+		out.write(".");
+		out.writeSpaceFill();
+		pout.writeBackReference(posn);
+		list = LList.Empty;
+		break;
+	      }
+	  }
       }
-    if (list != LList.Empty)
-      {
-	out.writeSpaceFill();
-	out.write(". ");
-	writeObject(LList.checkNonList(list), (Consumer) out);
-      }
+    for (;--stackTail >= 0;)
+      pout.writePairEnd(posnStack[stackTail]);
+
     out.endLogicalBlock(")");
   }
 
   public void writeObject(Object obj, Consumer out)
   {
+    PrettyWriter pout = ((OutPort) out).getPrettyWriter();
     boolean space = false;
+    boolean skip = false;
     if (out instanceof OutPort
         && ! (obj instanceof gnu.kawa.xml.UntypedAtomic)
         && ! (obj instanceof Values)
@@ -129,7 +198,36 @@ public class DisplayFormat extends AbstractFormat
         ((OutPort) out).writeWordStart();
         space = true;
       }
-    writeObjectRaw(obj, out);
+    if (checkSharing && isInteresting(obj))
+      {
+	// The value returned from this hash is the respective index in the
+	// queueInts[] from PrettyWriter to which this object should reference.
+	int hashIndex = pout.IDHashLookup(obj);
+	int posn = pout.IDHashGetFromIndex(hashIndex);
+	if (posn == -1)
+	  {
+	    // Find the position in the queueInts that future (if any) backreferences
+	    // should reference
+	    posn =  pout.writePositionMarker(false);
+	    // Mark (hash) this object
+	    pout.IDHashPutAtIndex(obj, posn, hashIndex);
+	    // Print the object, instead of emitting print-circle notation
+	    skip = false;
+	  }
+	else
+	  // This object is referring to another part of the expression.
+	  {
+	    // Activate the referenced position marker
+	    pout.writeBackReference(posn);
+	    // This object is referring to the structure, we shall not print it and
+	    // instead we shall emit print-circle notation.
+	    skip = true;
+	    // Format a fill space after the #N# token
+	    space = true;
+	  }
+      }
+    if (!skip)
+      writeObjectRaw(obj, out);
     if (space)
       ((OutPort) out).writeWordEnd();
   }
@@ -450,5 +548,19 @@ public class DisplayFormat extends AbstractFormat
       }
     /* #endif */
     write(sym, out);
+  }
+  
+  /**
+   * An "interesting" object is one where object identity is significant.
+   *
+   * Examples are vectors and lists.
+   * No immutable values (for example symbols or numbers) are interesting
+   * @param obj The object under test
+   * @return true if this object is considered interesting
+   */
+  private boolean isInteresting (Object obj)
+  {
+    // FIXME Should probably consider empty lists and vectors, as well as FStrings
+    return obj instanceof Pair || obj instanceof SimpleVector;
   }
 }

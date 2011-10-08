@@ -434,6 +434,7 @@ public class Scheme extends LispLanguage
       defProcStFld("eof-object?", "kawa.lib.ports");
       defProcStFld("char-ready?", "kawa.lib.ports");
       defProcStFld("write", "kawa.lib.ports");
+      defProcStFld("write-with-shared-structure", "kawa.lib.ports");
       defProcStFld("display", "kawa.lib.ports");
       defProcStFld("print-as-xml", "gnu.xquery.lang.XQuery", "writeFormat");
       defProcStFld("write-char", "kawa.lib.ports");
@@ -794,6 +795,7 @@ public class Scheme extends LispLanguage
                     "gnu.text.PrettyWriter", "lineLengthLoc");
       defAliasStFld("*print-miser-width*",
                     "gnu.text.PrettyWriter", "miserWidthLoc");
+      defAliasStFld("*print-circle*", "gnu.text.PrettyWriter", "isSharing");
       defAliasStFld("*print-xml-indent*",
                     "gnu.xml.XMLPrinter", "indentLoc");
       defAliasStFld("html", "gnu.kawa.xml.XmlNamespace", "HTML");
@@ -935,6 +937,8 @@ public class Scheme extends LispLanguage
   }
 
   public static final AbstractFormat writeFormat = new DisplayFormat(true, 'S');
+  public static final AbstractFormat sharedWriteFormat = new DisplayFormat(true, 'S');
+  static { ((DisplayFormat) sharedWriteFormat).checkSharing = true; }
   public static final AbstractFormat displayFormat = new DisplayFormat(false, 'S');
   public AbstractFormat getFormat(boolean readable)
   {

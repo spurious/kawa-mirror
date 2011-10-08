@@ -1,3 +1,9 @@
+2011-10-08  Charles Turner  <chturne@gmail.com>
+
+	* IntHashTable (new class): Specialised hash table for Object ->
+	int mappings.
+	* Makefile.am: Updated accordingly.
+
 2011-04-10  Per Bothner  <per@bothner.com>
 
 	* PreProcess.java: Change 'use:java.dyn' feature name to

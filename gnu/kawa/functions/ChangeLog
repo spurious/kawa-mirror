@@ -1,3 +1,10 @@
+2011-10-08  Jamison Hope  <jrh@theptrgroup.com>
+
+	* IsEqual.java (arrayEquals): New method, to compare Java arrays
+	by their contents, deferring to the java.util.Arrays#equals
+	methods for arrays of primitives.
+	(apply): Use arrayEquals when both arguments are arrays.
+
 2011-10-08  Charles Turner  <chturne@gmail.com>
 
 	* DisplayFormat.java (writeObject, writeList): Modified to print

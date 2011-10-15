@@ -1,6 +1,8 @@
 package gnu.kawa.functions;
 import gnu.expr.Language;
 import gnu.lists.*;
+import java.lang.reflect.Array;
+import java.util.Arrays;
 
 /** Implement the standard Scheme procedure <tt>equal?</tt>
  * and the Lisp <tt>equal</tt>. */
@@ -22,6 +24,49 @@ public class IsEqual extends gnu.mapping.Procedure2
     if (exact1 && exact2)
       return NumberCompare.$Eq(num1, num2);
     return exact1 == exact2 && num1.equals(num2);
+  }
+
+  public static boolean arrayEquals (Object arg1, Object arg2)
+  {
+    int len1 = Array.getLength(arg1);
+    int len2 = Array.getLength(arg2);
+    if (len1 != len2)
+      return false;
+
+    String tname1 = arg1.getClass().getName();
+    String tname2 = arg2.getClass().getName();
+    if (!tname1.equals(tname2))
+      return false;
+
+    if (tname1.length() == 2)   // matches primitive types
+    {
+      switch (tname1.charAt(1))
+      {
+        case 'Z':               // "[Z" ==> boolean[]
+          return Arrays.equals((boolean[]) arg1, (boolean[]) arg2);
+        case 'B':               // "[B" ==> byte[]
+          return Arrays.equals((byte[]) arg1, (byte[]) arg2);
+        case 'C':               // "[C" ==> char[]
+          return Arrays.equals((char[]) arg1, (char[]) arg2);
+        case 'D':               // "[D" ==> double[]
+          return Arrays.equals((double[]) arg1, (double[]) arg2);
+        case 'F':               // "[F" ==> float[]
+          return Arrays.equals((float[]) arg1, (float[]) arg2);
+        case 'I':               // "[I" ==> int[]
+          return Arrays.equals((int[]) arg1, (int[]) arg2);
+        case 'J':               // "[J" ==> long[]
+          return Arrays.equals((long[]) arg1, (long[]) arg2);
+        case 'S':               // "[S" ==> short[]
+          return Arrays.equals((short[]) arg1, (short[]) arg2);
+      }
+    }
+    for (int i = len1; --i >= 0; )
+    {
+      // FIXME handle cycles
+      if (! apply(Array.get(arg1,i), Array.get(arg2,i)))
+        return false;
+    }
+    return true;
   }
 
   public static boolean apply (Object arg1, Object arg2)
@@ -97,6 +142,7 @@ public class IsEqual extends gnu.mapping.Procedure2
         Object[] data2 = vec2.data;
         for (int i = n;  --i >= 0; )
           {
+            // FIXME handle cycles
             if (! apply(data1[i], data2[i]))
               return false;
           }
@@ -112,7 +158,7 @@ public class IsEqual extends gnu.mapping.Procedure2
           {
             Object x1 = pair1.getCar();
             Object x2 = pair2.getCar();
-            if (! apply(x1, x2))
+            if (! apply(x1, x2)) // FIXME handle cycles
               return false;
             x1 = pair1.getCdr();
             x2 = pair2.getCdr();
@@ -121,11 +167,17 @@ public class IsEqual extends gnu.mapping.Procedure2
             if (x1 == null || x2 == null)
               return false;
             if (! (x1 instanceof Pair) || !(x2 instanceof Pair))
-              return apply(x1, x2);
+              return apply(x1, x2); // FIXME handle cycles
             pair1 = (Pair) x1;
             pair2 = (Pair) x2;
           }
       }
+    if (arg1.getClass().isArray())
+    {
+      if (! (arg2.getClass().isArray()))
+        return false;
+      return IsEqual.arrayEquals(arg1, arg2);
+    }
     return arg1.equals (arg2);
   }
 

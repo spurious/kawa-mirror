@@ -39,7 +39,7 @@ check2-full-tailcalls:
 check-no-inline:
 	$(MAKE) check2 OPTIONS=--no-inline
 
-check1:  check-num check-arr check-lib \
+check1:  check-num check-arr check-java-array check-lib \
   check-srfi-16 check-srfi-38 check-srfi-64 check-srfi-69 \
   check-format check-ppfile check-text check-regex scribble.class \
   check-run-test-scripts check-moduleM \
@@ -69,6 +69,9 @@ check-num:
 
 check-arr:
 	$(KAWA) $(OPTIONS) "$(srcdir)/arr-test.scm"
+
+check-java-array:
+	$(KAWA) $(OPTIONS) "$(srcdir)/java-array-test.scm"
 
 check-lib:
 	$(KAWA) $(OPTIONS) "$(srcdir)/lib-test.scm"
@@ -574,7 +577,7 @@ SCRIPTS_TO_RUN = uninit1.scm sva34005.scm
 EXTRA_DIST = testing.scm test.scm num-test.scm mac-test.scm mac1.scm \
   classes1.scm classes2.scm SimpleB.java obj-test.scm arr-test.scm \
   lib-test.scm srfi-38-test.scm srfi-64-test.scm srfi-69-test.scm \
-  text-test.scm regex-test.scm \
+  text-test.scm regex-test.scm java-array-test.scm \
   jmc.scm sva31180.scm use-slots.scm ASupport.scm Base.java \
   MyFunc.java MyModule.java MyDate.java MyTimestamp.java \
   misc-test.scm polytype.scm formatst.scm scribble.scm moduleFT.scm \

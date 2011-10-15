@@ -1487,7 +1487,7 @@ public class Translator extends Compilation
    * So that such references can resolve to <code>decl</code>, we
    * create an alias in <code>templateScope</code> that points
    * to <code>decl</code>.  We record that we did this in the
-   * <code> renamedLiasStack</code>, so we can remove the alias later.
+   * <code>renamedAliasStack</code>, so we can remove the alias later.
    */
   public void pushRenamedAlias (Declaration alias)
   {

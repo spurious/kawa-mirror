@@ -1,3 +1,10 @@
+2011-10-21  Shad Gregory <captshadg@gmail.com>
+	    Per Bothner  <per@bothner.com>
+
+	* repl.java (evalInitFileWithErrorMessage): New static method.
+	(getInitFile): New static method.
+	(checkInitFile): Use getInitFile.
+
 2011-10-08  Per Bothner  <per@bothner.com>
 
 	* standard/Sheme.java (initScheme): Define write-with-shared-structure.
@@ -56,7 +63,7 @@
 2011-05-13  Per Bothner  <per@bothner.com>
 
 	* lang/Lambda.java (rewriteWrite): Skip the initial pass to count
-	formals - instead just use use a sinle pass.
+	formals - instead just use use a single pass.
 	Also, make more robust for some errors.
 
 2011-05-02  Per Bothner  <per@bothner.com>

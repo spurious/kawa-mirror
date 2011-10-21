@@ -1,3 +1,9 @@
+2011-10-21  Shad Gregory <captshadg@gmail.com>
+	    Per Bothner  <per@bothner.com>
+
+	* emacs.scm (load-init-file): New function.
+	(emacs): Call load-init-file.
+
 2011-05-02  Shad Gregory <captshadg@gmail.com>
 
 	* EFrame.java (showInfoMessage): New method.

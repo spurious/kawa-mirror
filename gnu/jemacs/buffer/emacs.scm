@@ -567,9 +567,18 @@
    (list "Help"
 	 #( "About JEmacs..." about-jemacs ) )))
 
+(define (load-init-file) ::void
+  (let ((msg (kawa.repl:evalInitFileWithErrorMessage)))
+    (if (not (eq? msg #!null))
+        (let ((err-buffer (get-buffer-create "*error*")))
+          (split-window)
+          (switch-to-buffer err-buffer)
+          (invoke err-buffer 'insert msg #!null)))))
+
 (define (emacs)
   (set-buffer (get-buffer-create "*scratch*"))
-  (make-frame))
+  (make-frame)
+  (load-init-file))
 
 ;;; TELNET
 

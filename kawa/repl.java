@@ -5,6 +5,7 @@ import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.text.SourceMessages;
 import gnu.text.SyntaxException;
+import gnu.text.Path;
 import gnu.lists.*;
 import java.util.ArrayList;
 import java.util.Vector;
@@ -124,25 +125,56 @@ public class repl extends Procedure0or1
     /* Set homeDirectory;  if first time called, run ~/.kawarc.scm. */
     if (homeDirectory == null)
       {
-	File initFile = null;
-	homeDirectory = System.getProperty ("user.home");
-	Object scmHomeDirectory;
-	if (homeDirectory != null)
-	  {
-	    scmHomeDirectory = new FString (homeDirectory);
-	    String file_separator = System.getProperty("file.separator");
-	    String kawarc_name =
-	      "/".equals(file_separator) ? ".kawarc.scm"
-	      : "kawarc.scm";
-	    initFile = new File(homeDirectory, kawarc_name);
-	  }
-	else
-	  scmHomeDirectory = Boolean.FALSE;
-	Environment.getCurrent().put("home-directory", scmHomeDirectory);
+	File initFile = getInitFile();
 	if (initFile != null && initFile.exists())
 	  if (! Shell.runFileOrClass(initFile.getPath(), true, 0))
-            System.exit(-1);
+	    System.exit(-1);
       }
+  }
+
+  static File getInitFile()
+  {
+    File initFile = null;
+    homeDirectory = System.getProperty ("user.home");
+    Object scmHomeDirectory;
+    if (homeDirectory != null)
+      {
+	scmHomeDirectory = new FString (homeDirectory);
+	String file_separator = System.getProperty("file.separator");
+	String kawarc_name = new String();
+	if (Language.getDefaultLanguage().getName().equals("Emacs-Lisp"))
+	    kawarc_name = ".jemacs";
+	else
+	    kawarc_name =
+	  "/".equals(file_separator) ? ".kawarc.scm"
+	  : "kawarc.scm";
+	initFile = new File(homeDirectory, kawarc_name);
+      }
+    else
+      scmHomeDirectory = Boolean.FALSE;
+    Environment.getCurrent().put("home-directory", scmHomeDirectory);
+    return initFile;
+  }
+
+  /** Evaluate init file, if any, returning error message on failure. */
+  public static String evalInitFileWithErrorMessage ()
+  {
+    File initFile = getInitFile();
+    if (initFile != null && initFile.exists())
+      {
+        try 
+          {
+            Path path = Path.valueOf(initFile.getPath());
+            InputStream fs = path.openInputStream();
+            Environment env = Environment.getCurrent();
+            Shell.runFile(fs, path, env, true, 0);
+          }
+        catch (Throwable e)
+          {
+            return "An error occurred while loading '" + initFile +"' : " + e;
+          }
+      }
+    return null;
   }
 
   public static void setArgs (String[] args, int arg_start)

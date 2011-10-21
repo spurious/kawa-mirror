@@ -1,3 +1,7 @@
+2011-10-21  Per Bothner  <per@bothner.com>
+
+	* lang/Translator.java (pushRenamedAlias): Fix thinko.
+
 2011-10-21  Shad Gregory <captshadg@gmail.com>
 	    Per Bothner  <per@bothner.com>
 

@@ -1494,7 +1494,7 @@ public class Translator extends Compilation
     Declaration decl = getOriginalRef(alias).getBinding();
     ScopeExp templateScope = alias.context;
     decl.setSymbol(null);
-    Declaration old = templateScope.lookup(decl.getSymbol());
+    Declaration old = templateScope.lookup(alias.getSymbol());
     if (old != null)
       templateScope.remove(old);
     templateScope.addDeclaration(alias);

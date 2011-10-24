@@ -237,8 +237,7 @@ public class FindTailCalls extends ExpExpVisitor<Expression>
       exp.setCanRead(true);
     try
       {
-	if (exp.defaultArgs != null)
-	  exp.defaultArgs = visitExps(exp.defaultArgs);
+        visitDefaultArgs(exp, exp);
 	if (exitValue == null && exp.body != null)
 	  exp.body = exp.body.visit(this, exp.getInlineOnly() ? exp : exp.body);
       }

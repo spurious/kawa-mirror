@@ -1,5 +1,8 @@
 2011-10-24  Per Bothner  <per@bothner.com>
 
+	* lang/Lambda.java (rewriteFormals, rewriteBody): Default argument
+	expressions use Declaration#initValue instead of LambdaWxp#defaultArgs.
+
 	* standard/Scheme.java: Update call to ReaderParens.readList.
 
 	* standard/define.java (scanForm): Defer lambda.rewriteFormals and

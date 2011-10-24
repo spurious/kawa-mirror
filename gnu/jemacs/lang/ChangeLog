@@ -1,6 +1,10 @@
+2011-10-24  Per Bothner  <per@bothner.com>
+
+	* lambda.java (rewriteBody): Update for new default argument handling.
+
 2011-05-02  Per Bothner  <per@bothner.com>
 
-	* lambda.java (rewriteBody): Update for new LetExp/FluidLtExp api.
+	* lambda.java (rewriteBody): Update for new LetExp/FluidLetExp api.
 
 2011-03-23  Per Bothner  <per@bothner.com>
 

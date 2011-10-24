@@ -205,7 +205,7 @@ public class ApplyExp extends Expression
       = exp.isTailCall()
       && func_lambda != null && func_lambda == comp.curLambda
       // No keyword or optional arguments.
-      && func_lambda.defaultArgs == null;
+      && func_lambda.opt_args == 0 && func_lambda.keywords == null;
 
     if (func_lambda != null)
       {

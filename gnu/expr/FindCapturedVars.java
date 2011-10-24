@@ -100,12 +100,9 @@ public class FindCapturedVars extends ExpExpVisitor<Void>
 
   public void visitDefaultArgs (LambdaExp exp, Void ignored)
   {
-    if (exp.defaultArgs == null)
-      return;
-
     super.visitDefaultArgs(exp, ignored);
 
-    // Check if any default expression "captured" a parameters.
+    // Check if any default expression "captured" a parameter.
     // If so, evaluating a default expression cannot be done until the
     // heapFrame is allocated in the main-method.  But in most cases, a
     // default expression will not contain a nested scope, hence no

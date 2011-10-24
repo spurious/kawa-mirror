@@ -160,7 +160,12 @@ public class ExpVisitor<R,D>
 
   public void visitDefaultArgs (LambdaExp exp, D d)
   {
-    exp.defaultArgs = visitExps(exp.defaultArgs, d);
+    for (Declaration p = exp.firstDecl(); p != null; p = p.nextDecl())
+      {
+        Expression init = p.getInitValue();
+        if (init != null)
+          p.setInitValue(visitAndUpdate(init, d));
+      }
   } 
 
   public void error(char kind, String message)

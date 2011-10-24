@@ -21,6 +21,8 @@ public class LambdaExp extends ScopeExp
   public int min_args;
   /** Maximum number of actual arguments;  -1 if variable. */
   public int max_args;
+  /** Number of optional arguments, not counting keyword arguments. */
+  public int opt_args;
 
   /** Set of visible top-level LambdaExps that need apply methods. */
   Vector applyMethods;
@@ -31,7 +33,6 @@ public class LambdaExp extends ScopeExp
   private Declaration firstArgsArrayArg;
 
   public Keyword[] keywords;
-  public Expression[] defaultArgs;
 
   /** A list of Declarations, chained using Declaration's nextCapturedVar.
     * All the Declarations are allocated in the current heapFrame. */
@@ -819,7 +820,6 @@ public class LambdaExp extends ScopeExp
     LambdaExp outer = outerLambda();
 
     int key_args = keywords == null ? 0 : keywords.length;
-    int opt_args = defaultArgs == null ? 0 : defaultArgs.length - key_args;
     int numStubs =
       ((flags & DEFAULT_CAPTURES_ARG) != 0) ? 0 : opt_args;
     boolean varArgs = max_args < 0 || min_args + numStubs < max_args;
@@ -1359,11 +1359,8 @@ public class LambdaExp extends ScopeExp
     // location (a local variable register, or the argsArray) into
     // its home location, if they are different.
     int i = 0;
-    int opt_i = 0;
     int key_i = 0;
     int key_args = keywords == null ? 0 : keywords.length;
-    int opt_args = defaultArgs == null ? 0
-      : defaultArgs.length - key_args;
     if (this instanceof ModuleExp)
       return;
     // If plainArgs>=0, it is the number of arguments *not* in argsArray.
@@ -1424,7 +1421,7 @@ public class LambdaExp extends ScopeExp
 		code.emitPushInt(i - plainArgs);
 		code.emitArrayLoad();
 		code.emitElse();
-		defaultArgs[defaultStart + opt_i++].compile(comp, paramType);
+		param.getInitValue().compile(comp, paramType);
 		code.emitFi();
 	      }
 	    else if (max_args < 0 && i == min_args + opt_args)
@@ -1441,7 +1438,7 @@ public class LambdaExp extends ScopeExp
 		code.emitLoad(argsArray);
 		code.emitPushInt(min_args + opt_args - plainArgs);
 		comp.compileConstant(keywords[key_i++]);
-		Expression defaultArg = defaultArgs[defaultStart + opt_i++];
+		Expression defaultArg = param.getInitValue();
 		// We can generate better code if the defaultArg expression
 		// has no side effects.  For simplicity and safety, we just
 		// special case literals, which handles most cases.
@@ -1539,11 +1536,6 @@ public class LambdaExp extends ScopeExp
 	if (i < numStubs)
 	  {
 	    CodeAttr code = comp.method.startCode();
-	    int toCall = i + 1;
-	    while (toCall < numStubs
-		   && defaultArgs[toCall] instanceof QuoteExp)
-	      toCall++;
-	    boolean varArgs = toCall == numStubs && restArgType != null;
 	    Declaration decl;
             Variable callContextSave = comp.callContextVar;
 	    Variable var = code.getArg(0);
@@ -1563,11 +1555,21 @@ public class LambdaExp extends ScopeExp
 		var = var.nextVar();
 	      }
 	    comp.callContextVar = ctxArg ? var : null;
+	    int toCall = i + 1;
 	    for (int j = i; j < toCall;  j++, decl = decl.nextDecl())
 	      {
 		Target paramTarget = StackTarget.getInstance(decl.getType());
-		defaultArgs[j].compile(comp, paramTarget);
+                Expression defaultArg = decl.getInitValue();
+		defaultArg.compile(comp, paramTarget);
+                // Minor optimization: Normally stub[i] calls stub[i+1],
+                // which calls stub[i+2] etc until we get to stub[numStubs].
+                // That way any given default argument expression is only
+                // compiled into a single stub.  However, if the default is a
+                // constant it makes sense to call stub[j] (where j>i+1) directly.
+                if (toCall < numStubs && defaultArg instanceof QuoteExp)
+                  toCall++;
 	      }
+	    boolean varArgs = toCall == numStubs && restArgType != null;
 	    if (varArgs)
 	      {
 		Expression arg;
@@ -1704,13 +1706,13 @@ public class LambdaExp extends ScopeExp
   {
     if (keywords != null && keywords.length > 0)
       return true;
-    if (defaultArgs != null)
+    if (opt_args != 0)
       {
-        for (int i = defaultArgs.length;  --i >= 0; )
+        for (Declaration p = firstDecl(); p != null; p = p.nextDecl())
           {
-            Expression def = defaultArgs[i];
+            Expression defaultArg = p.getInitValue();
             // Non-constant default arguments require care with scoping.
-            if (def != null && ! (def instanceof QuoteExp))
+            if (defaultArg != null && ! (defaultArg instanceof QuoteExp))
               return true;
           }
       }
@@ -1727,11 +1729,11 @@ public class LambdaExp extends ScopeExp
     ctx.writeValue(new Closure(this, ctx));
   }
 
-  Object evalDefaultArg(int index, CallContext ctx)
+  Object evalDefaultArg(Declaration param, CallContext ctx)
   {
     try
       {
-        return defaultArgs[index].eval(ctx);
+        return param.getInitValue().eval(ctx);
       }
     catch (Throwable ex)
       {
@@ -1830,9 +1832,7 @@ public class LambdaExp extends ScopeExp
     out.startLogicalBlock("(", false, ")");
     Special prevMode = null;
     int i = 0;
-    int opt_i = 0;
     int key_args = keywords == null ? 0 : keywords.length;
-    int opt_args = defaultArgs == null ? 0 : defaultArgs.length - key_args;
     Declaration decl = firstDecl();
     if (decl != null && decl.isThisParameter())
       i = -1;
@@ -1856,7 +1856,7 @@ public class LambdaExp extends ScopeExp
 	  }
 	Expression defaultArg = null;
 	if (mode == Special.optional || mode == Special.key)
-	  defaultArg = defaultArgs[opt_i++];
+	  defaultArg = decl.getInitValue();
 	if (defaultArg != null)
 	  out.print('(');
 	decl.printInfo(out);
@@ -2078,10 +2078,8 @@ class Closure extends MethodProc
 
     Object[] evalFrame = new Object[lambda.frameSize];
     int key_args = lambda.keywords == null ? 0 : lambda.keywords.length;
-    int opt_args = lambda.defaultArgs == null ? 0
-      : lambda.defaultArgs.length - key_args;
+    int opt_args = lambda.opt_args;
     int i = 0;
-    int opt_i = 0;
     int key_i = 0;
     int min_args = lambda.min_args;
     for (Declaration decl = lambda.firstDecl(); decl != null;
@@ -2095,8 +2093,7 @@ class Closure extends MethodProc
             if (i < nargs)
               value = args[i++];
             else
-              value = lambda.evalDefaultArg(opt_i, ctx);
-            opt_i++;
+              value = lambda.evalDefaultArg(decl, ctx);
           }
 	else if (lambda.max_args < 0 && i == min_args + opt_args)
           {
@@ -2139,8 +2136,7 @@ class Closure extends MethodProc
             int key_offset = min_args + opt_args;
             value = Keyword.searchForKeyword(args, key_offset, keyword);
             if (value == Special.dfault)
-              value = lambda.evalDefaultArg(opt_i, ctx);
-            opt_i++;
+              value = lambda.evalDefaultArg(decl, ctx);
           }
         if (decl.type != null)
           {

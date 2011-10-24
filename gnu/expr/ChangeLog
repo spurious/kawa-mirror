@@ -1,3 +1,16 @@
+2011-10-24  Per Bothner  <per@bothner.com>
+
+	For default expressions of optional parameters, use
+	Declaration#initValue instead of LambdaExp#defaultArgs.
+	* LambdaExp.java (defaultArgs): Removed field.
+	(opt_args): New field.
+	(enterFunction, mustCompile, evalDefaultArg, print, apply):
+	Update appropriately.
+	* ApplyExp.java (compile): Likewise.
+	* FindTailCalls.java (visitLambdaExp): Likewise.
+	* ExpVisitor.java (visitDefaultArgs): Likewise.
+	* FindCapturedVars.java (visitDefaultArgs): Likewise.
+
 2011-10-08  Charles Turner  <chturne@gmail.com>
 
 	* ApplicationMainSupport.java (propertyFields): Added the

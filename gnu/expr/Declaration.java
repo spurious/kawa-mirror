@@ -1316,7 +1316,7 @@ public class Declaration
 
   /** Get the "initial value" expression.
    * This is used for the initializing value in a LetExp,
-   * (FUTURE) the default value, or for pattern-matching.
+   * a parameter's default value, or for pattern-matching.
    */
   public Expression getInitValue() { return initValue; }
   public void setInitValue(Expression init) { this.initValue = init; }

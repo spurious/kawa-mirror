@@ -17,9 +17,12 @@ public class lambda extends Lambda
   public void rewriteBody(LambdaExp lexp, Object body, Translator tr)
   {
     tr.push(lexp);
-    if (lexp.defaultArgs != null)
-      for (int i = 0, n = lexp.defaultArgs.length;  i < n;  i++)
-	lexp.defaultArgs[i] = tr.rewrite(lexp.defaultArgs[i]);
+    for (Declaration p = lexp.firstDecl();  p != null;  p = p.nextDecl())
+      {
+        Expression defaultArg = p.getInitValue();
+        if (defaultArg != null)
+          p.setInitValue(tr.rewrite(defaultArg));
+      }
 
     Pair pair;
     int i = 0;
@@ -62,9 +65,9 @@ public class lambda extends Lambda
       lexp.setFile(((PairWithPosition) body).getFileName());
     FluidLetExp let = null;
 
-    int decl_count = lexp.min_args;
-    if (lexp.defaultArgs != null)
-      decl_count += lexp.defaultArgs.length;
+    int decl_count = lexp.min_args + lexp.opt_args;
+    if (lexp.keywords != null)
+      decl_count += lexp.keywords.length;
     if (lexp.max_args < 0)
       decl_count++;
 

@@ -250,19 +250,17 @@ public class Lambda extends Syntax
 	    tr.syntaxError ("parameter is neither name nor (name :: type) nor (name default)"+": "+pair);
             break;
 	  }
+	Declaration decl = new Declaration(name);
 	if (mode == optionalKeyword || mode == keyKeyword)
           {
-            if (defaultArgs == null)
-              defaultArgs = new ArrayList<Expression>();
-            defaultArgs.add(new LangExp(defaultValue));
+            decl.setInitValue(new LangExp(defaultValue));
             if (mode == keyKeyword)
               {
                 if (keywords == null)
                   keywords = new ArrayList<Keyword>();
               keywords.add(Keyword.make(name instanceof Symbol ? ((Symbol) name).getName() : name.toString()));
               }
-      }
-	Declaration decl = new Declaration(name);
+          }
 	Translator.setLine(decl, bindings);
 	if (typeSpecPair != null)
 	  {
@@ -317,8 +315,7 @@ public class Lambda extends Syntax
       lexp.max_args = -1;
     else   // Is this useful?
       lexp.max_args = lexp.min_args + opt_args + 2 * key_args;
-    if (defaultArgs != null)
-      lexp.defaultArgs = defaultArgs.toArray(new Expression[defaultArgs.size()]);
+    lexp.opt_args = opt_args;
     if (keywords != null)
       lexp.keywords = keywords.toArray(new Keyword[keywords.size()]);
   }
@@ -534,10 +531,8 @@ public class Lambda extends Syntax
       rewriteAnnotations(lexp.nameDecl, tr);
     Declaration prev = null;
     int key_args = lexp.keywords == null ? 0 : lexp.keywords.length;
-    int opt_args = lexp.defaultArgs == null ? 0
-      : lexp.defaultArgs.length - key_args;
+    int opt_args = lexp.opt_args;
     int arg_i = 0;
-    int opt_i = 0;
     for (Declaration cur = lexp.firstDecl(); cur != null; cur = cur.nextDecl())
       {
 	if (cur.isAlias())
@@ -562,8 +557,7 @@ public class Lambda extends Syntax
                 || lexp.max_args >= 0
                 || arg_i != lexp.min_args + opt_args))
           {
-            lexp.defaultArgs[opt_i] = tr.rewrite(lexp.defaultArgs[opt_i]);
-            opt_i++;
+            cur.setInitValue(tr.rewrite(cur.getInitValue()));
           }
         arg_i++;
 

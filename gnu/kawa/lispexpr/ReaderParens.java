@@ -66,21 +66,18 @@ public final class ReaderParens extends ReadTableEntry
         LineBufferedReader port = in.getPort();
         int startLine = port.getLineNumber();
         int startColumn = port.getColumnNumber();
-        p = ((LispReader) in).makePair(command, startLine, startColumn);
+        // startColumn is the 0-based position *after* reading ch.
+        // We want the position *before* reading ch.
+        // (makePair converts from 0-based to 1-based.)
+        p = ((LispReader) in).makePair(command, startLine, startColumn-1);
         ((LispReader) in).bindSharedObject(sharingIndex, p);
 	sharingIndex = -1;
       }
 
-    Object r = readList((LispReader) in, ch, count, close, sharingIndex);
-    if (command != null)
-      {
-        ((LispReader) in).setCdr(p, r);
-        r = p;
-      }
-    return r;
+    return readList((LispReader) in, p, ch, count, close, sharingIndex);
   }
 
-  public static Object readList (LispReader lexer,
+  public static Object readList (LispReader lexer, Object last,
 				 int ch, int count, int close, int sharingIndex)
     throws java.io.IOException, SyntaxException
   {
@@ -90,8 +87,7 @@ public final class ReaderParens extends ReadTableEntry
     int startColumn = port.getColumnNumber();
     try
       {
-	Object last = null;
-	Object list = lexer.makeNil();
+        Object list = last == null ? lexer.makeNil() : last;
 	boolean sawDot = false;
 	boolean sawDotCdr = false;
 	ReadTable readTable = ReadTable.getCurrent();

@@ -1,3 +1,11 @@
+2011-10-24  Per Bothner  <per@bothner.com>
+
+	* ReaderParens.java (readList): Pass 'last' variable as parameter.
+	If non-null, use that as the initial "list head".
+	(read): Above change allows simplification when command is provided.
+	It also fixes the column number of the first pair following a command.
+	* LispReader.java: Update calls to readList.
+
 2011-10-01  Jamison Hope  <jrh@theptrgroup.com>
 
 	* LispReader.java (readSpecial): Handle #!native.

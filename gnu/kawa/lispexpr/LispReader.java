@@ -450,7 +450,7 @@ public class LispReader extends Lexer
         if (ch == '[' && rtable.defaultBracketMode == -2)
           {
             port.read();
-            Object lst = ReaderParens.readList(this, ch, 1, ']', -1);
+            Object lst = ReaderParens.readList(this, null, ch, 1, ']', -1);
             value = PairWithPosition.make(value, lst,
                                           port.getName(), line+1, column+1);
             value = PairWithPosition.make(LispLanguage.bracket_apply_sym, value,
@@ -1327,7 +1327,7 @@ public class LispReader extends Lexer
         reader.error("invalid uniform vector syntax");
         return null;
       }
-    Object list = ReaderParens.readList(reader, '(', -1, ')', -1);
+    Object list = ReaderParens.readList(reader, null, '(', -1, ')', -1);
     int len = LList.listLength(list, false);
     if (len < 0)
       {

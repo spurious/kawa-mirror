@@ -88,13 +88,7 @@ public class define extends Syntax
             decl.setType(Compilation.typeProcedure);
             lexp.nameDecl = decl;
           }
-	Object formals = p4.getCar();
-	Object body = p4.getCdr();
 	Translator.setLine(lexp, p1);
-	lambda.rewriteFormals(lexp, formals, tr, null);
-	Object realBody = lambda.rewriteAttrs(lexp, body, tr);
-	if (realBody != body)
-	  p2 = new Pair(p2.getCar(), new Pair(p3.getCar(), new Pair(formals, realBody)));
         value = lexp;
       }
     else
@@ -147,8 +141,9 @@ public class define extends Syntax
     if ((options & 2) != 0)
       {
         LambdaExp lexp = (LambdaExp) sexp.getNewValue();
+        Object formals = p4.getCar();
 	Object body = p4.getCdr();
-	lambda.rewriteBody(lexp, body, tr);
+        lambda.rewrite(lexp, formals, body, tr, null);
         unknownValue = ! Compilation.inlineOk;
       }
     else

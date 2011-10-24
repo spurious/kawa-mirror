@@ -1,3 +1,10 @@
+2011-10-24  Per Bothner  <per@bothner.com>
+
+	* standard/define.java (scanForm): Defer lambda.rewriteFormals and
+	rewriteAttrs of lambdas to rewrite phase.
+	(rewriteForm): This allows simplification so we can just use
+	the Lambda.rewrite method.
+
 2011-10-21  Per Bothner  <per@bothner.com>
 
 	* lang/Translator.java (pushRenamedAlias): Fix thinko.

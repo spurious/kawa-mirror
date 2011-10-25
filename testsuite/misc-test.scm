@@ -1,4 +1,4 @@
-(test-init "Miscellaneous" 207)
+(test-init "Miscellaneous" 209)
 
 ;;; DSSSL spec example 11
 (test '(3 4 5 6) (lambda x x) 3 4 5 6)
@@ -62,6 +62,12 @@
 (test "a b c" keyword->string (string->keyword "a b c"))
 (test foo: string->keyword "foo")
 (test ||: string->keyword "")
+
+;; Test keyword parameter with primitive type.
+(define (fun-with-keys1 #!key (code ::int 400) (message ::string "brrp"))
+   (format "code: ~a message: ~a." code message))
+(test "code: 400 message: brrp." 'test-fun-with-keys1 (fun-with-keys1))
+(test "code: 200 message: brrp." 'test-fun-with-keys1 (fun-with-keys1 code: 200))
 
 (test "Hello" symbol->string 'H\x65;llo)
 

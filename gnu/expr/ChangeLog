@@ -1,3 +1,13 @@
+2011-10-25  Per Bothner  <per@bothner.com>
+
+	* LambdaExp.java (enterFunction): If default parameter has primitive
+	type, convert default to boxed type when calling searchForKeyword.
+	* QuoteExp.java (compile): If value has primitive type, but target is
+	corresponding boxed type, compile value as is.  This is an optimization
+	primarily for the sake of the enterFunction change above.
+	* InlineCalls.java (visitDefaultArgs): New method, so we can pass
+	required type when visiting default expression.
+
 2011-10-24  Per Bothner  <per@bothner.com>
 
 	For default expressions of optional parameters, use

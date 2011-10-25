@@ -1,7 +1,6 @@
 package gnu.expr;
 import gnu.mapping.*;
-import gnu.bytecode.Type;
-import gnu.bytecode.ParameterizedType;
+import gnu.bytecode.*;
 import gnu.text.SourceLocator;
 import gnu.kawa.reflect.MakeAnnotation;
 
@@ -114,8 +113,10 @@ public class QuoteExp extends Expression
   {
     if (type == null || type == Type.pointer_type
         || target instanceof IgnoreTarget
-        || (type instanceof gnu.bytecode.ObjectType
-            && type.isInstance(value)))
+        || (type instanceof ObjectType
+            && type.isInstance(value))
+        || (type instanceof PrimType
+            && target.getType() == ((PrimType) type).boxedType()))
       comp.compileConstant(value, target);
     else
       {

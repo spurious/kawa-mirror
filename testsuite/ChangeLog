@@ -1,3 +1,8 @@
+2011-10-25  Taylor Venable <venablet@ipfw.edu>
+	    Per Bothner  <per@bothner.com>
+
+	* misc-test.scm: New check for #!key parameter with primitive type.
+
 2011-10-15  Jamison Hope  <jrh@theptrgroup.com>
 	    Per Bothner  <per@bothner.com>
 

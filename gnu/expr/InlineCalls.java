@@ -524,6 +524,16 @@ public class InlineCalls extends ExpExpVisitor<Type>
     return exp;
   }
 
+  public void visitDefaultArgs (LambdaExp exp, Type required)
+  {
+    for (Declaration p = exp.firstDecl(); p != null; p = p.nextDecl())
+      {
+        Expression init = p.getInitValue();
+        if (init != null)
+          p.setInitValue(visitAndUpdate(init, p.getType()));
+      }
+  } 
+
   protected Expression visitClassExp (ClassExp exp, Type required) {
       Expression result = super.visitClassExp(exp, required);
       if (! exp.explicitInit && ! exp.instanceType.isInterface())

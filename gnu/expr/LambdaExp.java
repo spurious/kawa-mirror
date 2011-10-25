@@ -1439,6 +1439,10 @@ public class LambdaExp extends ScopeExp
 		code.emitPushInt(min_args + opt_args - plainArgs);
 		comp.compileConstant(keywords[key_i++]);
 		Expression defaultArg = param.getInitValue();
+                Type boxedParamType = paramType instanceof PrimType
+                    ? ((PrimType) paramType).boxedType()
+                    : paramType;
+
 		// We can generate better code if the defaultArg expression
 		// has no side effects.  For simplicity and safety, we just
 		// special case literals, which handles most cases.
@@ -1456,7 +1460,7 @@ public class LambdaExp extends ScopeExp
 			  ("searchForKeyword",  argts,
 			   Type.objectType, Access.PUBLIC|Access.STATIC);
 		      }
-		    defaultArg.compile(comp, paramType);
+		    defaultArg.compile(comp, boxedParamType);
 		    code.emitInvokeStatic(searchForKeywordMethod4);
 		  }
 		else
@@ -1477,7 +1481,8 @@ public class LambdaExp extends ScopeExp
 		    comp.compileConstant(Special.dfault);
 		    code.emitIfEq();
 		    code.emitPop(1);
-		    defaultArg.compile(comp, paramType);
+		    defaultArg.compile(comp, boxedParamType);
+                    paramType.emitCoerceToObject(code);
 		    code.emitFi();
 		  }
 	      }

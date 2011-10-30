@@ -1,3 +1,8 @@
+2011-10-29  Per Bothner  <per@bothner.com>
+
+	* readtable.scm (define-reader-ctor): Improve type specifiers
+	to avoid compiler warning.
+
 2011-09-24  Jamison Hope  <jrh@theptrgroup.com>
 
 	* srfi14.scm: Update character sets to match Unicode 6 and the

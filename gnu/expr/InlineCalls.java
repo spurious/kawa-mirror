@@ -8,6 +8,7 @@ import gnu.kawa.reflect.Invoke;
 import gnu.kawa.functions.Convert;
 import gnu.kawa.util.IdentityHashTable;
 import gnu.mapping.*;
+import gnu.math.DFloNum;
 import gnu.math.IntNum;
 import gnu.math.BitOps;
 import gnu.text.Char;
@@ -194,9 +195,11 @@ public class InlineCalls extends ExpExpVisitor<Type>
         if (vtype == Type.toStringType)
           vtype = Type.javalangStringType;
         exp.type = vtype;
-        if (required instanceof PrimType && ! exp.isExplicitlyTyped())
+        Type primRequired;
+        if (! exp.isExplicitlyTyped()
+            && (primRequired = PrimType.unboxedType(required)) != null)
           {
-            char sig1 = required.getSignature().charAt(0);
+            char sig1 = primRequired.getSignature().charAt(0);
             if (value instanceof IntNum)
               {
                 IntNum ivalue = (IntNum) value;
@@ -219,6 +222,12 @@ public class InlineCalls extends ExpExpVisitor<Type>
                     if (ivalue.inRange(Long.MIN_VALUE, Long.MAX_VALUE))
                       ival = Long.valueOf(ivalue.longValue());
                     break;
+                  case 'F':
+                    ival = Float.valueOf(ivalue.floatValue());
+                    break;
+                  case 'D':
+                    ival = Double.valueOf(ivalue.doubleValue());
+                    break;
                   default:
                     ivalue = null;
                   }
@@ -227,6 +236,26 @@ public class InlineCalls extends ExpExpVisitor<Type>
                 else if (ivalue != null)
                   error('w', "integer "+ivalue+" not in range of "+required.getName());
               }
+            if (value instanceof DFloNum)
+            {
+              DFloNum dvalue = (DFloNum) value;
+              Object dval;
+              switch (sig1)
+              {
+                case 'F':
+                  dval = Float.valueOf(dvalue.floatValue());
+                  break;
+                case 'D':
+                  dval = Double.valueOf(dvalue.doubleValue());
+                  break;
+                default:
+                  dval = null;
+              }
+              if (dval != null)
+                exp = new QuoteExp(dval, required);
+              else
+                error('w', "saw float where "+required.getName()+" expected");
+            }
             if (value instanceof Char && sig1 == 'C')
               {
                 int ival = ((Char) value).intValue();
@@ -234,6 +263,12 @@ public class InlineCalls extends ExpExpVisitor<Type>
                   exp = new QuoteExp(Character.valueOf((char) ival), required);
               }
           }
+        else if ((value instanceof IntNum) &&
+                 !exp.isExplicitlyTyped() && required != null &&
+                 "java.math.BigInteger".equals(required.getName()))
+        {
+          exp = new QuoteExp(((IntNum)value).asBigInteger(), required);
+        }
       }
     return exp;
   }

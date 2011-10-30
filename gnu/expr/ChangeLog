@@ -1,3 +1,9 @@
+2011-10-29  Jamison Hope  <jrh@theptrgroup.com>
+
+	* InlineCalls.java (visitQuoteExp): Allow converting integer
+	literals to boxed number types like java.lang.Integer and BigInteger.
+	Also allow converting integer and float to float/double/Float/Double.
+
 2011-10-25  Per Bothner  <per@bothner.com>
 
 	* LambdaExp.java (enterFunction): If default parameter has primitive

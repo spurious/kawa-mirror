@@ -63,10 +63,7 @@ public class module_name extends Syntax
         if (index >= 0)
           tr.classPrefix = name.substring(0, index+1);
         else
-          {
-            name = tr.classPrefix + name;
-            className = tr.classPrefix + Compilation.mangleName(name);
-          }
+          className = tr.classPrefix + Compilation.mangleName(name);
         ModuleExp module = tr.getModule();
         if (tr.mainClass == null)
           tr.mainClass = new gnu.bytecode.ClassType(className);

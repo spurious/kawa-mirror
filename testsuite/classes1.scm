@@ -48,6 +48,9 @@
   ((f (y :: <int>)) :: <int>
    (if (equal? hyphenated-field? "yes") (+ (g) b y) 999))
 
+  ((withVarArg a #!rest b)
+   (format "a:~a b:~b" a b))
+
   ((asText (i ::int))::string (java.lang.Integer:toString i))
   ((asText (t ::java.lang.CharSequence))::string (t:toString))
   ((test-asText)

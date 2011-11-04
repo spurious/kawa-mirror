@@ -1,4 +1,4 @@
-(test-init "Objects" 137)
+(test-init "Objects" 138)
 
 ;; Force procedure to be applied without being inlined:
 (define-syntax force-eval
@@ -252,6 +252,7 @@
 (test #t slot-ref (as <SimpleA> obj1) 'happy)
 (set! (field obj1 'happy) #f)
 (test #f field obj1 'happy)
+(test "a:5 b:(10 15)" 'with-var-arg (obj1:withVarArg 5 10 15))
 
 (define obj2 (make <SimpleB>))
 (test 4 field obj2 'a)

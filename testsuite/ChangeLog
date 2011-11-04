@@ -1,3 +1,8 @@
+2011-11-03  Per Bothner  <per@bothner.com>
+
+	* classes1.scm (SimpleA:withVarArg): New varargs method.
+	* obj-test.scm: New test.
+
 2011-10-25  Taylor Venable <venablet@ipfw.edu>
 	    Per Bothner  <per@bothner.com>
 

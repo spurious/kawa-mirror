@@ -16,7 +16,7 @@ import gnu.kawa.functions.Convert;
 public class LambdaExp extends ScopeExp
 {
   public Expression body;
-  /** Minumnum number of parameters.
+  /** Minimum number of parameters.
    * Does not count implicit isThisParameter(). */
   public int min_args;
   /** Maximum number of actual arguments;  -1 if variable. */
@@ -1358,7 +1358,9 @@ public class LambdaExp extends ScopeExp
     // For each non-artificial parameter, copy it from its incoming
     // location (a local variable register, or the argsArray) into
     // its home location, if they are different.
-    int i = 0;
+    Declaration param = firstDecl();
+    // i is index of current parameter, not counting this.
+    int i = param != null && param.isThisParameter() ? -1 : 0;
     int key_i = 0;
     int key_args = keywords == null ? 0 : keywords.length;
     if (this instanceof ModuleExp)
@@ -1369,7 +1371,7 @@ public class LambdaExp extends ScopeExp
     Method mainMethod = getMainMethod();
     Variable callContextSave = comp.callContextVar;
 
-    for (Declaration param = firstDecl();  param != null; param = param.nextDecl())
+    for (;  param != null; param = param.nextDecl())
       {
         comp.callContextVar
           = (getCallConvention() < Compilation.CALL_WITH_CONSUMER ? null

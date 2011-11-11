@@ -254,27 +254,32 @@ public class LambdaExp extends ScopeExp
     return body == QuoteExp.nativeExp;
   }
 
-  /** Specify the calling convention used for this function.
+  int callConvention;
+  /** The calling convention used for this function.
+   * It is derived from Compilation's currentCallConvention.
    * @return One of the CALL_WITH_xxx values in Compilation. */
-  public int getCallConvention ()
+  public int getCallConvention () { return callConvention; }
+  public void setCallConvention(Compilation comp)
   {
-    if (isModuleBody())
-      return ((Compilation.defaultCallConvention
-	      >= Compilation.CALL_WITH_CONSUMER)
-	      ? Compilation.defaultCallConvention
-	      : Compilation.CALL_WITH_CONSUMER);
     if (isClassMethod())
-      return Compilation.CALL_WITH_RETURN;
-    return ((Compilation.defaultCallConvention
-	     != Compilation.CALL_WITH_UNSPECIFIED)
-	    ? Compilation.defaultCallConvention
-	    : Compilation.CALL_WITH_RETURN);
+      callConvention = Compilation.CALL_WITH_RETURN;
+    else
+      {
+        int defaultConvention = comp.currentCallConvention();
+        callConvention =
+            (defaultConvention < Compilation.CALL_WITH_CONSUMER
+             && isModuleBody())
+            ? Compilation.CALL_WITH_CONSUMER
+            : defaultConvention == Compilation.CALL_WITH_UNSPECIFIED
+            ? Compilation.CALL_WITH_RETURN
+            : defaultConvention;
+      }
   }
 
   public final boolean isHandlingTailCalls ()
   {
     return isModuleBody()
-      || (Compilation.defaultCallConvention >= Compilation.CALL_WITH_TAILCALLS
+      || (getCallConvention() >= Compilation.CALL_WITH_TAILCALLS
 	  && ! isClassMethod());
   }
 
@@ -553,7 +558,7 @@ public class LambdaExp extends ScopeExp
     if (! getInlineOnly())
       {
 	if (comp.method.reachableHere()
-	    && (Compilation.defaultCallConvention < Compilation.CALL_WITH_TAILCALLS
+	    && (getCallConvention() < Compilation.CALL_WITH_TAILCALLS
 		|| isModuleBody() || isClassMethod() || isHandlingTailCalls()))
 	  code.emitReturn();
 	popScope(code);        // Undoes enterScope in allocParameters
@@ -576,7 +581,7 @@ public class LambdaExp extends ScopeExp
   public void generateApplyMethods(Compilation comp)
   {
     comp.generateMatchMethods(this);
-    if (Compilation.defaultCallConvention >= Compilation.CALL_WITH_CONSUMER)
+    if (comp.currentCallConvention() >= Compilation.CALL_WITH_CONSUMER)
       comp.generateApplyMethodsWithContext(this);
     else
       comp.generateApplyMethodsWithoutContext(this);

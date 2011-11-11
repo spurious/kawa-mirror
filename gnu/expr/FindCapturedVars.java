@@ -41,7 +41,7 @@ public class FindCapturedVars extends ExpExpVisitor<Void>
     // in which case the current function does as well;  this is taken
     // care of by calling setCallersNeedStaticLink in LambdaExp.)
     if (exp.func instanceof ReferenceExp
-	&& Compilation.defaultCallConvention <= Compilation.CALL_WITH_RETURN)
+	&& getCompilation().currentCallConvention() <= Compilation.CALL_WITH_RETURN)
       {
 	Declaration decl
 	  = Declaration.followAliases(((ReferenceExp) exp.func).binding);

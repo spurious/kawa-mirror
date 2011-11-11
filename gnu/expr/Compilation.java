@@ -174,7 +174,7 @@ public class Compilation implements SourceLocator
     ;
 
   /** The default calling convention.
-   * One of the following CALL_WITHG_xxx values. */
+   * One of the following CALL_WITH_xxx values. */
   public static int defaultCallConvention;
   public static final int CALL_WITH_UNSPECIFIED = 0;
   /** Plain calling convention, using regular Java parameters and returns. */
@@ -186,10 +186,14 @@ public class Compilation implements SourceLocator
   /** Support for full continuations.  Not implemented. */
   public static final int CALL_WITH_CONTINUATIONS = 4;
 
+  public int currentCallConvention() { return defaultCallConvention; }
+
   public boolean usingCPStyle()
-  { return defaultCallConvention == CALL_WITH_CONTINUATIONS; }
+  { return currentCallConvention() == CALL_WITH_CONTINUATIONS; }
   public boolean usingTailCalls()
-  { return defaultCallConvention >= CALL_WITH_TAILCALLS; }
+  { return currentCallConvention() >= CALL_WITH_TAILCALLS; }
+  public boolean usingCallContext()
+  { return currentCallConvention() >= CALL_WITH_CONSUMER; }
 
   public static final int MODULE_NONSTATIC = -1;
   public static final int MODULE_STATIC_DEFAULT = 0;
@@ -435,9 +439,7 @@ public class Compilation implements SourceLocator
 
   public final ClassType getModuleType()
   {
-    return (defaultCallConvention >= Compilation.CALL_WITH_CONSUMER
-	    ? typeModuleWithContext
-	    : typeModuleBody);
+      return usingCallContext() ? typeModuleWithContext : typeModuleBody;
   }
 
   /** Emit code to "evaluate" a compile-time constant.
@@ -1336,13 +1338,14 @@ public class Compilation implements SourceLocator
 		code.emitPutField(typeCallContext.getField("values"));
 	      }
 	    code.emitLoad(ctxVar);
-	    if (defaultCallConvention < Compilation.CALL_WITH_CONSUMER)
-	      code.emitLoad(code.getArg(1)); // proc
-	    else
+            boolean usingCallContext = usingCallContext();
+            if (usingCallContext)
 	      code.emitLoad(code.getArg(0)); // this (module)
+	    else
+	      code.emitLoad(code.getArg(1)); // proc
 	    code.emitPutField(procCallContextField);
 	    code.emitLoad(ctxVar);
-	    if (defaultCallConvention >= CALL_WITH_CONSUMER)
+	    if (usingCallContext)
 	      code.emitPushInt(source.getSelectorValue(this)+methodIndex);
 	    else
 	      code.emitPushInt(i);
@@ -1508,7 +1511,7 @@ public class Compilation implements SourceLocator
 	    code.emitInvoke(primMethod);
 	    while (--pendingIfEnds >= 0)
 	      code.emitFi();
-	    if (defaultCallConvention < Compilation.CALL_WITH_CONSUMER)
+	    if (! usingCallContext())
 	      Target.pushObject.compileFromStack(this,
 						 source.getReturnType());
             messages.swapSourceLocator(saveLoc1);
@@ -1541,9 +1544,7 @@ public class Compilation implements SourceLocator
       curClass = moduleClass;
     Method save_method = method;
     CodeAttr code = null;
-    for (int i = defaultCallConvention >= Compilation.CALL_WITH_CONSUMER
-	   ? 5 : 0;
-	 i < 6; i++)
+    for (int i = usingCallContext() ? 5 : 0; i < 6; i++)
       {
 	// If i < 5, generate the method named ("apply"+i);
 	// else generate "applyN".
@@ -1599,7 +1600,7 @@ public class Compilation implements SourceLocator
 		  }
 		applyArgs[0] = procType;
 		method = curClass.addMethod (mname, applyArgs,
-					     defaultCallConvention >= Compilation.CALL_WITH_CONSUMER ? (Type) Type.voidType : (Type) Type.objectType,
+					     usingCallContext() ? (Type) Type.voidType : (Type) Type.objectType,
 					     Access.PUBLIC);
 		code = method.startCode();
 
@@ -1705,7 +1706,7 @@ public class Compilation implements SourceLocator
 	    code.emitInvoke(primMethod);
 	    while (--pendingIfEnds >= 0)
 	      code.emitFi();
-	    if (defaultCallConvention < Compilation.CALL_WITH_CONSUMER)
+	    if (! usingCallContext())
 	      Target.pushObject.compileFromStack(this,
 						 source.getReturnType());
             messages.swapSourceLocator(saveLoc1);
@@ -1714,7 +1715,7 @@ public class Compilation implements SourceLocator
 	if (needThisApply)
 	  {
 	    aswitch.addDefault(code);
-	    if (defaultCallConvention >= Compilation.CALL_WITH_CONSUMER)
+	    if (usingCallContext())
 	      {
 		Method errMethod
 		  = typeModuleMethod.getDeclaredMethod("applyError", 0);

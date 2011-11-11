@@ -1,3 +1,13 @@
+2011-11-11  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (currentCallConvention, usingCallContext):
+	New methods.
+	* LambdaExp.java (callConvention): New field.
+	(getCallConvention, setCallConvention): New method.
+	* InlineCalls.java (visitLambdaExp): Call setCallConvention.
+	* FindCapturedVars.java: Update.
+	* ObjectExp.java (compile): Likewise.
+
 2011-11-03  Per Bothner  <per@bothner.com>
 
 	* LambdaExp.java (enterFunction): Adjust parameter count for "$this$".

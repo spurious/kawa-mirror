@@ -214,7 +214,7 @@ public class Options
   /** Get current option value.
    * Only look in local table, not in inherited Options.
    * Return null if there is no binding (even when get would
-   * throw an except on an unknonw option).
+   * throw an exception on an unknown option).
    */
   public Object getLocal (String key)
   {

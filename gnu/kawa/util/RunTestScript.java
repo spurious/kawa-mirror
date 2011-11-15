@@ -165,7 +165,7 @@ public class RunTestScript implements Runnable
         process.waitFor();
         checkOutput(out, expectedOut, "output");
         checkOutput(err, expectedErr, "diagnostics");
-        System.err.println("# "+getTestName()+" passes");
+        System.err.println("# "+getTestName()+(failed ? " fails" : " passes"));
       }
     catch (Throwable ex)
       {

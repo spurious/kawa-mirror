@@ -477,7 +477,7 @@ public class Scheme extends LispLanguage
       defSntxStFld("let*-values", "kawa.lib.syntax");
       defSntxStFld("case-lambda", "kawa.lib.syntax");
       defSntxStFld("receive", "kawa.lib.syntax");
-      defProcStFld("eval", "kawa.lang.Eval");
+      defProcStFld("eval", "kawa.lib.std_syntax");
       defProcStFld("repl", "kawa.standard.SchemeCompilation", "repl");
       defProcStFld("scheme-report-environment", "kawa.lib.misc");
       defProcStFld("null-environment", "kawa.lib.misc");

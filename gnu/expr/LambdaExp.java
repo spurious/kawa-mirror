@@ -258,7 +258,7 @@ public class LambdaExp extends ScopeExp
   /** The calling convention used for this function.
    * It is derived from Compilation's currentCallConvention.
    * @return One of the CALL_WITH_xxx values in Compilation. */
-  public int getCallConvention () { return callConvention; }
+  public int getCallConvention() { return callConvention; }
   public void setCallConvention(Compilation comp)
   {
     if (isClassMethod())
@@ -275,6 +275,8 @@ public class LambdaExp extends ScopeExp
             : defaultConvention;
       }
   }
+  public boolean usingCallContext()
+  { return getCallConvention() >= Compilation.CALL_WITH_CONSUMER; }
 
   public final boolean isHandlingTailCalls ()
   {
@@ -581,10 +583,8 @@ public class LambdaExp extends ScopeExp
   public void generateApplyMethods(Compilation comp)
   {
     comp.generateMatchMethods(this);
-    if (comp.currentCallConvention() >= Compilation.CALL_WITH_CONSUMER)
-      comp.generateApplyMethodsWithContext(this);
-    else
-      comp.generateApplyMethodsWithoutContext(this);
+    comp.generateApplyMethodsWithContext(this);
+    comp.generateApplyMethodsWithoutContext(this);
   }
 
   Field allocFieldFor (Compilation comp)

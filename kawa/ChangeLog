@@ -1,3 +1,13 @@
+2011-11-15  Per Bothner  <per@bothner.com>
+
+	* lang/Lambda.java (rewrite): Do setCallConvention on new LambdaExp.
+	* lang/Eval.java: No longer extends Procedure1or2.
+	Instead only static methods.
+	(eval): Remove field.
+	(apply1, apply2, apply): Remove methods.
+	(evalForm$X): New method.
+	* standard/Scheme.java (initScheme): eval method is now in Scheme.
+
 2011-11-02  Per Bothner  <per@bothner.com>
 
 	* standard/module_name.java (scanForm): Fix thinko where classPrefix

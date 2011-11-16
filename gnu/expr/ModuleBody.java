@@ -278,6 +278,7 @@ public abstract class ModuleBody extends Procedure0 implements RunnableModule
 	//ctx.proc = this; 	ctx.pc = proc.selector;
 	return 0;
       }
+    ctx.where = 0;
     Object[] args = { arg1 };
     return matchN(proc, args, ctx);
   }
@@ -303,6 +304,7 @@ public abstract class ModuleBody extends Procedure0 implements RunnableModule
 	ctx.proc = proc;
 	return 0;
       }
+    ctx.where = 0;
     Object[] args = { arg1, arg2 };
     return matchN(proc, args, ctx);
   }
@@ -331,6 +333,7 @@ public abstract class ModuleBody extends Procedure0 implements RunnableModule
 	// ctx.proc = this; ctx.pc = proc.selector;
 	return 0;
       }
+    ctx.where = 0;
     Object[] args = { arg1, arg2, arg3 };
     return matchN(proc, args, ctx);
   }
@@ -361,6 +364,7 @@ public abstract class ModuleBody extends Procedure0 implements RunnableModule
 	//ctx.proc = this;	ctx.pc = proc.selector;
 	return 0;
       }
+    ctx.where = 0;
     Object[] args = { arg1, arg2, arg3, arg4 };
     return matchN(proc, args, ctx);
   }

@@ -9,12 +9,9 @@ import gnu.lists.*;
 
 /* This implements the R5RS "eval" procedure. */
 
-public class Eval extends Procedure1or2
+public class Eval
 {
-  public static final Eval eval = new Eval();
-  static { eval.setName("eval"); }
-
-  public static void eval (Object sexpr, Environment env, CallContext ctx)
+  public static void evalForm$X (Object sexpr, Environment env, CallContext ctx)
     throws Throwable
   {
     PairWithPosition body;
@@ -29,15 +26,14 @@ public class Eval extends Procedure1or2
     evalBody(body, env, new SourceMessages(), ctx);
   }
 
-  public static Object evalBody (Object body, Environment env,
-				 SourceMessages messages)
-    throws Throwable
+  public static Object eval (Object sexpr, Environment env)
+        throws Throwable
   {
     CallContext ctx = CallContext.getInstance();
     int oldIndex = ctx.startFromContext();
     try
       {
-	evalBody(body, env, messages, ctx);
+	evalForm$X(sexpr, env, ctx);
 	return ctx.getFromContext(oldIndex);
       }
     catch (Throwable ex)
@@ -47,14 +43,15 @@ public class Eval extends Procedure1or2
       }
   }
 
-  public static Object eval (Object sexpr, Environment env)
-        throws Throwable
+  public static Object evalBody (Object body, Environment env,
+				 SourceMessages messages)
+    throws Throwable
   {
     CallContext ctx = CallContext.getInstance();
     int oldIndex = ctx.startFromContext();
     try
       {
-	eval(sexpr, env, ctx);
+	evalBody(body, env, messages, ctx);
 	return ctx.getFromContext(oldIndex);
       }
     catch (Throwable ex)
@@ -108,30 +105,5 @@ public class Eval extends Procedure1or2
 	if (env != saveGlobalEnv)
 	  Environment.setCurrent(saveGlobalEnv);
       }
-  }
-
-  public Object apply1 (Object arg1)
-    throws Throwable
-  {
-    return eval (arg1, Environment.user ());
-  }
-
-  public Object apply2 (Object arg1, Object arg2)
-    throws Throwable
-  {
-    return eval (arg1, (Environment) arg2);
-  }
-
-  public void apply (CallContext ctx)
-    throws Throwable
-  {
-    Procedure.checkArgCount(this, ctx.count);
-    Object exp = ctx.getNextArg();
-    Environment env;
-    env = (Environment) ctx.getNextArg(null);
-    if (env == null)
-      env = Environment.user();
-    ctx.lastArg();
-    eval(exp, env, ctx);
   }
 }

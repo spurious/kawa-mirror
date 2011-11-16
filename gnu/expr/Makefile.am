@@ -55,8 +55,8 @@ java_sources = \
   ModuleInfo.java \
   ModuleManager.java \
   ModuleMethod.java \
+  ModuleMethodWithContext.java \
   ModuleSet.java \
-  ModuleWithContext.java \
   ModuleExp.java \
   NameLookup.java \
   PairClassType.java \

@@ -43,20 +43,21 @@ public class ProcInitializer extends Initializer
           oldproc = (ModuleMethod) old;
       }
     CodeAttr code = comp.getCode();
-    ClassType procClass = Compilation.typeModuleMethod;
-    String initName;
+    ClassType procClass = proc.usingCallContext()
+        ? Compilation.typeModuleMethodWithContext
+        : Compilation.typeModuleMethod;
+    Method initModuleMethod;
     if (oldproc == null)
       {
         code.emitNew(procClass);
         code.emitDup(1);
-        initName = "<init>";
+        initModuleMethod = procClass.getDeclaredMethod("<init>", 4);
       }
     else
       {
         comp.compileConstant(oldproc, Target.pushValue(procClass));
-        initName = "init";
+        initModuleMethod = Compilation.typeModuleMethod.getDeclaredMethod("init", 4);
       }
-    Method initModuleMethod = procClass.getDeclaredMethod(initName, 4);
     LambdaExp owning = proc.getNeedsClosureEnv() ? proc.getOwningLambda()
       : comp.getModule();
     if (owning instanceof ClassExp && owning.staticLinkField != null)

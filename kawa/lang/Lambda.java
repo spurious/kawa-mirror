@@ -59,6 +59,7 @@ public class Lambda extends Syntax
   public void rewrite(LambdaExp lexp, Object formals, Object body,
 		      Translator tr, TemplateScope templateScopeRest)
   {
+    lexp.setCallConvention(tr);
     rewriteFormals(lexp, formals, tr, templateScopeRest);
     if (body instanceof PairWithPosition)
       lexp.setFile(((PairWithPosition) body).getFileName());

@@ -7,7 +7,7 @@
 	       begin-for-syntax define-for-syntax
 	       generate-temporaries define-procedure
 	       identifier? free-identifier=?
-	       syntax-source syntax-line syntax-column)
+	       syntax-source syntax-line syntax-column eval)
 
 ;;; COND
 
@@ -293,6 +293,11 @@
 	 (- ((as gnu.lists.PairWithPosition form):getColumnNumber) 0))
 	(else
 	 #f)))
+
+(with-compile-options
+ full-tailcalls: #t
+ (define (eval exp #!optional (env ::gnu.mapping.Environment (gnu.mapping.Environment:user)))
+   (kawa.lang.Eval:evalForm exp env)))
 
 (define-syntax begin-for-syntax
   (lambda (form)

@@ -482,7 +482,8 @@ public class InlineCalls extends ExpExpVisitor<Type>
 
   protected Expression visitLambdaExp (LambdaExp exp, Type required)
   {
-    exp.setCallConvention(getCompilation());
+    if (exp.getCallConvention() == Compilation.CALL_WITH_UNSPECIFIED)
+      exp.setCallConvention(getCompilation());
     Declaration firstDecl = exp.firstDecl();
     if (firstDecl != null && firstDecl.isThisParameter()
         && ! exp.isClassMethod() && firstDecl.type == null)

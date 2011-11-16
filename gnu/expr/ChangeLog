@@ -1,5 +1,28 @@
 2011-11-15  Per Bothner  <per@bothner.com>
 
+	Allow call-convention to vary from lambda to lambda.
+	* ModuleMethodWithContext.java: New class, extends ModuleMethod.
+	* ModuleWithContext.java: Remove class.
+	* Makefile.am: Update accordingly.
+	* Compilation.java (fullTailCallsVariable): New OptionInfo field.
+	(currentCallConvention): Check value of full-tailcalls options.
+	(typeModuleWithContext): Removed field.
+	(typeModul eMethodWithContext): New field.
+	(getModuleType): Always return typeModuleBody.
+	(generateApplyMethodsWithContext, generateApplyMethodsWithoutContext):
+	Check each lambda for usingCallContext.
+	* LambdaExp.java (usingCallContext): New method.
+	(generateApplyMethods): Call both generateApplyMethodsWithContext and
+	generateApplyMethodsWithoutContext - always.
+	* ModuleBody.java (match1, match2, match3, match4):
+	Clear 'where' field in CallContext.
+	* ProcInitializer.jav (aemitLoadModuleMethod): Update to generate
+	ModuleMethodWithContext or ModuleWithContext as appropriate.
+	* InlineCalls.java (visitLambdaExp): Only call setCallConvention
+	if not yet set.
+
+2011-11-15  Per Bothner  <per@bothner.com>
+
 	* InlineCalls.java (visitLambdaExp): Don't call noteValueFromApply
 	for optional or rest parameters.
 

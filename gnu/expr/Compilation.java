@@ -110,6 +110,10 @@ public class Compilation implements SourceLocator
   public static boolean debugPrintFinalExpr;
 
   public static Options options = new Options();
+  public static Options.OptionInfo fullTailCallsVariable =
+    options.add("full-tailcalls",
+                Options.BOOLEAN_OPTION, Boolean.TRUE,
+		"support full tailcalls");
   public static Options.OptionInfo warnUndefinedVariable =
     options.add("warn-undefined-variable",
                 Options.BOOLEAN_OPTION, Boolean.TRUE,
@@ -186,7 +190,14 @@ public class Compilation implements SourceLocator
   /** Support for full continuations.  Not implemented. */
   public static final int CALL_WITH_CONTINUATIONS = 4;
 
-  public int currentCallConvention() { return defaultCallConvention; }
+    public int currentCallConvention() {
+        Object ft = currentOptions.getLocal("full-tailcalls");
+        if (ft instanceof Boolean)
+            return ((Boolean) ft).booleanValue()
+                ? Compilation.CALL_WITH_TAILCALLS
+                : Compilation.CALL_WITH_RETURN;
+        return defaultCallConvention;
+    }
 
   public boolean usingCPStyle()
   { return currentCallConvention() == CALL_WITH_CONTINUATIONS; }
@@ -365,8 +376,6 @@ public class Compilation implements SourceLocator
     = ClassType.make("gnu.mapping.ProcedureN");
   public static ClassType typeModuleBody
     = ClassType.make("gnu.expr.ModuleBody");
-  public static ClassType typeModuleWithContext
-    = ClassType.make("gnu.expr.ModuleWithContext");
   public static ClassType typeApplet = ClassType.make("java.applet.Applet");
   public static ClassType typeServlet = ClassType.make("gnu.kawa.servlet.KawaServlet");
 
@@ -387,6 +396,8 @@ public class Compilation implements SourceLocator
   = ClassType.make("gnu.mapping.MethodProc");
   public static ClassType typeModuleMethod
   = ClassType.make("gnu.expr.ModuleMethod");
+  public static ClassType typeModuleMethodWithContext
+  = ClassType.make("gnu.expr.ModuleMethodWithContext");
   //  public static Field numArgsCallFrameField = typeCallFrame.getDeclaredField("numArgs");
   public static Field argsCallContextField
     = typeCallContext.getDeclaredField("values");
@@ -439,7 +450,7 @@ public class Compilation implements SourceLocator
 
   public final ClassType getModuleType()
   {
-      return usingCallContext() ? typeModuleWithContext : typeModuleBody;
+    return typeModuleBody;
   }
 
   /** Emit code to "evaluate" a compile-time constant.
@@ -1382,7 +1393,7 @@ public class Compilation implements SourceLocator
       return;
     ClassType save_class = curClass;
     curClass = lexp.getHeapFrameType();
-    if (! (curClass.getSuperclass().isSubtype(typeModuleWithContext)))
+    if (! (curClass.getSuperclass().isSubtype(typeModuleBody)))
       curClass = moduleClass;
     ClassType procType = typeModuleMethod;
     Method save_method = method;
@@ -1403,6 +1414,8 @@ public class Compilation implements SourceLocator
     for (int j = 0;  j < numApplyMethods;  ++j)
       {
 	LambdaExp source = (LambdaExp) lexp.applyMethods.elementAt(j);
+        if (! source.usingCallContext())
+          continue;
 	Method[] primMethods = source.primMethods;
 	int numMethods = primMethods.length;
 
@@ -1556,6 +1569,8 @@ public class Compilation implements SourceLocator
 	for (int j = 0;  j < numApplyMethods;  j++)
 	  {
 	    LambdaExp source = (LambdaExp) lexp.applyMethods.elementAt(j);
+            if (source.usingCallContext())
+              continue;
 	    // Select the subset of source.primMethods[*] that are suitable
 	    // for the current apply method.
 	    Method[] primMethods = source.primMethods;

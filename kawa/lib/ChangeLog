@@ -1,3 +1,7 @@
+2011-11-15  Per Bothner  <per@bothner.com>
+
+	* std_syntax.scm (eval): New method.   Compile with full-tailcalls.
+
 2011-10-08  Charles Turner  <chturne@gmail.com>
 
 	* ports.scm (write, write-with-shared-structure): write was

@@ -1,3 +1,8 @@
+2011-11-15  Per Bothner  <per@bothner.com>
+
+	* InlineCalls.java (visitLambdaExp): Don't call noteValueFromApply
+	for optional or rest parameters.
+
 2011-11-11  Per Bothner  <per@bothner.com>
 
 	* Compilation.java (currentCallConvention, usingCallContext):

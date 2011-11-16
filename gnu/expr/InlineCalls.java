@@ -514,7 +514,7 @@ public class InlineCalls extends ExpExpVisitor<Type>
                     if (p != null && p.isThisParameter())
                         p = p.nextDecl();
                     int i = 0;
-                    for (; p != null; p = p.nextDecl(), i++)
+                    for (; p != null && i < exp.min_args; p = p.nextDecl(), i++)
                       {
                         if (! p.hasUnknownValue())
                           p.noteValueFromApply(app, i);

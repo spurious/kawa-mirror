@@ -1242,7 +1242,7 @@ is only active within @var{body}.
 
 @node Compiling using Ant
 @subsection Compiling using Ant
-
+@cindex kawac
 Many Java projects use @uref{http://ant.apache.org, Ant}
 for building Java projects.  Kawa includes a @code{<kawac>}
 Ant ask that simplifies compiling Kawa sources files to classes.
@@ -8599,7 +8599,7 @@ using various mechanisms.
 
 @subsection Using colon notation
 
-The general form of the @uref{PathExpressions.html,colon notation} is this:
+The general form of the @ref{Colon notation} is this:
 @example
 @var{container}@var{:}@var{part-name}
 @end example

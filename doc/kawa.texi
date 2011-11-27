@@ -8234,12 +8234,12 @@ By default, if no @code{module-static} is specified:
 @item
 If there is a @code{module-extends} or @code{module-implements}
 declaration, or one of the @code{--applet} or @code{--servlet}
-caommand-line flags was specified, then @code{(module-static #f)} is implied.
+command-line flags was specified, then @code{(module-static #f)} is implied.
 @item
 If one of the command-line flags
 @code{--no-module-static}, @code{--module-nonstatic},
 @code{--module-static}, or @code{--module-static-run} was specified,
-the the default @code{#f}, @code{#f}, @code{#t}, or @code{'init-run},
+then the default is @code{#f}, @code{#f}, @code{#t}, or @code{'init-run},
 respectively.
 @item
 Otherwise the default is @code{(module-static #t)}.
@@ -8254,7 +8254,7 @@ share the same bindings, which you may not want if you use
 multiple top-level environments.
 @end deffn
 
-Unfortuntely, the Java class verifier does not allow fields to have
+Unfortunately, the Java class verifier does not allow fields to have
 arbitrary names.  Therefore, the name of a field that represents a
 Scheme variable is "mangled" (@pxref{Mangling}) into an acceptable Java name.
 The implementation can recover the original name of a field @code{X}

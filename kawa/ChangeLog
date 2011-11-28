@@ -1,3 +1,8 @@
+2011-11-27  Per Bothner  <per@bothner.com>
+
+	* standard/Scheme.java (getTypeMap): Define string-input-port type.
+	This fixes Savannah bug #34821 "String Input/Output Port Symmetry".
+
 2011-11-15  Per Bothner  <per@bothner.com>
 
 	* lang/Lambda.java (rewrite): Do setCallConvention on new LambdaExp.

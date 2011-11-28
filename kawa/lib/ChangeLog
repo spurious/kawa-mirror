@@ -1,3 +1,8 @@
+2011-11-27  Per Bothner  <per@bothner.com>
+
+	* ports.scm (get-input-string, call-with-input-string): Update to
+	use new string-input-port type.
+
 2011-11-15  Per Bothner  <per@bothner.com>
 
 	* std_syntax.scm (eval): New method.   Compile with full-tailcalls.

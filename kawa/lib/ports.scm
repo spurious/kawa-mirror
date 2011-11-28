@@ -65,8 +65,8 @@
   (gnu.text.Char:print (char->integer ch) port))
 
 ;; SRFI-6
-(define (open-input-string (str :: <string>)) :: <input-port>
-  (make <gnu.mapping.CharArrayInPort> str))
+(define (open-input-string (str ::string)) ::string-input-port
+  (gnu.mapping.CharArrayInPort str))
 
 (define (open-output-string) :: <string-output-port>
   (<string-output-port>))
@@ -75,8 +75,7 @@
   (<gnu.lists.FString> (output-port:toCharArray)))
 
 (define (call-with-input-string (str :: <string>) (proc :: <procedure>))
-  (let* ((port :: <gnu.mapping.CharArrayInPort>
-	  (make <gnu.mapping.CharArrayInPort> str))
+  (let* ((port ::string-input-port (gnu.mapping.CharArrayInPort str))
 	 (result (proc port)))
     (close-input-port port)
     result))

@@ -1,3 +1,12 @@
+2011-11-29  Per Bothner  <per@bothner.com>
+
+	* lang/Translator.java (pushRenamedAlias, popRenamedAlias): We don't
+	need to push the templateScope on the renamedAliasStack, since we
+	can get it from the alias Declaration.
+	(renamedAliasStack): Can therefore make renamedAliasStack be
+	parameterized, since only Declarations are pushed.
+	Also make private.
+
 2011-11-27  Per Bothner  <per@bothner.com>
 
 	* standard/Scheme.java (getTypeMap): Define string-input-port type.

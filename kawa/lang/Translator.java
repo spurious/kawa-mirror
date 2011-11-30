@@ -46,7 +46,7 @@ public class Translator extends Compilation
   public Declaration matchArray;
 
   /** A stack of aliases pushed by <code>pushRenamedAlias</code>. */
-  Stack renamedAliasStack;
+  private Stack<Declaration> renamedAliasStack;
 
   public Stack formStack = new Stack();
   public int firstForm;
@@ -1499,10 +1499,9 @@ public class Translator extends Compilation
       templateScope.remove(old);
     templateScope.addDeclaration(alias);
     if (renamedAliasStack == null)
-      renamedAliasStack = new Stack();
+      renamedAliasStack = new Stack<Declaration>();
     renamedAliasStack.push(old);
     renamedAliasStack.push(alias);
-    renamedAliasStack.push(templateScope);
   }
 
   /** Remove one or more aliases created by <code>pushRenamedAlias</code>. */
@@ -1510,14 +1509,14 @@ public class Translator extends Compilation
   {
     while (--count >= 0)
       {
-	ScopeExp templateScope = (ScopeExp) renamedAliasStack.pop();
 	Declaration alias = (Declaration) renamedAliasStack.pop();
+        ScopeExp templateScope = alias.getContext();
 	Declaration decl = getOriginalRef(alias).getBinding();
 	decl.setSymbol(alias.getSymbol());
 	templateScope.remove(alias);
-	Object old = renamedAliasStack.pop();
+	Declaration old = renamedAliasStack.pop();
 	if (old != null)
-	  templateScope.addDeclaration((Declaration) old);
+	  templateScope.addDeclaration(old);
       }
   }
 

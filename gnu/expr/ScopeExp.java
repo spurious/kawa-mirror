@@ -109,6 +109,7 @@ public abstract class ScopeExp extends Expression
       prev.setNext(next);
     if (last == decl)
       last = prev;
+    decl.setNext(null);
   }
 
   public ScopeExp () { }

@@ -1,4 +1,4 @@
-(test-init "Miscellaneous" 209)
+(test-init "Miscellaneous" 210)
 
 ;;; DSSSL spec example 11
 (test '(3 4 5 6) (lambda x x) 3 4 5 6)
@@ -1014,3 +1014,19 @@
 	result 
 	#f)))
 (test #f foo-savannah-32678 123)
+
+;; Testcase simplified from slime/config/swank-kawa.scm
+(define-syntax mif
+  (syntax-rules ()
+    ((mif ((p . ps) value) then)
+     (let ((fail (lambda () (error "mlet failed")))
+           (tmp value))
+       (if (instance? tmp <pair>)
+           (let* ((tmp :: <pair> tmp))
+             then)
+           (fail))))))
+(define (dispatch-events)
+  (let ((tmp0 '(a b c)))
+    (mif ((c . event) tmp0)
+            1234)))
+(test 1234 dispatch-events)

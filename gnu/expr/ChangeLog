@@ -1,5 +1,8 @@
 2011-11-29  Per Bothner  <per@bothner.com>
 
+	* ScopeExp.java (remove): Set next pointer of Declaration to null.
+	This avoid errors if the Declaration is added to some scope later.
+
 	* Declaration.java (next): Make private.
 	* ScopeExp.java: Update to use nextDecl and setNext accessor methods.
 

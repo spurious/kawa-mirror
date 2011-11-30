@@ -40,7 +40,7 @@ public abstract class ScopeExp extends Expression
     if (last == null)
       decls = decl;
     else
-      last.next = decl;
+      last.setNext(decl);
     last = decl;
     decl.context = this;
   }
@@ -51,13 +51,13 @@ public abstract class ScopeExp extends Expression
   {
     if (prev == null)
       { // Put first
-        decl.next = decls;
+        decl.setNext(decls);
         decls = decl;
       }
     else
       {
-        decl.next = prev.next;
-        prev.next = decl;
+        decl.setNext(prev.nextDecl());
+        prev.setNext(decl);
       }
     if (last == prev)
       last = decl;
@@ -76,13 +76,13 @@ public abstract class ScopeExp extends Expression
       }
     else
       {
-	oldDecl = prev.next;
-	prev.next = newDecl;
+        oldDecl = prev.nextDecl();
+        prev.setNext(newDecl);
       }
-    newDecl.next = oldDecl.next;
+    newDecl.setNext(oldDecl.nextDecl());
     if (last == oldDecl)
       last = newDecl;
-    oldDecl.next = null;
+    oldDecl.setNext(null);
     newDecl.context = this;
   }
 
@@ -102,10 +102,11 @@ public abstract class ScopeExp extends Expression
 
   public void remove (Declaration prev, Declaration decl)
   {
+    Declaration next = decl.nextDecl();
     if (prev == null)
-      decls = decl.next;
+      decls = next;
     else
-      prev.next = decl.next;
+      prev.setNext(next);
     if (last == decl)
       last = prev;
   }

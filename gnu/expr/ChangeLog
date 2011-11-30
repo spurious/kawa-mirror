@@ -1,3 +1,8 @@
+2011-11-29  Per Bothner  <per@bothner.com>
+
+	* Declaration.java (next): Make private.
+	* ScopeExp.java: Update to use nextDecl and setNext accessor methods.
+
 2011-11-15  Per Bothner  <per@bothner.com>
 
 	Allow call-convention to vary from lambda to lambda.

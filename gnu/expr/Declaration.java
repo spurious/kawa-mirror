@@ -207,10 +207,10 @@ public class Declaration
   public final void setSymbol(Object symbol) { this.symbol = symbol; }
 
   /* Declarations in a ScopeExp are linked together in a linked list. */
-  Declaration next;
+  private Declaration next;
 
   public final Declaration nextDecl() { return next; }
-  public final void setNext(Declaration next) {  this.next = next; }
+  public final void setNext(Declaration next) { this.next = next; }
 
   /** Index in evalFrame for this scope, if interpreting. */
   int evalIndex;

@@ -335,7 +335,7 @@ public class SchemeCompilation extends Translator
       }
     catch (NoClassDefFoundError ex)
       {
-        tr.error('w', "error loading class "+cname+" - "+ex.getMessage()+" not cound");
+        tr.error('w', "error loading class "+cname+" - "+ex.getMessage()+" not found");
       }
     catch (Throwable ex)
       {

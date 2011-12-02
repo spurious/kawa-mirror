@@ -333,6 +333,10 @@ public class SchemeCompilation extends Translator
         if (pack != null)
           return makeQuoteExp(pack);
       }
+    catch (NoClassDefFoundError ex)
+      {
+        tr.error('w', "error loading class "+cname+" - "+ex.getMessage()+" not cound");
+      }
     catch (Throwable ex)
       {
       }

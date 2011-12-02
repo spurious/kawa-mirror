@@ -559,14 +559,6 @@ public class Translator extends Compilation
       formStack.add(rewrite(exp, false));
   }
 
-  /**
-   * Re-write a Scheme expression in S-expression format into internal form.
-   */
-  public Expression rewrite (Object exp)
-  {
-    return rewrite(exp, false);
-  }
-
   public Object namespaceResolve (Object name)
   {
     if (! (name instanceof SimpleSymbol))
@@ -593,7 +585,24 @@ public class Translator extends Compilation
   /**
    * Re-write a Scheme expression in S-expression format into internal form.
    */
+  public Expression rewrite (Object exp)
+  {
+    return rewrite(exp, 'N');
+  }
+
+  /**
+   * Re-write a Scheme expression in S-expression format into internal form.
+   */
   public Expression rewrite (Object exp, boolean function)
+  {
+    return rewrite(exp, function ? 'F' : 'N');
+  }
+
+  /** Re-write a Scheme expression in S-expression format into internal form.
+   * @param mode either 'N' (normal), 'F' (function application context),
+   *  or 'M' (macro-checking).
+   */
+  public Expression rewrite (Object exp, char mode)
   {
     if (exp instanceof SyntaxForm)
       {
@@ -602,7 +611,7 @@ public class Translator extends Compilation
 	try
 	  {
 	    setCurrentScope(sf.getScope());
-	    Expression s = rewrite(sf.getDatum(), function);
+	    Expression s = rewrite(sf.getDatum(), mode);
 	    return s;
 	  }
 	finally
@@ -610,6 +619,7 @@ public class Translator extends Compilation
 	    setCurrentScope(save_scope);
 	  }
       }
+    boolean function = mode != 'N';
     if (exp instanceof PairWithPosition)
       return rewrite_with_position (exp, function, (PairWithPosition) exp);
     else if (exp instanceof Pair)
@@ -650,10 +660,10 @@ public class Translator extends Compilation
                          && caller.nameDecl.isStatic()));
                 if (part == null)
                   {
-                    char mode = contextStatic ? 'S' : 'V';
                     PrimProcedure[] methods
                       = ClassMethods.getMethods(ctype, dname,
-                                                mode, ctype, language);
+                                                contextStatic ? 'S' : 'V',
+                                                ctype, language);
                     if (methods.length == 0)
                       continue;
                   }
@@ -764,7 +774,7 @@ public class Translator extends Compilation
                     decl = null;
                   }
               }
-            else if (loc == null || ! loc.isBound())
+            else if (mode != 'M' && (loc == null || ! loc.isBound()))
               {
                 Expression e = checkDefaultBinding(symbol, this);
                 if (e != null)
@@ -1061,7 +1071,7 @@ public class Translator extends Compilation
             
             if (obj instanceof Symbol && ! selfEvaluatingSymbol(obj))
               {
-                Expression func = rewrite(obj, true);
+                Expression func = rewrite(obj, 'M');
                 if (func instanceof ReferenceExp)
                   {
                     Declaration decl = ((ReferenceExp) func).getBinding();

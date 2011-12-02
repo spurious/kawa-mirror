@@ -1,3 +1,12 @@
+2011-12-02  Per Bothner  <per@bothner.com>
+
+	* standard/SchemeCompilation.java (checkDefaultBinding): Catch
+	NoClassDefFoundError so we can emit informative warning.
+	* lang/Translator.java (rewrite): Change API so we can distinguidh
+	when called from scan looking for macros - in which case we don't
+	want to call checkDefaultBinding, both for performance, and to
+	avoid a duplicate warning.
+
 2011-11-29  Per Bothner  <per@bothner.com>
 
 	* lang/Translator.java (pushRenamedAlias, popRenamedAlias): We don't

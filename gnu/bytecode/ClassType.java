@@ -1307,6 +1307,8 @@ public class ClassType extends ObjectType
     if ((this == toStringType && other == javalangStringType)
 	|| (this == javalangStringType && other == toStringType))
       return true;
+    if (other == Type.javalangObjectType)
+      return true;
     ClassType baseClass = this;
     while (baseClass != null)
       {
@@ -1336,10 +1338,10 @@ public class ClassType extends ObjectType
     if (cother == toStringType)
       return this == Type.javalangObjectType ? 1 : -1;
     if (this.isInterface())
-      return isAnnotation() || cother.isFinal() ? -3
+      return cother.isAnnotation() || cother.isFinal() ? -3
         : cother == Type.javalangObjectType ? -1 : -2;
     if (cother.isInterface())
-      return cother.isAnnotation() || isFinal() ? -3
+      return isAnnotation() || isFinal() ? -3
         : this == Type.javalangObjectType ? 1 : -2;
     return -3;
   }

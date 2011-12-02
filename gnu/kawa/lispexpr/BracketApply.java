@@ -33,23 +33,21 @@ public class BracketApply extends Syntax
 	for (int i = 0;  i < length; i++) {
 	    Pair pp = (Pair) pairCdr;
 	    Expression arg1 = tr.rewrite_car(pp, false);
-	    Object val1 = arg1.valueIfConstant();
-	    if (val1 instanceof Class)
-		val1 = ClassType.make((Class) val1);
+	    Type type1 = tr.getLanguage().getTypeFor(arg1, false);
 	    TypeVariable tvar = TypeVariable.make(vars[i]);
-	    if (! (val1 instanceof Type)) {
+	    if (type1 == null) {
 		Object savedPosition = tr.pushPositionOf(pp);
 		tr.error('e', "unrecognized parameter type "+pp.getCar());
 		tr.popPositionOf(savedPosition);
-		val1 = Type.objectType;
+		type1 = Type.objectType;
 	    }
 	    else {
-		int comp = tvar.compare((Type) val1);
+		int comp = tvar.compare(type1);
 		Language language = tr.getLanguage();
 		if (comp < 0)
-		    tr.error('e', "type parameter "+tvar.getName()+" must extend "+language.formatType(tvar.getRawType())+" which is incompatible with "+language.formatType((Type)val1));
+		    tr.error('e', "type parameter "+tvar.getName()+" must extend "+language.formatType(tvar.getRawType())+" which is incompatible with "+language.formatType(type1));
 	    }
-	    params[i] = (Type) val1;
+	    params[i] = type1;
 	    pairCdr = pp.getCdr();
 	}
 	return new QuoteExp(new ParameterizedType((ClassType) ClassType.make(clas), params));

@@ -1,3 +1,8 @@
+2011-12-01  Per Bothner  <per@bothner.com>
+
+	* BracketApply.java (rewrite): Use Language#getTypeFor on type
+	parameters, so it also works for not-yet-compiled classes.
+
 2011-10-24  Per Bothner  <per@bothner.com>
 
 	* ReaderParens.java (readList): Pass 'last' variable as parameter.

@@ -667,9 +667,9 @@ public class PrettyWriter extends java.io.Writer
    * inactive (i.e. not back-referenced) until proven otherwise. Some position
    * markers are required to group new sublists, the grouping variable
    * notes this.
-   * @return Integer The index in {@link #queueItems} where this marker resides
+   * @return Integer The index in {@link #queueInts} where this marker resides
    *                 it's used for back-reference lookup.
-   * @see #writeBackReference(java.lang.Integer)
+   * @see #writeBackReference(int)
    */
   public int writePositionMarker (boolean grouping)
   {

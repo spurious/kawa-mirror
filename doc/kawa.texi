@@ -2164,8 +2164,8 @@ but it can be an unquoted @var{expression} (i.e. following a @code{,}),
 in which case the name is evaluated at run-time.
 No separators are allowed on either side of the colon.
 
-The input syntax @code{@var{exp}:@var{part}} is translated by
-the Scheme reader to the internal representation @code{($lookup$ @var{exp} (quasiquote @var{part}))}.
+The input syntax @code{@var{owner}:@var{part}} is translated by
+the Scheme reader to the internal representation @code{($lookup$ @var{owner} (quasiquote @var{part}))}.
 
 @subsection Part lookup rules
 
@@ -2173,16 +2173,17 @@ Evaluation proceeds as follows.
 First @var{property-owner-expression} is
 evaluated to yield a @var{owner} object.
 Evaluating the @var{property-name} yields a @var{part} name,
-which is a symbol: Either
+which is a simple symbol: Either
 the literal @var{identifier}, or the result of evaluating the
 property-name @var{expression}.
 If the @var{expression} evaluates to a string, it is converted to
-a simple symbol, as if using @code{string->symbol}.
+a symbol, as if using @code{string->symbol}.
 
 @itemize
 @item
-If the @var{owner} implements @code{gnu.mappingHasNamedParts},
-then the result is the same as @code{(invoke @var{owner} 'get @var{part})}.
+If the @var{owner} implements @code{gnu.mapping.HasNamedParts},
+then the result is that of invoking the @code{get} method of the @var{owner}
+with the @var{part} name as a parameter.
 
 As a special case of this rule, if @var{owner} is a
 @code{gnu.mapping.Namespace}, then the result is the
@@ -2199,6 +2200,8 @@ Otherwise, we look for a named member (instance member or field).
 
 Note you can't use colon notation to invoke instance methods
 of a @code{Class}, because it will match a previous rule.
+For example if you want to invoke the @code{getDeclaredMethod}
+method of the @code{java.util.List} , you can't write @code{(java.util.List:getDeclaredMethod} because that will look for a static method in @code{java.util.List}.
 @end itemize
 
 If the colon form is on the left-hand-side of an assignment (@code{set!}),
@@ -2208,6 +2211,70 @@ then the named part is modified as appropriate.
 @c @subsection The @code{HasNamedParts} case
 @c @subsection Static parts of classes and packages
 @c @subsection Instance parts
+
+@subsection Specific cases
+
+These are semi-depecated;
+more compact and readable forms are usually preferred.
+
+@subsubsection Type literal
+
+@display
+@stxlit{(}@stxref{type}@stxlit{:<>)}
+@end display
+Returns the @var{type}.
+Suggested alternative:
+@example
+@var{type}
+@end example
+
+@subsubsection Type cast
+
+@display
+@stxlit{(}@stxref{type}@stxlit{:}@stxlitat{} @stxref{expression}@stxlit{)}
+@end display
+Performs a cast.
+
+@subsubsection Type test
+
+@display
+@stxlit{(}@stxref{type}@stxlit{:instanceof?} @stxref{expression}@stxlit{)}
+@end display
+
+Suggested alternative:
+@example
+(@var{type}? @var{expression})
+@end example
+
+@subsubsection New object construction
+
+@display
+@stxlit{(}@stxref{type}@stxlit{:new)}
+@end display
+
+@subsubsection Invoking methods
+
+@display
+@stxlit{(}@var{instance}@stxlit{:}@stxref{method-name} @var{arg} ...@stxlit{)}
+@stxlit{(}@var{class}@stxlit{:}@stxref{method-name} @var{instance} @var{arg} ...@stxlit{)}
+@stxlit{(}@var{class}@stxlit{:}@stxref{method-name} @var{arg} ...@stxlit{)}
+@stxlit{(*:}@stxref{method-name} @var{instance} @var{arg} ...@stxlit{)}
+@end display
+
+@xref{Method operations} for details.
+
+@subsubsection Instance field access
+
+@display
+@stxlit{(}prefix@stxlit{:.}@stxref{field-name} instance@stxlit{)}
+@end display
+
+@subsubsection Getting array length
+
+@display
+@stxlit{(}@stxref{expression}@stxlit{:.length)}
+@end display
+
 
 @node Bodies
 @section Bodies
@@ -8597,144 +8664,129 @@ These procedures use the Java 1.1 reflection facility.
 You can call a Java method as if it were a Scheme procedure
 using various mechanisms.
 
-@subsection Using colon notation
+@subsection Calling static methods using colon notation
 
-The general form of the @ref{Colon notation} is this:
+The easiest way to invoke a static method is to use
+@ref{Colon notation, colon notation}, specifically:
+@display
+@stxlit{(}@var{class-expression}@stxlit{:}@var{method-name} @var{argument} ...@stxlit{)}
+@end display
+
+The @var{class-expression} can be a class in the current lexical
+scope, such as a class defined using @code{define-simple-class}:
 @example
-@var{container}@var{:}@var{part-name}
+(define-simple-class MyClass ()
+  ((add2 x y) allocation: 'static (+ x y)))
+(MyClass:add2 3 4) @result{} 7
 @end example
-This evaluates to the ``part'' named @var{part-name} in a given @var{container}.
-If the @var{container} is a class (i.e. a @code{java.lang.Class} or
-a @code{gnu.bytecode.ClassType}), then the ``parts'' of
-the class are its static methods and fields.
 
-The simplest case is when the class is a fully-qualified class name:
+Often @var{class-expression} is a full-qualified class name:
 @example
 (java.lang.Math:sqrt 9.0) @result{} 3.0
 @end example
+
 This is only allowed when the name is of a class that exists
 and is accessible both at compile-time and run-time,
 and the name is not otherwise lexically bound.
 
-You can also for the @var{container} use an expression that
-evalutes to a type or class.  Most commonly you'd use
-a class identifier, but you could also evaluate an
-expression at run-time (in which case Kawa may have to use slower reflection):
+You can also use a defined alias:
+@example
+(define-alias jlMath java.lang.Math)
+(jlMath:sqrt 16.0) @result{} 4.0
+@end example
+
+You can even evaluate @var{class-expression} at run-time
+(in which case Kawa may have to use slower reflection):
 @example
 (let ((math java.lang.Math)) math:sqrt 9.0) @result{} 3.0
 @end example
 
-@subsection Using a namespace prefix
+Here @code{java.lang.Math} evaluates to a @code{java.lang.Class}
+instance for the named class (like Java's @code{java.lang.Class.class},
+again assuming the class exists and is accessible both at compile-time and
+run-time, and the name is not otherwise lexically bound.
 
-You can also use @code{define-namespace} to define an alias for a Java class:
+@subsection Calling instance methods using colon notation
+
+The syntax is:
+@display
+@stxlit{(}@var{instance}@stxlit{:}@var{method-name} @var{argument} ...@stxlit{)}
+@end display
+This invokes the method named @var{method-name}
+with the evaluated  @var{instance} as the target object
+and the evaluated @var{argument}s as the method arguments.
+
+For example:
 @example
-(define-namespace Int32 "class:java.lang.Integer")
+((list 9 8 7):toString) @result{} "(9 8 7)"
+([5 6 7]:get 2) @result{} 7
 @end example
-In this example the name @code{Int32} is a @dfn{namespace alias}
-for the namespace whose full name is @code{"class:java.lang.Integer"}.
-The full name should be the 6 characters @code{"class:"} followed
-by the fully-qualified name of a Java class.
 
-Instead of a @var{vamespace-uri} you can use a variable that names
-a class, usually of the form @code{<@var{classname}>}.
-The following is equivalent to the above:
-@example
-(define-namespace Int32 <java.lang.Integer>)
-@end example
-However, there is one important difference: The @code{<@var{classname}>}
-is first searched in the lexical scope.
-It may resolve to a class defined in the current compilation unit
-(perhaps defined using @code{define-simple-class}),
-or imported from another module,
-or an alias (such as from @code{define-alias}).
-Only if @code{<@var{classname}>} is @emph{not} found in the current
-scope is it tried as the class name @var{classname}.
+This older syntax is also available:
+@display
+@stxlit{(*:}@var{method-name} @var{instance} @var{argument} ...@stxlit{)}
+@end display
 
-You can name a method using a @dfn{qualified name} containing a colon.
-The part of the name before the colon is a namespace alias (in
-this case @code{Int32}), and the part of the name after the colon is the
-method name.  For example:
-@example
-(Int32:toHexString 255) @result{} "ff"
-@end example
-This invokes the static method @code{toHexString} in the
-Java class @code{java.lang.Integer}, passing it the argument @code{255},
-and returning the Java String @code{"ff"}.  (Note this is not the
-same as a Scheme string!)
-
-The general syntax is
-@example
-(@var{prefix}:@var{method-name} @var{arg} ...)
-@end example
-This invokes the method named @var{method-name} in the class corresponding
-to @var{prefix}, and the @var{arg}s are the method arguments.
-
-You can use the method name @code{new} to construct new objects:
-@example
-(Int32:new '|255|)
-@end example
-This is equivalent to the Java expression @code{new Integer("255")}.
-You can also write:
-@example
-(Int32:new "255")
-@end example
-Kawa is smart enough to convert the Kawa string to a Java String.
-
-@subsection Invoking non-static methods
-
-To invoke a non-static method you can use a special prefix @code{*}:
+For example:
 @example
 (*:toString (list 9 8 7))
 @end example
-The general syntax is
-@example
-(*:@var{method-name} @var{instance} @var{arg} ...)
-@end example
-This invokes the method named @var{method-name}
-with @var{instance} as the target object, and the @var{arg}s are
-the method arguments.
 
-Alternatively, you can invoke a non-static method using an explicit
-@var{prefix}:
-@example
-(@var{prefix}:@var{method-name} @var{instance} @var{arg} ...)
-@end example
-Assuming that @var{prefix} is bound to @var{class} then the
-above is equivalent to:
-@example
-(*:@var{method-name} (as @var{class} @var{instance}) @var{arg} ...)
-@end example
+You can also name the class explicitly:
+@display
+@stxlit{(}@var{class-expression}@stxlit{:}@var{method-name} @var{instance} @var{argument} ...@stxlit{)}
+@end display
 For example:
 @example
-(Int32:doubleValue (Int32:new "00255"))
+(java.util.List:get [5 6 7] 2) @result{} 7
 @end example
-This returns the @code{double} value @code{255.0}.
+Using an explicit class is like coercing the @var{instance}:
+@display
+@stxlit{(*:}@var{method-name} @stxlit{(as }@var{class-expression} @var{instance} @stxlit{)}@var{argument} ...@stxlit{)}
+@end display
 
-As a shorthand, you can use the name of a Java class instead of a
-namespace alias:
+Note that for some special values,
+including @code{java.lang.Class} instances, you can't
+use the compact form of @ref{Colon notation, colon notation}
+where the @var{instance} is before the comma:
 @example
-(java.lang.Integer:toHexString 255)
-(java.lang.Object:toString some-value)
+(java.lang.Integer:getDeclaredField "MAX_VALUE") @result{} @i{error}
 @end example
-If Kawa sees a qualified name with a prefix that is not defined @emph{and}
-that matches the name of a known class, then Kawa will automatically
-treat the prefix
-as a nickname for namespace uri like @code{class:java.lang.Integer}.
-Both conditions should be true at both compile-time and run-time.
-However, using an explicit @code{define-namespace} is recommended.
+This is because in this case we look for a static member
+of @code{java.lang.Integer}
+(at least as currently defined and implemented),
+while we want an instance member of @code{java.lang.Class}.
+In those cases you can use one of
+these alternative forms, which all return the same
+@code{java.lang.reflect.Field} result:
+@example
+(*:getDeclaredField java.lang.Integer "MAX_VALUE")
+(java.lang.Class:getDeclaredField java.lang.Integer "MAX_VALUE")
+(invoke java.lang.Integer 'getDeclaredField "MAX_VALUE")
+@end example
 
-As a final shorthand you can use an identifier in handle brackets,
-such as an existing type alias like @code{<list>}.
-The following are all equivalent:
-@example
-(<list>:list3 'a 'b 'c)
-@end example
-This is equivalent to:
-@example
-(define-namespace @var{prefix} <list>
-(@var{prefix}:list3 'a 'b 'c)
-@end example
-for some otherwise-unused @var{prefix}.
+@subsection Method names
+
+The method to invoke is selected using the specified
+method name and argments.  If specified name is not a Java name,
+it is "mangled" (@pxref{Mangling}) into a valid Java name.
+All accessible methods whose names match are considered.
+Methods that match after appending @code{$V} or @code{$X} or @code{$V$X}
+are also considered.  A @code{$V} suffix matches a variable
+number of arguments:  any excess arguments are collect into an
+@code{gnu.lists.LList} or a Java array (depending on the final parameter type).
+A @code{$X} specifies that the method expects an extra implicit
+@code{CallContext} parameter.  In that case the method's result is written
+to the @code{CallContext}, so the method result type must be @code{void}.
+
+(Kawa may compile a procedure with a @code{#!rest} or keyword args
+whose name is @code{@var{fn}} to a method named @code{@var{fn}$V}.
+It adds an implicit parameter for the extra arguments.
+By default this extra extra parameter is a Scheme list.
+You can specify a Java array type instead, in which case the method is
+named @code{@var{fn}} without the @code{$V},
+and instead it is marked as a Java-5 varargs method.
+The array element type must be compatible with all the extra arguments.)
 
 @subsection Invoking a method with the @code{invoke} function
 
@@ -8853,26 +8905,93 @@ Some examples using these functions are @samp{vectors.scm}
 and @samp{characters.scm} the directory @samp{kawa/lib} in
 the Kawa sources.
 
-@subsection Method names
+@subsection Using a namespace prefix
 
-All of the above select a method to invoke base on specified
-method name and argments.  If specified name is not a Java name,
-it is "mangled" (@pxref{Mangling}) into a valid Java name.
-All accessible methods whose names match are considered.
-Methods that match after appending @code{$V} or @code{$X} or @code{$V$X}
-are also considered.  A @code{$V} suffix matches a variable
-number of arguments:  any excess arguments are collect into an
-@code{gnu.lists.LList} or a Java array (depending on the final parameter type).
-A @code{$X} specifies that the method expects an extra implicit
-@code{CallContext} parameter.  In that case the method's result is written
-to the @code{CallContext}, so the method result type must be @code{void}.
+@emph{This way of invoking a method is deprecated.}
 
-(Kawa compiles a procedure with a @code{#!rest} or keyword args
-whose name is @code{@var{fn}} to a method named @code{@var{fn}$V}.
-It adds an implicit parameter for the extra arguments.
-By default this extra extra parameter is a Scheme list,
-but you can specify a Java array type instead.  In tha case the
-array element type must be compatible with all the extra arguments.)
+You can use @code{define-namespace} to define an alias for a Java class:
+@example
+(define-namespace Int32 "class:java.lang.Integer")
+@end example
+In this example the name @code{Int32} is a @dfn{namespace alias}
+for the namespace whose full name is @code{"class:java.lang.Integer"}.
+The full name should be the 6 characters @code{"class:"} followed
+by the fully-qualified name of a Java class.
+
+Instead of a @var{vamespace-uri} you can use a variable that names
+a class, usually of the form @code{<@var{classname}>}.
+The following is equivalent to the above:
+@example
+(define-namespace Int32 <java.lang.Integer>)
+@end example
+However, there is one important difference: The @code{<@var{classname}>}
+is first searched in the lexical scope.
+It may resolve to a class defined in the current compilation unit
+(perhaps defined using @code{define-simple-class}),
+or imported from another module,
+or an alias (such as from @code{define-alias}).
+Only if @code{<@var{classname}>} is @emph{not} found in the current
+scope is it tried as the class name @var{classname}.
+
+You can name a method using a @dfn{qualified name} containing a colon.
+The part of the name before the colon is a namespace alias (in
+this case @code{Int32}), and the part of the name after the colon is the
+method name.  For example:
+@example
+(Int32:toHexString 255) @result{} "ff"
+@end example
+This invokes the static method @code{toHexString} in the
+Java class @code{java.lang.Integer}, passing it the argument @code{255},
+and returning the String @code{"ff"}.
+
+The general syntax is
+@example
+(@var{prefix}:@var{method-name} @var{arg} ...)
+@end example
+This invokes the method named @var{method-name} in the class corresponding
+to @var{prefix}, and the @var{arg}s are the method arguments.
+
+You can use the method name @code{new} to construct new objects:
+@example
+(Int32:new '|255|)
+@end example
+This is equivalent to the Java expression @code{new Integer("255")}.
+You can also write:
+@example
+(Int32:new "255")
+@end example
+
+You can also call instance methods using a namespace prefix:
+@example
+(Int32:doubleValue (Int32:new "00255"))
+@end example
+This returns the @code{double} value @code{255.0}.
+
+As a shorthand, you can use the name of a Java class instead of a
+namespace alias:
+@example
+(java.lang.Integer:toHexString 255)
+(java.lang.Object:toString some-value)
+@end example
+If Kawa sees a qualified name with a prefix that is not defined @emph{and}
+that matches the name of a known class, then Kawa will automatically
+treat the prefix
+as a nickname for namespace uri like @code{class:java.lang.Integer}.
+Both conditions should be true at both compile-time and run-time.
+However, using an explicit @code{define-namespace} is recommended.
+
+As a final shorthand you can use an identifier in handle brackets,
+such as an existing type alias like @code{<list>}.
+The following are all equivalent:
+@example
+(<list>:list3 'a 'b 'c)
+@end example
+This is equivalent to:
+@example
+(define-namespace @var{prefix} <list>
+(@var{prefix}:list3 'a 'b 'c)
+@end example
+for some otherwise-unused @var{prefix}.
 
 @node Allocating objects, Field operations, Method operations, Objects Classes and Modules
 @section  Allocating objects

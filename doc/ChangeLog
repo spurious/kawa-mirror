@@ -1,3 +1,9 @@
+2011-12-05  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Method operations): Major re-write to match current
+	features and recommendations.
+	(Colon notation): More details and examples.
+
 2011-10-02  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Defining new methods): New method-body non-terminal.

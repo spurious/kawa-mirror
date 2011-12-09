@@ -1844,9 +1844,9 @@ in a Scheme program.  Any identifier may also be used as a syntactic datum,
 in which case it represents a @emph{symbol}.
 @c (@ref{base symbols}).
 
-Note that colon @code{:} is treated specially for the
-``colon operator'' (FIXME NEEDS DOCUMENTATION) in Kawa Scheme,
-though it is @var{special-initial} in standard Scheme (R6RS).
+Note that colon @code{:} is treated specially for
+@ref{Colon notation, colon notation} in Kawa Scheme,
+though it is a @var{special-initial} in standard Scheme (R6RS).
 
 @node Datum syntax, Hash-prefixed forms, Lexical syntax, Syntax
 @section Datum syntax
@@ -8020,7 +8020,7 @@ with declarations.
 Kawa support for annotations is not complete (the most important
 functionality missing is being able to declare annotation types),
 but is fairly functional.
-Here is a simple example illustring use of
+Here is a simple example illustrating use of
 @uref{http://jcp.org/en/jsr/detail?id=222,JAXB annotations}:
 an @code{XmlRootElement} annotation on a class,
 and an @code{XmlElement} annotation on a field:

@@ -2214,7 +2214,7 @@ then the named part is modified as appropriate.
 
 @subsection Specific cases
 
-These are semi-depecated;
+Some of these are depecated;
 more compact and readable forms are usually preferred.
 
 @subsubsection Type literal
@@ -2223,7 +2223,7 @@ more compact and readable forms are usually preferred.
 @stxlit{(}@stxref{type}@stxlit{:<>)}
 @end display
 Returns the @var{type}.
-Suggested alternative:
+Deprecated; usually you can just write:
 @example
 @var{type}
 @end example
@@ -2241,7 +2241,7 @@ Performs a cast.
 @stxlit{(}@stxref{type}@stxlit{:instanceof?} @stxref{expression}@stxlit{)}
 @end display
 
-Suggested alternative:
+Deprecated; usually you can just write:
 @example
 (@var{type}? @var{expression})
 @end example
@@ -2249,7 +2249,12 @@ Suggested alternative:
 @subsubsection New object construction
 
 @display
-@stxlit{(}@stxref{type}@stxlit{:new)}
+@stxlit{(}@stxref{type}@stxlit{:new} @var{arg} ...@stxlit{)}
+@end display
+
+Deprecated; usually you can just write:
+@display
+@stxlit{(}@stxref{type} @var{arg} ...@stxlit{)}
 @end display
 
 @subsubsection Invoking methods
@@ -2261,13 +2266,17 @@ Suggested alternative:
 @stxlit{(*:}@stxref{method-name} @var{instance} @var{arg} ...@stxlit{)}
 @end display
 
-@xref{Method operations} for details.
+For details @pxref{Method operations}.
 
-@subsubsection Instance field access
+@subsubsection Accessing fields
 
 @display
-@stxlit{(}prefix@stxlit{:.}@stxref{field-name} instance@stxlit{)}
+@var{class}@stxlit{:}@stxref{field-name}
+@var{instance}@stxlit{:}@stxref{field-name}
+@stxlit{(}@var{prefix}@stxlit{:.}@stxref{field-name} @var{instance}@stxlit{)}
 @end display
+
+For details @pxref{Field operations}.
 
 @subsubsection Getting array length
 
@@ -8680,7 +8689,7 @@ scope, such as a class defined using @code{define-simple-class}:
 (MyClass:add2 3 4) @result{} 7
 @end example
 
-Often @var{class-expression} is a full-qualified class name:
+Often @var{class-expression} is a fully-qualified class name:
 @example
 (java.lang.Math:sqrt 9.0) @result{} 3.0
 @end example
@@ -9194,11 +9203,121 @@ The following three are all equivalent:
 @end example 
 
 @node Field operations, Mangling, Allocating objects, Objects Classes and Modules
-@section Accessing fields of Java objects
+@section Accessing object fields
+
+@subsection Accessing static fields and properties
 
 The recommmended way to access fields 
-uses the namespace-colon syntax described in @pxref{Method operations}.
-The difference is that instead of a method name following the colon
+uses the @ref{Colon notation, colon notation}.
+For static fields and properties the following is recommended:
+@display
+@var{class-expression}@stxlit{:}@var{field-name}
+@end display
+For example:
+@example
+java.lang.Integer:MAX_VALUE
+@end example
+
+A property with a @code{get} method is equivalent to a field.
+The following are all equivalent:
+@example
+java.util.Currency:available-currencies
+java.util.Currency:availableCurrencies
+(java.util.Currency:getAvailableCurrencies)
+@end example
+
+Just like for a method call, the @var{class-expression}
+can be a class in the current lexical scope,
+a fully-qualified class name, or more generally an
+expression that evaluates to a class.
+
+@subsection Accessing instance fields and properties
+
+The syntax is:
+@display
+@var{instance}@stxlit{:}@var{field-name}
+@end display
+
+The @var{field-name} can of course be the name of an actual
+object field, but it can also be the name of a property with
+a zero-argument @code{get} method.
+For example, if @code{cal} is a @code{java.util-Calendar} instance,
+then the following are all equivalent:
+@example
+cal:time-zone
+cal:timeZone
+(cal:getTimeZone)
+(cal:get-time-zone)
+@end example
+
+You can use colon notation to assign to a field:
+@example
+(set! cal:time-zone TimeZone:default)
+@end example
+which is equivalent to:
+@example
+(cal:setTimeZone (TimeZone:getDefault))
+@end example
+
+A Java array only has the @code{length} field, plus the @code{class} property:
+@example
+(int[] 4 5 6):length @result{} 3
+(int[] 4 5 6):class:name @result{} "int[]"
+@end example
+
+@subsection Using field and static-field methods
+
+The following methods are useful in cases where colon notation
+is ambiguous, for example where there are both fields and methods
+with the same name.
+You might also prefer as a matter of style, to
+emphasise that a field is being accessed.
+
+@deffn Procedure field object fieldname
+Get the instance field with the given @var{fieldname} from the given
+@var{Object}.  Returns the value of the field, which must be accessible.
+This procedure has a @code{setter}, and so can be used as the first
+operand to @code{set!}.
+
+The field name is "mangled" (@pxref{Mangling}) into a valid Java name.
+If there is no accessible field whose name is @code{"@var{fieldname}"},
+we look for a no-argument method whose name is
+@code{"get@var{Fieldname}"} (or @code{"is@var{Fieldname}"} for a
+boolean property).
+
+If @var{object} is a primitive Java array, then @var{fieldname} can only
+be @code{'length}, and the result is the number of elements of the array.
+@end deffn
+
+@deffn Procedure static-field class fieldname
+Get the static field with the given @var{fieldname} from the given
+@var{class}.  Returns the value of the field, which must be accessible.
+This procedure has a @code{setter}, and so can be used as the first
+operand to @code{set!}.
+
+If the @var{fieldname} is the special name @code{class},
+then it returns the @code{java.lang.Class} object corresponding to
+@var{class} (which is usually a @code{gnu.bytecode.ClassType} object).
+@end deffn
+
+Examples:
+@example
+(static-field java.lang.System 'err)
+;; Copy the car field of b into a.
+(set! (field a 'car) (field b 'car))
+@end example
+
+@deffn Procedure slot-ref object fieldname
+A synonym for @code{(field @var{object} @var{fieldname})}.
+@end deffn
+
+@deffn Procedure slot-set! object fieldname value
+A synonym for @code{(set! (field @var{object} @var{fieldname}) @var{value})}.
+@end deffn
+
+@subsection Older colon-dot notation
+
+There is older syntax where following the colon
 there is field name a following the colon @emph{and} a period.
 
 To access an static field named @var{field-name} use this syntax
@@ -9254,56 +9373,6 @@ is equivalent to:
 @example
 (*:.@var{field-name} (as <@var{class}> @var{instance}))
 @end example
-
-@subsection Using field and static-field methods
-
-Kawa has both a high-level interface and a low-level interface for accessing
-the fields of Java objects and static fields.
-The lower-level interfaces are macros that return functions.
-These functions can be inlined, producing efficient code.
-The higher-level functions are less verbose and more convenient.
-
-@deffn Procedure field object fieldname
-Get the instance field with the given @var{fieldname} from the given
-@var{Object}.  Returns the value of the field, which must be accessible.
-This procedure has a @code{setter}, and so can be used as the first
-operand to @code{set!}.
-
-The field name is "mangled" (@pxref{Mangling}) into a valid Java name.
-If there is no accessible field whose name is @code{"@var{fieldname}"},
-we look for a no-argument method whose name is
-@code{"get@var{Fieldname}"} (or @code{"is@var{Fieldname}"} for a
-boolean property).
-
-If @var{object} is a primitive Java array, then @var{fieldname} can only
-be @code{'length}, and the result is the number of elements of the array.
-@end deffn
-
-@deffn Procedure static-field class fieldname
-Get the static field with the given @var{fieldname} from the given
-@var{class}.  Returns the value of the field, which must be accessible.
-This procedure has a @code{setter}, and so can be used as the first
-operand to @code{set!}.
-
-If the @var{fieldname} is the special name @code{class},
-then it returns the @code{java.lang.Class} object corresponding to
-@var{class} (which is usually a @code{gnu.bytecode.ClassType} object).
-@end deffn
-
-Examples:
-@example
-(static-field <java.lang.System> 'err)
-;; Copy the car field of b into a.
-(set! (field a 'car) (field b 'car))
-@end example
-
-@deffn Procedure slot-ref object fieldname
-A synonym for @code{(field @var{object} @var{fieldname})}.
-@end deffn
-
-@deffn Procedure slot-set! object fieldname value
-A synonym for @code{(set! (field @var{object} @var{fieldname}) @var{value})}.
-@end deffn
 
 @node Mangling, Scheme types in Java, Field operations, Objects Classes and Modules
 @section Mapping Scheme names to Java names

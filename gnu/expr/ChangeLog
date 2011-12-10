@@ -1,3 +1,8 @@
+2011-12-09  Per Bothner  <per@bothner.com>
+
+	* InlineCalls.java (checkType): Refactor.  This fixes a bogus warning
+	if coercing (for example) a LetExp to Expression.
+
 2011-11-29  Per Bothner  <per@bothner.com>
 
 	* ScopeExp.java (remove): Set next pointer of Declaration to null.

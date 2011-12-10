@@ -32,84 +32,69 @@ import java.lang.annotation.ElementType;
  * we do type-checking and other stuff beyond inlining.
  */
 
-public class InlineCalls extends ExpExpVisitor<Type>
-{
-  public static Expression inlineCalls (Expression exp, Compilation comp)
-  {
-    InlineCalls visitor = new InlineCalls(comp);
-    return visitor.visit(exp, null);
-  }
+public class InlineCalls extends ExpExpVisitor<Type> {
 
-  public InlineCalls (Compilation comp)
-  {
-    setContext(comp);
-  }
+    public static Expression inlineCalls (Expression exp, Compilation comp) {
+        InlineCalls visitor = new InlineCalls(comp);
+        return visitor.visit(exp, null);
+    }
 
-  VarValueTracker valueTracker = new VarValueTracker(this);
+    public InlineCalls (Compilation comp) {
+        setContext(comp);
+    }
 
-  public Expression visit (Expression exp, Type required)
-  {
-    if (! exp.getFlag(Expression.VALIDATED))
-      {
-        exp.setFlag(Expression.VALIDATED); // Protect against cycles.
-        exp = super.visit(exp, required);
-        exp.setFlag(Expression.VALIDATED);
-      }
-    return checkType(exp, required);
-  }
+    VarValueTracker valueTracker = new VarValueTracker(this);
 
-  public Expression checkType(Expression exp, Type required)
-  {
-    Type expType = exp.getType();
-    boolean incompatible;
-    if ((required instanceof ClassType || required instanceof ParameterizedType)
-        && expType.isSubtype(Compilation.typeProcedure)
-        && ! expType.isSubtype(required))
-      {
-        if (exp instanceof LambdaExp)
-          {
-            ClassType reqraw = required instanceof ParameterizedType ? ((ParameterizedType) required).getRawType() : (ClassType) required;
-            Method amethod = reqraw.checkSingleAbstractMethod();
-            if (amethod != null)
-              {
-                LambdaExp lexp = (LambdaExp) exp;
-                ObjectExp oexp = new ObjectExp();
-                oexp.setLocation(exp);
-                oexp.supers = new Expression[] { new QuoteExp(required) };
-                oexp.setTypes(getCompilation());
-                Object mname = amethod.getName();
-                oexp.addMethod(lexp, mname);
-                Declaration mdecl = oexp.addDeclaration(mname, Compilation.typeProcedure);
-                oexp.firstChild = lexp;
-                oexp.declareParts(comp);
-                return visit(oexp, required);
-             }
-          }
-        incompatible = true;
-      }
-    else
-      {
+    public Expression visit (Expression exp, Type required) {
+        if (! exp.getFlag(Expression.VALIDATED)) {
+            exp.setFlag(Expression.VALIDATED); // Protect against cycles.
+            exp = super.visit(exp, required);
+            exp.setFlag(Expression.VALIDATED);
+        }
+        return checkType(exp, required);
+    }
+
+    public Expression checkType(Expression exp, Type required) {
+        Type expType = exp.getType();
         if (expType == Type.toStringType)
-          expType = Type.javalangStringType;
-        incompatible = required != null && required.compare(expType) == -3;
-        if (incompatible && required instanceof TypeValue)
-          {
-            Expression converted = ((TypeValue) required).convertValue(exp);
-            if (converted != null)
-              return converted;
-          }
-      }
-    if (incompatible)
-      {
-        Language language = comp.getLanguage();
-        comp.error(processingAnnotations() ? 'e' : 'w',
-                   ("type "+language.formatType(expType)
-                    +" is incompatible with required type "
-                    +language.formatType(required)),
-                   exp);
-      }
-    return exp;
-  }
+            expType = Type.javalangStringType;
+        boolean incompatible = required != null
+            && required.compare(expType) == -3;
+        if (incompatible) {
+            if (exp instanceof LambdaExp
+                && (required instanceof ClassType
+                    || required instanceof ParameterizedType)) {
+                ClassType reqraw = required instanceof ParameterizedType ? ((ParameterizedType) required).getRawType() : (ClassType) required;
+                Method amethod = reqraw.checkSingleAbstractMethod();
+                if (amethod != null) {
+                    LambdaExp lexp = (LambdaExp) exp;
+                    ObjectExp oexp = new ObjectExp();
+                    oexp.setLocation(exp);
+                    oexp.supers = new Expression[] { new QuoteExp(required) };
+                    oexp.setTypes(getCompilation());
+                    Object mname = amethod.getName();
+                    oexp.addMethod(lexp, mname);
+                    Declaration mdecl = oexp.addDeclaration(mname, Compilation.typeProcedure);
+                    oexp.firstChild = lexp;
+                    oexp.declareParts(comp);
+                    return visit(oexp, required);
+                }
+            }
+            if (required instanceof TypeValue) {
+                Expression converted = ((TypeValue) required).convertValue(exp);
+                if (converted != null)
+                    return converted;
+            }
+
+            Language language = comp.getLanguage();
+            comp.error(processingAnnotations() ? 'e' : 'w',
+                       ("type "+language.formatType(expType)
+                        +" is incompatible with required type "
+                        +language.formatType(required)),
+                       exp);
+        }
+        return exp;
+    }
 
   protected Expression visitApplyExp(ApplyExp exp, Type required)
   {

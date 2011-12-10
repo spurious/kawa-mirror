@@ -1,3 +1,8 @@
+2011-12-09  Per Bothner  <per@bothner.com>
+
+	* gui.scm (image-width, image-height): Fix typo.
+	* Makefile.am (SCM_COMPILE_FLAGS): New flags.
+
 2011-10-29  Per Bothner  <per@bothner.com>
 
 	* readtable.scm (define-reader-ctor): Improve type specifiers

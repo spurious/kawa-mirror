@@ -71,10 +71,10 @@
   (javax.imageio.ImageIO:read (uri:openInputStream)))
 
 (define (image-width (image  :: <java.awt.image.BufferedImage>)) :: <int>
-  (*.getWidth image))
+  (*:getWidth image))
 
 (define (image-height (image  :: <java.awt.image.BufferedImage>)) :: <int>
-  (*.getHeight image))
+  (*:getHeight image))
 
 (define-private (label-keyword (instance :: <gnu.kawa.models.Label>)
 				(name :: <java.lang.String>)

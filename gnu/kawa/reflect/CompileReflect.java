@@ -135,9 +135,15 @@ public class CompileReflect
           }
       }
     else
-      type = arg0.getType();
-    if (type instanceof ArrayType)
-      return exp;
+      {
+        type = arg0.getType();
+        if (type instanceof ArrayType && "length".equals(name))
+          {
+            exp.setType(Type.intType);
+            return exp;
+          }
+      }
+    Type rtype = null;
     if (type instanceof ObjectType)
       {
 	ObjectType ctype = (ObjectType) type;
@@ -171,6 +177,7 @@ public class CompileReflect
                   {
                   }
               }
+            rtype = field.getType();
           }
         else if (part instanceof gnu.bytecode.Method)
           {
@@ -184,6 +191,7 @@ public class CompileReflect
 	    if (caller != null && ! caller.isAccessible(dtype, ctype, modifiers))
 	      return new ErrorExp( "method "+method +" is not accessible here", 
                                    comp);
+            rtype = method.getReturnType();
           }
         else if (part instanceof ClassType && ((ClassType) part).getStaticFlag())
           {
@@ -202,6 +210,7 @@ public class CompileReflect
               = new Expression[] { arg0, new QuoteExp(part) };
             ApplyExp nexp = new ApplyExp(exp.getFunction(), nargs);
             nexp.setLine(exp);
+            nexp.setType(rtype);
             return nexp;
           }
 
@@ -247,7 +256,7 @@ public class CompileReflect
                        QuoteExp.getInstance(isName),
                        QuoteExp.getInstance(language)});
     nexp.setLine(exp);
-    return visitor.visitApplyOnly(nexp, null); // FIXME
+    return visitor.visitApplyOnly(nexp, required);
   }
 
   public static Expression validateApplySlotSet

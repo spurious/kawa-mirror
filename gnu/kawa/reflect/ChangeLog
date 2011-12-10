@@ -1,3 +1,10 @@
+2011-12-09  Per Bothner  <per@bothner.com>
+
+	* CompileReflect.java (validateApplySlotGet):  Set expression type.
+	Don't immediately return if object is array, unless the field
+	is "length".  This allows "class" property (i.e. getClass) to work.
+	* SlotGet.java (getReturnType): Remove method - no longer needed.
+
 2011-08-29  Charles Turner <chturne@gmail.com>
 
 	* FieldLocation.java (setKindFlags): Throw a RuntimeException if

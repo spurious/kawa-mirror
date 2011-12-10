@@ -328,28 +328,6 @@ public class SlotGet extends Procedure2
     ApplyExp.compile(exp, comp, target);
   }
 
-  public Type getReturnType (Expression[] args)
-  {
-    int nargs = args.length;
-    if (nargs == 2)
-      {
-        Expression arg0 = args[0];
-        Expression arg1 = args[1];
-        if (arg1 instanceof QuoteExp)
-          {
-            Object part = ((QuoteExp) arg1).getValue();
-            if (part instanceof gnu.bytecode.Field)
-              return ((gnu.bytecode.Field) part).getType();
-            if (part instanceof gnu.bytecode.Method)
-              return ((gnu.bytecode.Method) part).getReturnType();
-            if (! isStatic && arg0.getType() instanceof ArrayType
-                && "length".equals(ClassMethods.checkName(arg1, true)))
-              return gnu.kawa.lispexpr.LangPrimType.intType;  // FIXME
-          }
-      }
-    return Type.pointer_type;
-  }
-
   public Procedure getSetter()
   {
     return setter == null ? super.getSetter() : setter;

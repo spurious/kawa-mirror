@@ -1,3 +1,8 @@
+2011-12-10  Per Bothner  <per@bothner.com>
+
+	* Shell.java (run): Set PARSE_INTERACTIVE_MODULE module so
+	setInteractiveName gets called at the start of parse instead of after.
+
 2011-12-02  Per Bothner  <per@bothner.com>
 
 	* standard/SchemeCompilation.java (checkDefaultBinding): Catch

@@ -619,6 +619,7 @@ public abstract class Language
   public static final int PARSE_FOR_SERVLET = 32;
   /** Compilation explicitly requested, not just because of an import. */
   public static final int PARSE_EXPLICIT = 64;
+  public static final int PARSE_INTERACTIVE_MODULE = 128;
 
   public static boolean requirePedantic;
 
@@ -674,6 +675,8 @@ public abstract class Language
     if ((options & PARSE_PROLOG) != 0)
       tr.setState(Compilation.PROLOG_PARSING);
     tr.pushNewModule(lexer);
+    if ((options & PARSE_INTERACTIVE_MODULE) != 0)
+      tr.setInteractiveName();
     if (info != null)
       info.setCompilation(tr);
     if (! parse(tr, options))

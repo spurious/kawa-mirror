@@ -246,7 +246,7 @@ public class Shell
       {
 	for (;;)
 	  {
-	    int opts = Language.PARSE_FOR_EVAL|Language.PARSE_ONE_LINE;
+	    int opts = Language.PARSE_FOR_EVAL|Language.PARSE_ONE_LINE|Language.PARSE_INTERACTIVE_MODULE;
 	    try
 	      {
 		Compilation comp = language.parse(lexer, opts, null);
@@ -261,7 +261,6 @@ public class Shell
 		  break;
 		if (sawError)
 		  continue;
-		comp.setInteractiveName();
 
 		// Skip whitespace, in case (read-char) or similar is called:
 		int ch;

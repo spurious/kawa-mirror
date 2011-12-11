@@ -1,3 +1,10 @@
+2011-12-10  Per Bothner  <per@bothner.com>
+
+	* Language.java (PARSE_INTERACTIVE_MODULE): New flag.
+	(parse): If PARSE_INTERACTIVE_MODULE is set, call setInteractiveName.
+	This is preferable to setting it after parsing.
+	* KawaScriptEngine.java (compile): Use new flag.
+
 2011-12-09  Per Bothner  <per@bothner.com>
 
 	* InlineCalls.java (checkType): Refactor.  This fixes a bogus warning

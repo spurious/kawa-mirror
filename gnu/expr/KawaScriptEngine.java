@@ -96,11 +96,12 @@ public class KawaScriptEngine extends AbstractScriptEngine
     Environment saveEnv = Environment.setSaveCurrent(env);
     try
       {
-        Compilation comp = factory.language.parse(port, messages, Language.PARSE_IMMEDIATE);
+        Compilation comp =
+            factory.language.parse(port, messages,
+                                   Language.PARSE_IMMEDIATE|Language.PARSE_INTERACTIVE_MODULE);
         if (messages.seenErrors())
           throw new SyntaxException(messages);
         ModuleExp mexp = comp.getModule();
-        comp.setInteractiveName();
         String filename = (String) get(ScriptEngine.FILENAME);
         java.net.URL url = port.getPath().toURL();
         Writer errorWriter = context.getErrorWriter();

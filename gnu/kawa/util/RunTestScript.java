@@ -163,8 +163,8 @@ public class RunTestScript implements Runnable
         BufferedReader out = new BufferedReader(new InputStreamReader(process.getInputStream()));
         BufferedReader err = new BufferedReader(new InputStreamReader(process.getErrorStream()));
         process.waitFor();
-        checkOutput(out, expectedOut, "output");
         checkOutput(err, expectedErr, "diagnostics");
+        checkOutput(out, expectedOut, "output");
         System.err.println("# "+getTestName()+(failed ? " fails" : " passes"));
       }
     catch (Throwable ex)

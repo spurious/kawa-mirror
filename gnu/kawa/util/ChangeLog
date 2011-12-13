@@ -1,3 +1,8 @@
+2011-12-12  Per Bothner  <per@bothner.com>
+
+	* RunTestScript.java (run): Check standard error before checking
+	standard output, so we report unexpected diagnostics.
+
 2011-11-15  Per Bothner  <per@bothner.com>
 
 	* RunTestScript.java (<init>): Don't say test passes when it fails.

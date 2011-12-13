@@ -58,9 +58,11 @@ public class InlineCalls extends ExpExpVisitor<Type> {
         Type expType = exp.getType();
         if (expType == Type.toStringType)
             expType = Type.javalangStringType;
-        boolean incompatible = required != null
-            && required.compare(expType) == -3;
-        if (incompatible) {
+        int cmp = required == null ? 1 : required.compare(expType);
+        boolean incompatible = cmp == -3;
+        if (incompatible
+            || (cmp == -2 && required.isInterface()
+                && (exp instanceof QuoteExp || exp instanceof LambdaExp))) {
             if (exp instanceof LambdaExp
                 && (required instanceof ClassType
                     || required instanceof ParameterizedType)) {

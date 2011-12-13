@@ -1,3 +1,8 @@
+2011-12-12  Per Bothner  <per@bothner.com>
+
+	* CompileInvoke.java: isInterface call no longer needs cast.
+	* ClassMethods.java: Likewise.
+
 2011-12-09  Per Bothner  <per@bothner.com>
 
 	* CompileReflect.java (validateApplySlotGet):  Set expression type.

@@ -1,3 +1,8 @@
+2011-12-12  Per Bothner  <per@bothner.com>
+
+	* anonymous-lambda-1.scm: New test.
+	* Makefile.am: Update accordingly.
+
 2011-11-29  Per Bothner  <per@bothner.com>
 
 	* misc-test.scm: New test-case.

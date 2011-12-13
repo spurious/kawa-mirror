@@ -752,7 +752,8 @@ public class LambdaExp extends ScopeExp
       { LambdaExp outer = outerLambda();
 	rtype = Compilation.typeModuleMethod;
 	if ((flags & NO_FIELD) != 0
-	    || (comp.immediate && outer instanceof ModuleExp))
+            || (comp.immediate && outer instanceof ModuleExp
+                && comp.mainClass == comp.moduleClass))
 	  {
             if (primMethods == null)
               allocMethod(outerLambda(), comp);

@@ -67,7 +67,7 @@ public class CompileInvoke
         objIndex = 1;
         if (type0 == null)
           comp.error('e', "unknown class for invoke-special", arg0);
-        else if (! (type instanceof ClassType) || ((ClassType) type).isInterface())
+        else if (! (type instanceof ClassType) || type.isInterface())
           comp.error('e', "invalid class for invoke-special", arg0);
       }
     else

@@ -53,6 +53,11 @@ public abstract class Type
 	return this;
     }
 
+    public boolean isInterface() {
+        Type raw = getRawType();
+        return raw != this && raw.isInterface();
+    }
+
   public boolean isExisting()
   {
     // Overridden in ObjectType.

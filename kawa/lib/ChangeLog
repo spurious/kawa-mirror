@@ -1,3 +1,7 @@
+2011-12-19  Per Bothner  <per@bothner.com>
+
+	* bytevector.scm: New file, for R7RS bytevector functions.
+
 2011-11-27  Per Bothner  <per@bothner.com>
 
 	* ports.scm (get-input-string, call-with-input-string): Update to

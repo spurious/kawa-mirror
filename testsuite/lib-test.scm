@@ -1,4 +1,16 @@
-(test-begin "libs" 215)
+(test-begin "libs" 221)
+
+(test-begin "bytevectors") ;; Some bytevector tests
+(define bytes1 (bytevector #u8(#xCE #xBB)))
+(define lambda-char #\x3bb)
+(define lambda-string (string lambda-char))
+(test-equal #t (bytevector? bytes1))
+(test-equal 2 (bytevector-length bytes1))
+(test-equal 187 (bytevector-u8-ref bytes1 1))
+(test-equal #f (bytevector? lambda-string))
+(test-equal bytes1 (string->utf8 lambda-string))
+(test-equal lambda-string (utf8->string bytes1))
+(test-end)
 
 (import (srfi :2 and-let*))
 

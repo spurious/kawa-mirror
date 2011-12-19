@@ -1,3 +1,7 @@
+2011-12-19  Per Bothner  <per@bothner.com>
+
+	* lib-test.scm: New tests of R7RS bytevector functions.
+
 2011-12-12  Per Bothner  <per@bothner.com>
 
 	* anonymous-lambda-1.scm: New test.

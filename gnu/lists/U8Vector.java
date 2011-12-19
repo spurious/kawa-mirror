@@ -40,6 +40,23 @@ public class U8Vector extends ByteVector
     addAll(seq);
   }
 
+  /** Copy constructor. */
+  public U8Vector(U8Vector seq)
+  {
+    size = seq.size;
+    data = new byte[size];
+    System.arraycopy(seq.data, 0, data, 0, size);
+  }
+
+  public U8Vector(U8Vector seq, int offset, int length)
+  {
+    size = length;
+    data = new byte[length];
+    if (offset + length > seq.size)
+      throw new IndexOutOfBoundsException();
+    System.arraycopy(seq.data, offset, data, 0, length);
+  }
+
   public final int intAtBuffer(int index)
   {
     return data[index] & 0xff;
@@ -74,5 +91,22 @@ public class U8Vector extends ByteVector
   public int compareTo(Object obj)
   {
     return compareToInt(this, (U8Vector) obj);
+  }
+
+  /** Covert bytes, interpreted as UTF-8 characters, to a String. */
+  public String toUtf8() 
+  {
+    /* #ifdef JAVA7 */  
+    // return new String(data, 0, size, java.nio.charset.StandardCharsets.UTF_8);
+    /* #else */
+    try
+      {
+        return new String(data, 0, size, "UTF-8");
+      }
+    catch (UnsupportedEncodingException ex)
+      {
+          throw new RuntimeException(ex);
+      }
+    /* #endif */
   }
 }

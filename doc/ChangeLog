@@ -1,5 +1,8 @@
 2012-01-01  Per Bothner  <per@bothner.com>
 
+	* kawa.texi (Vectors): New section.
+	(Miscellaneous): Move vector-append to Vectors section.
+
 	* kawa.texi (Streams): New stub section, about SRFI-41.
 	(Implemented SRFIs): Link to new section.
 

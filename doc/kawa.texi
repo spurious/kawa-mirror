@@ -1464,7 +1464,7 @@ using @code{let-values} and @code{let*-value} - @pxref{Multiple values}.
 @uref{http://srfi.schemers.org/srfi-13/srfi-13.html, SRFI 13}: String Library.
 Needs some polishing.
 @item
-@uref{http://srfi.schemers.org/srfi-14/srfi-14.html, SRFI 14}: Character-set Library.
+@uref{http://srfi.schemers.org/srfi-14/srfi-14.html, SRFI 14}: Character-set Library - @pxref{Character sets}.
 @item
 @uref{http://srfi.schemers.org/srfi-16/srfi-16.html, SRFI 16}: Syntax for procedures of variable arity,
 using @uref{http://srfi.schemers.org/srfi-16/srfi-16.html, @code{case-lambda}}.
@@ -2440,10 +2440,11 @@ The second example assumes that @code{command-line} is an alias for some
 feature which gives access to command line arguments. Note that an error
 will be signaled at macro-expansion time if this feature is not present.
 
-You can use @code{java-6} to check for Java 6.
+You can use @code{java-6} or @code{java-6} to check for Java 6 or
+Java 7, respectively, at compile-time.
 
 You can use @code{class-exists:@var{ClassName}} to check
-if @code{@var{ClassName}} exists.
+if @code{@var{ClassName}} exists at compile-time.
 @end deffn
 
 @anchor{include}
@@ -8130,6 +8131,14 @@ In fact, any Java class class that has the properties of either
 an instance module or a static module, is a module, and can be
 loaded or imported as such;  the class need not have written
 using Scheme.
+
+You can declare a class using @code{define-simple-class}
+with the same name as the module class, for example the
+following in a file named @code{foo.scm}:
+@example
+(define-simple-class foo ...)
+@end example
+In this case the defined class will serve dual-purpose as the module class.
 
 @subsection Name visibility
 

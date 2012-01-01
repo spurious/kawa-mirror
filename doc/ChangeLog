@@ -1,7 +1,10 @@
+2012-01-01  Per Bothner  <per@bothner.com>
+
+	* kawa.texi: Small updates.
+
 2011-12-09  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Field operations): Major re-write.
-	(Colon notation): 
 
 2011-12-05  Per Bothner  <per@bothner.com>
 

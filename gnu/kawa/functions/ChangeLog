@@ -1,3 +1,20 @@
+2012-01-01  Per Bothner  <per@bothner.com>
+
+	* GetNamedPart.java (getNamedPart): Force lazy value if needed.
+	* DisplayFormat.java (writeObjectRaw): Likewise.
+	* IsEqual.java (apply): Likewise.
+	* IsEqv.java (apply): Likewise.
+	* ApplyToArgs.java (applyN): Likewise.
+	* Arithmetic.java (classifyValue, asInt, asLong, asFloat,
+	asDouble, asBigInteger. asIntNum, asBigDecimal, asRatNum,
+	asNumeric, comvert): Likewise.
+	(classifyType): Handle LazyType.
+	* CompilationHelpers.java (maybeLazy): New static method.
+	(validateIsEqv): Check for laziness before optimizing to isEq.
+	* MakePromise.java: New class, extends Procedure1.
+	* Makefile.am: Update accordingly.
+	* CompileMisc.java (validateApplyMakePromise): New method.
+
 2011-10-08  Jamison Hope  <jrh@theptrgroup.com>
 
 	* IsEqual.java (arrayEquals): New method, to compare Java arrays

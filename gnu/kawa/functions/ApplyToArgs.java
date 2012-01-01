@@ -131,7 +131,7 @@ public class ApplyToArgs extends ProcedureN
 
   public Object applyN (Object[] args) throws Throwable
   {
-    Object proc = args[0];
+    Object proc = Promise.force(args[0]);
     if (proc instanceof Procedure)
       {
         Object[] rargs = new Object[args.length-1];
@@ -153,7 +153,7 @@ public class ApplyToArgs extends ProcedureN
       {
         if (args.length != 2)
           throw new WrongArguments(this, args.length); // FIXME
-        int index = ((Number) args[1]).intValue();
+        int index = ((Number) Promise.force(args[1])).intValue();
         /* #ifdef JAVA2 */
         return ((java.util.List) proc).get(index);
         /* #else */

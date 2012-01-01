@@ -11,6 +11,7 @@ import gnu.text.*;
 import java.util.zip.*;
 import java.util.Stack;
 import gnu.kawa.functions.Convert;
+import gnu.kawa.reflect.LazyType;
 
 /** State for a single expression or module.
  * For each top-level thing (expression or file) we compile or evaluate
@@ -538,6 +539,8 @@ public class Compilation implements SourceLocator
     if (target instanceof StackTarget)
       {
 	Type type = ((StackTarget) target).getType();
+	if (type instanceof LazyType)
+	  type = ((LazyType) type).getValueType();
 	if (type instanceof PrimType)
 	  {
 	    try
@@ -611,7 +614,7 @@ public class Compilation implements SourceLocator
                   sbuf.append(value.getClass().getName());
 		sbuf.append(") to ");
 	      }
-	    sbuf.append(type.getName());
+	    sbuf.append(type);
             error('w', sbuf.toString());
          }
       }
@@ -1310,6 +1313,7 @@ public class Compilation implements SourceLocator
 		    Type ptype = var.getType();
 		    if (ptype != Type.objectType)
 		      {
+                        StackTarget.forceLazyIfNeeded(this, Type.objectType, ptype);
 			if (ptype instanceof TypeValue)
 			  {
 			    Label trueLabel = new Label(code),

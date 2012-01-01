@@ -85,6 +85,7 @@ public class GetNamedPart extends Procedure2 implements HasSetter
     throws Throwable
   {
     String name = part.getName();
+    container = Promise.force(container);
     if (container instanceof HasNamedParts)
       return ((HasNamedParts) container).get(name);
     if (container instanceof Class)

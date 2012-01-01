@@ -1,3 +1,11 @@
+2012-01-01  Per Bothner  <per@bothner.com>
+
+	* lazy-test.scm: New tests for lazy evaluation.
+	* Makefile.am: Update accordinl.
+	* inlining.expected: Update for implicit forcing.
+
+	* inlining.expected: Update for fannkuch.
+
 2011-12-19  Per Bothner  <per@bothner.com>
 
 	* lib-test.scm: New tests of R7RS bytevector functions.

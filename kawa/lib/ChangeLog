@@ -1,3 +1,8 @@
+2012-01-01  Per Bothner  <per@bothner.com>
+
+	* std_syntax.scm (delay): Use MakePromise:makePromise Procedure,
+	so we can infer types better.
+
 2011-12-19  Per Bothner  <per@bothner.com>
 
 	* bytevector.scm: New file, for R7RS bytevector functions.

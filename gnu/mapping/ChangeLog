@@ -1,3 +1,12 @@
+2012-01-01  Per Bothner  <per@bothner.com>
+
+	* Lazy.java (getValue): Changed to no longer throw Throwable.
+	* Future.java (getValue): Catch and maybe wrap exception.
+	* Promise.java (getValue): Likewise.
+	(makeBoundPromise): New static method.
+	(force): Simplify.
+	* WrappedException.java (rethrow): New static method.
+
 2011-10-08  Charles Turner  <chturne@gmail.com>
 
 	* OutPort.java (getPrettyWriter): New getter.

@@ -44,7 +44,7 @@ public class Future<T> extends Thread implements Lazy<T>
     closure.run();
   }
 
-  public T getValue ()  throws Throwable
+  public T getValue ()
   {
     try
       {
@@ -56,7 +56,7 @@ public class Future<T> extends Thread implements Lazy<T>
       }
     Throwable ex = closure.exception;
     if (ex != null)
-      throw ex;
+	WrappedException.rethrow(ex);
     return closure.result;
   }
 

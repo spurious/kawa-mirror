@@ -103,4 +103,13 @@ public class WrappedException extends RuntimeException
     else
       return new WrappedException(ex);
   }
+
+    public static void rethrow (Throwable ex) {
+	if (ex instanceof Error)
+	    throw (Error) ex;
+	else if (ex instanceof RuntimeException)
+	    throw (RuntimeException) ex;
+	else
+	    throw new WrappedException(ex);
+    }
 }

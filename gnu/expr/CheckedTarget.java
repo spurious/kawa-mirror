@@ -61,6 +61,14 @@ public class CheckedTarget extends StackTarget
     return getInstance(decl.getType(), decl.getName(), WrongType.ARG_VARNAME);
   }
 
+    protected StackTarget getClonedInstance(Type type) {
+        CheckedTarget target = new CheckedTarget(type);
+        target.procname = this.procname;
+        target.proc = this.proc;
+        target.argno = this.argno;
+        return target;
+    }
+
   static ClassType typeClassCastException;
   static ClassType typeWrongType;
   static Method initWrongTypeStringMethod;
@@ -92,27 +100,27 @@ public class CheckedTarget extends StackTarget
       }
   }
 
-  public void compileFromStack(Compilation comp, Type stackType)
-  {
-    if (! compileFromStack0(comp, stackType))
-      emitCheckedCoerce(comp, proc, procname, argno, type, null);
-  }
+    protected void doCoerce(Compilation comp) {
+        emitCheckedCoerce(comp, proc, procname, argno, type, null);
+    }
 
   public static void emitCheckedCoerce(Compilation comp,
                                        String procname, int argno, Type type)
   {
+    forceLazyIfNeeded(comp, Type.objectType, type);
     emitCheckedCoerce(comp, null, procname, argno, type, null);
   }
 
   public static void emitCheckedCoerce(Compilation comp, LambdaExp proc,
                                        int argno, Type type)
   {
-    emitCheckedCoerce(comp, proc, proc.getName(), argno, type, null);
+    emitCheckedCoerce(comp, proc, argno, type, null);
   }
 
   public static void emitCheckedCoerce(Compilation comp, LambdaExp proc,
                                        int argno, Type type, Variable argValue)
   {
+    forceLazyIfNeeded(comp, Type.objectType, type);
     emitCheckedCoerce(comp, proc, proc.getName(), argno, type, argValue);
   }
 

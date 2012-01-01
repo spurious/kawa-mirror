@@ -16,6 +16,7 @@ java_sources = \
   FieldLocation.java \
   InstanceOf.java \
   Invoke.java \
+  LazyType.java \
   MakeAnnotation.java \
   OccurrenceType.java \
   SingletonType.java \

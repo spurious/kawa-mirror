@@ -748,4 +748,33 @@ public class CompileMisc implements Inlineable
     else
       return let1;
   }
+
+  public static Expression validateApplyMakePromise
+  (ApplyExp exp, InlineCalls visitor, Type required, Procedure proc)
+  {
+    Expression[] args = exp.getArgs();
+    if (args.length == 1 && args[0] instanceof LambdaExp)
+      {
+        Type bodyRequired = (required instanceof LazyType
+                             ? ((LazyType) required).getValueType()
+                             : null);
+        LambdaExp lexp = (LambdaExp) args[0];
+        lexp.body = visitor.visit(lexp.body, bodyRequired);
+        args[0] = visitor.visit(lexp, null);
+        Type rtype = lexp.getReturnType();
+        Type type = LazyType.getPromiseType(rtype);
+        Method meth = ClassType.make("gnu.kawa.functions.MakePromise")
+          .getDeclaredMethod("makePromise", 1);
+	PrimProcedure mproc
+	  = new PrimProcedure(meth);
+        mproc.setReturnType(type);
+        exp = new ApplyExp(mproc, args);
+        exp.setType(type);
+      }
+    else
+      {
+        exp.visitArgs(visitor);
+      }
+    return exp;
+  }
 }

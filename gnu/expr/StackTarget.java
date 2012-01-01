@@ -4,6 +4,7 @@
 package gnu.expr;
 import gnu.bytecode.*;
 import gnu.mapping.Values;
+import gnu.kawa.reflect.LazyType;
 
 public class StackTarget extends Target
 {
@@ -19,6 +20,24 @@ public class StackTarget extends Target
             : new StackTarget(type));
   }
 
+    protected StackTarget getClonedInstance(Type type) {
+        return new StackTarget(type);
+    }
+
+    public static void forceLazyIfNeeded(Compilation comp, Type stackType, Type type) {
+	CodeAttr code = comp.getCode();
+	if (LazyType.maybeLazy(stackType) && ! LazyType.maybeLazy(type)) {
+	    Method forceMethod;
+	    if (stackType instanceof LazyType) {
+		forceMethod = LazyType.lazyType.getDeclaredMethod("getValue", 0);
+	    }
+	    else
+		forceMethod = ClassType.make("gnu.mapping.Promise").getDeclaredStaticMethod("force", 1);
+	    code.emitInvoke(forceMethod); // 
+	    stackType = stackType instanceof LazyType ? ((LazyType) stackType).getValueType() : Type.objectType;
+	}
+    }
+
   protected boolean compileFromStack0(Compilation comp, Type stackType)
   {
     return compileFromStack0(comp, stackType, type);
@@ -27,6 +46,8 @@ public class StackTarget extends Target
   static boolean compileFromStack0(Compilation comp, Type stackType, Type type)
   {
     CodeAttr code = comp.getCode();
+    forceLazyIfNeeded(comp, stackType, type);
+
     if (type == stackType || ! code.reachableHere())
       return true;
     if (stackType.isVoid())
@@ -79,9 +100,17 @@ public class StackTarget extends Target
       }
   }
 
-  public void compileFromStack(Compilation comp, Type stackType)
-  {
-    if (! compileFromStack0(comp, stackType))
-      emitCoerceFromObject(type, comp);
-  }
+    public void compileFromStack(Compilation comp, Type stackType) {
+        if (type instanceof LazyType && ! (stackType instanceof LazyType)) {
+            getClonedInstance(((LazyType) type).getValueType()).compileFromStack(comp, stackType);
+            Method wrapMethod = ClassType.make("gnu.mapping.Promise").getDeclaredStaticMethod("makeBoundPromise", 1);
+            comp.getCode().emitInvokeStatic(wrapMethod);
+        }
+        else if (! compileFromStack0(comp, stackType))
+            doCoerce(comp);
+    }
+
+    protected void doCoerce(Compilation comp) {
+        emitCoerceFromObject(type, comp);
+    }
 }

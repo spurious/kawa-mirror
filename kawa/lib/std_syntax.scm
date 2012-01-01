@@ -234,9 +234,12 @@
 
 ;;; DELAY
 
-(define-syntax delay (syntax-rules ()
-				   ((delay expression)
-				    (make gnu.mapping.Promise (lambda () expression)))))
+(define-syntax (delay form)
+  (syntax-case form ()
+    ((delay expression)
+     ; Unquote, so inlining gets called on literal Procedure.
+     #`(,gnu.kawa.functions.MakePromise:makePromise
+        (lambda () expression)))))
 
 (define-syntax define-procedure
   (syntax-rules (:: <gnu.expr.GenericProc>)

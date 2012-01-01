@@ -234,6 +234,11 @@ public class DisplayFormat extends AbstractFormat
 
   public void writeObjectRaw(Object obj, Consumer out)
   {
+    if (! readable)
+      {
+        while (obj instanceof Lazy<?>)
+          obj = ((Lazy<?>) obj).getValue();
+      }
     if (obj instanceof Boolean)
       writeBoolean(((Boolean)obj).booleanValue(), out);
     else if (obj instanceof Char)
@@ -344,7 +349,8 @@ public class DisplayFormat extends AbstractFormat
     /* #endif */
     else if (obj == Values.empty && getReadableOutput())
       write("#!void", out);
-    else if (obj instanceof Consumable)
+    else if (obj instanceof Consumable
+             && (! readable || ! (obj instanceof Printable)))
       ((Consumable) obj).consume(out);
     else if (obj instanceof Printable)
       ((Printable) obj).print(out);

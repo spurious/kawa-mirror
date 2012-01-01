@@ -20,7 +20,14 @@ public class Promise<T> implements Printable, Lazy<T>
     this.thunk = thunk;
   }
 
-  public T getValue () throws Throwable
+  /** Wrap value as a forced Promise. */
+  public static <T> Lazy<T> makeBoundPromise (T value) {
+      Promise<T> p = new Promise<T>(null);
+      p.result = value;
+      return p;
+  }
+
+  public T getValue ()
   {
     // Doesn't reliably work on JDK4 or earlier, but works on JDK5 or later.
     // http://www.cs.umd.edu/~pugh/java/memoryModel/DoubleCheckedLocking.html
@@ -42,33 +49,20 @@ public class Promise<T> implements Printable, Lazy<T>
                   }
               }
             if (throwable != null)
-              throw throwable;
+		WrappedException.rethrow(throwable);
           }
       }
     return (T) result;
   }
 
-  public static Object force (Object arg)
-  {
-    for (;;)
-      {
-        try
-          {
-            if (arg instanceof gnu.mapping.Lazy)
-              arg = ((gnu.mapping.Lazy) arg).getValue();
-            /* #ifdef JAVA5 */
-            else if (arg instanceof java.util.concurrent.Future<?>)
-              arg = ((java.util.concurrent.Future<?>) arg).get();
-            /* #endif */
-            else
-              return arg;
-          }
-        catch (Throwable ex)
-          {
-            throw WrappedException.wrapIfNeeded(ex);
-          }
-      }
-  }
+    /** Forces the argment, if needed, to a non-Lazy valyue.
+     * I.e. calls {@link Lazy#getValue} as many times as needed.
+     */
+    public static Object force (Object arg) {
+	while (arg instanceof Lazy)
+	    arg = ((Lazy) arg).getValue();
+	return arg;
+    }
 
   public void print (Consumer out)
   {

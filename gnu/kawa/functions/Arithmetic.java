@@ -5,8 +5,11 @@ package gnu.kawa.functions;
 import gnu.math.*;
 import java.math.*;
 import gnu.bytecode.*;
+import gnu.mapping.Lazy;
+import gnu.mapping.Promise;
 import gnu.kawa.lispexpr.LangPrimType;
 import gnu.kawa.lispexpr.LangObjType;
+import gnu.kawa.reflect.LazyType;
 
 public class Arithmetic
 {
@@ -33,42 +36,44 @@ public class Arithmetic
   /** Promotion code for other gnu.math.Numeric. */
   public static final int NUMERIC_CODE = 11;
 
-  public static int classifyValue (Object value)
-  {
-    if (value instanceof Numeric)
-      {
-	if (value instanceof IntNum)
-	  return INTNUM_CODE;
-	else if (value instanceof RatNum)
-	  return RATNUM_CODE;
-	else if (value instanceof DFloNum)
-	  return FLONUM_CODE;
-	else if (value instanceof RealNum)
-	  return REALNUM_CODE;
-	else
-	  return NUMERIC_CODE;
-      }
-    else if (value instanceof Number)
-      {
-	if (value instanceof Integer || value instanceof Short
-	    || value instanceof Byte)
-	  return INT_CODE;
-	else if (value instanceof Long)
-	  return LONG_CODE;
-	else if (value instanceof Float)
-	  return FLOAT_CODE;
-	else if (value instanceof Double)
-	  return DOUBLE_CODE;
-	else if (value instanceof BigInteger)
-	  return BIGINTEGER_CODE;
-	else if (value instanceof BigDecimal)
-	  return BIGDECIMAL_CODE;
-	else
-	  return -1;
-      }
-    else
-      return -1;
-  }
+    public static int classifyValue(Object value) {
+	for (;;) {
+	    if (value instanceof Numeric) {
+		if (value instanceof IntNum)
+		    return INTNUM_CODE;
+		else if (value instanceof RatNum)
+		    return RATNUM_CODE;
+		else if (value instanceof DFloNum)
+		    return FLONUM_CODE;
+		else if (value instanceof RealNum)
+		    return REALNUM_CODE;
+		else
+		    return NUMERIC_CODE;
+	    }
+	    else if (value instanceof Number) {
+		if (value instanceof Integer || value instanceof Short
+		    || value instanceof Byte)
+		    return INT_CODE;
+		else if (value instanceof Long)
+		    return LONG_CODE;
+		else if (value instanceof Float)
+		    return FLOAT_CODE;
+		else if (value instanceof Double)
+		    return DOUBLE_CODE;
+		else if (value instanceof BigInteger)
+		    return BIGINTEGER_CODE;
+		else if (value instanceof BigDecimal)
+		    return BIGDECIMAL_CODE;
+		else
+		    return -1;
+	    }
+	    else if (value instanceof Lazy<?>) {
+		value = ((Lazy) value).getValue();
+	    }
+	    else
+		return -1;
+	}
+    }
 
   public static Type kindType (int kind)
   {
@@ -154,32 +159,35 @@ public class Arithmetic
       return REALNUM_CODE;
     else if (type.isSubtype(typeNumeric))
       return NUMERIC_CODE;
+    else if (type instanceof LazyType)
+      return classifyType(((LazyType) type).getValueType());
     else
       return 0;
   }
 
   public static int asInt (Object value)
   {
-    return ((Number) value).intValue();
+    return ((Number) Promise.force(value)).intValue();
   }
 
   public static long asLong (Object value)
   {
-    return ((Number) value).longValue();
+    return ((Number) Promise.force(value)).longValue();
   }
 
   public static float asFloat (Object value)
   {
-    return ((Number) value).floatValue();
+    return ((Number) Promise.force(value)).floatValue();
   }
 
   public static double asDouble (Object value)
   {
-    return ((Number) value).doubleValue();
+    return ((Number) Promise.force(value)).doubleValue();
   }
 
   public static BigInteger asBigInteger (Object value)
   {
+    value = Promise.force(value);
     if (value instanceof BigInteger)
       return (BigInteger) value;
     if (value instanceof IntNum)
@@ -199,6 +207,7 @@ public class Arithmetic
 
   public static IntNum asIntNum (Object value)
   {
+    value = Promise.force(value);
     if (value instanceof IntNum)
       return (IntNum) value;
     if (value instanceof BigInteger)
@@ -210,6 +219,7 @@ public class Arithmetic
 
   public static BigDecimal asBigDecimal (Object value)
   {
+    value = Promise.force(value);
     if (value instanceof BigDecimal)
       return (BigDecimal) value;
     if (value instanceof BigInteger)
@@ -222,6 +232,7 @@ public class Arithmetic
 
   public static RatNum asRatNum (Object value)
   {
+    value = Promise.force(value);
     if (value instanceof RatNum)
       return (RatNum) value;
     if (value instanceof BigInteger)
@@ -234,6 +245,7 @@ public class Arithmetic
 
   public static Numeric asNumeric (Object value)
   {
+    value = Promise.force(value);
     Numeric n = Numeric.asNumericOrNull(value);
     return n != null ? n : (Numeric) value;
   }
@@ -279,6 +291,7 @@ public class Arithmetic
    */
   public static Object convert (Object value, int code)
   {
+    value = Promise.force(value);
     switch (code)
       {
       case Arithmetic.INT_CODE:

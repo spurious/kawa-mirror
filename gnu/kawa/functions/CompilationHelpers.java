@@ -6,6 +6,7 @@ import gnu.kawa.reflect.CompileReflect;
 import gnu.kawa.reflect.Invoke;
 import gnu.kawa.reflect.ArrayGet;
 import gnu.kawa.reflect.ArraySet;
+import gnu.kawa.reflect.LazyType;
 import gnu.math.*;
 import gnu.text.Char;
 
@@ -16,6 +17,12 @@ import gnu.text.Char;
 
 public class CompilationHelpers
 {
+    public static boolean maybeLazy(Expression exp) {
+        if (exp instanceof QuoteExp)
+            return false;
+        return LazyType.maybeLazy(exp.getType());
+    }
+
   private static boolean nonNumeric(Expression exp)
   {
     if (exp instanceof QuoteExp)
@@ -158,7 +165,8 @@ public class CompilationHelpers
   {
     exp.visitArgs(visitor);
     Expression[] args = exp.getArgs();
-    if (nonNumeric(args[0]) || nonNumeric(args[1]))
+    if ((nonNumeric(args[0]) || nonNumeric(args[1]))
+        && ! maybeLazy(args[0]) && ! maybeLazy(args[1]))
       return new ApplyExp(((IsEqv) proc).isEq, args);
     return exp;
   }

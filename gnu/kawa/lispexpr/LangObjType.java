@@ -6,6 +6,7 @@ import gnu.math.*;
 import gnu.text.*;
 import gnu.kawa.functions.Arithmetic;
 import gnu.kawa.reflect.Invoke;
+import gnu.kawa.reflect.LazyType;
 import java.util.*;
 
 /** A wrapper around a class type.
@@ -169,6 +170,8 @@ public class LangObjType extends ObjectType implements TypeValue
 
   public int compare(Type other)
   {
+    if (other instanceof LazyType)
+      other = ((LazyType) other).getValueType();
     switch (typeCode)
       {
       case CLASS_TYPE_CODE:
@@ -290,6 +293,7 @@ public class LangObjType extends ObjectType implements TypeValue
 
   public static Numeric coerceNumeric (Object value)
   {
+    value = Promise.force(value);
     Numeric rval = Numeric.asNumericOrNull(value);
     if (rval == null && value != null)
         throw new WrongType(WrongType.ARG_CAST, value, numericType);
@@ -298,6 +302,7 @@ public class LangObjType extends ObjectType implements TypeValue
 
   public static RealNum coerceRealNum (Object value)
   {
+    value = Promise.force(value);
     RealNum rval = RealNum.asRealNumOrNull(value);
     if (rval == null && value != null)
         throw new WrongType(WrongType.ARG_CAST, value, realType);
@@ -306,6 +311,7 @@ public class LangObjType extends ObjectType implements TypeValue
 
   public static DFloNum coerceDFloNum (Object value)
   {
+    value = Promise.force(value);
     DFloNum rval = DFloNum.asDFloNumOrNull(value);
     if (rval == null && value != null)
         throw new WrongType(WrongType.ARG_CAST, value, dflonumType);
@@ -314,6 +320,7 @@ public class LangObjType extends ObjectType implements TypeValue
 
   public static RatNum coerceRatNum (Object value)
   {
+    value = Promise.force(value);
     RatNum rval = RatNum.asRatNumOrNull(value);
     if (rval == null && value != null)
         throw new WrongType(WrongType.ARG_CAST, value, rationalType);
@@ -322,6 +329,7 @@ public class LangObjType extends ObjectType implements TypeValue
 
   public static IntNum coerceIntNum (Object value)
   {
+    value = Promise.force(value);
     IntNum ival = IntNum.asIntNumOrNull(value);
     if (ival == null && value != null)
         throw new WrongType(WrongType.ARG_CAST, value, integerType);
@@ -330,6 +338,7 @@ public class LangObjType extends ObjectType implements TypeValue
 
   public static Class coerceToClassOrNull (Object type)
   {
+    type = Promise.force(type);
     if (type instanceof Class)
       return (Class) type;
     if (type instanceof Type)
@@ -344,6 +353,7 @@ public class LangObjType extends ObjectType implements TypeValue
 
   public static Class coerceToClass (Object obj)
   {
+    obj = Promise.force(obj);
     Class coerced = coerceToClassOrNull(obj);
     if (coerced == null && obj != null)
       throw new ClassCastException("cannot cast "+obj+" to type");
@@ -366,6 +376,7 @@ public class LangObjType extends ObjectType implements TypeValue
 
   public static ClassType coerceToClassType (Object obj)
   {
+    obj = Promise.force(obj);
     ClassType coerced = coerceToClassTypeOrNull(obj);
     if (coerced == null && obj != null)
       throw new ClassCastException("cannot cast "+obj+" to class-type");
@@ -374,6 +385,7 @@ public class LangObjType extends ObjectType implements TypeValue
 
   public static Type coerceToTypeOrNull (Object type)
   {
+    type = Promise.force(type);
     if (type instanceof Type)
       return (Type) type;
     if (type instanceof Class)
@@ -392,8 +404,9 @@ public class LangObjType extends ObjectType implements TypeValue
     return coerced;
   }
 
-  public static Procedure coerceToProcedureOrNull (final Object obj)
+  public static Procedure coerceToProcedureOrNull(Object value)
   {
+    final Object obj = Promise.force(value);
     if (obj instanceof Procedure)
       return (Procedure) obj;
     if (obj instanceof LangObjType)
@@ -417,7 +430,8 @@ public class LangObjType extends ObjectType implements TypeValue
 
   public static Procedure coerceToProcedure (Object obj)
   {
-   Procedure coerced = coerceToProcedureOrNull(obj);
+    obj = Promise.force(obj);
+    Procedure coerced = coerceToProcedureOrNull(obj);
     if (coerced == null && obj != null)
        throw new ClassCastException("cannot cast "+obj+" to procedure");
     return coerced;  

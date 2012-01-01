@@ -702,6 +702,13 @@ public abstract class Language
   }
 
     public final Type getLangTypeFor (Type type) {
+	if (type instanceof ParameterizedType) {
+	    ParameterizedType ptype = (ParameterizedType) type;
+	    Type[] pargs = ptype.getTypeArgumentTypes();
+	    if (ptype.getRawType() == LazyType.lazyType && pargs.length == 1) {
+		return LazyType.getInstance(LazyType.lazyType, getLangTypeFor(pargs[0]));
+	    }
+	}
 	if (type instanceof TypeVariable) {
 	    return getLangTypeFor(((TypeVariable) type).getRawType());
 	}

@@ -49,6 +49,8 @@ public class OccurrenceType extends ObjectType
 
   public int compare(Type other)
   {
+    if (other instanceof LazyType)
+      other = ((LazyType) other).getValueType();
     if (other instanceof OccurrenceType)
       {
         OccurrenceType occOther = (OccurrenceType) other;

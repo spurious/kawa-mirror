@@ -31,6 +31,7 @@ java_sources=\
   IsEq.java IsEqual.java IsEqv.java \
   MakeList.java \
   MakeProcedure.java \
+  MakePromise.java \
   Map.java \
   MultiplyOp.java \
   NamedPart.java \

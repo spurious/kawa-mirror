@@ -14,6 +14,7 @@ import gnu.lists.AbstractFormat;
 import gnu.kawa.functions.*;
 import gnu.kawa.reflect.ClassMethods;
 import gnu.kawa.reflect.StaticFieldLocation;
+import gnu.kawa.reflect.LazyType;
 import gnu.math.DFloNum;
 import gnu.kawa.servlet.HttpRequestContext;
 
@@ -176,7 +177,6 @@ public class Scheme extends LispLanguage
       defSntxStFld("begin", "kawa.standard.begin", "begin");
       defSntxStFld("do", "kawa.lib.std_syntax");
       defSntxStFld("delay", "kawa.lib.std_syntax");
-      defProcStFld("%make-promise", "kawa.lib.std_syntax");
       defSntxStFld("quasiquote", "kawa.lang.Quote", "quasiQuote");
 
       //-- Section 5  -- complete [except for internal definitions]
@@ -1031,6 +1031,7 @@ public class Scheme extends LispLanguage
 	types.put ("type", LangObjType.typeType);
 	types.put ("class-type", LangObjType.typeClassType);
 	types.put ("class", LangObjType.typeClass);
+	types.put ("lazy", LazyType.lazyType);
 
         for (int i = uniformVectorTags.length;  --i >= 0; )
           {
@@ -1106,6 +1107,12 @@ public class Scheme extends LispLanguage
   public String formatType (Type type)
   {
     // FIXME synchronize
+    if (type instanceof LazyType)
+      {
+        LazyType ltype = (LazyType) type;
+        return formatType(ltype.getRawType())
+          +'['+formatType(ltype.getValueType())+']';
+      }
     if (typeToStringMap == null)
       {
         typeToStringMap = new HashMap<Type,String>();

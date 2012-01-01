@@ -1486,7 +1486,7 @@ using @uref{http://srfi.schemers.org/srfi-16/srfi-16.html, @code{case-lambda}}.
 @uref{http://srfi.schemers.org/srfi-39/srfi-39.html, SRFI 39}:
 @xref{Parameter objects}.
 @item
-@uref{http://srfi.schemers.org/srfi-41/srfi-41.html, SRFI 41}: Streams.
+@uref{http://srfi.schemers.org/srfi-41/srfi-41.html, SRFI 41}: Streams - @pxref{Streams}.
 @item
 @uref{http://srfi.schemers.org/srfi-62/srfi-62.html, SRFI 62}: S-expression comments.
 @item
@@ -4874,12 +4874,13 @@ See @uref{http://evalwhen.com/pregexp/index.html,here for details}.
 
 @menu
 * Lists::
+* Streams:: Lazy lists.
 * Arrays::  Multi-dimensional Arrays
 * Uniform vectors::
 * Hash tables::
 @end menu
 
-@node Lists, Arrays, , Data structures
+@node Lists
 @section Lists
 
 The @uref{http://srfi.schemers.org/srfi-1/srfi-1.html, SRFI-1 List Library}
@@ -4897,7 +4898,29 @@ with @code{cdr} cells of @var{list} reversed in place.  Note that if @var{list}
 was pair, it becomes the last pair of the reversed result.
 @end deffn
 
-@node Arrays, Uniform vectors, Lists, Data structures
+@node Streams
+@section Streams - lazy lists
+
+Streams, sometimes called lazy lists, are a sequential data structure
+containing elements computed only on demand. A stream is either null
+or is a pair with a stream in its cdr. Since elements of a stream are
+computed only when accessed, streams can be infinite. Once computed,
+the value of a stream element is cached in case it is needed again.
+
+@example
+(require 'srfi-41)
+(define fibs
+  (stream-cons 1
+    (stream-cons 1
+      (stream-map +
+        fibs
+        (stream-cdr fibs)))))
+(stream->list 8 fibs) @result{} (1 1 2 3 5 8 13 21)
+@end example
+
+See the @uref{http://srfi.schemers.org/srfi-41/srfi-41.html, SRFI 41 specification} for details.
+
+@node Arrays
 @section Multi-dimensional Arrays
 
 Arrays are heterogeneous data structures whose elements are indexed by

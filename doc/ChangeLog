@@ -1,5 +1,8 @@
 2012-01-01  Per Bothner  <per@bothner.com>
 
+	* kawa.texi: (Options): Document --r5rs, --r6rs, --r7rs flags.
+	(Ports): Note symbol-read-case is only checked when reader is created.
+
 	* kawa.texi: Improve documentation of identifiers and literals.
 	Document #!fold-case and #!no-fold-case.
 

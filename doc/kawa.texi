@@ -735,6 +735,17 @@ Telnet client program to a remote "Kawa server".
 Set the default language to Scheme.
 (This is the default unless you select another language,
 or you name a file with a known extension on the command-line.)
+@item --r5rs
+@itemx --r6rs
+@itemx --r7rs
+Provide better compatibility with the specified Scheme standards.
+(This is a work-in-progress.)
+For example @code{--r6rs} aims to disable Kawa extensions
+that conflict with R6RS.  It does not aim to disable all extensions,
+only incompatible extensions.
+So far these extensions disable the colon operator and keyword literals.
+Selecting @code{--r5rs} makes symbols by default
+case-insensitive.
 @item --elisp
 @itemx --emacs
 @itemx --emacs-lisp
@@ -7192,6 +7203,8 @@ If the first letter is @samp{I}, then the case of letters in symbols
 is inverted.
 Otherwise (the default), the letter is not changed.
 (Letters following a @samp{\} are always unchanged.)
+The value of @code{symbol-read-case} only checked
+when a reader is created, not each time a symbol is read.
 @end defvar
 
 @defvar port-char-encoding

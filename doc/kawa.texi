@@ -4654,6 +4654,29 @@ the argument instead of a newly allocated string.
 @end example
 @end deffn
 
+@deffn Procedure string-for-each @var{proc} @vari{string} @varii{string} @dots{}
+The @var{string}s must all have the same length.  @var{proc} should
+accept as many arguments as there are @var{string}s.
+
+The @func{string-for-each} procedure applies @var{proc} element--wise to
+the characters of the @var{string}s for its side effects, in order from
+the first characters to the last.  @var{proc} is always called in the
+same dynamic environment as @func{string-for-each} itself.
+@c  The return values of @func{string-for-each} are unspecified.
+
+Analogous to @func{for-each}.
+
+@example
+(let ((v '()))
+  (string-for-each
+    (lambda (c) (set! v (cons (char->integer c) v)))
+    "abcde")
+   v)
+  @result{} (101 100 99 98 97)
+@end example
+@end deffn
+
+
 @subsection Deprecated in-place case modification
 
 The following functions are deprecated; they really don't

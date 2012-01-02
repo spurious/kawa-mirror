@@ -3262,6 +3262,83 @@ and Java number types as appropriate.
 @node Arithmetic operations
 @section Arithmetic operations
 
+@deffn Procedure {real-valued?} @var{obj}
+@deffnx Procedure {rational-valued?} @var{obj}
+@deffnx Procedure {integer-valued?} @var{obj}
+These numerical type predicates can be applied to any kind of argument.
+The @func{real-valued?} procedure returns @true{} if the object is a
+number object and is equal in the sense of @code{=} to some real number
+object, or if the object is a NaN, or a complex number object whose real
+part is a NaN and whose imaginary part is zero in the sense of
+@func{zero?}.  The @func{rational-valued?} and @func{integer-valued?}
+procedures return @true{} if the object is a number object and is equal
+in the sense of @code{=} to some object of the named type, and otherwise
+they return @false{}.
+
+@example
+(real-valued? +nan.0)                  @result{} #t
+(real-valued? +nan.0+0i)               @result{} #t
+(real-valued? -inf.0)                  @result{} #t
+(real-valued? 3)                       @result{} #t
+(real-valued? -2.5+0.0i)               @result{} #t
+
+(real-valued? -2.5+0i)                 @result{} #t
+(real-valued? -2.5)                    @result{} #t
+(real-valued? #e1e10)                  @result{} #t
+
+(rational-valued? +nan.0)              @result{} #f
+(rational-valued? -inf.0)              @result{} #f
+(rational-valued? 6/10)                @result{} #t
+(rational-valued? 6/10+0.0i)           @result{} #t
+(rational-valued? 6/10+0i)             @result{} #t
+(rational-valued? 6/3)                 @result{} #t
+
+(integer-valued? 3+0i)                 @result{} #t
+(integer-valued? 3+0.0i)               @result{} #t
+(integer-valued? 3.0)                  @result{} #t
+(integer-valued? 3.0+0.0i)             @result{} #t
+(integer-valued? 8/4)                  @result{} #t
+@end example
+
+@quotation
+@emph{Note:} These procedures test whether a given number object can be
+coerced to the specified type without loss of numerical accuracy.
+Specifically, the behavior of these predicates differs from the behavior
+of @func{real?}, @func{rational?}, and @func{integer?} on complex number
+objects whose imaginary part is inexact zero.
+@end quotation
+
+@quotation
+@emph{Note:} The behavior of these type predicates on inexact number
+objects is unreliable, because any inaccuracy may affect the result.
+@end quotation
+@end deffn
+
+@deffn Procedure {finite?} @var{x}
+Tests whether it is not an infinity and not a NaN.
+@example
+(finite? 3)             @result{} #t
+(finite? +inf.0)        @result{} #t
+@end example
+@end deffn
+
+@deffn Procedure {infinite?} @var{x}
+Tests whether it is an infinity.
+@example
+(infinite? 5.0)         @result{} #f
+(infinite? +inf.0)      @result{} #t
+@end example
+@end deffn
+
+@deffn Procedure {nan?} @var{x}
+Tests whether it is a NaN.
+@example
+(nan? +nan.0)           @result{} #t
+(nan? 32)               @result{} #f
+@end example
+@end deffn
+
+
 @deffn Procedure + @var{z} @dots{}
 @deffnx Procedure * @var{z} @dots{}
 These procedures return the sum or product of their arguments.
@@ -3530,7 +3607,7 @@ of @code{0} is defined to be @code{1}.
 @example
 (numerator   (/ 6 4))            @result{}  3
 (denominator (/ 6 4))            @result{}  2
-@c (denominator (inexact (/ 6 4)))        =>  2.0
+@c (denominator (inexact (/ 6 4)))        @result{}  2.0
 @end example
 @end deffn
 
@@ -3602,12 +3679,12 @@ simpler @code{2/5} lies between @code{2/7} and @code{3/5}).
 
 Note that @code{0 = 0/1} is the simplest rational of all.
 @example
-(rationalize (exact .3) 1/10)          => 1/3
-(rationalize .3 1/10)                  => #i1/3  ; approximately
+(rationalize (exact .3) 1/10)          @result{} 1/3
+(rationalize .3 1/10)                  @result{} #i1/3  ; approximately
 
-(rationalize +inf.0 3)                 =>  +inf.0
-(rationalize +inf.0 +inf.0)            =>  +nan.0
-@c (rationalize 3 +inf.0)                 =>  0.0
+(rationalize +inf.0 3)                 @result{}  +inf.0
+(rationalize +inf.0 +inf.0)            @result{}  +nan.0
+@c (rationalize 3 +inf.0)                 @result{}  0.0
 @end example
 
 The first two examples hold only in implementations whose inexact real
@@ -3673,6 +3750,17 @@ an exact argument.
 (sqrt -5)                   @result{}  0.0+2.23606797749979i ; approximately
 (sqrt +inf.0)               @result{}  +inf.0
 (sqrt -inf.0)               @result{}  +inf.0i
+@end example
+@end deffn
+
+@deffn Procedure exact-integer-sqrt @var{k}
+The @func{exact-integer-sqrt} procedure returns two non--negative exact
+integer objects @emph{s} and @emph{r} where @code{@var{k} = s^2 + r} and
+@code{@var{k} < (s+1)^2}.
+
+@example
+(exact-integer-sqrt 4)  @result{} 2 0 ; two return values
+(exact-integer-sqrt 5)  @result{} 2 1 ; two return values
 @end example
 @end deffn
 
@@ -4788,7 +4876,7 @@ a empty strings at each end.
 
 @example
 (regex-split "" "smithereens")
-@result{} => ("" "s" "m" "i" "t" "h" "e" "r" "e" "e" "n" "s" "")
+  @result{} ("" "s" "m" "i" "t" "h" "e" "r" "e" "e" "n" "s" "")
 @end example
 
 (Note: This behavior is different from @code{pregexp-split}.)

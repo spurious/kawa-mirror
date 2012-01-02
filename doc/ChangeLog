@@ -1,5 +1,9 @@
 2012-01-01  Per Bothner  <per@bothner.com>
 
+	* kawa.texi (Arithmetic operations): Document real-valued?,
+	rational-valued?, integer-valued?, finite?, infinite?, nan?,
+	and exact-integer-sqrt.
+
 	* kawa.texi (Vectors): New section.
 	(Miscellaneous): Move vector-append to Vectors section.
 

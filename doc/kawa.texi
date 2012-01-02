@@ -8822,7 +8822,16 @@ and @code{pare?} to be a predicate for @code{pare}s.
   (kar k))                @result{} 3
 @end example
 
-The Kawa compiler creates a new Java class with a name derived from
+Kawa compiles the record type into a nested class.
+If the @code{define-record-type} appears at module level,
+the result is a class that is a member of the module class.
+For example if the above @code{pare} class is define in a
+module @code{parelib}, then the result is a class
+named @code{pare} with the internal JVM name @code{parelib$pare}.
+The @code{define-record-type} can appear inside a procedure,
+in which case the result is an inner class.
+
+The nested class has a name derived from
 the @var{type-name}.  If the @var{type-name} is valid Java class name,
 that becomes the name of the Java class.  If the @var{type-name} has
 the form @code{<@var{name}>} (for example @code{<pare>}), then @var{name}

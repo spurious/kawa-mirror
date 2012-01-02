@@ -1,5 +1,8 @@
 2012-01-01  Per Bothner  <per@bothner.com>
 
+	* kawa.texi (Record types): Update since define-record-type now
+	generates a nested class.
+
 	* kawa.texi (Unicode): Document string-for-each.
 
 	* kawa.texi (Arithmetic operations): Document real-valued?,

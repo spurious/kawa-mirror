@@ -1838,11 +1838,33 @@ as is any character between a pair of vertical bars.
 @c , and the identifier @code{\x3BB;} is the same as the
 @c identifier $\lambda$.
 
-Any identifier may be used as a variable or as a syntactic keyword
-@c (@ref{basic variables keywords regions} and @ref{syntax macros})
-in a Scheme program.  Any identifier may also be used as a syntactic datum,
-in which case it represents a @emph{symbol}.
-@c (@ref{base symbols}).
+Identifiers have two uses within Scheme programs:
+@itemize
+@item
+Any identifier may be used as a @ref{variable-reference,,variable}
+or as a @ref{macro-reference,,syntactic keyword}.
+@item
+When an identifier appears as or with in @ref{literal-expression,,literal},
+it is being used to denote a @ref{Simple symbols,,symbol}.
+@end itemize
+
+In contrast with older versions of Scheme, the syntax distinguishes
+between upper and lower case in identifiers and in characters
+specified via their names, but not in numbers, nor in inline hex
+escapes used in the syntax of identifiers, characters, or strings.
+The following directives give explicit control over case folding.
+
+@deffn Syntax #!fold-case
+@deffnx Syntax #!no-fold-case
+@end deffn
+
+These directives may appear anywhere comments are permitted and are
+treated as comments, except that they affect the reading of subsequent
+data.  The @code{#!fold-case} directive causes the @code{read}
+procedure to case-fold (as if by @code{string-foldcase}) each
+identifier and character name subsequently read from the same
+port. The @code{#!no-fold-case} directive causes the @code{read}
+procedure to return to the default, non-folding behavior.
 
 Note that colon @code{:} is treated specially for
 @ref{Colon notation, colon notation} in Kawa Scheme,
@@ -2021,17 +2043,43 @@ The follow named constructor forms are supported:
 @section Primitive expression syntax
 
 @display
-@stxdef{expression} @stxref{literal-value} | @stxref{variable-reference}
+@stxdef{expression} @stxref{literal-expression} | @stxref{variable-reference}
   | @stxref{procedure-call} | TODO
 @end display
 
-@subsection Constant literals
+@anchor{literal-expression}
+@subsection Literal expressions
 
 @display
-@stxdef{literal-value} @var{number} | @meta{boolean} | @meta{character} | @meta{string}
+@stxdef{literal-expression} @stxlit{(quote} @stxref{datum}@stxlit{)}
+  | @stxlit{'} @stxref{datum}
+  | @var{constant} 
+@stxdef{constant} @var{number} | @meta{boolean} | @meta{character} | @meta{string}
 @end display
-An expression consisting of a representation of a number object, a
-boolean, a character, or a string evaluates ``to itself''.
+
+@code{(quote @var{datum})} evaluates to @var{datum},
+which may be any external representation of a Scheme object.
+This notation is used to include literal constants in Scheme code.
+@example
+(quote a)               @result{}  a 
+(quote #(a b c))        @result{}  #(a b c)
+(quote (+ 1 2))         @result{}  (+ 1 2)
+@end example
+
+@code{(quote @var{datum})} may be abbreviated as @code{'@var{datum}}.
+The two notations are equivalent in all respects.
+@example
+’a                      @result{}  a
+’#(a b c)               @result{}  #(a b c)
+’()                     @result{}  ()
+’(+ 1 2)                @result{}  (+ 1 2)
+’(quote a)              @result{}  (quote a)
+’’a                     @result{}  (quote a)
+@end example
+
+Numerical constants, string constants, character constants,
+bytevector constants, and boolean constants evaluate to
+themselves; they need not be quoted.
 
 @example
 145932          @result{}  145932
@@ -2040,6 +2088,7 @@ boolean, a character, or a string evaluates ``to itself''.
 @end example
 @c #vu8(2 24 123)  @result{} #vu8(2 24 123)
 
+@anchor{variable-reference}
 @subsection Variable references
 
 @display
@@ -2080,8 +2129,8 @@ passed the resulting arguments.
 ((if #f + *) 3 4)      @result{}  12
 @end example
 
+@anchor{macro-reference}
 @subsection Macros
-
 Libraries and top--level programs can define and use new kinds of
 derived expressions and definitions called @emph{syntactic abstractions}
 or @emph{macros}.  A syntactic abstraction is created by binding a

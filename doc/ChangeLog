@@ -1,5 +1,8 @@
 2012-01-01  Per Bothner  <per@bothner.com>
 
+	* kawa.texi: Improve documentation of identifiers and literals.
+	Document #!fold-case and #!no-fold-case.
+
 	* kawa.texi (Record types): Update since define-record-type now
 	generates a nested class.
 

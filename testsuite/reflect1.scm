@@ -5,7 +5,7 @@
    (java.lang.System:out:format "test %d\n" arg)))
 
 (let ((t ::TestClass (TestClass))
-      (method 'test))
+      (method (string-copy "test"))) ;; avoid unintended inlining
   (invoke t 'test 1)
   (invoke t method 2))
 

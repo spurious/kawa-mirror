@@ -29,22 +29,42 @@ public class load extends Procedure1 {
   public final Object apply2 (Object name, Object arg2)
     throws Throwable
   {
+    Environment env = (Environment) arg2;
+    Path path = Path.valueOf(name);
+    if (relative)
+      {
+        Path curPath = (Path) Shell.currentLoadPath.get();
+        if (curPath != null)
+          path = curPath.resolve(path);
+      }
+    InputStream fs;
     try
       {
-	Environment env = (Environment) arg2;
-        Path path = Path.valueOf(name);
-        if (relative)
-          {
-            Path curPath = (Path) Shell.currentLoadPath.get();
-            if (curPath != null)
-              path = curPath.resolve(path);
-          }
-        Shell.runFile(path.openInputStream(), path, env, true, 0);
-	return Values.empty;
+        fs = path.openInputStream();
       }
     catch (java.io.FileNotFoundException e)
       {
-	throw new RuntimeException ("cannot load "+e.getMessage());
+        Class clas = null;
+        if (! relative && name instanceof CharSequence)
+          {
+            try
+              { 
+                clas = Class.forName(name.toString());
+              }
+            catch (Throwable e2)
+              {
+                // Handled below since clas==null
+              }
+          }
+        if (clas == null)
+          throw new RuntimeException ("cannot load "+e.getMessage());
+        Shell.runClass(clas, env);
+        return Values.empty;
+      }
+    try
+      {
+        Shell.runFile(fs, path, env, true, 0);
+	return Values.empty;
       }
     catch (SyntaxException ex)
       {

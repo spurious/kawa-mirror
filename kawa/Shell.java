@@ -445,8 +445,7 @@ public class Shell
           }
         try
           {
-            CompiledModule cmodule = CompiledModule.make(clas, language);
-            cmodule.evalModule(Environment.getCurrent(), OutPort.outDefault());
+            runClass(clas, Environment.getCurrent());
             return true;
           }
         catch (Throwable ex)
@@ -457,6 +456,10 @@ public class Shell
       }
   }
 
+    public static void runClass(Class clas, Environment env) throws Throwable {
+        CompiledModule cmodule = CompiledModule.make(clas, Language.getDefaultLanguage());
+        cmodule.evalModule(env, OutPort.outDefault());
+    }
 
   public static final boolean runFile(InputStream fs, Path path,
                                       Environment env,

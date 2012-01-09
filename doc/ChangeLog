@@ -1,3 +1,7 @@
+2012-01-09  Per Bothner  <per@bothner.com>
+
+	* kawa.texi: Some tweaks relating to load.
+
 2012-01-01  Per Bothner  <per@bothner.com>
 
 	* kawa.texi: (Options): Document --r5rs, --r6rs, --r7rs flags.

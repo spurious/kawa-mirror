@@ -618,10 +618,10 @@ However, @samp{kawa} only works if you have a Unix-like environment.
 On some platforms, @samp{kawa} is a program that uses the GNU
 @samp{readline} library to provide input line editing.
 
-To run Kawa manually, you must start a Java interpreter.
-How you do this depends on the Java interpreter.
+To run Kawa manually, you must start a Java Virtual Machine.
+How you do this depends on the Java implementation.
 For Sun's JDK s and some other implementations, you must have the
-Java interpret (usually named @code{java}) in your @code{PATH}.
+Java evaluator (usually named @code{java}) in your @code{PATH}.
 You must also make sure that the @code{kawa/repl.class} file,
 the rest of the Kawa packages, and the standard Java
 packages can be found by searching CLASSPATH.
@@ -670,12 +670,22 @@ or before the first @code{-f} or @code{-c} argument.  (It is not run
 for a @code{-e} command, to allow you to set options to override
 the defaults.)
 
-If there are further command-line arguments after the options
-have been processed, then the first remaining argument names a
-file that is read and evaluated.  If there is no such argument,
+If there are no command-line arguments following the options,
 then Kawa enters an interactive read-eval-print loop,
 but only if none of the @samp{-c}, @samp{-e}, @samp{-f}, @samp{-s},
 @samp{-C}, or @samp{--} options were specified.
+
+If there are command-line arguments after processing options,
+then the first remaining argument names either a
+file that is read and evaluated, or a compiled class.
+In the former case, the whole file is read and compiled as a module
+before being loaded (unlike the @code{-f} flag which reads and
+evaluates the file command by command.)
+If the argument is the fully-qualited name of a class,
+then the class is loaded, an instance allocated,
+and its @code{run} method invoked.  If the class was compiled from
+a Kawa Scheme module, then invoking @code{run} has the
+effect of evaluating the module body.
 
 @subsection General options
 
@@ -1141,7 +1151,7 @@ and can be used as an servlet in a servlet container like Tomcat.
 
 When you actually want to load the classes, the @var{outdirectory}
 must be in your @samp{CLASSPATH}.
-You can use the standard @code{load} function to load the code,
+You can use the @code{require} syntax or the @code{load} function to load the code,
 by specifying the top-level class, either as a file name
 (relative to @var{outdirectory}) or a class name.
 E.g. if you did:
@@ -1150,12 +1160,15 @@ kawa -d /usr/local/share/java -P my.lib. -T foo -C foosrc.scm
 @end example
 you can use either:
 @example
-(load "my.lib.foo")
+(require my.lib.foo)
 @end example
 or:
 @example
-(load "my/lib/foo.class")
+(load "my.lib.foo")
 @end example
+Using @code{require} is preferred as it imports the definitions
+from @code{my.lib.foo} into the compile-time environment,
+while @code{load} only imports the definitions into run-time environment.
 
 If you are compiling a Scheme source file (say @samp{foosrc.scm})
 that uses macros defined in some other file (say @samp{macs.scm}),
@@ -6238,10 +6251,15 @@ set to the URL of the document.
 @end deffn
 
 @deffn Procedure load path
-The @var{path} can be an (absolute) URL or a filename.
+The @var{path} can be an (absolute) URL or a filename
+of a source file, which is read and evaluated line-by-line.
+The @var{path} can also be a fully-qualified class name.
+(Mostly acts like the @code{-f} command-line option,
+but with different error handling.)
 Since @code{load} is a run-time function it doesn't work well
 with Kawa's orientation towards compilation.
-It is highly recommended that you use instead use @code{@ref{include, include}}.
+It is highly recommended that you use instead use
+@code{@ref{require, require}} or @code{@ref{include, include}}.
 @end deffn
 
 @deffn Procedure load-relative path
@@ -8689,7 +8707,7 @@ case the @code{run} method return an @code{Object} rather than @code{void}.
 This will likely change.)
 
 @subsection Requiring (importing) a module
-
+@anchor{require}
 You can import a module into the current namespace with @code{require}.
 
 @deffn Syntax require @stxlit{'}featureName

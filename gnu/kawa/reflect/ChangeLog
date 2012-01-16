@@ -1,3 +1,7 @@
+2012-01-15  Per Bothner  <per@bothner.com>
+
+	* LazyType.java (getLazyType): New static method.
+
 2011-12-29  Per Bothner  <per@bothner.com>
 
 	* LazyType.java: New class, extends ObjectType.

@@ -18,10 +18,10 @@
        (v2 ::vector v1))
   (test-equal 4 (v2 1)))
 
-(define v3 ::lazy (future (cons 3 4)))
+(define v3 ::promise (future (cons 3 4)))
 (test-equal 4 (cdr v3))
-(define v4 ::lazy[pair] (delay (cons 4 5)))
+(define v4 ::promise[pair] (delay (cons 4 5)))
 (test-equal 5 (cdr v4))
-;; error: (define v5 ::lazy[integer] (delay (cons 4 5)))
+;; error: (define v5 ::promise[integer] (delay (cons 4 5)))
 
 (test-end)

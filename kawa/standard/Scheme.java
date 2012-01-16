@@ -176,6 +176,7 @@ public class Scheme extends LispLanguage
 
       defSntxStFld("begin", "kawa.standard.begin", "begin");
       defSntxStFld("do", "kawa.lib.std_syntax");
+      defSntxStFld("lazy", "kawa.lib.std_syntax");
       defSntxStFld("delay", "kawa.lib.std_syntax");
       defSntxStFld("quasiquote", "kawa.lang.Quote", "quasiQuote");
 
@@ -413,6 +414,7 @@ public class Scheme extends LispLanguage
                    "gnu.kawa.functions.CallCC", "callcc");
       defProcStFld("call/cc", "kawa.standard.callcc", "callcc");
       defProcStFld("force", "kawa.lib.misc");
+      defProcStFld("eager", "kawa.lib.misc");
 
       //-- Section 6.10  -- complete
       defProcStFld("call-with-input-file", "kawa.lib.ports");
@@ -1031,7 +1033,7 @@ public class Scheme extends LispLanguage
 	types.put ("type", LangObjType.typeType);
 	types.put ("class-type", LangObjType.typeClassType);
 	types.put ("class", LangObjType.typeClass);
-	types.put ("lazy", LazyType.lazyType);
+	types.put ("promise", LazyType.lazyType);
 
         for (int i = uniformVectorTags.length;  --i >= 0; )
           {

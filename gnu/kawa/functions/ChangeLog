@@ -1,3 +1,13 @@
+2012-01-15  Per Bothner  <per@bothner.com>
+
+	* MakePromise.java (makePromise): Rename to ...
+	(makeDelay): ... new name.
+	(makeLazy): New field.
+	(makePromiseLazy): New method.
+	(apply1): Call makePromise or makePromiseLazy as appropriate,
+	* CompileMisc.java (validateApplyMakePromise): Add support for
+	SRFI-45 'lazy'.
+
 2012-01-01  Per Bothner  <per@bothner.com>
 
 	* GetNamedPart.java (getNamedPart): Force lazy value if needed.

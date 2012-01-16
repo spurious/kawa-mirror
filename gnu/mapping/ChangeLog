@@ -1,3 +1,15 @@
+2012-01-15  Per Bothner  <per@bothner.com>
+
+	* Promise.java: Make final, because moveFrom would be anomolous if
+	source or target would be a sub-class of Promise.
+	(moveFrom): New method.
+	(forceValueIfPromise): New field.
+	(setForceValueIfPromise): New method.
+	(<init>): New default constructor.
+	(setValue, setAlias, setException, setThunk): New methods.
+	(getValue) Re-implement to match SRFI-45.
+	(force1): New static method.
+
 2012-01-01  Per Bothner  <per@bothner.com>
 
 	* Lazy.java (getValue): Changed to no longer throw Throwable.

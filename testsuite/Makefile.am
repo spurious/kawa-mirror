@@ -576,7 +576,8 @@ check-sva31180:
 	  else echo FAIL check-sva31180; fi
 
 CLEANFILES = tmp* *.log testing.zip revcomp-input.txt knucleotide-input.txt regexdna-input.txt *.class HelloCgiK HelloCgiS
-SCRIPTS_TO_RUN = uninit1.scm sva34005.scm anonymous-lambda-1.scm reflect1.scm
+SCRIPTS_TO_RUN = uninit1.scm sva34005.scm anonymous-lambda-1.scm \
+  srfi-45-test1.scm srfi-45-test2.scm reflect1.scm
 EXTRA_DIST = testing.scm test.scm num-test.scm mac-test.scm mac1.scm \
   classes1.scm classes2.scm SimpleB.java obj-test.scm arr-test.scm \
   lib-test.scm srfi-38-test.scm srfi-64-test.scm srfi-69-test.scm \

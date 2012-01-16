@@ -1,3 +1,9 @@
+2012-01-15  Per Bothner  <per@bothner.com>
+
+	* std_syntax.scm (lazy): New syntax, from SRFI-45 and R7RS.
+	* misc.scm (force): Only calls force1, to match SRFI-45/R7RS.
+	(eager): New function, from SRFI-45 and R7RS.
+
 2012-01-01  Per Bothner  <per@bothner.com>
 
 	* std_syntax.scm (delay): Use MakePromise:makePromise Procedure,

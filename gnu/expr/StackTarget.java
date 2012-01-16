@@ -102,9 +102,12 @@ public class StackTarget extends Target
 
     public void compileFromStack(Compilation comp, Type stackType) {
         if (type instanceof LazyType && ! (stackType instanceof LazyType)) {
-            getClonedInstance(((LazyType) type).getValueType()).compileFromStack(comp, stackType);
-            Method wrapMethod = ClassType.make("gnu.mapping.Promise").getDeclaredStaticMethod("makeBoundPromise", 1);
+            LazyType ltype = (LazyType) type;
+            if (! LazyType.maybeLazy(stackType))
+                getClonedInstance(ltype.getValueType()).compileFromStack(comp, stackType);
+            Method wrapMethod = ClassType.make("gnu.mapping.Promise").getDeclaredStaticMethod("coerceToLazy", 1);
             comp.getCode().emitInvokeStatic(wrapMethod);
+            comp.getCode().emitCheckcast(ltype.getRawType());
         }
         else if (! compileFromStack0(comp, stackType))
             doCoerce(comp);

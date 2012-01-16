@@ -1,3 +1,9 @@
+2012-01-15  Per Bothner  <per@bothner.com>
+
+	* standard/Scheme.java (initScheme): Define "lazy" and "eager"
+	from SRFI-45 and R7RS.
+	(getTypeMap): Rename type "lazy" to "promise".
+
 2012-01-09  Per Bothner  <per@bothner.com>
 
 	* Shell.java (runClass): New static method.

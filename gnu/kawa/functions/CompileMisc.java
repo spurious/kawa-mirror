@@ -755,16 +755,30 @@ public class CompileMisc implements Inlineable
     Expression[] args = exp.getArgs();
     if (args.length == 1 && args[0] instanceof LambdaExp)
       {
-        Type bodyRequired = (required instanceof LazyType
-                             ? ((LazyType) required).getValueType()
-                             : null);
+        boolean forceValueIfPromise = proc == MakePromise.makeLazy;
+        Type bodyRequired;
+        if (required instanceof LazyType)
+          {
+            Type valueType = ((LazyType) required).getValueType();
+            bodyRequired = forceValueIfPromise ? LazyType.getLazyType(valueType)
+                : valueType;
+          }
+        else
+          bodyRequired = null;
         LambdaExp lexp = (LambdaExp) args[0];
         lexp.body = visitor.visit(lexp.body, bodyRequired);
         args[0] = visitor.visit(lexp, null);
         Type rtype = lexp.getReturnType();
-        Type type = LazyType.getPromiseType(rtype);
+        if (forceValueIfPromise)
+          {
+            rtype = rtype instanceof LazyType
+                ? ((LazyType) rtype).getValueType()
+                : Type.objectType;
+          }
+        Type type = LazyType.getLazyType(rtype);
+        String mname = forceValueIfPromise ? "makePromiseLazy" : "makePromise";
         Method meth = ClassType.make("gnu.kawa.functions.MakePromise")
-          .getDeclaredMethod("makePromise", 1);
+            .getDeclaredMethod(mname, 1);
 	PrimProcedure mproc
 	  = new PrimProcedure(meth);
         mproc.setReturnType(type);

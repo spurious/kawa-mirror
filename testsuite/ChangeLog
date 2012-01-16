@@ -1,3 +1,10 @@
+2012-01-15  Per Bothner  <per@bothner.com>
+
+	* srfi-45-test1.scm: New tests, from SRFI-45.
+	* srfi-45-test2.scm: Boundedness tests from SRFI-45.
+	* lazy-test.scm: Update type name from lazy[T} to promise[T]
+	* Makefile.am: Update acordingly.
+
 2012-01-07  Bill Robinson <airbaggins@gmail.com>
 	    Per Bothner  <per@bothner.com>
 

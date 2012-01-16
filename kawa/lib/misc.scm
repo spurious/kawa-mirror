@@ -96,7 +96,14 @@
    (after)))
 
 (define (force arg)
-  (gnu.mapping.Promise:force arg))
+  (gnu.mapping.Promise:force1 arg))
+
+(define (eager value)
+  (if (gnu.mapping.Promise? value)
+      (let ((p (gnu.mapping.Promise)))
+        (p:setValue value)
+        p)
+      value))
 
 ;;; The one-argument case is a standard DSSSL procedure.
 ;;; The multi-argument extension matches Guile.

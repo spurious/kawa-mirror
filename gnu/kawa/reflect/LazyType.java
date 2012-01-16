@@ -46,6 +46,10 @@ public class LazyType extends ObjectType
 	return valueType.compare(other);
     }
 
+    public static LazyType getLazyType(Type valueType) {
+        return getInstance(lazyType, valueType);
+    }
+
     public static LazyType getPromiseType(Type valueType) {
         return getInstance(promiseType, valueType);
     }

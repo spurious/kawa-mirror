@@ -1,3 +1,10 @@
+2012-01-09  Per Bothner  <per@bothner.com>
+
+	* Shell.java (runClass): New static method.
+	(runFileOrClass): Use runClass.
+	* standard/load.java (apply2): If file not found, try loading
+	and running class, similar with behavior of -f command-line option.
+
 2012-01-01  Per Bothner  <per@bothner.com>
 
 	* standard/Scheme.java (initScheme): Remove %make-promise definition.

@@ -18,7 +18,7 @@
   (<pair>:new car cdr))
 
 (define (null? x) :: <boolean>
-  (eq? x '()))
+  (eq? (gnu.mapping.Promise:force x) '()))
 
 (define (set-car! (p <pair>) x)
   (set! p:car x))

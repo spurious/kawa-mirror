@@ -20,6 +20,8 @@ public class expt extends Procedure2
 
   public static Numeric expt (Object arg1, Object arg2)
   {
+    arg1 = Promise.force(arg1);
+    arg2 = Promise.force(arg2);
     if (arg2 instanceof IntNum)
       return ((Numeric) arg1).power((IntNum) arg2);
     return Complex.power ((Complex) arg1, (Complex) arg2);

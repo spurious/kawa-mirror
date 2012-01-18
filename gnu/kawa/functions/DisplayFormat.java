@@ -131,6 +131,8 @@ public class DisplayFormat extends AbstractFormat
 	Pair pair = (Pair) list;
 	writeObject(pair.getCar(), (Consumer) out);
 	list = pair.getCdr();
+        while (list instanceof Lazy)
+          list = ((Lazy) list).getValue();
         if (list == LList.Empty)
           break;
         out.writeSpaceFill();

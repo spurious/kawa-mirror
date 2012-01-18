@@ -38,7 +38,7 @@ public class MultiplyOp extends ArithOp
     int len = args.length;
     if (len == 0)
       return IntNum.one ();
-    Number result = (Number) args[0];
+    Number result = (Number) Promise.force(args[0]);
     int code = Arithmetic.classifyValue(result);
     for (int i = 1; i < len; i++)
       {

@@ -1,3 +1,9 @@
+2012-01-17  Per Bothner  <per@bothner.com>
+
+	* DisplayFormat.java (writeList): Force Lazy values before checking
+	if a Pair.
+	* MultiplyOp.java (applyN): Force first operand.
+
 2012-01-15  Per Bothner  <per@bothner.com>
 
 	* MakePromise.java (makePromise): Rename to ...

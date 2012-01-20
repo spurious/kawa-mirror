@@ -1,3 +1,7 @@
+2012-01-19  Per Bothner  <per@bothner.com>
+
+	* LList.java (listRef): Remove method - reimplemented in Scheme.
+
 2011-12-19  Per Bothner  <per@bothner.com>
 
 	* U8Vector.java (<init>): Add copy constructors.

@@ -387,18 +387,6 @@ public class LList extends ExtSequence
     return prev;
   }
 
-  public static Object listTail(Object list, int count)
-  {
-    while (--count >= 0)
-      {
-	if (! (list instanceof Pair))
-	  throw new IndexOutOfBoundsException("List is too short.");
-	Pair pair = (Pair) list;
-	list = pair.cdr;
-      }
-    return list;
-  }
-
   /** SRFI-1's cons* and Common Lisp's list* function. */
   public static Object consX (Object[] args)
   {

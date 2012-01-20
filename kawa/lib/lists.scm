@@ -12,7 +12,7 @@
 (require <kawa.lib.reflection>)
 
 (define (pair? x) :: <boolean>
-  (<pair>:instance? x))
+  (<pair>:instance? (gnu.mapping.Promise:force x)))
 
 (define (cons car cdr) :: <pair>
   (<pair>:new car cdr))
@@ -101,7 +101,15 @@
 	  (loop (cdr pair) (cons (car pair) result))))))
 
 (define (list-tail list (count :: <int>))
-  (<list>:listTail list count))
+  (let loop ((lst list))
+    (set! count (- count 1))
+    (cond ((< count 0)
+           lst)
+          (else
+           (let ((flst (gnu.mapping.Promise:force lst)))
+             (if (gnu.lists.Pair? flst)
+                 (loop ((as gnu.lists.Pair flst):getCdr))
+                 (primitive-throw (java.lang.IndexOutOfBoundsException "List is too short."))))))))
 
 (define (list-ref list (index :: <int>))
   (car (list-tail list index)))

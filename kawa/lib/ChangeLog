@@ -1,5 +1,11 @@
 2012-01-19  Per Bothner  <per@bothner.com>
 
+	* lists.scm (pair?): Force operand.
+	(list-tail): Re-implement in Scheme, instead of Java.
+	Force operand as needed.
+
+	* misc.scm (eager): Use keyword-inconstructor syntax.
+
 	* std_syntax.scm (free-identifier=?): Re-implement to check that
 	arguments are identifiers and then call new the new method
 	SyntaxForms#identifierEquals.

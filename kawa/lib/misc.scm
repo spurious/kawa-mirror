@@ -100,9 +100,7 @@
 
 (define (eager value)
   (if (gnu.mapping.Promise? value)
-      (let ((p (gnu.mapping.Promise)))
-        (p:setValue value)
-        p)
+      (gnu.mapping.Promise value: value)
       value))
 
 ;;; The one-argument case is a standard DSSSL procedure.

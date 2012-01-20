@@ -1,3 +1,7 @@
+2012-01-19  Per Bothner  <per@bothner.com>
+
+	* mac-test.scm: New test of free-identifier=? and bound-identifier=?.
+
 2012-01-15  Per Bothner  <per@bothner.com>
 
 	* srfi-45-test1.scm: New tests, from SRFI-45.

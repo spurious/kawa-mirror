@@ -1,3 +1,10 @@
+2012-01-19  Per Bothner  <per@bothner.com>
+
+	* std_syntax.scm (free-identifier=?): Re-implement to check that
+	arguments are identifiers and then call new the new method
+	SyntaxForms#identifierEquals.
+	(bound-identifier=?): New function.
+
 2012-01-17  Per Bothner  <per@bothner.com>
 
 	* lists.scm (null?): Force operand before testing with eq?.

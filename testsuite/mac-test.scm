@@ -1,4 +1,4 @@
-(test-init "macros" 104)
+(test-init "macros" 105)
 
 (test 'ok 'letxx (let ((xx #f)) (cond (#t xx 'ok))))
 
@@ -442,6 +442,24 @@
 			  (let ((x (car '(3))))
 			    (quasisyntax (list x ,x))))))
 	  (m))))
+
+;; From R6RS, except [...] replaced by (...), and
+;; using letrec-syntax instead of nested define-syntax.
+;; Also, #, is not supported.  FIXME
+(test '(#t #f)
+      'free-identifier-1
+      (let ((fred 17))
+        (letrec-syntax
+            ((a (lambda (x)
+                  (syntax-case x ()
+                    ((_ id) #'(b id fred)))))
+             (b (lambda (x)
+                  (syntax-case x ()
+                    ((_ id1 id2)
+                     (list #'list
+                           (free-identifier=? #'id1 #'id2)
+                           (bound-identifier=? #'id1 #'id2)))))))
+          (a fred))))
 
 (begin
   ;; Note we need to compile define and define-for-syntax

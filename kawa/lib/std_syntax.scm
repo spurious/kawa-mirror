@@ -6,7 +6,7 @@
 	       syntax-object->datum datum->syntax-object with-syntax
 	       begin-for-syntax define-for-syntax
 	       generate-temporaries define-procedure
-	       identifier? free-identifier=?
+	       identifier? free-identifier=? bound-identifier=?
 	       syntax-source syntax-line syntax-column eval)
 
 ;;; COND
@@ -279,7 +279,14 @@
 	   (kawa.lang.SyntaxForms:isIdentifier form))))
 
 (define (free-identifier=? id1 id2) :: <boolean>
-  (kawa.lang.SyntaxForms:freeIdentifierEquals id1 id2))
+  (if (and (identifier? id1) (identifier? id2))
+      (kawa.lang.SyntaxForms:identifierEquals id1 id2 #f)
+      (syntax-error "free-identifier-? - argument is not an identifier")))
+
+(define (bound-identifier=? id1 id2) :: <boolean>
+  (if (and (identifier? id1) (identifier? id2))
+      (kawa.lang.SyntaxForms:identifierEquals id1 id2 #t)
+      (syntax-error "bound-identifier-? - argument is not an identifier")))
 
 (define (syntax-source form)
   (cond ((instance? form kawa.lang.SyntaxForm)

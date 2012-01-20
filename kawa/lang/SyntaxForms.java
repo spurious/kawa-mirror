@@ -42,11 +42,50 @@ public class SyntaxForms {
     return form;
   }
 
-  public static boolean freeIdentifierEquals (SyntaxForm id1, SyntaxForm id2)
-  {
-    Translator tr = (Translator) Compilation.getCurrent();
-    return tr.lexical.lookup(id1.getDatum(), -1) == tr.lexical.lookup(id2.getDatum(), -1);
-  }
+    /** Utility method to implement Schene free-identifier=? and bound-identifier=?.
+     * @param id1 An identifier - either a symbol or a SyntaxForm whose form is a symbol.  We assume it satisfies the Scheme predicate identifier?.
+     * @param id2 The other identifier to compare against.
+     * @param checkBound true for bound-identifier=? and false for free-identifier=?.
+     */
+    public static boolean identifierEquals (Object id1, Object id2, boolean checkBound) {
+        Compilation comp = (Translator) Compilation.getCurrent();
+        Object s1, s2;
+        ScopeExp sc1, sc2;
+        if (id1 instanceof SyntaxForm) {
+            SyntaxForm sf = (SyntaxForm) id1;
+            s1 = sf.getDatum();
+            sc1 = sf.getScope();
+        }
+        else {
+            s1 = id1;
+            sc1 = null;
+        }
+        if (id2 instanceof SyntaxForm) {
+            SyntaxForm sf = (SyntaxForm) id2;
+            s2 = sf.getDatum();
+            sc2 = sf.getScope();
+        }
+        else {
+            s2 = id2;
+            sc2 = null;
+        }
+
+        if (s1 != s2)
+            return false;
+        if (sc1 == sc2)
+            return true;
+        if (checkBound)
+            return false;
+        ScopeExp savedScope = comp.currentScope();
+        if (sc1 != null)
+            comp.setCurrentScope(sc1);
+        Declaration d1 = comp.lexical.lookup(s1, -1);
+        comp.setCurrentScope(sc2 != null ? sc2 : savedScope);
+        Declaration d2 = comp.lexical.lookup(s2, -1);
+        if (sc2 != null)
+            comp.setCurrentScope(savedScope);
+        return d1 == d2;
+    }
 
   public static boolean isIdentifier (SyntaxForm form)
   {

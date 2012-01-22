@@ -1,3 +1,7 @@
+2012-01-21  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Defining new classes): Document access: abstract.
+
 2012-01-09  Per Bothner  <per@bothner.com>
 
 	* kawa.texi: Some tweaks relating to load.

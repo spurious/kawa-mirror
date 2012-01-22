@@ -8007,8 +8007,11 @@ Can be one of @code{'public} (which is the default in Kawa),
 @code{'package} (which the default "unnamed" permission in Java code),
 @code{'protected}, @code{'private},
 @code{'volatile}, or @code{'transient}.
-Can also be used to specify @code{final} or @code{enum}, as in Java.
-Can also be a list, as for example:
+Can also be used to specify @code{final}, @code{abstract}, or @code{enum}, as in Java.
+(You don't need to explicitly specify the class is @code{abstract}
+if any @var{method-body} is @code{#!abstract},
+or you specify @code{interface: #t}.)
+The @var{kind} can also be a list, as for example:
 @example
 access: '(protected volatile)
 @end example

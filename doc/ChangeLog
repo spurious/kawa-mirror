@@ -1,5 +1,8 @@
 2012-01-22  Per Bothner  <per@bothner.com>
 
+	* kawa.texi (Source distribution): Update that you can use
+	configure+make on Windows by using Cygwin.
+
 	* kawa.texi (Parameterized Types): New section.
 
 2012-01-22  Per Bothner  <per@bothner.com>

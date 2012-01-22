@@ -597,12 +597,13 @@ for a solution.  Alternatively you can run
 the class @code{org.apache.tools.ant.Main} directly from the Ant jar.
 
 The Kawa @code{configure} and @code{make} process assumes a Unix-like
-environment.  If you want to build Kawa from source under Windows,
-you could use a Unix empulation package, such
-as the free @uref{http://sourceware.org/cygwin/,Cygwin}.
-However, there are some problems with filenames that make this
-more complicated than it should be.  It should be possible
-to build Kawa under Cygwin using @code{gcj} as descibed above.
+environment.  The free @uref{http://sourceware.org/cygwin/,Cygwin}
+environment can be used for building Kawa: The Kawa configure script
+recognizes Cygwin, and modifies the classpath to use Windows-style
+path separators.  (At the time of writing there were still some
+path issues with running the testsuite.)
+
+@uref{http://www.mingw.org/,MinGW} may also work but has not been tested.
 
 @node Running, Features, Installation, Top
 @chapter How to start up and run Kawa

@@ -26,7 +26,8 @@ public class StackTarget extends Target
 
     public static void forceLazyIfNeeded(Compilation comp, Type stackType, Type type) {
 	CodeAttr code = comp.getCode();
-	if (LazyType.maybeLazy(stackType) && ! LazyType.maybeLazy(type)) {
+	if (LazyType.maybeLazy(stackType) && ! LazyType.maybeLazy(type)
+            && type.getRawType().compare(stackType.getRawType()) < 0) {
 	    Method forceMethod;
 	    if (stackType instanceof LazyType) {
 		forceMethod = LazyType.lazyType.getDeclaredMethod("getValue", 0);

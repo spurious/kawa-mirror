@@ -5135,6 +5135,26 @@ you quote a vector constant:
 ’#(0 (2 2 2 2) "Anna")  @result{} #(0 (2 2 2 2) "Anna")
 @end example
 
+Compare these different ways of creating a vector:
+@table @code
+@item (vector a b c)
+In this case @code{a}, @code{b}, and @code{c} are expressions evaluated at
+run-time and the results used to initialize a newly-allocated 3-element vector.
+@item [a b c]
+Same as using vector, but more concise, and results in an immutable
+(non-modifiable) vector.
+@item #(a b c)
+This is reader syntax and creates a vector literal,
+at read-time, early in compile-time.
+The symbols @code{a}, @code{b}, and @code{c} are not evaluated
+but instead used literally.
+@item `#(,a ,b ,c)
+This is reader-syntax, using quasi-quotation,
+so @code{a}, @code{b}, and @code{c} are expressions evaluated at run-time.
+This is equivalent to @code{[a b c]} in that it results in an immutable vector.
+@end table
+
+
 @deffn Type vector
 The type of vector objects.
 @end deffn
@@ -5145,6 +5165,12 @@ arguments.  Analogous to @code{list}.
 
 @example
 (vector 'a 'b 'c)               @result{}  #(a b c)
+@end example
+
+Alternatively, you can use square-bracket syntax,
+which results in an immutable vector:
+@example
+['a 'b 'c]               @result{}  #(a b c)
 @end example
 @end deffn
 

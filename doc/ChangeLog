@@ -1,3 +1,8 @@
+2012-01-22  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Vectors): Document [xxx] constructor syntax,
+	and discuss immutability.
+
 2012-01-21  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Defining new classes): Document access: abstract.

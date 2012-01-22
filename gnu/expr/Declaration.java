@@ -563,21 +563,22 @@ public class Declaration
   public static final long TRANSIENT_ACCESS = 0x100000000l;
   public static final long ENUM_ACCESS = 0x200000000l;
   public static final long FINAL_ACCESS = 0x400000000l;
+  public static final long ABSTRACT_ACCESS = 0x800000000l;
   public static final long CLASS_ACCESS_FLAGS =
-    PRIVATE_ACCESS|PROTECTED_ACCESS|ENUM_ACCESS|FINAL_ACCESS;
+    PRIVATE_ACCESS|PROTECTED_ACCESS|ENUM_ACCESS|FINAL_ACCESS|ABSTRACT_ACCESS;
   public static final long FIELD_ACCESS_FLAGS = PRIVATE_ACCESS|PROTECTED_ACCESS|
     PUBLIC_ACCESS|PACKAGE_ACCESS|VOLATILE_ACCESS|TRANSIENT_ACCESS|
     ENUM_ACCESS|FINAL_ACCESS;
   public static final long METHOD_ACCESS_FLAGS = PRIVATE_ACCESS
     |PROTECTED_ACCESS|PUBLIC_ACCESS|PACKAGE_ACCESS|FINAL_ACCESS;
-  public static final long MAYBE_UNINITIALIZED_ACCESS = 0x800000000l;
+  public static final long MAYBE_UNINITIALIZED_ACCESS = 0x1000000000l;
   /** Allocate variable on JVM stack as an optimization.
    * This means load is implemented as a dup instruction.
    * (This is no faster on decent JVMs, but the bytecode is more compact.)
    * Note this may cause an InternalError if this is loaded when the
    * JVM stack has grown since the variable was initialized.
    */
-  public static final long ALLOCATE_ON_STACK = 0x1000000000l;
+  public static final long ALLOCATE_ON_STACK = 0x2000000000l;
 
   protected long flags = IS_SIMPLE;
 

@@ -1,3 +1,9 @@
+2012-01-21  Per Bothner  <per@bothner.com>
+
+	* standard/object.java (scanClassDef): If seen ABSTRACT_ACCESS
+	then set IS_ABSTRACT on ClassExp.
+	(matchAccess1):  Map "abstract" to ABSTRACT_ACCESS.
+
 2012-01-19  Per Bothner  <per@bothner.com>
 
 	* lang/SyntaxForms.java (identifierEquals): New static method.

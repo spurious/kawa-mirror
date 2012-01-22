@@ -1,5 +1,8 @@
 2012-01-21  Per Bothner  <per@bothner.com>
 
+	* Declaration.java (ABSTRACT_ACCESS): New flag.
+	(CLASS_ACCESS_FLAGS): Include ABSTACT_ACCESS.
+
 	* StackTarget.java (forceLazyIfNeeded): Don't force if stack type
 	is actually a subtype of target type.
 

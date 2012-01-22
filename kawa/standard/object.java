@@ -324,8 +324,12 @@ public class object extends Syntax
 	  tr.error ('e', "invalid field/method definition");
 	tr.popPositionOf(savedPos1);
       }
-  if (classAccessFlag != 0)
-    oexp.nameDecl.setFlag(classAccessFlag);
+    if (classAccessFlag != 0 && oexp.nameDecl != null)
+      {
+        oexp.nameDecl.setFlag(classAccessFlag);
+        if ((classAccessFlag & Declaration.ABSTRACT_ACCESS) != 0)
+          oexp.setFlag(ClassExp.IS_ABSTRACT);
+      }
 
     if (classNamePair != null)
       {
@@ -717,6 +721,8 @@ public class object extends Syntax
       return Declaration.ENUM_ACCESS;
     if ("final".equals(value))
       return Declaration.FINAL_ACCESS;
+    if ("abstract".equals(value))
+      return Declaration.ABSTRACT_ACCESS;
     return 0;
   }
 

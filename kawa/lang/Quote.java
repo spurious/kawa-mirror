@@ -376,7 +376,7 @@ public class Quote extends Syntax
 	if (max_state == 0)
 	  result = vector;
 	else if (max_state == 1)
-	  result = new FVector (buffer);
+	  result = new ConstVector<Object>(buffer);
 	else
 	  {
 	    Expression[] args = new Expression[n];
@@ -390,7 +390,7 @@ public class Quote extends Syntax
 		  {
 		    Object[] arg1 = new Object[1];
 		    arg1[0] = buffer[i];
-		    args[i] = leaf(new FVector (arg1), tr);
+		    args[i] = leaf(new ConstVector<Object>(arg1), tr);
 		  }
 		else
 		  {
@@ -480,11 +480,11 @@ public class Quote extends Syntax
 
   static final Method vectorAppendMethod
   = ClassType.make("kawa.standard.vector_append")
-    .getDeclaredMethod("apply$V", 1);
+    .getDeclaredMethod("appendToConstVector", 1);
   static final ClassType quoteType = ClassType.make("kawa.lang.Quote");
   static final Method consXMethod = quoteType.getDeclaredMethod("consX$V", 1);
   static final Method appendMethod = quoteType.getDeclaredMethod("append$V", 1);
   static final Method makePairMethod = Compilation.typePair.getDeclaredMethod("make", 2);
-  static final Method makeVectorMethod = ClassType.make("gnu.lists.FVector")
+  static final Method makeVectorMethod = ClassType.make("gnu.lists.ConstVector")
     .getDeclaredMethod("make", 1);
 }

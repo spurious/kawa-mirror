@@ -1,5 +1,9 @@
 2012-01-21  Per Bothner  <per@bothner.com>
 
+	* lang/Quote.java (expand):  If quasi-quoting a vector, return
+	a ConstVector, not a (mutable) FVector.
+	* standard/vector_appane.java (appendToConstVector): New method.
+
 	* standard/object.java (scanClassDef): If seen ABSTRACT_ACCESS
 	then set IS_ABSTRACT on ClassExp.
 	(matchAccess1):  Map "abstract" to ABSTRACT_ACCESS.

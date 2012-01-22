@@ -22,7 +22,15 @@ public class vector_append extends ProcedureN
     return apply$V(args);
   }
 
-  public static FVector apply$V (Object[] args)
+    public static FVector apply$V (Object[] args) {
+        return new FVector(appendToArray(args));
+    }
+
+    public static ConstVector appendToConstVector(Object... args) {
+        return new ConstVector(appendToArray(args));
+    }
+
+  public static Object[] appendToArray(Object[] args)
   {
     int length = 0;
     int args_length = args.length;
@@ -61,6 +69,6 @@ public class vector_append extends ProcedureN
 	      }
 	  }
       }
-    return new FVector (result);
+    return result;
   }
 }

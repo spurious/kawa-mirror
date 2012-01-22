@@ -1,5 +1,9 @@
 2012-01-22  Per Bothner  <per@bothner.com>
 
+	* kawa.texi (Parameterized Types): New section.
+
+2012-01-22  Per Bothner  <per@bothner.com>
+
 	* kawa.texi (Vectors): Document [xxx] constructor syntax,
 	and discuss immutability.
 

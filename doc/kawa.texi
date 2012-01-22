@@ -7737,6 +7737,7 @@ that map to primitive Java types or java classes.
 
 @menu
 * Standard Types::
+* Parameterized Types::
 * Declaring Types of Variables::
 * Type tests and conversions::
 @end menu
@@ -7874,6 +7875,28 @@ A type specifier can also be a fully-qualified Java class name
 the actual argument is cast at run time to the named class.
 Also, @code{java.lang.StringBuffer[]} represents
 an array of references to @code{java.lang.StringBuffer} objects.
+
+@node Parameterized Types
+@section Parameterized Types
+Kawa has some basic support for parameterized (generic) types.
+The syntax:
+@example
+Type[Arg1 Arg2 ... ArgN]
+@end example
+is more-or-less equivalent to Java's:
+@example
+Type<Arg1, Arg2, ..., ArgN>
+@end example
+
+This is a work-in-progress.  You can use this syntax with
+fully-qualified class names, and also type aliases:
+@example
+(define v1 ::gnu.lists.FVector[gnu.math.IntNum] [4 5 6])
+(define-alias fv gnu.lists.FVector)
+(define v2 ::fv[integer] [5 6 7])
+(define-alias fvi fv[integer])
+(define v3 ::fvi [6 7 8])
+@end example
 
 @node Declaring Types of Variables,  Type tests and conversions, Standard Types, Types
 @section Declaring Types of Variables

@@ -1,3 +1,8 @@
+2012-01-24  Per Bothner  <per@bothner.com>
+
+	* lang/SyntaxPattern.java (allocVars):  Don't copy more from
+	inherited array than is in it.
+
 2012-01-21  Per Bothner  <per@bothner.com>
 
 	* lang/Quote.java (expand):  If quasi-quoting a vector, return

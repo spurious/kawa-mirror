@@ -627,14 +627,17 @@ public class SyntaxPattern extends Pattern implements Externalizable
     varCount = in.readInt();
   }
 
-  /** The compiler calls this method to implement syntax-case. */
-  public static Object[] allocVars (int varCount, Object[] outer)
-  {
-    Object[] vars = new Object[varCount];
-    if (outer != null)
-      System.arraycopy(outer, 0, vars, 0, outer.length);
-    return vars;
-  }
+    /** The compiler calls this method to implement syntax-case. */
+    public static Object[] allocVars (int varCount, Object[] outer) {
+        Object[] vars = new Object[varCount];
+        if (outer != null) {
+            int toCopy = outer.length;
+            if (toCopy > varCount)
+                toCopy = varCount;
+            System.arraycopy(outer, 0, vars, 0, toCopy);
+        }
+        return vars;
+    }
 
   public static boolean literalIdentifierEq (Object id1, ScopeExp sc1,
 					     Object id2, ScopeExp sc2)

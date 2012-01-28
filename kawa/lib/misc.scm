@@ -95,6 +95,18 @@
    (thunk)
    (after)))
 
+(define (promise-set-value! promise::gnu.mapping.Promise value) ::void
+  (promise:setValue value))
+
+(define (promise-set-alias! promise::gnu.mapping.Promise aliasee::gnu.mapping.Lazy) ::void
+  (promise:setAlias aliasee))
+
+(define (promise-set-exception! promise::gnu.mapping.Promise exception::java.lang.Throwable) ::void
+  (promise:setException exception))
+
+(define (promise-set-thunk! promise::gnu.mapping.Promise thunk::gnu.mapping.Procedure) ::void
+  (promise:setThunk thunk))
+
 (define (force arg)
   (gnu.mapping.Promise:force1 arg))
 

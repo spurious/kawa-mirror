@@ -1,3 +1,12 @@
+2012-01-27  Per Bothner  <per@bothner.com>
+
+	* Promise.java (isBlank): New method.
+	(checkUnset): Rename to checkBlank.
+	(setValue, setvalue, setException, setThnk): New methods.
+	(getValue): Changes to handle new functionality.
+	(print): Add overload.
+	(toString): New method.
+
 2012-01-15  Per Bothner  <per@bothner.com>
 
 	* Promise.java: Make final, because moveFrom would be anomolous if

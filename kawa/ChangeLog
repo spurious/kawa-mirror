@@ -1,3 +1,9 @@
+2012-01-27  Per Bothner  <per@bothner.com>
+
+	* standard/Scheme.java (initScheme): Declare promise-set-value!,
+	promise-set-alias!, promise-set-exception!, and promise-set-thunk!.
+	(getTypeName): Change binding for "promise".
+
 2012-01-24  Per Bothner  <per@bothner.com>
 
 	* lang/SyntaxPattern.java (allocVars):  Don't copy more from

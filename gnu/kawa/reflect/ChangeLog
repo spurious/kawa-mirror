@@ -1,3 +1,8 @@
+2012-01-27  Per Bothner  <per@bothner.com>
+
+	* CompileInvoke.java (validateApplyInvoke): If type is LangObjType,
+	call getConstructorType.
+
 2012-01-15  Per Bothner  <per@bothner.com>
 
 	* LazyType.java (getLazyType): New static method.

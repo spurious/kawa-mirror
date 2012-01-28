@@ -1,3 +1,9 @@
+2012-01-27  Per Bothner  <per@bothner.com>
+
+	* LangObjType.java (promiseType): New static field.
+	(PROMISE_TYPE_CODE): New constant.
+	(getConstructorType): New method.
+
 2011-12-29  Per Bothner  <per@bothner.com>
 
 	* LangObjType.java (compare): Handle LazyType.

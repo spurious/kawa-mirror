@@ -415,6 +415,10 @@ public class Scheme extends LispLanguage
       defProcStFld("call/cc", "kawa.standard.callcc", "callcc");
       defProcStFld("force", "kawa.lib.misc");
       defProcStFld("eager", "kawa.lib.misc");
+      defProcStFld("promise-set-value!", "kawa.lib.misc");
+      defProcStFld("promise-set-alias!", "kawa.lib.misc");
+      defProcStFld("promise-set-exception!", "kawa.lib.misc");
+      defProcStFld("promise-set-thunk!", "kawa.lib.misc");
 
       //-- Section 6.10  -- complete
       defProcStFld("call-with-input-file", "kawa.lib.ports");
@@ -1034,7 +1038,7 @@ public class Scheme extends LispLanguage
 	types.put ("type", LangObjType.typeType);
 	types.put ("class-type", LangObjType.typeClassType);
 	types.put ("class", LangObjType.typeClass);
-	types.put ("promise", LazyType.lazyType);
+	types.put ("promise", LangObjType.promiseType);
 
         for (int i = uniformVectorTags.length;  --i >= 0; )
           {

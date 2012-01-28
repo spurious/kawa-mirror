@@ -35,6 +35,8 @@ public class CompileInvoke
     Type type0 = (kind == 'V' || kind == '*' ? arg0.getType() : iproc.language.getTypeFor(arg0));
     if (type0 instanceof PairClassType && kind == 'N')
       type = ((PairClassType) type0).instanceType;
+    else if (type0 instanceof LangObjType && kind == 'N')
+      type = ((LangObjType) type0).getConstructorType();
     else if (type0 instanceof ObjectType)
       type = (ObjectType) type0;
     else

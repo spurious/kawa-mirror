@@ -1,6 +1,7 @@
 package gnu.mapping;
 import gnu.text.Printable;
 import gnu.lists.Consumer;
+import java.io.IOException;
 
 /** Implement Scheme "promises".
  *
@@ -57,48 +58,46 @@ public final class Promise<T> implements Printable, Lazy<T>
         return p;
     }
 
-    public T getValue () {
-        Object r = result;
-        // Doesn't reliably work on JDK4 or earlier, but works on JDK5 or later.
-        // http://www.cs.umd.edu/~pugh/java/memoryModel/DoubleCheckedLocking.html
-        if (r != Location.UNBOUND)
-            return (T) r;
+    public synchronized T getValue () {
+        Object r;
         for (;;) {
-            // Invariant: r == this.result
             synchronized (this) {
-                while (r == Location.UNBOUND && throwable == null) {
-                    if (thunk == null) {
-                        try {
-                            wait();
-                        } catch (java.lang.InterruptedException ex) {
-                        }
-                        r = result;
-                    } else {
-                        try {
-                            r = thunk.apply0 ();
-                            if (result == Location.UNBOUND)
-                                result = r;
-                            else
-                                r = result;
-                        } catch (Throwable ex) {
-                            throwable = ex;
-                        }
-                        thunk = null;
-                        break;
+                while (isBlank()) {
+                    try {
+                        wait();
+                    } catch (java.lang.InterruptedException ex) {
                     }
+                }
+                
+                r = result;
+                if (r == Location.UNBOUND && throwable == null) {
+                    // thunk is non-null, because !isBlank().
+                    try {
+                        r = thunk.apply0 ();
+                        if (result == Location.UNBOUND)
+                            result = r;
+                        else
+                            r = result;
+                        if (forceValueIfPromise && r instanceof Promise) {
+                            Promise pr = (Promise) r;
+                            synchronized(r) {
+                                if (! pr.isBlank()) {
+                                    moveFrom(pr);
+                                    continue;
+                                }
+                            }
+                        }
+                    } catch (Throwable ex) {
+                        throwable = ex;
+                    }
+                    thunk = null;
                 }
                 if (throwable != null)
                     WrappedException.rethrow(throwable);
             }
-            if (! forceValueIfPromise || ! (r instanceof Lazy))
-                return (T) r;
-            if (! (r instanceof Promise)) {
+            if (forceValueIfPromise && r instanceof Lazy)
                 return ((Lazy<T>) r).getValue();
-            }
-            synchronized(r) {
-                moveFrom((Promise) r);
-            }
-            r = result;
+            return (T) r;
         }
     }
 
@@ -117,21 +116,25 @@ public final class Promise<T> implements Printable, Lazy<T>
         other.throwable = null;
     }
 
-    public void checkUnset() {
-         if (result != Location.UNBOUND || throwable != null || thunk != null)
-             throw new IllegalStateException();
+    public synchronized final boolean isBlank() {
+        return thunk == null && result == Location.UNBOUND && throwable == null;
+    }
+
+    public void checkBlank() {
+        if (! isBlank())
+            throw new IllegalStateException();
     }
 
     /** Bind this promise to a given (eager) value. */
     public synchronized void setValue(Object value) {
-         checkUnset();
+         checkBlank();
          result = value;
          notifyAll();
     }
 
     /** Bind promise to be an alias of another Lazy value. */
     public synchronized void setAlias(Lazy promise) {
-         checkUnset();
+         checkBlank();
          result = promise;
          setForceValueIfPromise(true);
          notifyAll();
@@ -139,14 +142,14 @@ public final class Promise<T> implements Printable, Lazy<T>
 
     /** Bind this promise so forcing it throws the given exception. */
     public synchronized void setException(Throwable exception) {
-         checkUnset();
+         checkBlank();
          throwable = exception;
          notifyAll();
     }
 
     /** Bind this promise so forcing it evaluates the given procedure. */
     public synchronized void setThunk(Procedure thunk) {
-         checkUnset();
+         checkBlank();
          this.thunk = thunk;
          notifyAll();
     }
@@ -169,30 +172,45 @@ public final class Promise<T> implements Printable, Lazy<T>
 	return arg;
     }
 
-  public void print (Consumer out)
-  {
-    Object r = result;
-    if (r == Location.UNBOUND)
-      {
-        synchronized (this)
-          {
-            if (throwable != null)
-              {
-                out.write("#<promise - force threw a ");
-                out.write(throwable.getClass().getName());
-                out.write('>');
-              }
-            else
-              out.write("#<promise - not forced yet>");
-          }
-      }
-    else if (r == null)
-      out.write("#<promise - forced to null>");
-    else
-      {
-	out.write("#<promise - forced to a ");
-	out.write(r.getClass().getName());
-	out.write ('>');
-      }
-  }
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        try {
+            print(sb);
+        }
+        catch (IOException ex) {
+            return "caught "+ex;
+        }
+        return sb.toString();
+    }
+
+    public void print (Consumer out) {
+        try {
+            print((Appendable) out);
+        }
+        catch (IOException ex) {
+            out.write("caught "+ex);
+        }
+    }
+
+    public void print (Appendable out) throws IOException {
+        Object r = result;
+        if (r == Location.UNBOUND) {
+            synchronized (this) {
+                if (throwable != null) {
+                    out.append("#<promise - force threw a ");
+                    out.append(throwable.getClass().getName());
+                    out.append('>');
+                }
+                else
+                    out.append("#<promise - not forced yet>");
+            }
+        }
+        else if (r == null)
+            out.append("#<promise - forced to null>");
+        else {
+            out.append("#<promise"+" - forced to a ");
+            out.append(r.getClass().getName());
+            out.append('>');
+        }
+    }
 }

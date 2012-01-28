@@ -1,3 +1,8 @@
+2012-01-27  Per Bothner  <per@bothner.com>
+
+	* misc.scm (promise-set-value!, promise-set-alias!,
+	promise-set-exception!, promise-set-thunk!): New procedures.
+
 2012-01-19  Per Bothner  <per@bothner.com>
 
 	* lists.scm (pair?): Force operand.

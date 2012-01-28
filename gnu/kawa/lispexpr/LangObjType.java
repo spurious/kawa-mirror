@@ -44,6 +44,7 @@ public class LangObjType extends ObjectType implements TypeValue
   private static final int F32VECTOR_TYPE_CODE = 25;
   private static final int F64VECTOR_TYPE_CODE = 26;
   private static final int PROCEDURE_TYPE_CODE = 27;
+  private static final int PROMISE_TYPE_CODE = 28;
 
   public static final LangObjType pathType =
     new LangObjType("path", "gnu.text.Path",
@@ -157,6 +158,10 @@ public class LangObjType extends ObjectType implements TypeValue
   public static final LangObjType procedureType =
     new LangObjType("procedure", "gnu.mapping.Procedure",
                     PROCEDURE_TYPE_CODE);
+
+  public static final LangObjType promiseType =
+    new LangObjType("promise", "gnu.mapping.Lazy",
+                    PROMISE_TYPE_CODE);
 
   LangObjType(String name, String implClass, int typeCode)
   {
@@ -726,6 +731,15 @@ public class LangObjType extends ObjectType implements TypeValue
   /* #else */
   // static final String VARARGS_SUFFIX = "$V";
   /* #endif */
+
+    public ObjectType getConstructorType() {
+        switch (typeCode) {
+        case PROMISE_TYPE_CODE:
+            return LazyType.promiseType;
+        default:
+            return this;
+        }
+    }
 
   public Procedure getConstructor ()
   {

@@ -1,3 +1,10 @@
+2012-01-27  Helmut Eller  <eller.helmut@gmail.com>
+	    Per Bothner  <per@bothner.com>
+
+	* sva35362.scm: New testcase for Savannah bug #35362 -
+	"endless loop + unused continuation".
+	* Makefile.am: Update accordingly.
+
 2012-01-27  Per Bothner  <per@bothner.com>
 
 	* promise1.scm: New testcase.

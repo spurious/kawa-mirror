@@ -61,12 +61,16 @@ public class ExitableBlock
 
   void finish ()
   {
-    if (resultVariable != null && code.reachableHere ())
+    boolean reachable = code.reachableHere();
+    if (resultVariable != null && reachable)
       code.emitStore(resultVariable);
     endLabel.define(code);
+    if (! reachable && ! endLabel.needsStackMapEntry)
+      code.setUnreachable();
+    else if (resultVariable != null)
+      code.emitLoad(resultVariable);
     if (resultVariable != null)
       {
-        code.emitLoad(resultVariable);
         code.popScope();
         --code.exitableBlockLevel;
       }

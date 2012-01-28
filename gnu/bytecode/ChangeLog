@@ -1,3 +1,8 @@
+2012-01-27  Per Bothner  <per@bothner.com>
+
+	* ExitableBlock.java (finish): If appropriate, do setUnreachabe().
+	This fixes Savannah bug #35362: "endless loop + unused continuation".
+
 2011-12-12  Per Bothner  <per@bothner.com>
 
 	* Type.java (isInterface): New method.

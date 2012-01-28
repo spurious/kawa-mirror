@@ -1,5 +1,7 @@
 2012-01-27  Per Bothner  <per@bothner.com>
 
+	* standard/Scheme.java (initScheme): Fix binding for "call/cc".
+
 	* standard/Scheme.java (initScheme): Declare promise-set-value!,
 	promise-set-alias!, promise-set-exception!, and promise-set-thunk!.
 	(getTypeName): Change binding for "promise".

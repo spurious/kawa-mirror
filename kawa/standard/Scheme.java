@@ -412,7 +412,7 @@ public class Scheme extends LispLanguage
       defProcStFld("for-each", "kawa.standard.Scheme", "forEach");
       defProcStFld("call-with-current-continuation",
                    "gnu.kawa.functions.CallCC", "callcc");
-      defProcStFld("call/cc", "kawa.standard.callcc", "callcc");
+      defProcStFld("call/cc", "gnu.kawa.functions.CallCC", "callcc");
       defProcStFld("force", "kawa.lib.misc");
       defProcStFld("eager", "kawa.lib.misc");
       defProcStFld("promise-set-value!", "kawa.lib.misc");

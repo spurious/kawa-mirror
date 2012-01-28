@@ -25,13 +25,16 @@ public class BracketApply extends Syntax
     Expression arg0 = tr.rewrite_car(pair, false);
     Object val = arg0.valueIfConstant();
     Object pairCdr = pair.getCdr();
-    if (length == 1 && val == LazyType.lazyType && pairCdr instanceof Pair)
+
+    // Special-case promise[T] to yield a LazyType:
+    if (length == 1 && val == LangObjType.promiseType && pairCdr instanceof Pair)
       {
         Expression arg1 = tr.rewrite_car((Pair) pairCdr, false);
         Object val1 = arg1.valueIfConstant();
         if (val1 instanceof Type)
           return new QuoteExp(LazyType.getInstance(LazyType.lazyType, (Type) val1));
       }
+
     if (length > 0 && val instanceof Class) {
 	Class clas = (Class) val;
 	java.lang.reflect.TypeVariable[] vars = clas.getTypeParameters();

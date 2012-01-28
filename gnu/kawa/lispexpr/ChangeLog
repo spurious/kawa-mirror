@@ -1,3 +1,7 @@
+2012-01-28  Per Bothner  <per@bothner.com>
+
+	* BracketApply.java (rewrite): Update for 'promise'.
+
 2012-01-27  Per Bothner  <per@bothner.com>
 
 	* LangObjType.java (promiseType): New static field.

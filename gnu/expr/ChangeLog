@@ -1,5 +1,12 @@
 2012-01-29  Per Bothner  <per@bothner.com>
 
+	* ModuleExp.java: Dynamically check if compiler is available,
+	so Android users can use eval more easily.
+	(compilerAvailable): Deprecate old field.
+	(compilerAvailable): New method.
+	(alwaysCompile): Update to call new compilerAvailable method.
+	* Compilation.java: Likewise.
+
 	* LambdaExp.java (getReturnType): Don't call getType on body if it
 	hasn't been VALIDATED yet - that could cause problems.
 

@@ -156,14 +156,34 @@ public class ModuleExp extends LambdaExp
       }
   }
 
-  // TODO: This should be false #ifdef Android.
-  // The complication is that it needs to be true while building
-  // Kawa itself, or generally compiling code *for* Android.
-  // I.e. we need to be able to distinguish compile-time and run-time.
-  public static boolean compilerAvailable = true;
+    /** @deprecated */
+    public static boolean compilerAvailable = true;
+
+    /** 1: have compiler; -1: don't have compiler: 0: need to check. */
+    private static int haveCompiler;
+
+    public static synchronized boolean compilerAvailable() {
+        if (haveCompiler == 0) {
+            if (! compilerAvailable)
+                haveCompiler = -1;
+            else if ("Dalvik".equals(System.getProperty("java.vm.name")))
+                haveCompiler = -1;
+            else {
+                try {
+                    // Just in case you somehow managed to get this far
+                    // while using kawart - i.e. the Kawa "runtime" jar.
+                    Class.forName("gnu.expr.TryExp");
+                    haveCompiler = 1;
+                } catch (Throwable ex) {
+                    haveCompiler = -1;
+                }
+            }
+        }
+        return haveCompiler >= 0;
+    }
 
   /** Flag to force compilation, even when not required. */
-  public static boolean alwaysCompile = compilerAvailable;
+  public static boolean alwaysCompile = compilerAvailable();
 
   public final static boolean evalModule (Environment env, CallContext ctx,
                                        Compilation comp, URL url,

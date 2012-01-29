@@ -2383,7 +2383,7 @@ public class Compilation implements SourceLocator
    */
   public void mustCompileHere ()
   {
-    if (! mustCompile && ! ModuleExp.compilerAvailable)
+    if (! mustCompile && ! ModuleExp.compilerAvailable())
       error('e', "this expression must be compiled, but compiler is unavailable");
     mustCompile = true;
   }
@@ -2459,7 +2459,7 @@ public class Compilation implements SourceLocator
   {
     if (! mustCompile
         && (scope.mustCompile()
-            || (ModuleExp.compilerAvailable
+            || (ModuleExp.compilerAvailable()
                 // We set mustCompile if we see a LambdaExp - not because
                 // we must but because it is usually desirable.
                 && scope instanceof LambdaExp

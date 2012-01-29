@@ -1,3 +1,8 @@
+2012-01-29  Per Bothner  <per@bothner.com>
+
+	* LambdaExp.java (getReturnType): Don't call getType on body if it
+	hasn't been VALIDATED yet - that could cause problems.
+
 2012-01-21  Per Bothner  <per@bothner.com>
 
 	* Declaration.java (ABSTRACT_ACCESS): New flag.

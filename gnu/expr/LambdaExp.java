@@ -1946,9 +1946,10 @@ public class LambdaExp extends ScopeExp
   {
     if (returnType == null)
       {
-	returnType = Type.objectType;  // To guards against cycles.
-	// body may not be set if define scan'd but not yet rewrit'ten.
-	if (body != null && ! isAbstract() && ! isNative())
+	returnType = Type.objectType;  // To guard against cycles.
+	// body may not be set if define scan'd but not yet rewritten.
+	if (body != null && ! isAbstract() && ! isNative()
+            && body.getFlag(Expression.VALIDATED))
 	  returnType = body.getType();
       }
     return returnType;

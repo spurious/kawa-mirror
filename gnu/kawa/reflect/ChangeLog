@@ -1,3 +1,8 @@
+2012-01-29  Per Bothner  <per@bothner.com>
+
+	* CompileInvoke.java (validateApplyInvoke): We should optimize
+	even if Compiler#mustCompile is false.
+
 2012-01-27  Per Bothner  <per@bothner.com>
 
 	* CompileInvoke.java (validateApplyInvoke): If type is LangObjType,

@@ -21,11 +21,10 @@ public class CompileInvoke
     Compilation comp = visitor.getCompilation();
     Expression[] args = exp.getArgs();
     int nargs = args.length;
-    if (! comp.mustCompile
+    if (nargs == 0 || ((kind == 'V' || kind == '*') && nargs == 1))
+      {
         // This should never happen, as InlineCalls.visitApplyExp
         // checks the number of arguments before inline is called.
-        || nargs == 0 || ((kind == 'V' || kind == '*') && nargs == 1))
-      {
         exp.visitArgs(visitor);
         return exp;
       }

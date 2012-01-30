@@ -575,7 +575,7 @@ public class object extends Syntax
         if (texp instanceof LangExp)
           {
             Pair typeSpecPair = (Pair) ((LangExp) texp).getLangValue(); 
-            tr.exp2Type(typeSpecPair, decl);
+            tr.exp2Type(typeSpecPair, decl, null/*FIXME*/);
           }
       }
 

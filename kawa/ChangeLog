@@ -1,3 +1,11 @@
+2012-01-29  Per Bothner  <per@bothner.com>
+
+	* lang/Translator.java (exp2Type): Take extra syntax parmeter 
+	so we can pass it to rewrite.
+	* standard/let.java (rewrite): Pass syntax to exp2Type.
+	* lang/Lambda.java: Update exp2Type call..
+	* standard/object.java: Likewise.
+
 2012-01-27  Per Bothner  <per@bothner.com>
 
 	* standard/Scheme.java (initScheme): Fix binding for "call/cc".

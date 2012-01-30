@@ -113,7 +113,7 @@ public class let extends Syntax
 	  }
 	else if (binding_cdr instanceof Pair)
 	  {
-	    decl.setType(tr.exp2Type(binding));
+            decl.setType(tr.exp2Type(binding, null, syntax));
 	    decl.setFlag(Declaration.TYPE_SPECIFIED);
 	    init = (Pair) binding_cdr;
 	  }

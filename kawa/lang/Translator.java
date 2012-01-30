@@ -899,15 +899,15 @@ public class Translator extends Compilation
   /** Extract a type from the car of a pair. */
   public Type exp2Type(Pair typeSpecPair)
   {
-    return exp2Type(typeSpecPair, null);
+    return exp2Type(typeSpecPair, null, null);
   }
 
-  public Type exp2Type(Pair typeSpecPair, Declaration decl)
+  public Type exp2Type(Pair typeSpecPair, Declaration decl, SyntaxForm syntax)
   {
     Object saved = pushPositionOf(typeSpecPair);
     try
       {
-	Expression texp = rewrite_car(typeSpecPair, false);
+	Expression texp = rewrite_car(typeSpecPair, syntax);
         texp = InlineCalls.inlineCalls(texp, this);
 	if (texp instanceof ErrorExp)
 	  return null;

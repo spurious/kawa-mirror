@@ -110,6 +110,9 @@
 (define (force arg)
   (gnu.mapping.Promise:force1 arg))
 
+(define (force* arg)
+  (gnu.mapping.Promise:force arg))
+
 (define (eager value)
   (if (gnu.mapping.Promise? value)
       (gnu.mapping.Promise value: value)

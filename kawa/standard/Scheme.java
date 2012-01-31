@@ -414,6 +414,7 @@ public class Scheme extends LispLanguage
                    "gnu.kawa.functions.CallCC", "callcc");
       defProcStFld("call/cc", "gnu.kawa.functions.CallCC", "callcc");
       defProcStFld("force", "kawa.lib.misc");
+      defProcStFld("force*", "kawa.lib.misc");
       defProcStFld("eager", "kawa.lib.misc");
       defProcStFld("promise-set-value!", "kawa.lib.misc");
       defProcStFld("promise-set-alias!", "kawa.lib.misc");

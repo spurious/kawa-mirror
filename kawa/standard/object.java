@@ -98,7 +98,7 @@ public class object extends Syntax
                     if (val == Boolean.FALSE)
                       oexp.setFlag(ClassExp.CLASS_SPECIFIED);
                     else
-                      oexp.setFlag(ClassExp.INTERFACE_SPECIFIED);
+                      oexp.setFlag(ClassExp.INTERFACE_SPECIFIED|ClassExp.IS_ABSTRACT);
                     obj = ((Pair) obj).getCdr();
                     tr.popPositionOf(savedPos1);
                     continue;

@@ -9,7 +9,7 @@ public class BindingInitializer extends Initializer
   Expression value;
 
   /** Create a BindingInitializer and link it into the correct
-   * intializer chain. */
+   * initializer chain. */
   public static void create (Declaration decl, Expression value,
                              Compilation comp)
   {

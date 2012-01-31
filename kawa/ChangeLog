@@ -1,5 +1,7 @@
 2012-01-31  Per Bothner  <per@bothner.com>
 
+	* standard/require.java (importDefinitions): Add a null check.
+
 	* standard/Scheme.java (initScheme): New functions 'force*'.
 
 	* standard/object.java (scanClassDef): Set IS_ABSTRACT if interface

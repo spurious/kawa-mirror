@@ -468,7 +468,8 @@ public class require extends Syntax
             ReferenceExp aref = (ReferenceExp) adecl.getValue();
             Declaration xdecl = ((ReferenceExp) fval).getBinding();
             aref.setBinding(xdecl);
-            if (xdecl.needsContext())
+            // xdecl can be null on an error.
+            if (xdecl != null && xdecl.needsContext())
               {
                 String iname
                   = (xdecl.field.getDeclaringClass().getName().replace('.', '$')

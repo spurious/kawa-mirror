@@ -130,9 +130,7 @@ public class DisplayFormat extends AbstractFormat
       {
 	Pair pair = (Pair) list;
 	writeObject(pair.getCar(), (Consumer) out);
-	list = pair.getCdr();
-        while (list instanceof Lazy)
-          list = ((Lazy) list).getValue();
+	list = Promise.force(pair.getCdr());
         if (list == LList.Empty)
           break;
         out.writeSpaceFill();
@@ -238,8 +236,7 @@ public class DisplayFormat extends AbstractFormat
   {
     if (! readable)
       {
-        while (obj instanceof Lazy<?>)
-          obj = ((Lazy<?>) obj).getValue();
+        obj = Promise.force(obj);
       }
     if (obj instanceof Boolean)
       writeBoolean(((Boolean)obj).booleanValue(), out);

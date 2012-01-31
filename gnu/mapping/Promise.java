@@ -12,14 +12,13 @@ import java.io.IOException;
  * @author Per Bothner
  */
 
-public final class Promise<T> implements Printable, Lazy<T>
-{
+public class Promise<T> implements Printable, Lazy<T> {
     Procedure thunk;
 
     /** If getValue yields another Lazy value, call getValue on that too. */
     boolean forceValueIfPromise;
 
-    /** Set whether to recursive call getValue if getValue yields a Laxy value. */
+    /** Set whether to recursive call getValue if getValue yields a Lazy value. */
     public void setForceValueIfPromise(boolean value) {
         forceValueIfPromise = value;
     }
@@ -167,8 +166,12 @@ public final class Promise<T> implements Printable, Lazy<T>
      * I.e. calls {@link Lazy#getValue} as many times as needed.
      */
     public static Object force (Object arg) {
-	while (arg instanceof Lazy)
-	    arg = ((Lazy) arg).getValue();
+	while (arg instanceof Lazy) {
+            Object val = ((Lazy) arg).getValue();
+            if (arg == val)
+                break;
+            arg = val;
+        }
 	return arg;
     }
 

@@ -65,14 +65,18 @@ public class Arithmetic
 		else if (value instanceof BigDecimal)
 		    return BIGDECIMAL_CODE;
 		else
-		    return -1;
+		    break;
 	    }
 	    else if (value instanceof Lazy<?>) {
-		value = ((Lazy) value).getValue();
+		Object v = ((Lazy) value).getValue();
+                if (v == value)
+                    break;
+                value = v;
 	    }
 	    else
-		return -1;
+		break;
 	}
+        return -1;
     }
 
   public static Type kindType (int kind)

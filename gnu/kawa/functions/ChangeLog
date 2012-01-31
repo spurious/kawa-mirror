@@ -1,3 +1,9 @@
+2012-01-31  Per Bothner  <per@bothner.com>
+
+	* DisplayFormat.java (writeList, writeObjectRaw): Use Promise#force
+	rather than doing it "by hand".
+	* Arithmetic.java (classifyValue): Handle that getvalue can return this.
+
 2012-01-17  Per Bothner  <per@bothner.com>
 
 	* DisplayFormat.java (writeList): Force Lazy values before checking

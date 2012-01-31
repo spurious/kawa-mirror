@@ -1,3 +1,9 @@
+2012-01-31  Per Bothner  <per@bothner.com>
+
+	* StreamsType.scm: Rewrite to build on top of
+	the new delay/lazy/force primitives.
+	* StreamsPrimitive.scm: Mostly re-write.
+
 2011-12-09  Per Bothner  <per@bothner.com>
 
 	* gui.scm (image-width, image-height): Fix typo.

@@ -22,6 +22,7 @@
 ;; SOFTWARE.
 
 ;; Translation to Kawa: Copyright (C) Jamison Hope (2010).
+;; Re-written to build on SRFI-45-compatible promises.
 
 ;; This Kawa module exports SRFI-41's (streams primitive) library.
 
@@ -29,67 +30,43 @@
                         warn-unknown-member: #t)
 
 (module-export stream-null stream-cons stream? stream-null?
+               stream? stream-type
                stream-pair? stream-car stream-cdr stream-lambda)
 
 (require 'srfi-41-streams-type)
 
-(define-syntax stream-lazy
-  (syntax-rules ()
-    ((_ expr)
-     (make-stream
-      (cons 'lazy (lambda () expr))))))
-
-(define (stream-eager expr) :: stream-type
-  (make-stream
-   (cons 'eager expr)))
-
-(define-syntax stream-delay
-  (syntax-rules ()
-    ((_ expr)
-     (stream-lazy (stream-eager expr)))))
+(define (stream? value)
+  (instance? value Stream))
 
 (define (stream-force promise)
-  (let ((content (stream-promise promise)))
-    (case (car content)
-      ((eager) (cdr content))
-      ((lazy) (let* ((promise* ((cdr content)))
-                     (content (stream-promise promise)))
-                (if (not (eqv? (car content) 'eager))
-                    (begin (set-car! content (car (stream-promise promise*)))
-                           (set-cdr! content (cdr (stream-promise promise*)))
-                           (stream-promise! promise* content)))
-                (stream-force promise))))))
+  (force promise))
 
-(define stream-null (stream-delay (cons 'stream 'null)))
-
-;; (define-record-type (stream-pare-type make-stream-pare stream-pare?)
-;;   (fields (immutable kar stream-kar) (immutable kdr stream-kdr)))
-(define-record-type stream-pare-type
-  (make-stream-pare x y)
-  stream-pare?
-  (x stream-kar)
-  (y stream-kdr))
+(define stream-null
+  (stream-delay stream-null-1))
 
 (define (stream-pair? obj) :: boolean
-  (and (stream? obj) (stream-pare? (stream-force obj))))
+  (or (instance? obj StreamPair)
+      (and (instance? obj StreamPromise)
+           (stream-pair? (force obj)))))
 
 (define (stream-null? obj) :: boolean
-  (and (stream? obj)
-       (eqv? (stream-force obj)
-             (stream-force stream-null))))
+  (or (eq? obj stream-null-1)
+      (and (gnu.mapping.Lazy? obj)
+           (let ((v ((as gnu.mapping.Lazy obj):getValue)))
+             (and (not (eq? v obj)) (stream-null? v))))))
 
 (define-syntax stream-cons
   (syntax-rules ()
     ((_ obj strm)
-     (stream-eager (make-stream-pare (stream-delay obj) (stream-lazy strm))))))
+     (StreamPair (stream-delay obj) (stream-lazy strm)))))
 
 (define (stream-car strm)
   (cond ((stream-null? strm) (error 'stream-car "null stream"))
-        (else (stream-force (stream-kar (stream-force strm))))))
+        (else (force (car strm)))))
 
 (define (stream-cdr strm)
   (cond ((stream-null? strm) (error 'stream-cdr "null stream"))
-        (else (stream-kdr (stream-force strm)))))
+        (else (cdr strm))))
 
 (define-syntax stream-lambda
   (syntax-rules ()

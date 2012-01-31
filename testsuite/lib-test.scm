@@ -1,4 +1,4 @@
-(test-begin "libs" 221)
+(test-begin "libs" 226)
 
 (test-begin "bytevectors") ;; Some bytevector tests
 (define bytes1 (bytevector #u8(#xCE #xBB)))
@@ -294,6 +294,53 @@
       (n in (stream-from 2))))
 (test-equal '(1 8 27 64 125 216 343 512 729 1000)
             (stream->list 10 (stream-ref power-table 1)))
+
+(test-equal '(0 1 2 3 4)
+            (stream-take 5 (stream-iterate (lambda (x) (+ x 1)) 0)))
+(test-equal '(1 2 4 8 16)
+            (stream-take 5 (stream-iterate (lambda (x) (* x 2)) 1)))
+
+(test-equal
+ '(1 2 3/2 5/3 8/5 13/8 21/13 34/21)
+ (stream-take 8 (stream-iterate (lambda (x) (+ 1 (/ x))) 1)))
+
+(test-equal '(0 1 3 6 10 15 )
+            (stream-take 6 (stream-scan + 0 (stream-from 1))))
+
+(define-stream (stream-merge lt? . strms)
+  (define-stream (merge xx yy)
+    (stream-match xx (() yy) ((x . xs)
+      (stream-match yy (() xx) ((y . ys)
+        (if (lt? y x)
+            (stream-cons y (merge xx ys))
+            (stream-cons x (merge xs yy))))))))
+  (stream-let loop ((strms strms))
+    (cond ((null? strms) stream-null)
+          ((null? (cdr strms)) (car strms))
+          (else (merge (car strms)
+                       (apply stream-merge lt?
+                         (cdr strms)))))))
+
+(define-stream (stream-unique eql? strm)
+  (if (stream-null? strm)
+      stream-null
+      (stream-cons (stream-car strm)
+        (stream-unique eql?
+          (stream-drop-while
+            (lambda (x)
+              (eql? (stream-car strm) x))
+            strm)))))
+
+(define (lsec proc . args)
+  (lambda x (apply proc (append args x))))
+(define hamming
+  (stream-cons 1
+    (stream-unique =
+      (stream-merge <
+        (stream-map (lsec * 2) hamming)
+        (stream-map (lsec * 3) hamming)
+        (stream-map (lsec * 5) hamming)))))
+(test-equal '(1 2 3 4 5 6 8 9 10 12) (stream-take 10 hamming))
 
 (test-begin "rnrs-lists" 50)
 

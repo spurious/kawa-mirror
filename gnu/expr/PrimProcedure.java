@@ -591,10 +591,10 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
             // on the operand stack or in a local variable when
             // any backwards branch is taken."
             // Hence re-write:
-            //   (make Foo a1 backward_dump_containing_expression a3 ...)
+            //   (make Foo a1 backward_jump_containing_expression a3 ...)
             // to:
             //   (let ((t1 a1)
-            //         (t2 backward_dump_containing_expression)
+            //         (t2 backward_jump_containing_expression)
             //         (t3 q2) ...)
             //     (make Foo a1 t1 t2 t3 ...))
             int nargs = args.length;
@@ -604,9 +604,19 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
             for (int i = 1;  i < nargs;  i++)
               {
                 Expression argi = args[i];
-                Declaration d = comp.letVariable(null, argi.getType(), argi);
-                d.setCanRead(true);
-                xargs[i] = new ReferenceExp(d);
+                // A modest optimzation: Don't generate temporary if not needed.
+                // But this also avoids a possible VerifyError in the case
+                // of LambdaExp, since if we set the latter's nameDecl to the
+                // new temporary, loading the temporary can get confused.
+                if (! (argi instanceof QuoteExp
+                       || argi instanceof LambdaExp
+                       || argi instanceof ReferenceExp))
+                  {
+                    Declaration d = comp.letVariable(null, argi.getType(), argi);
+                    d.setCanRead(true);
+                    argi = new ReferenceExp(d);
+                  }
+                xargs[i] = argi;
               }
             comp.letEnter();
             LetExp let = comp.letDone(new ApplyExp(exp.func, xargs));

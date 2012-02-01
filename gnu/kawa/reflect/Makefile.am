@@ -19,6 +19,7 @@ java_sources = \
   LazyType.java \
   MakeAnnotation.java \
   OccurrenceType.java \
+  ProceduralProxy.java \
   SingletonType.java \
   SlotGet.java \
   SlotSet.java \

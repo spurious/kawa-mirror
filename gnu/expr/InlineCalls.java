@@ -69,6 +69,24 @@ public class InlineCalls extends ExpExpVisitor<Type> {
                 ClassType reqraw = required instanceof ParameterizedType ? ((ParameterizedType) required).getRawType() : (ClassType) required;
                 Method amethod = reqraw.checkSingleAbstractMethod();
                 if (amethod != null) {
+                    if (! ModuleExp.compilerAvailable()) {
+                        if (! reqraw.isInterface())
+                            comp.error('e', "cannot convert procedure to abstract class "+reqraw.getClass().getName()+" without bytecode compiler");
+                        Class iface;
+                        try {
+                            iface = reqraw.getReflectClass();
+                        }
+                        catch (Throwable ex) {
+                            iface = null;
+                        }
+                        if (iface == null)
+                            comp.error('e', "cannot find interface "+reqraw.getClass().getName());
+                        Method makeProxy =
+                            ClassType.make("gnu.kawa.reflect.ProceduralProxy")
+                            .getDeclaredMethod("makeProxy", 2);
+                        Expression[] args = {QuoteExp.getInstance(iface), exp};
+                        return visit(new ApplyExp(makeProxy, args), required);
+                    }
                     LambdaExp lexp = (LambdaExp) exp;
                     ObjectExp oexp = new ObjectExp();
                     oexp.setLocation(exp);

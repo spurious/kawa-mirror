@@ -1,3 +1,8 @@
+2012-01-31  Per Bothner  <per@bothner.com>
+
+	* ProceduralProxy.java: New class.
+	* Makefile.am: Update accordingly.
+
 2012-01-29  Per Bothner  <per@bothner.com>
 
 	* CompileInvoke.java (validateApplyInvoke): We should optimize

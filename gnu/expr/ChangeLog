@@ -1,3 +1,8 @@
+2012-01-31  Per Bothner  <per@bothner.com>
+
+	* InlineCalls.java (checkType): Support SAM-conversion even when
+	compiler is unavailable, by using java.lang.reflect.Proxy.
+
 2012-01-30  Per Bothner  <per@bothner.com>
 
 	* PrimProcedure.java (compile): An optimization - which also fixes

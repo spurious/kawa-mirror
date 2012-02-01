@@ -5,7 +5,6 @@ package gnu.expr;
 import gnu.bytecode.*;
 import gnu.mapping.*;
 import java.util.*;
-import java.lang.reflect.Proxy;
 import java.lang.annotation.ElementType;
 
 public class ClassExp extends LambdaExp

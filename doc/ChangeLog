@@ -1,3 +1,9 @@
+2012-02-02  Per Bothner  <per@bothner.com>
+
+	* kawa.texi: Some re-arranging.
+	(Conditionals): New section.
+	(Lazy evaluation): New section.
+
 2012-01-22  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Source distribution): Update that you can use

@@ -182,7 +182,7 @@ This package has nothing to do with the defunct Kawa commercial Java IDE.
 * Exceptions::           Exception handling
 * Eval and Environments::
 * Debugging::
-* Threads::
+* Program structure::
 * Processes::
 * Miscellaneous::
 * Input-Output::         Input, output, and file handling
@@ -1512,6 +1512,8 @@ using @uref{http://srfi.schemers.org/srfi-16/srfi-16.html, @code{case-lambda}}.
 @xref{Parameter objects}.
 @item
 @uref{http://srfi.schemers.org/srfi-41/srfi-41.html, SRFI 41}: Streams - @pxref{Streams}.
+@item
+@uref{http://srfi.schemers.org/srfi-45/srfi-45.html, SRFI 45}: Primitives for Expressing Iterative Lazy Algorithms - @pxref{Lazy evaluation}.
 @item
 @uref{http://srfi.schemers.org/srfi-62/srfi-62.html, SRFI 62}: S-expression comments.
 @item
@@ -5106,6 +5108,11 @@ the value of a stream element is cached in case it is needed again.
 
 See the @uref{http://srfi.schemers.org/srfi-41/srfi-41.html, SRFI 41 specification} for details.
 
+The Kawa implementations builds on @ref{Lazy evaluation,,promises}.
+The @code{stream-null} value is a promise that evaluates to the empty list.
+The result of @code{stream-cons} is an eager immutable pair whose
+@code{car} and @code{cdr} properties return promises.
+
 @node Vectors
 @section Vectors
 
@@ -6509,7 +6516,7 @@ the parameterize form are the result(s) of the @var{body}.
 @end example
 @end deffn
 
-@node Debugging, Threads, Eval and Environments, Top
+@node Debugging
 @chapter Debugging
 
 @deffn Syntax trace procedure
@@ -6548,8 +6555,558 @@ Returns a string representation of the disassembled bytecode
 for @var{procedure}, when known.
 @end deffn
 
-@node Threads, Processes, Debugging, Top
-@chapter Threads
+@node Program structure
+@chapter Program structure
+
+@menu
+* Conditionals::
+* Lazy evaluation::
+* Threads::
+@end menu
+
+@node Conditionals
+@section Conditionals
+
+The standard boolean objects for true and false are written as @code{#t} and @code{#f}.
+@c R7RS: Alternatively, they may be written #true and #false, respectively.
+What really matters,
+though, are the objects that the Scheme conditional expressions (@code{if},
+@code{cond}, @code{and}, @code{or}, @code{when}, @code{unless}, @code{do})
+treat as true or
+false. The phrase ``a true value'' (or sometimes just ``true'')
+means any object treated as true by the conditional expressions, and the phrase ``a false value'' (or ``false'') means any
+object treated as false by the conditional expressions.
+Of all the Scheme values, only @code{#f} counts as false in conditional
+expressions. All other Scheme values, including @code{#t},
+count as true.  A @var{test-expression} is an expression evaluated
+in this manner for whether it is true or false.
+
+@display
+@stxdef{test-expression} @stxref{expression}
+@stxdef{consequent} @stxref{expression}
+@stxdef{alternate} @stxref{expression}
+@end display
+
+
+@deffn Syntax if @stxref{test-expression} @stxref{consequent} @stxref{alternate}
+@deffnx Syntax if @stxref{test-expression} @stxref{consequent}
+
+An @func{if} expression is evaluated as follows:
+first, @meta{test-expression} is
+evaluated.  If it yields a true value, then @meta{consequent} is
+evaluated and its values are returned.  Otherwise @meta{alternate} is
+evaluated and its values are returned.  If @meta{test} yields @false{}
+and no @meta{alternate} is specified, then the result of the expression
+is unspecified.
+
+@example
+(if (> 3 2) 'yes 'no)          @result{} yes
+(if (> 2 3) 'yes 'no)          @result{} no
+(if (> 3 2)
+    (- 3 2)
+    (+ 3 2))                   @result{} 1
+(if #f #f)                     @result{} unspecified
+@end example
+
+The @meta{consequent} and @meta{alternate} expressions are in tail
+context if the @func{if} expression itself is.
+@end deffn
+
+@display
+@stxdef{cond-clause} @stxlit{(}@stxref{test-expression} @stxref{expression} @dots{}@stxlit{)}
+  | @stxlit{(}@meta{test} @stxlit{=>} @meta{expression}@stxlit{)}
+@end display
+
+@deffn Syntax cond @stxref{cond-clause} @stxref{cond-clause} @dots{}
+@deffnx Syntax cond @stxref{cond-clause} @dots{} @stxlit{(else} @meta{expression}@dots{}@stxlit{)} 
+
+A @func{cond} expression is evaluated by evaluating the @meta{test-expression}s
+of successive @meta{cond-clause}s in order until one of them
+evaluates to a true value.  When a @meta{test-expression} evaluates to a true
+value, then the remaining @meta{expression}s in its @meta{cond-clause}
+are evaluated in order, and the results of the last @meta{expression} in
+the @meta{cond-clause} are returned as the results of the entire
+@func{cond} expression.
+If the selected @meta{cond-clause} contains only the @meta{test-expression} and no
+@meta{expression}s, then the value of the @meta{test-expression} is returned as the
+result.  If the selected @meta{cond-clause} uses the @code{=>} alternate
+form, then the @meta{expression} is evaluated.  Its value must be a
+procedure.  This procedure should accept one argument; it is called on
+the value of the @meta{test-expression} and the values returned by this procedure
+are returned by the @func{cond} expression.
+
+If all @meta{test-expression}s evaluate to @false{}, and there is no @code{else}
+clause, then the conditional expression returns unspecified values; if
+there is an @code{else} clause, then its @meta{expression}s are
+evaluated, and the values of the last one are returned.
+
+@example
+(cond ((> 3 2) 'greater)
+      ((< 3 2) 'less))         @result{} greater
+
+(cond ((> 3 3) 'greater)
+      ((< 3 3) 'less)
+      (else 'equal))           @result{} equal
+
+(cond ('(1 2 3) => cadr)
+      (else #f))               @result{} 2
+@end example
+
+For a @meta{cond-clause} of one of the following forms:
+@example
+(@meta{test} @stxref{expression} @dots{})
+(else @stxref{expression} @stxref{expression} @dots{})
+@end example
+
+@noindent
+the last @meta{expression} is in tail context if the @func{cond} form
+itself is.  For a @meta{cond clause} of the form:
+
+@example
+(@meta{test} => @meta{expression})
+@end example
+
+@noindent
+the (implied) call to the procedure that results from the evaluation of
+@meta{expression} is in a tail context if the @func{cond} form itself
+is.
+@end deffn
+
+@deffn Syntax case @meta{key} @stxref{case-clause} @stxref{case-clause} @dots{}
+@meta{key} must be an expression.
+
+
+@display
+@stxdef{case-clause} ((@stxref{datum} @dots{}) @stxref{expression} @stxref{expression} @dots{})
+  | (else @stxref{expression} @stxref{expression} @dots{})
+@end display
+
+The second form, which specifies an ``@code{else} clause'', may only
+appear as the last @meta{case-clause}.  Each @meta{datum} is an external
+representation of some object.  The data represented by the
+@meta{datum}s need not be distinct.
+
+A @func{case} expression is evaluated as follows.
+
+@enumerate
+@item
+@meta{key} is evaluated and its result is compared using @func{eqv?}
+against the data represented by the @meta{datum}s of each @meta{case
+clause} in turn, proceeding in order from left to right through the set
+of clauses.
+
+@item
+If the result of evaluating @meta{key} is equivalent to a datum of a
+@meta{case clause}, the corresponding @meta{expression}s are evaluated
+from left to right and the results of the last expression in the
+@meta{case clause} are returned as the results of the @func{case}
+expression.  Otherwise, the comparison process continues.
+@item
+If the result of evaluating @meta{key} is different from every datum in
+each set, then if there is an @code{else} clause its expressions are
+evaluated and the results of the last are the results of the @func{case}
+expression; otherwise the @func{case} expression returns unspecified
+values.
+@end enumerate
+
+@example
+(case (* 2 3)
+  ((2 3 5 7) 'prime)
+  ((1 4 6 8 9) 'composite))    @result{} composite
+(case (car '(c d))
+  ((a) 'a)
+  ((b) 'b))                    @result{} unspecified
+(case (car '(c d))
+  ((a e i o u) 'vowel)
+  ((w y) 'semivowel)
+  (else 'consonant))           @result{} consonant
+@end example
+
+The last @meta{expression} of a @meta{case clause} is in tail context if
+the @func{case} expression itself is.
+@end deffn
+
+@deffn Syntax and @stxref{test-expression} @dots{}
+
+If there are no @meta{test-expression}s, @true{} is returned.  Otherwise, the
+@meta{test-expression} are evaluated from left to right until a
+@meta{test-expression} returns @false{} or the last @meta{test-expression} is reached.  In the
+former case, the @func{and} expression returns @false{} without
+evaluating the remaining expressions.  In the latter case, the last
+expression is evaluated and its values are returned.
+
+@example
+(and (= 2 2) (> 2 1))          @result{}  #t
+(and (= 2 2) (< 2 1))          @result{}  #f
+(and 1 2 'c '(f g))            @result{}  (f g)
+(and)                          @result{}  #t
+@end example
+
+The @func{and} keyword could be defined in terms of @func{if} using
+@func{syntax-rules} as follows:
+
+@example
+(define-syntax and
+  (syntax-rules ()
+    ((and) #t)
+    ((and test) test)
+    ((and test1 test2 ...)
+     (if test1 (and test2 ...) #t))))
+@end example
+
+The last @meta{test-expression} is in tail context if the @func{and}
+expression itself is.
+@end deffn
+
+@deffn Syntax or @stxref{test-expression} @dots{}
+If there are no @meta{test-expression}s, @false{} is returned.  Otherwise, the
+@meta{test-expression}s are evaluated from left to right until a
+@meta{test-expression} returns a true value @var{val} or the last
+@meta{test-expression} is
+reached.  In the former case, the @func{or} expression returns @var{val}
+without evaluating the remaining expressions.  In the latter case, the
+last expression is evaluated and its values are returned.
+
+@example
+(or (= 2 2) (> 2 1))           @result{} #t
+(or (= 2 2) (< 2 1))           @result{} #t
+(or #f #f #f)                  @result{} #f
+(or '(b c) (/ 3 0))            @result{} (b c)
+@end example
+
+The @func{or} keyword could be defined in terms of @func{if} using
+@func{syntax-rules} as follows:
+
+@example
+(define-syntax or
+  (syntax-rules ()
+    ((or) #f)
+    ((or test) test)
+    ((or test1 test2 ...)
+     (let ((x test1))
+       (if x x (or test2 ...))))))
+@end example
+
+The last @meta{test-expression} is in tail context if the @func{or}
+expression itself is.
+@end deffn
+
+
+@deffn Syntax when @stxref{test-expression} form...
+If @var{test-expression} is true, evaluate each @var{form} in order,
+returning the value of the last one.
+@end deffn
+
+@deffn Syntax unless @stxref{test-expression} form...
+If @var{test-expression} is false, evaluate each @var{form} in order,
+returning the value of the last one.
+@end deffn
+
+@node Lazy evaluation
+@section Lazy evaluation
+
+@dfn{Lazy evaluation} (or call-by-need) delays evaluating an expression until it
+is actually needed; when it is evaluated, the result is saved so
+repeated evaluation is not needed.
+@uref{http://en.wikipedia.org/wiki/Lazy_evaluation,Lazy evaluation}
+is a technique that can make some algorithms easier to express compactly
+or much more efficiently, or both.  It is the normal evaluation mechanism
+for strict functional (side-effect-free) languages such as
+@uref{http://www.haskell.org,Haskell}.
+However, automatic lazy evaluation is awkward to combine with side-effects
+such as input-output.  It can also be difficult to implement
+lazy evaluation efficiently, as it requires more book-keeping.
+
+Kawa, like other Schemes, uses ``eager evaluation'' - an expression
+is normally evaluated immediately, unless it is wrapped in a special form.
+Standard Scheme has some basic building blocks for ``manual''
+lazy evaluation, using an explicit @code{delay} operator to
+indicate that an expression is to be evaluated lazily,
+yielding a @dfn{promise},
+and a @code{force} function to force evaluation of a promise.
+This functionality is enhanced in
+@uref{http://srfi.schemers.org/srfi-45/srfi-45.html, SRFI 45},
+in R7RS-draft (based on SRFI 45),
+and @uref{http://srfi.schemers.org/srfi-41/srfi-41.html, SRFI 41} (lazy lists aka streams).
+
+Kawa makes lazy evaluation easier to use, by @dfn{implicit forcing}:
+The promise is automatically evaluated (forced) when used in a
+context that requires a normal value, such as arithmetic needing a number.
+Kawa enhances lazy evaluation in other ways, including
+support for safe multi-threaded programming.
+
+@subsection Delayed evaluation
+
+@deffn Syntax delay @stxref{expression}
+The @func{delay} construct is used together with the procedure
+@func{force} to implement @emph{lazy evaluation} or @emph{call by need}.
+
+@code{(delay @var{expression})} returns an object called a
+@emph{promise} which at some point in the future may be asked (by the
+@func{force} procedure) to evaluate @var{expression}, and deliver the
+resulting value.  The effect of @var{expression} returning multiple
+values is unspecified.
+@end deffn
+
+@deffn Syntax lazy @stxref{expression}
+The @code{lazy} construct is similar to delay, but it is expected
+that its argument evaluates to a promise.
+(Kawa treats a non-promise value as if it were a forced promise.)
+The returned
+promise, when forced, will evaluate to whatever the original
+promise would have evaluated to if it had been forced.
+@end deffn
+
+@deffn Procedure eager obj
+Returns a promise that when forced will return @var{obj}.
+It is similar to @code{delay}, but does not delay its argument;
+it is a procedure rather than syntax.
+
+As a Kawa optimization, if the @var{obj} is not a promise
+(does not implement @code{gnu.mapping.Lazy}), it is returned as-is.
+(This is because Kawa generally minimizes the difference
+bwteen a value and forced promise evaluating to the value.)
+@end deffn
+
+@deffn Procedure force promise
+The @func{force} procedure forces the value of @var{promise}.
+As a Kawa extension, if the @var{promise} is not a promise (a value that
+does not implement @code{gnu.mapping.Lazy}) then the argument is returned unchanged.
+If no value has been computed for the promise, then a value is computed and
+returned.  The value of the promise is cached (or ``memoized'') so that
+if it is forced a second time, the previously computed value is
+returned.
+@example
+(force (delay (+ 1 2)))                @result{}  3
+
+(let ((p (delay (+ 1 2))))
+  (list (force p) (force p)))          @result{}  (3 3)
+
+(define integers
+  (letrec ((next
+            (lambda (n)
+              (cons n (delay (next (+ n 1)))))))
+    (next 0)))
+(define head 
+  (lambda (stream) (car (force stream)))) 
+(define tail 
+  (lambda (stream) (cdr (force stream)))) 
+
+(head (tail (tail integers)))          @result{}  2
+@end example
+
+The following example is a mechanical transformation of
+a lazy stream-filtering algorithm into Scheme. Each call
+to a constructor is wrapped in @code{delay}, and each argument
+passed to a deconstructor is wrapped in @code{force}. The use
+of @code{(lazy ...)} instead of @code{(delay (force ...))} around
+the body of the procedure ensures that an ever-growing
+sequence of pending promises does not exhaust the heap.
+
+@example
+(define (stream-filter p? s)
+  (lazy
+   (if (null? (force s))
+       (delay ’())
+       (let ((h (car (force s)))
+             (t (cdr (force s))))
+         (if (p? h)
+             (delay (cons h (stream-filter p? t)))
+             (stream-filter p? t))))))
+
+(head (tail (tail (stream-filter odd? integers))))
+    @result{} 5
+@end example
+
+@end deffn
+
+@deffn Procedure force* promise
+Does @code{force} as many times as necessary to produce a non-promise.
+(A non-promise is a value that does not implement @code{gnu.mapping.Lazy},
+or if it does implement @code{gnu.mapping.Lazy} then forcing the value
+using the @code{getValue} method yields the receiver.)
+
+The @code{force*} function is a Kawa extension.
+Kawa will add implicit calls to @code{force*}
+in most contexts that need it, but you can also call it explicitly.
+@end deffn
+
+The following examples are not intended to illustrate good
+programming style, as @code{delay}, @code{lazy}, and @code{force} are mainly
+intended for programs written in the functional style.
+However, they do illustrate the property that only one value is
+computed for a promise, no matter how many times it is
+forced.
+
+@example
+(define count 0)
+(define p
+  (delay (begin (set! count (+ count 1))
+                (if (> count x)
+                    count
+                    (force p)))))
+(define x 5)
+p                  @result{} @var{a promise}
+(force p)          @result{} 6
+p                  @result{} @var{a promise, still}
+(begin (set! x 10)
+       (force p))  @result{} 6
+@end example                                                                                                                                                                   
+
+@subsection Implicit forcing
+
+If you pass a promise as an argument to a function like @code{sqrt}
+if must first be forced to a number.  In general, Kawa does this
+automatically (implicitly) as needed, depending on the context.
+For example:
+@example
+(+ (delay (* 3 7)) 13)   @result{} 34
+@end example
+
+Other functions,
+like @code{cons} have no problems with promises, and automatic forcing
+would be undesirable.
+
+Generally, implicit forcing happens for arguments that require a
+specific type, and does not happen for arguments that work on
+@emph{any} type (or @code{Object}).
+
+Implicit forcing happens for:
+@itemize
+@item
+arguments to arithmetic functions;
+@item
+the sequence and the index in indexing operations, like @code{string-ref};
+@item
+the operands to @code{eqv?} and @code{equal?} are forced,
+though the operands to @code{eq?} are not;
+@item
+port operands to port functions;
+@item
+the value to be emitted by a @code{display} but @emph{not} the
+value to be emitted by a @code{write};
+@item
+the function in an application.
+@end itemize
+
+Type membership tests, such as the @code{instance?} operation,
+generally do not force their values.
+
+The exact behavior for when implicit forcing is a work-in-progress:
+There are certainly places where implicit forcing doesn't happen while
+it should; there are also likely to be places where implicit forcing
+happens while it is undesirable.
+
+Most Scheme implementations are such that a forced promise behaves differently
+from its forced value, but some Scheme implementions are such that there is no
+means by which a promise can be operationally distingished
+from its forced value.
+Kawa is a hybrid: Kawa tries to minimize the difference between
+a forced promise and its forced value, and may freely optimize
+and replace a forced promise with its value.
+
+@subsection Blank promises
+
+A @dfn{blank promise} is a promise that doesn't (yet) have
+a value @emph{or} a rule for calculating the value.
+Forcing a blank promise will wait forever, until some
+other thread makes the promise non-blank.
+
+Blank promises are useful as a synchronization mechanism -
+you can use it to safely pass data from one thread (the producer)
+to another thread (the consumer).  Note that you can only
+pass one value for a given promise: To pass multiple values, you
+need multiple promises.
+
+@example
+(define p (promise))
+(future ;; Consumer thread
+  (begin
+    (do-stuff)
+    (define v (force promise)) ; waits until promise-set-value!
+    (do-stuff-with v)))
+;; Producer thread
+... do stuff ...
+(promise-set-value! p (calculate-value))
+@end example
+
+@deffn Constructor promise
+Calling @code{promise} as a zero-argument constructor
+creates a new blank promise.
+
+This calls the constructor for @code{gnu.mapping.Promise}.
+You can also create a non-blank promise, by setting one
+of the @code{value}, @code{alias}, @code{thunk}, or @code{exception} properties.
+Doing so is equivalent to calling @code{promise-set-value!},
+@code{promise-set-alias!}, @code{promise-set-thunk!}, or
+@code{promise-set-exception!} on the resulting promise.
+For example: @code{(delay exp)} is equivalent to:
+@example
+(promise thunk: (lambda() exp))
+@end example
+@end deffn
+
+The following four procedures require that their first arguments
+be blank promises.  When the procedure returns, the promise is
+no longer blank, and cannot be changed.  This is because a
+promise is conceptually placeholder for a single ``not-yet-known'' value;
+it is not a location that can be assigned multiple times.
+The former enables clean and safe (``declarative") use of multiple threads;
+the latter is much trickier.
+
+@deffn Procedure promise-set-value! promise value
+Sets the value of the @var{promise} to @var{value},
+which makes the @var{promise} forced.
+@end deffn
+
+@deffn Procedure promise-set-exception! promise exception
+Associate @var{exception} with the @var{promise}.
+When the @var{promise} is forced the @var{excecption} gets thrown.
+@end deffn
+
+@deffn Procedure promise-set-alias! promise other
+Bind the @var{promise} to be an alias of @var{other}.
+Forcing @var{promise} will cause @var{other} to be forced.
+@end deffn
+
+@deffn Procedure promise-set-thunk! promise thunk
+Associate @var{thunk} (a zero-argument procedure) with the @var{promise}.
+The first time the @var{promise} is forced will causes the
+@var{thunk} to be called, with the result (a value or an exception)
+saved for future calls.
+@end deffn
+
+@subsection Lazy and eager types
+
+@deffn Type promise[T]
+This parameterized type is the type of promises that evaluate to
+an value of type @code{T}.
+It is equivalent to the Java interface @code{gnu.mapping.Lazy<T>}.
+The implementation class fro promises is usually @code{gnu.mapping.Promise},
+though there are other classes that implement @code{Lazy},
+most notably @code{gnu.mapping.Future}, used for futures,
+which are promises evaluated in a separate thread.
+@end deffn
+
+Note the distinction between the types @code{integer}
+(the type of actual (eager) integer values), and @code{promise[integer]}
+(the type of (lazy) promises that evaluate to integer).
+The two are compatible: if a @code{promise[integer]} value is provided
+in a context requiring an @code{integer} then it is automatically
+evaluated (forced).  If an @code{integer} value is provided
+in context requiring a @code{promise[integer]}, that conversion is basically
+a no-op (though the compiler may wrap the @code{integer}
+in a pre-forced promise).
+
+If a fully-lazy language there would be no distinction, or
+at least the promise type would be the default.  However, Kawa is
+mostly-eager langauge, so the eager type is the default.
+This makes efficient code-generation easier: If an expression
+has an eager type, then the compiler can generate code that
+works on its values directly, without having to check for laziness.
+
+@node Threads
+@section Threads
 
 There is a very preliminary interface to create parallel threads.
 The interface is similar to the standard @code{delay}/@code{force},
@@ -6558,6 +7115,9 @@ evaluation may be in parallel.
 
 @deffn Syntax future expression
 Creates a new thread that evaluates @var{expression}.
+
+(The result extends @code{java.lang.Thread} and
+implements @code{gnu.mapping.Lazy}.)
 @end deffn
 
 @deffn Procedure force thread
@@ -6568,9 +7128,20 @@ executing, and returns the result.
 
 @deffn Procedure runnable function
 Creates a new @code{Runnable} instance from a function.
-Useful for passing the Java code that expects a @code{Runnable}.
+Useful for passing to Java code that expects a @code{Runnable}.
 You can get the result (a value or a thrown exception) using the
 @code{getResult} method.
+@end deffn
+
+@deffn Syntax synchronized object form ...
+Synchronize on the given @var{object}.  (This means getting an
+exclusive lock on the object, by acquiring its @dfn{monitor}.)
+Then execute the @var{form}s while holding the lock.
+When the @var{form}s finish (normally or abnormally by throwing
+an exception), the lock is released.
+Returns the result of the last @var{form}.
+Equivalent to the Java @code{synchronized} statement,
+except that it may return a result.
 @end deffn
 
 @deffn Procedure sleep time
@@ -6579,8 +7150,12 @@ The @var{time} can be either a pure number (in secords),
 or a quantity whose unit is a time unit (such as @code{10s}).
 @end deffn
 
-@node Processes, Miscellaneous, Threads, Top
+@node Processes
 @chapter Processes
+
+@defvar home-directory
+A string containing the home directory of the user.
+@end defvar
 
 @deffn Procedure command-line
 Returns a nonempty list of strings. The first element is
@@ -6671,10 +7246,6 @@ Returns the Kawa version number as a string.
 @c (Compatible with slib.)
 @end deffn
 
-@defvar home-directory
-A string containing the home directory of the user.
-@end defvar
-
 @deffn Procedure scheme-window [shared]
 Create a read-eval-print-loop in a new top-level window.
 If @var{shared} is true, it uses the same environment as the
@@ -6683,27 +7254,6 @@ a new top-level environment is created.
 
 You can create multiple top-level window that can co-exist.
 They run in separate threads.
-@end deffn
-
-@deffn Syntax when condition form...
-If @var{condition} is true, evaluate each @var{form} in order,
-returning the value of the last one.
-@end deffn
-
-@deffn Syntax unless condition form...
-If @var{condition} is false, evaluate each @var{form} in order,
-returning the value of the last one.
-@end deffn
-
-@deffn Syntax synchronized object form ...
-Synchronize on the given @var{object}.  (This means getting an
-exclusive lock on the object, by acquiring its @dfn{monitor}.)
-Then execute the @var{form}s while holding the lock.
-When the @var{form}s finish (normally or abnormally by throwing
-an exception), the lock is released.
-Returns the result of the last @var{form}.
-Equivalent to the Java @code{synchronized} statement,
-except that it may return a result.
 @end deffn
 
 @node Input-Output, Types, Miscellaneous, Top

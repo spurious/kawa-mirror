@@ -1,3 +1,8 @@
+2012-02-02  Per Bothner  <per@bothner.com>
+
+	* configure.in (AC_INIT): Set version to 1.12.
+	* build.xml (version.release): Likewise.
+
 2011-09-24  Jamison Hope  <jrh@theptrgroup.com>
 
 	* build.xml (-maybe-select-java7): New target.

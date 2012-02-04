@@ -1,3 +1,8 @@
+2012-02-04  Helmut Eller <eller.helmut@gmail.com>
+
+	* TelnetRepl.java (serve): Return a vanilla Thread, rather than a
+	Future.  This avoids a force if displaying, and seems more appropriate.
+
 2012-01-31  Per Bothner  <per@bothner.com>
 
 	* standard/require.java (importDefinitions): Add a null check.

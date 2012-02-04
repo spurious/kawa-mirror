@@ -18,7 +18,7 @@ public class Promise<T> implements Printable, Lazy<T> {
     /** If getValue yields another Lazy value, call getValue on that too. */
     boolean forceValueIfPromise;
 
-    /** Set whether to recursive call getValue if getValue yields a Lazy value. */
+    /** Set whether to recursively call getValue if getValue yields a Lazy value. */
     public void setForceValueIfPromise(boolean value) {
         forceValueIfPromise = value;
     }

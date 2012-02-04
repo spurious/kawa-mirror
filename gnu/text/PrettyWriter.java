@@ -7,38 +7,39 @@ import java.io.*;
 import gnu.mapping.ThreadLocation;
 import gnu.lists.LList;
 
-/** A pretty printer.
+/** 
+ * A pretty printer.
  *
+ * <p>
  * This code is transcribed from pprint.lisp in Steel Bank Common Lisp,
  * which is again based on the code in CMU Common Lisp.
  * Modifications have been made to accommodate shared structures, as described
- * in SRFI-38.
- *
- * @author Per Bothner
- * @author Charles Turner
- */
-
-/** 
+ * in SRFI-38. 
+ * </p>
+ * <p>
  * The pretty printer (hereafter PP) is responsible for formatting the results 
  * of evaluating expressions so that the human user can easily read them. The PP
  * may also be responsible for choosing where to break lines so that the output 
  * looks reasonable.
- * 
+ * </p>
+ * <p>
  * Raw text that has not yet been written out is stored in the "buffer" array,
  * while information about the structure of the text is stored in a queue of
  * "formatting tokens" (see below) called queueInts. A circular queue is used
  * when the PP is not dealing with shared structures, and a linear array is used
  * when it is. This only effects how the formatting tokens are enqueued into the
  * structure, and how the structure is dynamically expanded.
- * 
+ * </p>
+ * <p>
  * Formatting tokens are simply contiguous chunks of the queue. All tokens have
  * a type and a size. For example, there is a formatting token called
- * QITEM_NEWLINE_TYPE whose size is specified by QITEM_NEWLINE_SIZE. The size
+ * {@code QITEM_NEWLINE_TYPE} whose size is specified by {@code QITEM_NEWLINE_SIZE}. The size
  * includes these type and size bits. The tokens use the space allocated to them
- * in different ways. For example, the tab token uses two of its chunks (ints)
+ * in different ways. For example, the tab token uses two of its chunks ({@code int}s)
  * to specify at which column it was entered, and to which column it should
  * expand to.
- * 
+ * </p>
+ * <p>
  * The tokens are buffered by a display formatter. The display formatter walks
  * the structure to be printed emitting these tokens when it finds it has to,
  * as well as the actual characters to be printed! Remember, the formatting
@@ -47,7 +48,8 @@ import gnu.lists.LList;
  * holds the actual characters as they appear to the display formatter, the queue 
  * holds the formatting tokens plus a mapping that specifies which character in 
  * the buffer they end at.
- * 
+ * </p>
+ * <p>
  * Once the display formatter has finished walking the expression to be printed,
  * the formatting queue is walked by the "destructive" methods, i.e., the ones
  * that actually flush the buffer to the output port. As mentioned above, each
@@ -58,9 +60,14 @@ import gnu.lists.LList;
  * so that the line will prettily fit on the specified line width, or more
  * drastically, remove a shared object of the expression and replacing
  * it will print-circle notation.
- * 
+ * </p>
+ * <p>
  * Once everything has been flushed, the initial conditions are reset ready for
- * the next printing.
+ * the next printing
+ * </p>
+ * 
+ * @author Per Bothner
+ * @author Charles Turner
  */
 
 public class PrettyWriter extends java.io.Writer

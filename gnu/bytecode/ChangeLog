@@ -1,3 +1,7 @@
+2012-02-03  Per Bothner  <per@bothner.com>
+
+	* Field.java (hasConstantValueAttr): New method.
+
 2012-01-27  Per Bothner  <per@bothner.com>
 
 	* ExitableBlock.java (finish): If appropriate, do setUnreachabe().

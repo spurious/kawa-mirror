@@ -1,3 +1,8 @@
+2012-02-03  Per Bothner  <per@bothner.com>
+
+	* SetExp.java (compile): Don't create BindingInitializer if field
+	hasConstantValueAttr.
+
 2012-01-31  Per Bothner  <per@bothner.com>
 
 	* InlineCalls.java (checkType): Support SAM-conversion even when

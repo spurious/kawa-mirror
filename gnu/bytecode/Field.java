@@ -174,6 +174,10 @@ public class Field extends Location
     attr.addToFrontOf(this);
   }
 
+    public boolean hasConstantValueAttr() {
+        return Attribute.get(this, "ConstantValue") != null;
+    }
+
   public String toString()
   {
     StringBuffer sbuf = new StringBuffer(100);

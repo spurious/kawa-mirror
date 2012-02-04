@@ -12297,6 +12297,46 @@ Alternatively, you can use the internal JVM class name:
 javax.swing.text.AbstractDocument$Content
 @end example
 
+@subsubsection Why does Kawa's REPL use display rather than write?
+
+The read-eval-print-loop of most Scheme implementations prints the
+evaluation result using @code{write}, while Kawa uses @code{display} by default.
+
+First note that it is easy to override the default with the
+@code{--output-format} command-line option:
+@example
+$kawa --output-format readable-scheme
+#|kawa:1|# "abc"
+"abc"
+@end example
+
+The reason @code{display} is the default is because of a vision of the REPL
+console as more than just printing out Scheme objects in
+textual form for use by a programmer.
+Some examples:
+@itemize
+@item
+A math program can display equations and graphs as the
+output of an expression.
+@item
+An expression can evaluate to a "picture" which would
+be @uref{http://per.bothner.com/blog/2007/ReplPane/,displayed inline}.
+@item
+An HTML/XML obj can be insert into the output in visual
+form if the console understands HTML.  (There is a prototype
+for this that works by using the JavaFX WebView as the display.)
+@item
+The plan for "Kawa-shell" functionality is to have expressions
+that evaluate to process objects, which would be lazy strings.
+This string would be the data from standard output.  Thus the
+effect of displaying a process object would be to print out
+the standard output - just like a regular shell.  Users would
+find it confusing/annoying if shell output used quotes.
+@end itemize
+
+This "repl-as-pad" model doesn't work as well if the repl
+uses @code{write} rather than @code{display}. 
+
 @node Community, License, FAQs, Top
 @chapter The Kawa Community
 

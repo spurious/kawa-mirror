@@ -1,5 +1,8 @@
 2012-02-04  Per Bothner  <per@bothner.com>
 
+	* kawa.texi: Lots of stuff moved around, mostly relating to
+	command-line options.
+
 	* kawa.texi (FAQs): New FAQ about why the REPL uses display.
 
 2012-02-02  Per Bothner  <per@bothner.com>

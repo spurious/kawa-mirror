@@ -789,6 +789,48 @@ Kawa convenience features.  This flags so far only affects
 the XQuery parser, but that will hopefully change.
 @end table
 
+@subsection Options for warnings and errors
+
+@table @code
+@cindex --warn-@var{whatever}
+@cindex --no-warn-@var{whatever}
+@pindex warn-unknown-member
+@item --warn-unknown-member
+Emit a warning if the code references a named member (field or method)
+for which there is no match in the compile-time type of the receiver.
+This defaults to on;
+to turn it off use the @code{--no-warn-unknown-member} flag.
+@pindex warn-invoke-unknown-method
+@item --warn-invoke-unknown-method
+Emit a warning if the @code{invoke} function calls a named method
+for which there is no matching method in the compile-time type of the receiver.
+This defaults to the value of @code{--warn-unknown-member},
+to turn it off use the @code{--no-warn-invoke-unknown-method} flag.
+@pindex warn-undefined-variable
+@item --warn-undefined-variable
+Emit a warning if the code references a variable which is neither in
+lexical scope nor in the compile-time dynamic (global) environment.
+This is useful for catching typos.
+(A @code{define-variable} form can be used to silence warnings.
+It declares to the compiler that a variable is to be resolved dynamically.)
+@pindex warn-as-error
+@item --warn-as-error
+Treat a compilation warning as if it were an error and halt compilation.
+@end table
+
+An option can be followed by a value, as
+in @code{--warn-invoke-unknown-method=no}.
+For boolean options, the values @code{yes}, @code{true}, @code{on}, or @code{1}
+enable the option, while @code{no}, @code{false}, @code{off},
+or @code{0} disable it.
+You can also negate an option by prefixing it with @code{no-}:
+The option @code{--no-warn-unknown-member}
+is the same as @code{--warn-unknown-member=no}.
+
+These options can also be used in the module source, using
+@code{module-compile-options} or @code{with-compile-options}.
+(In that case they override the options on the command line.)
+
 @subsection Options for setting variables
 
 @table @code
@@ -852,6 +894,18 @@ when the pretty-printer decides where to break a line.
 
 @subsection Options for compiling and optimizing
 
+@table @code
+@item --target @var{version}
+The @var{version} can be a JDK or Java specification version:
+@code{1.1}, @code{1.2}, @code{1.3}, @code{1.4},
+@code{5}, @code{6}, or @code{7}.
+The JDK versions @code{1.5} and @code{1.6} are equivalent to @code{5}
+or @code{6}, respectively.
+Specify a JVM (classfile) version to target.  This is useful
+if (for example) you use Java 6, but want to create @code{.class} files
+that can run on Java 5.  In that case specify @code{--target 5}.
+@end table
+
 The following options control which calling conventions are used:
 @table @code
 @item --full-tailcalls
@@ -881,21 +935,16 @@ Both calling conventions can co-exist:  Code compiled
 with @code{--full-tailcalls} can call code compiled
 with @code{--no-full-tailcalls} and vice versa.
 
-@table @code
-@item --target @var{version}
-The @var{version} can be a JDK or Java specification version:
-@code{1.1}, @code{1.2}, @code{1.3}, @code{1.4},
-@code{5}, @code{6}, or @code{7}.
-The JDK versions @code{1.5} and @code{1.6} are equivalent to @code{5}
-or @code{6}, respectively.
-Specify a JVM (classfile) version to target.  This is useful
-if (for example) you use Java 6, but want to create @code{.class} files
-that can run on Java 5.  In that case specify @code{--target 5}.
-@end table
+These options can also be used in the module source, using
+@code{module-compile-options} or @code{with-compile-options}.
+(In that case they override the options on the command line.)
 
 The options @samp{-C}, @samp{-d}, @samp{-T}, @samp{-P}, @samp{--main}
 @samp{--applet}, and @code{--servlet} are used to compile a Scheme file;
 see @ref{Files compilation}.
+The options @samp{--module-static}, @code{--module-nonstatic},
+@code{--no-module-static}, and @code{--module-static-run}
+control how a module is mapped to a Java class; see @ref{static-or-non-modules}.
 The option @samp{--connect @var{portnum}} is only used by
 the @samp{kawa} front-end program.
 
@@ -1076,36 +1125,13 @@ in the @code{CLASSPATH}.
 You can also compile your Scheme program to native code using GCJ.
 
 @menu
-* Archive compilation::         Compiling to an archive file
 * Files compilation::           Compiling to a set of .class files
-* Compilation options::
+* Archive compilation::         Compiling to an archive file
 * Compiling using Ant::
 * Application compilation::     Compiling to a standalone application
 * Applet compilation::          Compiling to an applet
 * Compiling to executable::     Compiling to a native executable
 @end menu
-
-@node Archive compilation, Files compilation, Compiling, Compiling
-@subsection Compiling to an archive file
-
-@deffn Procedure compile-file source-file compiled-archive
-Compile the @var{source-file}, producing a @code{.zip} archive
-@var{compiled-file}.
-
-
-For example, to byte-compile a file @samp{foo.scm} do:
-@example
-(compile-file "foo.scm" "foo")
-@end example
-
-This will create @samp{foo.zip}, which contains
-byte-compiled JVM @code{.class} files.
-You can move this file around, without worrying about class paths.
-To load the compiled file, you can later @code{load} the
-named file, as in either @code{(load "foo")} or @code{(load "foo.zip")}.
-This should have the same effect as
-loading @samp{foo.scm}, except you will get the faster byte-compiled versions.
-@end deffn
 
 @node Files compilation
 @subsection Compiling to a set of .class files
@@ -1179,90 +1205,30 @@ One way to do that is with the @samp{-f}:
 kawa -f macs.scm -C foosrc.scm
 @end example
 
-@node Compilation options
-@subsection Compilation options
+Many of the options @ref{Options,,described earlier} are
+relevant when compiling.  Commonly used options include language selection,
+the @code{--warn-xxx} options, and @code{--full-tailcalls}.
 
-Various named option control how Kawa compiles certain forms.
+@node Archive compilation
+@subsection Compiling to an archive file
 
-@table @code
-@item --module-static
-If no @code{module-static} is specified, generate a static module
-(as if @code{(module-static #t)} were specified). @xref{Module classes}.
-This is (now) the default.
-@item --module-nonstatic
-@itemx --no-module-static
-If no @code{module-static} is specified, generate a non-static module
-(as if @code{(module-static #f)} were specified). @xref{Module classes}.
-This used to be the default.
-@item --module-static-run
-If no @code{module-static} is specified, generate a static module
-(as if @code{(module-static 'init-run)} were specified). @xref{Module classes}.
-@cindex --warn-@var{whatever}
-@cindex --no-warn-@var{whatever}
-@pindex warn-unknown-member
-@item --warn-unknown-member
-Emit a warning if the code references a named member (field or method)
-for which there is no match in the compile-time type of the receiver.
-This defaults to on;
-to turn it off use the @code{--no-warn-unknown-member} flag.
-@pindex warn-invoke-unknown-method
-@item --warn-invoke-unknown-method
-Emit a warning if the @code{invoke} function calls a named method
-for which there is no matching method in the compile-time type of the receiver.
-This defaults to the value of @code{--warn-unknown-member},
-to turn it off use the @code{--no-warn-invoke-unknown-method} flag.
-@pindex warn-undefined-variable
-@item --warn-undefined-variable
-Emit a warning if the code references a variable which is neither in
-lexical scope nor in the compile-time dynamic (global) environment.
-This is useful for catching typos.
-(A @code{define-variable} form can be used to silence warnings.
-It declares to the compiler that a variable is to be resolved dynamically.)
-@pindex warn-as-error
-@item --warn-as-error
-Treat a compilation warning as if it were an error and halt compilation.
-@end table
+@deffn Procedure compile-file source-file compiled-archive
+Compile the @var{source-file}, producing a @code{.zip} archive
+@var{compiled-file}.
 
-An option can be followed by a value, as
-in @code{--warn-invoke-unknown-method=no}.
-For boolean options, the values @code{yes}, @code{true}, @code{on}, or @code{1}
-enable the option, while @code{no}, @code{false}, @code{off},
-or @code{0} disable it.
-You can also negate an option by prefixing it with @code{no-}:
-The option @code{--no-warn-unknown-member}
-is the same as @code{--warn-unknown-member=no}.
 
-You can set the same options within your Scheme source file.
-(In that case they override the options on the command line.)
-
-@deffn Syntax module-compile-options [key: value] ...
-This sets the value of the @code{key} option to @code{value}
-for the current module (source file).  It takes effect as
-soon it is seen during the first macro-expansion pass,
-and is active thereafter (unless overridden by @code{with-compile-options}).
-
-The @var{key} is one of the above option names.
-(The following colon make it a Kawa keyword.)
-The @var{value} must be a literal value: either a boolean
-(@code{#t} or @code{#f}), a number, or a string,
-depending on the @var{key}.
-(All the options so far are boolean options.)
-
+For example, to byte-compile a file @samp{foo.scm} do:
 @example
-(module-compile-options warn-undefined-variable: #t)
-;; This causes a warning message that y is unknown.
-(define (func x) (list x y))
+(compile-file "foo.scm" "foo")
 @end example
-@end deffn
 
-@deffn Syntax with-compile-options [key: value] ... body
-Similar to @code{module-compile-options}, but the option
-is only active within @var{body}.
-@example
-(define (func x)
-  (with-compile-options warn-invoke-unknown-method: #f
-    (invoke x 'size)))
-@end example
+This will create @samp{foo.zip}, which contains
+byte-compiled JVM @code{.class} files.
+You can move this file around, without worrying about class paths.
+To load the compiled file, you can later @code{load} the
+named file, as in either @code{(load "foo")} or @code{(load "foo.zip")}.
+This should have the same effect as
+loading @samp{foo.scm}, except you will get the faster byte-compiled versions.
 @end deffn
 
 @node Compiling using Ant
@@ -6559,10 +6525,53 @@ for @var{procedure}, when known.
 @chapter Program structure
 
 @menu
+* Definitions::
 * Conditionals::
 * Lazy evaluation::
 * Threads::
 @end menu
+
+@node Definitions
+@section Definitions
+
+@deffn Syntax define [@stxlit{::} type] value
+@end deffn
+
+In addition to @code{define} (which can take an optional type specifier),
+Kawa has some extra definition forms.
+
+@deffn Syntax define-private name [:: type] value
+@deffnx Syntax define-private (name formals) body
+Same as @code{define}, except that @code{name} is not exported.
+@end deffn
+
+@deffn Syntax define-constant name [:: type] value
+Definites @var{name} to have the given @var{value}.
+The value is readonly, and you cannot assign to it.
+(This is not fully enforced.)
+If the definition is at module level, then the compiler
+will create a @code{final} field with the given name and type.
+The @var{value} is evaluated as normal; however, if it is a
+compile-time constant, it defaults to being static.
+@end deffn
+
+@deffn Syntax define-variable name [init]
+If @var{init} is specified and @var{name} does not have a global variable
+binding, then @var{init} is evaluated, and @var{name} bound to the result.
+Otherwise, the value bound to @var{name} does not change.
+(Note that @var{init} is not evaluated
+if @var{name} does have a global variable binding.)
+
+Also, declares to the compiler that @var{name} will be looked up
+in the dynamic environment. This can be useful for shutting up
+warnings from @code{--warn-undefined-variable}.
+
+This is similar to the Common Lisp @code{defvar} form.
+However, the Kawa version is (currently) only allowed at module level.
+@end deffn
+
+For @code{define-namespace} and @code{define-private-namespace}
+see @ref{Namespaces}.
 
 @node Conditionals
 @section Conditionals
@@ -8466,11 +8475,6 @@ If @var{type} is not specified, it defaults to @code{Object}.
 @deffn Syntax letrec @stxlit{((}name [@stxlit{::} type] init@stxlit{)} ...@stxlit{)} body
 @end deffn
 
-@deffn Syntax define [@stxlit{::} type] value
-@end deffn
-
-See also @code{define-private}, and @code{define-constant}.
-
 @node Type tests and conversions, , Declaring Types of Variables, Types
 @section Type tests and conversions
 
@@ -9068,26 +9072,6 @@ When Kawa compiles the module source, the result is the
 @dfn{module class}.  Each exported definition is translated to
 a public field in the module class.
 
-There are two kinds of module class:
-A @dfn{static module} is a class (or gets compiled to a class)
-all of whose public fields a static, and that does not have a
-public constructor.  A JVM can only have a single global instance of
-a static module.
-An @dfn{instance module} has a public default constructor,
-and usually has at least one non-static public field.
-There can be multiple instances
-of an instance module; each instance is called a @dfn{module instance}.
-However, only a single instance of a module can be @dfn{registered}
-in an environment, so in most cases there is only a single
-instance of instance modules.  Registering an instance in an environment
-means creating a binding mapping a magic name (derived from the class name)
-to the instance.
-
-In fact, any Java class class that has the properties of either
-an instance module or a static module, is a module, and can be
-loaded or imported as such;  the class need not have written
-using Scheme.
-
 You can declare a class using @code{define-simple-class}
 with the same name as the module class, for example the
 following in a file named @code{foo.scm}:
@@ -9134,44 +9118,6 @@ Alternatively, you can write:
 (define (fact x) ...)
 @end example
 
-@subsection Definitions
-
-In addition to @code{define} (which can take an optional type specifier),
-Kawa has some extra definition forms.
-
-@deffn Syntax define-private name [:: type] value
-@deffnx Syntax define-private (name formals) body
-Same as @code{define}, except that @code{name} is not exported.
-@end deffn
-
-@deffn Syntax define-constant name [:: type] value
-Definites @var{name} to have the given @var{value}.
-The value is readonly, and you cannot assign to it.
-(This is not fully enforced.)
-If the definition is at module level, then the compiler
-will create a @code{final} field with the given name and type.
-The @var{value} is evaluated as normal; however, if it is a
-compile-time constant, it defaults to being static.
-@end deffn
-
-@deffn Syntax define-variable name [init]
-If @var{init} is specified and @var{name} does not have a global variable
-binding, then @var{init} is evaluated, and @var{name} bound to the result.
-Otherwise, the value bound to @var{name} does not change.
-(Note that @var{init} is not evaluated
-if @var{name} does have a global variable binding.)
-
-Also, declares to the compiler that @var{name} will be looked up
-in the dynamic environment. This can be useful for shutting up
-warnings from @code{--warn-undefined-variable}.
-
-This is similar to the Common Lisp @code{defvar} form.
-However, the Kawa version is (currently) only allowed at module level.
-@end deffn
-
-For @code{define-namespace} and @code{define-private-namespace}
-see @ref{Namespaces}.
-
 @subsection How a module becomes a class
 
 If you want to just use a Scheme module as a module (i.e. @code{load}
@@ -9188,7 +9134,8 @@ sripped off).  That can be overridden by the @code{-T} Kawa
 command-line flag.  The package-prefix specified by the @code{-P}
 flag is prepended to give the fully-qualified class name.
 
-@deffn Syntax module-name <name>
+@deffn Syntax module-name name
+@deffnx Syntax module-name <name>
 Sets the name of the generated class, overriding the default.
 If there is no @samp{.} in the @var{name}, the package-prefix
 (specified by the @code{-P} Kawa command-line flag) is prepended.
@@ -9198,12 +9145,12 @@ By default, the base class of the generated module class is unspecified;
 you cannot count on it being more specific than @code{Object}.
 However, you can override it with @code{module-extends}.
 
-@deffn Syntax module-extends <class>
+@deffn Syntax module-extends class
 Specifies that the class generated from the immediately surrounding
 module should extend (be a sub-class of) the class @code{<@var{class}>}.
 @end deffn
 
-@deffn Syntax module-implements <interface> ...
+@deffn Syntax module-implements interface ...
 Specifies that the class generated from the immediately surrounding
 module should implement the interfaces listed.
 @end deffn
@@ -9255,6 +9202,55 @@ or @code{defmacro}) create a field whose type is currently a sub-class of
 @code{kawa.lang.Syntax};  this allows importing modules to detect
 that the field is a macro and apply the macro at compile time.
 
+Unfortunately, the Java class verifier does not allow fields to have
+arbitrary names.  Therefore, the name of a field that represents a
+Scheme variable is "mangled" (@pxref{Mangling}) into an acceptable Java name.
+The implementation can recover the original name of a field @code{X}
+as @code{((gnu.mapping.Named) X).getName()} because all the standard
+compiler-generate field types implemented the @code{Named} interface.
+
+@anchor{static-or-non-modules}
+@subsection Static vs non-static modules
+
+There are two kinds of module class:
+A @dfn{static module} is a class (or gets compiled to a class)
+all of whose public fields a static, and that does not have a
+public constructor.  A JVM can only have a single global instance of
+a static module.
+An @dfn{instance module} has a public default constructor,
+and usually has at least one non-static public field.
+There can be multiple instances
+of an instance module; each instance is called a @dfn{module instance}.
+However, only a single instance of a module can be @dfn{registered}
+in an environment, so in most cases there is only a single
+instance of instance modules.  Registering an instance in an environment
+means creating a binding mapping a magic name (derived from the class name)
+to the instance.
+
+In fact, any Java class class that has the properties of either
+an instance module or a static module, is a module, and can be
+loaded or imported as such;  the class need not have written
+using Scheme.
+
+You can control whether a module is compiled to a static or
+a non-static class using either a command-line flag to the compiler,
+or using the @code{module-static} special form.
+
+@table @code
+@item --module-static
+If no @code{module-static} is specified, generate a static module
+(as if @code{(module-static #t)} were specified).
+This is (now) the default.
+@item --module-nonstatic
+@itemx --no-module-static
+If no @code{module-static} is specified, generate a non-static module
+(as if @code{(module-static #f)} were specified).
+This used to be the default.
+@item --module-static-run
+If no @code{module-static} is specified, generate a static module
+(as if @code{(module-static 'init-run)} were specified).
+@end table
+
 @deffn Syntax module-static name ...
 @deffnx Syntax module-static @code{#t}
 @deffnx Syntax module-static @code{#f}
@@ -9295,19 +9291,50 @@ share the same bindings, which you may not want if you use
 multiple top-level environments.
 @end deffn
 
-Unfortunately, the Java class verifier does not allow fields to have
-arbitrary names.  Therefore, the name of a field that represents a
-Scheme variable is "mangled" (@pxref{Mangling}) into an acceptable Java name.
-The implementation can recover the original name of a field @code{X}
-as @code{((gnu.mapping.Named) X).getName()} because all the standard
-compiler-generate field types implemented the @code{Named} interface.
-
 The top-level actions of a module will get compiled to a @code{run}
 method.  If there is an explicit @code{method-extends}, then the
 module class will also automatically implement @code{java.lang.Runnable}.
 (Otherwise, the class does not implement @code{Runnable}, since in that
 case the @code{run} method return an @code{Object} rather than @code{void}.
 This will likely change.)
+
+@subsection Module options
+
+Certain compilation options can be be specified @emph{either}
+on the command-line when compiling, or in the module itself.
+The can be any of the @code{--wan-} options,
+or the @code{--[full-]tailcalls} options.
+
+@deffn Syntax module-compile-options [key: value] ...
+This sets the value of the @code{key} option to @code{value}
+for the current module (source file).  It takes effect as
+soon it is seen during the first macro-expansion pass,
+and is active thereafter (unless overridden by @code{with-compile-options}).
+
+The @var{key} is one of the supported option names.
+XXXX
+(The following colon make it a Kawa keyword.)
+The @var{value} must be a literal value: either a boolean
+(@code{#t} or @code{#f}), a number, or a string,
+depending on the @var{key}.
+(All the options so far are boolean options.)
+
+@example
+(module-compile-options warn-undefined-variable: #t)
+;; This causes a warning message that y is unknown.
+(define (func x) (list x y))
+@end example
+@end deffn
+
+@deffn Syntax with-compile-options [key: value] ... body
+Similar to @code{module-compile-options}, but the option
+is only active within @var{body}.
+@example
+(define (func x)
+  (with-compile-options warn-invoke-unknown-method: #f
+    (invoke x 'size)))
+@end example
+@end deffn
 
 @subsection Requiring (importing) a module
 @anchor{require}

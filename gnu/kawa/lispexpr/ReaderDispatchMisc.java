@@ -127,50 +127,7 @@ public class ReaderDispatchMisc extends ReadTableEntry
 	  }
 	return Values.empty;
       case ',':
-	port = reader.getPort();
-        Object list;
-        if (port.peek() == '('
-            && ((length
-                 = LList.listLength(list = reader.readObject(), false))
-                > 0)
-            && ((Pair) list).getCar() instanceof Symbol)
-          {
-            name = ((Pair) list).getCar().toString();
-            Object proc = ReadTable.getCurrent().getReaderCtor(name);
-            if (proc == null)
-              in.error("unknown reader constructor "+name);
-            else if (! (proc instanceof Procedure || proc instanceof Type))
-              in.error("reader constructor must be procedure or type name");
-            else
-              {
-                length--;  // Subtract 1 for the constructor name.
-                int parg = proc instanceof Type ? 1 : 0;
-                Object[] args = new Object[parg+length];
-                Object argList = ((Pair) list).getCdr();
-                for (int i = 0;  i < length;  i++)
-                  {
-                    Pair pair = (Pair) argList;
-                    args[parg+i] = pair.getCar();
-                    argList = pair.getCdr();
-                  }
-                try
-                  {
-                    if (parg > 0)
-                      {
-                        args[0] = proc;
-                        return gnu.kawa.reflect.Invoke.make.applyN(args);
-                      }
-                    return ((Procedure) proc).applyN(args);
-                  }
-                catch (Throwable ex)
-                  {
-                    in.error("caught "+ex+" applying reader constructor "+name);
-                  }
-              }
-          }
-        else
-          in.error("a non-empty list starting with a symbol must follow #,");
-	return Boolean.FALSE;
+        return ReaderDispatchSyntaxQuote.readNamedConstructor(reader);
       case '=':
 	return reader.readObjectWithSharing(count);
       case '#':

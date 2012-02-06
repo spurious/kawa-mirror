@@ -36,6 +36,10 @@ public class ReadTable extends RangeTable
    */
   protected boolean hexEscapeAfterBackslash = true;
 
+    public static ReaderQuote unquoteEntry =
+        new ReaderQuote(makeSymbol(LispLanguage.unquote_sym),
+                        '@', makeSymbol(LispLanguage.unquotesplicing_sym));
+
   /** Set whether ":IDENTIFIER" should be treated as a keyword. */
   public void setInitialColonIsKeyword (boolean whenInitial)
   {
@@ -97,8 +101,7 @@ public class ReadTable extends RangeTable
 
     set('\'', new ReaderQuote(makeSymbol(LispLanguage.quote_sym)));
     set('`',  new ReaderQuote(makeSymbol(LispLanguage.quasiquote_sym)));
-    set(',',  new ReaderQuote(makeSymbol(LispLanguage.unquote_sym),
-                              '@', makeSymbol(LispLanguage.unquotesplicing_sym)));
+    set(',',  unquoteEntry);
 
     setBracketMode();  // Sets the entries for '[', ']', and '<'.
   }
@@ -246,7 +249,7 @@ public class ReadTable extends RangeTable
     return entry;
   }
 
-  protected Object makeSymbol (String name)
+  static Object makeSymbol (String name)
   {
     return Namespace.EmptyNamespace.getSymbol(name.intern());
   }

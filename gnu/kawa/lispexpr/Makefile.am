@@ -22,6 +22,7 @@ java_sources = \
   ReaderDispatch.java \
   ReaderDispatchMacro.java \
   ReaderDispatchMisc.java \
+  ReaderDispatchSyntaxQuote.java \
   ReaderIgnoreRestOfLine.java \
   ReaderMacro.java \
   ReaderMisc.java \

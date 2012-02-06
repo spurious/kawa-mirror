@@ -42,25 +42,25 @@
        ((_ fname slots)
        #`(define-procedure fname
 	   setter: (lambda (arg value)
-		     ,(syntax-case #'slots ()
+		     #,(syntax-case #'slots ()
 			((first1 . rest1)
 			 #`(set!
 			    (field 
-			     ,(let loop ((f #'rest1))
+			     #,(let loop ((f #'rest1))
 				(syntax-case f ()
 				  (() #'arg)
 				  ((first . rest)
-				   #`(field (as <pair> ,(loop #'rest))
-					    ',(syntax-object->datum #'first)))))
+				   #`(field (as <pair> #,(loop #'rest))
+					    '#,(syntax-object->datum #'first)))))
 			     'first1)
 			    value))))
 	   (lambda (arg) name: 'fname
-		   ,(let loop ((f #'slots))
+		   #,(let loop ((f #'slots))
 		      (syntax-case f ()
 			(() #'arg)
 			((first . rest)
-			 #`(field (as <pair> ,(loop #'rest))
-				  ',(syntax-object->datum #'first)))))))))))
+			 #`(field (as <pair> #,(loop #'rest))
+				  '#,(syntax-object->datum #'first)))))))))))
 
 (define-cxr caar (car car))
 (define-cxr cadr (car cdr))

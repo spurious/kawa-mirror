@@ -1,5 +1,11 @@
 2012-02-05  Per Bothner  <per@bothner.com>
 
+	* lang/Quote.java (matchesUnquote, matchesUnquoteSplicing,
+	matchesQuasiQuote): New protected methods for match unquote etc.
+	* standard/syntax.java (matchesUnquote, matchesUnquoteSplicing,
+	matchesQuasiQuote): Override for quasisyntax.
+	* standard/Scheme.java (createReadTable): Update.
+
 	* lang/TemplateScope.java (make): Make more robust in case
 	syntax/quasisyntax is used in an non-macro context.
 

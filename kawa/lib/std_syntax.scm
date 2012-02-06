@@ -241,14 +241,14 @@
   (syntax-case form ()
     ((lazy expression)
      ; Unquote, so inlining gets called on literal Procedure.
-     #`(,gnu.kawa.functions.MakePromise:makeLazy
+     #`(#,gnu.kawa.functions.MakePromise:makeLazy
         (lambda () expression)))))
 
 (define-syntax (delay form)
   (syntax-case form ()
     ((delay expression)
      ; Unquote, so inlining gets called on literal Procedure.
-     #`(,gnu.kawa.functions.MakePromise:makeDelay
+     #`(#,gnu.kawa.functions.MakePromise:makeDelay
         (lambda () expression)))))
 
 (define-syntax define-procedure

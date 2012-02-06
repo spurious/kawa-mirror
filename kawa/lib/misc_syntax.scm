@@ -4,7 +4,7 @@
   (syntax-case form ()
     ((provide 'feature)
      #`(define-constant
-         ,(datum->syntax-object
+         #,(datum->syntax-object
            form
            (string->symbol
             (string-append "%provide%"

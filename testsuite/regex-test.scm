@@ -33,16 +33,16 @@
      (syntax-case (syntax expr) ()
        ((#(f1 a1 ...) #(f2 a2 ...) . args)
 	#`(begin
-	    ,(gnu.lists.PairWithPosition (syntax-object->datum (syntax expr))
+	    #,(gnu.lists.PairWithPosition (syntax-object->datum (syntax expr))
 					 'test-equal
 					 #`('expected (f1 a1 ... . args)))
-	    ,(gnu.lists.PairWithPosition (syntax-object->datum (syntax expr))
+	    #,(gnu.lists.PairWithPosition (syntax-object->datum (syntax expr))
 					 'test-equal
 					 #`('expected (f2 a2 ... . args)))
 	    (test . rest)))
        (_
 	#`(begin
-	    ,(gnu.lists.PairWithPosition (syntax-object->datum (syntax expr))
+	    #,(gnu.lists.PairWithPosition (syntax-object->datum (syntax expr))
 					 'test-equal
 					 #'('expected expr))
 	    (test . rest)))))))

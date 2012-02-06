@@ -1,3 +1,8 @@
+2012-02-05  Per Bothner  <per@bothner.com>
+
+	* classes1.scm: Use #, and #,@ instead of , and ,@ in quasisyntax.
+	* regex-test.scm: Likewise.
+
 2012-01-31  Per Bothner  <per@bothner.com>
 
 	* lib-test.sc: Add more tests from SRFI-41.

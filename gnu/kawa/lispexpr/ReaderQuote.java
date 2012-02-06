@@ -28,29 +28,33 @@ public class ReaderQuote extends ReadTableEntry
     this.magicSymbol2 = magicSymbol2;
   }
 
-  public Object read (Lexer in, int ch, int count)
-    throws java.io.IOException, SyntaxException
-  {
-    LispReader reader = (LispReader) in;
-    String file = reader.getName();
-    int line1 = reader.getLineNumber() + 1;
-    int column1 = reader.getColumnNumber() + 1;
-    Object magic = magicSymbol;
-    if (next != '\0')
-      {
-	ch = reader.read();
-	if (ch == next)
-	  magic = magicSymbol2;
-	else if (ch >= 0)
-	  reader.unread(ch);
-      }
-    int line2 = reader.getLineNumber() + 1;
-    int column2 = reader.getColumnNumber() + 1;
-    Object operand = reader.readObject();
-    return PairWithPosition.make(magic,
-                                 PairWithPosition.make(operand,
-                                                       reader.makeNil(),
-                                                       file, line2, column2),
-                                 file, line1, column1);
-  }
+    public Object read (Lexer in, int ch, int count)
+        throws java.io.IOException, SyntaxException {
+        return read((LispReader) in, magicSymbol, next, magicSymbol2);
+    }
+
+    public static Object read(LispReader reader,
+                              Object magicSymbol,
+                              char next, Object magicSymbol2)
+            throws java.io.IOException, SyntaxException {
+        String file = reader.getName();
+        int line1 = reader.getLineNumber() + 1;
+        int column1 = reader.getColumnNumber() + 1;
+        Object magic = magicSymbol;
+        if (next != '\0') {
+            int ch = reader.read();
+            if (ch == next)
+                magic = magicSymbol2;
+            else if (ch >= 0)
+                reader.unread(ch);
+        }
+        int line2 = reader.getLineNumber() + 1;
+        int column2 = reader.getColumnNumber() + 1;
+        Object form = reader.readObject();
+        form = PairWithPosition.make(form, reader.makeNil(),
+                                     file, line2, column2);
+        form = PairWithPosition.make(magic, form,
+                                        file, line1, column1);
+        return form;
+    }
 }

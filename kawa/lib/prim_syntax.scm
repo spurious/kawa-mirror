@@ -122,4 +122,4 @@
 	       (process-binding (syntax bindings))
 	       (set! out-bindings (gnu.lists.LList:reverseInPlace out-bindings))
 	       (set! out-inits (gnu.lists.LList:reverseInPlace out-inits))
-	       #`(%let ,out-bindings ,@out-inits . body)))))))
+	       #`(%let #,out-bindings #,@out-inits . body)))))))

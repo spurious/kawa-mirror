@@ -16,16 +16,29 @@ import gnu.kawa.functions.CompileNamedPart;
  * @author	Per Bothner
  */
 
-public class Quote extends Syntax
-{
-  public static final Quote plainQuote = new Quote("quote", false);
-  public static final Quote quasiQuote = new Quote("quasiquote", true);
+public class Quote extends Syntax {
+    public static final Quote plainQuote = new Quote("quote", false);
+    public static final Quote quasiQuote = new Quote("quasiquote", true);
 
-  public Quote (String name, boolean isQuasi)
-  {
-    super(name);
-    this.isQuasi = isQuasi;
-  }
+    public Quote (String name, boolean isQuasi) {
+        super(name);
+        this.isQuasi = isQuasi;
+    }
+
+    protected boolean matchesUnquote(Pair pair, SyntaxForm syntax,
+                                     Translator tr) {
+        return tr.matches(pair.getCar(), syntax, LispLanguage.unquote_sym);
+    }
+
+    protected boolean matchesUnquoteSplicing(Pair pair, SyntaxForm syntax,
+                                     Translator tr) {
+        return tr.matches(pair.getCar(), syntax, LispLanguage.unquotesplicing_sym);
+    }
+
+    protected boolean matchesQuasiQuote(Object form, SyntaxForm syntax,
+                                     Translator tr) {
+        return tr.matches(form, syntax, LispLanguage.quasiquote_sym);
+    }
 
   /** An initial value for 'depth' for plain (non-quasi) quote. */
   protected static final int QUOTE_DEPTH = -1;
@@ -135,9 +148,9 @@ public class Quote extends Syntax
         else if (depth < 0)
           {
           }
-        else if (tr.matches(pair.getCar(), syntax, LispLanguage.quasiquote_sym))
+        else if (matchesQuasiQuote(pair.getCar(), syntax, tr))
           depth++;
-        else if (tr.matches(pair.getCar(), syntax, LispLanguage.unquote_sym))
+        else if (matchesUnquote(pair, syntax, tr))
           {
             depth--;
             Pair pair_cdr;
@@ -151,7 +164,7 @@ public class Quote extends Syntax
                 break;
               }
           }
-        else if (tr.matches(pair.getCar(), syntax, LispLanguage.unquotesplicing_sym))
+        else if (matchesUnquoteSplicing(pair, syntax, tr))
           return tr.syntaxError ("invalid used of " + pair.getCar() +
 				 " in quasiquote template");
         if (depth == 1 && pair.getCar() instanceof Pair)
@@ -166,10 +179,10 @@ public class Quote extends Syntax
             int splicing = -1;
             if (form instanceof Pair)
               {
-                Object op = ((Pair) form).getCar();
-                if (tr.matches(op, subsyntax, LispLanguage.unquote_sym))
+                Pair pform = (Pair) form;
+                if (matchesUnquote(pform, subsyntax, tr))
                   splicing = 0;
-                else if (tr.matches(op, subsyntax, LispLanguage.unquotesplicing_sym))
+                else if (matchesUnquoteSplicing(pform, subsyntax, tr))
                   splicing = 1;
               }
             if (splicing >= 0)
@@ -348,8 +361,7 @@ public class Quote extends Syntax
 	    int element_depth = depth;
 	    Pair pair;
 	    if (element instanceof Pair && depth > QUOTE_DEPTH
-		&& tr.matches((pair = (Pair)element).getCar(), syntax,
-			      LispLanguage.unquotesplicing_sym)
+		&& matchesUnquoteSplicing((pair = (Pair)element), syntax, tr)
 		&& --element_depth == 0)
 	      {
 		Pair pair_cdr;

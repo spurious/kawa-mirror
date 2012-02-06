@@ -1,3 +1,14 @@
+2012-02-05  Per Bothner  <per@bothner.com>
+
+	Support #, and #,@ inside quasisyntax.  Complicated becaue of backward
+	compatibility: Need to support , and ,@.  Also need to support SRFI10.
+	* ReaderDispatchSyntaxQuote.java: New class, extends ReadTableEntry.
+	* Makefile.am: Update.
+	* ReaderQuote.java (read): New static method.
+	* ReaderDispatchMisc.java: Move #, handing to ReaderDispatchSyntaxQuote.
+	* ReadTable.java (unquoteEntry): New field.
+	* LispReader.java (inQuasiSyntax): New field.
+
 2012-01-28  Per Bothner  <per@bothner.com>
 
 	* BracketApply.java (rewrite): Update for 'promise'.

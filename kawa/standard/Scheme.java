@@ -1190,9 +1190,10 @@ public class Scheme extends LispLanguage
     ReadTable tab = ReadTable.createInitial();
     int std =  standardToFollow;
     ReaderDispatch dispatchTable = (ReaderDispatch) tab.lookup('#');
-    dispatchTable.set('\'', new ReaderQuote(asSymbol("syntax")));
-    dispatchTable.set('`', new ReaderQuote(asSymbol("quasisyntax")));
-    dispatchTable.set(',', ReaderDispatchMisc.getInstance());
+    ReaderDispatchSyntaxQuote sentry = new ReaderDispatchSyntaxQuote();
+    dispatchTable.set('\'', sentry);
+    dispatchTable.set('`', sentry);
+    dispatchTable.set(',', sentry);
     tab.putReaderCtorFld("path", "gnu.kawa.lispexpr.LangObjType", "pathType");
     tab.putReaderCtorFld("filepath", "gnu.kawa.lispexpr.LangObjType", "filepathType");
     tab.putReaderCtorFld("URI", "gnu.kawa.lispexpr.LangObjType", "URIType");

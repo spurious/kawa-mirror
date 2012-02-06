@@ -82,6 +82,8 @@ public class LispReader extends Lexer
       } while (commentNesting > 0);
   }
 
+    boolean inQuasiSyntax;
+
   char readCase = lookupReadCase();
 
   /** Get specification of how symbols should be case-folded.

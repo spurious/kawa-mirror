@@ -80,4 +80,7 @@
 (test-equal "\x65;\x301;" (string-normalize-nfd "\x65;\x301;"))
 (test-equal "\xE9;" (string-normalize-nfc "\x65;\x301;"))
 
+(import (srfi :13 strings))
+(test-equal 15 (string-contains "eek -- what a geek." "ee" 12 18))
+
 (test-end)

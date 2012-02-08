@@ -1,3 +1,8 @@
+2012-02-07  Jamison Hope  <jrh@theptrgroup.com>
+
+	* srfi13.scm (let-optionals*): Re-implement to better match reference
+	implementation.  This fixes a crash when calling string-contains.
+
 2012-02-05  Per Bothner  <per@bothner.com>
 
 	* enums.scm: Use #, and #,@ instead of , and ,@ in quasisyntax.

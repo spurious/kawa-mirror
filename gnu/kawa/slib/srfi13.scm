@@ -130,7 +130,10 @@
 
 (define-syntax (let-optionals* form)
   (syntax-case form ()
-    ((_ rest-arg () e ...) #`(let () e ...))
+    ((_ rest-arg () e ...)
+     #`(if (null? rest-arg)
+           (let () e ...)
+           (error "too many arguments" rest-arg)))
     ((_ rest-arg (rest) e ...) (identifier? (syntax rest))
      #`(let ((rest rest-arg)) e ...))
     ((_ rest-arg ((var default) bindings ...) e ...)
@@ -143,8 +146,9 @@
          (let-optionals*
           (if (not (null? rest-arg)) (cdr rest-arg) rest-arg)
           (bindings ...) e ...)))
-    ((_ rest-arg ((vars proc)) e ...)
-     #`(receive vars (proc rest-arg) e ...))))
+    ((_ rest-arg (((var1 var2 ...) proc) bindings ...) e ...)
+     #`(receive (r var1 var2 ...) (proc rest-arg)
+                (let-optionals* r (bindings ...) e ...)))))
 
 (define-private (char-cased? (c ::character)) ::boolean
   (not (char=? (char-upcase c) (char-downcase c))))

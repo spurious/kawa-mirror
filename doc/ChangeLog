@@ -1,3 +1,7 @@
+2012-02-07  Per Bothner  <per@bothner.com>
+
+	* kawa.texi: Fix some formatting bugs.
+
 2012-02-04  Per Bothner  <per@bothner.com>
 
 	* kawa.texi: Lots of stuff moved around, mostly relating to

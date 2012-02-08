@@ -6955,9 +6955,9 @@ forced.
                     count
                     (force p)))))
 (define x 5)
-p                  @result{} @var{a promise}
+p                  @result{} @emph{a promise}
 (force p)          @result{} 6
-p                  @result{} @var{a promise, still}
+p                  @result{} @emph{a promise, still}
 (begin (set! x 10)
        (force p))  @result{} 6
 @end example                                                                                                                                                                   
@@ -8302,7 +8302,7 @@ that map to primitive Java types or java classes.
 * Type tests and conversions::
 @end menu
 
-@node Standard Types, Declaring Types of Variables, , Types
+@node Standard Types
 @section Standard Types
 
 These types are predefined with the following names.
@@ -8458,7 +8458,7 @@ fully-qualified class names, and also type aliases:
 (define v3 ::fvi [6 7 8])
 @end example
 
-@node Declaring Types of Variables,  Type tests and conversions, Standard Types, Types
+@node Declaring Types of Variables
 @section Declaring Types of Variables
 
 @deffn Syntax let @stxlit{((}name [@stxlit{::} type] init@stxlit{)} ...@stxlit{)} body

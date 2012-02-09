@@ -470,7 +470,7 @@ public class ClassExp extends LambdaExp
             instanceType.setEnclosingMember(compiledType);
             compiledType.addMemberClass(instanceType);
           }
-              
+
 	usedSuperClasses(compiledType, comp);
 	if (compiledType != instanceType)
 	  usedSuperClasses(instanceType, comp);
@@ -560,6 +560,23 @@ public class ClassExp extends LambdaExp
               }
 	    child.compileEnd(comp);
 	    child.generateApplyMethods(comp);
+        // Check to see if child overrides a superclass method and has
+        // a covariant return type. If so, generate a bridge method
+        // matching the superclass method's return type.
+        {
+          Method thisMethod = comp.method;
+          Type[] ptypes = thisMethod.getParameterTypes();
+          Type rtype = thisMethod.getReturnType();
+          ClassType superClass = instanceType.getSuperclass();
+          Method superMethod = superClass.getMethod(child.getName(),
+                                                    ptypes);
+          if (superMethod != null &&
+              superMethod.getReturnType().compare(rtype) == 1)
+          {
+            generateBridgeMethod(comp, thisMethod, ptypes,
+                                 superMethod.getReturnType());
+          }
+        }
 	    comp.method = save_method;
 	    comp.curClass = new_class;
 	    comp.curLambda = save_lambda;
@@ -632,11 +649,21 @@ public class ClassExp extends LambdaExp
 		getImplMethods(compiledType, mname, ptypes, vec);
 		if (vec.size() != 1)
 		  {
-		    // FIXME - need better error message!
-		    String msg = vec.size() == 0
-		      ? "missing implementation for "
-		      : "ambiguous implementation for ";
-		    comp.error('e', msg+meth);
+            Method impl = vec.size() != 0 ? null :
+              findMethodForBridge(mname, ptypes, rtype);
+
+            if (impl != null)
+            {
+              generateBridgeMethod(comp, impl, ptypes, rtype);
+            }
+            else
+            {
+              // FIXME - need better error message!
+              String msg = vec.size() == 0
+                ? "missing implementation for "
+                : "ambiguous implementation for ";
+              comp.error('e', msg+meth);
+            }
 		  }
 		else
 		  {
@@ -663,6 +690,63 @@ public class ClassExp extends LambdaExp
 	comp.curClass = saveClass;
 	comp.method = saveMethod;
       }
+  }
+
+  /**
+   * Finds a like-named method suitable for bridging the given
+   * arg/return types (i.e. a method whose arg types and return types
+   * are subclasses of those given here.
+   */
+  protected Method findMethodForBridge(String mname, Type[] ptypes,
+                                       Type rtype)
+  {
+    Method result = null;
+    for (Method method = compiledType.getDeclaredMethods();
+         method != null; method = method.getNext())
+    {
+      if (mname.equals(method.getName()) &&
+          method.getReturnType().isSubtype(rtype) &&
+          Type.isMoreSpecific(method.getParameterTypes(), ptypes))
+        result = method;
+    }
+    return result;
+  }
+
+  /**
+   * Given an existing method and a desired bridge method signature,
+   * generates an appropriate bridge method.
+   */
+  public final void generateBridgeMethod(Compilation comp,
+                                         Method src_method,
+                                         Type[] bridge_arg_types,
+                                         Type bridge_return_type)
+  {
+    ClassType save_class = comp.curClass;
+    Method save_method = comp.method;
+    try
+    {
+      comp.curClass = getCompiledClassType(comp);
+      comp.method = comp.curClass.addMethod
+        (src_method.getName(),
+         Access.PUBLIC|Access.BRIDGE|Access.SYNTHETIC,
+         bridge_arg_types, bridge_return_type);
+      Type[] src_arg_types = src_method.getParameterTypes();
+
+      CodeAttr code = comp.method.startCode();
+      code.emitLoad(code.getArg(0));
+      for (int i = 0; i < src_arg_types.length; ++i)
+      {
+        code.emitLoad(code.getArg(i+1));
+        code.emitCheckcast(src_arg_types[i]);
+      }
+      code.emitInvokeVirtual(src_method);
+      code.emitReturn();
+    }
+    finally
+    {
+      comp.method = save_method;
+      comp.curClass = save_class;
+    }
   }
 
   protected <R,D> R visit (ExpVisitor<R,D> visitor, D d)

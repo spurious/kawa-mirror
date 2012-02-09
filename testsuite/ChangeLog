@@ -1,3 +1,8 @@
+2012-02-09  Jamison Hope  <jrh@theptrgroup.com>
+
+	* bridge.scm: New tests for bridge methods.
+	* Makefile.am: Update accordingly.
+
 2012-02-07  Per Bothner  <per@bothner.com>
 
 	* text-test.scm: Add a test for SRFI-13's strings-contains.

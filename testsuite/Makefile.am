@@ -28,7 +28,8 @@ all:
 check: check2-no-full-tailcalls check1 check2-full-tailcalls check-no-inline \
   check-interpreted-cycle check-interpreted-cycleb check-interpreted-cyclebr \
   $(SERVLET_TESTS) $(SAX2_TESTS) \
-  check-inlining check-jmc check-use-slots check-load-require check-sva31180
+  check-inlining check-jmc check-use-slots check-load-require check-sva31180 \
+  check-bridge
 
 check2-no-full-tailcalls:
 	$(MAKE) check2 OPTIONS=--no-full-tailcalls
@@ -574,6 +575,9 @@ check-sva31180:
 	@if $(DIFF) tmp-sva31180.expected sva31180.log; \
 	  then echo '# check-sva31180 passes'; \
 	  else echo FAIL check-sva31180; fi
+
+check-bridge:
+	$(KAWA) $(OPTIONS) "$(srcdir)/bridge.scm"
 
 CLEANFILES = tmp* *.log testing.zip revcomp-input.txt knucleotide-input.txt regexdna-input.txt *.class HelloCgiK HelloCgiS
 SCRIPTS_TO_RUN = uninit1.scm sva34005.scm sva35362.scm anonymous-lambda-1.scm \

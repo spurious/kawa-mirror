@@ -1,3 +1,7 @@
+2012-02-09  Per Bothner  <per@bothner.com>
+
+	* SlotGet.scm (lookupMember): Look for "isXxx" method.
+
 2012-01-31  Per Bothner  <per@bothner.com>
 
 	* ProceduralProxy.java: New class.

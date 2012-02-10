@@ -231,6 +231,9 @@ public class SlotGet extends Procedure2
     String getname = ClassExp.slotToMethodName("get", name);
     gnu.bytecode.Method method = clas.getMethod(getname, Type.typeArray0);
     if (method == null)
+      method = clas.getMethod(ClassExp.slotToMethodName("is", name),
+                              Type.typeArray0);
+    if (method == null)
       return member;
     else
       return method;

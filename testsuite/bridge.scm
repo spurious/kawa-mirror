@@ -20,7 +20,10 @@ superclasses. If no such method is found, returns #!null."
                    (eq?    mtd:name            name)
                    (eq?    mtd:return-type     return-type)
                    (equal? mtd:parameter-types ptypes)
-                   (eq?    (mtd:bridge?)       bridge)
+                   ;; Why a different way of checking for bridge than for
+                   ;; checking synthetic?  For improved test coverage of
+                   ;; reflection - specifically handling of "isXxx" methods.
+                   (eq?    mtd:bridge          bridge)
                    (eq?    (mtd:synthetic?)    synthetic))
               mtd
               (loop (+ i 1)))))))

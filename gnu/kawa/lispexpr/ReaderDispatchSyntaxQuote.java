@@ -7,7 +7,7 @@ import gnu.mapping.*;
 import gnu.lists.*;
 import gnu.bytecode.Type;
 
-/** Handle pecial Scheme forms {code #`}, {code #'}, and {coded {#,}.
+/** Handle special Scheme forms {code #`}, {code #'}, and {coded {#,}.
  * This is because {code #,} has two meanings:
  * (1) equivalent to unsyntax when in the context of a quasisyntax form;
  * (2) otherwise a SRFI10 named constructor.

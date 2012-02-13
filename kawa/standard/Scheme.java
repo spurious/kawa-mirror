@@ -625,8 +625,10 @@ public class Scheme extends LispLanguage
                    "define_rewrite_syntax");
       defSntxStFld("syntax", "kawa.standard.syntax", "syntax");
       defSntxStFld("quasisyntax", "kawa.standard.syntax", "quasiSyntax");
+      defProcStFld("syntax->datum", "kawa.lib.std_syntax");
       defProcStFld("syntax-object->datum", "kawa.lib.std_syntax");
       defProcStFld("datum->syntax-object", "kawa.lib.std_syntax");
+      defProcStFld("datum->syntax", "kawa.lib.std_syntax");
       defProcStFld("syntax->expression", "kawa.lib.prim_syntax");
       defProcStFld("syntax-body->expression", "kawa.lib.prim_syntax");
       defProcStFld("generate-temporaries", "kawa.lib.std_syntax");

@@ -3,7 +3,8 @@
 ;;; Definitions for some standard syntax.
 
 (module-export cond case and or let let* do delay lazy
-	       syntax-object->datum datum->syntax-object with-syntax
+               syntax->datum datum->syntax with-syntax
+	       syntax-object->datum datum->syntax-object ; deprecated
 	       begin-for-syntax define-for-syntax
 	       generate-temporaries define-procedure
 	       identifier? free-identifier=? bound-identifier=?
@@ -262,11 +263,17 @@
 		     (make <gnu.expr.GenericProc> 'name))
 		   (invoke name 'setProperties (java.lang.Object[] args ...))))))
 
-(define (syntax-object->datum obj)
+(define (syntax->datum obj)
   (kawa.lang.Quote:quote obj))
 
-(define (datum->syntax-object template-identifier obj)
+(define (syntax-object->datum obj)
+  (syntax->datum obj))
+
+(define (datum->syntax template-identifier obj)
   (kawa.lang.SyntaxForms:makeWithTemplate template-identifier obj))
+
+(define (datum->syntax-object template-identifier obj)
+  (datum->syntax template-identifier obj))
 
 (define (generate-temporaries list)
   (let loop ((n (kawa.lang.Translator:listLength list)) (lst '()))

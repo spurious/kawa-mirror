@@ -306,10 +306,10 @@
   (lambda (x)
     (syntax-case x ()
       ((k e ...)
-       (with-syntax ((break (datum->syntax-object (syntax k) 'break)))
-          (syntax (call-with-current-continuation
-                    (lambda (break)
-                      (let f () e ... (f))))))))))
+       (with-syntax ((break (datum->syntax #'k 'break)))
+                    #'(call-with-current-continuation
+                       (lambda (break)
+                         (let f () e ... (f)))))))))
 (test '(a a a) 'test-loop-macro
       (let ((n 3) (ls '()))
 	(loop

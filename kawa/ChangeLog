@@ -1,3 +1,8 @@
+2012-02-13  Per Bothner  <per@bothner.com>
+
+	* standard/Scheme.java (initScheme): Define syntax->datum and
+	datum->syntax.
+
 2012-02-05  Per Bothner  <per@bothner.com>
 
 	* lang/Quote.java (matchesUnquote, matchesUnquoteSplicing,

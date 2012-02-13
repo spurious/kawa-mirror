@@ -1,3 +1,8 @@
+2012-02-13  Per Bothner  <per@bothner.com>
+
+	* mac-test.scm: Update to use datum->syntax and #' syntax.
+	* regex-test.scm: Update to use syntax->datum.
+
 2012-02-09  Per Bothner  <per@bothner.com>
 
 	* bridge.scm: Tweak to check for recent "isXxx" method fix.

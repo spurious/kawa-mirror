@@ -1,3 +1,8 @@
+2012-02-16  Per Bothner  <per@bothner.com>
+
+	* CallCC.java (class CompileTimeContinuation): Move top-level class ...
+	* CompileMisc.java: To here, as static member class.
+
 2012-01-31  Per Bothner  <per@bothner.com>
 
 	* DisplayFormat.java (writeList, writeObjectRaw): Use Promise#force

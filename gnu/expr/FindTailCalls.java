@@ -12,7 +12,7 @@ import gnu.bytecode.Type;
  * callers), so it is deferred to FindCapturedvars.visitLambdaExp.
  *
  * The extra parameter is the {@code returnContinuation} - the expression we
- * "return to" - i.e. when done eveluating an expression, we're also done
+ * "return to" - i.e. when done evaluating an expression, we're also done
  * with the {@code returnContinuation}.  Normally it is is same
  * {@code Expression} as we are visiting, but (for example) when visiting the
  * last expression of a {@code BeginExp} the  {@code returnContinuation}

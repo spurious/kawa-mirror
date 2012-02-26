@@ -110,8 +110,8 @@ check-obj: testing.zip module2.class module3.class classes2.class \
   MyFunc.class MyModule.class cycle1.class cycle2.class
 	$(KAWATEST) --no-warn-invoke-unknown-method -f "$(srcdir)/obj-test.scm" -e '(test-report)'
 
-check-polytype: testing.zip
-	$(KAWATEST) -f "$(srcdir)/polytype.scm" -e '(test-report)'
+check-polytype:
+	$(KAWA) "$(srcdir)/polytype.scm"
 
 check-format: testing.zip
 	$(KAWA) "$(srcdir)/formatst.scm"

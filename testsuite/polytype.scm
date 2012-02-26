@@ -1,5 +1,5 @@
 ;;; POLYTYPE -- A polymorphic type inferencer for Scheme.
-(test-init "polytype" 1)
+(test-begin "polytype" 1)
 
 ;------------------------------------------------------------------------------
 ;
@@ -7,7 +7,7 @@
 ;
 ;                              Marc Feeley (05/16/88)
 ;
-; Modified by Per Bothner (June 1998) to fit into Kawa test framework
+; Modified by Per Bothner (Febrary 2012) to fit into SRFI-64 test framework
 ;------------------------------------------------------------------------------
 
 ;------------------------------------------------------------------------------
@@ -304,4 +304,6 @@
 ;    (lambda () (run))
 ;    (lambda (result) (equal? result expected))))
 
-(test expected run)
+(test-equal expected (run))
+
+(test-end)

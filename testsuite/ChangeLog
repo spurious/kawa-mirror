@@ -1,3 +1,8 @@
+2012-02-25  Per Bothner  <per@bothner.com>
+
+	* polytype.scm: Convert to using SRFI-64-style test.
+	* Makefile.am: Update accordingly.
+
 2012-02-13  Per Bothner  <per@bothner.com>
 
 	* mac-test.scm: Update to use datum->syntax and #' syntax.

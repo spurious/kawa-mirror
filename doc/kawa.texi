@@ -12523,14 +12523,14 @@ to work on.  Here are some ideas.
 The Kawa compiler currently uses reflection to determine properties
 (such as exported function definitions) from referenced classes.
 It would be better to read class files.
-This should not be too difficult, since the gnu.bytecode library
+This should not be too difficult, since the @code{gnu.bytecode} library
 abstracts over class information read by reflection or class reading.
 
 @subsection Make use of Java-7 MethodHandles
-Java 7 will support MethodHandles which are meant to provide better
+Java 7 supports MethodHandles which are meant to provide better
 performance (ultimately) for dynamic languages.
 See @uref{http://jcp.org/en/jsr/detail?id=292,JSR 292}
-amd the @uref{http://openjdk.java.net/projects/mlvm/,Da Vinci Machine Project}. 
+and the @uref{http://openjdk.java.net/projects/mlvm/,Da Vinci Machine Project}. 
 MethodHandles will be used to compile lambdas in Java 8.
 Kawa can already be compiled to use Methodhandles, but only in
 one unimportant way.  There much more to be done.  For example we
@@ -12541,11 +12541,11 @@ At some point we want to compile lambdas in the same way
 as the experimental Java 8 branch does. This can potenitally
 be more efficient than Kawa's current mechanism.
 
-@subsection R6RS libraries and syntax
-Kawa supports most of the functionality of R6RS libraries,
-as well as the R6RS library @code{import} form.  However,
-it does not support actual R6RS library definition syntax.
-This needs to be added.
+@subsection R6RS and R7RS libraries and syntax
+Kawa supports most of the functionality of R6RS and (draft) R7RS.
+However, various R6R7 or (more importantly) R7RS features
+are missing, and should be added.
+For eaxmple, both R6RS or R7RS library definition syntax are unimplemented.
 In a related matter, Kawa supports most of the functionality of
 @code{syntax-case}, but some pieces are missing, and no
 doubt some of it is incorrect.  Adding the missing pieces
@@ -12557,19 +12557,27 @@ and testing for correctness of corner cases is needed.
 Implement @code{SwitchExp} as a new class extending @code{Expression},
 and compile it using the existing @code{gnu.bytecode.SwitchState}.
 Use it to optimize Scheme's @code{case} form.
+This might be better done without a new @code{Expression},
+but instead using a special @code{Procedure} with custom
+``validation'' and code-generation.
 
 (This is a fairly small starter project.)
 
+@anchor{task-parameterized-types}
 @subsection Parameterized types
-Add support for parameterized types to Kawa.  Currently, you can
-declare a variable as having type @samp{list}.  It would be useful
-to declare it to have type @samp{list[string]} (or whatever syntax
-makes most sense).  This should build on and be compatible with Java generics.
-(However, it might be better to have wild-carding be associated with
-declarations, as in Scala, rather than uses.)  This involves adding
-syntax, an appropriate internal repesentation, changing core sequence-based
-types to use generics, type checking/inference, reading and writing
-the appropriate information from/to class files.
+Kawa has some limited support for parameterized types, but
+it's not used much.  Improve type inferencing.
+Support definition of parameterized classes.
+Better used of parameterized types for sequence class.
+Support wildcards.  
+(It might be better to have wild-carding be associated with
+declarations, as in Scala, rather than uses.)
+
+@subsection Function types
+Kawa doesn't have true function types: Parameter and result
+types are only handled for ``known'' functions.
+Adding first-class function types would be a major task,
+possily depending on improvements in @ref{task-parameterized-types,Parameterized type}.
 
 @subsection Full continuations
 Add support for full continuations, which is the major
@@ -12580,8 +12588,8 @@ exhand the existing full-tail-call support to manage a stack.
 There are other ways to solve the problem.
 This may benefit from @ref{task-faster-tailcalls,Faster tailcalls}.
 
-@anchor{task-faster-tailcalls}
 @subsection Faster tailcalls
+@anchor{task-faster-tailcalls}
 Make @code{--full-tailcalls} run faster.
 This may depend on (or incorporate)
 @ref{task-TreeList-optimization,TreeList-optimization}. 
@@ -12672,6 +12680,83 @@ It would be nice to enhance the pretty-printer to handle
 variable-width fonts and other ``rich'' text.
 Figuring out how to make the output formatter more flexible,
 more efficient, and more customizable are also desirable.
+
+@subsection Rich String Literals
+Implement multi-line string literals with expression escapes.
+See Racket's @uref{http://docs.racket-lang.org/scribble/,Scribble}
+for some ideas and desired functonality.
+The exact syntax needs to be decided.  Presumably the literal
+starts with the dispatch characters @samp{#} followed by some other character
+(most likely @samp{"}, though possibly @samp{@{}).
+In the following the escape character is assumed to be @samp{\},
+but other possibilities include @samp{@@} (as in Scribble),
+or @samp{&} (as in XML).
+
+Various goals and ideas:
+@itemize @bullet
+@item
+General Scribble-like syntax:
+@display
+\@var{cmd}@code{[} @var{expression} ...@code{]}@code{@{}@var{textbody}@code{@}}
+@end display
+This is roughly equivalent to embedding the result of evaluating:
+@display
+@code{(}@var{cmd} @var{expression} ... "@var{textbody}"@code{)}
+@end display
+Both @code{[} @var{expression} ...@code{]} and @code{@{}@var{textbody}@code{@}} are optional.
+(We need some convention or delimiter to end @code{cmd},
+especially when @var{textbody} is missing.)
+The @var{cmd} is also optional, inwhich case the @var{expression}s
+are embedded in the output.
+@item
+The start delimiter and the end delimiter must be different - both
+for the entire string, and for embedded @var{textbodies}.
+This is for easier parsing (and catching errors) for both humans and tools.
+E.g. @code{#"some text"#} or @code{#@{some text@}} or
+@code{#@{some text@}#} depending on the delimiters chosen.
+@item
+There should be some convention for stripping off indentation.
+@item
+Should support optional end delimitors.
+This is useful to make long texts more readable, and
+also to catch errors.  For example:
+@example
+\cmd{some body stuff \cmd@}
+@end example
+Here the two instances of @code{cmd} have to match.
+(The end @code{\cmd} has to be immediatly followed
+by @samp{@}} to avoid ambiguity.)
+@item
+Support format specifiers:
+@example
+\~3d(length l)
+@end example
+is equivalent to:
+@example
+\[(format "~3d" (length l))]
+@end example
+Should also handle @code{printf}-style format specifers:
+@code{\%3d(length l)}.
+@item
+Handle localization.  I.e. some marker to indicate the
+string should be localized, in the manner of
+(and compatible with)
+@uref{http://www.gnu.org/software/gettext/,GNU gettext}.
+Optionally specify a localization key (to use as an index
+in the translation database); if there is no key specified,
+default to using the literal parts of the string.
+@item
+Note in general the result is a ``text'', which is a generalization
+of a string: A text is a sequence of characters *or* other values.
+If an embedded expression evaluates to a non-string, it is @emph{not}
+automatically converted to a string.  Conversion to a string
+is done on demand, for example on printing.
+(This is similar to values in the XML data model.)
+@end itemize
+
+@subsection Shell/process syntax
+See @uref{http://sourceware.org/ml/kawa/2012-q1/msg00084.html,this message}
+for a rough design.
 
 @node License, Overall Index, Community, Top
 @chapter License

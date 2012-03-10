@@ -129,4 +129,5 @@ public class Map extends gnu.mapping.ProcedureN
       }
   }
 
+  public int numArgs() { return (-1 << 12) | 2; }
 }

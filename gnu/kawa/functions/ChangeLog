@@ -1,3 +1,7 @@
+2012-03-10  Per Bothner  <per@bothner.com>
+
+	* Map.java (numRags): New method.
+
 2012-02-16  Per Bothner  <per@bothner.com>
 
 	* CallCC.java (class CompileTimeContinuation): Move top-level class ...

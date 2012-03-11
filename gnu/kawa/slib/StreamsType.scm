@@ -30,5 +30,8 @@
     ((_ expr)
      (StreamPromise  (lambda () expr) #f))))
 
+(define (stream-force promise)
+  (force promise))
+
 (define (stream-eager expr)
   expr)

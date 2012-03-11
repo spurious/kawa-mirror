@@ -38,9 +38,6 @@
 (define (stream? value)
   (instance? value Stream))
 
-(define (stream-force promise)
-  (force promise))
-
 (define stream-null
   (stream-delay stream-null-1))
 

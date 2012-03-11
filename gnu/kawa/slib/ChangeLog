@@ -1,3 +1,9 @@
+2012-03-11  Per Bothner  <per@bothner.com>
+
+	* StreamsPrimitive.scm (stream-force): Moved from here ...
+	* StreamsType.scm: ... here, because it is no part of the API
+	for streams.primitive.
+
 2012-02-07  Jamison Hope  <jrh@theptrgroup.com>
 
 	* srfi13.scm (let-optionals*): Re-implement to better match reference

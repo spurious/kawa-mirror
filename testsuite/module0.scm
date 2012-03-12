@@ -1,6 +1,6 @@
 (module-static #f)
 
-(module-export mod0-v1 mod0-v2 mod0-v3 mod0-f1 mod0-m1)
+(module-export mod0-v1 mod0-v2 mod0-v3 mod0-f1 mod0-m1 set-v1)
 (define mod0-v1 :: <int> 10)
 (define mod0-v2 11)
 (define mod0-v3 12)

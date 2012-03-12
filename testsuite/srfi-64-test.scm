@@ -74,7 +74,7 @@
     (test-runner-on-bad-end-name!
      r
      (lambda (runner begin end)
-       (error (string-append "bad end grojup name " end
+       (error (string-append "bad end group name " end
 			     " but expected " begin))))
     (test-runner-on-test-end! 
      r 

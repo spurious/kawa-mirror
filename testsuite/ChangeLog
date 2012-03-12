@@ -1,3 +1,10 @@
+2012-03-11  Per Bothner  <per@bothner.com>
+
+	* module0.scm: Add missing export.
+	* module2.scm: Likewise.
+	* module3.scm: Likewise.
+	* srfi-64-test.scm: Fix typo.
+
 2012-02-25  Per Bothner  <per@bothner.com>
 
 	* polytype.scm: Convert to using SRFI-64-style test.

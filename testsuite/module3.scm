@@ -3,7 +3,7 @@
 (require <module1>)
 
 (module-export dvar-test-1 factorial-4 check-fluid-let *VAR* check-thunk
-	       namespace-syntax-call list-length-4 my-compare
+	       namespace-syntax-call list-length-4 my-compare test3-import2
 	       test3-import1 get3-mod0-v2 set3-mod0-v2 counter-test-result
 	       pa-new pa-getter pa-setter pa-length iarr-set mB test1-import0)
 

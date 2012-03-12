@@ -3,7 +3,7 @@
 (module-implements java.io.Closeable)
 (module-export list-length-1 list-length-3 classify list1234 <A8711>
 	       length-diff1 length-diff2 length-diff3 make-literal make-pair
-	       my-array-7 mod2-v5 close)
+	       my-array-7 mod2-v5 close abc-returner)
 (require <module1>)
 (require <module1a>)
 (define (list-length-1 x) :: <integer>

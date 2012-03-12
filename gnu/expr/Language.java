@@ -783,6 +783,9 @@ public abstract class Language
     return getTypeFor(exp, true);
   }
 
+  /** Interpreting exp as a type specifier, get the actual type.
+   * (Does not get the type "of" but exp treats/casts exp "to" ("as") a type).
+   */
   public Type getTypeFor (Expression exp, boolean lenient)
   {
     if (exp instanceof QuoteExp)

@@ -30,6 +30,9 @@
 			warn-invoke-unknown-method: #t)
 (module-export make-condition-type condition-type? make-condition
 	       condition? condition-has-type? condition-ref
+               message-condition? serious-condition? error?
+               condition-message
+               condition-type-field-supertype check-condition-type-field-alist
 	       make-compound-condition extract-condition
 	       define-condition-type condition
 	       &condition &message &serious &error)

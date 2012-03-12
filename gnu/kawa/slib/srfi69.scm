@@ -57,20 +57,12 @@
   (let ((h :: <int> (*:hashCode (*:toLowerCase (*:toString s)))))
     (if (eq? bound #!null) h (modulo h bound))))
 
-(define (symbol-hash (s :: <symbol>) #!optional (bound :: <integer> #!null))
-  (let ((h :: <int> (*:hashCode s)))
-    (if (eq? bound #!null) h (modulo h bound))))
-
 (define (hash obj #!optional (bound :: <integer> #!null))
   (let ((h :: <int> (if (eq? obj #!null) 0 (*:hashCode obj))))
     (if (eq? bound #!null) h (modulo h bound))))
 
 (define (hash-by-identity obj #!optional (bound :: <integer> #!null))
   (let ((h :: <int> (java.lang.System:identityHashCode obj)))
-    (if (eq? bound #!null) h (modulo h bound))))
-
-(define (vector-hash v #!optional (bound :: <integer> #!null))
-  (let ((h :: <int> (*:hashCode v)))
     (if (eq? bound #!null) h (modulo h bound))))
 
 (define *default-table-size* 64)

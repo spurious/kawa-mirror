@@ -1,5 +1,10 @@
 2012-03-11  Per Bothner  <per@bothner.com>
 
+	* srfi69.scm (symbol-hash, vector-hash): Remove non-exported
+	un-used functions.
+
+	* conditions.scm: Add some missing exports.
+
 	* StreamsPrimitive.scm (stream-force): Moved from here ...
 	* StreamsType.scm: ... here, because it is no part of the API
 	for streams.primitive.

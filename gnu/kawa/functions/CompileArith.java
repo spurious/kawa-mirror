@@ -420,9 +420,21 @@ public class CompileArith implements Inlineable
     return getReturnKind2(kind1, kind2);
   }
 
-  private static int getReturnKind2 (int kind1, int kind2)
-  {
-    return kind1 <= 0 || (kind1 > kind2 && kind2 > 0) ? kind1 : kind2;
+    private static int getReturnKind2 (int kind1, int kind2) {
+        /* FIXME: Possible future optimization.
+           Would need to resolve print-out of Double vs DFloNum.
+        if (kind1 <= 0)
+            return kind1;
+        if (kind2 <= 0)
+            return kind2;
+        if ((kind1 == Arithmetic.FLONUM_CODE
+             && kind2 <= Arithmetic.DOUBLE_CODE) ||
+            (kind2 == Arithmetic.FLONUM_CODE
+             && kind1 <= Arithmetic.DOUBLE_CODE))
+            return Arithmetic.DOUBLE_CODE;
+        return kind1 > kind2 ? kind1 : kind2;
+        */
+        return kind1 <= 0 || (kind1 > kind2 && kind2 > 0) ? kind1 : kind2;
   }
 
   /** This actually returns the "promoted argument type".

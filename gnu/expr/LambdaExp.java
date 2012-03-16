@@ -1377,7 +1377,7 @@ public class LambdaExp extends ScopeExp
     Method mainMethod = getMainMethod();
     Variable callContextSave = comp.callContextVar;
 
-    for (;  param != null; param = param.nextDecl())
+    for (;  param != null; param = param.nextDecl(), i++)
       {
         comp.callContextVar
           = (getCallConvention() < Compilation.CALL_WITH_CONSUMER ? null
@@ -1395,6 +1395,8 @@ public class LambdaExp extends ScopeExp
 		defaultStart = 0;
 	      }
 	  }
+        if (param.ignorable())
+          continue;
 	if (plainArgs >= 0 || ! param.isSimple()
 	    || param.isIndirectBinding())
 	  {
@@ -1510,7 +1512,6 @@ public class LambdaExp extends ScopeExp
             else
 	      code.emitPutField(param.field);
 	  }
-	i++;
       }
     comp.callContextVar = callContextSave;
   }

@@ -1,3 +1,7 @@
+2012-03-15  Per Bothner  <per@bothner.com>
+
+	* LambdaExp.java (enterFunction): Skip ignorable parameter.
+
 2012-02-09  Jamison Hope  <jrh@theptrgroup.com>
 
 	* ClassExp.java: Generate bridge method for co-variance and generics.

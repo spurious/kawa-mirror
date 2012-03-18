@@ -1,3 +1,8 @@
+2012-03-18  Per Bothner  <per@bothner.com>
+
+	* PrecedingAxis.java (scan): Fix thinkos - and thus 8 testsuite
+	failures.
+
 2011-06-23  Per Bothner  <bothner@kuling.bothner.com>
 
 	* ElementType.java (anyElement): Add casts to disambiguate.

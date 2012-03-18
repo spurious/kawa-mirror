@@ -21,9 +21,9 @@ public class PrecedingAxis extends TreeScanner
     int parent = seq.parentPos(ipos);
     if (parent == end)
       return;
-    scan (seq, parent, end, type, out);
+    scan (seq, parent, ipos, type, out);
     int child = seq.firstChildPos(parent);
-    if (child == 0)
+    if (child == 0 || child == ipos)
       return;
     if (type.isInstancePos(seq, child))
       out.writePosition(seq, child);

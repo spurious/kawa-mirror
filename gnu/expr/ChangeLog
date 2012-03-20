@@ -1,3 +1,8 @@
+2012-03-20  Per Bothner  <per@bothner.com>
+
+	* LetExp.java (compile): Now that we do data-flow analysis, use
+	Declaration#mayBeAccessedUninitialized.
+
 2012-03-15  Per Bothner  <per@bothner.com>
 
 	* LambdaExp.java (enterFunction): Skip ignorable parameter.

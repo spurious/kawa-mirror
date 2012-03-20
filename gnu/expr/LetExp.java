@@ -137,10 +137,8 @@ public class LetExp extends ScopeExp
 	Expression init = decl.getInitValue();
         boolean initialized = init != QuoteExp.undefined_exp;
         // Does this variable need to be initialized or is the default ok?
-        // This is a kludge.  Ideally, we should do some data-flow analysis.
-        // But at least it makes sure require'd variables are not initialized.
-        boolean needsInit =  ! decl.ignorable()
-          && ! (decl.getValueRaw() == QuoteExp.nullExp && decl.base != null);
+        boolean needsInit = ! decl.ignorable()
+            && (initialized || decl.mayBeAccessedUninitialized());
 
 	if (needsInit && decl.isSimple())
           decl.allocateVariable(code);

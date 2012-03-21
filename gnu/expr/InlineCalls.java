@@ -500,7 +500,18 @@ public class InlineCalls extends ExpExpVisitor<Type> {
   protected Expression visitLetExp (LetExp exp, Type required)
   {
     if (! (exp instanceof CatchClause) && ! (exp instanceof FluidLetExp))
-      valueTracker.noteUnitialized(exp);
+      {
+        for (Declaration decl = exp.firstDecl();  decl != null;
+             decl = decl.nextDecl())
+          {
+            Expression init = decl.getInitValue();
+            if (init == QuoteExp.undefined_exp
+                && decl.getValueRaw() instanceof LambdaExp)
+              valueTracker.noteSet(decl, IntNum.make(~0));
+            else
+              valueTracker.noteUnitialized(decl);
+          }
+      }
 
     for (Declaration decl = exp.firstDecl(); decl != null; decl = decl.nextDecl())
       {

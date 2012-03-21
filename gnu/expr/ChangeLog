@@ -1,5 +1,8 @@
 2012-03-21  Per Bothner  <per@bothner.com>
 
+	* InlineCalls.java (visitLetExp): Special case if decl is bound
+	to a lambda (as in a letrec).
+
 	* FindCapturedVars.java (visitSetExp): Before warning about setting
 	unknown, check dynamic environment, as we do for visitReferenceExp.
 	(maybeWarnNoDeclarationSeen): New helper method.

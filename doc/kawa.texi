@@ -12552,6 +12552,13 @@ doubt some of it is incorrect.  Adding the missing pieces
 and testing for correctness of corner cases is needed.
 @uref{http://lists.r6rs.org/pipermail/r6rs-discuss/2007-October/003387.html,Andre van Tonder's R6RS expander} may be helpful.
 
+It would be useful to extend the @code{import} form (and also the
+@code{require} form when no explicit filename is given) to search a
+``source path'' for a matching source file, automatically compiling it as
+needed (as done in the @code{require} form when an explicit filename is given).
+In interactive mode, if the module is already loaded, check if it is updated
+- if not recompile and re-load it.
+
 @subsection Optimize switches (case)
 
 Implement @code{SwitchExp} as a new class extending @code{Expression},
@@ -12574,10 +12581,10 @@ Support wildcards.
 declarations, as in Scala, rather than uses.)
 
 @subsection Function types
-Kawa doesn't have true function types: Parameter and result
-types are only handled for ``known'' functions.
-Adding first-class function types would be a major task,
-possily depending on improvements in @ref{task-parameterized-types,Parameterized type}.
+Kawa doesn't have true function types: Parameter and result types
+are only handled for ``known'' functions.  Adding first-class
+function types would be a major task, possibly depending on
+improvements in @ref{task-parameterized-types,Parameterized types}.
 
 @subsection Full continuations
 Add support for full continuations, which is the major
@@ -12603,15 +12610,27 @@ to make make random-access indexing fast.  Also, support for updating
 is insufficient.  (This needs someone into designing and hacking on
 low-level data-structures, along with lots of profiling and testing.)
 
-@subsection Lazy evaluation
-Add support for lazy evaluation and implicit futures.
-Kawa alread has @code{delay} (which creates a lazily-calculated value)
-and @code{future} (which creates a child thread to calculate a value).
-The function @code{force} takes either of these and waits until the
-result is calculated.  Using these would be much more pleasant if
-the cmpiler could as @code{force} as needed automatically.
-This involves run-time changes, compiler changes, as well as
-optimizations (and type specifiers) to minimize unneeded @code{force} calls.
+@subsection Implement R7RS exceptions
+R6RS and R7RS specify an exception handling
+mechanism using the procedure @code{with-exception-handler}
+and syntax @code{guard}.
+This needs to be implemented.
+We also need to figure out how and if the R6RS exception handling
+model should co-exist with the Java exception handling model;
+the @code{guard} form may co-exist better.
+Kawa-generated exception should be caught by @code{with-exception-handler}
+and syntax @code{guard}, though that may be difficult to achieve.
+@uref{http://lists.scheme-reports.org/pipermail/scheme-reports/2012-March/001982.html,This message} has some suggestions.
+
+@subsection Asynchronous evaluation
+
+C# recently added @code{asynch} and @code{await} keywords
+for @uref{http://msdn.microsoft.com/en-us/vstudio/gg316360,asynchronous programming}.  Kawa's recently improved support for lazy programming
+seems like a good framework for equivalent functionality:
+Instead of an @code{asynch} method that returns a @code{Task<T>}
+the Kawa programmer would write a function that returns a @code{lazy[T]}.
+This involves some design work, and modifying the compiler to
+rewrite the function body as needed.
 
 @anchor{task-REPL-improvements}
 @subsection REPL console and other REPL improvement
@@ -12669,6 +12688,38 @@ other IDEs (NetBeans, IntelliJ).  But many improvements are
 desirable.
 @ref{task-REPL-improvements, REPL improvements} may be a component of this.
 
+@subsubsection Plugin for NetBeans IDE
+
+Kawa-Scheme support for the NetBeans IDE would be useful.
+One could perhaps build on the Clojure plugin.
+
+@subsubsection Plugin for Eclipse IDE
+
+Kawa-Scheme support for the Eclipse IDE would be useful.
+Probably makes sense to
+enhance @uref{http://sourceforge.net/projects/schemeway/,SchemeWay}.
+It may also make sense to build on
+the @uref{http://www.eclipse.org/dltk/,Dynamic Languages Toolkit},
+possibly making use of @uref{http://schemeide.sourceforge.net/,Schemeide},
+though DLTk seems more oriented towards interpreted non-JVM-based languages.
+
+@subsubsection Improve Emacs integration
+
+@uref{http://en.wikipedia.org/wiki/SLIME, SLIME} is an Emacs mode
+that provides IDE-like functionality.  It supports Kawa.
+
+@uref{http://jdee.sourceforge.net/,JDEE} is a Java development environment,
+so might have better hooks to the JVM and Java debugging architecture.
+
+@uref{http://cedet.sourceforge.net/,CEDET} is a more general
+framework of development tools.
+
+@subsubsection Implement @code{javax.tools} and code-range support in Kawa compiler
+
+Kawa currently records the line and column position of syntactic elements.
+For an IDE it is desirable to have both start and end position of an element,
+for example so it can put a squiggly line under an erroneous form.
+
 @subsection Output formatting and pretty printing
 Kawa's @code{write} should support back-references, as in
 @uref{http://srfi.schemers.org/srfi-38/srfi-38.html,SRFI-38}.
@@ -12680,6 +12731,10 @@ It would be nice to enhance the pretty-printer to handle
 variable-width fonts and other ``rich'' text.
 Figuring out how to make the output formatter more flexible,
 more efficient, and more customizable are also desirable.
+
+@subsection Shell/process syntax
+See @uref{http://sourceware.org/ml/kawa/2012-q1/msg00084.html,this message}
+for a rough design.
 
 @subsection Rich String Literals
 Implement multi-line string literals with expression escapes.
@@ -12721,7 +12776,7 @@ Should support optional end delimitors.
 This is useful to make long texts more readable, and
 also to catch errors.  For example:
 @example
-\cmd{some body stuff \cmd@}
+\cmd@{some body stuff \cmd@}
 @end example
 Here the two instances of @code{cmd} have to match.
 (The end @code{\cmd} has to be immediatly followed
@@ -12753,10 +12808,6 @@ automatically converted to a string.  Conversion to a string
 is done on demand, for example on printing.
 (This is similar to values in the XML data model.)
 @end itemize
-
-@subsection Shell/process syntax
-See @uref{http://sourceware.org/ml/kawa/2012-q1/msg00084.html,this message}
-for a rough design.
 
 @node License, Overall Index, Community, Top
 @chapter License

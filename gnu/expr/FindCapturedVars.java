@@ -157,6 +157,13 @@ public class FindCapturedVars extends ExpExpVisitor<Void>
       }
   }
 
+  void maybeWarnNoDeclarationSeen(Object name, boolean function,
+                                  Compilation comp, SourceLocator location)
+  {
+    if (comp.resolve(name, function) == null)
+      maybeWarnNoDeclarationSeen(name, comp, location);
+  }
+
   void maybeWarnNoDeclarationSeen (Object name, Compilation comp, SourceLocator location)
   {
     if (comp.warnUndefinedVariable())
@@ -472,11 +479,9 @@ public class FindCapturedVars extends ExpExpVisitor<Void>
 				exp.isProcedureName());
 	exp.setBinding(decl);
       }
-    if (decl.getFlag(Declaration.IS_UNKNOWN)
-        && comp.resolve(exp.getSymbol(), exp.isProcedureName()) == null)
-      {
-        maybeWarnNoDeclarationSeen(exp.getSymbol(), comp, exp);
-      }
+    if (decl.getFlag(Declaration.IS_UNKNOWN))
+      maybeWarnNoDeclarationSeen(exp.getSymbol(), exp.isProcedureName(),
+                                 comp, exp);
 
     capture(exp.contextDecl(), decl);
     return exp;
@@ -528,9 +533,7 @@ public class FindCapturedVars extends ExpExpVisitor<Void>
 	exp.binding = decl;
       }
     if (decl.getFlag(Declaration.IS_UNKNOWN))
-      {
-        maybeWarnNoDeclarationSeen(exp.getSymbol(), comp, exp);
-      }
+      maybeWarnNoDeclarationSeen(exp.getSymbol(), false, comp, exp);
     if (! decl.ignorable())
       {
 	if (! exp.isDefining())

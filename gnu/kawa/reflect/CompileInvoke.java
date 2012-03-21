@@ -120,6 +120,7 @@ public class CompileInvoke
           return alloc;
         comp.letStart();
         Declaration adecl = comp.letVariable((String) null, type, alloc);
+        adecl.setCanRead(true);
         BeginExp begin = new BeginExp();
         int index = 0;
         for (int i = lengthSpecified ? 3 : 1; i < args.length;  i++)

@@ -32,6 +32,11 @@ public class SchemeCompilation extends Translator
 
   public boolean isApplyFunction (Expression exp)
   {
+    return isSimpleApplyFunction(exp);
+  }
+
+  public boolean isSimpleApplyFunction (Expression exp)
+  {
     return exp instanceof ReferenceExp
       && ((ReferenceExp) exp).getBinding() == applyFieldDecl;
   }

@@ -233,6 +233,10 @@ public class FindCapturedVars extends ExpExpVisitor<Void>
       return current.returnContinuation;
     if (current.getCanRead()
         || current.isClassMethod()
+        // Usually best to not inline a module-level function, since that
+        // makes stack traces less helpful, and increases the risk of
+        // methods getting too big.
+        || (current.outer instanceof ModuleExp && current.nameDecl != null)
         || current.min_args != current.max_args)
       {
         current.returnContinuation = LambdaExp.unknownContinuation;
@@ -280,11 +284,7 @@ public class FindCapturedVars extends ExpExpVisitor<Void>
     java.util.Set<LambdaExp> seen = new java.util.LinkedHashSet<LambdaExp>();
     // Finish the job that was started in FindTailCalls.
     Expression caller = checkInlineable(exp, seen);
-    if (caller != LambdaExp.unknownContinuation
-        // Usually best to not inline a module-level function, since that
-        // makes stack traces less helpful, and increases the risk of
-        // methods getting too big.
-        && (! (exp.outer instanceof ModuleExp) || exp.nameDecl == null))
+    if (caller != LambdaExp.unknownContinuation)
       {
         exp.setInlineOnly(true);
         backJumpPossible++;

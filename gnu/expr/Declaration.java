@@ -137,7 +137,7 @@ public class Declaration
     ApplyExp aexp = (ApplyExp) exp;
     Expression func = aexp.getFunction();
     Compilation comp = Compilation.getCurrent();
-    boolean isApplyFunc = comp.isApplyFunction(func);
+    boolean isApplyFunc = comp.isSimpleApplyFunction(func);
     if (aexp.getArgCount() == (isApplyFunc ? 3 : 2))
       {
         if (isApplyFunc)
@@ -602,6 +602,10 @@ public class Declaration
   { return context instanceof ModuleExp && (flags & PRIVATE) == 0; }
 
   public final boolean isPrivate() { return (flags & PRIVATE) != 0; }
+
+    public final boolean isModuleLocal() {
+        return ! isPublic() && ! needsExternalAccess();
+    }
 
   public final void setPrivate(boolean isPrivate)
   {
@@ -1528,8 +1532,14 @@ public class Declaration
           // If a function is called via an apply-function, the latter
           // might distribute a multiple-valued argument among multiple
           // parameters.  Punt on that for now.
-          if (Compilation.getCurrent().isApplyFunction(app.getFunction()))
-            return null;
+          Compilation comp = Compilation.getCurrent();
+          Expression afunc = app.getFunction();
+          if (comp.isSimpleApplyFunction(afunc))
+              i++;
+          else if (comp.isApplyFunction(afunc))
+              return null;
+          if (i >= app.getArgCount())
+              return null;
           return app.getArg(i);
         default:
           throw new Error();

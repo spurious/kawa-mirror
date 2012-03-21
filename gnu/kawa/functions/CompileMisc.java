@@ -653,13 +653,22 @@ public class CompileMisc implements Inlineable
   {
     Map mproc = (Map) xproc;
     boolean collect = mproc.collect;
-    // FIXME: We should inline the list arguments first before inlining the
-    // procedure argument, for better type inference etc.
-    exp.visitArgs(visitor);
     Expression[] args = exp.getArgs();
     int nargs = args.length;
     if (nargs < 2)
       return exp;  // ERROR
+    
+    Type r = InlineCalls.typeForCalledFunction(args[0]);
+    if (r != null)
+      {
+        for (int i = 1; i < nargs;  i++)
+          visitor.visit(args[i], null);
+        // FIXME: We should inline the list arguments first before inlining the
+        // procedure argument, for better type inference etc.
+        visitor.visit(args[0], r);
+     }
+    else
+      exp.visitArgs(visitor);
 
     nargs--;
 

@@ -1,3 +1,7 @@
+2012-03-20  Per Bothner  <per@bothner.com>
+
+	* CompileMisc.java: Add needed setCanRead calls.
+
 2011-03-23  Per Bothner  <per@bothner.com>
 
 	* CompileMisc.java (validateApplyValuesFilter): Use letStart/letVariable

@@ -84,11 +84,15 @@ InliningTest.inlineTwoCalls(int)int: 27 bytes
 InliningTest.inlineTwoFunctions(java.lang.Object)java.lang.Object: 23 bytes
 InliningTest.checkEven(int)java.lang.Object: 34 bytes
 InliningTest.constantPropagation1()int: 3 bytes
+InliningTest.constantPropagation2()int: 3 bytes
+InliningTest.constantPropagation3()int: 6 bytes
 InliningTest.factorialInfer1(int)java.lang.Object: 25 bytes
 InliningTest.getFromVector1(gnu.lists.FVector,int)java.lang.Integer: 12 bytes
 InliningTest.getFromVector2(gnu.lists.FVector,int)java.lang.Integer: 12 bytes
 InliningTest.topLevelRecurse1(gnu.lists.Pair)java.lang.Object: 10 bytes
 InliningTest.topLevelRecurse2(java.lang.Object,java.lang.Object)java.lang.Object: 7 bytes
+InliningTest.sum1(gnu.math.IntNum)java.lang.Object: 36 bytes
+InliningTest.sum2(double)double: 30 bytes
 cycle1.isIsEven(int)boolean: 17 bytes
 cycle2.isIsOdd(int)boolean: 17 bytes
 binarytrees.bottomUpTree(int,int)binarytrees$TreeNode: 60 bytes
@@ -110,7 +114,7 @@ pidigits$PiDigitSpigot.produce(int)pidigits$Transformation: 27 bytes
 pidigits$PiDigitSpigot.consume(pidigits$Transformation)pidigits$Transformation: 9 bytes
 mandelbrot.compute(int,java.io.PrintStream)void: 324 bytes
 nbody.nbodySystem(int)void: 189 bytes
-nbody.advance(nbody$Body[],double)void: 330 bytes
+nbody.advance(nbody$Body[],double)void: 338 bytes
 nbody.energy(nbody$Body[])double: 181 bytes
 nbody.jupiter()nbody$Body: 57 bytes
 nbody$Body.offsetMomentum(double,double,double)void: 32 bytes

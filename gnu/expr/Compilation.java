@@ -127,6 +127,10 @@ public class Compilation implements SourceLocator
     options.add("warn-invoke-unknown-method",
                 Options.BOOLEAN_OPTION, warnUnknownMember,
 		"warn if invoke calls an unknown method (subsumed by warn-unknown-member)");
+  public static Options.OptionInfo warnUnused =
+    options.add("warn-unused",
+                Options.BOOLEAN_OPTION, Boolean.TRUE,
+                "warn if a variable is usused or code never executed");
   public static Options.OptionInfo warnAsError =
     options.add("warn-as-error", Options.BOOLEAN_OPTION, Boolean.FALSE,
 		"Make all warnings into errors");
@@ -144,6 +148,10 @@ public class Compilation implements SourceLocator
   public boolean warnInvokeUnknownMethod ()
   {
     return currentOptions.getBoolean(warnInvokeUnknownMethod);
+  }
+  public boolean warnUnused()
+  {
+    return currentOptions.getBoolean(warnUnused);
   }
   public boolean warnAsError ()
   {
@@ -508,6 +516,14 @@ public class Compilation implements SourceLocator
   }
 
   public boolean isApplyFunction (Expression exp)
+  {
+    return false;
+  }
+
+  /** A simple apply function maps actual arguments to formals directly.
+   * E.g. no distribution of multiple values.
+   */
+  public boolean isSimpleApplyFunction (Expression exp)
   {
     return false;
   }

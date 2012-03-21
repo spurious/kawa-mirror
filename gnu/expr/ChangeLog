@@ -1,11 +1,36 @@
+2012-03-15  Per Bothner  <per@bothner.com>
+
+	Implement data-flow from argument to function parameter.
+	This includes possible inlining of functions passed as parameters.
+	* InlineCalls.java (typeForCalledFunction): New helper function.
+	(visitReferenceExp): Many changes.
+	(visitRemainingDeclaredLambdas): Warn for unused lambdas.
+	(visitFluidLetExp): New method.
+	(ProcedureInCallContext): New helper class.
+	* FindTailCalls.java: Don't setCanRead or setCanCall - now handled
+	by InlineCalls, which uses data-flow and so is more accurate.
+	(visitLambdaExp): Do remove canRead parameter.
+	(visitReferenceExp): Removed - no longer needed.
+	* Compilation.java (warnUnused): New field and method.
+	(isSimpleApplyFunction): New method.
+	* Declaration.java (isModuleLocal): New method.
+	(ValueSource.getValue):  Return value if called by
+	isSimpleApplyFunction.
+	* LambdaExp.java (setCanAccess, outerLambdaOrCaller): New methods.
+	(declareClosureEnv, loadHeapFrame, enterFunction):
+	Use outerLambdaOrCaller.
+	(compile): Handle inline-only case.
+	* ApplyExp.java (compile): Do allocMethod if needed.
+	* FindCapturedVars.java (visitLambdaExp): Move check for named
+	top-level function from here ...
+	(checkInlineable): ... to here.
+
+	* LambdaExp.java (enterFunction): Skip ignorable parameter.
+
 2012-03-20  Per Bothner  <per@bothner.com>
 
 	* LetExp.java (compile): Now that we do data-flow analysis, use
 	Declaration#mayBeAccessedUninitialized.
-
-2012-03-15  Per Bothner  <per@bothner.com>
-
-	* LambdaExp.java (enterFunction): Skip ignorable parameter.
 
 2012-02-09  Jamison Hope  <jrh@theptrgroup.com>
 

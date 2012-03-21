@@ -51,6 +51,8 @@ public class InlineCalls extends ExpExpVisitor<Type> {
             exp = super.visit(exp, required);
             exp.setFlag(Expression.VALIDATED);
         }
+        if (required == ProcedureInCallContext.INSTANCE)
+          required = null;
         return checkType(exp, required);
     }
 
@@ -125,14 +127,32 @@ public class InlineCalls extends ExpExpVisitor<Type> {
     // visit the body with params bound to the known args.
     if (func instanceof LambdaExp)
       {
-        LambdaExp lexp = (LambdaExp) func;
+        // This optimization in principle should be redundant, but leaving
+        // it out currently causes worse type-inference and code generation.
         Expression inlined = inlineCall((LambdaExp) func, exp.args, false);
         if (inlined != null)
           return visit(inlined, required);
       }
-    func = visit(func, null);
+    func = visit(func, typeForCalledFunction(func));
     exp.func = func;
     return func.validateApply(exp, this, required, null);
+  }
+
+  /** Return a required type for procedure application context.
+   * This is ProcedureInCallContext.INSTANCE or null.
+   * The value ProcedureInCallContext.INSTANCE indicates the expression
+   * is used in application context and setCanCall is appropropriate.
+   * This means the function expression must be a lambda or reference.
+   * (Consider a function that is an IfExp:  If the required type is
+   * passed down to two branches that are both lambdas, we might think the
+   * lambdas are called but not read and thus safe for inlining - but that
+   * would be false, since we the If to yield a procedure value.)
+   */
+  public static Type typeForCalledFunction(Expression exp) {
+      return  (exp instanceof LambdaExp && ! (exp instanceof ClassExp))
+        || exp instanceof ReferenceExp
+        ? ProcedureInCallContext.INSTANCE
+        : null;
   }
 
   /** Visit an ApplyExp assuming function and arguments have been visited. */
@@ -293,22 +313,38 @@ public class InlineCalls extends ExpExpVisitor<Type> {
                 decl.setFlag(Declaration.MAYBE_UNINITIALIZED_ACCESS);
               }
           }
-      }
-    if (decl != null && decl.field == null && ! decl.getCanWrite())
-      {
+
         LambdaExp lval = decl.getLambdaValue();
         if (lval != null)
-          valueTracker.checkUninitializedVariables(lval, exp, null);
+          {
+            lval.setCanAccess(required != ProcedureInCallContext.INSTANCE);
+            valueTracker.checkUninitializedVariables(lval, exp, null);
+          }
         Expression dval = decl.getValue();
         if (dval instanceof LambdaExp && ! exp.getDontDereference() && ! (dval instanceof ClassExp) && ! dval.getFlag(Expression.VALIDATED))
           {
-            visit(dval, null);
+            visit(dval, required);
           }
+
+        // Replace references to a void variable (including one whose value
+        // is the empty sequence in XQuery) by an empty constant.  This is
+        // not so much an optimization as avoiding the complications and
+        // paradoxes of variables and expression that are void.
+        Type type = decl.getType();
+        if (type != null && type.isVoid())
+          return QuoteExp.voidExp;
+      }
+    if (decl != null && decl.field == null && ! decl.getCanWrite())
+      {
+        Expression dval = decl.getValue();
         if (dval instanceof QuoteExp && dval != QuoteExp.undefined_exp)
-          return visitQuoteExp((QuoteExp) dval, required);
+          return visitQuoteExp(new QuoteExp(((QuoteExp) dval).getValue(), decl.getType()), required);
         // We don't want to visit the body of a named function yet.
-        if (decl.nvalues == 1 && decl.values[0].kind == Declaration.ValueSource.APPLY_KIND)
-          dval = null;
+        // Though not doing so does hurt optimization.
+        // See testsuite/inlining-test.scm:constant-propagation3
+        if (dval != null && decl.nvalues == 1 && decl.values[0].kind == Declaration.ValueSource.APPLY_KIND) {
+            dval = null;
+        }
         if (dval instanceof ReferenceExp && ! decl.isAlias())
           {
             ReferenceExp rval = (ReferenceExp) dval;
@@ -337,6 +373,21 @@ public class InlineCalls extends ExpExpVisitor<Type> {
             comp.error('e', "unimplemented: reference to method "+decl.getName()+" as variable");
             comp.error('e', decl, "here is the definition of ", "");
           }
+      }
+    decl = Declaration.followAliases(decl);
+    if (decl != null)
+      {
+        if (required != ProcedureInCallContext.INSTANCE)
+            decl.setCanRead(true);
+        else {
+            decl.setCanCall(true);
+            // Avoid tricky optimization if we're interpreting.
+            if (! comp.mustCompile)
+                decl.setCanRead();
+        }
+        Declaration ctx = exp.contextDecl();
+        if (ctx != null)
+            ctx.setCanRead(true);
       }
     return super.visitReferenceExp(exp, required);
   }
@@ -415,8 +466,18 @@ public class InlineCalls extends ExpExpVisitor<Type> {
          decl = decl.nextDecl())
       {
         Expression value = decl.getValueRaw();
-        if (value instanceof LambdaExp)
+        if (value instanceof LambdaExp && ! decl.isModuleLocal())
           visit(value, null);
+      }
+    for (Declaration decl = exp.firstDecl(); decl != null;
+         decl = decl.nextDecl())
+      {
+        Expression value = decl.getValueRaw();
+        if (value instanceof LambdaExp
+            && ! value.getFlag(Expression.VALIDATED)
+            && decl.isModuleLocal()
+            && comp.warnUnused())
+            comp.error('w', decl, "no use of ", "");
       }
   }
 
@@ -485,8 +546,19 @@ public class InlineCalls extends ExpExpVisitor<Type> {
     return exp;
   }
 
+    protected Expression visitFluidLetExp(FluidLetExp exp, Type required) {
+        for (Declaration decl = exp.firstDecl();
+             decl != null; decl = decl.nextDecl()) {
+            decl.setCanRead(true);
+            if (decl.base != null)
+                decl.base.setCanRead(true);
+        }
+        return super.visitFluidLetExp(exp, required);
+    }
+
   protected Expression visitLambdaExp (LambdaExp exp, Type required)
   {
+    exp.setCanAccess(required != ProcedureInCallContext.INSTANCE);
     if (exp.getCallConvention() == Compilation.CALL_WITH_UNSPECIFIED)
       exp.setCallConvention(getCompilation());
     Declaration firstDecl = exp.firstDecl();
@@ -499,8 +571,7 @@ public class InlineCalls extends ExpExpVisitor<Type> {
       {
         Declaration ldecl = exp.nameDecl;
         boolean unknownCalls = true;
-        if (ldecl != null && ! exp.isClassMethod()
-            && (ldecl.isPrivate() || ! (ldecl.context instanceof ModuleExp)))
+        if (ldecl != null && ! exp.isClassMethod() && ldecl.isModuleLocal())
           {
             int countApply = 0;
             for (ApplyExp app = ldecl.firstCall; app != null;
@@ -670,6 +741,9 @@ public class InlineCalls extends ExpExpVisitor<Type> {
 	  decl.setType(Type.pointer_type);
       }
     */
+    Declaration ctx = exp.contextDecl();
+    if (ctx != null)
+      ctx.setCanRead(true);
     return exp;
   }
 
@@ -770,11 +844,7 @@ public class InlineCalls extends ExpExpVisitor<Type> {
   public static Expression inlineCall (LambdaExp lexp, Expression[] args,
                                        boolean makeCopy)
   {
-    if (lexp.keywords != null
-        // Since we re-use the Lambda in-place, we only want to do this
-        // for anonymous functions applied directly, as in:
-        // (apply (lambda (...) ...) ...)
-        || (lexp.nameDecl != null && ! makeCopy))
+    if (lexp.keywords != null)
       return null;
     boolean varArgs = lexp.max_args < 0;
     if ((lexp.min_args == lexp.max_args
@@ -837,13 +907,6 @@ public class InlineCalls extends ExpExpVisitor<Type> {
             prev = param;
             param = next;
           }
-        /*
-        for (Declaration param = let.firstDecl(); param != null; )
-          {
-            Declaration next = param.nextDecl();
-            param = next;
-          }
-        */
         Expression body = lexp.body;
         if (makeCopy)
           {
@@ -852,6 +915,9 @@ public class InlineCalls extends ExpExpVisitor<Type> {
               return null;
           }
         let.body = body;
+        lexp.body = null;
+        lexp.setFlag(Expression.VALIDATED);
+        lexp.setInlineOnly(true);
         return let;
       }
     /*
@@ -871,4 +937,20 @@ public class InlineCalls extends ExpExpVisitor<Type> {
     */
     return null;
   }
+
+    public static class ProcedureInCallContext extends ObjectType {
+        public static final ProcedureInCallContext INSTANCE = new ProcedureInCallContext();
+
+        ProcedureInCallContext() {
+            super("procedure-in-call-context");
+        }
+
+        public Type getImplementationType() {
+            return Compilation.typeProcedure;
+        }
+
+        public int compare(Type other) {
+            return getImplementationType().compare(other.getImplementationType());
+        }
+    }
 }

@@ -213,6 +213,20 @@
   (define x2 (* x 2))
   (+ x x2))
 
+(define (constant-propagation2)
+  (let ((cont2 (lambda (j::int) (+ 10 j))))
+    (cont2 3)))
+
+;; FIXME constant-folding is not done as well as we'd like.
+;; Partly caused by setting dval=null in InlineCalls:visitReferenceExp.
+;; The other problem is we visit a called Lambda (here cont2) before
+;; visiting the argument (here i).  That also means we visit the
+;; arguments without using the required parameter type.
+(define (constant-propagation3)
+  (let* ((i::int 2)
+         (cont2 (lambda (j::int) (+ i j))))
+    (cont2 i)))
+
 (define (factorial-infer1 (x ::int))
   ;; The type of r should be inferred as integer.
   (define r 1)
@@ -229,3 +243,15 @@
   (x:get i))
 (define (get-from-vector2 x::gnu.lists.FVector[java.lang.Integer] i::int)
   (x i))
+
+(define (sum1 n::integer)
+  (let loop ((i 0) (sum 0))
+    (if (< i n)
+        sum
+        (loop (+ i 1) (+ i sum)))))
+
+(define (sum2 n::double) ::double
+  (let loop ((i 0.0d0) (sum 0))
+    (if (< i n)
+        sum
+        (loop (+ i 1) (+ i sum)))))

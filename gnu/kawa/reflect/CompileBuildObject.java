@@ -159,6 +159,7 @@ public class CompileBuildObject {
         comp.letStart();
         Declaration adecl = comp.letVariable((String) null, ctype, e);
         adecl.setFlag(Declaration.ALLOCATE_ON_STACK);
+        adecl.setCanRead(true);
         BeginExp begin = new BeginExp();
         int i = keywordStart;
         for (;  i + 1 < args.length; i += 2) {

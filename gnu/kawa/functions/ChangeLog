@@ -1,3 +1,9 @@
+2012-03-20  Per Bothner  <per@bothner.com>
+
+	* CompilationHelpers.java (validateApplyToArgs): Better handling
+	of references bound to lambdas.
+	* CompileMisc.java (validateApplyMap): Improve validation order.
+
 2012-03-10  Per Bothner  <per@bothner.com>
 
 	* Map.java (numRags): New method.

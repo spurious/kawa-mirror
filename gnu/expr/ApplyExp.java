@@ -215,6 +215,9 @@ public class ApplyExp extends Expression
 	  throw new Error ("internal error - wrong number of parameters for "
 			   + func_lambda);
 	int conv = func_lambda.getCallConvention();
+        if (func_lambda.primMethods==null && ! func_lambda.isClassGenerated()
+            && ! func_lambda.getInlineOnly())
+            func_lambda.allocMethod(func_lambda.outerLambda(), comp);
         // Mostly duplicates logic with LambdaExp.validateApply.
         // See comment there.
 	if (comp.inlineOk(func_lambda)

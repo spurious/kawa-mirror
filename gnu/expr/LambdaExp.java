@@ -225,6 +225,10 @@ public class LambdaExp extends ScopeExp
     else flags &= ~CAN_CALL;
   }
 
+    public final void setCanAccess(boolean canRead) {
+        flags |= canRead ? CAN_READ : CAN_CALL;
+    }
+
   /** True if this is a method in an ClassExp. */
   public final boolean isClassMethod()
   { return (flags & CLASS_METHOD) != 0; }
@@ -391,6 +395,11 @@ public class LambdaExp extends ScopeExp
     return outer == null ? null : outer.currentLambda ();
   }
 
+  public LambdaExp outerLambdaOrCaller()
+  {
+    return getInlineOnly() ? inlineHome : outerLambda();
+  }
+
   /** Return the closest outer non-inlined LambdaExp. */
 
   public LambdaExp outerLambdaNotInline ()
@@ -448,11 +457,9 @@ public class LambdaExp extends ScopeExp
   {
     if (closureEnv == null && getNeedsClosureEnv())
       {
-	LambdaExp parent = outerLambda();
+        LambdaExp parent = outerLambdaOrCaller();
 	if (parent instanceof ClassExp)
 	  parent = parent.outerLambda();
-	Variable parentFrame = parent.heapFrame != null ?  parent.heapFrame
-	  : parent.closureEnv;
 	if (isClassMethod() && ! "*init*".equals(getName()))
           closureEnv = declareThis(compiledType);
 	else if (parent.heapFrame == null && ! parent.getNeedsStaticLink()
@@ -478,13 +485,18 @@ public class LambdaExp extends ScopeExp
 		closureEnv.setParameter(true);
 	      }
 	  }
-	else if (inlinedIn(parent))
-	  closureEnv = parentFrame;
 	else
-	  {
-	    closureEnv = new Variable("closureEnv", parentFrame.getType());
-	    getVarScope().addVariable(closureEnv);
-	  }
+          {
+            Variable parentFrame = parent.heapFrame != null ?  parent.heapFrame
+                : parent.closureEnv;
+            if (inlinedIn(parent))
+              closureEnv = parentFrame;
+            else
+              {
+                closureEnv = new Variable("closureEnv", parentFrame.getType());
+                getVarScope().addVariable(closureEnv);
+              }
+          }
       }
     return closureEnv;
   }
@@ -537,7 +549,7 @@ public class LambdaExp extends ScopeExp
             code.emitGetField(link);
             curType = (ClassType) link.getType();
           }
-        curLambda = curLambda.outerLambda();
+        curLambda = curLambda.outerLambdaOrCaller();
       }
   }
 
@@ -683,6 +695,15 @@ public class LambdaExp extends ScopeExp
   {
     if (target instanceof IgnoreTarget)
       return;
+    if (getInlineOnly())
+      {
+        // Normally this shouldn't happen.  One case where it does
+        // is when passing an inline-only lambda as a parameter to a function
+        // that doesn't get fully inlined.  Cleaner would be to elide
+        // the ignored parameter.
+        QuoteExp.nullExp.compile(comp, target);
+        return;
+      }
     Type rtype;
     CodeAttr code = comp.getCode();
 
@@ -798,7 +819,7 @@ public class LambdaExp extends ScopeExp
 	  return null;
 	if (exp instanceof ModuleExp
 	    || (exp instanceof ClassExp && getNeedsClosureEnv())
-	    || (exp instanceof LambdaExp
+	    || (exp instanceof LambdaExp 
 		&& ((LambdaExp) exp).heapFrame != null))
 	  return (LambdaExp) exp;
       }
@@ -1229,9 +1250,7 @@ public class LambdaExp extends ScopeExp
       {
 	if (! child.isClassGenerated() && ! child.getInlineOnly()
             && child.nameDecl != null)
-	  {
             child.allocMethod(this, comp);
-	  }
         if (child instanceof ClassExp)
           {
             ClassExp cl = (ClassExp) child;
@@ -1314,7 +1333,7 @@ public class LambdaExp extends ScopeExp
 	  }
 	else if (! inlinedIn(outerLambda()))
 	  {
-	    outerLambda().loadHeapFrame(comp);
+	    outerLambdaOrCaller().loadHeapFrame(comp);
 	    code.emitStore(closureEnv);
 	  }
       }

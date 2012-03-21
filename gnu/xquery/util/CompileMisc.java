@@ -102,6 +102,8 @@ public class CompileMisc
     Declaration dotArg = lexp2.firstDecl();
     Declaration posArg = dotArg.nextDecl();
     Declaration lastArg = posArg.nextDecl();
+    dotArg.setCanRead(true);
+    posArg.setCanRead(true);
 
     lexp2.setInlineOnly(true);
     lexp2.returnContinuation = exp;
@@ -117,6 +119,7 @@ public class CompileMisc
         // Don't need to do anything more - lastArg is not needed.
         return exp;
       }
+    lastArg.setCanRead(true);
 
     comp.letStart();
     Expression seq = args[0];
@@ -145,6 +148,7 @@ public class CompileMisc
     if (vproc.kind == 'R')
       {
         Declaration posIncoming = new Declaration(null, Type.intType);
+        posIncoming.setCanRead(true);
 	Expression init
 	  = new ApplyExp(AddOp.$Mn,
 			 new Expression[] {

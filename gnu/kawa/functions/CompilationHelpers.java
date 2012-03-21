@@ -45,14 +45,21 @@ public class CompilationHelpers
         Expression proc = args[0];
         if (! proc.getFlag(Expression.VALIDATED))
           {
-            if (proc instanceof LambdaExp)
+            Expression pval = proc;
+            if (proc instanceof ReferenceExp)
+              {
+                Declaration decl = ((ReferenceExp) proc).getBinding();
+                if (decl != null)
+                  pval = decl.getValue();
+              }
+            if (pval != null && pval.getClass() == LambdaExp.class)
               {
                 Expression[] rargs = new Expression[nargs];
                 System.arraycopy(args, 1, rargs, 0, nargs);
                 exp.setFuncArgs(proc, rargs);
                 return visitor.visit(exp, required);
               }
-            proc = visitor.visit(proc, null);
+            proc = visitor.visit(proc, InlineCalls.typeForCalledFunction(proc));
             args[0] = proc;
           }
         Type ptype = proc.getType().getRealType();

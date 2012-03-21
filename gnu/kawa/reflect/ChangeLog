@@ -1,3 +1,8 @@
+2012-03-20  Per Bothner  <per@bothner.com>
+
+	* CompileInvoke.java: Add needed setCanRead call.
+	* CompileBuildObject.java: Likewise.
+
 2012-02-09  Per Bothner  <per@bothner.com>
 
 	* SlotGet.scm (lookupMember): Look for "isXxx" method.

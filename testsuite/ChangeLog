@@ -1,3 +1,10 @@
+2012-03-14  Per Bothner  <per@bothner.com>
+
+	* inlining-test.scm (sum1, sum2, constant-propagation2,
+	constant-propagation3): New tests.
+	* inlining.expected: Update accordingly.
+	* Makefile.am: Likewise.
+
 2012-03-11  Per Bothner  <per@bothner.com>
 
 	* module0.scm: Add missing export.

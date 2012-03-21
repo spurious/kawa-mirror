@@ -527,6 +527,10 @@ public class FindCapturedVars extends ExpExpVisitor<Void>
 	decl = allocUnboundDecl(exp.getSymbol(), exp.isFuncDef());
 	exp.binding = decl;
       }
+    if (decl.getFlag(Declaration.IS_UNKNOWN))
+      {
+        maybeWarnNoDeclarationSeen(exp.getSymbol(), comp, exp);
+      }
     if (! decl.ignorable())
       {
 	if (! exp.isDefining())

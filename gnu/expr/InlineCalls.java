@@ -13,6 +13,7 @@ import gnu.math.IntNum;
 import gnu.math.BitOps;
 import gnu.text.Char;
 import java.lang.reflect.InvocationTargetException;
+import gnu.kawa.functions.MakePromise;
 import java.util.List;
 import java.util.HashMap;
 import java.lang.reflect.Proxy;
@@ -321,7 +322,7 @@ public class InlineCalls extends ExpExpVisitor<Type> {
             valueTracker.checkUninitializedVariables(lval, exp, null);
           }
         Expression dval = decl.getValue();
-        if (dval instanceof LambdaExp && ! exp.getDontDereference() && ! (dval instanceof ClassExp) && ! dval.getFlag(Expression.VALIDATED))
+        if (! exp.getDontDereference() && deferableInit(dval) && ! dval.getFlag(Expression.VALIDATED))
           {
             visit(dval, required);
           }
@@ -524,7 +525,7 @@ public class InlineCalls extends ExpExpVisitor<Type> {
           }
         boolean typeSpecified = decl.getFlag(Declaration.TYPE_SPECIFIED);
         Type dtype = typeSpecified && init != QuoteExp.undefined_exp ? decl.getType() : null;
-        if (init instanceof LambdaExp && ! (init instanceof ClassExp) && decl.getValueRaw() == init)
+        if (deferableInit(init) && decl.getValueRaw() == init)
           ; // defer
         else
           init = visit(init, dtype);
@@ -556,6 +557,17 @@ public class InlineCalls extends ExpExpVisitor<Type> {
     visitRemainingDeclaredLambdas(exp);
     return exp;
   }
+
+    protected boolean deferableInit(Expression init) {
+        if (init instanceof LambdaExp)
+            return ! (init instanceof ClassExp);
+        if (init instanceof ApplyExp) {
+            Object fun = ((ApplyExp) init).getFunctionValue();
+            if (fun == MakePromise.makeDelay || fun == MakePromise.makeLazy)
+                return true;
+        }
+        return false;
+    }
 
     protected Expression visitFluidLetExp(FluidLetExp exp, Type required) {
         for (Declaration decl = exp.firstDecl();
@@ -728,7 +740,8 @@ public class InlineCalls extends ExpExpVisitor<Type> {
         IntNum setterMask = IntNum.make(~exp.valueIndex);
         valueTracker.noteSet(decl, setterMask);
       }
-    if (decl != null && decl.getLambdaValue() != null)
+    if (decl != null && decl.getValueRaw() == exp.new_value
+        && deferableInit(exp.new_value))
       ; // defer
     else 
       exp.new_value = visit(exp.new_value, decl == null || decl.isAlias() ? null : decl.type);

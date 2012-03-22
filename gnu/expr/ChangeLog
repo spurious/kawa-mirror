@@ -1,5 +1,9 @@
 2012-03-21  Per Bothner  <per@bothner.com>
 
+	* InlineCalls.java: Defer visiting body of delay or lazy,
+	thus avoiding false warnings about initialized variables.
+	(deferableInit): New method.
+
 	* LambdaExp.java (unknownContinuation): Cast of null needed due to
 	change to use varargs.
 	* ApplyExp.java (<init>): Convert to using varargs.

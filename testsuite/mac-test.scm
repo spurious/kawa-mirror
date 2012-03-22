@@ -97,9 +97,9 @@
 	(define-syntax test-ds2 (syntax-rules () ((test-ds2 x) (list 'x))))
 	(test-ds2 (t2))))
 
-(set! x 1)
-(set! y 2)
-(set! z 3)
+(define x 1)
+(define y 2)
+(define z 3)
 (define-syntax test-ds3
   (syntax-rules () ((test-ds3 x y) (let ((y x) (x z) (z y)) (list x y z)))))
 (test '(3 2 3) 'test-ds3 (test-ds3 y z))
@@ -253,10 +253,12 @@
 	  (list (f 1) (g 1)))))
 
 (test '(1 1) 'dybvig-SchemePL3-8Syntax-ex4
-      (let ((f (lambda (x) (+ x 1))))
-	(letrec-syntax ((f (syntax-rules () ((_ x) x)))
-			(g (syntax-rules () ((_ x) (f x)))))
-	  (list (f 1) (g 1)))))
+      (with-compile-options
+       warn-unused: #f
+       (let ((f (lambda (x) (+ x 1))))
+         (letrec-syntax ((f (syntax-rules () ((_ x) x)))
+                         (g (syntax-rules () ((_ x) (f x)))))
+           (list (f 1) (g 1))))))
 
 ;; Savannah bug report #10561 from Chris Dean
 (define-syntax log-mode
@@ -418,34 +420,31 @@
 (test '(2 1) 'srfi-72-example-1
       (let-syntax ((main (lambda (form)
 			   (define (make-swap x y)
-			     (quasisyntax 
-			      (let ((t ,x))
-				(set! ,x ,y)
-				(set! ,y t))))
-			   (quasisyntax
-			    (let ((s 1)
-				  (t 2))
-			      ,(make-swap (syntax s) (syntax t))
-			      (list s t))))))
+			     #`(let ((t #,x))
+                                 (set! #,x #,y)
+                                 (set! #,y t)))
+			   #`(let ((s 1)
+                                   (t 2))
+                               #,(make-swap #'s #'t)
+                               (list s t)))))
 	(main)))
 
 (test '(1 2) 'srfi-72-example-2
       (let ((x 1))
 	(let-syntax ((m (lambda (form)
 			  (let ((x 2))
-			    (quasisyntax (list x ,x))))))
+			    #`(list x #,x)))))
 	  (m))))
 
 (test '(1 3) 'srfi-72-example-3
       (let ((x 1))
 	(let-syntax ((m (lambda (form)
 			  (let ((x (car '(3))))
-			    (quasisyntax (list x ,x))))))
-	  (m))))
+                            #`(list x #,x)))))
+          (m))))
 
 ;; From R6RS, except [...] replaced by (...), and
 ;; using letrec-syntax instead of nested define-syntax.
-;; Also, #, is not supported.  FIXME
 (test '(#t #f)
       'free-identifier-1
       (let ((fred 17))
@@ -456,20 +455,20 @@
              (b (lambda (x)
                   (syntax-case x ()
                     ((_ id1 id2)
-                     (list #'list
-                           (free-identifier=? #'id1 #'id2)
-                           (bound-identifier=? #'id1 #'id2)))))))
+                     #`(list
+                           #,(free-identifier=? #'id1 #'id2)
+                           #,(bound-identifier=? #'id1 #'id2)))))))
           (a fred))))
 
 (begin
   ;; Note we need to compile define and define-for-syntax
-  ;; in the same comilation unit for it to make sense.
+  ;; in the same compilation unit for it to make sense.
   (define x-72-x3 1)
   (define-for-syntax x-72-x3 2)
   (test '(1 2) 'srfi-72-example-4
 	(let-syntax ((m (lambda (form)
-			  (quasisyntax (list x-72-x3 ,x-72-x3)))))
-	  (m))))
+			  #`(list x-72-x3 #,x-72-x3))))
+          (m))))
 
 ;; Based on Savannah bug #17984 Chris Wegrzyn <chris.wegrzyn@gmail.com>
 ;; Compile time error in expansion of hygienic macros ending in literals
@@ -491,7 +490,7 @@
        #`(define-simple-class cl ()
            (arg type: argtype))))))
 (aa MyClass myparam <String>)
-(define aa-instance (MyClass myparam: "sarg"))
+(define aa-instance ::MyClass (MyClass myparam: "sarg"))
 (test (as <String> "sarg") 'savannah-bug-18504 aa-instance:myparam)
 
 ;; Savannah bug #18105: Chris Wegrzyn <chris.wegrzyn@gmail.com>
@@ -520,8 +519,7 @@
          (syntax-case stx ()
            ((_ sym . args)
             (let ((new-sym (alter-syntax-datum proc (syntax sym))))
-              ;; must use #, in PLT
-              #`(,new-sym . args)))))))))
+              #`(#,new-sym . args)))))))))
 (define-symbol-altering-macro (call-reversename sym)
   (string->symbol
    (list->string

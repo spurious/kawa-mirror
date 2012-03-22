@@ -62,7 +62,7 @@ check-scm: testing.zip
 	rm -rf tmp?
 	$(KAWATEST) \
 	  -e '(define this-file-name "$(srcdir)/test.scm")' \
-	  -e "(set! symbol-read-case 'D)" \
+	  -e "(set! symbol-read-case 'D)" --no-warn-undefined-variable \
 	  -f $(srcdir)/test.scm -e '(test-report)'
 
 check-num:
@@ -100,7 +100,8 @@ check-regex:
 
 check-misc: testing.zip moduleFT.class InliningTest.class \
 	    cycle1.class cycle2.class
-	$(KAWATEST) -f "$(srcdir)/misc-test.scm" -e '(test-report)'
+	$(KAWATEST) --no-warn-undefined-variable --no-warn-unused \
+	  -f "$(srcdir)/misc-test.scm" -e '(test-report)'
 
 check-mac: testing.zip
 	$(KAWATEST) \
@@ -108,7 +109,7 @@ check-mac: testing.zip
 
 check-obj: testing.zip module2.class module3.class classes2.class \
   MyFunc.class MyModule.class cycle1.class cycle2.class
-	$(KAWATEST) --no-warn-invoke-unknown-method -f "$(srcdir)/obj-test.scm" -e '(test-report)'
+	$(KAWATEST) --no-warn-unknown-member -f "$(srcdir)/obj-test.scm" -e '(test-report)'
 
 check-polytype:
 	$(KAWA) "$(srcdir)/polytype.scm"

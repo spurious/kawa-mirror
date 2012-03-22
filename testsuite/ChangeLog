@@ -1,3 +1,11 @@
+2012-03-21  Per Bothner  <per@bothner.com>
+
+	* Makefile.am: Pass --no-warn-xxx flags various places.  These are
+	needed after fixing bug that causes warnings to be ignored.
+	* mac-test.scm: Various changes to avoid or suppress warnings.
+	Also use more syntax abbreviations, such as #`.
+	* misc-test.scm: Add type-specifier to avoid a no known slot warning.
+
 2012-03-14  Per Bothner  <per@bothner.com>
 
 	* inlining-test.scm (sum1, sum2, constant-propagation2,

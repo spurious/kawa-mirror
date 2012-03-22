@@ -143,7 +143,7 @@
       (string-set! cr-test-string i #\Linefeed)))
 (call-with-input-string
  cr-test-string
- (lambda (iport)
+ (lambda (iport ::input-port)
    (iport:setConvertCR #t)
    (test 1 input-port-column-number iport)
    (test 1 input-port-line-number iport)

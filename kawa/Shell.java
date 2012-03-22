@@ -483,20 +483,21 @@ public class Shell
               {
                 SourceMessages messages = new SourceMessages();
                 URL url = path.toURL();
+                OutPort perr = OutPort.errDefault();
                 if (lineByLine)
                   {
                     boolean print = ModuleBody.getMainPrintValues();
                     Consumer out = (print ? getOutputConsumer(OutPort.outDefault())
                                     : new VoidConsumer());
                     Throwable ex
-                      = run(language, env, src, out, null, url, messages);
+                        = run(language, env, src, out, perr, url, messages);
                     if (ex != null)
                       throw ex;
                   }
                 else
                   {
                     cmodule = compileSource (src, env, url, language, messages);
-                    messages.printAll(OutPort.errDefault(), 20);
+                    messages.printAll(perr, 20);
                     if (cmodule == null)
                       return false;
                   }

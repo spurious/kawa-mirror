@@ -79,7 +79,8 @@ public class LambdaExp extends ScopeExp
   public LambdaExp nextSibling;
 
   /** A magic value to indicate there is no unique return continuation. */
-  final static ApplyExp unknownContinuation = new ApplyExp ((Expression) null, null);
+  final static ApplyExp unknownContinuation
+      = new ApplyExp ((Expression) null, (Expression[]) null);
 
   /** The unique call site that calls this lambda.
    * The value is null if no callers have been seen.

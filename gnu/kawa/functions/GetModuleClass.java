@@ -99,7 +99,7 @@ public class GetModuleClass extends ProcedureN
             Expression clas
               = new ApplyExp(gnu.kawa.functions.GetModuleClass.getModuleClass,
                              Expression.noExpressions);
-            value = new ApplyExp(maker, new Expression[] { clas });
+            value = new ApplyExp(maker, clas);
           }
         decl.setValue(value);
         comp.mainLambda.add(null, decl);
@@ -108,6 +108,6 @@ public class GetModuleClass extends ProcedureN
     if (comp.immediate)
       return ref;
     else
-      return new ApplyExp(getModuleUriDummy, new Expression[] { ref });
+      return new ApplyExp(getModuleUriDummy, ref);
   }
 }

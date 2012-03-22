@@ -1,3 +1,9 @@
+2012-03-21  Per Bothner  <per@bothner.com>
+
+	* CompileMisc.java: Simplify by using varargs of new ApplyExp.
+	* GetModuleClass.java: Likewise.
+	* CompileNamedPart.java: Likewise.
+
 2012-03-20  Per Bothner  <per@bothner.com>
 
 	* CompilationHelpers.java (validateApplyToArgs): Better handling

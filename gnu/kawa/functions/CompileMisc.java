@@ -566,7 +566,7 @@ public class CompileMisc implements Inlineable
     code.emitInvokeSpecial(typeContinuation.getDeclaredMethod("<init>", 1));
     code.emitStore(contVar);
     code.emitTryStart(false, target instanceof IgnoreTarget || target instanceof ConsumerTarget ? null : Type.objectType);
-    ApplyExp app = new ApplyExp(lambda, new Expression[] { new ReferenceExp(contDecl) });
+    ApplyExp app = new ApplyExp(lambda, new ReferenceExp(contDecl) );
     app.compile(comp, target);
     // Emit: cont.invoked = true
     if (code.reachableHere())

@@ -1,5 +1,7 @@
 2012-03-21  Per Bothner  <per@bothner.com>
 
+	* ApplyExp.java (<init>): Convert to using varargs.
+
 	* InlineCalls.java (visitLetExp): Special case if decl is bound
 	to a lambda (as in a letrec).
 

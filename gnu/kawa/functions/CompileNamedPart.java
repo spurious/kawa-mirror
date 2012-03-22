@@ -323,10 +323,9 @@ public class CompileNamedPart
         if (val instanceof SimpleSymbol)
           return QuoteExp.getInstance(new GetNamedInstancePart(val.toString()));
       }
-    Expression[] args = new Expression[2];
-    args[0] = new QuoteExp(ClassType.make("gnu.kawa.functions.GetNamedInstancePart"));
-    args[1] = member;
-    return new ApplyExp(Invoke.make, args);
+    return new ApplyExp(Invoke.make,
+                        new QuoteExp(ClassType.make("gnu.kawa.functions.GetNamedInstancePart")),
+                        member);
   }
 
   public static Expression validateGetNamedInstancePart

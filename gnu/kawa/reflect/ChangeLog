@@ -1,3 +1,7 @@
+2012-03-21  Per Bothner  <per@bothner.com>
+
+	* ProceduralProxy.java (invoke):  Special-case for methods of Object.
+
 2012-03-20  Per Bothner  <per@bothner.com>
 
 	* CompileInvoke.java: Add needed setCanRead call.

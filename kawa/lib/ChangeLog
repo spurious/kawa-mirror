@@ -1,3 +1,8 @@
+2012-03-21  Per Bothner  <per@bothner.com>
+
+	* std_syntax.scm (lazy, delay): Explicit ApplyExp creation.
+	This avoids the extra ApplyToArgs step.
+
 2012-02-13  Per Bothner  <per@bothner.com>
 
 	* std_syntax.scm: Implement syntax->datum and datum->syntax.

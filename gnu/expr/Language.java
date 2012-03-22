@@ -853,6 +853,10 @@ public abstract class Language
 
   public static/* for now */ Type unionType (Type t1, Type t2)
   {
+    if (t1 == Type.neverReturnsType)
+      return t2;
+    if (t2 == Type.neverReturnsType)
+      return t1;
     if (t1 == Type.toStringType)
       t1 = Type.javalangStringType;
     if (t2 == Type.toStringType)

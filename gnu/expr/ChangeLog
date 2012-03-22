@@ -1,5 +1,7 @@
 2012-03-21  Per Bothner  <per@bothner.com>
 
+	* Language.java (unionType): Handle Type.neverReturnsType.
+
 	* InlineCalls.java: Defer visiting body of delay or lazy,
 	thus avoiding false warnings about initialized variables.
 	(deferableInit): New method.

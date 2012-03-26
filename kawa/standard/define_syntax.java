@@ -108,14 +108,21 @@ public class define_syntax extends Syntax
 
     if (rule instanceof LambdaExp)
       ((LambdaExp) rule).setFlag(LambdaExp.NO_FIELD);
-    Expression args[] = new Expression[3];
-    args[0] = new QuoteExp(name);
-    args[1] = rule;
-    args[2] = ThisExp.makeGivingContext(defs);
-    rule = new ApplyExp((flags & Macro.SKIP_SCAN_FORM) != 0 ? makeSkipScanForm
-                        : (flags & Macro.HYGIENIC) != 0 ? makeHygienic
-                        : makeNonHygienic,
-			args);
+    Procedure makeMacroProc =
+        (flags & Macro.SKIP_SCAN_FORM) != 0 ? makeSkipScanForm
+        : (flags & Macro.HYGIENIC) != 0 ? makeHygienic
+        : makeNonHygienic;
+    // A top-level macro needs (in general) to be compiled into the
+    // class-file, but for a non-top-level macro it is better to use
+    // the quoted macro directly to get the right nesting, as we
+    // do for letrec-syntax.
+    if (decl.context instanceof ModuleExp || makeMacroProc != makeHygienic)
+      rule = new ApplyExp(makeMacroProc,
+                          new QuoteExp(name),
+                          rule,
+                          ThisExp.makeGivingContext(defs));
+    else
+        rule = new QuoteExp(macro);
     decl.noteValue(rule);
     decl.setProcedureDecl(true);
   
@@ -130,9 +137,8 @@ public class define_syntax extends Syntax
 
         if (tr.immediate)
           {
-            args = new Expression[2];
-            args[0] = new ReferenceExp(decl);
-            args[1] = new QuoteExp(defs);
+            Expression[] args =
+                { new ReferenceExp(decl), new QuoteExp(defs) };
             tr.formStack.addElement(new ApplyExp(setCapturedScope, args));
           }
       }

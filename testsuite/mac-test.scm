@@ -1,4 +1,4 @@
-(test-init "macros" 105)
+(test-init "macros" 110)
 
 (test 'ok 'letxx (let ((xx #f)) (cond (#t xx 'ok))))
 
@@ -617,3 +617,62 @@
 		      x))
 	       (x2 x))
 	  (list x0 x1 x2))))
+
+(test '(2 1) 'r7rs-test1
+      (let ((x 1) (y 2))
+        (define-syntax swap!
+          (syntax-rules ()
+            ((swap! a b)
+             (let ((tmp a))
+               (set! a b)
+               (set! b tmp)))))
+        (swap! x y)
+        (list x y)))
+
+(define-syntax r7rs-rec1
+  (lambda (x)
+    (syntax-case x ()
+      ((_ x e)
+       (identifier? #'x)
+       #'(letrec ((x e)) x))
+      ((_ x e)
+       "not an identifier"))))
+(test '(1 2 6 24 120) 'r7rs-rec1
+      (map (r7rs-rec1 fact
+                      (lambda (n)
+                        (if (= n 0)                 
+                            1
+                            (* n (fact (- n 1))))))
+           '(1 2 3 4 5)))
+(test "not an identifier" 'r7rs-rec2
+      (r7rs-rec1 5 (lambda (x) x))  )
+
+(test '(#t #f) 'free-identifier-1
+      (let ((fred 17))
+        (define-syntax a
+          (lambda (x)
+            (syntax-case x ()
+              ((_ id) #'(b id fred)))))
+        (define-syntax b
+          (lambda (x)
+            (syntax-case x ()
+              ((_ id1 id2)
+               #`(list
+                  #,(free-identifier=? #'id1 #'id2)
+                  #,(bound-identifier=? #'id1 #'id2))))))
+        (a fred)))
+(test '(#t #f) 'free-identifier-2
+      (let ((fred 17))
+        (letrec-syntax
+            ((a
+              (lambda (x)
+                (syntax-case x ()
+                  ((_ id) #'(b id fred)))))
+             (b
+              (lambda (x)
+                (syntax-case x ()
+                  ((_ id1 id2)
+                   #`(list
+                           #,(free-identifier=? #'id1 #'id2)
+                           #,(bound-identifier=? #'id1 #'id2)))))))
+          (a fred))))

@@ -1,3 +1,8 @@
+2012-03-25  Per Bothner  <per@bothner.com>
+
+	* standard/define_syntax.java (scanForm): If we're not in a top-level
+	context, quote the macro instead of compiling it.
+
 2012-03-21  Per Bothner  <per@bothner.com>
 
 	* Shell.java (runFile): Pass error port to run iflineByLine.

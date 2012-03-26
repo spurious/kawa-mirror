@@ -30,6 +30,8 @@ public class let extends Syntax
       
     Expression[] inits = new Expression[decl_count];
     Declaration[] decls = new Declaration[decl_count];
+    // Used to check for duplicate definitions.
+    SimpleEnvironment dupenv = new SimpleEnvironment();
     Stack renamedAliases = null;
     int renamedAliasesCount = 0;
     SyntaxForm syntaxRest = null;
@@ -66,8 +68,13 @@ public class let extends Syntax
         name = tr.namespaceResolve(name);
 	if (! (name instanceof Symbol))
 	  return tr.syntaxError("variable "+name+" in let binding is not a symbol: "+obj);
-
 	Declaration decl = new Declaration(name);
+        Translator.setLine(decl, binding);
+        Symbol sym = (Symbol) name;
+        Object old = dupenv.get(sym, templateScope, null);
+        if (old != null)
+          ScopeExp.duplicateDeclarationError((Declaration) old, decl, tr);
+        dupenv.put(sym, templateScope, decl);
         decls[i] = decl;
         decl.setFlag(Declaration.IS_SINGLE_VALUE);
 	if (templateScope != null)

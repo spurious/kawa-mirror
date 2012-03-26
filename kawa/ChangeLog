@@ -1,5 +1,7 @@
 2012-03-25  Per Bothner  <per@bothner.com>
 
+	* standard/let.java (rewrite): Check for duplicate definitions.
+
 	* standard/define_syntax.java (scanForm): If we're not in a top-level
 	context, quote the macro instead of compiling it.
 

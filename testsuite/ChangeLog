@@ -1,5 +1,9 @@
 2012-03-25  Per Bothner  <per@bothner.com>
 
+	* mac-test.scm: More tests from r6rs.
+	* errors1.scm: New test for duplicate declarations in let.
+	* Makefile.am: Update accordingly.
+
 	* mac-test.scm: 5 more tests.
 
 2012-03-21  Per Bothner  <per@bothner.com>

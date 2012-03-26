@@ -1,4 +1,4 @@
-(test-init "macros" 110)
+(test-init "macros" 116)
 
 (test 'ok 'letxx (let ((xx #f)) (cond (#t xx 'ok))))
 
@@ -676,3 +676,69 @@
                            #,(free-identifier=? #'id1 #'id2)
                            #,(bound-identifier=? #'id1 #'id2)))))))
           (a fred))))
+
+(define-syntax my-let
+  (lambda (x)
+    (define unique-ids?
+      (lambda (ls)
+        (or (null? ls)
+            (and (let notmem? ((x (car ls)) (ls (cdr ls)))
+                   (or (null? ls)
+                       (and (not (bound-identifier=? x (car ls)))
+                            (notmem? x (cdr ls)))))
+                 (unique-ids? (cdr ls))))))
+    (syntax-case x ()
+      ((_ ((i v) ...) e1 e2 ...)
+       (unique-ids? #'(i ...))
+       #'((lambda (i ...) e1 e2 ...) v ...))
+      ((_ . rest)
+       "syntax error"))))
+
+(test "syntax error" 'bound-identifier-1
+      (my-let ((a 3) (a 4)) (+ a a)))
+(test 7 'bound-identifier-2
+      (my-let ((a 3) (b 4)) (+ a b)))
+(test 7 'bound-identifier-3
+      (let-syntax
+          ((dolet (lambda (x)
+                    (syntax-case x ()
+                      ((_ b)
+                       #'(my-let ((a 3) (b 4)) (+ a b)))))))
+        (dolet a)))
+;; For comparison, check with builtin let.
+(test 7 'bound-identifier-4
+      (let-syntax
+          ((dolet (lambda (x)
+                    (syntax-case x ()
+                      ((_ b)
+                       #'(let ((a 3) (b 4)) (+ a b)))))))
+        (dolet a)))
+
+(define-syntax my-case
+  (lambda (x)
+    (syntax-case x ()
+      ((_ e0 ((k ...) e1 e2 ...) ...
+          (else-key else-e1 else-e2 ...))
+       (and (identifier? #'else-key)
+            (free-identifier=? #'else-key #'else))
+       #'(let ((t e0))
+           (cond
+            ((memv t '(k ...)) e1 e2 ...)
+            ...
+            (else else-e1 else-e2 ...))))
+      ((_ e0 ((ka ...) e1a e2a ...)
+          ((kb ...) e1b e2b ...) ...)
+       #'(let ((t e0))
+           (cond
+            ((memv t '(ka ...)) e1a e2a ...)
+            ((memv t '(kb ...)) e1b e2b ...)
+            ...)))
+      ((_ . rest)
+       "syntax error"))))
+
+(test "syntax error" 'my-case-1
+      (let ((else #f))
+        (my-case 0 (else (list "oops")))))
+(test '("oops") 'my-case-2
+      (let ((xy #f))
+        (my-case 0 (else (list "oops")))))

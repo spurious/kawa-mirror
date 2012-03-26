@@ -1542,6 +1542,7 @@ re-define a global definition), and there must be no assignments
 * Colon notation:: Property access using colon notation
 * Bodies::
 * Syntax and conditional compilation::
+* Macros::
 @end menu
 
 @node Syntax notation, Lexical and datum syntax, , Syntax
@@ -2377,65 +2378,6 @@ the @func{let} expression in the above example is equivalent to
 @node Syntax and conditional compilation
 @section Syntax and conditional compilation
 
-Kawa supports most of the @code{syntax-case} feature.
-
-@deffn Syntax define-syntax ..
-Pattern ...
-@end deffn
-
-@deffn Syntax define-syntax-case name @stxlit{(}literals@stxlit{)} @stxlit{(}pattern expr@stxlit{)} ...
-A convenience macro to make it easy to define @code{syntax-case}-style macros.
-Defines a macros with the given @var{name} and list of @var{literals}.
-Each @var{pattern} has the form of a @code{syntax-rules}-style pattern,
-and it is matched against the macro invocation syntax form.
-When a match is found, the corresponding @var{expr} is evaluated.
-It must evaluate to a syntax form,
-which replaces the macro invocation.
-@end deffn
-
-@deffn Syntax define-macro @stxlit{(}name lambda-list@stxlit{)} form ...
-@emph{This form is deprecated.}
-Functionally equivalent to @code{defmacro}.
-@end deffn
-
-@deffn Syntax defmacro name lambda-list form ...
-@emph{This form is deprecated.}
-Instead of
-@example
-(defmacro (@var{name} ...)
-  (let ... `(... ,@var{exp} ...)))
-@end example
-you should probably do:
-@example
-(define-syntax-case @var{name} ()
-  ((_ ...) (let #`(... @var{exp} ...))))
-@end example
-and instead of
-@example
-(defmacro (@var{name} ... @var{var} ...) `(... @var{var} ...))
-@end example
-you should probably do:
-@example
-(define-syntax-case @var{name} ()
-  ((_ ... @var{var} ...) #`(... @var{var} ...))
-@end example
-
-Defines an old-style macro a la Common Lisp,
-and installs @code{(lambda @var{lambda-list} @var{form} ...)}
-as the expansion function for @var{name}.
-When the translator sees an application of @var{name},
-the expansion function is called with the rest of the application
-as the actual arguments.  The resulting object must be a Scheme
-source form that is futher processed (it may be repeatedly macro-expanded).
-@end deffn
-
-@deffn Procedure gentemp
-Returns a new (interned) symbol each time it is called.
-The symbol names are implementation-dependent.
-(This is not directly macro-related, but is often used in conjunction
-with @code{defmacro} to get a fresh unique identifier.)
-@end deffn
-
 @deffn Syntax cond-expand cond-expand-clause* [@stxlit{(else} command-or-definition*@stxlit{)}]
 @display
 @stxdef{cond-expand-clause} @stxlit{(}@var{feature-requirement} @var{command-or-definition}*@stxlit{)}
@@ -2502,6 +2444,110 @@ Same as @code{include}, except that the @var{path} is relative to the
 path of the source-file containing the @code{include-file}.
 @end deffn
 
+@node Macros
+@section Macros
+
+Kawa supports most of the @code{syntax-case} feature.
+
+Syjntax definitions are valid wherever definitions are.
+The have the followin form:
+
+@deffn Syntax define-syntax keyword transformer-spec
+The @var{keyword} is a identifier, and @var{transformer-spec}
+is a function that maps syntax forms to syntax forms,
+usually an instance of @code{syntax-rules}.
+If the @code{define-syntax} occurs at the top level, then the top-level
+syntactic environment is extended by binding the @var{keyword}
+to to the specified transformer, but existing references to any top-level
+binding for @var{keyword} remain unchanged.  Otherwise, it is a
+@dfn{internal syntax definition}, and is local to the @var{body}
+in which it is defined.
+
+@example
+(let ((x 1) (y 2))
+   (define-syntax swap!
+     (syntax-rules ()
+       ((swap! a b)
+        (let ((tmp a))
+          (set! a b)
+          (set! b tmp)))))
+   (swap! x y)
+   (list x y))  @result{} (2 1)
+@end example
+
+Macros can expand into definitions in any context that permits them.
+However, it is an error for a definitiosn to define an identifier
+whose binding has to be known in order to determine the meaning
+of the definitoion itself, or of any predecing definiton that belongs
+to the same group of internal definitions.
+@end deffn
+
+@deffn Syntax define-syntax-case name @stxlit{(}literals@stxlit{)} @stxlit{(}pattern expr@stxlit{)} ...
+A convenience macro to make it easy to define @code{syntax-case}-style macros.
+Defines a macros with the given @var{name} and list of @var{literals}.
+Each @var{pattern} has the form of a @code{syntax-rules}-style pattern,
+and it is matched against the macro invocation syntax form.
+When a match is found, the corresponding @var{expr} is evaluated.
+It must evaluate to a syntax form,
+which replaces the macro invocation.
+@example
+(define-syntax-case macro-name (literals)
+  (pat1 result1)
+  (pat2 result2))
+@end example
+is equivalent to:
+@example
+(define-syntax macro-name
+  (lambda (form)
+    (syntax-case form (literals)
+      (pat1 result1)
+      (pat2 result2))))
+@end example
+@end deffn
+
+@deffn Syntax define-macro @stxlit{(}name lambda-list@stxlit{)} form ...
+@emph{This form is deprecated.}
+Functionally equivalent to @code{defmacro}.
+@end deffn
+
+@deffn Syntax defmacro name lambda-list form ...
+@emph{This form is deprecated.}
+Instead of
+@example
+(defmacro (@var{name} ...)
+  (let ... `(... ,@var{exp} ...)))
+@end example
+you should probably do:
+@example
+(define-syntax-case @var{name} ()
+  ((_ ...) (let #`(... #,@var{exp} ...))))
+@end example
+and instead of
+@example
+(defmacro (@var{name} ... @var{var} ...) `(... @var{var} ...))
+@end example
+you should probably do:
+@example
+(define-syntax-case @var{name} ()
+  ((_ ... @var{var} ...) #`(... @var{var} ...))
+@end example
+
+Defines an old-style macro a la Common Lisp,
+and installs @code{(lambda @var{lambda-list} @var{form} ...)}
+as the expansion function for @var{name}.
+When the translator sees an application of @var{name},
+the expansion function is called with the rest of the application
+as the actual arguments.  The resulting object must be a Scheme
+source form that is futher processed (it may be repeatedly macro-expanded).
+@end deffn
+
+@deffn Procedure gentemp
+Returns a new (interned) symbol each time it is called.
+The symbol names are implementation-dependent.
+(This is not directly macro-related, but is often used in conjunction
+with @code{defmacro} to get a fresh unique identifier.)
+@end deffn
+
 @deffn Procedure expand form
 The result of evaluating @var{form} is treated as a Scheme expression,
 syntax-expanded to internal form, and then converted back to (roughly)
@@ -2514,6 +2560,182 @@ To access this function, you must first @code{(require 'syntax-utils)}.
 (require 'syntax-utils)
 (expand '(cond ((> x y) 0) (else 1))) @result{} (if (> x y) 0 1)
 @end example
+@end deffn
+
+@subsubsection Identifier predicates
+
+@deffn Procedure {identifier?} @var{obj}
+Return @true{} if @var{obj} is an identifier, i.e., a syntax object
+representing an identifier, and @false{} otherwise.
+
+The @func{identifier?} procedure is often used within a fender to verify
+that certain subforms of an input form are identifiers, as in the
+definition of @code{rec}, which creates self--contained recursive
+objects, below.
+
+@example
+(define-syntax rec
+  (lambda (x)
+    (syntax-case x ()
+      ((_ x e)
+       (identifier? #'x)
+       #'(letrec ((x e)) x)))))
+
+(map (rec fact
+       (lambda (n)
+         (if (= n 0)                 
+             1
+             (* n (fact (- n 1))))))
+     '(1 2 3 4 5))    @result{} (1 2 6 24 120)
+ 
+(rec 5 (lambda (x) x))  @result{} exception
+@end example
+@end deffn
+
+
+The procedures @func{bound-identifier=?} and @func{free-identifier=?}
+each take two identifier arguments and return @true{} if their arguments
+are equivalent and @false{} otherwise.  These predicates are used to
+compare identifiers according to their @emph{intended use} as free
+references or bound identifiers in a given context.
+
+@deffn Procedure {bound-identifier=?} @vari{id} @varii{id}
+@vari{id} and @varii{id} must be identifiers.
+
+The procedure @func{bound-identifier=?} returns @true{} if a binding for
+one would capture a reference to the other in the output of the
+transformer, assuming that the reference appears within the scope of the
+binding, and @false{} otherwise.
+
+In general, two identifiers are @func{bound-identifier=?} only if both
+are present in the original program or both are introduced by the same
+transformer application (perhaps implicitly, see @func{datum->syntax}).
+
+The @func{bound-identifier=?} procedure can be used for detecting
+duplicate identifiers in a binding construct or for other preprocessing
+of a binding construct that requires detecting instances of the bound
+identifiers.
+@end deffn
+
+@deffn Procedure {free-identifier=?} @vari{id} @varii{id}
+@vari{id} and @varii{id} must be identifiers.
+
+The @func{free-identifier=?} procedure returns @true{} if and only if
+the two identifiers would resolve to the same binding if both were to
+appear in the output of a transformer outside of any bindings inserted
+by the transformer.  (If neither of two like--named identifiers resolves
+to a binding, i.e., both are unbound, they are considered to resolve to
+the same binding.)
+
+Operationally, two identifiers are considered equivalent by
+@func{free-identifier=?} if and only the topmost matching substitution
+for each maps to the same binding or the identifiers have the same name
+and no matching substitution.
+
+The @func{syntax-case} and @func{syntax-rules} forms internally use
+@func{free-identifier=?} to compare identifiers listed in the literals
+list against input identifiers.
+
+@example
+(let ((fred 17))
+  (define-syntax a
+    (lambda (x)
+      (syntax-case x ()
+        ((_ id) #'(b id fred)))))
+  (define-syntax b
+    (lambda (x)
+      (syntax-case x ()
+        ((_ id1 id2)
+         #`(list
+             #,(free-identifier=? #'id1 #'id2)
+             #,(bound-identifier=? #'id1 #'id2))))))
+  (a fred))
+    @result{} (#t #f)
+@end example
+
+The following definition of unnamed @func{let} uses
+@func{bound-identifier=?} to detect duplicate identifiers.
+
+@example
+(define-syntax let
+  (lambda (x)
+    (define unique-ids?
+      (lambda (ls)
+        (or (null? ls)
+            (and (let notmem? ((x (car ls)) (ls (cdr ls)))
+                   (or (null? ls)
+                       (and (not (bound-identifier=? x (car ls)))
+                            (notmem? x (cdr ls)))))
+                 (unique-ids? (cdr ls))))))
+    (syntax-case x ()
+      ((_ ((i v) ...) e1 e2 ...)
+       (unique-ids? #'(i ...))
+       #'((lambda (i ...) e1 e2 ...) v ...)))))
+@end example
+
+The argument @code{#'(i ...)} to @func{unique-ids?} is guaranteed to be
+a list by the rules given in the description of @func{syntax} above.
+
+With this definition of @func{let}:
+
+@example
+(let ((a 3) (a 4)) (+ a a))    @result{} @i{syntax error}
+@end example
+
+However,
+@example
+(let-syntax
+  ((dolet (lambda (x)
+            (syntax-case x ()
+              ((_ b)
+               #'(let ((a 3) (b 4)) (+ a b)))))))
+  (dolet a))
+@result{} 7
+@end example
+
+@noindent
+since the identifier @code{a} introduced by @func{dolet} and the
+identifier @code{a} extracted from the input form are not
+@func{bound-identifier=?}.
+
+Rather than including @code{else} in the literals list as before, this
+version of @func{case} explicitly tests for @code{else} using
+@func{free-identifier=?}.
+
+@example
+(define-syntax case
+  (lambda (x)
+    (syntax-case x ()
+      ((_ e0 ((k ...) e1 e2 ...) ...
+          (else-key else-e1 else-e2 ...))
+       (and (identifier? #'else-key)
+            (free-identifier=? #'else-key #'else))
+       #'(let ((t e0))
+           (cond
+            ((memv t '(k ...)) e1 e2 ...)
+            ...
+            (else else-e1 else-e2 ...))))
+      ((_ e0 ((ka ...) e1a e2a ...)
+          ((kb ...) e1b e2b ...) ...)
+       #'(let ((t e0))
+           (cond
+            ((memv t '(ka ...)) e1a e2a ...)
+            ((memv t '(kb ...)) e1b e2b ...)
+            ...))))))
+@end example
+
+With either definition of @func{case}, @code{else} is not recognized as
+an auxiliary keyword if an enclosing lexical binding for @code{else}
+exists.  For example,
+
+@example
+(let ((else @false{}))
+  (case 0 (else (write "oops"))))    => exception &syntax
+@end example
+
+@noindent
+since @code{else} is bound lexically and is therefore not the same
+@code{else} that appears in the definition of @func{case}.
 @end deffn
 
 @node Multiple values, Symbols and namespaces, Syntax, Top

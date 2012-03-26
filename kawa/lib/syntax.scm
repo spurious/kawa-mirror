@@ -20,7 +20,7 @@
      ((define-syntax-case name literals . parts)
       (define-syntax name
         (lambda (form)
-      (syntax-case form literals . parts))))))
+          (syntax-case form literals . parts))))))
 
 (define-syntax when (syntax-rules ()
 				  ((when cond exp ...)

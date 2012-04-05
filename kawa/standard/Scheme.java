@@ -881,8 +881,8 @@ public class Scheme extends LispLanguage
 
   public String getCompilationClass () { return "kawa.standard.SchemeCompilation"; }
 
-  /** Evalutate Scheme expressions from string.
-   * @param string the string constaining Scheme expressions
+  /** Evaluate Scheme expressions from string.
+   * @param string the string containing Scheme expressions
    * @param env the Environment to evaluate the string in
    * @return result of last expression, or Language.voidObject if none. */
   public static Object eval (String string, Environment env)
@@ -890,7 +890,7 @@ public class Scheme extends LispLanguage
     return eval (new CharArrayInPort(string), env);
   }
 
-  /** Evalutate Scheme expressions from stream.
+  /** Evaluate Scheme expressions from stream.
    * @param port the port to read Scheme expressions from
    * @param env the Environment to evaluate the string in
    * @return result of last expression, or Language.voidObject if none. */
@@ -932,7 +932,7 @@ public class Scheme extends LispLanguage
       }
   }
 
-  /** Evalutate Scheme expressions from an "S expression."
+  /** Evaluate Scheme expressions from an "S expression."
    * @param sexpr the S expression to evaluate
    * @param env the Environment to evaluate the string in
    * @return result of the expression. */
@@ -958,13 +958,17 @@ public class Scheme extends LispLanguage
 
   public static final AbstractFormat writeFormat = new DisplayFormat(true, 'S');
   public static final AbstractFormat sharedWriteFormat = new DisplayFormat(true, 'S');
+  // WRITE checks for circular references by default, DISPLAY does not.
   static { ((DisplayFormat) sharedWriteFormat).checkSharing = true; }
   public static final AbstractFormat displayFormat = new DisplayFormat(false, 'S');
+  
+  @Override
   public AbstractFormat getFormat(boolean readable)
   {
     return readable ? writeFormat : displayFormat;
   }
 
+  @Override
   public LispReader getLexer(InPort inp, SourceMessages messages)
   {
     LispReader reader = super.getLexer(inp, messages);
@@ -974,6 +978,7 @@ public class Scheme extends LispLanguage
     return reader;
   }
 
+  @Override
   public int getNamespaceOf (Declaration decl)
   {
     return FUNCTION_NAMESPACE+VALUE_NAMESPACE;

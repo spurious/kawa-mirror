@@ -39,7 +39,7 @@ public class LitTable implements ObjectOutput
 
   int literalsCount;
 
-  /** Rembembers literals to initialize (in <clinit>). */
+  /** Remembers literals to initialize (in <clinit>). */
   Literal literalsChain;
 
   public LitTable(Compilation comp)

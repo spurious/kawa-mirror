@@ -1622,7 +1622,7 @@
 	* CodeAttr.java (assignConstants):  Handle CodeFragments, labels here.
 	* Method.java (assign_constants):  REname to assignConstants.
 
-2000-11-21  Brian R. Lewis <brlewis@users.sourceforge.net>
+2000-11-21  Bruce R. Lewis <brlewis@users.sourceforge.net>
 
 	* ArrayClassLoader.java:  Handle custom classloader by using
 	Class.forName() instead of findSystemClass().

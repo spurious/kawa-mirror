@@ -17,12 +17,11 @@ public class ReferenceExp extends AccessExp
   /** Unique id number, to ease print-outs and debugging. */
   int id = ++counter;
 
-  public static final int DONT_DEREFERENCE = NEXT_AVAIL_FLAG;
-  public static final int PROCEDURE_NAME = NEXT_AVAIL_FLAG << 1;
-  public static final int PREFER_BINDING2 = NEXT_AVAIL_FLAG << 2;
+  public static final int DONT_DEREFERENCE = AccessExp.NEXT_AVAIL_FLAG;
+  public static final int PROCEDURE_NAME = AccessExp.NEXT_AVAIL_FLAG<<1;
   /** Flag indicates a reference to a type name. */
-  public static final int TYPE_NAME = NEXT_AVAIL_FLAG << 3;
-  public static final int ALLOCATE_ON_STACK_LAST = NEXT_AVAIL_FLAG << 4;
+  public static final int TYPE_NAME = AccessExp.NEXT_AVAIL_FLAG<<2;
+  public static final int ALLOCATE_ON_STACK_LAST = AccessExp.NEXT_AVAIL_FLAG<<3;
 
   /** Links in list headed by {@see LambdaExp#siblingReferences}. */
   ReferenceExp siblingReferencesNext;

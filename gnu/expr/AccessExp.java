@@ -9,6 +9,13 @@ import gnu.mapping.*;
 
 public abstract class AccessExp extends Expression
 {
+    /** Prefer the function binding rather than the value binding.
+     * This applies to languages like Common Lisp (and Java) that
+     * have separate namespaces for values/fields and functions/methods.
+     */
+    public static final int PREFER_BINDING2 = Expression.NEXT_AVAIL_FLAG;
+    public static final int NEXT_AVAIL_FLAG = Expression.NEXT_AVAIL_FLAG << 1;
+
   /** The name of the variable to set - either a String or a Symbol. */
   Object symbol;
   /** If non-null, the local Declaration this refers to. */

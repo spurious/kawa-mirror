@@ -1,3 +1,7 @@
+2012-04-05  Per Bothner  <per@bothner.com>
+
+	* setq.java (rewriteForm): Don't incorrect set PREFER_BINDING2.
+
 2011-04-25  Per Bothner  <per@bothner.com>
 
 	* Lisp2Compilation.java: Fix package to gnu.commonlisp.lang.

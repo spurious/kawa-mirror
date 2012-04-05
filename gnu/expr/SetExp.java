@@ -48,12 +48,11 @@ public class SetExp extends AccessExp
   public final Expression getNewValue() { return new_value; }
   public void setNewValue(Expression newValue) { this.new_value = newValue; }
 
-  public static final int DEFINING_FLAG = NEXT_AVAIL_FLAG;
-  public static final int GLOBAL_FLAG = NEXT_AVAIL_FLAG << 1;
-  public static final int PREFER_BINDING2 = NEXT_AVAIL_FLAG << 2;
-  public static final int PROCEDURE = NEXT_AVAIL_FLAG << 3;
-  public static final int SET_IF_UNBOUND = NEXT_AVAIL_FLAG << 4;
-  public static final int HAS_VALUE = NEXT_AVAIL_FLAG << 5;
+  public static final int DEFINING_FLAG = AccessExp.NEXT_AVAIL_FLAG;
+  public static final int GLOBAL_FLAG = AccessExp.NEXT_AVAIL_FLAG << 1;
+  public static final int PROCEDURE = AccessExp.NEXT_AVAIL_FLAG << 2;
+  public static final int SET_IF_UNBOUND = AccessExp.NEXT_AVAIL_FLAG << 3;
+  public static final int HAS_VALUE = AccessExp.NEXT_AVAIL_FLAG << 4;
 
   public final boolean isDefining ()
   {

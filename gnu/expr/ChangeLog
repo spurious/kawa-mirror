@@ -1,3 +1,9 @@
+2012-04-05  Per Bothner  <per@bothner.com>
+
+	* ReferenceExp.java (PREFER_BINDING2): Move flag from here ...
+	* SetExp.java (PREFER_BINDING2): .. and here ...
+	* AccessExp.java (PREFER_BINDING2): ... to common super-class here.
+
 2012-03-21  Per Bothner  <per@bothner.com>
 
 	* Language.java (unionType): Handle Type.neverReturnsType.

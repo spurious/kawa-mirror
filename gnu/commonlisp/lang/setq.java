@@ -36,7 +36,6 @@ public class setq extends Syntax
 	Expression value = tr.rewrite(pair.getCar());
 	obj = pair.getCdr();
 	SetExp sexp = new SetExp(name, value);
-	sexp.setFlag(SetExp.PREFER_BINDING2);
 	if (obj == LList.Empty)
 	  {
 	    sexp.setHasValue(true);

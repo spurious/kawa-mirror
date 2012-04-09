@@ -1,22 +1,5 @@
-R. Alexander Milowski wrote the original Kawa, as an interpreter.
-Per Bothner re-wrote Kawa as a compiler, and the current Kawa has
-probably none of Milowski's code left - only the name remains.
-Other people have contributed small amounts - see ChangeLog entries.
+Many people have contributed to Kawa.
+See the "Acknowledgement"s section of doc/kawa.texi .
+This is mirrored on http://www.gnu.org/software/kawa/Acknowledgements.html
+when there is a new release.
 
-Have looked thorough gnu.bytecode, gnu.math ChangeLogs - TO-DO OTHER PACKAGES.
-
-Geoff Berry  <gcb@duke.edu>: Handle Exceptions attribute.  Other improvements.
-Daniel Bonniot  <bonniot@users.sourceforge.net>:  Various small fixes
-  and additions to to gnu.bytecode.
-Marc Feeley: srfi-0 (cond-expand macro)
-Lars T Hansen: srfi-11 (let-values, let*-values macros)
-Thomas Kirk  <tk@research.att.com>  ZipLoader improvements
-Brian R. Lewis <brlewis@users.sourceforge.net>:  ArrayClassLoader, ZipLoader
-  improvements.
-Al Petrofsky <albatros@wco.com>: Improve gnu.math printing.
-  New IntNum methods.
-Ola Rinta-Koski  <ola@cyberell.com>:  ValueStack bug-fix.
-Olin Shivers:  SRFI-1 list-processing library.
-John David Stone: srfi-8 (receive macro)
-Marco Vezzoli <marco.vezzoli@st.com>:  SRFI-1 tailoring for Kawa.
-Albert Ting - old GuiConsole code.

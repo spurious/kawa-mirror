@@ -157,14 +157,7 @@ are used by Kawa, and distributed with it, but may be independently useful.
 For copyright information on the software and documentation,
 see @ref{License}.
 
-The author of Kawa is
-@uref{http://per.bothner.com/,Per Bothner}
-@email{per@@bothner.com}.
-Thanks to @uref{http://www.brainfood.com/,Brainfood}
-and @uref{http://www.mercedsystems.com/,Merced Systems} for support in
-developing Kawa.
-Kawa is a re-write of Kawa 0.2, which was written by
-R. Alexander Milowski @email{alex@@milowski.com}.
+Various people and orgnizations @ref{Acknowledgements,have contributed to Kawa}.
 
 This package has nothing to do with the defunct Kawa commercial Java IDE.
 
@@ -12592,6 +12585,7 @@ uses @code{write} rather than @code{display}.
 @menu
 * Reporting bugs::       Where to report bugs
 * Mailing lists::        Where to discuss changes, etc
+* Acknowledgements::     Acknowledgements and thanks
 * Support::              Technical support for Kawa
 * Projects::             Projects using Kawa
 * Ideas and tasks::      Ideas and tasks for contributing to Kawa
@@ -12633,8 +12627,187 @@ There are separate mailing lists for
 @uref{http://mail.gnu.org/mailman/listinfo/qexo-general, Qexo}
 and @uref{http://lists.sourceforge.net/mailman/listinfo/jemacs-info,JEmacs}.
 
+@node Acknowledgements
+@section Acknowledgements and thanks
 
-@node Support, Projects, Mailing lists, Community
+The author and project leader of Kawa is
+@uref{http://per.bothner.com/,Per Bothner}
+@email{per@@bothner.com}.
+
+Kawa is a re-write of Kawa 0.2, which was a Scheme interpreter written by
+R. Alexander Milowski @email{alex@@milowski.com}.
+
+Thanks to Cygnus Solutions (now part of Red Hat) for sponsoring
+the initial development of Kawa, and then transferring
+their ownership interest to Per.
+
+@subsubsection Financial support
+
+Ean Schuessler and @uref{http://www.brainfood.com/,Brainfood}
+provided financial support and encouragement.
+
+Thanks to Chris Dean, Dean Ferreyra, and others
+at @uref{http://www.mercedsystems.com/,Merced Systems} for financial
+support and other contributions.
+
+@uref{http://google.com/,Google} through their
+@uref{http://code.google.com/soc/,Summer of Code} project
+sponsored Charles Turner's work Summer 2011.
+
+Thomas Kirk and AT&T provided financial support, and useful bug reports.
+
+@subsubsection Various contributions
+
+@uref{http://jcubic.pl/,Jakub Jankiewicz} contributed the Kawa logo.
+
+Helmut Eller provided SLIME support, syntaxutils.scm, and many bug reports.
+
+Daniel Bonniot for multiple small improvements
+to gnu.bytecode and gnu.expr.
+
+Jamison Hope for multiple contributions,
+including the SRFI-14 implementation, and Google Summer of Code mentoring.
+
+Jim White for Ant support and other improvements.
+
+Bruce R. Lewis implemented @ref{KRL,,KRL} and made other contributions.
+
+Geoff Berry: Handle Exceptions attribute.  Other improvements.
+
+Shad Gregory improved JEmacs.
+
+Al Petrofsky improved gnu.math printing and added some IntNum methods.
+
+Marco Vezzoli:  SRFI-1 tailoring for Kawa.
+
+Albert Ting - old GuiConsole code.
+
+Christian Surlykke ported JEmacs to use SWT.
+
+Geoff Berry for various gnu.bytecode improvements.
+
+Ivelin Ivanov and Tom Reilly for servlet support.
+
+Anthony Green for Fedora packaging.
+
+Charles Turner for pretty-printer improvements and other changes.
+
+@subsubsection Small fixes and improvements
+
+Patrick Barta;
+Joseph Bowbeer;
+Dominique Boucher;
+Alexander Bunkenburg;
+Harold Carr;
+Emmanuel Castro;
+Heather Downs;
+Francisco Vides Fernández;
+Nic Ferrier;
+Oliver Flasch;
+Weiqi Gao;
+Luke Gorrie;
+Mario Domenech Goulart;
+Zvi Har'E;
+Jeff Haynes;
+Ethan Herdrick;
+Joerg-Cyril Hoehle;
+Elliott Hughes;
+Mike Kenne;
+Brian Jones;
+Gerardo Jorvilleur;
+Simon Josefsson (JEmacs menu);
+Thomas Kirk;
+Jay Krell;
+Edouard Parmelan;
+Walter C. Pelissero;
+Rafael Jesus Alcantara Perez;
+Lynn Quam;
+Marcus Otto;
+Terje Pedersen (some XQuery functions);
+Matthias Radestock;
+Ola Rinta-Koski;
+Andreas Schlapbach;
+Robert D. Skeels;
+Benny Tsai;
+Vladimir Tsichevski;
+Phil Walker;
+Knut Wannheden;
+Chris Wegrzyn.
+
+@subsubsection Bug reports and test cases
+
+Khairul Azhar;
+Bob Bane;
+Hans Boehm;
+Brian D. Carlstrom;
+Luis Casillas;
+Ken Dickey (format tests);
+Helge Dietert;
+Allan Erskine;
+Marc Feeley (polytype.scm);
+Margus Freudenthal;
+Weiqi Gao;
+Andrea Girotto;
+Norman Hard;
+Gerardo Horvilleur;
+Yaroslav Kavenchuk;
+Felix S Klock II;
+Francois Leygues;
+Mirko Luedde;
+Leonardo Valeri Manera;
+Kjetil S. Matheussen;
+Alex Mitchell;
+Edouard Parmelan;
+Walter C. Pelissero;
+Stephen L. Peters;
+François Pinard;
+Bill Robinson;
+Dan Stanger (Eaton Vance);
+Hallvard Traetteberg;
+Taylor Venable;
+Alessandro Vernet;
+Tony White
+John Whittaker;
+Robert Yokota.
+
+@subsubsection Code ported from other packages
+
+Kawa includes Free Software originally written for other purposes,
+but incorporated into Kawa, perhaps with some porting.  A partial list:
+
+Marc Feeley wrote SRFI-0 (cond-expand macro).
+
+Dorai Sitaram wrote pregexp.
+
+The @code{rationalize} algorithm is by Alan Bawden and Marc Feeley.
+
+Lars T Hansen wrote SRFI-11 (let-values, let*-values macros).
+
+Olin Shivers wrote the SRFI-1 list-processing library,
+and the SRFI-13 reference impementation.
+
+John David Stone wrote SRFI-8 (receive macro)
+
+Jussi Piitulainen wrote the SRFI-25 specification and tests.
+
+Richard Kelsey and Michael Sperber wrote SRFI-34.
+
+Anthony Carrico wrote the SRFI-37 reference implementation.
+
+Panu Kalliokoski wrote the SRFI-69 reference implementation.
+
+Donovan Kolbly wrote the srfi-64 ``meta'' testsuite.
+Alex Shinn improved SRFI-64 portability.
+
+Philip L. Bewig wrote the SRFI-41 (streams) specification and
+reference implementation.
+
+Simon Tatham wrote listsort.
+
+Aubrey Jaffer wrote much of SLIB, some of which has been
+imnported into gnu.kawa.slib.
+
+@node Support
 @section Technical Support for Kawa
 
 If you have a project that depends on Kawa or one of its component

@@ -1900,44 +1900,47 @@ Syntax'':
 @stxdef{kawa-abbreviation} XXX
 @end display
 
-The following are abbreviations:
+The following abbreviations are expanded at read-time:
 
 @table @asis
 @item @stxlit{'}@meta{datum}     
-for @code{(quote @meta{datum})},
+means @stxlit{(quote} @meta{datum}@stxlit{)}.
 
 @item @stxlit{`}@meta{datum}     
-for @code{(quasiquote @meta{datum})},
+means @stxlit{(quasiquote} @meta{datum}@stxlit{)}.
 
-@item @stxlit{,}@meta{datum}     
-for @code{(unquote @meta{datum})},
+@item @stxlit{,}@meta{datum}
+means @stxlit{(unquote} @meta{datum}@stxlit{)}.
 
 @item @stxlit{,@@}@meta{datum}     
-for @code{(unquote-splicing @meta{datum})},
+means @stxlit{(unquote-splicing} @meta{datum}@stxlit{)}.
 
 @item @stxlit{#'}@meta{datum}     
-for @code{(syntax @meta{datum})}
+means @stxlit{(syntax} @meta{datum}@stxlit{)}.
 
 @item @stxlit{#`}@meta{datum}     
-for @code{(quasisyntax @meta{datum})}.
+means @stxlit{(quasisyntax} @meta{datum}@stxlit{)}.
+
+@item @stxlit{#,}@meta{datum}
+means @stxlit{(unsyntax} @meta{datum}@stxlit{)}.
+This abbreviation is currently only recognized when nested inside an explicit
+@stxlit{#`}@meta{datum} form,
+because of a conflict with SRFI-10 named constructors.
+
+@item @stxlit{#,@@}@meta{datum}
+means @stxlit{(unsyntax-splicing} @meta{datum}@stxlit{)}.
 
 @item @meta{datum1}@stxlit{:}@meta{datum2}
-for @code{($lookup$ @meta{datum1} (quasiquote @meta{datum2}))}
+means @stxlit{($lookup$} @meta{datum1} @stxlit{(quasiquote} @meta{datum2}@stxlit{))}.
 @xref{Colon notation}.
 
 @item @stxlit{[}@meta{expression} ...@stxlit{]}
-for @code{($bracket-list$ @meta{expression} ...)}
+means @stxlit{($bracket-list$} @meta{expression} ...@stxlit{)}.
 
 @item @meta{operator}@stxlit{[}@meta{expression} ...@stxlit{]}
-for @code{($bracket-apply$ @meta{operator} @meta{expression} ...)}
+means @stxlit{($bracket-apply$} @meta{operator} @meta{expression} ...@stxlit{)}.
 
-@c FIXME
-@c @item @stxlit{#,}@meta{datum}     
-@c for @code{(unsyntax @meta{datum})}, and
-@c @item @stxlit{#,@@}@meta{datum}
-@c for @code{(unsyntax-splicing @meta{datum})}.
 @end table
-
 
 @node Hash-prefixed forms
 @section Hash-prefixed forms
@@ -1962,6 +1965,16 @@ Convenience syntax for syntax-case macros.
 @item @stxlit{#'}@var{datum}
 Equivalent to @code{(syntax @var{datum})}.
 Convenience syntax for syntax-case macros.
+@item @stxlit{#,}@var{datum}
+Equivalent to @code{(unsyntax @var{datum})}.
+Currently only recognized when inside a @code{#`@var{template}} form. 
+Convenience syntax for syntax-case macros.
+@item @stxlit{#,(}@var{name} @var{datum} ...@stxlit{)}
+Special named constructors.
+This syntax is deprecated, because it conflicts with @code{unsyntax}.
+It is only recognized when @emph{not} in a @code{#`@var{template}} form.
+@item @stxlit{#,@@}@var{datum}
+Equivalent to @code{(unsyntax-splicing @var{datum})}.
 @item @stxlit{#(}
 A vector.
 @item @stxlit{#|}
@@ -1973,8 +1986,6 @@ Start of nested-comment.
 @item @stxlit{#;}@var{datum}
 A datum comment - the @var{datum} is ignored.
 (An @var{interlexeme-space} may appear before the @var{datum}.)
-@item @stxlit{#,(}@var{name} @var{datum} ...@stxlit{)}
-Special named constructors.
 @item @stxlit{#}@var{number}@stxlit{=}@var{datum}
 A reference definition, allowing cyclic and shared structure.
 Equivalent to the @var{datum}, but also defines an association between
@@ -2442,8 +2453,8 @@ path of the source-file containing the @code{include-file}.
 
 Kawa supports most of the @code{syntax-case} feature.
 
-Syjntax definitions are valid wherever definitions are.
-The have the followin form:
+Syntax definitions are valid wherever definitions are.
+They have the following form:
 
 @deffn Syntax define-syntax keyword transformer-spec
 The @var{keyword} is a identifier, and @var{transformer-spec}
@@ -2469,7 +2480,7 @@ in which it is defined.
 @end example
 
 Macros can expand into definitions in any context that permits them.
-However, it is an error for a definitiosn to define an identifier
+However, it is an error for a definition to define an identifier
 whose binding has to be known in order to determine the meaning
 of the definitoion itself, or of any predecing definiton that belongs
 to the same group of internal definitions.
@@ -2477,7 +2488,7 @@ to the same group of internal definitions.
 
 @deffn Syntax define-syntax-case name @stxlit{(}literals@stxlit{)} @stxlit{(}pattern expr@stxlit{)} ...
 A convenience macro to make it easy to define @code{syntax-case}-style macros.
-Defines a macros with the given @var{name} and list of @var{literals}.
+Defines a macro with the given @var{name} and list of @var{literals}.
 Each @var{pattern} has the form of a @code{syntax-rules}-style pattern,
 and it is matched against the macro invocation syntax form.
 When a match is found, the corresponding @var{expr} is evaluated.
@@ -2723,13 +2734,316 @@ exists.  For example,
 
 @example
 (let ((else @false{}))
-  (case 0 (else (write "oops"))))    => exception &syntax
+  (case 0 (else (write "oops"))))    @result{} @i{syntax error}
 @end example
 
 @noindent
 since @code{else} is bound lexically and is therefore not the same
 @code{else} that appears in the definition of @func{case}.
 @end deffn
+
+@subsubsection Syntax-object and datum conversions
+
+@deffn Procedure {syntax->datum} @var{syntax-object}
+@deffnx {Deprecated procedure} {syntax-object->datum} @var{syntax-object}
+Strip all syntactic information from a syntax object and returns the
+corresponding Scheme datum.
+
+Identifiers stripped in this manner are converted to their symbolic
+names, which can then be compared with @func{eq?}.  Thus, a predicate
+@code{symbolic-identifier=?} might be defined as follows.
+
+@example
+(define symbolic-identifier=?
+  (lambda (x y)
+    (eq? (syntax->datum x)
+         (syntax->datum y))))
+@end example
+@end deffn
+
+@deffn Procedure {datum->syntax} @var{template-id} @var{datum}
+@deffnx {Deprecated procedure} {datum->syntax-object} @var{datum}
+@var{template-id} must be a template identifier and @var{datum} should
+be a datum value.
+
+The @func{datum->syntax} procedure returns a syntax-object
+representation of @var{datum} that contains the same contextual
+information as @var{template-id}, with the effect that the syntax object
+behaves as if it were introduced into the code when @var{template-id}
+was introduced.
+
+The @func{datum->syntax} procedure allows a transformer to ``bend''
+lexical scoping rules by creating @emph{implicit identifiers} that
+behave as if they were present in the input form, thus permitting the
+definition of macros that introduce visible bindings for or references
+to identifiers that do not appear explicitly in the input form.  For
+example, the following defines a @func{loop} expression that uses this
+controlled form of identifier capture to bind the variable @code{break}
+to an escape procedure within the loop body.  (The derived
+@func{with-syntax} form is like @func{let} but binds pattern variables.)
+
+
+@example
+(define-syntax loop
+  (lambda (x)
+    (syntax-case x ()
+      ((k e ...)
+       (with-syntax
+           ((break (datum->syntax #'k 'break)))
+         #'(call-with-current-continuation
+             (lambda (break)
+               (let f () e ... (f)))))))))
+
+(let ((n 3) (ls '()))
+  (loop
+    (if (= n 0) (break ls))
+    (set! ls (cons 'a ls))
+    (set! n (- n 1))))
+@result{} (a a a)
+@end example
+
+Were @code{loop} to be defined as:
+
+@example
+(define-syntax loop
+  (lambda (x)
+    (syntax-case x ()
+      ((_ e ...)
+       #'(call-with-current-continuation
+           (lambda (break)
+             (let f () e ... (f))))))))
+@end example
+
+@noindent
+the variable @code{break} would not be visible in @code{e ...}.
+
+The datum argument @var{datum} may also represent an arbitrary Scheme
+form, as demonstrated by the following definition of @func{include}.
+
+@example
+(define-syntax include
+  (lambda (x)
+    (define read-file
+      (lambda (fn k)
+        (let ((p (open-file-input-port fn)))
+          (let f ((x (get-datum p)))
+            (if (eof-object? x)
+                (begin (close-port p) '())
+                (cons (datum->syntax k x)
+                      (f (get-datum p))))))))
+    (syntax-case x ()
+      ((k filename)
+       (let ((fn (syntax->datum #'filename)))
+         (with-syntax (((exp ...)
+                        (read-file fn #'k)))
+           #'(begin exp ...)))))))
+@end example
+
+@code{(include "filename")} expands into a @func{begin} expression
+containing the forms found in the file named by @code{"filename"}.  For
+example, if the file @file{flib.ss} contains:
+
+@example
+(define f (lambda (x) (g (* x x))))
+@end example
+
+@noindent
+and the file @file{glib.ss} contains:
+
+@example
+(define g (lambda (x) (+ x x)))
+@end example
+
+@noindent
+the expression:
+
+@example
+(let ()
+  (include "flib.ss")
+  (include "glib.ss")
+  (f 5))
+@end example
+
+@noindent
+evaluates to @code{50}.
+
+The definition of @func{include} uses @func{datum->syntax} to convert
+the objects read from the file into syntax objects in the proper lexical
+context, so that identifier references and definitions within those
+expressions are scoped where the @func{include} form appears.
+
+Using @func{datum->syntax}, it is even possible to break hygiene
+entirely and write macros in the style of old Lisp macros.  The
+@func{lisp-transformer} procedure defined below creates a transformer
+that converts its input into a datum, calls the programmer's procedure
+on this datum, and converts the result back into a syntax object scoped
+where the original macro use appeared.
+
+@example
+(define lisp-transformer
+  (lambda (p)
+    (lambda (x)
+      (syntax-case x ()
+        ((kwd . rest)
+         (datum->syntax #'kwd
+           (p (syntax->datum x))))))))
+@end example
+@end deffn
+
+@subsubsection Convenience forms
+
+@deffn Syntax with-syntax ((@var{pattern} @stxref{expression}) @dots{}) @stxref{body}
+The @func{with-syntax} form is used to bind pattern variables, just as
+@func{let} is used to bind variables.  This allows a transformer to
+construct its output in separate pieces, then put the pieces together.
+
+Each @var{pattern} is identical in form to a @func{syntax-case}
+pattern.  The value of each @var{expression} is computed and
+destructured according to the corresponding @var{pattern}, and pattern
+variables within the @var{pattern} are bound as with
+@func{syntax-case} to the corresponding portions of the value within
+@var{body}.
+
+The @func{with-syntax} form may be defined in terms of
+@func{syntax-case} as follows.
+
+@example
+(define-syntax with-syntax
+  (lambda (x)
+    (syntax-case x ()
+      ((_ ((p e0) ...) e1 e2 ...)
+       (syntax (syntax-case (list e0 ...) ()
+                 ((p ...) (let () e1 e2 ...))))))))
+@end example
+
+The following definition of @func{cond} demonstrates the use of
+@func{with-syntax} to support transformers that employ recursion
+internally to construct their output.  It handles all @func{cond} clause
+variations and takes care to produce one-armed @func{if} expressions
+where appropriate.
+
+@example
+(define-syntax cond
+  (lambda (x)
+    (syntax-case x ()
+      ((_ c1 c2 ...)
+       (let f ((c1 #'c1) (c2* #'(c2 ...)))
+         (syntax-case c2* ()
+           (()
+            (syntax-case c1 (else =>)
+             (((else e1 e2 ...) #'(begin e1 e2 ...))
+              ((e0) #'e0)
+              ((e0 => e1)
+               #'(let ((t e0)) (if t (e1 t))))
+              ((e0 e1 e2 ...)
+               #'(if e0 (begin e1 e2 ...)))))
+           ((c2 c3 ...)
+            (with-syntax ((rest (f #'c2 #'(c3 ...))))
+              (syntax-case c1 (=>)
+                ((e0) #'(let ((t e0)) (if t t rest)))
+                ((e0 => e1)
+                 #'(let ((t e0)) (if t (e1 t) rest)))
+                ((e0 e1 e2 ...)
+                 #'(if e0 
+                        (begin e1 e2 ...)
+                        rest)))))))))))
+@end example
+@end deffn
+
+@deffn Syntax quasisyntax @var{template}
+@deffnx {Auxiliary Syntax} unsyntax
+@deffnx {Auxiliary Syntax} unsyntax-splicing
+The @func{quasisyntax} form is similar to @func{syntax}, but it allows
+parts of the quoted text to be evaluated, in a manner similar to the
+operation of @func{quasiquote}.
+
+Within a @func{quasisyntax} @var{template}, subforms of @func{unsyntax}
+and @func{unsyntax-splicing} forms are evaluated, and everything else is
+treated as ordinary template material, as with @func{syntax}.
+
+The value of each @func{unsyntax} subform is inserted into the output in
+place of the @func{unsyntax} form, while the value of each
+@func{unsyntax-splicing} subform is spliced into the surrounding list or
+vector structure.  Uses of @func{unsyntax} and @func{unsyntax-splicing}
+are valid only within @func{quasisyntax} expressions.
+
+A @func{quasisyntax} expression may be nested, with each
+@func{quasisyntax} introducing a new level of syntax quotation and each
+@func{unsyntax} or @func{unsyntax-splicing} taking away a level of
+quotation.  An expression nested within @emph{n} @func{quasisyntax}
+expressions must be within @emph{n} @emph{unsyntax} or
+@func{unsyntax-splicing} expressions to be evaluated.
+
+As noted in @stxref{abbreviation}, @code{#`@var{template}} is equivalent to
+@code{(quasisyntax @var{template})}, @code{#,@var{template}} is
+equivalent to @code{(unsyntax @var{template})}, and
+@code{#,@@@var{template}} is equivalent to @code{(unsyntax-splicing
+@var{template})}.  @emph{Note} that for backwards compatibility,
+you should only use @code{#,@var{template}} inside a literal @code{#`@var{template}} form.
+
+The @func{quasisyntax} keyword can be used in place of
+@func{with-syntax} in many cases.  For example, the definition of
+@func{case} shown under the description of @func{with-syntax} above can
+be rewritten using @func{quasisyntax} as follows.
+
+@example
+(define-syntax case
+  (lambda (x)
+    (syntax-case x ()
+      ((_ e c1 c2 ...)
+       #`(let ((t e))
+           #,(let f ((c1 #'c1) (cmore #'(c2 ...)))
+               (if (null? cmore)
+                   (syntax-case c1 (else)
+                     ((else e1 e2 ...)
+                      #'(begin e1 e2 ...))
+                     (((k ...) e1 e2 ...)
+                      #'(if (memv t '(k ...))
+                            (begin e1 e2 ...))])
+                   (syntax-case c1 ()
+                     (((k ...) e1 e2 ...)
+                      #`(if (memv t '(k ...))
+                            (begin e1 e2 ...)
+                            #,(f (car cmore)
+                                  (cdr cmore))))))))))))
+@end example
+                          
+@c ((Unknown if this works))
+@c Uses of @func{unsyntax} and @func{unsyntax-splicing} with zero or more
+@c than one subform are valid only in splicing (list or vector) contexts.
+@c @code{(unsyntax @var{template} @dots{})} is equivalent to
+@c @code{(unsyntax @var{template}) ...}, and @code{(unsyntax-splicing
+@c @var{template} ...)} is equivalent to @code{(unsyntax-splicing
+@c @var{template}) ...}.  These forms are primarily useful as intermediate
+@c forms in the output of the @func{quasisyntax} expander.
+@c 
+@c @quotation
+@c @emph{Note:} Uses of @func{unsyntax} and @func{unsyntax-splicing} with
+@c zero or more than one subform enable certain idioms, such as
+@c @code{#,@@#,@@}, which has the effect of a doubly indirect splicing when
+@c used within a doubly nested and doubly evaluated @func{quasisyntax}
+@c expression.
+@c @end quotation
+@end deffn
+
+@quotation
+@emph{Note:} Any @func{syntax-rules} form can be expressed with
+@func{syntax-case} by making the @func{lambda} expression and
+@func{syntax} expressions explicit, and @func{syntax-rules} may be
+defined in terms of @func{syntax-case} as follows.
+
+@example
+(define-syntax syntax-rules
+  (lambda (x)
+    (syntax-case x ()
+      ((_ (lit ...) ((k . p) t) ...)
+       (for-all identifier? #'(lit ... k ...))
+       #'(lambda (x)
+           (syntax-case x (lit ...)
+             ((_ . p) #'t) ...))))))
+@end example
+@end quotation
+
 
 @node Multiple values, Symbols and namespaces, Syntax, Top
 @chapter Multiple values

@@ -50,7 +50,7 @@ public class SyntaxForms {
     public static boolean identifierEquals (Object id1, Object id2, boolean checkBound) {
         Compilation comp = (Translator) Compilation.getCurrent();
         Object s1, s2;
-        ScopeExp sc1, sc2;
+        TemplateScope sc1, sc2;
         if (id1 instanceof SyntaxForm) {
             SyntaxForm sf = (SyntaxForm) id1;
             s1 = sf.getDatum();
@@ -69,13 +69,15 @@ public class SyntaxForms {
             s2 = id2;
             sc2 = null;
         }
-
         if (s1 != s2)
             return false;
         if (sc1 == sc2)
             return true;
-        if (checkBound)
-            return false;
+        if (checkBound) {
+            Object mark1 = sc1 != null ? sc1.macroMark : null;
+            Object mark2 = sc2 != null ? sc2.macroMark : null;
+            return mark1 == mark2;
+        }
         ScopeExp savedScope = comp.currentScope();
         if (sc1 != null)
             comp.setCurrentScope(sc1);

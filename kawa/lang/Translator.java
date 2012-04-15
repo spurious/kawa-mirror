@@ -41,6 +41,14 @@ public class Translator extends Compilation
 
   public Declaration templateScopeDecl;
 
+  /** A "mark" created for the current macro application.
+   * This is (more-or-less) the mark specified by the syntax-case
+   * specification (in r6rs-lib), applied to the output of a transformer.
+   * However, instead of "applying" a mark to the transformer output,
+   * we remember in the TemlateScope an object unique to the application.
+   */
+  Object currentMacroMark = null;
+
   /** A variable to hold the matched values for syntax-case
    * pattern variables. */
   public Declaration matchArray;

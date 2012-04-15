@@ -1,3 +1,16 @@
+2012-04-14  Per Bothner  <per@bothner.com>
+
+	Add "marks" to TemplateScope, match syntax-case spec.
+	Each mark corresponds to an application of a macro.
+	Fixes Savannah bug #35552: "bound-identifier=?".
+	* lang/TemplateScope.java (macroMark): New field.
+	(make): Set macroMark field.
+	* lang/Translator.java (currentMacroMark): New field.
+	* lang/Macro.java (expand): Create new mark and save it in
+	currentMacroMark field.
+	* lang/SyntaxForms.java (identifierEquals): In the bound-identifier=?
+	case compare marks from TemplateScope.
+
 2012-03-25  Per Bothner  <per@bothner.com>
 
 	* standard/let.java (rewrite): Check for duplicate definitions.

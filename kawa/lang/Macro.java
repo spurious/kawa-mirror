@@ -139,6 +139,8 @@ public class Macro extends Syntax implements Printable, Externalizable
 
   public Object expand (Object form, Translator tr)
   {
+    Object savedMacroMark = tr.currentMacroMark;
+    tr.currentMacroMark = new Object();
     try
       {
 	Procedure pr;
@@ -208,6 +210,10 @@ public class Macro extends Syntax implements Printable, Externalizable
       {
         return tr.syntaxError("evaluating syntax transformer '"
                               + getName() + "' threw " + ex);
+      }
+    finally
+      {
+        tr.currentMacroMark = savedMacroMark;
       }
   }
 

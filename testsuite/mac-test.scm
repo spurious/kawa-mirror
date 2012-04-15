@@ -1,4 +1,4 @@
-(test-init "macros" 116)
+(test-init "macros" 117)
 
 (test 'ok 'letxx (let ((xx #f)) (cond (#t xx 'ok))))
 
@@ -713,6 +713,9 @@
                       ((_ b)
                        #'(let ((a 3) (b 4)) (+ a b)))))))
         (dolet a)))
+;; Savannah bug #35552: bound-identifier=?
+(test #t 'bound-identifier-5
+      (bound-identifier=? #'+ #'+))
 
 (define-syntax my-case
   (lambda (x)

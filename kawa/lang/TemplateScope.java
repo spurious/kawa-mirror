@@ -16,6 +16,9 @@ public class TemplateScope extends LetExp implements Externalizable
    * This is used to setContextDecl() of such references. */
   Declaration macroContext;
 
+  /** See Translator#currentMacroMark. */
+  Object macroMark;
+
   private Syntax syntax; // Only used for debugging
 
   public TemplateScope ()
@@ -35,6 +38,7 @@ public class TemplateScope extends LetExp implements Externalizable
     public static TemplateScope make (Translator tr) {
         TemplateScope templateScope = new TemplateScope();
         if (tr != null) {
+            templateScope.macroMark = tr.currentMacroMark;
             Syntax curSyntax = tr.getCurrentSyntax();
             if (curSyntax instanceof Macro) {
                 templateScope.outer = ((Macro) curSyntax).getCapturedScope();

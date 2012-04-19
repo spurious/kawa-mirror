@@ -74,6 +74,16 @@ public class SyntaxForms {
         if (sc1 == sc2)
             return true;
         if (checkBound) {
+            // Note that SRFI-72 specifies:
+            // (bound-identifier=? (syntax x) (syntax x)) => #f
+            // but MzScheme/Rackets and Chez Scheme return #t.
+            // SRFI-72 says: "Two identifiers will also be bound-identifier=?
+            // if they were produced from existing bound-identifier=?
+            // identifiers during a single evaluation of the same syntax or
+            // quasisyntax form ..."
+            // but R6RS specifies bound-identifier=? in terms of "marks"
+            // which are applied when a transformer is applied, thus two
+            // syntax forms in the same transformer have the same marks.
             Object mark1 = sc1 != null ? sc1.macroMark : null;
             Object mark2 = sc2 != null ? sc2.macroMark : null;
             return mark1 == mark2;

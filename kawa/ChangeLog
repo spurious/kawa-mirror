@@ -1,3 +1,8 @@
+2012-04-18  Per Bothner  <per@bothner.com>
+
+	* lang/SyntaxTemplate.java (convert_template): Convert SyntaxForm
+	symbol to itself. This fixes Savanannah bug #35526 "Nested macro".
+
 2012-04-14  Per Bothner  <per@bothner.com>
 
 	Add "marks" to TemplateScope, match syntax-case spec.

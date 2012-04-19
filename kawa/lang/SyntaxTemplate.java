@@ -344,14 +344,16 @@ public class SyntaxTemplate implements Externalizable
 	  }
 	// else treated quoted symbol as literal:
       }
+    if (form instanceof Symbol)
+      tr.noteAccess(form, tr.currentScope());
+    if (syntax != null)
+      form = syntax;
     int literals_index = indexOf(literals_vector, form);
     if (literals_index < 0)
       {
 	literals_index = literals_vector.size ();
 	literals_vector.addElement(form);
       }
-    if (form instanceof Symbol)
-      tr.noteAccess(form, tr.currentScope());
     if (! (form instanceof SyntaxForm) && form != dots3)
       template_program.append((char) (BUILD_SYNTAX));
     template_program.append((char) (BUILD_LITERAL + 8 * literals_index));

@@ -1,4 +1,4 @@
-(test-init "macros" 117)
+(test-init "macros" 119)
 
 (test 'ok 'letxx (let ((xx #f)) (cond (#t xx 'ok))))
 
@@ -714,6 +714,8 @@
                        #'(let ((a 3) (b 4)) (+ a b)))))))
         (dolet a)))
 ;; Savannah bug #35552: bound-identifier=?
+;; Note the SRFI-72 specifies the result #f, but MzScheme/Racket
+;; and Chez Scheme both return #t.
 (test #t 'bound-identifier-5
       (bound-identifier=? #'+ #'+))
 
@@ -745,3 +747,29 @@
 (test '("oops") 'my-case-2
       (let ((xy #f))
         (my-case 0 (else (list "oops")))))
+
+;; Savannah bug report #35526, simplified version
+(define-syntax foo-35526a
+   (syntax-rules ()
+    ((foo-35526a bar-id stuff ...)
+     (let ((f (lambda () "+bar+")))
+       (let-syntax ((bar-id (syntax-rules ()
+                              ((bar-id) f))))
+          (list stuff ...))))))
+(define (baz-35526a)
+  (foo-35526a bar (bar) (bar)))
+(test '("+bar+" "+bar+") 'savannah-35526a (baz-35526a))
+
+;; Savannah bug report #35526, original version
+(define-syntax (foo-35526b form)
+  (syntax-case form ()
+    ((foo-id stuff ...)
+     (with-syntax ((bar-id (datum->syntax (syntax foo-id) 'bar)))
+                  (syntax
+        (let ((f (lambda () 'bar2)))
+          (let-syntax ((bar-id (syntax-rules ()
+                                 ((bar-id) f))))
+            (list stuff ...))))))))
+(define (baz-35526b)
+  (foo-35526b (bar) (bar)))
+(test '(bar2 bar2) 'savannah-35526a (baz-35526b))

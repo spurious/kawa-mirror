@@ -1,4 +1,4 @@
-(test-init "macros" 119)
+(test-init "macros" 122)
 
 (test 'ok 'letxx (let ((xx #f)) (cond (#t xx 'ok))))
 
@@ -773,3 +773,17 @@
 (define (baz-35526b)
   (foo-35526b (bar) (bar)))
 (test '(bar2 bar2) 'savannah-35526a (baz-35526b))
+
+;; #35555: Tail-call in syntax-case
+(define (foo-35555 forms)
+  (syntax-case forms ()
+    (((x . y)  . rest)
+     (foo-35555 #'rest))
+    (() #t)
+    (_ #f)))
+(define-syntax bar-35555
+  (lambda (forms)
+    (foo-35555 (cdr forms))))
+(test #t 'bar-35555-1 (bar-35555 (a b) (c d)))
+(test #t 'bar-35555-2 (bar-35555))
+(test #f 'bar-35555-3 (foo-35555 123))

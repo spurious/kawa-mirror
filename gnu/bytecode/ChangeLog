@@ -1,3 +1,7 @@
+2012-04-22  Per Bothner  <per@bothner.com>
+
+	* CodeAttr.java (emitFi): Fix logic for updating unreachability.
+
 2012-02-03  Per Bothner  <per@bothner.com>
 
 	* Field.java (hasConstantValueAttr): New method.

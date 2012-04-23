@@ -71,16 +71,20 @@ public class BlockExp extends Expression
     exitableBlock = bl;
     this.exitTarget = exitBody == null ? target : Target.Ignore;
     body.compileWithPosition(comp, target);
-    if (exitBody != null)
+    Label doneLabel;
+    if (exitBody != null && code.reachableHere())
       {
-        Label doneLabel = new Label(code);
+        doneLabel = new Label(code);
         code.emitGoto(doneLabel);
-        code.endExitableBlock();
-        exitBody.compileWithPosition(comp, target);
-        doneLabel.define(code);
       }
     else
-      code.endExitableBlock();
+      doneLabel = null;
+    code.endExitableBlock();
+    if (exitBody != null)
+      exitBody.compileWithPosition(comp, target);
+    if (doneLabel != null)
+      doneLabel.define(code);
+
     exitableBlock = null;
   }
 

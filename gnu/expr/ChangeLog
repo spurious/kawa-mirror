@@ -1,7 +1,13 @@
 2012-04-22  Per Bothner  <per@bothner.com>
 
+	* BlockExp.java (compile): Don't need goto around exitBody
+	if unreachable.
+	* IfExp.java (compile): Comment out optimization for when else is
+	an ExitExp, as it doesn't handle unreachability properly.
+
 	* BlockExp.java (id, counter): New fields.
 	(toString, print): Use id field.
+
 	* ExitExp.java (print) Print block's id.
 
 2012-04-05  Per Bothner  <per@bothner.com>

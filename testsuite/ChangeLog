@@ -1,3 +1,9 @@
+2012-04-22  Helmut Eller  <eller.helmut@gmail.com>
+	    Per Bothner  <per@bothner.com>
+
+	* mac-test.scm: New test for Savannah bug #35555
+	"Tail-call in syntax-case".
+
 2012-04-18  Helmut Eller  <eller.helmut@gmail.com>
 	    Per Bothner  <per@bothner.com>
 

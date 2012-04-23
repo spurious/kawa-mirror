@@ -75,6 +75,10 @@ public class IfExp extends Expression
 	else
 	  falseLabel = ((ConditionalTarget) target).ifFalse;
       }
+    /*
+    // This is a minor optimization, useful for syntax-case switches.
+    // However, there are some tricky bits setting reachabilty correctly,
+    // and getting it right doesn't seem worth the complication.
     else if (else_clause instanceof ExitExp
              && ((ExitExp) else_clause).result instanceof QuoteExp
              && (block = ((ExitExp) else_clause).block).exitTarget instanceof IgnoreTarget
@@ -82,6 +86,7 @@ public class IfExp extends Expression
       {
         falseInherited = true;
       }
+    */
     else
       falseInherited = false;
     if (falseLabel == null)
@@ -130,8 +135,6 @@ public class IfExp extends Expression
 	  else_clause.compileWithPosition(comp, target);
         comp.callContextVar = callContextSave;
       }
-    else
-      code.setUnreachable();
     code.emitFi();
   }
 

@@ -1894,7 +1894,6 @@ public class CodeAttr extends Attribute implements AttrContainer
   /** Compile end of conditional. */
   public final void emitFi ()
   {
-    boolean make_unreachable = false;
     if (! if_stack.doing_else)
       { // There was no 'else' clause.
 	if (reachableHere ()
@@ -1917,14 +1916,11 @@ public class CodeAttr extends Attribute implements AttrContainer
 	  throw new Error("at PC "+PC+": SP at end of 'then' was " +
 			  then_clause_stack_size
 			  + " while SP at end of 'else' was " + SP);
+        setReachable(true);
       }
-    else if (unreachable_here)
-      make_unreachable = true;
 
     if (if_stack.end_label != null)
       if_stack.end_label.define (this);
-    if (make_unreachable)
-      setUnreachable();
     // Pop the if_stack.
     if_stack = if_stack.previous;
   }

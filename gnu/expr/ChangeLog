@@ -1,3 +1,9 @@
+2012-04-22  Per Bothner  <per@bothner.com>
+
+	* BlockExp.java (id, counter): New fields.
+	(toString, print): Use id field.
+	* ExitExp.java (print) Print block's id.
+
 2012-04-05  Per Bothner  <per@bothner.com>
 
 	* ReferenceExp.java (PREFER_BINDING2): Move flag from here ...

@@ -68,10 +68,13 @@ public class ExitExp extends Expression
   {
     out.startLogicalBlock("(Exit", false, ")");
     out.writeSpaceFill();
-    if (block == null || block.label == null)
+    if (block != null)
+      {
+        out.print("Block#");
+        out.print(block.id);
+      }
+    else if (block == null)
       out.print("<unknown>");
-    else
-      out.print(block.label.getName());
     if (result != null)
       {
 	out.writeSpaceLinear();

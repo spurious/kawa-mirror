@@ -96,9 +96,14 @@ public class BlockExp extends Expression
       exitBody = visitor.visitAndUpdate(exitBody, d);
   }
 
+  int id = ++counter;
+  static int counter;
+  public String toString() { return "BlockExp#"+id; }
+
   public void print (OutPort out)
   {
-    out.startLogicalBlock("(Block", ")", 2);
+    out.startLogicalBlock("(Block#", ")", 2);
+    out.print(id);
     if (label != null)
       {
         out.print(' ');

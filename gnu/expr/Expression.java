@@ -369,6 +369,14 @@ public abstract class Expression extends Procedure0
     return Type.pointer_type;
   }
 
+    /** True if the expression provably never returns.
+     * Currently, this is very limited, not handling infinite recursion
+     * (tail- or otherwise), but better analysis is planned.
+     */
+    public boolean neverReturns() {
+        return getType() == Type.neverReturnsType;
+    }
+
   public boolean isSingleValue()
   {
     return OccurrenceType.itemCountIsOne(getType());

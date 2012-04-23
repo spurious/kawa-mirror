@@ -1,3 +1,7 @@
+2012-04-23  Per Bothner  <per@bothner.com>
+
+	* Expression.java (neverReturns): New convenience method.
+
 2012-04-22  Per Bothner  <per@bothner.com>
 
 	* BlockExp.java (compile): Don't need goto around exitBody

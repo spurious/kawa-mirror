@@ -2,6 +2,7 @@ package gnu.expr;
 import gnu.mapping.*;
 import java.util.Vector;
 import gnu.lists.*;
+import gnu.bytecode.CodeAttr;
 
 /**
  * This class represents a sequence of Expressions.
@@ -138,8 +139,17 @@ public class BeginExp extends Expression
     try
       {
 	int n = length, i;
+        CodeAttr code = comp.getCode();
 	for (i = 0; i < n - 1; i++)
-	  exps[i].compileWithPosition(comp, Target.Ignore);
+          {
+            exps[i].compileWithPosition(comp, Target.Ignore);
+            if (! code.reachableHere())
+              {
+                if (comp.warnUnreachable())
+                  comp.error('w', "unreachable code", exps[i+1]);
+                return;
+              }
+          }
 	exps[i].compileWithPosition(comp, target);
       }
     finally

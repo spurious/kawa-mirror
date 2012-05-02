@@ -115,6 +115,10 @@ public class Compilation implements SourceLocator
     options.add("full-tailcalls",
                 Options.BOOLEAN_OPTION, Boolean.TRUE,
 		"support full tailcalls");
+  public static Options.OptionInfo warnUnreachable =
+    options.add("warn-unreachable",
+                Options.BOOLEAN_OPTION, Boolean.TRUE,
+		"warn if this code can never be executed");
   public static Options.OptionInfo warnUndefinedVariable =
     options.add("warn-undefined-variable",
                 Options.BOOLEAN_OPTION, Boolean.TRUE,
@@ -137,6 +141,10 @@ public class Compilation implements SourceLocator
 
   public Options currentOptions = new Options(options);
 
+  public boolean warnUnreachable ()
+  {
+    return currentOptions.getBoolean(warnUnreachable);
+  }
   public boolean warnUndefinedVariable ()
   {
     return currentOptions.getBoolean(warnUndefinedVariable);

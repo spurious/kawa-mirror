@@ -1,3 +1,10 @@
+2012-05-02  Helmut Eller  <eller.helmut@gmail.com>
+	    Per Bothner  <per@bothner.com>
+
+	* sva35728.scm: New testcase based on Savannah bug# 35728
+	"More unreachable code".
+	* Makefile.am: Update accordingly.
+
 2012-04-22  Helmut Eller  <eller.helmut@gmail.com>
 	    Per Bothner  <per@bothner.com>
 

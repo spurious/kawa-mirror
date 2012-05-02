@@ -1,3 +1,13 @@
+2012-05-02  Per Bothner  <per@bothner.com>
+
+	* BeginExp.java (compile): Check for (and warn about) unreachable code.
+	This is (partial) fix for Savannah bug# 35728 "More unreachable code".
+
+	* Compilation.java (warnUnreachable): New static field.
+	(warnUnreachable): New method.
+	This is preliminary changes for Savannah bug #35524
+	"Unreachable code is not an error".
+
 2012-04-23  Per Bothner  <per@bothner.com>
 
 	* Expression.java (neverReturns): New convenience method.

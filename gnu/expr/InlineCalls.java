@@ -142,12 +142,12 @@ public class InlineCalls extends ExpExpVisitor<Type> {
   /** Return a required type for procedure application context.
    * This is ProcedureInCallContext.INSTANCE or null.
    * The value ProcedureInCallContext.INSTANCE indicates the expression
-   * is used in application context and setCanCall is appropropriate.
+   * is used in application context and setCanCall is appropriate.
    * This means the function expression must be a lambda or reference.
    * (Consider a function that is an IfExp:  If the required type is
    * passed down to two branches that are both lambdas, we might think the
    * lambdas are called but not read and thus safe for inlining - but that
-   * would be false, since we the If to yield a procedure value.)
+   * would be false, since we need the If to yield a procedure value.)
    */
   public static Type typeForCalledFunction(Expression exp) {
       return  (exp instanceof LambdaExp && ! (exp instanceof ClassExp))

@@ -1,3 +1,10 @@
+2012-05-03  Per Bothner  <per@bothner.com>
+
+	* unreach1.scm: New tests for unreachable code.
+	* sva35728.scm: Rename to ...
+	* unreach2.scm: .. new name.
+	* Makefile.am: Update accordingly.
+
 2012-05-02  Helmut Eller  <eller.helmut@gmail.com>
 	    Per Bothner  <per@bothner.com>
 

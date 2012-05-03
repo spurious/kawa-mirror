@@ -419,7 +419,8 @@ public class InlineCalls extends ExpExpVisitor<Type> {
         boolean truth = comp.getLanguage().isTrue(((QuoteExp) test).getValue());
         return exp.select(truth);
       }
-    if (test.getType().isVoid())
+    // The neverReturns case is handled in ChainLambdas.
+    if (test.getType().isVoid() && ! test.neverReturns())
       {
         boolean truth = comp.getLanguage().isTrue(Values.empty);
         comp.error('w', "void-valued condition is always "+truth);

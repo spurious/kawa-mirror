@@ -1,3 +1,4 @@
+;; Based on Savannah bug# 35728	"More unreachable code".
 (define (foo)
   (call/cc
    (lambda (return)
@@ -7,6 +8,6 @@
            (finish a)
            (let ((a 2))
              (loop a))))))))
-;; Diagnostic: sva35728.scm:8:12: warning - unreachable code
+;; Diagnostic: unreach2.scm:9:12: warning - unreachable code
 (format #t "foo: ~s~%" (foo))
 ;; Output: foo: #f

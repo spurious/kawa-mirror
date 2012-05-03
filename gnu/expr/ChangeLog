@@ -1,3 +1,9 @@
+2012-05-03  Per Bothner  <per@bothner.com>
+
+	* ChainLambdas.java: Add testing for unreachable code, by checking
+	if a neverReturns expression is followed by another.
+	* InlineCalls.java (visitIfExp): Minor update to get correct warning.
+
 2012-05-02  Per Bothner  <per@bothner.com>
 
 	* BeginExp.java (compile): Check for (and warn about) unreachable code.

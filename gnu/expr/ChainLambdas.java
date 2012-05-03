@@ -1,19 +1,96 @@
 package gnu.expr;
+import gnu.bytecode.Type;
 
 /** Sets up the firstChild/nextSibling links of each LambdaExp.
  * Setup 'outer' links of ScopeExp and its sub-classes.
  * Also generates a class name for each ClassExp and registers each class.
  * Also, if lambda is bound to a unique declaration, make that its name.
+ *
+ * This pass also checks for unreachable code, which happens if a
+ * neverReturns expression is followed dynamically by another expression.
+ * Doing this check after InlineCalls allows benefiting from data-flow; OTOH
+ * checking for unreachable code this late yields less precise type inference,
+ * but only when there actually is unreachable code, which is bogus anyway.
+ * (Currently, we don't check for infinite loops/recursion, but we
+ * hope to add a conservative test for this.)
  */
 
-public class ChainLambdas extends ExpExpVisitor<ScopeExp>
-{
-  public static void chainLambdas (Expression exp, Compilation comp)
-  {
-    ChainLambdas visitor = new ChainLambdas();
-    visitor.setContext(comp);
-    visitor.visit(exp, null);
-  }
+public class ChainLambdas extends ExpExpVisitor<ScopeExp> {
+    public static void chainLambdas (Expression exp, Compilation comp) {
+        ChainLambdas visitor = new ChainLambdas();
+        visitor.setContext(comp);
+        visitor.visit(exp, null);
+    }
+
+    protected void maybeWarnUnreachable(Expression exp) {
+        //new Error("maybeWarnUnreachable "+exp).printStackTrace();
+        if (! unreachableCodeSeen && comp.warnUnreachable())
+            comp.error('w', "unreachable code", exp);
+        unreachableCodeSeen = true;
+    }
+
+    /** True if we've seen (reported) unreachable code in this procedure. */
+    boolean unreachableCodeSeen;
+
+    protected Expression visitBeginExp(BeginExp exp, ScopeExp scope) {
+        int neverReturnsIndex = -1;
+        int last = exp.length - 1;
+        for (int i = 0;  i <= last;  i++) {
+            Expression e = visit(exp.exps[i], scope);
+            exp.exps[i] = e;
+            if (e.neverReturns() && neverReturnsIndex < 0) {
+                neverReturnsIndex = i;
+                if (i < last)
+                    maybeWarnUnreachable(exp.exps[i+1]);
+            }
+        }
+        if (neverReturnsIndex >= 0) {
+            exp.type = Type.neverReturnsType;
+            exp.length = neverReturnsIndex + 1;
+        }
+        return exp;
+    }
+
+    protected Expression visitApplyExp(ApplyExp exp, ScopeExp scope) {
+        Expression e = visit(exp.func, scope);
+        Expression[] args = exp.args;
+        int nargs = args.length;
+        exp.func = e;
+        if (e.neverReturns()) {
+            maybeWarnUnreachable(nargs > 0 ? args[0] : exp);
+            return e;
+        }
+        for (int i = 0; i < nargs;  i++) {
+            e = visit(args[i], scope);
+            if (e.neverReturns()) {
+                Expression[] xargs = new Expression[i+1];
+                xargs[0] = exp.func;
+                System.arraycopy(args, 0, xargs, 1, i);
+                maybeWarnUnreachable(i+1 < nargs ? args[i+1] : exp);
+                BeginExp bexp = new BeginExp(xargs);
+                bexp.type = Type.neverReturnsType;
+                return bexp;
+            }
+            args[i] = e;
+        }
+        return exp;
+    }
+
+    protected Expression visitIfExp(IfExp exp, ScopeExp scope) {
+        Expression e = visit(exp.test, scope);
+        if (e.neverReturns()) {
+            maybeWarnUnreachable(exp.then_clause);
+            return e;
+        }
+        exp.then_clause = visit(exp.then_clause, scope);
+        if (exp.else_clause != null) {
+            exp.else_clause = visit(exp.else_clause, scope);
+            if (exp.then_clause.neverReturns()
+                && exp.else_clause.neverReturns())
+                exp.type = Type.neverReturnsType;
+        }
+        return exp;
+    }
 
   protected Expression visitScopeExp (ScopeExp exp, ScopeExp scope)
   {
@@ -27,6 +104,8 @@ public class ChainLambdas extends ExpExpVisitor<ScopeExp>
 
   protected Expression visitLambdaExp (LambdaExp exp, ScopeExp scope)
   {    
+    boolean unreachableSaved = unreachableCodeSeen;
+    unreachableCodeSeen = false;
     LambdaExp parent = currentLambda;
     if (parent != null && ! (parent instanceof ClassExp))
       {
@@ -55,6 +134,7 @@ public class ChainLambdas extends ExpExpVisitor<ScopeExp>
     exp.setIndexes();
     if (exp.mustCompile())
       comp.mustCompileHere();
+    unreachableCodeSeen = unreachableSaved;
     return exp;
   }
 

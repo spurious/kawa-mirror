@@ -181,7 +181,8 @@ public class CompileInvoke
               {
                 Expression[] xargs = new Expression[nargs-1];
                 System.arraycopy(args, 1, xargs, 0, nargs-1);
-                return visitor.visit(new ApplyExp(constructor, xargs), required);
+                Expression xapp = new ApplyExp(constructor, xargs);
+                return visitor.visit(xapp.setLine(exp), required);
               }
           }
         PrimProcedure[] methods;

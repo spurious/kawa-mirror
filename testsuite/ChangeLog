@@ -1,5 +1,9 @@
 2012-05-03  Per Bothner  <per@bothner.com>
 
+	* bad-defclass.scm: New tests for bad define-class syntax,
+	including Savannah bug #36335 "NPE on syntax error".
+	* Makefile.am: Update accordingly.
+
 	* unreach1.scm: New tests for unreachable code.
 	* sva35728.scm: Rename to ...
 	* unreach2.scm: .. new name.

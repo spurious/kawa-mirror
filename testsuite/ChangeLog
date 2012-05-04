@@ -1,3 +1,9 @@
+2012-05-03  Helmut Eller  <eller.helmut@gmail.com>
+	    Per Bothner  <per@bothner.com>
+
+	* unreach1.scm: New test for Savannah bug #35524
+	"Unreachable code is not an error".
+
 2012-05-03  Per Bothner  <per@bothner.com>
 
 	* bad-defclass.scm: New tests for bad define-class syntax,

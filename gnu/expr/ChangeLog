@@ -1,5 +1,8 @@
 2012-05-03  Per Bothner  <per@bothner.com>
 
+	* ApplyExp.java (compile): Warn rather than error on unreachable
+	code.  Fixes Savannah bug #35524: "Unreachable code is not an error".
+
 	* ChainLambdas.java: Add testing for unreachable code, by checking
 	if a neverReturns expression is followed by another.
 	* InlineCalls.java (visitIfExp): Minor update to get correct warning.

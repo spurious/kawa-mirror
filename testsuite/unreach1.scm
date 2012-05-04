@@ -19,3 +19,12 @@
   (begin (primitive-throw java.lang.NullPointerException)
          13))
 ;; Diagnostic: unreach1.scm:20:10: warning - unreachable code
+
+;;; Savannah bug #35524: Unreachable code is not an error
+(define (foo)
+  (call-with-current-continuation
+   (lambda (return)
+     (let l ()
+       (return #f)
+       (l)))))
+;; Diagnostic: unreach1.scm:29:8: warning - unreachable code

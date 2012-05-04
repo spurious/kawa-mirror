@@ -406,7 +406,8 @@ public class ApplyExp extends Expression
       }
     if (! code.reachableHere())
       {
-        comp.error('e', "unreachable code");
+        if (comp.warnUnreachable())
+          comp.error('w', "unreachable code");
         return;
       }
     if (tail_recurse)

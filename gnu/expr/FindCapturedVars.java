@@ -240,10 +240,7 @@ public class FindCapturedVars extends ExpExpVisitor<Void>
       return current.returnContinuation;
     if (current.getCanRead()
         || current.isClassMethod()
-        // Usually best to not inline a module-level function, since that
-        // makes stack traces less helpful, and increases the risk of
-        // methods getting too big.
-        || (current.outer instanceof ModuleExp && current.nameDecl != null)
+        || Compilation.avoidInline(current)
         || current.min_args != current.max_args)
       {
         current.returnContinuation = LambdaExp.unknownContinuation;

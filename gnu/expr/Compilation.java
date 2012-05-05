@@ -523,6 +523,15 @@ public class Compilation implements SourceLocator
     return inlineOk;
   }
 
+    /** Should this inlineable method by inlined?
+     * Usually it's best to not inline a module-level function, since that
+     * makes stack traces less helpful, and increases the risk of
+     * methods getting too big.
+     */
+    static boolean avoidInline(LambdaExp proc) {
+        return proc.outer instanceof ModuleExp && proc.nameDecl != null;
+    }
+
   public boolean isApplyFunction (Expression exp)
   {
     return false;

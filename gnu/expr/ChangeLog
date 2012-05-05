@@ -1,3 +1,11 @@
+2012-05-05  Per Bothner  <per@bothner.com>
+
+	Fix for Savannah bug #36039 "inlining problem".
+	* Compilation.java (avoidInline): New method.
+	* FindCapturedVars.java (checkInlineable): Use new method to
+	express existing test.
+	* InlineCalls.java (visitLambdaExp): Use avoidInline - new test.
+
 2012-05-03  Per Bothner  <per@bothner.com>
 
 	* ApplyExp.java (compile): Warn rather than error on unreachable

@@ -1,3 +1,10 @@
+2012-05-05  Helmut Eller  <eller.helmut@gmail.com>
+	    Per Bothner  <per@bothner.com>
+
+	* sva36039.scm: New test for Savannah bug #36039 "inlining problem".
+	* Makefile.am: Update accordingly.
+	* inlining.expected: Update.
+
 2012-05-03  Helmut Eller  <eller.helmut@gmail.com>
 	    Per Bothner  <per@bothner.com>
 

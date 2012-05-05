@@ -601,7 +601,12 @@ public class InlineCalls extends ExpExpVisitor<Type> {
             for (ApplyExp app = ldecl.firstCall; app != null;
                  app = app.nextCall)
               countApply++;
-            if (countApply == ldecl.numReferences)
+            if (countApply == ldecl.numReferences
+                // Date-flow from calls to a non-inlined module-level function
+                // isn't wrong, but it can lead to problems in captured
+                // variables if the actual argument is an inlined lambda,
+                // We don't implement the necessary re-writing.
+                && ! Compilation.avoidInline(exp))
               {
                 // Some preliminary data-flow from a set of known call sites.
                 // This isn't fully implemented yet.

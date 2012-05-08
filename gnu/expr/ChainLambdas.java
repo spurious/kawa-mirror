@@ -23,7 +23,6 @@ public class ChainLambdas extends ExpExpVisitor<ScopeExp> {
     }
 
     protected void maybeWarnUnreachable(Expression exp) {
-        //new Error("maybeWarnUnreachable "+exp).printStackTrace();
         if (! unreachableCodeSeen && comp.warnUnreachable())
             comp.error('w', "unreachable code", exp);
         unreachableCodeSeen = true;

@@ -1,3 +1,8 @@
+2012-05-10  Per Bothner  <per@bothner.com>
+
+	* repl.java (processArgs): Fix error message if --no-xxx passed,
+	and xxx is not a known option.
+
 2012-05-03  Per Bothner  <per@bothner.com>
 
 	* standard/define_class.java (scanForDefinitions, rewriteForm): Make

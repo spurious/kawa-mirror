@@ -715,19 +715,26 @@ public class repl extends Procedure0or1
 		// Convert "--no-xxx" to "--xxx=no":
 		boolean startsWithNo
 		  = name.startsWith("no-") && name.length() > 3;
-		if (opt_value == null && startsWithNo)
+		boolean addedNo = false;
+                if (opt_value == null && startsWithNo)
 		  {
 		    opt_value = "no";
 		    name = name.substring(3);
+                    addedNo = true;
 		  }
 
 		String msg = Compilation.options.set(name, opt_value);
 		if (msg != null)
 		  {
-		    // It wasn't a valid Complation option.
-		    if (startsWithNo && msg == gnu.text.Options.UNKNOWN)
-		      msg = "both '--no-' prefix and '="+
-			opt_value+"' specified";
+		    if (msg == gnu.text.Options.UNKNOWN)
+                      {
+                        if (addedNo)
+                          msg = "unknown option '"+name+"'";
+                        // It wasn't a valid Compilation option.
+                        else if (startsWithNo)
+                          msg = "both '--no-' prefix and '="+
+                            opt_value+"' specified";
+                      }
 		    if (msg == gnu.text.Options.UNKNOWN)
 		      {
 			bad_option(arg);

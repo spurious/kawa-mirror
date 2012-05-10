@@ -1,3 +1,8 @@
+2012-05-10  Per Bothner  <per@bothner.com>
+
+	* build.xml: Add dependencies on with-swing property.
+	(java-classes): Always compile gnu/kawa/models.
+
 2012-04-08  Per Bothner  <per@bothner.com>
 
 	* AUTHORS: Point to Acknowledgement section of doc/kawa.texi.

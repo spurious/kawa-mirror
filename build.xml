@@ -451,10 +451,17 @@
       <include name="gnu/text/"/>
       <include name="kawa/lang/"/>
       <include name="kawa/standard/"/>
-      <include name="kawa/"/>
+      <include name="kawa/repl.java"/>
+      <include name="kawa/Shell.java"/>
+      <include name="kawa/Version.java"/>
+      <include name="kawa/Telnet*.java"/>
+      <include name="kawa/Gui*.java" if="${with-swing}"/>
+      <include name="kawa/Repl*.java" if="${with-swing}"/>
       <include name="gnu/kawa/xml/"/>
       <include name="gnu/xml/"/>
       <patternset refid="with-awt-${with-awt}"/>
+      <include name="gnu/kawa/models/"/>
+      <include name="gnu/kawa/swingviews/" if="${with-swing}"/>
     </javac>
   </target>
    
@@ -485,7 +492,7 @@
         <include name="uniform.scm"/>
         <include name="arrays.scm"/>
         <include name="trace.scm"/>
-        <include name="windows.scm"/>
+        <include name="windows.scm" if="${with-swing}"/>
         <include name="system.scm"/>
         <include name="srfi95.scm"/>
         <include name="kawa/hashtable.scm"/>
@@ -539,7 +546,7 @@
         <include name="enums.scm"/>
         <include name="gui.scm"/>
         <include name="XML.scm"/>
-        <include name="swing.scm"/>
+        <include name="swing.scm" if="${with-swing}"/>
         <include name="syntaxutils.scm"/>
         <include name="Streams.scm"/>
         <include name="StreamsDerived.scm"/>
@@ -670,7 +677,7 @@
       </fileset>
     </apply>
   </target>
-   
+
   <target name="jemacs-java-classes" 
           depends="build-settings, java-classes" 
           if="${enable-jemacs}">
@@ -682,12 +689,10 @@
 	   includeantruntime="false">
       <include name="gnu/jemacs/buffer/"/>
       <include name="gnu/jemacs/lang/"/>
-      <include name="gnu/jemacs/swing/"/>
-      <include name="gnu/kawa/models/"/>
-      <include name="gnu/kawa/swingviews/"/>
+      <include name="gnu/jemacs/swing/" if="${with-swing}"/>
     </javac>
   </target>
-   
+
   <target name="jemacs-swt-classes" depends="jemacs-classes">
     <javac srcdir="${src.dir}" destdir="${build.classes}"
 	   includeantruntime="false">

@@ -208,10 +208,10 @@ java_SCM_ALWAYS = \
   srfi95.scm rnrs/unicode.scm rnrs/sorting.scm rnrs/programs.scm \
   trace.scm
 
-scm_WITH_AWT = windows.scm
-EXTRA_DIST = $(java_SCM_ALWAYS) $(scm_WITH_AWT)
-@WITH_AWT_FALSE@java_SCM = $(java_SCM_ALWAYS)
-@WITH_AWT_TRUE@java_SCM = $(java_SCM_ALWAYS) $(scm_WITH_AWT)
+scm_WITH_SWING = windows.scm
+EXTRA_DIST = $(java_SCM_ALWAYS) $(scm_WITH_SWING)
+@WITH_SWING_FALSE@java_SCM = $(java_SCM_ALWAYS)
+@WITH_SWING_TRUE@java_SCM = $(java_SCM_ALWAYS) $(scm_WITH_SWING)
 PACKAGE_FNAME = kawa-lib
 EXTRA_GCJ_COMPILED = scm-classes.stamp
 EXTRA_GCJ_INPUTS = *.class

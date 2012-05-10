@@ -28,11 +28,11 @@ java_SCM_ALWAYS =\
   srfi95.scm rnrs/unicode.scm rnrs/sorting.scm rnrs/programs.scm \
   trace.scm
 
-scm_WITH_AWT = windows.scm
-EXTRA_DIST = $(java_SCM_ALWAYS) $(scm_WITH_AWT)
+scm_WITH_SWING = windows.scm
+EXTRA_DIST = $(java_SCM_ALWAYS) $(scm_WITH_SWING)
 
-if WITH_AWT
-java_SCM= $(java_SCM_ALWAYS) $(scm_WITH_AWT)
+if WITH_SWING
+java_SCM= $(java_SCM_ALWAYS) $(scm_WITH_SWING)
 else
 java_SCM= $(java_SCM_ALWAYS)
 endif

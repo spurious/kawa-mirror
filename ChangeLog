@@ -1,3 +1,9 @@
+2012-05-13  Per Bothner  <per@bothner.com>
+
+	* build.xml: Add ScriptEngineFactory support for discovering
+	JSR-223 script engines (Scheme and optionally XQuery).
+	Also, improvements in handling of enable-xml.
+
 2012-05-10  Per Bothner  <per@bothner.com>
 
 	* build.xml: Add dependencies on with-swing property.

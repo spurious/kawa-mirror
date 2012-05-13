@@ -189,6 +189,26 @@
       <available classname="com.sun.net.httpserver.HttpServer"/>
     </condition>
 
+    <condition property="with-javax-script" else="false">
+      <available classname="javax.script.ScriptEngine"/>
+    </condition>
+
+    <condition property="-needs-scripting-inf">
+      <and>
+        <istrue value="${with-javax-script}"/>
+        <not>
+          <available file="META-INF/services/javax.script.ScriptEngineFactory"/>
+        </not>
+      </and>
+    </condition>
+
+    <condition property="-needs-scripting-inf-xquery">
+      <and>
+        <istrue value="${-needs-scripting-inf}"/>
+        <istrue value="${enable-xml}"/>
+      </and>
+    </condition>
+
     <echo>
         version=${version}
         dist.kawa.jar=${dist.kawa.jar}
@@ -442,7 +462,10 @@
       <exclude name="gnu/expr/KawaScriptEngine.java" unless="has-java6"/>
       <exclude name="kawa/standard/SchemeScriptEngineFactory.java" unless="has-java6"/>
       <include name="gnu/kawa/functions/"/>
-      <include name="gnu/kawa/lispexpr/"/>
+      <include name="gnu/kawa/lispexpr/*.java"/>
+      <exclude name="gnu/kawa/lispexpr/MakeXmlElement.java" unless="${enable-xml}"/>
+      <exclude name="gnu/kawa/lispexpr/ReaderXmlElement.java" unless="${enable-xml}"/>
+      <exclude name="gnu/kawa/lispexpr/ResolveNamespace.java" unless="${enable-xml}"/>
       <include name="gnu/kawa/reflect/"/>
       <include name="gnu/kawa/util/"/>
       <include name="gnu/lists/"/>
@@ -743,10 +766,22 @@
     </kawac>
   </target>
 
-  <target name="jar">
+  <target name="script-factory-scheme" if="${-needs-scripting-inf}">
+    <echo message="kawa.standard.SchemeScriptEngineFactory #Scheme&#xA;"
+          append="true"
+          file="META-INF/services/javax.script.ScriptEngineFactory"/>
+  </target>
+  <target name="script-factory-xquery" if="${-needs-scripting-inf-xquery}">
+    <echo message="gnu.xquery.lang.XQueryScriptEngineFactory #XQuery&#xA;"
+          append="true"
+          file="META-INF/services/javax.script.ScriptEngineFactory"/>
+  </target>
+
+  <target name="jar" depends="script-factory-scheme,script-factory-xquery">
     <jar jarfile="${dist.kawa.jar}"
          manifest="${src.dir}/jar-manifest">
        <fileset refid="build.classes"/>
+       <include name="META-INF/services/*"/>
     </jar>
   </target>
 
@@ -772,6 +807,7 @@
        <fileset refid="build.preprocessed"/>
        <fileset file="bin/kawa.bat"/>
     </delete>
+    <delete dir="META-INF"/>
   </target>
 
   <target name="clean-tools">

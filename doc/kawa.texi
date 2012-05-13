@@ -12905,7 +12905,7 @@ uses @code{write} rather than @code{display}.
 * Ideas and tasks::      Ideas and tasks for contributing to Kawa
 @end menu
 
-@node Reporting bugs, Mailing lists, , Community
+@node Reporting bugs
 @section Reporting bugs
 
 To report a bug or feature request for Kawa (including Qexo or JEmacs), it is
@@ -12920,7 +12920,7 @@ the archives through the
 @uref{http://mail.gnu.org/mailman/listinfo/bug-kawa,
 @code{bug-kawa} web interface}.
 
-@node Mailing lists, Support, Reporting bugs, Community
+@node Mailing lists
 @section General Kawa email and discussion
 
 The general Kawa email list is @email{kawa@@sourceware.org}.

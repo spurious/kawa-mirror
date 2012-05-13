@@ -1,3 +1,7 @@
+2012-05-13  Per Bothner  <per@bothner.com>
+
+	* kawa.texi: Remove bad "next" reference.
+
 2012-04-09  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Macros):  Document syntax->datum and datum->syntax.

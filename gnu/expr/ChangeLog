@@ -1,3 +1,7 @@
+2012-05-14  Per Bothner  <per@bothner.com>
+
+	* AbstractScriptEngineFactory.java (getExtensions): Two small fixes.
+
 2012-05-05  Per Bothner  <per@bothner.com>
 
 	Fix for Savannah bug #36039 "inlining problem".

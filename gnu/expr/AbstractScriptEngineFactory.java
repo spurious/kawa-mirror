@@ -74,13 +74,17 @@ public abstract class AbstractScriptEngineFactory implements ScriptEngineFactory
               continue;
             int n = lang.length - 1;
             String langClass = lang[n];
-            if (! language.getName().equals(langClass))
+            if (! language.getClass().getName().equals(langClass))
               continue;
             for (int j = 1; j < n;  j++)
               {
                 String ext = lang[j];
                 if (ext != null && ext.charAt(0) == '.')
-                  exts.add(ext.substring(1));
+                  {
+                    ext = ext.substring(1);
+                    if (! exts.contains(ext))
+                      exts.add(ext);
+                  }
               }
           }
         extensions = Collections.unmodifiableList(exts);

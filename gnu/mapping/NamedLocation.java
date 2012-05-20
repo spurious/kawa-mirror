@@ -7,9 +7,7 @@ package gnu.mapping;
 
 public abstract class NamedLocation extends IndirectableLocation
   implements
-  /* #ifdef JAVA2 */
-  java.util.Map.Entry /* <EnvironmentKey, Object> */,
-  /* #endif */
+  java.util.Map.Entry<EnvironmentKey, Object>,
   EnvironmentKey
 {
   NamedLocation next;
@@ -69,7 +67,7 @@ public abstract class NamedLocation extends IndirectableLocation
     return Symbol.equals(symbol, this.name) && property == this.property;
   }
 
-  public final Object /*<EnvironmentKey>*/ getKey ()
+  public final EnvironmentKey getKey ()
   {
     if (property == null)
       return name;

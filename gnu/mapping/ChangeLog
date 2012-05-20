@@ -1,3 +1,8 @@
+2012-05-20  Per Bothner  <per@bothner.com>
+
+	* NamedLocation.java: Add generic parameter to supertype.
+	(getKey): Fix return type to match.
+
 2012-01-31  Per Bothner  <per@bothner.com>
 
 	* Lazy.java: Note that getValue is allowed to return this.

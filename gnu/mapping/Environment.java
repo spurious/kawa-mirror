@@ -11,7 +11,7 @@ import java.util.Hashtable;
 
 public abstract class Environment
   extends PropertySet
-  // implements java.util.map.Map<EnvironmentKey, Object>
+  // implements java.util.Map<EnvironmentKey, Object>
 {
   static Environment global;
 

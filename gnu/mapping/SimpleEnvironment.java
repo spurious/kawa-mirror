@@ -111,7 +111,7 @@ public class SimpleEnvironment extends Environment
   }
 
   // Rename to newEntry? FIXME
-  NamedLocation newLocation (Symbol name, Object property)
+  protected NamedLocation newLocation (Symbol name, Object property)
   {
     if ((flags & THREAD_SAFE) != 0)
       return new SharedLocation(name, property, currentTimestamp);

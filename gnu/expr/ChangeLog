@@ -1,3 +1,13 @@
+2012-05-20  Per Bothner  <per@bothner.com>
+
+	* AbstractScriptEngineFactory.java: Re-do handing of Bindings so we
+	can better handling SimpleBindings and other random Bindings.
+	This means creating an Environment that proxies to the Bindings.
+	* KawaScriptEngine.java (createBindings): Create a new
+	SimpleEnvironment for just the current new Bindings, without Builtins.
+
+	* KawaScriptEngine.java (compile): Fix NPE calculating URL.
+
 2012-05-14  Per Bothner  <per@bothner.com>
 
 	* AbstractScriptEngineFactory.java (getExtensions): Two small fixes.

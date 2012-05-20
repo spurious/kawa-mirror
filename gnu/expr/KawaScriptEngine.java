@@ -25,9 +25,8 @@ public class KawaScriptEngine extends AbstractScriptEngine
 
   public Bindings createBindings()
   {
-    SimpleEnvironment env = (SimpleEnvironment) factory.language.getNewEnvironment();
+    SimpleEnvironment env = new SimpleEnvironment();
     Bindings bindings = new KawaScriptBindings(env);
-    factory.setEnvironment(bindings, env);
     return bindings;
   }
 
@@ -103,7 +102,14 @@ public class KawaScriptEngine extends AbstractScriptEngine
           throw new SyntaxException(messages);
         ModuleExp mexp = comp.getModule();
         String filename = (String) get(ScriptEngine.FILENAME);
-        java.net.URL url = port.getPath().toURL();
+        java.net.URL url;
+        if (filename != null)
+          url = Path.toURL(filename);
+        else
+          {
+            Path portpath = port.getPath();
+            url = portpath == null ? null : portpath.toURL();
+          }
         Writer errorWriter = context.getErrorWriter();
         OutPort errorPort
           = (errorWriter instanceof OutPort ? (OutPort) errorWriter

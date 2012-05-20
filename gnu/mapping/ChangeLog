@@ -1,5 +1,7 @@
 2012-05-20  Per Bothner  <per@bothner.com>
 
+	* SimpleEnvironment.java (newLocation): Make protected.
+
 	* NamedLocation.java: Add generic parameter to supertype.
 	(getKey): Fix return type to match.
 

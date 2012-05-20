@@ -399,7 +399,7 @@ public class repl extends Procedure0or1
             ModuleManager manager = ModuleManager.getInstance();
 	    manager.setCompilationDirectory(args[iArg]);
 	  }
-        else if (arg.equals("--target") || arg.equals("target"))
+        else if (arg.equals("--target") || arg.equals("-target"))
           {
 	    iArg++;
 	    if (iArg == maxArg)

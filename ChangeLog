@@ -1,3 +1,7 @@
+2012-05-20  JH
+
+	* build.xml: Fix to build META_INFO/services.
+
 2012-05-20  Jamison Hope  <jrh@theptrgroup.com>
 
 	* build.xml: "Inline" named filesets lib-scm and slib-scm to their

@@ -1,3 +1,9 @@
+2012-05-20  Jamison Hope  <jrh@theptrgroup.com>
+
+	* build.xml: "Inline" named filesets lib-scm and slib-scm to their
+	point of use, fixing a problem where the filesets depend on
+	with-swing, which is used before it is set in build-settings.
+
 2012-05-13  Per Bothner  <per@bothner.com>
 
 	* build.xml: Add ScriptEngineFactory support for discovering

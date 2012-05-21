@@ -495,7 +495,12 @@
     Kawa needs all the files listed for its scanning.
   -->
 
-      <fileset id="lib-scm" dir="${src.dir}/kawa/lib"> 
+  <target name="lib-scm-classes" 
+          depends="java-classes">
+    <kawac failonerror="true" destdir="${build.classes}"
+	   prefix="kawa.lib." modulestatic="run" language="scheme">
+      <arg line="--warn-undefined-variable --warn-unknown-member --warn-as-error"/>
+      <fileset dir="${src.dir}/kawa/lib">
         <include name="prim_syntax.scm"/>
         <include name="std_syntax.scm"/>
         <include name="syntax.scm"/>
@@ -503,7 +508,7 @@
         <include name="lists.scm"/>
         <include name="characters.scm"/>
         <include name="strings.scm"/>
-	<include name="parameters.scm"/>
+        <include name="parameters.scm"/>
         <include name="thread.scm"/>
         <include name="keywords.scm"/>
         <include name="numbers.scm"/>
@@ -526,13 +531,6 @@
         <include name="rnrs/programs.scm"/>
         <include name="rnrs/lists.scm"/>
       </fileset>
-
-  <target name="lib-scm-classes" 
-          depends="java-classes">
-    <kawac failonerror="true" destdir="${build.classes}"
-	   prefix="kawa.lib." modulestatic="run" language="scheme">
-      <arg line="--warn-undefined-variable --warn-unknown-member --warn-as-error"/>
-      <fileset refid="lib-scm"/>
     </kawac>
   </target>
   
@@ -548,7 +546,11 @@
     </kawac>
   </target>
 
-  <fileset id="slib-scm" dir="${src.dir}/gnu/kawa/slib">
+  <target name="slib-scm-classes" depends="java-classes">
+    <kawac failonerror="true" destdir="${build.classes}"
+	   prefix="gnu.kawa.slib." modulestatic="run"
+	   language="scheme">
+      <fileset dir="${src.dir}/gnu/kawa/slib">
         <include name="genwrite.scm"/>
         <include name="pp.scm"/>
         <include name="ppfile.scm"/>
@@ -575,13 +577,7 @@
         <include name="StreamsDerived.scm"/>
         <include name="StreamsPrimitive.scm"/>
         <include name="StreamsType.scm"/>
-  </fileset>
-
-  <target name="slib-scm-classes" depends="java-classes">
-    <kawac failonerror="true" destdir="${build.classes}"
-	   prefix="gnu.kawa.slib." modulestatic="run"
-	   language="scheme">
-      <fileset refid="slib-scm"/>
+      </fileset>
     </kawac>
   </target> 
 

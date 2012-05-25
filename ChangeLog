@@ -1,3 +1,7 @@
+2012-05-24  Jacques Herry
+
+	* build.xml (jar): Fix.
+
 2012-05-25  Per Bothner  <per@bothner.com>
 
 	* configure.in (WITH_SERVLET_ARG): New variable.

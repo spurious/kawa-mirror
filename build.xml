@@ -776,9 +776,10 @@
   <target name="jar" depends="script-factory-scheme,script-factory-xquery">
     <jar jarfile="${dist.kawa.jar}"
          manifest="${src.dir}/jar-manifest">
-       <fileset dir="${build.classes}">
-         <include name="META-INF/services/*"/>
-       </fileset>
+      <fileset refid="build.classes"/>
+      <fileset dir="${build.classes}">
+        <include name="META-INF/services/*"/>
+      </fileset>
     </jar>
   </target>
 

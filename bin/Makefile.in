@@ -300,6 +300,7 @@ libkawa_OFILES = \
 
 LIBTOOL = libtool
 @WITH_LIBTOOL_TRUE@LIBTOOL_INSTALL = $(LIBTOOL) --mode=install
+EXTRA_DIST = kawa.bat.in
 all: all-am
 
 .SUFFIXES:

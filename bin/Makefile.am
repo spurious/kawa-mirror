@@ -263,3 +263,5 @@ uninstall-local: uninstall-exec-bindir
 
 uninstall-exec-bindir:
 	rm -f $(DESTDIR)$(bindir)/kawa $(DESTDIR)$(bindir)/gckawa $(DESTDIR)$(bindir)/qexo
+
+EXTRA_DIST = kawa.bat.in

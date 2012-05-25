@@ -1,3 +1,8 @@
+2012-05-24  Jamison Hope  <jrh@theptrgroup.com>
+
+	* Compilation.java (compileConstant): Use language-specific
+	conversion to primitive boolean.
+
 2012-05-20  Per Bothner  <per@bothner.com>
 
 	* AbstractScriptEngineFactory.java: Re-do handing of Bindings so we

@@ -614,7 +614,7 @@ public class Compilation implements SourceLocator
 		  }
 		if (sig1 == 'Z')
 		  {
-		    boolean val = PrimType.booleanValue(value);
+		    boolean val = getLanguage().isTrue(value);
 		    code.emitPushInt(val ? 1 : 0);
 		    return;
 		  }

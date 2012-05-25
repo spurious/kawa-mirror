@@ -802,7 +802,7 @@ dist-kawa-@VERSION@.jar: $(DIST_ARCHIVES)
 	  && tar xzf ../$(distdir).tar.gz \
 	  && rm -f ./patch-source-list \
 	  && ./kawa-@VERSION@/configure --with-java-source=6compat5 --with-servlet  \
-	  && CLASSPATH=@conf_classpath@.:$$CLASSPATH $(MAKE) \
+	  && CLASSPATH=@conf_classpath@.$(CLASSPATH_SEPARATOR)$$CLASSPATH $(MAKE) \
 	  && mv kawa-@VERSION@.jar ../dist-kawa-@VERSION@.jar \
 	  && cd .. && rm -rf tmpdir
 
@@ -860,7 +860,7 @@ install-javadoc-html:
 	-mkdir $(JAVADOC_DIR)
 	-#rm `find $(JAVADOC_DIR)/ -name CVS -prune -o '(' '!' -type d ')' -print`
 	-rm `find $(JAVADOC_DIR)/ -name '*.html'`
-	CLASSPATH=$(JAVADOC_EXTRA_PATH):@conf_classpath@$$CLASSPATH \
+	CLASSPATH=$(JAVADOC_EXTRA_PATH)$(CLASSPATH_SEPARATOR)@conf_classpath@$$CLASSPATH \
 	$(JAVADOC) $(JAVADOC_FLAGS) -sourcepath .:$(top_srcdir) -d $(JAVADOC_DIR) $(JAVADOC_PACKAGES)
 	cp $(srcdir)/COPYING  $(JAVADOC_DIR)/COPYING
 
@@ -976,7 +976,7 @@ select-android: $(srcdir)/patch-source-list gnu/kawa/util/PreProcess.class
 	$(MAKE) do-preprocess SELECTOR='%android'
 
 do-preprocess:
-	CLASSPATH=.:$$CLASSPATH $(JAVA) gnu.kawa.util.PreProcess \
+	CLASSPATH=".$(CLASSPATH_SEPARATOR)$$CLASSPATH" $(JAVA) gnu.kawa.util.PreProcess \
 	  $(SELECTOR) $(PREPROCESS_HTTPSERVER) $(PREPROCESS_XML) \
 	  `sed -e 's|\([^ ]*\)|$(srcdir)/\1|' < $(srcdir)/patch-source-list`
 	$(MAKE) set-selected-java-source JAVA_SOURCE=$(JAVA_SOURCE)

@@ -1,4 +1,8 @@
-2012-05-20  JH
+2012-05-25  Per Bothner  <per@bothner.com>
+
+	* Makefile.am: Use CLASSPATH_SEPARATOR for the sake of CygWin.
+
+2012-05-20  Jacques Herry
 
 	* build.xml: Fix to build META_INFO/services.
 

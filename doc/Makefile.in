@@ -148,6 +148,7 @@ SHELL = @SHELL@
 STRIP = @STRIP@
 TOP_BUILDDIR = @TOP_BUILDDIR@
 VERSION = @VERSION@
+WITH_SERVLET_ARG = @WITH_SERVLET_ARG@
 XQTS_PATH = @XQTS_PATH@
 abs_builddir = @abs_builddir@
 abs_srcdir = @abs_srcdir@

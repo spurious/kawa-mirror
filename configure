@@ -574,6 +574,7 @@ GCJ_COMPILED_SELECTED
 JAVACFLAGS
 JAVAC
 JAVA
+WITH_SERVLET_ARG
 filesep
 pathsep
 CLASSPATH_SEPARATOR
@@ -2578,6 +2579,7 @@ if test "${with_servlet+set}" = set; then :
   withval=$with_servlet;
 fi
 
+WITH_SERVLET_ARG="${with_servlet}"
 
 
 # Check whether --with-android was given.
@@ -4570,6 +4572,7 @@ case ${with_sax2} in
 esac
 
 XQTS_PATH=${with_XQTS:-XQTS}
+
 
 
 

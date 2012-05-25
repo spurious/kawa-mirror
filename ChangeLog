@@ -1,5 +1,9 @@
 2012-05-25  Per Bothner  <per@bothner.com>
 
+	* configure.in (WITH_SERVLET_ARG): New variable.
+	* Makefile.am (dist-kawa-@VERSION@.jar): Include serlet jar's
+	location in build classpath.
+
 	* Makefile.am: Use CLASSPATH_SEPARATOR for the sake of CygWin.
 
 2012-05-20  Jacques Herry

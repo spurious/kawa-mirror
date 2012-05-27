@@ -7,8 +7,8 @@
            (else "getChildren"))))
   ((buildAddChild target child)
    (gnu.expr.ApplyExp gnu.kawa.reflect.Invoke:invoke
-                      [(gnu.expr.ApplyExp gnu.kawa.reflect.Invoke:invoke
-                                         [(gnu.expr.ReferenceExp target)
-                                         (gnu.expr.QuoteExp (getChildrenMethod))])
+                      (gnu.expr.ApplyExp gnu.kawa.reflect.Invoke:invoke
+                                         (gnu.expr.ReferenceExp target)
+                                         (gnu.expr.QuoteExp (getChildrenMethod)))
                       (gnu.expr.QuoteExp "add")
-                      child])))
+                      child)))

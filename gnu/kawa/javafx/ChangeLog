@@ -1,3 +1,8 @@
+2012-05-27  Per Bothner  <per@bothner.com>
+
+	* GroupObjectBuilder.scm (buildAddChild): Update since ApplyExp
+	constructor is now varargs,
+
 2011-08-17  Per Bothner  <per@bothner.com>
 
 	* defs.scm: Update to use Stage#show rather than old Stage#setVisible.

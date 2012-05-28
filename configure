@@ -574,6 +574,7 @@ GCJ_COMPILED_SELECTED
 JAVACFLAGS
 JAVAC
 JAVA
+WITH_JAVAFX_ARG
 WITH_SERVLET_ARG
 filesep
 pathsep
@@ -2594,6 +2595,7 @@ if test "${with_javafx+set}" = set; then :
   withval=$with_javafx;
 fi
 
+WITH_JAVAFX_ARG="${with_javafx}"
 
 
 # Check whether --with-XQTS was given.
@@ -4358,7 +4360,7 @@ fi
 esac
 JAVACFLAGS=${JAVACFLAGS--g}
 case "$JAVA_SOURCE" in
-  6compat5) JAVACFLAGS="${JAVACFLAGS} -target 1.5" ;;
+  6compat5) JAVACFLAGS="${JAVACFLAGS} -target 1.5 -source 1.5" ;;
 esac
 
 pathsep="$PATH_SEPARATOR"
@@ -4572,6 +4574,7 @@ case ${with_sax2} in
 esac
 
 XQTS_PATH=${with_XQTS:-XQTS}
+
 
 
 

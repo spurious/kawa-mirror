@@ -34,6 +34,7 @@ AC_ARG_WITH(android,
 
 AC_ARG_WITH(javafx,
   AS_HELP_STRING(--with-javafx@<:@=javafx_home@:>@,Enable support for JavaFX))
+WITH_JAVAFX_ARG="${with_javafx}"
 
 AC_ARG_WITH(XQTS,
   AS_HELP_STRING(--with-XQTS@<:@=XQTS-path@:>@,Support XQuery Test Suite))
@@ -164,7 +165,7 @@ case ${with_gcj} in
 esac
 JAVACFLAGS=${JAVACFLAGS--g}
 case "$JAVA_SOURCE" in
-  6compat5) JAVACFLAGS="${JAVACFLAGS} -target 1.5" ;;
+  6compat5) JAVACFLAGS="${JAVACFLAGS} -target 1.5 -source 1.5" ;;
 esac
 
 pathsep="$PATH_SEPARATOR"
@@ -242,6 +243,7 @@ AC_SUBST(CLASSPATH_SEPARATOR)
 AC_SUBST(pathsep)
 AC_SUBST(filesep)
 AC_SUBST(WITH_SERVLET_ARG)
+AC_SUBST(WITH_JAVAFX_ARG)
 
 AC_SUBST(JAVA)
 AC_SUBST(JAVAC)

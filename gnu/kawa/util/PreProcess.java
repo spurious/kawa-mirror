@@ -29,7 +29,7 @@ public class PreProcess
     "java4", "-JAVA5 "+JAVA4_FEATURES+" -use:org.w3c.dom.Node -JAXP-1.3 -use:javax.xml.transform -JAXP-QName -JAVA6COMPAT5 -Android "+NO_JAVA6_FEATURES,
     "java4x", "-JAVA5 "+JAVA4_FEATURES+" +use:org.w3c.dom.Node +JAXP-1.3 +use:javax.xml.transform -JAXP-QName -JAVA6COMPAT5 -Android "+NO_JAVA6_FEATURES,
     "java5", JAVA5_FEATURES+" -JAVA6COMPAT5 -Android "+NO_JAVA6_FEATURES,
-    "java6compat5", JAVA5_FEATURES+" -JAVA6 -JAVA7 +JAVA6COMPAT5 +use:java.text.Normalizer -use:javax.lang.model-use:java.lang.invoke -Android",
+    "java6compat5", JAVA5_FEATURES+" -JAVA6 -JAVA7 +JAVA6COMPAT5 +use:java.text.Normalizer -use:javax.lang.model -use:java.lang.invoke -Android",
     "java6", JAVA5_FEATURES+" +JAVA6 -JAVA7 -JAVA6COMPAT5 +use:java.text.Normalizer +use:javax.lang.model -use:java.lang.invoke -Android",
     "java7", JAVA5_FEATURES+" +JAVA6 +JAVA7 -JAVA6COMPAT5 +use:java.text.Normalizer +use:javax.lang.model +use:java.lang.invoke -Android",
     "android", "+JAVA5 "+JAVA4_FEATURES+" +use:org.w3c.dom.Node +JAXP-1.3 -JAXP-QName -use:javax.xml.transform -JAVA6 -JAVA6COMPAT5 +Android "+NO_JAVA6_FEATURES,

@@ -1,3 +1,7 @@
+2012-05-28  Per Bothner  <per@bothner.com>
+
+	* defs.scm: Fixes to avoid warnings about old unsyntax forms.
+
 2012-05-27  Per Bothner  <per@bothner.com>
 
 	* GroupObjectBuilder.scm (buildAddChild): Update since ApplyExp

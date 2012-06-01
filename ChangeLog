@@ -1,4 +1,10 @@
-2012-05-30  Per Bothner  <per@bothner.com>
+2012-05-31  Per Bothner  <per@bothner.com>
+
+	* configure.in: Change argument to --with-javafx to be actual jfxrt.jar
+	though also supporting old meaning.
+	Also a fix for servlet path.
+
+con2012-05-30  Per Bothner  <per@bothner.com>
 
 	* configure.in (AC_INIT): Set version to 1.12.1.
 	* build.xml (version.release): Likewise.

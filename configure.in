@@ -33,7 +33,7 @@ AC_ARG_WITH(android,
   AS_HELP_STRING(--with-android@<:@=android.jar@:>@,Build for the Android platform))
 
 AC_ARG_WITH(javafx,
-  AS_HELP_STRING(--with-javafx@<:@=javafx_home@:>@,Enable support for JavaFX))
+  AS_HELP_STRING(--with-javafx@<:@=jfxrt.jar@:>@,Enable support for JavaFX))
 WITH_JAVAFX_ARG="${with_javafx}"
 
 AC_ARG_WITH(XQTS,
@@ -214,13 +214,16 @@ case ${with_servlet} in
   yes) ;;
   no) ;;
   "") ;;
-  *) conf_classpath=${with_servlet}${pathsep}$conf_classpath ;;
+  *) conf_classpath=${with_servlet}${CLASSPATH_SEPARATOR}$conf_classpath ;;
 esac
 case ${with_javafx} in
   yes) ;;
   no) ;;
   "") ;;
-  *) conf_classpath=${with_javafx}/rt/lib/jfxrt.jar${CLASSPATH_SEPARATOR}$conf_classpath ;;
+  *)
+    test '!' -f "${with_javafx}" -a -f "${with_javafx}/rt/lib/jfxrt.jar" \
+      && with_javafx="${with_javafx}/rt/lib/jfxrt.jar"
+    conf_classpath=${with_javafx}${CLASSPATH_SEPARATOR}$conf_classpath ;;
 esac
 case ${with_android} in
   yes) ;;

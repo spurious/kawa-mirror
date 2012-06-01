@@ -1404,7 +1404,7 @@ Optional Packages:
                           Build support for generating servlets
   --with-android[=android.jar]
                           Build for the Android platform
-  --with-javafx[=javafx_home]
+  --with-javafx[=jfxrt.jar]
                           Enable support for JavaFX
   --with-XQTS[=XQTS-path] Support XQuery Test Suite
   --with-httpserver       Make use of JDK6's builtin http server
@@ -4552,13 +4552,16 @@ case ${with_servlet} in
   yes) ;;
   no) ;;
   "") ;;
-  *) conf_classpath=${with_servlet}${pathsep}$conf_classpath ;;
+  *) conf_classpath=${with_servlet}${CLASSPATH_SEPARATOR}$conf_classpath ;;
 esac
 case ${with_javafx} in
   yes) ;;
   no) ;;
   "") ;;
-  *) conf_classpath=${with_javafx}/rt/lib/jfxrt.jar${CLASSPATH_SEPARATOR}$conf_classpath ;;
+  *)
+    test '!' -f "${with_javafx}" -a -f "${with_javafx}/rt/lib/jfxrt.jar" \
+      && with_javafx="${with_javafx}/rt/lib/jfxrt.jar"
+    conf_classpath=${with_javafx}${CLASSPATH_SEPARATOR}$conf_classpath ;;
 esac
 case ${with_android} in
   yes) ;;

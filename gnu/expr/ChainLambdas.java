@@ -62,9 +62,9 @@ public class ChainLambdas extends ExpExpVisitor<ScopeExp> {
         for (int i = 0; i < nargs;  i++) {
             e = visit(args[i], scope);
             if (e.neverReturns()) {
-                Expression[] xargs = new Expression[i+1];
+                Expression[] xargs = new Expression[i+2];
                 xargs[0] = exp.func;
-                System.arraycopy(args, 0, xargs, 1, i);
+                System.arraycopy(args, 0, xargs, 1, i+1);
                 maybeWarnUnreachable(i+1 < nargs ? args[i+1] : exp);
                 BeginExp bexp = new BeginExp(xargs);
                 bexp.type = Type.neverReturnsType;

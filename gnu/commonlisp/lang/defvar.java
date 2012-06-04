@@ -23,12 +23,14 @@ public class defvar extends Syntax
     Object name = p.getCar();
     if (name instanceof String || name instanceof Symbol)
       {
-	Declaration decl = defs.lookup(name);
+        Declaration decl = defs.lookup(name, tr.getLanguage(),
+                                       Language.VALUE_NAMESPACE);
 	if (decl == null)
 	  {
 	    decl = new Declaration(name);
 	    decl.setFlag(Declaration.IS_DYNAMIC);
 	    defs.addDeclaration(decl);
+            tr.push(decl);
 	  }
 	else
 	  tr.error('w', "duplicate declaration for `" + name + "'");

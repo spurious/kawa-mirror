@@ -27,12 +27,14 @@ public class defun extends Syntax
 	      || p.getCar() instanceof Symbol))
       return super.scanForDefinitions(st, forms, defs, tr);
     Object sym = p.getCar();
-    Declaration decl = defs.lookup(sym);
+    Declaration decl = defs.lookup(sym, tr.getLanguage(),
+                                   Language.FUNCTION_NAMESPACE);
     if (decl == null)
       {
 	decl = new Declaration(sym);
 	decl.setProcedureDecl(true);
 	defs.addDeclaration(decl);
+        tr.push(decl);
       }
     else
       tr.error('w', "duplicate declaration for `"+sym+"'");
@@ -55,7 +57,7 @@ public class defun extends Syntax
       {
 	Pair p1 = (Pair) obj;
         Object p1_car = p1.getCar();
-	
+
 	if (p1_car instanceof Symbol || p1_car instanceof String)
 	  {
 	    name = p1_car.toString();

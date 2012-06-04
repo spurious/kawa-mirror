@@ -1,3 +1,14 @@
+2012-06-04  Jamison Hope  <jrh@theptrgroup.com>
+
+	Fixes for erroneous warnings and lookup failures.
+	* defun.java (scanForDefinitions): Fix declaration lookup to
+	specify function namespace.  Push newly created declaration to
+	lexical bindings map.
+	* defvar.java (scanForDefinitions): Likewise, but specifying value
+	namespace.
+	* function.java (rewriteForm): Look for an existing declaration
+	when creating ReferenceExp.
+
 2012-04-05  Per Bothner  <per@bothner.com>
 
 	* setq.java (rewriteForm): Don't incorrect set PREFER_BINDING2.

@@ -24,7 +24,8 @@ public class function extends Syntax
 	Object name = pair.getCar();
 	if (name instanceof String || name instanceof Symbol)
 	  {
-	    ReferenceExp rexp = new ReferenceExp(name);
+            Declaration decl = tr.lookup(name, Language.FUNCTION_NAMESPACE);
+	    ReferenceExp rexp = new ReferenceExp(name, decl);
 	    rexp.setProcedureName(true);
 	    rexp.setFlag(ReferenceExp.PREFER_BINDING2);
 	    return rexp;

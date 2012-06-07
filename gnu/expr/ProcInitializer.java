@@ -30,7 +30,8 @@ public class ProcInitializer extends Initializer
     Declaration pdecl = proc.nameDecl;
     Object pname = pdecl == null ? proc.getName() : pdecl.getSymbol();
     ModuleMethod oldproc = null;
-    if (comp.immediate && pname != null && pdecl != null)
+    if (comp.immediate && pname != null
+        && pdecl != null && pdecl.context instanceof ModuleExp)
       {
         // In interactive mode allow dynamic rebinding of procedures.
         // If there is an existing ModuleMethod binding, re-use it.

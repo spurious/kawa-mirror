@@ -1,3 +1,8 @@
+2012-06-06  Per Bothner  <per@bothner.com>
+
+	* ProcInitializer.java (compile): Only re-bind old binding if
+	new binding is module-level.
+
 2012-05-31  Per Bothner  <per@bothner.com>
 
 	* ChainLambdas.java (visitApplyExp): Fix off-by-one bug in

@@ -111,7 +111,7 @@ public class SyntaxRules extends Procedure1 implements Printable, Externalizable
 	    StringBuffer programbuf = new StringBuffer();
 
 	    // In R5RS syntax-rules, the initial name is neither a
-	    // pattern variable or a literal identifier, so ingore it.
+	    // pattern variable or a literal identifier, so ignore it.
 	    if (pattern instanceof Pair)
 	      {
 		// ?? FIXME

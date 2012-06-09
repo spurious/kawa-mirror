@@ -1,3 +1,13 @@
+2012-06-08  Helmut Eller  <eller.helmut@gmail.com>
+	    Per Bothner  <per@bothner.com>
+
+	* sva36556.scm: New test for Savannah bug #36556 "Macro problem".
+	* Makefile.am: Update accordingly.
+	* mac-test.scm (foo-35526a, foo-35526b): The test-case was incorrect.
+	Note the original Savannah test-case was correct, but somehow when
+	creating a version for the Kawa testsuite, I made a mistake.
+	The fix for Savannah bug #36556 uncovered the error.
+
 2012-06-06  Per Bothner  <per@bothner.com>
 
 	* inner-1.scm: New test.

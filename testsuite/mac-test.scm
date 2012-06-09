@@ -751,10 +751,10 @@
 ;; Savannah bug report #35526, simplified version
 (define-syntax foo-35526a
    (syntax-rules ()
-    ((foo-35526a bar-id stuff ...)
-     (let ((f (lambda () "+bar+")))
-       (let-syntax ((bar-id (syntax-rules ()
-                              ((bar-id) f))))
+     ((foo-35526a bar-id stuff ...)
+      (let ((f (lambda () "+bar+")))
+        (let-syntax ((bar-id (syntax-rules ()
+                               ((bar-id) (f)))))
           (list stuff ...))))))
 (define (baz-35526a)
   (foo-35526a bar (bar) (bar)))
@@ -766,13 +766,13 @@
     ((foo-id stuff ...)
      (with-syntax ((bar-id (datum->syntax (syntax foo-id) 'bar)))
                   (syntax
-        (let ((f (lambda () 'bar2)))
-          (let-syntax ((bar-id (syntax-rules ()
-                                 ((bar-id) f))))
-            (list stuff ...))))))))
+                   (let ((f (lambda () 'bar2)))
+                     (let-syntax ((bar-id (syntax-rules ()
+                                            ((bar-id) (f)))))
+                       (list stuff ...))))))))
 (define (baz-35526b)
   (foo-35526b (bar) (bar)))
-(test '(bar2 bar2) 'savannah-35526a (baz-35526b))
+(test '(bar2 bar2) 'savannah-35526b (baz-35526b))
 
 ;; #35555: Tail-call in syntax-case
 (define (foo-35555 forms)

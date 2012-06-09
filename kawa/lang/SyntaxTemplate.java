@@ -36,7 +36,7 @@ public class SyntaxTemplate implements Externalizable
   static final int BUILD_VECTOR = (5<<3)+BUILD_MISC;
 
   /** Instruction to creat a <code>Pair</code> from sub-expressions.
-   * Instruction <code>BUILD_CONS+4*delta</code> is followed by a
+   * Instruction <code>BUILD_CONS+8*delta</code> is followed by a
    * sub-expression for the <code>car</code>
    * (whose length is <code>delta</code> chars),
    * followed by the expression for the <code>cdr</code>. */
@@ -346,8 +346,7 @@ public class SyntaxTemplate implements Externalizable
       }
     if (form instanceof Symbol)
       tr.noteAccess(form, tr.currentScope());
-    if (syntax != null)
-      form = syntax;
+    form = SyntaxForms.makeWithTemplate(syntax, form); // Usually a no-op.
     int literals_index = indexOf(literals_vector, form);
     if (literals_index < 0)
       {

@@ -680,9 +680,14 @@ public class CompileMisc implements Inlineable
     Compilation comp = visitor.getCompilation();
 
     // First an outer (let ((%proc PROC)) L2), where PROC is args[0].
-    comp.letStart();
-    Declaration procDecl = comp.letVariable("%proc", Compilation.typeProcedure,
-                                            proc);
+    if (! procSafeForMultipleEvaluation)
+      {
+        comp.letStart();
+        Declaration procDecl = comp.letVariable("%proc",
+                                                Compilation.typeProcedure,
+                                                proc);
+        proc = new ReferenceExp(procDecl);
+      }
 
     // Then an inner L2=(let ((%loop (lambda (argi ...) ...))) (%loop ...))
     comp.letStart();
@@ -709,8 +714,6 @@ public class CompileMisc implements Inlineable
 	doArgs[i+1] = visitor.visitApplyOnly(SlotGet.makeGetField(new ReferenceExp(pargs[i]), "car"), null);
 	recArgs[i] = visitor.visitApplyOnly(SlotGet.makeGetField(new ReferenceExp(pargs[i]), "cdr"), null);
       }
-    if (! procSafeForMultipleEvaluation)
-      proc = new ReferenceExp(procDecl);
     doArgs[0] = proc;
     Expression applyFunc = new ReferenceExp(SchemeCompilation.applyFieldDecl);
     Expression doit = visitor.visitApplyOnly(new ApplyExp(applyFunc, doArgs), null);
@@ -749,13 +752,10 @@ public class CompileMisc implements Inlineable
 	body = Invoke.makeInvokeStatic(Compilation.scmListType,
 				       "reverseInPlace", reverseArgs);
       }
-    LetExp let2 = comp.letDone(body);
-    LetExp let1 = comp.letDone(let2);
-
-    if (procSafeForMultipleEvaluation)
-      return let2;
-    else
-      return let1;
+    LetExp ret = comp.letDone(body);
+    if (! procSafeForMultipleEvaluation)
+      ret = comp.letDone(ret);
+    return ret;
   }
 
   public static Expression validateApplyMakePromise

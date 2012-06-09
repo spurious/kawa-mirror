@@ -1,3 +1,7 @@
+2012-06-08  Per Bothner  <per@bothner.com>
+
+	* LList.java (toString): Use getCar/getCdr instead of car/cdr.
+
 2012-01-19  Per Bothner  <per@bothner.com>
 
 	* LList.java (listRef): Remove method - reimplemented in Scheme.

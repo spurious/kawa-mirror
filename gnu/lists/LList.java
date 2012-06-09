@@ -427,8 +427,8 @@ public class LList extends ExtSequence
 	if (rest instanceof Pair)
 	  {
 	    Pair pair = (Pair) rest;
-	    sbuf.append(pair.car);
-	    rest = pair.cdr;
+            sbuf.append(pair.getCar());
+	    rest = pair.getCdr();
 	  }
 	else
 	  {

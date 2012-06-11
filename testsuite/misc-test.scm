@@ -1,4 +1,4 @@
-(test-init "Miscellaneous" 210)
+(test-init "Miscellaneous" 211)
 
 ;;; DSSSL spec example 11
 (test '(3 4 5 6) (lambda x x) 3 4 5 6)
@@ -1030,3 +1030,7 @@
     (mif ((c . event) tmp0)
             1234)))
 (test 1234 dispatch-events)
+
+;; Savavvah bug #36592 "nested map causes compiler inliner NPE"
+(test '(1 2 3) 'savannah-36592
+      (map (lambda (x) x) (map (lambda (x) x) '(1 2 3))))

@@ -711,12 +711,12 @@ public class CompileMisc implements Inlineable
     Expression[] recArgs = new Expression[collect ? nargs + 1 : nargs];
     for (int i = 0;  i < nargs;  i++)
       {
-	doArgs[i+1] = visitor.visitApplyOnly(SlotGet.makeGetField(new ReferenceExp(pargs[i]), "car"), null);
-	recArgs[i] = visitor.visitApplyOnly(SlotGet.makeGetField(new ReferenceExp(pargs[i]), "cdr"), null);
+        doArgs[i+1] = SlotGet.makeGetField(new ReferenceExp(pargs[i]), "car");
+	recArgs[i] = SlotGet.makeGetField(new ReferenceExp(pargs[i]), "cdr");
       }
     doArgs[0] = proc;
     Expression applyFunc = new ReferenceExp(SchemeCompilation.applyFieldDecl);
-    Expression doit = visitor.visitApplyOnly(new ApplyExp(applyFunc, doArgs), null);
+    Expression doit = new ApplyExp(applyFunc, doArgs);
     if (collect)
       {
 	Expression[] consArgs = new Expression[2];
@@ -725,7 +725,7 @@ public class CompileMisc implements Inlineable
 	recArgs[nargs] = Invoke.makeInvokeStatic(Compilation.typePair,
 						 "make", consArgs);
       }
-    Expression rec = visitor.visitApplyOnly(new ApplyExp(new ReferenceExp(loopDecl), recArgs), null);
+    Expression rec = new ApplyExp(new ReferenceExp(loopDecl), recArgs);
     lexp.body = comp.letDone(collect ? rec : new BeginExp(doit, rec));
     Expression[] initArgs = new Expression[collect ? nargs + 1 : nargs];
     QuoteExp empty = new QuoteExp(LList.Empty);
@@ -737,14 +737,14 @@ public class CompileMisc implements Inlineable
 	Expression result
 	  = collect ? (Expression) new ReferenceExp(resultDecl)
 	  : (Expression) QuoteExp.voidExp;
-	lexp.body = new IfExp(visitor.visitApplyOnly(new ApplyExp(mproc.isEq, compArgs), null),
+	lexp.body = new IfExp(new ApplyExp(mproc.isEq, compArgs),
 			      result, lexp.body);
 	initArgs[i] = args[i+1];
       }
     if (collect)
       initArgs[nargs] = empty;
 
-    Expression body = visitor.visitApplyOnly(new ApplyExp(new ReferenceExp(loopDecl), initArgs), null);
+    Expression body = new ApplyExp(new ReferenceExp(loopDecl), initArgs);
     if (collect)
       {
 	Expression[] reverseArgs = new Expression[1];
@@ -755,7 +755,7 @@ public class CompileMisc implements Inlineable
     LetExp ret = comp.letDone(body);
     if (! procSafeForMultipleEvaluation)
       ret = comp.letDone(ret);
-    return ret;
+    return visitor.visit(ret, null);
   }
 
   public static Expression validateApplyMakePromise

@@ -1,3 +1,9 @@
+2012-06-10  Thomas Kirk <tk@research.att.com>
+	    Per Bothner  <per@bothner.com>
+
+	* misc-test.scm: Test for Savannah bug #36592
+	"nested map causes compiler inliner NPE".
+
 2012-06-08  Helmut Eller  <eller.helmut@gmail.com>
 	    Per Bothner  <per@bothner.com>
 

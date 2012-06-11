@@ -1,3 +1,8 @@
+2012-06-10  Per Bothner  <per@bothner.com>
+
+	* CompileMisc.java (validateApplyMap): Defer validation until end.
+	Fixes Savannah bug #36592 "nested map causes compiler inliner NPE".
+
 2012-06-09  Per Bothner  <per@bothner.com>
 
 	* CompileMisc.java (validateApplyMap): Don't create outer LetExp if

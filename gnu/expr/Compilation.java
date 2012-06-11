@@ -2681,10 +2681,10 @@ public class Compilation implements SourceLocator
   public LetExp letDone (Expression body)
   {
     LetExp let = (LetExp) current_scope;
-    if (let.getFlag(Expression.VALIDATED))
-      let.setFlag(false, Expression.VALIDATED);
-    else
+    // Check if letEnter has been called.
+    if (! let.getFlag(Expression.VALIDATED))
       letEnter();
+    let.setFlag(false, Expression.VALIDATED);
     let.body = body;
     pop(let);
     return let;

@@ -582,7 +582,8 @@ public class LambdaExp extends ScopeExp
 
     for (LambdaExp child = firstChild;  child != null; )
       {
-	if (! child.getCanRead() && ! child.getInlineOnly())
+	if (! child.getCanRead() && ! child.getInlineOnly()
+            && child.getFlag(Expression.VALIDATED))
 	  {
 	    child.compileAsMethod(comp);
 	  }
@@ -1250,7 +1251,7 @@ public class LambdaExp extends ScopeExp
 	 child = child.nextSibling)
       {
 	if (! child.isClassGenerated() && ! child.getInlineOnly()
-            && child.nameDecl != null)
+            && child.nameDecl != null && child.getFlag(Expression.VALIDATED))
             child.allocMethod(this, comp);
         if (child instanceof ClassExp)
           {

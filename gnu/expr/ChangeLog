@@ -1,3 +1,9 @@
+2012-06-13  Per Bothner  <per@bothner.com>
+
+	* LambdaExp.java (compileEnd, allocChildMethods): Don't generate
+	method for unused function.  This fixes Savannah bug#36413
+	"Unused function in module".
+
 2012-06-10  Per Bothner  <per@bothner.com>
 
 	* Compilation.java (letDone): Fix thinko.

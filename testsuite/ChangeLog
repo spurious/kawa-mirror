@@ -1,3 +1,8 @@
+2012-06-19  Per Bothner  <per@bothner.com>
+
+	* inlining.expected: Update for some better boolean folding.  (In this
+	case, we only seems to get rid of a useless goto, and I'm not sure why.)
+
 2012-06-13  Helmut Eller  <eller.helmut@gmail.com>
 	    Per Bothner  <per@bothner.com>
 

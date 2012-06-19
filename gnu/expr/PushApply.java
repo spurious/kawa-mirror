@@ -5,7 +5,11 @@ package gnu.expr;
     Optimizes ((begin ... last) . args) to (begin ... (last . args)).
     This helps optimize Scheme "named let" (and some other forms)
     by making it more likely the application will be to a known procedure.
-    This optimization has to be done after Declarations are bound. */
+    Optimizes (if (let (...) body) e1 [e2])
+      to (let (...) (if body e1 [e2])).
+    Optimizes (if (begin ... last) e1 [e2])
+      to (begin ... (if last e1 [e2]))
+    These optimizations have to be done after Declarations are bound. */
 
 public class PushApply extends ExpVisitor<Expression,Void>
 {
@@ -72,6 +76,32 @@ public class PushApply extends ExpVisitor<Expression,Void>
     exp.visitChildren(this, ignored);
     return exp;
   }
+
+    protected Expression visitIfExp(IfExp exp, Void ignored) {
+        Expression test = exp.test;
+        if (test instanceof LetExp
+            && ! (test instanceof FluidLetExp)) { // [IF-LET] 
+            // Optimize (if (let (...) body) e1 [e2])
+            // to (let (...) (if body e1 [e2]))
+            LetExp let = (LetExp) test;
+            Expression body = let.body;
+            let.body = exp;
+            exp.test = body;
+            return visit(let, ignored);
+        }
+        else if (test instanceof BeginExp) { // [IF-BEGIN]
+            // Optimize (if (begin ... last) e1 [e2])
+            // to (begin ... (if last e1 [e2])).
+            BeginExp begin = (BeginExp) test;
+            Expression[] stmts = begin.exps;
+            int last_index = begin.exps.length - 1;
+            exp.test = stmts[last_index];
+            stmts[last_index] = exp;
+            return visit(begin, ignored);
+        }
+        else
+            return super.visitIfExp(exp, ignored);
+    }
 
   protected Expression visitReferenceExp (ReferenceExp exp, Void ignored)
   {

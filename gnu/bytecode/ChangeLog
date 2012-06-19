@@ -1,3 +1,7 @@
+2012-06-19  Per Bothner  <per@bothner.com>
+
+	* Label.java (isUsed): New method.
+
 2012-04-22  Per Bothner  <per@bothner.com>
 
 	* CodeAttr.java (emitFi): Fix logic for updating unreachability.

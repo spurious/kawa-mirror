@@ -44,6 +44,8 @@ public class Label {
     this.position = position;
   }
 
+    public boolean isUsed() { return stackTypes != null; }
+
   Type mergeTypes (Type t1, Type t2)
   {
     if ((t1 instanceof PrimType) != (t2 instanceof PrimType))

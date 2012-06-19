@@ -119,7 +119,7 @@ nbody.energy(nbody$Body[])double: 181 bytes
 nbody.jupiter()nbody$Body: 57 bytes
 nbody$Body.offsetMomentum(double,double,double)void: 32 bytes
 regexdna.regexdna(java.io.InputStream)void: 329 bytes
-revcomp1.revcomp(java.io.InputStream)void: 382 bytes
+revcomp1.revcomp(java.io.InputStream)void: 379 bytes
 revcomp2.run(gnu.mapping.CallContext)void: 212 bytes
 revcomp2$RevByteArray.reverseAndPrint()void: 129 bytes
 spectralnorm.Approximate(int)double: 110 bytes

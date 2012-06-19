@@ -113,7 +113,7 @@ public class IfExp extends Expression
       ctarget.trueBranchComesFirst = false;
     test.compile(comp, ctarget);
     code.emitIfThen();
-    if (! trueInherited /* && trueLabel.hasFixups()*/)
+    if (! trueInherited && trueLabel.isUsed())
       {
 	trueLabel.define(code);
         // An alternative to saving and restoring callContextVar
@@ -123,7 +123,7 @@ public class IfExp extends Expression
 	then_clause.compileWithPosition(comp, target);
         comp.callContextVar = callContextSave;
       }
-    if (! falseInherited /* && falseLabel.hasFixups()*/)
+    if (! falseInherited && falseLabel.isUsed())
       {
 	code.emitElse();
 	falseLabel.define(code);

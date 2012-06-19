@@ -1,3 +1,10 @@
+2012-06-19  Per Bothner  <per@bothner.com>
+
+	* PushApply.java (visitIfExp): Rewrite Let or Begin in test of IfExp.
+	This allows better folding of booleans.
+	* IfExp.java (compile): Don't compile then_clause or else_clause
+	if not transferred to.
+
 2012-06-13  Per Bothner  <per@bothner.com>
 
 	* LambdaExp.java (compileEnd, allocChildMethods): Don't generate

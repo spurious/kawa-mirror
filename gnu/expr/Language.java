@@ -676,7 +676,10 @@ public abstract class Language
       tr.setState(Compilation.PROLOG_PARSING);
     tr.pushNewModule(lexer);
     if ((options & PARSE_INTERACTIVE_MODULE) != 0)
-      tr.setInteractiveName();
+      {
+        tr.setInteractiveName();
+        tr.getModule().setFlag(ModuleExp.INTERACTIVE);
+      }
     if (info != null)
       info.setCompilation(tr);
     if (! parse(tr, options))

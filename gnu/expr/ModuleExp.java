@@ -22,9 +22,19 @@ public class ModuleExp extends LambdaExp
   public static final int SUPERTYPE_SPECIFIED = NONSTATIC_SPECIFIED << 1;
   public static final int STATIC_RUN_SPECIFIED = SUPERTYPE_SPECIFIED << 1;
   public static final int LAZY_DECLARATIONS = STATIC_RUN_SPECIFIED << 1;
+
+  /** True if the module is immediately evaluated. */
   public static final int IMMEDIATE = LAZY_DECLARATIONS << 1;
+
+  /** True of a read-eval-print interface where each module is only partial.
+   * Conceptually, each statement is a fragent of a imagined super-module
+   * for the whole interaction, thugh current there is no super-module object.
+   * IMMEDIATE is also set in this case.
+   */
+  public static final int INTERACTIVE = IMMEDIATE << 1;
+
   /** Using explicit class (e.g. define-simple-class) for module class. */
-  public static final int USE_DEFINED_CLASS = IMMEDIATE << 1;
+  public static final int USE_DEFINED_CLASS = INTERACTIVE << 1;
 
   public ModuleExp ()
   {

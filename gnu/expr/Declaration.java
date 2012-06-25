@@ -1091,7 +1091,8 @@ public class Declaration
     int fflags = 0;
     boolean isConstant = getFlag(IS_CONSTANT);
     boolean typeSpecified = getFlag(TYPE_SPECIFIED);
-    if (comp.immediate && context instanceof ModuleExp
+    if (comp.getModule().getFlag(ModuleExp.INTERACTIVE)
+        && context == comp.getModule()
         && ! isConstant && ! typeSpecified)
       setIndirectBinding(true);
     // In immediate mode we may need to access the field from a future

@@ -1,3 +1,10 @@
+2012-06-25  Per Bothner  <per@bothner.com>
+
+	* ModuleExp.java (INTERACTIVE): New flag.
+	* Language.java (parse): Maybe set INTERACTIVE flag on module
+	* Declaration.java (makeField): Check INTERACTIVE flag rather than
+	IMMEDIATE flag to decide if setIndirectBinding.
+
 2012-06-19  Per Bothner  <per@bothner.com>
 
 	* PushApply.java (visitIfExp): Rewrite Let or Begin in test of IfExp.

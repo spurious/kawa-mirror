@@ -1,3 +1,7 @@
+2012-06-26  Per Bothner  <per@bothner.com>
+
+	* ReferenceExp.java (calculateType): Fix non-fully-resolved-alias case.
+
 2012-06-25  Per Bothner  <per@bothner.com>
 
 	* ModuleExp.java (INTERACTIVE): New flag.

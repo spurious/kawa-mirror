@@ -394,7 +394,6 @@ public class Declaration
         if (isIndirectBinding()
             && (flags & ReferenceExp.DONT_DEREFERENCE) == 0)
           {
-
             String filename;
             int line;
             if (access != null

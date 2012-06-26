@@ -240,7 +240,9 @@ public class ReferenceExp extends AccessExp
         return Compilation.typeLocation;
       }
     decl = Declaration.followAliases(decl);
-    Type type = decl.getType();
+    Type type = decl.isAlias() && decl.isIndirectBinding()
+        ? Type.objectType // FIXME - should use a parameterized Location type
+        : decl.getType();
     if (type == Type.toStringType)
       type = Type.javalangStringType;
     return type;

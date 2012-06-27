@@ -1,5 +1,8 @@
 2012-06-26  Per Bothner  <per@bothner.com>
 
+	* AbstractScriptEngineFactory.java (class BindingsLocation): Update
+	for Location being made generic.
+
 	* ReferenceExp.java (calculateType): Fix non-fully-resolved-alias case.
 
 2012-06-25  Per Bothner  <per@bothner.com>

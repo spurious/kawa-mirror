@@ -6,7 +6,7 @@ package gnu.mapping;
 /** A Location suitable when Environment or Location can be access by
  * multiple threads.  Accesses are synchronized. */
 
-public class SharedLocation extends NamedLocation
+public class SharedLocation<T> extends NamedLocation<T>
 {
   int timestamp;
 
@@ -16,10 +16,17 @@ public class SharedLocation extends NamedLocation
     this.timestamp = timestamp;
   }
 
-  public synchronized final Object get (Object defaultValue)
+  public synchronized final T get ()
+  {
+    if (base != null) return base.get();
+    if (value == Location.UNBOUND) throw new UnboundLocationException(this);
+    return (T) value;
+  }
+
+  public synchronized final T get (T defaultValue)
   {
     return base != null ? base.get(defaultValue)
-      : value == Location.UNBOUND ? defaultValue : value;
+        : value == Location.UNBOUND ? defaultValue : (T) value;
   }
 
   public synchronized boolean isBound ()
@@ -27,7 +34,7 @@ public class SharedLocation extends NamedLocation
     return base != null ? base.isBound() : value != Location.UNBOUND;
   }
 
-  public synchronized final void set (Object newValue)
+  public synchronized final void set (T newValue)
   {
     if (base == null)
       value = newValue;

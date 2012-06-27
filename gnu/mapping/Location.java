@@ -3,9 +3,9 @@
 
 package gnu.mapping;
 
-/** A Location is an abstract cell/location/variable with a value. */
+/** A Location is an abstract cell/location/variable with a value of type T. */
 
-public abstract class Location
+public abstract class Location<T>
 {
   /* DEBUGGING
   static int counter;
@@ -55,32 +55,28 @@ public abstract class Location
   /** Magic value used to indicate there is no property binding. */
   public static final String UNBOUND = new String("(unbound)");
 
-  public abstract Object get (Object defaultValue);
+  public T get (T defaultValue)
+  {
+    return isBound() ? get() : defaultValue;
+  }
 
   /** Get the current value of this location.
    * @exception UnboundLocationException the location does not have a value. */
-  public final Object get ()
-  {
-    Object unb = Location.UNBOUND;
-    Object val = get(unb);
-    if (val == unb)
-      throw new UnboundLocationException(this);
-    return val;
-  }
+  public abstract T get ();
 
-  public abstract void set (Object value);
+  public abstract void set (T value);
 
   public void undefine ()
   {
-    set(UNBOUND);
+    throw new UnsupportedOperationException ();
   }
 
   /** Set a value, but return cookie so old value can be restored.
    * This is intended for fluid-let where (in the case of multiple threads)
    * a simple save-restore isn't always the right thing. */
-  public Object setWithSave (Object newValue)
+  public Object setWithSave (T newValue)
   {
-    Object old = get(UNBOUND);
+    Object old = isBound() ? get() : UNBOUND;
     set(newValue);
     return old;
   }
@@ -89,15 +85,13 @@ public abstract class Location
    * @param oldValue the return value from a prior setWithSave. */
   public void setRestore (Object oldValue)
   {
-    // if (oldValue == UNBOUND) ???;  // FIXME
-    set(oldValue);
+    if (oldValue == UNBOUND)
+      undefine();
+    else
+      set((T) oldValue);
   }
 
-  public boolean isBound ()
-  {
-    Object unb = Location.UNBOUND;
-    return get(unb) != unb;
-  }
+  public abstract boolean isBound ();
 
   public boolean isConstant ()
   {
@@ -109,14 +103,14 @@ public abstract class Location
     return this;
   }
 
-  public final Object getValue ()
+  public final T getValue ()
   {
     return get(null);
   }
 
-  public final Object setValue (Object newValue)
+  public final T setValue (T newValue)
   {
-    Object value = get(null);
+    T value = get(null);
     set(newValue);
     return value;
   }
@@ -133,12 +127,17 @@ public abstract class Location
     Symbol name = getKeySymbol();
     if (name != null)
       ps.print(name);
-    Object unb = Location.UNBOUND;
-    Object value = get(unb);
-    if (value != unb)
+    if (isBound())
       {
 	ps.print(" -> ");
-	ps.print(value);
+        try
+          {
+            ps.print(get());
+          }
+        catch (Throwable ex)
+          {
+            ps.print("<caught "+ex+">");
+          }
       }
     else
       ps.print("(unbound)");

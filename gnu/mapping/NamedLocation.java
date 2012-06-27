@@ -5,9 +5,9 @@ package gnu.mapping;
 
 /** A Location that can be used as an entry in an Environment. */
 
-public abstract class NamedLocation extends IndirectableLocation
+public abstract class NamedLocation<T> extends IndirectableLocation<T>
   implements
-  java.util.Map.Entry<EnvironmentKey, Object>,
+  java.util.Map.Entry<EnvironmentKey, T>,
   EnvironmentKey
 {
   NamedLocation next;
@@ -102,7 +102,7 @@ public abstract class NamedLocation extends IndirectableLocation
     return h;
   }
 
-  public synchronized Object setWithSave (Object newValue)
+  public synchronized Object setWithSave (T newValue)
   {
     if (value == INDIRECT_FLUIDS)
       return base.setWithSave(newValue);

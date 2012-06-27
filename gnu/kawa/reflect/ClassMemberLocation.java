@@ -9,7 +9,7 @@ import gnu.expr.*;
  * (For now, only fields are supported.)
  */
 
-public abstract class ClassMemberLocation extends Location
+public abstract class ClassMemberLocation<T> extends Location<T>
 {
   Object instance;
   ClassType type;
@@ -126,7 +126,7 @@ public abstract class ClassMemberLocation extends Location
       }   
   }
 
-  public Object get (Object defaultValue)
+  public T get (T defaultValue)
   {
     java.lang.reflect.Field rfld = getRField();
     if (rfld == null)
@@ -134,7 +134,7 @@ public abstract class ClassMemberLocation extends Location
 
     try
       {
-        return rfld.get(instance);
+        return (T) rfld.get(instance);
       }
     catch (IllegalAccessException ex)
       {
@@ -154,7 +154,7 @@ public abstract class ClassMemberLocation extends Location
     return rfld != null;
   }
 
-  public void set (Object value)
+  public void set (T value)
   {
     setup();
     try

@@ -3,23 +3,30 @@
 
 package gnu.mapping;
 
-public class PlainLocation extends NamedLocation
+public class PlainLocation<T> extends NamedLocation<T>
 {
   public PlainLocation (Symbol symbol, Object property)
   {
     super(symbol, property);
   }
 
-  public PlainLocation (Symbol symbol, Object property, Object value)
+  public PlainLocation (Symbol symbol, Object property, T value)
   {
     super(symbol, property);
     this.value = value;
   }
 
-  public final Object get (Object defaultValue)
+  public final T get ()
+  {
+    if (base != null) return base.get();
+    if (value == Location.UNBOUND) throw new UnboundLocationException(this);
+    return (T) value;
+  }
+
+  public final T get (T defaultValue)
   {
     return base != null ? base.get(defaultValue)
-      : value == Location.UNBOUND ? defaultValue : value;
+        : value == Location.UNBOUND ? defaultValue : (T) value;
   }
 
   public boolean isBound ()
@@ -27,7 +34,7 @@ public class PlainLocation extends NamedLocation
     return base != null ? base.isBound() : value != Location.UNBOUND;
   }
 
-  public final void set (Object newValue)
+  public final void set (T newValue)
   {
     if (base == null)
       value = newValue;

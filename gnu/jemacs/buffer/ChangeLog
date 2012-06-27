@@ -1,3 +1,7 @@
+2012-06-26  Per Bothner  <per@bothner.com>
+
+	* BufferLocal.java: Update for Location being made generic.
+
 2011-10-21  Shad Gregory <captshadg@gmail.com>
 	    Per Bothner  <per@bothner.com>
 

@@ -6,7 +6,7 @@ import gnu.jemacs.lang.ELisp;
  * A buffer-local variable (Location).
  */
 
-public class BufferLocal extends IndirectableLocation
+public class BufferLocal extends IndirectableLocation<Object>
 {
   boolean all;
 
@@ -49,6 +49,14 @@ public class BufferLocal extends IndirectableLocation
         bloc.setAlias(loc);
       }
     return bloc;
+  }
+
+  public Object get ()
+  {
+    Object v = get(Buffer.getCurrent(), Location.UNBOUND);
+    if (v == Location.UNBOUND)
+        throw new UnboundLocationException(this);
+    return v;
   }
 
   public Object get (Object defaultValue)
@@ -122,7 +130,7 @@ public class BufferLocal extends IndirectableLocation
 	  }
 	cachedIndex = 0;
       }
-    return super.isBound();
+    return get(unb) != unb;
   }
 
   public synchronized final void set (Object newValue)

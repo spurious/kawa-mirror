@@ -6,7 +6,7 @@ package gnu.mapping;
 /** A Location that forwards to a thread-specific Location.
  */
 
-public class ThreadLocation extends NamedLocation implements Named
+public class ThreadLocation<T> extends NamedLocation<T> implements Named
 {
   static int counter;
   private static synchronized int nextCounter() { return ++counter; }
@@ -16,10 +16,10 @@ public class ThreadLocation extends NamedLocation implements Named
    * that are not tied to a specfic name. */
   public static final String ANONYMOUS = new String("(dynamic)");
 
-  SharedLocation global;
+  SharedLocation<T> global;
 
   // Only used when property==ANONYMOUS.
-  private ThreadLocal<NamedLocation> thLocal;
+  private ThreadLocal<NamedLocation<T>> thLocal;
 
   // Only used when property!=ANONYMOUS.
   private int hash;
@@ -36,14 +36,14 @@ public class ThreadLocation extends NamedLocation implements Named
   public ThreadLocation (String name)
   {
     super(Symbol.makeUninterned(name), ANONYMOUS);
-    thLocal = new InheritingLocation();
-    global = new SharedLocation(this.name, null, 0);
+    thLocal = new InheritingLocation<T>();
+    global = new SharedLocation<T>(this.name, null, 0);
   }
 
   private ThreadLocation (Symbol name)
   {
     super(name, ANONYMOUS);
-    thLocal = new InheritingLocation();
+    thLocal = new InheritingLocation<T>();
     String str = name == null ? null : name.toString();
     global = new SharedLocation(Symbol.makeUninterned(str), null, 0);
   }
@@ -72,18 +72,18 @@ public class ThreadLocation extends NamedLocation implements Named
   }
 
   /** Set the default/global value. */
-  public void setGlobal (Object value)
+  public void setGlobal (T value)
   {
     synchronized (this)
       {
 	if (global == null)
-	  global = new SharedLocation(this.name, null, 0);
+	  global = new SharedLocation<T>(this.name, null, 0);
 	global.set(value);
       }
   }
 
   /** Get the thread-specific Location for this Location. */
-  public NamedLocation getLocation ()
+  public NamedLocation<T> getLocation ()
   {
     if (property != ANONYMOUS)
       {
@@ -100,16 +100,26 @@ public class ThreadLocation extends NamedLocation implements Named
     return entry;
   }
 
-  public Object get (Object defaultValue)
+  public T get()
+  {
+    return getLocation().get();
+  }
+
+  public T get(T defaultValue)
   {
     return getLocation().get(defaultValue);
   }
 
-  public void set (Object value)
+  public boolean isBound()
+  {
+    return getLocation().isBound();
+  }
+
+  public void set (T value)
   {
     getLocation().set(value);
   }
-  public Object setWithSave (Object newValue)
+  public Object setWithSave (T newValue)
   {
     return getLocation().setWithSave(newValue);
   }
@@ -152,25 +162,25 @@ public class ThreadLocation extends NamedLocation implements Named
     return tloc;
   }
 
-  public class InheritingLocation
-    extends InheritableThreadLocal<NamedLocation>
+  public class InheritingLocation<T>
+    extends InheritableThreadLocal<NamedLocation<T>>
   {
-    protected SharedLocation childValue(NamedLocation parentValue)
+    protected SharedLocation childValue(NamedLocation<T> parentValue)
     {
       if (property != ANONYMOUS)
         throw new Error();
       if (parentValue == null)
         parentValue = (SharedLocation) getLocation();
-      NamedLocation nloc = parentValue;
+      NamedLocation<T> nloc = parentValue;
       if (nloc.base == null)
         {
-          SharedLocation sloc = new SharedLocation(name, property, 0);
+          SharedLocation<T> sloc = new SharedLocation<T>(name, property, 0);
           sloc.value = nloc.value;
           nloc.base = sloc;
           nloc.value = null;
           nloc = sloc;
         }
-      SharedLocation sloc = new SharedLocation(name, property, 0);
+      SharedLocation<T> sloc = new SharedLocation<T>(name, property, 0);
       sloc.value = null;
       sloc.base = nloc;
       return sloc;

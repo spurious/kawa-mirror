@@ -8,13 +8,13 @@ import gnu.lists.*;
  * working with property lists.
  */
 
-public class PropertyLocation extends Location
+public class PropertyLocation extends Location<Object>
 {
   //  Location plist;
 
   Pair pair;
 
-  public final Object get (Object defaultValue)
+  public final Object get ()
   {
     return pair.getCar();
   }
@@ -246,7 +246,7 @@ public class PropertyLocation extends Location
     return true;
   }
 
-  /** Remove a properaty assocatied with an object.
+  /** Remove a property associated with an object.
    * Corresponds to Common Lisp's <code>remprop</code> function.
    */
   public static boolean removeProperty (Object symbol, Object property)

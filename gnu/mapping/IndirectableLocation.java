@@ -3,7 +3,7 @@
 
 package gnu.mapping;
 
-public abstract class IndirectableLocation extends Location
+public abstract class IndirectableLocation<T> extends Location<T>
 {
   /** If <code>value==DIRECT_ON_SET</code>, break indirection on a <code>set</code>. */
   protected static final Object DIRECT_ON_SET = new String("(direct-on-set)");
@@ -18,7 +18,7 @@ public abstract class IndirectableLocation extends Location
   protected static final Object INDIRECT_FLUIDS = new String("(indirect-fluids)");
 
   /** If non-null, operations are forwarded to the base location. */
-  protected Location base;
+  protected Location<T> base;
 
   /** If <code>base</code> is null, the current value stored in
    * this <code>Location</code>.

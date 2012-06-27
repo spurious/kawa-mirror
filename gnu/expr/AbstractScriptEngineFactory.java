@@ -150,7 +150,7 @@ public abstract class AbstractScriptEngineFactory implements ScriptEngineFactory
 
     /** A Location object that proxies lookup in global and engine Bindings.
      */
-    public static class BindingsLocation extends NamedLocation {
+    public static class BindingsLocation extends NamedLocation<Object> {
         final BindingsEnvironment env;
         final String sname;
         public BindingsLocation(SimpleSymbol name, BindingsEnvironment env) {
@@ -168,9 +168,23 @@ public abstract class AbstractScriptEngineFactory implements ScriptEngineFactory
                 return r;
             return defaultValue;
         }
+        public Object get() {
+            Object unbound = Location.UNBOUND;
+            Object v = get(unbound);
+            if (v == unbound)
+                throw new UnboundLocationException();
+            return v;
+        }
+
+        public boolean isBound() {
+            Object unbound = get(Location.UNBOUND);
+            return get(unbound) == unbound;
+        }
+
         public void set(Object newValue) {
             env.ebindings.put(sname, newValue);
         }
+
         public Environment getEnvironment () {
             return env;
         }

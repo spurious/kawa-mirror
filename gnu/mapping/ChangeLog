@@ -1,3 +1,15 @@
+2012-06-26  Per Bothner  <per@bothner.com>
+
+	* Location.java: Change to parameterized class.
+	* NamedLocation.java: Update accordingly.
+	* IndirectableLocation.java: Update accordingly.
+	* PlainLocation.java: Update accordingly.
+	* ProcLocation.java: Update accordingly.
+	* ThreadLocation.java: Update accordingly.
+	* PropertyLocation.java: Update accordingly.
+	* SharedLocation.java: Update accordingly.
+	* ConstrainedLocation.java: Update accordingly.
+
 2012-05-20  Per Bothner  <per@bothner.com>
 
 	* SimpleEnvironment.java (newLocation): Make protected.

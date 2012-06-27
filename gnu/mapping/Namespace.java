@@ -1,8 +1,9 @@
-// Copyright (c) 1996-2000, 2001, 2002, 2004  Per M.A. Bothner.
+// Copyright (c) 1996-2000, 2001, 2002, 2004, 2012  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.mapping;
-import java.util.Hashtable;
+import gnu.kawa.util.*;
+import java.util.*;
 import java.io.*;
 
 /** A mapping from strings ("print names") to <code>Symbol</code>s.
@@ -17,6 +18,7 @@ import java.io.*;
  */
 
 public class Namespace
+//extends AbstractHashTable<SymbolRef, String, Symbol>
   implements Externalizable, HasNamedParts
 {
   /** Map namepsace names (and nick-names) to Namespaces. */
@@ -360,45 +362,48 @@ public class Namespace
  * even though they're referenced from a <code>Namespace</code>. */
 
 class SymbolRef
-  /* #ifdef JAVA2 */
-  extends java.lang.ref.WeakReference
-  /* #endif */
+  extends java.lang.ref.WeakReference<Symbol>
+  implements Map.Entry<String,Symbol>
 {
-  SymbolRef next;
+    SymbolRef next;
 
-  /* #ifndef JAVA2 */
-  // Symbol sym;
-  /* #endif */
+    String getName () {
+        Symbol sym = getSymbol();
+        return sym == null ? null : sym.getName();
+    }
 
-  /*
-  String getName ()
-  {
-    Symbol sym = getSymbol();
-    return sym == null ? null : sym.getName();
-  }
-  */
+    SymbolRef (Symbol sym, Namespace ns) {
+        super(sym);
+    }
 
-  SymbolRef (Symbol sym, Namespace ns)
-  {
-    /* #ifdef JAVA2 */
-    super(sym);
-    /* #else */
-    // this.sym = sym;
-    /* #endif */
-  }
+    public String getKey() {
+        Symbol sym = getSymbol();
+        return sym == null ? null : sym.getName();
+    }
 
-  Symbol getSymbol()
-  {
-    /* #ifdef JAVA2 */
-    return (Symbol) get();
-    /* #endif */
-    /* #ifndef JAVA2 */
-    // return sym;
-    /* #endif */
-  }
+    public Symbol getValue() {
+        return getSymbol();
+    }
 
-  public String toString()
-  {
-    return "SymbolRef["+getSymbol()+"]";
-  }
+    public int hashCode() {
+        Symbol sym = getSymbol();
+        return sym == null ? 0 : sym.hashCode();
+    }
+
+    public Symbol setValue(Symbol value) {
+        throw new UnsupportedOperationException();
+    }
+
+    public boolean equals (Object o) {
+        return o instanceof SymbolRef
+            && get() == ((SymbolRef) o).get();
+    }
+
+    Symbol getSymbol() {
+        return get();
+    }
+
+    public String toString() {
+        return "SymbolRef["+getSymbol()+"]";
+    }
 }

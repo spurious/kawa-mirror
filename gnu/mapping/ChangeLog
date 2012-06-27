@@ -1,3 +1,7 @@
+2012-06-27  Per Bothner  <per@bothner.com>
+
+	* Namespace.java (class SymbolRef): Implement Map.Entry<String,Symbol>.
+
 2012-06-26  Per Bothner  <per@bothner.com>
 
 	* Location.java: Change to parameterized class.

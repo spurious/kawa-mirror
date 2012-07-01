@@ -1,3 +1,8 @@
+2012-07-01  Charles Turner  <chturne@gmail.com>
+
+	* Symbols.java (isSymbol): Fix the incorrect definition whereby a
+	string was considered a symbol.
+
 2012-07-01  Per Bothner  <per@bothner.com>
 
 	* Lisp2.java (getNamespaceOf): Also check Declaration.IS_SYNTAX.

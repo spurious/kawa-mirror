@@ -1,6 +1,5 @@
 package gnu.commonlisp.lang;
 import gnu.mapping.*;
-import gnu.lists.*;
 
 /** Support for Lisp Symbols.
  * The special symbol `nil' is actually the value gnu.lists.LList.Empty. */
@@ -11,10 +10,14 @@ public class Symbols
   {
   }
 
+  /**
+   * Predicate to check whether a given object is a CL symbol.
+   * 
+   * Used for {@code SYMBOLP}.
+   */
   public static boolean isSymbol(Object val)
   {
-    return val instanceof String || val == Lisp2.FALSE
-      || val instanceof Symbol;
+    return val == Lisp2.FALSE || val instanceof Symbol;
   }
 
   public static boolean isBound(Object sym)
@@ -52,11 +55,23 @@ public class Symbols
       : Lisp2.getString(((Symbol) sym).getName());
   }
 
+  /**
+   * Get the function binding for a given symbol in the current environment.
+   * 
+   * Will throw an {@link UnboundLocationException} if no such symbol exists
+   * in the current environment.
+   */
   public static Object getFunctionBinding (Object symbol)
   {
     return Environment.getCurrent().getFunction(getSymbol(symbol));
   }
 
+  /**
+   * Get the function binding for a given symbol in a given environment.
+   * 
+   * Will throw an {@link UnboundLocationException} if no such symbol exists
+   * in the current environment.
+   */
   public static Object getFunctionBinding (Environment environ, Object symbol)
   {
     return environ.getFunction(getSymbol(symbol));

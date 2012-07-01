@@ -501,7 +501,7 @@ public class Declaration
 
   /** True if in the function namespace, for languages that distinguishes them.
    * I.e. a function definition or macro definition. */
-  static final int PROCEDURE = 0x80;
+  public static final int PROCEDURE = 0x80;
 
   public static final int IS_ALIAS = 0x100;
 

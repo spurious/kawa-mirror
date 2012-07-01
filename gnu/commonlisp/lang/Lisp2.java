@@ -61,7 +61,9 @@ public abstract class Lisp2 extends LispLanguage
     // function and variable position.
     if (decl.isAlias())
       return FUNCTION_NAMESPACE+VALUE_NAMESPACE;
-    return decl.isProcedureDecl() ? FUNCTION_NAMESPACE : VALUE_NAMESPACE;
+    return decl.getFlag(Declaration.PROCEDURE|Declaration.IS_SYNTAX)
+        ? FUNCTION_NAMESPACE
+        : VALUE_NAMESPACE;
   }
 
   /** Get a symbol for a given (interned) Java string. */

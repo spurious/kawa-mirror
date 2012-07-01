@@ -1,3 +1,7 @@
+2012-07-01  Per Bothner  <per@bothner.com>
+
+	* Lisp2.java (getNamespaceOf): Also check Declaration.IS_SYNTAX.
+
 2012-06-04  Jamison Hope  <jrh@theptrgroup.com>
 
 	Fixes for erroneous warnings and lookup failures.

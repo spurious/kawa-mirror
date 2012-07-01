@@ -1,3 +1,7 @@
+2012-07-01  Per Bothner  <per@bothner.com>
+
+	* Declaration.java (PROCEDURE): Make public.
+
 2012-06-26  Per Bothner  <per@bothner.com>
 
 	* AbstractScriptEngineFactory.java (class BindingsLocation): Update

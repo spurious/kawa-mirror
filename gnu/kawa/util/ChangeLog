@@ -1,3 +1,7 @@
+2012-06-08  Jamison Hope  <jrh@theptrgroup.com>
+
+	* RunTestScript.java: Add support for Common Lisp.
+
 2012-05-28  Per Bothner  <per@bothner.com>
 
 	* PreProcess.java (version_features): Fix typo.

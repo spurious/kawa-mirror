@@ -54,6 +54,7 @@ public class RunTestScript implements Runnable
   List<String> expectedErr = new ArrayList<String>();
 
   String[] commentSyntaxTable = {
+    "CommonLisp", ";;", "#|", "|#",
     "Scheme", ";;", "#|", "|#",
     "Q2", "#", null, null };
 
@@ -80,7 +81,7 @@ public class RunTestScript implements Runnable
               }
           }
       }
-    if (language == null)    
+    if (language == null)
       error("unknown or unsupported language");
     if (lineComment != null)
       {
@@ -157,7 +158,7 @@ public class RunTestScript implements Runnable
                   }
               }
           }
-    
+
         ProcessBuilder kawa = new ProcessBuilder("java", "kawa.repl", "--diagnostic-strip-directories", filename);
         Process process = kawa.start();
         BufferedReader out = new BufferedReader(new InputStreamReader(process.getInputStream()));

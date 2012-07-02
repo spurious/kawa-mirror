@@ -18,7 +18,7 @@ import java.io.*;
  */
 
 public class Namespace
-//extends AbstractHashTable<SymbolRef, String, Symbol>
+  extends AbstractHashTable<SymbolRef, String, Symbol>
   implements Externalizable, HasNamedParts
 {
   /** Map namepsace names (and nick-names) to Namespaces. */
@@ -46,12 +46,7 @@ public class Namespace
 
   protected Namespace (int capacity)
   {
-    log2Size = 4;
-    while (capacity > (1 << log2Size))
-      log2Size++;
-    capacity = 1 << log2Size;
-    table = new SymbolRef[capacity];
-    mask = capacity - 1;
+    super(capacity);
   }
 
   public static Namespace create (int capacity)
@@ -173,7 +168,7 @@ public class Namespace
 
   protected final Symbol lookupInternal(String key, int hash)
   {
-    int index = hash & mask;
+    int index = hashToIndex(hash);
     SymbolRef prev = null;
     for (SymbolRef ref = table[index];  ref != null;  )
       {
@@ -201,15 +196,19 @@ public class Namespace
 
   public Symbol add(Symbol sym, int hash)
   {
-    int index = hash & mask;
-    SymbolRef ref = new SymbolRef(sym, this);
-    sym.namespace = this;
-    ref.next = table[index];
-    table[index] = ref;
-    num_bindings++;
-    if (num_bindings >= table.length)
-      rehash();
+    put(sym.getName(), hash, sym);
     return sym;
+  }
+
+  public Symbol get (Object key, Symbol defaultValue)
+  {
+    if (key instanceof String)
+      {
+        Symbol sym = lookup((String) key, key.hashCode(), false);
+        if (sym != null)
+          return sym;
+      }
+      return defaultValue;
   }
 
   public Symbol lookup(String key, int hash, boolean create)
@@ -248,70 +247,21 @@ public class Namespace
     synchronized (this)
       {
 	String name = symbol.getLocalPart();
-	int hash = name.hashCode();
-	int index = hash & mask;
-	SymbolRef prev = null;
-	SymbolRef ref = table[index];
-	while (ref != null)
-	  {
-	    SymbolRef next = ref.next;
-	    Symbol refsym = ref.getSymbol();
-	    if (refsym == null || refsym == symbol)
-	      {
-		if (prev == null)
-		  table[index] = next;
-		else
-		  prev.next = next;
-		num_bindings--;
-		if (refsym != null)
-		  return true;
-	      }
-	    else
-	      prev = ref;
-	    ref = next;
-	  }
-	return false;
+        return remove(name) != null;
       }
   }
 
-  protected SymbolRef[] table;
-  int log2Size;
-  private int mask;
-  int num_bindings;
+    protected int getEntryHashCode (SymbolRef entry) { return entry.hashCode(); }
+    /** Extract next Entry in same hash-bucket. */
+    protected SymbolRef getEntryNext (SymbolRef entry) { return entry.next; }
+    /** Set next Entry in same hash-bucket. */
+    protected void setEntryNext (SymbolRef entry, SymbolRef next) { entry.next = next; }
+    /** Allocate Entry[n]. */
+    protected SymbolRef[] allocEntries(int n) { return new SymbolRef[n]; }
 
-  protected void rehash ()
-  {
-    int oldCapacity = table.length;
-    int newCapacity = 2 * oldCapacity;
-    int newMask = newCapacity - 1;
-    int countInserted = 0;
-    SymbolRef[] oldTable = table;
-    SymbolRef[] newTable = new SymbolRef[newCapacity];
-
-    for (int i = oldCapacity;  --i >= 0;)
-      {
-	for (SymbolRef ref = oldTable[i];  ref != null;  )
-	  {
-	    SymbolRef next = ref.next;
-	    Symbol sym = ref.getSymbol();
-	    if (sym != null)
-	      {
-		String key = sym.getName();
-		int hash = key.hashCode();
-		int index = hash & newMask;
-		countInserted++;
-		ref.next = newTable[index];
-		newTable[index] = ref;
-	      }
-	    ref = next;
-	  }
-      }
-
-    table = newTable;
-    log2Size++;
-    mask = newMask;
-    num_bindings = countInserted;
-  }
+    protected SymbolRef makeEntry (String key, int hash, Symbol value) {
+        return new SymbolRef(value);
+    }
 
   public void writeExternal(ObjectOutput out) throws IOException
   {
@@ -372,7 +322,7 @@ class SymbolRef
         return sym == null ? null : sym.getName();
     }
 
-    SymbolRef (Symbol sym, Namespace ns) {
+    SymbolRef (Symbol sym) {
         super(sym);
     }
 

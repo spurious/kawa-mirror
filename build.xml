@@ -483,7 +483,7 @@
       <include name="gnu/kawa/xml/"/>
       <include name="gnu/xml/"/>
       <patternset refid="with-awt-${with-awt}"/>
-      <include name="gnu/kawa/models/"/>
+      <include name="gnu/kawa/models/" if="${with-awt}"/>
       <include name="gnu/kawa/swingviews/" if="${with-swing}"/>
     </javac>
   </target>
@@ -569,8 +569,7 @@
         <include name="readtable.scm"/>
         <include name="cut.scm"/>
         <include name="enums.scm"/>
-        <include name="gui.scm"/>
-        <include name="XML.scm"/>
+        <include name="gui.scm" if="${with-awt}"/>
         <include name="swing.scm" if="${with-swing}"/>
         <include name="syntaxutils.scm"/>
         <include name="Streams.scm"/>

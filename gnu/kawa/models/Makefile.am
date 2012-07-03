@@ -28,4 +28,7 @@ java_sources = \
 PACKAGE_FNAME = gnu-kawa-models
 GCJ_INPUTS =  $(java_Java)
 
-all: Makefile java-classes.stamp $(@GCJ_COMPILED_SELECTED@)
+if WITH_AWT
+ALL = java-classes.stamp $(@GCJ_COMPILED_SELECTED@)
+endif
+all: Makefile $(ALL)

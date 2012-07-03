@@ -1,3 +1,7 @@
+2012-07-03  Per Bothner  <per@bothner.com>
+
+	* Makefile.am: Conditionalize gui.scm on WITH_AWT.
+
 2012-03-11  Per Bothner  <per@bothner.com>
 
 	* srfi69.scm (symbol-hash, vector-hash): Remove non-exported

@@ -1,3 +1,11 @@
+2012-06-08  Jamison Hope  <jrh@theptrgroup.com>
+
+	* Makefile.am (SCRIPTS_TO_RUN): New variable.
+	(check,check-lang-test,check-run-test-scripts): Move the
+	lang-test.lisp test to its own rule, and add rule for running
+	tests with RunTestScript.
+	* warnings.lisp: New file.
+
 2010-01-13  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (DOTEST): Use -f option.

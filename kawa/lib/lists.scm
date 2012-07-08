@@ -45,14 +45,15 @@
 		     #,(syntax-case #'slots ()
 			((first1 . rest1)
 			 #`(set!
-			    (field 
-			     #,(let loop ((f #'rest1))
-				(syntax-case f ()
-				  (() #'arg)
-				  ((first . rest)
-				   #`(field (as <pair> #,(loop #'rest))
-					    '#,(syntax-object->datum #'first)))))
-			     'first1)
+			    (field
+                             (as <pair>
+                                 #,(let loop ((f #'rest1))
+                                     (syntax-case f ()
+                                       (() #'arg)
+                                       ((first . rest)
+                                        #`(field (as <pair> #,(loop #'rest))
+                                                 '#,(syntax-object->datum #'first))))))
+                             'first1)
 			    value))))
 	   (lambda (arg) name: 'fname
 		   #,(let loop ((f #'slots))

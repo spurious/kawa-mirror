@@ -1,3 +1,8 @@
+2012-07-07  Per Bothner  <per@bothner.com>
+
+	* lists.scm (define-cxr): Add cast to <pair> so field can
+	resolve to setCdr method.
+
 2012-05-10  Per Bothner  <per@bothner.com>
 
 	* Makefile.am: Comfile windows.scm if WITH_SWING is set, rather

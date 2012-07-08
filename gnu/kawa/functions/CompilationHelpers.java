@@ -151,8 +151,18 @@ public class CompilationHelpers
             Object value = ((QuoteExp) arg).getValue();
             if (value instanceof Procedure)
               {
-                Object setter = ((Procedure) value).getSetter();
-                if (setter instanceof Procedure)
+                Procedure setter;
+                Procedure pvalue = (Procedure) value;
+                try
+                  {
+                    setter = pvalue.getSetter();
+                  }
+                catch (RuntimeException ex)
+                  {
+                    setter = null;
+                    visitor.getCompilation().error('w', "procedure '"+pvalue.getName()+"' has no setter");
+                  }
+                if (setter != null)
                   {
                     if (setter instanceof java.io.Externalizable)
                       return new QuoteExp(setter);

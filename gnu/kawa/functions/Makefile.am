@@ -20,7 +20,6 @@ java_sources=\
   CompileMisc.java \
   ConstantFunction0.java \
   Convert.java \
-  CountValues.java \
   DisplayFormat.java \
   DivideOp.java \
   FileUtils.java \

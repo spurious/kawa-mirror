@@ -6,7 +6,7 @@ PACKAGE_FNAME = gnu-kawa-slib
 EXTRA_GCJ_INPUTS =  *.class
 
 if ENABLE_XML
-XML_SCM = XML.scm XStrings.scm
+XML_SCM = XML.scm XStrings.scm Xutils.scm
 endif
 
 if WITH_SWING

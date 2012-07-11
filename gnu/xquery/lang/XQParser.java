@@ -3532,7 +3532,7 @@ public class XQParser extends Lexer
     comp.pop(lexp);
     lexp.body = body;
     Expression[] args = { lexp, inits[0]};  // SIC
-    return new ApplyExp(makeFunctionExp("gnu.xquery.util.ValuesEvery",
+    return new ApplyExp(makeFunctionExp("gnu.xquery.util.Xutils",
 					isEvery ? "every" : "some"),
 			args);
   }

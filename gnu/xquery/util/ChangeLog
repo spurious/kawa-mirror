@@ -1,3 +1,10 @@
+2012-07-10  Per Bothner  <per@bothner.com>
+
+	* Xutils.scm: Moved from gnu/kawa/slib.
+	* Makefile.am: Update accordingly.
+	* Xutils.scm (every-or-some-values, every, some): New functions.
+	* ValuesEvery.java: Removed class.
+
 2012-03-20  Per Bothner  <per@bothner.com>
 
 	* CompileMisc.java: Add needed setCanRead calls.

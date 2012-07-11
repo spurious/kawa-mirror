@@ -185,7 +185,7 @@ KAWA_COMPILER = $(JAVA) -classpath "$(CLASSPATH)" kawa.repl -d $(top_builddir) \
 
 PACKAGE_FNAME = gnu-kawa-slib
 EXTRA_GCJ_INPUTS = *.class
-@ENABLE_XML_TRUE@XML_SCM = XML.scm XStrings.scm Xutils.scm
+@ENABLE_XML_TRUE@XML_SCM = XML.scm XStrings.scm
 @WITH_SWING_TRUE@SWING_SCM = swing.scm
 @WITH_AWT_TRUE@AWT_SCM = gui.scm
 

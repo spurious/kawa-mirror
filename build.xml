@@ -604,6 +604,12 @@
         <include name="XStrings.scm"/>
       </fileset>
     </kawac>
+    <kawac failonerror="true" destdir="${build.classes}"
+	    prefix="gnu.xquery.util."  modulestatic="run" language="scheme">
+      <fileset dir="${src.dir}/gnu/xquery/util"> 
+        <include name="Xutils.scm"/>
+      </fileset>
+    </kawac>
   </target>
 
   <target name="brl-classes"

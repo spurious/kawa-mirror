@@ -28,9 +28,13 @@ java_sources = \
   StringUtils.java \
   SubList.java \
   TimeUtils.java \
-  ValuesEvery.java \
   ValuesFilter.java \
   XQException.java
 
+java_SCM = Xutils.scm
+
 PACKAGE_FNAME = gnu-xquery-util
-all: Makefile java-classes.stamp $(@GCJ_COMPILED_SELECTED@)
+
+ALL = java-classes.stamp scm-classes.stamp $(@GCJ_COMPILED_SELECTED@)
+all: Makefile $(ALL)
+

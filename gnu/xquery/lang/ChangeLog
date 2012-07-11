@@ -1,5 +1,8 @@
 2012-07-10  Per Bothner  <per@bothner.com>
 
+	* XQuery.java (initXQuery): Update implementation of 'count'.
+	* XQParser.java (parseQuantifiedExpr): Update some/every implementation.
+
 	* XQuery.java (initXQuery): Implementation of "count" method changed.
 
 2011-03-16  Per Bothner  <per@bothner.com>

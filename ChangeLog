@@ -1,3 +1,12 @@
+2012-07-10  Per Bothner  <per@bothner.com>
+
+	* build.xml (xml-classes): Added Xutils.scm.
+
+2012-07-03  Per Bothner  <per@bothner.com>
+
+	* build.xml: Some cleanups for with-awt dependeny, which
+	should benefit Android.
+
 2012-05-31  Per Bothner  <per@bothner.com>
 
 	* configure.in: Change argument to --with-javafx to be actual jfxrt.jar

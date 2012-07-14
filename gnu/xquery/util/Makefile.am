@@ -26,7 +26,6 @@ java_sources = \
   RelativeStepFilter.java \
   SequenceUtils.java \
   StringUtils.java \
-  SubList.java \
   TimeUtils.java \
   ValuesFilter.java \
   XQException.java

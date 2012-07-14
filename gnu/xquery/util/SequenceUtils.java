@@ -324,4 +324,42 @@ public class SequenceUtils
           }
       }
   }
+
+  public static void subList$X(Object seq, double start, double end,
+                               CallContext ctx)
+  {
+    subList$C(seq, start, end, ctx.consumer);
+  }
+
+  public static void subList$C(Object seq, double start, double end,
+                               Consumer out)
+  {
+    if (seq instanceof Values)
+      {
+	Values vals = (Values) seq;
+        int n = 0;
+	int i = 0;
+	while (++n < start)
+	  {
+	    i = vals.nextDataIndex(i);
+	    if (i < 0)
+	      return;
+	  }
+	int startPosition = i;
+	int endPosition = i;
+	while (n++ < end)
+	  {
+	    i = vals.nextDataIndex(i);
+	    if (i < 0)
+	      break;
+	    endPosition = i;
+	  }
+	vals.consumeIRange(startPosition, endPosition, out);
+      }
+    else
+      {
+	if (start <= 1 && end >= 2)
+	  out.writeObject(seq);
+      }
+  }
 }

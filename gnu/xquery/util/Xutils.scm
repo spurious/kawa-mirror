@@ -3,6 +3,8 @@
 (module-compile-options full-tailcalls: #t)
 
 (define-alias BooleanValue gnu.xquery.util.BooleanValue)
+(define-alias StringUtils gnu.xquery.util.StringUtils)
+(define-alias Math java.lang.Math)
 
 (define (count-values arg) ::int
   (if (instance? arg gnu.mapping.Values)
@@ -29,3 +31,11 @@
                     (loop)
                     ok)))))
       (BooleanValue:booleanValue (proc values))))
+
+(define (sublist seq arg1 #!optional (arg2 #!null))
+  (let* ((d1 ::double (Math:round (StringUtils:asDouble arg1)))
+         (d2 ::double (if (eq? arg2 #!null) java.lang.Double:POSITIVE_INFINITY
+                          (+ d1 (Math:round (StringUtils:asDouble arg2))))))
+    (gnu.xquery.util.SequenceUtils:subList seq d1 d2)))
+
+

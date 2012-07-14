@@ -1,3 +1,7 @@
+2012-07-14  Per Bothner  <per@bothner.com>
+
+	* XQuery.java (initXQuery): Update sublist and subsequence.
+
 2012-07-10  Per Bothner  <per@bothner.com>
 
 	* XQuery.java (initXQuery): Update implementation of 'count'.

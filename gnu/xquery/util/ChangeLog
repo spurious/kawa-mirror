@@ -1,3 +1,11 @@
+2012-07-14  Per Bothner  <per@bothner.com>
+
+	* SubList.java: Class removed.
+	(subList): Moved to SequenceUtils.
+	* SequenceUtils.java (subList$X, subList$C): New methods.
+	* Makefile.am: Update accordingly.
+	* Xutils.scm (sublist): New function.
+
 2012-07-10  Per Bothner  <per@bothner.com>
 
 	* Xutils.scm: Moved from gnu/kawa/slib.

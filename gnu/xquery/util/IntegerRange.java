@@ -8,15 +8,8 @@ import gnu.mapping.*;
 import gnu.kawa.xml.KNode;
 import gnu.kawa.xml.UntypedAtomic;
 
-public class IntegerRange extends MethodProc // implements Inlineable
+public class IntegerRange
 {
-  public static final IntegerRange integerRange = new IntegerRange("to");
-
-  public IntegerRange(String name)
-  {
-    setName(name);
-  }
-
   public static final IntNum MIN_INT = IntNum.make(Integer.MIN_VALUE);
   public static final IntNum MAX_INT = IntNum.make(Integer.MAX_VALUE);
 
@@ -60,11 +53,8 @@ public class IntegerRange extends MethodProc // implements Inlineable
       }
   }
 
-  public void apply (CallContext ctx)
+  public static void integerRange$X(Object first, Object last, CallContext ctx)
   {
-    Object first = ctx.getNextArg();
-    Object last = ctx.getNextArg();
-    ctx.lastArg();
     first = KNode.atomicValue(first);
     last = KNode.atomicValue(last);
     if (first == Values.empty || first == null

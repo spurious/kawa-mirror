@@ -213,6 +213,7 @@ java_sources = \
 
 java_SCM = Xutils.scm
 PACKAGE_FNAME = gnu-xquery-util
+SCM_COMPILE_FLAGS = --warn-undefined-variable --warn-unknown-member --warn-as-error
 ALL = java-classes.stamp scm-classes.stamp $(@GCJ_COMPILED_SELECTED@)
 all: all-am
 

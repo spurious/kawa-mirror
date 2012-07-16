@@ -1,3 +1,12 @@
+2012-07-15  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (SCM_COMPILE_FLAGS): New macro.
+
+	* IntegerRange.java: No longer extend MethodProc.
+	(apply): Remove method.
+	(integerRange$X): New static method.
+	* Xutils.scm (integerRange): New function, uses integerRange$X.
+
 2012-07-14  Per Bothner  <per@bothner.com>
 
 	* SubList.java: Class removed.

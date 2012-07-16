@@ -38,4 +38,5 @@
                           (+ d1 (Math:round (StringUtils:asDouble arg2))))))
     (gnu.xquery.util.SequenceUtils:subList seq d1 d2)))
 
-
+(define (integerRange first last)
+  (gnu.xquery.util.IntegerRange:integerRange first last))

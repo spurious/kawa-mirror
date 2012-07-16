@@ -1360,7 +1360,7 @@ public class XQParser extends Lexer
 	func = makeFunctionExp("gnu.kawa.xml.NodeCompare", "$Ls", "<<");
 	break;
       case OP_RANGE_TO:
-	func = makeFunctionExp("gnu.xquery.util.IntegerRange", "integerRange");
+	func = makeFunctionExp("gnu.xquery.util.Xutils", "integerRange");
 	break;
       case OP_UNION:
 	func = makeFunctionExp("gnu.kawa.xml.UnionNodes", "unionNodes");

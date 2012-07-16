@@ -1,3 +1,11 @@
+2012-07-16  Per Bothner  <per@bothner.com>
+
+	* ClassMethods.java (getMethods):  When calling an Object method (such
+	as hashCode) though an interface reference, general an invokevirtual
+	on Object rather than an invokeinterface.  This is compatible with
+	javac, and is required by the Dalvik VM - though not the Java VM.
+	This fixes Savannah bug #36847 "CharSequence#hashCode".
+
 2012-06-26  Per Bothner  <per@bothner.com>
 
 	* ClassMemberLocation.java: Update for Location being made generic.

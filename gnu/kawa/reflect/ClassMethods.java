@@ -132,14 +132,20 @@ public class ClassMethods extends Procedure2
     for (int i = mlength;  --i >= 0; )
     {
       Method method = (Method) methods.elementAt(i);
-      if (! named_class_only && method.getDeclaringClass() != dtype)
+      if (! named_class_only)
         {
-          Type itype = dtype.getImplementationType();
-          if (itype instanceof ClassType)
+          ClassType mdclass = method.getDeclaringClass();
+          if (mdclass != dtype)
             {
-              // Override declared type of method so it matches receiver,
-              // like javac does, for improved binary compatibility.
-              method = new Method(method, (ClassType) itype);
+              Type itype = dtype.getImplementationType();
+              if (itype instanceof ClassType
+                  && ! (((ClassType) itype).isInterface()
+                        && mdclass == Type.objectType))
+                {
+                  // Override declared type of method so it matches receiver,
+                  // like javac does, for improved binary compatibility.
+                  method = new Method(method, (ClassType) itype);
+                }
             }
         }
       PrimProcedure pproc = new PrimProcedure(method, mode, language, ptype);

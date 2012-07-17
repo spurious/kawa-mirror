@@ -1,3 +1,8 @@
+2012-07-17  Per Bothner  <per@bothner.com>
+
+	* CodeAttr.java (emitInvoke): Use invokespecial if method is private.
+	Fixes Savannah bug #36856 "More Dalvik issues".
+
 2012-06-19  Per Bothner  <per@bothner.com>
 
 	* Label.java (isUsed): New method.

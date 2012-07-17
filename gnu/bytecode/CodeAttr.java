@@ -1533,7 +1533,8 @@ public class CodeAttr extends Attribute implements AttrContainer
       opcode = 184;   // invokestatic
     else if (method.classfile.isInterface())
       opcode = 185;   // invokeinterface
-    else if ("<init>".equals(method.getName()))
+    else if ("<init>".equals(method.getName())
+             || (method.access_flags & Access.PRIVATE) != 0)
       opcode = 183;   // invokespecial
     else
       opcode = 182;   // invokevirtual

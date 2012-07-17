@@ -316,8 +316,34 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
     this(method, '\0', language, null);
   }
 
+    static Type resolveTypeVariables(Type langType, ParameterizedType parameterizedType) {
+        if (langType instanceof TypeVariable)
+            return resolveTypeVariable((TypeVariable) langType, parameterizedType);
+        if (langType instanceof ParameterizedType) {
+            ParameterizedType ptype = (ParameterizedType) langType;
+            Type[] paramTypes = ptype.getTypeArgumentTypes();
+            int nparams = paramTypes.length;
+            Type[] resolvedTypes = new Type[nparams];
+            boolean changed = false;
+            for (int i = 0; i < nparams;  i++) {
+                Type t0 = paramTypes[i];
+                char bound = ptype.getTypeArgumentBound(i);
+                // FIXME Don't support wildcards here yet.
+                if (bound != '\0')
+                    return langType.getRawType();
+                Type t1 = resolveTypeVariables(t0, parameterizedType);
+                resolvedTypes[i] = t1;
+                if (t0 != t1)
+                    changed = true;
+            }
+            if (changed) {
+                return new ParameterizedType(ptype.getRawType(), resolvedTypes);
+            }
+        }
+        return langType;
+}
 
-    static Type resolveTypeVariable(TypeVariable tvar, ParameterizedType parameterizedType ) {
+    static Type resolveTypeVariable(TypeVariable tvar, ParameterizedType parameterizedType) {
 	if (parameterizedType != null) {
 	    TypeVariable[] tparams = parameterizedType.getRawType().getTypeParameters();
 	    int nparams = tparams.length;
@@ -336,7 +362,6 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
     this.mode = mode;
 
     init(method);
-
     // This stuff deals with that a language may have its own mapping
     // from Java types to language types, for coercions and other reasons.
     Type[] pTypes = this.argTypes;
@@ -345,10 +370,7 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
     for (int i = nTypes;  --i >= 0; )
       {
 	Type javaType = pTypes[i];
-	Type langType = javaType;
-	if (langType instanceof TypeVariable) {
-	    langType = resolveTypeVariable((TypeVariable) langType, parameterizedType);
-	}
+	Type langType = resolveTypeVariables(javaType, parameterizedType);
 	langType = language.getLangTypeFor(langType);
 	if (javaType != langType)
 	  {
@@ -368,10 +390,8 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
       retType = Type.objectType;
     else
       {
-	retType = method.getReturnType();
-	if (retType instanceof TypeVariable) {	
-	    retType = resolveTypeVariable((TypeVariable) retType, parameterizedType);
-	}
+        retType = method.getReturnType();
+        retType = resolveTypeVariables(retType, parameterizedType);
         retType = language.getLangTypeFor(retType);
 
         // Kludge - toStringType doesn't have methods.

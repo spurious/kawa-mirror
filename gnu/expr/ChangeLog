@@ -1,3 +1,9 @@
+2012-07-16  Per Bothner  <per@bothner.com>
+
+	* PrimProcedure.java: Better expansion of parameterized methods.
+	(resolveTypeVariables): New method.
+	This fixes Savanna bug #36853 "Propagate type parameters".
+
 2012-07-01  Per Bothner  <per@bothner.com>
 
 	* Declaration.java (PROCEDURE): Make public.

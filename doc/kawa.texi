@@ -2566,7 +2566,7 @@ To access this function, you must first @code{(require 'syntax-utils)}.
 @end example
 @end deffn
 
-@subsubsection Identifier predicates
+@subsection Identifier predicates
 
 @deffn Procedure {identifier?} @var{obj}
 Return @true{} if @var{obj} is an identifier, i.e., a syntax object
@@ -12683,7 +12683,7 @@ BRL has an extensive utility library.  Most of this has not yet been ported
 to KRL, even in BRL-compatibility mode.
 @end itemize
 
-@node Low-level functions, FAQs, XML tools, Top
+@node Low-level functions
 @chapter Deprecated low-level functions
 
 These sections document older and less convenient ways
@@ -12816,7 +12816,7 @@ Applying the procedure returns the length of the array.
 @node FAQs, Community, Low-level functions, Top
 @chapter Frequently Asked Questions
 
-@subsubsection What is the equivalent of Java import?
+@subsubheading What is the equivalent of Java import?
 
 Kawa's @code{import} follows R6RS, so it is bit like
 Java's @code{import static TypeName.*} (static-import-on-demand) declaration.
@@ -12840,7 +12840,7 @@ You can also use @code{define-namespace} to introduce an abbreviation or
 renaming of a class name, but as a matter of style @code{define-alias}
 is preferred.
 
-@subsubsection How do I refer to a Java member (nested) class?
+@subsubheading How do I refer to a Java member (nested) class?
 
 Consider the Java SE member class @code{javax.swing.text.AbstractDocument.Content}.
 Using the Java syntax doesn't work in Kawa.
@@ -12853,7 +12853,7 @@ Alternatively, you can use the internal JVM class name:
 javax.swing.text.AbstractDocument$Content
 @end example
 
-@subsubsection Why does Kawa's REPL use display rather than write?
+@subsubheading Why does Kawa's REPL use display rather than write?
 
 The read-eval-print-loop of most Scheme implementations prints the
 evaluation result using @code{write}, while Kawa uses @code{display} by default.
@@ -12955,7 +12955,7 @@ Thanks to Cygnus Solutions (now part of Red Hat) for sponsoring
 the initial development of Kawa, and then transferring
 their ownership interest to Per.
 
-@subsubsection Financial support
+@subsubheading Financial support
 
 Ean Schuessler and @uref{http://www.brainfood.com/,Brainfood}
 provided financial support and encouragement.
@@ -12970,7 +12970,7 @@ sponsored Charles Turner's work Summer 2011.
 
 Thomas Kirk and AT&T provided financial support, and useful bug reports.
 
-@subsubsection Various contributions
+@subsubheading Various contributions
 
 @uref{http://jcubic.pl/,Jakub Jankiewicz} contributed the Kawa logo.
 
@@ -13006,7 +13006,7 @@ Anthony Green for Fedora packaging.
 
 Charles Turner for pretty-printer improvements and other changes.
 
-@subsubsection Small fixes and improvements
+@subsubheading Small fixes and improvements
 
 Patrick Barta;
 Joseph Bowbeer;
@@ -13048,7 +13048,7 @@ Phil Walker;
 Knut Wannheden;
 Chris Wegrzyn.
 
-@subsubsection Bug reports and test cases
+@subsubheading Bug reports and test cases
 
 Khairul Azhar;
 Bob Bane;
@@ -13084,7 +13084,7 @@ Tony White
 John Whittaker;
 Robert Yokota.
 
-@subsubsection Code ported from other packages
+@subsubheading Code ported from other packages
 
 Kawa includes Free Software originally written for other purposes,
 but incorporated into Kawa, perhaps with some porting.  A partial list:
@@ -13119,7 +13119,7 @@ reference implementation.
 Simon Tatham wrote listsort.
 
 Aubrey Jaffer wrote much of SLIB, some of which has been
-imnported into gnu.kawa.slib.
+imported into gnu.kawa.slib.
 
 @node Support
 @section Technical Support for Kawa

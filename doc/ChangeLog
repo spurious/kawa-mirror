@@ -1,5 +1,8 @@
 2012-07-20  Per Bothner  <per@bothner.com>
 
+	* kawa.texi: Simplify home page to emphasize Scheme,
+	(Framework): Move discussion of internals and other languages here.
+
 	* kawa.texi: Fix some sectioning problems.
 
 2012-05-13  Per Bothner  <per@bothner.com>

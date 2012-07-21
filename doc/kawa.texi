@@ -2,7 +2,7 @@
 @c %**start of header
 @setfilename kawa.info
 @documentencoding UTF-8
-@settitle The Kawa language framework
+@settitle The Kawa Scheme language
 @setchapternewpage off
 @syncodeindex fn cp
 @syncodeindex vr cp
@@ -82,7 +82,7 @@
 @finalout
 @end iftex
 @titlepage
-@title The Kawa language framework
+@title The Kawa Scheme language
 @subtitle @value{UPDATED}
 @sp 1
 @author Per Bothner
@@ -92,34 +92,34 @@
 @ifinfo
 @format
 START-INFO-DIR-ENTRY
-* kawa: (kawa).         The Kawa language framework
+* kawa: (kawa).         The Kawa Scheme language
 END-INFO-DIR-ENTRY
 @end format
 @end ifinfo
 
 @ifnottex
 @node Top, Installation, (dir), (dir)
-@top The Kawa language framework
+@top The Kawa Scheme language
 @end ifnottex
 
-Kawa is:
-@itemize
-@item
-A framework written in Java for implementing
-high-level and dynamic languages, compiling them into Java bytecodes.
-@item
-An implementation of @uref{http://www.schemers.org/,Scheme}, which
+@c Kawa is best known as an implementation of the
+@c @uref{http://www.schemers.org/,Scheme language} for the Java platform.
+@c It compiles Scheme to high-performance Java bytecodes.
+@c It is also a general framework for implementing dynamic languages,
+@c and includes a full implementation of XQuery and the beginnings of
+@c implementations of Common Lisp and Emacs Lisp (JEmacs).
+
+Kawa is an implementation of @uref{http://www.schemers.org/,Scheme}, which
 is in the Lisp family of programming languages.
 Kawa is a featureful dialect in its own right,
 and additionally provides very useful integration with Java.
 It can be used as a ``scripting language'', but includes a compiler
 and all the benefits of a ``real'' programming language, including
-optional static typing.
-@item
-Implementations of other programming languages,
-including @uref{../qexo/index.html, XQuery (Qexo)}
-and @uref{http://JEmacs.sourceforge.net/,Emacs Lisp (JEmacs)}.
-@end itemize
+optional static typing, so Kawa programs can be as efficient as Java.
+
+Kawa is also a useful @ref{Framework,framework} for implementing
+other programming languages on the Java platform.
+It has has many useful utility classes.
 
 This documents version @value{VERSION}, updated @value{UPDATED}.
 See the summary
@@ -139,20 +139,6 @@ A nice quick introduction to Scheme can be found in
 @uref{http://www.cs.washington.edu/education/courses/341/99su/lectures/scheme/,Greg Badros's lecture notes}.  A more in-depth tutorial which also
 discusses Scheme implementation is
 @uref{ftp://ftp.cs.utexas.edu/pub/garbage/cs345/schintro-v14/schintro_toc.html, Paul Wilson's "An Introduction to Scheme and its Implementation"}.
-
-For a technical overview of Kawa, see these
-@uref{http://www.gnu.org/software/kawa/internals/index.html}.
-Javadoc generated @uref{http://www.gnu.org/software/kawa/api/,documentation of the Kawa classes} is also available.
-The packages
-@uref{http://www.gnu.org/software/kawa/api/gnu/bytecode/package-summary.html,@code{gnu.bytecode}},
-@uref{http://www.gnu.org/software/kawa/api/gnu/math/package-summary.html,@code{gnu.math}},
-@uref{http://www.gnu.org/software/kawa/api/gnu/lists/package-summary.html,@code{gnu.lists}},
-@uref{http://www.gnu.org/software/kawa/api/gnu/xml/package-summary.html,@code{gnu.xml}},
-@uref{http://www.gnu.org/software/kawa/api/gnu/expr/package-summary.html,@code{gnu.expr}},
-@uref{http://www.gnu.org/software/kawa/api/gnu/mapping/package-summary.html,@code{gnu.mapping}},
-and
-@uref{http://www.gnu.org/software/kawa/api/gnu/text/package-summary.html,@code{gnu.text}},
-are used by Kawa, and distributed with it, but may be independently useful.
 
 For copyright information on the software and documentation,
 see @ref{License}.
@@ -183,7 +169,8 @@ This package has nothing to do with the defunct Kawa commercial Java IDE.
 * Objects Classes and Modules::
 * XML tools::            XML, HTML, and the web
 * Low-level functions::  Deprecated low-level functions
-* FAQs:: Frequently Asked Questions
+* Framework::            The Kawa language framework
+* FAQs::                 Frequently Asked Questions
 * Community::
 * License::
 * Overall Index::	 Index of functions, macros, concepts, and more.
@@ -1367,17 +1354,21 @@ find that library.
 @node Features, Syntax, Running, Top
 @chapter Summary of Kawa Scheme Features
 
-This manual mostly documents how Kawa Scheme differs from
-standard (R5RS) Scheme, though the goal is to merge in
-information about standard Scheme here as well.
+Kawa is a mostly-compatible implementatation of 
+the Scheme programming language,
+which has history going back to 1975, is standardized,
+has been the base for much programming language research,
+and has dozens of implementations.
 
-Kawa is a full Scheme implementation.  It implements almost
-all of R5RS (for exceptions @pxref{Restrictions}), plus some extensions.
-By default, symbols are case sensitive.
+Kawa runs on top of the Java platform.  The implementation
+is written in Java and Kawa itself, without native code.
+Scheme programs have full and convenient
+access to the huge set of Java libraries.
 
-It is completely written in Java.  Scheme functions and files
-are automatically compiled into Java byte-codes.  Kawa does some
-optimizations, and the compiled code runs at reasonable speed.
+Kawa programs @uref{http://per.bothner.com/blog/2010/Kawa-in-shootout/, are fast}.
+A sophisticated compiler, type inference, and optional type declarations
+means you can write programs that run roughly as fast as Java programs,
+and much faster than other ``scripting languages''.
 
 Kawa uses Unicode internally, and uses the Java facilities to convert
 files using other character encodings.
@@ -1394,6 +1385,9 @@ Kawa is written in an object-oriented style.
 Kawa has builtin pretty-printer support, and fancy formatting.
 
 Kawa supports class-definition facilities, and separately-compiled modules.
+
+Kawa can be @ref{Evaluating Scheme expressions from Java,
+embedded as a scripting language in Java programs}.
 
 Kawa implements the full numeric tower, including infinite-precision
 rational numbers and complex numbers.  It also supports "quantities"
@@ -1521,6 +1515,8 @@ This means the procedure must be defined using a letrec, not a
 define (because the compiler does not know if someone might
 re-define a global definition), and there must be no assignments
 (using @code{set!}) to the procedure binding.
+
+By default, symbols are case sensitive.
 
 @node Syntax, Multiple values, Features, Top
 @chapter Syntax
@@ -11285,6 +11281,26 @@ Object x = scm.eval("(+ 3 2)");
 System.out.println(x);
 @end example
 
+@subsection Using @code{javax.script} portable Java scripting
+
+Kawa also supports the standard
+@uref{http://docs.oracle.com/javase/7/docs/api/javax/script/package-summary.html,@code{javax.script}} API.
+The main advantage of this API is if you want your users to be able to chose
+between multiple scripting languages.  That way you can support Kawa
+without Kawa-specific programming.
+
+For example the standard JDK tool @uref{http://docs.oracle.com/javase/7/docs/technotes/tools/share/jrunscript.html,jrunscript} provides a
+read-eval-print-loop for any language that implements the  @code{javax.script}
+API.  It knows nothing about Kawa but can still use it:
+@example
+$ jrunscript -cp kawa.jar -l scheme
+scheme> (cadr '(3 4 5))
+4
+@end example
+
+(Of course the @code{jrunscript} REPL isn't as  nice as the one that
+Kawa provides.  For example the latter can handle multi-line inputs.)
+
 @node XML tools, Low-level functions, Objects Classes and Modules, Top
 @chapter Working with XML and HTML
 
@@ -12695,7 +12711,7 @@ to call Java methods, access Java fields, and use Java arrays.
 * Low-level array macros::
 @end menu
 
-@node Low-level Method invocation, Low-level Field operations, , Low-level functions
+@node Low-level Method invocation
 @section Low-level Method invocation
 
 The following lower-level primitives require you to specify
@@ -12733,7 +12749,7 @@ then kawa can inline the correct bytecodes to call the specified methods.
 checks that there really is a method that matches the specification.)
 Otherwise, the Java reflection facility is used.
 
-@node Low-level Field operations, Low-level array macros, Low-level Method invocation, Low-level functions
+@node Low-level Field operations
 @section Low-level field operations
 
 The following macros evaluate to procedures that can be used to
@@ -12776,7 +12792,7 @@ Returns a one-argument function, which when called sets the
 value of the static field to the argument.
 @end deffn
 
-@node Low-level array macros, , Low-level Field operations, Low-level functions
+@node Low-level array macros
 @section Old low-level array macros
 
 The following macros evaluate to procedures that can be used to
@@ -12813,7 +12829,35 @@ Applying the procedure returns the length of the array.
 (Alternatively, you can use @code{(field @var{array} 'length)}.)
 @end deffn
 
-@node FAQs, Community, Low-level functions, Top
+@node Framework
+@chapter The Kawa language framework
+
+Kawa is a framework written in Java for implementing
+high-level and dynamic languages, compiling them into Java bytecodes.
+
+The Kawa distributions includes of other programming languages
+besides Scheme,
+including @uref{../qexo/index.html, XQuery (Qexo)}
+and @uref{http://JEmacs.sourceforge.net/,Emacs Lisp (JEmacs)}.
+
+For a technical overview of Kawa, see these
+@uref{http://www.gnu.org/software/kawa/internals/index.html}.
+Javadoc generated @uref{http://www.gnu.org/software/kawa/api/,documentation of the Kawa classes} is also available.
+The packages
+@uref{http://www.gnu.org/software/kawa/api/gnu/bytecode/package-summary.html,@code{gnu.bytecode}},
+@uref{http://www.gnu.org/software/kawa/api/gnu/math/package-summary.html,@code{gnu.math}},
+@uref{http://www.gnu.org/software/kawa/api/gnu/lists/package-summary.html,@code{gnu.lists}},
+@uref{http://www.gnu.org/software/kawa/api/gnu/xml/package-summary.html,@code{gnu.xml}},
+@uref{http://www.gnu.org/software/kawa/api/gnu/expr/package-summary.html,@code{gnu.expr}},
+@uref{http://www.gnu.org/software/kawa/api/gnu/mapping/package-summary.html,@code{gnu.mapping}},
+and
+@uref{http://www.gnu.org/software/kawa/api/gnu/text/package-summary.html,@code{gnu.text}},
+are used by Kawa, and distributed with it, but may be independently useful.
+
+This @uref{gnu.bytecode/compiling-regexps.html,article} explains how to
+use @code{gnu.bytecode} to compile regular expressions to bytecode.
+
+@node FAQs
 @chapter Frequently Asked Questions
 
 @subsubheading What is the equivalent of Java import?
@@ -12893,7 +12937,7 @@ find it confusing/annoying if shell output used quotes.
 This "repl-as-pad" model doesn't work as well if the repl
 uses @code{write} rather than @code{display}. 
 
-@node Community, License, FAQs, Top
+@node Community
 @chapter The Kawa Community
 
 @menu
@@ -13518,7 +13562,7 @@ is done on demand, for example on printing.
 (This is similar to values in the XML data model.)
 @end itemize
 
-@node License, Overall Index, Community, Top
+@node License
 @chapter License
 
 @menu

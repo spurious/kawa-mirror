@@ -18,16 +18,33 @@ import java.util.regex.*;
  * <p>The following assumes Scheme, with a line-comment {@code ";;"},
  * start-block-comment {@code "#|"} and end-block-comment {@code "|#"}.
  * <dl>
- * <dt><code>;;Output: </code><var>line</var></dt>
+ * <dt><code>;; Kawa-options: </code><var>options</var></dt>
+ * <dd>Add <var>options</var> to the <code>kawa</code> command,
+ * i.e. after the class name.
+ * The <var>options</var> are split into space-separated words,
+ * though you can use single or double quotes to include spaces in words.
+ * (The quoting is like in Unix shells, in that a quote does not start or
+ * end a word.  Instead, a word can contain zero or more quote-delimited
+ * segments.)
+ * The characters {@code %F} are replaced by the source file name.
+ * The default for <var>options</var> is
+ *   {@code --diagnostic-strip-directories %F}.
+ * </dd>
+ * <dt><code>;; Java-options: </code><var>options</var></dt>
+ * <dd>Add <var>options</var> to the {@code java} command,
+ * before the class name.
+ * The <var>options</var> are parsed the same way as for {@code Kawa-options}.
+ * </dd>
+ * <dt><code>;; Output: </code><var>line</var></dt>
  * <dd>Expect <var>line</var> literally in the output stream.</dd>
- * <dt><code>;;Output-pattern: </code><var>pattern</var></dt>
+ * <dt><code>;; Output-pattern: </code><var>pattern</var></dt>
  * <dd>Expect a line matching the regex <var>pattern</var> in the output.</dd>
  * <dt><code>#|Output:</code></dt>
  * <dd>The following lines, ending with a line containing just the
  * matching end-block-comment {@code |#}, are expected literally in the output stream.</dd>
- * <dt><code>;;Diagnostic: </code><var>line</var></dt>
+ * <dt><code>;; Diagnostic: </code><var>line</var></dt>
  * <dd>Expect <var>line</var> literally in the error stream.</dd>
- * <dt><code>;;Diagnostic-pattern: </code><var>pattern</var></dt>
+ * <dt><code>;; Diagnostic-pattern: </code><var>pattern</var></dt>
  * <dd>Expect a line matching the regex <var>pattern</var> in the error stream.</dd>
  * <dt><code>#|Diagnostic:</code></dt>
  * <dd>The following lines, ending with a line containing just the
@@ -47,11 +64,16 @@ public class RunTestScript implements Runnable
   Pattern errRegexPattern;
   Pattern outBlockStart;
   Pattern errBlockStart;
+  Pattern javaOptionsPattern;
+  Pattern kawaOptionsPattern;
 
   boolean failed;
 
   List<String> expectedOut = new ArrayList<String>();
   List<String> expectedErr = new ArrayList<String>();
+
+  String javaOptions = null;
+  String kawaOptions = null;
 
   String[] commentSyntaxTable = {
     "CommonLisp", ";;", "#|", "|#",
@@ -89,6 +111,8 @@ public class RunTestScript implements Runnable
         outRegexPattern = Pattern.compile(Pattern.quote(lineComment) + ".*Output-pattern: *(.*) *$");
         errPattern = Pattern.compile(Pattern.quote(lineComment) + ".*Diagnostic: *(.*) *$");
         errRegexPattern = Pattern.compile(Pattern.quote(lineComment) + ".*Diagnostic-pattern: *(.*) *$");
+        javaOptionsPattern = Pattern.compile(Pattern.quote(lineComment) + ".*Java-options: *(.*) *$");
+        kawaOptionsPattern = Pattern.compile(Pattern.quote(lineComment) + ".*Kawa-options: *(.*) *$");
       }
     if (startComment != null)
       {
@@ -127,6 +151,12 @@ public class RunTestScript implements Runnable
                 matcher = errRegexPattern.matcher(line);
                 if (matcher.matches())
                   expectedErr.add(matcher.group(1));
+                matcher = javaOptionsPattern.matcher(line);
+                if (matcher.matches())
+                    javaOptions = matcher.group(1);
+                matcher = kawaOptionsPattern.matcher(line);
+                if (matcher.matches())
+                    kawaOptions = matcher.group(1);
               }
             if (startComment != null)
               {
@@ -159,7 +189,18 @@ public class RunTestScript implements Runnable
               }
           }
 
-        ProcessBuilder kawa = new ProcessBuilder("java", "kawa.repl", "--diagnostic-strip-directories", filename);
+        List<String> args = new ArrayList<String>();
+        args.add("java");
+        if (javaOptions != null)
+            parseAddString(javaOptions, args);
+        args.add("kawa.repl");
+        if (kawaOptions != null)
+            parseAddString(kawaOptions, args);
+        else {
+            args.add("--diagnostic-strip-directories");
+            args.add(filename);
+        }
+        ProcessBuilder kawa = new ProcessBuilder(args);
         Process process = kawa.start();
         BufferedReader out = new BufferedReader(new InputStreamReader(process.getInputStream()));
         BufferedReader err = new BufferedReader(new InputStreamReader(process.getErrorStream()));
@@ -197,6 +238,47 @@ public class RunTestScript implements Runnable
         i++;
       }
   }
+
+    void parseAddString(String str, List<String> out) {
+        int slen = str.length();
+        StringBuilder sbuf = new StringBuilder();
+        int inQuote = -1;
+        boolean inToken = false;
+        for (int i = 0; ; i++) {
+            int ch = i == slen ? -1 : str.charAt(i);
+            if (ch < 0 || ((ch == ' ' || ch == '\t') && inQuote < 0)) {
+                if (inToken) {
+                    out.add(sbuf.toString());
+                    sbuf.setLength(0);
+                    inToken = false;
+                }
+                if (ch < 0)
+                    break;
+            } else if (ch == inQuote) {
+                inQuote = -1;
+            }
+            else if (inQuote >= 0) {
+                sbuf.append((char) ch);
+            }
+            else if (ch == '\'' || ch == '\"') {
+                inQuote = ch;
+                inToken = true;
+            }
+            else if (ch == '%' && i + 1 < slen) {
+                ++i;
+                char c2 = str.charAt(i);
+                if (c2 == 'F')
+                    sbuf.append(filename);
+                else
+                    sbuf.append(c2);
+                inToken = true;
+            }
+            else {
+                inToken = true;
+                sbuf.append((char) ch);
+            }
+        }
+    }
 
   String getTestName ()
   {

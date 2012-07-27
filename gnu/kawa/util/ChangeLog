@@ -1,3 +1,8 @@
+2012-07-27  Per Bothner  <per@bothner.com>
+
+	* RunTestScript.java: Support new directives Java-options
+	and Kawa-options.
+
 2012-06-08  Jamison Hope  <jrh@theptrgroup.com>
 
 	* RunTestScript.java: Add support for Common Lisp.

@@ -42,7 +42,8 @@ public class PushApply extends ExpVisitor<Expression,Void>
     if (func instanceof ReferenceExp)
       {
         Declaration fdecl = ((ReferenceExp) func).getBinding();
-        if (fdecl != null && ! fdecl.hasUnknownValue())
+        if (fdecl != null && ! fdecl.hasUnknownValue()
+            && ! fdecl.inExternalModule(comp))
           fdecl.addCaller(exp);
       }
     if (func instanceof LetExp

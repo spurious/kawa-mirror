@@ -1,3 +1,13 @@
+2012-07-28  Per Bothner  <per@bothner.com>
+
+	* Declaration.java (inExternalModule): New method.
+	(maybeIndirectBinding): Use it.
+	* FindTailCalls.java (visitApplyExp): Likewise.
+	* PushApply.java (visitApplyExp): Likewise.
+	This fixes Savannah bug #36917 "Memory leak".
+
+	* FindCapturedVars.java (visitApplyExp): Use addCaller method.
+
 2012-07-16  Per Bothner  <per@bothner.com>
 
 	* PrimProcedure.java: Better expansion of parameterized methods.

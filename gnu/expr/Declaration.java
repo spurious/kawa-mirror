@@ -679,10 +679,13 @@ public class Declaration
 
   public void maybeIndirectBinding (Compilation comp)
   {
-    if (isLexical() 
-        && ! (context instanceof ModuleExp) || context == comp.mainLambda)
+      if (isLexical() && ! inExternalModule(comp))
       setIndirectBinding(true);
   }
+
+    public boolean inExternalModule(Compilation comp) {
+        return context instanceof ModuleExp && context != comp.mainLambda;
+    }
 
   /* Note:  You probably want to use !ignorable(). */
   public final boolean getCanRead() { return (flags & CAN_READ) != 0; }
@@ -778,7 +781,11 @@ public class Declaration
 
   /** List of ApplyExp where this declaration is the function called.
    * The applications are chained using their nextCall fields.
-   * The chain is not built if STATIC_SPECIFIED. */
+   * This is list is built twice:
+   * First in PushApply (for use during InlineCalls),
+   * then the list is clearest, then rebuilt in FindTailCalls.
+   * This is because InlineCalls may inline and re-arrange the call graph.
+   * The chain is not built the second time if STATIC_SPECIFIED. */
   public ApplyExp firstCall;
 
   /** Add a call to the list headed by {@code firstCall}. */

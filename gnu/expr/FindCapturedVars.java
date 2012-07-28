@@ -79,8 +79,7 @@ public class FindCapturedVars extends ExpExpVisitor<Void>
                     LambdaExp lexp = (LambdaExp) value;
                     if (! lexp.getNeedsClosureEnv())
                       {
-                        exp.nextCall = decl.firstCall;
-                        decl.firstCall = exp;
+                        decl.addCaller(exp);
                         for (int i = 1;  i < args.length;  i++)
                           args[i].visit(this, ignored);
                         skipFunc = skipArgs = true;

@@ -58,7 +58,8 @@ public class FindTailCalls extends ExpExpVisitor<Expression>
             // No point in building chain if STATIC_SPECIFIED, and it can
             // lead to memory leaks.  At least if interactive calls can
             // resolve to previously-compiled Declarations (as in XQuery).
-            if (! binding.getFlag(Declaration.STATIC_SPECIFIED))
+            if (! binding.getFlag(Declaration.STATIC_SPECIFIED)
+                && ! binding.inExternalModule(comp))
               {
                 binding.addCaller(exp);
               }

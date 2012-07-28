@@ -119,7 +119,9 @@ fi
 
 if test -z "$with_httpserver"; then
   case "$JAVA_SOURCE" in
-  6compat5|6|7) with_httpserver="yes";;
+  6compat5|6|7)
+    test "$with_android" != "" -a "$with_android" != "no" \
+      || with_httpserver="yes";;
   esac
 fi
 

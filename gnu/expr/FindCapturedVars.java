@@ -40,6 +40,7 @@ public class FindCapturedVars extends ExpExpVisitor<Void>
     // possible that we later find out that func needs a static link,
     // in which case the current function does as well;  this is taken
     // care of by calling setCallersNeedStaticLink in LambdaExp.)
+    // (This code may be less useful now that --module-static is the default.)
     if (exp.func instanceof ReferenceExp
 	&& getCompilation().currentCallConvention() <= Compilation.CALL_WITH_RETURN)
       {
@@ -64,12 +65,13 @@ public class FindCapturedVars extends ExpExpVisitor<Void>
       {
         Object val = ((QuoteExp) exp.func).getValue();
         Expression arg0 = exp.getArg(0);
-        if (val instanceof PrimProcedure && arg0 instanceof ReferenceExp)
+        if (val instanceof PrimProcedure
+            && ((PrimProcedure) val).isConstructor()
+            && arg0 instanceof ReferenceExp)
           {
-            PrimProcedure pproc = (PrimProcedure) val;
             Declaration decl
               = Declaration.followAliases(((ReferenceExp) arg0).binding);
-            if (decl != null && decl.context instanceof ModuleExp
+            if (decl != null && decl.context == comp.getModule()
                 && ! decl.getFlag(Declaration.NONSTATIC_SPECIFIED))
               {
                 Expression value = decl.getValue();

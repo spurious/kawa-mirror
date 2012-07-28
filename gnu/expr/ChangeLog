@@ -1,5 +1,8 @@
 2012-07-28  Per Bothner  <per@bothner.com>
 
+	* FindCapturedVars.java (visitApplyExp): Minor fixes.
+	I think this fixes a bug, but I don't remember ...
+
 	* Declaration.java (inExternalModule): New method.
 	(maybeIndirectBinding): Use it.
 	* FindTailCalls.java (visitApplyExp): Likewise.

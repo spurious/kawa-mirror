@@ -1,3 +1,10 @@
+2012-07-27  Per Bothner  <per@bothner.com>
+	    Peter Feigl
+
+	* mac-obj.scm: New test-case for object form in macro.
+	This was originally an Android report - see Kawa mailing list
+	thread "Macros for Android".
+
 2012-07-16  Helmut Eller  <eller.helmut@gmail.com>
 	    Per Bothner  <per@bothner.com>
 

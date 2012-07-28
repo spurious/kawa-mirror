@@ -1,3 +1,8 @@
+2012-07-27  Per Bothner  <per@bothner.com>
+
+	* standard/object.java (scanClassDef): Handle the case when
+	method name is a SyntaxForm.
+
 2012-06-08  Per Bothner  <per@bothner.com>
 
 	* lang/SyntaxTemplate.java (convert_template): The 2012-04-18

@@ -305,6 +305,8 @@ public class object extends Syntax
 	  { // Method declaration.
 	    Pair mpair = (Pair) pair_car;
 	    Object mname = mpair.getCar();
+            while (mname instanceof SyntaxForm)
+              mname = ((SyntaxForm) mname).getDatum();
 	    if (! (mname instanceof String)
 		&& ! (mname instanceof Symbol))
 	      {

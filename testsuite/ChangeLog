@@ -1,3 +1,9 @@
+2012-08-01  Helmut Eller  <eller.helmut@gmail.com>
+	    Per Bothner  <per@bothner.com>
+
+	* sva36917.scm: New test-case forSavannah bug #36917 "Memory leak".
+	* Makefile.am: Update accordingly.
+
 2012-07-27  Per Bothner  <per@bothner.com>
 	    Peter Feigl
 

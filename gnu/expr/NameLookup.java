@@ -50,6 +50,18 @@ public class NameLookup extends GeneralHashTable<Object,Declaration>
       env.put(KEY, null, instance);
   }
 
+  /** When true, top-level defs should push rather then replace old ones.
+   * Otherwise, a module-level declaration should replace a matching
+   * previous declaration, to avoid leaks.
+   * However, sometimes we temporarily push new declarations that should not
+   * permanently replace old declarations - for example when a hygienic
+   * macro changes the current scope.
+   */
+  public boolean doSaveTopLevelRedefs() { return saveToplevelsRedefsCount > 0; }
+  public void pushSaveTopLevelRedefs() { saveToplevelsRedefsCount++; }
+  public void popSaveTopLevelRedefs() { saveToplevelsRedefsCount--; }
+  int saveToplevelsRedefsCount = 0;
+
   public void push (Declaration decl)
   {
     Object symbol = decl.getSymbol();
@@ -58,8 +70,35 @@ public class NameLookup extends GeneralHashTable<Object,Declaration>
     if (++num_bindings >= table.length)
       rehash();
     int hash = hash(symbol);
-    HashNode node = makeEntry(symbol, hash, decl);
+    HashNode<Object,Declaration> node = makeEntry(symbol, hash, decl);
     int index = hashToIndex(hash);
+    if (decl.getContext() instanceof ModuleExp
+        && ! doSaveTopLevelRedefs())
+      {
+        int dnamespace = language.getNamespaceOf(decl);
+        HashNode<Object,Declaration> prevNode = null;
+        HashNode<Object,Declaration> oldNode = table[index];
+        while (oldNode != null)
+          {
+            Declaration oldDecl = oldNode.getValue();
+            HashNode<Object,Declaration> oldNext = oldNode.next;
+            if (oldDecl != null
+                && decl.getSymbol() == oldDecl.getSymbol()
+                && oldDecl.getContext() instanceof ModuleExp
+                && decl.getContext() != oldDecl.getContext()
+                && dnamespace == language.getNamespaceOf(oldDecl))
+              {
+                if (prevNode == null)
+                  table[index] = oldNext;
+                else
+                  prevNode.next = oldNext;
+                --num_bindings;
+                break;
+              }
+            prevNode = oldNode;
+            oldNode = oldNext;
+          }
+      }
     node.next = table[index];
     table[index] = node;
   }

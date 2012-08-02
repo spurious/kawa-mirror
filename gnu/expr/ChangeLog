@@ -1,3 +1,13 @@
+2012-08-01  Per Bothner  <per@bothner.com>
+
+	* NameLookup.java: Avoid memory leak in interactive/eval-type contexts.
+	This means we need to clear out old variable bindings when they are
+	replaced by newer ones.  The complication is that sometime we only
+	replace bindings temporarily - for example handling hygienic macros.
+	This fixes (the rest of) Savannah bug #36917 "Memory leak".
+	* Compilation.java (setPushCurrentScope, setPopCurrentScope):
+	New methods.
+
 2012-07-28  Per Bothner  <per@bothner.com>
 
 	* FindCapturedVars.java (visitApplyExp): Minor fixes.

@@ -96,15 +96,14 @@ public class Translator extends Compilation
     if (syntax == null || syntax.getScope() == current_scope
 	|| pair.getCar() instanceof SyntaxForm)
       return rewrite_car(pair, false);
-    ScopeExp save_scope = current_scope;
+    ScopeExp save_scope = setPushCurrentScope(syntax.getScope());
     try
       {
-	setCurrentScope(syntax.getScope());
 	return rewrite_car(pair, false);
       }
     finally
       {
-	setCurrentScope(save_scope);
+	setPopCurrentScope(save_scope);
       }
   }
 
@@ -375,6 +374,9 @@ public class Translator extends Compilation
 	  {
 	    SyntaxForm sf = (SyntaxForm) cdr;
 	    cdr = sf.getDatum();
+	    // I.e. first time do equivalent of setPushCurrentScope
+            if (current_scope == save_scope)
+              lexical.pushSaveTopLevelRedefs();
 	    setCurrentScope(sf.getScope());
 	  }
 	Pair cdr_pair = (Pair) cdr;
@@ -409,7 +411,7 @@ public class Translator extends Compilation
     vec.copyInto(args);
 
     if (save_scope != current_scope)
-      setCurrentScope(save_scope);
+      setPopCurrentScope(save_scope);
 
     if (func instanceof ReferenceExp
         && (((ReferenceExp) func).getBinding()==getNamedPartDecl))
@@ -546,15 +548,14 @@ public class Translator extends Compilation
     if (exp instanceof SyntaxForm)
       {
 	SyntaxForm sf = (SyntaxForm) exp;
-	ScopeExp save_scope = current_scope;
+	ScopeExp save_scope = setPushCurrentScope(sf.getScope());
 	try
 	  {
-	    setCurrentScope(sf.getScope());
 	    rewriteInBody(sf.getDatum());
 	  }
 	finally
 	  {
-	    setCurrentScope(save_scope);
+	    setPopCurrentScope(save_scope);
 	  }
       }
     else if (exp instanceof Values)
@@ -615,16 +616,15 @@ public class Translator extends Compilation
     if (exp instanceof SyntaxForm)
       {
 	SyntaxForm sf = (SyntaxForm) exp;
-	ScopeExp save_scope = current_scope;
+	ScopeExp save_scope = setPushCurrentScope(sf.getScope());
 	try
 	  {
-	    setCurrentScope(sf.getScope());
 	    Expression s = rewrite(sf.getDatum(), mode);
 	    return s;
 	  }
 	finally
 	  {
-	    setCurrentScope(save_scope);
+	    setPopCurrentScope(save_scope);
 	  }
       }
     boolean function = mode != 'N';
@@ -1006,10 +1006,9 @@ public class Translator extends Compilation
     if (st instanceof SyntaxForm)
       {
 	SyntaxForm sf = (SyntaxForm) st;
-	ScopeExp save_scope = currentScope();
+	ScopeExp save_scope = setPushCurrentScope(sf.getScope());
 	try
 	  {
-	    setCurrentScope(sf.getScope());
 	    int first = formStack.size();
 	    scanForm(sf.getDatum(), defs);
 	    formStack.add(wrapSyntax(popForms(first), sf));
@@ -1017,7 +1016,7 @@ public class Translator extends Compilation
 	  }
 	finally
 	  {
-	    setCurrentScope(save_scope);
+	    setPopCurrentScope(save_scope);
 	  }
       }
     if (st instanceof Values)
@@ -1047,7 +1046,7 @@ public class Translator extends Compilation
             if (obj instanceof SyntaxForm)
               {
                 SyntaxForm sf = (SyntaxForm) st_pair.getCar();
-                setCurrentScope(sf.getScope());
+                savedScope = setPushCurrentScope(sf.getScope());
                 obj = sf.getDatum();
               }
             Pair p;
@@ -1102,7 +1101,7 @@ public class Translator extends Compilation
         finally
           {
             if (savedScope != current_scope)
-              setCurrentScope(savedScope);
+              setPopCurrentScope(savedScope);
             popPositionOf(savedPosition);
           }
 	if (syntax != null)
@@ -1144,10 +1143,9 @@ public class Translator extends Compilation
 	if (body instanceof SyntaxForm)
 	  {
 	    SyntaxForm sf = (SyntaxForm) body;
-	    ScopeExp save_scope = current_scope;
+	    ScopeExp save_scope = setPushCurrentScope(sf.getScope());
 	    try
 	      {
-		setCurrentScope(sf.getScope());
 		int first = formStack.size();
 		LList f = scanBody(sf.getDatum(), defs, makeList);
                 if (makeList)
@@ -1163,7 +1161,7 @@ public class Translator extends Compilation
 	      }
 	    finally
 	      {
-		setCurrentScope(save_scope);
+		setPopCurrentScope(save_scope);
 	      }
 	  }
 	else if (body instanceof Pair)
@@ -1341,7 +1339,12 @@ public class Translator extends Compilation
 	Object name = notedAccess.elementAt(i);
 	ScopeExp scope = (ScopeExp) notedAccess.elementAt(i+1);
 	if (current_scope != scope)
-	  setCurrentScope(scope);
+          {
+            // I.e. first time do equivalent of setPushCurrentScope
+            if (current_scope == saveScope)
+              lexical.pushSaveTopLevelRedefs();
+	    setCurrentScope(scope);
+          }
 	Declaration decl =  (Declaration) lexical.lookup(name, -1);
 	if (decl != null && ! decl.getFlag(Declaration.IS_UNKNOWN))
 	  {
@@ -1352,7 +1355,7 @@ public class Translator extends Compilation
 	  }
       }
     if (current_scope != saveScope)
-      setCurrentScope(saveScope);
+      setPopCurrentScope(saveScope);
   }
 
   public void finishModule(ModuleExp mexp)
@@ -1453,7 +1456,7 @@ public class Translator extends Compilation
       {
         rewriteInBody(popForms(firstForm));
 	mexp.body = makeBody(firstForm, mexp);
-        // In immediate mode need to preseve Declaration for current "seesion".
+        // In immediate mode need to preserve Declaration for current "session".
         if (! immediate)
 	  lexical.pop(mexp);
       }

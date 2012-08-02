@@ -2449,6 +2449,18 @@ public class Compilation implements SourceLocator
     pushChain(scope, sc);
   }
 
+    public ScopeExp setPushCurrentScope (ScopeExp scope) {
+        ScopeExp old = currentScope();
+        lexical.pushSaveTopLevelRedefs();
+        setCurrentScope(scope);
+        return old;
+    }
+
+    public void setPopCurrentScope (ScopeExp old) {
+        setCurrentScope(old);
+        lexical.popSaveTopLevelRedefs();
+    }
+
   void pushChain (ScopeExp scope, ScopeExp limit)
   {
     if (scope != limit)

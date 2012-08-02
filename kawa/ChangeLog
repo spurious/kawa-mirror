@@ -1,3 +1,8 @@
+2012-08-01  Per Bothner  <per@bothner.com>
+
+	* lang/Translator.java: Use new setPushCurrentScope/setPopCurrentScope
+	methods to control re-use of module-level declarations.
+
 2012-07-27  Per Bothner  <per@bothner.com>
 
 	* standard/object.java (scanClassDef): Handle the case when

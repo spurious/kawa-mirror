@@ -1,3 +1,9 @@
+2012-08-08  Per Bothner  <per@bothner.com>
+
+	* Declaration.java (needsContext): Handle the case when this is a
+	field in on-simple ClassExpr, in which case the" field" is actually
+	compiled to a getter/setter pair.
+
 2012-08-01  Per Bothner  <per@bothner.com>
 
 	* NameLookup.java: Avoid memory leak in interactive/eval-type contexts.

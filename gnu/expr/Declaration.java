@@ -535,7 +535,9 @@ public class Declaration
   /** If we need a 'context' supplied from a ReferenceExp or 'this. */
   public final boolean needsContext ()
   {
-    return base == null && field != null && ! field.getStaticFlag();
+    return base == null
+        && ((isClassField() && ! isStatic())
+            || (field != null && ! field.getStaticFlag()));
   }
 
   /** True if this is a field or method in a class definition. */

@@ -1,3 +1,7 @@
+2012-08-13  Charles Turner  <chturne@gmail.com>
+
+	* CommonLisp.java: Add defun for internal flet rewriter.
+
 2012-07-01  Charles Turner  <chturne@gmail.com>
 
 	* Symbols.java (isSymbol): Fix the incorrect definition whereby a

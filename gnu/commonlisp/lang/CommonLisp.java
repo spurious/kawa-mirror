@@ -143,6 +143,7 @@ public class CommonLisp extends Lisp2
     defun("typep", new gnu.kawa.reflect.InstanceOf(this));
     defun("princ", displayFormat);
     defun("prin1", writeFormat);
+    defun("%flet", new kawa.standard.let("flet", true));
 
     defProcStFld("=", "gnu.commonlisp.lang.CommonLisp", "numEqu");
     defProcStFld("<", "gnu.commonlisp.lang.CommonLisp", "numLss");

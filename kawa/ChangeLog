@@ -1,3 +1,10 @@
+2012-08-13  Charles Turner  <chturne@gmail.com>
+
+	* standard/let.java (let, settingProcedures): Distinguish between flet
+	and let.
+	* standard/let.java (maybeSetProcedure): New method, sets a
+	procedure declaration if its a flet.
+
 2012-08-01  Per Bothner  <per@bothner.com>
 
 	* lang/Translator.java: Use new setPushCurrentScope/setPopCurrentScope

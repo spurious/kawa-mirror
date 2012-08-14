@@ -14,6 +14,16 @@
 (define (setcdr (p <pair>) x)
   (set-cdr! p x))
 
+;; ANSI: This should be inclosed in "an implicit block whose name is
+;; the function block name of the function-name or name, as
+;; appropriate." But we don't have support for CL blocks yet.
+(define-syntax flet
+  (syntax-rules ()
+    ((_ ((fname parameters body ...) ...)
+	e ...)
+     (%flet ((fname (lambda parameters body ...)) ...)
+	    e ...))))
+
 ;; SYMBOLS
 
 (define (boundp symbol) :: |clisp:boolean|
@@ -111,6 +121,9 @@
   ((as <function>
        (if (symbol? func) (symbol-function func) func)):applyN
        (gnu.kawa.functions.Apply:getArguments args 0 apply)))
+
+(define (funcall func #!rest args)
+  (apply func args))
 
 ;;; ARRAYS
 

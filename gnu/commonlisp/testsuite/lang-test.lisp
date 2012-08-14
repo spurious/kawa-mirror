@@ -1,4 +1,4 @@
-(test-init "Common Lisp tests" 11)
+(test-init "Common Lisp tests" 17)
 
 (setq y 100)
 (defun foo1 (x)
@@ -30,3 +30,22 @@
 (test t 'functionp-2 (functionp #'list))
 (test t 'functionp-3 (functionp (function list)))
 (test '(3 4) 'function-1 ((function list) 3 4))
+
+(test 6 'flet-1 (flet ((flet1 (n) (+ n n)))
+                  (flet ((flet1 (n) (+ 2 (flet1 n))))
+                    (flet1 2))))
+
+(defun dummy-function () 'top-level)
+
+(test 'shadow 'flet-2 (flet ((dummy-function () 'shadow))
+                        (funcall #'dummy-function)))
+
+(test 'top-level 'funcall-3 (funcall #'dummy-function))
+
+(test 'shadow 'flet-2 (flet ((dummy-function () 'shadow))
+                        (funcall #'dummy-function)))
+
+(test t 'flet-3 (eq (funcall #'dummy-function) (funcall 'dummy-function)))
+(test '() 'flet-4 (flet ((dummy-function () 'shadow))
+		    (eq (funcall #'dummy-function)
+			(funcall 'dummy-function))))

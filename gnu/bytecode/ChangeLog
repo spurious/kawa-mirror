@@ -1,3 +1,7 @@
+2012-08-16  Per Bothner  <per@bothner.com>
+
+	* ExitableBlock.java: When exiting, we may need to pop the stack.
+
 2012-07-17  Per Bothner  <per@bothner.com>
 
 	* CodeAttr.java (emitInvoke): Use invokespecial if method is private.

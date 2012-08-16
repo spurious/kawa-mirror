@@ -1,3 +1,9 @@
+2012-08-16  Per Bothner  <per@bothner.com>
+	    Weiqi Gao <weiqigao@gmail.com>
+
+	* unreach3.scm: New test for exit.
+	* Makefile.am: Update accordingly.
+
 2012-08-01  Helmut Eller  <eller.helmut@gmail.com>
 	    Per Bothner  <per@bothner.com>
 

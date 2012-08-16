@@ -41,11 +41,13 @@ public class ExitableBlock
   // Next ExitableBlock in list headed by currentTryState.exitCases.
   ExitableBlock nextCase;
   int switchCase;
+  int startStackSize;
 
   ExitableBlock (Type resultType, CodeAttr code, boolean runFinallyBlocks)
   {
     this.code = code;
     this.resultType = resultType;
+    this.startStackSize = code.SP;
     initialTryState = code.try_stack;
     if (runFinallyBlocks && resultType != null)
       {
@@ -96,9 +98,30 @@ public class ExitableBlock
       return null;
   }
 
+    private void popStack(CodeAttr code) {
+        int retSize = resultVariable != null || resultType == null ? 0
+            : resultType.size > 4 ? 2 : 1;
+        if (code.SP == startStackSize + retSize)
+            return;
+        Variable resultVar;
+        if (retSize > 0) {
+            code.pushScope();
+            resultVar = code.addLocal(resultType);
+            code.emitStore(resultVar);
+        }
+        else
+            resultVar = null;
+        code.emitPop(code.SP - startStackSize);
+        if (resultVar != null) {
+            code.emitLoad(resultVar);
+            code.popScope();
+        }
+    }
+
   /** Exit this surrounding block, executing finally blocks as needed. */
   void exit (TryState activeTry)
   {
+    popStack(code);
     if (activeTry == initialTryState)
       code.emitGoto(endLabel);
     else if (code.useJsr())

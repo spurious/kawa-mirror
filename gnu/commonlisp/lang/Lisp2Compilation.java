@@ -52,9 +52,7 @@ public class Lisp2Compilation extends Translator
         
         if (!( (decls instanceof Pair) && 
                (((Pair) decls).getCar() instanceof Pair) )) {
-          Object save = pushPositionOf(decls);
-          error('e', "Arguments to declare must be proper lists");
-          popPositionOf(save);
+          errorWithPosition("Arguments to declare must be proper lists", decls);
           break;
         }
         
@@ -62,9 +60,7 @@ public class Lisp2Compilation extends Translator
         
         if (!(declItem.getCdr() instanceof Pair))
         {
-          Object save = pushPositionOf(declItem);
-          error('e', "Bad declare syntax, expected a list but got something else.");
-          popPositionOf(save);
+          errorWithPosition("Bad declare syntax, expected a list but got something else.", declItem);
           break;
         }
         

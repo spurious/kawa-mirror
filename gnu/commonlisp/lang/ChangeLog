@@ -1,3 +1,7 @@
+2012-08-18  Per Bothner  <per@bothner.com>
+
+	* Lisp2Compilation.java (rewriteBody): Use errorWithPosition.
+
 2012-08-14  Charles Turner  <chturne@gmail.com>
 
 	* Lisp2Compilation.java (rewriteBody): New method, process declare

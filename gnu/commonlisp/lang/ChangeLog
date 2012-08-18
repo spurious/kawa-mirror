@@ -1,3 +1,8 @@
+2012-08-14  Charles Turner  <chturne@gmail.com>
+
+	* Lisp2Compilation.java (rewriteBody): New method, process declare
+	form.
+
 2012-08-13  Charles Turner  <chturne@gmail.com>
 
 	* CommonLisp.java: Add defun for internal flet rewriter.

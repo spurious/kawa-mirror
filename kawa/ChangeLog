@@ -5,6 +5,12 @@
 
 2012-08-13  Charles Turner  <chturne@gmail.com>
 
+	* lang/Translator.java (rewriteBody, makeBody): Changed access
+	from private to protected for Lisp2Compilation's declare
+	processing.
+
+2012-08-13  Charles Turner  <chturne@gmail.com>
+
 	* standard/let.java (let, settingProcedures): Distinguish between flet
 	and let.
 	* standard/let.java (maybeSetProcedure): New method, sets a

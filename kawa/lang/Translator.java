@@ -1262,8 +1262,8 @@ public class Translator extends Compilation
 	popPositionOf(saved);
       }
   }
-
-  private void rewriteBody (LList forms)
+  
+  protected void rewriteBody (LList forms)
   {
     while (forms != LList.Empty)
       {
@@ -1282,7 +1282,7 @@ public class Translator extends Compilation
   }
 
   /** Combine a list of zero or more expression forms into a "body". */
-  private Expression makeBody(int first, ScopeExp scope)
+  protected Expression makeBody(int first, ScopeExp scope)
   {
     int nforms = formStack.size() - first;
     if (nforms == 0)

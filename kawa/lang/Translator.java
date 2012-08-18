@@ -893,6 +893,12 @@ public class Translator extends Compilation
       positionPair = (PairWithPosition) positionPair.getCdr();
   }
 
+    public void errorWithPosition(String message, Object form) {
+        Object save = pushPositionOf(form);
+        error('e', message);
+        popPositionOf(save);
+    }
+
   /** Set the line position of the argument to the current position. */
 
   public void setLineOf (Expression exp)

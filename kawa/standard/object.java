@@ -348,11 +348,7 @@ public class object extends Syntax
             && (classNameSpecifier = classNameVal.toString()).length() > 0)
           oexp.classNameSpecifier = classNameSpecifier;
         else
-          {
-            Object savedPos = tr.pushPositionOf(classNamePair);
-            tr.error('e', "class-name specifier must be a non-empty string literal");
-            tr.popPositionOf(savedPos);
-          }
+            tr.errorWithPosition("class-name specifier must be a non-empty string literal", classNamePair);
       }
 
     Object[] result = {

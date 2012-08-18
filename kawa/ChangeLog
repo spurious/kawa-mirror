@@ -1,3 +1,8 @@
+2012-08-18  Per Bothner  <per@bothner.com>
+
+	* lang/Translator.java (errorWithPosition): New convenience method.
+	* standard/object.java (scanClassDef): Use it.
+
 2012-08-13  Charles Turner  <chturne@gmail.com>
 
 	* standard/let.java (let, settingProcedures): Distinguish between flet

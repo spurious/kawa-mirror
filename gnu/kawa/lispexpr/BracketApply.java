@@ -47,9 +47,8 @@ public class BracketApply extends Syntax
 	    Type type1 = tr.getLanguage().getTypeFor(arg1, false);
 	    TypeVariable tvar = TypeVariable.make(vars[i]);
 	    if (type1 == null) {
-		Object savedPosition = tr.pushPositionOf(pp);
-		tr.error('e', "unrecognized parameter type "+pp.getCar());
-		tr.popPositionOf(savedPosition);
+		tr.errorWithPosition("unrecognized parameter type "+pp.getCar(),
+                                     pp);
 		type1 = Type.objectType;
 	    }
 	    else {

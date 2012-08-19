@@ -4,18 +4,13 @@ import gnu.bytecode.Type;
 import gnu.bytecode.ClassType;
 import gnu.bytecode.ArrayType;
 import gnu.mapping.*;
-import gnu.math.IntNum;
 import gnu.expr.*;
 import java.util.*;
-import gnu.text.Lexer;
 import gnu.text.SourceMessages;
 import gnu.kawa.lispexpr.*;
 import gnu.lists.AbstractFormat;
 import gnu.kawa.functions.*;
-import gnu.kawa.reflect.ClassMethods;
-import gnu.kawa.reflect.StaticFieldLocation;
 import gnu.kawa.reflect.LazyType;
-import gnu.math.DFloNum;
 import gnu.kawa.servlet.HttpRequestContext;
 
 public class Scheme extends LispLanguage

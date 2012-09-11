@@ -1,4 +1,4 @@
-(test-begin "libs" 226)
+(test-begin "libs" 235)
 
 (test-begin "bytevectors") ;; Some bytevector tests
 (define bytes1 (bytevector #u8(#xCE #xBB)))
@@ -147,6 +147,26 @@
       (expand '(define x 10)))
 (test-equal '(as <java.lang.String> (quote a))
       (expand '(as String 'a)))
+
+(test-equal '(lambda (a b c) #f)
+	    (expand '(lambda (a b c) #f)))
+(test-equal '(lambda (#!rest r) #f)
+	    (expand '(lambda r #f)))
+(test-equal '(lambda (#!rest r) #f)
+	    (expand '(lambda (#!rest r) #f)))
+(test-equal '(lambda (a b c #!rest r) #f)
+	    (expand '(lambda (a b c #!rest r) #f)))
+(test-equal '(lambda (#!optional d e f) #f)
+	    (expand '(lambda (#!optional d e f) #f)))
+(test-equal '(lambda (a b c #!optional d e f) #f)
+	    (expand '(lambda (a b c #!optional d e f) #f)))
+(test-equal '(lambda (a b c #!optional d e f #!rest r) #f)
+	    (expand '(lambda (a b c #!optional d e f #!rest r) #f)))
+(test-equal '(lambda (a b c #!rest r #!key d e f ) #f)
+	    (expand '(lambda (a b c #!rest r #!key d e f ) #f)))
+(test-equal '(lambda (a b c #!optional d e f #!rest r #!key g i j ) #f)
+	    (expand '(lambda (a b c #!optional d e f #!rest r #!key g i j)
+		      #f)))
 
 (import (srfi :41 streams))
 

@@ -1,3 +1,7 @@
+2012-09-11  Helmut Eller  <eller.helmut@gmail.com>
+
+	* lib-test.scm: More expand tests.
+
 2012-08-16  Per Bothner  <per@bothner.com>
 	    Weiqi Gao <weiqigao@gmail.com>
 

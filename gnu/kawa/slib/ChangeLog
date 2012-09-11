@@ -1,3 +1,10 @@
+2012-09-11  Helmut Eller  <eller.helmut@gmail.com>
+
+	Fix Savannah bug #15579.
+	Handle some complex arglists, in particular #!rest args.
+	* syntaxutils.scm (unrewrite-arglist): New function.
+	(unrewrite): Use it.
+
 2012-07-10  Per Bothner  <per@bothner.com>
 
 	* Xutils.scm: Moved to gnu/xquery/util.

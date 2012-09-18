@@ -74,7 +74,10 @@ public abstract class LispLanguage extends Language
                 break;
               }
             if (lexer.peek() == ')')
-              lexer.fatal("An unexpected close paren was read.");
+              {
+                lexer.skip();
+                lexer.fatal("An unexpected close paren was read.");
+              }
             tr.scanForm(sexp, mexp);
             if ((options & PARSE_ONE_LINE) != 0)
               {

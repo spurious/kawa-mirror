@@ -1,3 +1,7 @@
+2012-09-18  Per Bothner  <per@bothner.com>
+
+	* Q2Read.java: Make a bit more robust for erroneous input.
+
 2011-07-11  Per Bothner  <per@bothner.com>
 
 	* Q2Read.java (readIndentCommand): Use updated LispReader API.

@@ -130,9 +130,8 @@ public class Q2Read extends LispReader
                 if (comparedIndent == -1 || comparedIndent == 1)
                   {
                     error('e', "indentation must differ by 2 or more");
-                    break;
                   }
-                if (comparedIndent <= 0)
+                else if (comparedIndent <= 0)
                   {
                     // reset to start of line FIXME
                     break;
@@ -433,10 +432,10 @@ public class Q2Read extends LispReader
         {
           Object result = reader.readIndentCommand(false);
 	  LineBufferedReader port = reader.getPort();
-          if (port.read() != ')')
-            {
-              reader.error("missing ')'");
-            }
+          if (port.peek() == ')')
+            port.skip();
+          else
+            reader.error("missing ')'");
           if (reader.resetNeeded)
             {
               reader.resetNeeded = false;

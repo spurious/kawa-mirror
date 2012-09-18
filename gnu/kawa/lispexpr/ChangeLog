@@ -1,3 +1,7 @@
+2012-09-18  Per Bothner  <per@bothner.com>
+
+	* LispLanguage.java (parse): If seeing an unexpected ')', skip it.
+
 2012-08-18  Per Bothner  <per@bothner.com>
 
 	* BracketApply.java (rewrite): New convenience method errorWithPosition.

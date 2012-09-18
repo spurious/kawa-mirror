@@ -287,7 +287,7 @@ public class SetExp extends AccessExp
 	    String setName = ClassExp.slotToMethodName("set", decl.getName());
 	    ClassExp cl = (ClassExp) decl.context;
 	    Method setter = cl.compiledType.getDeclaredMethod(setName, 1);
-	    cl.loadHeapFrame(comp);
+            decl.loadOwningObject(owner, comp);
 	    new_value.compile(comp, decl);
 	    if (needValue)
 	      {

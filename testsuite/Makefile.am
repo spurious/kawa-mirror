@@ -584,7 +584,7 @@ check-bridge:
 CLEANFILES = tmp* *.log testing.zip revcomp-input.txt knucleotide-input.txt regexdna-input.txt *.class HelloCgiK HelloCgiS
 SCRIPTS_TO_RUN = uninit1.scm errors1.scm sva34005.scm sva35362.scm \
   sva36039.scm sva36413.scm sva36556.scm sva36853.scm sva36917.scm \
-  inner-1.scm \
+  inner-1.scm lambda-in-class-1.scm \
   anonymous-lambda-1.scm unreach1.scm unreach2.scm unreach3.scm \
   bad-defclass.scm \
   srfi-45-test1.scm srfi-45-test2.scm reflect1.scm promise1.scm \

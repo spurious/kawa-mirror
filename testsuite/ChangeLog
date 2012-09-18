@@ -1,3 +1,9 @@
+2012-09-18  Alex Moiseenko  <imdagger@yandex.ru>
+            Per Bothner  <per@bothner.com>
+
+	* lambda-in-class-1.scm: New testcase, from mail to kawa list.
+	* Makefile.am: Update accodingly.
+
 2012-09-11  Helmut Eller  <eller.helmut@gmail.com>
 
 	* lib-test.scm: More expand tests.

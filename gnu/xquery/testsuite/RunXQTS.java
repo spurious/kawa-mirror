@@ -168,10 +168,9 @@ public class RunXQTS extends FilterConsumer
             xqlog.setPrintXMLdecl(true);
             xqlog.setStyle("xml");
             xqlog.useEmptyElementTag = 1;
-            Object saveIndent = XMLPrinter.indentLoc.get(null);
-            XMLPrinter.indentLoc.set("pretty");
+            Object saveIndent = XMLPrinter.indentLoc.setWithSave("pretty");
             xqlog.startDocument();
-            XMLPrinter.indentLoc.set(saveIndent);
+            XMLPrinter.indentLoc.setRestore(saveIndent);
 
 	    Document.parse(runner.catalog, runner);
             xqlog.endDocument();

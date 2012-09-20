@@ -58,8 +58,8 @@ public class XMLPrinter extends OutPort
    * If non-null, this is the the system identifier. */
   public static final ThreadLocation doctypePublic
     = new ThreadLocation("doctype-public");
-  public static final ThreadLocation indentLoc
-    = new ThreadLocation("xml-indent");
+  public static final ThreadLocation<String> indentLoc
+    = new ThreadLocation<String>("xml-indent");
 
   public boolean strict;
 

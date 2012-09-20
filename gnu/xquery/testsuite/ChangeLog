@@ -1,3 +1,7 @@
+2012-09-20  Per Bothner  <per@bothner.com>
+
+	* RunXQTS.java (main): Use setWithSave/setRestore methods.
+
 2011-08-04  Per Bothner  <per@bothner.com>
 
 	* RunXQTS.java (isSelected): Also skip K2-InternalVariablesWithout-9.

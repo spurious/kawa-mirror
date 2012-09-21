@@ -1,3 +1,12 @@
+2012-09-20  Per Bothner  <per@bothner.com>
+
+	* LambdaExp.java (applyMethods): Change type from Vector to
+	ArrayList<LambdaExp>.
+	(addApplyMethod): Update accordingly.
+	* Compilation.java (generateMatchMethods,
+	generateApplyMethodsWithContext, generateApplyMethodsWithoutContext):
+	Likewise.
+
 2012-09-17  Per Bothner  <per@bothner.com>
 
 	* SetExp.java (compile): Use loadOwningObject to load context

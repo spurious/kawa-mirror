@@ -1274,7 +1274,7 @@ public class Compilation implements SourceLocator
 	Type[] matchArgs = null;
 	for (int j = numApplyMethods;  --j >= 0; )
 	  {
-	    LambdaExp source = (LambdaExp) lexp.applyMethods.elementAt(j);
+	    LambdaExp source = lexp.applyMethods.get(j);
 	    // Select the subset of source.primMethods[*] that are suitable
 	    // for the current apply method.
 	    Method[] primMethods = source.primMethods;
@@ -1450,7 +1450,7 @@ public class Compilation implements SourceLocator
 
     for (int j = 0;  j < numApplyMethods;  ++j)
       {
-	LambdaExp source = (LambdaExp) lexp.applyMethods.elementAt(j);
+	LambdaExp source = lexp.applyMethods.get(j);
         if (! source.usingCallContext())
           continue;
 	Method[] primMethods = source.primMethods;
@@ -1605,7 +1605,7 @@ public class Compilation implements SourceLocator
 
 	for (int j = 0;  j < numApplyMethods;  j++)
 	  {
-	    LambdaExp source = (LambdaExp) lexp.applyMethods.elementAt(j);
+	    LambdaExp source = lexp.applyMethods.get(j);
             if (source.usingCallContext())
               continue;
 	    // Select the subset of source.primMethods[*] that are suitable

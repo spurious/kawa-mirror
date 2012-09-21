@@ -5,7 +5,7 @@ package gnu.expr;
 import gnu.bytecode.*;
 import gnu.mapping.*;
 import gnu.lists.LList;
-import java.util.Vector;
+import java.util.ArrayList;
 import gnu.kawa.functions.Convert;
 
 /**
@@ -25,7 +25,7 @@ public class LambdaExp extends ScopeExp
   public int opt_args;
 
   /** Set of visible top-level LambdaExps that need apply methods. */
-  Vector applyMethods;
+  ArrayList<LambdaExp> applyMethods;
 
   //  public int plainArgs;
   Variable argsArray;
@@ -673,8 +673,8 @@ public class LambdaExp extends ScopeExp
           owner = comp.getModule();
       }
     if (owner.applyMethods == null)
-      owner.applyMethods = new Vector();
-    owner.applyMethods.addElement(this);
+      owner.applyMethods = new ArrayList<LambdaExp>();
+    owner.applyMethods.add(this);
   }
 
   public Field compileSetField (Compilation comp)

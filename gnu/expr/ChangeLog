@@ -1,3 +1,7 @@
+2012-09-25  Per Bothner  <per@bothner.com>
+
+	* ReferenceExp.java (print): Note if DONT_DEREFERENCE is set.
+
 2012-09-20  Per Bothner  <per@bothner.com>
 
 	* LambdaExp.java (applyMethods): Change type from Vector to

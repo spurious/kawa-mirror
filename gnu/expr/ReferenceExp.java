@@ -212,6 +212,8 @@ public class ReferenceExp extends AccessExp
   {
     ps.print("(Ref/");
     ps.print(id);
+    if (getDontDereference())
+      ps.print(",dont-deref");
     if (symbol != null
 	&& (binding == null || symbol.toString() != binding.getName()))
       {

@@ -1,3 +1,11 @@
+2012-09-26  Per Bothner  <per@bothner.com>
+
+	* standard/define_alias.java (rewrite): Replace by non-dummy ...
+	(rewriteForm): New method that does actual rewrite for alias-ee.
+	Note that Declaration is EARLY_INIT.
+	(scanForDefinitions): Replace by ...
+	(scanForm): Defer expression handling to rewriteForm.
+
 2012-08-18  Charles Turner  <chturne@gmail.com>
 
 	* lang/begin.java: Purged unused imports.

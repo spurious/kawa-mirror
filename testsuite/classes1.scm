@@ -1,4 +1,4 @@
-(module-static counter get-new-count <IdClass1> <IdClass2> call-lambda)
+(module-static counter get-new-count <IdClass1> <IdClass2> my-id-class-2 call-lambda)
 
 ;; Based on a test-case from Jamison Hope <jrh@theptrgroup.com>
 (define-syntax (import-class form)
@@ -95,6 +95,10 @@
   ((get-year) :: <int>
    (+ (invoke-special <java.util.Date> (this) 'get-year)
       (invoke-static <SimpleA> 'x1900))))
+
+;; Test separate compilation of type-alias for simple class.
+;; Make it a forward declaration for a better test.
+(define-alias my-id-class-2 <IdClass2>)
 
 (define-simple-class <IdClass1> ()
   (var0 allocation: 'class init: (get-new-count))

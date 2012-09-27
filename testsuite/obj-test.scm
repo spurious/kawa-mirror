@@ -275,7 +275,7 @@
 (test 44 'obj4-f (invoke obj4 'f 2))
 
 (define (make-ClsD) (make <ClsD>))
-(define obj5 (make-ClsD))
+(define obj5 (let ((x ::cls-d (make-ClsD))) x))
 (test 23 'obj5-d (slot-ref obj5 'd))
 
 (define obj6 (make <ClsE>))

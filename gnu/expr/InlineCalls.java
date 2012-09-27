@@ -338,7 +338,8 @@ public class InlineCalls extends ExpExpVisitor<Type> {
     if (decl != null && decl.field == null && ! decl.getCanWrite())
       {
         Expression dval = decl.getValue();
-        if (dval instanceof QuoteExp && dval != QuoteExp.undefined_exp)
+        if (dval instanceof QuoteExp && dval != QuoteExp.undefined_exp
+            && ! exp.getDontDereference())
           return visitQuoteExp(new QuoteExp(((QuoteExp) dval).getValue(), decl.getType()), required);
         // We don't want to visit the body of a named function yet.
         // Though not doing so does hurt optimization.

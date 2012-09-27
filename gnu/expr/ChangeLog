@@ -1,3 +1,17 @@
+2012-09-27  Per Bothner  <per@bothner.com>
+
+	Improve handling of separate compilation of define-alias on classes.
+	* LitTable.java (emit): Add support for PairClassType.
+	* Declaration.java (load): If loading a reference to a simple class,
+	load as class reference.  This is partly an optimization, but it
+	also fixes an order dependency for a forwards define-alias.
+	* InlineCalls.java (visitReferenceExp): Don't optimize to constant
+	value if DONT_DEREFENCE set.
+	* ClassInitializer.java (<init>): Move some logic to caller (below).
+	* ClassExp.java (compileSetField): Change initialization of class
+	object, so when generating a ClassType (or pair) do it as a literal.
+	This avoids an order dependency with type aliases.
+
 2012-09-25  Per Bothner  <per@bothner.com>
 
 	* ReferenceExp.java (print): Note if DONT_DEREFERENCE is set.

@@ -335,7 +335,12 @@ public class Declaration
       {
         Object val;
         Expression value = getValueRaw();
-        if (field != null)
+        if (type == Type.javalangClassType
+            && (value instanceof ClassExp || value instanceof ModuleExp))
+          {
+            comp.loadClassRef(((LambdaExp) value).getCompiledClassType(comp));
+          }
+        else if (field != null)
           {
             comp.usedClass(field.getDeclaringClass());
             comp.usedClass(field.getType());

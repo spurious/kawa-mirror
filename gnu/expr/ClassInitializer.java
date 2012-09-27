@@ -10,23 +10,18 @@ public class ClassInitializer extends Initializer
 {
   ClassExp cexp;
 
-  public ClassInitializer(ClassExp cexp, Compilation comp)
-  {
-    field = cexp.allocFieldFor(comp);
-    cexp.compileMembers(comp);
-    this.cexp = cexp;
-    if (field.getStaticFlag())
-      {
-	next = comp.clinitChain;
-	comp.clinitChain = this;
-      }
-    else
-      {
-	LambdaExp heapLambda = cexp.getOwningLambda();
-	next = heapLambda.initChain;
-	heapLambda.initChain = this;
-      }
-  }
+    public ClassInitializer(ClassExp cexp, Field field, Compilation comp) { 
+        this.field = field;
+        this.cexp = cexp;
+        if (field.getStaticFlag()) {
+            next = comp.clinitChain;
+            comp.clinitChain = this;
+        } else {
+            LambdaExp heapLambda = cexp.getOwningLambda();
+            next = heapLambda.initChain;
+            heapLambda.initChain = this;
+        }
+    }
 
   public void emit(Compilation comp)
   {

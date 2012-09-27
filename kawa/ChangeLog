@@ -1,3 +1,8 @@
+2012-09-27  Per Bothner  <per@bothner.com>
+
+	* standard/module_name.java (scanForm): Set declarations value to
+	the ModuleExp (similar to what we do for ClassExp), not ClassType.
+
 2012-09-26  Per Bothner  <per@bothner.com>
 
 	* standard/define_alias.java (rewrite): Replace by non-dummy ...

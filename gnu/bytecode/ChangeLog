@@ -1,3 +1,7 @@
+2012-09-27  Per Bothner  <per@bothner.com>
+
+	* Field.java (setModifiers): New method.
+
 2012-08-16  Per Bothner  <per@bothner.com>
 
 	* ExitableBlock.java: When exiting, we may need to pop the stack.

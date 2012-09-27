@@ -24,7 +24,7 @@
 	 classes)))
 
 ;; Based on a bug report from Walter C. Pelissero <walter@pelissero.org>:
-(define (length-diff1 (str1 :: <java.lang.String>)
+(define (length-diff1 (str1 :: jlString)
 		      (str2 :: <java.lang.String>))
   (let ((diff (- (invoke str1 'length) (invoke str2 'length))))
     diff))

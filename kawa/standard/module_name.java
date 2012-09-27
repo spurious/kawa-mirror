@@ -80,7 +80,7 @@ public class module_name extends Syntax
 
         if (decl != null)
           {
-            decl.noteValue(new QuoteExp(tr.mainClass, Compilation.typeClass));
+            decl.noteValue(tr.getModule());
             decl.setFlag(Declaration.IS_CONSTANT|Declaration.PRIVATE_SPECIFIED);
             if (module.outer == null)
               decl.setFlag(Declaration.STATIC_SPECIFIED);

@@ -1,5 +1,9 @@
 (require <classes1>)
 
+;; Test separate compilation of type alias of non-simple class.
+;; Might as well make it a forward declaration.
+(define-alias cls-d <ClsD>)
+
 (define-class <ClsD> (<ClsB>)
   (d :: <int> init-form: 23))
 ;  ((f (y :: <int>)) :: <int> (+ d y)))
@@ -55,3 +59,7 @@
 		 (y)
 		 (action (lambda (e) (+ yy 10))))))
     (slot-ref obj 'action)))
+
+(define my-id-instance-2 :: my-id-class-2
+  (let ((ii :: my-id-class-2 (my-id-class-2)))
+    ii))

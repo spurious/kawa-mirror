@@ -1,3 +1,13 @@
+2012-09-27  Per Bothner  <per@bothner.com>
+
+	Add tests of separate compilation of define-alias of classes.
+	* classes1.scm (my-id-class-2): New type alias of simple class.
+	* classes2.scm (my-id-instance-2): Test use of my-id-class-2.
+	* module1a.scm (jlString): Type alias of existing class.
+	* module2.scm (length-diff1): Test use of jlString.
+	* classes2.scm (cls-d): New type alias of non-simple class.
+	* obj-test.scm: Test cls-d.
+
 2012-09-18  Alex Moiseenko  <imdagger@yandex.ru>
             Per Bothner  <per@bothner.com>
 

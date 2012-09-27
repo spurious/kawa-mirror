@@ -598,9 +598,17 @@ public class LitTable implements ObjectOutput
 	// We need to special case ClassTypes that are (currently)
 	// non-existing, because the corresponding reflective Class
 	// needs to be loaded using the correct ClassLoader.
-	comp.loadClassRef((ClassType) literal.value);
-        Method meth = Compilation.typeType
-            .getDeclaredMethod("make", new Type[]{Type.javalangClassType});
+        ClassType ct = (ClassType) literal.value;
+        boolean isPair = literal.value instanceof PairClassType;
+        ClassType typeType = isPair ? ClassType.make("gnu.expr.PairClassType")
+            : Compilation.typeType;
+        Type[] atypes = new Type[isPair ? 2 : 1];
+        for (int i = atypes.length;  --i >= 0; )
+            atypes[i] = Type.javalangClassType;
+        Method meth = typeType.getDeclaredMethod("make", atypes);
+	comp.loadClassRef((ClassType) ct);
+        if (isPair)
+            comp.loadClassRef(((PairClassType) ct).instanceType);
 	code.emitInvokeStatic(meth);
 	code.emitCheckcast(Compilation.typeClassType);
 	store(literal, ignore, code);

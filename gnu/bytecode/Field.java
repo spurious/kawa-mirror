@@ -65,6 +65,10 @@ public class Field extends Location
   public final int getModifiers() {
     return flags;
   }
+
+    public final void setModifiers(int modifiers) {
+        flags = modifiers;
+    }
   
   void write (DataOutputStream dstr, ClassType classfile)
        throws java.io.IOException

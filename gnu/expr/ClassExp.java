@@ -107,7 +107,7 @@ public class ClassExp extends LambdaExp
       }
     else
       {
-	typeType = ClassType.make("gnu.bytecode.Type");
+	typeType = Compilation.typeType;
 	nargs = 1;
       }
     Type[] argsClass = new Type[nargs];
@@ -116,7 +116,7 @@ public class ClassExp extends LambdaExp
 	getOwningLambda().loadHeapFrame(comp);
 	argsClass[--nargs] = Type.pointer_type;
       }
-    ClassType typeClass = ClassType.make("java.lang.Class");
+    ClassType typeClass = Type.javalangClassType;
     while (--nargs >= 0) argsClass[nargs] = typeClass;
     Method makeMethod
       = typeType.addMethod("make", argsClass,
@@ -875,10 +875,19 @@ public class ClassExp extends LambdaExp
     out.endLogicalBlock(")");
   }
 
-  public Field compileSetField (Compilation comp)
-  {
-    return (new ClassInitializer(this, comp)).field;
-  }
+    public Field compileSetField (Compilation comp) {
+        Field field = allocFieldFor(comp);
+        compileMembers(comp);
+        if (! getNeedsClosureEnv() && field.getStaticFlag()
+            &&  type != Type.javalangClassType) {
+            new Literal(compiledType, type, comp.litTable)
+                .assign(field, comp.litTable);
+            if (comp.immediate)
+                field.setModifiers(field.getModifiers() & ~Access.FINAL);
+        } else
+            new ClassInitializer(this, field, comp);
+        return field;
+    }
 
   /** Mangle a "slot" name to a get- or set- method name.
    * @param prefix either "get" or "set" or "add"

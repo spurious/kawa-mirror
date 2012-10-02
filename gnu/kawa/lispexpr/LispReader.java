@@ -393,11 +393,11 @@ public class LispReader extends Lexer
       }
   }
 
-    public Object readObject () throws java.io.IOException, SyntaxException {
-	return readObjectWithSharing(-1);
+    public Object readObject() throws java.io.IOException, SyntaxException {
+	return readObject(-1, false);
     }
 
-    public Object readObjectWithSharing (int sharingIndex)
+    public Object readObject(int sharingIndex, boolean topLevel)
 	throws java.io.IOException, SyntaxException
     {
     char saveReadState = ((InPort) port).readState;
@@ -417,6 +417,12 @@ public class LispReader extends Lexer
 	    if (value == Values.empty)
 	      continue;
 	    value = handlePostfix(value, rtable, line, column);
+            if (topLevel && ! (value instanceof Pair))
+              {
+                // Wrap in begin form so top-level forms have position info.
+                value = makePair(kawa.standard.begin.begin,
+                                 makePair(value, line, column), line, column);
+              }
 	    return value;
 	  }
       }
@@ -1130,11 +1136,11 @@ public class LispReader extends Lexer
   }
 
   /** Read a "command" - a top-level expression or declaration.
-   * Return Sequence.eofValue of end of file. */
+   * Return Sequence.eofValue at end of file. */
   public Object readCommand ()
       throws java.io.IOException, SyntaxException
   {
-    return readObject();
+    return readObject(-1, true);
   }
 
   protected Object makeNil ()

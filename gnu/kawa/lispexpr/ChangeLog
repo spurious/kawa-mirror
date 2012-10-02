@@ -1,3 +1,12 @@
+2012-10-02  Per Bothner  <per@bothner.com>
+
+	Fix line number support for top-level non-pairs.
+	* LispReader.java (readObjectWithSharing): Rename to ...
+	(readObject(int,boolean)):  Take extra topLevel parameter.  If true
+	and read object is not a list, wrap it in a begin form.
+	(readCommand): Update with extra parameter to readObject.
+	* ReaderDispatchMisc.java: Likewise.
+
 2012-09-18  Per Bothner  <per@bothner.com>
 
 	* LispLanguage.java (parse): If seeing an unexpected ')', skip it.

@@ -34,6 +34,11 @@ public class BRLRead extends LispReader
     init();
   }
   
+    @Override
+    public Object readCommand () throws java.io.IOException, SyntaxException {
+        return readObject();
+    }
+
   public Object readObject ()
       throws java.io.IOException, SyntaxException
   {

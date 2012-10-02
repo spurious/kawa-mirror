@@ -129,7 +129,7 @@ public class ReaderDispatchMisc extends ReadTableEntry
       case ',':
         return ReaderDispatchSyntaxQuote.readNamedConstructor(reader);
       case '=':
-	return reader.readObjectWithSharing(count);
+        return reader.readObject(count, false);
       case '#':
         if (in instanceof LispReader)
           {

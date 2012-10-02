@@ -1,3 +1,8 @@
+2012-10-02  Per Bothner  <per@bothner.com>
+
+	* BRLRead.java (readCommand): New override, needed because of new
+	new "topLevel" behavior of inherited readObject.
+
 2011-07-11  Per Bothner  <per@bothner.com>
 
 	* BRLRead.java:  Use updated LispReader API.

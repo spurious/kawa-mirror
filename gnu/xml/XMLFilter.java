@@ -696,7 +696,9 @@ public class XMLFilter implements
       }
     else
       {
-        closeStartTag();
+        boolean inImplicitAttr = previous == SAW_KEYWORD;
+        if (! inImplicitAttr)
+          closeStartTag();
         if (v instanceof UnescapedData)
           {
             base.writeObject(v);
@@ -709,6 +711,8 @@ public class XMLFilter implements
             TextUtils.textValue(v, this);  // Atomize.
             previous = SAW_WORD;
           }
+        if (inImplicitAttr)
+          endAttribute();
       }
   }
 

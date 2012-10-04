@@ -1,3 +1,8 @@
+2012-10-03  Per Bothner  <per@bothner.com>
+
+	* XMLFilter.java (writeObject): Fix buggy handling of attribute
+	implicitly specified by a Keyword, as when called from MakeElement.
+
 2012-09-20  Per Bothner  <per@bothner.com>
 
 	* XMLPrinter.java (indentLoc): Add generic parameters.

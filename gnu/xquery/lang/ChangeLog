@@ -1,3 +1,9 @@
+2012-10-06  Per Bothner  <per@bothner.com>
+
+	Implement check for a cycle in variale initialization.
+	* XQResolveNames.java (CycleDetector): New helper member class.
+	(resolveModule): Check for cycle.
+
 2012-07-15  Per Bothner  <per@bothner.com>
 
 	* XQParser.java (makeBinary): Update OP_RANGE_TO.

@@ -259,8 +259,6 @@ public class RunXQTS extends FilterConsumer
     /* #endif */
     // RunXQTS failures rather than Qexo errors:
     // Some work under gcj but not JDK 1.4.x or 1.5.0_05:
-    expectFailures("vardeclerr|K-InternalVariablesWith-17|K-InternalVariablesWith-18",
-                   "missing check for circular definitions");
     expectFailures("K-TimeAddDTD-1|K-TimeAddDTD-2|K-TimeSubtractDTD-1",
                    "bad interaction between fields and millis");
     expectFailures("op-time-greater-than-2",

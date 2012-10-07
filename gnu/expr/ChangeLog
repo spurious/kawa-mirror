@@ -1,3 +1,21 @@
+2012-10-06  Per Bothner  <per@bothner.com>
+
+	Improved unreachability analysis.
+	* ReferenceExp.java (validateApply): If function is a Continuation,
+	then set type to neverReturnsType.
+	* ChainLambdas.java: Improvements to unreachable code reporting.
+	(visitSetExp): New method, so we can check for unreachable assignment.
+	* ApplyExp.java (isAppendValues): New method.
+	* FindTailCalls.java (visitApplyExp): Use new isAppendValues method.
+	* InlineCalls.java (visitLambdaExp): If lambda cannot finish, then
+	set its return type to neverReturnsType.
+	* LambdaExp.java (canFinishCondition, canFinishListeners): Data
+	structures used to figure out which functions can never return normally.
+	(CAN_FINISH, CANNOT_FINISH, IN_EXPWALKER): New constants.
+	(notifyCanFinish, notifyCanFinish): New methods.
+	* PushApply.java: This pass now calculates canFinishCondition.
+	(CanFinishTracker): New helper class.
+
 2012-09-27  Per Bothner  <per@bothner.com>
 
 	Improve handling of separate compilation of define-alias on classes.

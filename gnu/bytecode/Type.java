@@ -611,9 +611,9 @@ public abstract class Type
 	mapNameToType.put("void",    voidType);
   }
 
-  /** The "return type" of an expression that never returns, such as a throw. */
-  public static final PrimType neverReturnsType = new PrimType (voidType);
-  static { neverReturnsType.this_name = "(never-returns)"; }
+    /** The return type of an expression that never returns, such as a throw. */
+    public static final Type neverReturnsType
+        = ClassType.make("gnu.bytecode.Type$NeverReturns");
 
   /** The magic type of null. */
   public static final ObjectType nullType = new ObjectType("(type of null)");
@@ -696,6 +696,11 @@ public abstract class Type
     String name = toString();
     return name == null ? 0 : name.hashCode ();
   }
+
+    /** A marker class, used for {@code Type.neverReturnsType}. */
+    public static class NeverReturns {
+        private NeverReturns() { }
+    }
 
   static class ClassToTypeMap extends AbstractWeakHashTable<Class,Type>
   {

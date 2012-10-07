@@ -57,6 +57,12 @@ public class ApplyExp extends Expression
     return func instanceof QuoteExp ? ((QuoteExp) func).getValue() : null;
   }
 
+    public boolean isAppendValues() {
+        return func instanceof QuoteExp
+            && (((QuoteExp) func).getValue()
+                == gnu.kawa.functions.AppendValues.appendValues);
+    }
+
   public ApplyExp (Expression f, Expression... a) { func = f; args = a; }
 
   public ApplyExp (Procedure p, Expression... a) { this(new QuoteExp(p), a); }

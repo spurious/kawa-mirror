@@ -65,7 +65,13 @@ public class ChainLambdas extends ExpExpVisitor<ScopeExp> {
                 Expression[] xargs = new Expression[i+2];
                 xargs[0] = exp.func;
                 System.arraycopy(args, 0, xargs, 1, i+1);
-                maybeWarnUnreachable(i+1 < nargs ? args[i+1] : exp);
+                if (i+1 < nargs || ! exp.isAppendValues()) {
+                    if (! unreachableCodeSeen && comp.warnUnreachable()) {
+                        comp.error('w', "unreachable procedure call", exp);
+                        comp.error('i', "this operand never finishes", args[i]);
+                    }
+                    unreachableCodeSeen = true;
+                }
                 BeginExp bexp = new BeginExp(xargs);
                 bexp.type = Type.neverReturnsType;
                 return bexp;
@@ -73,6 +79,18 @@ public class ChainLambdas extends ExpExpVisitor<ScopeExp> {
             args[i] = e;
         }
         return exp;
+    }
+
+    protected Expression visitSetExp(SetExp sexp, ScopeExp scope) {
+        Expression r = super.visitSetExp(sexp, scope);
+        if (r == sexp) {
+            Expression rval = sexp.getNewValue();
+            if (rval.neverReturns()) {
+                maybeWarnUnreachable(sexp);
+                return rval;
+            }
+        }
+        return r;
     }
 
     protected Expression visitIfExp(IfExp exp, ScopeExp scope) {

@@ -75,9 +75,7 @@ public class FindTailCalls extends ExpExpVisitor<Expression>
         lexp = (LambdaExp) exp.func;
         visitLambdaExp(lexp);
       }
-    else if (exp.func instanceof QuoteExp
-             && (((QuoteExp) exp.func).getValue()
-                 == gnu.kawa.functions.AppendValues.appendValues))
+    else if (exp.isAppendValues())
       isAppendValues = true;
     else
       {

@@ -4,21 +4,23 @@
 
 (define (bar2)
   (list (primitive-throw java.lang.NullPointerException) 12 13))
-;; Diagnostic: unreach1.scm:6:58: warning - unreachable code
+;; Diagnostic: unreach1.scm:6:3: warning - unreachable procedure call
+;; Diagnostic: unreach1.scm:6:9: note - this operand never finishes
 
 (define (bar3)
   (list 12 (primitive-throw java.lang.NullPointerException) (sqrt 13)))
-;; Diagnostic: unreach1.scm:10:61: warning - unreachable code
+;; Diagnostic: unreach1.scm:11:3: warning - unreachable procedure call
+;; Diagnostic: unreach1.scm:11:12: note - this operand never finishes
 
 (define (bar4)
   (primitive-throw java.lang.NullPointerException)
   13)
-;; Diagnostic: unreach1.scm:15:3: warning - unreachable code
+;; Diagnostic: unreach1.scm:17:3: warning - unreachable code
 
 (define (bar5)
   (begin (primitive-throw java.lang.NullPointerException)
          13))
-;; Diagnostic: unreach1.scm:20:10: warning - unreachable code
+;; Diagnostic: unreach1.scm:22:10: warning - unreachable code
 
 ;;; Savannah bug #35524: Unreachable code is not an error
 (define (foo)
@@ -27,4 +29,10 @@
      (let l ()
        (return #f)
        (l)))))
-;; Diagnostic: unreach1.scm:29:8: warning - unreachable code
+;; Diagnostic: unreach1.scm:31:8: warning - unreachable code
+
+;;; Savannah bug #36560: eq? <endless-loop>
+(define (foo36560)
+  (eq? (let loop () (loop)) #t))
+;; Diagnostic: unreach1.scm:36:3: warning - unreachable procedure call
+;; Diagnostic: unreach1.scm:36:8: note - this operand never finishes

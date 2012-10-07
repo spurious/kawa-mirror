@@ -195,6 +195,10 @@ public class ReferenceExp extends AccessExp
             Expression dval = decl.getValue();
             if (dval != null)
               return dval.validateApply(exp, visitor, required, decl);
+            Type dtype = decl.type;
+            if (dtype instanceof ClassType
+                && ((ClassType) dtype).isSubclass("kawa.lang.Continuation"))
+                exp.setType(Type.neverReturnsType);
           }
       }
     else if (getSymbol() instanceof Symbol)

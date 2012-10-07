@@ -1,3 +1,9 @@
+2012-10-06  Per Bothner  <per@bothner.com>
+
+	Change so reading a class cann detecte neverReturnsType easily.
+	* Type.java (neverReturnsType): Change to use Type$NeverReturns.
+	(NeverReturns): New helper class.
+
 2012-09-27  Per Bothner  <per@bothner.com>
 
 	* Field.java (setModifiers): New method.

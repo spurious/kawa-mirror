@@ -1,11 +1,11 @@
 // Copyright (c) 1999, 2000, 2001, 2002, 2003, 2004, 2007, 2008, 2009  Per M.A. Bothner.
-// This is free software;  for terms and warranty disclaimer see ./COPYING.
+otify// This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.expr;
 import gnu.bytecode.*;
 import gnu.mapping.*;
 import gnu.lists.LList;
-import java.util.ArrayList;
+import java.util.*;
 import gnu.kawa.functions.Convert;
 
 /**
@@ -148,7 +148,8 @@ public class LambdaExp extends ScopeExp
   public static final int OVERLOADABLE_FIELD = 2048;
   public static final int ATTEMPT_INLINE = 4096;
   static final int INLINE_ONLY = 8192;
-  protected static final int NEXT_AVAIL_FLAG = 16384;
+  public static final int IN_EXPWALKER = 0x4000;
+  protected static final int NEXT_AVAIL_FLAG = 0x8000;
 
   /** True iff this lambda is only "called" inline. */
   public final boolean getInlineOnly() { return (flags & INLINE_ONLY) != 0; }
@@ -282,6 +283,56 @@ public class LambdaExp extends ScopeExp
   }
   public boolean usingCallContext()
   { return getCallConvention() >= Compilation.CALL_WITH_CONSUMER; }
+
+    /** This function can finish if specified functions can finish.
+     * I.e. call this function can complete normally is there is some i
+     * such that all members of canFinishDependencies.get(i) can finish.
+     * May be null if there is no dependency yet in the current execution
+     * path fork, in which case PsuhApply.canGinishDeps will realize it.
+     * This value is calculated during PushApply and used in InlineCalls.
+     */
+    ArrayList<HashSet<LambdaExp>> canFinishCondition;
+
+    static ArrayList<HashSet<LambdaExp>> CAN_FINISH = new ArrayList();
+    static { CAN_FINISH.add(new HashSet<LambdaExp>()); }
+
+    static ArrayList<HashSet<LambdaExp>> CANNOT_FINISH = new ArrayList();
+
+    /** Set of functions whose canFinishCondition may depend on this. */
+    Set<LambdaExp> canFinishListeners;
+
+    void notifyCanFinish() {
+        Set<LambdaExp> listeners = canFinishListeners;
+        if (listeners != null) {
+            canFinishListeners = null;
+            for (LambdaExp f : listeners) {
+                f.checkCanFinish();
+            }
+        } 
+    }
+
+    void checkCanFinish() {
+        ArrayList<HashSet<LambdaExp>> cond = canFinishCondition;
+        if (cond != null && ! getFlag(LambdaExp.IN_EXPWALKER)) {
+            // See if we can simplify exp.canFinishCondition.
+            // I.e. if any dependencies are now CAN_FINISH.
+            for (Set<LambdaExp> set : cond) {
+                Iterator<LambdaExp> callees = set.iterator();
+                while (callees.hasNext()) {
+                    LambdaExp callee = callees.next();
+                    if (callee.canFinishCondition == LambdaExp.CAN_FINISH)
+                        callees.remove();
+                }
+                if (set.isEmpty()) {
+                    canFinishCondition = LambdaExp.CAN_FINISH;
+                    notifyCanFinish();
+                    return;
+                }
+            }
+        }
+    }
+
+
 
   public final boolean isHandlingTailCalls ()
   {

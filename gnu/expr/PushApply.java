@@ -1,15 +1,24 @@
 package gnu.expr;
+import gnu.bytecode.Type;
+import java.util.*;
 
 /** Re-arranges ApplyExp where the function is a LetExp or BeginExp.
-    Optimizes ((let (...) body) . args) to (let (...) (body . args)).
-    Optimizes ((begin ... last) . args) to (begin ... (last . args)).
-    This helps optimize Scheme "named let" (and some other forms)
-    by making it more likely the application will be to a known procedure.
-    Optimizes (if (let (...) body) e1 [e2])
-      to (let (...) (if body e1 [e2])).
-    Optimizes (if (begin ... last) e1 [e2])
-      to (begin ... (if last e1 [e2]))
-    These optimizations have to be done after Declarations are bound. */
+ *  Optimizes {@code ((let (...) body) . args)} to (let (...) (body . args)).
+ *  Optimizes ((begin ... last) . args) to (begin ... (last . args)).
+ *  This helps optimize Scheme "named let" (and some other forms)
+ *  by making it more likely the application will be to a known procedure.
+ *  Optimizes {@code (if (let (...) body) e1 [e2])}
+ *    to {@code (let (...) (if body e1 [e2]))}.
+ *  Optimizes {@code (if (begin ... last) e1 [e2])}
+ *    to {@code (begin ... (if last e1 [e2]))}.
+ *  These optimizations have to be done after Declarations are bound.
+ *
+ *  Also, for each {@code LambdaExp} set the {@code canFinishCondition} field.
+ *  This information is used in the  following {@code InlineCalls} pass,
+ *  to determine which calls (and thus other expressions) have the type
+ *  {@code neverReturnsType}.  That in turn is used in the later
+ *  {@code ChainLambda} pass to warn about unreachable code.
+ */
 
 public class PushApply extends ExpVisitor<Expression,Void>
 {
@@ -30,22 +39,25 @@ public class PushApply extends ExpVisitor<Expression,Void>
     return r;
   }
 
-  protected Expression visitApplyExp(ApplyExp exp, Void ignored)
-  {
-    Expression func = exp.func;
-    boolean isApplyFunc = getCompilation().isApplyFunction(func)
-      && exp.getArgCount() > 0;
-    if (isApplyFunc)
-      {
-        func = exp.getArg(0);
-      }
-    if (func instanceof ReferenceExp)
-      {
-        Declaration fdecl = ((ReferenceExp) func).getBinding();
-        if (fdecl != null && ! fdecl.hasUnknownValue()
-            && ! fdecl.inExternalModule(comp))
-          fdecl.addCaller(exp);
-      }
+    protected Expression visitApplyExp(ApplyExp exp, Void ignored) {
+        Expression func = exp.func;
+        boolean isApplyFunc = getCompilation().isApplyFunction(func)
+            && exp.getArgCount() > 0;
+        if (isApplyFunc) {
+            func = exp.getArg(0);
+        }
+        if (func instanceof ReferenceExp) {
+            Declaration fdecl = ((ReferenceExp) func).getBinding();
+            if (fdecl != null && ! fdecl.hasUnknownValue()) {
+                if (! fdecl.inExternalModule(comp))
+                    fdecl.addCaller(exp);
+                Expression fval = Declaration.followAliases(fdecl).getValue();
+                if (fval != null && fval.getClass() == LambdaExp.class
+                    && ! canFinishTracker.ignoreThisFork) {
+                    noteFinishDependency((LambdaExp) fval,  currentLambda);
+                }                                
+            }
+        }
     if (func instanceof LetExp
         && ! (func instanceof FluidLetExp)) // [APPLY-LET]
       {
@@ -78,6 +90,22 @@ public class PushApply extends ExpVisitor<Expression,Void>
     return exp;
   }
 
+    void noteFinishDependency(LambdaExp callee, LambdaExp caller) {
+        if (callee == caller || callee.body.type == Type.neverReturnsType) {
+            canFinishTracker.dependencyAddedThisFork = true;
+            caller.canFinishCondition = LambdaExp.CANNOT_FINISH;
+        } else if (caller.canFinishCondition != LambdaExp.CAN_FINISH) {
+            ArrayList<HashSet<LambdaExp>> deps = canFinishDeps();
+            int ndeps = deps.size();
+            for (int i = 0;  i < ndeps;  i++) {
+                if (caller.canFinishCondition.get(i).add(callee))
+                    canFinishTracker.dependencyAddedThisFork = true;
+            }
+            if (callee.canFinishListeners == null)
+                callee.canFinishListeners = new HashSet<LambdaExp>(); 
+            callee.canFinishListeners.add(caller);
+        }
+    }
     protected Expression visitIfExp(IfExp exp, Void ignored) {
         Expression test = exp.test;
         if (test instanceof LetExp
@@ -100,8 +128,32 @@ public class PushApply extends ExpVisitor<Expression,Void>
             stmts[last_index] = exp;
             return visit(begin, ignored);
         }
-        else
-            return super.visitIfExp(exp, ignored);
+        else { 
+            exp.test = visit(exp.test, ignored);
+            forkPush();
+            exp.then_clause = visit(exp.then_clause, ignored);
+            forkNext();
+            if (exp.else_clause != null)
+                exp.else_clause = visit(exp.else_clause, ignored);
+            forkPop();
+            return exp;
+        }
+    }
+
+    protected Expression visitTryExp (TryExp exp, Void ignored) {
+        forkPush();
+        exp.try_clause = visit(exp.try_clause, ignored);
+        CatchClause catch_clause = exp.catch_clauses;
+        while (catch_clause != null) {
+            forkNext();
+            visit(catch_clause, ignored);
+            catch_clause = catch_clause.getNext();
+        }
+        forkPop();
+
+        if (exp.finally_clause != null)
+            exp.finally_clause = visit(exp.finally_clause, ignored);
+        return exp;
     }
 
   protected Expression visitReferenceExp (ReferenceExp exp, Void ignored)
@@ -140,4 +192,101 @@ public class PushApply extends ExpVisitor<Expression,Void>
     exp.declareParts(getCompilation());
     return visitLambdaExp(exp, ignored);
   }
+
+    protected Expression visitLambdaExp (LambdaExp exp, Void ignored) {
+        CanFinishTracker oldTracker = canFinishTracker;
+        CanFinishTracker newTracker = new CanFinishTracker();
+        canFinishTracker = newTracker;
+        newTracker.dependenciesAtForkStart = LambdaExp.CAN_FINISH;
+        LambdaExp saveLambda = currentLambda;
+        exp.setFlag(true, LambdaExp.IN_EXPWALKER);
+        currentLambda = exp;
+        try {
+            return super.visitLambdaExp(exp, ignored);
+        }
+        finally {
+            exp.setFlag(false, LambdaExp.IN_EXPWALKER);
+
+            if (exp.canFinishCondition == null)
+                exp.canFinishCondition = LambdaExp.CAN_FINISH;
+            exp.checkCanFinish();
+            currentLambda = saveLambda;
+            canFinishTracker = oldTracker;
+        }
+    }
+
+    class CanFinishTracker {
+        CanFinishTracker outer;
+
+        /** Don't need to update canFinishCondition in this fork of an If.
+         * The reason is that a prior fork did not add extra dependencies,
+         * or that we depend on something known not to return.
+         */
+        boolean ignoreThisFork;
+
+        boolean dependencyAddedThisFork;
+        ArrayList<HashSet<LambdaExp>> dependenciesAtForkStart;
+        ArrayList<HashSet<LambdaExp>> dependenciesPreviousForks;
+    }
+
+    CanFinishTracker canFinishTracker;
+
+    private static ArrayList<HashSet<LambdaExp>> cloneDeps(ArrayList<HashSet<LambdaExp>> deps) {
+        ArrayList<HashSet<LambdaExp>> result = new ArrayList<HashSet<LambdaExp>>();
+        for (HashSet<LambdaExp> x : deps)
+            result.add((HashSet<LambdaExp>) x.clone());
+        return result;
+    }
+
+    private static ArrayList<HashSet<LambdaExp>> canFinishDeps(CanFinishTracker outer) {
+        if (outer.dependenciesAtForkStart == null)
+            outer.dependenciesAtForkStart = cloneDeps(canFinishDeps(outer.outer));
+        return outer.dependenciesAtForkStart;
+    }
+
+    ArrayList<HashSet<LambdaExp>> canFinishDeps() {
+        if (currentLambda.canFinishCondition == null)
+            currentLambda.canFinishCondition = cloneDeps(canFinishDeps(canFinishTracker));
+        return currentLambda.canFinishCondition;
+    }
+    
+    public void forkPush() {
+        LambdaExp curLambda = getCurrentLambda();
+        CanFinishTracker oldTracker = canFinishTracker;
+        CanFinishTracker newTracker = new CanFinishTracker();
+        newTracker.dependenciesAtForkStart = curLambda.canFinishCondition;
+        curLambda.canFinishCondition = null;
+        newTracker.ignoreThisFork = false;
+        newTracker.dependencyAddedThisFork = false;
+        newTracker.outer = oldTracker;
+        canFinishTracker = newTracker;
+    }
+
+    public void forkNext() {
+        LambdaExp curLambda = getCurrentLambda();
+        if (! canFinishTracker.dependencyAddedThisFork) {
+            canFinishTracker.ignoreThisFork = true;
+            canFinishTracker.dependenciesPreviousForks = null;
+        } else {
+            canFinishTracker.ignoreThisFork = false;
+            canFinishTracker.dependencyAddedThisFork = false;
+            if (canFinishTracker.dependenciesPreviousForks == null)
+                canFinishTracker.dependenciesPreviousForks = curLambda.canFinishCondition;
+            else {
+                canFinishTracker.dependenciesPreviousForks.addAll(curLambda.canFinishCondition);
+            }
+            curLambda.canFinishCondition = null;
+        }
+    }
+
+    public void forkPop() {
+        CanFinishTracker oldTracker = canFinishTracker;
+        forkNext();
+        LambdaExp curLambda = currentLambda;
+        if (canFinishTracker.ignoreThisFork)
+            curLambda.canFinishCondition = canFinishTracker.dependenciesAtForkStart;
+        else
+            curLambda.canFinishCondition = canFinishTracker.dependenciesPreviousForks;
+        canFinishTracker = oldTracker.outer;
+    }
 }

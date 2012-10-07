@@ -123,17 +123,22 @@ public class IfExp extends Expression
 	then_clause.compileWithPosition(comp, target);
         comp.callContextVar = callContextSave;
       }
-    if (! falseInherited && falseLabel.isUsed())
+    if (! falseInherited)
       {
-	code.emitElse();
-	falseLabel.define(code);
-        // See note above for then_clause.
-        Variable callContextSave = comp.callContextVar;
-	if (else_clause == null)
-	  comp.compileConstant(Values.empty, target);
-	else
-	  else_clause.compileWithPosition(comp, target);
-        comp.callContextVar = callContextSave;
+        code.emitElse();
+        if (falseLabel.isUsed())
+          {
+            falseLabel.define(code);
+            // See note above for then_clause.
+            Variable callContextSave = comp.callContextVar;
+            if (else_clause == null)
+              comp.compileConstant(Values.empty, target);
+            else
+              else_clause.compileWithPosition(comp, target);
+            comp.callContextVar = callContextSave;
+          }
+        else
+          code.setUnreachable();
       }
     code.emitFi();
   }

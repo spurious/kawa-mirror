@@ -1,3 +1,9 @@
+2012-10-07  Per Bothner  <per@bothner.com>
+
+	* IfExp.java (compile): Handle case where else clause is never
+	jumped to.  This fixes Savannah bug #36863
+	"then clause grows stack with no else clause".
+
 2012-10-06  Per Bothner  <per@bothner.com>
 
 	Improved unreachability analysis.

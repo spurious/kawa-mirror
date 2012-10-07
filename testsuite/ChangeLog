@@ -1,3 +1,10 @@
+2012-10-07  Helmut Eller  <eller.helmut@gmail.com>
+	    Per Bothner  <per@bothner.com>
+
+	* sva36863.scm: New test, based on Savannah bug #36863
+	"then clause grows stack with no else clause".
+	* Makefile.am: Update accordingly.
+
 2012-10-06  Per Bothner  <per@bothner.com>
 
 	* unreach1.scm: Added or improved tests for unreachable code.

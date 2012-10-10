@@ -1,3 +1,7 @@
+2012-10-09  Per Bothner  <per@bothner.com>
+
+	* defs.scm: Update datum->syntax-object -> datum->object.
+
 2012-05-28  Per Bothner  <per@bothner.com>
 
 	* defs.scm: Fixes to avoid warnings about old unsyntax forms.

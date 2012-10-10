@@ -32,7 +32,7 @@
   ((javafx-application)
    #`(begin
        (module-extends KawaJavafxApplication)
-       (define (#,(datum->syntax-object #'javafx-application 'javafx-stage))::javafx.stage.Stage ;; FIXME
+       (define (#,(datum->object #'javafx-application 'javafx-stage))::javafx.stage.Stage ;; FIXME
          (this):*stage*))))
 
 (require gnu.kawa.javafx.MakeScene)

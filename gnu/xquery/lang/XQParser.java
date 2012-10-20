@@ -4,13 +4,11 @@
 package gnu.xquery.lang;
 import gnu.kawa.lispexpr.*;
 import gnu.mapping.*;
-import gnu.lists.*;
 import gnu.text.*;
 import gnu.expr.*;
 import gnu.math.IntNum;
 import java.util.Vector;
 import java.util.Stack;
-import java.io.File;
 import gnu.kawa.xml.*;
 import gnu.xml.*;
 import gnu.bytecode.*;

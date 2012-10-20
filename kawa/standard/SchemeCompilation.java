@@ -1,16 +1,14 @@
 package kawa.standard;
-import kawa.lang.*;
 import gnu.bytecode.*;
 import gnu.expr.*;
-import gnu.lists.*;
+import gnu.kawa.functions.*;
+import gnu.kawa.reflect.MakeAnnotation;
+import gnu.kawa.xml.XmlNamespace;
 import gnu.mapping.*;
 import gnu.math.*;
 import gnu.text.*;
-import gnu.kawa.functions.*;
-import gnu.kawa.lispexpr.*;
-import gnu.kawa.reflect.MakeAnnotation;
-import gnu.kawa.xml.XmlNamespace;
 import java.util.*;
+import kawa.lang.*;
 
 public class SchemeCompilation extends Translator
 {

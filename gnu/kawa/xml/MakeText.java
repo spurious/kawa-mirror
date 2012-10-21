@@ -62,9 +62,9 @@ public class MakeText extends NodeConstructor
     if (texp instanceof QuoteExp)
       {
         Object tval = ((QuoteExp) texp).getValue();
-        if (tval instanceof String)
+        if (tval instanceof CharSequence)
           {
-            String str = (String) tval;
+            String str = tval.toString();
             String segments = CodeAttr.calculateSplit(str);
             int numSegments = segments.length();
             ClassType ctype = (ClassType) cvar.getType();

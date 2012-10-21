@@ -1,4 +1,4 @@
-// Copyright (c) 2001, 2004, 2005  Per M.A. Bothner
+// Copyright (c) 2001, 2004, 2005, 2012  Per M.A. Bothner
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.kawa.lispexpr;
@@ -6,10 +6,10 @@ import gnu.expr.*;
 import gnu.mapping.*;
 import gnu.text.*;
 import gnu.lists.*;
-import gnu.bytecode.Access;
-import gnu.bytecode.Field;
+import gnu.bytecode.*;
 import gnu.mapping.EnvironmentKey;
 import gnu.kawa.reflect.StaticFieldLocation;
+import java.util.HashMap;
 import kawa.lang.Translator; // FIXME
 import kawa.lang.Syntax; // FIXME
 
@@ -171,5 +171,140 @@ public abstract class LispLanguage extends Language
       return getSymbol((String) sym);
     return (Symbol) sym;
   }
+
+  /** The types common to Lisp-like languages. */
+  private HashMap<String,Type> types;
+  /** The string representations of Lisp-like types. */
+  private HashMap<Type,String> typeToStringMap;
+
+    protected synchronized HashMap<String, Type> getTypeMap () {
+        if (types == null) {
+            types = new HashMap<String, Type>(64); // Plently of space.
+            types.put("void", LangPrimType.voidType);
+            types.put("int", LangPrimType.intType);
+            types.put("char", LangPrimType.charType);
+
+            types.put("byte", LangPrimType.byteType);
+            types.put("short", LangPrimType.shortType);
+            types.put("long", LangPrimType.longType);
+            types.put("float", LangPrimType.floatType);
+            types.put("double", LangPrimType.doubleType);
+            types.put("never-returns", Type.neverReturnsType);
+
+            types.put("Object", Type.objectType);
+            types.put("String", Type.toStringType);
+
+            types.put("object", Type.objectType);
+            types.put("number", LangObjType.numericType);
+            types.put("quantity", ClassType.make("gnu.math.Quantity"));
+            types.put("complex", ClassType.make("gnu.math.Complex"));
+            types.put("real", LangObjType.realType);
+            types.put("rational", LangObjType.rationalType);
+            types.put("integer", LangObjType.integerType);
+            types.put("symbol", ClassType.make("gnu.mapping.Symbol"));
+            types.put("namespace", ClassType.make("gnu.mapping.Namespace"));
+            types.put("keyword", ClassType.make("gnu.expr.Keyword"));
+            types.put("pair", ClassType.make("gnu.lists.Pair"));
+            types.put("pair-with-position",
+                      ClassType.make("gnu.lists.PairWithPosition"));
+            types.put("constant-string", ClassType.make("java.lang.String"));
+            types.put("abstract-string", ClassType.make("gnu.lists.CharSeq"));
+            types.put("character", ClassType.make("gnu.text.Char"));
+            types.put("vector", LangObjType.vectorType);
+            types.put("string", LangObjType.stringType);
+            types.put("empty-list", ClassType.make("gnu.lists.EmptyList"));
+            types.put("list", LangObjType.listType);
+            types.put("function", ClassType.make("gnu.mapping.Procedure"));
+            types.put("procedure", LangObjType.procedureType);
+            types.put("input-port", ClassType.make("gnu.mapping.InPort"));
+            types.put("output-port", ClassType.make("gnu.mapping.OutPort"));
+            types.put("string-output-port",
+                      ClassType.make("gnu.mapping.CharArrayOutPort"));
+            types.put("string-input-port",
+                      ClassType.make("gnu.mapping.CharArrayInPort"));
+            types.put("record", ClassType.make("kawa.lang.Record"));
+            types.put("type", LangObjType.typeType);
+            types.put("class-type", LangObjType.typeClassType);
+            types.put("class", LangObjType.typeClass);
+            types.put("promise", LangObjType.promiseType);
+            types.put("document", ClassType.make("gnu.kawa.xml.KDocument"));
+            types.put("readtable",
+                      ClassType.make("gnu.kawa.lispexpr.ReadTable"));
+        }
+        return types;
+    }
+
+    /**
+     * Try to get a type of the form lang:type.
+     *
+     * E.g. elisp:buffer.
+     *
+     * @param name The package-style type name as a string.
+     * @return null if no such type could be found, or the corresponding
+     * {@code Type}.
+     */
+    public Type getPackageStyleType(String name) {
+        int colon = name.indexOf(':');
+
+        if (colon > 0) {
+            String lang = name.substring(0, colon);
+            Language interp = Language.getInstance(lang);
+            if (interp == null)
+                throw new RuntimeException("unknown type '" + name
+                    + "' - unknown language '" + lang + '\'');
+
+            Type type = interp.getNamedType(name.substring(colon + 1));
+
+            if (type != null)
+                types.put(name, type);
+            return type;
+        }
+        return null;
+    }
+
+    @Override
+    // FIXME: getNamedType is over-specialised....
+    public Type getNamedType (String name) {
+        // Initialise the type map if necessary.
+        Type type = getTypeMap().get(name);
+        return (type != null) ? type : getPackageStyleType(name);
+    }
+
+    // FIXME: Would be better and little fuss to use a perfect hash
+    // function for this.
+    public Type getTypeFor(Class clas) {
+        String name = clas.getName();
+        if (clas.isPrimitive())
+            return getNamedType(name);
+        if ("java.lang.String".equals(name))
+            return Type.toStringType;
+        if ("gnu.math.IntNum".equals(name))
+            return LangObjType.integerType;
+        if ("gnu.math.DFloNum".equals(name))
+            return LangObjType.dflonumType;
+        if ("gnu.math.RatNum".equals(name))
+            return LangObjType.rationalType;
+        if ("gnu.math.RealNum".equals(name))
+            return LangObjType.realType;
+        if ("gnu.math.Numeric".equals(name))
+            return LangObjType.numericType;
+        if ("gnu.lists.FVector".equals(name))
+            return LangObjType.vectorType;
+        if ("gnu.lists.LList".equals(name))
+            return LangObjType.listType;
+        if ("gnu.text.Path".equals(name))
+            return LangObjType.pathType;
+        if ("gnu.text.URIPath".equals(name))
+            return LangObjType.URIType;
+        if ("gnu.text.FilePath".equals(name))
+            return LangObjType.filepathType;
+        if ("java.lang.Class".equals(name))
+            return LangObjType.typeClass;
+        if ("gnu.bytecode.Type".equals(name))
+            return LangObjType.typeType;
+        if ("gnu.bytecode.ClassType".equals(name))
+            return LangObjType.typeClassType;
+        return super.getTypeFor(clas);
+    }
 
 }

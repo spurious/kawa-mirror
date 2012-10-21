@@ -1,3 +1,10 @@
+2012-10-20  Charles Turner <chturne@gmail.com>
+	    Per Bothner  <per@bothner.com>
+
+	Re-factor type lookup to avoid Scheme dependencies.
+	* LispLanguage.java (getTypeMap, getPackageStyleType,
+	getNamedType, getTypeFor(Class)): New methods.
+
 2012-10-02  Per Bothner  <per@bothner.com>
 
 	Fix line number support for top-level non-pairs.

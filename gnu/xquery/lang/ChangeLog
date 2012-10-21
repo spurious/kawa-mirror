@@ -1,3 +1,11 @@
+2012-10-20  Charles Turner <chturne@gmail.com>
+	    Per Bothner  <per@bothner.com>
+
+	Re-factor type lookup to avoid Scheme dependencies.
+	* XQuery.java (getStandardType): Make non-static.
+	* XQResolveNames.java: Access current langauge rather than Scheme.
+	Use getTypeFor rather than string2Type.
+
 2012-10-06  Per Bothner  <per@bothner.com>
 
 	Implement check for a cycle in variale initialization.

@@ -288,7 +288,7 @@ public class SchemeCompilation extends Translator
     try
       { 
         Class clas;
-        Type type = Scheme.getNamedType(cname);
+        Type type = getLanguage().getNamedType(cname);
         if (rank > 0 && (! sawAngle || type == null))
           {
             Symbol tsymbol = namespace.getSymbol(cname.intern());

@@ -1,3 +1,10 @@
+2012-10-20  Charles Turner <chturne@gmail.com>
+	    Per Bothner  <per@bothner.com>
+
+	Re-factor type lookup to avoid Scheme dependencies.
+	* Language.java (getNamedType): New method.
+	(string2Type): Remove - merge into getTypeFor(String).
+
 2012-10-07  Per Bothner  <per@bothner.com>
 
 	* IfExp.java (compile): Handle case where else clause is never

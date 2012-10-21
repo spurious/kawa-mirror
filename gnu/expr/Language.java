@@ -1,4 +1,4 @@
-// Copyright (c) 2002, 2003, 2004, 2005  Per M.A. Bothner.
+// Copyright (c) 2002, 2003, 2004, 2005, 2012  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.expr;
@@ -322,6 +322,23 @@ public abstract class Language
     Symbol s = getSymbol(sym);
     environ.define(s, null, p);
   }
+
+  /**
+   * Get the corresponding {@link Type} for a given name.
+   * 
+   * This is currently used as a hook in the conversion of type designators to
+   * types. {@link LispLanguage} uses it to check for package style type
+   * designators such as {@code emacs:buffer}, and CommonLisp uses it to
+   * check for a type designator "boolean", so that is can return the appropriate
+   * boolean type. This is a bit over-specialised, but it beats actually
+   * overriding getTypeFor(String) in LispLanguage, CommonLisp just for these minor
+   * changes... FIXME!
+   *
+   * @param name The name of a type to search for.
+   * @return The corresponding {@link Type} if a suitable one can be found,
+   *   otherwise {@code null}.
+   */
+  public Type getNamedType (String name) { return null; }
 
   /** Declare in the current Environment a variable aliased to a static field.
    */
@@ -699,25 +716,26 @@ public abstract class Language
   {
   }
 
-  public Type getTypeFor(Class clas)
-  {
-    return Type.make(clas);
-  }
+    // FIXME: Would be better and little fuss to use a perfect hash
+    // function for this.
+    public Type getTypeFor(Class clas) {
+        return Type.make(clas);
+    }
 
     public final Type getLangTypeFor (Type type) {
 	if (type instanceof ParameterizedType) {
-	    ParameterizedType ptype = (ParameterizedType) type;
-	    Type[] pargs = ptype.getTypeArgumentTypes();
-	    if (ptype.getRawType() == LazyType.lazyType && pargs.length == 1) {
+            ParameterizedType ptype = (ParameterizedType) type;
+            Type[] pargs = ptype.getTypeArgumentTypes();
+            if (ptype.getRawType() == LazyType.lazyType && pargs.length == 1) {
 		return LazyType.getInstance(LazyType.lazyType, getLangTypeFor(pargs[0]));
-	    }
+            }
 	}
 	if (type instanceof TypeVariable) {
-	    return getLangTypeFor(((TypeVariable) type).getRawType());
+            return getLangTypeFor(((TypeVariable) type).getRawType());
 	}
 	if (type.isExisting()) {
-	    Class clas = type.getReflectClass();
-	    if (clas != null)
+            Class clas = type.getReflectClass();
+            if (clas != null)
 		return getTypeFor(clas);
 	}
 	return type;
@@ -731,27 +749,23 @@ public abstract class Language
     return s;
   }
 
-  public static Type string2Type (String name)
-  {
-    Type t;
-    if (name.endsWith("[]"))
-      {
-	t = string2Type(name.substring(0, name.length()-2));
-	if (t == null)
-	  return null;
-	t = gnu.bytecode.ArrayType.make(t);
-      }
-    else if (gnu.bytecode.Type.isValidJavaTypeName(name))
-      t = gnu.bytecode.Type.getType(name);
-    else
-      return null;
-    return t;
-  }
-
-  public Type getTypeFor (String name)
-  {
-    return string2Type(name);
-  }
+    public Type getTypeFor (String name) {
+        Type t;
+        if (name.endsWith("[]")) {
+            t = getTypeFor(name.substring(0, name.length() - 2));
+            if (t != null)
+                t = ArrayType.make(t);
+        }
+        else {
+            t = getNamedType(name);
+        }
+        if (t != null)
+            return t;
+        else if (Type.isValidJavaTypeName(name)) {
+            t = Type.getType(name);
+        }
+        return t;
+    }
 
   public final Type getTypeFor (Object spec, boolean lenient)
   {
@@ -769,7 +783,7 @@ public abstract class Language
       {
         String uri = ((Namespace) spec).getName();
         if (uri != null && uri.startsWith("class:"))
-          return getLangTypeFor(string2Type(uri.substring(6)));
+          return getLangTypeFor(getTypeFor(uri.substring(6)));
       }
     return null;
   }

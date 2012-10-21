@@ -196,7 +196,7 @@ public class ELisp extends Lisp2
       name = "gnu.jemacs.buffer.Buffer";
     else if (name == "window")
       name = "gnu.jemacs.buffer.Window";
-    return Scheme.string2Type(name);
+    return super.getTypeFor(name);
   }
 
   public Type getTypeFor (Class clas)
@@ -210,7 +210,7 @@ public class ELisp extends Lisp2
 	      booleanType = new LangPrimType(Type.booleanType, this);
 	    return booleanType;
 	  }
-	return Scheme.getNamedType(name);
+	return getNamedType(name);
       }
     return Type.make(clas);
   }

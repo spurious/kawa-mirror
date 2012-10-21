@@ -6,10 +6,7 @@ import gnu.mapping.*;
 import gnu.lists.*;
 import gnu.expr.*;
 import gnu.text.Char;
-import kawa.standard.Scheme;
 import gnu.bytecode.*;
-import gnu.kawa.lispexpr.LangPrimType;
-import gnu.xquery.util.*;
 import gnu.xml.*;
 import gnu.text.Lexer;
 import gnu.text.SourceMessages;
@@ -826,7 +823,7 @@ public class XQuery extends Language
       "anyType", Type.objectType
     };
 
-  public static Type getStandardType (String name)
+  public Type getStandardType (String name)
   {
     for (int i = typeMap.length;  (i -= 2) >= 0; )
       {
@@ -834,7 +831,7 @@ public class XQuery extends Language
 	  {
 	    Object t = typeMap[i+1];
 	    if (t instanceof String)
-	      return Scheme.string2Type((String) t);
+	      return super.getTypeFor((String) t);
 	    else
 	      return (Type) t;
 	  }
@@ -842,15 +839,17 @@ public class XQuery extends Language
     return null;
   }
 
+  @Override
   public Type getTypeFor(String name)
   {
     String core = name.startsWith("xs:") ? name.substring(3)
       : name.startsWith("xdt:") ? name.substring(4)
       : name;
     Type t = getStandardType(core);
-    return t != null ? t : Scheme.string2Type(name);
+    return t != null ? t : super.getTypeFor(name);
   }
 
+  @Override
   public String formatType (Type type)
   {
     String tname = type.getName();
@@ -862,6 +861,7 @@ public class XQuery extends Language
     return type.toString();
   }
 
+  @Override
   public Type getTypeFor (Class clas)
   {
     if (clas.isPrimitive())
@@ -869,7 +869,7 @@ public class XQuery extends Language
 	String name = clas.getName();
 	if (name.equals("boolean"))
           return XDataType.booleanType;
-	return Scheme.getNamedType(name);
+	return super.getTypeFor(name);
       }
     else if (! clas.isArray())
       {
@@ -894,6 +894,7 @@ public class XQuery extends Language
     return Type.make(clas);
   }
 
+  @Override
   public Procedure getPrompter()
   {
     return new Prompter();

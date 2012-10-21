@@ -1,3 +1,7 @@
+2012-10-20  Charles Turner <chturne@gmail.com>
+
+	* PrimOps.scm (functionp): Remove brackets from type specifier.
+
 2008-05-26  Per Bothner  <per@bothner.com>
 
 	* simple.el (kill-region): Incomplete uncommenting of non-working code.

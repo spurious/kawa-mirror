@@ -1,3 +1,8 @@
+2012-10-20  Charles Turner <chturne@gmail.com>
+
+	Re-factor type lookup to avoid Scheme dependencies.
+	* ELisp.java: Don't depend on static Scheme methods.
+
 2011-10-24  Per Bothner  <per@bothner.com>
 
 	* lambda.java (rewriteBody): Update for new default argument handling.

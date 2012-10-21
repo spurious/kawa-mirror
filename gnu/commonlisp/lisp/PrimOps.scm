@@ -168,5 +168,5 @@
 (define (char-to-string ch)
   (make <gnu.lists.FString> 1 (invoke-static <gnu.commonlisp.lang.CommonLisp> 'asChar ch)))
 
-(define (functionp x) |<clisp:boolean>|
+(define (functionp x) |clisp:boolean|
   (instance? x <function>))

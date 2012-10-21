@@ -7,13 +7,11 @@ import gnu.kawa.xml.*;
 import gnu.xml.*;
 import gnu.mapping.*;
 import gnu.bytecode.*;
-import gnu.kawa.util.HashNode;
 import gnu.kawa.reflect.StaticFieldLocation;
 import gnu.kawa.reflect.SingletonType;
 import gnu.kawa.functions.CompileNamedPart;
 import gnu.xquery.util.NamedCollator;
 import gnu.xquery.util.QNameUtils;
-import kawa.standard.Scheme;
 import java.util.*;
 
 public class XQResolveNames extends ResolveNames
@@ -344,12 +342,12 @@ public class XQResolveNames extends ResolveNames
                         Type type = null;
                         if (XQuery.SCHEMA_NAMESPACE.equals(uri))
                           {
-                            type = XQuery.getStandardType(sym.getName());
+                            type = parser.interpreter.getStandardType(sym.getName());
                           }
                         else if (needType && uri == ""
                             && ! getCompilation().isPedantic())
                           {
-                            type = Scheme.string2Type(sym.getName());
+                            type = parser.interpreter.getTypeFor(name);
                           }
                         if (type != null)
                           return new QuoteExp(type).setLine(exp);

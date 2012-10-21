@@ -2,7 +2,6 @@ package kawa.standard;
 import kawa.lang.*;
 import gnu.bytecode.Type;
 import gnu.bytecode.ClassType;
-import gnu.bytecode.ArrayType;
 import gnu.mapping.*;
 import gnu.expr.*;
 import java.util.*;
@@ -985,134 +984,25 @@ public class Scheme extends LispLanguage
     return getInstance().getTypeFor(exp);
   }
 
-  static HashMap<String,Type> types;
-  static HashMap<Type,String> typeToStringMap;
+    private HashMap<String,Type> types;
+    private HashMap<Type,String> typeToStringMap;
 
-  static synchronized HashMap<String,Type> getTypeMap ()
-  {
-    if (types == null)
-      {
-	booleanType
-	  = new LangPrimType(Type.booleanType, Scheme.getInstance());
-	types = new HashMap<String,Type> ();
-	types.put ("void", LangPrimType.voidType);
-	types.put ("int", LangPrimType.intType);
-	types.put ("char", LangPrimType.charType);
-	types.put ("boolean", booleanType);
-	types.put ("byte", LangPrimType.byteType);
-	types.put ("short", LangPrimType.shortType);
-	types.put ("long", LangPrimType.longType);
-	types.put ("float", LangPrimType.floatType);
-	types.put ("double", LangPrimType.doubleType);
-	types.put ("never-returns", Type.neverReturnsType);
-
-	types.put ("Object", Type.objectType);
-	types.put ("String", Type.toStringType);
-
-	types.put ("object", Type.objectType);
-	types.put ("number", LangObjType.numericType);
-	types.put ("quantity", ClassType.make("gnu.math.Quantity"));
-	types.put ("complex", ClassType.make("gnu.math.Complex"));
-	types.put ("real", LangObjType.realType);
-	types.put ("rational", LangObjType.rationalType);
-	types.put ("integer", LangObjType.integerType);
-	types.put ("symbol", ClassType.make("gnu.mapping.Symbol"));
-	types.put ("namespace", ClassType.make("gnu.mapping.Namespace"));
-	types.put ("keyword", ClassType.make("gnu.expr.Keyword"));
-	types.put ("pair", ClassType.make("gnu.lists.Pair"));
-	types.put ("pair-with-position",
-		   ClassType.make("gnu.lists.PairWithPosition"));
-	types.put ("constant-string", ClassType.make("java.lang.String"));
-	types.put ("abstract-string", ClassType.make("gnu.lists.CharSeq"));
-	types.put ("character", ClassType.make("gnu.text.Char"));
-	types.put ("vector", LangObjType.vectorType);
-	types.put ("string", LangObjType.stringType);
-        types.put ("empty-list", ClassType.make("gnu.lists.EmptyList"));
-	types.put ("list", LangObjType.listType);
-	types.put ("function", ClassType.make("gnu.mapping.Procedure"));
-	types.put ("procedure", LangObjType.procedureType);
-	types.put ("input-port", ClassType.make("gnu.mapping.InPort"));
-	types.put ("output-port", ClassType.make("gnu.mapping.OutPort"));
-	types.put ("string-output-port",
-                   ClassType.make("gnu.mapping.CharArrayOutPort"));
-	types.put ("string-input-port",
-                   ClassType.make("gnu.mapping.CharArrayInPort"));
-	types.put ("record", ClassType.make("kawa.lang.Record"));
-	types.put ("type", LangObjType.typeType);
-	types.put ("class-type", LangObjType.typeClassType);
-	types.put ("class", LangObjType.typeClass);
-	types.put ("promise", LangObjType.promiseType);
-
-        for (int i = uniformVectorTags.length;  --i >= 0; )
-          {
-            String tag = uniformVectorTags[i];
-            String cname = "gnu.lists."+tag.toUpperCase()+"Vector";
-            types.put(tag+"vector", ClassType.make(cname));
-          }
-
-        types.put ("document", ClassType.make("gnu.kawa.xml.KDocument"));
-        types.put ("readtable", ClassType.make("gnu.kawa.lispexpr.ReadTable"));
-      }
-    return types;
-  }
-
-  public static Type getNamedType (String name)
-  {
-    getTypeMap();
-    Type type = (Type) types.get(name);
-    if (type == null
-	&& (name.startsWith("elisp:") || name.startsWith("clisp:")))
-      {
-	int colon = name.indexOf(':');
-	Class clas = getNamedType(name.substring(colon+1)).getReflectClass();
-	String lang = name.substring(0,colon);
-	Language interp = Language.getInstance(lang);
-	if (interp == null)
-	    throw new RuntimeException("unknown type '" + name
-				       + "' - unknown language '"
-				       + lang + '\'');
-	type = interp.getTypeFor(clas);
-	if (type != null)
-	  types.put(name, type);
-      }
-    return type;
-  }
-
-  public Type getTypeFor (Class clas)
-  {
-    String name = clas.getName();
-    if (clas.isPrimitive())
-      return getNamedType(name);
-    if ("java.lang.String".equals(name))
-      return Type.toStringType;
-    if ("gnu.math.IntNum".equals(name))
-      return LangObjType.integerType;
-    if ("gnu.math.DFloNum".equals(name))
-      return LangObjType.dflonumType;
-    if ("gnu.math.RatNum".equals(name))
-      return LangObjType.rationalType;
-    if ("gnu.math.RealNum".equals(name))
-      return LangObjType.realType;
-    if ("gnu.math.Numeric".equals(name))
-      return LangObjType.numericType;
-    if ("gnu.lists.FVector".equals(name))
-      return LangObjType.vectorType;
-    if ("gnu.lists.LList".equals(name))
-      return LangObjType.listType;
-    if ("gnu.text.Path".equals(name))
-      return LangObjType.pathType;
-    if ("gnu.text.URIPath".equals(name))
-      return LangObjType.URIType;
-    if ("gnu.text.FilePath".equals(name))
-      return LangObjType.filepathType;
-    if ("java.lang.Class".equals(name))
-      return LangObjType.typeClass;
-    if ("gnu.bytecode.Type".equals(name))
-      return LangObjType.typeType;
-    if ("gnu.bytecode.ClassType".equals(name))
-      return LangObjType.typeClassType;
-    return Type.make(clas);
-  }
+    @Override
+    protected synchronized HashMap<String, Type> getTypeMap() {
+        if (types == null) {
+            booleanType = new LangPrimType(Type.booleanType,
+                                           Scheme.getInstance());
+            types = new HashMap<String, Type>(128); // Bit more wiggle room
+            types.put("boolean", booleanType);
+            types.putAll(super.getTypeMap());
+            for (int i = uniformVectorTags.length; --i >= 0;) {
+                String tag = uniformVectorTags[i];
+                String cname = "gnu.lists." + tag.toUpperCase() + "Vector";
+                types.put(tag + "vector", ClassType.make(cname));
+            }
+        }
+        return types;
+    }
 
   public String formatType (Type type)
   {
@@ -1142,31 +1032,7 @@ public class Scheme extends LispLanguage
     return super.formatType(type);
   }
 
-  public static Type string2Type (String name)
-  {
-    Type t;
-    if (name.endsWith("[]"))
-      {
-	t = string2Type(name.substring(0, name.length()-2));
-	if (t != null)
-	  t = ArrayType.make(t);
-      }
-    else
-      t = getNamedType (name);
-    if (t != null)
-      return t;
-    t = Language.string2Type(name);
-    if (t != null)
-      types.put (name, t);
-    return t;
-  }
-
-  public Type getTypeFor(String name)
-  {
-    return string2Type(name);
-  }
-
-  /** Convert expression to a Type.
+ /** Convert expression to a Type.
    * Allow "TYPE" or 'TYPE or <TYPE>.
    */
   public static Type exp2Type (Expression exp)

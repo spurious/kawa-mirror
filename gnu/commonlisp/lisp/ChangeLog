@@ -1,3 +1,7 @@
+2012-10-20  Charles Turner <chturne@gmail.com>
+
+	* PrimOps.scm (functionp): Remove brackets from type specifier.
+
 2012-08-13  Charles Turner  <chturne@gmail.com>
 
 	* PrimOps.scm (flet, funcall): New functions.

@@ -175,26 +175,26 @@ public class CommonLisp extends Lisp2
 
   LangPrimType booleanType;
 
-  public Type getTypeFor(String name)
-  {
-    if (name == "t")
-      name = "java.lang.Object";
-    return Scheme.string2Type(name);
-  }
+    @Override
+    public Type getTypeFor(String name) {
+        if (name == "t")
+            name = "java.lang.Object";
+        return super.getTypeFor(name);
+    }
 
-  public Type getTypeFor (Class clas)
-  {
-    if (clas.isPrimitive())
-      {
-	String name = clas.getName();
-	if (name.equals("boolean"))
-	  {
-	    if (booleanType == null)
-	      booleanType = new LangPrimType(Type.booleanType, this);
-	    return booleanType;
-	  }
-	return Scheme.getNamedType(name);
-      }
-    return Type.make(clas);
-  }
+    @Override
+    public Type getTypeFor(Class clas) {
+        if (clas.isPrimitive())
+            return getNamedType(clas.getName());
+        return Type.make(clas);
+    }
+
+    public Type getNamedType (String name) {
+        if (name.equals("boolean")) {
+            if (booleanType == null)
+                booleanType = new LangPrimType(Type.booleanType, this);
+            return booleanType;
+        }
+        return super.getNamedType(name);
+    }
 }

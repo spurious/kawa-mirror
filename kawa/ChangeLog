@@ -1,3 +1,8 @@
+2012-10-20  Per Bothner  <per@bothner.com>
+
+	* Shell.java (printError): Remove confusing/unhelpful special case
+	for ClassCastException.
+
 2012-10-20  Charles Turner <chturne@gmail.com>
 
 	Re-factor type lookup to avoid Scheme dependencies.

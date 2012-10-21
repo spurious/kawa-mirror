@@ -311,12 +311,6 @@ public class Shell
           perr.println("usage: "+e.usage);
         e.printStackTrace(perr);
       }
-    else if (ex instanceof ClassCastException)
-      {
-        messages.printAll(perr, 20);
-        perr.println("Invalid parameter, was: "+ ex.getMessage());
-        ex.printStackTrace(perr);
-      }
     /*
     else if (ex instanceof java.io.IOException)
       {

@@ -833,8 +833,8 @@ public class Translator extends Compilation
   }
 
   /** If a symbol is lexically unbound, look for a default binding.
-   * The default implementation does nothing.
-   * @return null if no binidng, or an Expression.
+   * The default implementation returns null.
+   * @return null if no binding, otherwise an Expression.
    */
   public Expression checkDefaultBinding (Symbol name, Translator tr)
   {

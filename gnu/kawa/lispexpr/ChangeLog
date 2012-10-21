@@ -1,3 +1,7 @@
+2012-10-21  Per Bothner  <per@bothner.com>
+
+	* ReadTable.java (makeSymbol): Simplify.
+
 2012-10-20  Charles Turner <chturne@gmail.com>
 	    Per Bothner  <per@bothner.com>
 

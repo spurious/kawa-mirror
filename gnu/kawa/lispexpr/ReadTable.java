@@ -251,6 +251,6 @@ public class ReadTable extends RangeTable
 
   static Object makeSymbol (String name)
   {
-    return Namespace.EmptyNamespace.getSymbol(name.intern());
+    return Symbol.valueOf(name);
   }
 }

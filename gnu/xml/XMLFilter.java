@@ -444,6 +444,8 @@ public class XMLFilter implements
                 else
                   uri = resolve(prefix, i > 0);
               }
+            else if (! (saved instanceof Symbol))
+                throw new ClassCastException("expected element start tag (a symbol) - instead got a "+saved.getClass().getName());
             else
               {
                 Symbol symbol = (Symbol) saved;

@@ -1,3 +1,8 @@
+2012-10-21  Per Bothner  <per@bothner.com>
+
+	* XMLFilter.java (closeStartTag): Better error if start tag is not
+	a symbol.
+
 2012-10-03  Per Bothner  <per@bothner.com>
 
 	* XMLFilter.java (writeObject): Fix buggy handling of attribute

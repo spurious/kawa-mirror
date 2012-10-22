@@ -39,7 +39,7 @@ public class MakeXmlElement extends Syntax
           }
         Pair namespacePair = (Pair) namespaceList;
         Pair namespaceNode = (Pair) namespacePair.getCar();
-        String nsPrefix = (String) namespaceNode.getCar();
+        String nsPrefix = namespaceNode.getCar().toString();
         nsPrefix = nsPrefix.length() == 0 ? null : nsPrefix.intern();
         Object valueList = namespaceNode.getCdr();
         StringBuilder sbuf = new StringBuilder();
@@ -50,7 +50,7 @@ public class MakeXmlElement extends Syntax
             Object value;
             if (LList.listLength(valueForm, false) == 2
                 && valueForm instanceof Pair
-                && ((Pair) valueForm).getCar() == MakeText.makeText)
+                && ((Pair) valueForm).getCar() == ReaderXmlElement.xmlTextSymbol)
               {
                 value = ((Pair) ((Pair) valueForm).getCdr()).getCar();
               }
@@ -97,6 +97,7 @@ public class MakeXmlElement extends Syntax
     // if (namespaceList != LList.Empty) ERROR;
     MakeElement mkElement = new MakeElement();
     mkElement.setNamespaceNodes(nsBindings);
+    mkElement.setStringIsText(true);
     tr.xmlElementNamespaces = nsBindings;
     try
       {

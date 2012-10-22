@@ -1,3 +1,7 @@
+2012-10-21  Per Bothner  <per@bothner.com>
+
+	* standard/Scheme.java: Define $xml-element$ and similar bindings.
+
 2012-10-20  Per Bothner  <per@bothner.com>
 
 	* Shell.java (printError): Remove confusing/unhelpful special case
@@ -6,9 +10,9 @@
 2012-10-20  Charles Turner <chturne@gmail.com>
 
 	Re-factor type lookup to avoid Scheme dependencies.
-	* Scheme.java: Bunch of stuff moved up to LispLanguage.
+	* standard/Scheme.java: Bunch of stuff moved up to LispLanguage.
 	(getTypeMap): Most of the predefined types moved to super.
-	* SchemeCompilation.java: Don't use static cal to getNamedType.
+	* standard/SchemeCompilation.java: Don't use static cal to getNamedType.
 
 2012-09-27  Per Bothner  <per@bothner.com>
 

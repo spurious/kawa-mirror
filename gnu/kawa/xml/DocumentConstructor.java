@@ -49,7 +49,7 @@ public class DocumentConstructor extends NodeConstructor
     code.emitLoad(consumer);
     code.emitInvokeInterface(startDocumentMethod);
     for (int i = 0;  i < nargs;  i++)
-      compileChild(args[i], comp, target);
+      compileChild(args[i], stringIsText, comp, target);
     code.emitLoad(consumer);
     code.emitInvokeInterface(endDocumentMethod);
   }

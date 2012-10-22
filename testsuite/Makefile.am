@@ -42,7 +42,7 @@ check-no-inline:
 
 check1:  check-num check-arr check-java-array check-lazy check-lib \
   check-srfi-16 check-srfi-38 check-srfi-64 check-srfi-69 \
-  check-format check-ppfile check-text check-regex scribble.class \
+  check-format check-ppfile check-text check-regex check-xml scribble.class \
   check-run-test-scripts check-moduleM \
   check-annotations1 check-annotations2\
   check-binarytrees check-chameneosredux check-fannkuch check-fannkuchredux check-fasta \
@@ -97,6 +97,9 @@ check-text:
 
 check-regex:
 	$(KAWA) $(OPTIONS) "$(srcdir)/regex-test.scm"
+
+check-xml:
+	$(KAWA) $(OPTIONS) "$(srcdir)/xml-test.scm"
 
 check-misc: testing.zip moduleFT.class InliningTest.class \
 	    cycle1.class cycle2.class

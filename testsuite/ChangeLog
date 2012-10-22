@@ -1,3 +1,8 @@
+2012-10-21  Per Bothner  <per@bothner.com>
+
+	* xml-test.scm: New test-suite.
+	* Makefile.am (check-xml): Update accordingly.
+
 2012-10-07  Helmut Eller  <eller.helmut@gmail.com>
 	    Per Bothner  <per@bothner.com>
 

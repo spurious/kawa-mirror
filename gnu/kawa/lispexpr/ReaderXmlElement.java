@@ -12,6 +12,14 @@ import gnu.expr.*;
 
 public class ReaderXmlElement extends ReadTableEntry
 {
+    static final Symbol xmlTextSymbol = Symbol.valueOf("$xml-text$");
+    static final Symbol xmlCommentSymbol = Symbol.valueOf("$xml-comment$");
+    static final Symbol xmlElementSymbol = Symbol.valueOf("$xml-element$");
+    static final Symbol xmlCDATASymbol = Symbol.valueOf("$xml-CDATA$");
+    static final Symbol xmlProcInstSymbol = Symbol.valueOf("xml-processing-instruction$");
+    static final Symbol xmlAttributeSymbol = Symbol.valueOf("$xml-attribute$");
+    static final Symbol resolveQNameSymbol = Symbol.valueOf("$resolve-qname$");
+
   public Object read (Lexer in, int ch, int count)
     throws java.io.IOException, SyntaxException
   {
@@ -25,7 +33,9 @@ public class ReaderXmlElement extends ReadTableEntry
     return LList.list2(q, obj);
   }
 
-  static final String DEFAULT_ELEMENT_NAMESPACE = "[default-element-namespace]";
+    static final String DEFAULT_ELEMENT_NAMESPACE = "$default-element-namespace$";
+    public static final Symbol defaultElementNamespaceSymbol
+        = Symbol.valueOf(DEFAULT_ELEMENT_NAMESPACE);
 
   /** Read either a QName literal or an enclosed QName-producing form.
    * If literal, returns a quoted symbol, and the source literal
@@ -59,13 +69,14 @@ public class ReaderXmlElement extends ReadTableEntry
             int llen = reader.tokenBufferLength - colon - 1;
             String local
               = new String(reader.tokenBuffer, colon+1, llen).intern();
-            String prefix = colon < 0 ? DEFAULT_ELEMENT_NAMESPACE
-              : new String(reader.tokenBuffer, 0, colon).intern();
-            Symbol psym = Namespace.EmptyNamespace.getSymbol(prefix);
+            Object ns = LList.Empty;
+            if (colon >= 0) {
+                String prefix = new String(reader.tokenBuffer, 0, colon).intern();
+                ns = new Pair(Symbol.valueOf(prefix), ns);
+            }
 
-            return new Pair(ResolveNamespace.resolveQName,
-                            PairWithPosition.make(psym,
-                                                  new Pair(local, LList.Empty),
+            return new Pair(resolveQNameSymbol,
+                            PairWithPosition.make(Symbol.valueOf(local), ns,
                                                   reader.getName(), line, column));
           }
         else
@@ -158,7 +169,7 @@ public class ReaderXmlElement extends ReadTableEntry
 	    if (! reader.readDelimited("-->"))
               reader.error('f', reader.getName(), startLine, startColumn, "unexpected end-of-file in XML comment starting here - expected \"-->\"");
             String str = reader.tokenBufferString();
-            exp = LList.list2(CommentConstructor.commentConstructor, str);
+            exp = LList.list2(xmlCommentSymbol, str);
 	  }
         else if (next == '['
                  && (next = reader.read()) == 'C'
@@ -172,7 +183,7 @@ public class ReaderXmlElement extends ReadTableEntry
               reader.error('f', reader.getName(), startLine, startColumn,
                            "unexpected end-of-file in CDATA starting here - expected \"]]>\"");
             String str = reader.tokenBufferString();
-            exp = LList.list2(MakeCDATA.makeCDATA, str);
+            exp = LList.list2(xmlCDATASymbol, str);
 	  }
         else
           {
@@ -220,10 +231,11 @@ public class ReaderXmlElement extends ReadTableEntry
         if (nspaces == 0 && reader.tokenBufferLength > 0)
           reader.error("target must be followed by space or '?>'");
 	String content = reader.tokenBufferString();
-        exp = LList.list3(MakeProcInst.makeProcInst, target, content);
+        exp = LList.list3(xmlProcInstSymbol, target, content);
       }
-    else
+    else {
       exp = readElementConstructor(reader, next);
+    }
     return exp;
   }
 
@@ -286,14 +298,13 @@ public class ReaderXmlElement extends ReadTableEntry
           }
 	ch = skipSpace(reader, ' ');
         PairWithPosition attrList
-          = PairWithPosition.make(MakeAttribute.makeAttribute, LList.Empty,
+          = PairWithPosition.make(xmlAttributeSymbol, LList.Empty,
                                   reader.getName(), startLine, startColumn);
-        Pair attrTail = attrList;
         PairWithPosition attrPair
           = PairWithPosition.make(attrName, LList.Empty,
                                   reader.getName(), startLine, startColumn);
-        reader.setCdr(attrTail, attrPair);
-        attrTail = attrPair;
+        reader.setCdr(attrList, attrPair);
+        Pair attrTail = attrPair;
         attrTail = readContent(reader, (char) ch, attrTail);
 	if (definingNamespace != null)
 	  {
@@ -354,7 +365,7 @@ public class ReaderXmlElement extends ReadTableEntry
           reader.error("missing '>' after end element");
       }
     namespaceList = LList.reverseInPlace(namespaceList);
-    return PairWithPosition.make(MakeXmlElement.makeXml,
+    return PairWithPosition.make(xmlElementSymbol,
                                  Pair.make(namespaceList, tagPair),
                                  reader.getName(),
                                  startLine, startColumn);
@@ -440,10 +451,7 @@ public class ReaderXmlElement extends ReadTableEntry
           }
         if (text != null)
           {
-            // Wrap String as Text to avoid extra spaces.
-            // If string-insert semantcs change, may be unneeded.
-            Pair tnode = Pair.list2(MakeText.makeText, text);
-            Pair pair = PairWithPosition.make(tnode,  reader.makeNil(),
+            Pair pair = PairWithPosition.make(text,  reader.makeNil(),
                                               null, -1, -1); // FIXME
             resultTail.setCdrBackdoor(pair);
             resultTail = pair;

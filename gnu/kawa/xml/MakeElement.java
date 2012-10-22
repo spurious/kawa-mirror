@@ -8,9 +8,9 @@ import gnu.bytecode.*;
 import gnu.expr.*;
 import gnu.xml.*;
 
-public class MakeElement extends NodeConstructor
-{
-  public static final MakeElement makeElement = new MakeElement();
+public class MakeElement extends NodeConstructor {
+    public static final MakeElement makeElementS = new MakeElement();
+    static { makeElementS.setStringIsText(true); }
 
   public int numArgs() { return tag == null ? 0xFFFFF001 : 0xFFFFF000; }
 
@@ -113,10 +113,10 @@ public class MakeElement extends NodeConstructor
 	    Object arg = ctx.getNextArg(endMarker);
 	    if (arg == endMarker)
 	      break;
-	    if (arg instanceof Consumable)
-	      ((Consumable) arg).consume(out);
-	    else
-	      ctx.writeValue(arg);
+            if (stringIsText)
+                writeContentS(arg, out);
+            else
+                writeContent(arg, out);
             // Handling Keyword values is actually done by the Consumer.
             if (isHandlingKeywordParameters())
               out.endAttribute();
@@ -161,7 +161,7 @@ public class MakeElement extends NodeConstructor
       code.emitInvokeStatic(startElementMethod3);
     for (;  i < nargs;  i++)
       {
-        compileChild(args[i], comp, target);
+        compileChild(args[i], stringIsText, comp, target);
         if (isHandlingKeywordParameters())
           {
             code.emitLoad(consumer);

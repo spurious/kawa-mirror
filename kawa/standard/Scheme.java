@@ -149,6 +149,14 @@ public class Scheme extends LispLanguage
 
       defSntxStFld("lambda", "kawa.standard.SchemeCompilation", "lambda");
       defSntxStFld("$bracket-apply$", "gnu.kawa.lispexpr.BracketApply", "instance");
+      defSntxStFld("$xml-element$", "gnu.kawa.lispexpr.MakeXmlElement", "makeXml");
+      defProcStFld("$xml-attribute$", "gnu.kawa.xml.MakeAttribute", "makeAttributeS");
+      defProcStFld("$xml-text$", "gnu.kawa.xml.MakeText", "makeText");
+      defProcStFld("$xml-CDATA$", "gnu.kawa.xml.MakeCDATA", "makeCDATA");
+      defProcStFld("$xml-comment$", "gnu.kawa.xml.CommentConstructor", "commentConstructor");
+      defProcStFld("$xml-processing-instruction$", "gnu.kawa.xml.MakeProcInst", "makeProcInst");
+      defSntxStFld("$resolve-qname$", "gnu.kawa.lispexpr.ResolveNamespace",
+                   "resolveQName");
 
       //-- Section 4.1  -- complete
       defSntxStFld(LispLanguage.quote_sym, "kawa.lang.Quote", "plainQuote");
@@ -723,8 +731,8 @@ public class Scheme extends LispLanguage
       defProcStFld("format", "gnu.kawa.functions.Format");
       defProcStFld("parse-format", "gnu.kawa.functions.ParseFormat", "parseFormat");
 
-      defProcStFld("make-element", "gnu.kawa.xml.MakeElement", "makeElement");
-      defProcStFld("make-attribute", "gnu.kawa.xml.MakeAttribute", "makeAttribute");
+      defProcStFld("make-element", "gnu.kawa.xml.MakeElement", "makeElementS");
+      defProcStFld("make-attribute", "gnu.kawa.xml.MakeAttribute", "makeAttributeS");
       defProcStFld("map-values", "gnu.kawa.functions.ValuesMap", "valuesMap");
       defProcStFld("children", "gnu.kawa.xml.Children", "children");
       defProcStFld("attributes", "gnu.kawa.xml.Attributes");

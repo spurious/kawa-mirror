@@ -206,8 +206,8 @@ EXTRA_LOAD_REQUIRE_DIST = test-load-require.scm test-load-require-1.scm \
 
 CLEANFILES = tmp* *.log testing.zip revcomp-input.txt knucleotide-input.txt regexdna-input.txt *.class HelloCgiK HelloCgiS
 SCRIPTS_TO_RUN = uninit1.scm errors1.scm sva34005.scm sva35362.scm \
-  sva36039.scm sva36413.scm sva36556.scm sva36853.scm sva36917.scm \
-  inner-1.scm lambda-in-class-1.scm \
+  sva36039.scm sva36413.scm sva36556.scm sva36853.scm sva36863.scm \
+  sva36917.scm inner-1.scm lambda-in-class-1.scm \
   anonymous-lambda-1.scm unreach1.scm unreach2.scm unreach3.scm \
   bad-defclass.scm \
   srfi-45-test1.scm srfi-45-test2.scm reflect1.scm promise1.scm \
@@ -449,7 +449,7 @@ check-no-inline:
 
 check1:  check-num check-arr check-java-array check-lazy check-lib \
   check-srfi-16 check-srfi-38 check-srfi-64 check-srfi-69 \
-  check-format check-ppfile check-text check-regex scribble.class \
+  check-format check-ppfile check-text check-regex check-xml scribble.class \
   check-run-test-scripts check-moduleM \
   check-annotations1 check-annotations2\
   check-binarytrees check-chameneosredux check-fannkuch check-fannkuchredux check-fasta \
@@ -504,6 +504,9 @@ check-text:
 
 check-regex:
 	$(KAWA) $(OPTIONS) "$(srcdir)/regex-test.scm"
+
+check-xml:
+	$(KAWA) $(OPTIONS) "$(srcdir)/xml-test.scm"
 
 check-misc: testing.zip moduleFT.class InliningTest.class \
 	    cycle1.class cycle2.class

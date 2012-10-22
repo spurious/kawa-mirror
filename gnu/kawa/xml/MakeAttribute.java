@@ -10,6 +10,8 @@ import gnu.bytecode.*;
 public class MakeAttribute extends NodeConstructor
 {
   public static final MakeAttribute makeAttribute = new MakeAttribute();
+  public static final MakeAttribute makeAttributeS = new MakeAttribute();
+    static { makeAttributeS.setStringIsText(true); }
   public static final QuoteExp makeAttributeExp = new QuoteExp(makeAttribute);
 
   public int numArgs() { return 0xFFFFF001; }
@@ -33,10 +35,10 @@ public class MakeAttribute extends NodeConstructor
 	    Object arg = ctx.getNextArg(endMarker);
 	    if (arg == endMarker)
 	      break;
-	    if (arg instanceof Consumable)
-	      ((Consumable) arg).consume(out);
-	    else
-	      ctx.writeValue(arg);
+            if (stringIsText)
+                writeContentS(arg, out);
+            else
+                writeContent(arg, out);
 	  }
 	out.endAttribute();
       }
@@ -59,7 +61,7 @@ public class MakeAttribute extends NodeConstructor
     // Stack:  consumer, consumer, tagtype
     code.emitInvokeStatic(startAttributeMethod);
     for (int i = 1;  i < nargs;  i++)
-      compileChild(args[i], comp, target);
+      compileChild(args[i], stringIsText, comp, target);
     code.emitInvokeInterface(endAttributeMethod);
   }
 

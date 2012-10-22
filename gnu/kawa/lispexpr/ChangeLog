@@ -1,5 +1,15 @@
 2012-10-21  Per Bothner  <per@bothner.com>
 
+	* ReaderXmlElement.java: Change reading of XML literals so it returns
+	"call" of a symbol like $xml-element$, and not a literal Procedure.
+	This enables better quotation behavior and read/write round-tripping.
+	Also some other improvememts like using a symbol in place of a string.
+	Also, pass String to MakeElement instead of wrapping in MakeText.
+	* ResolveNamespace.java: Update to match ReaderXmlElement changes.
+	* MakeXmlElement.java: Update to call MakeElement#setStringIsText.
+
+2012-10-21  Per Bothner  <per@bothner.com>
+
 	* ReadTable.java (makeSymbol): Simplify.
 
 2012-10-20  Charles Turner <chturne@gmail.com>

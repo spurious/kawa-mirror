@@ -1,3 +1,15 @@
+2012-10-21  Per Bothner  <per@bothner.com>
+
+	* NodeConstructor.java (stringIsText): New field.
+	(setStringIsText): New setter.
+	(compileChild): New stringIsText parameter.
+	(writeContent, writeContentS): New methods.
+	* MakeElement.java (makeElementS): New static field.  Use to control
+	whether to call writeContent or writeContentS.
+	* MakeAttribute.java (makeAttributeS): Similar new field.
+	* DocumentConstructor.java: Update.
+	* MakeWithBaseUri.java: Update.
+
 2012-10-20  Per Bothner  <per@bothner.com>
 
 	* MakeText.java (compileToNode): Generalize from String to CharSequence.

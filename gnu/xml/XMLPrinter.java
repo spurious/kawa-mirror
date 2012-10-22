@@ -740,7 +740,7 @@ public class XMLPrinter extends OutPort
           prev = '-';
 	return;
       }
-    if (v instanceof Consumable && ! (v instanceof UnescapedData))
+    if (v instanceof Consumable)
       {
 	((Consumable) v).consume(this);
 	return;

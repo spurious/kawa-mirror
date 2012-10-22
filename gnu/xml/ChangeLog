@@ -1,5 +1,7 @@
 2012-10-21  Per Bothner  <per@bothner.com>
 
+	* XMLPrinter.java (writeObject): Remove never-true instanceof test.
+
 	* XMLFilter.java (closeStartTag): Better error if start tag is not
 	a symbol.
 

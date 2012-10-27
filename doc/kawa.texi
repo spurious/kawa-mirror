@@ -28,15 +28,22 @@
 @end macro
 
 @ifnotinfo
+@ifnottex
 @macro stxref{NAME}
-@ref{meta-\NAME\, @var{\NAME\}}
+@ref{meta-\NAME\, @var{\NAME\}, @var{\NAME\}}
 @end macro
+@end ifnottex
 @end ifnotinfo
 @ifinfo
 @macro stxref{NAME}
 @var{\NAME\}
 @end macro
 @end ifinfo
+@iftex
+@macro stxref{NAME}
+@var{\NAME\}
+@end macro
+@end iftex
 
 @macro stxlit{TEXT}
 @t{@b{\TEXT\}}
@@ -7595,7 +7602,7 @@ which makes the @var{promise} forced.
 
 @deffn Procedure promise-set-exception! promise exception
 Associate @var{exception} with the @var{promise}.
-When the @var{promise} is forced the @var{excecption} gets thrown.
+When the @var{promise} is forced the @var{exception} gets thrown.
 @end deffn
 
 @deffn Procedure promise-set-alias! promise other
@@ -7634,7 +7641,7 @@ in a pre-forced promise).
 
 If a fully-lazy language there would be no distinction, or
 at least the promise type would be the default.  However, Kawa is
-mostly-eager langauge, so the eager type is the default.
+mostly-eager language, so the eager type is the default.
 This makes efficient code-generation easier: If an expression
 has an eager type, then the compiler can generate code that
 works on its values directly, without having to check for laziness.
@@ -11584,7 +11591,7 @@ comments, and CDATA section) we'll cover later.
 @stxdef{xml-name-form} @stxref{QName}
   | @stxref{xml-enclosed-expression}
 @stxdef{xml-enclosed-expression}
-    @stxlitlbrace{}@stxref{expression}@stxlitat{}
+    @stxlitlbrace{}@stxref{expression}@stxlit{@}}
   | @stxlit{(}@stxref{expression}...@stxlit{)}
 @end display
 

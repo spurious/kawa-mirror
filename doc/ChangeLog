@@ -1,3 +1,9 @@
+2012-11-02  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Arithmetic operations): Remove documentation (copied
+	from R6RS) of unimplemented (and non-R7RS) 2-argument log function.
+	This fixes Savannah bug #37610 "Logarithm's description".
+
 2012-10-26  Per Bothner  <per@bothner.com>
 
 	* kawa.texi: Various small fixes.

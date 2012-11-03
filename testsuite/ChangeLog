@@ -1,3 +1,8 @@
+2012-11-02  Per Bothner  <per@bothner.com>
+
+	* module2.scm: Add a define-alias to test that module-implements
+	works with an alias.
+
 2012-10-21  Per Bothner  <per@bothner.com>
 
 	* xml-test.scm: New test-suite.

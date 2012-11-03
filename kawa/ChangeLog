@@ -1,3 +1,10 @@
+2012-11-02  Per Bothner  <per@bothner.com>
+
+	* standard/module_export.scm:  Defer resolving the type name.
+	(scanForm): New method.
+	* standard/module_implements: Similar.
+	* lang/Translator.java (exp2Type): Don't use InlineCalls at this stage.
+
 2012-10-21  Per Bothner  <per@bothner.com>
 
 	* standard/Scheme.java: Define $xml-element$ and similar bindings.

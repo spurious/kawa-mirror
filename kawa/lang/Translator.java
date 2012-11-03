@@ -922,7 +922,6 @@ public class Translator extends Compilation
     try
       {
 	Expression texp = rewrite_car(typeSpecPair, syntax);
-        texp = InlineCalls.inlineCalls(texp, this);
 	if (texp instanceof ErrorExp)
 	  return null;
         Type type = getLanguage().getTypeFor(texp);

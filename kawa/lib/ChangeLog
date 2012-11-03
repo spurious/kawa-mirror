@@ -1,3 +1,7 @@
+2012-11-03  Per Bothner  <per@bothner.com>
+
+	* numbers.scm (log): Implement 2-argument version of log function.
+
 2012-07-07  Per Bothner  <per@bothner.com>
 
 	* lists.scm (define-cxr): Add cast to <pair> so field can

@@ -141,8 +141,11 @@
 (define (exp (x :: <complex>)) :: <complex>
   (invoke x 'exp))
 
-(define (log (x :: <complex>)) :: <complex>
-  (invoke x 'log))
+(define-procedure log
+  (lambda ((x ::complex) (base ::complex))  ::complex
+          (/ (invoke x 'log) (invoke base 'log)))
+  (lambda ((x ::complex))  ::complex
+          (invoke x 'log)))
 
 ;;; These are only implemented for <real> arguments.
 (define (sin (x :: <double>)) :: <double>

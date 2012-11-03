@@ -4267,6 +4267,7 @@ number objects have sufficient precision.
 
 @deffn Procedure exp @var{z}
 @deffnx Procedure log @var{z}
+@deffnx Procedure log @vari{z} @varii{z}
 @deffnx Procedure sin @var{z}
 @deffnx Procedure cos @var{z}
 @deffnx Procedure tan @var{z}
@@ -4278,14 +4279,9 @@ These procedures compute the usual transcendental functions.
 
 The @func{exp} procedure computes the base--@var{e} exponential of
 @var{z}.
-The @func{log} procedure computes the natural
-logarithm of @var{z} (@strong{not} the base--10 logarithm).
-@c R6RS - not in R7RS or implemtened in Kawa
-@c The @func{log} procedure with a single argument computes the natural
-@c logarithm of @var{z} (@strong{not} the base--10 logarithm).
-@c @deffnx Procedure log @vari{z} @varii{z}
-@c @code{(log
-@c @vari{z} @varii{z})} computes the base--@varii{z} logarithm of @vari{z}.
+The @func{log} procedure with a single argument computes the natural
+logarithm of @var{z} (@strong{not} the base--10 logarithm); @code{(log
+@vari{z} @varii{z})} computes the base--@varii{z} logarithm of @vari{z}.
 
 The @func{asin}, @func{acos}, and @func{atan} procedures compute
 arcsine, arccosine, and arctangent, respectively.  The two--argument

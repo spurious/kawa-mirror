@@ -1,3 +1,9 @@
+2012-11-03  Charles Turner  <chturne@gmail.com>
+	    Per Bothner  <per@bothner.com>
+
+	* standard/expt.java (expt): Fixes an unchecked cast to type
+	Numeric causing unwanted exceptions.
+
 2012-11-02  Per Bothner  <per@bothner.com>
 
 	* standard/module_export.scm:  Defer resolving the type name.

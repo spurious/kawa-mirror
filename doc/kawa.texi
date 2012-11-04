@@ -169,13 +169,12 @@ This package has nothing to do with the defunct Kawa commercial Java IDE.
 * Eval and Environments::
 * Debugging::
 * Program structure::
-* Processes::
 * Miscellaneous::
 * Input-Output::         Input, output, and file handling
 * Types::
 * Objects Classes and Modules::
 * XML tools::            XML, HTML, and the web
-* Low-level functions::  Deprecated low-level functions
+* Special topics::
 * Framework::            The Kawa language framework
 * FAQs::                 Frequently Asked Questions
 * Community::
@@ -7691,95 +7690,7 @@ The @var{time} can be either a pure number (in secords),
 or a quantity whose unit is a time unit (such as @code{10s}).
 @end deffn
 
-@node Processes
-@chapter Processes
-
-@defvar home-directory
-A string containing the home directory of the user.
-@end defvar
-
-@deffn Procedure command-line
-Returns a nonempty list of strings. The first element is
-an implementation-specific name for the running top-level
-program. (For now this is just @code{"kawa"}, but it may
-become something more useful in the future.)
-The remaining elements are the command-line arguments,
-as passed to the @code{main} method.
-@end deffn
-
-@defvar command-line-arguments
-Any command-line arguments (following flags processed by Kawa itself)
-are assigned to the global variable @samp{command-line-arguments},
-which is a vector of strings.
-@end defvar
-
-@deffn Procedure process-command-line-assignments
-Process any initial command-line options that set variables.
-These have the form @code{@var{name}=@var{value}}.
-Any such command-line options (at the start of the command-line)
-are processed and removed from the command-line.
-@example
-$ kawa -- abc=123 def
-#|kawa:1|# (command-line)
-(kawa abc=123 def)
-#|kawa:2|# (process-command-line-assignments)
-#|kawa:3|# (command-line)
-(kawa def)
-#|kawa:4|# abc
-123
-@end example
-This function is mostly useful for Kawa applications
-compiled with the @code{--main} option.
-(It is used to set XQuery @code{external} variables.)
-@end deffn
-
-@deffn Procedure exit [code]
-Exits the Kawa interpreter, and ends the Java session.
-The integer value @var{code} is returned to the operating
-system.  If @var{code} is not specified, zero is returned,
-indicating normal (non-error) termination.
-If the @var{code} is @code{#f}, it
-is treated as -1, which means an abnormal exit.
-@end deffn
-
-@deffn Procedure make-process command envp
-Creates a @code{<java.lang.Process>} object, using the specified
-@var{command} and @var{envp}.
-The @var{command} is converted to an array of Java strings
-(that is an object that has type @code{<java.lang.String[]>}.
-It can be a Scheme vector or list (whose elements should be
-Java strings or Scheme strings);  a Java array of Java strings;
-or a Scheme string.  In the latter case, the command is converted
-using @code{command-parse}.
-The @var{envp} is process environment;  it should be either
-a Java array of Java strings, or the special @code{#!null} value.
-@end deffn
-
-@deffn Procedure system command
-Runs the specified @var{command}, and waits for it to finish.
-Returns the return code from the command.  The return code is an integer,
-where 0 conventionally means successful completion.
-The @var{command} can be any of the types handled by @code{make-process}.
-@end deffn
-
-@defvar command-parse
-The value of this variable should be a one-argument procedure.
-It is used to convert a command from a Scheme string to a Java
-array of the constituent "words".
-The default binding, on Unix-like systems, returns a new command to
-invoke @code{"/bin/sh" "-c"} concatenated with the command string;
-on non-Unix-systems, it is bound to @code{tokenize-string-to-string-array}.
-@end defvar
-
-@deffn Procedure tokenize-string-to-string-array command
-Uses a @code{java.util.StringTokenizer} to parse the @var{command} string
-into an array of words.  This splits the @var{command} using spaces
-to delimit words; there is no special processing for quotes or other
-special characters.
-(This is the same as what @code{java.lang.Runtime.exec(String)} does.)
-@end deffn
-
-@node Miscellaneous, Input-Output, Processes, Top
+@node Miscellaneous
 @chapter Miscellaneous
 
 @deffn Procedure scheme-implementation-version
@@ -11308,7 +11219,7 @@ scheme> (cadr '(3 4 5))
 (Of course the @code{jrunscript} REPL isn't as  nice as the one that
 Kawa provides.  For example the latter can handle multi-line inputs.)
 
-@node XML tools, Low-level functions, Objects Classes and Modules, Top
+@node XML tools, Special topics, Objects Classes and Modules, Top
 @chapter Working with XML and HTML
 
 Kawa has a number of features for working with XML, HTML,
@@ -12706,21 +12617,110 @@ BRL has an extensive utility library.  Most of this has not yet been ported
 to KRL, even in BRL-compatibility mode.
 @end itemize
 
+@node Special topics
+@chapter Special topics
+
+@menu
+* Processes::
+* Low-level functions:: Deprecated low-level functions
+@end menu
+
+@node Processes
+@section Processes
+
+@defvar home-directory
+A string containing the home directory of the user.
+@end defvar
+
+@deffn Procedure command-line
+Returns a nonempty list of strings. The first element is
+an implementation-specific name for the running top-level
+program. (For now this is just @code{"kawa"}, but it may
+become something more useful in the future.)
+The remaining elements are the command-line arguments,
+as passed to the @code{main} method.
+@end deffn
+
+@defvar command-line-arguments
+Any command-line arguments (following flags processed by Kawa itself)
+are assigned to the global variable @samp{command-line-arguments},
+which is a vector of strings.
+@end defvar
+
+@deffn Procedure process-command-line-assignments
+Process any initial command-line options that set variables.
+These have the form @code{@var{name}=@var{value}}.
+Any such command-line options (at the start of the command-line)
+are processed and removed from the command-line.
+@example
+$ kawa -- abc=123 def
+#|kawa:1|# (command-line)
+(kawa abc=123 def)
+#|kawa:2|# (process-command-line-assignments)
+#|kawa:3|# (command-line)
+(kawa def)
+#|kawa:4|# abc
+123
+@end example
+This function is mostly useful for Kawa applications
+compiled with the @code{--main} option.
+(It is used to set XQuery @code{external} variables.)
+@end deffn
+
+@deffn Procedure exit [code]
+Exits the Kawa interpreter, and ends the Java session.
+The integer value @var{code} is returned to the operating
+system.  If @var{code} is not specified, zero is returned,
+indicating normal (non-error) termination.
+If the @var{code} is @code{#f}, it
+is treated as -1, which means an abnormal exit.
+@end deffn
+
+@deffn Procedure make-process command envp
+Creates a @code{<java.lang.Process>} object, using the specified
+@var{command} and @var{envp}.
+The @var{command} is converted to an array of Java strings
+(that is an object that has type @code{<java.lang.String[]>}.
+It can be a Scheme vector or list (whose elements should be
+Java strings or Scheme strings);  a Java array of Java strings;
+or a Scheme string.  In the latter case, the command is converted
+using @code{command-parse}.
+The @var{envp} is process environment;  it should be either
+a Java array of Java strings, or the special @code{#!null} value.
+@end deffn
+
+@deffn Procedure system command
+Runs the specified @var{command}, and waits for it to finish.
+Returns the return code from the command.  The return code is an integer,
+where 0 conventionally means successful completion.
+The @var{command} can be any of the types handled by @code{make-process}.
+@end deffn
+
+@defvar command-parse
+The value of this variable should be a one-argument procedure.
+It is used to convert a command from a Scheme string to a Java
+array of the constituent "words".
+The default binding, on Unix-like systems, returns a new command to
+invoke @code{"/bin/sh" "-c"} concatenated with the command string;
+on non-Unix-systems, it is bound to @code{tokenize-string-to-string-array}.
+@end defvar
+
+@deffn Procedure tokenize-string-to-string-array command
+Uses a @code{java.util.StringTokenizer} to parse the @var{command} string
+into an array of words.  This splits the @var{command} using spaces
+to delimit words; there is no special processing for quotes or other
+special characters.
+(This is the same as what @code{java.lang.Runtime.exec(String)} does.)
+@end deffn
+
 @node Low-level functions
-@chapter Deprecated low-level functions
+@section Deprecated low-level functions
 
 These sections document older and less convenient ways
 to call Java methods, access Java fields, and use Java arrays.
 
-@menu
-* Low-level Method invocation::
-* Low-level Field operations::
-* Low-level array macros::
-@end menu
-
-@node Low-level Method invocation
-@section Low-level Method invocation
-
+@anchor{Low-level Method invocation}
+@subsection Low-level Method invocation
 The following lower-level primitives require you to specify
 the parameter and return types explicitly.
 You should probably use the functions @code{invoke} and @code{invoke-static}
@@ -12756,8 +12756,7 @@ then kawa can inline the correct bytecodes to call the specified methods.
 checks that there really is a method that matches the specification.)
 Otherwise, the Java reflection facility is used.
 
-@node Low-level Field operations
-@section Low-level field operations
+@subsection Low-level field operations
 
 The following macros evaluate to procedures that can be used to
 access or change the fields of objects or static fields.
@@ -12799,8 +12798,8 @@ Returns a one-argument function, which when called sets the
 value of the static field to the argument.
 @end deffn
 
-@node Low-level array macros
-@section Old low-level array macros
+@anchor{Low-level array macros}
+@subsection Old low-level array macros
 
 The following macros evaluate to procedures that can be used to
 manipulate primitive Java array objects.

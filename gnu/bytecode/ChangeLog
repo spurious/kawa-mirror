@@ -1,3 +1,13 @@
+2012-11-05  Per Bothner  <per@bothner.com>
+
+	Fix bug in encodding of enum annotation values.  They should
+	use the enum type's descriptor (signature), not "internal name".
+	* AnnotationEntry.java (decodeEnumEntry): New static method.
+	(print): Use it.
+	* RuntimeAnnotationsAttr.java (assignConstants): Use decodeEnumEntry.
+	* ClassType.java (nameToSignature): New static method.
+	(setName): Use it.
+
 2012-10-06  Per Bothner  <per@bothner.com>
 
 	Change so reading a class cann detecte neverReturnsType easily.

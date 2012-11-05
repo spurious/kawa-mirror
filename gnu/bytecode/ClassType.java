@@ -351,8 +351,12 @@ public class ClassType extends ObjectType
   public void setName (String name)
   {
     this_name = name;
-    setSignature("L"+name.replace('.', '/')+";");
+    setSignature(nameToSignature(name));
   }
+
+    public static String nameToSignature(String name) {
+        return "L"+name.replace('.', '/')+";";
+    }
 
   SourceDebugExtAttr sourceDbgExt;
 

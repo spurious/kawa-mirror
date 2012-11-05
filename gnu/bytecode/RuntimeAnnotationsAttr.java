@@ -270,29 +270,11 @@ public class RuntimeAnnotationsAttr extends Attribute
           dlen += assignConstants(vals.get(i), constants);
         return dlen;
       case 'e':
-        String cname, ename;
-        if (value instanceof Field)
-          {
-            Field fld = (Field) value;
-            cname = fld.getDeclaringClass().getInternalName();
-            ename = fld.getName();
-          }
-        else if (value instanceof Enum)
-          {
-            Enum evalue = (Enum) value;
-            cname = evalue.getDeclaringClass().getName().replace('.', '/');
-            ename = evalue.name();
-          }
-        else
-          {
-            String[] sarr = (String[]) value;
-            cname = sarr[0];
-            ename = sarr[0];
-          }
+        String[] sarr = AnnotationEntry.decodeEnumEntry(value);
         if (val.index1 == 0)
-          val.index1 = constants.addUtf8(cname).index;
+          val.index1 = constants.addUtf8(sarr[0]).index;
         if (val.index2 == 0)
-          val.index2 = constants.addUtf8(ename).index;
+          val.index2 = constants.addUtf8(sarr[1]).index;
         return 5;
       case 'c':
         if (val.index1 == 0)

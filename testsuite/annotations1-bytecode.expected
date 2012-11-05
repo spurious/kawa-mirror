@@ -14,11 +14,11 @@ Attribute "RuntimeVisibleAnnotations", length:0, number of entries: 1
     ivalue => 112
     blvalue => false
     chvalue => B
-    etype => enum[java/lang/annotation/ElementType PACKAGE]
+    etype => enum[java.lang.annotation.ElementType PACKAGE]
 Field name: y public Signature: gnu.math.IntNum
 Attribute "RuntimeVisibleAnnotations", length:0, number of entries: 1
   @javax.annotation.Resource
-    authenticationType => enum[javax/annotation/Resource$AuthenticationType CONTAINER]
+    authenticationType => enum[javax.annotation.Resource$AuthenticationType CONTAINER]
     type => java.util.ArrayList
 
 Methods (count: 2):

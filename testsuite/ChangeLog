@@ -1,3 +1,7 @@
+2012-11-05  Per Bothner  <per@bothner.com>
+
+	* annotations1-bytecode.expected: Update.
+
 2012-11-02  Per Bothner  <per@bothner.com>
 
 	* module2.scm: Add a define-alias to test that module-implements

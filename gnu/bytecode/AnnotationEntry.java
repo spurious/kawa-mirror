@@ -370,25 +370,9 @@ implements java.lang.reflect.InvocationHandler
           out.print(value.toString());
         break;
       case 'e': // enum constant
-        String cname, ename;
-        if (value instanceof Field)
-          {
-            Field fld = (Field) value;
-            cname = fld.getDeclaringClass().getInternalName();
-            ename = fld.getName();
-          }
-        else if (value instanceof Enum)
-          {
-            Enum evalue = (Enum) value;
-            cname = evalue.getDeclaringClass().getName().replace('.', '/');
-            ename = evalue.name();
-          }
-        else
-          {
-            String[] sarr = (String[]) value;
-            cname = sarr[0];
-            ename = sarr[1];
-          }
+        String[] sarr = decodeEnumEntry(value);
+        String cname = sarr[0];
+        String ename = sarr[1];
         out.print("enum[");
         if ((out.flags & ClassTypeWriter.PRINT_EXTRAS) != 0)
           out.print("type:");
@@ -428,4 +412,22 @@ implements java.lang.reflect.InvocationHandler
       }
     }
   }
+
+    /** Return [type descriptor, field name]. */
+    static String[] decodeEnumEntry(Object value) {
+        if (value instanceof Field) {
+            Field fld = (Field) value;
+            return new String[]{
+                fld.getDeclaringClass().getSignature(),
+                fld.getName()};
+        }
+        else if (value instanceof Enum) {
+            Enum evalue = (Enum) value;
+            return new String[]{
+                ClassType.nameToSignature(evalue.getDeclaringClass().getName()),
+                evalue.name()};
+        }
+        else
+            return (String[]) value;
+    }
 }

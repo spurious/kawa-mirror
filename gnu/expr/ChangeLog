@@ -1,6 +1,13 @@
+2012-11-05  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (generateBytecode): If USE_DEFINED_CLASS is set,
+	then we shouldn't use the mainClass as the moduleClass.
+	(makeRunnable): Not if USE_DEFINED_CLASS is set.
+	(addMainClass): Don't set super to ModuleBody if USE_DEFINED_CLASS.
+
 2012-11-02  Per Bothner  <per@bothner.com>
 
-	* Compilation.java (process): Defer addMainClass to after resolve.
+	* Compilation.java (process): Defer addMainClass to after resolve If .
 
 2012-10-20  Charles Turner <chturne@gmail.com>
 	    Per Bothner  <per@bothner.com>

@@ -1079,7 +1079,8 @@ public class Compilation implements SourceLocator
   public boolean makeRunnable ()
   {
     return ! generatingServlet() && ! generatingApplet()
-      && ! getModule().staticInitRun();
+      && ! getModule().staticInitRun()
+      && ! getModule().getFlag(ModuleExp.USE_DEFINED_CLASS);
   }
 
   public void addMainClass (ModuleExp module)
@@ -1096,6 +1097,8 @@ public class Compilation implements SourceLocator
 	  sup = typeApplet;
 	else if (generatingServlet())
 	  sup = typeServlet;
+        else if (module.getFlag(ModuleExp.USE_DEFINED_CLASS))
+          sup = Type.objectType;
 	else
 	  sup = getModuleType();
       }
@@ -1994,7 +1997,8 @@ public class Compilation implements SourceLocator
       }
 
     ClassType neededSuper = getModuleType();
-    if (mainClass.getSuperclass().isSubtype(neededSuper))
+    if (mainClass.getSuperclass().isSubtype(neededSuper)
+        && ! module.getFlag(ModuleExp.USE_DEFINED_CLASS))
       moduleClass = mainClass;
     else
       {
@@ -2094,8 +2098,7 @@ public class Compilation implements SourceLocator
 
 	if (staticModule)
 	  {
-            if (! module.getFlag(ModuleExp.USE_DEFINED_CLASS))
-              generateConstructor (module);
+            generateConstructor(module);
 
 	    code.emitNew(moduleClass);
 	    code.emitDup(moduleClass);

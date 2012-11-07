@@ -1,3 +1,16 @@
+2012-11-06  Per Bothner  <per@bothner.com>
+
+	* ModuleExp.java (superType, interfaces): Remove fields.  Use
+	respective properties from compileType field instead.
+	(getSuperType, setSuperType, getInterfaces, setInterfaces):
+	Update accordingly.
+	* Compilation.java (generateBytecode): Partially revert previous change.
+	(generateConstructor): Don't register module instance if
+	USE_DEFINED_CLASS.
+
+	* Language.java (parse): Call ModuleExp.classFor after parsing.
+	* Compilation.java (process): Call ModuleExp.classFor after parsing.
+
 2012-11-05  Per Bothner  <per@bothner.com>
 
 	* Compilation.java (generateBytecode): If USE_DEFINED_CLASS is set,

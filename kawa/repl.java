@@ -794,7 +794,6 @@ public class repl extends Procedure0or1
             comp
               = language.parse(fstream, messages,
                                defaultParseOptions, minfo);
-            comp.getModule().classFor(comp);
             infos[i-iArg] = minfo;
             comps[i-iArg] = comp;
 

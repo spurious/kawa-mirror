@@ -691,11 +691,11 @@ public abstract class Language
       tr.explicit = true;
     if ((options & PARSE_PROLOG) != 0)
       tr.setState(Compilation.PROLOG_PARSING);
-    tr.pushNewModule(lexer);
+    ModuleExp module = tr.pushNewModule(lexer);
     if ((options & PARSE_INTERACTIVE_MODULE) != 0)
       {
         tr.setInteractiveName();
-        tr.getModule().setFlag(ModuleExp.INTERACTIVE);
+        module.setFlag(ModuleExp.INTERACTIVE);
       }
     if (info != null)
       info.setCompilation(tr);
@@ -703,6 +703,8 @@ public abstract class Language
       return null;
     if (tr.getState() == Compilation.PROLOG_PARSING)
       tr.setState(Compilation.PROLOG_PARSED);
+    else
+      module.classFor(tr);
     return tr;
   }
 

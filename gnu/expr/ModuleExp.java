@@ -380,17 +380,22 @@ public class ModuleExp extends LambdaExp
       }
   }
 
-  ClassType superType;
-  ClassType[] interfaces;
-
   ModuleInfo info;
 
   public String getNamespaceUri () { return info.uri; }
 
-  public final ClassType getSuperType() { return superType; }
-  public final void setSuperType(ClassType s) { superType = s; }
-  public final ClassType[] getInterfaces() { return interfaces; }
-  public final void setInterfaces(ClassType[] s) { interfaces = s; }
+    public final ClassType getSuperType() {
+        return compiledType.getSuperclass();
+    }
+    public final void setSuperType(ClassType s) {
+        compiledType.setSuper(s);
+    }
+    public final ClassType[] getInterfaces() {
+        return compiledType.getInterfaces();
+    }
+    public final void setInterfaces(ClassType[] s) {
+        compiledType.setInterfaces(s);
+    }
 
   public final boolean isStatic ()
   {

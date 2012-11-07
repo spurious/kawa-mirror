@@ -1161,7 +1161,8 @@ public class Compilation implements SourceLocator
     if (curClass == mainClass
         // Optimization: No point in calling ModuleInfo.register if we aren't
         // compiling a named module.
-        && minfo != null && minfo.sourcePath != null)
+        && minfo != null && minfo.sourcePath != null
+        && ! getModule().getFlag(ModuleExp.USE_DEFINED_CLASS))
       {
 	code.emitPushThis();
 	code.emitInvokeStatic(ClassType.make("gnu.expr.ModuleInfo")
@@ -1905,6 +1906,7 @@ public class Compilation implements SourceLocator
           {
             setState(BODY_PARSED-1);
             language.parse(this, 0);
+            mexp.classFor(this);
             lexer.close();
             lexer = null;
             setState(messages.seenErrors() ? ERROR_SEEN : BODY_PARSED);
@@ -2098,7 +2100,8 @@ public class Compilation implements SourceLocator
 
 	if (staticModule)
 	  {
-            generateConstructor(module);
+            if (! module.getFlag(ModuleExp.USE_DEFINED_CLASS))
+              generateConstructor(module);
 
 	    code.emitNew(moduleClass);
 	    code.emitDup(moduleClass);

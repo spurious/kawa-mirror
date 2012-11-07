@@ -1404,6 +1404,8 @@ public class Translator extends Compilation
 		 || mexp.getFlag(ModuleExp.SUPERTYPE_SPECIFIED))
 	  decl.setFlag(Declaration.NONSTATIC_SPECIFIED);
       }
+    if (mexp.getFlag(ModuleExp.SUPERTYPE_SPECIFIED))
+        mexp.setFlag(false, ModuleExp.USE_DEFINED_CLASS);
   }
 
   static void vectorReverse (Vector vec, int start, int count)

@@ -12621,9 +12621,225 @@ to KRL, even in BRL-compatibility mode.
 @chapter Special topics
 
 @menu
+* Building for Android::  Building for Android devices.
 * Processes::
 * Low-level functions:: Deprecated low-level functions
 @end menu
+
+@node Building for Android
+@section Building for Android
+
+Google's phone/tablet operating system
+@uref{https://developers.google.com/android/,Android}
+is based on a custom virtual machine on top of a Linux kernel.
+Even though Android isn't strictly (or legally) speaking Java,
+you can build Android applications using Kawa.
+
+Here is "Hello world" written in Kawa Scheme:
+
+@example
+(require 'android-defs)
+(activity hello
+  (on-create-view
+   (android.widget.TextView (this)
+    text: "Hello, Android from Kawa Scheme!")))
+@end example
+
+The following instructions have been tested on GNU/Linux,
+specifically Fedora 17.
+@uref{http://asieno.com/blog/index.php/post/2012/08/16/Setting-up-the-environment-Android-Kawa,This link} may be helpful if you're building on Windows.
+
+@subsection Downloading and setting up the Android SDK
+
+First @uref{http://code.google.com/android/download.html,download the Android SDK}. Unzip in a suitable location, which we'll refer to as @code{ANDROID_HOME}.
+
+@example
+export ANDROID_HOME=/path/to/android-sdk-linux
+PATH=$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools:$PATH
+@end example
+
+Next you have to get the appropriate platform SDK:
+
+@example
+$ android update sdk
+@end example
+You need to select an Android <q>platform</q>.
+Platform (API) 16 corresponds to Android 4.1.2 (Jelly Bean).
+Select that or whatever you prefer, and click @code{Install}.
+(You can install multiple platforms, but each project
+is built for a specific platform.)
+
+@example
+ANDROID_PLATFORM=android-16
+@end example
+
+@subsection Building Kawa for Android
+
+Set @code{JAVA_HOME} to where your JDK tree is.
+You should use JDK 6; JDK 7 does not work at time of writing.
+
+@example
+$ export JAVA_HOME=/opt/jdk1.6
+@end example
+
+First @uref{http://www.gnu.org/software/kawa/Getting-Kawa.html,get the Kawa source code} (version 1.11 or later).
+
+If using Ant (as is recommended on Windows):
+
+@example
+$ ant -Denable-android=true
+@end example
+Alternatively, you can use @code{configure} and @code{make}:
+
+@example
+$ KAWA_DIR=path_to_Kawa_sources
+$ cd $KAWA_DIR
+$ ./configure --with-android=$ANDROID_HOME/platforms/$ANDROID_PLATFORM/android.jar --disable-xquery --disable-jemacs
+$ make
+@end example
+
+@subsection Creating the application
+
+Next, we need to create a project or <q>activity</q>.
+This tutorial assumes you want to create the project
+in the target directory @code{KawaHello},
+with the main activity being a class named @code{hello} in a
+package @code{kawa.android}:
+@example
+PROJECT_DIR=KawaHello
+PROJECT_CLASS=hello
+PROJECT_PACKAGE=kawa.android
+PROJECT_PACKAGE_PATH=kawa/android
+@end example
+
+To create the project use the following command:
+@example
+$ android create project --target $ANDROID_PLATFORM --name $PROJECT_DIR --activity $PROJECT_CLASS --path ./$PROJECT_DIR --package $PROJECT_PACKAGE
+@end example
+
+Replace the skeleton @code{hello.java} by the Scheme code at the
+top of this note, placing in a file named @code{hello.scm}:
+@example
+$ cd $PROJECT_DIR
+$ HELLO_APP_DIR=`pwd`
+$ cd $HELLO_APP_DIR/src/$PROJECT_PACKAGE_PATH
+$ rm $PROJECT_CLASS.java
+$ @i{create} $PROJECT_CLASS.scm
+@end example
+
+We need to copy/link the Kawa jar file so the Android SDK can find it:
+@example
+$ cd $HELLO_APP_DIR
+$ ln -s $KAWA_DIR/kawa-@value{VERSION}.jar libs/kawa.jar
+@end example
+
+Optionally, you can use kawart-@value{VERSION}.jar, which is slightly smaller,
+but does not support eval, and does not get built by the Ant build:
+@example
+$ ln -s $KAWA_DIR/kawart-@value{VERSION}.jar libs/kawa.jar
+@end example
+
+Copy or link @code{custom_rules.xml} from the Kawa sources:
+@example
+ln -s $KAWA_DIR/gnu/kawa/android/custom_rules.xml .
+@end example
+
+Finally to build the application just do:
+@example
+$ ant debug
+@end example
+
+@subsection Running the application on the Android emulator
+
+First you need to create an @uref{http://developer.android.com/tools/devices,Android Virtual Device (avd)}. Start:
+@example
+android
+@end example
+Then from menu @code{Tools} select @code{Manage AVDs...}.
+In the new window click @code{New....}
+Pick a @code{Name} (we use @code{avd16} in the following),
+a @code{Target} (to match @code{$ANDROID_PLATFORM}),
+and optionally change the other properties, before clicking @code{Create AVD}.
+
+Now you can start up the Android emulator:
+
+@example
+$ emulator -avd avd16 &
+@end example
+Wait until Android has finished booting (you will see the Android home screen),
+click the menu and home buttons. Now install our new application:
+
+@example
+adb install bin/KawaHello-debug.apk
+@end example
+
+@subsection Running the application on your device
+
+If the emulator is running, kill it:
+@example
+$ kill %emulator
+@end example
+
+On your phone or other Android devude, enable USB debugging.
+(This is settable from the @code{Settings} application,
+under @code{Applications / Development}.)
+
+Connect the phone to your computer with the USB cable.
+Verify that the phone is accessible to @code{adb}:
+@example
+$ adb devices
+List of devices attached 
+0A3A560F0C015024	device
+@end example
+
+If you don't see a device listed, it may be permission problem. You can figure out which device corresponds to the phone by doing:
+
+@example
+$ ls -l /dev/bus/usb/*
+/dev/bus/usb/001:
+total 0
+...
+crw-rw-rw- 1 root wheel 189, 5 2010-10-18 16:52 006
+...
+@end example
+
+The timestamp corresponds to when you connected the phone.
+Make the USB connection readable:
+@example
+$ sudo chmod a+w /dev/bus/usb/001/006
+@end example
+
+Obviously if you spend time developing for an Androd phone you'll want to automate this process;
+@uref{https://sites.google.com/site/siteofhx/Home/android/drivers/udc,this link}
+or @uref{https://groups.google.com/forum/?fromgroups=#!topic/android-developers/nTfhhPktGfM,this link} may be helpful.
+
+Anyway, once @code{adb} can talk to the phone, you install in the same way as before:
+@example
+adb install bin/KawaHello-debug.apk
+@end example
+
+@subsection Some debugging notes
+
+You will find a copy of the SDK documentation in @code{$ANDROID_HOME/docs/index.html}.
+
+If the emulator complains that your application has stopped unexpectedly, do:
+@example
+$ adb logcat
+@end example
+
+This shows log messages, stack traces, output from the @code{Log.i} logging method, and other useful information.
+(You can alternatively start @code{ddms} (Dalvik Debug Monitor Service), click on the @code{kawa.android line} in the top-left sub-window to select it, then from the @code{Device} menu select @code{Run logcat....}).
+
+To uninstall your application, do:
+@example
+$ adb uninstall kawa.android
+@end example
+
+@subsection Other resources
+
+(A more interesting @uref{http://androidscheme.blogspot.com/2010/10/text-to-speech-app.html,text-to-speech} example app is on Santosh Rajan's @uref{http://androidscheme.blogspot.com/,Android-Scheme blog}.)
+
+@uref{https://github.com/ecraven/SchemeAndroidOGL}
 
 @node Processes
 @section Processes
@@ -13054,7 +13270,10 @@ Ivelin Ivanov and Tom Reilly for servlet support.
 
 Anthony Green for Fedora packaging.
 
-Charles Turner for pretty-printer improvements and other changes.
+Charles Turner for pretty-printer improvements,
+improvements in the Common Lips support, and other changes.
+
+Julien Rousseau and Marius Kjeldahl contributed to Android support.
 
 @subsubheading Small fixes and improvements
 

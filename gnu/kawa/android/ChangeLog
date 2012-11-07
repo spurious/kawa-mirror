@@ -1,6 +1,9 @@
+2012-11-06  Julien Rousseau <julien.rousseau@gmail.com>
+
+	* custom_rules.xml: New build file for Android.
+
 2009-01-14  Per Bothner  <per@bothner.com>
 
 	New package for Android support.
 	* defs.scm: New file - definition of the activity macro.
-	
 

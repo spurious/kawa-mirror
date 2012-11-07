@@ -1,3 +1,8 @@
+2012-11-06  Per Bothner  <per@bothner.com>
+
+	* SlotGet.java (getSlotValue): Look for a member class.
+	This fixes Savannah bug#37684 "Nested class types of field".
+
 2012-07-16  Per Bothner  <per@bothner.com>
 
 	* ClassMethods.java (getMethods):  When calling an Object method (such

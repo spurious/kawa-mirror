@@ -121,6 +121,14 @@ public class SlotGet extends Procedure2
           }
         catch (Exception ex)
           {
+            // Check for a member class.
+            Class[] memberClasses = clas.getClasses();
+            for (int i = memberClasses.length;  --i >= 0; )
+              {
+                Class memberClass = memberClasses[i];
+                if (memberClass.getSimpleName().equals(fname))
+                  return memberClass;
+              }
             field = null;
           }
         if (field != null)

@@ -1,3 +1,9 @@
+2012-11-06  Alex Moiseenko <imdagger>
+
+	* sva37684.scm: New test case for Savannah bug #37684
+	"Nested class types of fields".
+	* Makefile.am: Update accordingly.
+
 2012-11-05  Per Bothner  <per@bothner.com>
 
 	* annotations1-bytecode.expected: Update.

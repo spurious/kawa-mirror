@@ -1,3 +1,10 @@
+2012-11-07  Per Bothner  <per@bothner.com>
+
+	* CompileBuildObject.java (make): Search superclasses for matching
+	ObjectBuilder binding.
+	(getAddChildMethodName): New method.
+	(buildAddChild): Use it.
+
 2012-11-06  Per Bothner  <per@bothner.com>
 
 	* SlotGet.java (getSlotValue): Look for a member class.

@@ -1,3 +1,7 @@
+(define-alias TextView android.widget.TextView)
+(define-alias Button android.widget.Button)
+(define-alias LinearLayout android.widget.LinearLayout)
+
 (define (%process-activity form)
   (syntax-case form (on-create on-create-view)
     (((on-create stmt ...) . rest)
@@ -20,3 +24,6 @@
   ((activity name . parts)
    #`(define-simple-class name (android.app.Activity)
        ,@(%process-activity #`parts))))
+
+(define-constant {gnu.kawa.reflect/ObjectBuilder}:android.view.View
+  "gnu.kawa.android.ViewBuilder")

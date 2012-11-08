@@ -206,9 +206,8 @@ KAWA_COMPILER = $(JAVA) -classpath "$(CLASSPATH)" kawa.repl -d $(top_builddir) \
   -P `echo $(PACKAGE_FNAME)|sed -e s/-/./g`.
 
 java_sources = 
-java_SCM = defs.scm
-EXTRA_DIST = defs.scm
-GCJ_INPUTS = defs*.class
+java_SCM = defs.scm ViewBuilder.scm 
+GCJ_INPUTS = defs*.class ViewBuilder*.class
 EXTRA_GCJ_DEPS = scm-classes.stamp
 PACKAGE_FNAME = gnu-kawa-android
 all: all-am

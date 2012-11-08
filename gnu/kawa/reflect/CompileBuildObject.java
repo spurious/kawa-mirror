@@ -52,21 +52,26 @@ public class CompileBuildObject {
         String builderName = null;
         Compilation comp = visitor.getCompilation();
         Namespace ns = Namespace.valueOfNoCreate("gnu.kawa.reflect/ObjectBuilder");
-        if (ns != null)
-          {
-            Symbol sym = ns.lookup(ctype.getName().intern());
-            if (sym != null)
-              {
-                ModuleExp mexp = comp.getModule();
-                Declaration builderDecl = comp.lookup(sym, Language.VALUE_NAMESPACE);
-                if (builderDecl != null)
-                  {
-                    Object val = builderDecl.getValue().valueIfConstant();
-                    if (val instanceof String)
-                      builderName = (String) val;
-                  }
-              }
-          }
+        if (ns != null) {
+            ObjectType btype = ctype;
+            for (;;) {
+                Symbol sym = ns.lookup(btype.getName());
+                if (sym != null) {
+                    ModuleExp mexp = comp.getModule();
+                    Declaration builderDecl = comp.lookup(sym, Language.VALUE_NAMESPACE);
+                    if (builderDecl != null) {
+                        Object val = builderDecl.getValue().valueIfConstant();
+                        if (val instanceof String)
+                            builderName = (String) val;
+                    }
+                }
+                if (! (btype instanceof ClassType))
+                    break;
+                btype = ((ClassType) btype).getSuperclass();
+                if (btype == null || btype == Type.objectType)
+                    break;
+            }
+        }
         if (builderName != null) {
             try {
                 builder = (CompileBuildObject) Class.forName(builderName).newInstance();
@@ -132,9 +137,15 @@ public class CompileBuildObject {
         return CompileReflect.makeSetterCall(new ReferenceExp(target), member, value);
     }
 
+    public String getAddChildMethodName() {
+        return "add";
+    }
+
     public Expression buildAddChild(Declaration target, Expression child) {
         Expression[] iargs = {
-            new ReferenceExp(target), QuoteExp.getInstance("add"), child
+            new ReferenceExp(target),
+            QuoteExp.getInstance(getAddChildMethodName()),
+            child
         };
         return new ApplyExp(Invoke.invoke, iargs);
     } 

@@ -1,3 +1,11 @@
+2012-11-07  Per Bothner  <per@bothner.com>
+
+	* ViewBuilder.scm (ViewBuilder): New class, extends CompileBuildObject.
+	* Makefile.am: Update accordingly.
+	* defs.scm: Add ObjectBuilder binding for View types.
+
+	* defs.scm: Add some aliases (preliminary).
+
 2012-11-06  Julien Rousseau <julien.rousseau@gmail.com>
 
 	* custom_rules.xml: New build file for Android.

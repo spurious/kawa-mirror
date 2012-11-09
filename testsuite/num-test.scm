@@ -1,4 +1,4 @@
-(test-begin "numbers" 1866)
+(test-begin "numbers" 1872)
 
 (test-equal 7 (+ 3 4))
 (test-equal 3 (+ 3))
@@ -445,5 +445,12 @@
                 java.lang.Float:POSITIVE_INFINITY))
 (test-eqv #f (equal? java.lang.Double:POSITIVE_INFINITY 
                      java.lang.Float:POSITIVE_INFINITY))
+
+(test-assert (> 1/0 -1/0))
+(test-assert (< -1/0 1/0))
+(test-assert (> 4/5 -1/0))
+(test-assert (< 4/5 1/0))
+(test-assert (< 0 1/0))
+(test-assert (> 4.5 -1/0))
 
 (test-end)

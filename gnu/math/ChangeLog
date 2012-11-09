@@ -1,3 +1,8 @@
+2012-11-09  Per Bothner  <per@bothner.com>
+
+	* RatNum.java (compare): Fix bug when comparing two infinites,
+	where both denominators are zero.  Bug reported by John Cowan.
+
 2011-09-24  Per Bothner  <per@bothner.com>
 
 	* IntNum.java (shift(long,int)): Fix serious copy-and-paste errors.

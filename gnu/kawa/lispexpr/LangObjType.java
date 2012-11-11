@@ -177,6 +177,8 @@ public class LangObjType extends ObjectType implements TypeValue
   {
     if (other instanceof LazyType)
       other = ((LazyType) other).getValueType();
+    if (other == nullType)
+      return 1;
     switch (typeCode)
       {
       case CLASS_TYPE_CODE:

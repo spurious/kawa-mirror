@@ -1,3 +1,7 @@
+2012-11-11  Per Bothner  <per@bothner.com>
+
+	* LangObjType.java (compare): Add test for nullType.
+
 2012-10-21  Per Bothner  <per@bothner.com>
 
 	* ReaderXmlElement.java: Change reading of XML literals so it returns

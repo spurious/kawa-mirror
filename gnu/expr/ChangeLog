@@ -1,3 +1,7 @@
+2012-11-11  Per Bothner  <per@bothner.com>
+
+	* LitTable.java (emit): Special-case optimization for SimpleSymbol.
+
 2012-11-06  Per Bothner  <per@bothner.com>
 
 	* ModuleExp.java (superType, interfaces): Remove fields.  Use

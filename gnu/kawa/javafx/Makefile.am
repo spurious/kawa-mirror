@@ -6,8 +6,7 @@ java_sources=
 
 java_SCM = GroupObjectBuilder.scm MakeScene.scm defs.scm
 
-EXTRA_DIST = defs.scm
-GCJ_INPUTS = defs*.class
+GCJ_INPUTS = GroupObjectBuilder*.class MakeScene*.class defs*.class
 EXTRA_GCJ_DEPS = scm-classes.stamp
 PACKAGE_FNAME = gnu-kawa-javafx
 

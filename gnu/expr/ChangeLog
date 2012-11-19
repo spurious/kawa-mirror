@@ -1,5 +1,8 @@
 2012-11-18  Per Bothner  <per@bothner.com>
 
+	* Language.java (declFromField): Unless the type is a ModuleMethod
+	don't extract symbol from value, since that may fail for aliases.
+
 	* ClassExp.java (compileMembers): Skip generating code for class
 	initializer if module class.
 	* ClassInitializer.java (emit):  Instead emit inline body here,

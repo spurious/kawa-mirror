@@ -1,3 +1,7 @@
+2012-11-18  Per Bothner  <per@bothner.com>
+
+	* MyFunc.java (MyFunc): Add SourceName attribute.
+
 2012-11-09  Per Bothner  <per@bothner.com>
 
 	* num-test.scm: Add tests for comparing exact infinite rationals.

@@ -1,3 +1,7 @@
+2012-11-18  Per Bothner  <per@bothner.com>
+
+	* testing.scm: Add test-group to list of exported names.
+
 2012-09-11  Helmut Eller  <eller.helmut@gmail.com>
 
 	Fix Savannah bug #15579.

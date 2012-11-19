@@ -3,7 +3,7 @@ import gnu.bytecode.*;
 import gnu.mapping.*;
 import gnu.expr.*;
 
-/** Support for custome class-specific compile-time object builders.
+/** Support for custom class-specific compile-time object builders.
  * This class as-is supports compiling the Scheme form:
  * <pre>
  * (TYPE carg1 ... cargK key1: karg1 ... keyL: kargL carg1 ... cargM)
@@ -44,6 +44,22 @@ public class CompileBuildObject {
     }
 
     public CompileBuildObject() {
+    }
+
+    public Expression getArg(int i) { return exp.getArg(i); }
+    public int getArgCount() { return exp.getArgCount(); }
+    public void setArg(int i, Expression arg) { exp.setArg(i, arg); }
+
+    /** Insert an expression into the argument list. */
+    public void insertArgument(int index, Expression arg) {
+        Expression[] args = exp.getArgs();
+        Expression[] xargs = new Expression[args.length+1];
+        System.arraycopy(args, 0, xargs, 0, index);
+        xargs[index] = arg;
+        System.arraycopy(args, index, xargs, index+1, args.length-index);
+        exp.setArgs(xargs);
+        if (keywordStart >= index)
+            keywordStart++;
     }
 
     public static CompileBuildObject make(ApplyExp exp, InlineCalls visitor,
@@ -149,6 +165,23 @@ public class CompileBuildObject {
         };
         return new ApplyExp(Invoke.invoke, iargs);
     } 
+
+    /** Check if we should use the builder rather than the default.
+     * @return if true, caller should rewrite using the {@link #build} method;
+     *   otherwise caller ({@link CompileInvoke}) should do the work itself.
+     */
+    public boolean useBuilder(int numCode, InlineCalls visitor) {
+        if (getArgCount() > keywordStart && numCode > 0) // Have keywords
+            return true;
+        else if (numCode == MethodProc.NO_MATCH_TOO_MANY_ARGS
+                 && hasDefaultConstructor()
+                 && hasAddChildMethod()) {
+            keywordStart = 1;
+            return true;
+        }
+        else
+            return false;
+    }
 
     public Expression build() {
         Compilation comp = getCompilation();

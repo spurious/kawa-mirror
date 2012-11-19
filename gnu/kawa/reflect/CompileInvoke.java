@@ -238,20 +238,13 @@ public class CompileInvoke
               }
 
             CompileBuildObject builder = CompileBuildObject.make(exp, visitor, required, keywordStart, ctype, caller);
-            if (tailArgs > 0 && numCode > 0) // Have keywords
-              return builder.build();
             if (usingConstVector)
               {
                 builder.setDefaultConstructor(methods[0]);  
                 return builder.build();
               }
-            if (numCode == MethodProc.NO_MATCH_TOO_MANY_ARGS
-                && builder.hasDefaultConstructor()
-                && builder.hasAddChildMethod())
-              {
-                builder.keywordStart = 1;
-                return builder.build();
-              }
+            else if (builder.useBuilder(numCode, visitor))
+               return builder.build();
           }
         int okCount = 0, maybeCount = 0;
 	if (kind == 'N' && tailArgs > 0)

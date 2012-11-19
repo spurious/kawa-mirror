@@ -166,6 +166,9 @@ public class Namespace
     return lookup(key, key.hashCode(), false);
   }
 
+  /** Search for an existing Symbol with the give name.
+   * @param key String - does not need to be interned.
+   */
   protected final Symbol lookupInternal(String key, int hash)
   {
     int index = hashToIndex(hash);

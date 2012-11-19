@@ -1,3 +1,10 @@
+2012-11-18  Per Bothner  <per@bothner.com>
+
+	* ClassExp.java (compileMembers): Skip generating code for class
+	initializer if module class.
+	* ClassInitializer.java (emit):  Instead emit inline body here,
+	along with other module-level static initialization.
+
 2012-11-11  Per Bothner  <per@bothner.com>
 
 	* LitTable.java (emit): Special-case optimization for SimpleSymbol.

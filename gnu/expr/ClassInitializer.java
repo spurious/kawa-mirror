@@ -33,5 +33,7 @@ public class ClassInitializer extends Initializer
       code.emitPutStatic(field);
     else
       code.emitPutField(field);
+    if (cexp.compiledType == comp.mainClass && cexp.clinitMethod != null)
+      cexp.clinitMethod.body.compileWithPosition(comp, Target.Ignore);
   }
 }

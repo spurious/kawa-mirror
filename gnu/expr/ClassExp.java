@@ -498,6 +498,8 @@ public class ClassExp extends LambdaExp
 	  {
             if (child.isAbstract() || child.isNative())
               continue;
+            if (child == clinitMethod && compiledType == comp.mainClass)
+               continue;
 	    Method save_method = comp.method;
 	    LambdaExp save_lambda = comp.curLambda;
             String saveFilename = comp.getFileName();

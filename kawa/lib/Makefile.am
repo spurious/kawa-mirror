@@ -21,7 +21,7 @@ java_SCM_ALWAYS =\
   misc_syntax.scm \
   vectors.scm \
   uniform.scm \
-  bytevector.scm \
+  bytevectors.scm \
   arrays.scm \
   system.scm \
   kawa/hashtable.scm kawa/regex.scm rnrs/hashtables.scm rnrs/lists.scm \

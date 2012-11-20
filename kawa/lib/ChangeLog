@@ -1,5 +1,9 @@
 2012-11-20  Per Bothner  <per@bothner.com>
 
+	* bytevector.scm: Renamed file to ...
+	* bytevectors.scm: ... for compatibility with other names.
+	* Makefile.am: Update accordingly.
+
 	* vectors.scm (vector-fill!): Add optional bounds, as in R7RS.
 	* bytevector.scm (bytevector-copy): Likewise.
 

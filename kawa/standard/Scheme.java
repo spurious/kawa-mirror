@@ -795,13 +795,13 @@ public class Scheme extends LispLanguage
 
       defAliasStFld("bytevector", "gnu.kawa.lispexpr.LangObjType",
                     "u8vectorType");
-      defProcStFld("make-bytevector", "kawa.lib.bytevector");
-      defProcStFld("bytevector-length", "kawa.lib.bytevector");
-      defProcStFld("bytevector-u8-ref", "kawa.lib.bytevector");
-      defProcStFld("bytevector-u8-set!", "kawa.lib.bytevector");
-      defProcStFld("bytevector-copy", "kawa.lib.bytevector");
-      defProcStFld("utf8->string", "kawa.lib.bytevector");
-      defProcStFld("string->utf8", "kawa.lib.bytevector");
+      defProcStFld("make-bytevector", "kawa.lib.bytevectors");
+      defProcStFld("bytevector-length", "kawa.lib.bytevectors");
+      defProcStFld("bytevector-u8-ref", "kawa.lib.bytevectors");
+      defProcStFld("bytevector-u8-set!", "kawa.lib.bytevectors");
+      defProcStFld("bytevector-copy", "kawa.lib.bytevectors");
+      defProcStFld("utf8->string", "kawa.lib.bytevectors");
+      defProcStFld("string->utf8", "kawa.lib.bytevectors");
 
       defSntxStFld("cut", "gnu.kawa.slib.cut");
       defSntxStFld("cute", "gnu.kawa.slib.cut");

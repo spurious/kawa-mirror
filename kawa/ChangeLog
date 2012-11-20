@@ -1,3 +1,7 @@
+2012-11-20  Per Bothner  <per@bothner.com>
+
+	* standard/Scheme.scm: Update classname for bytevector functions.
+
 2012-11-06  Per Bothner  <per@bothner.com>
 
 	* lang/Translator.java (finishModule): If SUPERTYPE_SPECIFIED then

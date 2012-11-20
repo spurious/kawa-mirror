@@ -1,3 +1,10 @@
+2012-11-20  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Restrictions): Renamed node to ...
+	(Compatibility): new node name.
+	* kawa.texi (bytevetors): New section node.
+	* kawa.texi: Some minor fixes.
+
 2012-11-07  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Building for Android): New node, based on

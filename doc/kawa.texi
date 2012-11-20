@@ -157,7 +157,7 @@ This package has nothing to do with the defunct Kawa commercial Java IDE.
 @menu
 * Installation::         Building and installing Kawa
 * Running::              Invoking, Running, and Using Kawa
-* Features::             Summary of Kawa Scheme Features
+* Features::
 * Syntax::
 * Multiple values::
 * Symbols and namespaces::
@@ -1358,7 +1358,7 @@ the @code{-L$PREFIX/bin} option tells the linker where it can
 find that library.
 
 @node Features, Syntax, Running, Top
-@chapter Summary of Kawa Scheme Features
+@chapter Features
 
 Kawa is a mostly-compatible implementatation of 
 the Scheme programming language,
@@ -1416,10 +1416,10 @@ Quantities, keyword values, and the expanded @code{lambda} form
 
 @menu
 * Implemented SRFIs::
-* Restrictions::
+* Compatibility::        Compatibility with standards
 @end menu
 
-@node Implemented SRFIs, Restrictions, , Features
+@node Implemented SRFIs
 @section Implemented SRFIs
 
 Kawa implements the following semi-standard SRFIs
@@ -1487,8 +1487,10 @@ using @uref{http://srfi.schemers.org/srfi-16/srfi-16.html, @code{case-lambda}}.
 @uref{http://srfi.schemers.org/srfi-97/srfi-97.html, SRFI 97}: Names for SRFI Libraries.
 @end itemize
 
-@node Restrictions, , Implemented SRFIs, Features
-@section Features of R5RS not implemented
+@node Compatibility
+@section Compatibility with standards
+
+@emph{This will be re-written to compare with R7RS.}
 
 Kawa implements all the required and optional features of R5RS,
 with the following exceptions.
@@ -5562,6 +5564,7 @@ See @uref{http://evalwhen.com/pregexp/index.html,here for details}.
 * Vectors::
 * Arrays::  Multi-dimensional Arrays
 * Uniform vectors::
+* Bytevectors::
 * Hash tables::
 @end menu
 
@@ -5706,7 +5709,6 @@ procedure returns the contents of element @var{k} of @var{vector}.
   (inexact->exact (round (* 2 (acos -1)))))
 @result{} 13
 @end example
-
 @end deffn
 
 @deffn Procedure vector-set! @var{vector} @var{k} @var{obj}
@@ -5740,9 +5742,14 @@ initialized to the elements of the list @var{list}.
 @end example
 @end deffn
 
-@deffn Procedure {vector-fill!} @var{vector fill}
-Store @var{fill} in every element of @var{vector} and returns
-unspecified.
+@deffn Procedure {vector-fill!} @var{vector fill} [@var{start} [@var{end}]]
+Stores @var{fill} in in the elements of @var{vector}
+between @var{start} and @var{end}.
+@example
+(define a (vector 1 2 3 4 5))
+(vector-fill! a 'smash 2 4)
+a  @result{} #(1 2 smash smash 5)
+@end example
 @end deffn
 
 @deffn Procedure vector-map @var{proc} @vari{vector} @varii{vector} @dots{}
@@ -5948,7 +5955,7 @@ evaluates to a two-dimensionsal array of @code{<double>}:
 
 Uniform vectors are vectors whose elements are of the same numeric type.
 The are defined by @uref{http://srfi.schemers.org/srfi-4/srfi-4.html,SRFI-4}.
-However, the type names (such as @code{s8vector}) are a Kawa extension.
+The type names (such as @code{s8vector}) are a Kawa extension.
 
 @deffn Type s8vector
 The type of uniform vectors where each element can contain
@@ -5959,6 +5966,9 @@ a signed 8-bit integer.  Represented using an array of @code{byte}.
 The type of uniform vectors where each element can contain
 an unsigned 8-bit integer.  Represented using an array of @code{<byte>},
 but each element is treated as if unsigned.
+
+This type is a synonym for @code{bytevector},
+which has @ref{Bytevectors, extra functions}.
 @end deffn
 
 @deffn Type s16vector
@@ -6147,7 +6157,90 @@ so changes to one affect the other.
 It @code{vec} is re-sized so it needs a larger underlying array,
 then it will no longer use @code{arr}.
 
-@node Hash tables, , Uniform vectors, Data structures
+@node Bytevectors
+@section Bytevectors
+
+@dfn{Bytevectors} represent blocks of binary data. They are
+fixed-length sequences of bytes, where a @var{byte} is an exact
+integer in the range [0, 255]. A bytevector is typically more
+space-efficient than a vector containing the same values.
+
+The length of a bytevector is the number of elements that
+it contains. This number is a non-negative integer that is
+fixed when the bytevector is created. The valid indexes of
+a bytevector are the exact non-negative integers less than
+the length of the bytevector, starting at index zero as with
+vectors.
+
+The @code{bytevector} type is equivalent to the @code{u8vector}
+@ref{Uniform vectors,uniform vector} type, but is specified
+by the R7RS standard.
+
+Bytevectors are written using the notation @code{#u8(byte . . . )}.
+For example, a bytevector of length 3 containing the byte
+0 in element 0, the byte 10 in element 1, and the byte 5 in
+element 2 can be written as following:
+@example
+#u8(0 10 5)
+@end example
+Bytevector constants are self-evaluating, so they do not
+need to be quoted in programs.
+
+@deffn Type bytevector
+The type of bytevector objects.
+@end deffn
+
+@deffn Constructor bytevector @var{byte} @dots{}
+Return a newly allocated bytevector whose elements contain the given
+arguments.  Analogous to @code{vector}.
+@example
+(bytevector 1 3 5 1 3 5)  @result{}  #u8(1 3 5 1 3 5)
+(bytevector)  @result{}  #u8()
+@end example
+@end deffn
+
+@deffn Procedure bytevector? @var{obj}
+Return @true{} if @var{obj} is a bytevector, @false{} otherwise.
+@end deffn
+
+@deffn Procedure make-bytevector k
+@deffnx Procedure make-bytevector k byte
+The @code{make-bytevector} procedure returns a newly allocated
+bytevector of length @var{k}. If @var{byte} is given, then all elements
+of the bytevector are initialized to @var{byte},
+otherwise the contents of each element are unspecified.
+@example
+(make-bytevector 2 12) @result{} #u8(12 12)
+@end example
+@end deffn
+
+@deffn Procedure bytevector-length bytevector
+Returns the length of @var{bytevector} in bytes
+as an exact integer.
+@end deffn
+
+@deffn Procedure bytevector-u8-ref bytevector k 
+It is an error if @var{k} is not a valid index of @var{bytevector}.
+Returns the @var{k}th byte of @var{bytevector}.
+@example
+(bytevector-u8-ref ’#u8(1 1 2 3 5 8 13 21) 5)
+  @result{} 8
+@end example
+@end deffn
+
+@deffn Procedure bytevector-u8-set! bytevector k byte
+It is an error if @var{k} is not a valid index of @var{bytevector}.
+Stores @var{byte} as the @var{k}th byte of @var{bytevector}.
+@example
+(let ((bv (bytevector 1 2 3 4)
+  (bytevector-u8-set! bv 1 3)
+  bv)
+  @result{} #u8(1 3 3 4)
+@end example
+@end deffn
+
+
+@node Hash tables
 @section Hash tables
 
 A @dfn{hashtable} is a data structure that
@@ -12663,7 +12756,7 @@ Next you have to get the appropriate platform SDK:
 @example
 $ android update sdk
 @end example
-You need to select an Android <q>platform</q>.
+You need to select an Android ``platform''.
 Platform (API) 16 corresponds to Android 4.1.2 (Jelly Bean).
 Select that or whatever you prefer, and click @code{Install}.
 (You can install multiple platforms, but each project
@@ -12682,7 +12775,7 @@ You should use JDK 6; JDK 7 does not work at time of writing.
 $ export JAVA_HOME=/opt/jdk1.6
 @end example
 
-First @uref{http://www.gnu.org/software/kawa/Getting-Kawa.html,get the Kawa source code} (version 1.11 or later).
+First @ref{Getting Kawa,get the Kawa source code}.
 
 If using Ant (as is recommended on Windows):
 
@@ -12700,7 +12793,7 @@ $ make
 
 @subsection Creating the application
 
-Next, we need to create a project or <q>activity</q>.
+Next, we need to create a project or ``activity''.
 This tutorial assumes you want to create the project
 in the target directory @code{KawaHello},
 with the main activity being a class named @code{hello} in a

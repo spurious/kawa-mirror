@@ -1,4 +1,12 @@
-(test-begin "libs" 235)
+(test-begin "libs" 236)
+
+(test-begin "vectors")
+(test-equal #(1 2 smash smash 5)
+            (let ()
+              (define a (vector 1 2 3 4 5))
+              (vector-fill! a 'smash 2 4)
+              a))
+(test-end)
 
 (test-begin "bytevectors") ;; Some bytevector tests
 (define bytes1 (bytevector #u8(#xCE #xBB)))

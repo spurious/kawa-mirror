@@ -30,8 +30,10 @@
 (define (list->vector (x :: <list>)) :: <vector>
   (gnu.lists.FVector x))
 
-(define (vector-fill! (vec :: vector) fill) :: void
-  (vec:setAll fill))
+(define (vector-fill! (vec :: vector) fill
+                      #!optional (start ::int 0) (end ::int (vec:size)))
+  :: void
+  (vec:fill fill start end))
 
 ;;; vector-map and vector-for-each are mandated by R6RS. These
 ;;; implementations are optimized for the one-vector case, and permit

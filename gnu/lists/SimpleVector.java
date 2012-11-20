@@ -16,7 +16,7 @@ import java.util.*;
  * and have a fill pointer (the size field). */
 
 public abstract class SimpleVector<E> extends AbstractSequence<E>
-  implements Sequence<E>, Array<E>
+    implements Sequence<E>, Array<E>, RandomAccess
 {
   /** The (current) number of elements.
    * Must always have size() >= 0 && size() <= getBufferLength(). */

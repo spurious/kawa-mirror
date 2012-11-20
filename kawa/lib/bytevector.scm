@@ -14,17 +14,19 @@
 (define (bytevector-u8-set! (v ::bytevector) (i ::int) (x ::int)) ::void
   (invoke v 'setByteAt i x))
 
-(define (bytevector-copy v::bytevector) ::bytevector
-  (gnu.lists.U8Vector v))
-
-#|
-(define (bytevector-copy-partial v::bytevector start::int end::int) ::bytevector
+(define (bytevector-copy v::bytevector
+                         #!optional (start ::int 0) (end ::int (v:size)))
+  ::bytevector
   (gnu.lists.U8Vector v start (- end start)))
-|#
 
+;; FIXME
+;; (define (bytevector-append ...) ...)
+
+;; FIXME add start end
 (define (utf8->string v::bytevector) ::string
   (v:toUtf8))
 
+;; FIXME add start end
 (define (string->utf8 v::string) ::bytevector
   (gnu.lists.U8Vector
    ((v:toString):getBytes

@@ -3,6 +3,7 @@
 
 package gnu.lists;
 import java.io.*;
+import java.util.Arrays;
 
 /** Simple adjustable-length vector whose elements are Object references.
  */
@@ -170,14 +171,10 @@ public class FVector<E> extends SimpleVector<E>
   }
   */
 
-  // FIXME - bad name - setAll should take a Collection
-  public final void setAll (Object new_value)
-  {
-    checkCanWrite();
-    Object[] d = data;
-    for (int i = size; --i >= 0; )
-      d[i] = new_value;
-  }
+    public final void fill(Object new_value, int start, int end) {
+        checkCanWrite();
+        Arrays.fill(data, start, end, new_value);
+    }
 
   public boolean consumeNext(int ipos, Consumer out)
   {

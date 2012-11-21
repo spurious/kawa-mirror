@@ -1,6 +1,24 @@
-(test-begin "libs" 236)
+(test-begin "libs" 244)
 
 (test-begin "vectors")
+(test-equal '(dah dah didah)
+            (vector->list '#(dah dah didah)))
+(test-equal '(dah)
+             (vector->list '#(dah dah didah) 1 2))
+(test-equal #(dididit dah)
+            (list->vector '(dididit dah)))
+
+(test-equal #(#\A #\B #\C)
+            (string->vector "ABC"))
+(test-equal #(#\B #\C)
+            (string->vector "ABCDE" 1 3))
+(test-equal "123"
+            (vector->string #(#\1 #\2 #\3)))
+(test-equal "345"
+            (vector->string #(#\1 #\2 #\3 #\4 #\5) 2))
+(test-equal "34"
+            (vector->string #(#\1 #\2 #\3 #\4 #\5) 2 4))
+
 (test-equal #(1 2 smash smash 5)
             (let ()
               (define a (vector 1 2 3 4 5))

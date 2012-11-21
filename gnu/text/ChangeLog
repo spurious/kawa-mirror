@@ -1,3 +1,8 @@
+2012-11-20  Per Bothner  <per@bothner.com>
+
+	* Char.java (append): New static methods.
+	(print): Re-implement using append, and generalize to Appendable.
+
 2011-10-08  Charles Turner  <chturne@gmail.com>
 
 	* PrettyWriter.java (isSharing, sharing, reallySharing)

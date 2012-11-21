@@ -1,5 +1,8 @@
 2012-11-20  Per Bothner  <per@bothner.com>
 
+	* FString.java (<init>): Add constructor taking StringBuilder,
+	in addition to ones taking StringBuffer.
+
 	* FVector.java (setAll):  Rename to ...
 	(fill): and add optional range parameters.
 

@@ -45,16 +45,23 @@ public class Char
     print(value, out);
   }
 
-  public static void print (int i, Consumer out)
-  {
-    if (i >= 0x10000)
-      {
-        out.write((char) (((i - 0x10000) >> 10) + 0xD800));
-        out.write((char) ((i & 0x3FF) + 0xDC00));
-      }
-    else
-      out.write((char) i);
-  }
+    public static void print(int i, Appendable out) {
+        try {
+            append(i, out);
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+                
+    }
+
+    public static void append(int i, Appendable out) throws IOException {
+        if (i >= 0x10000) {
+            out.append((char) (((i - 0x10000) >> 10) + 0xD800));
+            out.append((char) ((i & 0x3FF) + 0xDC00));
+        }
+        else
+            out.append((char) i);
+    }
 
   public final char charValue ()
   {

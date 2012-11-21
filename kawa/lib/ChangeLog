@@ -1,5 +1,8 @@
 2012-11-20  Per Bothner  <per@bothner.com>
 
+	* vectors.scm (vector->list): Add optional bounds, as in R7RS.
+	(vector->string, string->vector): New functions.
+
 	* bytevector.scm: Renamed file to ...
 	* bytevectors.scm: ... for compatibility with other names.
 	* Makefile.am: Update accordingly.

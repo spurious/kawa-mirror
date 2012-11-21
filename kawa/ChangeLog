@@ -1,5 +1,8 @@
 2012-11-20  Per Bothner  <per@bothner.com>
 
+	* standard/Scheme.scm (initScheme): Add vector->string
+	and string->vector.
+
 	* standard/Scheme.scm: Update classname for bytevector functions.
 
 2012-11-06  Per Bothner  <per@bothner.com>

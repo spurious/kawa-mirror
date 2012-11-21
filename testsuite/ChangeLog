@@ -1,5 +1,7 @@
 2012-11-20  Per Bothner  <per@bothner.com>
 
+	* lib-test.scm: SOme more tests of vector functions.
+
 	* lib-test.scm: Add a vector-fill! test
 
 2012-11-18  Per Bothner  <per@bothner.com>

@@ -56,18 +56,27 @@ public class FString extends SimpleVector
     size = data.length;
   }
 
-  public FString (StringBuffer buffer)
-  {
-    this(buffer, 0, buffer.length());
-  }
+    public FString (StringBuilder buffer) {
+        this(buffer, 0, buffer.length());
+    }
 
-  public FString (StringBuffer buffer, int offset, int length)
-  {
-    this.size = length;
-    data = new char[length];
-    if (length > 0)
-      buffer.getChars (offset, offset+length, data, 0);
-  }
+    public FString (StringBuilder buffer, int offset, int length) {
+        this.size = length;
+        data = new char[length];
+        if (length > 0)
+            buffer.getChars(offset, offset+length, data, 0);
+    }
+
+    public FString (StringBuffer buffer) {
+        this(buffer, 0, buffer.length());
+    }
+
+    public FString (StringBuffer buffer, int offset, int length) {
+        this.size = length;
+        data = new char[length];
+        if (length > 0)
+            buffer.getChars (offset, offset+length, data, 0);
+    }
 
   public FString (char[] buffer, int offset, int length)
   {

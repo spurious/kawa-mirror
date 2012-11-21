@@ -19,16 +19,44 @@
       (invoke vector 'get k))
     vector-ref))
 
-(define (vector->list (vec :: <vector>)) :: <list>
+(define (vector->list (vec :: <vector>)
+                      #!optional (start ::int 0) (end ::int (vec:size)))
+                      :: <list>
   (let loop ((result :: <list> '())
-	     (i :: <int> (vector-length vec)))
+	     (i ::int end))
     (set! i (- i 1))
-    (if (< i 0)
+    (if (< i start)
 	result
 	(loop (cons (vector-ref vec i) result) i))))
 
 (define (list->vector (x :: <list>)) :: <vector>
   (gnu.lists.FVector x))
+
+(define (vector->string (vec ::vector)
+                        #!optional (start ::int 0) (end ::int (vec:size)))
+  ::string
+  (let loop ((result ::java.lang.StringBuilder (java.lang.StringBuilder))
+	     (i ::int start))
+    (if (>= i end)
+	(gnu.lists.FString result)
+        (let ((ch (vector-ref vec i)))
+          (if (java.lang.Character? ch)
+              (result:append ((as java.lang.Character ch):charValue))
+              (gnu.text.Char:print ((as gnu.text.Char ch):intValue) result))
+          (loop result (+ i 1))))))
+
+(define (string->vector (str ::string)
+                        #!optional (start ::int 0) (end ::int (str:length)))
+  ::vector
+  (let loop ((result ::Object[] (Object[] length: (- end start)))
+	     (i ::int start)
+             (j ::int 0))
+    (if (>= i end)
+	(gnu.lists.FVector result)
+        ;; FIXME not handling surrogates.
+        (let ((ch ::char (str:charAt i)))
+          (set! (result j) ch)
+          (loop result (+ i 1) (+ j 1))))))
 
 (define (vector-fill! (vec :: vector) fill
                       #!optional (start ::int 0) (end ::int (vec:size)))

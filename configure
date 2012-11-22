@@ -4561,8 +4561,14 @@ case ${with_javafx} in
   no) ;;
   "") ;;
   *)
-    test '!' -f "${with_javafx}" -a -f "${with_javafx}/rt/lib/jfxrt.jar" \
-      && with_javafx="${with_javafx}/rt/lib/jfxrt.jar"
+    if test -f "${with_javafx}" ; then true
+    elif test -f "${with_javafx}/rt/lib/jfxrt.jar"
+    then with_javafx="${with_javafx}/rt/lib/jfxrt.jar"
+    elif test -f "${with_javafx}/lib/jfxrt.jar"
+    then with_javafx="${with_javafx}/lib/jfxrt.jar"
+    elif test -f "${with_javafx}/jre/lib/jfxrt.jar"
+    then with_javafx="${with_javafx}/jre/lib/jfxrt.jar"
+    fi
     conf_classpath=${with_javafx}${CLASSPATH_SEPARATOR}$conf_classpath ;;
 esac
 case ${with_android} in

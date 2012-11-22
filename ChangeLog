@@ -1,5 +1,7 @@
 2012-11-21  Per Bothner  <per@bothner.com>
 
+	* configure.in: Try harder to find jfxrt.jar.
+
 	* Makefile.am (+DISTCLEANFILES): New macro - add selected-java-source.
 	(selected-java-source, set-selected-java-source): Change
 	selected-java-source to be in current directory, not srcdir.

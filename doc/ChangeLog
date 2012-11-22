@@ -1,5 +1,7 @@
 2012-11-21  Per Bothner  <per@bothner.com>
 
+	* kawa.texi (stxlitrbrace): New macro.  Needed in tex mode.
+
 	* kawa.texi (Sequences): New section.
 	(Data structures): Re-order some sections.
 	(Vectors): Document begin-end bounds as appropriate plus other tweaks.

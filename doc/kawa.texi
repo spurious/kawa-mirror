@@ -51,6 +51,9 @@
 @macro stxlitlbrace
 @t{@b{@{}}
 @end macro
+@macro stxlitrbrace
+@t{@b{@}}}
+@end macro
 @macro stxlitat
 @t{@b{@@}}
 @end macro
@@ -11685,7 +11688,7 @@ comments, and CDATA section) we'll cover later.
 @stxdef{xml-name-form} @stxref{QName}
   | @stxref{xml-enclosed-expression}
 @stxdef{xml-enclosed-expression}
-    @stxlitlbrace{}@stxref{expression}@stxlit{@}}
+    @stxlitlbrace{}@stxref{expression}@stxlitrbrace{}
   | @stxlit{(}@stxref{expression}...@stxlit{)}
 @end display
 

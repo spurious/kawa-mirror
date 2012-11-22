@@ -119,10 +119,11 @@ END-INFO-DIR-ENTRY
 @c and includes a full implementation of XQuery and the beginnings of
 @c implementations of Common Lisp and Emacs Lisp (JEmacs).
 
-Kawa is an implementation of @uref{http://www.schemers.org/,Scheme}, which
+Kawa is a programming language for the Java platform.
+It is an implementation of @uref{http://www.schemers.org/,Scheme}, which,
 is in the Lisp family of programming languages.
-Kawa is a featureful dialect in its own right,
-and additionally provides very useful integration with Java.
+Kawa has many @ref{Features,useful features},
+including convenient integration with Java.
 It can be used as a ``scripting language'', but includes a compiler
 and all the benefits of a ``real'' programming language, including
 optional static typing, so Kawa programs can be as efficient as Java.
@@ -5766,6 +5767,15 @@ returns no values.
   @result{}  @i{error}    ;; constant vector
 @end example
 @end deffn
+
+A concise alternative to @code{vector-ref} and @code{vector-set!}
+is to use function call syntax.  For example:
+@example
+(let ((vec (vector 0 '(2 2 2 2) "Anna")))
+  (set! (vec 1) '("Sue" "Sue"))
+  (list (vec 2) (vec 1)))
+  @result{}  ("Anna" ("Sue" "Sue"))
+@end example
 
 @deffn Procedure vector->list @var{vector} [@var{start} [@var{end}]]
 The @func{vector->list} procedure returns a newly allocated list of the

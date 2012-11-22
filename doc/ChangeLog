@@ -1,3 +1,9 @@
+2012-11-22  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Top): Re-phrase initial paragraph.
+
+	* kawa.texi (Vectors): Mention function call syntax.
+
 2012-11-21  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (stxlitrbrace): New macro.  Needed in tex mode.

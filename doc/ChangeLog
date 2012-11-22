@@ -1,3 +1,9 @@
+2012-11-21  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Sequences): New section.
+	(Data structures): Re-order some sections.
+	(Vectors): Document begin-end bounds as appropriate plus other tweaks.
+
 2012-11-20  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Restrictions): Renamed node to ...

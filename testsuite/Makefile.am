@@ -596,7 +596,7 @@ EXTRA_DIST = testing.scm test.scm num-test.scm mac-test.scm mac1.scm \
   classes1.scm classes2.scm SimpleB.java obj-test.scm arr-test.scm \
   lib-test.scm srfi-38-test.scm srfi-64-test.scm srfi-69-test.scm \
   text-test.scm regex-test.scm java-array-test.scm lazy-test.scm \
-  jmc.scm sva31180.scm use-slots.scm ASupport.scm Base.java \
+  jmc.scm jmc.expected sva31180.scm use-slots.scm ASupport.scm Base.java \
   MyFunc.java MyModule.java MyDate.java MyTimestamp.java \
   misc-test.scm polytype.scm formatst.scm scribble.scm moduleFT.scm \
   module0.scm module1.scm module1a.scm module2.scm module3.scm included-1.scm \

@@ -1,3 +1,7 @@
+2012-11-21  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (EXTRA_DIST): Add jmc.expected.
+
 2012-11-20  Per Bothner  <per@bothner.com>
 
 	* lib-test.scm: SOme more tests of vector functions.

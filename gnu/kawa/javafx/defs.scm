@@ -32,7 +32,7 @@
   ((javafx-application)
    #`(begin
        (module-extends KawaJavafxApplication)
-       (define (#,(datum->object #'javafx-application 'javafx-stage))::javafx.stage.Stage ;; FIXME
+       (define (#,(datum->syntax #'javafx-application 'javafx-stage))::javafx.stage.Stage ;; FIXME
          (this):*stage*))))
 
 (require gnu.kawa.javafx.MakeScene)
@@ -40,10 +40,10 @@
 (define-syntax-case javafx-scene (javafx-stage)
   ((javafx-scene . args)
    #`(let* ((builder (MakeScene . args))
-            (stage (#,(datum->syntax-object #'javafx-scene 'javafx-stage)))
+            (stage (#,(datum->syntax #'javafx-scene 'javafx-stage)))
             (scene (builder:build))
             (title builder:title))
-       (invoke (#,(datum->syntax-object #'javafx-scene 'javafx-stage)) 'setScene scene)
+       (invoke (#,(datum->syntax #'javafx-scene 'javafx-stage)) 'setScene scene)
        (if (not (eq? title #!null))
            (set! stage:title title))
        (invoke stage 'show)

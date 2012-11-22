@@ -1,3 +1,8 @@
+2012-11-21  Per Bothner  <per@bothner.com>
+
+	* defs.scm: Fix typo datum->object to datum->syntax/
+	Update datum->syntax-object -> datum->syntax two more places.
+
 2012-11-19  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (EXTRA_DIST): Remove - not needed.

@@ -119,6 +119,7 @@ EXTRA_DIST = debian/control debian/rules debian/changelog debian/dirs \
 
 MOSTLYCLEANFILES = tmp *.o kawa1$(exeext) *.stamp classes.list classes-rt.list
 CLEANFILES = *.jar kawa/Version.java $(META_ScriptEngineFactory)
+DISTCLEANFILES = selected-java-source
 
 HTML_HOME = $$HOME/public_html
 JAVADOC_DIR = $$HOME/Kawa/api
@@ -224,7 +225,7 @@ PREPROCESS_XML = -enable:XML
 endif
 
 selected-java-source: Makefile
-	@java_source=`cat $(srcdir)/selected-java-source 2>/dev/null || echo none`; \
+	@java_source=`cat selected-java-source 2>/dev/null || echo none`; \
 	if test "$$java_source" = "$(JAVA_SOURCE)"; \
 	then echo current java-source is ok; \
 	elif test "$(JAVA_SOURCE)" = 1; \
@@ -304,9 +305,9 @@ do-preprocess:
 	$(MAKE) set-selected-java-source JAVA_SOURCE=$(JAVA_SOURCE)
 
 set-selected-java-source:
-	if test ! -e $(srcdir)/selected-java-source || \
-	   test "$(JAVA_SOURCE)" != "`cat $(srcdir)/selected-java-source`"; \
-	   then echo "$(JAVA_SOURCE)" >$(srcdir)/selected-java-source; \
+	if test ! -e selected-java-source || \
+	   test "$(JAVA_SOURCE)" != "`cat selected-java-source`"; \
+	   then echo "$(JAVA_SOURCE)" >selected-java-source; \
 	fi
 
 distall:  distcheck dist-kawa-@VERSION@.jar kawa-doc-$(VERSION).tar.gz

@@ -1,3 +1,9 @@
+2012-11-21  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (+DISTCLEANFILES): New macro - add selected-java-source.
+	(selected-java-source, set-selected-java-source): Change
+	selected-java-source to be in current directory, not srcdir.
+
 2012-07-28  Per Bothner  <per@bothner.com>
 
 	* configure.in: Don't default to with-httpserver or Java6
@@ -182,7 +188,7 @@ con2012-05-30  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (select-java7, selected-java-source):
 	Add missing jdk7 support.
-	* configure.in: Map --with-jave-source to JAVA_SOURCE=7 - not 6.
+	* configure.in: Map --with-java-source to JAVA_SOURCE=7 - not 6.
 
 2010-08-27  Per Bothner  <per@bothner.com>
 

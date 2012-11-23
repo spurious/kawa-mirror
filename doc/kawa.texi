@@ -8296,6 +8296,24 @@ this will be fixed in a future release (using Java2 features).
 @node Ports, Format, Files, Input-Output
 @section Ports
 
+Ports represent input and output devices.
+An input port is a Scheme object that can deliver data upon
+command, while an output port is a Scheme object that can
+accept data.  These are disjoint types in Kawa.
+
+@deffn Procedure open-input-file string
+@end deffn
+
+@deffn Procedure open-output-file string
+@deffnx Procedure open-binary-output-file string
+Takes a string naming an output file to be created and returns
+respectively a textual output port or binary output port that is
+capable of writing data to a new file by that name. If a
+file with the given name already exists, the effect is unspecified.
+@c If the file cannot be opened, an error that satisfies
+@c file-error? is signaled.
+@end deffn
+
 @deffn Procedure current-error-port
 Return the port to which errors and warnings should be sent
 (the @dfn{standard error} in Unix and C terminology).
@@ -8331,7 +8349,7 @@ garbage collector if it becomes inaccessible.
 @end deffn
 
 @deffn Procedure open-output-string
-Returns an output port that will accumulate characters
+Returns an textual output port that will accumulate characters
 for retrieval by @code{get-output-string}.
 The port can be closed by the procedure @code{close-output-port},
 though its storage will be reclaimed by the garbage collector
@@ -8351,6 +8369,17 @@ returns a string consisting of the characters that have been
 output to the port so far. 
 @end deffn
 
+@deffn Procedure open-output-bytevector
+Returns a binary output port that will accumulate bytes
+for retrieval by @code{get-output-bytevector}.
+@end deffn
+
+@deffn Procedure get-output-bytevector port
+Returns a bytevector consisting of the bytes that have been
+output to the port so far in the order they were output.
+It is an error if @var{port} was not created with @code{open-output-bytevector}.
+@end deffn
+
 @deffn Procedure call-with-input-string string proc
 Create an input port that gets its data from @var{string},
 call @var{proc} with that port as its one argument, and return
@@ -8363,11 +8392,60 @@ and call @var{proc} with that port as its one argument.
 Return a string consisting of the data written to the port.
 @end deffn
 
-@deffn Procedure force-output [port]
-Forces any pending output on @var{port} to be delivered to the output
+@subsection Output
+
+If @var{port} is omitted from any output procedure, it defaults
+to the value returned by @code{(current-output-port)}. It is an
+error to attempt an output operation on a closed port.
+
+The return type of these methods is @code{void}.
+
+@deffn Procedure write obj [port]
+Writes a representation of @var{obj} to the given textual output
+@var{port}. Strings that appear in the written representation
+are enclosed in quotation marks, and within those strings
+backslash and quotation mark characters are escaped by
+backslashes. Symbols that contain non-ASCII characters
+are escaped with vertical lines.
+Character objects are written using the @code{#\} notation.
+@end deffn
+
+@deffn Procedure newline [port]
+Writes an end of line to textual output @var{port}.
+This is done using the @code{println} method
+of the Java class @code{java.io.PrintWriter}.
+@end deffn
+
+@deffn Procedure write-char char [port]
+Writes the character @var{char} (not an external representation
+of the character) to the given textual output @var{port}.
+@end deffn
+
+@deffn Procedure write-string string [port [start [end]]]
+Writes the characters of @var{string} from @var{start} to @var{end}
+in left-to-right order to the textual output @var{port}.
+@end deffn
+
+@deffn Procedure write-u8 byte [port]
+Writes the @var{byte} to the given binary output port.
+@end deffn
+
+@deffn Procedure write-bytevector bytevector [port [start [end]]]
+Writes the bytes of @var{bytevector} from @var{start} to @var{end}
+in left-to-right order to the binary output @var{port}.
+@end deffn
+
+@deffn Procedure flush-output-port [port]
+@deffnx Procedure force-output [port]
+Forces any pending output on @var{port} to be delivered to the output file or
 device and returns an unspecified value.  If the @var{port} argument is
 omitted it defaults to the value returned by @code{(current-output-port)}.
+(The name @code{force-output} is older,
+while R6RS added @code{flush-output-port}. They have the same effect.)
 @end deffn
+
+
+@subsection Miscellaeous
 
 An interactive input port has a prompt procedure associated with it.
 The prompt procedure is called before a new line is read.  It is passed

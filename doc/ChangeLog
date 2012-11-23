@@ -1,5 +1,8 @@
 2012-11-22  Per Bothner  <per@bothner.com>
 
+	* kawa.texi (Ports): Add documentation, mostly from R7RS.
+	(Output): New subsection.
+
 	* Makefile.am: When generating html, specify --no-node-files.
 
 	* kawa.texi (Top): Re-phrase initial paragraph.

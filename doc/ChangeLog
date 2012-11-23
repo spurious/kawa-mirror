@@ -1,5 +1,7 @@
 2012-11-22  Per Bothner  <per@bothner.com>
 
+	* Makefile.am: When generating html, specify --no-node-files.
+
 	* kawa.texi (Top): Re-phrase initial paragraph.
 
 	* kawa.texi (Vectors): Mention function call syntax.

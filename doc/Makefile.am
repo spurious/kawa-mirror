@@ -10,7 +10,7 @@ kawa.txt:  $(srcdir)/kawa.texi version.texi
 KAWA_HTMLDIR = kawa-html
 KAWA_HTMLS = $(KAWA_HTMLDIR)/index.html
 $(KAWA_HTMLS):  $(srcdir)/kawa.texi version.texi
-	$(MAKEINFO) -I$(srcdir) --html $< -o $(KAWA_HTMLDIR)
+	$(MAKEINFO) -I$(srcdir) --html --no-node-files $< -o $(KAWA_HTMLDIR)
 HTMLS = $(KAWA_HTMLS)
 
 html: $(KAWA_HTMLS)

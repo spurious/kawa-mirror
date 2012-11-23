@@ -436,6 +436,7 @@ public class Scheme extends LispLanguage
       defProcStFld("with-output-to-file", "kawa.lib.ports");
       defProcStFld("open-input-file", "kawa.lib.ports");
       defProcStFld("open-output-file", "kawa.lib.ports");
+      defProcStFld("open-binary-output-file", "kawa.lib.ports");
       defProcStFld("close-input-port", "kawa.lib.ports");
       defProcStFld("close-output-port", "kawa.lib.ports");
       defProcStFld("read", "kawa.lib.ports");
@@ -449,6 +450,9 @@ public class Scheme extends LispLanguage
       defProcStFld("display", "kawa.lib.ports");
       defProcStFld("print-as-xml", "gnu.xquery.lang.XQuery", "writeFormat");
       defProcStFld("write-char", "kawa.lib.ports");
+      defProcStFld("write-string", "kawa.lib.ports");
+      defProcStFld("write-u8", "kawa.lib.ports");
+      defProcStFld("write-bytevector", "kawa.lib.ports");
       defProcStFld("newline", "kawa.lib.ports");
       defProcStFld("load", "kawa.standard.load", "load");
       defProcStFld("load-relative", "kawa.standard.load", "loadRelative");
@@ -458,7 +462,10 @@ public class Scheme extends LispLanguage
       defProcStFld("open-input-string", "kawa.lib.ports");  // SRFI-6
       defProcStFld("open-output-string", "kawa.lib.ports");  // SRFI-6
       defProcStFld("get-output-string", "kawa.lib.ports");  // SRFI-6
+      defProcStFld("open-output-bytevector", "kawa.lib.ports");
+      defProcStFld("get-output-bytevector", "kawa.lib.ports");
       defProcStFld("call-with-output-string", "kawa.lib.ports"); // Extension
+      defProcStFld("flush-output-port", "kawa.lib.ports");  // R6RS/R7RS
       defProcStFld("force-output", "kawa.lib.ports");  // Extension
 
       defProcStFld("port-line", "kawa.lib.ports");

@@ -11,6 +11,9 @@
 (define (open-output-file (name :: path)) :: <output-port>
   (invoke-static <output-port> 'openFile name))
 
+(define (open-binary-output-file (name ::path)) ::gnu.mapping.BinaryOutputPort
+  (gnu.mapping.BinaryOutPort:openFile name))
+
 (define (call-with-input-file (path :: path) (proc :: <procedure>))
  (let ((port :: <input-port> (open-input-file path)))
     (try-finally
@@ -64,6 +67,26 @@
   :: <void>
   (gnu.text.Char:print (char->integer ch) port))
 
+(define (write-string (str ::string)
+                      #!optional
+                      (port ::java.lang.Appendable (current-output-port))
+                      (start ::int 0)
+                      (end ::int (str:length)))
+  ::void
+  (port:append str start end))
+
+(define (write-u8 byte::int #!optional (port (current-output-port))) ::void
+  ((gnu.mapping.BinaryOutPort:asOutputStream port):write byte))
+
+(define (write-bytevector (bytes ::bytevector)
+                          #!optional
+                          (port (current-output-port))
+                          (start ::int 0)
+                          (end ::int (bytes:size)))
+  ::void
+  (bytes:writeTo start (- end start)
+                 (gnu.mapping.BinaryOutPort:asOutputStream port)))
+
 ;; SRFI-6
 (define (open-input-string (str ::string)) ::string-input-port
   (gnu.mapping.CharArrayInPort str))
@@ -73,6 +96,15 @@
 
 (define (get-output-string (output-port  <string-output-port>))
   (<gnu.lists.FString> (output-port:toCharArray)))
+
+(define (open-output-bytevector) ::gnu.mapping.BinaryOutPort
+  (let* ((bo (java.io.ByteArrayOutputStream))
+         (out (gnu.mapping.BinaryOutPort bo "<bytevector>")))
+        out))
+
+(define (get-output-bytevector port::gnu.mapping.BinaryOutPort) ::bytevector
+  (let ((bo ::java.io.ByteArrayOutputStream (port:getOutputStream)))
+    (gnu.lists.U8Vector (bo:toByteArray))))
 
 (define (call-with-input-string (str :: <string>) (proc :: <procedure>))
   (let* ((port ::string-input-port (gnu.mapping.CharArrayInPort str))
@@ -88,9 +120,15 @@
       (invoke port 'close)
       (make <gnu.lists.FString> chars))))
 
+(define (flush-output-port #!optional (port (current-output-port))) ::void
+  (if (java.io.OutputStream? port)
+      ((as java.io.OutputStream port):flush)
+      ((as java.io.Writer port):flush)))
+
 (define (force-output #!optional (port (current-output-port)))
-  ((primitive-virtual-method <java.io.Writer> "flush" <void> ())
-   port))
+  (if (java.io.OutputStream? port)
+      ((as java.io.OutputStream port):flush)
+      ((as java.io.Writer port):flush)))
 
 (define (newline #!optional (port (current-output-port)))
   ((primitive-virtual-method <output-port> "println"

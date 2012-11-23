@@ -122,31 +122,29 @@ public class OutPort extends PrintConsumer implements Printable
     errLocation.set(e);
   }
 
-  public PrettyWriter getPrettyWriter ()
-  {
-    return bout;
-  }
+    public PrettyWriter getPrettyWriter() {
+        return bout;
+    }
 
-  public static OutPort openFile(Object fname)
-    throws java.io.IOException
-  {
-      Object conv = Environment.user().get("port-char-encoding");
-      Path path = Path.valueOf(fname);
-      java.io.OutputStream strm = path.openOutputStream();
-      strm = new java.io.BufferedOutputStream(strm);
-      java.io.Writer wr;
-      if (conv == null || conv == Boolean.TRUE)
-	wr = new java.io.OutputStreamWriter(strm);
-      else
-	{
-	  if (conv == Boolean.FALSE)
-	    conv = "8859_1";
-	  wr = new java.io.OutputStreamWriter(strm, conv.toString());
-	}
-      OutPort op = new OutPort(wr, path);
-      op.finalizeAction = CLOSE_ON_FINALIZE;
-      return op;
-  }
+    public static OutPort openFile(Object fname)
+        throws java.io.IOException {
+        return openFile(fname, Environment.user().get("port-char-encoding"));
+    }
+
+    public static OutPort openFile(Object fname, Object conv)
+        throws java.io.IOException {
+        Path path = Path.valueOf(fname);
+        java.io.OutputStream strm = path.openOutputStream();
+        strm = new java.io.BufferedOutputStream(strm);
+        OutPort op = conv == Boolean.FALSE
+            ? new BinaryOutPort(strm, path)
+            : new OutPort(conv == null || conv == Boolean.TRUE
+                          ? new OutputStreamWriter(strm)
+                          : new OutputStreamWriter(strm, conv.toString()),
+                          path);
+        op.finalizeAction = CLOSE_ON_FINALIZE;
+        return op;
+    }
 
   public void echo (char[] buf, int off, int len)  throws java.io.IOException
   {

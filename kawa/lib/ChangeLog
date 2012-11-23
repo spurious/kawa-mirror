@@ -1,4 +1,10 @@
-2012-11-20  Per Bothner  <per@bothner.com>
+2012-11-22  Per Bothner  <per@bothner.com>
+
+	* ports.scm (open-binary-output-file, write-string, write-u8,
+	write-bytevector, open-output-bytevector, get-output-bytevector,
+	flush-output-port): New R7RS output functions.
+
+(2012-11-20  Per Bothner  <per@bothner.com>
 
 	* vectors.scm (vector->list): Add optional bounds, as in R7RS.
 	(vector->string, string->vector): New functions.

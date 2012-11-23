@@ -1,3 +1,7 @@
+2012-11-22  Per Bothner  <per@bothner.com>
+
+	* U8Vector.java (writeTo): New method.
+
 2012-11-20  Per Bothner  <per@bothner.com>
 
 	* FString.java (<init>): Add constructor taking StringBuilder,

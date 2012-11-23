@@ -1,3 +1,9 @@
+2012-11-22  Per Bothner  <per@bothner.com>
+
+	* standard/Scheme.scm (initScheme): Add R7RS output functions
+	open-binary-output-file, write-string, write-u8, write-bytevector,
+	open-output-bytevector, get-output-bytevector, and flush-output-port.
+
 2012-11-20  Per Bothner  <per@bothner.com>
 
 	* standard/Scheme.scm (initScheme): Add vector->string

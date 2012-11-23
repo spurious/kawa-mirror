@@ -93,6 +93,11 @@ public class U8Vector extends ByteVector
     return compareToInt(this, (U8Vector) obj);
   }
 
+    public void writeTo(int start, int count, OutputStream out)
+        throws IOException {
+        out.write(data, start, count);
+    }
+
   /** Covert bytes, interpreted as UTF-8 characters, to a String. */
   public String toUtf8() 
   {

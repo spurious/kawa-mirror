@@ -3,6 +3,7 @@
 include $(top_srcdir)/Make-rules
 
 java_sources=\
+  BinaryOutPort.java \
   CallContext.java \
   ConstrainedLocation.java \
   Environment.java \

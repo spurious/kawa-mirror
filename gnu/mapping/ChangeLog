@@ -1,3 +1,10 @@
+2012-11-22  Per Bothner  <per@bothner.com>
+
+	* BinaryOutPort.java: New class, extends OutPort.
+	* Makefile.am: Update accordingly.
+	* OutPort.java (openFile): New overload.
+	Return BinaryOutPort if conv is FALSE.
+
 2012-07-02  Per Bothner  <per@bothner.com>
 
 	* Namespace.java: Reimplement to extend AbstractHashTable - and

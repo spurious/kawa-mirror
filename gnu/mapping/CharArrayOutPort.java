@@ -59,7 +59,7 @@ public class CharArrayOutPort extends OutPort
   /** Returns the written data as a new {@code String}. */
   public String toString ()
   {
-    return new String(bout.buffer, 0, bout.bufferFillPointer);
+    return toSubString(0);
   }
 
   /** Returns a substring of the written data as a new {@code String}.
@@ -85,7 +85,7 @@ public class CharArrayOutPort extends OutPort
 
   public void writeTo (Consumer out)
   {
-    out.write(bout.buffer, 0, bout.bufferFillPointer);
+    writeTo(0, bout.bufferFillPointer, out);
   }
 
   public void writeTo (int start, int count, Consumer out)

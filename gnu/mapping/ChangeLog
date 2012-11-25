@@ -1,3 +1,8 @@
+2012-11-24  Per Bothner  <per@bothner.com>
+
+	* CharArrayOutPort.java (writeTo(Consumer)): Call 3-parameter writeTo.
+	(toString): Implement using toSubString.
+
 2012-11-22  Per Bothner  <per@bothner.com>
 
 	* BinaryOutPort.java: New class, extends OutPort.

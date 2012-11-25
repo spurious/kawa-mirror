@@ -345,6 +345,7 @@ public class OutPort extends PrintConsumer implements Printable
       println();
   }
 
+  /** Get zero-based column number or -1 for unknown. */
   public int getColumnNumber ()
   {
     return bout.getColumnNumber();
@@ -354,6 +355,10 @@ public class OutPort extends PrintConsumer implements Printable
   {
     bout.setColumnNumber(column);
   }
+
+    void flushBuffer() {
+        bout.forcePrettyOutput();
+    }
 
   public void clearBuffer ()
   {

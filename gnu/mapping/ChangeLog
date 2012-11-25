@@ -1,5 +1,9 @@
 2012-11-24  Per Bothner  <per@bothner.com>
 
+	* OutPort.java (flushBuffer): New method.
+	* BinaryOutPort.java: Call flushBuffer is appropriate.
+	(writeByte, writeBytes, getColumnNumber): New methods.
+
 	* CharArrayOutPort.java (writeTo(Consumer)): Call 3-parameter writeTo.
 	(toString): Implement using toSubString.
 

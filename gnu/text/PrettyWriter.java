@@ -82,7 +82,7 @@ public class PrettyWriter extends java.io.Writer
   public PrettyWriter(java.io.Writer out)
   {
     this.out = out;
-    prettyPrintingMode = 1;
+    setPrettyPrintingMode(1);
   }
 
   /**
@@ -98,7 +98,7 @@ public class PrettyWriter extends java.io.Writer
   {
     this.out = out;
     this.lineLength = lineLength;
-    prettyPrintingMode = lineLength > 1 ? 1 : 0;
+    setPrettyPrintingMode(lineLength > 1 ? 1 : 0);
   }
 
   /**
@@ -110,7 +110,7 @@ public class PrettyWriter extends java.io.Writer
   public PrettyWriter(java.io.Writer out, boolean prettyPrintingMode)
   {
     this.out = out;
-    this.prettyPrintingMode = prettyPrintingMode ? 1 : 0;
+    setPrettyPrintingMode(prettyPrintingMode ? 1 : 0);
   }
 
   /** Line length we should format to. */
@@ -161,7 +161,7 @@ public class PrettyWriter extends java.io.Writer
 
   /** The current pretty-printing mode.
    * See setPrettyPrintingMode for valid values. */
-  int prettyPrintingMode;
+  private int prettyPrintingMode;
   
   private IntHashTable idhash;
 
@@ -191,14 +191,21 @@ public class PrettyWriter extends java.io.Writer
 
   /** Control pretty-printing mode.
    * @param mode the value 0 disables pretty-printing;
-   *   the value 1 enables ecplicit pretty-printing;
+   *   the value 1 enables explicit pretty-printing;
    *   the value 2 enables pretty-printing with auto-fill, which means that
    *   spaces are treated like enqueing NEWLINE_SPACE (essentiall a 'fill').
    */
-  public void setPrettyPrintingMode (int mode)
-  { prettyPrintingMode = mode; }
+    public void setPrettyPrintingMode (int mode) {
+        if (mode > 0)
+            ensureSpaceInBuffer(initialBufferSize);
+        prettyPrintingMode = mode;
+    }
 
-  public void setSharing (boolean sharing) {this.sharing = sharing; }
+    public void setSharing (boolean sharing) {
+        if (sharing)
+            ensureSpaceInBuffer(initialBufferSize);
+        this.sharing = sharing;
+    }
 
   /** Return pretty-printing mode.
    * @return 0, 1, 2, as described for {@link #setPrettyPrintingMode(int)}.
@@ -213,13 +220,18 @@ public class PrettyWriter extends java.io.Writer
    */
   public void setPrettyPrinting (boolean mode)
   {
-    prettyPrintingMode = mode ? 0 : 1;
+    setPrettyPrintingMode(mode ? 0 : 1);
   }
+
+    /** Should we write directly to out without using buffer? */
+    private boolean isPassingThrough() {
+        return buffer.length == 0 && out != null;
+    }
 
   public static int initialBufferSize = 126;
 
   /** Holds all the text that has been output but not yet printed. */
-  public /* FIXME */ char[] buffer = new char[initialBufferSize];
+  public /* FIXME */ char[] buffer = new char[0];
 
   /** The index into BUFFER where more text should be put. */
   public /* FIXME */ int bufferFillPointer;
@@ -558,7 +570,12 @@ public class PrettyWriter extends java.io.Writer
   {
     wordEndSeen = false;
     //log("{WRITE-ch: "+((char)ch)+"}");
-    if (ch == '\n' && prettyPrintingMode > 0)
+    if (isPassingThrough()) {
+        if (ch == '\n' || ch == '\r')
+            bufferStartColumn = 0;
+        writeToBase(ch);
+    }
+    else if (ch == '\n' && prettyPrintingMode > 0)
       enqueueNewline(NEWLINE_LITERAL);
     else
       {
@@ -588,6 +605,21 @@ public class PrettyWriter extends java.io.Writer
   {
     wordEndSeen = false;
     //log("{WRITE-str: "+str.substring(start, start+count)+"}");
+    if (isPassingThrough()) {
+        for (int i = count; ; ) {
+            if (--i < 0) {
+                bufferStartColumn += count;
+                break;
+            }
+            char ch = str.charAt(start+i);
+            if (ch == '\r' || ch == '\n') {
+                bufferStartColumn = count - (i + 1);
+                break;
+            }
+        }
+        writeToBase(str, start, count);
+        return;
+    }
     while (count > 0)
       {
 	int cnt = count;
@@ -630,6 +662,21 @@ public class PrettyWriter extends java.io.Writer
   {
     wordEndSeen = false;
     //log("{WRITE: "+new String(str, start, count)+"}");
+    if (isPassingThrough()) {
+        for (int i = count; ; ) {
+            if (--i < 0) {
+                bufferStartColumn += count;
+                break;
+            }
+            char ch = str[start+i];
+            if (ch == '\r' || ch == '\n') {
+                bufferStartColumn = count - (i + 1);
+                break;
+            }
+        }
+        writeToBase(str, start, count);
+        return;
+    }
     int end = start + count;
   retry:
     while (count > 0)
@@ -665,6 +712,33 @@ public class PrettyWriter extends java.io.Writer
 	  }
       }
   }
+
+    private void writeToBase(char[] buf, int start, int count) {
+        try {
+            out.write(buf, start, count);
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        } 
+    }
+    
+    private void writeToBase(String str, int start, int count) {
+        try {
+            out.write(str, start, count);
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        } 
+    }
+
+    private void writeToBase(String str) {
+        writeToBase(str, 0, str.length());
+    }
+    private void writeToBase(int ch) {
+        try {
+            out.write(ch);
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        } 
+    }
 
   /**
    * A position marker is queued for every Scheme object that *could* refer
@@ -954,7 +1028,7 @@ public class PrettyWriter extends java.io.Writer
    * when the current buffer cannot fit on one line.
    * @param kind The type of newline to enqueue
    */
-  public void enqueueNewline (int kind)
+  private void enqueueNewline (int kind)
   {
     wordEndSeen = false;
     int depth = pendingBlocksCount;
@@ -1356,17 +1430,10 @@ public class PrettyWriter extends java.io.Writer
 	    if (cond)
 	      {
 		outputAnything = true;
-		try
-		  {
-                    if (flushing && fits == 0)
-                      outputPartialLine();
-                    else
-                      outputLine(next);
-		  }
-		catch (IOException ex)
-		  {
-		    throw new RuntimeException(ex);
-		  }
+		if (flushing && fits == 0)
+                  outputPartialLine();
+                else
+                  outputLine(next);
 	      }
 	    break;
 	  case QITEM_INDENTATION_TYPE:
@@ -1481,7 +1548,7 @@ public class PrettyWriter extends java.io.Writer
   /** Output a new line.
    * @param newline index of a newline queue item
    */
-  void outputLine (int newline)  throws IOException
+  void outputLine (int newline)
   {
     char[] buffer = this.buffer;
     int kind = queueInts[newline + QITEM_NEWLINE_KIND];
@@ -1507,7 +1574,7 @@ public class PrettyWriter extends java.io.Writer
 	      }
 	  }
       }
-    out.write(buffer, 0, amountToPrint);
+    writeToBase(buffer, 0, amountToPrint);
     int lineNumber = this.lineNumber;
     //log("outputLine#"+lineNumber+": \""+new String(buffer, 0, amountToPrint)+"\" curBlock:"+currentBlock);
     lineNumber++;
@@ -1516,20 +1583,20 @@ public class PrettyWriter extends java.io.Writer
 	int maxLines = getMaxLines();
 	if (maxLines > 0 && lineNumber >= maxLines)
 	  {
-	    out.write(" ..");
+	    writeToBase(" ..");
 	    int suffixLength = getSuffixLength();
 	    if (suffixLength != 0)
 	      {
 		char[] suffix = this.suffix;
 		int len = suffix.length;
-		out.write(suffix, len - suffixLength, suffixLength);
+		writeToBase(suffix, len - suffixLength, suffixLength);
 	      }
 	    // (throw 'line-limit-abbreviation-happened t))
 	    lineAbbreviationHappened();
 	  }
       }
     this.lineNumber = lineNumber;
-    out.write('\n');
+    writeToBase('\n');
     bufferStartColumn = 0;
     int fillPtr = bufferFillPointer;
     int prefixLen = isLiteral ? getPerLinePrefixEnd() : getPrefixLength();
@@ -1573,16 +1640,8 @@ public class PrettyWriter extends java.io.Writer
       : fillPtr;
     int newFillPtr = fillPtr - count;
     if (count <= 0)
-      throw new Error("outputPartialLine called when nothing can be output.");
-    try
-      {
-	out.write(buffer, 0, count);
-	//log("outputPartial: \""+new String(buffer, 0, count)+'\"');
-      }
-    catch (IOException ex)
-      {
-	throw new RuntimeException(ex);
-      }
+        throw new Error("outputPartialLine called when nothing can be output.");
+    writeToBase(buffer, 0, count);
     bufferFillPointer = count; // For the sake of the following:
     bufferStartColumn = getColumnNumber();
     System.arraycopy(buffer, count, buffer, 0, newFillPtr);
@@ -1729,14 +1788,14 @@ public class PrettyWriter extends java.io.Writer
     posnMarkerCount = 1;
   }
 
-  public void forcePrettyOutput () throws IOException
+  public void forcePrettyOutput ()
   {
     maybeOutput(false, true);
     if (bufferFillPointer > 0)
       outputPartialLine();
     expandTabs(-1);
     bufferStartColumn = getColumnNumber();
-    out.write(buffer, 0, bufferFillPointer);
+    writeToBase(buffer, 0, bufferFillPointer);
     bufferFillPointer = 0;
     queueSize = queueTail = bufferOffset = 0;
   }
@@ -1778,7 +1837,8 @@ public class PrettyWriter extends java.io.Writer
     buffer = null;
   }
 
-  /** Not meaningful if {@code prettyPrintingMode > 0}. */
+  /** Get zero-origin column number, or -1 if unknown.
+   * Not meaningful if {@code prettyPrintingMode > 0}. */
   public int getColumnNumber ()
   {
     int i = bufferFillPointer;

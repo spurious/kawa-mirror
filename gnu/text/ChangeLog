@@ -1,3 +1,13 @@
+2012-11-24  Per Bothner  <per@bothner.com>
+
+	* PrettyWriter.java: Avoid using a buffer if not pretty-printing or
+	sharing.  Instead write directly to sink.  This reduces buffer
+	synchronization issues - for example for BinaryOutPort.
+	(isPassingThrough, writeToBase*4): New methods.
+	(write*3): If isPassingThrough use writeToBase.
+	(buffer): Initialize to a zero-length buffer.
+	(setPrettyPrintingMode, setSharing): Allocate non-zero-length buffer.
+
 2012-11-20  Per Bothner  <per@bothner.com>
 
 	* Char.java (append): New static methods.

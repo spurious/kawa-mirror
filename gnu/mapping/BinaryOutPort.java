@@ -13,10 +13,18 @@ import gnu.text.*;
 public class BinaryOutPort extends OutPort {
     OutputStream strm;
 
-    public OutputStream getOutputStream() { return strm; }
+    public OutputStream getOutputStream() {
+        flushBuffer();
+        return strm;
+    }
 
     public BinaryOutPort(OutputStream strm, Path path) {
-        super(new OutputStreamWriterLatin1(strm), path);
+        this(strm, new OutputStreamWriterLatin1(strm), path);
+    }
+
+    private BinaryOutPort(OutputStream strm, OutputStreamWriterLatin1 out, Path path) {
+        super(out, path);
+        out.port = this;
         this.strm = strm;
     }
 
@@ -30,6 +38,16 @@ public class BinaryOutPort extends OutPort {
         return op;
     }
 
+    public void writeBytes(byte[] buf, int off, int len) throws IOException {
+        flushBuffer(); // Should normally be a no-op, but just in case ...
+        strm.write(buf, off, len);
+    }
+
+    public void writeByte(int b) throws IOException {
+        flushBuffer();
+        strm.write(b);
+    }
+
     public static OutputStream asOutputStream(Object obj) {
         if (obj instanceof BinaryOutPort)
             return ((BinaryOutPort) obj).getOutputStream();
@@ -37,11 +55,15 @@ public class BinaryOutPort extends OutPort {
             return (OutputStream) obj;
     }
 
+    @Override
+    public int getColumnNumber () { return -1; }
+
     /** Like an OutputStreamWriter, but optimized for Latin1.
      * This converter performs no buffering, so it is recommended
      * that the underlying OutputStream be buffered. */
     public static class OutputStreamWriterLatin1 extends Writer {
         OutputStream strm;
+        BinaryOutPort port;
 
         public OutputStreamWriterLatin1(OutputStream strm) {
             this.strm = strm;

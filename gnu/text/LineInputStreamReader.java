@@ -119,7 +119,7 @@ public class LineInputStreamReader extends LineBufferedReader
     /* #endif */
   }
 
-  public int fill (int len) throws java.io.IOException
+  protected int fill (int len) throws java.io.IOException
   {
     /* #ifdef use:java.nio */
     if (cset == null)

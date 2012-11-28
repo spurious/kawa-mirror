@@ -1,3 +1,8 @@
+2012-11-27  Per Bothner  <per@bothner.com>
+
+	* ports.scm (eof-object, read-string, read-u8, peek-u8, u8-ready,
+	read-bytevector, read-bytevector!): New R7RS input procedures.
+
 2012-11-22  Per Bothner  <per@bothner.com>
 
 	* ports.scm (open-binary-output-file, write-string, write-u8,

@@ -75,6 +75,12 @@ public abstract class ByteVector extends SimpleVector
     data[index] = value;
   }
 
+    public void copyFrom(byte[] src, int soffset, int doffset, int length) {
+        if (doffset + length > size)
+            throw new IndexOutOfBoundsException();
+        System.arraycopy(src, soffset, data, doffset, length);
+    }
+
   protected void clearBuffer(int start, int count)
   {
     while (--count >= 0)
@@ -103,4 +109,15 @@ public abstract class ByteVector extends SimpleVector
     this.data = data;
     this.size = size;
   }
+
+    public int readFrom(int start, int count, InputStream in)
+        throws IOException {
+        return in.read(data, start, count);
+    }
+
+    public void writeTo(int start, int count, OutputStream out)
+        throws IOException {
+        out.write(data, start, count);
+    }
+
 }

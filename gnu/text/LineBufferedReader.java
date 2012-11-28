@@ -81,6 +81,8 @@ public class LineBufferedReader extends Reader
    * I.e. the application doesn't need to scan to the beginning of line. */
   private static final int DONT_KEEP_FULL_LINES = 8;
 
+  private static final int EOF_SEEN = 16;
+
   /** Should we preserve the complete current line?
    * The default is true, but in some cases there can be a performance
    * improvement if we don't need to keep a long line when filling the buffer.
@@ -149,11 +151,11 @@ public class LineBufferedReader extends Reader
   }
 
   /** Called by {@code read()} when it needs its buffer filled.
-    * Read characters into buffer, starting at off, for len.
-    * Can assume that len > 0.  Only called if {@code pos>=limit}.
+    * Read characters into buffer, starting at pos, for len.
+    * Can assume that {@code len > 0}.  Only called if {@code pos>=limit}.
     * Return -1 if EOF, otherwise number of read chars.
     * This can be usefully overridden by sub-classes. */
-  public int fill (int len) throws java.io.IOException
+  protected int fill (int len) throws java.io.IOException
   {
     return in.read(buffer, pos, len);
   }
@@ -294,7 +296,10 @@ public class LineBufferedReader extends Reader
 	  }
 	int readCount = fill(buffer.length - pos);
 	if (readCount <= 0)
-	  return -1;
+          {
+            flags |= EOF_SEEN;
+            return -1;
+          }
 	limit += readCount;
       }
 
@@ -618,7 +623,11 @@ public class LineBufferedReader extends Reader
 
   public boolean ready () throws java.io.IOException
   {
-    return pos < limit || in.ready();
+    return pos < limit || (flags & EOF_SEEN) != 0 || sourceReady();
+  }
+  
+  protected boolean sourceReady() throws java.io.IOException {
+      return in.ready();
   }
 
   /** Same as skip(), but assumes previous command was a non-EOF peek(). */

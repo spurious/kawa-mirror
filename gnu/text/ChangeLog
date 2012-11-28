@@ -1,3 +1,11 @@
+2012-11-27  Per Bothner  <per@bothner.com>
+
+	* LineBufferedReader.java (EOF_SEEN): New constant.
+	(fill): Make protected instead of public.  Natbe set EOF_SEEN.
+	(sourceReady): New proected method.
+	(ready): Return true if EOF_SEEN.  Use sourceReady.
+	* LineInputStreamReader.java (fill): Make protected instead of public.
+
 2012-11-24  Per Bothner  <per@bothner.com>
 
 	* PrettyWriter.java: Avoid using a buffer if not pretty-printing or

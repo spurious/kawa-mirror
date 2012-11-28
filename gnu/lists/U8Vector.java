@@ -57,6 +57,13 @@ public class U8Vector extends ByteVector
     System.arraycopy(seq.data, offset, data, 0, length);
   }
 
+  public U8Vector(byte[] buffer, int offset, int length)
+  {
+    size = length;
+    data = new byte[length];
+    System.arraycopy(buffer, offset, data, 0, length);
+  }
+
   public final int intAtBuffer(int index)
   {
     return data[index] & 0xff;
@@ -92,11 +99,6 @@ public class U8Vector extends ByteVector
   {
     return compareToInt(this, (U8Vector) obj);
   }
-
-    public void writeTo(int start, int count, OutputStream out)
-        throws IOException {
-        out.write(data, start, count);
-    }
 
   /** Covert bytes, interpreted as UTF-8 characters, to a String. */
   public String toUtf8() 

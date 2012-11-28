@@ -206,6 +206,7 @@ KAWA_COMPILER = $(JAVA) -classpath "$(CLASSPATH)" kawa.repl -d $(top_builddir) \
   -P `echo $(PACKAGE_FNAME)|sed -e s/-/./g`.
 
 java_sources = \
+  BinaryInPort.java \
   BinaryOutPort.java \
   CallContext.java \
   ConstrainedLocation.java \

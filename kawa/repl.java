@@ -345,7 +345,7 @@ public class repl extends Procedure0or1
 		      }
 		  }
 		getLanguageFromFilenameExtension(filename);
-		freader = InPort.openFile(fstream, filename);
+		freader = InPort.openFile(fstream, Path.valueOf(filename));
 		// FIXME adjust line number
 		setArgs(args, iArg+1);
 		checkInitFile();

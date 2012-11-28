@@ -1,3 +1,10 @@
+2012-11-27  Per Bothner  <per@bothner.com>
+
+	* U8Vector.java: New constructor.
+	(writeTo): Move to super-class.
+	* ByteVector.java (writeTo): New method, moved from U8Vector.
+	(copyFrom, readFrom): New methods.
+
 2012-11-22  Per Bothner  <per@bothner.com>
 
 	* U8Vector.java (writeTo): New method.

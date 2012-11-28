@@ -57,28 +57,27 @@ public class readchar extends Procedure0or1
       }
   }
 
-  final Object readChar (InputStream port)
-  {
-    try
-      {
-	int ch;
-	if (peeking)
-	  {
-	    port.mark(1);
-	    ch = port.read();
-	    port.reset();
-	  }
-	else
-	  ch = port.read();
-	if (ch < 0)
-	  return Sequence.eofValue;
+    public static int readByte(InputStream port, boolean peeking) {
+        try {
+            int ch;
+            if (peeking) {
+                port.mark(1);
+                ch = port.read();
+                port.reset();
+            } else
+                ch = port.read();
+            return ch;
+        } catch (java.io.IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    final Object readChar (InputStream port) {
+        int ch = readByte(port, peeking);
+        if (ch < 0)
+            return Sequence.eofValue;
 	return Char.make (ch);
-      }
-    catch (java.io.IOException e)
-      {
-	throw new RuntimeException ("IO Exception caught");
-      }
-  }
+    }
 
   public final Object apply0 ()
   {

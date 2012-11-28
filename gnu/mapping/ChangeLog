@@ -1,3 +1,11 @@
+2012-11-27  Per Bothner  <per@bothner.com>
+
+	* BinaryInPort.java: New class, extends InPort.
+	* Makefile.am: Update accordingly.
+	* InPort.java (convertToReader, <init>): Inline into other constructor.
+	(openFile): Add overload.  Re-write to use BinaryInPort if requested.
+	* TtyInPort.java (fill): Make protected.
+
 2012-11-24  Per Bothner  <per@bothner.com>
 
 	* OutPort.java (flushBuffer): New method.

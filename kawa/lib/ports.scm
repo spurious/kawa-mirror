@@ -138,8 +138,78 @@
 (define (eof-object? obj)
   (eq? obj #!eof))
 
+(define (eof-object)
+  #!eof)
+
 (define (char-ready? #!optional (port (current-input-port)))
   (invoke-static <kawa.standard.char_ready_p> 'ready port))
+
+(define (read-string (k ::int)
+                     #!optional (port ::input-port (current-input-port)))
+  (let* ((arr (char[] length: k)))
+    (let loop ((seen ::int 0))
+      (let* ((m ::int (- k seen))
+             (n (port:read arr seen m)))
+        (cond ((< n 0)
+               (if (> seen 0)
+                   (gnu.lists.FString arr 0 seen)
+                   #!eof))
+              ((= n m) (gnu.lists.FString arr)) ;; resuse arr
+              (else (loop (+ seen n))))))))
+
+(define (read-u8 #!optional (port (current-input-port)))
+  (let ((b ::int (if (gnu.mapping.BinaryInPort? port)
+                     ((as gnu.mapping.BinaryInPort port):readByte)
+                     ((as java.io.InputStream port):read))))
+    (if (< b 0) #!eof b)))
+
+(define (peek-u8 #!optional (port (current-input-port)))
+  (let ((b ::int (if (gnu.mapping.BinaryInPort? port)
+                     ((as gnu.mapping.BinaryInPort port):peekByte)
+                     (kawa.standard.readchar:readByte port #t))))
+    (if (< b 0) #!eof b)))
+
+(define (u8-ready #!optional (port (current-input-port)))
+  (if (gnu.mapping.BinaryInPort? port)
+      ((as gnu.mapping.BinaryInPort port):ready)
+      (> ((as java.io.InputStream port):available) 0)))
+  
+(define (read-bytevector (k ::int)
+                     #!optional (port (current-input-port)))
+  (let ((arr (byte[] length: k)))
+    (let loop ((seen ::int 0))
+      (let* ((m ::int (- k seen))
+             (n ::int (if (gnu.mapping.BinaryInPort? port)
+                          ((as gnu.mapping.BinaryInPort port):readBytes
+                           arr seen m)
+                          ((as java.io.InputStream port):read arr seen m))))
+        (cond ((< n 0)
+               (if (> seen 0)
+                   (gnu.lists.U8Vector arr 0 seen) ;; copy seen bytes of arr
+                   #!eof))
+              ((= n m) (gnu.lists.U8Vector arr)) ;; reuse arr
+              (else
+               (loop (+ seen n))))))))
+
+(define (read-bytevector! (bv ::bytevector)
+                          #!optional
+                          (start ::int 0)
+                          (end ::int (bv:size))
+                          (port (current-input-port)))
+  (let loop ((seen ::int 0))
+    (let* ((want ::int (- end start seen))
+           (n ::int (if (gnu.mapping.BinaryInPort? port)
+                        ((as gnu.mapping.BinaryInPort port):readByteVector
+                         bv (+ start seen) want)
+                        (bv:readFrom (+ start seen) want
+                                     ((as java.io.InputStream port))))))
+      (cond ((< n 0)
+             (if (> seen 0)
+                 seen
+                 #!eof))
+            ((= n want) (+ seen n))
+            (else
+             (loop (+ seen n)))))))
 
 (define (write value #!optional (out ::output-port (current-output-port))) ::void
   (if *print-circle*

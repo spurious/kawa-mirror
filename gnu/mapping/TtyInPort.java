@@ -41,7 +41,8 @@ public class TtyInPort extends InPort
 
   protected boolean promptEmitted;
 
-  public int fill (int len) throws java.io.IOException
+  @Override
+  protected int fill (int len) throws java.io.IOException
   {
     int count = in.read(buffer, pos, len);
     if (tie != null && count > 0)

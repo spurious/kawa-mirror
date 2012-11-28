@@ -8319,18 +8319,6 @@ Return the port to which errors and warnings should be sent
 (the @dfn{standard error} in Unix and C terminology).
 @end deffn
 
-@deffn Procedure read-line [port [handle-newline]]
-Reads a line of input from @var{port}.
-The @var{handle-newline} parameter determines what is done with
-terminating end-of-line delimiter.
-The default, @code{'trim}, ignores the delimiter;
-@code{'peek} leaves the delimiter in the input stream;
-@code{'concat} appends the delimiter to the returned value;
-and @code{'split} returns the delimiter as a second value.
-You can use the last three options to tell if the string was
-terminated by end-or-line or by end-of-file.
-@end deffn
-
 @deffn Procedure open-input-string string
 Takes a string and returns an input port that delivers characters
 from the string. The port can be closed by @code{close-input-port},
@@ -8390,6 +8378,150 @@ the result from the call of @var{proc}
 Create an output port that writes its data to a @var{string},
 and call @var{proc} with that port as its one argument.
 Return a string consisting of the data written to the port.
+@end deffn
+
+@subsection Input
+
+If @var{port} is omitted from any input procedure, it defaults
+to the value returned by @code{(current-input-port)}. It is an
+error to attempt an input operation on a closed port.
+
+@deffn Procedure read [port]
+The @code{read} procedure converts external representations of
+Scheme objects into the objects themselves. That is, it is
+a parser for the non-terminal @stxref{datum}.
+It returns the next object parsable from the
+given textual input port, updating port to point to the
+first character past the end of the external representation
+of the object.
+
+If an end of file is encountered in the input before any
+characters are found that can begin an object, then an
+end-of-file object is returned. The port remains open, and
+further attempts to read will also return an end-of-file object.
+If an end of file is encountered after the beginning of
+an object’s external representation, but the external repre-
+sentation is incomplete and therefore not parsable, an error
+@c FIXME that satisfies @code{read-error?}
+is signaled.
+@end deffn
+
+@deffn Procedure read-char [port]
+Returns the next character available from the textual input
+@var{port}, updating the port to point to the following character.
+If no more characters are available, an end-of-file object is
+returned.
+@end deffn
+
+@deffn Procedure peek-char [port]
+Returns the next character available from the textual input @var{port},
+but @emph{without} updating the port to point to the
+following character. If no more characters are available, an
+end-of-file object is returned.
+
+@emph{Note:} The value returned by a call to @code{peek-char} is the same as
+the value that would have been returned by a call to @code{read-char}
+with the same @var{port}. The only difference is that the very next call
+to @code{read-char} or @code{peek-char} on that @var{port} will return the
+value returned by the preceding call to @code{peek-char}. In particular, a
+call to @code{peek-char} on an interactive port will hang waiting for
+input whenever a call to @code{read-char} would have hung.
+@end deffn
+
+@deffn Procedure read-line [port [handle-newline]]
+Reads a line of input from the textual input @var{port}.
+The @var{handle-newline} parameter determines what is done with
+terminating end-of-line delimiter.
+The default, @code{'trim}, ignores the delimiter;
+@code{'peek} leaves the delimiter in the input stream;
+@code{'concat} appends the delimiter to the returned value;
+and @code{'split} returns the delimiter as a second value.
+You can use the last three options to tell if the string was
+terminated by end-or-line or by end-of-file.
+If an end of file is encountered before any end of
+line is read, but some characters have been read, a string
+containing those characters is returned.
+(In this case, @code{'trim}, @code{'peek}, and @code{'concat}
+have the same result and effect.  The @code{'split} case returns two
+values: The characters read, and the delimiter is an empty string.)
+If an end of file is encountered before any characters are read,
+an end-of-file object is returned.
+For the purpose of this procedure, an
+end of line consists of either a linefeed character, a carriage
+return character, or a sequence of a carriage return character
+followed by a linefeed character.
+@end deffn
+
+@deffn Pocedure eof-object? obj
+Returns @code{#t} if @var{obj} is an end-of-file object,
+otherwise returns @code{#f}.
+@end deffn
+
+@deffn Procedure eof-object
+Returns an end-of-file object.
+@end deffn
+
+@deffn Procedure char-ready? [port]
+Returns @code{#t} if a character is ready on the textual input
+@var{port} and returns @code{#f} otherwise. If char-ready returns @code{#t}
+then the next @code{read-char} operation on the given @var{port} is
+guaranteed not to hang. If the port is at end of file then
+@code{char-ready?} returns @code{#t}.
+
+@emph{Rationale:} The @code{char-ready?} procedure exists to make it
+possible for a program to accept characters from interactive ports
+without getting stuck waiting for input. Any input editors as-
+sociated with such ports must ensure that characters whose
+existence has been asserted by @code{char-ready?} cannot be removed
+from the input. If @code{char-ready?} were to return @code{#f} at end of
+file, a port at end-of-file would be indistinguishable from an
+interactive port that has no ready characters.
+@end deffn
+
+@deffn Procedure read-string k [port]
+Reads the next @var{k} characters, or as many as are available
+before the end of file, from the textual input @var{port} into a
+newly allocated string in left-to-right order and returns the
+string. If no characters are available before the end of file,
+an end-of-file object is returned.
+@end deffn
+
+@deffn Procedure read-u8 [port]
+Returns the next byte available from the binary input @var{port},
+updating the @var{port} to point to the following byte. If no more
+bytes are available, an end-of-file object is returned.
+@end deffn
+
+@deffn Procedure peek-u8 [port]
+Returns the next byte available from the binary input @var{port},
+but @emph{without} updating the @var{port} to point to the following byte.
+If no more bytes are available, an end-of-file object is returned.
+@end deffn
+
+@deffn Procedure u8-ready? [port]
+Returns @code{#t} if a byte is ready on the binary input @var{port} and
+returns @code{#f} otherwise. If @code{u8-ready?} returns @code{#t} then the
+next @code{read-u8} operation on the given port is guaranteed
+not to hang. If the port is at end of file then @code{u8-ready?}
+returns @code{#t}.
+@end deffn
+
+@deffn read-bytevector k [port]
+Reads the next @var{k} bytes, or as many as are available before
+the end of file, from the binary input @var{port} into a newly
+allocated bytevector in left-to-right order and returns the
+bytevector. If no bytes are available before the end of file,
+an end-of-file object is returned.
+@end deffn
+
+@deffn read-bytevector! bytevector [start [end [port]]]
+Reads the next @var{end} − @var{start} bytes, or as many as are
+available before the end of file, from the binary input @var{port}
+into @var{bytevector} in left-to-right order beginning at the @var{start}
+position. If @var{end} is not supplied, reads until the end of
+@var{bytevector} has been reached. If @var{start} is not supplied, reads
+beginning at position 0. Returns the number of bytes read.
+If no bytes are available, an end-of-file object is returned.
 @end deffn
 
 @subsection Output

@@ -7,6 +7,7 @@ import gnu.text.*;
  * than '\xFF' is converted to '?', and others are copied straight through.
  * However, there is guaranteed no local buffering, so you can
  * switch back and forth with the underlying OutputStream without flushing.
+ * (Unless you do something weird, like request pretty-printing.)
  * The underlying OutputStream should therefore be buffered, for performance.
  */
 

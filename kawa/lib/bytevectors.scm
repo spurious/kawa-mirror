@@ -19,17 +19,45 @@
   ::bytevector
   (gnu.lists.U8Vector v start (- end start)))
 
-;; FIXME
-;; (define (bytevector-append ...) ...)
+(define (bytevector-copy! (to ::bytevector)
+                          (at ::int)
+                          (from ::bytevector)
+                          #!optional
+                          (start ::int 0)
+                          (end ::int (from:size)))
+  (to:copyFrom at from start end))
 
-;; FIXME add start end
-(define (utf8->string v::bytevector) ::string
-  (v:toUtf8))
+(define (bytevector-append #!rest (bvs ::bytevector[]))
+  (define nbvs ::int bvs:length)
+  (define size ::int
+    (let loop ((i ::int 0) (sz ::int 0))
+      (if (< i nbvs)
+          (loop (+ i 1) (+ sz ((bvs i):size)))
+          sz)))
+  (define result ::bytevector (gnu.lists.U8Vector size))
+  (let loop ((i ::int 0) (off ::int 0))
+    (if (< i nbvs)
+        (let* ((bv (bvs i))
+               (bvlength (bv:size)))
+          (result:copyFrom off bv 0 bvlength)
+          (loop (+ i 1) (+ off bvlength)))
+        result)))
 
-;; FIXME add start end
-(define (string->utf8 v::string) ::bytevector
+(define (utf8->string (v ::bytevector)
+                      #!optional
+                      (start ::int 0)
+                      (end ::int (v:size)))
+  ::string
+  (v:toUtf8 start (- end start)))
+
+(define (string->utf8
+         (v ::string)
+         #!optional
+         (start ::int 0)
+         (end ::int (v:length)))
+  ::bytevector
   (gnu.lists.U8Vector
-   ((v:toString):getBytes
+   (((v:toString):substring start end):getBytes
     (cond-expand (java-7 java.nio.charset.StandardCharsets:UTF_8)
                  (else "UTF-8")))))
 

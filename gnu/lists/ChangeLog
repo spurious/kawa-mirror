@@ -1,5 +1,8 @@
 2012-11-29  Per Bothner  <per@bothner.com>
 
+	* U8Vector.java (toUtf): Add (start,length) parameters.
+	* ByteVector.java (copyFrom): New method.
+
 	* FVector.java (copyFrom): New method.
 
 2012-11-28  Per Bothner  <per@bothner.com>

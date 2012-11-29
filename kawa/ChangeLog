@@ -1,5 +1,8 @@
 2012-11-29  Per Bothner  <per@bothner.com>
 
+	* standard/Scheme.java (initScheme): New R7RS bytevector functions
+	byteector-copy! and vector-append.
+
 	* standard/Scheme.java (initScheme): New R7RS vector functions
 	vector-copy and vector-copy!.
 

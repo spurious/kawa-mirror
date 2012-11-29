@@ -1,5 +1,9 @@
 2012-11-29  Per Bothner  <per@bothner.com>
 
+	* bytevectors.scm (bytevector-copy!, bytevector-append):
+	New R7RS procedures.
+	(utf8->string, string->utf8): Extend with start/end parameters.
+
 	* vectors.scm (vector-copy, vector-copy!): New R7RS procedures.
 
 2012-11-28  Per Bothner  <per@bothner.com>

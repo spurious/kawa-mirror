@@ -1,4 +1,4 @@
-(test-begin "libs" 244)
+(test-begin "libs" 254)
 
 (test-begin "vectors")
 (test-equal '(dah dah didah)
@@ -18,6 +18,20 @@
             (vector->string #(#\1 #\2 #\3 #\4 #\5) 2))
 (test-equal "34"
             (vector->string #(#\1 #\2 #\3 #\4 #\5) 2 4))
+ 
+(let* ((a #(1 8 2 8))
+       (b (vector-copy a)))
+  (vector-set! b 0 3)
+  (test-equal #(3 8 2 8) b)
+  (test-equal #(8 2) (vector-copy b 1 3)))
+
+(test-equal #(a b c d e f)
+            (vector-append #(a b c) #(d e f)))
+
+(let* ((a (vector 1 2 3 4 5))
+       (b (vector 10 20 30 40 50)))
+  (vector-copy! b 1 a 0 2)
+  (test-equal #(10 1 2 40 50) b))
 
 (test-equal #(1 2 smash smash 5)
             (let ()
@@ -34,6 +48,19 @@
 (test-equal 2 (bytevector-length bytes1))
 (test-equal 187 (bytevector-u8-ref bytes1 1))
 (test-equal #f (bytevector? lambda-string))
+(let ((bv (bytevector 1 2 3 4)))
+  (bytevector-u8-set! bv 1 3)
+  (test-equal #u8(1 3 3 4) bv))
+(let ((a #u8(1 2 3 4 5)))
+  (test-equal #u8(3 4) (bytevector-copy a 2 4)))
+(let ((a (bytevector 1 2 3 4 5))
+      (b (bytevector 10 20 30 40 50)))
+  (bytevector-copy! b 1 a 0 2)
+  (test-equal #u8(10 1 2 40 50) b))
+(test-equal #u8(0 1 2 3 4 5)
+            (bytevector-append #u8(0 1 2) #u8(3 4 5)))
+(test-equal "A" (utf8->string #u8(#x41)))
+(test-equal #u8(#xCE #xBB) (string->utf8 "λ"))
 (test-equal bytes1 (string->utf8 lambda-string))
 (test-equal lambda-string (utf8->string bytes1))
 (test-end)

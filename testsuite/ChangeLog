@@ -1,3 +1,7 @@
+2012-11-29  Per Bothner  <per@bothner.com>
+
+	* lib-test.scm: Some more vector and bytevectors tests from R7RS.
+
 2012-11-21  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (EXTRA_DIST): Add jmc.expected.

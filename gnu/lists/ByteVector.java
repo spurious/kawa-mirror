@@ -87,6 +87,13 @@ public abstract class ByteVector extends SimpleVector
       data[start++] = 0;
   }
 
+    public void copyFrom (int index, ByteVector src, int start, int end) {
+        int count = end-start;
+        if (count < 0 || index+count > size || end > src.size)
+            throw new ArrayIndexOutOfBoundsException();
+        System.arraycopy(src.data, start, data, index, count);
+    }
+
   /**
    * @serialData Write 'size' (using writeInt),
    *   followed by 'size' elements in order (using writeByte).

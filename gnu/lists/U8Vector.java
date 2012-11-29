@@ -100,20 +100,17 @@ public class U8Vector extends ByteVector
     return compareToInt(this, (U8Vector) obj);
   }
 
-  /** Covert bytes, interpreted as UTF-8 characters, to a String. */
-  public String toUtf8() 
-  {
-    /* #ifdef JAVA7 */  
-    // return new String(data, 0, size, java.nio.charset.StandardCharsets.UTF_8);
-    /* #else */
-    try
-      {
-        return new String(data, 0, size, "UTF-8");
-      }
-    catch (UnsupportedEncodingException ex)
-      {
+    /** Covert bytes, interpreted as UTF-8 characters, to a String. */
+    public String toUtf8(int start, int length) {
+      if (start+length>size) throw new IndexOutOfBoundsException();
+      /* #ifdef JAVA7 */  
+      // return new String(data, start, length, java.nio.charset.StandardCharsets.UTF_8);
+      /* #else */
+      try {
+        return new String(data, start, length, "UTF-8");
+      } catch (UnsupportedEncodingException ex) {
           throw new RuntimeException(ex);
       }
-    /* #endif */
+      /* #endif */
   }
 }

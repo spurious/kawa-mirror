@@ -826,6 +826,8 @@ public class Scheme extends LispLanguage
       defProcStFld("bytevector-u8-ref", "kawa.lib.bytevectors");
       defProcStFld("bytevector-u8-set!", "kawa.lib.bytevectors");
       defProcStFld("bytevector-copy", "kawa.lib.bytevectors");
+      defProcStFld("bytevector-copy!", "kawa.lib.bytevectors");
+      defProcStFld("bytevector-append", "kawa.lib.bytevectors");
       defProcStFld("utf8->string", "kawa.lib.bytevectors");
       defProcStFld("string->utf8", "kawa.lib.bytevectors");
 

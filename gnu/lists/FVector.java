@@ -68,6 +68,13 @@ public class FVector<E> extends SimpleVector<E>
     return new FVector(data);
   }
 
+    public void copyFrom (int index, FVector src, int start, int end) {
+        int count = end-start;
+        if (count < 0 || index+count > size || end > src.size)
+            throw new ArrayIndexOutOfBoundsException();
+        System.arraycopy(src.data, start, data, index, count);
+    }
+
   /** Get the allocated length of the data buffer. */
   public int getBufferLength()
   {

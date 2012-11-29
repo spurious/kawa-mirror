@@ -403,6 +403,8 @@ public class Scheme extends LispLanguage
       defProcStFld("vector->list", "kawa.lib.vectors");
       defProcStFld("vector->string", "kawa.lib.vectors");
       defProcStFld("string->vector", "kawa.lib.vectors");
+      defProcStFld("vector-copy", "kawa.lib.vectors");
+      defProcStFld("vector-copy!", "kawa.lib.vectors");
       defProcStFld("vector-fill!", "kawa.lib.vectors");
       // Extension:
       defProcStFld("vector-append", "kawa.standard.vector_append", "vectorAppend");

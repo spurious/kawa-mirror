@@ -1,3 +1,7 @@
+2012-11-29  Per Bothner  <per@bothner.com>
+
+	* vectors.scm (vector-copy, vector-copy!): New R7RS procedures.
+
 2012-11-28  Per Bothner  <per@bothner.com>
 
 	* ports.scm (open-binary-input-file, call-with-port, textual-port?,

@@ -58,6 +58,23 @@
           (set! (result j) ch)
           (loop result (+ i 1) (+ j 1))))))
 
+(define (vector-copy (vec :: vector)
+                     #!optional
+                     (start ::int 0)
+                     (end ::int (vec:size)))
+  ::vector
+  (let ((result (gnu.lists.FVector (- end start))))
+    (result:copyFrom 0 vec start end)
+    result))
+
+(define (vector-copy! (to ::vector)
+                      (at ::int)
+                      (from ::vector)
+                      #!optional
+                      (start ::int 0)
+                      (end ::int (from:size)))
+  (to:copyFrom  at from start end))
+
 (define (vector-fill! (vec :: vector) fill
                       #!optional (start ::int 0) (end ::int (vec:size)))
   :: void

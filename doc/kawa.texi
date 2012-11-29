@@ -5818,6 +5818,54 @@ of the string @var{string} between @var{start} and @var{end}.
 @end example
 @end deffn
 
+@deffn Procedure vector-copy vector [start [end]]
+Returns a newly allocated copy of the elements of the given
+@var{vector} between @var{start} and @var{end} . The elements of the new
+vector are the same (in the sense of @code{eqv?}) as the elements
+of the old.
+
+@example
+(define a #(1 8 2 8)) ; a may be immutable
+(define b (vector-copy a))
+(vector-set! b 0 3)   ; b is mutable
+b                     @result{}      #(3 8 2 8)
+(define c (vector-copy b 1 3))
+c                     @result{} #(8 2)
+@end example
+@end deffn
+
+@deffn Procedure vector-copy! to at from [start [end]]
+Copies the elements of vector from between start and end
+to vector to, starting at at. The order in which elements
+are copied is unspecified, except that if the source and
+destination overlap, copying takes place as if the source is first
+copied into a temporary vector and then into the destination.
+This can be achieved without allocating storage by making
+sure to copy in the correct direction in such circumstances.
+
+It is an error if @var{at} is less than zero or greater than the length
+of @var{to}.
+It is also an error if @code{(- (vector-length @var{to}) @var{at})} is less
+than @code{(- @var{end} @var{start})}.
+
+@example
+(define a (vector 1 2 3 4 5))
+(define b (vector 10 20 30 40 50))
+(vector-copy! b 1 a 0 2)
+b    @result{} #(10 1 2 40 50)
+@end example
+@end deffn
+
+@deffn Procedure vector-append @var{arg}...
+Creates a newly allocated vector whose elements are the
+concatenation of the elements of the given arguments.
+Each @var{arg} may be a vector or a list.
+@example
+(vector-append #(a b c) #(d e f))
+    @result{} #(a b c d e f)
+@end example
+@end deffn
+
 @deffn Procedure {vector-fill!} @var{vector fill} [@var{start} [@var{end}]]
 Stores @var{fill} in in the elements of @var{vector}
 between @var{start} and @var{end}.
@@ -5855,12 +5903,6 @@ of @func{vector-for-each} are unspecified.
 
 Analogous to @func{for-each}.
 @end deffn
-
-@deffn Procedure vector-append @var{arg}...
-Creates a new vector, containing the elements from all the @var{arg}s
-appended together.   Each @var{arg} may be a vector or a list.
-@end deffn
-
 
 @node Uniform vectors
 @section Uniform vectors
@@ -6148,6 +6190,50 @@ Stores @var{byte} as the @var{k}th byte of @var{bytevector}.
   (bytevector-u8-set! bv 1 3)
   bv)
   @result{} #u8(1 3 3 4)
+@end example
+@end deffn
+
+@deffn Procedure bytevector-copy bytevector [start [end]]
+Returns a newly allocated bytevector containing the bytes
+in @var{bytevector} between @var{start} and @var{end}.
+
+@example
+(define a #u8(1 2 3 4 5))
+(bytevector-copy a 2 4))
+    @result{} #u8(3 4)
+@end example
+@end deffn
+
+@deffn Procedure bytevector-copy! to at from start end 
+Copies the bytes of bytevector@var{from} between @var{start} and @var{end}
+to bytevector @var{to}, starting at @var{at}. The order in which bytes
+are copied is unspecified, except that if the source and destination overlap,
+copying takes place as if the source is first
+copied into a temporary bytevector and then into the destination.
+This is achieved without allocating storage
+by making sure to copy in the correct direction in such
+circumstances.
+
+It is an error if @var{at} is less than zero or greater than the length
+of @var{to}.
+It is also an error if @code{(- (bytevector-length @var{to}) @var{at})}
+is less than @code{(- @var{end} @var{start})}.
+
+@example
+(define a (bytevector 1 2 3 4 5))
+(define b (bytevector 10 20 30 40 50))
+(bytevector-copy! b 1 a 0 2)
+b        @result{} #u8(10 1 2 40 50)
+@end example
+@end deffn
+
+@deffn Procedure bytevector-append bytevector...
+Returns a newly allocated bytevector whose elements are
+the concatenation of the elements in the given bytevectors.
+
+@example
+(bytevector-append #u8(0 1 2) #u8(3 4 5))
+        @result{}  #u8(0 1 2 3 4 5)
 @end example
 @end deffn
 
@@ -8719,7 +8805,7 @@ Writes a representation of @var{obj} to the given textual output
 port. Strings that appear in the written representation
 are output as if by @code{write-string} instead of by @code{write}.
 Symbols are not escaped. Character objects appear in the
-representation as if written by !code{write-char} instead of by
+representation as if written by @code{write-char} instead of by
 @code{write}.
 The @code{display} representation of other objects is unspecified.
 @c However, display must always terminate. Thus if the normal write

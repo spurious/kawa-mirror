@@ -1,3 +1,7 @@
+2012-11-29  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Vectors, Bytevectors): More R7RS documentation.
+
 2012-11-28  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Ports): Document some more R7TS port functions,

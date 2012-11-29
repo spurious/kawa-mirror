@@ -28,7 +28,7 @@ public abstract class ByteVector extends SimpleVector
       }
   }
 
-  protected Object getBuffer() { return data; }
+  public byte[] getBuffer() { return data; }
 
   public final byte byteAt(int index)
   {

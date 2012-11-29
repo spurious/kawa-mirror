@@ -425,18 +425,25 @@ public class Scheme extends LispLanguage
       defProcStFld("promise-set-exception!", "kawa.lib.misc");
       defProcStFld("promise-set-thunk!", "kawa.lib.misc");
 
-      //-- Section 6.10  -- complete
+      defProcStFld("call-with-port", "kawa.lib.ports");
       defProcStFld("call-with-input-file", "kawa.lib.ports");
       defProcStFld("call-with-output-file", "kawa.lib.ports");
       defProcStFld("input-port?", "kawa.lib.ports");
       defProcStFld("output-port?", "kawa.lib.ports");
+      defProcStFld("textual-port?", "kawa.lib.ports");
+      defProcStFld("binary-port?", "kawa.lib.ports");
+      defProcStFld("port?", "kawa.lib.ports");
+      defProcStFld("input-port-open?", "kawa.lib.ports");
+      defProcStFld("output-port-open?", "kawa.lib.ports");
       defProcStFld("current-input-port", "kawa.lib.ports");
       defProcStFld("current-output-port", "kawa.lib.ports");
       defProcStFld("with-input-from-file", "kawa.lib.ports");
       defProcStFld("with-output-to-file", "kawa.lib.ports");
       defProcStFld("open-input-file", "kawa.lib.ports");
+      defProcStFld("open-binary-input-file", "kawa.lib.ports");
       defProcStFld("open-output-file", "kawa.lib.ports");
       defProcStFld("open-binary-output-file", "kawa.lib.ports");
+      defProcStFld("close-port", "kawa.lib.ports");
       defProcStFld("close-input-port", "kawa.lib.ports");
       defProcStFld("close-output-port", "kawa.lib.ports");
       defProcStFld("read", "kawa.lib.ports");
@@ -469,6 +476,7 @@ public class Scheme extends LispLanguage
       defProcStFld("open-input-string", "kawa.lib.ports");  // SRFI-6
       defProcStFld("open-output-string", "kawa.lib.ports");  // SRFI-6
       defProcStFld("get-output-string", "kawa.lib.ports");  // SRFI-6
+      defProcStFld("open-input-bytevector", "kawa.lib.ports");
       defProcStFld("open-output-bytevector", "kawa.lib.ports");
       defProcStFld("get-output-bytevector", "kawa.lib.ports");
       defProcStFld("call-with-output-string", "kawa.lib.ports"); // Extension

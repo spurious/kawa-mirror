@@ -1,5 +1,14 @@
 2012-11-28  Per Bothner  <per@bothner.com>
 
+	* BinaryInPort.java (<init>): New constructor taking byte array.
+	(close): Call super.close.
+	(bfill):  Allow null stream - needed for bytevector port.
+	(openFile): New method.
+	* InPort.java (openFile): New overload.  Some refactoring.
+	* OutPort.java (IS_CLOSED): New constant.
+	(close): Set IS_CLOSED.
+	(isOpen): New method.
+
 	* BinaryOutPort.java (openFile): Just use super.openFile.
 
 2012-11-27  Per Bothner  <per@bothner.com>

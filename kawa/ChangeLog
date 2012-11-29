@@ -1,3 +1,10 @@
+2012-11-28  Per Bothner  <per@bothner.com>
+
+	* standard/Scheme.java (initScheme): New R7RS port functions
+	open-binary-input-file, call-with-port, textual-port?, binary-port?,
+	port?, input-port-open?, output-port-open?, open-input-bytevector,
+	and close-port.
+
 2012-11-27  Per Bothner  <per@bothner.com>
 
 	* standard/Scheme.java (initScheme): New R7RS input functions

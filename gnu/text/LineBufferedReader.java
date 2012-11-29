@@ -25,7 +25,15 @@ import java.io.*;
 
 public class LineBufferedReader extends Reader
 {
-  public void close () throws IOException { in.close(); }
+    public void close () throws IOException {
+        flags |= IS_CLOSED;
+        if (in != null) {
+            in.close();
+            in = null;
+        }
+    }
+
+    public boolean isOpen() { return (flags & IS_CLOSED) == 0; }
 
   // Not used by LineInputStreamReader subclass!
   protected Reader in;
@@ -82,6 +90,7 @@ public class LineBufferedReader extends Reader
   private static final int DONT_KEEP_FULL_LINES = 8;
 
   private static final int EOF_SEEN = 16;
+  private static final int IS_CLOSED = 32;
 
   /** Should we preserve the complete current line?
    * The default is true, but in some cases there can be a performance

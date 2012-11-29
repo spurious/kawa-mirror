@@ -1,3 +1,9 @@
+2012-11-28  Per Bothner  <per@bothner.com>
+
+	* ports.scm (open-binary-input-file, call-with-port, textual-port?,
+	binary-port?, port?, input-port-open?, output-port-open?,
+	open-input-bytevector, close-port): New functions.
+
 2012-11-27  Per Bothner  <per@bothner.com>
 
 	* ports.scm (eof-object, read-string, read-u8, peek-u8, u8-ready,

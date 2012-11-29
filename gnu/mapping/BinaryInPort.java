@@ -28,6 +28,19 @@ public class BinaryInPort extends InPort {
         bbuffer = new byte[8192];
     }
 
+    public BinaryInPort(byte[] buffer, int length, Path path) {
+        super((Reader) null, path);
+        // Use a fixed-size buffer.  This prevents really-long "lines"
+	// from causing the buffer to grow to accomodate them.
+	try
+	  {
+	    setBuffer(new char[2048]);
+	  }
+	catch (java.io.IOException ex) { /* ignored */ }
+        bbuffer = buffer;
+        blimit = length;
+    }
+
     @Override
     protected int fill (int len) throws java.io.IOException {
         if (! bfill())
@@ -42,6 +55,8 @@ public class BinaryInPort extends InPort {
     /** Read some bytes into byte buffer bbuffer.  Return false on EOF. */
     private boolean bfill() throws IOException {
         while (bpos >= blimit) {
+            if (strm == null)
+                return false;
             int n = strm.read(bbuffer, 0, bbuffer.length);
             bpos = 0;
             if (n < 0) {
@@ -119,12 +134,20 @@ public class BinaryInPort extends InPort {
 
     @Override
     public void close() throws IOException {
-        strm.close();
+        if (strm != null)
+            strm.close();
+        strm = null;
         bbuffer = null;
+        super.close();
     }
 
     @Override
     protected boolean sourceReady() throws IOException {
-        return bpos < blimit || strm.available() > 0;
+        return bpos < blimit || (strm != null && strm.available() > 0);
+    }
+
+    public static BinaryInPort openFile(Object fname)
+        throws IOException {
+        return (BinaryInPort) InPort.openFile(fname, Boolean.FALSE);
     }
 }

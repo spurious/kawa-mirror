@@ -43,16 +43,25 @@ public class InPort extends gnu.text.LineBufferedReader implements Printable
     inLocation.set(in);
   }
 
-  public static InPort openFile(Object fname)
-    throws java.io.IOException
-  {
-    Path path = Path.valueOf(fname);
-    return openFile(path.openInputStream(), path);
-  }
+    public static InPort openFile(Object fname) throws java.io.IOException {
+        Path path = Path.valueOf(fname);
+        return openFile(path.openInputStream(), path);
+    }
+
+    public static InPort openFile(Object fname, Object conv)
+        throws java.io.IOException {
+        Path path = Path.valueOf(fname);
+        return openFile(path.openInputStream(), path, conv);
+    }
 
     public static InPort openFile(InputStream strm, Path path)
             throws java.io.UnsupportedEncodingException {
         Object conv = Environment.user().get("port-char-encoding");
+        return openFile(strm, path, conv);
+    }
+
+    public static InPort openFile(InputStream strm, Path path, Object conv)
+            throws java.io.UnsupportedEncodingException {
         if (conv == Boolean.FALSE) {
             return new BinaryInPort(strm, path);
         }

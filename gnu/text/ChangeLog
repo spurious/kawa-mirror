@@ -1,3 +1,9 @@
+2012-11-28  Per Bothner  <per@bothner.com>
+
+	* LineBufferedReader.java (IS_CLOSED): New constant.
+	(close): Set IS_CLOSED.  Don't crash if already closed.
+	(isOpen): New method.
+
 2012-11-27  Per Bothner  <per@bothner.com>
 
 	* LineBufferedReader.java (EOF_SEEN): New constant.

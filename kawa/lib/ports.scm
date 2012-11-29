@@ -8,11 +8,19 @@
 (define (open-input-file (name :: path)) :: <input-port>
   (invoke-static <input-port> 'openFile name))
 
+(define (open-binary-input-file (name :: path)) ::gnu.mapping.BinaryInputPort
+  (gnu.mapping.BinaryInPort:openFile name))
+
 (define (open-output-file (name :: path)) :: <output-port>
   (invoke-static <output-port> 'openFile name))
 
 (define (open-binary-output-file (name ::path)) ::gnu.mapping.BinaryOutputPort
   (gnu.mapping.BinaryOutPort:openFile name))
+
+(define (call-with-port (port ::java.io.Closeable) (proc ::procedure))
+  (try-finally
+   (proc port)
+   (close-port port)))
 
 (define (call-with-input-file (path :: path) (proc :: <procedure>))
  (let ((port :: <input-port> (open-input-file path)))
@@ -53,6 +61,21 @@
 
 (define (output-port? x) :: <boolean>
   (instance? x <output-port>))
+
+(define (textual-port? port x) ::boolean
+  (or (input-port? x) (output-port? x)))
+
+(define (binary-port? port x) ::boolean
+  (or (gnu.mapping.BinaryInPort? x) (gnu.mapping.BinaryOutPort? x)))
+
+(define (port? x)
+  (or (input-port? x) (output-port? x)))
+
+(define (input-port-open? (port ::input-port))
+  (port:isOpen))
+
+(define (output-port-open? (port ::output-port))
+  (port:isOpen))
 
 (define-alias-parameter current-input-port <input-port>
   (static-field <input-port> 'inLocation))
@@ -96,6 +119,10 @@
 
 (define (get-output-string (output-port  <string-output-port>))
   (<gnu.lists.FString> (output-port:toCharArray)))
+
+(define (open-input-bytevector (bvector ::bytevector))
+  ::gnu.mapping.BinaryInPort
+  (gnu.mapping.BinaryInPort (bvector:getBuffer) (bvector:size) "<bytevector>"))
 
 (define (open-output-bytevector) ::gnu.mapping.BinaryOutPort
   (let* ((bo (java.io.ByteArrayOutputStream))
@@ -287,11 +314,14 @@
       (invoke port 'getPrompter))
     input-port-prompter))
 
-(define (close-input-port (port :: <input-port>))
-  (invoke port 'close))
+(define (close-port (port ::java.io.Closeable))
+  (port:close))
 
-(define (close-output-port (port :: <output-port>))
-  (invoke port 'close))
+(define (close-input-port (port ::java.io.Reader))
+  (port:close))
+
+(define (close-output-port (port ::java.io.Writer))
+  (port:close))
 
 (define (read #!optional (port :: <input-port> (current-input-port)))
   (let ((lexer (gnu.kawa.lispexpr.LispReader:new port)))

@@ -13,6 +13,7 @@ public class OutPort extends PrintConsumer implements Printable
   private Writer base;
   static final int FLUSH_ON_FINALIZE = 1;
   static final int CLOSE_ON_FINALIZE = 2;
+  static final int IS_CLOSED = 4;
   int finalizeAction;
 
   // To keep track of column-numbers, we use a helper class.
@@ -384,6 +385,8 @@ public class OutPort extends PrintConsumer implements Printable
     unregisterRef = null;
   }
 
+    public boolean isOpen() { return (finalizeAction & IS_CLOSED) == 0; }
+
   @Override
   public void close()
   {
@@ -404,6 +407,7 @@ public class OutPort extends PrintConsumer implements Printable
       }
     WriterManager.instance.unregister(unregisterRef);
     unregisterRef = null;
+    finalizeAction = IS_CLOSED;
   }
 
   /** True if the port should be automatically closed on exit.

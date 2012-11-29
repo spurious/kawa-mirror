@@ -1,3 +1,7 @@
+2012-11-28  Per Bothner  <per@bothner.com>
+
+	* BinaryOutPort.java (openFile): Just use super.openFile.
+
 2012-11-27  Per Bothner  <per@bothner.com>
 
 	* BinaryInPort.java: New class, extends InPort.

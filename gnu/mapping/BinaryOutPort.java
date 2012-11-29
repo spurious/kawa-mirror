@@ -31,12 +31,7 @@ public class BinaryOutPort extends OutPort {
 
     public static BinaryOutPort openFile(Object fname)
         throws IOException {
-        Path path = Path.valueOf(fname);
-        java.io.OutputStream strm = path.openOutputStream();
-        BinaryOutPort op =
-            new BinaryOutPort(new BufferedOutputStream(strm), path);
-        op.finalizeAction = CLOSE_ON_FINALIZE;
-        return op;
+        return (BinaryOutPort) OutPort.openFile(fname, Boolean.FALSE);
     }
 
     public void writeBytes(byte[] buf, int off, int len) throws IOException {

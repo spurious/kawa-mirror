@@ -1,3 +1,8 @@
+2012-11-28  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Ports): Document some more R7TS port functions,
+	including discussion of textual vs binary ports.
+
 2012-11-27  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Ports): Add documentation of input procedures,

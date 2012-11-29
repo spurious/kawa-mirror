@@ -7183,6 +7183,7 @@ passed to the parameter object, and an unspecified value is returned.
 @end example
 @end deffn
 
+@anchor{parameterize-syntax}
 @deffn Syntax parameterize ((expr1 expr2) ...) @stxref{body}
 The expressions @var{expr1} and @var{expr2} are evaluated in an
 unspecified order. The value of the @var{expr1} expressions must be
@@ -8014,8 +8015,8 @@ If @var{arg} is already a @code{path}, it is returned unchanged.
 If @var{arg} is a @code{java.net.URI}, or a @code{java.net.URL}
 then a @code{URI} value is returned.
 If @var{arg} is a @code{java.io.File}, a @code{filepath} value is returned.
-Otherwise, @var{arg} can be a Scheme string or a @code{java.lang.String}.
-A @code{URI} value is returns if the string starts with a URI scheme
+Otherwise, @var{arg} can be a string.
+A @code{URI} value is returned if the string starts with a URI scheme
 (such as @code{"http:"}),
 and a @code{filepath} value is returned otherwise.
 @end deffn
@@ -8299,28 +8300,178 @@ this will be fixed in a future release (using Java2 features).
 Ports represent input and output devices.
 An input port is a Scheme object that can deliver data upon
 command, while an output port is a Scheme object that can
-accept data.  These are disjoint types in Kawa.
+accept data.
 
-@deffn Procedure open-input-file string
+Different @dfn{port types} operate on different data:
+@itemize @bullet
+@item
+A @dfn{textual port} supports reading or writing of individual
+characters from or to a backing store containing characters
+using @code{read-char} and @code{write-char} below, and it supports
+operations defined in terms of characters, such as @code{read} and
+@code{write}.
+@item
+A @dfn{binary port} supports reading or writing of individual
+bytes from or to a backing store containing bytes using
+@code{read-u8} and @code{write-u8} below, as well as operations defined
+in terms of bytes (integers in the range 0 to 255).
+
+All Kawa binary ports created by procedures documented here
+are also textual ports.  Thus you can either read/write
+bytes as described above, or read/write
+characters whose scalar value is in the range 0 to 255
+(i.e. the Latin-1 character set), using @code{read-char} and @code{write-char}.
+
+A native binary port is a @code{java.io.InputStream}
+or @code{java.io.OutputStream} instance.  These are not textual ports.
+You can use methods @code{read-u8} and @code{write-u8},
+but not @code{read-char} and @code{write-char} on native binary ports.
+(The functions @code{input-port?}, @code{output-port?}, @code{binary-port?},
+and @code{port?} all currently return false on native binary ports,
+but that may change.)
+@end itemize
+
+@deffn Procedure call-with-port port proc
+The @code{call-with-port} procedure calls @var{proc} with port as an
+argument. If @var{proc} returns, then the port is closed automatically
+and the values yielded by the proc are returned.
+
+If @var{proc} does not return, then the port must not be closed
+automatically unless it is possible to prove that the port
+will never again be used for a read or write operation.
+
+As a Kawa extension, @var{port} may be any object
+that implements @code{java.io.Closeable}.
+It is an error if @var{proc} does not accept one argument.
+
+@c @emph{Rationale}: Because Scheme’s escape procedures have unlimited
+@c extent, it is possible to escape from the current continuation
+@c but later to resume it. If implementations were permitted to
+@c close the port on any escape from the current continuation,
+@c then it would be impossible to write portable code using both
+@c call-with-current-continuation and call-with-port.
 @end deffn
 
-@deffn Procedure open-output-file string
-@deffnx Procedure open-binary-output-file string
-Takes a string naming an output file to be created and returns
+@deffn Procedure call-with-input-file path proc
+@deffnx Procedure call-with-output-file path proc
+These procedures obtain a textual port obtained by
+opening the named file for input or output as if by
+@code{open-input-file} or @code{open-output-file}. The port and
+@var{proc} are then passed to a procedure equivalent to
+@code{call-with-port}.
+
+It is an error if @var{proc} does not accept one argument.
+@end deffn
+
+@deffn Procedure input-port? obj
+@deffnx Procedure output-port? obj
+@deffnx Procedure textual-port? obj
+@deffnx Procedure binary-port? obj
+@deffnx Procedure port? obj
+These procedures return @code{#t} if obj is an input port, output port,
+textual port, binary port, or any kind of port,
+respectively. Otherwise they return @code{#f}.
+
+These procedures currently return @code{#f} on a native Java streams
+(@code{java.io.InputStream} or @code{java.io.OutputStream}),
+a native reader (a @code{java.io.Reader} that is not an
+@code{gnu.mapping.Inport}), or a native writer (a @code{java.io.Writer}
+that is not an @code{gnu.mapping.Outport}).  This may change if
+conversions between native ports and Scheme ports becomes more seamless.
+
+@end deffn
+
+@deffn Procedure input-port-open? port
+@deffnx Procedure output-port-open? port
+Returns @code{#t} if @var{port} is still open and capable of performing
+input or output, respectively, and @code{#f} otherwise.
+(Not supported for native binary ports - i.e. @code{java.io.InputStteam}
+or @code{java.io.OutputStream}.)
+@end deffn
+
+@deffn Procedure current-input-port
+@deffnx Procedure current-output-port
+@deffnx Procedure current-error-port
+Returns the current default input port, output port, or
+error port (an output port), respectively.
+(The error port is the the port to which errors and warnings should be sent
+- the @dfn{standard error} in Unix and C terminology.)
+These procedures are @ref{Parameter objects,parameter objects},
+which can be overridden with @ref{parameterize-syntax,@code{parameterize}}.
+The initial bindings for these are implementation-defined textual ports.
+@end deffn
+
+@deffn Procedure with-input-from-file path thunk
+@deffnx Procedure with-output-to-file path thunk
+The file is opened for input or output as if by
+@code{open-input-file} or @code{open-output-file}, and the new port
+is made to be the value returned by @code{current-input-port}
+or @code{current-output-port} (as used by @code{(read)},
+@code{(write @var{obj})}, and so forth). The thunk is then called with no
+arguments. When the @var{thunk} returns, the port is closed
+and the previous default is restored. It is an error if @var{thunk}
+does not accept zero arguments. Both procedures return
+the values yielded by @var{thunk}. If an escape procedure is used
+to escape from the continuation of these procedures, they
+behave exactly as if the current input or output port had
+been bound dynamically with @code{parameterize}.
+@end deffn
+
+@deffn Procedure open-input-file path
+@deffnx Procedure open-binary-input-file path
+Takes a @var{path} naming an existing file and returns a textual
+input port or binary input port that is capable of delivering
+data from the file.
+@c If the file does not exist or cannot be
+@c opened, an error that satisfies file-error? is signaled.
+
+The procedure @code{open-input-file} checks the fluid variable
+@code{@ref{port-char-encoding}} to determine how bytes are decoded
+into characters.  The procedure @code{open-binary-input-file}
+is equivalent to calling @code{open-input-file} with
+@code{port-char-encoding} set to @code{#f}.
+@end deffn
+
+@deffn Procedure open-output-file path
+@deffnx Procedure open-binary-output-file path
+Takes a @var{path} naming an output file to be created and returns
 respectively a textual output port or binary output port that is
 capable of writing data to a new file by that name. If a
 file with the given name already exists, the effect is unspecified.
 @c If the file cannot be opened, an error that satisfies
 @c file-error? is signaled.
+
+The procedure @code{open-output-file} checks the fluid variable
+@code{@ref{port-char-encoding}} to determine how characters are
+encoded as bytes.  The procedure @code{open-binary-output-file}
+is equivalent to calling @code{open-output-file} with
+@code{port-char-encoding} set to @code{#f}.
 @end deffn
 
-@deffn Procedure current-error-port
-Return the port to which errors and warnings should be sent
-(the @dfn{standard error} in Unix and C terminology).
+@deffn Procedure close-port port
+@deffnx Procedure close-input-port port
+@deffnx Procedure close-output-port port
+Closes the resource associated with @var{port}, rendering the port
+incapable of delivering or accepting data. It is an error to
+apply the last two procedures to a port which is not an
+input or output port, respectively.
+(Specifically, @code{close-input-port} requires a @code{java.io.Reader},
+while @code{close-output-port} requires a @code{java.io.Writer}.
+In contrast @code{close-port} accepts any object whose class
+implements @code{java.io.Closeable}.)
+@c Scheme implementations may provide ports which are simultaneously input
+@c and output ports, such as sockets; the close-input-port
+@c and close-output-port procedures can then be used to
+@c close the input and output sides of the port independently.
+
+These routines have no effect if the port has already been
+closed.
 @end deffn
+
+@subsection String and bytevector ports
 
 @deffn Procedure open-input-string string
-Takes a string and returns an input port that delivers characters
+Takes a string and returns a text input port that delivers characters
 from the string. The port can be closed by @code{close-input-port},
 though its storage will be reclaimed by the
 garbage collector if it becomes inaccessible. 
@@ -8354,18 +8505,19 @@ if it becomes inaccessible.
 @deffn Procedure get-output-string output-port
 Given an output port created by @code{open-output-string},
 returns a string consisting of the characters that have been
-output to the port so far. 
-@end deffn
-
-@deffn Procedure open-output-bytevector
-Returns a binary output port that will accumulate bytes
-for retrieval by @code{get-output-bytevector}.
-@end deffn
-
-@deffn Procedure get-output-bytevector port
-Returns a bytevector consisting of the bytes that have been
 output to the port so far in the order they were output.
-It is an error if @var{port} was not created with @code{open-output-bytevector}.
+If the result string is modified, the effect is unspecified.
+
+@example
+(parameterize
+    ((current-output-port (open-output-string)))
+    (display "piece")
+    (display " by piece ")
+    (display "by piece.")
+    (newline)
+    (get-output-string (current-output-port)))
+        @result{} "piece by piece by piece.\n"
+@end example
 @end deffn
 
 @deffn Procedure call-with-input-string string proc
@@ -8378,6 +8530,22 @@ the result from the call of @var{proc}
 Create an output port that writes its data to a @var{string},
 and call @var{proc} with that port as its one argument.
 Return a string consisting of the data written to the port.
+@end deffn
+
+@deffn Procedure open-input-bytevector bytevector
+Takes a bytevector and returns a binary input port that
+delivers bytes from the bytevector.
+@end deffn
+
+@deffn Procedure open-output-bytevector
+Returns a binary output port that will accumulate bytes
+for retrieval by @code{get-output-bytevector}.
+@end deffn
+
+@deffn Procedure get-output-bytevector port
+Returns a bytevector consisting of the bytes that have been
+output to the port so far in the order they were output.
+It is an error if @var{port} was not created with @code{open-output-bytevector}.
 @end deffn
 
 @subsection Input
@@ -8506,7 +8674,7 @@ not to hang. If the port is at end of file then @code{u8-ready?}
 returns @code{#t}.
 @end deffn
 
-@deffn read-bytevector k [port]
+@deffn Procedure read-bytevector k [port]
 Reads the next @var{k} bytes, or as many as are available before
 the end of file, from the binary input @var{port} into a newly
 allocated bytevector in left-to-right order and returns the
@@ -8514,7 +8682,7 @@ bytevector. If no bytes are available before the end of file,
 an end-of-file object is returned.
 @end deffn
 
-@deffn read-bytevector! bytevector [start [end [port]]]
+@deffn Procedure read-bytevector! bytevector [start [end [port]]]
 Reads the next @var{end} − @var{start} bytes, or as many as are
 available before the end of file, from the binary input @var{port}
 into @var{bytevector} in left-to-right order beginning at the @var{start}
@@ -8540,6 +8708,23 @@ backslash and quotation mark characters are escaped by
 backslashes. Symbols that contain non-ASCII characters
 are escaped with vertical lines.
 Character objects are written using the @code{#\} notation.
+@end deffn
+
+@c write-shared obj [port]
+
+@c write-simple obj [port]
+
+@deffn Procedure display obj [port]
+Writes a representation of @var{obj} to the given textual output
+port. Strings that appear in the written representation
+are output as if by @code{write-string} instead of by @code{write}.
+Symbols are not escaped. Character objects appear in the
+representation as if written by !code{write-char} instead of by
+@code{write}.
+The @code{display} representation of other objects is unspecified.
+@c However, display must always terminate. Thus if the normal write
+@c representation is used, datum labels are needed
+@c to represent cycles as in write.
 @end deffn
 
 @deffn Procedure newline [port]
@@ -8577,7 +8762,7 @@ while R6RS added @code{flush-output-port}. They have the same effect.)
 @end deffn
 
 
-@subsection Miscellaeous
+@subsection Line numbers and other input port properties
 
 An interactive input port has a prompt procedure associated with it.
 The prompt procedure is called before a new line is read.  It is passed
@@ -8660,6 +8845,9 @@ The value of @code{symbol-read-case} only checked
 when a reader is created, not each time a symbol is read.
 @end defvar
 
+@subsection Miscellaeous
+
+@anchor{port-char-encoding}
 @defvar port-char-encoding
 Controls how bytes in external files are converted to/from internal
 Unicode characters.  Can be either a symbol or a boolean.

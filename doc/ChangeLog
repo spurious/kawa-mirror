@@ -1,5 +1,7 @@
 2012-11-29  Per Bothner  <per@bothner.com>
 
+	* kawa.texi (Ports): Document write-simple, write-shared.
+
 	* kawa.texi (Vectors, Bytevectors): More R7RS documentation.
 
 2012-11-28  Per Bothner  <per@bothner.com>

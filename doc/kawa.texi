@@ -8791,14 +8791,31 @@ Writes a representation of @var{obj} to the given textual output
 @var{port}. Strings that appear in the written representation
 are enclosed in quotation marks, and within those strings
 backslash and quotation mark characters are escaped by
-backslashes. Symbols that contain non-ASCII characters
+backslashes.
+Symbols that contain non-ASCII characters
 are escaped with vertical lines.
 Character objects are written using the @code{#\} notation.
+
+@c If @var{obj} contains cycles which would cause an infinite loop
+@c using the normal written representation, then at least the
+@c objects that form part of the cycle must be represented
+@c using datum labels as described in XXXX. Datum
+@c labels must not be used if there are no cycles.
 @end deffn
 
-@c write-shared obj [port]
+@deffn Procedure write-shared obj [port]
+The @code{write-shared} procedure is the same as @code{write}, except
+that shared structure must be represented using datum
+labels for all pairs and vectors that appear more than once
+in the output.
+@end deffn
 
-@c write-simple obj [port]
+@deffn Procedure write-simple obj [port]
+The @code{write-simple} procedure is the same as @code{write}, except
+that shared structure is never represented using datum labels.
+This can cause write-simple not to terminate if @var{obj}
+contains circular structure.
+@end deffn
 
 @deffn Procedure display obj [port]
 Writes a representation of @var{obj} to the given textual output

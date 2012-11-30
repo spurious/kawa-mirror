@@ -1,5 +1,7 @@
 2012-11-29  Per Bothner  <per@bothner.com>
 
+	* ports.scm (write-simple, write-shared): New R7RS procedures.
+
 	* bytevectors.scm (bytevector-copy!, bytevector-append):
 	New R7RS procedures.
 	(utf8->string, string->utf8): Extend with start/end parameters.

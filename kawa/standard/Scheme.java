@@ -462,7 +462,9 @@ public class Scheme extends LispLanguage
       defProcStFld("read-bytevector!", "kawa.lib.ports");
       defProcStFld("char-ready?", "kawa.lib.ports");
       defProcStFld("write", "kawa.lib.ports");
+      defProcStFld("write-shared", "kawa.lib.ports");
       defProcStFld("write-with-shared-structure", "kawa.lib.ports");
+      defProcStFld("write-simple", "kawa.lib.ports");
       defProcStFld("display", "kawa.lib.ports");
       defProcStFld("print-as-xml", "gnu.xquery.lang.XQuery", "writeFormat");
       defProcStFld("write-char", "kawa.lib.ports");

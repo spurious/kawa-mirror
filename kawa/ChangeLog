@@ -1,5 +1,8 @@
 2012-11-29  Per Bothner  <per@bothner.com>
 
+	* standard/Scheme.java (initScheme): New R7RS output functions
+	write-simple and write-shared.
+
 	* standard/Scheme.java (initScheme): New R7RS bytevector functions
 	byteector-copy! and vector-append.
 

@@ -240,10 +240,13 @@
 
 (define (write value #!optional (out ::output-port (current-output-port))) ::void
   (if *print-circle*
-      (write-with-shared-structure value out)
+      (write-shared value out)
       (*:format (kawa.standard.Scheme:.writeFormat) value out)))
 
-(define (write-with-shared-structure 
+(define (write-simple value #!optional (out ::output-port (current-output-port))) ::void
+  (*:format (kawa.standard.Scheme:.writeFormat) value out))
+
+(define (write-shared
 	 value #!optional (out ::output-port (current-output-port))) ::void
   (let ((pretty-out (out:getPrettyWriter)))
     (pretty-out:initialiseIDHash)
@@ -255,6 +258,10 @@
     (pretty-out:writeEndOfExpression)
     (pretty-out:resolveBackReferences)
     (pretty-out:flush)))
+
+(define (write-with-shared-structure 
+	 value #!optional (out ::output-port (current-output-port))) ::void
+         (write-shared value out))
     
 (define (display value #!optional (out (current-output-port))) :: <void>
   (*:format (kawa.standard.Scheme:.displayFormat) value out))

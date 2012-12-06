@@ -10038,8 +10038,8 @@ in a scope where all the @var{field-name}s are visible.
 A @var{method-decl} is as for @code{define-class}.
 @end deffn
 
-@subsection Lambda as shorthand for anonymous class
 @anchor{SAM-conversion}
+@subsection Lambda as shorthand for anonymous class
 An anonymous class is commonly used in the Java platform where a
 function language would use a lambda expression.
 Examples are call-back handlers, events handlers, and @code{run} methods.
@@ -13319,6 +13319,7 @@ to KRL, even in BRL-compatibility mode.
 
 @menu
 * Building for Android::  Building for Android devices.
+* Android view construction:
 * Processes::
 * Low-level functions:: Deprecated low-level functions
 @end menu
@@ -13332,7 +13333,8 @@ is based on a custom virtual machine on top of a Linux kernel.
 Even though Android isn't strictly (or legally) speaking Java,
 you can build Android applications using Kawa.
 
-Here is "Hello world" written in Kawa Scheme:
+Below is "Hello world" written in Kawa Scheme.  A slightly
+more interesting example is in @ref{Android view construction,next section}.
 
 @example
 (require 'android-defs)
@@ -13537,6 +13539,87 @@ $ adb uninstall kawa.android
 (A more interesting @uref{http://androidscheme.blogspot.com/2010/10/text-to-speech-app.html,text-to-speech} example app is on Santosh Rajan's @uref{http://androidscheme.blogspot.com/,Android-Scheme blog}.)
 
 @uref{https://github.com/ecraven/SchemeAndroidOGL}
+
+@node Android view construction
+@section Android view construction
+
+An Android user interface is constructed from @code{View} objects.
+The following is an example that illustrates some features of
+Kawa to help write views hierarchies,
+The example is self-contained, and can be built and run
+as described in @ref{Building for Android}.
+
+@example
+(require 'android-defs)
+(activity hello
+  (on-create-view 
+   (define counter ::integer 0)
+   (define counter-view
+     (TextView text: "Not clicked yet."))
+   (LinearLayout orientation: LinearLayout:VERTICAL
+    (TextView text: "Hello, Android from Kawa Scheme!")
+    (Button
+     text: "Click here!"
+     on-click-listener: (lambda (e)
+                          (set! counter (+ counter 1))
+                          (counter-view:setText
+                           (format "Clicked ~d times." counter))))
+    counter-view)))
+@end example
+
+The first @code{import} form imports various useful definitions
+from the Kawa Android library.  Using these is not required for
+writing a Kawa application, but makes it more convenient.
+
+An Android application consists of one or more @dfn{activities},
+each of which is an instance of the @code{android.app.Activity} class.
+You can use the @code{activity} macro to define your @code{Activity} class.
+The first macro argument (in this case @code{hello}) is the class name,
+and the others are members of the class, in the syntax of
+a @stxref{field-or-method-decl}.  The sub-form @code{on-create-view}
+is an abbreviation for declaring an @code{onCreate} method
+(which is called when the @code{Activity} starts up
+@c LOOK THIS UP - also when re-started?
+followed by a @code{setContentView}:
+The body of the @code{on-create-view} is evaluated.
+The result should be a @code{View} expression,
+which is passed to @code{setContentView}.
+
+The names @code{LinearLayout}, @code{TextView}, and @code{Button}
+are just aliases for standard Android @code{View} sub-classes.
+A few are prefined by @code{(require 'android-defs)}, or you
+can define them yourself using @code{define-alias}.
+
+@subsection View object allocation
+
+To create an instance of a @code{View} class you ``call'' the
+class as if it were a function,
+as described in @ref{Allocating objects}.
+For example:
+@example
+(TextView (this) text: "Hello, Android from Kawa Scheme!")
+@end example
+
+If you @code{(require 'android-defs)} that defines
+some special handling for @code{View} classes.
+You can leave out the @code{(this)} argument,
+which refers to the enclosing @code{Activity}:
+@example
+(TextView text: "Hello, Android from Kawa Scheme!")
+@end example
+
+@subsection Event handlers
+
+You can register event listeners on Android @code{View} objects
+using methods typically named @code{setOn@var{EVENT}Listener}.
+For example @code{setOnClickListener}.  When allocating
+an object you can leave out the @code{set}, and you can optionally
+use Scheme-style names: @code{on-click-listener}.  The argument
+is an object of a special nested listener class,
+for example @code{View$OnClickListener}.  These are
+single-method classes, so you can use a lambda expression
+and @ref{SAM-conversion} will automatically create the needed
+listener class.
 
 @node Processes
 @section Processes

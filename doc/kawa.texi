@@ -1385,12 +1385,10 @@ files using other character encodings.
 
 Kawa provides the usual read-eval-print loop, as well as batch modes.
 
-Kawa provides a framework for implementing other progressing languages,
+Kawa provides a framework for implementing other programming languages,
 and comes with incomplete support for CommonLisp, Emacs Lisp, and
 EcmaScript, and the
 draft @uref{http://www.gnu.org/software/qexo/,XML Query language}.
-
-Kawa is written in an object-oriented style.
 
 Kawa has builtin pretty-printer support, and fancy formatting.
 
@@ -1400,23 +1398,12 @@ Kawa can be @ref{Evaluating Scheme expressions from Java,
 embedded as a scripting language in Java programs}.
 
 Kawa implements the full numeric tower, including infinite-precision
-rational numbers and complex numbers.  It also supports "quantities"
+rational numbers and complex numbers.  It also supports @ref{Quantities}
 with units, such as @code{3cm}.
 
 You can optionally declare the types of variables.
 
 You can conveniently access Java objects, methods, fields, and classes.
-
-Kawa implements most of the features of the expression language of DSSSL,
-the Scheme-derived ISO-standard Document Style Semantics and Specification
-Language for SGML.  Of the core expression language, the only features
-missing are character properties, @code{external-procedure},
-the time-relationed procedures, and character name escapes in
-string literals.  Also, Kawa is not generally tail-recursive.
-From the full expression language, Kawa additionally is missing
-@code{format-number}, @code{format-number-list}, and language objects.
-Quantities, keyword values, and the expanded @code{lambda} form
-(with optional and keyword parameters) are supported.
 
 @menu
 * Implemented SRFIs::
@@ -1529,6 +1516,17 @@ re-define a global definition), and there must be no assignments
 (using @code{set!}) to the procedure binding.
 
 By default, symbols are case sensitive.
+
+Kawa implements most of the features of the expression language of DSSSL,
+the Scheme-derived ISO-standard Document Style Semantics and Specification
+Language for SGML.  Of the core expression language, the only features
+missing are character properties, @code{external-procedure},
+the time-relationed procedures, and character name escapes in
+string literals.
+From the full expression language, Kawa additionally is missing
+@code{format-number}, @code{format-number-list}, and language objects.
+Quantities, keyword values, and the expanded @code{lambda} form
+(with optional and keyword parameters) are supported.
 
 @node Syntax, Multiple values, Features, Top
 @chapter Syntax
@@ -1671,13 +1669,12 @@ of the input.
 @c language: @code{@{ @}}
 
 @display
-@stxdef{lexeme} @stxref{identifier} | @var{boolean} | @var{number}
+@stxdef{lexeme} @stxref{identifier} | @var{boolean} | @stxref{number}
          | @var{character} | @var{string}
          | @stxlit{(} |  @stxlit{)} |  @stxlit{[} |  @stxlit{]} |  @stxlit{#(}
-@c | #vu8( |
          | @stxlit{'} | @stxlit{`} | @stxlit{,} | @stxlit{,@@} | @stxlit{.}
          | @stxlit{#'} |  @stxlit{#`} |  @stxlit{#,} |  @stxlit{#,@@}
-@stxdef{delimiter} @stxlit{(} |  @stxlit{)} |  @stxlit{[} | @stxlit{]} | @stxlit{"} | @stxlit{}; | @stxlit{#}
+@stxdef{delimiter} @stxlit{(} |  @stxlit{)} |  @stxlit{[} | @stxlit{]} | @stxlit{"} | @stxlit{;} | @stxlit{#}
          | @stxref{whitespace}
 @end display
 
@@ -1865,6 +1862,29 @@ Note that colon @code{:} is treated specially for
 @ref{Colon notation, colon notation} in Kawa Scheme,
 though it is a @var{special-initial} in standard Scheme (R6RS).
 
+@subsection Numbers
+
+((INCOMPLETE))
+
+@display
+@stxdef{number} ((TODO))
+  | @stxref{quantity}
+@stxdef{decimal} @stxref{digit}+ @stxref{optional-exponent}
+  | @stxlit{.} @stxref{digit}+ @stxref{optional-exponent}
+  | @stxref{digit}+ @stxlit{.} @stxref{digit}+ @stxref{optional-exponent}
+@end display
+
+@display
+@stxdef{optional-exponent} @i{empty}
+  | @stxref{exponent-marker} @stxref{optional-sign} @stxref{digit}+
+@stxdef{exponent-marker} @stxlit{e} | @stxlit{s} | @stxlit{f} | @stxlit{d} | @stxlit{l}
+@stxdef{optional-sign} @i{empty} | @stxlit{+} | @stxlit{-}
+@stxdef{digit-2} @stxlit{0} | @stxlit{1}
+@stxdef{digit-8} @stxlit{0} | @stxlit{1} | @stxlit{2} | @stxlit{3} | @stxlit{4} | @stxlit{5} | @stxlit{6} | @stxlit{7}
+@stxdef{digit-10} @stxref{digit}
+@stxdef{digit-16} @stxref{digit-10} | @stxlit{a} | @stxlit{b} | @stxlit{c} | @stxlit{d} | @stxlit{e} | @stxlit{f}
+@end display
+
 @node Datum syntax, Hash-prefixed forms, Lexical syntax, Syntax
 @section Datum syntax
 
@@ -1879,7 +1899,6 @@ Syntax'':
 @stxdef{datum} @stxref{defining-datum}
          | @stxref{nondefining-datum}
          | @stxref{defined-datum}
-
 @stxdef{defining-datum} @stxlit{#}@stxref{indexnum}@stxlit{=}@stxref{nondefining-datum}
 @stxdef{defined-datum} @stxlit{#}@var{indexnum}@stxlit{#}
 @stxdef{nondefining-datum} @stxref{lexeme-datum}
@@ -4352,12 +4371,23 @@ The number part can be an arbitrary complex number.
 The unit is a product of integer powers of base units,
 such as meter or second.
 
-Kawa quantities are a generalization of the quantities in DSSSL,
-which only has length-derived quantities.
-
-The precise syntax of quantity literals may change,
-but some examples are @code{10pt} (10 points), @code{5s} (5 seconds),
+Quantity literals have the following syntax:
+@display
+@stxdef{quantity} @stxref{optional-sign} @stxref{decimal} @stxref{unit-term} [@stxlit{*} @stxref{unit-term}]... [@stxlit{/} @stxref{unit-term}]
+@stxdef{unit-term} @stxref{unit-name} [@stxlit{^} @stxref{digit}+]
+@stxdef{unit-name} @stxref{letter}+
+@end display
+Some examples are @code{10pt} (10 points), @code{5s} (5 seconds),
 and @code{4cm^2} (4 square centimeters).
+
+Note the @var{quantity} syntax is not recognized by the reader.
+Instead these are read as symbols.
+Assuming there is no lexical binding the for the symbol, it will be
+rewritten at compile-time into an expression.  For example @code{4cm^2}
+is transformed into:
+@example
+(* 4.0 (expt unit:cm 2))
+@end example
 
 @deffn Procedure quantity? object
 True iff @var{object} is a quantity.  Note that all numbers are

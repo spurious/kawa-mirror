@@ -1,5 +1,8 @@
 2012-12-06  Per Bothner  <per@bothner.com>
 
+	* kawa.texi (Quantities): Add soem more information, including
+	documenting syntax.
+
 	* kawa.texi (Android view construction): New section.
 
 2012-11-29  Per Bothner  <per@bothner.com>

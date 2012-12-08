@@ -1401,6 +1401,8 @@ Kawa implements the full numeric tower, including infinite-precision
 rational numbers and complex numbers.  It also supports @ref{Quantities}
 with units, such as @code{3cm}.
 
+Kawa supports @ref{Lazy evaluation}, with convenient implicit forcing.
+
 You can optionally declare the types of variables.
 
 You can conveniently access Java objects, methods, fields, and classes.
@@ -13348,8 +13350,8 @@ to KRL, even in BRL-compatibility mode.
 @chapter Special topics
 
 @menu
-* Building for Android::  Building for Android devices.
-* Android view construction:
+* Building for Android::  Building for Android devices
+* Android view construction::
 * Processes::
 * Low-level functions:: Deprecated low-level functions
 @end menu

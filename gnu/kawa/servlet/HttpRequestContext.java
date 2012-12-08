@@ -124,7 +124,8 @@ public abstract class HttpRequestContext
    * This is an initial substring of the {@link #getRequestPath}.
    * Like {@code ServletContext#getContextPath}, but ends with a {@code '/'}.
    * The string {@code getRequestURI()} is the same as the concatenation of
-   * {@code getContextPath()}, {@code getScriptPath()}, and {code getLocationPath()}.
+   * {@code getContextPath()}, {@code getScriptPath()},
+   * and {@code getLocalPath()}.
    */
   public abstract String getContextPath ();
 

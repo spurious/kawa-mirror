@@ -5,6 +5,16 @@
 <article id="root">
 <title>Kawa Scheme Tutorial</title>
 
+<para><emphasis>This is obviously incomplete, but it may be useful,
+especially if you're starting with Kawa from scratch.</emphasis>
+If you're new to Scheme you might also check out one of these tutorials:
+Takafumi Shido's
+<ulink url="http://www.shido.info/lisp/idx_scm_e.html">Yet Another Scheme Tutorial</ulink>;
+Greg Badross <ulink url="http://www.cs.washington.edu/education/courses/341/99suq/lectures/scheme/">lecture notes</ulink>;
+Dorai Sitaram's <ulink url="http://www.ccs.neu.edu/home/dorai/t-y-scheme/t-y-scheme-Z-H-1.html">Teach Yourself Scheme in Fixnum Days</ulink>; or
+Paul Wilson's <ulink url="ftp://ftp.cs.utexas.edu/pub/garbage/cs345/schintro-v14/schintro_toc.html">An Introduction to Scheme and its Implementation</ulink>.
+</para>
+
 <sect1 id="Introduction"><title>Introduction</title>
 <para>
 You've heard about all the hot scripting languages
@@ -41,8 +51,8 @@ Luckily, you don't need to understand continuations!
 <para>
 The following assumes that Kawa is already installed on your computer;
 if not see these <ulink url="../Installation.html">installation instructions</ulink>.</para>
-<para>The best way to learn Kawa is by starting the
-<literal>kawa</literal> command in interactive mode:</para>
+<para>Running the <literal>kawa</literal> command in interactive mode
+is a good way start learning Kawa:</para>
 <programlisting>
 $ kawa
 #|kawa:1|# 
@@ -208,7 +218,63 @@ A few tests:
 </sect1>
 
 <sect1 id="Functions"><title>Functions</title>
-<para></para>
+<para>To declare a new function use <literal>define</literal>,
+which has the following form:</para>
+<programlisting>
+(define (<replaceable>function-name</replaceable> <replaceable>parameter-names</replaceable>) <replaceable>body</replaceable>)
+</programlisting>
+<para>
+This creates a new function named <replaceable>function-name</replaceable>,
+which takes <replaceable>parameter-names</replaceable> as parameters.
+When the function is called, the  <replaceable>parameter-names</replaceable>
+are initialized with the actual arguments. Then <replaceable>body</replaceable>
+is evaluated, and that becomes the result of the call.</para>
+<para>
+For example in the <literal>factorial</literal> function we looked at recently,
+the <replaceable>function-name</replaceable> is <literal>factorial</literal>,
+and the <replaceable>parameter-names</replaceable> is <literal>x</literal>:
+</para>
+<programlisting>
+(define (factorial x)
+  (if (&lt; x 1) 1
+  (* x (factorial (- x 1)))))
+</programlisting>
+
+<sect2><title>Anonymous functions</title>
+<para>
+<!--If you just evaluate a function nameA function is an actual variable you can evaluate xxx-->
+A <firstterm>lambda expression</firstterm> has the following form:</para>
+<programlisting>
+(lambda (<replaceable>parameter-names</replaceable>) <replaceable>body</replaceable>)
+</programlisting>
+</sect2>
+
+<sect2><title>Optional and rest parameters</title>
+<para>You can declare a function that takes optional argument,
+or variable number of arguments.
+You can also use keyword parameters.
+<ulink url="../Extended-formals.html">Read more here.</ulink>
+</para>
+</sect2>
+
+</sect1>
+
+<sect1 id="Variables"><title>Variables</title>
+<para>You can declare a variable using a <literal>define</literal> form.
+This takes a variable name, and an expression.  It declares a new
+variable with the given name, and assigned the value of the
+expression to the variable.</para>
+<programlisting>
+#|kawa:1|# (define binary-kilo 1024)
+#|kawa:2|# (define binary-mega (* binary-kilo binary-kilo))
+#|kawa:3|# binary-mega
+1048576
+</programlisting>
+<para>A <literal>define</literal> typed into the command-line
+defines a top-level variable.</para>
+<para>
+You can also declare local variables.  TODO.
+</para>
 </sect1>
 
 <sect1 id="Sequences"><title>Lists and sequences</title>

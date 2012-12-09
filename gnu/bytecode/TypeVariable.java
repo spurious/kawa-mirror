@@ -42,6 +42,7 @@ public class TypeVariable extends ObjectType {
     public ClassType getRawType() {
         return rawType;
     }
-    /** @Override */
+
+    @Override
     public String getSignature () { return getRawType().getSignature(); }
 }

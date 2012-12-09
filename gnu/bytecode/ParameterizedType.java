@@ -52,10 +52,10 @@ public class ParameterizedType extends ObjectType
 	this.typeArgumentBounds = bounds;
     }
 
-    /** @Override */
+    @Override
     public String getSignature () { return getRawType().getSignature(); }
 
-    /** @Override */
+    @Override
     public String getGenericSignature() {
         String s = super.getGenericSignature();
         if (s == null) {
@@ -86,12 +86,12 @@ public class ParameterizedType extends ObjectType
 	getRawType().emitCoerceFromObject(code);
     }
 
-    /** @Override */
+    @Override
     public String getName() {
         return toString();
     }
 
-    /** @Override */
+    @Override
     public String toString() {
 	StringBuilder buf = new StringBuilder();
 	buf.append(rawType);

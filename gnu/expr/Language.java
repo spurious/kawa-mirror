@@ -327,10 +327,11 @@ public abstract class Language
    * Get the corresponding {@link Type} for a given name.
    * 
    * This is currently used as a hook in the conversion of type designators to
-   * types. {@link LispLanguage} uses it to check for package style type
-   * designators such as {@code emacs:buffer}, and CommonLisp uses it to
-   * check for a type designator "boolean", so that is can return the appropriate
-   * boolean type. This is a bit over-specialised, but it beats actually
+   * types. {@link gnu.kawa.lispexpr.LispLanguage} uses it to check for package
+   * style type designators such as {@code emacs:buffer},
+   * and CommonLisp uses it to check for a type designator "boolean",
+   * so that is can return the appropriate boolean type.
+   * This is a bit over-specialised, but it beats actually
    * overriding getTypeFor(String) in LispLanguage, CommonLisp just for these minor
    * changes... FIXME!
    *

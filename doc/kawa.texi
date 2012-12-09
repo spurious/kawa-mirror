@@ -8544,7 +8544,7 @@ data from the file.
 @c opened, an error that satisfies file-error? is signaled.
 
 The procedure @code{open-input-file} checks the fluid variable
-@code{@ref{port-char-encoding}} to determine how bytes are decoded
+@ref{port-char-encoding,@code{port-char-encoding}} to determine how bytes are decoded
 into characters.  The procedure @code{open-binary-input-file}
 is equivalent to calling @code{open-input-file} with
 @code{port-char-encoding} set to @code{#f}.
@@ -8560,7 +8560,7 @@ file with the given name already exists, the effect is unspecified.
 @c file-error? is signaled.
 
 The procedure @code{open-output-file} checks the fluid variable
-@code{@ref{port-char-encoding}} to determine how characters are
+@ref{port-char-encoding,@code{port-char-encoding}} to determine how characters are
 encoded as bytes.  The procedure @code{open-binary-output-file}
 is equivalent to calling @code{open-output-file} with
 @code{port-char-encoding} set to @code{#f}.

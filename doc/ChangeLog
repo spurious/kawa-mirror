@@ -1,3 +1,7 @@
+2012-12-09  Per Bothner  <per@bothner.com>
+
+	* kawa.texi: Some tweaks to avoid problems with texi2pdf.
+
 2012-12-08  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Special topics): Fix syntax error.

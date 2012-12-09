@@ -41,9 +41,6 @@ public class BufferContent extends SwtCharBuffer
 
   private Set textChangeListeners = new HashSet();
   
-  /**
-   * @see org.eclipse.swt.custom.StyledTextContent#addTextChangeListener(org.eclipse.swt.custom.TextChangeListener)
-   */
   public void addTextChangeListener(TextChangeListener textChangeListener)
   {
     if (textChangeListener != null) 
@@ -53,26 +50,17 @@ public class BufferContent extends SwtCharBuffer
 
   }
 
-  /**
-   * @see org.eclipse.swt.custom.StyledTextContent#removeTextChangeListener(org.eclipse.swt.custom.TextChangeListener)
-   */
   public void removeTextChangeListener(TextChangeListener textChangeListener)
   {
     textChangeListeners.remove(textChangeListener);
   }
 
   
-  /**
-   * @see org.eclipse.swt.custom.StyledTextContent#getCharCount()
-   */
   public int getCharCount()
   {
     return size();
   }
 
-  /**
-   * @see org.eclipse.swt.custom.StyledTextContent#getLine(int)
-   */
   public String getLine(int lineIndex)
   {
     int startPos = offset2pos(lineOffsets.index2offset(lineIndex));
@@ -96,42 +84,27 @@ public class BufferContent extends SwtCharBuffer
     return new String(tmp);
   }
 
-  /**
-   * @see org.eclipse.swt.custom.StyledTextContent#getLineAtOffset(int)
-   */
   public int getLineAtOffset(int pos)
   {
     return (lineOffsets.offset2index(pos2offset(pos)));
   }
 
-  /**
-   * @see org.eclipse.swt.custom.StyledTextContent#getLineCount()
-   */
   public int getLineCount()
   {
     return lineOffsets.size();
   }
 
-  /**
-   * @see org.eclipse.swt.custom.StyledTextContent#getLineDelimiter()
-   */
   public String getLineDelimiter()
   {
     return "\n";
   }
 
-  /**
-   * @see org.eclipse.swt.custom.StyledTextContent#getOffsetAtLine(int)
-   */
   public int getOffsetAtLine(int lineIndex)
   {
     int result = offset2pos(lineOffsets.index2offset(lineIndex));
     return result;
   }
 
-  /**
-   * @see org.eclipse.swt.custom.StyledTextContent#getTextRange(int, int)
-   */
   public String getTextRange(int start, int length)
   {
     char[] tmp = new char[length];
@@ -139,9 +112,6 @@ public class BufferContent extends SwtCharBuffer
     return new String(tmp);
   }
   
-  /**
-   * @see org.eclipse.swt.custom.StyledTextContent#replaceTextRange(int, int, java.lang.String)
-   */
   public void replaceTextRange(int start, int length, String newText)
   {
     newText = newText == null ? "" : newText; 
@@ -160,12 +130,7 @@ public class BufferContent extends SwtCharBuffer
     "replaceLineCount: " + changingEvent.replaceLineCount + "\n" +
     "text: " + printable(changingEvent.newText) + "\n");
   }
-  /**
-   * @param start
-   * @param length
-   * @param newText
-   * @return
-   */
+
   private TextChangingEvent makeTextChangingEvent(int start, int length, String newText)
   {
     TextChangingEvent result = new TextChangingEvent(this);
@@ -179,9 +144,6 @@ public class BufferContent extends SwtCharBuffer
     return result;
   }
 
-  /**
-   * @see org.eclipse.swt.custom.StyledTextContent#setText(java.lang.String)
-   */
   public void setText(String newText)
   {
     delete(0, size());
@@ -193,9 +155,6 @@ public class BufferContent extends SwtCharBuffer
     }
   }
   
-  /**
-   * @param changedEvent
-   */
   private void notifyListeners(TextChangedEvent changedEvent)
   {
     for (Iterator iter = textChangeListeners.iterator(); iter.hasNext();)
@@ -206,9 +165,6 @@ public class BufferContent extends SwtCharBuffer
     
   }
 
-  /**
-   * @param changingEvent
-   */
   private void notifyListeners(TextChangingEvent changingEvent)
   {
     for (Iterator iter = textChangeListeners.iterator(); iter.hasNext();)
@@ -220,14 +176,6 @@ public class BufferContent extends SwtCharBuffer
   }
 
   
-  /**
-   * For testing purposes
-   * @param args
-   */
-  public static void main(String[] args) 
-  {
-  }
-
   public int lineStartPos(int pos)
   {
     int offset = pos2offset(pos);
@@ -235,21 +183,12 @@ public class BufferContent extends SwtCharBuffer
     return offset2pos(lineStartOffset);
   }
 
-  /**
-   * @param start
-   * @param count
-   * @param out
-   */
-  public void consume(int start, int count, Consumer out)
+ public void consume(int start, int count, Consumer out)
   {
     // TODO Auto-generated method stub
     
   }
 
-  /**
-   * @param in
-   * @throws IOException
-   */
   public void insertFile(Reader in, int pos) throws IOException
   {
     char[] buf = new char[65536];

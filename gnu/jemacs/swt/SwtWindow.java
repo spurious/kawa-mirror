@@ -82,12 +82,6 @@ public class SwtWindow extends EWindow implements VerifyKeyListener, FocusListen
    * I've been thinkin it perhaps would be better to make EKeymap abstract with implementors 
    * for each toolkit, and then lookup commands by Swt events directly when running
    * Swt and Swing events when running swing. Must be considered more... 
-   * 
-   *  
-   * @param swtKeyCode
-   * @param stateMask
-   * @param additionalFlags
-   * @return
    */
   private int transFormKeyKode(int swtKeyCode, int stateMask, int additionalFlags)
   {

@@ -91,9 +91,6 @@ public class SwtBuffer extends Buffer
 
   // ---------------------- Insertion --------------------------
   
-  /**
-   * @see gnu.jemacs.buffer.Buffer#insertChar(java.lang.String, java.lang.Object, int)
-   */
   public void insert(String string, Object style, int ipos)
   {
     // TODO Auto-generated method stub

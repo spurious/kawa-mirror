@@ -93,8 +93,6 @@ public class LineOffsets extends GapVector
   /**
    * We seek the line containing a given text offset using a halfing of intervals algorithm. Therefore
    * the method will use O(log(n)) time, n being the number of lines. 
-   * 
-   * @see org.eclipse.swt.custom.StyledTextContent#getLineAtOffset(int)
    */
   public int offset2index(int offset)
   {

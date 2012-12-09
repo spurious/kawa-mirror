@@ -130,7 +130,9 @@ public class DisplayFormat extends AbstractFormat
       {
 	Pair pair = (Pair) list;
 	writeObject(pair.getCar(), (Consumer) out);
-	list = Promise.force(pair.getCdr());
+        list = pair.getCdr();
+        if (! getReadableOutput())
+          list = Promise.force(list);
         if (list == LList.Empty)
           break;
         out.writeSpaceFill();

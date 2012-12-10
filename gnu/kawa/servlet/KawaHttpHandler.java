@@ -94,6 +94,8 @@ public class KawaHttpHandler
     int rlen = resourceRoot.length();
     if (rlen > 0 && resourceRoot.charAt(rlen-1) != '/')
       resourceRoot = resourceRoot + "/";
+    if (uriRoot.length() == 0 || uriRoot.charAt(0) != '/')
+      uriRoot = "/" + uriRoot;
     server.createContext(uriRoot, new KawaHttpHandler(resourceRoot));
   }
   public static void startServer(int port) throws IOException
@@ -133,7 +135,7 @@ public class KawaHttpHandler
     {
       try
         {
-      String p = path;
+          String p = path;
           Path root = httpHandler.resourceRoot;
           path = normalizeToContext(path);
           if (path == null)

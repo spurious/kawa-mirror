@@ -1,3 +1,7 @@
+2012-12-10  Per Bothner  <per@bothner.com>
+
+	* webtest/info/+default+: Minor tweaks.
+
 2012-11-29  Per Bothner  <per@bothner.com>
 
 	* lib-test.scm: Some more vector and bytevectors tests from R7RS.

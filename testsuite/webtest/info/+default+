@@ -31,8 +31,8 @@
 (request-url) &{arrow} &(request-url)
 
 (module-uri) &{arrow} (module-uri)
-(resource-url "foo.png") &{arrow} &(resource-url "foo.png")
-(request-path-translated)" &{arrow} &(request-path-translated)
+(resource-url "example.png") &{arrow} &(resource-url "example.png")
+(request-path-translated) &{arrow} &(request-path-translated)
 
 (request-local-socket-address) &{arrow} &(request-local-socket-address)
 (request-local-IP-address) &{arrow} &(request-local-IP-address)

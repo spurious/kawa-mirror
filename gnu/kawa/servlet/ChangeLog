@@ -1,5 +1,9 @@
 2012-12-10  Per Bothner  <per@bothner.com>
 
+	* KawaAutoHandler.java (getModule): Don't include initial slash in
+	path value.  This sort-of works if context-path doens't end in slash.
+	Fix some problems if path is a directory.
+
 	* KawaHttpHandler.java (addAutoHandler): Add initial "/" to
 	uriRoot if needed.
 

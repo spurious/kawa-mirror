@@ -38,8 +38,8 @@ public class KawaAutoHandler
     throws Exception
   {
     String path = hctx.getRequestPath();
-    // Adjust to relative to context, starting with "/".
-    path = path.substring(hctx.getContextPath().length()-1);
+    // Adjust to relative to context.
+    path = path.substring(hctx.getContextPath().length());
     Hashtable mmap
       = (Hashtable) hctx.getAttribute(MODULE_MAP_ATTRIBUTE);
     if (mmap == null)
@@ -64,13 +64,17 @@ public class KawaAutoHandler
       return mcontext.findInstance(minfo);
 
     int plen = path.length();
+    // Temporarily preset script-path to "" while doing getResourceURL.
+    hctx.setScriptAndLocalPath("", "");
     // If the path matches a directory rather than a file, keep looking.
     URL url = (plen == 0 || path.charAt(plen-1) == '/') ? null
       : hctx.getResourceURL(path);
-
+    Path absPath = url == null ? null : URLPath.valueOf(url);
     String upath = path;
-    if (url == null)
+    if (url == null || absPath.isDirectory())
       {
+        if (url != null) // i.e. if path is a directory without final '/'.
+          upath = path = path + '/';
         String xpath = path;
         for (;;)
           {
@@ -82,7 +86,8 @@ public class KawaAutoHandler
             url = hctx.getResourceURL(upath);
             if (url != null)
               {
-                hctx.setScriptAndLocalPath(path.substring(1, sl+1), path.substring(sl+1));
+                hctx.setScriptAndLocalPath(path.substring(0, sl+1), path.substring(sl+1));
+                absPath = URLPath.valueOf(url);
                 break;
               }
           }
@@ -92,11 +97,11 @@ public class KawaAutoHandler
         hctx.setScriptAndLocalPath(path, "");
       }
 
-    if (url == null)
+    if (absPath == null || absPath.isDirectory())
       {
         //	hctx.sendNotFound(path);
-        String msg = "The requested URL "+path+" was not found on this server."
-          +" res/:"+hctx.getResourceURL("/")+"\r\n";
+        String msg = "The requested URL "+path+" was not found on this server. "
+          +hctx.getResourceURL("/")+"\r\n";
         byte[] bmsg = msg.getBytes();
         hctx.sendResponseHeaders(HttpRequestContext.HTTP_NOT_FOUND, null, bmsg.length);
         OutputStream out = hctx.getResponseStream();
@@ -119,7 +124,6 @@ public class KawaAutoHandler
 
     mmap.put(path, minfo);
 
-    Path absPath = minfo.getSourceAbsPath();
     InputStream resourceStream = absPath.openInputStream();
     if (! (resourceStream instanceof BufferedInputStream))
       // Not just a performance issue, since we need marks to be supported

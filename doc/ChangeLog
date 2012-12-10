@@ -1,3 +1,9 @@
+2012-12-10  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Top): Link to tutorial.
+	(Features): Add some features worth mentioning.
+	(Self-configuring page scripts): Some extra information.
+
 2012-12-09  Per Bothner  <per@bothner.com>
 
 	* kawa.texi: Some tweaks to avoid problems with texi2pdf.

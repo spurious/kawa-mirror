@@ -142,14 +142,9 @@ version of this document) is @uref{http://www.gnu.org/software/kawa/}.
 
 @c (blank line needed above) @end ifnotdocbook
 
-For lots of Scheme resources, see
-@uref{http://www.schemers.org/,www.schemers.org},
-including an online copy of the
-@uref{http://www.schemers.org/Documents/Standards/,R6RS standard}.
-A nice quick introduction to Scheme can be found in
-@uref{http://www.cs.washington.edu/education/courses/341/99su/lectures/scheme/,Greg Badros's lecture notes}.  A more in-depth tutorial which also
-discusses Scheme implementation is
-@uref{ftp://ftp.cs.utexas.edu/pub/garbage/cs345/schintro-v14/schintro_toc.html, Paul Wilson's "An Introduction to Scheme and its Implementation"}.
+The (quite incomplete) @uref{tutorial/index.html,Kawa tutorial} can
+be useful to get stated; it also also links to some other more in-depth
+(but not Kawa-specific) Scheme tutorials.
 
 For copyright information on the software and documentation,
 see @ref{License}.
@@ -1396,6 +1391,22 @@ Kawa supports class-definition facilities, and separately-compiled modules.
 
 Kawa can be @ref{Evaluating Scheme expressions from Java,
 embedded as a scripting language in Java programs}.
+
+Kawa has convenient syntax for
+@ref{Allocating objects,allocating and initializing objects}.
+
+Kawa has some special handling to ease
+@uref{http://www.oracle.com/technetwork/java/javafx/overview/index.html,JavaFX} programming.
+Read @uref{http://per.bothner.com/blog/2011/JavaFX-using-Kawa-intro/, this introduction}, and
+@uref{http://localhost/per/blog/2011/JavaFX-using-Kawa-animation/,about doing animation}.
+
+You can @ref{Building for Android,run Kawa programs on Android},
+and there is special handing to make @ref{Android view construction,constructuing View objects} easier.
+
+Kawa makes it easy to write
+@ref{Server-side scripts,web page scripts} running
+running on @ref{Self-configuring page scripts,self-configuring web servers}
+and optionally using @ref{XML literals}.
 
 Kawa implements the full numeric tower, including infinite-precision
 rational numbers and complex numbers.  It also supports @ref{Quantities}
@@ -12591,6 +12602,9 @@ kawa --http-auto-handler @var{context-path} @var{appdir} --http-start @var{port}
 This starts a web server that listens on the given @var{port},
 using the files in directory @var{appdir} to handle
 requests that start with the given @var{context-path}.
+The @var{context-path} must start with a @code{"/"} (one is added if
+needed), and it is recommended that it also end with a @code{"/"}
+(otherwise you might get some surprising behavior).
 
 You can specify multiple @code{--http-auto-handler} options.
 
@@ -12606,6 +12620,9 @@ the Kawa source distribution.  You can start the server thus:
 bin/kawa --http-auto-handler / testsuite/webtest/ --http-start 8888
 @end example
 and then for example browse to @code{http://localhost:8888/adder.scm}.
+
+For lots of information about the HTTP request, browse to
+@code{http://localhost:8888/info/@var{anything}}.
 
 @subsection Using a servlet container
 
@@ -13001,6 +13018,10 @@ in BRL-compatible mode or not), and from XQuery.
 
 The examples below assume the request @code{http://example.com:8080/myapp/foo/bar?val1=xyz&val2=abc}, where @code{myapp} is the application context.
 We also assume that this is handled by a script @code{foo/+default+}.
+
+The file @code{testsuite/webtest/info/+default+} in the Kawa source distribution
+calls most of these functions.
+You can try it as described in @ref{Self-configuring page scripts}.
 
 @subsection Request URL components
 

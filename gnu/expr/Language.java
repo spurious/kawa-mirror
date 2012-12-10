@@ -170,10 +170,9 @@ public abstract class Language
         || str.indexOf("-*- lisp -*-") >= 0)
       return getInstance("common-lisp");
     // Does it start with an XQuery comment or XQuery version statement?
-    if ((str.charAt(0) == '(' && str.charAt(1) == ':')
-        || (str.length() >= 7 && str.substring(0, 7).equals("xquery ")))
+    if (str.startsWith("(:") || str.startsWith("xquery"))
       return getInstance("xquery");
-    if (str.charAt(0) == ';' && str.charAt(1) == ';')
+    if (str.startsWith(";;"))
       return getInstance("scheme");
     return null;
   }

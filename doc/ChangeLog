@@ -1,5 +1,6 @@
 2012-12-10  Per Bothner  <per@bothner.com>
 
+	* kawa.texi (Features): Link to new JavaFX section.
 	* kawa.texi (Building JavaFX applications): New section.
 
 	* kawa.texi (Top): Link to tutorial.

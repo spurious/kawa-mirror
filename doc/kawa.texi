@@ -1396,9 +1396,7 @@ Kawa has convenient syntax for
 @ref{Allocating objects,allocating and initializing objects}.
 
 Kawa has some special handling to ease
-@uref{http://www.oracle.com/technetwork/java/javafx/overview/index.html,JavaFX} programming.
-Read @uref{http://per.bothner.com/blog/2011/JavaFX-using-Kawa-intro/, this introduction}, and
-@uref{http://localhost/per/blog/2011/JavaFX-using-Kawa-animation/,about doing animation}.
+@ref{Building JavaFX applications,JavaFX programming}.
 
 You can @ref{Building for Android,run Kawa programs on Android},
 and there is special handing to make @ref{Android view construction,constructuing View objects} easier.

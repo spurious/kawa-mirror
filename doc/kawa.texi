@@ -13371,11 +13371,58 @@ to KRL, even in BRL-compatibility mode.
 @chapter Special topics
 
 @menu
+* Building JavaFX applications::
 * Building for Android::  Building for Android devices
 * Android view construction::
 * Processes::
 * Low-level functions:: Deprecated low-level functions
 @end menu
+
+@node Building JavaFX applications
+@section Building JavaFX applications
+
+Kawa makes it easy to build ``rich client'' (i.e. GUI) applications using
+@uref{http://www.oracle.com/technetwork/java/javafx/overview/index.html,JavaFX}.
+For example the following program will print up a window with a button;
+clicking on the button will print a message on the console output about the
+event.
+@example
+(require 'javafx-defs)
+(javafx-application)
+
+(javafx-scene
+ title: "Hello Button"
+ width: 600 height: 450
+ (Button
+  text: "Click Me"
+  layout-x: 25
+  layout-y: 40
+  on-action: (lambda (e) (format #t "Event: ~s~%~!" e))))
+@end example
+
+JDK 7 update 9 or later has JavaFX included, but it is a separate
+@code{jfxrt.jar} which not in the default @code{CLASSPATH}.
+JavaFX support is builtin to the pre-built
+@code{kawa-@value{VERSION}.jar}.
+Assume the above file is @code{HelloButton1.scm}, you can
+run it like this:
+@example
+java -cp $JAVA_HOME/lib/jfxrt.jar:$KAWA_HOME/kawa.jar HelloButton1.scm
+@end example
+
+If you build Kawa from source, do:
+@example
+$ ./configure --with-javafx=$JAVA_HOME --enable-kawa-frontend ...other-args...
+@end example
+The resulting Kawa binary sets up the path to @code{jfxrt.jar} so you just need to do:
+@example
+$ kawa HelloButton1.scm
+@end example
+
+For more information and examples read this (slightly older)
+@uref{http://per.bothner.com/blog/2011/JavaFX-using-Kawa-intro/,introduction},
+and
+@uref{http://localhost/per/blog/2011/JavaFX-using-Kawa-animation/,this on animation}.
 
 @node Building for Android
 @section Building for Android

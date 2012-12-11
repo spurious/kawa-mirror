@@ -1,3 +1,8 @@
+2012-12-08  Per Bothner  <per@bothner.com>
+
+	* configure.in (AC_INIT): Set version to 1.13.
+	* build.xml (version.release): Likewise.
+
 2012-11-21  Per Bothner  <per@bothner.com>
 
 	* configure.in: Try harder to find jfxrt.jar.
@@ -26,7 +31,7 @@
 	though also supporting old meaning.
 	Also a fix for servlet path.
 
-con2012-05-30  Per Bothner  <per@bothner.com>
+2012-05-30  Per Bothner  <per@bothner.com>
 
 	* configure.in (AC_INIT): Set version to 1.12.1.
 	* build.xml (version.release): Likewise.

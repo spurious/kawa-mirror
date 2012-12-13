@@ -130,11 +130,13 @@ public class ZipLoader extends ClassLoader
 	java.io.InputStream strm = zar.getInputStream(member);
 	byte[] bytes = new byte[member_size];
 	new java.io.DataInputStream(strm).readFully(bytes);
-	Class clas = defineClass (name, bytes, 0, member_size);
-        if (mainClass == null)
-          mainClass = clas;
-	loadedClasses.addElement(name);
-	loadedClasses.addElement(clas);
+        if (!loadedClasses.contains(name)) {
+          Class clas = defineClass (name, bytes, 0, member_size);
+          if (mainClass == null)
+            mainClass = clas;
+          loadedClasses.addElement(name);
+          loadedClasses.addElement(clas);
+        }
       }
     close();
     return mainClass;

@@ -24,7 +24,7 @@ public class LineCommenterSet extends FilterSet
      * @author    Jim White
      * Created   2001-11-14.
      */
-    public static class LineCommenter // extends FilterSet.Filter
+    public static class LineCommenter extends FilterSet.Filter
     {
         String first;
         String last;

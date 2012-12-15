@@ -23,7 +23,7 @@ public class LineStripperSet extends FilterSet
      * @author    Jim White
      * Created   2001-11-14.
      */
-    public static class LineStripper // extends FilterSet.Filter
+    public static class LineStripper extends FilterSet.Filter
     {
         String first;
         String last;

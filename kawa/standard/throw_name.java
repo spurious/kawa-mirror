@@ -1,6 +1,7 @@
 package kawa.standard;
 import kawa.lang.*;
 import gnu.mapping.*;
+import gnu.kawa.reflect.Throw;
 
 public class throw_name extends ProcedureN
 {
@@ -16,7 +17,7 @@ public class throw_name extends ProcedureN
 	if (key instanceof Throwable)
 	  {
 	    if (args.length == 1)
-	      prim_throw.throw_it(key);
+	      Throw.doThrow(key);
 	  }
 	else if (key instanceof Symbol)
 	  throw new NamedException((Symbol) key, args);

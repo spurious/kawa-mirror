@@ -26,6 +26,7 @@ java_sources = \
   StaticFieldLocation.java \
   StaticGet.java \
   StaticSet.java \
+  Throw.java \
   TypeSwitch.java
 
 EXTRA_DIST = package.html

@@ -357,4 +357,12 @@ public class CompileReflect
     Expression[] sargs = { receiver, new QuoteExp(slot), newValue};
     return new ApplyExp(p, sargs);
   }
+
+    public static Expression validateThrow
+            (ApplyExp exp, InlineCalls visitor, Type required, Procedure proc) {
+        Expression[] args = exp.getArgs();
+        args[0] = visitor.visit(args[0], Type.javalangThrowableType);
+        exp.setType(Type.neverReturnsType);
+        return exp;
+    }
 }

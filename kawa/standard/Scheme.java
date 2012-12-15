@@ -616,7 +616,7 @@ public class Scheme extends LispLanguage
       defSntxStFld("primitive-array-set", "kawa.lib.reflection");
       defSntxStFld("primitive-array-length", "kawa.lib.reflection");
       defProcStFld("subtype?", "kawa.lib.reflection");
-      defProcStFld("primitive-throw", "kawa.standard.prim_throw", "primitiveThrow");
+      defProcStFld("primitive-throw", "gnu.kawa.reflect.Throw", "primitiveThrow");
       defSntxStFld("try-finally", "kawa.lib.syntax");
       defSntxStFld("try-catch", "kawa.lib.prim_syntax");
       defProcStFld("throw", "kawa.standard.throw_name", "throwName");

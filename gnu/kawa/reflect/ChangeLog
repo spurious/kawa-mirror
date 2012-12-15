@@ -1,3 +1,13 @@
+2012-12-15  Per Bothner  <per@bothner.com>
+
+	* Throw.java: Moved from kawa/standard/prim_throw.
+	Set validateApply handler.
+	(compile): Don't create new ClassType instance for Throwable, as
+	that causes pointless cast.
+	(getReturnType): Remove.
+	* Makefile.am: Update for new class.
+	* CompileReflect.java (validateThrow): New method.
+
 2012-11-19  Per Bothner  <per@bothner.com>
 
 	* CompileBuildObject.java (insertArgument, useBuilder): New methods.

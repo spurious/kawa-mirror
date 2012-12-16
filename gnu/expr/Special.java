@@ -21,6 +21,9 @@ public class Special extends Object implements Printable, Externalizable
   // #!void is the same as Values.Empty.
   // #!null is Java null.
 
+    public static final Error kawaInternalError
+        = new Error("Kawa-internal error");
+
   public Special ()
   {
   }

@@ -782,7 +782,17 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
                                getDeclaredMethod("getFromContext", 1));
         code.popScope();
       }
-    target.compileFromStack(comp, stackType);
+    if (method.getReturnType() == Type.neverReturnsType)
+      { 
+        // Currently only go here if !takesContext(method).  FIXME: We should
+        // use annotations or something to figure out return type of methods
+        // that take a context (and whose return type is thus void).
+        code.emitGetStatic(ClassType.make("gnu.expr.Special")
+                           .getDeclaredField("kawaInternalError"));
+        code.emitThrow();
+      }
+    else
+      target.compileFromStack(comp, stackType);
   }
 
   public Type getParameterType(int index)

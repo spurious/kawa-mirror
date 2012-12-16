@@ -1,5 +1,12 @@
 2012-12-16  Per Bothner  <per@bothner.com>
 
+	* Special.java (kawaInternalError): New Error constant.
+	* PrimProcedure.java (compileInvoke): If the called method's return
+	type is Type.neverReturnsType, then throw Special.kawaInternalError.
+	This avoids the JVM verifier sometimes complaining.
+	* InlineCalls.java (checkType): If the expression type is
+	Type.neverReturnsType then always succeed.
+
 	* IgnoreTarget.java (compileFromStack): Do nothing if
 	not reachableHere().
 

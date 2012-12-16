@@ -58,14 +58,16 @@ public class Compilation implements SourceLocator
   public static final int BODY_PARSED = 4;
   /** State code for lexical bindings having been resolved. */ 
   public static final int RESOLVED = 6;
+  /** State code when initial tree-walking (PushApply) are done. */
+  public static final int PRE_WALKED = 8;
   /** State code when various inlining and optimization passes are done. */
-  public static final int WALKED = 8;
+  public static final int WALKED = 10;
   /** State code that various compile-only data has been determined. */
-  public static final int COMPILE_SETUP = 10;
+  public static final int COMPILE_SETUP = 12;
   /** State code indicating the bytecode has been generated. */
-  public static final int COMPILED = 12;
+  public static final int COMPILED = 14;
   /** State code indicating that bytecode has been written to its target. */
-  public static final int CLASS_WRITTEN = 14;
+  public static final int CLASS_WRITTEN = 16;
   public static final int ERROR_SEEN = 100;
 
   public ModuleInfo minfo;
@@ -941,24 +943,6 @@ public class Compilation implements SourceLocator
     this.language = language;
     this.messages = messages;
     this.lexical = lexical;
-  }
-
-  /** Shared processing for both compiling/eval. */
-  public void walkModule (ModuleExp mexp)
-  {
-    if (debugPrintExpr)
-      {
-	OutPort dout = OutPort.errDefault();
-	dout.println("[Module:" + mexp.getName());
-	mexp.print(dout);
-	dout.println(']');
-	dout.flush();
-      }
-
-    PushApply.pushApply(mexp, this);
-    InlineCalls.inlineCalls(mexp, this);
-    ChainLambdas.chainLambdas(mexp, this);
-    FindTailCalls.findTailCalls(mexp, this);
   }
 
   public void outputClass (String directory) throws IOException
@@ -1933,11 +1917,27 @@ public class Compilation implements SourceLocator
             setState(CLASS_WRITTEN);
           }
 
+        if (wantedState >= PRE_WALKED && getState() < PRE_WALKED)
+          {
+            if (debugPrintExpr) {
+                OutPort dout = OutPort.errDefault();
+                dout.println("[Module:" + mexp.getName());
+                mexp.print(dout);
+                dout.println(']');
+                dout.flush();
+            }
+            PushApply.pushApply(mexp, this);  
+            setState(messages.seenErrors() ? ERROR_SEEN : PRE_WALKED);
+          }
+
         if (wantedState >= WALKED && getState() < WALKED)
           {
-            walkModule(mexp);
+            InlineCalls.inlineCalls(mexp, this);
+            ChainLambdas.chainLambdas(mexp, this);
+            FindTailCalls.findTailCalls(mexp, this);
             setState(messages.seenErrors() ? ERROR_SEEN : WALKED);
           }
+
         if (wantedState >= COMPILE_SETUP && getState() < COMPILE_SETUP)
           {
             litTable = new LitTable(this);

@@ -288,7 +288,7 @@ public class LambdaExp extends ScopeExp
      * I.e. call this function can complete normally is there is some i
      * such that all members of canFinishDependencies.get(i) can finish.
      * May be null if there is no dependency yet in the current execution
-     * path fork, in which case PsuhApply.canGinishDeps will realize it.
+     * path fork, in which case PushApply.canFinishDeps will realize it.
      * This value is calculated during PushApply and used in InlineCalls.
      */
     ArrayList<HashSet<LambdaExp>> canFinishCondition;

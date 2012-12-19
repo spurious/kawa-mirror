@@ -13,6 +13,13 @@ import gnu.kawa.lispexpr.*;
 import java.util.*;
 import gnu.kawa.functions.GetNamedPart;
 import gnu.kawa.functions.CompileNamedPart;
+import gnu.kawa.functions.MultiplyOp;
+import gnu.kawa.xml.XmlNamespace;
+import gnu.math.DFloNum;
+import gnu.math.IntNum;
+import gnu.math.Unit;
+import kawa.standard.Scheme;
+import kawa.standard.expt;
 import gnu.text.SourceLocator;
 /* #ifdef enable:XML */
 import gnu.xml.NamespaceBinding;
@@ -832,12 +839,293 @@ public class Translator extends Compilation
       return QuoteExp.getInstance(Quote.quote(exp, this), this);
   }
 
-  /** If a symbol is lexically unbound, look for a default binding.
-   * The default implementation returns null.
+  /** 
+   * If a symbol is lexically unbound, look for a default binding.
+   * The default implementation does the following:
+   * 
+   * If the symbol is the name of an existing Java class, return that class.
+   * Handles both with and without (semi-deprecated) angle-brackets:
+   *   {@code <java.lang.Integer>} and {@code java.lang.Integer}.
+   * Also handles arrays, such as {@code java.lang.String[]}.
+   *
+   * If the symbol starts with {@code '@'} parse as an annotation class.
+   *
+   * Recognizes quanties with units, such as {@code 2m} and {@code 3m/s^2}.
+   *
+   * Handles the xml and unit namespaces.
+   *
    * @return null if no binding, otherwise an Expression.
+   * 
+   * FIXME: This method should be refactored. The quantities parsing should
+   *        be moved to its own method at least.
    */
-  public Expression checkDefaultBinding (Symbol name, Translator tr)
+  public Expression checkDefaultBinding (Symbol symbol, Translator tr)
   {
+    Namespace namespace = symbol.getNamespace();
+    String local = symbol.getLocalPart();
+    String name = symbol.toString();
+    int len = name.length();
+
+    if (namespace instanceof XmlNamespace)
+      return makeQuoteExp(((XmlNamespace) namespace).get(local));
+    // TODO: Refactor the unitNamespace into LispLanguage, as it is of general
+    // utility. We should not be referencing members static to Scheme from this
+    // class ideally.
+    if (namespace.getName() == Scheme.unitNamespace.getName())
+    {
+      Object val = Unit.lookup(local);
+      if (val != null)
+        return makeQuoteExp(val);
+    }
+
+    char ch0 = name.charAt(0);
+
+    if (ch0 == '@')
+    {
+      String rest = name.substring(1);
+      Expression classRef = tr.rewrite(Symbol.valueOf(rest));
+      return MakeAnnotation.makeAnnotationMaker(classRef);
+    }
+
+    // Look for quantities.
+    if (ch0 == '-' || ch0 == '+' || Character.digit(ch0, 10) >= 0)
+    {
+      // 1: initial + or -1 seen.
+      // 2: digits seen
+      // 3: '.' seen
+      // 4: fraction seen
+      // 5: [eE][=+]?[0-9]+ seen
+      int state = 0;
+      int i = 0;
+      
+      for (; i < len; i++)
+      {
+        char ch = name.charAt(i);
+        if (Character.digit(ch, 10) >= 0)
+          state = state < 3 ? 2 : state < 5 ? 4 : 5;
+        else if ((ch == '+' || ch == '-') && state == 0)
+          state = 1;
+        else if (ch == '.' && state < 3)
+          state = 3;
+        else if ((ch == 'e' || ch == 'E') && (state == 2 || state == 4)
+            && i + 1 < len)
+        {
+          int j = i + 1;
+          char next = name.charAt(j);
+          if ((next == '-' || next == '+') && ++j < len)
+            next = name.charAt(j);
+          if (Character.digit(next, 10) < 0)
+            break;
+          state = 5;
+          i = j + 1;
+        }
+        else
+          break;
+      }
+      tryQuantity:
+      if (i < len && state > 1)
+      {
+        DFloNum num = new DFloNum(name.substring(0, i));
+        boolean div = false;
+        Vector vec = new Vector();
+        for (; i < len;)
+        {
+          char ch = name.charAt(i++);
+          if (ch == '*')
+          {
+            if (i == len)
+              break tryQuantity;
+            ch = name.charAt(i++);
+          }
+          else if (ch == '/')
+          {
+            if (i == len || div)
+              break tryQuantity;
+            div = true;
+            ch = name.charAt(i++);
+          }
+          int unitStart = i - 1;
+          int unitEnd;
+          for (;;)
+          {
+            if (!Character.isLetter(ch))
+            {
+              unitEnd = i - 1;
+              if (unitEnd == unitStart)
+                break tryQuantity;
+              break;
+            }
+            if (i == len)
+            {
+              unitEnd = i;
+              ch = '1';
+              break;
+            }
+            ch = name.charAt(i++);
+          }
+          vec.addElement(name.substring(unitStart, unitEnd));
+          boolean expRequired = false;
+          if (ch == '^')
+          {
+            expRequired = true;
+            if (i == len)
+              break tryQuantity;
+            ch = name.charAt(i++);
+          }
+          boolean neg = div;
+          if (ch == '+')
+          {
+            expRequired = true;
+            if (i == len)
+              break tryQuantity;
+            ch = name.charAt(i++);
+          }
+          else if (ch == '-')
+          {
+            expRequired = true;
+            if (i == len)
+              break tryQuantity;
+            ch = name.charAt(i++);
+            neg = !neg;
+          }
+          int nexp = 0;
+          int exp = 0;
+          for (;;)
+          {
+            int dig = Character.digit(ch, 10);
+            if (dig <= 0)
+            {
+              i--;
+              break;
+            }
+            exp = 10 * exp + dig;
+            nexp++;
+            if (i == len)
+              break;
+            ch = name.charAt(i++);
+          }
+          if (nexp == 0)
+          {
+            exp = 1;
+            if (expRequired)
+              break tryQuantity;
+          }
+          if (neg)
+            exp = -exp;
+          vec.addElement(IntNum.make(exp));
+        }
+        if (i == len)
+        {
+          int nunits = vec.size() >> 1;
+          Expression[] units = new Expression[nunits];
+          for (i = 0; i < nunits; i++)
+          {
+            String uname = (String) vec.elementAt(2 * i);
+            // TODO: Get rid of this reference.
+            Symbol usym = Scheme.unitNamespace.getSymbol(uname.intern());
+            Expression uref = tr.rewrite(usym);
+            IntNum uexp = (IntNum) vec.elementAt(2 * i + 1);
+            if (uexp.longValue() != 1)
+              uref = new ApplyExp(expt.expt,
+                  new Expression[]
+                  {
+                    uref, makeQuoteExp(uexp)
+                  });
+            units[i] = uref;
+          }
+          Expression unit;
+          if (nunits == 1)
+            unit = units[0];
+          else
+            unit = new ApplyExp(MultiplyOp.$St, units);
+          return new ApplyExp(MultiplyOp.$St,
+              new Expression[]
+              {
+                makeQuoteExp(num),
+                unit
+              });
+        }
+      }
+    }
+
+    boolean sawAngle;
+    if (len > 2 && ch0 == '<' && name.charAt(len - 1) == '>')
+    {
+      name = name.substring(1, len - 1);
+      len -= 2;
+      sawAngle = true;
+    }
+    else
+      sawAngle = false;
+    int rank = 0;
+    while (len > 2 && name.charAt(len - 2) == '[' && name.charAt(len - 1) == ']')
+    {
+      len -= 2;
+      rank++;
+    }
+    //(future) String cname = (namespace == LispPackage.ClassNamespace) ? local : name;
+    String cname = name;
+    if (rank != 0)
+      cname = name.substring(0, len);
+    try
+    {
+      Class clas;
+      Type type = getLanguage().getNamedType(cname);
+      if (rank > 0 && (!sawAngle || type == null))
+      {
+        Symbol tsymbol = namespace.getSymbol(cname.intern());
+        Expression texp = tr.rewrite(tsymbol, false);
+        texp = InlineCalls.inlineCalls(texp, tr);
+        if (!(texp instanceof ErrorExp))
+          type = tr.getLanguage().getTypeFor(texp);
+      }
+      if (type != null)
+      {
+        // Somewhat inconsistent: Types named by getNamedType are Type,
+        // while standard type/classes are Class.  FIXME.
+        while (--rank >= 0)
+        {
+          type = gnu.bytecode.ArrayType.make(type);
+        }
+        return makeQuoteExp(type);
+      }
+      else
+      {
+        type = Type.lookupType(cname);
+        if (type instanceof gnu.bytecode.PrimType)
+          clas = type.getReflectClass();
+        else
+        {
+          if (cname.indexOf('.') < 0)
+            cname = (tr.classPrefix
+                + Compilation.mangleNameIfNeeded(cname));
+          clas = ClassType.getContextClass(cname);
+        }
+      }
+      if (clas != null)
+      {
+        if (rank > 0)
+        {
+          type = Type.make(clas);
+          while (--rank >= 0)
+          {
+            type = gnu.bytecode.ArrayType.make(type);
+          }
+          clas = type.getReflectClass();
+        }
+        return makeQuoteExp(clas);
+      }
+    } catch (ClassNotFoundException ex)
+    {
+      Package pack = gnu.bytecode.ArrayClassLoader.getContextPackage(name);
+      if (pack != null)
+        return makeQuoteExp(pack);
+    } catch (NoClassDefFoundError ex)
+    {
+      tr.error('w', "error loading class " + cname + " - " + ex.getMessage() + " not found");
+    } catch (Throwable ex)
+    {
+    }    
     return null;
   }
 

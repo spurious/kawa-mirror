@@ -868,10 +868,7 @@ public class Translator extends Compilation
 
     if (namespace instanceof XmlNamespace)
       return makeQuoteExp(((XmlNamespace) namespace).get(local));
-    // TODO: Refactor the unitNamespace into LispLanguage, as it is of general
-    // utility. We should not be referencing members static to Scheme from this
-    // class ideally.
-    if (namespace.getName() == Scheme.unitNamespace.getName())
+    if (namespace.getName() == LispLanguage.unitNamespace.getName())
     {
       Object val = Unit.lookup(local);
       if (val != null)
@@ -1021,8 +1018,7 @@ public class Translator extends Compilation
           for (i = 0; i < nunits; i++)
           {
             String uname = (String) vec.elementAt(2 * i);
-            // TODO: Get rid of this reference.
-            Symbol usym = Scheme.unitNamespace.getSymbol(uname.intern());
+            Symbol usym = LispLanguage.unitNamespace.getSymbol(uname.intern());
             Expression uref = tr.rewrite(usym);
             IntNum uexp = (IntNum) vec.elementAt(2 * i + 1);
             if (uexp.longValue() != 1)

@@ -2,12 +2,13 @@
 // This is free software;  for terms and warranty disclaimer see ../../COPYING.
 
 package kawa.standard;
-import kawa.lang.*;
-import gnu.lists.*;
-import gnu.expr.*;
-import gnu.math.*;
 import gnu.bytecode.*;
+import gnu.expr.*;
+import gnu.kawa.lispexpr.LispLanguage;
+import gnu.lists.*;
 import gnu.mapping.*;
+import gnu.math.*;
+import kawa.lang.*;
 
 public class define_unit extends Syntax
 {
@@ -34,7 +35,7 @@ public class define_unit extends Syntax
 	if (q instanceof SimpleSymbol)
 	  {
 	    String name = q.toString();
-            Symbol sym = Scheme.unitNamespace.getSymbol(name);
+            Symbol sym = LispLanguage.unitNamespace.getSymbol(name);
 	    Declaration decl = defs.getDefine(sym, 'w', tr);
 	    tr.push(decl);
 	    Translator.setLine(decl, p);

@@ -34,6 +34,13 @@ public abstract class LispLanguage extends Language
   public static StaticFieldLocation getNamedPartLocation =
     new StaticFieldLocation("gnu.kawa.functions.GetNamedPart", "getNamedPart");
   static { getNamedPartLocation.setProcedure(); }
+  
+  /**
+   * The unit namespace contains the bindings for symbols such as `cm',
+   * `s', etc.
+   */
+  public static final Namespace unitNamespace =
+      Namespace.valueOf("http://kawa.gnu.org/unit", "unit");
 
   /** The default <code>ReadTable</code> for this language. */
   protected ReadTable defaultReadTable;

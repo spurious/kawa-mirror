@@ -851,7 +851,7 @@ public class Scheme extends LispLanguage
       defAliasStFld("*print-xml-indent*",
                     "gnu.xml.XMLPrinter", "indentLoc");
       defAliasStFld("html", "gnu.kawa.xml.XmlNamespace", "HTML");
-      defAliasStFld("unit", "kawa.standard.Scheme", "unitNamespace");
+      defAliasStFld("unit", "gnu.kawa.lispexpr.LispLanguage", "unitNamespace");
 
       defAliasStFld("path", "gnu.kawa.lispexpr.LangObjType", "pathType");
       defAliasStFld("filepath", "gnu.kawa.lispexpr.LangObjType", "filepathType");
@@ -1077,9 +1077,6 @@ public class Scheme extends LispLanguage
   {
     return getInstance().getTypeFor(exp);
   }
-
-  public static final Namespace unitNamespace =
-    Namespace.valueOf("http://kawa.gnu.org/unit", "unit");
 
   public Symbol asSymbol (String ident)
   {

@@ -1,3 +1,12 @@
+2012-12-19  Charles Turner  <chturne@gmail.com>
+
+	* lang/Translator.java (checkDefaultBinding): Removed references
+	to Scheme.unitNamespace. It has now been moved to LispLanguage.
+	* standard/Scheme.java: Factored the unitNamespace into LispLanguage.
+	* standard/define_alias.java: Updated references to unitNamespace.
+	* standard/define_unit.java: Removed unused imports (unrelated to
+	the unitNamespace refactoring). Updated references to unitNamespace.
+
 2012-12-17  Charles Turner  <chturne@gmail.com>
 
 	* standard/SchemeCompilation.java (checkDefaultBinding): Factored

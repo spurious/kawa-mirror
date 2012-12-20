@@ -1,9 +1,8 @@
 package kawa.standard;
-import kawa.lang.*;
+import gnu.expr.*;
 import gnu.lists.*;
 import gnu.mapping.*;
-import gnu.expr.*;
-import gnu.bytecode.*;
+import kawa.lang.*;
 
 public class define_alias extends Syntax {
     public static final define_alias define_alias = new define_alias();

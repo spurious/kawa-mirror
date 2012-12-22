@@ -138,6 +138,7 @@ public class CompileMisc implements Inlineable
             xargs[0] = new QuoteExp(Integer.valueOf(0), Type.intType);
             System.arraycopy(args, skip, xargs, 1, xargs.length-1);
             ApplyExp ae = new ApplyExp(typeFormat.getDeclaredMethod("formatToString", 2), xargs);
+            ae.setLine(exp);
             ae.setType(Type.javalangStringType);
             return ae;
           }
@@ -152,6 +153,7 @@ public class CompileMisc implements Inlineable
                 args = xargs;
               }
             ApplyExp ae = new ApplyExp(typeFormat.getDeclaredMethod("formatToWriter", 3), args);
+            ae.setLine(exp);
             ae.setType(Type.voidType);
             return ae;
           }

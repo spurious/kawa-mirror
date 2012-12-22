@@ -43,6 +43,14 @@
 		 (try-catch (begin body ...)
 			    (ex <gnu.jemacs.lang.CatchableException>
 				(invoke ex 'match tag))))))
+(define-syntax condition-case
+  (syntax-rules ()
+		((_ var body (handler-name . handler-body) ...)
+                 (try-catch body
+                            (ex gnu.jemacs.lang.CatchableException
+                                (cond ((ex:match 'handler-name) . handler-body)
+                                      ...
+                                      (else (primitive-throw ex))))))))
 
 (define (throw tag value) :: <never-returns>
   (primitive-throw

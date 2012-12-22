@@ -1,3 +1,7 @@
+2012-12-22  Per Bothner  <per@bothner.com>
+
+	* MiscOps.scm (condition-case): New syntax.
+
 2012-10-20  Charles Turner <chturne@gmail.com>
 
 	Re-factor type lookup to avoid Scheme dependencies.

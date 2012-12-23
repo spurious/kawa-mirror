@@ -102,6 +102,8 @@ public class CompileMisc implements Inlineable
             args[1] = visitor.visit(args[1], type);
             CompileReflect.checkKnownClass(type, comp);
             exp.setType(type);
+            if (args[1].getType() == type)
+                return args[1];
             return exp;
           }
       }

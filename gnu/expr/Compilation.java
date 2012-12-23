@@ -1521,8 +1521,9 @@ public class Compilation implements SourceLocator
 		if (ptype != Type.objectType)
                   {
                     SourceLocator saveLoc2 = messages.swapSourceLocator(var);
-                    CheckedTarget.emitCheckedCoerce(this, source,
-                                                    k+1, ptype);
+                    CheckedTarget.emitCheckedCoerce(this, source, k+1,
+                                                    Type.objectType, ptype,
+                                                    null);
                     messages.swapSourceLocator(saveLoc2);
                   }
 		var = var.nextDecl();
@@ -1719,8 +1720,9 @@ public class Compilation implements SourceLocator
 		if (ptype != Type.objectType)
                   {
                     SourceLocator saveLoc2 = messages.swapSourceLocator(var);
-                    CheckedTarget.emitCheckedCoerce(this, source,
-                                                    k+1, ptype, pvar);
+                    CheckedTarget.emitCheckedCoerce(this, source, k+1,
+                                                    Type.objectType, ptype,
+                                                    pvar);
                     messages.swapSourceLocator(saveLoc2);
                   }
 		var = var.nextDecl();

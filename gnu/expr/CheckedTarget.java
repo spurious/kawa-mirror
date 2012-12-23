@@ -112,15 +112,9 @@ public class CheckedTarget extends StackTarget
   }
 
   public static void emitCheckedCoerce(Compilation comp, LambdaExp proc,
-                                       int argno, Type type)
+                                       int argno, Type stackType, Type type, Variable argValue)
   {
-    emitCheckedCoerce(comp, proc, argno, type, null);
-  }
-
-  public static void emitCheckedCoerce(Compilation comp, LambdaExp proc,
-                                       int argno, Type type, Variable argValue)
-  {
-    forceLazyIfNeeded(comp, Type.objectType, type);
+    forceLazyIfNeeded(comp, stackType, type);
     emitCheckedCoerce(comp, proc, proc.getName(), argno, type, argValue);
   }
 

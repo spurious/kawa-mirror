@@ -36,3 +36,21 @@
   (eq? (let loop () (loop)) #t))
 ;; Diagnostic: unreach1.scm:36:3: warning - unreachable procedure call
 ;; Diagnostic: unreach1.scm:36:8: note - this operand never finishes
+
+(define (let1 x y)
+  (let ((a (list x y))
+        (b (primitive-throw (java.lang.NullPointerException))))
+    (list a b)))
+;; Diagnostic: unreach1.scm:42:12: warning - initialization of b never finishes
+
+(define (let2 x y)
+  (fluid-let ((a (list x y))
+              (b (primitive-throw (java.lang.NullPointerException))))
+    (list a b)))
+;; Diagnostic: unreach1.scm:48:18: warning - initialization of b never finishes
+
+(define (let3 x y)
+  (let ((a (primitive-throw (java.lang.NullPointerException)))
+        (b (list x y)))
+    (list a b)))
+;; Diagnostic: unreach1.scm:53:12: warning - initialization of a never finishes

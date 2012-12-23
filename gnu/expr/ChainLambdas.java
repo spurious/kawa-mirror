@@ -1,5 +1,6 @@
 package gnu.expr;
 import gnu.bytecode.Type;
+import gnu.kawa.functions.Convert;
 
 /** Sets up the firstChild/nextSibling links of each LambdaExp.
  * Setup 'outer' links of ScopeExp and its sub-classes.
@@ -61,7 +62,11 @@ public class ChainLambdas extends ExpExpVisitor<ScopeExp> {
         }
         for (int i = 0; i < nargs;  i++) {
             e = visit(args[i], scope);
-            if (e.neverReturns()) {
+            if (e.neverReturns()
+                // It seems best to silently allow converting never-returns
+                // to any type.  For example it useful for stub procedures
+                // that throw an "unimplemented" exception.
+                && ! (e.valueIfConstant() instanceof Convert)) {
                 Expression[] xargs = new Expression[i+2];
                 xargs[0] = exp.func;
                 System.arraycopy(args, 0, xargs, 1, i+1);
@@ -111,7 +116,7 @@ public class ChainLambdas extends ExpExpVisitor<ScopeExp> {
 
   protected Expression visitScopeExp (ScopeExp exp, ScopeExp scope)
   {
-    exp.outer = scope;
+    exp.outer = scope; 
     exp.visitChildren(this, exp);
     exp.setIndexes();
     if (exp.mustCompile())
@@ -119,8 +124,37 @@ public class ChainLambdas extends ExpExpVisitor<ScopeExp> {
     return exp;
   }
 
+  protected Expression visitLetExp (LetExp exp, ScopeExp scope)
+  {
+    exp.outer = scope;
+    int count = 0;
+    for (Declaration decl = exp.firstDecl(); decl != null; decl = decl.nextDecl())
+      {
+          Expression init = decl.getInitValue();
+          Expression e = visit(init, exp);
+          count++;
+          if (e.neverReturns()) {
+              if (! unreachableCodeSeen && comp.warnUnreachable())
+                  comp.error('w', "initialization of "+decl.getName()+" never finishes", init);
+              unreachableCodeSeen = true;
+              Expression[] exps = new Expression[count];
+              int i = 0;
+              Declaration end = decl.nextDecl();
+              for (Declaration d = exp.firstDecl(); d != end; d = d.nextDecl())
+                  exps[i++] = d.getInitValue();
+              return BeginExp.canonicalize(exps);
+          }
+          decl.setInitValue(e);
+      }
+    exp.body = visit(exp.body, exp);
+    exp.setIndexes();
+    if (exp.mustCompile())
+      comp.mustCompileHere();
+    return exp;
+  }
+
   protected Expression visitLambdaExp (LambdaExp exp, ScopeExp scope)
-  {    
+  {
     boolean unreachableSaved = unreachableCodeSeen;
     unreachableCodeSeen = false;
     LambdaExp parent = currentLambda;

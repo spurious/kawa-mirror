@@ -1,3 +1,9 @@
+2012-12-23  Per Bothner  <per@bothner.com>
+
+	* srfi14.scm (%boundary-pairs-union): Fix for Savannah bug #37633
+	"char-set-union with same char-sets".  Fix by anonymous;
+	verified by Jamison Hope.
+
 2012-12-22  Per Bothner  <per@bothner.com>
 
 	* pregexp.scm (pregexp-error): Just define as error function.

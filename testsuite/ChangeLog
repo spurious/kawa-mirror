@@ -1,3 +1,8 @@
+2012-12-23  Jamison Hope  <jrh@theptrgroup.com>
+
+	* lib-test.scm: Test for Savannah bug #37633
+	"char-set-union with same char-sets".
+
 2012-12-22  Per Bothner  <per@bothner.com>
 
 	* unreach1.scm: Add tests of unreachable let-initializers.

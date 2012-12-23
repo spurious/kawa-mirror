@@ -1,4 +1,4 @@
-(test-begin "libs" 254)
+(test-begin "libs" 255)
 
 (test-begin "vectors")
 (test-equal '(dah dah didah)
@@ -492,7 +492,7 @@
 
 (test-end "rnrs-lists")
 
-(test-begin "char-sets" 88)
+(test-begin "char-sets" 89)
 
 (import (srfi :14 char-sets))
 (import (rnrs sorting))
@@ -735,6 +735,7 @@
 ; char-set-union, char-set-union!, meanings of standard derived sets
 (test-equal #t (char-set= char-set:empty (char-set-union)))
 (test-equal #t (char-set= abc (char-set-union abc)))
+(test-equal #t (char-set= abc (char-set-union abc abc)))
 (test-equal #t (char-set= char-set:letter+digit
                           (char-set-union char-set:letter
                                           char-set:digit)))

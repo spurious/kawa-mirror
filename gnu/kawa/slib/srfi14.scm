@@ -1723,7 +1723,8 @@ allowed, but not required, to side-effect its first argument."
         ((null? l2) l1)
         ((or (> (cdar l2) (cdar l1))        ; swap arguments if
              (and (= (cdar l2) (cdar l1))   ; necessary to ensure
-                  (< (caar l2) (cdar l1)))) ; (cdar l1) is highest
+                  (< (caar l2) (cdar l1))   ; (cdar l1) is highest
+                  (> (caar l2) (caar l1))))
          (%boundary-pairs-union l2 l1))
         (else
          (let ((ending ::int (cdar l1)))

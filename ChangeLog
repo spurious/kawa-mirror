@@ -1,3 +1,8 @@
+2012-12-14  Jamison Hope  <jrh@theptrgroup.com>
+
+	* build.xml: Use filelist instead of fileset to force compilation
+	order for Scheme source files.
+
 2012-12-12  Per Bothner  <per@bothner.com>
 
 	* configure.in (AC_INIT): Set version to 1.13.1.

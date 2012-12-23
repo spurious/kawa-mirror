@@ -500,36 +500,39 @@
     <kawac failonerror="true" destdir="${build.classes}"
 	   prefix="kawa.lib." modulestatic="run" language="scheme">
       <arg line="--warn-undefined-variable --warn-unknown-member --warn-as-error"/>
+      <filelist dir="${src.dir}/kawa/lib">
+        <file name="prim_syntax.scm"/>
+        <file name="std_syntax.scm"/>
+        <file name="reflection.scm"/>
+        <file name="syntax.scm"/>
+        <file name="lists.scm"/>
+        <file name="thread.scm"/>
+        <file name="characters.scm"/>
+        <file name="keywords.scm"/>
+        <file name="numbers.scm"/>
+        <file name="strings.scm"/>
+        <file name="parameters.scm"/>
+        <file name="ports.scm"/>
+        <file name="files.scm"/>
+        <file name="misc.scm"/>
+        <file name="misc_syntax.scm"/>
+        <file name="vectors.scm"/>
+        <file name="uniform.scm"/>
+        <file name="bytevectors.scm"/>
+        <file name="arrays.scm"/>
+        <file name="system.scm"/>
+        <file name="kawa/hashtable.scm"/>
+        <file name="kawa/regex.scm"/>
+        <file name="rnrs/hashtables.scm"/>
+        <file name="rnrs/lists.scm"/>
+        <file name="srfi95.scm"/>
+        <file name="rnrs/unicode.scm"/>
+        <file name="rnrs/sorting.scm"/>
+        <file name="rnrs/programs.scm"/>
+        <file name="trace.scm"/>
+      </filelist>
       <fileset dir="${src.dir}/kawa/lib">
-        <include name="prim_syntax.scm"/>
-        <include name="std_syntax.scm"/>
-        <include name="syntax.scm"/>
-        <include name="reflection.scm"/>
-        <include name="lists.scm"/>
-        <include name="characters.scm"/>
-        <include name="strings.scm"/>
-        <include name="parameters.scm"/>
-        <include name="thread.scm"/>
-        <include name="keywords.scm"/>
-        <include name="numbers.scm"/>
-        <include name="vectors.scm"/>
-        <include name="ports.scm"/>
-        <include name="misc.scm"/>
-        <include name="misc_syntax.scm"/>
-        <include name="files.scm"/>
-        <include name="uniform.scm"/>
-        <include name="arrays.scm"/>
-        <include name="trace.scm"/>
         <include name="windows.scm" if="${with-swing}"/>
-        <include name="system.scm"/>
-        <include name="srfi95.scm"/>
-        <include name="kawa/hashtable.scm"/>
-        <include name="kawa/regex.scm"/>
-        <include name="rnrs/hashtables.scm"/>
-        <include name="rnrs/sorting.scm"/>
-        <include name="rnrs/unicode.scm"/>
-        <include name="rnrs/programs.scm"/>
-        <include name="rnrs/lists.scm"/>
       </fileset>
     </kawac>
   </target>
@@ -550,32 +553,34 @@
     <kawac failonerror="true" destdir="${build.classes}"
 	   prefix="gnu.kawa.slib." modulestatic="run"
 	   language="scheme">
+      <filelist dir="${src.dir}/gnu/kawa/slib">
+        <file name="DefineRecordType.scm"/>
+        <file name="enums.scm"/>
+        <file name="readtable.scm"/>
+        <file name="srfi1.scm"/>
+        <file name="srfi2.scm"/>
+        <file name="conditions.scm"/>
+        <file name="srfi13.scm"/>
+        <file name="srfi14.scm"/>
+        <file name="srfi34.scm"/>
+        <file name="srfi37.scm"/>
+        <file name="srfi69.scm"/>
+        <file name="pregexp.scm"/>
+        <file name="Streams.scm"/>
+        <file name="StreamsDerived.scm"/>
+        <file name="StreamsPrimitive.scm"/>
+        <file name="StreamsType.scm"/>
+        <file name="genwrite.scm"/>
+        <file name="pp.scm"/>
+        <file name="ppfile.scm"/>
+        <file name="printf.scm"/>
+        <file name="syntaxutils.scm"/>
+        <file name="cut.scm"/>
+        <file name="testing.scm"/>
+      </filelist>
       <fileset dir="${src.dir}/gnu/kawa/slib">
-        <include name="genwrite.scm"/>
-        <include name="pp.scm"/>
-        <include name="ppfile.scm"/>
-        <include name="printf.scm"/>
-        <include name="DefineRecordType.scm"/>
-        <include name="srfi1.scm"/>
-        <include name="srfi2.scm"/>
-        <include name="srfi13.scm"/>
-        <include name="srfi14.scm"/>
-        <include name="srfi34.scm"/>
-        <include name="conditions.scm"/>
-        <include name="srfi37.scm"/>
-        <include name="srfi69.scm"/>
-        <include name="testing.scm"/>
-        <include name="pregexp.scm"/>
-        <include name="readtable.scm"/>
-        <include name="cut.scm"/>
-        <include name="enums.scm"/>
         <include name="gui.scm" if="${with-awt}"/>
         <include name="swing.scm" if="${with-swing}"/>
-        <include name="syntaxutils.scm"/>
-        <include name="Streams.scm"/>
-        <include name="StreamsDerived.scm"/>
-        <include name="StreamsPrimitive.scm"/>
-        <include name="StreamsType.scm"/>
       </fileset>
     </kawac>
   </target> 
@@ -751,19 +756,18 @@
 
     <kawac failonerror="true" destdir="${build.classes}"
 	    prefix="gnu.jemacs.lisp." language="elisp">
-      <fileset dir="${src.dir}/gnu/jemacs/lisp"> 
-        <include name="primitives.el"/>
-        <include name="alist.el"/>
-        <include name="simple.el"/>
-        <include name="alist.el"/>
-        <include name="keymap.el"/>
-        <include name="keydefs.el"/>
-        <include name="hanoi.el"/>
-        <include name="rect.el"/>
-        <include name="editfns.el"/>
-        <include name="subr.el"/>
-        <include name="autoloads.el"/>
-      </fileset>
+      <filelist dir="${src.dir}/gnu/jemacs/lisp">
+        <file name="primitives.el"/>
+        <file name="alist.el"/>
+        <file name="simple.el"/>
+        <file name="keymap.el"/>
+        <file name="keydefs.el"/>
+        <file name="hanoi.el"/>
+        <file name="rect.el"/>
+        <file name="editfns.el"/>
+        <file name="subr.el"/>
+        <file name="autoloads.el"/>
+      </filelist>
     </kawac>
   </target>
 

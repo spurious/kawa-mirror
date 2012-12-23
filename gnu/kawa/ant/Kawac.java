@@ -14,6 +14,8 @@ import org.apache.tools.ant.taskdefs.LogStreamHandler;
 import org.apache.tools.ant.taskdefs.MatchingTask;
 import org.apache.tools.ant.taskdefs.condition.Os;
 import org.apache.tools.ant.types.Commandline;
+import org.apache.tools.ant.types.DataType;
+import org.apache.tools.ant.types.FileList;
 import org.apache.tools.ant.types.FileSet;
 import org.apache.tools.ant.types.Path;
 import org.apache.tools.ant.types.PatternSet;
@@ -61,13 +63,13 @@ import org.apache.tools.ant.util.StringUtils;
  * If <b>srcdir</b> is set, then that directory is searched for source
  * files to compile (subject to any nested
  * includes/excludes). Otherwise, files included in nested filesets
- * will be compiled and written into <b>destdir</b>.
+ * and filelists will be compiled and written into <b>destdir</b>.
  * <p>
  * When this task executes, it will compile any listed source file
  * which is younger than its corresponding class file.
  * <p>
  * Superficially based upon the standard Ant Javac Task, but with
- * FileSet support as well.
+ * FileSet and FileList support as well.
  *
  * @author Jamison Hope
  */
@@ -104,7 +106,7 @@ public class Kawac extends MatchingTask {
   private boolean taskSuccess = true;       // will be set false on error
 
   private boolean usedMatchingTask = false; // a la org.apache.tools.ant.taskdefs.Delete
-  private Vector<FileSet> filesets = new Vector<FileSet>();
+  private Vector<DataType> filesets = new Vector<DataType>();
 
   private Vector<Commandline.Argument> otherArgs =
     new Vector<Commandline.Argument>();
@@ -433,6 +435,14 @@ public class Kawac extends MatchingTask {
   }
 
   /**
+   * Adds a list of files to be compiled.
+   * @param list the list of files to be compiled
+   */
+  public void addFilelist(FileList list) {
+    filesets.addElement(list);
+  }
+
+  /**
    * Adds a nested {@code <arg>}.
    * @param arg the argument to add to the kawa command line
    */
@@ -626,11 +636,18 @@ public class Kawac extends MatchingTask {
                 mapper);
       }
     }
-    // now scan each fileset
-    for (FileSet set : filesets) {
-      DirectoryScanner ds = set.getDirectoryScanner(getProject());
-      String[] files = ds.getIncludedFiles();
-      scanDir(set.getDir(), destDir, files, mapper);
+    // now scan each fileset and filelist
+    for (DataType dt : filesets) {
+      if (dt instanceof FileSet) {
+        FileSet set = (FileSet) dt;
+        DirectoryScanner ds = set.getDirectoryScanner(getProject());
+        String[] files = ds.getIncludedFiles();
+        scanDir(set.getDir(), destDir, files, mapper);
+      } else if (dt instanceof FileList) {
+        FileList list = (FileList) dt;
+        scanDir(list.getDir(getProject()), destDir,
+                list.getFiles(getProject()), mapper);
+      }
     }
 
     compile();
@@ -837,8 +854,8 @@ public class Kawac extends MatchingTask {
     }
 
     if (!usedMatchingTask && filesets.size() == 0) {
-      throw new BuildException("either srcdir or a nested fileset must"
-                               + " be specified", getLocation());
+      throw new BuildException("either srcdir or a nested fileset/list"
+                               + " must be specified", getLocation());
     }
   }
 

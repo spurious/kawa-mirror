@@ -118,9 +118,19 @@
       (gnu.mapping.Promise value: value)
       value))
 
+(define (throw #!rest (args ::Object[])) ::never-returns
+  (let ((len args:length))
+    (if (> len 0)
+        (let ((key (args 0)))
+          (cond ((symbol? key)
+                 (primitive-throw (kawa.lang.NamedException key args)))
+                ((and (java.lang.Throwable? key) (= len 1))
+                 (gnu.kawa.reflect.Throw:doThrow key)))))
+    (primitive-throw (kawa.lang.GenericError "bad arguments to throw"))))
+              
 ;;; The one-argument case is a standard DSSSL procedure.
 ;;; The multi-argument extension matches Guile.
-(define (error msg . args)
+(define (error msg . args)  ::never-returns
   (set! msg (call-with-output-string (lambda (port) (display msg port))))
   (set! args (map
 	      (lambda (arg)

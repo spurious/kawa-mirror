@@ -1,3 +1,8 @@
+2012-12-22  Per Bothner  <per@bothner.com>
+
+	* pregexp.scm (pregexp-error): Just define as error function.
+	(pregexp-match-positions-aux): Remove unreachable constant.
+
 2012-11-18  Per Bothner  <per@bothner.com>
 
 	* testing.scm: Add test-group to list of exported names.

@@ -619,7 +619,7 @@ public class Scheme extends LispLanguage
       defProcStFld("primitive-throw", "gnu.kawa.reflect.Throw", "primitiveThrow");
       defSntxStFld("try-finally", "kawa.lib.syntax");
       defSntxStFld("try-catch", "kawa.lib.prim_syntax");
-      defProcStFld("throw", "kawa.standard.throw_name", "throwName");
+      defProcStFld("throw", "kawa.lib.misc");
       defProcStFld("catch", "kawa.lib.system");
       defProcStFld("error", "kawa.lib.misc");
       defProcStFld("as", "gnu.kawa.functions.Convert", "as");

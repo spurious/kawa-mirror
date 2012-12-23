@@ -1,3 +1,10 @@
+2012-12-22  Per Bothner  <per@bothner.com>
+
+	* standard/throw_name.java: Remove class.  Instead re-implement
+	'throw' function in Scheme.
+	* standard/Makefile.am (java_sources): Update accordingly.
+	* standard/Scheme.java (initScheme): Likewise.
+
 2012-12-19  Charles Turner  <chturne@gmail.com>
 
 	* lang/Translator.java (checkDefaultBinding): Removed references

@@ -54,12 +54,17 @@
 (define pregexp-error
   ;R5RS won't give me a portable error procedure.
   ;modify this as needed
-  (lambda whatever 
-    (display "Error:")
-    (for-each (lambda (x) (display #\space) (write x))
-              whatever)
-    (newline)
-    (error "pregexp-error")))
+  error
+#|
+  (lambda whatever ::never-returns
+    ;;(display "Error:")
+    ;;(for-each (lambda (x) (display #\space) (write x))
+    ;;          whatever)
+    ;;(newline)
+    ;;(error "pregexp-error")))
+    (apply error whatever))
+|#
+)
 
 (define pregexp-read-pattern
   (lambda (s i n)
@@ -533,8 +538,7 @@
                            (cond (c => cdr)
                                  (else 
                                    (pregexp-error 'pregexp-match-positions-aux
-                                                  'non-existent-backref re)
-                                   #f))))
+                                                  'non-existent-backref re)))))
                     (if backref
                         (pregexp-string-match
                           (substring s (car backref) (cdr backref))

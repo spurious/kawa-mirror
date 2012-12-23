@@ -1,5 +1,8 @@
 2012-12-22  Per Bothner  <per@bothner.com>
 
+	* CompileMisc.java (compileConvert): Handle conversion to
+	neverReturnsType - by throwing a RuntimeException reachedUnexpected.
+
 	* CompileMisc.java (validateApplyConvert): Optimize away
 	conversion if it is a no-op.
 

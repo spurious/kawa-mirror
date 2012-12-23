@@ -787,13 +787,19 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
         // Currently only go here if !takesContext(method).  FIXME: We should
         // use annotations or something to figure out return type of methods
         // that take a context (and whose return type is thus void).
-        code.emitGetStatic(ClassType.make("gnu.expr.Special")
-                           .getDeclaredField("kawaInternalError"));
-        code.emitThrow();
+        compileReachedUnexpected(code);
       }
     else
       target.compileFromStack(comp, stackType);
   }
+
+    public static void compileReachedUnexpected(CodeAttr code) {
+        if (code.reachableHere()) {
+            code.emitGetStatic(ClassType.make("gnu.expr.Special")
+                               .getDeclaredField("reachedUnexpected"));
+            code.emitThrow();
+        }
+    }
 
   public Type getParameterType(int index)
   {

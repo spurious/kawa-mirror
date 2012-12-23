@@ -267,7 +267,12 @@ public class CompileMisc implements Inlineable
       throw new Error ("wrong number of arguments to "+proc.getName());
     CodeAttr code = comp.getCode();
     Type type = Scheme.getTypeValue(args[0]);
-    if (type != null)
+    if (type == Type.neverReturnsType)
+      {
+        args[1].compile(comp, Target.Ignore);
+        PrimProcedure.compileReachedUnexpected(code);
+      }
+    else if (type != null)
       {
         args[1].compile(comp, Target.pushValue(type));
 	if (code.reachableHere())

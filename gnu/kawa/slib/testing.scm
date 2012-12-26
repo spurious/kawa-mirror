@@ -1,4 +1,7 @@
-;; Copyright (c) 2005, 2006, 2007 Per Bothner
+;; Copyright (c) 2005, 2006, 2007, 2012 Per Bothner
+;; Added "full" support for Chicken, Gauche, Guile and SISC.
+;;   Alex Shinn, Copyright (c) 2005.
+;; Modified for Scheme Spheres by Álvaro Castro-Castilla, Copyright (c) 2012.
 ;;
 ;; Permission is hereby granted, free of charge, to any person
 ;; obtaining a copy of this software and associated documentation
@@ -156,20 +159,20 @@
 )
 
 (define (test-runner-reset runner)
-    (test-result-alist! runner '())
-    (test-runner-pass-count! runner 0)
-    (test-runner-fail-count! runner 0)
-    (test-runner-xpass-count! runner 0)
-    (test-runner-xfail-count! runner 0)
-    (test-runner-skip-count! runner 0)
-    (%test-runner-total-count! runner 0)
-    (%test-runner-count-list! runner '())
-    (%test-runner-run-list! runner #t)
-    (%test-runner-skip-list! runner '())
-    (%test-runner-fail-list! runner '())
-    (%test-runner-skip-save! runner '())
-    (%test-runner-fail-save! runner '())
-    (test-runner-group-stack! runner '()))
+  (test-result-alist! runner '())
+  (test-runner-pass-count! runner 0)
+  (test-runner-fail-count! runner 0)
+  (test-runner-xpass-count! runner 0)
+  (test-runner-xfail-count! runner 0)
+  (test-runner-skip-count! runner 0)
+  (%test-runner-total-count! runner 0)
+  (%test-runner-count-list! runner '())
+  (%test-runner-run-list! runner #t)
+  (%test-runner-skip-list! runner '())
+  (%test-runner-fail-list! runner '())
+  (%test-runner-skip-save! runner '())
+  (%test-runner-fail-save! runner '())
+  (test-runner-group-stack! runner '()))
 
 (define (test-runner-group-path runner)
   (reverse (test-runner-group-stack runner)))
@@ -818,7 +821,7 @@
 		   (and (condition? ex) (condition-has-type? ex etype)))
 		  ((procedure? etype)
 		   (etype ex))
-		  ((equal? type #t)
+		  ((equal? etype #t)
 		   #t)
 		  (else #t))
 	      expr))))))
@@ -862,11 +865,14 @@
   (define-syntax test-error
     (syntax-rules ()
       ((test-error name etype expr)
-       (test-assert name (%test-error etype expr)))
+       (let ((r (test-runner-get)))
+         (test-assert name (%test-error r etype expr))))
       ((test-error etype expr)
-       (test-assert (%test-error etype expr)))
+       (let ((r (test-runner-get)))
+         (test-assert (%test-error r etype expr))))
       ((test-error expr)
-       (test-assert (%test-error #t expr)))))))
+       (let ((r (test-runner-get)))
+         (test-assert (%test-error r #t expr))))))))
 
 (define (test-apply first . rest)
   (if (test-runner? first)
@@ -875,7 +881,7 @@
 	(if r
 	    (let ((run-list (%test-runner-run-list r)))
 	      (cond ((null? rest)
-		     (%test-runner-run-list! r (reverse! run-list))
+		     (%test-runner-run-list! r (reverse run-list))
 		     (first)) ;; actually apply procedure thunk
 		    (else
 		     (%test-runner-run-list!

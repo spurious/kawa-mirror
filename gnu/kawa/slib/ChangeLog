@@ -1,3 +1,7 @@
+2012-12-26  Álvaro Castro-Castilla
+
+	* testing.scm: Modified for Scheme Spheres.
+
 2012-12-23  Per Bothner  <per@bothner.com>
 
 	* srfi14.scm (%boundary-pairs-union): Fix for Savannah bug #37633
@@ -233,7 +237,7 @@
 	expected-value property - to R5RS standard function exp.
 
 	* testing.scm (test-assert): Fix thinko expr -> test-expression.
-	
+
 2006-06-06  Per Bothner  <per@bothner.com>
 
 	* testing.scm: Rename non-exported names to consistently start with %.
@@ -352,7 +356,7 @@
 
 	* testing.scm: Add module-compile-options if Kawa, to catch bugs.
 	This did catch some bugs; fixed those.
-	
+
 2005-10-16  Alex Shinn <alexshinn@gmail.com>
 
 	* testing.scm (%test-record-define%): Add predicate and allocator as

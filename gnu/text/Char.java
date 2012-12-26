@@ -260,7 +260,7 @@ public class Char
     throws IOException, ClassNotFoundException
   {
     value = in.readChar();
-    if (value >= 0xD800 && value < 0xDBFF)
+    if (value >= 0xD800 && value <= 0xDBFF)
       {
 	char next = in.readChar();
 	if (next >= 0xDC00 && next <= 0xDFFF)

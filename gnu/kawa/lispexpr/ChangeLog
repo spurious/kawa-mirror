@@ -1,3 +1,8 @@
+2012-12-26  Per Bothner  <per@bothner.com>
+
+	* LispReader.java (readValuesAndAppend): New method.
+	* ReaderVector.java (readVector): Use readValuesAndAppend.
+
 2012-12-19  Charles Turner  <chturne@gmail.com>
 
 	* LispLanguage.java (unitNamespace): Moved here from Scheme class.

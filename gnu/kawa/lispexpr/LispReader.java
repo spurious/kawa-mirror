@@ -160,10 +160,37 @@ public class LispReader extends Lexer
     return bindSharedObject(sharingIndex, result);
   }
 
+    public Pair readValuesAndAppend(int ch, ReadTable rtable, Pair last)
+            throws java.io.IOException, SyntaxException {
+        int line = port.getLineNumber();
+        int column = port.getColumnNumber();
+        Object values = readValues(ch, rtable, -1);
+        int index = 0;
+        int next = Values.nextIndex(values, index);
+        if (next >= 0) {
+            for (;;) {
+                Object value = Values.nextValue(values, index);
+                index = next;
+                if (value == gnu.expr.QuoteExp.voidExp)
+                    value = Values.empty;
+                next = Values.nextIndex(values, index);
+                if (next < 0)
+                    value = handlePostfix(value, rtable, line, column);
+                Pair pair = makePair(value, line, column);
+                setCdr(last, pair);
+                last = pair;
+                if (next < 0)
+                    break;
+            }
+        }
+        return last;
+    }
+
   protected Object readAndHandleToken(int ch, int startPos, ReadTable rtable)
     throws java.io.IOException, SyntaxException
   {
-    readToken(ch, getReadCase(), rtable);
+    char readCase = getReadCase();
+    readToken(ch, readCase, rtable);
     int endPos = tokenBufferLength;
     if (! seenEscapes)
       {
@@ -181,7 +208,6 @@ public class LispReader extends Lexer
         */
       }
 
-    char readCase = getReadCase();
     if (readCase == 'I')
       {
 	int upperCount = 0;

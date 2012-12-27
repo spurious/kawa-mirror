@@ -7,6 +7,8 @@ import gnu.mapping.InPort;
 import gnu.mapping.Values;
 import gnu.lists.FVector;
 import gnu.lists.ConstVector;
+import gnu.lists.LList;
+import gnu.lists.Pair;
 
 public class ReaderVector extends ReadTableEntry
 {
@@ -34,11 +36,12 @@ public class ReaderVector extends ReadTableEntry
       }
      try
        {
-	 java.util.Vector vec = new java.util.Vector();
          ConstVector result = new ConstVector();
          lexer.bindSharedObject(sharingIndex, result);
 
          ReadTable rtable = ReadTable.getCurrent();
+         Pair head = new Pair(null, LList.Empty);
+         Pair last = head;
 	 for (;;)
 	   {
 	     int ch = lexer.read();
@@ -46,24 +49,9 @@ public class ReaderVector extends ReadTableEntry
 	       lexer.eofError("unexpected EOF in vector");
 	     if (ch == close)
 	       break;
-	     Object value = lexer.readValues(ch, rtable, -1);
-	     if (value instanceof Values)
-	       {
-		 Object[] values = ((Values) value).getValues();
-		 int n = values.length;
-		 for (int i = 0;  i < n;  i++)
-		   vec.addElement(values[i]);
-	       }
-	     else
-	       {
-		 if (value == gnu.expr.QuoteExp.voidExp)
-		   value = Values.empty;
-		 vec.addElement(value);
-	       }
+             last = lexer.readValuesAndAppend(ch, rtable, last);
 	   }
-	 Object[] objs = new Object[vec.size()];
-	 vec.copyInto(objs);
-         result.setDataBackDoor(objs);
+         result.setDataBackDoor(((LList) head.getCdr()).toArray());
 	 return result;
 
        }

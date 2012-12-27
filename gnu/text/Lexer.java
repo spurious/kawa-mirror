@@ -63,21 +63,21 @@ public class Lexer extends Reader
   {
     return port.read();
   }
+ 
+    /** Read a Unicode character (codepoint) by checking for surrogates.
+     * @deprecated Use {@link #readCodePoint}.
+     */
+    public int readUnicodeChar() throws java.io.IOException {
+        return port.readCodePoint();
+    }
 
-  public int readUnicodeChar () throws java.io.IOException
-  {
-    int c = port.read();
-    if (c >= 0xD800 && c < 0xDBFF)
-      {
-	int next = port.read();
-        // FIXME: if (c < 0) ????
-	if (next >= 0xDC00 && next <= 0xDFFF)
-	  c = ((c - 0xD800) << 10) + (c - 0xDC00) + 0x10000;
-      }
-    return c;
-  }
+    /** Read a Unicode character (codepoint) by checking for surrogates.
+     */
+    public int readCodePoint() throws java.io.IOException {
+        return port.readCodePoint();
+    }
 
-  public int read(char[] buf, int offset, int length)
+   public int read(char[] buf, int offset, int length)
     throws java.io.IOException
   {
     return port.read(buf, offset, length);

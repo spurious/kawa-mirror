@@ -742,4 +742,54 @@ public class LineBufferedReader extends Reader
       unread_quick();
     return c;
   }
+
+    /** Reads a Unicode character (codepoint) by checking for surrogates.
+     * An invalid surrogate pair retruns 0xFFFD.
+     */
+    public static int readCodePoint(Reader in) throws java.io.IOException {
+        int c = in.read();
+        if (c >= 0xD800 && c <= 0xDBFF) {
+            int next = in.read();
+            if (next >= 0xDC00 && next <= 0xDFFF)
+                c = ((c - 0xD800) << 10) + (c - 0xDC00) + 0x10000;
+            else
+                c = 0xFFFD; // Unicode replacement character.
+        }
+        return c;
+    }
+
+    public int readCodePoint() throws java.io.IOException {
+        return readCodePoint(this);
+    }
+
+    public static int peekCodePoint(Reader in) throws java.io.IOException {
+        if (in instanceof LineBufferedReader)
+            return ((LineBufferedReader) in).peekCodePoint();
+        else {
+            in.mark(2);
+            int ch = LineBufferedReader.readCodePoint(in);
+            in.reset();
+            return ch;
+        }
+    }
+    public int peekCodePoint() throws java.io.IOException {
+        int ch = peek();
+        if (ch < 0xD800 || ch > 0xDBFF)
+            return ch;
+        if (readAheadLimit > 0 && pos + 2 - markPos > readAheadLimit)
+            clearMark();
+        if (readAheadLimit == 0) {
+            mark(2);
+            ch = readCodePoint(this);
+            reset();
+        } else {
+            // Here we know that pos + 2 - markPos <= readAheadLimit.
+            int savePos = pos;
+            ch = LineBufferedReader.readCodePoint(this);
+            if (pos > highestPos)
+                highestPos = pos;
+            pos = savePos;
+        }
+        return ch;
+    }
 }

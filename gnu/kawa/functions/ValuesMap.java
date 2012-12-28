@@ -158,7 +158,7 @@ public class ValuesMap extends MethodProc implements Inlineable
 	   goto done;
 	 Values.nextValue(values, index);
 	 compileFromStackSimple(comp, Type.pointerType);
-	 index = index;
+	 index = next;
        }
     */
     Variable indexVar = code.addLocal(Type.intType);

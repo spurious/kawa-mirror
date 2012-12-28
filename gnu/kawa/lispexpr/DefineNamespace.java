@@ -61,6 +61,7 @@ public class DefineNamespace extends Syntax
       {
         literal = p2.getCar().toString();
         Namespace namespace;
+        String prefix = name.getName();
         if (literal.startsWith("class:"))
           {
             String cname = literal.substring(6);
@@ -70,12 +71,12 @@ public class DefineNamespace extends Syntax
           }
         else if (makeXML)
           {
-            namespace = XmlNamespace.getInstance(name.getName(), literal);
+            namespace = XmlNamespace.getInstance(prefix, literal);
             decl.setType(ClassType.make("gnu.kawa.xml.XmlNamespace"));
           }
         else
           {
-            namespace = Namespace.valueOf(literal);
+            namespace = Namespace.valueOf(literal, prefix);
             decl.setType(ClassType.make("gnu.mapping.Namespace"));
           }
         value = new QuoteExp(namespace);

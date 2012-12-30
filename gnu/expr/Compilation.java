@@ -1173,7 +1173,8 @@ public class Compilation implements SourceLocator
     if (lexp instanceof ClassExp)
       {
 	ClassExp cexp = (ClassExp) lexp;
-	callInitMethods(cexp.getCompiledClassType(this), new Vector<ClassType>(10));
+	callInitMethods(cexp.getCompiledClassType(this),
+                        new ArrayList<ClassType>(10));
       }
 
     code.emitReturn();
@@ -1187,7 +1188,7 @@ public class Compilation implements SourceLocator
    * @param clas Class to search for $finit$, and to search supertypes.
    * @param seen array of seen classes, to avoid duplicate $finit$ calls.
    */
-  void callInitMethods (ClassType clas, Vector<ClassType> seen)
+  void callInitMethods (ClassType clas, ArrayList<ClassType> seen)
   {
     if (clas == null)
       return;
@@ -1197,9 +1198,9 @@ public class Compilation implements SourceLocator
       return;
     // Check for duplicates.
     for (int i = seen.size();  --i >= 0; )
-      if (((ClassType) seen.elementAt(i)).getName() == name)
+      if (seen.get(i).getName() == name)
 	return;
-    seen.addElement(clas);
+    seen.add(clas);
 
     // Recusive call to emit $finit$ of super-types.  However, don't do that
     // for clas.getSuperclass(), because our <init> will automatically call

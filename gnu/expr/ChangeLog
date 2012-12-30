@@ -1,3 +1,13 @@
+2012-12-29  Per Bothner  <per@bothner.com>
+
+	* ClassExp.java (compileMembers): Don't generate field for a get/set
+	method if we already have a matching implementation method.
+
+	* ClassExp.java (getImplMethods): New overloaded private method.
+	Minor optimization - reuse Type[] for recursive calls.
+	(getImplMethods): Change parameter type from Vector to ArrayList.
+	* Compilation.java (callInitMethods): Likewise.
+
 2012-12-22  Per Bothner  <per@bothner.com>
 
 	* ChainLambdas.java (visitApplyExp): Silently allow explicit

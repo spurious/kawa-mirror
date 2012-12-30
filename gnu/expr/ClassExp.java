@@ -350,7 +350,14 @@ public class ClassExp extends LambdaExp
      * is more specific and overrides any that might in super-interfaces.
      */
     static void getImplMethods(ClassType interfaceType,
-                               String mname, Type[] paramTypes, Vector vec) {
+                               String mname, Type[] paramTypes,
+                               ArrayList<Method> vec) {
+        getImplMethods(interfaceType, mname, paramTypes, vec, null);
+    }
+
+    private static void getImplMethods(ClassType interfaceType,
+                                       String mname, Type[] paramTypes,
+                                       ArrayList<Method> vec, Type[] itypes) {
         ClassType implType;
         if (interfaceType instanceof PairClassType)
             implType = ((PairClassType) interfaceType).instanceType;
@@ -373,18 +380,21 @@ public class ClassExp extends LambdaExp
                 return;
             }
         }
-        Type[] itypes = new Type[paramTypes.length + 1];
+        if (itypes == null) {
+            itypes = new Type[paramTypes.length + 1];
+            System.arraycopy (paramTypes, 0, itypes, 1, paramTypes.length);
+        }
         itypes[0] = interfaceType;
-        System.arraycopy (paramTypes, 0, itypes, 1, paramTypes.length);
         Method implMethod = implType.getDeclaredMethod(mname, itypes);
         if (implMethod != null) {
             int count = vec.size();
-            if (count == 0 || ! vec.elementAt(count-1).equals(implMethod))
-                vec.addElement(implMethod);
+            if (count == 0 || ! vec.get(count-1).equals(implMethod))
+                vec.add(implMethod);
         } else {
             ClassType[] superInterfaces = interfaceType.getInterfaces();
             for (int i = 0;  i < superInterfaces.length;  i++)
-                getImplMethods(superInterfaces[i], mname, paramTypes, vec);
+                getImplMethods(superInterfaces[i], mname, paramTypes, vec,
+                               itypes);
         }
     }
 
@@ -493,7 +503,7 @@ public class ClassExp extends LambdaExp
                 child.enterFunction(comp);
                 if (calledInit != instanceType)
                     comp.callInitMethods(getCompiledClassType(comp),
-                                         new Vector(10));
+                                         new ArrayList<ClassType>(10));
                 if (calledInit != null)
                     // Skip bodyFirst since we already compiled it.
                     Expression.compileButFirst(child.body, comp);
@@ -552,7 +562,10 @@ public class ClassExp extends LambdaExp
                     continue;
 
                 char ch;
-                if (mname.length() > 3
+                ArrayList<Method> vec = new ArrayList<Method>();
+                getImplMethods(compiledType, mname, ptypes, vec);
+                if (vec.size() == 0
+                        && mname.length() > 3
                         && mname.charAt(2) == 't'
                         && mname.charAt(1) == 'e'
                         && ((ch = mname.charAt(0)) == 'g' || ch == 's')) {
@@ -582,8 +595,6 @@ public class ClassExp extends LambdaExp
                     }
                     code.emitReturn();
                 } else {
-                    Vector vec = new Vector();
-                    getImplMethods(compiledType, mname, ptypes, vec);
                     if (vec.size() != 1) {
                         Method impl = vec.size() != 0 ? null :
                             findMethodForBridge(mname, ptypes, rtype);
@@ -605,8 +616,7 @@ public class ClassExp extends LambdaExp
                         for (Variable var = code.getCurrentScope().firstVar();
                              var != null;  var = var.nextVar())
                             code.emitLoad(var);
-                        Method imethod = (Method) vec.elementAt(0);
-                        code.emitInvokeStatic(imethod);
+                        code.emitInvokeStatic(vec.get(0));
                         code.emitReturn();
                     }
                 }

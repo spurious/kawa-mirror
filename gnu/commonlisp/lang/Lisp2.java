@@ -3,77 +3,111 @@
 
 package gnu.commonlisp.lang;
 import gnu.expr.*;
-import gnu.lists.*;
-import gnu.mapping.*;
-import gnu.bytecode.CodeAttr;
-import gnu.bytecode.ClassType;
-import gnu.text.*;
 import gnu.kawa.lispexpr.*;
 import gnu.kawa.reflect.FieldLocation;
+import gnu.lists.*;
+import gnu.mapping.*;
 
 /** Abstract class for Lisp-like languages with separate namespaces. */
 
-public abstract class Lisp2 extends LispLanguage
-{
-  public static final LList FALSE = LList.Empty;
-  // FIXME - which namespace?
-  public static final Symbol TRUE = Namespace.getDefault().getSymbol("t");
-  public static final Expression nilExpr = new QuoteExp(FALSE);
+public abstract class Lisp2 extends LispLanguage {
+    public static final LList FALSE = LList.Empty;
+    // FIXME - which namespace?
+    public static final Symbol TRUE = Namespace.getDefault().getSymbol("t");
+    public static final Expression nilExpr = new QuoteExp(FALSE);
 
-  public boolean isTrue(Object value)
-  {
-    return value != FALSE;
-  }
+    @Override
+    public boolean isTrue(Object value) {
+        return value != FALSE;
+    }
 
-  public Object booleanObject(boolean b)
-  {
-    if (b) return TRUE; else return FALSE;
-  }
+    @Override
+    public Object booleanObject(boolean b) {
+        return b ? TRUE : FALSE;
+    }
 
-  public Object noValue()
-  {
-    return FALSE;
-  }
+    @Override
+    public Object noValue() {
+        return FALSE;
+    }
 
-  public boolean hasSeparateFunctionNamespace()
-  {
-    return true;
-  }
+    /**
+     * Determines if functions in this language have a separate namespace.
+     *
+     * Different Lisps have different organisations of the symbol namespace.
+     * "Lisp1" languages, notably Scheme, have a single namespace where
+     * functions and values are not distinguished. "Lisp2" languages,
+     * notably CL, separate the two objects into conceptually two namespaces.
+     * Kawa doesn't literally use two namespaces, such binding properties are 
+     * looked up in an {@link Environment} table.
+     * 
+     * @return true if this language has a separate function namespace, false
+     *         otherwise.
+     */
+    @Override
+    public boolean hasSeparateFunctionNamespace() {
+        return true;
+    }
 
-  public boolean selfEvaluatingSymbol (Object obj)
-  {
-    return obj instanceof Keyword || obj == TRUE || obj == FALSE;
-  }
+    /**
+     * Determine whether a symbol evaluates to itself.
+     * @param obj The symbol to check
+     * @return true if the symbol evaluates to itself, otherwise false.
+     */
+    @Override
+    public boolean selfEvaluatingSymbol (Object obj) {
+        return obj instanceof Keyword || obj == TRUE || obj == FALSE;
+    }
 
-  public Object getEnvPropertyFor (java.lang.reflect.Field fld, Object value)
-  {
-    if (Compilation.typeProcedure.getReflectClass()
-	.isAssignableFrom(fld.getType())
-	|| value instanceof kawa.lang.Syntax)
-      return EnvironmentKey.FUNCTION;
-    return null;
-  }
+    /**
+     * Given a field, figure out which namespace to put its binding in.
+     * Specifically, return the appropriate property key to use when
+     * importing the field's binding into an {@link Environment}:
+     * This is null for Scheme (as a Lisp1), but may be the FUNCTION property
+     * for languages like CL and Emacs Lisp, for example.
+     *
+     * @param fld The field of some module we're importing.
+     * @param value The value of the field (assuming it is constant).
+     * @return {@code EnvironmentKey.FUNCTION} if this is a function binding or
+     *         {@code null} if this binding has the null property key.
+     */
+    @Override
+    public Object getEnvPropertyFor(java.lang.reflect.Field fld, Object value) {
+        if (Compilation.typeProcedure.getReflectClass()
+                .isAssignableFrom(fld.getType())
+            || value instanceof kawa.lang.Syntax) {
+            return EnvironmentKey.FUNCTION;
+        }
+        return null;
+    }
 
-  public int getNamespaceOf(Declaration decl)
-  {
-    // This is a kludge because the hygiene renameing in SyntaxRules
-    // (which is used for some macros that Lisp uses) doesn't distinguish
-    // function and variable position.
-    if (decl.isAlias())
-      return FUNCTION_NAMESPACE+VALUE_NAMESPACE;
-    return decl.getFlag(Declaration.PROCEDURE|Declaration.IS_SYNTAX)
-        ? FUNCTION_NAMESPACE
-        : VALUE_NAMESPACE;
-  }
+    /**
+     * Get the namespace of a declaration.
+     *
+     * Declaration symbols are either in the function or value namespace.
+     *
+     * @param decl The declaration to check
+     * @return {@code FUNCTION_NAMESPACE} or {@code VALUE_NAMESPACE}.
+     */
+    @Override
+    public int getNamespaceOf(Declaration decl) {
+        // This is a kludge because the hygiene renaming in SyntaxRules
+        // (which is used for some macros that Lisp uses) doesn't distinguish
+        // function and variable position.
+        if (decl.isAlias())
+            return FUNCTION_NAMESPACE+VALUE_NAMESPACE;
+        return decl.getFlag(Declaration.PROCEDURE|Declaration.IS_SYNTAX)
+            ? FUNCTION_NAMESPACE
+            : VALUE_NAMESPACE;
+    }
 
-  /** Get a symbol for a given (interned) Java string. */
-  public static Object asSymbol (String name)
-  {
-    if (name == "nil")
-      return FALSE;
-    return Environment.getCurrent().getSymbol(name);
-    //return name;
-  }
+    /** Get a symbol for a given (interned) Java string. */
+    public static Object asSymbol(String name) {
+        // FIXME: Symbol comparison instead of string.
+        if (name == "nil")
+            return FALSE;
+        return Environment.getCurrent().getSymbol(name);
+    }
 
   protected Symbol fromLangSymbol (Object obj)
   {

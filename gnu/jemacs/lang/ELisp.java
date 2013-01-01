@@ -142,8 +142,8 @@ public class ELisp extends Lisp2
     defun("eq", new gnu.kawa.functions.IsEq(this, "eq"));
     defun("equal", new gnu.kawa.functions.IsEqual(this, "equal"));
     defun("typep", new gnu.kawa.reflect.InstanceOf(this));
-    defun("princ", displayFormat);
-    defun("prin1", writeFormat);
+    defProcStFld("princ", "gnu.jemacs.lang.MiscOps");
+    defProcStFld("prin1", "gnu.jemacs.lang.MiscOps");
     LocationEnumeration e = Scheme.builtin().enumerateAllLocations();
     while (e.hasMoreElements())
       {
@@ -176,8 +176,8 @@ public class ELisp extends Lisp2
     Language.setDefaults(instance);
   }
 
-  static final AbstractFormat writeFormat = new Print(true);
-  static final AbstractFormat displayFormat = new Print(false);
+    public static final AbstractFormat writeFormat = new Print(true);
+    public static final AbstractFormat displayFormat = new Print(false);
 
   public AbstractFormat getFormat(boolean readable)
   {

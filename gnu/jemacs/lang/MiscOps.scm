@@ -70,4 +70,8 @@
 (define (emacs:read #!optional (port (current-input-port)))
   ((<gnu.kawa.lispexpr.LispReader> port):readObject))
 
+(define (princ value #!optional (out (current-output-port))) :: <void>
+  (gnu.jemacs.lang.ELisp:displayFormat:format value out))
 
+(define (prin1 value #!optional (out (current-output-port))) :: <void>
+  (gnu.jemacs.lang.ELisp:writeFormat:format value out))

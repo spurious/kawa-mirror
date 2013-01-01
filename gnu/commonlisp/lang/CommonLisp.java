@@ -141,9 +141,9 @@ public class CommonLisp extends Lisp2
     defun("eq", new gnu.kawa.functions.IsEq(this, "eq"));
     defun("equal", new gnu.kawa.functions.IsEqual(this, "equal"));
     defun("typep", new gnu.kawa.reflect.InstanceOf(this));
-    defun("princ", displayFormat);
-    defun("prin1", writeFormat);
     defun("%flet", new kawa.standard.let("flet", true));
+    defProcStFld("princ", "gnu.commonlisp.lisp.PrimOps");
+    defProcStFld("prin1", "gnu.commonlisp.lisp.PrimOps");
 
     defProcStFld("=", "gnu.commonlisp.lang.CommonLisp", "numEqu");
     defProcStFld("<", "gnu.commonlisp.lang.CommonLisp", "numLss");
@@ -165,8 +165,10 @@ public class CommonLisp extends Lisp2
     Language.setDefaults(instance);
   }
 
-  static final AbstractFormat writeFormat = new DisplayFormat(true, 'C');
-  static final AbstractFormat displayFormat = new DisplayFormat(false, 'C');
+    public static final AbstractFormat writeFormat
+        = new DisplayFormat(true, 'C');
+    public static final AbstractFormat displayFormat
+        = new DisplayFormat(false, 'C');
 
   public AbstractFormat getFormat(boolean readable)
   {

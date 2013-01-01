@@ -170,3 +170,9 @@
 
 (define (functionp x) |clisp:boolean|
   (instance? x <function>))
+
+(define (princ value #!optional (out (current-output-port))) :: <void>
+  (gnu.commonlisp.lang.CommonLisp:displayFormat:format value out))
+
+(define (prin1 value #!optional (out (current-output-port))) :: <void>
+  (gnu.commonlisp.lang.CommonLisp:writeFormat:format value out))

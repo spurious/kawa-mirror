@@ -1,3 +1,9 @@
+2013-01-05  Per Bothner  <per@bothner.com>
+
+	* LispLanguage.java (quote_sym, unquote_sym, unquotesplicing_sym)
+	quasiquote_sym): Rename static fields to quote_str, unquote_str,
+	unquotesplicing_str, and quasiquote_str.
+
 2012-12-27  Per Bothner  <per@bothner.com>
 
 	* DefineNamespace.java (scanForDefinitions): Also use prefix when

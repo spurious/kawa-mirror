@@ -27,17 +27,17 @@ public class Quote extends Syntax {
 
     protected boolean matchesUnquote(Pair pair, SyntaxForm syntax,
                                      Translator tr) {
-        return tr.matches(pair.getCar(), syntax, LispLanguage.unquote_sym);
+        return tr.matches(pair.getCar(), syntax, LispLanguage.unquote_str);
     }
 
     protected boolean matchesUnquoteSplicing(Pair pair, SyntaxForm syntax,
                                      Translator tr) {
-        return tr.matches(pair.getCar(), syntax, LispLanguage.unquotesplicing_sym);
+        return tr.matches(pair.getCar(), syntax, LispLanguage.unquotesplicing_str);
     }
 
     protected boolean matchesQuasiQuote(Object form, SyntaxForm syntax,
                                      Translator tr) {
-        return tr.matches(form, syntax, LispLanguage.quasiquote_sym);
+        return tr.matches(form, syntax, LispLanguage.quasiquote_str);
     }
 
   /** An initial value for 'depth' for plain (non-quasi) quote. */

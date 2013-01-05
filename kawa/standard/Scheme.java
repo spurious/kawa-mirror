@@ -159,7 +159,7 @@ public class Scheme extends LispLanguage
                    "resolveQName");
 
       //-- Section 4.1  -- complete
-      defSntxStFld(LispLanguage.quote_sym, "kawa.lang.Quote", "plainQuote");
+      defSntxStFld(LispLanguage.quote_str, "kawa.lang.Quote", "plainQuote");
       defSntxStFld("%define", "kawa.standard.define", "defineRaw");
       defSntxStFld("define", "kawa.lib.prim_syntax");
 

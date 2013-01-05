@@ -17,10 +17,10 @@ import kawa.lang.Syntax; // FIXME
 
 public abstract class LispLanguage extends Language
 {
-  static public final String quote_sym = "quote";
-  static public final String unquote_sym = "unquote";
-  static public final String unquotesplicing_sym = "unquote-splicing";
-  static public final String quasiquote_sym = "quasiquote";
+  static public final String quote_str = "quote";
+  static public final String unquote_str = "unquote";
+  static public final String unquotesplicing_str = "unquote-splicing";
+  static public final String quasiquote_str = "quasiquote";
   /** Used for Kawa infix ':' operator. */
   static public final Symbol lookup_sym = Namespace.EmptyNamespace.getSymbol("$lookup$");
   // FUTURE: Used for: [ e1 e2 ... ]

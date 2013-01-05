@@ -222,7 +222,7 @@ public class Translator extends Compilation
 
   public Object matchQuoted (Pair pair)
   {
-    if (matches(pair.getCar(), LispLanguage.quote_sym)
+    if (matches(pair.getCar(), LispLanguage.quote_str)
         && pair.getCdr() instanceof Pair
         && (pair = (Pair) pair.getCdr()).getCdr() == LList.Empty)
       return pair.getCar();

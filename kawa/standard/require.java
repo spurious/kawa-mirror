@@ -137,7 +137,7 @@ public class require extends Syntax
     Type type = null;
     Pair p;
     if (name instanceof Pair
-        && tr.matches((p = (Pair) name).getCar(), Scheme.quote_sym))
+        && tr.matches((p = (Pair) name).getCar(), Scheme.quote_str))
       {
 	name = p.getCdr();
 	if (! (name instanceof Pair)

@@ -32,7 +32,7 @@ public class module_static extends Syntax
     else if (list instanceof Pair
              && (st = (Pair) list).getCdr() == LList.Empty
              && st.getCar() instanceof Pair
-             && tr.matches((st = (Pair) st.getCar()).getCar(), Scheme.quote_sym))
+             && tr.matches((st = (Pair) st.getCar()).getCar(), Scheme.quote_str))
       {
         Object cdr = st.getCdr();
         if (cdr != LList.Empty

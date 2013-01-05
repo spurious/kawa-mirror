@@ -503,7 +503,7 @@ public class LispReader extends Lexer
             ch = port.read();
             Object rightOperand = readValues(ch, rtable.lookup(ch), rtable, -1);
             value = LList.list2(value,
-                                LList.list2(rtable.makeSymbol(LispLanguage.quasiquote_sym), rightOperand));
+                                LList.list2(rtable.makeSymbol(LispLanguage.quasiquote_str), rightOperand));
             value = PairWithPosition.make(LispLanguage.lookup_sym, value,
                                           port.getName(), line+1, column+1);
           }

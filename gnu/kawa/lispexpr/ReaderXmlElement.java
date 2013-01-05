@@ -29,7 +29,7 @@ public class ReaderXmlElement extends ReadTableEntry
 
   public static Pair quote (Object obj)
   {
-    Symbol q = Namespace.EmptyNamespace.getSymbol(LispLanguage.quote_sym);
+    Symbol q = Namespace.EmptyNamespace.getSymbol(LispLanguage.quote_str);
     return LList.list2(q, obj);
   }
 

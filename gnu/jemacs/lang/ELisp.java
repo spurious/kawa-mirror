@@ -117,7 +117,7 @@ public class ELisp extends Lisp2
     defun("defun", new gnu.commonlisp.lang.defun(lambda));
     defun("function", new gnu.commonlisp.lang.function(lambda));
 
-    defun(gnu.kawa.lispexpr.LispLanguage.quote_sym,
+    defun(gnu.kawa.lispexpr.LispLanguage.quote_str,
 	  kawa.lang.Quote.plainQuote);
     defun("defgroup", new defgroup());
     defun("defcustom", new defcustom());

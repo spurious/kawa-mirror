@@ -37,8 +37,8 @@ public class ReadTable extends RangeTable
   protected boolean hexEscapeAfterBackslash = true;
 
     public static ReaderQuote unquoteEntry =
-        new ReaderQuote(makeSymbol(LispLanguage.unquote_sym),
-                        '@', makeSymbol(LispLanguage.unquotesplicing_sym));
+        new ReaderQuote(makeSymbol(LispLanguage.unquote_str),
+                        '@', makeSymbol(LispLanguage.unquotesplicing_str));
 
   /** Set whether ":IDENTIFIER" should be treated as a keyword. */
   public void setInitialColonIsKeyword (boolean whenInitial)
@@ -99,8 +99,8 @@ public class ReadTable extends RangeTable
     set(';',  ReaderIgnoreRestOfLine.getInstance());
     set('(',  ReaderParens.getInstance('(', ')'));
 
-    set('\'', new ReaderQuote(makeSymbol(LispLanguage.quote_sym)));
-    set('`',  new ReaderQuote(makeSymbol(LispLanguage.quasiquote_sym)));
+    set('\'', new ReaderQuote(makeSymbol(LispLanguage.quote_str)));
+    set('`',  new ReaderQuote(makeSymbol(LispLanguage.quasiquote_str)));
     set(',',  unquoteEntry);
 
     setBracketMode();  // Sets the entries for '[', ']', and '<'.

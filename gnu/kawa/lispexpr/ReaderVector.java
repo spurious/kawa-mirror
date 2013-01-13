@@ -34,6 +34,8 @@ public class ReaderVector extends ReadTableEntry
 	saveReadState = ((InPort) port).readState;
 	((InPort) port).readState = close == ']' ? '[' : '(';
       }
+    int startLine = port.getLineNumber();
+    int startColumn = port.getColumnNumber()-1;
      try
        {
          ConstVector result = new ConstVector();
@@ -46,7 +48,8 @@ public class ReaderVector extends ReadTableEntry
 	   {
 	     int ch = lexer.read();
 	     if (ch < 0)
-	       lexer.eofError("unexpected EOF in vector");
+	       lexer.eofError("unexpected EOF in vector starting here",
+			      startLine + 1, startColumn);
 	     if (ch == close)
 	       break;
              last = lexer.readValuesAndAppend(ch, rtable, last);

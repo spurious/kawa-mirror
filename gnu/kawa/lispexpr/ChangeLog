@@ -1,3 +1,8 @@
+2013-01-13  Per Bothner  <per@bothner.com>
+
+	* ReaderVector.java (readVector): On EOF, use vector's start
+	position for error message.
+
 2013-01-05  Per Bothner  <per@bothner.com>
 
 	* LispLanguage.java (quote_sym, unquote_sym, unquotesplicing_sym)

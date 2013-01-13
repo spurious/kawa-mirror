@@ -1,3 +1,8 @@
+2013-01-13  Per Bothner  <per@bothner.com>
+
+	* Shell.java (runFile, compileSource): Tweaks to better handle
+	exceptions while parsing/compiling, including SyntaxExceptions.
+
 2012-12-26  Per Bothner  <per@bothner.com>
 
 	* standard/readchar.java: Fix to handle surrogate characters.

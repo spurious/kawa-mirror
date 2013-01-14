@@ -233,7 +233,7 @@
 
 2006-08-11  Per Bothner  <per@bothner.com>
 
-	* testing.scm (%test-comp1body):  Remove inccorect setting of
+	* testing.scm (%test-comp1body):  Remove incorrect setting of
 	expected-value property - to R5RS standard function exp.
 
 	* testing.scm (test-assert): Fix thinko expr -> test-expression.

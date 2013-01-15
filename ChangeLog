@@ -1,3 +1,10 @@
+2013-01-13  Per Bothner  <per@bothner.com>
+
+	* configure.in: Renamed to ...
+	* configure.ac: ... new name, following current preferred autoconf
+	practice.
+	* Makefile.am (kawa/Version.java): Update accordingly.
+
 2012-12-14  Jamison Hope  <jrh@theptrgroup.com>
 
 	* build.xml: Use filelist instead of fileset to force compilation

@@ -201,7 +201,7 @@ uninstall-bytecode-jar:
 	rm -f $(DESTDIR)$(javadir)/bytecode-@BYTECODE_VERSION@.jar \
 	  $(DESTDIR)$(javadir)/bytecode.jar
 
-kawa/Version.java: $(srcdir)/kawa/Version.java.in $(srcdir)/configure.in
+kawa/Version.java: $(srcdir)/kawa/Version.java.in $(srcdir)/configure.ac
 	test -f .svn/entries \
 	&& SVN_REVISION=`svnversion 2>/dev/null` \
 	&& test -n "$$SVN_REVISION" \

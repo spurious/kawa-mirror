@@ -307,7 +307,12 @@ public class Lexer extends Reader
   }
 
   public String getName() { return port.getName(); }
+
+  /** Get the current line number.
+    * The "first" line is number number 0. */
   public int getLineNumber() { return port.getLineNumber(); }
+
+  /** Return the current (zero-based) column number. */
   public int getColumnNumber() { return port.getColumnNumber(); }
 
   public boolean isInteractive() { return interactive; }

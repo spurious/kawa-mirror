@@ -388,7 +388,8 @@ public class XMLPrinter extends OutPort
           setIndentMode();
         if (prev == PROC_INST)
           write('\n');
-        writeDoctypeIfDefined(type.toString());
+        if (type != null)
+            writeDoctypeIfDefined(type.toString());
       }
     if (printIndent >= 0)
       {

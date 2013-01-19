@@ -1,3 +1,9 @@
+2013-01-18  Per Bothner  <per@bothner.com>
+
+	* ReadTable.java (unquoteEntry): Inline field where used ...
+	(initialize): ... here.
+	(makeSymbol): Make non-static and protected.
+
 2013-01-13  Per Bothner  <per@bothner.com>
 
 	* ReaderVector.java (readVector): On EOF, use vector's start

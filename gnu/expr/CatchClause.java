@@ -19,7 +19,7 @@ public class CatchClause extends LetExp
   {
     this();
     Declaration decl = lexp.firstDecl();
-    decl.setInitValue(QuoteExp.voidExp);
+    decl.setInitValue(QuoteExp.undefined_exp);
     lexp.remove(null, decl);
     add(decl);
     body = lexp.body;

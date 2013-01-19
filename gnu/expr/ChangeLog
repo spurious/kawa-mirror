@@ -1,3 +1,8 @@
+2013-01-18  Per Bothner  <per@bothner.com>
+
+	* CatchClause.java (<init>): Set Declaration's initial value
+	to undefined_exp, not voidExp.
+
 2012-12-31  Charles Turner  <chturne@gmail.com>
 
 	* Keyword.java: Re-formatted. Added more documentation.

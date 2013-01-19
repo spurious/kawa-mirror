@@ -1,5 +1,8 @@
 2013-01-18  Per Bothner  <per@bothner.com>
 
+	* ReaderDispatchMisc.java (read): Move handling of #|...|# comments to
+	(readNestedComment): ... new method..
+
 	* ReadTable.java (unquoteEntry): Inline field where used ...
 	(initialize): ... here.
 	(makeSymbol): Make non-static and protected.

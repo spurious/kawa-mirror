@@ -93,21 +93,7 @@ public class ReaderDispatchMisc extends ReadTableEntry
       return readRegex(in, ch, count);
       /* #endif */
       case '|':
-	port = reader.getPort();
-	if (port instanceof InPort)
-	  {
-	    saveReadState = ((InPort) port).readState;
-	    ((InPort) port).readState = '|';
-	  }
-	try
-	  {
-	    reader.readNestedComment('#', '|');
-	  }
-	finally
-	  {
-	    if (port instanceof InPort)
-	      ((InPort) port).readState = saveReadState;
-	  }
+        readNestedComment(reader);
 	return Values.empty;
       case ';':
 	port = reader.getPort();
@@ -150,6 +136,22 @@ public class ReaderDispatchMisc extends ReadTableEntry
 	return Values.empty;
       }
   }
+
+    public static void readNestedComment(LispReader reader)
+            throws java.io.IOException, SyntaxException {
+	LineBufferedReader port = reader.getPort();
+        char saveReadState = '\0';
+	if (port instanceof InPort) {
+	    saveReadState = ((InPort) port).readState;
+	    ((InPort) port).readState = '|';
+        }
+	try {
+	    reader.readNestedComment('#', '|');
+        } finally {
+	    if (port instanceof InPort)
+                ((InPort) port).readState = saveReadState;
+        }
+    }
 
   /* #ifdef use:java.util.regex */
   public static Pattern readRegex (Lexer in, int ch, int count)

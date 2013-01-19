@@ -197,7 +197,10 @@ public class LispReader extends Lexer
         Object value = parseNumber(tokenBuffer, startPos, endPos - startPos,
                                    '\0', 0, SCM_NUMBERS);
         if (value != null && ! (value instanceof String))
-          return value;
+          {
+            tokenBufferLength = startPos;
+            return value;
+          }
         /* Common Lisp only?  FIXME
         if (isPotentialNumber(tokenBuffer, startPos, endPos))
           {
@@ -286,6 +289,7 @@ public class LispReader extends Lexer
 
     int len = endPos - startPos;
 
+    Object result;
     if (lbrace >= 0 && rbrace > lbrace)
       {
         String prefix = lbrace > 0 ? new String(tokenBuffer, startPos, lbrace-startPos) : null;
@@ -297,22 +301,24 @@ public class LispReader extends Lexer
         if (! (rightOperand instanceof SimpleSymbol))
           error("expected identifier in symbol after '{URI}:'");
         // FIXME should allow "compound keyword" - for attribute names
-        return Symbol.valueOf(rightOperand.toString(), uri, prefix);
+        result = Symbol.valueOf(rightOperand.toString(), uri, prefix);
       }
-
-    if (rtable.initialColonIsKeyword && packageMarker == startPos && len > 1)
+    else if (rtable.initialColonIsKeyword && packageMarker == startPos && len > 1)
       {
 	startPos++;
 	String str = new String(tokenBuffer, startPos, endPos-startPos);
-	return Keyword.make(str.intern());
+	result = Keyword.make(str.intern());
     }
-    if (rtable.finalColonIsKeyword && packageMarker == endPos - 1
+    else if (rtable.finalColonIsKeyword && packageMarker == endPos - 1
         && (len > 1 || seenEscapes))
       {
 	String str = new String(tokenBuffer, startPos, len - 1);
-	return Keyword.make(str.intern());
+	result = Keyword.make(str.intern());
       }
-    return rtable.makeSymbol(new String(tokenBuffer, startPos, len));
+    else
+      result = rtable.makeSymbol(new String(tokenBuffer, startPos, len));
+    tokenBufferLength = startPos;
+    return result;
   }
 
   public static final char TOKEN_ESCAPE_CHAR = '\uffff';

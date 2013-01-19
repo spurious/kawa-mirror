@@ -1,3 +1,8 @@
+2013-01-19  Per Bothner  <per@bothner.com>
+
+	* LispReader.java (readAndHandleToken): When done, restore
+	tokenBufferLength to startPos.
+
 2013-01-18  Per Bothner  <per@bothner.com>
 
 	* ReaderDispatchMisc.java (read): Move handling of #|...|# comments to

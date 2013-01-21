@@ -49,7 +49,7 @@ public class ReaderDispatchMisc extends ReadTableEntry
 	// Handle Guile-style keyword syntax: '#:KEYWORD'
 	// Note this conflicts with Common Lisp uninterned symbols.  FIXME
 	int startPos = reader.tokenBufferLength;
-	reader.readToken(reader.read(), 'P', ReadTable.getCurrent());
+	reader.readToken(reader.read(), ReadTable.getCurrent());
 	length = reader.tokenBufferLength - startPos;
 	name = new String(reader.tokenBuffer, startPos, length);
 	reader.tokenBufferLength = startPos;

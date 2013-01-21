@@ -163,7 +163,7 @@ public class LispReader extends Lexer
     throws java.io.IOException, SyntaxException
   {
     char readCase = getReadCase();
-    readToken(ch, readCase, rtable);
+    readToken(ch, rtable);
     int endPos = tokenBufferLength;
     if (! seenEscapes)
       {
@@ -301,7 +301,10 @@ public class LispReader extends Lexer
    */
   protected boolean seenEscapes;
 
-  void readToken(int ch, char readCase, ReadTable rtable)
+    /** Read token, leaving characters in tokenBuffer.
+     * Sets seenEscapes if escape characters are seen.
+     */
+  void readToken(int ch, ReadTable rtable)
       throws java.io.IOException, SyntaxException
   {
     boolean inEscapes = false;
@@ -438,59 +441,55 @@ public class LispReader extends Lexer
       }
   }
 
-  protected boolean validPostfixLookupStart (int ch, ReadTable rtable)
-      throws java.io.IOException
-  {
-    if (ch < 0 || ch == rtable.postfixLookupOperator)
-      return false;
-    if (ch == ',')
-      return true;
-    int kind = rtable.lookup(ch).getKind();
-    return kind == ReadTable.CONSTITUENT
-      || kind == ReadTable.NON_TERMINATING_MACRO
-      || kind == ReadTable.MULTIPLE_ESCAPE
-      || kind == ReadTable.SINGLE_ESCAPE;
-  }
+    protected boolean validPostfixLookupStart (int ch, ReadTable rtable)
+            throws java.io.IOException {
+        if (ch < 0 || ch == rtable.postfixLookupOperator)
+            return false;
+        if (ch == ',')
+            return true;
+        int kind = rtable.lookup(ch).getKind();
+        return kind == ReadTable.CONSTITUENT
+            || kind == ReadTable.NON_TERMINATING_MACRO
+            || kind == ReadTable.MULTIPLE_ESCAPE
+            || kind == ReadTable.SINGLE_ESCAPE;
+    }
 
-  Object handlePostfix (Object value, ReadTable rtable, int line, int column)
-      throws java.io.IOException, SyntaxException
-  {
-    if (value == QuoteExp.voidExp)
-      value = Values.empty;
-    for (;;)
-      {
-        int ch = port.peek();
-        if (ch == '[' && rtable.defaultBracketMode == -2)
-          {
-            port.read();
-            Object lst = ReaderParens.readList(this, null, ch, 1, ']', -1);
-            value = PairWithPosition.make(value, lst,
-                                          port.getName(), line+1, column+1);
-            value = PairWithPosition.make(LispLanguage.bracket_apply_sym, value,
-                                          port.getName(), line+1, column+1);
-          }
-        else if (ch == rtable.postfixLookupOperator)
-          {
-            // A kludge to map PreOpWord to ($lookup$ Pre 'Word).
-            port.read();
-            int ch2 = port.peek();
-            if (! validPostfixLookupStart(ch2, rtable))
-              {
-                unread();
+    /** After reading a value check for following {@code '['} or {@code ':'}.
+     */
+    Object handlePostfix (Object value, ReadTable rtable, int line, int column)
+        throws java.io.IOException, SyntaxException {
+        if (value == QuoteExp.voidExp)
+            value = Values.empty;
+        for (;;) {
+            int ch = port.peek();
+            String str; int slen;
+            if (ch == '[' && rtable.defaultBracketMode == -2) {
+                port.read();
+                Object lst = ReaderParens.readList(this, null, ch, 1, ']', -1);
+                value = PairWithPosition.make(value, lst,
+                                              port.getName(), line+1, column+1);
+                value = PairWithPosition.make(LispLanguage.bracket_apply_sym, value,
+                                              port.getName(), line+1, column+1);
+            } else if (ch == rtable.postfixLookupOperator) {
+                // A kludge to map PreOpWord to ($lookup$ Pre 'Word).
+                port.read();
+                int ch2 = port.peek();
+                if (! validPostfixLookupStart(ch2, rtable)) {
+                    unread();
+                    break;
+                }
+                ch = port.read();
+                Object rightOperand = readValues(ch, rtable.lookup(ch), rtable, -1);
+                value = LList.list2(value,
+                                    LList.list2(rtable.makeSymbol(LispLanguage.quote_str), rightOperand));
+                value = PairWithPosition.make(LispLanguage.lookup_sym, value,
+                                              port.getName(), line+1, column+1);
+            }
+            else
                 break;
-              }
-            ch = port.read();
-            Object rightOperand = readValues(ch, rtable.lookup(ch), rtable, -1);
-            value = LList.list2(value,
-                                LList.list2(rtable.makeSymbol(LispLanguage.quasiquote_str), rightOperand));
-            value = PairWithPosition.make(LispLanguage.lookup_sym, value,
-                                          port.getName(), line+1, column+1);
-          }
-        else
-          break;
-      }
-    return value;
-  }
+        }
+        return value;
+    }
 
   private boolean isPotentialNumber (char[] buffer, int start, int end)
   {
@@ -1187,7 +1186,7 @@ public class LispReader extends Lexer
     throws java.io.IOException, SyntaxException
   {
     int startPos = reader.tokenBufferLength - previous;
-    reader.readToken(reader.read(), 'P', ReadTable.getCurrent());
+    reader.readToken(reader.read(), ReadTable.getCurrent());
     int endPos = reader.tokenBufferLength;
     if (startPos == endPos)
       {
@@ -1218,7 +1217,7 @@ public class LispReader extends Lexer
       reader.eofError("unexpected EOF in character literal");
     int startPos = reader.tokenBufferLength;
     reader.tokenBufferAppend(ch);
-    reader.readToken(reader.read(), 'D', ReadTable.getCurrent());
+    reader.readToken(reader.read(), ReadTable.getCurrent());
     char[] tokenBuffer = reader.tokenBuffer;
     int length = reader.tokenBufferLength - startPos;
     if (length == 1)
@@ -1279,7 +1278,7 @@ public class LispReader extends Lexer
 
     int startPos = reader.tokenBufferLength;
     reader.tokenBufferAppend(ch);
-    reader.readToken(reader.read(), 'D', ReadTable.getCurrent());
+    reader.readToken(reader.read(), ReadTable.getCurrent());
     int length = reader.tokenBufferLength - startPos;
     String name = new String(reader.tokenBuffer, startPos, length);
     if (name.equals("optional"))

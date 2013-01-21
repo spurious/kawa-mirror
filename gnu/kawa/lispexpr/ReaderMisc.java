@@ -14,7 +14,7 @@ public class ReaderMisc extends ReadTableEntry
 
   public int getKind() { return kind; }
 
-    public Object read(Lexer in, int ch, int count, int sharingIndex)
+    public Object read(Lexer in, int ch, int count)
 	throws java.io.IOException, SyntaxException {
         if (kind == ReadTable.ILLEGAL) {
             String msg = ("invalid character #\\"+((char) ch));  // FIXME

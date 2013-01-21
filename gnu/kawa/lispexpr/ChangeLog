@@ -1,3 +1,11 @@
+2013-01-21  Per Bothner  <per@bothner.com>
+
+	* LispReader.java (readToken): Remove unused readCase parameter.
+	Update callers.
+	* ReaderConstituent.java: Change to extend ReaderMisc.
+	(read): Override 3-parameter version, not 4-parameter version.
+	* ReaderMisc.java (read): Likewise.
+
 2013-01-20  Per Bothner  <per@bothner.com>
 
 	* ReaderConstituent.java: New class, extends ReadTableEntry.

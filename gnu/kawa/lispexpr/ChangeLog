@@ -1,3 +1,12 @@
+2013-01-20  Per Bothner  <per@bothner.com>
+
+	* ReaderConstituent.java: New class, extends ReadTableEntry.
+	* Makefile.am: Update acccordingly.
+	* ReaderMisc.java (read): New method.
+	* ReadTableEntry.java (singleEscape, multipleEscape,
+	constituent, brace): Initialize to ReaderConstituent instances.
+	* LispReader.java (readValues): Is now trivial - no switch statement.
+
 2013-01-19  Per Bothner  <per@bothner.com>
 
 	* LispReader.java (readAndHandleToken): When done, restore

@@ -120,45 +120,18 @@ public class LispReader extends Lexer
   }
 
     public Object readValues (int ch,  ReadTable rtable, int sharingIndex)
-      throws java.io.IOException, SyntaxException
-  {
-    return readValues(ch, rtable.lookup(ch), rtable, sharingIndex);
-  }
+            throws java.io.IOException, SyntaxException {
+        return readValues(ch, rtable.lookup(ch), rtable, sharingIndex);
+    }
 
-  /** May return zero or multiple values.
-   * Returns no values if looking at whitespace or a comment. */
-  public Object readValues (int ch, ReadTableEntry entry, ReadTable rtable, int sharingIndex)
-      throws java.io.IOException, SyntaxException
-  {
-    // Step numbers refer to steps in section 2.2 of the HyperSpec.
-    // Step 1:
-    int startPos = tokenBufferLength;
-
-    seenEscapes = false;
-    int kind = entry.getKind();
-    Object result;
-    switch (kind)
-      {
-      case ReadTable.ILLEGAL:
-	// Step 2:
-	String err = ("invalid character #\\"+((char) ch));  // FIXME
-	if (interactive) fatal(err);
-	else error(err);
-	return Values.empty;
-      case ReadTable.WHITESPACE:
-	// Step 3:
-	return Values.empty;
-      case ReadTable.TERMINATING_MACRO:
-      case ReadTable.NON_TERMINATING_MACRO:
-	  return entry.read(this, ch, -1, sharingIndex);
-      case ReadTable.CONSTITUENT:
-      case ReadTable.SINGLE_ESCAPE: // Step 5:
-      case ReadTable.MULTIPLE_ESCAPE: // Step 6:
-      default:  // 
-	  result = readAndHandleToken(ch, startPos, rtable);
-      }
-    return bindSharedObject(sharingIndex, result);
-  }
+    /** May return zero or multiple values.
+     * Returns no values if looking at whitespace or a comment. */
+    public Object readValues (int ch, ReadTableEntry entry, ReadTable rtable,
+                              int sharingIndex)
+        throws java.io.IOException, SyntaxException {
+        seenEscapes = false;
+        return entry.read(this, ch, -1, sharingIndex);
+    }
 
     public Pair readValuesAndAppend(int ch, ReadTable rtable, Pair last)
             throws java.io.IOException, SyntaxException {

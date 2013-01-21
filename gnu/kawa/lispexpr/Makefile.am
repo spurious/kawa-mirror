@@ -19,6 +19,7 @@ java_sources = \
   LispPackage.java \
   LispReader.java \
   ReaderColon.java \
+  ReaderConstituent.java \
   ReaderDispatch.java \
   ReaderDispatchMacro.java \
   ReaderDispatchMisc.java \

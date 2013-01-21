@@ -12,13 +12,13 @@ public abstract class ReadTableEntry
   public static final ReadTableEntry whitespace
     = new ReaderMisc(ReadTable.WHITESPACE);
   public static final ReadTableEntry singleEscape
-    = new ReaderMisc(ReadTable.SINGLE_ESCAPE);
+    = new ReaderConstituent(ReadTable.SINGLE_ESCAPE);
   public static final ReadTableEntry multipleEscape
-    = new ReaderMisc(ReadTable.MULTIPLE_ESCAPE);
+    = new ReaderConstituent(ReadTable.MULTIPLE_ESCAPE);
   public static final ReadTableEntry constituent
-    = new ReaderMisc(ReadTable.CONSTITUENT);
+    = new ReaderConstituent(ReadTable.CONSTITUENT);
   public static final ReadTableEntry brace // special handling for '{' and '}'
-    = new ReaderMisc(ReadTable.CONSTITUENT);
+    = new ReaderConstituent(ReadTable.CONSTITUENT);
 
   public static ReadTableEntry getIllegalInstance()
   { return illegal; }

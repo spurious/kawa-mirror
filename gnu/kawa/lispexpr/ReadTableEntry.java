@@ -19,6 +19,9 @@ public abstract class ReadTableEntry
     = new ReaderConstituent(ReadTable.CONSTITUENT);
   public static final ReadTableEntry brace // special handling for '{' and '}'
     = new ReaderConstituent(ReadTable.CONSTITUENT);
+    /** Sppecial ahndling of {code '&'} for SRFI-108/109. */
+    public static final ReadTableEntry ampersand
+        = new ReaderExtendedLiteral();
 
   public static ReadTableEntry getIllegalInstance()
   { return illegal; }

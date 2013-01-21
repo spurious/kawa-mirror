@@ -1,7 +1,8 @@
 package gnu.text;
-import java.io.*;
 import gnu.lists.Consumer;
 import gnu.kawa.util.*;
+import java.io.*;
+import java.util.Map;
 
 /**
  * A wrapper for characters.
@@ -107,10 +108,8 @@ public class Char
       && ((Char)obj).intValue() == value;
   }
 
-  static char[] charNameValues = { ' ', '\t', '\n', '\n',
-				   '\r', '\f', '\b', '\033',
-                                   '\177', '\177', '\177',
-                                   '\007', '\007', '\013', '\0' };
+    private static String charNameValues =
+      " \t\n\n\r\f\b\033\033\177\177\177\007\007\013\0\0";
   static String[] charNames = { "space",
 				"tab",
 				"newline",
@@ -118,6 +117,7 @@ public class Char
 				"return",
 				"page",
 				"backspace",
+				"escape",
 				"esc",
 				"delete",
 				"del",
@@ -125,19 +125,26 @@ public class Char
 				"alarm",
 				"bel",
 				"vtab",
-				"nul"};
+                                "null",
+                                "nul" };
+
+    public static void addNamedChars(Map<String,String> map) {
+        for (int i = charNames.length; --i >= 0 ; ) {
+            map.put(charNames[i], charNameValues.substring(i,i+1));
+        }
+    }
 
   public static int nameToChar(String name)
   {
     for (int i = charNames.length; --i >= 0 ; )
       {
         if (charNames[i].equals(name))
-          return charNameValues[i];
+            return charNameValues.charAt(i);
       }
     for (int i = charNames.length; --i >= 0 ; )
       {
         if (charNames[i].equalsIgnoreCase(name))
-          return charNameValues[i];
+          return charNameValues.charAt(i);
       }
     int len = name.length();
     if (len > 1 && name.charAt(0) == 'u')
@@ -214,9 +221,10 @@ public class Char
   {
     StringBuffer sbuf = new StringBuffer(20);
     sbuf.append("#\\");
-    for (int i = 0;  i < charNameValues.length;  i++)
+    int nlen = charNameValues.length();
+    for (int i = 0;  i < nlen;  i++)
       {
-	if ((char) ch == charNameValues[i])
+          if ((char) ch == charNameValues.charAt(i))
 	  {
 	    sbuf.append(charNames[i]);
 	    return sbuf.toString();

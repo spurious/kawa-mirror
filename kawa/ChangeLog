@@ -1,3 +1,10 @@
+2013-01-20  Per Bothner  <per@bothner.com>
+
+	* lang/Translator.java (checkDefaultBinding): Handle $entity$:NAME,
+	where NAME is a standard enity names, such as "apos".
+	* standard/Scheme.java (initScheme): Define $string$, $format$,
+	$entity$, and $construct$.
+
 2013-01-13  Per Bothner  <per@bothner.com>
 
 	* Shell.java (runFile, compileSource): Tweaks to better handle

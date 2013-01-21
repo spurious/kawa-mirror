@@ -381,7 +381,7 @@ public class LispReader extends Lexer
 	      case ReadTable.CONSTITUENT:
                 if (ch == '{' && entry == ReadTableEntry.brace)
                   braceNesting++;
-                /* ... fall thotugh ... */
+                /* ... fall through ... */
 	      case ReadTable.NON_TERMINATING_MACRO:
 		tokenBufferAppend(ch);
 		continue;
@@ -1167,6 +1167,11 @@ public class LispReader extends Lexer
       return Pair.make(car, cdr);
   }
 
+    protected Pair makePair2 (Object car, Object cadr, Object cddr,
+                              int line, int column) {
+        return makePair(car, makePair(cadr, cddr, line, column), line, column);
+    }
+
   protected void setCar (Object pair, Object car)
   {
     ((Pair) pair).setCarBackdoor(car);
@@ -1374,4 +1379,6 @@ public class LispReader extends Lexer
       }
     return null;
   }
+
+    boolean deprecatedXmlEnlosedReported;
 }

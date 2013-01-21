@@ -149,6 +149,8 @@ public class Scheme extends LispLanguage
 
       defSntxStFld("lambda", "kawa.standard.SchemeCompilation", "lambda");
       defSntxStFld("$bracket-apply$", "gnu.kawa.lispexpr.BracketApply", "instance");
+      defSntxStFld("$string$", "kawa.lib.syntax");
+      defSntxStFld("$format$", "kawa.lib.syntax");
       defSntxStFld("$xml-element$", "gnu.kawa.lispexpr.MakeXmlElement", "makeXml");
       defProcStFld("$xml-attribute$", "gnu.kawa.xml.MakeAttribute", "makeAttributeS");
       defProcStFld("$xml-text$", "gnu.kawa.xml.MakeText", "makeText");
@@ -852,6 +854,8 @@ public class Scheme extends LispLanguage
                     "gnu.xml.XMLPrinter", "indentLoc");
       defAliasStFld("html", "gnu.kawa.xml.XmlNamespace", "HTML");
       defAliasStFld("unit", "gnu.kawa.lispexpr.LispLanguage", "unitNamespace");
+      defAliasStFld("$entity$", "gnu.kawa.lispexpr.LispLanguage", "entityNamespace");
+      defAliasStFld("$construct$", "gnu.kawa.lispexpr.LispLanguage", "constructNamespace");
 
       defAliasStFld("path", "gnu.kawa.lispexpr.LangObjType", "pathType");
       defAliasStFld("filepath", "gnu.kawa.lispexpr.LangObjType", "filepathType");

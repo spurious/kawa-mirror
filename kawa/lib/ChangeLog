@@ -1,3 +1,9 @@
+2013-01-20  Per Bothner  <per@bothner.com>
+
+	* syntax.scm: Add support for $string$ quasi-literals.
+	($string$, $format$): New syntax.
+	(%string-format-format, %string-format-args): New helper functions.
+
 2012-12-22  Per Bothner  <per@bothner.com>
 
 	* misc.scm (throw): New function.

@@ -1,4 +1,4 @@
-(test-init "Miscellaneous" 211)
+(test-init "Miscellaneous" 212)
 
 ;;; DSSSL spec example 11
 (test '(3 4 5 6) (lambda x x) 3 4 5 6)
@@ -745,7 +745,10 @@
 (test "<code xmlns=\"http://www.w3.org/1999/xhtml\">Foo</code>" 'html-contructor-1lit
       (as-xml #<html:code>Foo</html:code>))
 (test "<a xmlns=\"http://www.w3.org/1999/xhtml\" href=\"foo.html\">Foo</a>" 'html-contructor-2lit
-      (as-xml #<html:a {'href}="&{"foo"}.&(string-append "ht" "ml")">Foo</>))
+      (as-xml #<html:a ['href]="&["foo"].&(string-append "ht" "ml")">Foo</>))
+;; old syntax
+(test "<a xmlns=\"http://www.w3.org/1999/xhtml\" href=\"foo.html\">Foo</a>" 'html-contructor-2lit
+      (as-xml #<html:a ['href]="&["foo"].&(string-append "ht" "ml")">Foo</>))
 (define-xml-namespace h "HTML")
 (test "<h:code xmlns:h=\"HTML\">Foo</h:code>" 'html-contructor-3lit
       (as-xml #<h:code>Foo</>))
@@ -755,7 +758,7 @@
       (let ((body1 "Foo")
 	    (body2 "Bar")
 	    (code 'html:code))
-	(as-xml #<{(quote html:b)}><{code}>&{body1}&(car (list body2))</></>)))
+	(as-xml #<[(quote html:b)]><[code]>&[body1]&(car (list body2))</></>)))
 
 (test "<list><b xmlns=\"http://www.w3.org/1999/xhtml\">bold 1</b> <b xmlns=\"http://www.w3.org/1999/xhtml\">bold2</b></list>" 'html-contructor-5 (as-xml (map html:b '("bold 1" "bold2"))))
 

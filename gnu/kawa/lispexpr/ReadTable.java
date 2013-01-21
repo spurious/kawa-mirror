@@ -73,7 +73,7 @@ public class ReadTable extends RangeTable
     set('!',  entry);
     set('$',  entry);
     set('%',  entry);
-    set('&',  entry);
+    set('&',  ReadTableEntry.ampersand);
     set('*',  entry);
     set('+',  entry);
     set('-',  entry);
@@ -150,7 +150,7 @@ public class ReadTable extends RangeTable
   }
 
   /** Specify how '[' and ']' are handled.
-   * Overless overridden, uses defaultBracketMode. */
+   * Unless overridden, uses defaultBracketMode. */
   public void setBracketMode()
   {
     setBracketMode(defaultBracketMode);

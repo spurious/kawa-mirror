@@ -271,3 +271,44 @@
 						     (as <int> 1) arg)))
 		 (set! (field wt 'expectedType) type)
 		 (primitive-throw wt))))))))))
+
+(define (%string-format-format forms)
+  (syntax-case forms ($format$ $unquote$)
+    (() '())
+    ((($format$ fstr . args) . rest)
+     (let ((xd (syntax->datum #'fstr)))
+       (cons #'fstr (%string-format-format #'rest))))
+    ((($unquote$) . rest)
+     (%string-format-format #'rest))
+    ((($unquote$ arg1 . args) . rest)
+     (cons "~a" (%string-format-format #'(($unquote$ . args) . rest))))
+    ((x . rest)
+     (cons #'(constant-fold invoke (constant-fold invoke x 'toString)
+                            'replace "~" "~~")
+           (%string-format-format #'rest)))))
+
+ (define (%string-format-args forms)
+  (syntax-case forms ($format$ $unquote$)
+    (() '())
+    ((($format$ fstr arg ...) . rest)
+     #`(arg ... #,(%string-format-args #'rest)))
+    ((($unquote$ arg ...) . rest)
+     #`(arg ... #,(%string-format-args #'rest)))
+    ((x . rest)
+     (%string-format-args #'rest))))
+                         
+(define-syntax $string$
+  (lambda (form)
+    (syntax-case form ()
+      (($quasi-string$ . forms)
+       #`($format$ (constant-fold invoke
+                                  (constant-fold string-append
+                                                 . #,(%string-format-format
+                                                      #'forms))
+                                  'toString)
+                   . #,(%string-format-args #'forms))))))
+
+(define-syntax $format$
+  (syntax-rules ()
+    ((_ . args)
+     (gnu.kawa.functions.Format:formatToString 0 . args))))

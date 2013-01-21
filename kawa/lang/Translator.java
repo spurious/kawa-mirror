@@ -20,6 +20,7 @@ import gnu.math.IntNum;
 import gnu.math.Unit;
 import kawa.standard.Scheme;
 import kawa.standard.expt;
+import gnu.text.Char;
 import gnu.text.SourceLocator;
 /* #ifdef enable:XML */
 import gnu.xml.NamespaceBinding;
@@ -868,11 +869,19 @@ public class Translator extends Compilation
 
     if (namespace instanceof XmlNamespace)
       return makeQuoteExp(((XmlNamespace) namespace).get(local));
-    if (namespace.getName() == LispLanguage.unitNamespace.getName())
+    String namespaceName = namespace.getName();
+    if (namespaceName == LispLanguage.unitNamespace.getName())
     {
       Object val = Unit.lookup(local);
       if (val != null)
         return makeQuoteExp(val);
+    }
+    if (namespaceName == LispLanguage.entityNamespace.getName())
+    {
+      Object val = lookupStandardEntity(local);
+      if (val != null)
+        return makeQuoteExp(val);
+      tr.error('e', "unknown entity name "+local);
     }
 
     char ch0 = name.charAt(0);
@@ -1121,9 +1130,25 @@ public class Translator extends Compilation
       tr.error('w', "error loading class " + cname + " - " + ex.getMessage() + " not found");
     } catch (Throwable ex)
     {
-    }    
+    }
     return null;
   }
+
+    static Map<String,String> standardEntities;
+    public static synchronized String lookupStandardEntity(String key) {
+        if (standardEntities == null) {
+            standardEntities = new HashMap<String,String>();
+            standardEntities.put("lt", "<");
+            standardEntities.put("gt", ">");
+            standardEntities.put("amp", "&");
+            standardEntities.put("apos", "'");
+            standardEntities.put("quot", "\"");
+            standardEntities.put("lbrace", "{");
+            standardEntities.put("rbrace", "}");
+            Char.addNamedChars(standardEntities);
+        }
+        return standardEntities.get(key);
+    }
 
   public static void setLine(Expression exp, Object location)
   {

@@ -1,5 +1,22 @@
 2013-01-21  Per Bothner  <per@bothner.com>
 
+	* LispReader.java (readToken): Break on '{' in token starting with '&'.
+	(handlePostfix): If we see '[' or '{' following a '&SYMBOL',
+	then parse a SRFI-108 named quasi-symbol.
+	(makePair2): New convenience method.
+	(deprecatedXmlEnlosedReported): New boolean.
+	* ReaderExtendedLiteral.java: New class, extending ReaderConstituent.
+	Support for SRFI-108 and SRFI-109 string and named quasi-literals.
+	Lots of code factored out from ReaderXmlElement.java.
+	* ReaderXmlElement.java: Re-factored to use inherited code.
+	Also, deprecated '{...}' for enclosed expressions in favor of '[...]'.
+	* Makefile.am: Update accordingly.
+	* ReaderTable.java (initialize): Bind '&; to ReaderExtendedLiteral.
+	* LispLanguage.java (constructNamespace, entityNamespace): New statics.
+	* ReadTableEntry.java (ampersand): New field.
+
+2013-01-21  Per Bothner  <per@bothner.com>
+
 	* LispReader.java (readToken): Remove unused readCase parameter.
 	Update callers.
 	* ReaderConstituent.java: Change to extend ReaderMisc.

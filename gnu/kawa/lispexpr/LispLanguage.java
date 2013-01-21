@@ -42,6 +42,12 @@ public abstract class LispLanguage extends Language
   public static final Namespace unitNamespace =
       Namespace.valueOf("http://kawa.gnu.org/unit", "unit");
 
+  public static final Namespace constructNamespace =
+      Namespace.valueOf("http://kawa.gnu.org/construct", "$construct$");
+
+  public static final Namespace entityNamespace =
+      Namespace.valueOf("http://kawa.gnu.org/entity", "$entity$");
+
   /** The default <code>ReadTable</code> for this language. */
   protected ReadTable defaultReadTable;
 

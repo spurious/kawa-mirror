@@ -10,7 +10,7 @@ import gnu.kawa.xml.*;
 import java.io.*;
 import gnu.expr.*;
 
-public class ReaderXmlElement extends ReadTableEntry
+public class ReaderXmlElement extends ReaderExtendedLiteral
 {
     static final Symbol xmlTextSymbol = Symbol.valueOf("$xml-text$");
     static final Symbol xmlCommentSymbol = Symbol.valueOf("$xml-comment$");
@@ -42,7 +42,7 @@ public class ReaderXmlElement extends ReadTableEntry
    * in the non-empty token-buffer.
    * If non-literal, tokenBufferLength is set to 0.
    */
-  public static Object readQNameExpression (LispReader reader, int ch, boolean forElement)
+  public Object readQNameExpression (LispReader reader, int ch, boolean forElement)
       throws java.io.IOException, SyntaxException
   {
     String file = reader.getName();
@@ -85,9 +85,9 @@ public class ReaderXmlElement extends ReadTableEntry
             return quote(symbol);
           }
       }
-    else if (ch == '{' || ch == '(')
+    else if (enclosedExprDelim(ch, reader) >= 0 || ch == '(')
       {
-        return readEscapedExpression(reader, ch);
+        return readEnclosedSingleExpression(reader, ReadTable.getCurrent(), ch);
       }
     else
       {
@@ -96,65 +96,11 @@ public class ReaderXmlElement extends ReadTableEntry
       }
   }
 
-  static Object readEscapedExpression (LispReader reader, int ch)
-    throws IOException, SyntaxException
-  {
-    if (ch == '(')
-      {
-        reader.unread(ch);
-        return reader.readObject();
-      }
-    else
-      {
-        LineBufferedReader port = reader.getPort();
-        char saveReadState = reader.pushNesting('{');
-        int startLine = port.getLineNumber();
-        int startColumn = port.getColumnNumber();
-        try
-          {
-            Object valuesMake = new PrimProcedure(Compilation.typeValues.getDeclaredMethod("values", 1));
-
-            Pair list = reader.makePair(valuesMake, startLine, startColumn);
-            Pair last = list;
-            ReadTable readTable = ReadTable.getCurrent();
-            for (;;)
-              {
-                int line = port.getLineNumber();
-                int column = port.getColumnNumber();
-                ch = port.read();
-                if (ch == '}')
-                  break;
-                if (ch < 0)
-                  reader.eofError("unexpected EOF in list starting here",//FIXME
-                                 startLine + 1, startColumn);
-                ReadTableEntry entry = readTable.lookup(ch);
-                Object value = reader.readValues(ch, entry, readTable, -1);
-                if (value == Values.empty)
-                  continue;
-                value = reader.handlePostfix(value, readTable, line, column);
-
-                Pair pair = reader.makePair(value, line, column);
-                reader.setCdr(last, pair);
-                last = pair;
-              }
-            reader.tokenBufferLength = 0;
-            // optimize if single
-            if (last == list.getCdr())
-              return last.getCar();
-            return list;
-          }
-        finally
-          {
-            reader.popNesting(saveReadState);
-          }
-      }
-  }
-
   /** Parse an Element or other constructs starting with '<'.
    * Assume initial '<' has been processed.
    * @param next next character (after '<').
    */
-  static Object readXMLConstructor (LispReader reader, int next, boolean inElementContent)
+  Object readXMLConstructor (LispReader reader, int next, boolean inElementContent)
       throws java.io.IOException, SyntaxException
   {
     Object exp;
@@ -244,7 +190,7 @@ public class ReaderXmlElement extends ReadTableEntry
    * and we're read the next character.
    * Reads through end of the end tag.
    */
-  public static Object readElementConstructor(LispReader reader, int ch)
+  public Object readElementConstructor(LispReader reader, int ch)
       throws java.io.IOException, SyntaxException
   {
     int startLine = reader.getLineNumber() + 1;
@@ -375,7 +321,7 @@ public class ReaderXmlElement extends ReadTableEntry
    * @param delimiter is '<' if parsing ElementContent, is either '\'' or
    *   '\"' if parsing AttributeContent depending on the starting quote
    */
-  public static Pair readContent(LispReader reader, char delimiter, Pair resultTail)
+  public Pair readContent(LispReader reader, char delimiter, Pair resultTail)
       throws java.io.IOException, SyntaxException
   {
     reader.tokenBufferLength = 0;
@@ -419,13 +365,13 @@ public class ReaderXmlElement extends ReadTableEntry
 	  {
             next = reader.read();
             if (next == '#')
-              readCharRef(reader);
-            else if (next == '(' || next == '{')
+                readCharRef(reader, reader.read());
+            else if (next == '(' || next == '{' || next == '[')
               {
                 if (reader.tokenBufferLength > 0 || prevWasEnclosed)
                   text = reader.tokenBufferString();
                 reader.tokenBufferLength = 0;
-                item = readEscapedExpression(reader, next);
+                item = readEnclosedSingleExpression(reader, ReadTable.getCurrent(), next);
               }
             else
               {
@@ -433,7 +379,6 @@ public class ReaderXmlElement extends ReadTableEntry
                 if (prevWasEnclosed && reader.tokenBufferLength == 0)
                   text = "";
               }
-            prevWasEnclosed = true;
 	  }
 	else
 	  {
@@ -469,104 +414,7 @@ public class ReaderXmlElement extends ReadTableEntry
     return resultTail;
   }
 
-  /** Read a character reference, assuming {@code "&#"} have been read. */
-  static void readCharRef (LispReader reader)
-    throws IOException, SyntaxException
-  {
-    int base;
-    int next = reader.read();
-    if (next == 'x')
-      {
-        base = 16;
-        next = reader.read();
-      }
-    else
-      base = 10;
-    int value = 0;
-    while (next >= 0)
-      {
-        char ch = (char) next;
-        int digit = Character.digit((char) ch, base);
-        if (digit < 0)
-          break;
-        if (value >= 0x8000000)
-          break; // Overflow likely.
-        value = value * base;
-        value += digit;
-        next = reader.read();
-      }
-    if (next != ';')
-      {
-        reader.unread(next);
-        reader.error("invalid character reference");
-      }
-    // See definition of 'Char' in XML 1.1 2nd ed Specification.
-    else if ((value > 0 && value <= 0xD7FF)
-             || (value >= 0xE000 && value <= 0xFFFD)
-             || (value >= 0x10000 && value <= 0x10FFFF))
-      {
-        reader.tokenBufferAppend(value);
-      }
-    else
-      reader.error("invalid character value "+value);
-  }
-
-  /** Read entity following {@code '&'}.
-   * If result is null, it was appended to the token-buffer.
-   */
-  static Object readEntity (LispReader reader, int next)
-    throws IOException, SyntaxException
-  {
-    Object result = "?";
-    // FIXME
-      {
-	int saveLength = reader.tokenBufferLength;
-	while (next >= 0)
-	  {
-	    char ch = (char) next;
-	    if (! XName.isNamePart(ch))
-	      break;
-	    reader.tokenBufferAppend(ch);
-	    next = reader.read();
-	  }
-	if (next != ';')
-	  {
-            reader.unread(next);
-            reader. error("invalid entity reference");
-	  }
-        else
-          {
-            String ref = new String(reader.tokenBuffer, saveLength,
-                                    reader.tokenBufferLength - saveLength);
-            reader.tokenBufferLength = saveLength;
-            namedEntity(reader, ref);
-            result = null;
-          }
-      }
-    return result;
-  }
-
-  public static void namedEntity(LispReader reader, String name)
-  {
-    name = name.intern();
-    char ch = '?';
-    if (name == "lt")
-      ch = '<';
-    else if (name == "gt")
-      ch = '>';
-    else if (name == "amp")
-      ch = '&';
-    else if (name == "quot")
-      ch = '"';
-    else if (name == "apos")
-      ch = '\'';
-    else
-      reader.error("unknown enity reference: '"+name+"'");
-    reader.tokenBufferAppend(ch);
-    return;
-  }
-
-  static int skipSpace (LispReader reader, int ch)
+  public  static int skipSpace (LispReader reader, int ch)
       throws java.io.IOException, SyntaxException
   {
     for (;;)
@@ -576,4 +424,17 @@ public class ReaderXmlElement extends ReadTableEntry
         ch = reader.readUnicodeChar();
       }
   }
+
+    protected int enclosedExprDelim(int ch, LispReader reader) {
+        if (ch == '[')
+            return ']';
+        if (ch == '{') {
+            if (! reader.deprecatedXmlEnlosedReported) {
+                reader.error('w', "use '[' instead of deprecated '{' for enclosed expression");
+                reader.deprecatedXmlEnlosedReported = true;
+            }
+            return '}';
+        }
+        return -1;
+    }
 }

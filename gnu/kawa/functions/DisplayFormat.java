@@ -14,6 +14,7 @@ import gnu.kawa.xml.KNode;
 import gnu.xml.XMLPrinter;
 /* #endif */
 import gnu.kawa.xml.XmlNamespace;
+import gnu.kawa.lispexpr.LispLanguage;
 import gnu.text.PrettyWriter;
 import gnu.text.Printable;
 /* #ifdef use:java.util.regex */
@@ -249,9 +250,17 @@ public class DisplayFormat extends AbstractFormat
     else if (obj instanceof Symbol)
       {
         Symbol sym = (Symbol) obj;
-        if (sym.getNamespace() == XmlNamespace.HTML)
+        Namespace ns = sym.getNamespace();
+        if (ns == XmlNamespace.HTML)
           {
             write("html:", out);
+            write(sym.getLocalPart(), out);
+          }
+        else if (ns == LispLanguage.entityNamespace
+                 || ns == LispLanguage.constructNamespace)
+          {
+            write(ns.getPrefix(), out);
+            write(":", out);
             write(sym.getLocalPart(), out);
           }
         else

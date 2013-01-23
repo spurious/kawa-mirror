@@ -64,31 +64,22 @@ public class MakeElement extends NodeConstructor {
     return null;
   }
 
-  public static void startElement (Consumer out, Object qname,
+  public static void startElement (Consumer out, Symbol qname,
                                    int copyNamespacesMode,
                                    NamespaceBinding namespaceNodes)
   {
-    XName type;
-    if (qname instanceof Symbol)
-      type = new XName((Symbol) qname, namespaceNodes);
-    else
-      type = new XName(Symbol.make("", qname.toString(), ""), namespaceNodes);
+    XName type = new XName((Symbol) qname, namespaceNodes);
     if (out instanceof XMLFilter)
       ((XMLFilter) out).copyNamespacesMode = copyNamespacesMode;
     out.startElement(type);
   }
 
-  public static void startElement (Consumer out, Object qname,
+  public static void startElement (Consumer out, Symbol qname,
                                    int copyNamespacesMode)
   {
-    Symbol type;
-    if (qname instanceof Symbol)
-      type = (Symbol) qname;
-    else
-      type = Symbol.make("", qname.toString(), "");
     if (out instanceof XMLFilter)
       ((XMLFilter) out).copyNamespacesMode = copyNamespacesMode;
-    out.startElement(type);
+    out.startElement(qname);
   }
 
   public static void endElement (Consumer out, Object type/*FIXME:unused*/)
@@ -102,7 +93,7 @@ public class MakeElement extends NodeConstructor {
     Consumer out = pushNodeContext(ctx);
     try
       {
-	Object type = tag != null ? tag : ctx.getNextArg();
+        Symbol type = tag != null ? tag : (Symbol) ctx.getNextArg();
 	if (namespaceNodes != null)
 	  startElement(out, type, copyNamespacesMode, namespaceNodes);
 	else
@@ -139,14 +130,15 @@ public class MakeElement extends NodeConstructor {
     code.emitLoad(consumer);
     code.emitDup();
     int i;
+    Target tagTarget = CheckedTarget.getInstance(Compilation.typeSymbol);
     if (tag == null)
       {
-        args[0].compile(comp, Target.pushObject);
+        args[0].compile(comp, tagTarget);
         i = 1;
       }
     else
       {
-        comp.compileConstant(tag, Target.pushObject);
+        comp.compileConstant(tag, tagTarget);
         i = 0;
       }
     code.emitDup(1, 1); // dup_x1

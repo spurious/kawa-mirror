@@ -1,3 +1,8 @@
+2013-01-23  Per Bothner  <per@bothner.com>
+
+	* MakeElement.java (startElement): Require qname argument to be Symbol.
+	* MakeAttribute.java (startAttribute): Likewise.
+
 2012-10-21  Per Bothner  <per@bothner.com>
 
 	* NodeConstructor.java (stringIsText): New field.

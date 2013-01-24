@@ -33,4 +33,11 @@
                  xtex "t")
          &{<a id="mine">text</a>}))
 
+;; Computed attribute value.
+(let ((idatr ($xml-attribute$ 'id "myId")))
+  (xmltest #<ab [idatr] x="name"/>
+           '($xml-element$ () ($resolve-qname$ ab)
+                           idatr ($xml-attribute$ 'x "name"))
+           &{<ab id="myId" x="name" />}))
+
 (test-end)

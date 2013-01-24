@@ -1,5 +1,7 @@
 2013-01-23  Per Bothner  <per@bothner.com>
 
+	* xml-test.scm: Add a test for an attribute-valued enclosed expressions.
+
 	* xml-test.scm (xmltest): New macro.  Use it.
 	Add some more tests.
 

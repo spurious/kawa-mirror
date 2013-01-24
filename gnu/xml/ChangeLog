@@ -1,3 +1,9 @@
+2013-01-23  Per Bothner  <per@bothner.com>
+
+	* XMLPrinter.java (startAttribute): Check for null type.
+
+	* XMLFilter.java (startAttribute): Require type to be a Symbol.
+
 2013-01-15  Per Bothner  <per@bothner.com>
 
 	* XMLPrinter.java (startElement): Check that type isn't null.

@@ -619,7 +619,7 @@ public class XMLPrinter extends OutPort
     bout.write(' ');
     if (printIndent >= 0)
       writeBreakFill();
-    bout.write(attrType.toString()); // FIXME: use Symbol.print
+    bout.write(attrType==null ? "{null name}" : attrType.toString());
     bout.write("=\"");
     prev = ' ';
   }

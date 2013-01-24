@@ -941,11 +941,8 @@ public class XMLFilter implements
     return true;
   }
 
-  public void startAttribute (Object attrType)
-  {
-    previous = 0;
-    if (attrType instanceof Symbol)
-      {
+    public void startAttribute (Object attrType) {
+        previous = 0;
         Symbol sym = (Symbol) attrType;
         String local = sym.getLocalPart();
         attrLocalName = local;
@@ -954,19 +951,19 @@ public class XMLFilter implements
         if (uri == "http://www.w3.org/2000/xmlns/"
             || (uri == "" && local == "xmlns"))
           error('e', "arttribute name cannot be 'xmlns' or in xmlns namespace");
-      }
-    if (nesting == 2 && workStack[1] == null)
-      error('e', "attribute not allowed at document level");
-    if (attrCount < 0 && nesting > 0)
-      error('e', "attribute '"+attrType+"' follows non-attribute content");
-    if (! startAttributeCommon())
-      return;
-    workStack[nesting+attrCount-1] = attrType;
-    if (nesting == 0)
-      base.startAttribute(attrType);
-    else
-      tlist.startAttribute(0);
-  }
+
+        if (nesting == 2 && workStack[1] == null)
+            error('e', "attribute not allowed at document level");
+        if (attrCount < 0 && nesting > 0)
+            error('e', "attribute '"+attrType+"' follows non-attribute content");
+        if (startAttributeCommon()) {
+            workStack[nesting+attrCount-1] = attrType;
+            if (nesting == 0)
+                base.startAttribute(attrType);
+            else
+                tlist.startAttribute(0);
+        }
+    }
 
   /** Process an attribute, with the given attribute name.
    * The attribute value is given using {@code write}.

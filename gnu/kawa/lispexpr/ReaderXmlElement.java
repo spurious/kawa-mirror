@@ -185,137 +185,142 @@ public class ReaderXmlElement extends ReaderExtendedLiteral
     return exp;
   }
 
-  /** Parse ElementConstructor.
-   * Assume initial {@code '<'} has been processed,
-   * and we're read the next character.
-   * Reads through end of the end tag.
-   */
-  public Object readElementConstructor(LispReader reader, int ch)
-      throws java.io.IOException, SyntaxException
-  {
-    int startLine = reader.getLineNumber() + 1;
-    int startColumn = reader.getColumnNumber() - 2;
-    Object tag = readQNameExpression(reader, ch, true);
-    // Note that we cannot do namespace resolution at reader time,
-    // because of constructs like this:  <a x="&{x:v}" xmlns:x="xx"/>
-    // Instead we defer namespace lookup until rewrite-time.
-    String startTag = reader.tokenBufferLength == 0 ? null
-      : reader.tokenBufferString();
-    Pair tagPair = PairWithPosition.make(tag, LList.Empty,
-                                            reader.getName(),
-                                            startLine, startColumn);
-    Pair resultTail = tagPair;
-    LList namespaceList = LList.Empty;
-    NamespaceBinding nsBindings = null; // ???
-    for (;;)
-      {
+    /** Parse ElementConstructor.
+     * Assume initial {@code '<'} has been processed,
+     * and we're read the next character.
+     * Reads through end of the end tag.
+     */
+    public Object readElementConstructor(LispReader reader, int ch)
+        throws java.io.IOException, SyntaxException {
+        int startLine = reader.getLineNumber() + 1;
+        int startColumn = reader.getColumnNumber() - 2;
+        Object tag = readQNameExpression(reader, ch, true);
+        // Note that we cannot do namespace resolution at reader time,
+        // because of constructs like this:  <a x="&{x:v}" xmlns:x="xx"/>
+        // Instead we defer namespace lookup until rewrite-time.
+        String startTag = reader.tokenBufferLength == 0 ? null
+            : reader.tokenBufferString();
+        Pair tagPair = PairWithPosition.make(tag, LList.Empty,
+                                             reader.getName(),
+                                             startLine, startColumn);
+        Pair resultTail = tagPair;
+        LList namespaceList = LList.Empty;
+        NamespaceBinding nsBindings = null; // ???
         boolean sawSpace = false;
-        ch = reader.readUnicodeChar();
-        while (ch >= 0 && Character.isWhitespace(ch))
-          {
+        for (;;) {
+            ch = reader.readUnicodeChar();
+            while (ch >= 0 && Character.isWhitespace(ch)) {
+                ch = reader.readUnicodeChar();
+                sawSpace = true;
+            }
+            if (ch < 0 || ch == '>' || ch == '/')
+                break;
+            if (! sawSpace)
+                reader.error("missing space before attribute");
+            Object attrName = readQNameExpression(reader, ch, false);
+            int line = reader.getLineNumber() + 1;
+            int column = reader.getColumnNumber() + 1 - reader.tokenBufferLength;
+            String definingNamespace = null;
+            if (reader.tokenBufferLength >= 5
+                && reader.tokenBuffer[0] == 'x'
+                && reader.tokenBuffer[1] == 'm'
+                && reader.tokenBuffer[2] == 'l'
+                && reader.tokenBuffer[3] == 'n'
+                && reader.tokenBuffer[4] == 's') {
+                if (reader.tokenBufferLength == 5)
+                    definingNamespace = "";
+                else if (reader.tokenBuffer[5] == ':')
+                    definingNamespace =
+                        new String(reader.tokenBuffer, 6, reader.tokenBufferLength-6);
+            }
+            sawSpace = false;
+            for (;;) {
+                ch = reader.readUnicodeChar();
+                if (ch < 0)
+                    break;
+                if (Character.isWhitespace(ch))
+                    sawSpace = true;
+                else
+                    break;
+            }
+            Object attrExpr;
+            if (ch != '=' && reader.tokenBufferLength == 0
+                && (sawSpace || ch == '/' || ch == '>')) {
+                // Attribute is an enclosed (attribute-valued) expression.
+                reader.unread(ch);
+                attrExpr = attrName;
+            }
+            else {
+                if (ch != '=')
+                    reader.error("missing '=' after attribute");
+                ch = skipSpace(reader, ' ');
+                PairWithPosition attrList
+                    = PairWithPosition.make(xmlAttributeSymbol, LList.Empty,
+                                            reader.getName(), startLine, startColumn);
+                PairWithPosition attrPair
+                    = PairWithPosition.make(attrName, LList.Empty,
+                                            reader.getName(), startLine, startColumn);
+                reader.setCdr(attrList, attrPair);
+                Pair attrTail = attrPair;
+                attrTail = readContent(reader, (char) ch, attrTail);
+                attrExpr = attrList;
+                if (definingNamespace != null) {
+                    namespaceList = new PairWithPosition(attrPair,
+                                                         Pair.make(definingNamespace, attrPair.getCdr()),
+                                                         namespaceList);
+                }
+                sawSpace = false;
+            }
+            if (definingNamespace == null) {
+                Pair pair = PairWithPosition.make(attrExpr,  reader.makeNil(),
+                                                  null, -1, -1); // FIXME
+                resultTail.setCdrBackdoor(pair);
+                resultTail = pair;
+            }
+        }
+        boolean empty = false;
+        if (ch == '/') {
             ch = reader.read();
-            sawSpace = true;
-          }
-	if (ch < 0 || ch == '>' || ch == '/')
-	  break;
-        if (! sawSpace)
-          reader.error("missing space before attribute");
-        Object attrName = readQNameExpression(reader, ch, false);
-	int line = reader.getLineNumber() + 1;
-	int column = reader.getColumnNumber() + 1 - reader.tokenBufferLength;
-	String definingNamespace = null;
-        if (reader.tokenBufferLength >= 5
-            && reader.tokenBuffer[0] == 'x'
-            && reader.tokenBuffer[1] == 'm'
-            && reader.tokenBuffer[2] == 'l'
-            && reader.tokenBuffer[3] == 'n'
-            && reader.tokenBuffer[4] == 's')
-          {
-            if (reader.tokenBufferLength == 5)
-              definingNamespace = "";
-            else if (reader.tokenBuffer[5] == ':')
-                definingNamespace =
-                  new String(reader.tokenBuffer, 6, reader.tokenBufferLength-6);
-	  }
-	ch = skipSpace(reader, ' ');
-	if (ch != '=')
-          {
-            reader.error("missing '=' after attribute");
-          }
-	ch = skipSpace(reader, ' ');
-        PairWithPosition attrList
-          = PairWithPosition.make(xmlAttributeSymbol, LList.Empty,
-                                  reader.getName(), startLine, startColumn);
-        PairWithPosition attrPair
-          = PairWithPosition.make(attrName, LList.Empty,
-                                  reader.getName(), startLine, startColumn);
-        reader.setCdr(attrList, attrPair);
-        Pair attrTail = attrPair;
-        attrTail = readContent(reader, (char) ch, attrTail);
-	if (definingNamespace != null)
-	  {
-            
-            namespaceList = new PairWithPosition(attrPair,
-                                                 Pair.make(definingNamespace, attrPair.getCdr()),
-                                                 namespaceList);
-	  }
-	else
-	  {
-            Pair pair = PairWithPosition.make(attrList,  reader.makeNil(),
-                                              null, -1, -1); // FIXME
-            resultTail.setCdrBackdoor(pair);
-            resultTail = pair;
-	  }
-
-      }
-    boolean empty = false;
-    if (ch == '/')
-      {
-	ch = reader.read();
-	if (ch == '>')
-	  empty = true;
-	else
-	  reader.unread(ch);
-      }
-    if (! empty)
-      {
-	if (ch != '>')
-          {
-            reader.error("missing '>' after start element");
-            return Boolean.FALSE;
-          }
-	resultTail = readContent(reader, '<', resultTail);
-	ch = reader.readUnicodeChar();
-        if (XName.isNameStart(ch))
-          {
-            reader.tokenBufferLength = 0;
-            for (;;)
-              {
-                 reader.tokenBufferAppend(ch);
-                 ch = reader.readUnicodeChar();
-                 if (! XName.isNamePart(ch) && ch != ':')
-                   break;
-              }
-	    String endTag = reader.tokenBufferString();
-            if (startTag == null || ! endTag.equals(startTag))
-              reader.error('e', reader.getName(),
-                           reader.getLineNumber() + 1,
-                           reader.getColumnNumber() - reader.tokenBufferLength,
-                           startTag == null
-                           ? "computed start tag closed by '</"+endTag+">'"
-                           : "'<"+startTag+">' closed by '</"+endTag+">'");
-            reader.tokenBufferLength = 0;
-          }
-        ch = skipSpace(reader, ch);
-	if (ch != '>')
-          reader.error("missing '>' after end element");
-      }
-    namespaceList = LList.reverseInPlace(namespaceList);
-    return PairWithPosition.make(xmlElementSymbol,
-                                 Pair.make(namespaceList, tagPair),
-                                 reader.getName(),
-                                 startLine, startColumn);
-  }
+            if (ch == '>')
+                empty = true;
+            else
+                reader.unread(ch);
+        }
+        if (! empty) {
+            if (ch != '>') {
+                reader.error("missing '>' after start element");
+                return Boolean.FALSE;
+            }
+            resultTail = readContent(reader, '<', resultTail);
+            ch = reader.readUnicodeChar();
+            if (XName.isNameStart(ch)) {
+                reader.tokenBufferLength = 0;
+                for (;;) {
+                    reader.tokenBufferAppend(ch);
+                    ch = reader.readUnicodeChar();
+                    if (! XName.isNamePart(ch) && ch != ':')
+                        break;
+                }
+                String endTag = reader.tokenBufferString();
+                if (startTag == null || ! endTag.equals(startTag))
+                    reader.error('e', reader.getName(),
+                                 reader.getLineNumber() + 1,
+                                 reader.getColumnNumber() - reader.tokenBufferLength,
+                                 startTag == null
+                                 ? "computed start tag closed by '</"+endTag+">'"
+                                 : "'<"+startTag+">' closed by '</"+endTag+">'");
+                reader.tokenBufferLength = 0;
+            }
+            ch = skipSpace(reader, ch);
+            if (ch != '>')
+                reader.error("missing '>' after end element");
+        }
+        namespaceList = LList.reverseInPlace(namespaceList);
+        return PairWithPosition.make(xmlElementSymbol,
+                                     Pair.make(namespaceList, tagPair),
+                                     reader.getName(),
+                                     startLine, startColumn);
+    }
 
   /** Parse ElementContent (delimiter == '<')  or AttributeContent (otherwise).
    * @param delimiter is '<' if parsing ElementContent, is either '\'' or

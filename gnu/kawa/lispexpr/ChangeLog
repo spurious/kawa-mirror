@@ -1,3 +1,8 @@
+2013-01-23  Per Bothner  <per@bothner.com>
+
+	* ReaderXmlElement.java (readElementConstructor): Add support for
+	enclosed expression that evaluate to an attribute node.
+
 2013-01-21  Per Bothner  <per@bothner.com>
 
 	* LispReader.java (readToken): Break on '{' in token starting with '&'.

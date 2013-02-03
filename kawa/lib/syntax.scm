@@ -272,35 +272,58 @@
 		 (set! (field wt 'expectedType) type)
 		 (primitive-throw wt))))))))))
 
+;; Helper macros for $string$:
+;; Collect format string (assuming we're *not* inside $[$ ... $]$)
 (define (%string-format-format forms)
-  (syntax-case forms ($format$ $unquote$)
+  (syntax-case forms ($format$ |$[$| |$]$|)
     (() '())
+    ((|$[$| . rest)
+     (%string-format-enclosed-format #'rest))
     ((($format$ fstr . args) . rest)
      (let ((xd (syntax->datum #'fstr)))
        (cons #'fstr (%string-format-format #'rest))))
-    ((($unquote$) . rest)
-     (%string-format-format #'rest))
-    ((($unquote$ arg1 . args) . rest)
-     (cons "~a" (%string-format-format #'(($unquote$ . args) . rest))))
     ((x . rest)
      (cons #'(constant-fold invoke (constant-fold invoke x 'toString)
                             'replace "~" "~~")
            (%string-format-format #'rest)))))
 
- (define (%string-format-args forms)
-  (syntax-case forms ($format$ $unquote$)
+;; Collect format string, assuming we're inside $[$ ... $]$
+(define (%string-format-enclosed-format forms)
+  (syntax-case forms (|$[$| |$]$|)
     (() '())
+    ((|$]$| . rest)
+     (%string-format-format #'rest))
+    ((arg1 . rest)
+     (cons "~a" (%string-format-enclosed-format #'rest)))
+    ((x . rest)
+     (%string-format-enclosed-format #'rest))))
+
+;; Collect format arguments (assuming we're *not* inside $[$ ... $]$)
+(define (%string-format-args forms)
+  (syntax-case forms ($format$ |$[$| |$]$|)
+    (() '())
+    ((|$[$| . rest)
+     (%string-format-enclosed-args #'rest))
     ((($format$ fstr arg ...) . rest)
-     #`(arg ... #,(%string-format-args #'rest)))
-    ((($unquote$ arg ...) . rest)
      #`(arg ... #,(%string-format-args #'rest)))
     ((x . rest)
      (%string-format-args #'rest))))
                          
+;; Collect format arguments, assuming we're inside $[$ ... $]$
+(define (%string-format-enclosed-args forms)
+  (syntax-case forms ($format$ |$[$| |$]$|)
+    (() '())
+    ((|$]$| . rest)
+     (%string-format-args #'rest))
+    ((arg . rest)
+     #`(arg . #,(%string-format-enclosed-args #'rest)))
+    ((x . rest)
+     (%string-format-args #'rest))))
+
 (define-syntax $string$
   (lambda (form)
     (syntax-case form ()
-      (($quasi-string$ . forms)
+      (($string$ . forms)
        #`($format$ (constant-fold invoke
                                   (constant-fold string-append
                                                  . #,(%string-format-format

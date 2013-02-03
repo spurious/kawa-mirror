@@ -1,3 +1,10 @@
+2013-02-02  Per Bothner  <per@bothner.com>
+
+	* ReaderExtendedLiteral.java: Change how enclosed expressions are
+	translated - use begin/end markers ($[$ and $]$) instead of $unquote$.
+	Add support for continuaton markers '&-'.
+	(readEnclosed): New protected convenience method.
+
 2013-01-23  Per Bothner  <per@bothner.com>
 
 	* ReaderXmlElement.java (readElementConstructor): Add support for

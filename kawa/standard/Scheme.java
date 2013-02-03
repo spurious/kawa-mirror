@@ -56,6 +56,8 @@ public class Scheme extends LispLanguage
   private static final String[] uniformVectorTags =
     {"s8", "s16", "s32", "s64", "u8", "u16", "u32", "u64", "f32", "f64" };
 
+    public static final String emptyString = "";
+
   static {
     // (null-environment)
     nullEnvironment = Environment.make("null-environment");
@@ -151,6 +153,8 @@ public class Scheme extends LispLanguage
       defSntxStFld("$bracket-apply$", "gnu.kawa.lispexpr.BracketApply", "instance");
       defSntxStFld("$string$", "kawa.lib.syntax");
       defSntxStFld("$format$", "kawa.lib.syntax");
+      defAliasStFld("$[$", "kawa.standard.Scheme", "emptyString");
+      defAliasStFld("$]$", "kawa.standard.Scheme", "emptyString");
       defSntxStFld("$xml-element$", "gnu.kawa.lispexpr.MakeXmlElement", "makeXml");
       defProcStFld("$xml-attribute$", "gnu.kawa.xml.MakeAttribute", "makeAttributeS");
       defProcStFld("$xml-text$", "gnu.kawa.xml.MakeText", "makeText");

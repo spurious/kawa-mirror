@@ -1,3 +1,8 @@
+2013-02-02  Per Bothner  <per@bothner.com>
+
+	* standard/Scheme.java (emptyString): New constant.
+	(initScheme): Bind "$[$" and "$]$" tp emptyString.
+
 2013-01-20  Per Bothner  <per@bothner.com>
 
 	* lang/Translator.java (checkDefaultBinding): Handle $entity$:NAME,

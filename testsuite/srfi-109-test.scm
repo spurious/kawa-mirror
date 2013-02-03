@@ -11,16 +11,21 @@
          '($string$ "abc")
          "abc")
 (strtest &{ab&(+ 3 4)xz}
-         '($string$ "ab" ($unquote$ (+ 3 4)) "xz")
+         '($string$ "ab" |$[$| (+ 3 4) |$]$| "xz")
          "ab7xz")
 (strtest &{ab&[(+ 3 4)]xz}
-         '($string$ "ab" ($unquote$ (+ 3 4)) "xz")
+         '($string$ "ab" |$[$| (+ 3 4) |$]$| "xz")
          "ab7xz")
-(strtest &{ab{x}c}
-         '($string$ "ab{x}c")
-         "ab{x}c")
+;; Literal nested braces.
+(strtest &{ab{x}{}c{{d}}}
+         '($string$ "ab{x}{}c{{d}}")
+         "ab{x}{}c{{d}}")
+;; Literal nested braces with enclosed expression.
+(strtest &{ab{&[(+ 5 7)]c}z}
+         '($string$ "ab{" |$[$| (+ 5 7) |$]$| "c}z")
+         "ab{12c}z")
 (strtest &{ab&[3 4]xzy}
-         '($string$ "ab" ($unquote$ 3 4) "xzy")
+         '($string$ "ab" |$[$| 3 4 |$]$| "xzy")
          "ab3 4xzy")
 (strtest &{_&lbrace;_&rbrace;_&gt;_&lt;_&quot;_&apos;_}
          '($string$ "_" $entity$:lbrace "_" $entity$:rbrace "_" $entity$:gt
@@ -50,6 +55,12 @@ b}
     &| klm}
          '($string$ "abc\ndef\n klm")
          "abc\ndef\n klm")
+
+(strtest &{abc&-
+  def&-
+  &| klm}
+         '($string$ "abc  def klm")
+         "abc  def klm")
 
 ;; Some tests using format
 (strtest &{abc&~3d(+ 4 5)z}

@@ -1,3 +1,11 @@
+2013-02-02  Per Bothner  <per@bothner.com>
+
+	* srfi-109-test.scm: Added and updated tests.
+	* srfi-108-test.scm: New file with SRFI-108 tests.
+	* bad-srfi-109.scm: New file testing error reporting of
+	malformed SRFI-109 forms.
+	* Makefile.am: Update accordingly.
+
 2013-01-23  Per Bothner  <per@bothner.com>
 
 	* xml-test.scm: Add a test for an attribute-valued enclosed expressions.

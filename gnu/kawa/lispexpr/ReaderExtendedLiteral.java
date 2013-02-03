@@ -1,4 +1,4 @@
-// Copyright (c) 2012  Per M.A. Bothner
+// Copyright (c) 2012, 2013  Per M.A. Bothner
 // This is free software;  for terms and warranty disclaimer see ../../../COPYING.
 
 package gnu.kawa.lispexpr;
@@ -12,7 +12,8 @@ import gnu.xml.XName; // FIXME - not available if --disable-xml
 public class ReaderExtendedLiteral extends ReaderConstituent {
     static final Symbol qstringSymbol = Symbol.valueOf("$string$");
     static final Symbol formatSymbol = Symbol.valueOf("$format$");
-    static final Symbol unquoteSymbol = Symbol.valueOf("$unquote$");
+    static final Symbol startEnclosedSymbol = Symbol.valueOf("$[$");
+    static final Symbol endEnclosedSymbol = Symbol.valueOf("$]$");
 
     public ReaderExtendedLiteral() { super(ReadTable.CONSTITUENT); }
 
@@ -63,28 +64,45 @@ public class ReaderExtendedLiteral extends ReaderConstituent {
         Pair rtail = result;
         int endDelimiter = enclosedExprDelim(next, reader);
         if (endDelimiter >= 0 && tag != null) {
-            rtail = readEnclosedExpressions(reader, rtable, rtail, endDelimiter);
+            int line = reader.getLineNumber() + 1;
+            int column = reader.getColumnNumber();
+            rtail = readEnclosed(reader, rtable, rtail, next, endDelimiter);
+            Pair endMarker = reader.makePair(endEnclosedSymbol, LList.Empty,
+                                             reader.getLineNumber() + 1,
+                                             reader.getColumnNumber());
+            rtail.setCdrBackdoor(endMarker);
+            rtail = endMarker;
             next = reader.read();
         }
         if (next == '{') {
             readContent(reader, '}', rtail);
         }
         else if (tag == null) {
-            reader.error("unexpected character after #&");
+            reader.error("unexpected character after &");
         } else
              reader.unread(next);
         return result;
     }
 
-    public Pair readContent(LispReader reader, char delimiter, Pair resultTail)
+    public Pair readContent(LispReader reader, char delimiter, Pair head)
         throws java.io.IOException, SyntaxException {
+        Pair resultTail = head;
         reader.tokenBufferLength = 0;
         int braceNesting = 1;
+        int lineStart = -1; // Index into tokenBuffer, if >= 0.
+        int nonSpace = -1;
         for (;;) {
             Object item = null;
             int line = reader.getLineNumber() + 1;
             int column = reader.getColumnNumber();
             int next = reader.readCodePoint();
+            if (next == '\r' || next == '\n') {
+                lineStart = reader.tokenBufferLength + 1;
+                nonSpace = -1;
+            }
+            else if (nonSpace < 0 && next != ' ' && next != '\t') {
+                nonSpace = reader.tokenBufferLength;
+            }
             if (next < 0) {
                 reader.error("unexpected end-of-file");
                 item = Special.eof;
@@ -96,22 +114,37 @@ public class ReaderExtendedLiteral extends ReaderConstituent {
                 if (next1 == '|') {
                     int skipped = 0;
                     int blen = reader.tokenBufferLength;
+                    if (lineStart < 0) {
+                        reader.error('e', reader.getName(),
+                                     line, column+1,
+                                     "invalid '&|'");
+                    } else if (nonSpace != reader.tokenBufferLength) {
+                        reader.error('e', reader.getName(),
+                                     line,
+                                     nonSpace - lineStart + 1,
+                                     "non-whitespace before '&|'");
+                    }
+                    else
+                        reader.tokenBufferLength = lineStart;
+                     reader.skip();
+                    continue;
+                } else if (next1 == '-') {
+                    reader.skip();
                     boolean complained = false;
-                    while (blen > skipped) {
-                        skipped++;
-                        char ch = reader.tokenBuffer[blen-skipped];
-                        if (ch == '\r' || ch == '\n')
+                    for (;;) {
+                        next = reader.read();
+                        if (next == '\r' || next == '\n')
                             break;
-                        if (! complained && ch != ' ' && ch != '\t') {
+                        if (! complained && next != ' ' && next != '\t') {
                             reader.error('e', reader.getName(),
                                          reader.getLineNumber() + 1,
-                                         reader.getColumnNumber() - skipped,
-                                         "non-whitespace before '&|'");
+                                         reader.getColumnNumber(),
+                                         "non-whitespace after '&-'");
                             complained = true;
                         }
                     }
-                    reader.tokenBufferLength = blen - skipped + 1;
-                    reader.skip();
+                    lineStart = reader.tokenBufferLength;
+                    nonSpace = -1;
                     continue;
                 } else if (next1 == '#') {
                     reader.skip();
@@ -141,17 +174,14 @@ public class ReaderExtendedLiteral extends ReaderConstituent {
                 ReadTable rtable = ReadTable.getCurrent();
                 next = reader.read();
                 int endDelimiter = enclosedExprDelim(next, reader);
-                if (endDelimiter >= 0) {
-                    Pair head =
-                        reader.makePair(unquoteSymbol, LList.Empty,
+                if (endDelimiter >= 0 || next == '(') {
+                    Pair qq =
+                        reader.makePair(startEnclosedSymbol, LList.Empty,
                                         line, column);
-                    readEnclosedExpressions(reader, rtable, head, endDelimiter);
-                    item = head;
-                }
-                else if (next == '(') {
-                    item = readEnclosedSingleExpression(reader, rtable, next);
-                    item = reader.makePair2(unquoteSymbol, item, LList.Empty,
-                                            line, column);
+                    resultTail.setCdrBackdoor(qq);
+                    resultTail = qq;
+                    resultTail = readEnclosed(reader, rtable, resultTail, next, endDelimiter);
+                    item = endEnclosedSymbol;
                 }
                 else if (next == '~') {
                     boolean sawQuote = false;
@@ -190,10 +220,7 @@ public class ReaderExtendedLiteral extends ReaderConstituent {
                     Pair ffmt = reader.makePair(fmt, LList.Empty, line, column);
                     Pair fhead = reader.makePair(formatSymbol, ffmt,
                                                  line, column);
-                    if (next == '(')
-                        reader.readValuesAndAppend('(', rtable, ffmt);
-                    else
-                        readEnclosedExpressions(reader, rtable, ffmt, endDelimiter);
+                    readEnclosed(reader, rtable, ffmt, next, endDelimiter);
                     item = fhead;
                 }
                 else {
@@ -202,24 +229,26 @@ public class ReaderExtendedLiteral extends ReaderConstituent {
                     if (next == '[' || next == '{') {
                         item = readNamedLiteral(reader, rtable, str, reader.read(),
                                                 line, column);
-                    } else {
+                    } else if (next == ';') {
                         item = checkEntity(reader, str);
+                    } else {
+                        reader.error('e', "expected '[', '{', or ';'");
                     }
                 }
             } else if (next == '}' || next < 0)
                 break;
-         if (item == Special.eof)
-          break;
-        if (item != null)
-          {
-            Pair pair = PairWithPosition.make(item,  reader.makeNil(),
-                                              null, line, column);
-            resultTail.setCdrBackdoor(pair);
-            resultTail = pair;
-          }
-      }
-    return resultTail;
-  }
+            if (item == Special.eof)
+                break;
+            if (item != null) {
+                Pair pair = PairWithPosition.make(item,  reader.makeNil(),
+                                                  reader.getName(),
+                                                  line, column+1);
+                resultTail.setCdrBackdoor(pair);
+                resultTail = pair;
+            }
+        }
+        return resultTail;
+    }
 
     protected Object wrapText(String text) {
         return text;
@@ -246,6 +275,16 @@ public class ReaderExtendedLiteral extends ReaderConstituent {
                 reader.error('e', reader.getName(), line, column,
                              "too many expressions");
             return first.getCar();
+        }
+    }
+
+    protected Pair readEnclosed(LispReader reader, ReadTable readTable, Pair last, int startDelimiter, int endDelimiter)
+            throws IOException, SyntaxException {
+        if (startDelimiter == '(') {
+            return reader.readValuesAndAppend('(', readTable, last);
+        } else {
+            return readEnclosedExpressions(reader, readTable, last,
+                                           endDelimiter);
         }
     }
 

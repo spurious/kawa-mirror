@@ -1,3 +1,10 @@
+2013-02-02  Per Bothner  <per@bothner.com>
+
+	* syntax.scm ($string$): Reimplement since enclosed expressions are
+	no represented using $[$ .... $]$ rather than ($unquote$ ...).
+	(%string-format-format, %string-format-enclosed-format,
+	%string-format-args, %string-format-enclosed-args): New helper macros.
+
 2013-01-20  Per Bothner  <per@bothner.com>
 
 	* syntax.scm: Add support for $string$ quasi-literals.

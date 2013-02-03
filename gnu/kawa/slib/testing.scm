@@ -467,7 +467,7 @@
 	  (if test-name (%test-write-result1 test-name log))
 	  (if source-file (%test-write-result1 source-file log))
 	  (if source-line (%test-write-result1 source-line log))
-	  (if source-file (%test-write-result1 source-form log))))))
+	  (if source-form (%test-write-result1 source-form log))))))
 
 (define-syntax test-result-ref
   (syntax-rules ()

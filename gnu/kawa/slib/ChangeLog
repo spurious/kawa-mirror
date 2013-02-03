@@ -1,3 +1,7 @@
+2013-02-02  Per Bothner  <per@bothner.com>
+
+	* testing.scm (test-on-test-begin-simple): Fix thinko.
+
 2012-12-26  Álvaro Castro-Castilla
 
 	* testing.scm: Modified for Scheme Spheres.

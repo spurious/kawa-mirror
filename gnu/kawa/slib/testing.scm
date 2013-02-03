@@ -1,4 +1,4 @@
-;; Copyright (c) 2005, 2006, 2007, 2012 Per Bothner
+;; Copyright (c) 2005, 2006, 2007, 2012, 2013 Per Bothner
 ;; Added "full" support for Chicken, Gauche, Guile and SISC.
 ;;   Alex Shinn, Copyright (c) 2005.
 ;; Modified for Scheme Spheres by Álvaro Castro-Castilla, Copyright (c) 2012.

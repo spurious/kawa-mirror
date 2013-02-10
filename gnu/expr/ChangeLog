@@ -1,3 +1,9 @@
+2013-02-10  Per Bothner  <per@bothner.com>
+
+	* TryExp.java (calculateType): Use Language.unionType.
+	* InlineCalls.java (visitTryExp): Re-implement with fixed
+	type handling.
+
 2013-01-18  Per Bothner  <per@bothner.com>
 
 	* CatchClause.java (<init>): Set Declaration's initial value

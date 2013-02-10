@@ -691,13 +691,26 @@ public class InlineCalls extends ExpExpVisitor<Type> {
       return result;
   }
 
-  protected Expression visitTryExp (TryExp exp, Type required)
-  {
-    if (exp.getCatchClauses() == null && exp.getFinallyClause() == null)
-      return visit(exp.try_clause, required);
-    else
-      return super.visitTryExp(exp, required);
-  }
+    protected Expression visitTryExp (TryExp exp, Type required) {
+        if (exp.getCatchClauses() == null && exp.getFinallyClause() == null)
+            return visit(exp.try_clause, required);
+
+        VarValueTracker.forkPush(this);
+        exp.try_clause = exp.try_clause.visit(this, required);
+        for (CatchClause clause = exp.catch_clauses;
+             clause != null; clause = clause.getNext())  {
+            valueTracker.forkNext();
+            clause.visit(this, required); // FIXME update?
+        }
+        // It is possible none of the try_clause or catch_clauses are executed
+        // before the finally_clause is executed, so treat as an empty branch.
+        if (exp.finally_clause != null)
+            valueTracker.forkNext();
+        VarValueTracker.forkPop(this);
+        if (exp.finally_clause != null)
+            exp.finally_clause = exp.finally_clause.visit(this, null);
+        return exp;
+    }
 
   boolean processingAnnotations;
   /** If currently processing an annotation belonging to a declaration.

@@ -110,13 +110,14 @@ public class TryExp extends Expression
       finally_clause = visitor.visitAndUpdate(finally_clause, d);
   }
 
-  protected gnu.bytecode.Type calculateType()
-  {
-    if (catch_clauses == null)
-      return try_clause.getType();
-    // FIXME - return union type
-    return super.getType();
-  }
+    protected gnu.bytecode.Type calculateType() {
+        Type t = try_clause.getType();
+        for (CatchClause clause = catch_clauses;
+             clause != null; clause = clause.getNext())  {
+            t = Language.unionType(t, clause.getType());
+        }
+        return t;
+    }
 
   public void print (OutPort ps)
   {

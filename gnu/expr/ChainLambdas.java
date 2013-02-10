@@ -12,8 +12,6 @@ import gnu.kawa.functions.Convert;
  * Doing this check after InlineCalls allows benefiting from data-flow; OTOH
  * checking for unreachable code this late yields less precise type inference,
  * but only when there actually is unreachable code, which is bogus anyway.
- * (Currently, we don't check for infinite loops/recursion, but we
- * hope to add a conservative test for this.)
  */
 
 public class ChainLambdas extends ExpExpVisitor<ScopeExp> {

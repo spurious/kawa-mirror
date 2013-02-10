@@ -458,11 +458,11 @@ public abstract class Type
     if (t2 == neverReturnsType)
       return t1;
     if (t1 == null || t2 == null)
-     return null;
+      return null;
+    if (t1 == t2)
+      return t1;
     if (t1 instanceof PrimType && t2 instanceof PrimType)
       {
-        if (t1 == t2)
-          return t1;
         t1 = ((PrimType) t1).promotedType();
         t2 = ((PrimType) t2).promotedType();
         return t1 == t2 ? t1 : null;

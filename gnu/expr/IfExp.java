@@ -178,4 +178,11 @@ public class IfExp extends Expression
       }
     out.endLogicalBlock(")");
   }
+
+    /* DEBUGGING:
+    private static int counter;
+    protected int id = ++counter;
+
+    public String toString() { return "IfExp#"+id; }
+    */
 }

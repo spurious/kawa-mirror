@@ -1,4 +1,4 @@
-(test-init "Miscellaneous" 212)
+(test-init "Miscellaneous" 209)
 
 ;;; DSSSL spec example 11
 (test '(3 4 5 6) (lambda x x) 3 4 5 6)
@@ -99,20 +99,6 @@
 
 (test 3 try-vector-ref #(1 2 3) 2)
 (test "Bad array index" try-vector-ref #(1 2 3) 10)
-
-(define (test-catch)
-  (let* ((x 0)
-	 (y (catch 'key
-		   (lambda ()
-		     (set! x 2)
-		     (throw 'key 10)
-		     (set! x 1000))
-		   (lambda (key arg)
-		     (set! x (* x arg))
-		     (+ x 10)))))
-    (list x y)))
-
-(test '(20 30) test-catch)
 
 ;; Extracted from bug reported by Joerg-Cyril.Hoehle@t-systems.com
 (define (test-unary-minus)
@@ -397,16 +383,6 @@
          (lambda ()
            (define (bar) (foo))
            (list bar (bar))))))
-
-(test #t procedure?
-      (let () 
-        (define aa 20)
-        (define (foo) aa)
-        (define (bar)
-          (let loop ((arg 'bar))
-            (foo)
-            (not (loop (foo)))))
-        bar))
 
 (test #t not
       (let* ((foo (lambda ()
@@ -1005,18 +981,6 @@
   (define (bar-savannah-32657) ::<list>
     (list 1))
   (test 1 'savannah-32657 (foo-savannah-32657)))
-
-;; Savannah bug ##32678: set! and endless loop
-(define (foo-savannah-32678 x)
-  (let ((fail 0)
-	(result #!null))
-    (if (instance? x pair)
-	(set! result (do () (#f)))
-	(set! fail -1))
-    (if (= fail 0) 
-	result 
-	#f)))
-(test #f foo-savannah-32678 123)
 
 ;; Testcase simplified from slime/config/swank-kawa.scm
 (define-syntax mif

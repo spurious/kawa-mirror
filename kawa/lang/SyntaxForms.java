@@ -1,10 +1,11 @@
-// Copyright (c) 2009 Per M.A. Bothner.
+// Copyright (c) 2009, 2013 Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ../../COPYING.
 
 package kawa.lang;
 import gnu.expr.*;
 import gnu.mapping.Symbol;
 import gnu.lists.*;
+import gnu.text.SourceLocator;
 
 /**
  * Helper method and implementation classes for SyntaxForm.
@@ -21,26 +22,41 @@ public class SyntaxForms {
     return new SimpleSyntaxForm(datum, scope);
   }
 
-  /** Create a syntax object with specified datum, and given syntatic context.
-   * Used to implement datum->syntax-object in the syntax-case API.
-   * @param template If this is a SyntaxForm, use its scope;
-   *   otherwise use the current Compilation's current scope.
-   *   (This means just returning the datum as-is.)
-   * @param form The value (S-expression datum) to use.
-   */
-  public static Object makeWithTemplate (Object template, Object form)
-  {
-    if (form instanceof SyntaxForm)
-      return (SyntaxForm) form;
-    if (template instanceof SyntaxForm)
-      {
-        SyntaxForm sform = (SyntaxForm) template;
-	if (form == sform.getDatum())
-	  return sform;
-	return fromDatum(form, sform);
-      }
-    return form;
-  }
+    /** Create a syntax object with specified datum, and given syntatic context.
+     * Used to implement datum->syntax-object in the syntax-case API.
+     * @param template If this is a SyntaxForm, use its scope;
+     *   otherwise use the current Compilation's current scope.
+     *   (This means just returning the datum as-is.)
+     * @param form The value (S-expression datum) to use.
+     * @param srcloc Used to set source location (line number etc).
+     *   Ignored if null; otherwise should be a SourceLocator.
+     */
+    public static Object makeWithTemplate(Object template, Object datum,
+                                          Object srcloc) {
+        if (srcloc instanceof SourceLocator
+            && datum instanceof Pair) {
+            Pair pdatum = (Pair) datum;
+            SourceLocator sloc = (SourceLocator) srcloc;
+            if (template instanceof SyntaxForm)
+                return new PairWithPositionSyntaxForm(pdatum, sloc,
+                                                      ((SyntaxForm) template).getScope());
+            else
+                return new PairWithPosition(sloc, pdatum.getCar(), pdatum.getCdr());
+        }
+        if (datum instanceof SyntaxForm)
+            return (SyntaxForm) datum;
+        if (template instanceof SyntaxForm) {
+            SyntaxForm sdatum = (SyntaxForm) template;
+            if (datum == sdatum.getDatum())
+                return sdatum;
+            return fromDatum(datum, sdatum);
+        }
+        return datum;
+    }
+
+    public static Object makeWithTemplate(Object template, Object form) {
+        return makeWithTemplate(template, form, null);
+    }
 
     /** Utility method to implement Schene free-identifier=? and bound-identifier=?.
      * @param id1 An identifier - either a symbol or a SyntaxForm whose form is a symbol.  We assume it satisfies the Scheme predicate identifier?.
@@ -234,6 +250,50 @@ public class SyntaxForms {
       return SyntaxForms.toString(this, null);
     }
   }
+
+    static class PairWithPositionSyntaxForm extends PairWithPosition
+        implements SyntaxForm, SourceLocator {
+        private PairWithPosition datum;
+        private TemplateScope scope;
+
+        public PairWithPositionSyntaxForm(PairWithPosition datum,
+                                          TemplateScope scope) {
+            super(datum, datum.getCar(), datum.getCdr());
+            this.datum = datum;
+            this.scope = scope;
+        }
+
+        public PairWithPositionSyntaxForm(Pair datum,
+                                          SourceLocator where,
+                                          TemplateScope scope) {
+            this(new PairWithPosition(where, datum.getCar(), datum.getCdr()),
+                 scope);
+        }
+
+        public Object getDatum() {
+            return datum;
+        }
+
+        public TemplateScope getScope() {
+            return scope;
+        }
+
+        public Object getCar () {
+            if (car == null)
+                car = SyntaxForms.makeForm(getCar(), scope);
+            return car;
+        }
+
+        public Object getCdr () {
+            if (cdr == null)
+                cdr = SyntaxForms.makeForm(getCdr(), scope);
+            return cdr;
+        }
+        public String toString () {
+            //String sid = DEBUGGING ? Integer.toString(id) : null;
+            return SyntaxForms.toString(this, null);
+        }
+    }
 
   // TODO: static class VectorSyntaxForm ...
 }

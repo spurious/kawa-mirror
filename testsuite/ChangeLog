@@ -1,3 +1,9 @@
+2013-02-13  Per Bothner  <per@bothner.com>
+
+	* srfi-108-test.scm (xtest): Use 3-operand datum->syntax to set
+	source location (line number) in a useful manner.
+	* srfi-109-test.scm (strtest): Likewise.
+
 2013-02-10  Per Bothner  <per@bothner.com>
 
 	* misc-test.scm: Move 3 tests that produce warnings from here ...

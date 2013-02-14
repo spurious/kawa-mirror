@@ -267,8 +267,8 @@
 (define (syntax-object->datum obj)
   (syntax->datum obj))
 
-(define (datum->syntax template-identifier obj)
-  (kawa.lang.SyntaxForms:makeWithTemplate template-identifier obj))
+(define (datum->syntax template-identifier obj #!optional (srcloc #!null))
+  (kawa.lang.SyntaxForms:makeWithTemplate template-identifier obj srcloc))
 
 (define (datum->syntax-object template-identifier obj)
   (datum->syntax template-identifier obj))

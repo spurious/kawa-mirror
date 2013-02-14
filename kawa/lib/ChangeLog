@@ -1,3 +1,8 @@
+2013-02-13  Per Bothner  <per@bothner.com>
+
+	* std_syntax.scm (datum->syntax): Add 3rd optional source-location
+	parameter.
+
 2013-02-02  Per Bothner  <per@bothner.com>
 
 	* syntax.scm ($string$): Reimplement since enclosed expressions are

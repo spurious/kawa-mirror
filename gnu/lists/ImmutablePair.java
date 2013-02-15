@@ -8,8 +8,7 @@ public class ImmutablePair extends Pair
 {
   public ImmutablePair (Object carval, Object cdrval)
   {
-    car = carval;
-    cdr = cdrval;
+    super(carval, cdrval);
   }
 
   public ImmutablePair ()

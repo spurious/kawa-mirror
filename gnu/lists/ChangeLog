@@ -1,3 +1,9 @@
+2013-02-14  Per Bothner  <per@bothner.com>
+
+	* Pair.java: Use getCar()/getCdr() instead of accessinging car/cdr
+	fields directly - which may not work for for subclasses.
+	* ImmutablePair.java (<init>): Call super constructor.
+
 2012-11-29  Per Bothner  <per@bothner.com>
 
 	* U8Vector.java (toUtf): Add (start,length) parameters.

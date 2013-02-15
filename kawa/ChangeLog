@@ -1,3 +1,9 @@
+2013-02-14  Per Bothner  <per@bothner.com>
+
+	* lang/SyntaxForms.java (makeForm): Preserve position info.
+	(in member class PairWithPositionSyntaxForm)
+	(getCar, getCdr, <init>): Fix bug.
+
 2013-02-13  Per Bothner  <per@bothner.com>
 
 	* lang/SyntaxForms.java (PairWithPositionSyntaxForm): New member class.

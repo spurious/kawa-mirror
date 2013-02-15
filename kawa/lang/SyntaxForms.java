@@ -13,14 +13,18 @@ import gnu.text.SourceLocator;
  */
 public class SyntaxForms {
 
-  public static Object makeForm (Object datum, TemplateScope scope)
-  {
-    if (datum instanceof Pair)
-      return new PairSyntaxForm((Pair) datum, scope);
-    if (datum == LList.Empty)
-        return datum;
-    return new SimpleSyntaxForm(datum, scope);
-  }
+    public static Object makeForm (Object datum, TemplateScope scope) {
+        if (datum instanceof SyntaxForm)
+            return datum;
+        if (datum instanceof PairWithPosition)
+            return new PairWithPositionSyntaxForm((PairWithPosition) datum,
+                                                  scope);
+        if (datum instanceof Pair)
+            return new PairSyntaxForm((Pair) datum, scope);
+        if (datum == LList.Empty)
+            return datum;
+        return new SimpleSyntaxForm(datum, scope);
+    }
 
     /** Create a syntax object with specified datum, and given syntatic context.
      * Used to implement datum->syntax-object in the syntax-case API.
@@ -258,7 +262,10 @@ public class SyntaxForms {
 
         public PairWithPositionSyntaxForm(PairWithPosition datum,
                                           TemplateScope scope) {
-            super(datum, datum.getCar(), datum.getCdr());
+            // The inherited car and cdr fields are initialized to null
+            // because they're used as caches -
+            // see the getCar and getCdr methods below
+            super(datum, null, null);
             this.datum = datum;
             this.scope = scope;
         }
@@ -280,13 +287,13 @@ public class SyntaxForms {
 
         public Object getCar () {
             if (car == null)
-                car = SyntaxForms.makeForm(getCar(), scope);
+                car = SyntaxForms.makeForm(datum.getCar(), scope);
             return car;
         }
 
         public Object getCdr () {
             if (cdr == null)
-                cdr = SyntaxForms.makeForm(getCdr(), scope);
+                cdr = SyntaxForms.makeForm(datum.getCdr(), scope);
             return cdr;
         }
         public String toString () {

@@ -1,3 +1,10 @@
+2013-02-20  Per Bothner  <per@bothner.com>
+
+	* HashNode.java (hash): Rename field to keyHash and make protected.
+	(<init>): New 3-operand constructor, to also set keyHash.
+	* GeneralHashTable.java (getEntryHashCode): Update accordingly.
+	(makeEntry): Simplify by using new HashNode constructor.
+
 2012-07-27  Per Bothner  <per@bothner.com>
 
 	* RunTestScript.java: Support new directives Java-options

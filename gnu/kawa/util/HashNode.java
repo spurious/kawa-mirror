@@ -16,7 +16,7 @@ public class HashNode<K,V>
 /* #endif */
 {
   public HashNode<K,V> next;
-  int hash;
+  protected int keyHash;
 
   // Skip stuff inherited from SimpleEntry.
   /* #ifndef JAVA6 */
@@ -56,6 +56,12 @@ public class HashNode<K,V>
     // this.key = key;
     // this.value = value;
     /* #endif */
+  }
+
+  public HashNode(K key, V value, int keyHash)
+  {
+    this(key, value);
+    this.keyHash = keyHash;
   }
 
   public V get (V defaultValue)

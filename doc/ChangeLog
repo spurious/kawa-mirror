@@ -1,3 +1,9 @@
+2013-02-21  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Macros): Note optional 3rd parameter to datum->syntax.
+
+	* kawa.texi (Acknowledgements):  Add more names.
+
 2012-12-10  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Features): Link to new JavaFX section.

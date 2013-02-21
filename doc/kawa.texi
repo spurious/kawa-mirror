@@ -2799,7 +2799,7 @@ names, which can then be compared with @func{eq?}.  Thus, a predicate
 @end example
 @end deffn
 
-@deffn Procedure {datum->syntax} @var{template-id} @var{datum}
+@deffn Procedure {datum->syntax} @var{template-id} @var{datum} [@var{srcloc}]
 @deffnx {Deprecated procedure} {datum->syntax-object} @var{datum}
 @var{template-id} must be a template identifier and @var{datum} should
 be a datum value.
@@ -2810,6 +2810,12 @@ information as @var{template-id}, with the effect that the syntax object
 behaves as if it were introduced into the code when @var{template-id}
 was introduced.
 
+If @var{srcloc} is specified (and neither @code{#f} or @code{#!null}),
+it specifies the file position (including line number) for the result.
+In that case it should be a syntax object representing
+a list; otherwise it is currently ignored, though future extensions
+may support other ways of specifying the position.
+
 The @func{datum->syntax} procedure allows a transformer to ``bend''
 lexical scoping rules by creating @emph{implicit identifiers} that
 behave as if they were present in the input form, thus permitting the
@@ -2819,7 +2825,6 @@ example, the following defines a @func{loop} expression that uses this
 controlled form of identifier capture to bind the variable @code{break}
 to an escape procedure within the loop body.  (The derived
 @func{with-syntax} form is like @func{let} but binds pattern variables.)
-
 
 @example
 (define-syntax loop
@@ -14161,6 +14166,7 @@ Dominique Boucher;
 Alexander Bunkenburg;
 Harold Carr;
 Emmanuel Castro;
+Álvaro Castro-Castilla;
 Heather Downs;
 Francisco Vides Fernández;
 Nic Ferrier;
@@ -14191,6 +14197,7 @@ Andreas Schlapbach;
 Robert D. Skeels;
 Benny Tsai;
 Vladimir Tsichevski;
+Matthieu Vachon;
 Phil Walker;
 Knut Wannheden;
 Chris Wegrzyn.
@@ -14218,6 +14225,7 @@ Mirko Luedde;
 Leonardo Valeri Manera;
 Kjetil S. Matheussen;
 Alex Mitchell;
+Alex Moiseenko
 Edouard Parmelan;
 Walter C. Pelissero;
 Stephen L. Peters;

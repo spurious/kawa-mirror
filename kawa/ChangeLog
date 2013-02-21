@@ -1,3 +1,10 @@
+2013-02-05 Matthieu Vachon  <matthieu.o.vachon@gmail.com>
+
+	* lang/Translator.java: Replaced usage of Compilation.generateMain
+	with method Compilation.generateMainMethod.
+	* repl.java: Delegating handling of --main argument to
+	Compilation.options.
+
 2013-02-21  Per Bothner  <per@bothner.com>
 
 	* lang/Translator.java (lookupStandardEntity): Use new generated

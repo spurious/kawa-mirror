@@ -102,7 +102,6 @@ public class repl extends Procedure0or1
     printOption(out, "-P <prefix>", "Prefix to prepand to class names");
     printOption(out, "-T <topname>", "name to give to top-level class");
     
-    printOption(out, "--main", "Generate an application, with a main method");
     printOption(out, "--applet", "Generate an applet");
     printOption(out, "--servlet", "Generate a servlet");
     printOption(out, "--module-static", "Top-level definitions are by default static");
@@ -589,10 +588,6 @@ public class repl extends Procedure0or1
             // System.exit(-1);
             /* #endif */
           }
-        else if (arg.equals("--main"))
-	  {
-	    Compilation.generateMainDefault = true;
-	  }
 	else if (arg.equals("--applet"))
 	  {
 	    defaultParseOptions |= Language.PARSE_FOR_APPLET;

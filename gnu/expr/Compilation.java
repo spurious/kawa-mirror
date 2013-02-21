@@ -117,6 +117,10 @@ public class Compilation implements SourceLocator
     options.add("full-tailcalls",
                 Options.BOOLEAN_OPTION, Boolean.TRUE,
 		"support full tailcalls");
+  public static Options.OptionInfo mainMethodVariable =
+    options.add("main",
+                Options.BOOLEAN_OPTION, Boolean.FALSE,
+                "generate an application, with a main method");
   public static Options.OptionInfo warnUnreachable =
     options.add("warn-unreachable",
                 Options.BOOLEAN_OPTION, Boolean.TRUE,
@@ -143,6 +147,11 @@ public class Compilation implements SourceLocator
 
   public Options currentOptions = new Options(options);
 
+  public boolean generateMainMethod ()
+  {
+    return currentOptions.getBoolean(mainMethodVariable);
+  }
+  
   public boolean warnUnreachable ()
   {
     return currentOptions.getBoolean(warnUnreachable);
@@ -433,10 +442,6 @@ public class Compilation implements SourceLocator
 
   /** Rembembers stuff to do in <clinit> of main class. */
   Initializer clinitChain;
-
-  public static boolean generateMainDefault = false;
-  /** True if we should generate a main(String[]) method. */
-  public boolean generateMain = generateMainDefault;
 
   LitTable litTable;
 
@@ -1866,7 +1871,7 @@ public class Compilation implements SourceLocator
 
     CodeAttr code = method.startCode();
 
-    if (generateMain || generatingApplet() || generatingServlet())
+    if (generateMainMethod() || generatingApplet() || generatingServlet())
       {
 	ClassType languageType
 	  = (ClassType) Type.make(getLanguage().getClass());
@@ -2223,7 +2228,7 @@ public class Compilation implements SourceLocator
 	code.fixupChain(endLiterals, afterLiterals);
       }
 
-    if (generateMain && curClass == mainClass)
+    if (generateMainMethod() && curClass == mainClass)
       {
 	Type[] args = { new ArrayType(javaStringType) };
 	method = curClass.addMethod("main", Access.PUBLIC|Access.STATIC,

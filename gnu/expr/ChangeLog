@@ -1,3 +1,11 @@
+2013-02-05  Matthieu Vachon  <matthieu.o.vachon@gmail.com>
+
+	* Compilation.java (options): Added a new compilation option
+	main to generate a module with a main method.
+	(generateMain): Removed field.
+	(generateMainDefault): Removed field.
+	(generateMainMethod): New method, replace field generateMain.
+
 2013-02-10  Per Bothner  <per@bothner.com>
 
 	* TryExp.java (calculateType): Use Language.unionType.

@@ -1687,7 +1687,7 @@ public class Translator extends Compilation
 	    error('e', decl, msg1, msg2);
 	  }
 	if (mexp.getFlag(ModuleExp.EXPORT_SPECIFIED)
-            || (generateMain && ! immediate))
+            || (generateMainMethod() && ! immediate))
 	  {
 	    if (decl.getFlag(Declaration.EXPORT_SPECIFIED))
 	      {

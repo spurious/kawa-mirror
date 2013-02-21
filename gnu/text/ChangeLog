@@ -1,3 +1,10 @@
+2013-02-21  Per Bothner  <per@bothner.com>
+
+	* NamedCharTable.java: New utility class.
+	* StandardNamedChars.java: New generated class.
+	* Makefile.am: Update for new classes.
+	Also add rule to generate StandardNamedChars.java.
+
 2013-01-20  Per Bothner  <per@bothner.com>
 
 	* Char.java (charNameValues): Replace char[] by String.

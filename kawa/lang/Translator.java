@@ -22,6 +22,7 @@ import kawa.standard.Scheme;
 import kawa.standard.expt;
 import gnu.text.Char;
 import gnu.text.SourceLocator;
+import gnu.text.StandardNamedChars;
 /* #ifdef enable:XML */
 import gnu.xml.NamespaceBinding;
 /* #endif */
@@ -1138,16 +1139,12 @@ public class Translator extends Compilation
     public static synchronized String lookupStandardEntity(String key) {
         if (standardEntities == null) {
             standardEntities = new HashMap<String,String>();
-            standardEntities.put("lt", "<");
-            standardEntities.put("gt", ">");
-            standardEntities.put("amp", "&");
-            standardEntities.put("apos", "'");
-            standardEntities.put("quot", "\"");
-            standardEntities.put("lbrace", "{");
-            standardEntities.put("rbrace", "}");
             Char.addNamedChars(standardEntities);
         }
-        return standardEntities.get(key);
+        String val = standardEntities.get(key);
+        if (val != null)
+            return val;
+        return val = StandardNamedChars.instance.get(key);
     }
 
   public static void setLine(Expression exp, Object location)

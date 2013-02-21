@@ -1,3 +1,8 @@
+2013-02-21  Per Bothner  <per@bothner.com>
+
+	* lang/Translator.java (lookupStandardEntity): Use new generated
+	StandardNamedChars class.
+
 2013-02-14  Per Bothner  <per@bothner.com>
 
 	* lang/SyntaxForms.java (makeForm): Preserve position info.

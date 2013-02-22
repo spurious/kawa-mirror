@@ -779,6 +779,19 @@ the XQuery parser, but that will hopefully change.
 @table @code
 @cindex --warn-@var{whatever}
 @cindex --no-warn-@var{whatever}
+@pindex warn-unreachable
+@item --warn-unreachable
+Emit a warning if the code can never be executed. This defaults to on;
+to turn it off use the @code{--no-warn-unreachable} flag.
+@pindex warn-undefined-variable
+@item --warn-undefined-variable
+Emit a warning if the code references a variable which is neither in
+lexical scope nor in the compile-time dynamic (global) environment.
+This is useful for catching typos.
+(A @code{define-variable} form can be used to silence warnings.
+It declares to the compiler that a variable is to be resolved dynamically.)
+This defaults to on;
+to turn it off use the @code{--no-warn-undefined-variable} flag.
 @pindex warn-unknown-member
 @item --warn-unknown-member
 Emit a warning if the code references a named member (field or method)
@@ -791,13 +804,10 @@ Emit a warning if the @code{invoke} function calls a named method
 for which there is no matching method in the compile-time type of the receiver.
 This defaults to the value of @code{--warn-unknown-member},
 to turn it off use the @code{--no-warn-invoke-unknown-method} flag.
-@pindex warn-undefined-variable
-@item --warn-undefined-variable
-Emit a warning if the code references a variable which is neither in
-lexical scope nor in the compile-time dynamic (global) environment.
-This is useful for catching typos.
-(A @code{define-variable} form can be used to silence warnings.
-It declares to the compiler that a variable is to be resolved dynamically.)
+@pindex warn-unused
+@item --warn-unused
+Emit a warning if a variable is usused or code never executed. This defaults 
+to on; to turn it off use the @code{--no-warn-unused} flag.
 @pindex warn-as-error
 @item --warn-as-error
 Treat a compilation warning as if it were an error and halt compilation.
@@ -1233,15 +1243,42 @@ A Java application is a Java class with a special method
 by naming it in the Java command.
 If you want to generate an application from a Scheme program,
 create a Scheme source file with the definitions you need, plus
-the top-level actions that you want the application to execute.
-You can compile in the regular way decribed in the previous section, but add
-the @code{--main} option.  For example,
-assuming your Scheme file is @code{MyProgram.scm}:
+the top-level actions that you want the application to execute. 
+
+For example, assuming your Scheme file is 
+@code{MyProgram.scm}, you  have two ways at your disposal to 
+compile this Scheme program to a standalone application:
+@enumerate
+@item
+Compile
+in the regular way decribed in the previous section, but add the 
+@code{--main} option.
 @example
 kawa --main -C MyProgram.scm
 @end example
-This will create a @code{MyProgram.class} which you can either @code{load}
-(as decribed in the previous section), or invoke as an application:
+
+The @code{--main} option will compile all Scheme programs
+received in arguments to standalone applications.
+@item
+Compile
+in the regular way decribed in the previous section, but add the 
+@code{main: #t} module compile option to your module.
+@example
+;; MyProgram.scm
+(module-name <myprogram>)
+(module-compile-options main: #t)
+@end example
+
+@example
+kawa -C MyProgram.scm
+@end example
+
+This way you can compile multiple Scheme programs at once, and
+still control which one(s) will compile to standalone application(s).
+@end enumerate
+
+Both method will create a @code{MyProgram.class} which you can either 
+@code{load} (as decribed in the previous section), or invoke as an application:
 @example
 java MyProgram [@var{args}]
 @end example
@@ -10488,8 +10525,6 @@ This will likely change.)
 
 Certain compilation options can be be specified @emph{either}
 on the command-line when compiling, or in the module itself.
-The can be any of the @code{--wan-} options,
-or the @code{--[full-]tailcalls} options.
 
 @deffn Syntax module-compile-options [key: value] ...
 This sets the value of the @code{key} option to @code{value}
@@ -10497,9 +10532,40 @@ for the current module (source file).  It takes effect as
 soon it is seen during the first macro-expansion pass,
 and is active thereafter (unless overridden by @code{with-compile-options}).
 
-The @var{key} is one of the supported option names.
-XXXX
-(The following colon make it a Kawa keyword.)
+The @var{key:} is one of the supported option names 
+(The ending colon make it a Kawa keyword). Valid
+option keys are:
+
+@itemize @bullet
+@item
+@var{main:} - Generate an application, with a main method.
+@end itemize
+
+@itemize @bullet
+@item
+@var{full-tailcalls:} - Use a calling convention that supports proper tail recursion.
+@end itemize
+
+@itemize @bullet
+@item
+@var{warn-unreachable:} - Warn if this code can never be executed.
+
+@item
+@var{warn-undefined-variable:} - Warn if no compiler-visible binding for a variable.
+
+@item
+@var{warn-unknown-member:} - Warn if referencing an unknown method or field.
+
+@item
+@var{warn-invoke-unknown-method:} - Warn if invoke calls an unknown method (subsumed by warn-unknown-member).
+
+@item
+@var{warn-unsued:} - Warn if a variable is usused or code never executed.
+
+@item
+@var{warn-as-error:} - Treat a compilation warning as if it were an error.
+@end itemize
+
 The @var{value} must be a literal value: either a boolean
 (@code{#t} or @code{#f}), a number, or a string,
 depending on the @var{key}.
@@ -10515,6 +10581,10 @@ depending on the @var{key}.
 @deffn Syntax with-compile-options [key: value] ... body
 Similar to @code{module-compile-options}, but the option
 is only active within @var{body}.
+
+The module option key @code{main:} has no effect when applied 
+to a particular body via the @code{with-compile-options} syntax.
+
 @example
 (define (func x)
   (with-compile-options warn-invoke-unknown-method: #f

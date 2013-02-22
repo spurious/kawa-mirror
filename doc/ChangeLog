@@ -1,3 +1,12 @@
+2013-02-17  Matthieu Vachon  <matthieu.o.vachon@gmail.com>
+
+	* kawa.texi (Running): Added documentation about some missing
+	--warn compilation options.
+	* kawa.texi (Running): Added documentation about
+	main: #t module-compile-options.
+	* kawa.texi (Modules classes) : Added documentation on valid keys for
+	module-compile-options.
+
 2013-02-21  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Macros): Note optional 3rd parameter to datum->syntax.

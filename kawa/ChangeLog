@@ -1,3 +1,7 @@
+2013-02-23  Per Bothner  <per@bothner.com>
+
+	* lang/SyntaxForms.java (makeForm): Handle null scope.
+
 2013-02-05 Matthieu Vachon  <matthieu.o.vachon@gmail.com>
 
 	* lang/Translator.java: Replaced usage of Compilation.generateMain

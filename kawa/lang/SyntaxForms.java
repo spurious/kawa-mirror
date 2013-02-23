@@ -14,15 +14,14 @@ import gnu.text.SourceLocator;
 public class SyntaxForms {
 
     public static Object makeForm (Object datum, TemplateScope scope) {
-        if (datum instanceof SyntaxForm)
+        if (datum instanceof SyntaxForm || datum == LList.Empty
+            || scope == null)
             return datum;
         if (datum instanceof PairWithPosition)
             return new PairWithPositionSyntaxForm((PairWithPosition) datum,
                                                   scope);
         if (datum instanceof Pair)
             return new PairSyntaxForm((Pair) datum, scope);
-        if (datum == LList.Empty)
-            return datum;
         return new SimpleSyntaxForm(datum, scope);
     }
 

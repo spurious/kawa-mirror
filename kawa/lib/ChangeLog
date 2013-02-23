@@ -1,5 +1,7 @@
 2013-02-23  Per Bothner  <per@bothner.com>
 
+	* std_syntax.scm (and): Minor tweak.
+
 	* syntax.scm: Update $[$ ... $]$ to $<<$ ... $>>$.
 
 2013-02-13  Per Bothner  <per@bothner.com>

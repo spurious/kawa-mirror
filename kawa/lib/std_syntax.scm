@@ -90,9 +90,9 @@
   (syntax-case f ()
 	       ((and) (%lang-boolean #t))
 	       ((and test) (syntax test))
-	       ((and test1 test2 ...)
-		(syntax (%let ((x test1))
-			  (if x (and test2 ...) x))))))
+	       ((and test1 . test2)
+		#`(%let ((x test1))
+			  (if x (and . test2) x)))))
 ;;; OR
 
 (define-syntax (or f)

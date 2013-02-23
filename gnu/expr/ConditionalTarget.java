@@ -1,6 +1,8 @@
 package gnu.expr;
 
 import gnu.bytecode.*;
+import gnu.mapping.Values;
+
 /** This is the Target of a boolean expression, in a conditional context.
   * If the expression evaluates to true, transfer to the ifTrue label;
   * if false, transfer to the ifFalse label. */
@@ -37,6 +39,11 @@ public class ConditionalTarget extends Target
     char sig = stackType.getSignature().charAt(0);
     switch (sig)
       {
+      case 'V':
+          code.emitGoto(language == null || language.isTrue(Values.empty)
+                        ? ifTrue
+                        : ifFalse);
+          return;
       case 'J':
 	code.emitPushLong(0);
 	break;

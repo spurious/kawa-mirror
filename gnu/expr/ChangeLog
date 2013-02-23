@@ -1,3 +1,8 @@
+2013-02-23  Per Bothner  <per@bothner.com>
+
+	* Declaration.java (setType): If type is void, use Object instead.
+	* ConditionalTarget.java (compileFromStack): Handle a void stackType.
+
 2013-02-05  Matthieu Vachon  <matthieu.o.vachon@gmail.com>
 
 	* Compilation.java (options): Added a new compilation option

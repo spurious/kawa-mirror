@@ -1,5 +1,7 @@
 2013-02-23  Per Bothner  <per@bothner.com>
 
+	* lang/Translator.java (setLineOf): Only set location if not yet set.
+
 	* standard/Scheme.java (initScheme): Update to use use "$<<$" and
 	"$>>$" bindings for quasi-value escaped-expression delimiters.
 

@@ -1213,7 +1213,8 @@ public class Translator extends Compilation
     // call to QuoteExp.getInstance at end of re-write) for normal ones.
     if (exp instanceof QuoteExp) 
       return;
-    exp.setLocation(this);
+    if (exp.getLineNumber() <= 0)
+        exp.setLocation(this);
   }
 
   /** Extract a type from the car of a pair. */

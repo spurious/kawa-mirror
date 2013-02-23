@@ -3,6 +3,7 @@
 include $(top_srcdir)/Make-rules
 
 java_sources = \
+  ApplyTemplates.java \
   TemplateTable.java \
   XSLT.java \
   XslTranslator.java

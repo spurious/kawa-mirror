@@ -1,3 +1,10 @@
+2013-02-23  Per Bothner  <per@bothner.com>
+
+	* ApplyTemplates.java: New class, extends NodeConstructor.
+	* Makefile.am: Update accordingly.
+	* XSLT.java (applyTemplates): Remove method.
+	* XslTranslator.java: Update accordingly.
+
 2010-04-05  Per Bothner  <per@bothner.com>
 
 	* XSLT.java (parse): Set compilation state to BODY_PARSED

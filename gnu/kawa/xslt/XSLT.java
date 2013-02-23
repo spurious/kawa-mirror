@@ -177,18 +177,4 @@ public class XSLT extends XQuery
 	process((TreeList) doc.sequence, pos, ctx);
       }
   }
-
-  public static void applyTemplates(String select, Symbol mode)
-    throws Throwable
-  {
-    if (mode == null)
-      mode = nullMode;
-    TemplateTable table = TemplateTable.getTemplateTable(mode);
-    CallContext ctx = CallContext.getInstance();
-    Focus pos = Focus.getCurrent();
-    TreeList doc = (TreeList) pos.sequence;
-    pos.push(doc, doc.firstChildPos(pos.ipos));
-    process(doc, pos, ctx);
-    pos.pop();
-  }
 }

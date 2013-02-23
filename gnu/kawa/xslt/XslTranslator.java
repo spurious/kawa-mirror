@@ -218,7 +218,7 @@ public class XslTranslator extends Lexer implements Consumer
 	Expression[] args
 	  = { new QuoteExp(select), resolveQNameExpression(mode) };
 	comp.exprStack.pop();
-	push(new ApplyExp(new QuoteExp(applyTemplatesProc), args));
+	push(new ApplyExp(ApplyTemplates.applyTemplatesProc, args));
       }
     else if (xslTag == "if")
       {
@@ -528,8 +528,4 @@ public class XslTranslator extends Lexer implements Consumer
     = new PrimProcedure(defineTemplateMethod);
   static final PrimProcedure runStylesheetProc
     = new PrimProcedure(runStylesheetMethod);
-  static final Method applyTemplatesMethod
-    = typeXSLT.getDeclaredMethod("applyTemplates", 2);
-  static final PrimProcedure applyTemplatesProc
-    = new PrimProcedure(applyTemplatesMethod);
 }

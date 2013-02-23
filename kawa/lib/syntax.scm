@@ -273,11 +273,11 @@
 		 (primitive-throw wt))))))))))
 
 ;; Helper macros for $string$:
-;; Collect format string (assuming we're *not* inside $[$ ... $]$)
+;; Collect format string (assuming we're *not* inside $<<$ ... $>>$)
 (define (%string-format-format forms)
-  (syntax-case forms ($format$ |$[$| |$]$|)
+  (syntax-case forms ($format$ $<<$ $>>$)
     (() '())
-    ((|$[$| . rest)
+    (($<<$ . rest)
      (%string-format-enclosed-format #'rest))
     ((($format$ fstr . args) . rest)
      (let ((xd (syntax->datum #'fstr)))
@@ -287,33 +287,33 @@
                             'replace "~" "~~")
            (%string-format-format #'rest)))))
 
-;; Collect format string, assuming we're inside $[$ ... $]$
+;; Collect format string, assuming we're inside $<<$ ... $>>$
 (define (%string-format-enclosed-format forms)
-  (syntax-case forms (|$[$| |$]$|)
+  (syntax-case forms ($<<$ $>>$)
     (() '())
-    ((|$]$| . rest)
+    (($>>$ . rest)
      (%string-format-format #'rest))
     ((arg1 . rest)
      (cons "~a" (%string-format-enclosed-format #'rest)))
     ((x . rest)
      (%string-format-enclosed-format #'rest))))
 
-;; Collect format arguments (assuming we're *not* inside $[$ ... $]$)
+;; Collect format arguments (assuming we're *not* inside $<<$ ... $>>$)
 (define (%string-format-args forms)
-  (syntax-case forms ($format$ |$[$| |$]$|)
+  (syntax-case forms ($format$ $<<$ $>>$)
     (() '())
-    ((|$[$| . rest)
+    (($<<$ . rest)
      (%string-format-enclosed-args #'rest))
     ((($format$ fstr arg ...) . rest)
      #`(arg ... #,(%string-format-args #'rest)))
     ((x . rest)
      (%string-format-args #'rest))))
                          
-;; Collect format arguments, assuming we're inside $[$ ... $]$
+;; Collect format arguments, assuming we're inside $<<$ ... $>>$
 (define (%string-format-enclosed-args forms)
-  (syntax-case forms ($format$ |$[$| |$]$|)
+  (syntax-case forms ($format$ $<<$ $>>$)
     (() '())
-    ((|$]$| . rest)
+    (($>>$ . rest)
      (%string-format-args #'rest))
     ((arg . rest)
      #`(arg . #,(%string-format-enclosed-args #'rest)))

@@ -120,8 +120,9 @@ public class QuoteExp extends Expression
       comp.compileConstant(value, target);
     else
       {
-        comp.compileConstant(value, StackTarget.getInstance(type));
-        target.compileFromStack(comp, type);
+        Type vtype = type.isVoid() ? Type.objectType : type;
+        comp.compileConstant(value, StackTarget.getInstance(vtype));
+        target.compileFromStack(comp, vtype);
       }
   }
  

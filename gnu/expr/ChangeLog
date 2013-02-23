@@ -1,6 +1,7 @@
 2013-02-23  Per Bothner  <per@bothner.com>
 
 	* Declaration.java (setType): If type is void, use Object instead.
+	* QuoteExp.java (compile): Likewise.
 	* ConditionalTarget.java (compileFromStack): Handle a void stackType.
 
 2013-02-05  Matthieu Vachon  <matthieu.o.vachon@gmail.com>

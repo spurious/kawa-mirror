@@ -1,3 +1,8 @@
+2013-02-23  Per Bothner  <per@bothner.com>
+
+	* ReaderExtendedLiteral.java (startEnclosedSymbol,
+	endEnclosedSymbol): Change values to not require symbol-escaping.
+
 2013-02-02  Per Bothner  <per@bothner.com>
 
 	* ReaderExtendedLiteral.java: Change how enclosed expressions are

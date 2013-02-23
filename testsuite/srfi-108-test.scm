@@ -70,11 +70,11 @@
        &{<em>abc</em>})
 
 (xtest &emph{abc&["n1" 3 "m2"]z}
-       '($construct$:emph "abc" |$[$| "n1" 3 "m2" |$]$| "z")
+       '($construct$:emph "abc" $<<$ "n1" 3 "m2" $>>$ "z")
        &{<em>abcn13m2z</em>})
 
 (xtest &emph{abc&(+ 3 4)z}
-       '($construct$:emph "abc" |$[$| (+ 3 4) |$]$| "z")
+       '($construct$:emph "abc" $<<$ (+ 3 4) $>>$ "z")
        &{<em>abc7z</em>})
 
 (xtest &itemlist[&item{We have cookies for you.}
@@ -84,7 +84,7 @@
          ($construct$:item "We have cookies for you.")
          ($construct$:item "If you want to eat a cookie,
                        you must bring your own straw.")
-         |$]$|)
+         $>>$)
        "<ul><li>We have cookies for you.</li><li>If you want to eat a cookie,\n                       you must bring your own straw.</li></ul>")
 
 (test-end)

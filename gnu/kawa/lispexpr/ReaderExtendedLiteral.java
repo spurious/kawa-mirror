@@ -12,8 +12,8 @@ import gnu.xml.XName; // FIXME - not available if --disable-xml
 public class ReaderExtendedLiteral extends ReaderConstituent {
     static final Symbol qstringSymbol = Symbol.valueOf("$string$");
     static final Symbol formatSymbol = Symbol.valueOf("$format$");
-    static final Symbol startEnclosedSymbol = Symbol.valueOf("$[$");
-    static final Symbol endEnclosedSymbol = Symbol.valueOf("$]$");
+    static final Symbol startEnclosedSymbol = Symbol.valueOf("$<<$");
+    static final Symbol endEnclosedSymbol = Symbol.valueOf("$>>$");
 
     public ReaderExtendedLiteral() { super(ReadTable.CONSTITUENT); }
 

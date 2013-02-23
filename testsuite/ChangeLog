@@ -1,3 +1,9 @@
+2013-02-23  Per Bothner  <per@bothner.com>
+
+	* srfi-108-test.scm: Update to use use "$<<$" and "$>>$" bindings
+	for quasi-value escaped-expression delimiters.
+	* srfi-109-test.scm: Likewise.
+
 2013-02-13  Per Bothner  <per@bothner.com>
 
 	* srfi-108-test.scm (xtest): Use 3-operand datum->syntax to set

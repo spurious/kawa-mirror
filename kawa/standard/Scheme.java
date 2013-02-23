@@ -153,8 +153,8 @@ public class Scheme extends LispLanguage
       defSntxStFld("$bracket-apply$", "gnu.kawa.lispexpr.BracketApply", "instance");
       defSntxStFld("$string$", "kawa.lib.syntax");
       defSntxStFld("$format$", "kawa.lib.syntax");
-      defAliasStFld("$[$", "kawa.standard.Scheme", "emptyString");
-      defAliasStFld("$]$", "kawa.standard.Scheme", "emptyString");
+      defAliasStFld("$<<$", "kawa.standard.Scheme", "emptyString");
+      defAliasStFld("$>>$", "kawa.standard.Scheme", "emptyString");
       defSntxStFld("$xml-element$", "gnu.kawa.lispexpr.MakeXmlElement", "makeXml");
       defProcStFld("$xml-attribute$", "gnu.kawa.xml.MakeAttribute", "makeAttributeS");
       defProcStFld("$xml-text$", "gnu.kawa.xml.MakeText", "makeText");

@@ -1,5 +1,8 @@
 2013-02-23  Per Bothner  <per@bothner.com>
 
+	* standard/Scheme.java (initScheme): Update to use use "$<<$" and
+	"$>>$" bindings for quasi-value escaped-expression delimiters.
+
 	* lang/SyntaxForms.java (makeForm): Handle null scope.
 
 2013-02-05 Matthieu Vachon  <matthieu.o.vachon@gmail.com>

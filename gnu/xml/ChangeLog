@@ -1,3 +1,8 @@
+2013-02-23  Per Bothner  <per@bothner.com>
+
+	* TextUtils.java (stingValue): Special handling for gnu.text.Char
+	and java.lang.Character.
+
 2013-01-23  Per Bothner  <per@bothner.com>
 
 	* XMLPrinter.java (startAttribute): Check for null type.

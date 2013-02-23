@@ -3,6 +3,7 @@ import gnu.mapping.*;
 import gnu.xml.*;
 import gnu.kawa.xml.KNode;
 import gnu.lists.*;
+import gnu.text.Char;
 import java.math.BigDecimal;
 
 public class TextUtils
@@ -42,24 +43,26 @@ public class TextUtils
     return sbuf.toString();
   }
 
-  public static void stringValue (Object node, StringBuffer sbuf)
-  {
-    if (node instanceof KNode)
-      {
-	KNode pos = (KNode) node;
-	NodeTree tlist = (NodeTree) pos.sequence;
-	tlist.stringValue(tlist.posToDataIndex(pos.ipos), sbuf);
-	return;
-      }
-    if (node instanceof BigDecimal)
-      node = XMLPrinter.formatDecimal((BigDecimal) node);
-    else if (node instanceof Double || node instanceof gnu.math.DFloNum)
-      node = XMLPrinter.formatDouble(((Number) node).doubleValue());
-    else if (node instanceof Float)
-      node = XMLPrinter.formatFloat(((Number) node).floatValue());
-    if (node != null && node != Values.empty)
-      sbuf.append(node);
-  }
+    public static void stringValue (Object node, StringBuffer sbuf) {
+        if (node instanceof KNode) {
+            KNode pos = (KNode) node;
+            NodeTree tlist = (NodeTree) pos.sequence;
+            tlist.stringValue(tlist.posToDataIndex(pos.ipos), sbuf);
+        } else if (node instanceof Char) {
+            Char.print(((Char) node).intValue(), sbuf);
+        } else if (node instanceof Character) {
+            sbuf.append(((Character) node).charValue());
+        } else {
+            if (node instanceof BigDecimal)
+                node = XMLPrinter.formatDecimal((BigDecimal) node);
+            else if (node instanceof Double || node instanceof gnu.math.DFloNum)
+                node = XMLPrinter.formatDouble(((Number) node).doubleValue());
+            else if (node instanceof Float)
+                node = XMLPrinter.formatFloat(((Number) node).floatValue());
+            if (node != null && node != Values.empty)
+                sbuf.append(node);
+        }
+    }
 
   public static void textValue (Object arg, Consumer out)
   {

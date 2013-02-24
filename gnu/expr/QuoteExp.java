@@ -55,6 +55,8 @@ public class QuoteExp extends Expression
   static public QuoteExp abstractExp = makeShared(Special.abstractSpecial);
   static public QuoteExp nativeExp = makeShared(Special.nativeSpecial);
   static public QuoteExp voidExp = makeShared(Values.empty, Type.voidType);
+    /** Same value as voidExp, but different type, to suppress diagnostics. */
+  static public QuoteExp voidObjectExp = makeShared(Values.empty, Type.objectType);
   static public QuoteExp trueExp = makeShared(Boolean.TRUE);
   static public QuoteExp falseExp = makeShared(Boolean.FALSE);
   static public QuoteExp nullExp = makeShared(null, Type.nullType);
@@ -163,7 +165,8 @@ public class QuoteExp extends Expression
         if (i == nargs - 1 && ptype != null
             && asMProc.maxArgs() < 0 && i == asMProc.minArgs())
           ptype = null;
-        args[i] = visitor.visit(args[i], ptype);
+        args[i] = visitor.visit(args[i],
+                                InlineCalls.ValueNeededType.make(ptype));
       }
     Compilation comp = visitor.getCompilation();
     if (exp.getFlag(ApplyExp.INLINE_IF_CONSTANT))

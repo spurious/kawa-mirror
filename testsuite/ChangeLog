@@ -1,5 +1,10 @@
 2013-02-23  Per Bothner  <per@bothner.com>
 
+	* bad-voidexp.scm: New test suite.
+	* Makefile.am: Update accordingly.
+	* test.scm: Move tests that create warnings to  bad-voidexp.scm.
+	* misc-test.scm: Likewise.
+
 	* srfi-108-test.scm: Update to use use "$<<$" and "$>>$" bindings
 	for quasi-value escaped-expression delimiters.
 	* srfi-109-test.scm: Likewise.

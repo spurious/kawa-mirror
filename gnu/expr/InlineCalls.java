@@ -47,6 +47,7 @@ public class InlineCalls extends ExpExpVisitor<Type> {
     VarValueTracker valueTracker = new VarValueTracker(this);
 
     public Expression visit (Expression exp, Type required) {
+        Expression exp0 = exp;
         if (! exp.getFlag(Expression.VALIDATED)) {
             exp.setFlag(Expression.VALIDATED); // Protect against cycles.
             exp = super.visit(exp, required);
@@ -54,6 +55,14 @@ public class InlineCalls extends ExpExpVisitor<Type> {
         }
         if (required == ProcedureInCallContext.INSTANCE)
           required = null;
+        if (required instanceof ValueNeededType && exp.getType().isVoid()) {
+            if (exp == QuoteExp.voidExp)
+              return QuoteExp.voidObjectExp;
+            comp.error('w', "void-valued expression where value is needed",
+                       exp0);
+            // To avoid cascading warnings.
+            return Compilation.makeCoercion(exp, Type.objectType);
+        }
         return checkType(exp, required);
     }
 
@@ -399,7 +408,7 @@ public class InlineCalls extends ExpExpVisitor<Type> {
 
   protected Expression visitIfExp (IfExp exp, Type required)
   {
-    Expression test = exp.test.visit(this, null);
+    Expression test = exp.test.visit(this, ValueNeededType.instance);
     if (test instanceof ReferenceExp)
       {
         Declaration decl = ((ReferenceExp) test).getBinding();
@@ -418,17 +427,23 @@ public class InlineCalls extends ExpExpVisitor<Type> {
     if (exitValue == null && exp.else_clause != null)
       exp.else_clause = visit(exp.else_clause, required);
     VarValueTracker.forkPop(this);
-    if (test instanceof QuoteExp)
+    // truth: 1 - test is true; 0: test is false; -1 - test is unknown.
+    int truth = ! (test instanceof QuoteExp) ? -1
+        : comp.getLanguage().isTrue(((QuoteExp) test).getValue()) ? 1 : 0;
+    if (exp.else_clause == null && truth <= 0
+        && required instanceof ValueNeededType) {
+        comp.error('w', "missing else where value is required", exp);
+        if (truth == 0)
+            return QuoteExp.voidObjectExp;
+    }
+    if (truth >= 0)
+        return exp.select(truth != 0);
+    if (test.getType().isVoid())
       {
-        boolean truth = comp.getLanguage().isTrue(((QuoteExp) test).getValue());
-        return exp.select(truth);
-      }
-    // The neverReturns case is handled in ChainLambdas.
-    if (test.getType().isVoid() && ! test.neverReturns())
-      {
-        boolean truth = comp.getLanguage().isTrue(Values.empty);
-        comp.error('w', "void-valued condition is always "+truth);
-        return new BeginExp(test, exp.select(truth));
+        boolean voidTrue = comp.getLanguage().isTrue(Values.empty);
+
+        comp.error('w', "void-valued condition is always "+(truth!=0));
+        return new BeginExp(test, exp.select(voidTrue));
       }
     return exp;
   }
@@ -533,7 +548,7 @@ public class InlineCalls extends ExpExpVisitor<Type> {
         if (deferableInit(init) && decl.getValueRaw() == init)
           ; // defer
         else
-          init = visit(init, dtype);
+          init = visit(init, ValueNeededType.make(dtype));
 	decl.setInitValue(init);
       }
 
@@ -770,8 +785,8 @@ public class InlineCalls extends ExpExpVisitor<Type> {
     if (decl != null && decl.getValueRaw() == exp.new_value
         && deferableInit(exp.new_value))
       ; // defer
-    else 
-      exp.new_value = visit(exp.new_value, decl == null || decl.isAlias() ? null : decl.type);
+    else
+      exp.new_value = visit(exp.new_value, decl == null || decl.isAlias() || decl.type == null ? ValueNeededType.instance : decl.type);
     if (! exp.isDefining() && decl != null && decl.isClassMethod())
       comp.error('e', "can't assign to method "+decl.getName(), exp);
     if (decl != null && decl.getFlag(Declaration.TYPE_SPECIFIED))
@@ -1002,6 +1017,40 @@ public class InlineCalls extends ExpExpVisitor<Type> {
 
         public int compare(Type other) {
             return getImplementationType().compare(other.getImplementationType());
+        }
+    }
+
+    /** A marker type to indicate that void is invalid.
+     * Only used as the required type, in e.g. rhs of assignment.
+     */
+    public static class ValueNeededType extends ObjectType {
+        static final ValueNeededType instance
+            = new ValueNeededType(null);
+
+        Type actualType;
+
+        ValueNeededType(Type actualType) {
+            super("value-needed-type:"+actualType);
+            this.actualType = actualType;
+        }
+
+        public static Type make(Type type) {
+            if (type == null || type == Type.objectType)
+                return instance;
+            if (type instanceof ValueNeededType)
+                return type;
+            /* FUTURE not support by code yet
+            return new ValueNeededType(type);
+            */
+            return type;
+        }
+
+        public Type getImplementationType() {
+            return actualType;
+        }
+
+        public int compare(Type other) {
+            return other.isVoid() ? -1 : 1;
         }
     }
 }

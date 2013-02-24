@@ -1,4 +1,4 @@
-(test-init "Miscellaneous" 209)
+(test-init "Miscellaneous" 208)
 
 ;;; DSSSL spec example 11
 (test '(3 4 5 6) (lambda x x) 3 4 5 6)
@@ -738,20 +738,6 @@
 
 (test "<list><b xmlns=\"http://www.w3.org/1999/xhtml\">bold 1</b> <b xmlns=\"http://www.w3.org/1999/xhtml\">bold2</b></list>" 'html-contructor-5 (as-xml (map html:b '("bold 1" "bold2"))))
 
-;; Based on Savannah bug#18736, "intenal compile error -- svn rev 5816".
-;; From Thomas Kirk <tk@research.att.com>
-(test #t 'test-savannah-18736
-      (let* ((elapsed 0)
-	     (oldtime (java.lang.System:currentTimeMillis))
-	     (val ((lambda () (sleep 0.015))))
-	     (ignored
-	      (begin
-		(set! elapsed (- (java.lang.System:currentTimeMillis) oldtime))
-		val)))
-	;; While time resolution is non-portable, assume a sleep of 20ms
-	;; will be detectable as taking at least 10ms.
-	(>= elapsed 10)))
-
 ;; Test for Savannah bug #18909 "Recursive call to function in closure causes
 ;; NullPointerException".  Chris Wegrzyn <chris.wegrzyn@gmail.com>
 (define (savannah-18909-outerproc foo)
@@ -890,12 +876,6 @@
   (set! x20 x0 ) 
   x0)
 (test "a" big-let)
-
-;; Savannah bug #27014 "AND vs. VOID"
-(begin
-  (define (foo) (and (bar) (bar)))
-  (define baz #f)
-  (define (bar) (set! baz #f)))
 
 ;; Savannah bug #27019 "setLength method of StringBuilder not found"
 (define sb (java.lang.StringBuilder "abcdef"))

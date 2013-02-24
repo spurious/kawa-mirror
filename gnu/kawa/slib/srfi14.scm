@@ -1446,7 +1446,8 @@ that want to provide \"user-friendly,\" wide-spectrum interfaces to
 their clients."
   (cond ((string? x) (string->char-set x))
         ((character? x) (char-set x))
-        ((char-set? x) x)))
+        ((char-set? x) x)
+        (else (primitive-throw (java.lang.ClassCastException "not converible to char-set")))))
 
 (define (char-set-size (cs ::char-set)) ::int
   "Returns the number of elements in character set CS."

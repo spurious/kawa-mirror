@@ -442,10 +442,12 @@ public class ApplyExp extends Expression
     return visitor.visitApplyExp(this, d);
   }
 
-  public void visitArgs (InlineCalls visitor)
-  {
-    args = visitor.visitExps(args, args.length, null);
-  }
+    public void visitArgs(InlineCalls visitor) {
+        int nargs = args.length;
+        args = visitor.visitExps(args, nargs,
+                                 isAppendValues() ? null
+                                 : InlineCalls.ValueNeededType.instance);
+    }
 
   protected <R,D> void visitChildren(ExpVisitor<R,D> visitor, D d)
   {

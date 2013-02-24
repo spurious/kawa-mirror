@@ -1,5 +1,16 @@
 2013-02-23  Per Bothner  <per@bothner.com>
 
+	Add/improve warnings for using void-valued expressions.
+	* InlineCalls.java (class ValueNeededType): New helper class.
+	(visit): Warn if expression is void and non-void value needed.
+	(visitIfExp): Value is needed for condition.
+	Warn if value is needed and else branch is missing.
+	(visitLetExp): Note that value is needed for decl value.
+	(visitSetExp): Likewise.
+	* ApplyExp.java
+	* QuoteExp.java (voidObjectExp): New constant.
+	(validateApply): Set a ValueNeedType value as expected for arguments.
+
 	* Declaration.java (setType): If type is void, use Object instead.
 	* QuoteExp.java (compile): Likewise.
 	* ConditionalTarget.java (compileFromStack): Handle a void stackType.

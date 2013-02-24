@@ -1,3 +1,8 @@
+2013-02-23  Per Bothner  <per@bothner.com>
+
+	* printf.scm (formal-real): Add missing else for case.
+	* srfi14.scm (->char-set): Add missing else for case.
+
 2013-02-02  Per Bothner  <per@bothner.com>
 
 	* testing.scm (test-on-test-begin-simple): Fix thinko.

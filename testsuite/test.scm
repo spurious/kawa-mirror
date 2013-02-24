@@ -29,7 +29,7 @@
 ;;; send corrections or additions to jaffer@ai.mit.edu or
 ;;; Aubrey Jaffer, 84 Pleasant St., Wakefield MA 01880, USA
 
-(TEST-INIT "scm-test" 623)(define errs '())
+(TEST-INIT "scm-test" 621)(define errs '())
 
 ;(define test
 ;  (lambda (expect fun . args)
@@ -128,17 +128,19 @@
 (set! x 4)
 (test 5 'set! (+ x 1))
 (SECTION 4 2 1)
-(test 'greater 'cond (cond ((> 3 2) 'greater)
-                           ((< 3 2) 'less)))
+;; Moved to bad-voidexp.scm
+;;(test 'greater 'cond (cond ((> 3 2) 'greater)
+;;                           ((< 3 2) 'less)))
 (test 'equal 'cond (cond ((> 3 3) 'greater)
                          ((< 3 3) 'less)
                          (else 'equal)))
 (test 2 'cond (cond ((assv 'b '((a 1) (b 2))) => cadr)
                      (else #f)))
 (test #t 'cond (cond (#t) (3 4)))
-(test 'composite 'case (case (* 2 3)
-                         ((2 3 5 7) 'prime)
-                         ((1 4 6 8 9) 'composite)))
+;; Moved to bad-voidexp.scm
+;;(test 'composite 'case (case (* 2 3)
+;;                         ((2 3 5 7) 'prime)
+;;                         ((1 4 6 8 9) 'composite)))
 (test 'consonant 'case (case (car '(c d))
                          ((a e i o u) 'vowel)
                          ((w y) 'semivowel)
@@ -1102,7 +1104,7 @@
 (SECTION 6 10 2)
 (test #\; peek-char this-file)
 (test #\; read-char this-file)
-(test '(TEST-INIT "scm-test" 623) read this-file)
+(test '(TEST-INIT "scm-test" 621) read this-file)
 (test #\( peek-char this-file)
 (test '(define errs '()) read this-file)
 (close-input-port this-file)

@@ -1,3 +1,9 @@
+2013-02-24  Per Bothner  <per@bothner.com>
+
+	* InlineCalls.java (ValueNeededType:make): If required type is
+	explicitly specified as Object, then don't warn about void expressions.
+	(visitSetExp): Update to call ValueNeededType.make.
+
 2013-02-23  Per Bothner  <per@bothner.com>
 
 	Add/improve warnings for using void-valued expressions.

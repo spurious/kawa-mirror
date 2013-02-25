@@ -1,3 +1,8 @@
+2013-02-24  Per Bothner  <per@bothner.com>
+
+	* bad-voidexp.scm: Add test that explicit cast to object supresses
+	warning.
+
 2013-02-23  Per Bothner  <per@bothner.com>
 
 	* bad-voidexp.scm: New test suite.

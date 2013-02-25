@@ -785,8 +785,10 @@ public class InlineCalls extends ExpExpVisitor<Type> {
     if (decl != null && decl.getValueRaw() == exp.new_value
         && deferableInit(exp.new_value))
       ; // defer
-    else
-      exp.new_value = visit(exp.new_value, decl == null || decl.isAlias() || decl.type == null ? ValueNeededType.instance : decl.type);
+    else {
+        Type dtype = decl == null || decl.isAlias() ? null : decl.type;
+        exp.new_value = visit(exp.new_value, ValueNeededType.make(dtype));
+    }
     if (! exp.isDefining() && decl != null && decl.isClassMethod())
       comp.error('e', "can't assign to method "+decl.getName(), exp);
     if (decl != null && decl.getFlag(Declaration.TYPE_SPECIFIED))
@@ -1035,9 +1037,9 @@ public class InlineCalls extends ExpExpVisitor<Type> {
         }
 
         public static Type make(Type type) {
-            if (type == null || type == Type.objectType)
+            if (type == null)
                 return instance;
-            if (type instanceof ValueNeededType)
+            if (type instanceof ValueNeededType || type == Type.objectType)
                 return type;
             /* FUTURE not support by code yet
             return new ValueNeededType(type);

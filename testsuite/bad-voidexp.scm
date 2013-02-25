@@ -39,6 +39,15 @@
 ;; Diagnostic: bad-voidexp.scm:37:12: warning - void-valued condition is always true
 ;; Output: val4 #2: 11
 
+(set! val4 (car (cons 13 (sleep 0.013))))
+(format #t "val4 #3: ~w~%" val4)
+;; Output: val4 #3: 13
+
+;; No diagnostic if void-expression explicitly cast to object.
+(set! val4 (car (cons 14 (->object (sleep 0.014)))))
+(format #t "val4 #4: ~w~%" val4)
+;; Output: val4 #4: 14
+
 ;; Based on Savannah bug#18736, "intenal compile error -- svn rev 5816".
 ;; From Thomas Kirk <tk@research.att.com>
 (format #t "test-savannah-18736: ~w~%"
@@ -53,20 +62,20 @@
           ;; While time resolution is non-portable, assume a sleep of 20ms
           ;; will be detectable as taking at least 10ms.
           (>= elapsed 10)))
-;; Diagnostic: bad-voidexp.scm:47:33: warning - void-valued expression where value is needed
+;; Diagnostic: bad-voidexp.scm:56:33: warning - void-valued expression where value is needed
 ;; Output: test-savannah-18736: #t
 
 (format #t "compare 3 2: ~s~%"
         (cond ((> 3 2) 'greater)
               ((< 3 2) 'less)))
-;; Diagnostic: bad-voidexp.scm:60:9: warning - missing else where value is required
+;; Diagnostic: bad-voidexp.scm:69:9: warning - missing else where value is required
 ;; Output: compare 3 2: greater
 
 (let ((v (list (case (* 2 3)
                  ((2 3 5 7) 'prime)
                  ((1 4 6 8 9) 'composite)))))
   (format #t "6 is ~s~%" (car v)))
-;; Diagnostic: bad-voidexp.scm:65:16: warning - missing else where value is required
+;; Diagnostic: bad-voidexp.scm:74:16: warning - missing else where value is required
 ;; Output: 6 is composite
 
 ;; Savannah bug #27014 "AND vs. VOID"
@@ -74,4 +83,4 @@
   (define (foo) (and (bar) (bar)))
   (define baz #f)
   (define (bar) (set! baz #f)))
-;; Diagnostic: bad-voidexp.scm:74:22: warning - void-valued expression where value is needed
+;; Diagnostic: bad-voidexp.scm:83:22: warning - void-valued expression where value is needed

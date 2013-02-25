@@ -1,3 +1,8 @@
+2013-02-24  Per Bothner  <per@bothner.com>
+
+	* standard/SchemeCompilation.java (checkDefaultBinding): Add
+	handling of '->TYPE' as a conversion function.
+
 2013-02-23  Per Bothner  <per@bothner.com>
 
 	* lang/Translator.java (setLineOf): Only set location if not yet set.

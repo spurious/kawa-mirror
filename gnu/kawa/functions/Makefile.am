@@ -20,6 +20,8 @@ java_sources=\
   CompileMisc.java \
   ConstantFunction0.java \
   Convert.java \
+  CurryExp.java \
+  Curry1.java \
   DisplayFormat.java \
   DivideOp.java \
   FileUtils.java \

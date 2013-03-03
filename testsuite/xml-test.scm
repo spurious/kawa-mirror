@@ -1,14 +1,6 @@
 (test-begin "xml")
 
 (require "test-utils.scm")
-#|
-(define-syntax xmltest
-  (syntax-rules ()
-    ((xmltest value quoted evaluated)
-     (begin
-       (test-equal quoted (quote value))
-       (test-equal evaluated (format "~a" value))))))
-|#
 
 (xtest #<a id="mine"/>
          '($xml-element$ () ($resolve-qname$ a)
@@ -32,8 +24,8 @@
       (xtex "tex"))
 (xtest #<[xa] [xid]="m&[xine]">&[xtex]t</>
          '($xml-element$ () xa
-                 ($xml-attribute$ xid "m" xine)
-                 xtex "t")
+                 ($xml-attribute$ xid "m" $<<$ xine $>>$)
+                 $<<$ xtex $>>$ "t")
          &{<a id="mine">text</a>}))
 
 ;; Computed attribute value.

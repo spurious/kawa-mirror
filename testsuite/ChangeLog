@@ -1,5 +1,9 @@
 2013-03-02  Per Bothner  <per@bothner.com>
 
+	* xml-test.scm: Update.
+
+2013-03-02  Per Bothner  <per@bothner.com>
+
 	* srfi-108-test.scm (xtest): Move macro to ...
 	* test-utils.scm: ... new file.
 	* Makefile.am: update accordingly.

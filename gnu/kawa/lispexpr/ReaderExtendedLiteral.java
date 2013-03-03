@@ -84,6 +84,19 @@ public class ReaderExtendedLiteral extends ReaderConstituent {
         return result;
     }
 
+    protected Object checkDelim(LispReader reader, int next, int delimiter)
+        throws java.io.IOException, SyntaxException {
+        return next == delimiter || next < 0 ? Special.eof : null;
+    }
+
+    protected boolean isNestableStartDelim(int next) {
+        return next == '{';
+    }
+
+    protected boolean isNestableEndDelim(int next) {
+        return next == '}';
+    }
+
     public Pair readContent(LispReader reader, char delimiter, Pair head)
         throws java.io.IOException, SyntaxException {
         Pair resultTail = head;
@@ -118,7 +131,9 @@ public class ReaderExtendedLiteral extends ReaderConstituent {
                 reader.error("unexpected end-of-file");
                 item = Special.eof;
             }
-            else if (next == '}' && --braceNesting == 0)
+            else if (next == delimiter
+                     && (! isNestableEndDelim(next)
+                         || --braceNesting == 0))
                 item = Special.eof;
             else if (next == '&') {
                 int next1 = reader.peek();
@@ -166,13 +181,13 @@ public class ReaderExtendedLiteral extends ReaderConstituent {
                         readCharRef(reader, next);
                 }
             } else {
-                if (next == '{')
+                if (isNestableStartDelim(next))
                     braceNesting++;
                 reader.tokenBufferAppend(next);
                 next = ' ';
             }
             if (reader.tokenBufferLength > 0
-                    && (next == '}' || next == '&' || next < 0)) {
+                    && (next == delimiter || next == '&' || next < 0)) {
                 String text = reader.tokenBufferString();
                 reader.tokenBufferLength = 0;
                 Object tnode = wrapText(text);
@@ -246,8 +261,10 @@ public class ReaderExtendedLiteral extends ReaderConstituent {
                         reader.error('e', "expected '[', '{', or ';'");
                     }
                 }
-            } else if (next == '}' || next < 0)
-                break;
+            }
+            else {
+                item = checkDelim(reader, next, delimiter);
+            }
             if (item == Special.eof)
                 break;
             if (item != null) {

@@ -1,5 +1,14 @@
 2013-03-02  Per Bothner  <per@bothner.com>
 
+	* ReaderExtendedLiteral.java (readContent): Generalize so logic
+	can also work for ReaderXmlElement.
+	(checkDelim, isNestableStartDelim, isNestableEndDelim):
+	New protected methods.
+	* ReaderXmlElement.java (readContent): Remove.
+	(checkDelim, isNestableStartDelim, isNestableEndDelim): New.
+
+2013-03-02  Per Bothner  <per@bothner.com>
+
 	* ReaderExtendedLiteral.java (readContent): Tweak logic of &| so
 	it skip initial newline.
 

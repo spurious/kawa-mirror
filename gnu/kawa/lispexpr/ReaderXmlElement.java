@@ -1,4 +1,4 @@
-// Copyright (c) 2010  Per M.A. Bothner
+// Copyright (c) 2010, 2013  Per M.A. Bothner
 // This is free software;  for terms and warranty disclaimer see ../../../COPYING.
 
 package gnu.kawa.lispexpr;
@@ -322,102 +322,28 @@ public class ReaderXmlElement extends ReaderExtendedLiteral
                                      startLine, startColumn);
     }
 
-  /** Parse ElementContent (delimiter == '<')  or AttributeContent (otherwise).
-   * @param delimiter is '<' if parsing ElementContent, is either '\'' or
-   *   '\"' if parsing AttributeContent depending on the starting quote
-   */
-  public Pair readContent(LispReader reader, char delimiter, Pair resultTail)
-      throws java.io.IOException, SyntaxException
-  {
-    reader.tokenBufferLength = 0;
-    boolean prevWasEnclosed = false;
-    for (;;)
-      {
-        Object item = null;
-        String text = null;
-        int line = reader.getLineNumber() + 1;
-        int column = reader.getColumnNumber();
-	int next = reader.read();
-        if (next < 0)
-          {
-            reader.error("unexpected end-of-file");
-            item = Special.eof;
-          }
-        else if (next == delimiter)
-          {
-            if (delimiter == '<')
-              {
-                if (reader.tokenBufferLength > 0)
-                  {
-                    text = reader.tokenBufferString();
-                    reader.tokenBufferLength = 0;
-                  }
-                next = reader.read();
-                if (next == '/')
-                  item = Special.eof;
-                else
-                  item = readXMLConstructor(reader, next, true);
-              }
-            else if (reader.checkNext(delimiter)) // ???
-              {
-                reader.tokenBufferAppend(delimiter);
-              }
-            else
-              item = Special.eof;
-            prevWasEnclosed = false;
-          }
-	else if (next == '&')
-	  {
+    protected Object checkDelim(LispReader reader, int next, int delimiter)
+        throws java.io.IOException, SyntaxException {
+        if (delimiter == '<' && next == '<') {
             next = reader.read();
-            if (next == '#')
-                readCharRef(reader, reader.read());
-            else if (next == '(' || next == '{' || next == '[')
-              {
-                if (reader.tokenBufferLength > 0 || prevWasEnclosed)
-                  text = reader.tokenBufferString();
-                reader.tokenBufferLength = 0;
-                item = readEnclosedSingleExpression(reader, ReadTable.getCurrent(), next);
-              }
+            if (next == '/')
+                return Special.eof;
             else
-              {
-                item = readEntity(reader, next);
-                if (prevWasEnclosed && reader.tokenBufferLength == 0)
-                  text = "";
-              }
-	  }
-	else
-	  {
-            if (delimiter != '<'
-                && (next == '\t' || next == '\n' || next == '\r'))
-              next = ' ';
-            if (next == '<')
-              reader.error('e', "'<' must be quoted in a direct attribute value");
-	    reader.tokenBufferAppend((char) next);
-	  }
-        if (item != null && reader.tokenBufferLength > 0)
-          {
-            text = reader.tokenBufferString();
-            reader.tokenBufferLength = 0;
-          }
-        if (text != null)
-          {
-            Pair pair = PairWithPosition.make(text,  reader.makeNil(),
-                                              null, -1, -1); // FIXME
-            resultTail.setCdrBackdoor(pair);
-            resultTail = pair;
-          }
-        if (item == Special.eof)
-          break;
-        if (item != null)
-          {
-            Pair pair = PairWithPosition.make(item,  reader.makeNil(),
-                                              null, line, column);
-            resultTail.setCdrBackdoor(pair);
-            resultTail = pair;
-          }
-      }
-    return resultTail;
-  }
+                return readXMLConstructor(reader, next, true);
+        }
+        else if (next < 0 || (delimiter != '<' && next == delimiter))
+            return Special.eof;
+        else
+            return null;
+    }
+
+    protected boolean isNestableStartDelim(int next) {
+        return false;
+    }
+
+    protected boolean isNestableEndDelim(int next) {
+        return false;
+    }
 
   public  static int skipSpace (LispReader reader, int ch)
       throws java.io.IOException, SyntaxException

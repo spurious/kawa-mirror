@@ -1,3 +1,8 @@
+2013-03-02  Per Bothner  <per@bothner.com>
+
+	* ReaderExtendedLiteral.java (readContent): Tweak logic of &| so
+	it skip initial newline.
+
 2013-02-23  Per Bothner  <per@bothner.com>
 
 	* ReaderExtendedLiteral.java (startEnclosedSymbol,

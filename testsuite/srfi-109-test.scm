@@ -76,6 +76,68 @@ b}
          '($string$ "abc\ndef\n klm")
          "abc\ndef\n klm")
 
+(strtest &{
+    &|def
+    &| klm}
+         '($string$ "def\n klm")
+         "def\n klm")
+
+;; Next line is supposed to have trailing whitespace - should be ignored.
+(strtest &{  
+    &|def
+    &| klm}
+         '($string$ "def\n klm")
+         "def\n klm")
+
+(test-equal
+ "\n  ab\n  cd\n"
+ (test-read-eval-string "&{\n  ab\n  cd\n}"))
+
+(test-equal
+ " ab\n cd\n"
+ (test-read-eval-string "&{\n &| ab\n &| cd\n}"))
+
+(test-equal
+ "\n\n ab\n cd\n"
+ (test-read-eval-string "&{\n\n &| ab\n &| cd\n}"))
+
+(test-equal
+ "\n ab\n cd\n"
+ (test-read-eval-string "&{&#||#\n &| ab\n &| cd\n}"))
+
+(test-equal
+ "\n ab\n cd\n"
+ (test-read-eval-string "&{&[]\n &| ab\n &| cd\n}"))
+
+(test-equal
+ " ab\n cd\n"
+ (test-read-eval-string "&{   \n &| ab\n &| cd\n}"))
+
+(test-equal
+ "line1\nline2\n"
+ (test-read-eval-string "&{
+     &|line1
+     &|line2
+     &|}"))
+
+(test-equal
+ "line1\nline2\n"
+ (test-read-eval-string "&{\n     &|line1\n     &|line2\n}"))
+
+(test-equal
+ " k \n ab\n cd\n"
+ (test-read-eval-string "&{ k \n &| ab\n &| cd\n}"))
+
+(test-equal
+ "   \n ab\n cd\n"
+ (test-read-eval-string "&{ &space; \n &| ab\n &| cd\n}"))
+
+(strtest &{&space;
+    &|def
+    &| klm}
+         '($string$ $entity$:space "\ndef\n klm")
+         " \ndef\n klm")
+
 (strtest &{abc&-
   def&-
   &| klm}

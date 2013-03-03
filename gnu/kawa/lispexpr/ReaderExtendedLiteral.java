@@ -89,7 +89,12 @@ public class ReaderExtendedLiteral extends ReaderConstituent {
         Pair resultTail = head;
         reader.tokenBufferLength = 0;
         int braceNesting = 1;
-        int lineStart = -1; // Index into tokenBuffer, if >= 0.
+        // If lineStart >= 0 then it is an index into tokenBuffer
+        // such that &| should delete up to lineStart.
+        // However, there is an error if we've seen a non-space,
+        // and so we use nonSpace to mark the first non-space character
+        // on the line.
+        int lineStart = -1;
         int nonSpace = -1;
         for (;;) {
             Object item = null;
@@ -97,7 +102,13 @@ public class ReaderExtendedLiteral extends ReaderConstituent {
             int column = reader.getColumnNumber();
             int next = reader.readCodePoint();
             if (next == '\r' || next == '\n') {
-                lineStart = reader.tokenBufferLength + 1;
+                // As a special case, if this is the first newline
+                // since the start of the literal text, and we haven't
+                // seen any whitespace, then &| also delete this newline.
+                if (lineStart < 0 && nonSpace < 0)
+                    lineStart = 0;
+                else
+                    lineStart = reader.tokenBufferLength + 1;
                 nonSpace = -1;
             }
             else if (nonSpace < 0 && next != ' ' && next != '\t') {

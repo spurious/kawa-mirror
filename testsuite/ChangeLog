@@ -1,3 +1,7 @@
+2013-03-02  Per Bothner  <per@bothner.com>
+
+	* srfi-109-test.scm: More tests, mainly of &|.
+
 2013-02-24  Per Bothner  <per@bothner.com>
 
 	* bad-voidexp.scm: Add test that explicit cast to object supresses

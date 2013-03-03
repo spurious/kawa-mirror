@@ -1,5 +1,10 @@
 2013-03-02  Per Bothner  <per@bothner.com>
 
+	* srfi-108-test.scm (xtest): Move macro to ...
+	* test-utils.scm: ... new file.
+	* Makefile.am: update accordingly.
+	* xml-test.scm: Use xtest. Rename xmltest->xtest.
+
 	* srfi-109-test.scm: More tests, mainly of &|.
 
 2013-02-24  Per Bothner  <per@bothner.com>

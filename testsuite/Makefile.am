@@ -600,7 +600,8 @@ SCRIPTS_TO_RUN = uninit1.scm errors1.scm errors2.scm sva34005.scm sva35362.scm \
   srfi-45-test1.scm srfi-45-test2.scm bad-srfi-109.scm \
   reflect1.scm promise1.scm \
   define1.scm mac-obj.scm
-EXTRA_DIST = testing.scm test.scm num-test.scm mac-test.scm mac1.scm \
+EXTRA_DIST = testing.scm test-utils.scm \
+  test.scm num-test.scm mac-test.scm mac1.scm \
   classes1.scm classes2.scm SimpleB.java obj-test.scm arr-test.scm \
   lib-test.scm srfi-38-test.scm srfi-64-test.scm srfi-69-test.scm \
   srfi-108-test.scm srfi-109-test.scm \

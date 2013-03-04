@@ -25,19 +25,21 @@ public abstract class ReportFormat extends Format
   public static int nextArg(int result) { return result & 0xffffff; }
   public static int resultCode(int result) { return result >>> 24; }
 
-  /** Format an array of arguments, and write out the result.
-   * @param dst where to write the result
-   * @param args the objects to be formatted
-   * @param start the index (in args) of the argument to start with
-   * @return an integer result(resultCode, nextArg), where
-   * nextArg is the index following the last argument processed, and
-   * code is a result code (normally 0, or negative if early termintation)
-   */
-  public abstract int format(Object[] args, int start,
-			     Writer dst, FieldPosition fpos)
+    /**
+     * Format an array of arguments, and write out the result.
+     *
+     * @param args the objects to be formatted
+     * @param start the index (in args) of the argument to start with
+     * @param dst where to write the result
+     * @return an integer result(resultCode, nextArg), where
+     * nextArg is the index following the last argument processed, and
+     * code is a result code (normally 0, or negative if early termination)
+     */
+    
+  public abstract int format(Object[] args, int start, Appendable dst, FieldPosition fpos)
     throws java.io.IOException;
 
-  public int format(Object arg, int start, Writer dst, FieldPosition fpos)
+  public int format(Object arg, int start, Appendable dst, FieldPosition fpos)
     throws java.io.IOException
   {
     if (arg instanceof Object[])
@@ -73,8 +75,7 @@ public abstract class ReportFormat extends Format
     return start;
   }
 
-  public static int format(Format fmt, Object[] args, int start, 
-			   Writer dst, FieldPosition fpos) 
+  public static int format(Format fmt, Object[] args, int start, Appendable dst, FieldPosition fpos) 
     throws java.io.IOException
   {
     if (fmt instanceof ReportFormat)
@@ -84,10 +85,7 @@ public abstract class ReportFormat extends Format
       start = format(fmt, args, start, sbuf, fpos);
     else
       fmt.format(args[start++], sbuf, fpos);
-    int slen = sbuf.length();
-    char[] cbuf = new char[slen];
-    sbuf.getChars(0, slen, cbuf, 0);
-    dst.write(cbuf);
+    dst.append(sbuf);
     return start;
   }
 
@@ -126,7 +124,7 @@ public abstract class ReportFormat extends Format
     if (dst instanceof java.io.PrintWriter)
       ((java.io.PrintWriter) dst).print(str);
     else
-      dst.write(str.toCharArray());
+      dst.write(str);
   }
 
   public static void print (Object value, Consumer out)

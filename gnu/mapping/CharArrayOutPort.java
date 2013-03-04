@@ -1,6 +1,7 @@
 package gnu.mapping;
 import gnu.lists.Consumer;
-import java.io.PrintWriter;
+import gnu.lists.FString;
+import java.io.IOException;
 
 /**
  * Similar to CharArrayWriter.
@@ -17,6 +18,11 @@ public class CharArrayOutPort extends OutPort
   {
     return bout.bufferFillPointer;
   }
+  public int size()
+  {
+    return bout.bufferFillPointer;
+  }
+
 
   public void setLength (int length)
   {
@@ -83,14 +89,20 @@ public class CharArrayOutPort extends OutPort
                       bout.bufferFillPointer - beginIndex);
   }
 
-  public void writeTo (Consumer out)
-  {
-    writeTo(0, bout.bufferFillPointer, out);
-  }
+    public void writeTo(Appendable out) {
+        writeTo(0, bout.bufferFillPointer, out);
+    }
 
-  public void writeTo (int start, int count, Consumer out)
-  {
-    out.write(bout.buffer, start, count);
-  }
+    public void writeTo (int start, int count, Appendable out) {
+        if (out instanceof Consumer)
+            ((Consumer) out).write(bout.buffer, start, count);
+        else {
+            try {
+                out.append(new FString(bout.buffer), start, start+count);
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        }
+    }
 }
 

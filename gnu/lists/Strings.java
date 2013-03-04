@@ -2,6 +2,7 @@
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.lists;
+import java.io.IOException;
 
 /** Various static utility methods for general strings (CharSeqs). */
 
@@ -40,42 +41,37 @@ public class Strings
       }
   }
 
-  public static void printQuoted (
-                                  /* #ifdef use:java.lang.CharSequence */
-                                  CharSequence str,
-                                  /* #else */
-                                  // String str,
-                                  /* #endif */
-				  java.io.PrintWriter ps, int escapes)
-  {
-    int len = str.length();
-    ps.print ('\"');
-    for (int i = 0;  i < len; i++)
-      {
-	char ch = str.charAt(i);
-	if ((ch == '\\' || ch == '\"'))
-	  ps.print ('\\');
-	else if (escapes > 0)
-	  {
-	    // These escapes are R6RS:
-	    if (ch == '\n')
-	     { ps.print("\\n"); continue; }
-	    else if (ch == '\r')
-	      { ps.print("\\r"); continue; }
-	    else if (ch == '\t')
-	      { ps.print("\\t"); continue; }
-            else if (ch == '\007')
-              { ps.print("\\a"); continue; }
-            else if (ch == '\b')
-              { ps.print("\\b"); continue; }
-            else if (ch == '\013')
-              { ps.print("\\v"); continue; }
-            else if (ch == '\f')
-              { ps.print("\\f"); continue; }
-	  }
-	ps.print (ch);
-      }
-    ps.print ('\"');
-  }
-
+    public static void printQuoted(CharSequence str,
+                                   Appendable ps, int escapes) {
+        int len = str.length();
+        try {
+            ps.append('\"');
+            for (int i = 0;  i < len; i++) {
+                char ch = str.charAt(i);
+                if ((ch == '\\' || ch == '\"'))
+                    ps.append('\\');
+                else if (escapes > 0) {
+                    // These escapes are R6RS:
+                    if (ch == '\n')
+                    { ps.append("\\n"); continue; }
+                    else if (ch == '\r')
+                    { ps.append("\\r"); continue; }
+                    else if (ch == '\t')
+                    { ps.append("\\t"); continue; }
+                    else if (ch == '\007')
+                    { ps.append("\\a"); continue; }
+                    else if (ch == '\b')
+                    { ps.append("\\b"); continue; }
+                    else if (ch == '\013')
+                    { ps.append("\\v"); continue; }
+                    else if (ch == '\f')
+                    { ps.append("\\f"); continue; }
+                }
+                ps.append(ch);
+            }
+            ps.append('\"');
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
 }

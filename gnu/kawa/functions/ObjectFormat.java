@@ -46,7 +46,7 @@ public class ObjectFormat extends ReportFormat
     this.maxChars = maxChars;
   }
 
-  public int format(Object[] args, int start, Writer dst, FieldPosition fpos)
+  public int format(Object[] args, int start, Appendable dst, FieldPosition fpos)
     throws java.io.IOException
   {
     int maxChars = getParam(this.maxChars, -1, args, start);
@@ -74,12 +74,13 @@ public class ObjectFormat extends ReportFormat
       }
   }
 
-  /**
-   * Return false iff truncation.
-   * @param maxChars maximum number of characters; -1 means unlimited
-   */
-  public static boolean format(Object arg, Writer dst,
-			       int maxChars, boolean readable)
+    /**
+     * Return false iff truncation.
+     *
+     * @param maxChars maximum number of characters; -1 means unlimited
+     */
+    
+  public static boolean format(Object arg, Appendable dst, int maxChars, boolean readable)
     throws java.io.IOException
   {
     if (maxChars < 0 && dst instanceof OutPort)
@@ -89,33 +90,30 @@ public class ObjectFormat extends ReportFormat
       }
     else if (maxChars < 0 && dst instanceof CharArrayWriter)
       {
-	OutPort oport = new OutPort(dst);
+	OutPort oport = new OutPort((CharArrayWriter) dst);
 	print(arg, oport, readable);
 	oport.close();
 	return true;
       }
     else
       {
-	CharArrayWriter wr = new CharArrayWriter();
-	OutPort oport = new OutPort(wr);
+	CharArrayOutPort oport = new CharArrayOutPort();
 	print(arg, oport, readable);
-	oport.close();
-	int len = wr.size();
+	int len = oport.size();
 	if (maxChars < 0 || len <= maxChars)
 	  {
-	    wr.writeTo(dst);
+	    oport.writeTo(dst);
 	    return true;
 	  }
 	else
 	  {
-	    dst.write(wr.toCharArray(), 0, maxChars);
+            oport.writeTo(0, maxChars, dst);
 	    return false;
 	  }
       }
   }
 
-  public static int format(Object[] args, int start, Writer dst,
-			   int maxChars, boolean readable)
+  public static int format(Object[] args, int start, Appendable dst, int maxChars, boolean readable)
     throws java.io.IOException
   {
     Object arg;

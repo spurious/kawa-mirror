@@ -1,3 +1,13 @@
+2013-03-04  Per Bothner  <per@bothner.com>
+
+	* ReportFormat.java (format): Generalize to write to Appendable.
+	* CaseConvertFormat.java: Likewise.
+	* IntegerFormat.java: Likewise.
+	* PadFormat.java: Likewise.
+	* CompoundFormat.java: Likewise.
+	* FlushFormat.java: Likewise. Use Flushable.
+	* LiteralFormat.java (text): Internally store String, not char[].
+
 2013-02-21  Per Bothner  <per@bothner.com>
 
 	* NamedCharTable.java: New utility class.

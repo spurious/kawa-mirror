@@ -1,3 +1,8 @@
+2013-03-04  Per Bothner  <per@bothner.com>
+
+	* CharArrayOutPort.java (writeTo): Generalize to Appendable.
+	(size): Add synonym for length, to match CharArrayWriter.
+
 2012-11-28  Per Bothner  <per@bothner.com>
 
 	* BinaryInPort.java (<init>): New constructor taking byte array.

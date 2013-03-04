@@ -1,6 +1,6 @@
 package gnu.text;
 import java.text.FieldPosition;
-import java.io.Writer;
+import java.io.Flushable;
 
 /* A Format that does nothing except flush the destination stream. */
 
@@ -15,10 +15,10 @@ public class FlushFormat extends ReportFormat
     return flush;
   }
 
-  public int format(Object[] args, int start, Writer dst, FieldPosition fpos)
-    throws java.io.IOException
-  {
-    dst.flush();
-    return start;
-  }
+    public int format(Object[] args, int start, Appendable dst, FieldPosition fpos)
+        throws java.io.IOException {
+        if (dst instanceof Flushable)
+            ((Flushable) dst).flush();
+        return start;
+    }
 }

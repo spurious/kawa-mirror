@@ -22,7 +22,7 @@ public class CaseConvertFormat extends ReportFormat
   public Format getBaseFormat() { return baseFormat; }
   public void setBaseFormat(Format baseFormat) { this.baseFormat = baseFormat;}
 
-  public int format(Object[] args, int start, Writer dst, FieldPosition fpos)
+  public int format(Object[] args, int start, Appendable dst, FieldPosition fpos)
     throws java.io.IOException
   {
     StringBuffer sbuf = new StringBuffer(100);
@@ -40,7 +40,7 @@ public class CaseConvertFormat extends ReportFormat
 	else
 	  ch = Character.toLowerCase(ch);
 	prev = ch;
-	dst.write(ch);
+	dst.append(ch);
       }
     return result;
   }

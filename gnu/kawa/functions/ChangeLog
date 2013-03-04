@@ -1,3 +1,8 @@
+2013-03-04  Per Bothner  <per@bothner.com>
+
+	* ObjectFormat.java (format): Generalize to write to Appendable.
+	* LispFormat.java: Likewise.
+
 2013-02-24  Per Bothner  <per@bothner.com>
 
 	* Curry1.java: New class, extends Procedure.

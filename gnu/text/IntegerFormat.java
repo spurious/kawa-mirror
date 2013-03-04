@@ -13,7 +13,7 @@ public class IntegerFormat extends ReportFormat
 {
   public int base;
 
-  /** Minimal width of the result, includiing sign, commas, etc.
+  /** Minimal width of the result, including sign, commas, etc.
    * However, if the MIN_DIGITS flag is given, it's the minimum number
    * of digits instead.  This is used for printf-style "precision".  */
   public int minWidth;
@@ -54,15 +54,13 @@ public class IntegerFormat extends ReportFormat
     flags = 0;
   }
 
-  public int format(Object[] args, int start, 
-		    Writer dst, FieldPosition fpos) 
+  public int format(Object[] args, int start, Appendable dst, FieldPosition fpos) 
     throws java.io.IOException
   {
     return format((Object) args, start, dst, fpos);
   }
 
-  public int format(Object arg, int start, 
-		    Writer dst, FieldPosition fpos) 
+  public int format(Object arg, int start, Appendable dst, FieldPosition fpos) 
     throws java.io.IOException
   {
     Object[] args = arg instanceof Object[] ? (Object[]) arg : null;
@@ -81,7 +79,7 @@ public class IntegerFormat extends ReportFormat
       {
 	if (start >= args.length)
 	  {
-	    dst.write("#<missing format argument>");
+	    dst.append("#<missing format argument>");
 	    return start;
 	  }
 	arg = args[start];
@@ -113,32 +111,32 @@ public class IntegerFormat extends ReportFormat
 	  }
         if (! padRight && ! padInternal)
           for (; minWidth > unpadded_len;  --minWidth)
-            dst.write(padChar);
+            dst.append(padChar);
 	int i = 0;
 	if (neg)
 	  {
-	    dst.write('-');
+	    dst.append('-');
 	    i++;
 	    slen--;
 	  }
 	else if ((flags & SHOW_PLUS) != 0)
-	  dst.write('+');
+	  dst.append('+');
 	else if ((flags & SHOW_SPACE) != 0)
-	  dst.write(' ');
+	  dst.append(' ');
         boolean uppercase = base > 10 && (flags & UPPERCASE) != 0;
         if ((flags & SHOW_BASE) != 0)
           {
             if (base == 16)
               {
-                dst.write('0');
-                dst.write(uppercase ? 'X' : 'x');
+                dst.append('0');
+                dst.append(uppercase ? 'X' : 'x');
               }
             else if (base == 8 && sarg0 != '0')
-              dst.write('0');
+              dst.append('0');
           }
         if (padInternal)
           for (; minWidth > unpadded_len;  --minWidth)
-            dst.write(padChar);
+            dst.append(padChar);
 	for (;;)
 	  {
 	    if (slen == 0)
@@ -146,17 +144,17 @@ public class IntegerFormat extends ReportFormat
             char ch = sarg.charAt(i++);
             if (uppercase)
               ch = Character.toUpperCase(ch);
-	    dst.write(ch);
+	    dst.append(ch);
 	    --slen;
 	    if (printCommas && slen > 0 && (slen % commaInterval) == 0)
-	      dst.write(commaChar);
+	      dst.append(commaChar);
 	  }
         if (padRight)
           for (; minWidth > unpadded_len;  --minWidth)
-            dst.write(padChar);
+            dst.append(padChar);
       }
     else
-      print(dst, arg.toString());
+      dst.append(arg.toString());
     return start + 1;
   }
 

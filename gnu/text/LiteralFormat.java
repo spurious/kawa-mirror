@@ -1,51 +1,42 @@
 package gnu.text;
 import java.text.FieldPosition;
 import java.io.Writer;
+import gnu.lists.Strings;
 
-public class LiteralFormat extends ReportFormat
-{
-  char[] text;
+public class LiteralFormat extends ReportFormat {
+    String text;
 
-  public LiteralFormat(char[] text)
-  {
-    this.text = text;
-  }
+    public LiteralFormat(char[] text) {
+        this.text = String.valueOf(text);
+    }
 
-  public LiteralFormat(String text)
-  {
-    this.text = text.toCharArray();
-  }
+    public LiteralFormat(String text) {
+        this.text = text;
+    }
 
-  public LiteralFormat(StringBuffer sbuf)
-  {
-    int len = sbuf.length();
-    text = new char[len];
-    sbuf.getChars(0, len, text, 0);
-  }
+    public LiteralFormat(StringBuffer sbuf) {
+        this(sbuf.toString());
+    }
 
-  public int format(Object[] args, int start, Writer dst, FieldPosition fpos)
-    throws java.io.IOException
-  {
-    dst.write(text);
-    return start;
-  }
+    public int format(Object[] args, int start, Appendable dst, FieldPosition fpos)
+            throws java.io.IOException {
+        dst.append(text);
+        return start;
+    }
 
-  public Object parseObject(String text, java.text.ParsePosition status)
-  {
-    throw new Error("LiteralFormat.parseObject - not implemented");
-  }
+    public Object parseObject(String text, java.text.ParsePosition status){
+        throw new Error("LiteralFormat.parseObject - not implemented");
+    }
 
-  /** Return the text that would be printed by the format. */
-  public String content ()
-  {
-    return new String(text);
-  }
+    /** Return the text that would be printed by the format. */
+    public String content() {
+        return text;
+    }
 
-  public String toString()
-  {
-    StringBuffer sbuf = new StringBuffer("LiteralFormat[\"");
-    sbuf.append(text);
-    sbuf.append("\"]");
-    return sbuf.toString();
-  }
+    public String toString() {
+        StringBuilder sbuf = new StringBuilder("LiteralFormat[");
+        Strings.printQuoted(text, sbuf, 1);
+        sbuf.append(']');
+        return sbuf.toString();
+    }
 }

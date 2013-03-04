@@ -20,7 +20,7 @@ public class CompoundFormat extends ReportFormat
     this.length = formats.length;
   }
 
-  public int format(Object[] args, int start, Writer dst, FieldPosition fpos)
+  public int format(Object[] args, int start, Appendable dst, FieldPosition fpos)
     throws java.io.IOException
   {
     for (int i = 0;  i < length;  i++)
@@ -33,12 +33,12 @@ public class CompoundFormat extends ReportFormat
 	      return start;
 	  }
 	else if (start >= args.length)
-	  dst.write("#<missing format argument>");
+	  dst.append("#<missing format argument>");
 	else
 	  {
 	    StringBuffer sbuf = new StringBuffer();
 	    fmt.format(args[start], sbuf, fpos);
-	    dst.write(sbuf.toString());
+	    dst.append(sbuf.toString());
 	    start++;
 	  }
       }

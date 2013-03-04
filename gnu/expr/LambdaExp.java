@@ -16,7 +16,7 @@ import gnu.kawa.functions.Convert;
 public class LambdaExp extends ScopeExp
 {
   public Expression body;
-  /** Minimum number of parameters.
+  /** Minimum number of actual arguments.
    * Does not count implicit isThisParameter(). */
   public int min_args;
   /** Maximum number of actual arguments;  -1 if variable. */

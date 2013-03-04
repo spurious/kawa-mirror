@@ -64,6 +64,8 @@ public class CommonLisp extends Lisp2
   public static final NumberCompare numLss;
   public static final NumberCompare numLEq;
 
+  public static final gnu.kawa.functions.IsEq isEq;
+
   static
   {
     instance = new CommonLisp();
@@ -80,6 +82,7 @@ public class CommonLisp extends Lisp2
                                 NumberCompare.TRUE_IF_LSS);
     numLEq = NumberCompare.make(instance, "<=",
                                 NumberCompare.TRUE_IF_LSS|NumberCompare.TRUE_IF_EQU);
+    isEq = new gnu.kawa.functions.IsEq(instance, "eq?");
     Environment saveEnv = Environment.setSaveCurrent(clispEnvironment);
     try
       {
@@ -106,22 +109,25 @@ public class CommonLisp extends Lisp2
 
     try
       {
-	// Force it to be loaded now, so we can over-ride let* length etc.
-	loadClass("kawa.lib.prim_syntax");
-	loadClass("kawa.lib.std_syntax");
-	loadClass("kawa.lib.lists");
-	loadClass("kawa.lib.strings");
-	loadClass("gnu.commonlisp.lisp.PrimOps");
+        // Force it to be loaded now, so we can over-ride let* length etc.
+        loadClass("kawa.lib.prim_syntax");
+        loadClass("kawa.lib.std_syntax");
+        loadClass("kawa.lib.lists");
+        loadClass("kawa.lib.strings");
+        loadClass("gnu.commonlisp.lisp.PrimOps");
       }
     catch (java.lang.ClassNotFoundException ex)
       {
-	// Ignore - happens while building this directory.
+        // Ignore - happens while building this directory.
       }
 
-    kawa.lang.Lambda lambda = new kawa.lang.Lambda();
+    OrdinaryLambda lambda = new OrdinaryLambda();
     lambda.setKeywords(asSymbol("&optional"),
-		       asSymbol("&rest"),
-		       asSymbol("&key"));
+                       asSymbol("&rest"),
+                       asSymbol("&key"),
+                       asSymbol("&allow-other-keys"),
+                       asSymbol("&aux"),
+                       asSymbol("&body"));
     lambda.defaultDefault = nilExpr;
     defun("lambda", lambda);
     defun("defun", new defun(lambda));

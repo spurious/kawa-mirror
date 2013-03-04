@@ -1,3 +1,10 @@
+2013-03-04  Charles Turner <chturne@gmail.com>
+
+	* lang/Lambda.java: New hooks for CommonLisp's OrdinaryLambda.
+	(addParam): Make protected.
+	(auxillaryRewrite): New method.
+	(rewriteBody): Use it.
+
 2013-02-24  Per Bothner  <per@bothner.com>
 
 	* standard/SchemeCompilation.java (checkDefaultBinding): Add

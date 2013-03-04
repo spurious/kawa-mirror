@@ -1,3 +1,10 @@
+2013-03-04  Charles Turner <chturne@gmail.com>
+
+	* OrdinaryLambda.java: New class, extends kawa.lang.Lambda.
+	* Makefile.am: Update accordingly.
+	* CommonLisp.java (initLisp): Use OrdinaryLambda.
+	(isEq): New field.
+
 2012-12-31  Per Bothner  <per@bothner.com>
 
 	* CommonLisp.java (initLisp): Update definitions of princ, prin1.

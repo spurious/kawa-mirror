@@ -1,3 +1,7 @@
+2013-03-04  Charles Turner  <chturne@gmail.com>
+
+	* lambda.lisp: New tests for lambda.
+
 2012-08-13  Charles Turner  <chturne@gmail.com>
 
 	* lang-test.lisp: New tests for funcall and flet.

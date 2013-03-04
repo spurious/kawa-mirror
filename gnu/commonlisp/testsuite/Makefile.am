@@ -9,10 +9,13 @@ CLEANFILES = *.log
 
 all:
 
-check: check-lang-test check-run-test-scripts
+check: check-lang-test check-lambda-test check-run-test-scripts
 
 check-lang-test:
 	$(DOTEST) -f "$(srcdir)/lang-test.lisp" -e '(test-report)'
+
+check-lambda-test:
+	$(DOTEST) -f "$(srcdir)/lambda.lisp" -e '(test-report)'
 
 check-run-test-scripts:
 	CLASSPATH=$(top_builddir) $(JAVA) gnu.kawa.util.RunTestScript \

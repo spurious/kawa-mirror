@@ -29,6 +29,7 @@ public class Lambda extends Syntax
     keyKeyword = key;
   }
 
+  @Override
   public Expression rewriteForm (Pair form, Translator tr)
   {
     Expression exp = rewrite(form.getCdr(), tr);
@@ -36,6 +37,7 @@ public class Lambda extends Syntax
     return exp;
   }
 
+  @Override
   public Expression rewrite (Object obj, Translator tr)
   {
     if (! (obj instanceof Pair))
@@ -321,8 +323,8 @@ public class Lambda extends Syntax
       lexp.keywords = keywords.toArray(new Keyword[keywords.size()]);
   }
 
-  private static void addParam (Declaration decl, ScopeExp templateScope,
-				LambdaExp lexp, Translator tr)
+  protected static void addParam (Declaration decl, ScopeExp templateScope,
+				  LambdaExp lexp, Translator tr)
   {
     if (templateScope != null)
       decl = tr.makeRenamedAlias(decl, templateScope);
@@ -582,7 +584,7 @@ public class Lambda extends Syntax
                                          (SyntaxForm) tform[1]);
         rtype = tr.getLanguage().getTypeFor(texp);
       }
-    lexp.body = tr.rewrite_body (body);
+    lexp.body = auxillaryRewrite(body, tr);
     tr.curLambda = saveLambda;
     Expression[] exps;
     int len;
@@ -615,7 +617,13 @@ public class Lambda extends Syntax
     if (tr.curMethodLambda == lexp)
       tr.curMethodLambda = null;
   }
+  
+  public Expression auxillaryRewrite(Object body, Translator tr)
+  {
+    return tr.rewrite_body(body);
+  }
 
+  @Override
   public void print (Consumer out)
   {
     out.write("#<builtin lambda>");

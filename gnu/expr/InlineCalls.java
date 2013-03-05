@@ -915,12 +915,12 @@ public class InlineCalls extends ExpExpVisitor<Type> {
     if (lexp.keywords != null)
       return null;
     boolean varArgs = lexp.max_args < 0;
-    if ((lexp.min_args == lexp.max_args
-         && lexp.min_args == args.length)
-        || (varArgs && lexp.min_args == 0))
+    int fixed = lexp.min_args;
+    if ((fixed == lexp.max_args
+         && fixed == args.length)
+        || (varArgs && args.length >= fixed))
       {
         Declaration prev = null;
-        int i = 0;
         IdentityHashTable mapper;
         Expression[] cargs;
         if (makeCopy)
@@ -937,11 +937,20 @@ public class InlineCalls extends ExpExpVisitor<Type> {
           }
         if (varArgs)
           {
-            Expression[] xargs = new Expression[args.length+1];
-            xargs[0] = QuoteExp.getInstance(lexp.firstDecl().type);
-            System.arraycopy(args, 0, xargs, 1, args.length);
-            cargs = new Expression[] { new ApplyExp(Invoke.make, xargs) };
+            cargs = new Expression[fixed+1];
+            // Copy over fixed arguments.
+            System.arraycopy(args, 0, cargs, 0, fixed);
+            // Create list/array constructor for rest args.
+            Expression[] xargs = new Expression[args.length-fixed+1];
+            Declaration restArg = lexp.firstDecl();
+            for (int i = fixed;  --i >= 0; )
+                restArg = restArg.nextDecl();
+            xargs[0] = QuoteExp.getInstance(restArg.type);
+            // Copy over rest args.
+            System.arraycopy(args, fixed, xargs, 1, args.length-fixed);
+            cargs[fixed] = new ApplyExp(Invoke.make, xargs);
           }
+        int i = 0;
         LetExp let = new LetExp();
         for (Declaration param = lexp.firstDecl(); param != null; i++)
           {
@@ -964,14 +973,11 @@ public class InlineCalls extends ExpExpVisitor<Type> {
                 lexp.remove(prev, param);
                 let.add(prev, param);
               }
-            if (! varArgs)
-              {
-                if ( ! param.getCanWrite()) {
-                  param.nvalues = 0;
-                  param.values = null;
-                  param.noteValueFromLet(let);
-                }
-              }
+            if ( ! param.getCanWrite()) {
+                param.nvalues = 0;
+                param.values = null;
+                param.noteValueFromLet(let);
+            }
             prev = param;
             param = next;
           }

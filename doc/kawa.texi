@@ -12555,7 +12555,7 @@ The easiest to manage is to use Kawa's mechanism for
 @ref{Self-configuring page scripts}.  Ths is especially
 easy if you the web server built in to JDK 6, since no
 configuration files are needed.
-You can also use a ``serlvet engine'' like Tomcat or Glassfish.
+You can also use a ``servlet engine'' like Tomcat or Glassfish.
 
 @item
 You can explicitly compile the web page script to a servlet,
@@ -12892,12 +12892,12 @@ the @code{WEB-INF/web.xml} file:
   <display-name>My Application</display-name>
 
   <servlet>
-    <selvlet-name>MyHello</servlet-name>
-    <selvlet-class>hello</servlet-class>
+    <servlet-name>MyHello</servlet-name>
+    <servlet-class>hello</servlet-class>
   </servlet>
 
   <servlet-mapping>
-    <selvlet-name>MyHello</servlet-name>
+    <servlet-name>MyHello</servlet-name>
     <url-pattern>/hello</url-pattern>
   </servlet-mapping>
 </web-app>

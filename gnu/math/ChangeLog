@@ -1,3 +1,9 @@
+2013-03-18  Per Bothner  <per@bothner.com>
+
+	* ExponentialFormat.java (style): New flag.
+	(format): Use it to control handling of '~g' format.
+	(format):  Allow general Number, not just RealNum.
+
 2012-11-09  Per Bothner  <per@bothner.com>
 
 	* RatNum.java (compare): Fix bug when comparing two infinites,

@@ -1,3 +1,7 @@
+2013-03-18  Per Bothner  <per@bothner.com>
+
+	* formatst.scm: Update "%g" tests to match Comon Lisp spec.
+
 2013-03-02  Per Bothner  <per@bothner.com>
 
 	* xml-test.scm: Update.

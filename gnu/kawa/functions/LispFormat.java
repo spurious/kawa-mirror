@@ -137,6 +137,7 @@ public class LispFormat extends CompoundFormat
 	  case '$':
 	    LispRealFormat dfmt = new LispRealFormat();
 	    dfmt.op = ch;
+            dfmt.style = 'L';
 	    dfmt.arg1 = getParam(stack, speci);
 	    dfmt.arg2 = getParam(stack, speci+1);
 	    dfmt.arg3 = getParam(stack, speci+2);
@@ -152,10 +153,7 @@ public class LispFormat extends CompoundFormat
 	      }
 	    dfmt.showPlus = seenAt;
 	    dfmt.internalPad = seenColon;
-	    if (dfmt.argsUsed == 0)
-	      fmt = dfmt.resolve(null, 0);
-	    else
-	      fmt = dfmt;
+            fmt = dfmt.resolve(null, 0);
 	    break;
 	  case 'A':  case 'S':  case 'W':
 	  case 'Y':  // SRFI-48 "yuppify" (pretty-print)
@@ -1178,122 +1176,6 @@ class LispTabulateFormat extends ReportFormat
       }
     while (--spaces >= 0)
       dst.append(padChar);
-    return start;
-  }
-}
-
-/* Support for ~F, ~$, ~E, ~G. */
-
-class LispRealFormat extends ReportFormat
-{
-  char op;
-  int arg1;
-  int arg2;
-  int arg3;
-  int arg4;
-  int arg5;
-  int arg6;
-  int arg7;
-  boolean showPlus;
-  boolean internalPad;
-  /** Twice the number of args consumed; odd if any arg is PARAM_FROM_COUNT. */
-  int argsUsed;
-
-  LispRealFormat()
-  {
-    argsUsed = (arg1 == LispFormat.PARAM_FROM_COUNT
-		|| arg2 == LispFormat.PARAM_FROM_COUNT
-		|| arg3 == LispFormat.PARAM_FROM_COUNT
-		|| arg4 == LispFormat.PARAM_FROM_COUNT
-		|| arg5 == LispFormat.PARAM_FROM_COUNT
-		|| arg6 == LispFormat.PARAM_FROM_COUNT
-		|| arg7 == LispFormat.PARAM_FROM_COUNT) ? 1 : 0;
-    if (arg1 == LispFormat.PARAM_FROM_LIST) argsUsed += 2;
-    if (arg2 == LispFormat.PARAM_FROM_LIST) argsUsed += 2;
-    if (arg3 == LispFormat.PARAM_FROM_LIST) argsUsed += 2;
-    if (arg4 == LispFormat.PARAM_FROM_LIST) argsUsed += 2;
-    if (arg5 == LispFormat.PARAM_FROM_LIST) argsUsed += 2;
-    if (arg6 == LispFormat.PARAM_FROM_LIST) argsUsed += 2;
-    if (arg7 == LispFormat.PARAM_FROM_LIST) argsUsed += 2;
-  }
-
-  public Format resolve (Object[] args, int start)
-  {
-    if (op == '$')
-      {
-	FixedRealFormat mfmt = new FixedRealFormat();
-	int decimals = getParam(this.arg1, 2, args, start);
-	if (this.arg1 == LispFormat.PARAM_FROM_LIST)  start++;
-	int digits = getParam(this.arg2, 1, args, start);
-	if (this.arg2 == LispFormat.PARAM_FROM_LIST)  start++;
-	int width = getParam(this.arg3, 0, args, start);
-	if (this.arg3 == LispFormat.PARAM_FROM_LIST)  start++;
-	char padChar = getParam(this.arg4, ' ', args, start);
-	if (this.arg4 == LispFormat.PARAM_FROM_LIST)  start++;
-
-	mfmt.setMaximumFractionDigits(decimals);
-	mfmt.setMinimumIntegerDigits(digits);
-	mfmt.width = width;
-	mfmt.padChar = padChar;
-	mfmt.internalPad = internalPad;
-	mfmt.showPlus = showPlus;
-	return mfmt;
-      }
-    else if (op == 'F')
-      {
-	FixedRealFormat mfmt = new FixedRealFormat();
-	int width = getParam(this.arg1, 0, args, start);
-	if (this.arg1 == LispFormat.PARAM_FROM_LIST)  start++;
-	int decimals = getParam(this.arg2, -1, args, start);
-	if (this.arg2 == LispFormat.PARAM_FROM_LIST)  start++;
-	int scale = getParam(this.arg3, 0, args, start);
-	if (this.arg3 == LispFormat.PARAM_FROM_LIST)  start++;
-	mfmt.overflowChar = getParam(this.arg4, '\0', args, start);
-	if (this.arg4 == LispFormat.PARAM_FROM_LIST)  start++;
-	char padChar = getParam(this.arg5, ' ', args, start);
-	if (this.arg5 == LispFormat.PARAM_FROM_LIST)  start++;
-	mfmt.setMaximumFractionDigits(decimals);
-	mfmt.setMinimumIntegerDigits(0);
-	mfmt.width = width;
-	mfmt.scale = scale;
-	mfmt.padChar = padChar;
-	mfmt.internalPad = internalPad;
-	mfmt.showPlus = showPlus;
-	return mfmt;
-      }
-    else // if (op == 'E' || op == 'G')
-      {
-	ExponentialFormat efmt = new ExponentialFormat();
-        efmt.exponentShowSign = true;
-	efmt.width = getParam(this.arg1, 0, args, start);
-	if (this.arg1 == LispFormat.PARAM_FROM_LIST)  start++;
-	efmt.fracDigits = getParam(this.arg2, -1, args, start);
-	if (this.arg2 == LispFormat.PARAM_FROM_LIST)  start++;
-	efmt.expDigits = getParam(this.arg3, 0, args, start);
-	if (this.arg3 == LispFormat.PARAM_FROM_LIST)  start++;
-	efmt.intDigits = getParam(this.arg4, 1, args, start);
-	if (this.arg4 == LispFormat.PARAM_FROM_LIST)  start++;
-	efmt.overflowChar = getParam(this.arg5, '\0', args, start);
-	if (this.arg5 == LispFormat.PARAM_FROM_LIST)  start++;
-	efmt.padChar = getParam(this.arg6, ' ', args, start);
-	if (this.arg6 == LispFormat.PARAM_FROM_LIST)  start++;
-	efmt.exponentChar = getParam(this.arg7, 'E', args, start);
-	if (this.arg7 == LispFormat.PARAM_FROM_LIST)  start++;
-	efmt.general = op == 'G';
-	efmt.showPlus = showPlus;
-	return efmt;
-      }
-  }
-
-  public int format(Object[] args, int start, Appendable dst, FieldPosition fpos)
-    throws java.io.IOException
-  {
-    StringBuffer sbuf = new StringBuffer(100);
-    Format fmt = resolve(args, start);
-    start += argsUsed >> 1;
-    RealNum value = (RealNum) args[start++];
-    fmt.format(value, sbuf, fpos);
-    dst.append(sbuf);
     return start;
   }
 }

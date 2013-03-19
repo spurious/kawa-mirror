@@ -1,3 +1,19 @@
+2013-03-18  Per Bothner  <per@bothner.com>
+
+	* ParseFormat.java (parseFormat): Fix some missing read calls
+	when handling '*' for width and precision.
+	Provide a reasonable implementation of %f, %e, and %g formats
+	using LispRealFormat instead of falling back to ObjectFormat.
+	* LispFormat.java (class LispRealFormat): Move to new file, because it
+	now also used by printf-style "%g" format.
+	(<init>): In the LispRealFormat case fix bug that assumed
+	dfmt.argsUsed is set at this point.  Instead, always calls resolve
+	to set it.
+	* LispRealFormat.java: New file.
+	(<init>): We can't argsUsed here, since arg1...arg7 aren't set yet.
+	* Makefile.am: Update accoringly.
+	* Format.java (sprintfToString): New static method.
+
 2013-03-04  Per Bothner  <per@bothner.com>
 
 	* ObjectFormat.java (format): Generalize to write to Appendable.

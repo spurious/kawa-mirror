@@ -35,8 +35,13 @@ public class ExponentialFormat extends java.text.Format
   /** True if '+' should be printed for non-negative number. */
   public boolean showPlus;
 
-  public int width;
   public boolean general;
+
+    /** 'L': Common Lisp style; 'P' C/Java printf-style.
+     * Used for fine points of printing 'g' style. */
+    public char style;
+
+  public int width;
 
   static final double LOG10 = Math.log(10);
 
@@ -272,12 +277,7 @@ public class ExponentialFormat extends java.text.Format
 	    sbuf.insert(digStart, '0');
 	    --i;
 	  }
-        if (! showExponent
-            // The CommonLisp spec requires adding spaces on the right
-            // when a ~g format ends up using fixed-point format, corresponding
-            // to the space otherwise used for the exponent.  However, it seems
-            // wrong to do so when using a variable-width format.
-            && width > 0)
+        if (! showExponent && style == 'L')
           {
             for (; --ee >= 0; --i) //  && sbuf.length() < oldLen + width; --i)
               sbuf.append(' ');
@@ -303,7 +303,8 @@ public class ExponentialFormat extends java.text.Format
   public StringBuffer format(Object num, StringBuffer sbuf, FieldPosition fpos)
   {
     // Common Lisp says if value is non-real, print as if with ~wD.  FIXME.
-    return format(((RealNum) num).doubleValue(), sbuf, fpos);
+    // Actually want: Number && (! Numeric || RealNum)
+    return format(((Number) num).doubleValue(), sbuf, fpos);
   }
 
   public java.lang.Number parse(String text, java.text.ParsePosition status)

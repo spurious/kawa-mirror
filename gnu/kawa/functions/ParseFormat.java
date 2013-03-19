@@ -1,9 +1,10 @@
 package gnu.kawa.functions;
-import gnu.text.*;
 import java.text.ParseException;
 import java.text.Format;
 import gnu.mapping.*;
+import gnu.math.FixedRealFormat;
 import gnu.lists.*;
+import gnu.text.*;
 
 public class ParseFormat extends Procedure1
 {
@@ -98,9 +99,13 @@ public class ParseFormat extends Procedure1
 	    break;
 	  }
 
-	int width = PARAM_UNSPECIFIED;
-	digit = Character.digit((char) ch, 10);
-	if (digit >= 0)
+	int width;
+        if (ch == '*')
+          {
+            width = PARAM_FROM_LIST;
+            ch = fmt.read();
+          }
+	else if ((digit = Character.digit((char) ch, 10)) >= 0)
 	  {
 	    width = digit;
 	    for (;;)
@@ -112,28 +117,34 @@ public class ParseFormat extends Procedure1
 		width = 10 * width + digit;
 	      }
 	  }
-        else if (ch == '*')
-          width = PARAM_FROM_LIST;
+        else
+          width = PARAM_UNSPECIFIED;
 
 	int precision = PARAM_UNSPECIFIED;
 	if (ch == '.')
 	  {
+            ch = fmt.read();
 	    if (ch == '*')
-	      precision = PARAM_FROM_LIST;
-	    else
+              {
+                precision = PARAM_FROM_LIST;
+                ch = fmt.read();
+              }
+	    else if ((digit = Character.digit((char) ch, 10)) >= 0)
 	      {
-		precision = 0;
-		for (;;)
-		  {
-		    ch = fmt.read();
-		    digit = Character.digit((char) ch, 10);
-		    if (digit < 0)
-		      break;
-		    precision = 10 * precision + digit;
-		  }
-	      }
-	  }
+                precision = digit;
+                for (;;)
+                  {
+                    ch = fmt.read();
+                    digit = Character.digit((char) ch, 10);
+                    if (digit < 0)
+                        break;
+                    precision = 10 * precision + digit;
+                  }
+              }
+          }
 
+        char padChar
+            = (flags & (SEEN_ZERO+SEEN_MINUS)) == SEEN_ZERO ? '0' : ' ';
 	switch (ch)
 	  {
 	  case 's':
@@ -159,8 +170,6 @@ public class ParseFormat extends Procedure1
               }
             boolean seenColon = false;
             boolean seenAt = false;
-            char padChar
-              = (flags & (SEEN_ZERO+SEEN_MINUS)) == SEEN_ZERO ? '0' : ' ';
             if ((flags & SEEN_HASH) != 0)
               fflags |= IntegerFormat.SHOW_BASE;
             if ((flags & SEEN_PLUS) != 0)
@@ -182,17 +191,40 @@ public class ParseFormat extends Procedure1
 						 padChar, PARAM_UNSPECIFIED,
 						 PARAM_UNSPECIFIED, fflags);
             break;
-	  case 'e':
 	  case 'f':
+	  case 'e':
+	  case 'E':
 	  case 'g':
-	    format = new ObjectFormat(false);  // FIXME
+	  case 'G':
+              LispRealFormat dfmt = new LispRealFormat();
+              dfmt.op = (char) ch;
+              dfmt.style = 'P';
+              dfmt.arg1 = width;
+              if (precision == PARAM_UNSPECIFIED)
+                  precision = 6;
+              dfmt.arg2 = precision;
+              dfmt.showPlus = (flags & SEEN_PLUS) != 0;
+              if (ch == 'e' || ch == 'E' || ch == 'g' || ch == 'G') {
+                  dfmt.arg3 = 2;
+                  dfmt.arg4 = 1; // intDigits
+                  dfmt.arg5 = '\0'; // overflowChar
+                  dfmt.arg6  = padChar;
+                  // set exponentChar
+                  dfmt.arg7 = ch == 'E' || ch == 'G' ? 'E' : 'e';
+              }
+              else {
+                  dfmt.arg3 = '\0'; // overflowChar
+                  dfmt.arg5 = padChar;
+              }
+              dfmt.internalPad = true;
+              format = dfmt.resolve(null, 0);
 	    break;
 	  default:
 	    throw new ParseException ("unknown format character '"+ch+"'", -1);
 	  }
 	if (width > 0)
 	  {
-	    char padChar = (flags & SEEN_ZERO) != 0 ? '0' : ' ';
+	    padChar = (flags & SEEN_ZERO) != 0 ? '0' : ' ';
 	    int where;
 	    if ((flags & SEEN_MINUS) != 0)
 	      where = 100;

@@ -245,7 +245,10 @@ java_sources = \
   Setter.java \
   UnicodeUtils.java \
   ValuesMap.java \
-  ObjectFormat.java LispFormat.java ParseFormat.java Format.java 
+  Format.java \
+  LispFormat.java LispRealFormat.java \
+  ObjectFormat.java \
+  ParseFormat.java
 
 PACKAGE_FNAME = gnu-kawa-functions
 GCJ_INPUTS = $(java_Java)

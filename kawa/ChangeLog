@@ -1,3 +1,7 @@
+2013-03-18  Per Bothner  <per@bothner.com>
+
+	* lang/SyntaxRules.java (<init>): Some improvements to error reporting.
+
 2013-03-04  Charles Turner <chturne@gmail.com>
 
 	* lang/Lambda.java: New hooks for CommonLisp's OrdinaryLambda.

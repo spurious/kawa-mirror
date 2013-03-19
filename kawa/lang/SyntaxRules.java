@@ -63,7 +63,7 @@ public class SyntaxRules extends Procedure1 implements Printable, Externalizable
 	  }
 	if (! (syntax_rule instanceof Pair))
 	  {
-	    tr.syntaxError ("missing pattern in " + i + "'th syntax rule");
+            tr.error('e', "missing pattern in syntax rule #" + i);
 	    return;
 	  }
 	// SyntaxForm, if any, wrapping the current rule's pattern.
@@ -88,13 +88,15 @@ public class SyntaxRules extends Procedure1 implements Printable, Externalizable
 	      }
 	    if (! (syntax_rule instanceof Pair))
 	      {
-		tr.syntaxError ("missing template in " + i + "'th syntax rule");
+		tr.error('e', "missing template in syntax rule #" + i);
 		return;
 	      }
 	    syntax_rule_pair = (Pair) syntax_rule;
 	    if (syntax_rule_pair.getCdr() != LList.Empty)
 	      {
-		tr.syntaxError ("junk after "+i+"'th syntax rule");
+                Object save = tr.pushPositionOf(syntax_rule_pair.getCdr());
+                tr.error('e', "junk after syntax rule #" + i);
+                tr.popPositionOf(save);
 		return;
 	      }
 	    Object template = syntax_rule_pair.getCar();
@@ -125,7 +127,7 @@ public class SyntaxRules extends Procedure1 implements Printable, Externalizable
 	    else
 	      {
 		// Identifier macro? FIXME
-		tr.syntaxError ("pattern does not start with name");
+                tr.error('e', "pattern does not start with name");
 		return;
 	      }
 	    SyntaxPattern spattern = new SyntaxPattern(programbuf, pattern,

@@ -124,7 +124,6 @@
   (syntax-rules ()
     ((let-values (?binding ...) ?body0 ?body1 ...)
      (let-values "bind" (?binding ...) () (begin ?body0 ?body1 ...)))
-    
     ((let-values "bind" () ?tmps ?body)
      (let ?tmps ?body))
     
@@ -335,3 +334,8 @@
   (syntax-rules ()
     ((_ . args)
      (gnu.kawa.functions.Format:formatToString 0 . args))))
+
+(define-syntax $sprintf$
+  (syntax-rules ()
+    ((_ fmt . args)
+     (gnu.kawa.functions.Format:sprintfToString fmt . args))))

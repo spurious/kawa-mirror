@@ -1,3 +1,7 @@
+2013-03-20  Per Bothner  <per@bothner.com>
+
+	* standard/Scheme.java (initScheme): Declare '$sprintf$'.
+
 2013-03-18  Per Bothner  <per@bothner.com>
 
 	* lang/SyntaxRules.java (<init>): Some improvements to error reporting.

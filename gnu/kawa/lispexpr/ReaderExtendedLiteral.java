@@ -12,6 +12,7 @@ import gnu.xml.XName; // FIXME - not available if --disable-xml
 public class ReaderExtendedLiteral extends ReaderConstituent {
     static final Symbol qstringSymbol = Symbol.valueOf("$string$");
     static final Symbol formatSymbol = Symbol.valueOf("$format$");
+    static final Symbol sprintfSymbol = Symbol.valueOf("$sprintf$");
     static final Symbol startEnclosedSymbol = Symbol.valueOf("$<<$");
     static final Symbol endEnclosedSymbol = Symbol.valueOf("$>>$");
 
@@ -209,8 +210,9 @@ public class ReaderExtendedLiteral extends ReaderConstituent {
                     resultTail = readEnclosed(reader, rtable, resultTail, next, endDelimiter);
                     item = endEnclosedSymbol;
                 }
-                else if (next == '~') {
+                else if (next == '~' || next == '%') {
                     boolean sawQuote = false;
+                    boolean printfStyle = next == '%';
                     for (;;) {
                         reader.tokenBufferAppend(next);
                         next = reader.read();
@@ -226,9 +228,12 @@ public class ReaderExtendedLiteral extends ReaderConstituent {
                         // Prefix characters allowed in a format directive.
                         // We should probably be more restrictive.
                         else if ((next >= '0' && next <= '9')
-                                 || next == '+' || next == '-' || next == ','
-                                 || next == 'v' || next == 'V'
-                                 || next == '#' || next == ':' || next == '@')
+                                 || next == '+' || next == '-' || next == ' '
+                                 || (printfStyle
+                                     ? (next == '.' || next == '*')
+                                     : (next == ',' || next == '#' 
+                                        || next == 'v' || next == 'V'
+                                        || next == ':' || next == '@')))
                             ; // prefix directive part
                         else {
                             reader.tokenBufferAppend(next);
@@ -244,7 +249,8 @@ public class ReaderExtendedLiteral extends ReaderConstituent {
                     endDelimiter = enclosedExprDelim(next, reader);
                     reader.tokenBufferLength = 0;
                     Pair ffmt = reader.makePair(fmt, LList.Empty, line, column);
-                    Pair fhead = reader.makePair(formatSymbol, ffmt,
+                    Object fun = printfStyle ? sprintfSymbol : formatSymbol;
+                    Pair fhead = reader.makePair(fun, ffmt,
                                                  line, column);
                     readEnclosed(reader, rtable, ffmt, next, endDelimiter);
                     item = fhead;

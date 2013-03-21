@@ -1,3 +1,7 @@
+2013-03-20  Per Bothner  <per@bothner.com>
+
+	* syntax.scm ($sprintf$): New macro.
+
 2013-02-23  Per Bothner  <per@bothner.com>
 
 	* std_syntax.scm (and): Minor tweak.

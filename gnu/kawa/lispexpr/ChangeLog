@@ -1,3 +1,8 @@
+2013-03-20  Per Bothner  <per@bothner.com>
+
+	* ReaderExtendedLiteral.java: Add support for printf-style '%'
+	format specifiers.
+
 2013-03-02  Per Bothner  <per@bothner.com>
 
 	* ReaderExtendedLiteral.java (readContent): Generalize so logic

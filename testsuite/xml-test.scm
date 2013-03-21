@@ -35,4 +35,18 @@
                            idatr ($xml-attribute$ 'x "name"))
            &{<ab id="myId" x="name" />}))
 
+;; Test &#|comment|#
+(xtest #<ab id="n&#|comment1|#ame">12&#|comment2|#9</>
+       '($xml-element$ () ($resolve-qname$ ab)
+                       ($xml-attribute$ (quote id) "name") "129")
+       &{<ab id="name">129</ab>})
+
+;; Test line-continuation &- in both attribute and element content.
+(xtest #<em id="na&-
+me">abc&-
+  def</em>
+       '($xml-element$ () ($resolve-qname$ em)
+                       ($xml-attribute$ (quote id) "name") "abc  def")
+       &{<em id="name">abc  def</em>})
+
 (test-end)

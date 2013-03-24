@@ -53,7 +53,6 @@
   (javafx.application.Application java.lang.Runnable)
   (title ::java.lang.String)
   (*stage* ::javafx.stage.Stage)
-  ((make-scene (stage ::javafx.stage.Stage)) ::MakeScene #!abstract)
   ((run-scene)::void #!void)
   ((run ctx::gnu.mapping.CallContext)::void #!abstract)
   ((run)::void

@@ -1,3 +1,7 @@
+2013-03-23  Per Bothner  <per@bothner.com>
+
+	* defs.scm (KawaJavafxApplication): Remove unused make-scape method.
+
 2012-11-21  Per Bothner  <per@bothner.com>
 
 	* defs.scm: Fix typo datum->object to datum->syntax/

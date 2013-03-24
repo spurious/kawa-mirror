@@ -1,3 +1,7 @@
+2013-03-23  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (kawa/Version.java): Add $(srcdir) reference.
+
 2013-01-13  Per Bothner  <per@bothner.com>
 
 	* configure.in: Renamed to ...

@@ -330,8 +330,10 @@ public class ClassExp extends LambdaExp
         if (! explicitInit && ! instanceType.isInterface())
             Compilation.getConstructor(instanceType, this);
         int instanceModifiers = instanceType.getModifiers();
-        if (isAbstract())
-            instanceType.setModifiers(instanceModifiers | Access.ABSTRACT);
+        if (isAbstract()) {
+            instanceModifiers |= Access.ABSTRACT;
+            instanceType.setModifiers(instanceModifiers);
+        }
         if (nameDecl != null)
             instanceType.setModifiers((instanceModifiers & ~Access.PUBLIC)
                                       | nameDecl.getAccessFlags(Access.PUBLIC));

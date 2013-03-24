@@ -1,3 +1,7 @@
+2013-03-23  Per Bothner  <per@bothner.com>
+
+	* ClassExp.java (declareParts): Fix logic error with modifiers.
+
 2013-03-04  Per Bothner  <per@bothner.com>
 
 	* InlineCalls.java (inlineCall): Fix missing noteValueFromLet

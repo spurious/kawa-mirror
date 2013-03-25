@@ -26,13 +26,13 @@ public class SyntaxForms {
     }
 
     /** Create a syntax object with specified datum, and given syntatic context.
-     * Used to implement datum->syntax-object in the syntax-case API.
-     * @param template If this is a SyntaxForm, use its scope;
-     *   otherwise use the current Compilation's current scope.
+     * Used to implement {@code datum->syntax}.
+     * @param template If this is a {@code SyntaxForm}, use its scope;
+     *   otherwise use the current {@code Compilation}'s current scope.
      *   (This means just returning the datum as-is.)
-     * @param form The value (S-expression datum) to use.
+     * @param datum The value (S-expression datum) to use.
      * @param srcloc Used to set source location (line number etc).
-     *   Ignored if null; otherwise should be a SourceLocator.
+     *   Ignored if null; otherwise should be a {@code SourceLocator}.
      */
     public static Object makeWithTemplate(Object template, Object datum,
                                           Object srcloc) {

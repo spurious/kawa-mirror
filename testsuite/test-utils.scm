@@ -23,4 +23,4 @@
       ((xtest value quoted evaluated)
        (begin
          (test-equal quoted (quote value))
-         (test-equal evaluated (format "~a" value))))))))
+         (test-equal evaluated (format "~w" value))))))))

@@ -155,6 +155,7 @@ public class Scheme extends LispLanguage
       defSntxStFld("$string$", "kawa.lib.syntax");
       defSntxStFld("$format$", "kawa.lib.syntax");
       defSntxStFld("$sprintf$", "kawa.lib.syntax");
+      defSntxStFld("define-simple-constructor", "kawa.lib.syntax");
       defAliasStFld("$<<$", "kawa.standard.Scheme", "emptyStringLeft");
       defAliasStFld("$>>$", "kawa.standard.Scheme", "emptyStringRight");
       defSntxStFld("$xml-element$", "gnu.kawa.lispexpr.MakeXmlElement", "makeXml");

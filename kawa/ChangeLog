@@ -1,5 +1,7 @@
 2013-03-25  Per Bothner  <per@bothner.com>
 
+	* standard/Scheme.java (initScheme): Define 'define-simple-constructor'.
+
 	* standard/Scheme.java (emptyString): Replace by 2 new fields:
 	(emptyStringLeft, emptyStringRight): New fields, initialized to
 	unique objects.

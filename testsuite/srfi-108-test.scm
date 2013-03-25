@@ -62,4 +62,23 @@
          $>>$)
        "<ul><li>We have cookies for you.</li><li>If you want to eat a cookie,\n                       you must bring your own straw.</li></ul>")
 
+(define (make-foo . args) (apply list 'FOO args))
+
+(define-simple-constructor foo make-foo)
+
+(test-equal '(FOO "abc7z")
+            &foo{abc&(+ 3 4)z})
+(test-equal '(FOO 3 20 "abc7z")
+            &foo[(+ 1 2) (* 4 5)]{abc&(+ 3 4)z})
+(test-equal '(FOO id: "n7" "7abc")
+            &foo[id: "n7"]{&(+ 3 4)abc})
+
+(define-syntax $construct$:bar
+  (syntax-rules ()
+    ((_ . args) (list 'BAR . args))))
+(test-equal '(BAR "abc" "" 7 "" "z")
+            &bar{abc&(+ 3 4)z})
+(test-equal '(BAR 3 20 "" "abc" "" 7 "" "z")
+            &bar[(+ 1 2) (* 4 5)]{abc&(+ 3 4)z})
+
 (test-end)

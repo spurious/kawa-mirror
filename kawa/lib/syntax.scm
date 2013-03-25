@@ -339,3 +339,42 @@
   (syntax-rules ()
     ((_ fmt . args)
      (gnu.kawa.functions.Format:sprintfToString fmt . args))))
+
+(cond-expand
+ (kawa
+  ;; (%symbol->construct 'sym) returns '$construct$:sym
+  ;; In Kawa we lookup sym in the $construct$ package.
+  (define-syntax %symbol->construct
+    (syntax-rules ()
+      ((%symbol->construct sym)
+       (symbol sym $construct$)))))
+ (else
+  ;; In a Scheme without namespaces (i.e. colon not special)
+  ;; construct a regular symbol.
+  (define-syntax %symbol->construct
+    (syntax-rules ()
+      ((%symbol->construct sym)
+       (string->symbol (string-append "$construct$:"
+                                      (symbol->string sym))))))))
+(define-syntax define-simple-constructor
+  (lambda (form)
+    (syntax-case form ($construct$)
+      ((_ name constructor text-collector)
+       (let ((cname (datum->syntax #'name (%symbol->construct (syntax->datum #'name)))))
+         #`(define-syntax #,cname
+             (syntax-rules ()
+               ((#,cname . args)
+                (%simple-construct-builder constructor text-collector () . args))))))
+      ((_ name constructor)
+       #`(define-simple-constructor name constructor $string$)))))
+
+(define-syntax %simple-construct-builder
+  (syntax-rules ($<<$ $>>$)
+    ((%simple-construct-builder fun mkstr (seen ...) $<<$ . rest)
+     (fun (mkstr seen ... $<<$ . rest)))
+    ((%simple-construct-builder fun mkstr (seen ...) $>>$ . rest)
+     (fun seen ... (mkstr . rest)))
+    ((%simple-construct-builder fun mkstr (seen ...) x . rest)
+     (%simple-construct-builder fun mkstr (seen ... x) . rest))
+    ((%simple-construct-builder fun mkstr (seen ...))
+     (fun seen ... (mkstr)))))

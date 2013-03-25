@@ -1,3 +1,10 @@
+2013-03-25  Per Bothner  <per@bothner.com>
+
+	* standard/Scheme.java (emptyString): Replace by 2 new fields:
+	(emptyStringLeft, emptyStringRight): New fields, initialized to
+	unique objects.
+	(initScheme): Update '$<<$' and '$>>$' to bind to new fields.
+
 2013-03-20  Per Bothner  <per@bothner.com>
 
 	* standard/Scheme.java (initScheme): Declare '$sprintf$'.

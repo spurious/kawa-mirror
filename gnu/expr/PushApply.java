@@ -93,14 +93,12 @@ public class PushApply extends ExpVisitor<Expression,Void>
     void noteFinishDependency(LambdaExp callee, LambdaExp caller) {
         if (callee == caller || callee.body.type == Type.neverReturnsType) {
             canFinishTracker.dependencyAddedThisFork = true;
-            caller.canFinishCondition = LambdaExp.CANNOT_FINISH;
-        } else if (caller.canFinishCondition != LambdaExp.CAN_FINISH) {
-            ArrayList<HashSet<LambdaExp>> deps = canFinishDeps();
-            int ndeps = deps.size();
-            for (int i = 0;  i < ndeps;  i++) {
-                if (caller.canFinishCondition.get(i).add(callee))
-                    canFinishTracker.dependencyAddedThisFork = true;
-            }
+            caller.canFinishCondition = CanFinishMap.CANNOT_FINISH;
+        } else if (caller.canFinishCondition != CanFinishMap.CAN_FINISH) {
+            CanFinishMap deps = canFinishDeps();
+            if (deps != CanFinishMap.CANNOT_FINISH
+                    && deps.addDependency(callee))
+                canFinishTracker.dependencyAddedThisFork = true;
             if (callee.canFinishListeners == null)
                 callee.canFinishListeners = new HashSet<LambdaExp>(); 
             callee.canFinishListeners.add(caller);
@@ -197,7 +195,7 @@ public class PushApply extends ExpVisitor<Expression,Void>
         CanFinishTracker oldTracker = canFinishTracker;
         CanFinishTracker newTracker = new CanFinishTracker();
         canFinishTracker = newTracker;
-        newTracker.dependenciesAtForkStart = LambdaExp.CAN_FINISH;
+        newTracker.dependenciesAtForkStart = CanFinishMap.CAN_FINISH;
         LambdaExp saveLambda = currentLambda;
         exp.setFlag(true, LambdaExp.IN_EXPWALKER);
         currentLambda = exp;
@@ -208,7 +206,7 @@ public class PushApply extends ExpVisitor<Expression,Void>
             exp.setFlag(false, LambdaExp.IN_EXPWALKER);
 
             if (exp.canFinishCondition == null)
-                exp.canFinishCondition = LambdaExp.CAN_FINISH;
+                exp.canFinishCondition = CanFinishMap.CAN_FINISH;
             exp.checkCanFinish();
             currentLambda = saveLambda;
             canFinishTracker = oldTracker;
@@ -225,28 +223,21 @@ public class PushApply extends ExpVisitor<Expression,Void>
         boolean ignoreThisFork;
 
         boolean dependencyAddedThisFork;
-        ArrayList<HashSet<LambdaExp>> dependenciesAtForkStart;
-        ArrayList<HashSet<LambdaExp>> dependenciesPreviousForks;
+        CanFinishMap dependenciesAtForkStart;
+        CanFinishMap dependenciesPreviousForks;
     }
 
     CanFinishTracker canFinishTracker;
 
-    private static ArrayList<HashSet<LambdaExp>> cloneDeps(ArrayList<HashSet<LambdaExp>> deps) {
-        ArrayList<HashSet<LambdaExp>> result = new ArrayList<HashSet<LambdaExp>>();
-        for (HashSet<LambdaExp> x : deps)
-            result.add((HashSet<LambdaExp>) x.clone());
-        return result;
-    }
-
-    private static ArrayList<HashSet<LambdaExp>> canFinishDeps(CanFinishTracker outer) {
+    private static CanFinishMap canFinishDeps(CanFinishTracker outer) {
         if (outer.dependenciesAtForkStart == null)
-            outer.dependenciesAtForkStart = cloneDeps(canFinishDeps(outer.outer));
+            outer.dependenciesAtForkStart = canFinishDeps(outer.outer).clone();
         return outer.dependenciesAtForkStart;
     }
 
-    ArrayList<HashSet<LambdaExp>> canFinishDeps() {
+    CanFinishMap canFinishDeps() {
         if (currentLambda.canFinishCondition == null)
-            currentLambda.canFinishCondition = cloneDeps(canFinishDeps(canFinishTracker));
+            currentLambda.canFinishCondition = canFinishDeps(canFinishTracker).clone();
         return currentLambda.canFinishCondition;
     }
     
@@ -270,10 +261,11 @@ public class PushApply extends ExpVisitor<Expression,Void>
         } else {
             canFinishTracker.ignoreThisFork = false;
             canFinishTracker.dependencyAddedThisFork = false;
-            if (canFinishTracker.dependenciesPreviousForks == null)
+            if (canFinishTracker.dependenciesPreviousForks == null
+                || canFinishTracker.dependenciesPreviousForks == CanFinishMap.CANNOT_FINISH)
                 canFinishTracker.dependenciesPreviousForks = curLambda.canFinishCondition;
-            else {
-                canFinishTracker.dependenciesPreviousForks.addAll(curLambda.canFinishCondition);
+            else if (curLambda.canFinishCondition != CanFinishMap.CANNOT_FINISH) {
+                canFinishTracker.dependenciesPreviousForks.addPaths(curLambda.canFinishCondition);
             }
             curLambda.canFinishCondition = null;
         }

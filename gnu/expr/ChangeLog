@@ -1,3 +1,18 @@
+2013-03-28  Per Bothner  <per@bothner.com>
+
+	Refactor the data structures used by the can-finish analysis.
+	The basic algorithm is the same, but the new data structure uses
+	much less memory: Instead of a set (Arraylist) of a set (HashSet)
+	of LambdaExp, we have a Map from a LambdaExp to set, where the
+	set is compactly represented by an IntNum.
+	* CanFinishMap.java: New class - basically a map from LambdaExp
+	to a bitstring.
+	* Makefile.am: Add new file.
+	* LambdaExp.java (CAN_FINISH, CANNOT_FINISH): Moved to CanFinishMap.
+	* LambdaExp.java: Update for some logic moved to CanFinishMap.
+	* PushApply.java: Likewise.
+	* InlineCalls.java: Likewise.
+
 2013-03-23  Per Bothner  <per@bothner.com>
 
 	* ClassExp.java (declareParts): Fix logic error with modifiers.

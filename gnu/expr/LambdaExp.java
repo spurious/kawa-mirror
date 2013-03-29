@@ -285,18 +285,14 @@ public class LambdaExp extends ScopeExp
   { return getCallConvention() >= Compilation.CALL_WITH_CONSUMER; }
 
     /** This function can finish if specified functions can finish.
-     * I.e. call this function can complete normally is there is some i
-     * such that all members of canFinishDependencies.get(i) can finish.
+     * I.e. calling this function can complete normally is there is a bit i
+     * such that for all LambdaExp l the mask canFinishCondition.get(l)
+     * bit a zero value for bit i.
      * May be null if there is no dependency yet in the current execution
      * path fork, in which case PushApply.canFinishDeps will realize it.
      * This value is calculated during PushApply and used in InlineCalls.
      */
-    ArrayList<HashSet<LambdaExp>> canFinishCondition;
-
-    static ArrayList<HashSet<LambdaExp>> CAN_FINISH = new ArrayList();
-    static { CAN_FINISH.add(new HashSet<LambdaExp>()); }
-
-    static ArrayList<HashSet<LambdaExp>> CANNOT_FINISH = new ArrayList();
+    CanFinishMap canFinishCondition;
 
     /** Set of functions whose canFinishCondition may depend on this. */
     Set<LambdaExp> canFinishListeners;
@@ -312,22 +308,13 @@ public class LambdaExp extends ScopeExp
     }
 
     void checkCanFinish() {
-        ArrayList<HashSet<LambdaExp>> cond = canFinishCondition;
+        CanFinishMap cond = canFinishCondition;
         if (cond != null && ! getFlag(LambdaExp.IN_EXPWALKER)) {
             // See if we can simplify exp.canFinishCondition.
             // I.e. if any dependencies are now CAN_FINISH.
-            for (Set<LambdaExp> set : cond) {
-                Iterator<LambdaExp> callees = set.iterator();
-                while (callees.hasNext()) {
-                    LambdaExp callee = callees.next();
-                    if (callee.canFinishCondition == LambdaExp.CAN_FINISH)
-                        callees.remove();
-                }
-                if (set.isEmpty()) {
-                    canFinishCondition = LambdaExp.CAN_FINISH;
-                    notifyCanFinish();
-                    return;
-                }
+            if (cond.canFinish()) {
+                canFinishCondition = CanFinishMap.CAN_FINISH;
+                notifyCanFinish();
             }
         }
     }

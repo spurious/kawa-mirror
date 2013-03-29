@@ -612,7 +612,7 @@ public class InlineCalls extends ExpExpVisitor<Type> {
       }
     if (exp.getClass() == LambdaExp.class)
       {
-          if (exp.canFinishCondition != LambdaExp.CAN_FINISH
+          if (exp.canFinishCondition != CanFinishMap.CAN_FINISH
               && exp.canFinishCondition != null) {
               exp.setReturnType(Type.neverReturnsType);
           }

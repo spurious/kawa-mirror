@@ -50,21 +50,21 @@ public class ChainLambdas extends ExpExpVisitor<ScopeExp> {
     }
 
     protected Expression visitApplyExp(ApplyExp exp, ScopeExp scope) {
-        Expression e = visit(exp.func, scope);
+        Expression f = visit(exp.func, scope);
         Expression[] args = exp.args;
         int nargs = args.length;
-        exp.func = e;
-        if (e.neverReturns()) {
+        exp.func = f;
+        if (f.neverReturns()) {
             maybeWarnUnreachable(nargs > 0 ? args[0] : exp);
-            return e;
+            return f;
         }
         for (int i = 0; i < nargs;  i++) {
-            e = visit(args[i], scope);
+            Expression e = visit(args[i], scope);
             if (e.neverReturns()
                 // It seems best to silently allow converting never-returns
                 // to any type.  For example it useful for stub procedures
                 // that throw an "unimplemented" exception.
-                && ! (e.valueIfConstant() instanceof Convert)) {
+                && ! (f.valueIfConstant() instanceof Convert)) {
                 Expression[] xargs = new Expression[i+2];
                 xargs[0] = exp.func;
                 System.arraycopy(args, 0, xargs, 1, i+1);

@@ -1,3 +1,8 @@
+2013-05-11  Per Bothner  <per@bothner.com>
+
+	* Format.java (formatToWriter): Use ParseFormat.asFormat rather than
+	apply1.
+
 2013-03-18  Per Bothner  <per@bothner.com>
 
 	* ParseFormat.java (parseFormat): Fix some missing read calls

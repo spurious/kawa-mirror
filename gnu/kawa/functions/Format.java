@@ -37,7 +37,7 @@ public class Format extends ProcedureN
         else
           {
             if (! (format instanceof ReportFormat))
-              format = ParseFormat.parseFormat.apply1(format);
+              format = ParseFormat.asFormat(format, '~');
 	    ((ReportFormat) format).format(vals, 0, dst, null);
 	  }
       }

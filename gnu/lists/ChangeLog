@@ -1,3 +1,9 @@
+2013-05-11  Per Bothner  <per@bothner.com>
+
+	* PrintConsumer.java (write): If range is empty, write empty String.
+	Thus delimiter actions done for any string get done.
+	(append): Don't use loop - use above version of write instead.
+
 2013-03-04  Per Bothner  <per@bothner.com>
 
 	* Strings.java (printQuoted): Generalize to Appendable.

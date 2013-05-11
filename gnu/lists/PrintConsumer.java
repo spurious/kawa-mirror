@@ -59,10 +59,8 @@ public class PrintConsumer extends PrintWriter
 
   public PrintConsumer append (CharSequence csq, int start, int end)
   {
-    if (csq == null)
-      csq = "null";
-    for (int i = start; i < end;  i++)
-      append(csq.charAt(i));
+      write(csq == null ? "null" : csq,
+            start, end);
     return this;
   }
   /* #endif */
@@ -70,6 +68,8 @@ public class PrintConsumer extends PrintWriter
   /* #ifdef use:java.lang.CharSequence */
   public void write (CharSequence csq, int start, int end)
   {
+    if (start==end)
+      csq = "";
     if (csq instanceof String)
       write((String) csq, start, end);
     else

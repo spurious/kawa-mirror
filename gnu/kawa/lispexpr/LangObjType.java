@@ -203,27 +203,6 @@ public class LangObjType extends ObjectType implements TypeValue
         if (other == typeClassType)
           return 1;
         break;
-      case INTEGER_TYPE_CODE:
-        if (other instanceof PrimType)
-          {
-            char sig1 = other.getSignature().charAt(0);
-            switch (sig1)
-              {
-              case 'I': case 'J':  case 'S':  case 'B':
-                return 1;
-              }
-          }
-      case DFLONUM_TYPE_CODE:
-      case REAL_TYPE_CODE:
-        if (other instanceof PrimType)
-          {
-            char sig1 = other.getSignature().charAt(0);
-            switch (sig1)
-              {
-              case 'D': case 'F':
-                return 1;
-              }
-          }
       }
     return getImplementationType().compare(other.getImplementationType());
   }

@@ -4,7 +4,8 @@ import gnu.bytecode.ClassType;
 import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.lists.FString;
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ClassMethods extends Procedure2
 {
@@ -50,20 +51,20 @@ public class ClassMethods extends Procedure2
     return result;
   }
 
-  private static int removeRedundantMethods(Vector methods)
+  private static int removeRedundantMethods(List<Method> methods)
   {
     // Remove over-ridden methods.
     int mlength = methods.size();
   loopi:
     for (int i = 1;  i < mlength; )
     {
-      Method method1 = (Method) methods.elementAt(i);
+      Method method1 = (Method) methods.get(i);
       ClassType class1 = method1.getDeclaringClass();
       Type[] types1 = method1.getParameterTypes();
       int tlen = types1.length;
       for (int j = 0;  j < i;  j++)
 	{
-	  Method method2 = (Method) methods.elementAt(j);
+	  Method method2 = (Method) methods.get(j);
 	  Type[] types2 = method2.getParameterTypes();
 	  if (tlen != types2.length)
 	    continue;
@@ -82,8 +83,8 @@ public class ClassMethods extends Procedure2
 	  if (k >= 0)
 	    continue;
 	  if (class1.isSubtype(method2.getDeclaringClass()))
-	    methods.setElementAt(method1, j);
-	  methods.setElementAt(methods.elementAt(mlength - 1), i);
+              methods.set(j, method1);
+	  methods.set(i, methods.get(mlength - 1));
 	  mlength--;
 	  // Re-do current i, since methods[i] replaced.
 	  continue loopi;
@@ -93,66 +94,63 @@ public class ClassMethods extends Procedure2
     return mlength;
   }
     
-  /** Return the methods of a class with the specified name and flag.
-   * @param caller if non-null, check that methods are accessible in it.
-   * @return an array containing the methods.
-   */
-  public static PrimProcedure[] getMethods(ObjectType dtype, String mname,
-                                           char mode,
-                                           ClassType caller,
-                                           Language language)
-  {
-    // FIXME kludge until we handle "language types".
-    if (dtype == Type.tostring_type)
-      dtype = Type.string_type;
-    MethodFilter filter = new MethodFilter(mname, 0, 0, caller,
-                                           mode == 'P' ? null : dtype);
-    boolean named_class_only = mode == 'P' || "<init>".equals(mname);
-    Vector methods = new Vector();
-    ParameterizedType ptype;
-    ObjectType rtype;
-    if (dtype instanceof ParameterizedType) {
-	ptype = (ParameterizedType) dtype;
-	rtype = ptype.getRawType();
-    }
-    else {
-	ptype = null;
-	rtype = dtype;
-    }
-    rtype.getMethods(filter, named_class_only ? 0 : 2, methods);
-    if (! named_class_only &&
-        // If not redundant (i.e. not a normal ClassType), also search Object.
-        ! (dtype instanceof ClassType && ! dtype.isInterface()))
-      Type.pointer_type.getMethods(filter, 0, methods);
-    int mlength = (named_class_only ? methods.size()
-		   : removeRedundantMethods(methods));
+    /** Return the methods of a class with the specified name and flag.
+     * @param caller if non-null, check that methods are accessible in it.
+     * @return an array containing the methods.
+     */
+    public static PrimProcedure[] getMethods(ObjectType dtype, String mname,
+                                             char mode,
+                                             ClassType caller,
+                                             Language language) {
+        // FIXME kludge until we handle "language types".
+        if (dtype == Type.tostring_type)
+            dtype = Type.string_type;
+        MethodFilter filter = new MethodFilter(mname, 0, 0, caller,
+                                               mode == 'P' ? null : dtype);
+        boolean named_class_only = mode == 'P' || "<init>".equals(mname);
+        ArrayList<Method> methods = new ArrayList<Method>();
+        ParameterizedType ptype;
+        ObjectType rtype;
+        if (dtype instanceof ParameterizedType) {
+            ptype = (ParameterizedType) dtype;
+            rtype = ptype.getRawType();
+        } else {
+            ptype = null;
+            rtype = dtype;
+        }
+        rtype.getMethods(filter, named_class_only ? 0 : 2, methods);
+        if (! named_class_only &&
+            // If not redundant (i.e. not a normal ClassType),
+            // also search Object.
+            ! (dtype instanceof ClassType && ! dtype.isInterface()))
+            Type.pointer_type.getMethods(filter, 0, methods);
 
-    PrimProcedure[] result = new PrimProcedure[mlength];
-    int count = 0;
-    for (int i = mlength;  --i >= 0; )
-    {
-      Method method = (Method) methods.elementAt(i);
-      if (! named_class_only)
-        {
-          ClassType mdclass = method.getDeclaringClass();
-          if (mdclass != dtype)
-            {
-              Type itype = dtype.getImplementationType();
-              if (itype instanceof ClassType
-                  && ! (((ClassType) itype).isInterface()
-                        && mdclass == Type.objectType))
-                {
-                  // Override declared type of method so it matches receiver,
-                  // like javac does, for improved binary compatibility.
-                  method = new Method(method, (ClassType) itype);
+        int mlength = (named_class_only ? methods.size()
+                       : removeRedundantMethods(methods));
+        PrimProcedure[] result = new PrimProcedure[mlength];
+        int count = 0;
+        for (int i = mlength;  --i >= 0; ) {
+            Method method = methods.get(i);
+            PrimProcedure pproc
+                = new PrimProcedure(method, mode, language, ptype);
+            if (! named_class_only) {
+                ClassType mdclass = method.getDeclaringClass();
+                if (mdclass != dtype) {
+                    Type itype = dtype.getImplementationType();
+                    if (itype instanceof ClassType
+                        && ! (((ClassType) itype).isInterface()
+                              && mdclass == Type.objectType)) {
+                        // Override declared type of method so it matches
+                        // receiver, like javac does, for improved binary
+                        // compatibility.
+                        pproc.setMethodForInvoke(new Method(method, (ClassType) itype));
+                    }
                 }
             }
+            result[count++] = pproc;
         }
-      PrimProcedure pproc = new PrimProcedure(method, mode, language, ptype);
-      result[count++] = pproc;
+        return result;
     }
-    return result;
-  }
 
   /** Re-order the methods such that the ones that are definite
    * applicable (all argtypes is subset of parameter type) are first;

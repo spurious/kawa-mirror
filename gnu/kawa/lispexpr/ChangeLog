@@ -1,3 +1,10 @@
+2013-05-11  Per Bothner  <per@bothner.com>
+
+	* LangObjType.java (compare):  Remove special handing for
+	integerType, dflonumType, realType. No longer needed thanks
+	to 2010-10-06 changes to PrimType.java.	This fixes
+	Savannah bug #38891 "Wrong warning with literal double value".
+
 2013-03-20  Per Bothner  <per@bothner.com>
 
 	* ReaderExtendedLiteral.java: Add support for printf-style '%'

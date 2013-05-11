@@ -2069,24 +2069,26 @@ public class LambdaExp extends ScopeExp
     return bodyFirst;
   }
 
-  /** Check if argument is a this(...) or super(...) initializtion.
-   * If so, return return the corresponding this or super class.
-   */
-  public ClassType checkForInitCall (Expression bodyFirst)
-  {
-    ClassType calledInit = null;
-    Object value;  Expression exp;
-    if (bodyFirst instanceof ApplyExp
-        && (exp = ((ApplyExp) bodyFirst).func) instanceof QuoteExp
-        && (value = ((QuoteExp) exp).getValue()) instanceof PrimProcedure)
-      {
-        PrimProcedure pproc = (PrimProcedure) value;
-        if (pproc.isSpecial()
-            && ("<init>".equals(pproc.method.getName())))
-          calledInit = pproc.method.getDeclaringClass();
-      }
-    return calledInit;
-  }
+    /** Check if argument is a this(...) or super(...) initializtion.
+     * If so, return return the corresponding this or super class.
+     */
+    public ClassType checkForInitCall (Expression bodyFirst) {
+        ClassType calledInit = null;
+        if (bodyFirst instanceof ApplyExp) {
+            Expression exp = ((ApplyExp) bodyFirst).func;
+            if (exp instanceof QuoteExp) {
+                Object value = ((QuoteExp) exp).getValue();
+                if (value instanceof PrimProcedure) {
+                    PrimProcedure pproc = (PrimProcedure) value;
+                    Method meth = pproc.getMethod();
+                    if (pproc.isSpecial()
+                        && ("<init>".equals(meth.getName())))
+                        calledInit = meth.getDeclaringClass();
+                }
+            }
+        }
+        return calledInit;
+    }
 }
 
 class Closure extends MethodProc

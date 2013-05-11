@@ -10,37 +10,49 @@ import java.io.Writer;
 
 /** A primitive Procedure implemented by a plain Java method. */
 
-public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
-{
-  Type retType;
-  /** The types of the method parameters.
-   * If known, the types have been coerced to Language-specific parameters.
-   * Does not include the implicit static link argument of some constructors.
-   */
-  Type[] argTypes;
-  Method method;
-  int op_code;
-  /** 'P' means use invokespecial;
-   * 'V' means expect a target (this) argument, even if method is static;
-   * '\0' means don't expect a target. */
-  char mode;
-  boolean sideEffectFree;
+public class PrimProcedure extends MethodProc implements Inlineable {
+    private Type retType;
 
-  /** If non-null, the LambdaExp that this PrimProcedure implements. */
-  LambdaExp source;
+    /** The types of the method parameters.
+     * If known, the types have been coerced to Language-specific parameters.
+     * Does not include the implicit static link argument of some constructors.
+     */
+    private Type[] argTypes;
 
-  java.lang.reflect.Member member;
+    private Method method;
 
-  public final int opcode() { return op_code; }
+    /** Actual method to invoke. Normally same as method.
+     * However, may have declaring class of the actual caller. 
+     * This is similar to what javac does for improved binary compatibility. */
+    private Method methodForInvoke;
 
-  public Type getReturnType () { return retType; }
-  public void setReturnType (Type retType) { this.retType = retType; }
+    private int op_code;
+    /** 'P' means use invokespecial;
+     * 'V' means expect a target (this) argument, even if method is static;
+     * '\0' means don't expect a target. */
+    private char mode;
+    private boolean sideEffectFree;
 
-  public boolean isSpecial() { return mode == 'P'; }
+    /** If non-null, the LambdaExp that this PrimProcedure implements. */
+    private LambdaExp source;
 
-  public Type getReturnType (Expression[] args) { return retType; }
+    private java.lang.reflect.Member member;
 
-  public Method getMethod () { return method; }
+    public final int opcode() { return op_code; }
+
+    public Type getReturnType () { return retType; }
+    public void setReturnType (Type retType) { this.retType = retType; }
+
+    public boolean isSpecial() { return mode == 'P'; }
+
+    public Type getReturnType (Expression[] args) { return retType; }
+
+    public Method getMethod () { return method; }
+
+    public void setMethodForInvoke(Method m) {
+        methodForInvoke = m;
+        setOpcode(m);
+    }
 
   public boolean isSideEffectFree ()
   {
@@ -402,28 +414,31 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
       }
   }
   
+    private void setOpcode(Method m) {
+        int flags = m.getModifiers();
+        if ((flags & Access.STATIC) != 0)
+            this.op_code = 184;  // invokestatic
+        else {
+            ClassType mclass = m.getDeclaringClass();
+            if (mode == 'P')
+                this.op_code = 183;  // invokespecial
+            else {
+                mode = 'V';
+                if ("<init>".equals(m.getName()))
+                    this.op_code = 183;  // invokespecial
+                else if ((mclass.getModifiers() & Access.INTERFACE) != 0)
+                    this.op_code = 185;  // invokeinterface
+                else
+                    this.op_code = 182;  // invokevirtual
+            }
+        }
+    }
+
   private void init(Method method)
   {
     this.method = method;
-    int flags = method.getModifiers();
-    if ((flags & Access.STATIC) != 0)
-      this.op_code = 184;  // invokestatic
-    else
-      {
-	ClassType mclass = method.getDeclaringClass();
-	if (mode == 'P')
-	  this.op_code = 183;  // invokespecial
-        else
-          {
-            mode = 'V';
-            if ("<init>".equals(method.getName()))
-              this.op_code = 183;  // invokespecial
-            else if ((mclass.getModifiers() & Access.INTERFACE) != 0)
-              this.op_code = 185;  // invokeinterface
-            else
-              this.op_code = 182;  // invokevirtual
-          }
-      }
+    this.methodForInvoke = method;
+    setOpcode(method);
     Type[] mtypes = method.getParameterTypes();
     if (isConstructor() && method.getDeclaringClass().hasOuterLink())
       {
@@ -472,6 +487,7 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
     this.op_code = op_code;
     method = classtype.addMethod (name, op_code == 184 ? Access.STATIC : 0,
 				  argTypes, retType);
+    methodForInvoke = method;
     this.retType = retType;
     this.argTypes= argTypes;
     mode = op_code == 184 ? '\0' : 'V';
@@ -600,7 +616,7 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
   public void compile (ApplyExp exp, Compilation comp, Target target)
   {
     gnu.bytecode.CodeAttr code = comp.getCode();
-    ClassType mclass = method == null ? null : method.getDeclaringClass();
+    ClassType mclass = method == null ? null : methodForInvoke.getDeclaringClass();
     Expression[] args = exp.getArgs();
     if (isConstructor())
       {
@@ -697,7 +713,7 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
       }
     else
       {
-        compileInvoke(comp, method, target,
+        compileInvoke(comp, methodForInvoke, target,
                       exp.isTailCall(), op_code, stackType);
       }
   }

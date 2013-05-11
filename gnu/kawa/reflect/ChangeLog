@@ -1,3 +1,12 @@
+2013-05-11  Per Bothner  <per@bothner.com>
+
+	* ClassMethods.java (getMethods): Instead of replacing Method with
+	declaring-class-adjusted method, pass both to PrimProcedure.
+	Specifically use the initial method for overload resolution and
+	only use the adjusted method for code-generation.
+
+	* ClassMethods.java: Update to use Java2 List with generics.
+
 2012-12-15  Per Bothner  <per@bothner.com>
 
 	* Throw.java: Moved from kawa/standard/prim_throw.

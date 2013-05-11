@@ -1,3 +1,14 @@
+2013-05-11  Per Bothner  <per@bothner.com>
+
+	* PrimProcedure.java (methodForInvoke): New field.  Use this Method
+	for code-generation, whiling using 'method' field for type-checking.
+	This fixes Savannah bug #38890 "Wrong more than one
+	applicable method warning".
+	(setMethodForInvoke, setOpcode): New methods.
+
+	* PrimProcedure.java: Make various fields private.
+	* LambdaExp.java (checkForInitCall): Use PrimProcedure#getMethod.
+
 2013-05-06  Per Bothner  <per@bothner.com>
 
 	* ChainLambdas.java (visitApplyExp): Fix thinko - incorrect

@@ -1,3 +1,9 @@
+2013-05-10  Per Bothner  <per@bothner.com>
+
+	* syntax.scm (%string-format-arg): Fix thinko - missing dot in list.
+	(%string-format-enclosed-format): Remove never-reached case.
+	(%string-format-enclosed-args): Likewise.
+
 2013-03-25  Per Bothner  <per@bothner.com>
 
 	* syntax.scm (define-simple-constructor): New macro, for SRFI-108.

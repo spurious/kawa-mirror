@@ -273,6 +273,7 @@
 
 ;; Helper macros for $string$:
 ;; Collect format string (assuming we're *not* inside $<<$ ... $>>$)
+;; Returns list of format string fragments, to be concatenated.
 (define (%string-format-format forms)
   (syntax-case forms ($format$ $<<$ $>>$)
     (() '())
@@ -287,15 +288,14 @@
            (%string-format-format #'rest)))))
 
 ;; Collect format string, assuming we're inside $<<$ ... $>>$
+;; Returns list of format string fragments, to be concatenated.
 (define (%string-format-enclosed-format forms)
   (syntax-case forms ($<<$ $>>$)
     (() '())
     (($>>$ . rest)
      (%string-format-format #'rest))
     ((arg1 . rest)
-     (cons "~a" (%string-format-enclosed-format #'rest)))
-    ((x . rest)
-     (%string-format-enclosed-format #'rest))))
+     (cons "~a" (%string-format-enclosed-format #'rest)))))
 
 ;; Collect format arguments (assuming we're *not* inside $<<$ ... $>>$)
 (define (%string-format-args forms)
@@ -304,7 +304,7 @@
     (($<<$ . rest)
      (%string-format-enclosed-args #'rest))
     ((($format$ fstr arg ...) . rest)
-     #`(arg ... #,(%string-format-args #'rest)))
+     #`(arg ... . #,(%string-format-args #'rest)))
     ((x . rest)
      (%string-format-args #'rest))))
                          
@@ -315,9 +315,7 @@
     (($>>$ . rest)
      (%string-format-args #'rest))
     ((arg . rest)
-     #`(arg . #,(%string-format-enclosed-args #'rest)))
-    ((x . rest)
-     (%string-format-args #'rest))))
+     #`(arg . #,(%string-format-enclosed-args #'rest)))))
 
 (define-syntax $string$
   (lambda (form)

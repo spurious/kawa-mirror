@@ -1,3 +1,9 @@
+2013-05-12  Per Bothner  <per@bothner.com>
+
+	* ReaderExtendedLiteral.java (readContent): Generalize handling
+	of format specifiers to allow multiple specifiers in a row, and
+	to allow leaving out an empty enclosed expression-list.
+
 2013-05-11  Per Bothner  <per@bothner.com>
 
 	* LangObjType.java (compare):  Remove special handing for

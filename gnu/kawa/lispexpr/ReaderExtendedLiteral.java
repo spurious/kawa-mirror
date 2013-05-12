@@ -213,18 +213,20 @@ public class ReaderExtendedLiteral extends ReaderConstituent {
                 else if (next == '~' || next == '%') {
                     boolean sawQuote = false;
                     boolean printfStyle = next == '%';
-                    for (;;) {
+                    boolean needEnclosed;
+                    int magic = next;
+                    for (;;) { 
                         reader.tokenBufferAppend(next);
                         next = reader.read();
-                        if (next == '\'')
-                            sawQuote = true;
-                        else if (sawQuote)
-                            sawQuote = false;
-                        // FIXME should ~Newline (ignored Newline) be allowed?
-                        else if (next < 0 || next == '\n') {
+                        if (next < 0 || next == '\n') {
                             reader.error('e', "non-terminated format specifier");
+                            needEnclosed = false;
                             break;
                         }
+                        if (sawQuote)
+                            sawQuote = false;
+                        else if (next == '\'' && magic == '~')
+                            sawQuote = true;
                         // Prefix characters allowed in a format directive.
                         // We should probably be more restrictive.
                         else if ((next >= '0' && next <= '9')
@@ -236,13 +238,18 @@ public class ReaderExtendedLiteral extends ReaderConstituent {
                                         || next == ':' || next == '@')))
                             ; // prefix directive part
                         else {
+                            // next is (hopefully) a directive character
                             reader.tokenBufferAppend(next);
-                            next = reader.peek();
-                            if (next == '[' || next == '(')
-                                reader.skip();
-                            else
-                                reader.error('e', "expected '(' or '[' after format specifier");
-                            break;
+                            next = reader.read();
+                            if (next == '[' || next == '(') {
+                                needEnclosed = true;
+                                break;
+                            } else if (next != magic) {
+                                reader.unread(next);
+                                needEnclosed = false;
+                                break;
+                            }
+                            // if next==magic continue to read next specifier.
                         }
                     }
                     String fmt = reader.tokenBufferString();
@@ -252,7 +259,8 @@ public class ReaderExtendedLiteral extends ReaderConstituent {
                     Object fun = printfStyle ? sprintfSymbol : formatSymbol;
                     Pair fhead = reader.makePair(fun, ffmt,
                                                  line, column);
-                    readEnclosed(reader, rtable, ffmt, next, endDelimiter);
+                    if (needEnclosed)
+                        readEnclosed(reader, rtable, ffmt, next, endDelimiter);
                     item = fhead;
                 }
                 else {

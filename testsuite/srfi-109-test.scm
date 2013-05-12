@@ -144,9 +144,38 @@ b}
          '($string$ "abc  def klm")
          "abc  def klm")
 
+(strtest &{m&[3]&[4]n}
+         '($string$ "m" $<<$ 3 $>>$ $<<$ 4 $>>$ "n")
+         "m3 4n")
+
 ;; Some tests using format
 (strtest &{abc&~3d(+ 4 5)z}
          '($string$ "abc" ($format$ "~3d" (+ 4 5)) "z")
          "abc  9z")
+
+(strtest &{A&~{[]<&[[5 6 7]]>&~}[]Z}
+         '($string$ "A" ($format$ "~{") "<" $<<$ ($bracket-list$ 5 6 7)
+                    $>>$ ">" ($format$ "~}") "Z")
+         "A<5><6><7>Z")
+
+;; Same as above, but with ellided empty []
+(strtest &{A&~{<&[[5 6 7]]>&~}Z}
+         '($string$ "A" ($format$ "~{") "<" $<<$ ($bracket-list$ 5 6 7)
+                    $>>$ ">" ($format$ "~}") "Z")
+         "A<5><6><7>Z")
+
+(strtest &{[&~{&[[5 6 7]]&~^_&~}]}
+         '($string$ "[" ($format$ "~{") $<<$ ($bracket-list$ 5 6 7)
+                    $>>$ ($format$ "~^") "_" ($format$ "~}") "]")
+         "[5_6_7]")
+
+(strtest &{[&~{&[[]]&~^_&~}]}
+         '($string$ "[" ($format$ "~{") $<<$ ($bracket-list$)
+                    $>>$ ($format$ "~^") "_" ($format$ "~}") "]")
+         "[]")
+
+(strtest &{_&~4t~w["qwerty"]_}
+         '($string$ "_" ($format$ "~4t~w" "qwerty") "_")
+         &{_   "qwerty"_})
 
 (test-end)

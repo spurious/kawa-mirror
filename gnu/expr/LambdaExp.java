@@ -1214,7 +1214,7 @@ public class LambdaExp extends ScopeExp
         if (decl == firstArgsArrayArg && argsArray != null)
           {
             getVarScope().addVariable(argsArray);
-          } 
+          }
         if (! getInlineOnly()
             && getCallConvention() >= Compilation.CALL_WITH_CONSUMER
             && (firstArgsArrayArg == null ? decl == null
@@ -1454,8 +1454,7 @@ public class LambdaExp extends ScopeExp
 		defaultStart = 0;
 	      }
 	  }
-        if (param.ignorable())
-          continue;
+        boolean ignorable = param.ignorable();
 	if (plainArgs >= 0 || ! param.isSimple()
 	    || param.isIndirectBinding())
 	  {
@@ -1466,102 +1465,131 @@ public class LambdaExp extends ScopeExp
 	    // slot in the heapFrame.  Thus we emit an aaload instruction.
 	    // Unfortunately, it expects the new value *last*,
 	    // so first push the heapFrame array and the array index.
-	    if (!param.isSimple ())
+	    if (!param.isSimple () && ! ignorable)
 	      param.loadOwningObject(null, comp);
 	    // This part of the code pushes the incoming argument.
 	    if (plainArgs < 0)
 	      {
 		// Simple case:  Use Incoming register.
-		code.emitLoad(param.getVariable());
+                if (! ignorable)
+		  code.emitLoad(param.getVariable());
 	      }
             else if (i < min_args)
 	      { // This is a required parameter, in argsArray[i].
-		code.emitLoad(argsArray);
-		code.emitPushInt(i);
-		code.emitArrayLoad(Type.objectType);
+                if (! ignorable)
+                  {
+                    code.emitLoad(argsArray);
+                    code.emitPushInt(i);
+                    code.emitArrayLoad(Type.objectType);
+                  }
 	      }
             else if (i < min_args + opt_args)
 	      { // An optional parameter
-		code.emitPushInt(i - plainArgs);
-                code.emitLoad(argsArray);
-		code.emitArrayLength();
-		code.emitIfIntLt();
-                code.emitLoad(argsArray);
-		code.emitPushInt(i - plainArgs);
-		code.emitArrayLoad();
-		code.emitElse();
-		param.getInitValue().compile(comp, paramType);
-		code.emitFi();
+                Expression defaultArg = param.getInitValue();
+                if (! ignorable || ! (defaultArg instanceof QuoteExp))
+                  {
+                    code.emitPushInt(i - plainArgs);
+                    code.emitLoad(argsArray);
+                    code.emitArrayLength();
+                    code.emitIfIntLt();
+                    if (! ignorable)
+                      {
+                        code.emitLoad(argsArray);
+                        code.emitPushInt(i - plainArgs);
+                        code.emitArrayLoad();
+                      }
+                    code.emitElse();
+                    if (ignorable)
+                      defaultArg.compile(comp, Target.Ignore);
+                    else
+                      defaultArg.compile(comp, paramType);
+                    code.emitFi();
+                  }
 	      }
 	    else if (max_args < 0 && i == min_args + opt_args)
 	      {
 		// This is the "rest" parameter (i.e. following a "."):
 		// Convert argsArray[i .. ] to a list.
-		code.emitLoad(argsArray);
-		code.emitPushInt(i - plainArgs);
-		code.emitInvokeStatic(Compilation.makeListMethod);
+                if (! ignorable)
+                  {
+                    code.emitLoad(argsArray);
+                    code.emitPushInt(i - plainArgs);
+                    code.emitInvokeStatic(Compilation.makeListMethod);
+                  }
 		stackType = Compilation.scmListType;
               }
 	    else
 	      { // Keyword argument.
-		code.emitLoad(argsArray);
-		code.emitPushInt(min_args + opt_args - plainArgs);
-		comp.compileConstant(keywords[key_i++]);
+                Keyword keyword = keywords[key_i++];
 		Expression defaultArg = param.getInitValue();
-                Type boxedParamType = paramType instanceof PrimType
-                    ? ((PrimType) paramType).boxedType()
-                    : paramType;
+                if (! ignorable || ! (defaultArg instanceof QuoteExp))
+                {
+                    code.emitLoad(argsArray);
+                    code.emitPushInt(min_args + opt_args - plainArgs);
+                    comp.compileConstant(keyword);
+                    Type boxedParamType = paramType instanceof PrimType
+                        ? ((PrimType) paramType).boxedType()
+                        : paramType;
 
-		// We can generate better code if the defaultArg expression
-		// has no side effects.  For simplicity and safety, we just
-		// special case literals, which handles most cases.
-		if (defaultArg instanceof QuoteExp)
-		  {
-		    if (searchForKeywordMethod4 == null)
-		      {
-			Type[] argts = new Type[4];
-			argts[0] = Compilation.objArrayType;
-			argts[1] = Type.intType;
-			argts[2] = Type.objectType;
-			argts[3] = Type.objectType;
-			searchForKeywordMethod4
-			  = Compilation.scmKeywordType.addMethod
-			  ("searchForKeyword",  argts,
-			   Type.objectType, Access.PUBLIC|Access.STATIC);
-		      }
-		    defaultArg.compile(comp, boxedParamType);
-		    code.emitInvokeStatic(searchForKeywordMethod4);
-		  }
-		else
-		  {
-		    if (searchForKeywordMethod3 == null)
-		      {
-			Type[] argts = new Type[3];
-			argts[0] = Compilation.objArrayType;
-			argts[1] = Type.intType;
-			argts[2] = Type.objectType;
-			searchForKeywordMethod3
-			  = Compilation.scmKeywordType.addMethod
-			  ("searchForKeyword",  argts,
-			   Type.objectType, Access.PUBLIC|Access.STATIC);
-		      }
-		    code.emitInvokeStatic(searchForKeywordMethod3);
-		    code.emitDup(1);
-		    comp.compileConstant(Special.dfault);
-		    code.emitIfEq();
-		    code.emitPop(1);
-		    defaultArg.compile(comp, boxedParamType);
-                    paramType.emitCoerceToObject(code);
-		    code.emitFi();
-		  }
+                    // We can generate better code if the defaultArg expression
+                    // has no side effects.  For simplicity and safety, we just
+                    // special case literals, which handles most cases.
+                    if (defaultArg instanceof QuoteExp)
+                      {
+                        if (searchForKeywordMethod4 == null)
+                        {
+                            Type[] argts = new Type[4];
+                            argts[0] = Compilation.objArrayType;
+                            argts[1] = Type.intType;
+                            argts[2] = Type.objectType;
+                            argts[3] = Type.objectType;
+                            searchForKeywordMethod4
+                                = Compilation.scmKeywordType.addMethod
+                                ("searchForKeyword",  argts,
+                                 Type.objectType, Access.PUBLIC|Access.STATIC);
+                        }
+                        defaultArg.compile(comp, boxedParamType);
+                        code.emitInvokeStatic(searchForKeywordMethod4);
+                      }
+                    else
+                      {
+                        if (searchForKeywordMethod3 == null)
+                          {
+                            Type[] argts = new Type[3];
+                            argts[0] = Compilation.objArrayType;
+                            argts[1] = Type.intType;
+                            argts[2] = Type.objectType;
+                            searchForKeywordMethod3
+                                = Compilation.scmKeywordType.addMethod
+                                ("searchForKeyword",  argts,
+                                 Type.objectType, Access.PUBLIC|Access.STATIC);
+                          }
+                        code.emitInvokeStatic(searchForKeywordMethod3);
+                        if (! ignorable)
+                          code.emitDup(1);
+                        comp.compileConstant(Special.dfault);
+                        code.emitIfEq();
+                        if (ignorable)
+                          defaultArg.compile(comp, Target.Ignore);
+                        else
+                          {
+                            code.emitPop(1);
+                            defaultArg.compile(comp, boxedParamType);
+                            paramType.emitCoerceToObject(code);
+                          }
+                        code.emitFi();
+                      }
+                }
 	      }
+            if (ignorable)
+              continue;
 	    // Now finish copying the incoming argument into its
 	    // home location.
             if (paramType != stackType)
               CheckedTarget.emitCheckedCoerce(comp, this, i+1, stackType, paramType, null);
 	    if (param.isIndirectBinding())
               param.pushIndirectBinding(comp);
-	    if (param.isSimple())
+            if (param.isSimple())
               {
                 Variable var = param.getVariable();
                 if (param.isIndirectBinding())

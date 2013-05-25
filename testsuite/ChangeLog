@@ -1,3 +1,10 @@
+2013-05-25 Matthieu Vachon  <matthieu.o.vachon@gmail.com>
+	   Per Bothner  <per@bothner.com>
+
+	* misc-test.scm: Add test based on Savannah bug #39059
+	"Method keywords problem".  Also test for side effects in
+	default expressions for ignored parameters.
+
 2013-03-25  Per Bothner  <per@bothner.com>
 
 	* srfi-108-test.scm: Add some define-simple-constructor and other tests.

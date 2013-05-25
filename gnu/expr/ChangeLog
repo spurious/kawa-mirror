@@ -1,3 +1,10 @@
+2013-05-25  Per Bothner  <per@bothner.com>
+
+	* LambdaExp.java (enterFunction): Make sure key_i is incremented
+	even if a keyword parameter is ignored.  Also handle the case of
+	side effects in default expressions for ignored parameters.
+	This fixes Savannah bug #39059 "Method keywords problem".
+
 2013-05-11  Per Bothner  <per@bothner.com>
 
 	* PrimProcedure.java (methodForInvoke): New field.  Use this Method

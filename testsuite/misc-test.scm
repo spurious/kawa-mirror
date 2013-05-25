@@ -1,4 +1,4 @@
-(test-init "Miscellaneous" 208)
+(test-init "Miscellaneous" 211)
 
 ;;; DSSSL spec example 11
 (test '(3 4 5 6) (lambda x x) 3 4 5 6)
@@ -54,6 +54,20 @@
 (test #t keyword? ||:)
 (test #t keyword? (car '(a: b:)))
 (test #f keyword? "bar")
+
+;; This is Savannah bug #39059: Method keywords problem
+(define (key-1 #!key (a "default a") (b "default b") (c "default c"))
+  (list c a))
+(test '("c" "a") 'key-1 (key-1 a: "a" b: "b" c: "c"))
+
+(define key-2-counter 0)
+(define (incr-key-2-counter)
+  (set! key-2-counter (+ key-2-counter 1))
+  key-2-counter)
+(define (key-2 #!key (a "default a") (b (incr-key-2-counter)) (c "default c"))
+  (list c a key-2-counter))
+(test '("c" "a" 0) 'key-2a (key-2 a: "a" b: "b" c: "c"))
+(test '("default c" "a" 1) 'key-2b (key-2 a: "a"))
 
 ;;; DSSSL spec example 44
 (test "Argentina" keyword->string \Argentina:)

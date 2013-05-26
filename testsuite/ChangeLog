@@ -5,6 +5,14 @@
 	"Method keywords problem".  Also test for side effects in
 	default expressions for ignored parameters.
 
+2013-05-11  Matthieu Vachon  <matthieu.o.vachon@gmail.com>
+	    Per Bothner  <per@bothner.com>
+
+	* overload1.scm: New tests: Savannah bugs #38890 "Wrong more than one
+	applicable method warning" and #38891 "Wrong warning with literal
+	double value".
+	* Makefile.am: Update accordingly.
+
 2013-03-25  Per Bothner  <per@bothner.com>
 
 	* srfi-108-test.scm: Add some define-simple-constructor and other tests.

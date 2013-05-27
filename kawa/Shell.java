@@ -277,7 +277,7 @@ public class Shell
 		  }
 
 		if (! ModuleExp.evalModule(env, ctx, comp, url, perr))
-		  continue;
+		  throw new SyntaxException(messages);
                 if (out instanceof Writer)
                   ((Writer) out).flush();
 		if (ch < 0)

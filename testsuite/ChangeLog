@@ -1,3 +1,7 @@
+2013-06-02  Per Bothner  <per@bothner.com>
+
+	* inner-1.scm (next-leaf-generator): New test.
+
 2013-05-25 Matthieu Vachon  <matthieu.o.vachon@gmail.com>
 	   Per Bothner  <per@bothner.com>
 

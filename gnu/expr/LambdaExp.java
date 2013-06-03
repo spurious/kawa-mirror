@@ -202,7 +202,7 @@ public class LambdaExp extends ScopeExp
 
   void setCallersNeedStaticLink()
   {
-    LambdaExp outer = outerLambda();
+    LambdaExp outer = nameDecl.getContext().currentLambda();
     for (ApplyExp app = nameDecl.firstCall;  app != null;  app = app.nextCall)
       {
         LambdaExp caller = app.context;

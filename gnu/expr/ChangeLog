@@ -1,3 +1,8 @@
+2013-06-02  Per Bothner  <per@bothner.com>
+
+	* LambdaExp.java (setCallersNeedStaticLink): Better check for "outer"
+	lambda.  Fixed bug - see testsuite/inner-1.scm.
+
 2013-05-25  Per Bothner  <per@bothner.com>
 
 	* LambdaExp.java (enterFunction): Make sure key_i is incremented

@@ -1,5 +1,8 @@
 2013-06-02  Per Bothner  <per@bothner.com>
 
+	* InlineCalls.java (checkType): Use new Type#isCompatibleWithValue.
+	* Language.java (unionType): Some improvements.
+
 	* LambdaExp.java (setCallersNeedStaticLink): Better check for "outer"
 	lambda.  Fixed bug - see testsuite/inner-1.scm.
 

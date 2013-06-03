@@ -282,7 +282,7 @@ public class CompileInvoke
                               atype = null;
                             else
                               {
-                                atype = Type.lowestCommonSuperType(atype, ptype);
+                                atype = Language.unionType(atype, ptype);
                               }
                           }
                         if (atype == null)

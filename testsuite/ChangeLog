@@ -1,3 +1,9 @@
+2013-06-02  Matthieu Vachon  <matthieu.o.vachon@gmail.com>
+	    Per Bothner  <per@bothner.com>
+
+	* overload1.scm: Add test for Savannah bug #39047
+	"Wrong incompatible type (boolean) with expected int".
+
 2013-06-02  Per Bothner  <per@bothner.com>
 
 	* inner-1.scm (next-leaf-generator): New test.

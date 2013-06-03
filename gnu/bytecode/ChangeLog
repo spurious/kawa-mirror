@@ -1,3 +1,8 @@
+2013-06-02  Per Bothner  <per@bothner.com>
+
+	* Type.java (isCompatibleWithValue): New method.
+	(lowestCommonSuperType): Minor bullet-proofing.
+
 2013-02-10  Per Bothner  <per@bothner.com>
 
 	* Type.java (lowestCommonSuperType): Minor tweak.

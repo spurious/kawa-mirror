@@ -1,3 +1,7 @@
+2013-06-02  Per Bothner  <per@bothner.com>
+
+	* CompileInvoke.java (validateApplyInvoke): Use Language.unionType.
+
 2013-05-11  Per Bothner  <per@bothner.com>
 
 	* ClassMethods.java (getMethods): Instead of replacing Method with

@@ -882,24 +882,12 @@ public abstract class Language
       t2 = Type.javalangStringType;
     if (t1 == t2)
       return t1;
-    if (t1 instanceof PrimType && t2 instanceof PrimType)
-      {
-        char sig1 = t1.getSignature().charAt(0);
-        char sig2 = t2.getSignature().charAt(0);
-        if (sig1 == sig2)
-          return t1;
-        if ((sig1 == 'B' || sig1 == 'S' || sig1 == 'I') && (sig2 == 'I' || sig2 == 'J'))
-          return t2;
-        if ((sig2 == 'B' || sig2 == 'S' || sig2 == 'I') && (sig1 == 'I' || sig1 == 'J'))
-          return t1;
-        if (sig1 == 'F' && sig2 == 'D')
-          return t2;
-        if (sig2 == 'F' && sig1 == 'D')
-          return t1;
+    if (t1.isVoid() || t2.isVoid())
         return Type.objectType;
-      }
-    // FIXME handle class types better:
-    // Type.lowestCommonSuperType(t1, t2);
+    if (t1.isSubtype(t2))
+        return t2;
+    if (t2.isSubtype(t1))
+        return t1;
     return Type.objectType;
   }
 

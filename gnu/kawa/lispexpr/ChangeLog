@@ -1,3 +1,12 @@
+2013-06-02  Per Bothner  <per@bothner.com>
+
+	Improve handling of boolean type - specifically comparison and union.
+	This fixes Savannah bug #39047
+	"Wrong incompatible type (boolean) with expected int".
+	* LangPrimType.java (isCompatibleWithValue): New method.
+	Add special handling for boolean type.
+	(compare): Remove special handling for boolean type.
+
 2013-05-12  Per Bothner  <per@bothner.com>
 
 	* ReaderExtendedLiteral.java (readContent): Generalize handling

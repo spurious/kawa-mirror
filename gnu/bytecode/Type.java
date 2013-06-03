@@ -440,6 +440,15 @@ public abstract class Type
     return comp == -1 || comp == 0;
   }
 
+    /** If this is the target type, is a given source type compatible?
+     * Return -1 if no; 1 if yes; 0 if need to check at run-time. */
+    public int isCompatibleWithValue(Type valueType) {
+        if (this == toStringType)
+            return 1;
+        int comp = compare(valueType);
+        return comp >= 0 ? 1 : comp == -3 ? -1 : 0;
+    }
+
   /**
    * Computes the common supertype
    *
@@ -478,11 +487,15 @@ public abstract class Type
          return Type.objectType;
        ClassType c1 = (ClassType) t1;
        ClassType c2 = (ClassType) t2;
-       if (c1.isInterface() || c2.isInterface())
-         return Type.objectType;
-
-       return lowestCommonSuperType(c1.getSuperclass(), c2.getSuperclass());
+       if (! c1.isInterface() && ! c2.isInterface())
+         {
+           ClassType s1 = c1.getSuperclass();
+           ClassType s2 = c2.getSuperclass();
+           if (s1 != null && s2 != null)
+             return lowestCommonSuperType(s1, s2);
+         }
       }
+    return Type.objectType;
   }
 
   /** Return a numeric code showing "subtype" relationship:

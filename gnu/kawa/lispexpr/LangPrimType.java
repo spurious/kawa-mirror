@@ -171,28 +171,35 @@ public class LangPrimType extends PrimType implements TypeValue
       }
   }
 
-  public int compare(Type other)
-  {
-    // Anything (except void) can be converted to boolean.
-    char sig1 = getSignature().charAt(0);
-    if (other instanceof PrimType)
-      {
-	char sig2 = other.getSignature().charAt(0);
-	if (sig1 == sig2)
-	  return 0;
-	if (sig1 == 'V')
-	  return 1;
-	if (sig2 == 'V' || sig2 == 'Z')
-	  return -1;
-      }
-    if (sig1 == 'V' || sig1 == 'Z')
-      return 1;
-    if (sig1 == 'C' && other.getName().equals("gnu.text.Char"))
-      return -1;
-    if (other instanceof LangObjType)
-      return swappedCompareResult(other.compare(this));
-    return super.compare(other);
-  }
+    @Override
+    public int compare(Type other) {
+        char sig1 = getSignature().charAt(0);
+        if (sig1 == 'Z')
+            return implementationType.compare(other);
+        if (other instanceof PrimType) {
+            char sig2 = other.getSignature().charAt(0);
+            if (sig1 == sig2)
+                return 0;
+            if (sig1 == 'V')
+                return 1;
+            if (sig2 == 'V')
+                return -1;
+        }
+        if (sig1 == 'V')
+            return 1;
+        if (sig1 == 'C' && other.getName().equals("gnu.text.Char"))
+            return -1;
+        if (other instanceof LangObjType)
+            return swappedCompareResult(other.compare(this));
+        return super.compare(other);
+    }
+
+    @Override
+    public int isCompatibleWithValue(Type valueType) {
+        if (getSignature().charAt(0) == 'Z')
+            return 1;
+        return super.isCompatibleWithValue(valueType);
+    }
 
   public void emitTestIf(Variable incoming, Declaration decl, Compilation comp)
   {

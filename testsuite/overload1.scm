@@ -13,3 +13,13 @@
   (make <java.lang.Double> 3.0))
 (format #t "three: ~s~%" (test-d))
 ;; Output: three: 3.0
+
+;; Savannah bug #39047: Wrong incompatible type (boolean) with expected int
+(define-simple-class <Simple> (<Object>)
+  ((create (value :: <int>))
+   (format #t "Calling create int version with value[~a]~%" value))
+  ((create (value :: <boolean>))
+   (format #t "Calling create bool version with value[~a]~%" value)))
+(let ((simple :: <Simple> (make <Simple>)))
+  (invoke simple 'create #t))
+;; Output: Calling create bool version with value[#t]

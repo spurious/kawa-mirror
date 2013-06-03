@@ -1,3 +1,7 @@
+2013-06-02  Per Bothner  <per@bothner.com>
+
+	* conditions.scm: Minor tweaks.
+
 2013-02-23  Per Bothner  <per@bothner.com>
 
 	* printf.scm (formal-real): Add missing else for case.

@@ -41,7 +41,7 @@
 (provide 'conditions)
 
 (define-simple-class <condition-type> ()
-  (name)
+  (name ::symbol)
   (supertype)
   (fields)
   (all-fields)
@@ -52,8 +52,8 @@
    (set! (*:.all-fields (this)) all-fields))
   ((toString) :: <java.lang.String>
    (let ((sbuf (make <java.lang.StringBuffer> "#<condition-type ")))
-     (*:append sbuf name)
-     (*:append sbuf '|>|)
+     (*:append sbuf (symbol->string name))
+     (*:append sbuf ">")
      (*:toString sbuf))))
 
 (define (condition-type? obj) :: <boolean>

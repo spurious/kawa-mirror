@@ -1,4 +1,4 @@
-(test-begin "java-array" 19)
+(test-begin "java-array" 24)
 
 (define obj1 ::Object (Object))
 (define obj2 ::Object (Object))
@@ -55,5 +55,11 @@
 (test-equal (short[][] [1 2 3] [1 2 3]) (short[][] short-arr short-arr))
 
 (test-equal #f (equal? (Object[] obj1) (Object[] obj2)))
+
+(test-equal 5 (apply - (vector 10 4 1)))
+(test-equal 5 (apply - (object[] 10 4 1)))
+(test-equal 5 (apply - (integer[] 10 4 1)))
+(test-equal 5 (apply - (short[] 10 4 1)))
+(test-equal 5.0d+0 (apply - (double[] 10 4 1)))
 
 (test-end)

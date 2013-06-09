@@ -1,3 +1,9 @@
+2013-06-09  Per Bothner  <per@bothner.com>
+
+	* Apply.java (getArguments): Fix off-by-one error in optimization
+	of Object[] - noted by Jamison Hope.
+	Add support for primitive arrays.
+
 2013-05-11  Per Bothner  <per@bothner.com>
 
 	* Format.java (formatToWriter): Use ParseFormat.asFormat rather than

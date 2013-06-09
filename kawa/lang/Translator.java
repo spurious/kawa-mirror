@@ -2,10 +2,11 @@ package kawa.lang;
 import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.kawa.reflect.*;
-import gnu.bytecode.Type;
+import gnu.bytecode.ArrayClassLoader;
 import gnu.bytecode.ClassType;
 import gnu.bytecode.Field;
-import gnu.bytecode.ArrayClassLoader;
+import gnu.bytecode.Member;
+import gnu.bytecode.Type;
 import gnu.bytecode.ZipLoader;
 import gnu.text.SourceMessages;
 import gnu.lists.*;
@@ -663,14 +664,18 @@ public class Translator extends Compilation
           {
             if (scope instanceof LambdaExp
                 && scope.outer instanceof ClassExp // redundant? FIXME
-                && ((LambdaExp) scope).isClassMethod())
+                && ((LambdaExp) scope).isClassMethod()
+                && mode != 'M')
               {
                 if (decl_nesting >= ScopeExp.nesting(scope.outer))
                   break;
                 LambdaExp caller = (LambdaExp) scope;
                 ClassExp cexp = (ClassExp) scope.outer;
                 ClassType ctype = (ClassType) cexp.getClassType();
-                Object part = SlotGet.lookupMember(ctype, dname, ctype);
+                // BUG: lookupMember doesn't work if ctype
+                // is a class that hasn't been compiled yet,
+                // such that ClassExp#declareParts hasn't been called.
+                Member part = SlotGet.lookupMember(ctype, dname, ctype);
                 boolean contextStatic
                   = (caller == cexp.clinitMethod
                      || (caller != cexp.initMethod 
@@ -683,6 +688,10 @@ public class Translator extends Compilation
                                                 ctype, language);
                     if (methods.length == 0)
                       continue;
+                  }
+                else if (decl != null && ! dname.equals(part.getName()))
+                  {
+                    continue;
                   }
                 Expression part1;
                 // FIXME We're throwing away 'part', which is wasteful.

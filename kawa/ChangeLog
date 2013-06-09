@@ -1,3 +1,10 @@
+2013-06-08  Per Bothner  <per@bothner.com>
+
+	* lang/Translator.java (rewrite): When in a method and checking
+	if inherited class members are in scope, don't accept a mangled
+	match if an exact match is in the regular scope.
+	This fixes Savannah bug #39048 "Bad method call resolution?".
+
 2013-05-26  Per Bothner  <per@bothner.com>
 
 	* Shell.java (run): If evalModule fails, throw SyntaxException,

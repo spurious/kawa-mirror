@@ -1,6 +1,6 @@
 (module-static #t)
 
-(test-begin "slot-mangling" 14)
+(test-begin "slot-mangling" 15)
 
 (define slot-name 'target-axis-name)
 (define tzoffset (slot-ref (make <java.util.Date>) 'timezone-offset))
@@ -67,4 +67,17 @@
   (test-equal 15 (modulo (+ 45 tzoffset) 30)))
 
 (run-me)
+
+;; Based on Savannah bug #39048: Bad method call resolution?
+(define (target-axis-name argument)
+  (format "from top-level with argument ~a" argument))
+(let ((simple
+       (object (Base)
+               ((setTargetAxisName v::String)
+                (error "setTargetAxisName called"))
+               ((getTargetAxisName)
+                (target-axis-name "from create-simple")))))
+  (test-equal "from top-level with argument from create-simple"
+              (invoke simple 'getTargetAxisName)))
+
 (test-end)

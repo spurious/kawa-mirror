@@ -1,4 +1,4 @@
-(test-begin "java-array" 24)
+(test-begin "java-array" 28)
 
 (define obj1 ::Object (Object))
 (define obj2 ::Object (Object))
@@ -58,8 +58,12 @@
 
 (test-equal 5 (apply - (vector 10 4 1)))
 (test-equal 5 (apply - (object[] 10 4 1)))
+(test-equal 85 (apply - 100 (object[] 10 4 1)))
 (test-equal 5 (apply - (integer[] 10 4 1)))
+(test-equal 85 (apply - 100 (integer[] 10 4 1)))
 (test-equal 5 (apply - (short[] 10 4 1)))
+(test-equal 85 (apply - 100 (short[] 10 4 1)))
 (test-equal 5.0d+0 (apply - (double[] 10 4 1)))
+(test-equal 85.0d+0 (apply - 100 (double[] 10 4 1)))
 
 (test-end)

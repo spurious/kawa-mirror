@@ -120,7 +120,7 @@
             (symbol-parts (symbol "loc5" (namespace "uri5" "pre"))))
 (test-equal '("abc:def" "" "")
 	    (symbol-parts '|abc:def|))
-(test-equal '("abc:def" "" "")
+(test-equal '("def" "" "abc")
 	    (symbol-parts 'abc:def))
 
 (require 'xml)

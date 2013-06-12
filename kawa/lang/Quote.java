@@ -138,7 +138,11 @@ public class Quote extends Syntax {
                                                     part2 });
             else if (p1.getCar() instanceof SimpleSymbol
                      && part2 instanceof QuoteExp)
-              cdr = tr.getGlobalEnvironment().getSymbol(p1.getCar().toString() + ':' + ((QuoteExp) part2).getValue().toString());
+              {
+                String s1 = ((QuoteExp) part2).getValue().toString();
+                String s2 = p1.getCar().toString();
+                cdr = Symbol.makeWithUnknownNamespace(s1, s2);
+              }
             else if ((combinedName = CompileNamedPart.combineName(part1, part2)) != null)
               cdr = tr.getGlobalEnvironment().getSymbol(combinedName);
             else

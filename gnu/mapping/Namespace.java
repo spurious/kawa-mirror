@@ -113,7 +113,9 @@ public class Namespace
 	if (old instanceof Namespace)
 	  return (Namespace) old;
 	Namespace ns = new Namespace();
-        ns.setName(uri.intern());
+        if (uri != UNKNOWN_NAMESPACE)
+            uri = uri.intern();
+        ns.setName(uri);
         ns.prefix = prefix.intern();
 	nsTable.put(xname, ns);
 	return ns;
@@ -125,19 +127,22 @@ public class Namespace
     return valueOf(uri, prefix == null ? null : prefix.getName());
   }
 
-  /** Create a "placeholder" for a namespace with a known prefix
-   * but unknown uri.
-   * @see Symbol#makeWithUnknownNamespace
-   */
-  public static Namespace makeUnknownNamespace (String prefix)
-  {
-    String uri;
-    if (prefix == null || prefix == "")
-      uri = "";
-    else
-      uri = "http://kawa.gnu.org/unknown-namespace/"+prefix;
-    return Namespace.valueOf(uri, prefix);
-  }
+  public static final String UNKNOWN_NAMESPACE = new String("$unknown$");
+
+  /** A namespace with known prefix but unknown uri. */
+  public boolean isUnknownNamespace() {
+      return name == UNKNOWN_NAMESPACE;
+    }
+
+    /** Create a "placeholder" for a namespace with a known prefix
+     * but unknown uri.
+     * @see Symbol#makeWithUnknownNamespace
+     */
+    public static Namespace makeUnknownNamespace (String prefix) {
+        String uri = prefix == null || prefix == "" ? ""
+            : UNKNOWN_NAMESPACE;
+        return Namespace.valueOf(uri, prefix);
+    }
 
   public Object get (String key)
   {

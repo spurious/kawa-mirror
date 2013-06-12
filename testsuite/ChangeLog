@@ -1,3 +1,10 @@
+2013-06-11  Per Bothner  <per@bothner.com>
+
+	* eval1.scm: New file.
+	Add tests for new unknown-namespace handling with eval.
+	* Makefile.am: Update.
+	* lib-test.scm: Update for new unknown-namespace Symbol handling.
+
 2013-06-09  Per Bothner  <per@bothner.com>
 
 	* java-array-test.scm: Add some tests of apply with arrays.

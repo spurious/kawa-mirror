@@ -52,7 +52,8 @@ public class Symbol
   public final String getNamespaceURI()
   {
     Namespace ns = getNamespace();
-    return ns == null ? null : ns.getName();
+    String uri = ns == null ? null : ns.getName();
+    return uri == Namespace.UNKNOWN_NAMESPACE ? "" : uri;
   }
 
   public final String getLocalPart()
@@ -74,6 +75,11 @@ public class Symbol
     return (ns == null
 	    || (nsname = ns.getName()) == null || nsname.length() == 0);
   }
+
+    public final boolean hasUnknownNamespace() {
+        Namespace ns = getNamespace();
+        return ns != null && ns.isUnknownNamespace();
+    }
 
   /** Synonym for getName - the "print name" of the symbol without Namespace.
    * Useful when thinking of a Symbol as an XML QName. */

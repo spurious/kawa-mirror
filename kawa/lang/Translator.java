@@ -425,17 +425,18 @@ public class Translator extends Compilation
 
     if (func instanceof ReferenceExp
         && (((ReferenceExp) func).getBinding()==getNamedPartDecl))
-      {
-        Expression part1 = args[0];
-        Expression part2 = args[1];
+        return rewrite_lookup(args[0], args[1], function);
+
+    return makeApply(func, args);
+  }
+
+    public Expression rewrite_lookup(Expression part1, Expression part2, boolean function) {
         Symbol sym = namespaceResolve(part1, part2);
         if (sym != null)
           return rewrite(sym, function);
         // FIXME don't copy the args array in makeExp ...
         return CompileNamedPart.makeExp(part1, part2);
-      }
-    return makeApply(func, args);
-  }
+    }
 
   public ApplyExp makeApply (Expression func, Expression[] args)
   { 
@@ -578,28 +579,36 @@ public class Translator extends Compilation
       formStack.add(rewrite(exp, false));
   }
 
-  public Object namespaceResolve (Object name)
-  {
-    if (! (name instanceof SimpleSymbol))
-      {
+    public Object namespaceResolve(Object name) {
+        Object prefix = null;
+        Expression part2 = null;
         Pair p;
         if (name instanceof Pair
             && safeCar(p = (Pair) name) == LispLanguage.lookup_sym
             && p.getCdr() instanceof Pair
-            && (p = (Pair) p.getCdr()).getCdr() instanceof Pair)
-          {
-            Expression part1 = rewrite(p.getCar());
-            Expression part2 = rewrite(((Pair) p.getCdr()).getCar());
+            && (p = (Pair) p.getCdr()).getCdr() instanceof Pair) {
+            prefix = p.getCar();
+            part2 = rewrite(((Pair) p.getCdr()).getCar());
+        }
+        else if (name instanceof Symbol) {
+            Symbol s = (Symbol) name;
+            if (s.hasUnknownNamespace()) {
+                String loc = s.getLocalPart();
+                prefix = Symbol.valueOf(s.getPrefix());
+                part2 = QuoteExp.getInstance(Symbol.valueOf(s.getLocalPart()));
+            }
+        }
+        if (part2 != null) {
+            Expression part1 = rewrite(prefix);
             Symbol sym = namespaceResolve(part1, part2);
             if (sym != null)
-              return sym;
+                return sym;
             String combinedName = CompileNamedPart.combineName(part1, part2);
             if (combinedName != null)
-              return Namespace.EmptyNamespace.getSymbol(combinedName);
-          }
-      }
-    return name;
-  }
+                return Namespace.EmptyNamespace.getSymbol(combinedName);
+        }
+        return name;
+    }
 
   /**
    * Re-write a Scheme expression in S-expression format into internal form.
@@ -644,6 +653,13 @@ public class Translator extends Compilation
       return rewrite_pair((Pair) exp, function);
     else if (exp instanceof Symbol && ! selfEvaluatingSymbol(exp))
       {
+          Symbol s = (Symbol) exp;
+          if (s.hasUnknownNamespace()) {
+              String loc = s.getLocalPart();
+              return rewrite_lookup(rewrite(Symbol.valueOf(s.getPrefix()), false),
+                                    QuoteExp.getInstance(Symbol.valueOf(s.getLocalPart())),
+                                    function);
+          }
 	Declaration decl = lexical.lookup(exp, function);
         Declaration cdecl = null;
 
@@ -653,7 +669,7 @@ public class Translator extends Compilation
         ScopeExp scope = current_scope;
         int decl_nesting = decl == null ? -1 : ScopeExp.nesting(decl.context);
         String dname;
-        if (exp instanceof Symbol && ((Symbol) exp).hasEmptyNamespace())
+        if (exp instanceof SimpleSymbol)
           dname = exp.toString();
         else
           {

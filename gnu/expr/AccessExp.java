@@ -29,17 +29,19 @@ public abstract class AccessExp extends Expression
       : symbol.toString();
   }
 
-  /** Return a simple name, or null if the name has a non-empty namespace. */
-  public final String getSimpleName()
-  {
-    if (symbol instanceof String)
-      return (String) symbol;
-    Symbol sym;
-    if (symbol instanceof Symbol
-        && (sym = (Symbol) symbol).hasEmptyNamespace())
-      return sym.getLocalName();
-    return null;
-  }
+    /** Return a simple name, or null if the name has a non-empty namespace. */
+    public final String getSimpleName() {
+        if (symbol instanceof String)
+            return (String) symbol;
+        if (symbol instanceof Symbol) {
+            Symbol sym = (Symbol) symbol;
+            if (sym.hasEmptyNamespace())
+                return sym.getLocalName();
+            if (sym.hasUnknownNamespace())
+                return sym.getPrefix() + ':' + sym.getLocalPart();
+        }
+        return null;
+    }
 
   public final Object getSymbol() { return symbol; }
   /** If non-null, the local Declaration this refers to. */

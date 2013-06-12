@@ -1,3 +1,7 @@
+2013-06-11  Per Bothner  <per@bothner.com>
+
+	* AccessExp.java (getSimpleName): Handle unknown-namespace symbols.
+
 2013-06-02  Per Bothner  <per@bothner.com>
 
 	* InlineCalls.java (checkType): Use new Type#isCompatibleWithValue.

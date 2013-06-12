@@ -1,3 +1,11 @@
+2013-06-10  Per Bothner  <per@bothner.com>
+
+	* Namespace.java (isUnknownNamespace): New method.
+	(UNKNOWN_NAMESPACE): New macro.
+	(valueOf, makeUnknownNamespace): Update.
+	* Symbol.java (hasUnknownNamespace): New method.
+	(getNamespaceURI): Return "" for UNKNOWN_NAMESPACE.
+
 2013-03-04  Per Bothner  <per@bothner.com>
 
 	* CharArrayOutPort.java (writeTo): Generalize to Appendable.

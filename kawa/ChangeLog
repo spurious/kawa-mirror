@@ -1,3 +1,11 @@
+2013-06-10  Per Bothner  <per@bothner.com>
+
+	* lang/Quote.java (expand_pair): Return a unknown-namespace symbol
+	where we before made a SimpleSymbol containing a ':'.
+	* lang/Translator.java (rewrite_lookup): New method.
+	(rewrite): Handle unknown-namespace Symbol.
+	(namespaceResolve): Likewise.
+
 2013-06-08  Per Bothner  <per@bothner.com>
 
 	* lang/Translator.java (rewrite): When in a method and checking

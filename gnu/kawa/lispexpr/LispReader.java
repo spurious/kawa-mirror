@@ -282,7 +282,7 @@ public class LispReader extends Lexer
 	String str = new String(tokenBuffer, startPos, endPos-startPos);
 	result = Keyword.make(str.intern());
     }
-    else if (rtable.finalColonIsKeyword && packageMarker == endPos - 1
+    else if (rtable.finalColonIsKeyword && packageMarker != -1 && packageMarker == endPos - 1
         && (len > 1 || seenEscapes))
       {
 	String str = new String(tokenBuffer, startPos, len - 1);

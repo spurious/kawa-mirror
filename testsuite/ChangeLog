@@ -1,3 +1,11 @@
+2013-06-12  Matthieu Vachon  <matthieu.o.vachon@gmail.com>
+    	    Per Bothner  <per@bothner.com>
+
+	* eval1.scm: Renamed to symbol1.scm.
+	* Makefile.am: Update.
+	* symbol1.scm: Added test for Savannah bug #39229
+	"Empty string symbol lexer problem".
+
 2013-06-11  Per Bothner  <per@bothner.com>
 
 	* eval1.scm: New file.

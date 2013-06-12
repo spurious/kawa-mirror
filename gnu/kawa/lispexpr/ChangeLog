@@ -1,3 +1,8 @@
+2013-06-11  Matthieu Vachon  <matthieu.o.vachon@gmail.com>
+
+	* LispReader.java: Fix wrong reading of empty string symbol (i.e. '||)
+	This fixes Savannah bug #39229 "Empty string symbol lexer problem".
+
 2013-06-02  Per Bothner  <per@bothner.com>
 
 	Improve handling of boolean type - specifically comparison and union.

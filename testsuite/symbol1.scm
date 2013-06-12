@@ -1,6 +1,10 @@
-;; Some tests of eval.
+;; This should return #t. If the bug present, code will not
+;; compile. Test case for Savannah bug #39229
+(format #t "~s~%" (equal? '|| (string->symbol "")))
+;; Output: #t
 
-;; Some tests of round-tripping symbols with colon and no namespace.
+;; Some tests of round-tripping symbols with colon and no namespace,
+;; including testing of eval.
 
 (format #t "short-type.class: ~s~%"
         (gnu.bytecode.Type:lookupType "short"))

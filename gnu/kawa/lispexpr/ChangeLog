@@ -1,3 +1,8 @@
+2013-06-13  Charles Turner  <chturne@gmail.com>
+
+	* LispLanguage.java (getTypeMap): Add a type alias `simple-symbol' of
+	class SimpleSymbol for more readable error messages.
+
 2013-06-11  Matthieu Vachon  <matthieu.o.vachon@gmail.com>
 
 	* LispReader.java: Fix wrong reading of empty string symbol (i.e. '||)

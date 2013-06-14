@@ -215,6 +215,7 @@ public abstract class LispLanguage extends Language
             types.put("rational", LangObjType.rationalType);
             types.put("integer", LangObjType.integerType);
             types.put("symbol", ClassType.make("gnu.mapping.Symbol"));
+            types.put("simple-symbol", ClassType.make("gnu.mapping.SimpleSymbol"));
             types.put("namespace", ClassType.make("gnu.mapping.Namespace"));
             types.put("keyword", ClassType.make("gnu.expr.Keyword"));
             types.put("pair", ClassType.make("gnu.lists.Pair"));

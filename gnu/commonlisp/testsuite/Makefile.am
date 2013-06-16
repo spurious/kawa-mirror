@@ -4,7 +4,7 @@ DOTEST = $(KAWA) --clisp\
  -f "$(KAWALIB)/testsuite/testing.zip" $(OPTIONS)
 
 SCRIPTS_TO_RUN = warnings.lisp
-EXTRA_DIST = lang-test.lisp $(SCRIPTS_TO_RUN)
+EXTRA_DIST = lang-test.lisp lambda.lisp $(SCRIPTS_TO_RUN)
 CLEANFILES = *.log
 
 all:

@@ -1,3 +1,8 @@
+2013-06-16  Per Bothner  <per@bothner.com>
+
+	* configure.ac (AC_CONFIG_FILES): Remove kawa/lang/Makefile
+	and kawa/standard/Makefile.
+
 2013-03-23  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (kawa/Version.java): Add $(srcdir) reference.

@@ -51,6 +51,8 @@ build_triplet = @build@
 host_triplet = @host@
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(top_srcdir)/Make-rules $(top_srcdir)/mkinstalldirs ChangeLog
+@WITH_AWT_TRUE@am__append_1 = $(java_WITH_AWT)
+@WITH_JAVAX_SCRIPT_TRUE@am__append_2 = $(JAVAX_SCRIPT_EXTRA)
 subdir = kawa
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
@@ -244,19 +246,105 @@ CLEANFILES = $(java_BUILT) *.class *.stamp *.jar $(PACKAGE_OFILE) $(EXTRA_CLEAN)
 KAWA_COMPILER = $(JAVA) -classpath "$(CLASSPATH)" kawa.repl -d $(top_builddir) \
   -P `echo $(PACKAGE_FNAME)|sed -e s/-/./g`.
 
-SUBDIRS = lang standard lib
+SUBDIRS = lib
 
 # Use an environment variable for CLASSPATH so we pick up standard classes:
 #CLASSPATH_ENV = CLASSPATH=..:$(srcdir)/..:$$CLASSPATH
-@WITH_AWT_TRUE@java_WITH_AWT = \
-@WITH_AWT_TRUE@  GuiConsole.java ReplPane.java ReplDocument.java \
-@WITH_AWT_TRUE@  ReplPaneOutPort.java GuiInPort.java
+java_WITH_AWT = \
+  GuiConsole.java ReplPane.java ReplDocument.java \
+  ReplPaneOutPort.java GuiInPort.java
+
+JAVAX_SCRIPT_EXTRA = \
+  standard/SchemeScriptEngineFactory.java
+
+KAWA_LANG_JAVA_FILES = \
+  lang/Pattern.java \
+  lang/AnyPat.java \
+  lang/EqualPat.java \
+  lang/ListPat.java \
+  lang/ListRepeatPat.java \
+  lang/PairPat.java \
+  lang/VarListPat.java \
+  lang/Lambda.java \
+  lang/Quote.java \
+  lang/Translator.java \
+  lang/Eval.java \
+  lang/AutoloadProcedure.java \
+  lang/Continuation.java \
+  lang/CalledContinuation.java \
+  lang/Syntax.java \
+  lang/Macro.java \
+  lang/SyntaxPattern.java \
+  lang/SyntaxRule.java \
+  lang/SyntaxRules.java \
+  lang/PatternScope.java \
+  lang/TemplateScope.java \
+  lang/SyntaxTemplate.java \
+  lang/AutoloadSyntax.java \
+  lang/CompileFile.java \
+  lang/SyntaxForm.java \
+  lang/SyntaxForms.java \
+  lang/Record.java \
+  lang/GetFieldProc.java \
+  lang/SetFieldProc.java \
+  lang/RecordConstructor.java \
+  lang/GenericError.java\
+  lang/NamedException.java
+
+KAWA_STANDARD_JAVA_FILES = \
+  standard/set_b.java \
+  standard/prim_method.java \
+  standard/append.java \
+  standard/fluid_let.java \
+  standard/expt.java \
+  standard/vector_append.java \
+  standard/readchar.java \
+  standard/read_line.java \
+  standard/char_ready_p.java \
+  standard/load.java \
+  standard/constant_fold.java \
+  standard/define.java \
+  standard/define_syntax.java \
+  standard/syntax_rules.java \
+  standard/let_syntax.java \
+  standard/syntax.java \
+  standard/syntax_case.java \
+  standard/require.java \
+  standard/module_extends.java \
+  standard/module_implements.java \
+  standard/module_name.java \
+  standard/module_compile_options.java \
+  standard/with_compile_options.java \
+  standard/module_static.java \
+  standard/export.java \
+  standard/define_unit.java \
+  standard/syntax_error.java \
+  standard/let.java \
+  standard/begin.java \
+  standard/call_with_values.java \
+  standard/sleep.java \
+  standard/try_catch.java \
+  standard/make.java \
+  standard/location.java \
+  standard/define_alias.java \
+  standard/define_variable.java \
+  standard/define_autoload.java \
+  standard/define_member_alias.java \
+  standard/Scheme.java \
+  standard/SchemeCompilation.java \
+  standard/object.java \
+  standard/define_class.java \
+  standard/thisRef.java \
+  standard/IfFeature.java \
+  standard/ImportFromLibrary.java \
+  standard/TracedProcedure.java
 
 java_sources = Shell.java repl.java Version.java \
-  TelnetInputStream.java TelnetOutputStream.java Telnet.java TelnetRepl.java \
-  $(java_WITH_AWT)
-
-EXTRA_DIST = Version.java.in $(java_WITH_AWT)
+	TelnetInputStream.java TelnetOutputStream.java Telnet.java \
+	TelnetRepl.java $(KAWA_LANG_JAVA_FILES) \
+	$(KAWA_STANDARD_JAVA_FILES) $(am__append_1) $(am__append_2)
+EXTRA_DIST = Version.java.in $(java_WITH_AWT) $(JAVAX_SCRIPT_EXTRA)
+EXTRA_CLEAN = lang/*.class standard/*.class
 PACKAGE_FNAME = kawa-repl
 GCJ_INPUTS = $(java_Java)
 all: all-recursive

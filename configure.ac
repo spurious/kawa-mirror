@@ -301,7 +301,7 @@ AC_CONFIG_FILES([Makefile gnu/bytecode/Makefile gnu/math/Makefile
   gnu/jemacs/lang/Makefile gnu/jemacs/buffer/Makefile
   gnu/jemacs/lisp/Makefile gnu/jemacs/testsuite/Makefile
   gnu/jemacs/swing/Makefile gnu/jemacs/swt/Makefile
-  kawa/Makefile kawa/lang/Makefile kawa/standard/Makefile kawa/lib/Makefile
+  kawa/Makefile kawa/lib/Makefile
   gnu/q2/Makefile gnu/q2/lang/Makefile gnu/q2/testsuite/Makefile
   gnu/xquery/Makefile gnu/xquery/lang/Makefile
   gnu/xquery/util/Makefile gnu/xquery/testsuite/Makefile

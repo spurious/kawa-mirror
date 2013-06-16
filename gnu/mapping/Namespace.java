@@ -39,7 +39,7 @@ public class Namespace
 
   public final String getPrefix () { return prefix; }
 
-  protected Namespace ()
+  public Namespace()
   {
     this(64);
   }

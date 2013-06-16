@@ -1,3 +1,9 @@
+2013-06-12  Charles Turner  <chturne@gmail.com>
+
+	* LispPackage.java: Add preliminary support for Common Lisp
+	package. Create the standard CL packages, the special *package*,
+	and fix the USE method.
+
 2013-06-13  Charles Turner  <chturne@gmail.com>
 
 	* LispLanguage.java (getTypeMap): Add a type alias `simple-symbol' of

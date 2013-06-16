@@ -1,3 +1,8 @@
+2013-06-12  Charles Turner  <chturne@gmail.com>
+
+	* Namespace.java (Namespace()): Changed from protected to public
+	for use by gnu.kawa.lispexpr.LispPackage.
+
 2013-06-10  Per Bothner  <per@bothner.com>
 
 	* Namespace.java (isUnknownNamespace): New method.

@@ -1,5 +1,11 @@
 2013-06-12  Charles Turner  <chturne@gmail.com>
 
+	* LispPackage.java
+	(pkgUsesList,pkgUsedByList,addNickNames,usePackages,makeLispPackage):
+	New methods adding extra support for CL packages.
+
+2013-06-12  Charles Turner  <chturne@gmail.com>
+
 	* LispPackage.java: Add preliminary support for Common Lisp
 	package. Create the standard CL packages, the special *package*,
 	and fix the USE method.

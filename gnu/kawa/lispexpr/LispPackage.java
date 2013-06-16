@@ -67,7 +67,74 @@ public class LispPackage extends Namespace
   /** Namespaces that import/use this namespace.
    * The CommonLisp "used-by" list. */
   NamespaceUse importing;
+  
+  /** Used for the CL PACKAGE-USE-LIST function. */
+  public static LList pkgUsesList(LispPackage lp)
+  {
+    LList uses = LList.Empty;
+    NamespaceUse it = lp.imported;
+    while (it != null) {
+      uses = Pair.make(it.imported, uses);
+      it = it.nextImported;
+    }
+    return uses;
+  }
+  
+  /** Used for the CL PACKAGE-USED-BY-LIST function */
+  public static LList pkgUsedByList(LispPackage lp)
+  {
+    LList usedby = LList.Empty;
+    NamespaceUse it = lp.importing;
+    while (it != null) {
+      usedby = Pair.make(it.importing, usedby);
+      it = it.nextImporting;
+    }
+    return usedby;
+  }
+  
+  public static void addNickNames(LispPackage name, LList nicks)
+  {
+    synchronized (nsTable)
+    {
+      for (Object nick : nicks) {
+        name.nicknames = Pair.make((String) nick, name.nicknames);
+        nsTable.put((String) nick, name);
+      }
+    }
+  }
+  
+  public static void usePackages (LList importees, LispPackage importer)
+  {
+    for (Object usePkg : importees)
+    {
+      LispPackage lp;
 
+      if (usePkg instanceof Symbol)
+        lp = (LispPackage) LispPackage.valueOfNoCreate(((Symbol) usePkg).getName());//uc
+      else if (usePkg instanceof LispPackage)
+        lp = (LispPackage) usePkg;
+      else
+        lp = (LispPackage) LispPackage.valueOfNoCreate((String) usePkg);
+
+      if (lp != null)
+      {
+        use(importer, lp);
+      }
+      else
+      {
+        throw new RuntimeException("The name " + usePkg + " does not designate any package");
+     }
+   }
+ }
+  
+  public static LispPackage makeLispPackage (Object name, LList nicks,
+                                             LList used)
+  {
+    LispPackage newpack = (LispPackage) LispPackage.valueOf((String) name);
+    addNickNames(newpack, nicks);
+    usePackages(used, newpack);
+    return newpack;    
+  }
 
   public static void use (LispPackage importing, LispPackage imported)
   {

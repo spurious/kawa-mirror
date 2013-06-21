@@ -93,6 +93,11 @@ InliningTest.topLevelRecurse1(gnu.lists.Pair)gnu.bytecode.Type$NeverReturns: 10 
 InliningTest.topLevelRecurse2(java.lang.Object,java.lang.Object)gnu.bytecode.Type$NeverReturns: 7 bytes
 InliningTest.sum1(gnu.math.IntNum)java.lang.Object: 36 bytes
 InliningTest.sum2(double)double: 30 bytes
+InliningTest.numcomp1(java.lang.Object,java.lang.Object)int: 15 bytes
+InliningTest.numcomp2(java.lang.Object,java.lang.Object)int: 16 bytes
+InliningTest.numcomp3(java.lang.Object,java.lang.Object,java.lang.Object)int: 19 bytes
+InliningTest.numcomp4(java.lang.Object,java.lang.Object,java.lang.Object)int: 32 bytes
+InliningTest.numcomp5(java.lang.Object,java.lang.Object,java.lang.Object)int: 33 bytes
 cycle1.isIsEven(int)boolean: 17 bytes
 cycle2.isIsOdd(int)boolean: 17 bytes
 binarytrees.bottomUpTree(int,int)binarytrees$TreeNode: 60 bytes

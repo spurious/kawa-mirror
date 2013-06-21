@@ -255,3 +255,20 @@
     (if (< i n)
         sum
         (loop (+ i 1) (+ i sum)))))
+
+(define (numcomp1 x y) ::int
+  (if (< x y) 5 6))
+
+(define(numcomp2 x y) ::int
+  (let ((b (<= x y)))
+    (if b 4 5)))
+
+(define (numcomp3 x y z) ::int
+  (if (> x y z) 3 2))
+
+(define (numcomp4 x y z) ::int
+  (if (> x 10 y 5 z) 6 3))
+
+(define (numcomp5 x y z) ::int
+  (let ((b (> x 10 y 5 z)))
+    (if b 4 3)))

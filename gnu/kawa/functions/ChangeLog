@@ -1,3 +1,9 @@
+2013-06-20  Per Bothner  <per@bothner.com>
+
+	* CompileMisc.java (compileNumberCompare): If we can't optimize based
+	on type information, call $Ls, $Eq et methods directly.
+	These return boolean, rather than Object, avoiding boxing.
+
 2013-06-09  Per Bothner  <per@bothner.com>
 
 	* Apply.java (getArguments): Fix off-by-one error in optimization

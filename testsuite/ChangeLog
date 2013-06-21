@@ -1,3 +1,10 @@
+2013-06-20  Per Bothner  <per@bothner.com>
+
+	* inlining-test.scm (numcomp1, numcomp2, numcomp3, numcomp4, numcomp5):
+	New functions, to test non-type-optimized <, <=, etc.
+	* inlining.expected: Update accordingly.
+	* Makefile.am: Likewise.
+
 2013-06-12  Matthieu Vachon  <matthieu.o.vachon@gmail.com>
     	    Per Bothner  <per@bothner.com>
 

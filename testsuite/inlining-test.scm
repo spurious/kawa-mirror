@@ -195,7 +195,21 @@
                 (if x (g) (f)))))
     (f)))
 
-(define (check-even (x :: int))
+(define (check-even (x :: int)) ::boolean
+  (letrec ((even?
+	    (lambda ((n1 :: int))
+	      (if (= n1 0)
+		  #t
+		  (odd? (- n1 1)))))
+	   (odd?
+	    (lambda ((n2 :: int))
+	      (if (= n2 0)
+		  #f
+		  (even? (- n2 1))))))
+    (even? x)))
+
+;; Same as check-even, but without return-type specifier
+(define (check-even-unspec-return (x :: int))
   (letrec ((even?
 	    (lambda ((n1 :: int))
 	      (if (= n1 0)
@@ -272,3 +286,6 @@
 (define (numcomp5 x y z) ::int
   (let ((b (> x 10 y 5 z)))
     (if b 4 3)))
+
+(define (eqv1 x y)
+  (eqv? y x))

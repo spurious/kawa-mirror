@@ -82,7 +82,8 @@ InliningTest.plusLambda1()int: 3 bytes
 InliningTest.firstNegative(double[])double: 32 bytes
 InliningTest.inlineTwoCalls(int)int: 27 bytes
 InliningTest.inlineTwoFunctions(java.lang.Object)gnu.bytecode.Type$NeverReturns: 23 bytes
-InliningTest.checkEven(int)java.lang.Object: 34 bytes
+InliningTest.checkEven(int)boolean: 30 bytes
+InliningTest.checkEvenUnspecReturn(int)java.lang.Object: 34 bytes
 InliningTest.constantPropagation1()int: 3 bytes
 InliningTest.constantPropagation2()int: 3 bytes
 InliningTest.constantPropagation3()int: 6 bytes
@@ -98,6 +99,7 @@ InliningTest.numcomp2(java.lang.Object,java.lang.Object)int: 16 bytes
 InliningTest.numcomp3(java.lang.Object,java.lang.Object,java.lang.Object)int: 19 bytes
 InliningTest.numcomp4(java.lang.Object,java.lang.Object,java.lang.Object)int: 32 bytes
 InliningTest.numcomp5(java.lang.Object,java.lang.Object,java.lang.Object)int: 33 bytes
+InliningTest.eqv1(java.lang.Object,java.lang.Object)boolean: 6 bytes
 cycle1.isIsEven(int)boolean: 17 bytes
 cycle2.isIsOdd(int)boolean: 17 bytes
 binarytrees.bottomUpTree(int,int)binarytrees$TreeNode: 60 bytes

@@ -57,8 +57,10 @@ public class QuoteExp extends Expression
   static public QuoteExp voidExp = makeShared(Values.empty, Type.voidType);
     /** Same value as voidExp, but different type, to suppress diagnostics. */
   static public QuoteExp voidObjectExp = makeShared(Values.empty, Type.objectType);
-  static public QuoteExp trueExp = makeShared(Boolean.TRUE);
-  static public QuoteExp falseExp = makeShared(Boolean.FALSE);
+    static public QuoteExp trueExp = makeShared(Boolean.TRUE, Type.booleanType);
+  static public QuoteExp falseExp = makeShared(Boolean.FALSE, Type.booleanType);
+    static public QuoteExp trueObjExp = makeShared(Boolean.TRUE);
+  static public QuoteExp falseObjExp = makeShared(Boolean.FALSE);
   static public QuoteExp nullExp = makeShared(null, Type.nullType);
   public static final QuoteExp classObjectExp = makeShared(Type.objectType);
 
@@ -79,7 +81,7 @@ public class QuoteExp extends Expression
       return voidExp;
     // Note we deliberately don't map abstractSpecial to abstractExp.
     if (value instanceof Boolean)
-      return ((Boolean) value).booleanValue() ? trueExp : falseExp;
+      return ((Boolean) value).booleanValue() ? trueObjExp : falseObjExp;
     QuoteExp q = new QuoteExp(value);
     if (position != null)
       q.setLocation(position);

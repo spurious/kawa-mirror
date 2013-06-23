@@ -1,3 +1,10 @@
+2013-06-22  Per Bothner  <per@bothner.com>
+
+	* QuoteExp.java (trueExp, falseExp): Change type to Type.booleanType.
+	(trueObjExp, falseObjExp): New constants, whose type are
+	java.lang.Boolean.
+	(getInstance): Update accordingly.
+
 2013-06-11  Per Bothner  <per@bothner.com>
 
 	* AccessExp.java (getSimpleName): Handle unknown-namespace symbols.

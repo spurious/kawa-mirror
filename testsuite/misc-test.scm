@@ -1,4 +1,4 @@
-(test-init "Miscellaneous" 211)
+(test-init "Miscellaneous" 212)
 
 ;;; DSSSL spec example 11
 (test '(3 4 5 6) (lambda x x) 3 4 5 6)
@@ -843,6 +843,7 @@
 (test 7 inline-two-calls -5)
 (test #f check-even 200001)
 (test #t check-even 18)
+(test #f check-even-unspec-return 23)
 
 ;; Savannah bug #27011: ArrayIndexOutOfBoundsException after 20 local variables
 (define (big-let) ; no argument!

@@ -185,7 +185,10 @@ public class CompilationHelpers
     if ((nonNumeric(args[0]) || nonNumeric(args[1]))
         && ! maybeLazy(args[0]) && ! maybeLazy(args[1]))
       return new ApplyExp(((IsEqv) proc).isEq, args);
-    return exp;
+    Method meth =
+        ClassType.make("gnu.kawa.functions.IsEqv")
+        .getDeclaredMethod("apply", 2);
+    return new ApplyExp(meth, args).setLine(exp);
   }
 }
 

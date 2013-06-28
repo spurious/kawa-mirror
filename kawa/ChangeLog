@@ -1,3 +1,8 @@
+2013-06-27  Per Bothner  <per@bothner.com>
+
+	* standard/define.java (scanForm): Don't set writable if
+	this is define-constant.
+
 2013-06-16  Per Bothner  <per@bothner.com>
 
 	* Makefile.am: Merge in file lists from lang/Makefile.am

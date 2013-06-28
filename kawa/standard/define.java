@@ -95,7 +95,7 @@ public class define extends Syntax
       value = null;
     SetExp sexp = new SetExp(decl, value);
 
-    if (defs instanceof ModuleExp && ! makePrivate
+    if (defs instanceof ModuleExp && ! makePrivate && ! makeConstant
         && (! Compilation.inlineOk || tr.sharedModuleDefs()))
       decl.setCanWrite(true);
 

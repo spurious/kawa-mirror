@@ -1197,7 +1197,7 @@ public class ClassType extends ObjectType
 
     Attribute.writeAll (this, dstr);
 
-    flags |= ADD_FIELDS_DONE | ADD_METHODS_DONE;
+    flags |= ADD_FIELDS_DONE | ADD_METHODS_DONE | ADD_ENCLOSING_DONE;
   }
 
   public void writeToFile (String filename)

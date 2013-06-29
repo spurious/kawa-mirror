@@ -1,3 +1,15 @@
+2013-06-28  Per Bothner  <per@bothner.com>
+
+	* ClassExp.java (compileSetField): If immediate, don't create Literal
+	here for compound class.  Hence, we don't have to clear FINAL flag.
+	Which avoids confusing/complicating import in ModuleExp#evelModule2.
+	* ClassInitializer.java (emit): In the immediate case changed above,
+	use Compilation#compileConstant.  This does create a Literal,
+	but uses a fresh field, which is the copied into the ClassType field.
+
+	* ClassExp.java (compilePushClass): Cleanup so
+	Target#compileFromStack is called in all cases.
+
 2013-06-22  Per Bothner  <per@bothner.com>
 
 	* QuoteExp.java (trueExp, falseExp): Change type to Type.booleanType.

@@ -1,3 +1,10 @@
+2013-06-28  John Cowan  <cowan@mercury.ccil.org>
+	    Per Bothner  <per@bothner.com>
+
+	* defclass2.scm: New test for non-simple inheritace
+	in immediate line-by-line mode.
+	* Makefile.am (SCRIPTS_TO_RUN): Update accrdingly.
+
 2013-06-22  Per Bothner  <per@bothner.com>
 
 	* inlining-test.scm (check-even): Add return-type specifier.

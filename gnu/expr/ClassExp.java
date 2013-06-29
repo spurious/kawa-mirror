@@ -87,35 +87,36 @@ public class ClassExp extends LambdaExp
         ClassType new_class = compiledType;
 
         gnu.bytecode.CodeAttr code = comp.getCode();
-        comp.loadClassRef(new_class);
+        ClassType typeClass = Type.javalangClassType;
         ClassType typeType;
         int nargs;
         boolean needsLink = getNeedsClosureEnv();
-        if (isSimple() && ! needsLink)
-            return;
-        if (isMakingClassPair() || needsLink) {
-            if (new_class == instanceType)
-                code.emitDup(instanceType);
-            else
-                comp.loadClassRef(instanceType);
-            typeType = ClassType.make("gnu.expr.PairClassType");
-            nargs = needsLink ? 3 : 2;
+        comp.loadClassRef(new_class);
+        if (isSimple() && ! needsLink) {
+            typeType = typeClass;
         } else {
-            typeType = Compilation.typeType;
-            nargs = 1;
+            if (isMakingClassPair() || needsLink) {
+                if (new_class == instanceType)
+                    code.emitDup(instanceType);
+                else
+                    comp.loadClassRef(instanceType);
+                typeType = ClassType.make("gnu.expr.PairClassType");
+                nargs = needsLink ? 3 : 2;
+            } else {
+                typeType = Compilation.typeType;
+                nargs = 1;
+            }
+            Type[] argsClass = new Type[nargs];
+            if (needsLink) {
+                getOwningLambda().loadHeapFrame(comp);
+                argsClass[--nargs] = Type.objectType;
+            }
+            while (--nargs >= 0) argsClass[nargs] = typeClass;
+            Method makeMethod
+                = typeType.addMethod("make", argsClass,
+                                     typeType, Access.STATIC|Access.PUBLIC);
+            code.emitInvokeStatic(makeMethod);
         }
-        Type[] argsClass = new Type[nargs];
-        if (needsLink) {
-            getOwningLambda().loadHeapFrame(comp);
-            argsClass[--nargs] = Type.pointer_type;
-        }
-        ClassType typeClass = Type.javalangClassType;
-        while (--nargs >= 0) argsClass[nargs] = typeClass;
-        Method makeMethod
-            = typeType.addMethod("make", argsClass,
-                                 typeType, Access.STATIC|Access.PUBLIC);
-        code.emitInvokeStatic(makeMethod);
-
         target.compileFromStack(comp, typeType);
     }
 
@@ -792,11 +793,9 @@ public class ClassExp extends LambdaExp
         Field field = allocFieldFor(comp);
         compileMembers(comp);
         if (! getNeedsClosureEnv() && field.getStaticFlag()
-            &&  type != Type.javalangClassType) {
+            && ! comp.immediate && type != Type.javalangClassType) {
             new Literal(compiledType, type, comp.litTable)
                 .assign(field, comp.litTable);
-            if (comp.immediate)
-                field.setModifiers(field.getModifiers() & ~Access.FINAL);
         } else
             new ClassInitializer(this, field, comp);
         return field;

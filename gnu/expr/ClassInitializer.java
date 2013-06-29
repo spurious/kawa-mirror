@@ -23,12 +23,17 @@ public class ClassInitializer extends Initializer
         }
     }
 
+  @Override
   public void emit(Compilation comp)
   {
     CodeAttr code = comp.getCode();
     if (! field.getStaticFlag())
       code.emitPushThis();
-    cexp.compilePushClass(comp, Target.pushValue(Compilation.typeClassType));
+    if (comp.immediate && field.getStaticFlag()
+            && cexp.type != Type.javalangClassType)
+        comp.compileConstant(cexp.compiledType);
+    else
+        cexp.compilePushClass(comp, Target.pushValue(field.getType()));
     if (field.getStaticFlag())
       code.emitPutStatic(field);
     else

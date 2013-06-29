@@ -592,14 +592,14 @@ check-bridge:
 	$(KAWA) $(OPTIONS) "$(srcdir)/bridge.scm"
 
 CLEANFILES = tmp* *.log testing.zip revcomp-input.txt knucleotide-input.txt regexdna-input.txt *.class HelloCgiK HelloCgiS
-SCRIPTS_TO_RUN = uninit1.scm errors1.scm errors2.scm sva34005.scm sva35362.scm \
-  sva36039.scm sva36413.scm sva36556.scm sva36853.scm sva36863.scm \
-  sva36917.scm sva37684.scm inner-1.scm lambda-in-class-1.scm \
+SCRIPTS_TO_RUN = uninit1.scm errors1.scm errors2.scm \
+  inner-1.scm lambda-in-class-1.scm reflect1.scm promise1.scm \
   anonymous-lambda-1.scm unreach1.scm unreach2.scm unreach3.scm \
-  bad-defclass.scm defclass1.scm bad-voidexp.scm \
+  bad-defclass.scm defclass1.scm defclass2.scm bad-voidexp.scm \
   srfi-45-test1.scm srfi-45-test2.scm bad-srfi-109.scm \
-  reflect1.scm promise1.scm \
-  define1.scm mac-obj.scm overload1.scm symbol1.scm
+  define1.scm mac-obj.scm overload1.scm symbol1.scm \
+  sva34005.scm sva35362.scm sva36039.scm sva36413.scm sva36556.scm \
+  sva36853.scm sva36863.scm sva36917.scm sva37684.scm
 EXTRA_DIST = testing.scm test-utils.scm \
   test.scm num-test.scm mac-test.scm mac1.scm \
   classes1.scm classes2.scm SimpleB.java obj-test.scm arr-test.scm \

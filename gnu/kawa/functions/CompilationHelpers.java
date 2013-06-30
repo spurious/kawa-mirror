@@ -28,7 +28,9 @@ public class CompilationHelpers
     if (exp instanceof QuoteExp)
       {
         Object value = ((QuoteExp) exp).getValue();
-        return ! (value instanceof Number || value instanceof Char
+        return ! (value instanceof Number
+                  || value instanceof Boolean
+                  || value instanceof Char
                   || value instanceof Symbol);
       }
     return false;

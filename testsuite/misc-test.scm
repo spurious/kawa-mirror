@@ -1,4 +1,4 @@
-(test-init "Miscellaneous" 212)
+(test-init "Miscellaneous" 219)
 
 ;;; DSSSL spec example 11
 (test '(3 4 5 6) (lambda x x) 3 4 5 6)
@@ -996,3 +996,13 @@
 ;; Savavvah bug #36592 "nested map causes compiler inliner NPE"
 (test '(1 2 3) 'savannah-36592
       (map (lambda (x) x) (map (lambda (x) x) '(1 2 3))))
+
+(define falseBool1 (java.lang.Boolean #f))
+(define falseBool2 (java.lang.Boolean #f))
+(test #f 'eq1-falseBool (eq? falseBool1 falseBool2))
+(test #f 'eq2-falseBool (apply eq? falseBool1 falseBool2 '()))
+(test #t 'eqv1-falseBool (eqv? falseBool1 falseBool2))
+(test #t 'eqv2-falseBool (apply eqv? falseBool1 falseBool2 '()))
+(test #t 'eqv3-falseBool (eqv? falseBool1 #f))
+(test #t 'equal1-falseBool (equal? falseBool1 falseBool2))
+(test #t 'equal2-falseBool (apply equal? falseBool1 falseBool2 '()))

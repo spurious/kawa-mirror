@@ -79,7 +79,6 @@ public class ClassExp extends LambdaExp
     public void compile(Compilation comp, Target target) {
         if (target instanceof IgnoreTarget)
             return;
-        compileMembers(comp);
         compilePushClass(comp, target);
     }
 
@@ -791,7 +790,6 @@ public class ClassExp extends LambdaExp
 
     public Field compileSetField (Compilation comp) {
         Field field = allocFieldFor(comp);
-        compileMembers(comp);
         if (! getNeedsClosureEnv() && field.getStaticFlag()
             && ! comp.immediate && type != Type.javalangClassType) {
             new Literal(compiledType, type, comp.litTable)

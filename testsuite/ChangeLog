@@ -1,3 +1,10 @@
+2013-06-30  Matthieu Vachon  <matthieu.o.vachon@gmail.com>
+	    Per Bothner  <per@bothner.com>
+
+	* sva39060.scm: New test for Savannah bug #39060
+	"ClassFormatException (Absent Code attribute)".
+	* Makefile.ma: Update accordingly.
+
 2013-06-29  Per Bothner  <per@bothner.com>
 
 	* misc.test.scm: Add some tests for non-canonical Booleans.

@@ -612,6 +612,9 @@ public class LambdaExp extends ScopeExp
 	  {
 	    child.compileAsMethod(comp);
 	  }
+        else if (child instanceof ClassExp) {
+            ((ClassExp) child).compileMembers(comp);
+        }
 	child = child.nextSibling;
       }
 

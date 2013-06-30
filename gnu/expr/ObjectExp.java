@@ -17,7 +17,6 @@ public class ObjectExp extends ClassExp
 
   public void compile (Compilation comp, Target target)
   {
-    compileMembers(comp);
     CodeAttr code = comp.getCode();
     code.emitNew(compiledType);
     code.emitDup(1);

@@ -1,3 +1,11 @@
+2013-06-30  Per Bothner  <per@bothner.com>
+
+	* LambdaExp.java (compileEnd): Call compileMembers on child
+	ClassExp.  This fixes Savannah bug #39060
+	"ClassFormatException (Absent Code attribute)".
+	* ObjectExp.java (compile): Don't call compileMembers.
+	* ClassExp.java (compile, compileSetField): Likewise.
+
 2013-06-29  Per Bothner  <per@bothner.com>
 
 	* LambdaExp.java (getCanCall): Remove - never actually used.

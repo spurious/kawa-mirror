@@ -340,7 +340,6 @@ public class FindCapturedVars extends ExpExpVisitor<Void>
         if (chain == null || curLambda.inlineHome == null)
           {
             // Infinite loop of functions that are inlined in each other.
-            curLambda.setCanCall(false);
             return;
           }
         curLambda = curLambda.getCaller();

@@ -130,6 +130,11 @@ public class InlineCalls extends ExpExpVisitor<Type> {
         return exp;
     }
 
+    private void setCanAccess(LambdaExp exp, Type required) {
+        if (required != ProcedureInCallContext.INSTANCE)
+            exp.setCanRead(true);
+    }
+
   protected Expression visitApplyExp(ApplyExp exp, Type required)
   {
     Expression func = exp.func;
@@ -329,7 +334,7 @@ public class InlineCalls extends ExpExpVisitor<Type> {
         LambdaExp lval = decl.getLambdaValue();
         if (lval != null)
           {
-            lval.setCanAccess(required != ProcedureInCallContext.INSTANCE);
+            setCanAccess(lval, required);
             valueTracker.checkUninitializedVariables(lval, exp, null);
           }
         Expression dval = decl.getValue();
@@ -600,7 +605,7 @@ public class InlineCalls extends ExpExpVisitor<Type> {
 
   protected Expression visitLambdaExp (LambdaExp exp, Type required)
   {
-    exp.setCanAccess(required != ProcedureInCallContext.INSTANCE);
+    setCanAccess(exp, required);
     if (exp.getCallConvention() == Compilation.CALL_WITH_UNSPECIFIED)
       exp.setCallConvention(getCompilation());
     Declaration firstDecl = exp.firstDecl();

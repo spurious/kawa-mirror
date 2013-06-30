@@ -134,7 +134,7 @@ public class LambdaExp extends ScopeExp
   Variable closureEnv;
 
   static final int CAN_READ = 2;
-  static final int CAN_CALL = 4;
+  static final int INLINE_ONLY = 4;
   static final int IMPORTS_LEX_VARS = 8;
   static final int NEEDS_STATIC_LINK = 16;
   /* Used (future) by FindTailCalls. */
@@ -147,9 +147,8 @@ public class LambdaExp extends ScopeExp
   public static final int SEQUENCE_RESULT = 1024;
   public static final int OVERLOADABLE_FIELD = 2048;
   public static final int ATTEMPT_INLINE = 4096;
-  static final int INLINE_ONLY = 8192;
-  public static final int IN_EXPWALKER = 0x4000;
-  protected static final int NEXT_AVAIL_FLAG = 0x8000;
+  public static final int IN_EXPWALKER = 0x2000;
+  protected static final int NEXT_AVAIL_FLAG = 0x4000;
 
   /** True iff this lambda is only "called" inline. */
   public final boolean getInlineOnly() { return (flags & INLINE_ONLY) != 0; }
@@ -218,18 +217,6 @@ public class LambdaExp extends ScopeExp
     if (read) flags |= CAN_READ;
     else flags &= ~CAN_READ;
   }
-
-  public final boolean getCanCall()
-  { return (flags & CAN_CALL) != 0; }
-  public final void setCanCall(boolean called)
-  {
-    if (called) flags |= CAN_CALL;
-    else flags &= ~CAN_CALL;
-  }
-
-    public final void setCanAccess(boolean canRead) {
-        flags |= canRead ? CAN_READ : CAN_CALL;
-    }
 
   /** True if this is a method in an ClassExp. */
   public final boolean isClassMethod()

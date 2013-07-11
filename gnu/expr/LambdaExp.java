@@ -45,6 +45,9 @@ public class LambdaExp extends ScopeExp
    */
   ReferenceExp siblingReferences;
 
+    /** The location for function start, before arguments are stored. */
+    Label startForInlining;
+
   public void capture (Declaration decl)
   {
     if (decl.isSimple())

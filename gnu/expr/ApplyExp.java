@@ -319,8 +319,7 @@ public class ApplyExp extends Expression
         pushArgs(func_lambda, exp.args, exp.args.length, null, comp);
         if (func_lambda.getFlag(LambdaExp.METHODS_COMPILED))
           {
-            popParams(code, func_lambda, null, false);
-            code.emitTailCall(false, func_lambda.getVarScope());
+            code.emitTailCall(false, func_lambda.startForInlining);
             return;
           }
         func_lambda.flags |= LambdaExp.METHODS_COMPILED;
@@ -328,12 +327,13 @@ public class ApplyExp extends Expression
 	comp.curLambda = func_lambda;
 	func_lambda.allocChildClasses(comp);
 	func_lambda.allocParameters(comp);
+        func_lambda.startForInlining = code.getLabel();
 	popParams (code, func_lambda, null, false);
 	func_lambda.enterFunction(comp);
 	func_lambda.body.compileWithPosition(comp, target);
 	func_lambda.compileEnd(comp);
 	func_lambda.generateApplyMethods(comp);
-        code.popScope();
+        code.popScope(); // Matches enterScope in allocParameters.
 	comp.curLambda = saveLambda;
 	return;
       }

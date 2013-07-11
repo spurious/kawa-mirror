@@ -1,3 +1,7 @@
+2013-07-11  Per Bothner  <per@bothner.com>
+
+	* inlining.expected: Update results.
+
 2013-06-30  Matthieu Vachon  <matthieu.o.vachon@gmail.com>
 	    Per Bothner  <per@bothner.com>
 

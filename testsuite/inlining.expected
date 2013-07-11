@@ -80,10 +80,10 @@ InliningTest.factoriali2(int)int: 18 bytes
 InliningTest.factoriall1(long)long: 19 bytes
 InliningTest.plusLambda1()int: 3 bytes
 InliningTest.firstNegative(double[])double: 32 bytes
-InliningTest.inlineTwoCalls(int)int: 27 bytes
+InliningTest.inlineTwoCalls(int)int: 26 bytes
 InliningTest.inlineTwoFunctions(java.lang.Object)gnu.bytecode.Type$NeverReturns: 23 bytes
-InliningTest.checkEven(int)boolean: 30 bytes
-InliningTest.checkEvenUnspecReturn(int)java.lang.Object: 34 bytes
+InliningTest.checkEven(int)boolean: 29 bytes
+InliningTest.checkEvenUnspecReturn(int)java.lang.Object: 33 bytes
 InliningTest.constantPropagation1()int: 3 bytes
 InliningTest.constantPropagation2()int: 3 bytes
 InliningTest.constantPropagation3()int: 6 bytes
@@ -108,7 +108,7 @@ binarytrees$TreeNode.itemCheck()int: 36 bytes
 fannkuch.vectorReverseSlice$Ex(int[],int,int)void: 35 bytes
 fannkuch.countFlips(int[],int[])int: 46 bytes
 fannkuch.fannkuch(int)int: 230 bytes
-fannkuchredux.fannkuch(int)int: 289 bytes
+fannkuchredux.fannkuch(int)int: 287 bytes
 fasta.randomNext(double)double: 28 bytes
 pidigits.pidigits(int,java.io.PrintStream)void: 125 bytes
 pidigits$Transformation.next()void: 59 bytes

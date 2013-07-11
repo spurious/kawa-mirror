@@ -1,3 +1,14 @@
+2013-07-11  Per Bothner  <per@bothner.com>
+
+	Fix complaint from Android's dx tool that variable use in bytecode
+	is inconsistent with "LocalVariableTable" attribute.
+	* LambdaExp.java (startForInlining): New field.
+	* ApplyExp.java (compile): When doing a "sibling call" to an
+	inlined function, don't do the store into parameter registers,
+	since they may have different types than in current context.
+	Instead do tail call to just before store where actually inlined.
+	As a bonus, the bytecode is shorter.
+
 2013-06-30  Per Bothner  <per@bothner.com>
 
 	* LambdaExp.java (compileEnd): Call compileMembers on child

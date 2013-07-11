@@ -2464,8 +2464,8 @@ public class CodeAttr extends Attribute implements AttrContainer
 
   /** Compile a tail-call to position 0 of the current procedure.
    * @param pop_args if true, copy argument registers (except this) from stack.
-   * @param scope Scope whose start we jump back to. */
-  public void emitTailCall (boolean pop_args, Scope scope)
+   * @param start the Label to jump back to. */
+  public void emitTailCall (boolean pop_args, Label start)
   {
     if (pop_args)
       {
@@ -2479,7 +2479,15 @@ public class CodeAttr extends Attribute implements AttrContainer
 	    emitStore(locals.used [arg_slots]);
 	  }
       }
-    emitGoto(scope.start);
+    emitGoto(start);
+  }
+
+  /** Compile a tail-call to position 0 of the current procedure.
+   * @param pop_args if true, copy argument registers (except this) from stack.
+   * @param scope Scope whose start we jump back to. */
+  public void emitTailCall (boolean pop_args, Scope scope)
+  {
+    emitTailCall(pop_args, scope.start);
   }
 
   public void processFixups ()

@@ -418,8 +418,23 @@ public class ApplyExp extends Expression
       }
     if (tail_recurse)
       {
-	popParams(code, func_lambda, incValues, toArray);
-	code.emitTailCall(false, func_lambda.getVarScope());
+        Label startLabel = func_lambda.startForInlining;
+        boolean mustStore = startLabel == null;
+        if (incValues != null && ! mustStore)
+          {
+            for (int i = incValues.length;  --i >= 0; )
+              if (incValues[i] != SetExp.BAD_SHORT)
+                {
+                  mustStore = true;
+                  break;
+                }
+          }
+        if (mustStore)
+          {
+            popParams(code, func_lambda, incValues, toArray);
+            startLabel = func_lambda.getVarScope().getStartLabel();
+          }
+        code.emitTailCall(false, startLabel);
 	return;
       }
     code.emitInvokeVirtual(method);

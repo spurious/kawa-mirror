@@ -1,5 +1,7 @@
 2013-07-11  Per Bothner  <per@bothner.com>
 
+	* Scope.java (getStartLabel, getEndLabel): New accessor methods.
+
 	* CodeAttr.java (emitTailCall): Add overloaded method.
 
 2013-06-28  Per Bothner  <per@bothner.com>

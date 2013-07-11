@@ -1,5 +1,10 @@
 2013-07-11  Per Bothner  <per@bothner.com>
 
+	* ApplyExp.java (compile): Extend previous optimization
+	to self-tail-recursion, when possible.
+
+2013-07-11  Per Bothner  <per@bothner.com>
+
 	Fix complaint from Android's dx tool that variable use in bytecode
 	is inconsistent with "LocalVariableTable" attribute.
 	* LambdaExp.java (startForInlining): New field.

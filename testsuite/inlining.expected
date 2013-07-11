@@ -92,8 +92,8 @@ InliningTest.getFromVector1(gnu.lists.FVector,int)java.lang.Integer: 12 bytes
 InliningTest.getFromVector2(gnu.lists.FVector,int)java.lang.Integer: 12 bytes
 InliningTest.topLevelRecurse1(gnu.lists.Pair)gnu.bytecode.Type$NeverReturns: 10 bytes
 InliningTest.topLevelRecurse2(java.lang.Object,java.lang.Object)gnu.bytecode.Type$NeverReturns: 7 bytes
-InliningTest.sum1(gnu.math.IntNum)java.lang.Object: 36 bytes
-InliningTest.sum2(double)double: 30 bytes
+InliningTest.sum1(gnu.math.IntNum)java.lang.Object: 34 bytes
+InliningTest.sum2(double)double: 27 bytes
 InliningTest.numcomp1(java.lang.Object,java.lang.Object)int: 15 bytes
 InliningTest.numcomp2(java.lang.Object,java.lang.Object)int: 16 bytes
 InliningTest.numcomp3(java.lang.Object,java.lang.Object,java.lang.Object)int: 19 bytes
@@ -108,7 +108,7 @@ binarytrees$TreeNode.itemCheck()int: 36 bytes
 fannkuch.vectorReverseSlice$Ex(int[],int,int)void: 35 bytes
 fannkuch.countFlips(int[],int[])int: 46 bytes
 fannkuch.fannkuch(int)int: 230 bytes
-fannkuchredux.fannkuch(int)int: 287 bytes
+fannkuchredux.fannkuch(int)int: 285 bytes
 fasta.randomNext(double)double: 28 bytes
 pidigits.pidigits(int,java.io.PrintStream)void: 125 bytes
 pidigits$Transformation.next()void: 59 bytes

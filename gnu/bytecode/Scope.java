@@ -33,6 +33,10 @@ public class Scope
 
   public VarEnumerator allVars () { return new VarEnumerator (this); }
 
+    public Label getStartLabel() { return start; }
+    public Label getEndLabel() { return end; }
+
+
   /** Link this scope as the next child of its parent scope. */
   public void linkChild (Scope parent)
   {

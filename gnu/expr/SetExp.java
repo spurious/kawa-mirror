@@ -351,8 +351,8 @@ public class SetExp extends AccessExp
    * Also, if the {@code rhs} is the same as (i.e. a reference to)
    * {@code target}, return zero, to indicate a possible no-op.
    * I.e. we treat {@code target=target} as if it were
-   * {@code target=target+0} - even is {@code tragte} is non-numeric.
-   * @return return increment, or BAD_SHORT.
+   * {@code target=target+0} - even is {@code target} is non-numeric.
+   * @return return increment, or {@code BAD_SHORT}.
    */
   public static int canUseInc (Expression rhs, Declaration target)
   {

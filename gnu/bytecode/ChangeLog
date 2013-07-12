@@ -1,5 +1,9 @@
 2013-07-11  Per Bothner  <per@bothner.com>
 
+	* CodeAttr.java (pushAutoPoppableScope): New method.
+	(popScope): Keep popping Scopes until we pop a non-autoPop Scope.
+	* Scope.java (autoPop): New field.
+
 	* Scope.java (getStartLabel, getEndLabel): New accessor methods.
 
 	* CodeAttr.java (emitTailCall): Add overloaded method.

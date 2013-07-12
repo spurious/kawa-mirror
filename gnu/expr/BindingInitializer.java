@@ -111,7 +111,7 @@ public class BindingInitializer extends Initializer
       {
 	Variable var = decl.getVariable();
 	if (var == null)
-	  var = decl.allocateVariable(code);
+            var = decl.allocateVariable(code, true);
 	code.emitStore(var);
       }
     else if (field.getStaticFlag())

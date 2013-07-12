@@ -1,5 +1,11 @@
 2013-07-11  Per Bothner  <per@bothner.com>
 
+	* Declaration.java (allocateVariable): New overload, with
+	parameter to control if we want an autuPop Scope.
+	(load): Use new allocateVariable variant if Variable needed.
+	* SetExp.java (compile): Likewise.
+	* BindingInitializer.java (emit): Likewise.
+
 	* ApplyExp.java (compile): Extend previous optimization
 	to self-tail-recursion, when possible.
 

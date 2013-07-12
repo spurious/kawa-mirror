@@ -256,7 +256,7 @@ public class SetExp extends AccessExp
             type = decl.getType();
 	    Variable var = decl.getVariable();
 	    if (var == null)
-	      var = decl.allocateVariable(code);
+                var = decl.allocateVariable(code, true);
             int delta = canUseInc(new_value, decl);
             if (delta != BAD_SHORT)
               {

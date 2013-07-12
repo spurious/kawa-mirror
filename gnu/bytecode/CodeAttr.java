@@ -641,18 +641,33 @@ public class CodeAttr extends Attribute implements AttrContainer
     return scope;
   }
 
+    /** Create a Scope that is automatically popped.
+     * I.e. the next popScope will keep popping autoPop scopes until
+     * it gets to a non-autoPop scope.  An autoPop Scope is useful for
+     * variables that are assigned and set in the middle of a managed Scope.
+     */
+    public Scope pushAutoPoppableScope() {
+        Scope scope = pushScope();
+        scope.autoPop = true;
+        return scope;
+    }
+
   public Scope getCurrentScope()
   {
     return locals.current_scope;
   }
 
-  public Scope popScope () {
-    Scope scope = locals.current_scope;
-    locals.current_scope = scope.parent;
-    scope.freeLocals(this);
-    scope.end = getLabel();
-    return scope;
-  }
+    public Scope popScope () {
+        Label end = getLabel();
+        for (;;) {
+            Scope scope = locals.current_scope;
+            locals.current_scope = scope.parent;
+            scope.freeLocals(this);
+            scope.end = end;
+            if (! scope.autoPop)
+                return scope;
+        }
+    }
 
   /** Get the index'th parameter. */
   public Variable getArg (int index)

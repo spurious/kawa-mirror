@@ -13,6 +13,8 @@ public class Scope
   /** If true, don't call freeLocal on our variables (yet). */
   boolean preserved;
 
+    boolean autoPop;
+
   Label start;
   Label end;
   Variable vars;
@@ -35,7 +37,6 @@ public class Scope
 
     public Label getStartLabel() { return start; }
     public Label getEndLabel() { return end; }
-
 
   /** Link this scope as the next child of its parent scope. */
   public void linkChild (Scope parent)

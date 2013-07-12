@@ -394,7 +394,7 @@ public class Declaration
             else
               {
                 if (var == null)
-                  var = allocateVariable(code);
+                    var = allocateVariable(code, true);
                 code.emitLoad(var);
               }
           }
@@ -912,6 +912,10 @@ public class Declaration
 
   public final Variable allocateVariable(CodeAttr code)
   {
+    return allocateVariable(code, false);
+  }
+  public final Variable allocateVariable(CodeAttr code, boolean autoPopScope)
+  {
     if (! isSimple() || var == null)
       {
         String vname = null;
@@ -926,7 +930,9 @@ public class Declaration
 	  {
 	    Type type = isIndirectBinding() ? Compilation.typeLocation
 	      : getType().getImplementationType();
-	    var = context.getVarScope().addVariable(code, type, vname);
+            Scope scope = autoPopScope ? code.pushAutoPoppableScope()
+                : context.getVarScope();
+	    var = scope.addVariable(code, type, vname);
 	  }
       }
     return var;

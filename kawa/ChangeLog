@@ -1,3 +1,10 @@
+2013-07-16  Per Bothner  <per@bothner.com>
+
+	* lang/Quote.java (expand_pair): Fix bug in handling of nested (i.e.
+	doubly quasi-quoted) unquote-splicing.  Simplify to be (almost)
+	like handling of plain unquote.
+	This fixes Savannah bug #39501 "invalid use of unquote-splicing".
+
 2013-06-27  Per Bothner  <per@bothner.com>
 
 	* standard/define.java (scanForm): Don't set writable if

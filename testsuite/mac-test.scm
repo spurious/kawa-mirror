@@ -1,4 +1,4 @@
-(test-init "macros" 122)
+(test-init "macros" 123)
 
 (test 'ok 'letxx (let ((xx #f)) (cond (#t xx 'ok))))
 
@@ -405,6 +405,12 @@
       (quasiquote (a (unquote  x y) b)))
 (test '(a "X1" "X2" "Y1" "Y2" b) 'unquote-2
       (quasiquote (a (unquote-splicing  x y) b)))
+
+;; Savannah bug #39501 "invalid use of unquote-splicing"
+(define-macro (a-39501)
+  `(define-macro (b-39501 . x) `(+ 1 ,@x)))
+(a-39501)
+(test 7 'savannah-39501 (b-39501 1 2 3))
 
 (begin ;; Test that we can define and use a syntax-case macro in same module.
   (define-syntax local-defmac-or

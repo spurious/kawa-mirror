@@ -113,6 +113,7 @@ public class Quote extends Syntax {
         // to avoid stack overflow in the case of long lists.
         rest = pair;
         Pair p1, p2;
+        boolean isUnquote;
         // We're currently examining pair, which is the n'th cdr of list.
         // All previous elements (cars) are returned identically by expand.
         // What makes things complicated is that to the extent that no changes
@@ -154,12 +155,15 @@ public class Quote extends Syntax {
           }
         else if (matchesQuasiQuote(pair.getCar(), syntax, tr))
           depth++;
-        else if (matchesUnquote(pair, syntax, tr))
+        else if ((isUnquote = matchesUnquote(pair, syntax, tr))
+                  || matchesUnquoteSplicing(pair, syntax, tr))
           {
             depth--;
             Pair pair_cdr;
             if (! (pair.getCdr() instanceof Pair)
-                || (pair_cdr = (Pair) pair.getCdr()).getCdr() != LList.Empty)
+                || (pair_cdr = (Pair) pair.getCdr()).getCdr() != LList.Empty
+                // Can't splice in cdr position (i.e. following dot).
+                || (depth == 0 && ! isUnquote))
               return tr.syntaxError ("invalid used of " + pair.getCar() +
 				     " in quasiquote template");
             if (depth == 0)
@@ -168,9 +172,7 @@ public class Quote extends Syntax {
                 break;
               }
           }
-        else if (matchesUnquoteSplicing(pair, syntax, tr))
-          return tr.syntaxError ("invalid used of " + pair.getCar() +
-				 " in quasiquote template");
+ 
         if (depth == 1 && pair.getCar() instanceof Pair)
           {
             Object form = pair.getCar();

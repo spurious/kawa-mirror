@@ -1,3 +1,8 @@
+2013-07-16  Per Bothner  <per@bothner.com>
+
+	* mac-test.scm: Add test for Savannah bug #39501
+	"invalid use of unquote-splicing".
+
 2013-07-11  Per Bothner  <per@bothner.com>
 
 	* inlining.expected: Update results.

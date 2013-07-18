@@ -262,7 +262,11 @@ public class Declaration
                     Compilation comp, Target target)
   {
     if (target instanceof IgnoreTarget)
-      return;
+      {
+        if (access.getFlag(ReferenceExp.ALLOCATE_ON_STACK_LAST))
+          comp.getCode().emitPop(1);
+        return;
+      }
     Declaration owner = access == null ? null : access.contextDecl();
     Expression dvalue = getValueRaw();
     if (isAlias() && dvalue instanceof ReferenceExp)

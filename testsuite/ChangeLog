@@ -1,3 +1,10 @@
+2013-07-18  Matthieu Vachon  <matthieu.o.vachon@gmail.com>
+	    Per Bothner  <per@bothner.com>
+
+	* sva39150.scm: New test for Savannah bug #39150
+	"AppendValue procedure compiler InternalError".
+	* Makefile.am: Update accordingly.
+
 2013-07-16  Per Bothner  <per@bothner.com>
 
 	* mac-test.scm: Add test for Savannah bug #39501

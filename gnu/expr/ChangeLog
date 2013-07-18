@@ -1,3 +1,9 @@
+2013-07-18  Per Bothner  <per@bothner.com>
+
+	* Declaration.java (load): Handle combination of IgnoreTarget and
+	ALLOCATE_ON_STACK_LAST.  This fixes Savannah bug #39150
+	"AppendValue procedure compiler InternalError".
+
 2013-07-11  Per Bothner  <per@bothner.com>
 
 	* Declaration.java (allocateVariable): New overload, with

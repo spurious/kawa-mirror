@@ -1,3 +1,10 @@
+2013-07-18  Alex Moiseenko <imdagger@yandex.ru>
+	    Per Bothner  <per@bothner.com>
+
+	* sva38026.scm: New test for Savannah bug #38026
+	"Mixed variables scope".
+	* Makefile.am: Update accordingly.
+
 2013-07-18  Matthieu Vachon  <matthieu.o.vachon@gmail.com>
 	    Per Bothner  <per@bothner.com>
 

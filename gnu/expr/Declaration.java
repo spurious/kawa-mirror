@@ -358,6 +358,16 @@ public class Declaration
             else
               code.emitGetStatic(field);
           }
+        else if (isClassField())
+          {
+            String getName = ClassExp.slotToMethodName("get", getName());
+            Method getter = ((ClassExp) context).compiledType
+                .getDeclaredMethod(getName, 0);
+            comp.usedClass(getter.getDeclaringClass());
+            comp.usedClass(getter.getReturnType());
+            loadOwningObject(owner, comp);
+            code.emitInvoke(getter);
+          }
         else if (isIndirectBinding() && comp.immediate && getVariable() == null)
           {
             // This is a bit of a kludge.  See comment in ModuleExp.evalModule.
@@ -385,22 +395,9 @@ public class Declaration
         else
           {
             Variable var = getVariable();
-            ClassExp cl;
-            if (context instanceof ClassExp && var == null
-                && ! getFlag(PROCEDURE)
-                && (cl = (ClassExp) context).isMakingClassPair())
-              {
-                String getName = ClassExp.slotToMethodName("get", getName());
-                Method getter = cl.compiledType.getDeclaredMethod(getName, 0);
-                cl.loadHeapFrame(comp);
-                code.emitInvoke(getter);
-              }
-            else
-              {
-                if (var == null)
-                    var = allocateVariable(code, true);
-                code.emitLoad(var);
-              }
+            if (var == null)
+              var = allocateVariable(code, true);
+            code.emitLoad(var);
           }
         if (isIndirectBinding()
             && (flags & ReferenceExp.DONT_DEREFERENCE) == 0)

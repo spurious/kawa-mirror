@@ -1,5 +1,8 @@
 2013-07-18  Per Bothner  <per@bothner.com>
 
+	* SetExp.java (compile): Re-factor code some simple-field
+	and setter-method cases share logic when appropriate.
+
 	* Declaration.java (load): Handle combination of IgnoreTarget and
 	ALLOCATE_ON_STACK_LAST.  This fixes Savannah bug #39150
 	"AppendValue procedure compiler InternalError".

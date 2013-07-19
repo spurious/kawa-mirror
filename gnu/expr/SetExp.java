@@ -280,37 +280,34 @@ public class SetExp extends AccessExp
                 code.emitStore(var);
               }
 	  }
-	else if (decl.context instanceof ClassExp && decl.field == null
-		 && ! getFlag(PROCEDURE)
-		 && ((ClassExp) decl.context).isMakingClassPair())
-	  {
-	    String setName = ClassExp.slotToMethodName("set", decl.getName());
-	    ClassExp cl = (ClassExp) decl.context;
-	    Method setter = cl.compiledType.getDeclaredMethod(setName, 1);
-            decl.loadOwningObject(owner, comp);
-	    new_value.compile(comp, decl);
-	    if (needValue)
-	      {
-		code.emitDupX();
-		valuePushed = true;
-	      }
-	    code.emitInvoke(setter);
-	  }
-	else
+        else
 	  {
 	    Field field = decl.field;
-            if (! field.getStaticFlag())
+            boolean isStatic = field != null && field.getStaticFlag();
+            Method setter;
+            if (field == null)
+              {
+                String setName = ClassExp.slotToMethodName("set",
+                                                           decl.getName());
+                ClassExp cl = (ClassExp) decl.context;
+                setter = cl.compiledType.getDeclaredMethod(setName, 1);
+                comp.usedClass(setter.getDeclaringClass());
+              }
+            else
+              {
+                setter = null;
+                comp.usedClass(field.getDeclaringClass());
+              }
+            if (! isStatic)
               decl.loadOwningObject(owner, comp);
-            type = field.getType();
 	    new_value.compile(comp, decl);
             if (! checkReachable(comp))
               return;
-            comp.usedClass(field.getDeclaringClass());
-            if (field.getStaticFlag())
+            if (isStatic)
               {
                 if (needValue)
                   {
-                    code.emitDup(type);
+                    code.emitDup();
                     valuePushed = true;
                   }
                 code.emitPutStatic(field);
@@ -322,7 +319,10 @@ public class SetExp extends AccessExp
                     code.emitDupX();
                     valuePushed = true;
                   }
-                code.emitPutField(field);
+                if (field != null)
+                    code.emitPutField(field);
+                else
+                    code.emitInvoke(setter); 
               }
 	  }
       }

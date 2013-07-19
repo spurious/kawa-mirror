@@ -1,3 +1,9 @@
+2013-07-18  Per Bothner  <per@bothner.com>
+
+	* Variable.java (freeLocal): Avoid out-of-bounds indexing of
+	local_types array.  This fixes Savannah bug # 39151
+	"ArrayOutOfBoundsException in Variable.freeLocal".
+
 2013-07-11  Per Bothner  <per@bothner.com>
 
 	* CodeAttr.java (pushAutoPoppableScope): New method.

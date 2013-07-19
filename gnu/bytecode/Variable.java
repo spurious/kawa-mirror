@@ -138,7 +138,7 @@ public class Variable extends Location implements java.util.Enumeration
       {
         code.locals.used[vnum] = null;
         Type[] local_types = code.local_types;
-        if (local_types != null)
+        if (local_types != null && vnum < local_types.length)
           local_types[vnum] = null;
       }
   }

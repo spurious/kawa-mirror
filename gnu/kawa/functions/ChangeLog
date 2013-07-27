@@ -1,3 +1,11 @@
+2013-07-26  Per Bothner  <per@bothner.com>
+
+	* LispFormat.java (<init>): If there is no literal text between
+	two format specifier, insert LiteralFormat.separator.
+	This avoids a spurious space between numeric values.
+	* ParseFormat.java (parseFormat): Similar change.
+	Also, update to use use ArrayList instead of Vector.
+
 2013-06-29  Per Bothner  <per@bothner.com>
 
 	* IsEqv.java (apply): If types are Boolean, compare like equal?.

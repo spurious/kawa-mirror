@@ -46,7 +46,7 @@
          "ab{12c}z")
 (strtest &{ab&[3 4]xzy}
          '($string$ "ab" $<<$ 3 4 $>>$ "xzy")
-         "ab3 4xzy")
+         "ab34xzy")
 (strtest &{_&lbrace;_&rbrace;_&gt;_&lt;_&quot;_&apos;_}
          '($string$ "_" $entity$:lbrace "_" $entity$:rbrace "_" $entity$:gt
                     "_" $entity$:lt "_" $entity$:quot "_" $entity$:apos "_")
@@ -146,7 +146,7 @@ b}
 
 (strtest &{m&[3]&[4]n}
          '($string$ "m" $<<$ 3 $>>$ $<<$ 4 $>>$ "n")
-         "m3 4n")
+         "m34n")
 
 ;; Some tests using format
 (strtest &{abc&~3d(+ 4 5)z}

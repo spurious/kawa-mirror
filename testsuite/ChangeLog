@@ -1,3 +1,8 @@
+2013-07-26  Per Bothner  <per@bothner.com>
+
+	* formatst.scm: New tests for adjacent formats, and using values.
+	* srfi-109-test.scm: Tweak expected output for format changes.
+
 2013-07-18  Alex Moiseenko <imdagger@yandex.ru>
 	    Per Bothner  <per@bothner.com>
 

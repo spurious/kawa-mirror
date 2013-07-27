@@ -28,7 +28,7 @@
 ;      (newline)
 ;      (format:abort)))
 
-(test-begin "format" 423)
+(test-begin "format" 425)
 (define-syntax test 
   (syntax-rules ()
     ((test format-args out-str)
@@ -718,6 +718,9 @@ Does not match implementation - or Common Lisp.
 (test '("~10,3F" 1.002) "     1.002")
 (test '("~10,3F" 1.0025) "     1.002")
 (test '("~10,3F" 1.00256) "     1.003")
+
+(test '("<~a~a>" 3 4) "<34>")
+(test `("<~a>" ,(values 3 4)) "<3 4>")
 
 ; inquiry test
 

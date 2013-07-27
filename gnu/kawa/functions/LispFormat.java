@@ -30,9 +30,15 @@ public class LispFormat extends CompoundFormat
     int i = offset;
     for (;;)
       {
-	if ((i >= limit || format[i] == '~') && litbuf.length() > 0)
+        // Note we create a LiteralFormat even when litbuf is empty.
+        // This is to make sure there are string-valued separators between
+        // specifiers (as well as before and after).  Otherwise
+        // (format "~a~a" 3 4) would return "3 4" rather than "34".
+        if (i >= limit || format[i] == '~')
 	  {
-	    stack.push(new LiteralFormat(litbuf));
+            LiteralFormat fmt = litbuf.length() > 0 ? new LiteralFormat(litbuf)
+                : LiteralFormat.separator;
+	    stack.push(fmt);
 	    litbuf.setLength(0);
 	  }
 	if (i >= limit)
@@ -222,7 +228,11 @@ public class LispFormat extends CompoundFormat
 	    lfmt = (LispIterationFormat) stack.elementAt(start_nesting);
 	    lfmt.atLeastOnce = seenColon;
 	    if (speci > start_nesting + 2)
-	      lfmt.body = popFormats(stack, start_nesting + 2, speci);
+              {
+                Format body = popFormats(stack, start_nesting + 2, speci);
+                if (body != LiteralFormat.separator)
+                  lfmt.body = body;
+              }
 	    start_nesting = ((IntNum) stack.pop()).intValue();
 	    continue;
 	  case '<':

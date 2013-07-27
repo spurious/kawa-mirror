@@ -6,6 +6,9 @@ import gnu.lists.Strings;
 public class LiteralFormat extends ReportFormat {
     String text;
 
+    /** A literal empty string.  Useful as a separator. */
+    public static final LiteralFormat separator = new LiteralFormat("");
+
     public LiteralFormat(char[] text) {
         this.text = String.valueOf(text);
     }

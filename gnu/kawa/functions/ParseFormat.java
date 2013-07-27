@@ -1,6 +1,7 @@
 package gnu.kawa.functions;
 import java.text.ParseException;
 import java.text.Format;
+import java.util.ArrayList;
 import gnu.mapping.*;
 import gnu.math.FixedRealFormat;
 import gnu.lists.*;
@@ -36,7 +37,7 @@ public class ParseFormat extends Procedure1
   {
     StringBuffer fbuf = new StringBuffer(100);
     int position = 0;
-    java.util.Vector formats = new java.util.Vector();
+    ArrayList<Format> formats = new ArrayList<Format>();
     Format format;
     for (;;)
       {
@@ -57,13 +58,22 @@ public class ParseFormat extends Procedure1
 	      }
 	  }
 	int len = fbuf.length();
-	if (len > 0)
-	  {
-	    char[] text = new char[len];
-	    fbuf.getChars(0, len, text, 0);
-	    fbuf.setLength(0);
-	    formats.addElement(new LiteralFormat(text));
-	  }
+
+        // Note we create a LiteralFormat even when fbuf is empty.
+        // This is to make sure there are string-valued separators between
+        // specifiers (as well as before and after).  Otherwise
+        // ($sprintf$ "%s%s" 3 4) would return "3 4" rather than "34".
+        if (len == 0)
+            format = LiteralFormat.separator;
+        else
+          {
+            char[] text = new char[len];
+            fbuf.getChars(0, len, text, 0);
+            fbuf.setLength(0);
+            format = new LiteralFormat(text);
+          }
+        formats.add(format);
+
 	if (ch < 0)
 	  break;
 	int digit;
@@ -238,20 +248,17 @@ public class ParseFormat extends Procedure1
 	//fbuf.append('{');
         // fbuf.append(position);
 	//fbuf.append('}');
-	formats.addElement(format);
+	formats.add(format);
 	position++;
       }
-    // System.err.println("format: "+fbuf.toString());
     int fcount = formats.size();
     if (fcount == 1)
       {
-	Object f = formats.elementAt(0);
+	Object f = formats.get(0);
 	if (f instanceof ReportFormat)
 	  return (ReportFormat) f;
       }
-    Format[] farray = new Format[fcount];
-    formats.copyInto(farray);
-    return new CompoundFormat(farray);
+    return new CompoundFormat(formats.toArray(new Format[fcount]));
   }
 
   public Object apply1 (Object arg)

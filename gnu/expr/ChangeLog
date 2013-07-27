@@ -1,3 +1,10 @@
+2013-07-26  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (compileConstant): Inline
+	compileConstantToField here.  No need to wire in implementation
+	strategy of using static fields.
+	(compileConstantToField): Remove.
+
 2013-07-18  Per Bothner  <per@bothner.com>
 
 	* Declaration.java (load): When invoking a getter method,

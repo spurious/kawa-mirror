@@ -477,28 +477,24 @@ public class Compilation implements SourceLocator
     return typeModuleBody;
   }
 
-  /** Emit code to "evaluate" a compile-time constant.
-   * This is the normal external interface.
-   * @param value the value to be compiled
-   */
-  public void compileConstant (Object value)
-  {
-    gnu.bytecode.CodeAttr code = getCode();
-    if (value == null)
-      code.emitPushNull();
-    else if (value instanceof String && ! immediate)
-      code.emitPushString((String) value);
-    else
-      code.emitGetStatic(compileConstantToField(value));
-  }
-
-  public Field compileConstantToField (Object value)
-  {
-    Literal literal = litTable.findLiteral(value);
-    if (literal.field == null)
-      literal.assign(litTable);
-    return literal.field;
-  }
+    /** Emit code to "evaluate" a compile-time constant.
+     * This is the normal external interface.
+     * @param value the value to be compiled
+     */
+    public void compileConstant (Object value) {
+        gnu.bytecode.CodeAttr code = getCode();
+        if (value == null)
+            code.emitPushNull();
+        else if (value instanceof String && ! immediate)
+            code.emitPushString((String) value);
+        else {
+            Literal literal = litTable.findLiteral(value);
+            // if (immediate) maybe we want to use a differnet approach.
+            if (literal.field == null)
+                literal.assign(litTable);
+            code.emitGetStatic(literal.field);
+        }
+    }
 
   public static boolean inlineOk = true;
 
@@ -2114,8 +2110,11 @@ public class Compilation implements SourceLocator
 	    code.emitNew(moduleClass);
 	    code.emitDup(moduleClass);
 	    code.emitInvokeSpecial(moduleClass.constructor);
-            // The $instance field needs to be Public so
+            // The $instance field needs to be public so
             // ModuleContext.findInstance can find it.
+            // It needs to be non-final in case moduleClass!=mainClass.
+            // (The latter should probably be fixed by moving this code
+            // to moduleClass's <clinit>.)
 	    moduleInstanceMainField
 	      = moduleClass.addField("$instance", moduleClass,
 				     Access.STATIC|Access.PUBLIC);

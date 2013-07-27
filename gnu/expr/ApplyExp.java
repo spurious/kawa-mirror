@@ -327,7 +327,9 @@ public class ApplyExp extends Expression
 	comp.curLambda = func_lambda;
 	func_lambda.allocChildClasses(comp);
 	func_lambda.allocParameters(comp);
-        func_lambda.startForInlining = code.getLabel();
+        Label startForInlining = new Label(code);
+        startForInlining.define(code);
+        func_lambda.startForInlining = startForInlining;
 	popParams (code, func_lambda, null, false);
 	func_lambda.enterFunction(comp);
 	func_lambda.body.compileWithPosition(comp, target);

@@ -1,5 +1,9 @@
 2013-07-26  Per Bothner  <per@bothner.com>
 
+	* ApplyExp.java (compile): Fix 2013-07-11 tail-call change
+	to use regular Label#define, rather than CodeAttr#getLabel.
+	The latter doesn't set types correctly.
+
 	* Compilation.java (compileConstant): Inline
 	compileConstantToField here.  No need to wire in implementation
 	strategy of using static fields.

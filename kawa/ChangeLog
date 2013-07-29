@@ -1,3 +1,10 @@
+2013-07-29  Matthieu Vachon  <matthieu.o.vachon@gmail.com>
+
+	* standard/define_alias.java: Implemented define-private-alias
+	syntax. This syntax is equivalent to define-alias except it is
+	private by default.
+	* standard/Scheme.java: Added define-private-alias binding.
+
 2013-07-16  Per Bothner  <per@bothner.com>
 
 	* lang/Quote.java (expand_pair): Fix bug in handling of nested (i.e.

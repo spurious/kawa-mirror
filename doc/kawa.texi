@@ -7245,6 +7245,11 @@ is equivalent to @code{(location @var{lvalue})}.
 This works both top-level and inside a function.
 @end deffn
 
+@deffn Syntax define-private-alias variable lvalue
+Same as @code{define-alias}, but the @var{variable}
+is local to the current module.
+@end deffn
+
 Some people might find it helpful to think of a location
 as a settable @dfn{thunk}.  Others may find it useful to
 think of the @code{location} syntax as similar to the C @samp{&} operator;

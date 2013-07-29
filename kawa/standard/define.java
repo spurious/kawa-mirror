@@ -44,7 +44,6 @@ public class define extends Syntax
     Pair p1 = (Pair) st.getCdr();
     Pair p2 = (Pair) p1.getCdr();
     Pair p3 = (Pair) p2.getCdr();
-    Pair p4 = (Pair) p3.getCdr();
     SyntaxForm nameSyntax = null;
     Object name = p1.getCar();
     while (name instanceof SyntaxForm)
@@ -56,7 +55,6 @@ public class define extends Syntax
     boolean makePrivate = (options & 4) != 0;
     boolean makeConstant = (options & 8) != 0;
 
-    ScopeExp scope = tr.currentScope();
     name = tr.namespaceResolve(name);
     if (! (name instanceof Symbol))
       {

@@ -5,8 +5,18 @@ import gnu.mapping.*;
 import kawa.lang.*;
 
 public class define_alias extends Syntax {
+
     public static final define_alias define_alias = new define_alias();
-    static { define_alias.setName("define-alias"); }
+    public static final define_alias define_private_alias = new define_alias();
+
+    static {
+      define_alias.setName("define-alias");
+
+      define_private_alias.setName("define-private-alias");
+      define_private_alias.makePrivate = false;
+    }
+
+    private boolean makePrivate = false;
 
     public void scanForm (Pair st, ScopeExp defs, Translator tr) {
         Object formCdr = st.getCdr();
@@ -28,13 +38,18 @@ public class define_alias extends Syntax {
                 formSyntax = (SyntaxForm) f2;
                 f2 = formSyntax.getDatum();
             }
-            Pair p2;
+
             if ((name instanceof String || name instanceof Symbol)
                 && f2 instanceof Pair
-                && (p2 = (Pair) f2).getCdr() == LList.Empty) {
+                && ((Pair) f2).getCdr() == LList.Empty) {
                 Declaration decl = tr.define(name, nameSyntax, defs);
                 decl.setIndirectBinding(true);
                 decl.setAlias(true);
+                if (makePrivate) {
+                    decl.setFlag(Declaration.PRIVATE_SPECIFIED);
+                    decl.setPrivate(true);
+                }
+
                 if (formSyntax != null)
                     f2 = SyntaxForms.makeForm(f2, formSyntax.getScope());
                 tr.formStack.addElement(Translator.makePair(st, this,
@@ -83,6 +98,6 @@ public class define_alias extends Syntax {
                 return sexp;
             }
         }
-        return tr.syntaxError ("define-alias is only allowed in a <body>");
+        return tr.syntaxError(getName()+" is only allowed in a <body>");
     }
 }

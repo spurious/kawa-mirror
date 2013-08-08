@@ -159,8 +159,11 @@ public class KawaAutoHandler
                   }
                 return null;
               }
-            //String contentType = context.getMimeType(path); FIXME
-            //hctx.setContentType(contentType);
+
+            String contentType = absPath.probeContentType();
+            if (contentType != null)
+                hctx.setContentType(contentType);
+
             // should set content length.
             long len = absPath.getContentLength();
             hctx.sendResponseHeaders(200, null, len);

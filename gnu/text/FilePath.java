@@ -313,4 +313,18 @@ public class FilePath
       }
     return this;
   }
+
+    /* #ifdef JAVA7 */
+    // /** Convert to a {@code java.nio.file.Path} instance.
+    //  * Unlike the overriden base method, this cannot
+    //  * throw {@code FileSystemNotFoundException}.
+    //  * Use caution if this is a relative path and the {@code currentPath()}
+    //  * is not the default path, since {@code java.nio} assumes a relative path
+    //  * is relative to the default directory.
+    //  */
+    // @Override
+    // public java.nio.file.Path toNPath() {
+    //     return file.toPath();
+    // }
+    /* #endif */
 }

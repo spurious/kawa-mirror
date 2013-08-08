@@ -1,3 +1,9 @@
+2013-08-07  Per Bothner  <per@bothner.com>
+
+	* Path.java (toNPath): New method - only if JAVA7 nio.
+	(probeContentType): New method.
+	* FilePath.java (toNPath): New method override.
+
 2013-03-04  Per Bothner  <per@bothner.com>
 
 	* ReportFormat.java (format): Generalize to write to Appendable.

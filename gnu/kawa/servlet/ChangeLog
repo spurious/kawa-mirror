@@ -1,3 +1,7 @@
+2013-08-07  Per Bothner  <per@bothner.com>
+
+	* KawaAutoHandler.java (getModule): Call new Path#probeContentType.
+
 2012-12-10  Per Bothner  <per@bothner.com>
 
 	* KawaAutoHandler.java (getModule): Don't include initial slash in

@@ -423,7 +423,7 @@ implements javax.tools.FileObject
         /* #else */
         contentType = null;
         /* #endif */
-        if (contentType != null) {
+        if (contentType == null) {
             contentType = URLConnection.guessContentTypeFromName(getPath());
         }
         return contentType;

@@ -1,3 +1,7 @@
+2013-08-16  Alex Mitchell <lexaay@gmail.com>
+
+	* Path.java (probeContentType): Fix thinko.
+
 2013-08-07  Per Bothner  <per@bothner.com>
 
 	* Path.java (toNPath): New method - only if JAVA7 nio.

@@ -14675,78 +14675,37 @@ more efficient, and more customizable are also desirable.
 See @uref{http://sourceware.org/ml/kawa/2012-q1/msg00084.html,this message}
 for a rough design.
 
-@subsection Rich String Literals
-Implement multi-line string literals with expression escapes.
-See Racket's @uref{http://docs.racket-lang.org/scribble/,Scribble}
-for some ideas and desired functonality.
-The exact syntax needs to be decided.  Presumably the literal
-starts with the dispatch characters @samp{#} followed by some other character
-(most likely @samp{"}, though possibly @samp{@{}).
-In the following the escape character is assumed to be @samp{\},
-but other possibilities include @samp{@@} (as in Scribble),
-or @samp{&} (as in XML).
+@subsection Hop-style web programming
+@uref{http://hop.inria.fr/,Hop} is an interesting design
+for integrating server-side and client-side programming using
+a Scheme dialect.  These ideas seem like they would port
+quite well to Kawa.
 
-Various goals and ideas:
-@itemize @bullet
-@item
-General Scribble-like syntax:
-@display
-\@var{cmd}@code{[} @var{expression} ...@code{]}@code{@{}@var{textbody}@code{@}}
-@end display
-This is roughly equivalent to embedding the result of evaluating:
-@display
-@code{(}@var{cmd} @var{expression} ... "@var{textbody}"@code{)}
-@end display
-Both @code{[} @var{expression} ...@code{]} and @code{@{}@var{textbody}@code{@}} are optional.
-(We need some convention or delimiter to end @code{cmd},
-especially when @var{textbody} is missing.)
-The @var{cmd} is also optional, inwhich case the @var{expression}s
-are embedded in the output.
-@item
-The start delimiter and the end delimiter must be different - both
-for the entire string, and for embedded @var{textbodies}.
-This is for easier parsing (and catching errors) for both humans and tools.
-E.g. @code{#"some text"#} or @code{#@{some text@}} or
-@code{#@{some text@}#} depending on the delimiters chosen.
-@item
-There should be some convention for stripping off indentation.
-@item
-Should support optional end delimitors.
-This is useful to make long texts more readable, and
-also to catch errors.  For example:
-@example
-\cmd@{some body stuff \cmd@}
-@end example
-Here the two instances of @code{cmd} have to match.
-(The end @code{\cmd} has to be immediatly followed
-by @samp{@}} to avoid ambiguity.)
-@item
-Support format specifiers:
-@example
-\~3d(length l)
-@end example
-is equivalent to:
-@example
-\[(format "~3d" (length l))]
-@end example
-Should also handle @code{printf}-style format specifers:
-@code{\%3d(length l)}.
-@item
-Handle localization.  I.e. some marker to indicate the
-string should be localized, in the manner of
-(and compatible with)
+@subsection String localization
+Support localization by extending the
+@uref{http://srfi.schemers.org/srfi-109/srfi-109.html,SRFI_109}
+syntax, in the manner of (and compatible with)
 @uref{http://www.gnu.org/software/gettext/,GNU gettext}.
-Optionally specify a localization key (to use as an index
+I.e. optionally specify a localization key (to use as an index
 in the translation database); if there is no key specified,
 default to using the literal parts of the string.
-@item
-Note in general the result is a ``text'', which is a generalization
-of a string: A text is a sequence of characters *or* other values.
-If an embedded expression evaluates to a non-string, it is @emph{not}
-automatically converted to a string.  Conversion to a string
-is done on demand, for example on printing.
-(This is similar to values in the XML data model.)
-@end itemize
+
+@subsection Data binding
+Implement a ``bind'' mechanism similar to that
+of @uref{http://docs.oracle.com/javafx/1.3/tutorials/core/dataBinding/,JavaFX Script}.
+The idea is when you initialize a variable or field,
+instead of initializing it to a fixed value, you bind it to
+an expression depending on other variables.
+We install ``listeners'' on those variables, so when those variables
+change, we update the bound variable.
+This feature is useful in many application, but the initial
+focus could be GUI programming and perhaps web programming.
+@c Note in general the result is a ``text'', which is a generalization
+@c of a string: A text is a sequence of characters *or* other values.
+@c If an embedded expression evaluates to a non-string, it is @emph{not}
+@c automatically converted to a string.  Conversion to a string
+@c is done on demand, for example on printing.
+@c (This is similar to values in the XML data model.)
 
 @node License
 @chapter License

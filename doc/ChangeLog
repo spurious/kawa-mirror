@@ -1,6 +1,7 @@
 2013-08-17  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Ideas and tasks): Various updates.
+	(Macros): Fix thinko.
 
 2013-07-29  Per Bothner  <per@bothner.com>
 

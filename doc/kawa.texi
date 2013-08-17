@@ -2837,7 +2837,7 @@ names, which can then be compared with @func{eq?}.  Thus, a predicate
 @end deffn
 
 @deffn Procedure {datum->syntax} @var{template-id} @var{datum} [@var{srcloc}]
-@deffnx {Deprecated procedure} {datum->syntax-object} @var{datum}
+@deffnx {Deprecated procedure} {datum->syntax-object} @var{template-id} @var{datum}
 @var{template-id} must be a template identifier and @var{datum} should
 be a datum value.
 

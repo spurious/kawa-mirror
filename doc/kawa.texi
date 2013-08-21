@@ -1926,6 +1926,23 @@ though it is a @var{special-initial} in standard Scheme (R6RS).
 @stxdef{optional-exponent} @i{empty}
   | @stxref{exponent-marker} @stxref{optional-sign} @stxref{digit}+
 @stxdef{exponent-marker} @stxlit{e} | @stxlit{s} | @stxlit{f} | @stxlit{d} | @stxlit{l}
+@end display
+The letter used for the exponent in a floating-point literal determines
+its type:
+@table @asis
+@item @stxlit{e}
+Returns a @code{gnu.math.DFloat} - for example @code{12e2}.
+Note this matches the default when there is no @stxref{exponent-marker}.
+@item @stxlit{s} or @stxlit{f}
+Returns a primitive @code{float} (or @code{java.lang.Float}
+when boxed as an object) - for example @code{12s2} or @code{12f2}.
+@item @stxlit{d}
+Returns a primitive @code{double} (or @code{java.lang.Double} when boxed)
+- for example @code{12d2}.
+@item @stxlit{l}
+Returns a @code{java.math.BigDecimal} - for example @code{12l2}.
+@end table
+@display
 @stxdef{optional-sign} @i{empty} | @stxlit{+} | @stxlit{-}
 @stxdef{digit-2} @stxlit{0} | @stxlit{1}
 @stxdef{digit-8} @stxlit{0} | @stxlit{1} | @stxlit{2} | @stxlit{3} | @stxlit{4} | @stxlit{5} | @stxlit{6} | @stxlit{7}
@@ -9719,9 +9736,17 @@ and @code{#f} otherwise:
 (gnu.lists.FVector? #(123)) @result{} #t
 (let ((iarr (int[] 10))) (int[]? iarr)) @result{} #t 
 @end example
+
+To convert (coerce) the result of an expression @var{value} to a
+type @var{T} use the syntax: @code{->@var{T} @var{value})}.
+@example
+(->float 12) @result{} 12.0f0
+@end example
+
 In general:
 @example
 (@var{T}? @var{x}) @result{} (instance? @var{x} @var{T})
+(->@var{T} @var{x}) @result{} (as @var{T} @var{x})
 @end example
 
 @deffn Procedure instance? value type
@@ -12283,7 +12308,7 @@ Crreate a processing-instruction object with the specified @var{target}
 You can write XML literals directly in Scheme code,
 following a @code{#}.
 Notice that the outermost element needs to be prefixed
-by @code{#}, but nested elements do (and must not).
+by @code{#}, but nested elements do not (and must not).
 @example
 #<p>The result is <b>final</b>!</p>
 @end example

@@ -1,3 +1,7 @@
+2013-08-20  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (stxlit macro): Use @code for better info output.
+
 2013-08-17  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Ideas and tasks): Various updates.

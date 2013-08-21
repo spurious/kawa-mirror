@@ -46,7 +46,7 @@
 @end iftex
 
 @macro stxlit{TEXT}
-@t{@b{\TEXT\}}
+@code{@b{\TEXT\}}
 @end macro
 @macro stxlitlbrace
 @t{@b{@{}}

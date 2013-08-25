@@ -91,34 +91,23 @@ public class FString extends SimpleVector
     addAll(seq);
   }
 
-  public FString(CharSeq seq)
-  {
-    this(seq, 0, seq.size());
-  }
+    public FString(CharSequence seq) {
+        this(seq, 0, seq.length());
+    }
 
-  public FString(CharSeq seq, int offset, int length)
-  {
-    char[] data = new char[length];
-    seq.getChars(offset, offset+length, data, 0);
-    this.data = data;
-    this.size = length;
-  }
-
-  /* #ifdef use:java.lang.CharSequence */
-  public FString (CharSequence seq)
-  {
-    this(seq, 0, seq.length());
-  }
-
-  public FString(CharSequence seq, int offset, int length)
-  {
-    char[] data = new char[length];
-    for (int i = length; --i >= 0; )
-      data[i] = seq.charAt(offset+i);
-    this.data = data;
-    this.size = length;
-  }
-  /* #endif */
+    public FString(CharSequence seq, int offset, int length) {
+        char[] data = new char[length];
+        if (seq instanceof CharSeq)
+            ((CharSeq) seq).getChars(offset, offset+length, data, 0);
+        else if (seq instanceof String)
+            ((String) seq).getChars(offset, offset+length, data, 0);
+        else {
+            for (int i = length; --i >= 0; )
+                data[i] = seq.charAt(offset+i);
+        }
+        this.data = data;
+        this.size = length;
+    }
 
   public int length() { return size; }
 

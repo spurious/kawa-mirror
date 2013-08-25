@@ -1,5 +1,8 @@
 2013-08-25  Per Bothner  <per@bothner.com>
 
+	* FString.java: Some simplication of constructors that copy a
+	CharSequence.
+
 	* Strings.java (copyInto): New static method, used by string-copy!.
 
 2013-05-11  Per Bothner  <per@bothner.com>

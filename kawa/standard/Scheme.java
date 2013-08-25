@@ -332,6 +332,7 @@ public class Scheme extends LispLanguage
       defProcStFld("acos", "kawa.lib.numbers");
       defProcStFld("atan", "kawa.lib.numbers");
       defProcStFld("sqrt", "kawa.lib.numbers");
+      defProcStFld("square", "kawa.lib.numbers");
       defProcStFld("expt", "kawa.standard.expt");
       defProcStFld("make-rectangular", "kawa.lib.numbers");
       defProcStFld("make-polar", "kawa.lib.numbers");
@@ -401,6 +402,7 @@ public class Scheme extends LispLanguage
       defProcStFld("string->list", "kawa.lib.strings");
       defProcStFld("list->string", "kawa.lib.strings");
       defProcStFld("string-copy", "kawa.lib.strings");
+      defProcStFld("string-copy!", "kawa.lib.strings");
       defProcStFld("string-fill!", "kawa.lib.strings");
 
       //-- Section 6.8  -- complete

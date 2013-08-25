@@ -1,3 +1,7 @@
+2013-08-25  Per Bothner  <per@bothner.com>
+
+	* Strings.java (copyInto): New static method, used by string-copy!.
+
 2013-05-11  Per Bothner  <per@bothner.com>
 
 	* PrintConsumer.java (write): If range is empty, write empty String.

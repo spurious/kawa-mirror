@@ -74,4 +74,27 @@ public class Strings
             throw new RuntimeException(ex);
         }
     }
+
+    public static void copyInto(CharSequence src, int start, int end,
+                                CharSeq dst, int at) {
+        int dstLen = dst.length();
+        int srcLen = src.length();
+        if (at < 0 || at > dstLen || start < 0 || end > srcLen || end < start
+            || dstLen - at < end - start)
+            throw new StringIndexOutOfBoundsException();
+        if (at < start) {
+            int i = at;
+            int j = start;
+            for (; j < end; i++, j++) {
+                dst.setCharAt(i, src.charAt(j));
+            }
+        }
+        else {
+            int i = at + end - start;
+            int j = end;
+            for (; j >= start; --i, j--) {
+                dst.setCharAt(i, src.charAt(j));
+            }
+        }
+    }
 }

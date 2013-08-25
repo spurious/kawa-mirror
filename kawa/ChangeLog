@@ -1,5 +1,8 @@
 2013-08-25  Per Bothner  <per@bothner.com>
 
+	* standard/Scheme.java (initScheme): Add "string-copy!"
+	and "square".
+
 	* standard/Scheme.java (initScheme): Add "make-list".
 
 2013-07-29  Matthieu Vachon  <matthieu.o.vachon@gmail.com>

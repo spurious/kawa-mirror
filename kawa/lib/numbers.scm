@@ -198,6 +198,9 @@
                 (values r d)
                 (loop r+1 (- i r+1-squared))))))))
 
+(define (square x::quantity) ::quantity
+  (* x x))
+
 (define (make-rectangular (x :: <real>) (y :: <real>)) :: <complex>
   (invoke-static <complex> 'make x y))
 

@@ -1,5 +1,12 @@
 2013-08-25  Per Bothner  <per@bothner.com>
 
+	* numbers.scm (square): New procedure from R7RS.
+	* strings.scm (string-ref, string-copy): Generalize to CharSequence.
+	(string->list): Take R7RS-style optional (start,end) bounds.
+	(string-fill!): Likewise.
+	(string-copy): Likewise.
+	(string-copy!): New procedure from R7RS.
+
 	* lists.scm (make-list): New procedure from R7RS.
 
 	* ports.scm (textual-port?, binary-port?): Fix typos.

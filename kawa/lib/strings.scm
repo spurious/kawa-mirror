@@ -19,7 +19,7 @@
 (define (string-length str ::string) :: <int>
   (invoke str 'length))
 
-(define (string-ref (string :: <string>) (k :: <int>)) :: <char>
+(define (string-ref (string ::java.lang.CharSequence) (k ::int)) ::char
   (invoke string 'charAt k))
 
 (define (string-set! string::abstract-string k::int char::char)
@@ -45,11 +45,13 @@
   :: <string>
   (make <gnu.lists.FString> str start (- end start)))
 
-(define (string->list (str :: <string>)) :: <list>
-  (let loop ((result :: <list> '())
-	     (i :: <int> (string-length str)))
+(define (string->list (str ::string)
+                      #!optional (start ::int 0) (end ::int (str:length)))
+  ::list
+  (let loop ((result ::list '())
+	     (i ::int end))
     (set! i (- i 1))
-    (if (< i 0)
+    (if (< i start)
 	result
 	(loop (make <pair> (string-ref str i) result) i))))
 
@@ -62,11 +64,28 @@
 	(string-set! result i pair:car)
 	(set! lst pair:cdr)))))
 
-(define (string-copy (str <string>)) :: <gnu.lists.FString>
-  (make <gnu.lists.FString> str))
+(define (string-copy (str ::java.lang.CharSequence)
+                     #!optional
+                     (start ::int 0)
+                     (end ::int (str:length)))
+  ::gnu.lists.FString
+  (gnu.lists.FString str start (- end start)))
 
-(define (string-fill! str ::abstract-string ch ::char) ::void
-  (str:fill ch))
+(define (string-copy! (to ::abstract-string)
+                      (at ::int)
+                      (from ::java.lang.CharSequence)
+                      #!optional
+                      (start ::int 0)
+                      (end ::int (from:length)))
+  ::void
+  (gnu.lists.Strings:copyInto from start end to at))
+
+(define (string-fill! str ::abstract-string ch ::char
+                      #!optional
+                      (start ::int 0)
+                      (end ::int (str:length)))
+  ::void
+  (str:fill start end ch))
 
 (define (string-upcase! str ::abstract-string) ::string
   (gnu.lists.Strings:makeUpperCase str)

@@ -15,6 +15,16 @@
 (define (boolean? x) :: <boolean>
   (or (eq? x #t) (eq? x #f)))
 
+(define (boolean=? b1 b2 #!rest (r ::object[])) ::boolean
+  (let ((n (- r:length 1)))
+    (if b1
+        (and b2
+             (let loop ((i ::int n))
+               (or (< i 0) (and (r i) (loop (- i 1))))))
+        (and (not b2)
+             (let loop ((i ::int n))
+               (or (< i 0) (and (not (r i)) (loop (- i 1)))))))))
+
 (define (symbol? x) :: <boolean>
   (instance? x <gnu.mapping.Symbol>))
 

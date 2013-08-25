@@ -207,6 +207,7 @@ public class Scheme extends LispLanguage
       //-- Section 6.1  -- complete
       defProcStFld("not", "kawa.standard.Scheme");
       defProcStFld("boolean?", "kawa.lib.misc");
+      defProcStFld("boolean=?", "kawa.lib.misc");
 
       //-- Section 6.2  -- complete
       defProcStFld("eq?", "kawa.standard.Scheme", "isEq");

@@ -1,5 +1,7 @@
 2013-08-25  Per Bothner  <per@bothner.com>
 
+	* standard/Scheme.java (initScheme): Add "boolean=?".
+
 	* standard/Scheme.java (initScheme): Add "string-copy!"
 	and "square".
 

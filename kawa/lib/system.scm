@@ -106,3 +106,13 @@
 
 (define (process-command-line-assignments)
   (gnu.expr.ApplicationMainSupport:processSetProperties))
+
+(define (current-second) ::double
+  (* (java.lang.System:currentTimeMillis) 0.001))
+
+(define (current-jiffy) ::long
+  (java.lang.System:nanoTime))
+
+(define (jiffies-per-second) ::long
+  1000000000)
+

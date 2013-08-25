@@ -1,5 +1,8 @@
 2013-08-25  Per Bothner  <per@bothner.com>
 
+	* standard/Scheme.java (initScheme): Add "current-second",
+	"current-jiffy", "jiffies-per-second".
+
 	* standard/Scheme.java (initScheme): Add "boolean=?".
 
 	* standard/Scheme.java (initScheme): Add "string-copy!"

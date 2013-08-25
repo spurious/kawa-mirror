@@ -1,5 +1,8 @@
 2013-08-25  Per Bothner  <per@bothner.com>
 
+	* system.java (current-second, current-jiffy, jiffies-per-second):
+	New procedures from R7RS.
+
 	* misc.scm (boolean=?): New procedure from R7RS.
 
 	* numbers.scm (square): New procedure from R7RS.

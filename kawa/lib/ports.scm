@@ -62,11 +62,11 @@
 (define (output-port? x) :: <boolean>
   (instance? x <output-port>))
 
-(define (textual-port? port x) ::boolean
-  (or (input-port? x) (output-port? x)))
+(define (textual-port? obj) ::boolean
+  (or (input-port? obj) (output-port? obj)))
 
-(define (binary-port? port x) ::boolean
-  (or (gnu.mapping.BinaryInPort? x) (gnu.mapping.BinaryOutPort? x)))
+(define (binary-port? obj) ::boolean
+  (or (gnu.mapping.BinaryInPort? obj) (gnu.mapping.BinaryOutPort? obj)))
 
 (define (port? x)
   (or (input-port? x) (output-port? x)))

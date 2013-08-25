@@ -106,7 +106,7 @@ public class Q2 extends Scheme
     ReadTable rt = ReadTable.createInitial();
     rt.set('(', new Q2Read.ReadTableEntry());
     rt.set(';', new Q2Read.ReadTableEntry());
-    ReaderDispatch rdispatch = ReaderDispatch.create(rt);
+    ReaderDispatch rdispatch = ReaderDispatch.create(rt, false);
     rt.set('#', rdispatch);
     rdispatch.set(' ', ReaderIgnoreRestOfLine.getInstance());
     //For now, allow #t #f #!eof etc.

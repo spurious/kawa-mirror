@@ -1,3 +1,7 @@
+2013-08-25  Per Bothner  <per@bothner.com>
+
+	* Q2.lang (createReadTable): Update ReaderDispatch.create call.
+
 2012-09-18  Per Bothner  <per@bothner.com>
 
 	* Q2Read.java: Make a bit more robust for erroneous input.

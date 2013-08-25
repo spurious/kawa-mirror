@@ -186,7 +186,7 @@ public abstract class Lisp2 extends LispLanguage {
   public ReadTable createReadTable ()
   {
     ReadTable tab = new Lisp2ReadTable();
-    tab.initialize();
+    tab.initialize(false);
     tab.setInitialColonIsKeyword(true);
     return tab;
   }

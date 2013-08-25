@@ -54,7 +54,7 @@ public class ReadTable extends RangeTable
   {
   }
 
-  public void initialize ()
+  public void initialize(boolean sharpIsTerminating)
   {
     ReadTableEntry entry;
     entry = ReadTableEntry.getWhitespaceInstance();
@@ -91,7 +91,7 @@ public class ReadTable extends RangeTable
     set('\b', entry);
     set(':',  new ReaderColon());
     set('\"', new ReaderString());
-    set('#',  ReaderDispatch.create(this));
+    set('#',  ReaderDispatch.create(this, ! sharpIsTerminating));
     set(';',  ReaderIgnoreRestOfLine.getInstance());
     set('(',  ReaderParens.getInstance('(', ')'));
 
@@ -109,7 +109,7 @@ public class ReadTable extends RangeTable
   public static ReadTable createInitial ()
   {
     ReadTable tab = new ReadTable();
-    tab.initialize();
+    tab.initialize(true);
     return tab;
   }
 

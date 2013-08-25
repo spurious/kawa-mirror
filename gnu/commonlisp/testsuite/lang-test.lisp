@@ -1,4 +1,4 @@
-(test-init "Common Lisp tests" 17)
+(test-init "Common Lisp tests" 18)
 
 (setq y 100)
 (defun foo1 (x)
@@ -49,3 +49,6 @@
 (test '() 'flet-4 (flet ((dummy-function () 'shadow))
 		    (eq (funcall #'dummy-function)
 			(funcall 'dummy-function))))
+
+;; # is a non-terminating macro character in Common Lisp.
+(test '(|a#com#b|) 'sharp-in-token '(a#|com|#b))

@@ -1,3 +1,7 @@
+2013-08-25  Per Bothner  <per@bothner.com>
+
+	* lang-test.lisp: Add test for '#' in token.
+
 2013-08-24  Per Bothner  <per@bothner.com>
 
 	* warnings.scm: Update.

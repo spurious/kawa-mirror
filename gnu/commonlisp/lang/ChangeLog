@@ -1,3 +1,7 @@
+2013-08-25  Per Bothner  <per@bothner.com>
+
+	* Lisp2.java (createReadTable): Specify that '#' is non-terminating.
+
 2013-03-04  Charles Turner <chturne@gmail.com>
 
 	* OrdinaryLambda.java: New class, extends kawa.lang.Lambda.

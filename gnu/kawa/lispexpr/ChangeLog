@@ -1,3 +1,9 @@
+2013-08-25  Per Bothner  <per@bothner.com>
+
+	* ReaderDispatch.java (create): Take nonTerminating parameter.
+	* ReadTable.java (createInitial): Pas parameter.
+	(initialize): Take sharpIsTerminating parameter.
+
 2013-06-12  Charles Turner  <chturne@gmail.com>
 
 	* LispPackage.java

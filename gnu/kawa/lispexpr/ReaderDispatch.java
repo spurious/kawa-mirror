@@ -39,9 +39,9 @@ public class ReaderDispatch extends ReadTableEntry
 
   /** Create a fresh instance and initialize it appropriately for Common Lisp.
    */
-  public static ReaderDispatch create(ReadTable rtable)
+  public static ReaderDispatch create(ReadTable rtable, boolean nonTerminating)
   {
-    ReaderDispatch tab = new ReaderDispatch();
+    ReaderDispatch tab = new ReaderDispatch(nonTerminating);
     ReaderDispatchMisc entry = ReaderDispatchMisc.getInstance();
     tab.set(':', entry);
     tab.set('B', entry);

@@ -1,4 +1,4 @@
-(test-init "Miscellaneous" 219)
+(test-init "Miscellaneous" 220)
 
 ;;; DSSSL spec example 11
 (test '(3 4 5 6) (lambda x x) 3 4 5 6)
@@ -1006,3 +1006,6 @@
 (test #t 'eqv3-falseBool (eqv? falseBool1 #f))
 (test #t 'equal1-falseBool (equal? falseBool1 falseBool2))
 (test #t 'equal2-falseBool (apply equal? falseBool1 falseBool2 '()))
+
+;; # is a terminating macro character in Scheme.
+(test '(a b) 'adjacent-sharp-comment '(a#|com|#b))

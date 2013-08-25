@@ -1,3 +1,7 @@
+2013-08-25  Per Bothner  <per@bothner.com>
+
+	* standard/Scheme.java (initScheme): Add "make-list".
+
 2013-07-29  Matthieu Vachon  <matthieu.o.vachon@gmail.com>
 
 	* standard/define_alias.java: Implemented define-private-alias

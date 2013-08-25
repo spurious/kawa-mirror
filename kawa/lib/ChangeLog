@@ -1,5 +1,7 @@
 2013-08-25  Per Bothner  <per@bothner.com>
 
+	* lists.scm (make-list): New procedure from R7RS.
+
 	* ports.scm (textual-port?, binary-port?): Fix typos.
 
 2013-05-10  Per Bothner  <per@bothner.com>

@@ -4,7 +4,7 @@
 	       caaar caadr cadar caddr cdaar cdadr cddar cdddr
 	       caaaar caaadr caadar caaddr cadaar cadadr caddar cadddr
 	       cdaaar cdaadr cdadar cdaddr cddaar cddadr cdddar cddddr
-	       length reverse list-tail list-ref list? reverse!
+	       length reverse list-tail list-ref list? make-list reverse!
 	       memq memv member assq assv assoc)
 
 (require <kawa.lib.prim_syntax>)
@@ -117,6 +117,13 @@
 
 (define (list? obj) :: <boolean>
   (>= (invoke-static <list> 'listLength obj #f) 0))
+
+(define (make-list k::int #!optional (fill #!null)) ::list
+  (let loop ((result ::list '())
+	     (i ::int k))
+    (if (> i 0)
+	(loop (cons fill result) (- i 1))
+	result)))
 
 ;; Not in R5RS, but is in Guile (with extra mystery argument).
 (define (reverse! (list :: <list>)) :: <list>

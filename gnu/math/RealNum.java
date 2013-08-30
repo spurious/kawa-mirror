@@ -23,7 +23,13 @@ public abstract class RealNum extends Complex
 
   public abstract boolean isNegative ();
 
-  /** Return 1 if >0; 0 if ==0; -1 if <0; -2 if NaN. */
+    @Override
+    public int classifyFinite() {
+        double d = doubleValue();
+        return Double.isNaN(d) ? -1 : Double.isInfinite(d) ? 0 : 1;
+    }
+
+  /** Return 1 if {@code >0}; 0 if {@code ==0}; -1 if {@code <0}; -2 if {@code NaN}. */
   public abstract int sign ();
 
   public RealNum max (RealNum x)

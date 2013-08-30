@@ -11,6 +11,11 @@ public abstract class RatNum extends RealNum
   public abstract IntNum numerator ();
   public abstract IntNum denominator ();
 
+    @Override
+    public int classifyFinite() {
+        return ! denominator().isZero() ? 1 : numerator().isZero() ? -1 : 0;
+    }
+
   public static RatNum make(IntNum num, IntNum den)
   {
     IntNum g = IntNum.gcd (num, den);

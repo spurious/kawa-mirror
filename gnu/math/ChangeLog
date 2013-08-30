@@ -1,3 +1,9 @@
+2013-08-30  Per Bothner  <per@bothner.com>
+
+	* Complex.java (classifyFinite): New method.
+	* RealNum.java (classifyFinite): New override.
+	* RatNum.java (classifyFinite): New override.
+
 2013-03-18  Per Bothner  <per@bothner.com>
 
 	* ExponentialFormat.java (style): New flag.

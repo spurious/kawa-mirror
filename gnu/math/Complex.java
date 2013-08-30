@@ -13,6 +13,17 @@ public abstract class Complex extends Quantity
     return re().isExact() && im().isExact();
   }
 
+    /** Check if value is finite, infinite, or NaN.
+     * @return 1 if finite; 0 if infinite; -1 if NaN.
+     */
+    public int classifyFinite() {
+        int r = re().classifyFinite();
+        if (r < 0)
+            return r;
+        int i = im().classifyFinite();
+        return r < i ? r : i;
+    }
+
   public Complex toExact ()
   {
     RealNum re = re();

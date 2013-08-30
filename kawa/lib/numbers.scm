@@ -51,17 +51,14 @@
 (define (negative? (x :: real)) :: <boolean> 
   (invoke x 'isNegative))
 
-(define (finite? (x :: real)) :: boolean
-  (let ((d :: double (*:doubleValue x)))
-    (not (java.lang.Double:isInfinite d))))
+(define (finite? (z ::complex)) ::boolean
+  (> (z:classifyFinite) 0))
 
-(define (infinite? (x :: real)) :: boolean
-  (let ((d :: double (*:doubleValue x)))
-    (java.lang.Double:isInfinite d)))
+(define (infinite? (z ::complex)) ::boolean
+  (= (z:classifyFinite) 0))
 
-(define (nan? (x :: real)) :: boolean
-  (let ((d :: double (*:doubleValue x)))
-    (java.lang.Double:isNaN d)))
+(define (nan? (z ::complex)) ::boolean
+  (< (z:classifyFinite) 0))
 
 (define (max #!rest (args :: <Object[]>))
   (let ((n :: <int> args:length)

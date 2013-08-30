@@ -1,3 +1,9 @@
+2013-08-30  Per Bothner  <per@bothner.com>
+
+	* numbers.scm (finite?): Generalize to complex.
+	(infinite?): Likewise.
+	(nan?): Likewise.
+
 2013-08-25  Per Bothner  <per@bothner.com>
 
 	* system.java (current-second, current-jiffy, jiffies-per-second):

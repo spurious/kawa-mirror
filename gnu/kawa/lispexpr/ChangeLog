@@ -1,3 +1,7 @@
+2013-08-31  Per Bothner  <per@bothner.com>
+
+	* LispReader.java (parseNumber): Allow arbitrary-case for inf and nan.
+
 2013-08-25  Per Bothner  <per@bothner.com>
 
 	* ReaderDispatch.java (create): Take nonTerminating parameter.

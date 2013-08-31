@@ -779,15 +779,17 @@ public class LispReader extends Lexer
         if (sign_seen
             && pos + 4 < end && buffer[pos+3] == '.' && buffer[pos+4] == '0')
           {
-            if (buffer[pos] == 'i'
-                && buffer[pos+1] == 'n'
-                && buffer[pos+2] == 'f')
+            char b0 = buffer[pos];
+            char b1, b2;
+            if ((b0 == 'i' || b0 == 'I')
+                && ((b1 = buffer[pos+1]) == 'n' || b1 == 'N')
+                && ((b2 = buffer[pos+2]) == 'f' || b2 == 'F'))
               {
                 infnan = 'i';
               }
-            else if (buffer[pos] == 'n'
-                && buffer[pos+1] == 'a'
-                && buffer[pos+2] == 'n')
+            else if ((b0 == 'n' || b0 == 'N')
+                     && ((b1 = buffer[pos+1]) == 'a' || b1 == 'A')
+                     && ((b2 = buffer[pos+2]) == 'n' || b2 == 'N'))
               {
                 infnan = 'n';
               }

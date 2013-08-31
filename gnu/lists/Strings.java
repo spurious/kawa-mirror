@@ -92,8 +92,8 @@ public class Strings
         else {
             int i = at + end - start;
             int j = end;
-            for (; j >= start; --i, j--) {
-                dst.setCharAt(i, src.charAt(j));
+            while (--j >= start) {
+                dst.setCharAt(--i, src.charAt(j));
             }
         }
     }

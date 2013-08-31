@@ -1,3 +1,7 @@
+2013-08-31  Per Bothner  <per@bothner.com>
+
+	* Strings.java (copyInfo): Fix off-by-one error.
+
 2013-08-25  Per Bothner  <per@bothner.com>
 
 	* FString.java: Some simplication of constructors that copy a

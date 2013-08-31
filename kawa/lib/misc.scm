@@ -170,3 +170,6 @@
 	 (proc :: <gnu.expr.GenericProc>)
 	 #!rest (args :: <object[]>)) :: <void>
   (invoke proc 'setProperties args))
+
+(define (features) ::list
+  (kawa.standard.IfFeature:featureList))

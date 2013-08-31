@@ -1,3 +1,10 @@
+2013-08-31  Per Bothner  <per@bothner.com>
+
+	* standard/IfFeature.java (coreFeatures): New static field.
+	(hasFeature): Use coreFeatures.
+	(featureList): New static method.
+	* standard/Scheme.java (initScheme): Add "features".
+
 2013-08-25  Per Bothner  <per@bothner.com>
 
 	* standard/Scheme.java (initScheme): Add "current-second",

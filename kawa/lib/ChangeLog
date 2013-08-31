@@ -1,5 +1,7 @@
 2013-08-31  Per Bothner  <per@bothner.com>
 
+	* misc.scm (features): New R7RS function.
+
 	* std_syntax.scm (%case): Support => R7RS syntax in case expression.
 
 2013-08-30  Per Bothner  <per@bothner.com>

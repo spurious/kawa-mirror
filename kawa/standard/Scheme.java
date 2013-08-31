@@ -710,6 +710,7 @@ public class Scheme extends LispLanguage
       defProcStFld("current-second", "kawa.lib.system");
       defProcStFld("current-jiffy", "kawa.lib.system");
       defProcStFld("jiffies-per-second", "kawa.lib.system");
+      defProcStFld("features", "kawa.lib.misc");
       
       defProcStFld("record-accessor", "kawa.lib.reflection");
       defProcStFld("record-modifier", "kawa.lib.reflection");

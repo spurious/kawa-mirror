@@ -52,7 +52,9 @@
 				   (%let ((tmp key))
 				     (%case tmp clauses ...)))))
 
-(define-syntax %case (syntax-rules (else)
+(define-syntax %case (syntax-rules (else =>)
+				   ((%case key (else => expression))
+                                    (expression key))
 				   ((%case key (else expression ...))
 				    (begin expression ...))
 				   ((%case key (else expression ...) . junk)

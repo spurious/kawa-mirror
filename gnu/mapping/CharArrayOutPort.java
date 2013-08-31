@@ -43,13 +43,14 @@ public class CharArrayOutPort extends OutPort
     return result;
   }
 
-  /** Do nothing.
+  /** Do nothing except set the 'closed' flag.
    * This allows access to the buffer after the port is closed.
    * Not clear whether this is a good or bad idea, but it matches
    * ByteArrayOutputStream, CharArrayWriter, and StringWriter.
    */
   public void close ()
   {
+    finalizeAction = IS_CLOSED;
   }
 
   /** No point in registering this port with a WriterManager. */

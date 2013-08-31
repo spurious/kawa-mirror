@@ -1,3 +1,8 @@
+2013-08-31  Per Bothner  <per@bothner.com>
+
+	* CharArrayOutPort.java (close): Set IS_CLOSED flag, so
+	output-port-open? will do the expected.
+
 2013-06-12  Charles Turner  <chturne@gmail.com>
 
 	* Namespace.java (Namespace()): Changed from protected to public

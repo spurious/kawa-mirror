@@ -470,7 +470,7 @@ public class Scheme extends LispLanguage
       defProcStFld("read-string", "kawa.lib.ports");
       defProcStFld("read-u8", "kawa.lib.ports");
       defProcStFld("peek-u8", "kawa.lib.ports");
-      defProcStFld("u8-ready", "kawa.lib.ports");
+      defProcStFld("u8-ready?", "kawa.lib.ports");
       defProcStFld("read-bytevector", "kawa.lib.ports");
       defProcStFld("read-bytevector!", "kawa.lib.ports");
       defProcStFld("char-ready?", "kawa.lib.ports");

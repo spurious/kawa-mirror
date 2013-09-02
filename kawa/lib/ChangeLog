@@ -1,3 +1,9 @@
+2013-09-01  Per Bothner  <per@bothner.com>
+
+	* ports.scm (read-bytevector!): Fix parameter order.
+
+	* ports.scm (u8-ready): Fix name to 'u8-ready?'.
+
 2013-08-31  Per Bothner  <per@bothner.com>
 
 	* misc.scm (features): New R7RS function.

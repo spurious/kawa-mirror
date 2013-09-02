@@ -196,7 +196,7 @@
                      (kawa.standard.readchar:readByte port #t))))
     (if (< b 0) #!eof b)))
 
-(define (u8-ready #!optional (port (current-input-port)))
+(define (u8-ready? #!optional (port (current-input-port)))
   (if (gnu.mapping.BinaryInPort? port)
       ((as gnu.mapping.BinaryInPort port):ready)
       (> ((as java.io.InputStream port):available) 0)))
@@ -220,9 +220,9 @@
 
 (define (read-bytevector! (bv ::bytevector)
                           #!optional
+                          (port (current-input-port))
                           (start ::int 0)
-                          (end ::int (bv:size))
-                          (port (current-input-port)))
+                          (end ::int (bv:size)))
   (let loop ((seen ::int 0))
     (let* ((want ::int (- end start seen))
            (n ::int (if (gnu.mapping.BinaryInPort? port)

@@ -226,22 +226,14 @@ public class ContentConsumer implements Consumer
   }
 
   /* #ifdef use:java.lang.CharSequence */
-  public void write (CharSequence str, int start, int end)
+  public void write (CharSequence str, int start, int length)
   /* #else */
-  // public void write (String str, int start, int end)
+  // public void write (String str, int start, int length)
   /* #endif */
   {
     if (inStartTag == 1)
       endStartTag();
-    /* #ifdef use:java.lang.CharSequence */
-    /* #ifdef JAVA5 */
-    strBuffer.append(str, start, end);
-    /* #else */
-    // strBuffer.append(str.subSequence(start, end).toString());
-    /* #endif */
-    /* #else */
-    // strBuffer.append(str.substring(start, end));
-    /* #endif */
+    strBuffer.append(str, start, start+length);
   }
 
   /* #ifdef JAVA5 */

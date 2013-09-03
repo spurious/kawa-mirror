@@ -1,3 +1,8 @@
+2013-09-03  Per Bothner  <per@bothner.com>
+
+	* ContentConsumer.java (write): The write method is supposed to
+	take a (start,length)-pair, not a (start,end)-pair.
+
 2006-12-29  Per Bothner  <per@bothner.com>
 
 	* ContentConsumer.java (write): Fix non-CharSequence PreProcess-case.

@@ -194,7 +194,10 @@ public class DFloNum extends RealNum implements Externalizable
 	int i = compare(y_rat.numerator(), y_rat.denominator(), value);
 	return i < -1 ? i : -i;
       }
-    return compare (value, ((RealNum)obj).doubleValue ());
+    if (obj instanceof RealNum)
+      return compare (value, ((RealNum) obj).doubleValue ());
+    else
+      return ((Numeric) obj).compareReversed(this);
   }
 
   public int compareReversed (Numeric x)

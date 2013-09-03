@@ -1,3 +1,8 @@
+2013-09-01  Per Bothner  <per@bothner.com>
+
+	* DFloNum.java (compare): Use compareReversed when needed.
+	This fixes (= a-DFloNum a-Complex).
+
 2013-08-30  Per Bothner  <per@bothner.com>
 
 	* Complex.java (classifyFinite): New method.

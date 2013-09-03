@@ -204,17 +204,23 @@
 (define (make-polar (x :: <double>) (y :: <double>)) :: <gnu.math.DComplex>
   (invoke-static <complex> 'polar x y))
 
-(define (real-part (x :: <complex>)) :: <real>
-  (invoke x 're))
+(define (real-part (x ::java.lang.Number)) ::java.lang.Number
+  (if (gnu.math.Complex? x)
+      ((->gnu.math.Complex x):re)
+      x))
 
-(define (imag-part (x :: <complex>)) :: <real>
-  (invoke x 'im))
+(define (imag-part (x ::java.lang.Number)) ::java.lang.Number
+  (if (gnu.math.Complex? x)
+      ((->gnu.math.Complex x):im)
+      (gnu.math.IntNum:zero)))
 
 (define (magnitude (x :: java.lang.Number)) :: java.lang.Number
   (abs x))
 
-(define (angle (x :: <complex>)) :: <real>
-  (invoke x 'angle))
+(define (angle (x ::java.lang.Number)):: <real>
+  (if (gnu.math.Complex? x)
+      ((->gnu.math.Complex x):angle)
+      0))
 
 (define (inexact (num :: java.lang.Number)) :: java.lang.Number
   (gnu.kawa.functions.Arithmetic:toInexact num))

@@ -11,6 +11,7 @@ public abstract class RealNum extends Complex
 {
   public final RealNum re() { return this; }
   public final RealNum im() { return IntNum.zero(); }
+  public final RealNum angle() { return IntNum.zero(); }
 
   public static RealNum asRealNumOrNull (Object value)
   {

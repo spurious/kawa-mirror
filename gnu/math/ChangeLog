@@ -1,3 +1,7 @@
+2013-09-03  Per Bothner  <per@bothner.com>
+
+	* RealNum.java (angle): New method - return exact zero.
+
 2013-09-01  Per Bothner  <per@bothner.com>
 
 	* DFloNum.java (compare): Use compareReversed when needed.

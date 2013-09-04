@@ -1,3 +1,9 @@
+2013-09-04  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (warnVoidUsed): New option.
+	(warnVoidUsed): New method.
+	* InlineCalls.java (visit, visitIfExp): Use warnVoidUsed.
+
 2013-07-26  Per Bothner  <per@bothner.com>
 
 	* ApplyExp.java (compile): Fix 2013-07-11 tail-call change

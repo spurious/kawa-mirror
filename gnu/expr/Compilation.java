@@ -125,6 +125,10 @@ public class Compilation implements SourceLocator
     options.add("warn-unreachable",
                 Options.BOOLEAN_OPTION, Boolean.TRUE,
 		"warn if this code can never be executed");
+  public static Options.OptionInfo warnVoidUsed =
+    options.add("warn-void-used",
+                Options.BOOLEAN_OPTION, Boolean.TRUE,
+		"warn if void-valued expression is used");
   public static Options.OptionInfo warnUndefinedVariable =
     options.add("warn-undefined-variable",
                 Options.BOOLEAN_OPTION, Boolean.TRUE,
@@ -171,6 +175,10 @@ public class Compilation implements SourceLocator
   public boolean warnUnused()
   {
     return currentOptions.getBoolean(warnUnused);
+  }
+  public boolean warnVoidUsed()
+  {
+    return currentOptions.getBoolean(warnVoidUsed);
   }
   public boolean warnAsError ()
   {

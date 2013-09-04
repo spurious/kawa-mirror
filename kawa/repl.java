@@ -7,7 +7,8 @@ import gnu.text.SourceMessages;
 import gnu.text.SyntaxException;
 import gnu.text.Path;
 import gnu.lists.*;
-import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Vector;
 import gnu.bytecode.ClassType;
 import gnu.kawa.servlet.HttpRequestContext;
@@ -106,7 +107,8 @@ public class repl extends Procedure0or1
     printOption(out, "--servlet", "Generate a servlet");
     printOption(out, "--module-static", "Top-level definitions are by default static");
 
-    ArrayList<String> keys = Compilation.options.keys();
+    List<String> keys = Compilation.options.keys();
+    Collections.sort(keys);
     for (int i = 0; i < keys.size(); ++i)
       {
         String name = keys.get(i);
@@ -682,9 +684,8 @@ public class repl extends Procedure0or1
 	  }
 	else if (arg.length () > 0 && arg.charAt(0) == '-')
 	  { // Check if arg is a known language name.
-	    String name = arg;
-	    if (name.length() > 2 && name.charAt(0) == '-')
-	      name = name.substring(name.charAt(1) == '-' ? 2 :1);
+            boolean doubleDash = arg.length() > 2 && arg.charAt(1) == '-';
+	    String name = arg.substring(doubleDash ? 2 : 1);
 	    Language lang = Language.getInstance(name);
 	    if (lang != null)
 	      {

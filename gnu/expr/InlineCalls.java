@@ -58,7 +58,8 @@ public class InlineCalls extends ExpExpVisitor<Type> {
         if (required instanceof ValueNeededType && exp.getType().isVoid()) {
             if (exp == QuoteExp.voidExp)
               return QuoteExp.voidObjectExp;
-            comp.error('w', "void-valued expression where value is needed",
+            if (comp.warnVoidUsed())
+                comp.error('w', "void-valued expression where value is needed",
                        exp0);
             // To avoid cascading warnings.
             return Compilation.makeCoercion(exp, Type.objectType);
@@ -436,7 +437,8 @@ public class InlineCalls extends ExpExpVisitor<Type> {
         : comp.getLanguage().isTrue(((QuoteExp) test).getValue()) ? 1 : 0;
     if (exp.else_clause == null && truth <= 0
         && required instanceof ValueNeededType) {
-        comp.error('w', "missing else where value is required", exp);
+        if (comp.warnVoidUsed())
+            comp.error('w', "missing else where value is required", exp);
         if (truth == 0)
             return QuoteExp.voidObjectExp;
     }
@@ -446,7 +448,8 @@ public class InlineCalls extends ExpExpVisitor<Type> {
       {
         boolean voidTrue = comp.getLanguage().isTrue(Values.empty);
 
-        comp.error('w', "void-valued condition is always "+(truth!=0));
+        if (comp.warnVoidUsed())
+            comp.error('w', "void-valued condition is always "+(truth!=0));
         return new BeginExp(test, exp.select(voidTrue));
       }
     return exp;

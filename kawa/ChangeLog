@@ -1,3 +1,9 @@
+2013-09-04  Per Bothner  <per@bothner.com>
+
+	* repl.java (printOptions): Sort compilation options before printing.
+
+	* repl.java (processArgs): Fix bug in handling of '--'.
+
 2013-09-01  Per Bothner  <per@bothner.com>
 
 	* standard/Scheme.java (initScheme): Fix 'u8-ready' to 'u8-ready?'.

@@ -1,5 +1,8 @@
 2013-09-04  Per Bothner  <per@bothner.com>
 
+	* mac-test.scm: New test for Savannah bug #39946
+	"NullPointerException when using syntax->datum".
+
 	* misc-test.scm: New test-case from Savannah bug report #39944
 	"Possible bug with omitted keyword arguments" which currently passes.
 

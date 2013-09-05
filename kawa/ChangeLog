@@ -1,5 +1,9 @@
 2013-09-04  Per Bothner  <per@bothner.com>
 
+	* lang/Quote.java (expand_pair): Check for null Translator argument.
+	This fixes Savannah bug #39946 "NullPointerException when
+	using syntax->datum".
+
 	* repl.java (printOptions): Sort compilation options before printing.
 
 	* repl.java (processArgs): Fix bug in handling of '--'.

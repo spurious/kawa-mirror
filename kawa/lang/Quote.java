@@ -119,6 +119,7 @@ public class Quote extends Syntax {
         // What makes things complicated is that to the extent that no changes
         // are needed, we want to return the input list as-is.
         if (expandColonForms()
+            && tr != null
             && pair == list
             && tr.matches(pair.getCar(), syntax, LispLanguage.lookup_sym)
             && pair.getCdr() instanceof Pair

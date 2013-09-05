@@ -1,4 +1,4 @@
-(test-init "macros" 123)
+(test-init "macros" 124)
 
 (test 'ok 'letxx (let ((xx #f)) (cond (#t xx 'ok))))
 
@@ -793,3 +793,6 @@
 (test #t 'bar-35555-1 (bar-35555 (a b) (c d)))
 (test #t 'bar-35555-2 (bar-35555))
 (test #f 'bar-35555-3 (foo-35555 123))
+
+;; Savannah bug report #39946 "NullPointerException when using syntax->datum"
+(test '(+ 1 2) 'savannah-39946 (syntax->datum (syntax (+ 1 2))))

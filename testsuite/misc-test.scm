@@ -1,4 +1,4 @@
-(test-init "Miscellaneous" 220)
+(test-init "Miscellaneous" 221)
 
 ;;; DSSSL spec example 11
 (test '(3 4 5 6) (lambda x x) 3 4 5 6)
@@ -1009,3 +1009,7 @@
 
 ;; # is a terminating macro character in Scheme.
 (test '(a b) 'adjacent-sharp-comment '(a#|com|#b))
+
+;; Savannah bug report #39944 "Possible bug with omitted keyword arguments"
+(define (f-39944 #!key (y -1) (z -2)) z)
+(test 42 'savannah-39944 (f-39944 z: 42))

@@ -1,3 +1,11 @@
+2013-09-05  Per Bothner  <per@bothner.com>
+
+	* numbers.scm (quantity?, complex?, real?, rational?):
+	Generalize so they return true for java.lang.Integer etc.
+	(finite?, infinite?, nan?): Handle java.lang.Number objects
+	that are not gnu.math.Complex.
+	(java.lang.real?): New private helper method.
+
 2013-09-03  Per Bothner  <per@bothner.com>
 
 	* numbers.scm (real-part, imag-part, angle): Generalize to

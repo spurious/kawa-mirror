@@ -3,11 +3,35 @@
 (require <kawa.lib.syntax>)
 (require <kawa.lib.misc>)
 
-(define (number? x) :: <boolean> (java.lang.Number? x))
-(define (quantity? x) :: <boolean>  (instance? x <quantity>))
-(define (complex? x) :: <boolean>  (instance? x <complex>))
-(define (real? x) :: <boolean> (instance? x <real>))
-(define (rational? x)  :: <boolean> (instance? x <rational>))
+(define-private (java.lang.real? x) ::boolean
+  (and (java.lang.Number? x)
+       (or (java.lang.Long? x)
+           (java.lang.Integer? x)
+           (java.lang.Short? x)
+           (java.lang.Byte? x)
+           (java.lang.Double? x)
+           (java.lang.Float? x)
+           (java.math.BigInteger? x)
+           (java.math.BigDecimal? x))))
+(define (number? x) ::boolean (java.lang.Number? x))
+(define (quantity? x) ::boolean
+  (or (instance? x <quantity>)
+      (java.lang.real? x)))
+(define (complex? x) ::boolean
+  (or (instance? x <complex>)
+      (java.lang.real? x)))
+(define (real? x) ::boolean
+  (or (instance? x <real>)
+      (java.lang.real? x)))
+(define (rational? x)  ::boolean
+  (or (instance? x <rational>)
+      (and (java.lang.Number? x)
+	   (or (java.lang.Long? x)
+	       (java.lang.Integer? x)
+	       (java.lang.Short? x)
+	       (java.lang.Byte? x)
+	       (java.math.BigInteger? x)
+	       (java.math.BigDecimal? x)))))
 (define (integer? x) :: <boolean>
   (or (instance? x <gnu.math.IntNum>)
       (and (instance? x <gnu.math.DFloNum>)
@@ -19,6 +43,7 @@
 	   (or (instance? x <java.lang.Long>)
 	       (instance? x <java.lang.Integer>)
 	       (instance? x <java.lang.Short>)
+	       (instance? x <java.lang.Byte>)
 	       (instance? x <java.math.BigInteger>)))))
 (define (real-valued? x) ::boolean
   (and (complex? x) (zero? (imag-part x)) (real? (real-part x))))
@@ -51,14 +76,27 @@
 (define (negative? (x :: real)) :: <boolean> 
   (invoke x 'isNegative))
 
-(define (finite? (z ::complex)) ::boolean
-  (> (z:classifyFinite) 0))
+(define (finite? (z ::java.lang.Number)) ::boolean
+  (if (gnu.math.Complex? z)
+      (> ((->gnu.math.Complex z):classifyFinite) 0)
+      (and (java.lang.real? z)
+           (let ((d (z:doubleValue)))
+             (and (not (java.lang.Double:isInfinite d))
+                  (not (java.lang.Double:isNaN d)))))))
 
-(define (infinite? (z ::complex)) ::boolean
-  (= (z:classifyFinite) 0))
+(define (infinite? (z ::java.lang.Number)) ::boolean
+  (if (gnu.math.Complex? z)
+      (= ((->gnu.math.Complex z):classifyFinite) 0)
+      (and (java.lang.real? z)
+           (let ((d (z:doubleValue)))
+             (java.lang.Double:isInfinite d)))))
 
-(define (nan? (z ::complex)) ::boolean
-  (< (z:classifyFinite) 0))
+(define (nan? (z ::java.lang.Number)) ::boolean
+  (if (gnu.math.Complex? z)
+      (< ((->gnu.math.Complex z):classifyFinite) 0)
+      (and (java.lang.real? z)
+           (let ((d (z:doubleValue)))
+             (java.lang.Double:isNaN d)))))
 
 (define (max #!rest (args :: <Object[]>))
   (let ((n :: <int> args:length)

@@ -475,9 +475,9 @@ public class Scheme extends LispLanguage
       defProcStFld("read-bytevector!", "kawa.lib.ports");
       defProcStFld("char-ready?", "kawa.lib.ports");
       defProcStFld("write", "kawa.lib.ports");
+      defProcStFld("write-simple", "kawa.lib.ports");
       defProcStFld("write-shared", "kawa.lib.ports");
       defProcStFld("write-with-shared-structure", "kawa.lib.ports");
-      defProcStFld("write-simple", "kawa.lib.ports");
       defProcStFld("display", "kawa.lib.ports");
       defProcStFld("print-as-xml", "gnu.xquery.lang.XQuery", "writeFormat");
       defProcStFld("write-char", "kawa.lib.ports");
@@ -1009,16 +1009,11 @@ public class Scheme extends LispLanguage
       }
   }
 
-  public static final AbstractFormat writeFormat = new DisplayFormat(true, 'S');
-  public static final AbstractFormat sharedWriteFormat = new DisplayFormat(true, 'S');
-  // WRITE checks for circular references by default, DISPLAY does not.
-  static { ((DisplayFormat) sharedWriteFormat).checkSharing = true; }
-  public static final AbstractFormat displayFormat = new DisplayFormat(false, 'S');
-  
   @Override
   public AbstractFormat getFormat(boolean readable)
   {
-    return readable ? writeFormat : displayFormat;
+    return readable ? DisplayFormat.schemeWriteFormat
+        : DisplayFormat.schemeDisplayFormat;
   }
 
   @Override

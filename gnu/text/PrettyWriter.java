@@ -189,6 +189,10 @@ public class PrettyWriter extends java.io.Writer
     return idhash.putAtIndex(obj, value, index);
   }
 
+  public int IDHashRemove(Object obj) {
+    return idhash.remove(obj);
+  }
+
   /** Control pretty-printing mode.
    * @param mode the value 0 disables pretty-printing;
    *   the value 1 enables explicit pretty-printing;

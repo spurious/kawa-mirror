@@ -238,33 +238,46 @@
             (else
              (loop (+ seen n)))))))
 
-(define (write value #!optional (out ::output-port (current-output-port))) ::void
-  (if *print-circle*
-      (write-shared value out)
-      (*:format (kawa.standard.Scheme:.writeFormat) value out)))
-
 (define (write-simple value #!optional (out ::output-port (current-output-port))) ::void
-  (*:format (kawa.standard.Scheme:.writeFormat) value out))
+  (gnu.kawa.functions.DisplayFormat:schemeWriteSimpleFormat:format
+   value out))
 
-(define (write-shared
-	 value #!optional (out ::output-port (current-output-port))) ::void
+(define-private (%write-shared%
+                 fmt::gnu.kawa.functions.DisplayFormat
+                 value out::output-port) ::void
   (let ((pretty-out (out:getPrettyWriter)))
     (pretty-out:initialiseIDHash)
     (pretty-out:setSharing #t)
     (try-finally
-     (*:format (kawa.standard.Scheme:.sharedWriteFormat) value out)
+     (fmt:format value out)
      (pretty-out:setSharing #f))
     (pretty-out:clearIDHash)
     (pretty-out:writeEndOfExpression)
     (pretty-out:resolveBackReferences)
     (pretty-out:flush)))
 
+(define (write
+	 value #!optional (out ::output-port (current-output-port))) ::void
+         (%write-shared%
+          (if (eqv? *print-circle* #t)
+              gnu.kawa.functions.DisplayFormat:schemeWriteSharedFormat
+              gnu.kawa.functions.DisplayFormat:schemeWriteFormat)
+          value out))
+
+(define (write-shared
+	 value #!optional (out ::output-port (current-output-port))) ::void
+         (%write-shared%
+          gnu.kawa.functions.DisplayFormat:schemeWriteSharedFormat
+          value out))
+
 (define (write-with-shared-structure 
 	 value #!optional (out ::output-port (current-output-port))) ::void
-         (write-shared value out))
+         (%write-shared%
+          gnu.kawa.functions.DisplayFormat:schemeWriteSharedFormat
+          value out))
     
 (define (display value #!optional (out (current-output-port))) :: <void>
-  (*:format (kawa.standard.Scheme:.displayFormat) value out))
+  (*:format gnu.kawa.functions.DisplayFormat:schemeDisplayFormat value out))
 
 (define (input-port-read-state port)
   ((primitive-virtual-method <input-port> "getReadState" <char> ())

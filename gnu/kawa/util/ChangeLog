@@ -1,3 +1,8 @@
+2013-09-06  Per Bothner  <per@bothner.com>
+
+	* IntHashTable.java: Implement deletion support.
+	(remove): New method.
+
 2013-02-20  Per Bothner  <per@bothner.com>
 
 	* HashNode.java (hash): Rename field to keyHash and make protected.

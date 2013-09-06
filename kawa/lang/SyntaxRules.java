@@ -3,6 +3,7 @@ import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.lists.*;
 import java.io.*;
+import gnu.kawa.functions.DisplayFormat;
 import gnu.text.*;
 
 public class SyntaxRules extends Procedure1 implements Printable, Externalizable 
@@ -258,7 +259,7 @@ public class SyntaxRules extends Procedure1 implements Printable, Externalizable
 		err.print(macro);
 		err.println(":");
 		err.startLogicalBlock("  ", "}", 2);
-		kawa.standard.Scheme.writeFormat.writeObject(expansion, err);
+		DisplayFormat.schemeWriteFormat.writeObject(expansion, err);
 		err.endLogicalBlock("}");
 		err.println();
 		err.flush();

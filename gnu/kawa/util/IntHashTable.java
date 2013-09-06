@@ -15,7 +15,8 @@ public class IntHashTable
   protected Object[] objs; // the domain set
   protected int[] ints; // the image set
   protected int mask; // used to clip int's into the domain
-  protected int num_bindings; // the number of mappings
+  protected int num_bindings; // the number of mappings (including DELETED)
+  private static Object DELETED = new Object();
 
   /**
    * Construct an Object -> int hash table.
@@ -70,11 +71,16 @@ public class IntHashTable
     Object node;
     int hash1 = hash ^ (hash >>> 15);
     int hash2 = (hash ^ (hash << 6)) | 1; //ensure coprimeness
+    int deleted = -1;
     for (int i = hash1 & mask;; i = (i + hash2) & mask)
     {
       node = objs[i];
-      if (node == null || node == key)
+      if (node == key)
         return i;
+      if (node == null)
+        return deleted >= 0 ? deleted : i;
+      if (node == DELETED && deleted < 0)
+        deleted = i;
     }
   }
   
@@ -97,7 +103,8 @@ public class IntHashTable
    *         value, or -1 if it does.
    */
   public int getFromIndex (int index) {
-    return (objs[index] == null) ? -1 : ints[index];
+    Object node = objs[index];
+    return node == null || node == DELETED ? -1 : ints[index];
   }
 
   /**
@@ -107,15 +114,17 @@ public class IntHashTable
    * @param value value to be associated with the specified key.
    * @param index the index at which to place this binding, as returned
    *              from {@link #lookup}.
-   * @return previous value associated with specified key, or null if there was
+   * @return previous value associated with specified key, or -1 if there was
    * no mapping for key.
    */
   public int putAtIndex (Object key, int value, int index) {
-    if (objs[index] == null)
+    Object old = objs[index];
+    if (old == null || old == DELETED)
     {
       objs[index] = key;
       ints[index] = value;
-      num_bindings++;
+      if (old != DELETED)
+          num_bindings++;
       if (3 * num_bindings >= 2 * objs.length)
         rehash();
       return -1;
@@ -127,6 +136,15 @@ public class IntHashTable
       return oldValue;
     }
   }
+
+    public int remove(Object key) {
+        int index = lookup(key);
+        Object old = objs[index];
+        if (old == null || old == DELETED)
+            return -1;
+        objs[index] = DELETED;
+        return ints[index];
+    }
 
   /**
    * Expand the hash table when it exceeds the load factor. 
@@ -150,7 +168,7 @@ public class IntHashTable
     for (int i = oldIntsTable.length; --i >= 0;)
     {
       key = oldObjsTable[i];
-      if (key != null)
+      if (key != null && key != DELETED)
         putAtIndex(key, oldIntsTable[i], lookup(key, hash(key)));
     }
     

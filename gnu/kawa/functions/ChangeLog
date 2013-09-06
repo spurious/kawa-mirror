@@ -1,3 +1,12 @@
+2013-09-06  Per Bothner  <per@bothner.com>
+
+	* DisplayFormat.java (schemeDisplayFormat, schemeWriteSimpleFormat,
+	schemeWriteFormat, schemeWriteSharedFormat): New static fields.
+	(checkSharing): Change from boolean to 3-valued int.
+	(writeList, writeObject): Supports Scheme 'write' semantics,
+	in which #N# label are used for cycles only, not other sharing.
+	* ObjectFormat.java: Update to use new fields.
+
 2013-07-26  Per Bothner  <per@bothner.com>
 
 	* LispFormat.java (<init>): If there is no literal text between

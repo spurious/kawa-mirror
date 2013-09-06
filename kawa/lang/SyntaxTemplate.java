@@ -3,6 +3,7 @@ import gnu.lists.*;
 import java.io.*;
 import gnu.mapping.*;
 import gnu.expr.*;
+import gnu.kawa.functions.DisplayFormat;
 import java.util.*;
 
 /** The translated form of a <code>(syntax <var>template</var>)</code>. */
@@ -400,7 +401,7 @@ public class SyntaxTemplate implements Externalizable
               {
                 err.println();
                 err.print("  " + i +" : ");
-                kawa.standard.Scheme.writeFormat.writeObject(vars[i], err);
+                DisplayFormat.schemeWriteFormat.writeObject(vars[i], err);
               }
           }
 	err.println('}');
@@ -418,7 +419,7 @@ public class SyntaxTemplate implements Externalizable
 	err.print(((Translator) Compilation.getCurrent()).getCurrentSyntax());
 	err.print(": ");
 	err.writeBreakLinear();
-	kawa.standard.Scheme.writeFormat.writeObject(result, err);
+	DisplayFormat.schemeWriteFormat.writeObject(result, err);
 	err.endLogicalBlock("}");
 	err.println();
 	err.flush();

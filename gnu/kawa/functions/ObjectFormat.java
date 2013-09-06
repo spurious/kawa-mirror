@@ -63,7 +63,8 @@ public class ObjectFormat extends ReportFormat
       {
 	out.printReadable = readable;
 	AbstractFormat format
-	  = readable ? Scheme.writeFormat : Scheme.displayFormat;
+            = readable ? DisplayFormat.schemeWriteFormat
+            : DisplayFormat.schemeDisplayFormat;
 	out.objectFormat = format;
 	format.writeObject(obj, (gnu.lists.Consumer) out);
       }

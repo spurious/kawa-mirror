@@ -21,7 +21,7 @@
 
 (define (make-write-string form)
   (call-with-output-string
-   (lambda (s) (write form s))))
+   (lambda (s) (write-shared form s))))
 
 (set-car! (cdr circ1) circ1)
 (test-equal "#1=(1 #1# 3)"

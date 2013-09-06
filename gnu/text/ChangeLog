@@ -1,3 +1,7 @@
+2013-09-06  Per Bothner  <per@bothner.com>
+
+	* PrettyWriter.java (IDHashRemove): New method.
+
 2013-09-05  Per Bothner  <per@bothner.com>
 
 	* PrettyWriter.java (resolveBackReferences): Copy into the GapBuffer

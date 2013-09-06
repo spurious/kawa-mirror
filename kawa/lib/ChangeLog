@@ -1,3 +1,8 @@
+2013-09-06  Per Bothner  <per@bothner.com>
+
+	* ports.scm (display, write, write-simple, write-shared,
+	write-with-shared-structure): Re-implement for R7RS write semantics.
+
 2013-09-05  Per Bothner  <per@bothner.com>
 
 	* bytevectors.scm ($make$bytevector$): New helper function

@@ -34,8 +34,23 @@ public class DisplayFormat extends AbstractFormat
   public static final ThreadLocation outRadix
     = new ThreadLocation("out-radix");
 
-  /** This field is set true by Scheme when it creates a shared write format */
-  public boolean checkSharing = false;
+    public static final DisplayFormat schemeDisplayFormat
+        = new DisplayFormat(false, 'S');
+
+    public static final DisplayFormat schemeWriteSimpleFormat
+        = new DisplayFormat(true, 'S');
+    public static final DisplayFormat schemeWriteFormat
+        = new DisplayFormat(true, 'S');
+    public static final DisplayFormat schemeWriteSharedFormat
+        = new DisplayFormat(true, 'S');
+    static {
+        schemeWriteFormat.checkSharing = 0;
+        schemeWriteSharedFormat.checkSharing = 1;
+    }
+
+    /** Controls whether we check for sharing and cycles.
+     * 1: check for sharing; 0: check for cycles: -1: no checking. */
+    public int checkSharing = -1;
 
   /** Create a new instance.
    * @param readable if output should be formatted so it could be read
@@ -123,6 +138,7 @@ public class DisplayFormat extends AbstractFormat
     PrettyWriter pout = out.getPrettyWriter();
     // The stack of position markers, populated by CDR'ing further into the list.
     int[] posnStack = null;
+    Object[] tailStack = null;
     int stackTail = 0;
     Object list = value;
     out.startLogicalBlock("(", false, ")");
@@ -143,7 +159,7 @@ public class DisplayFormat extends AbstractFormat
 	    writeObject(LList.checkNonList(list), (Consumer) out);
 	    break;
 	  }
-	if (checkSharing)
+	if (checkSharing >= 0)
 	  {
 	    
 	    int hashIndex = pout.IDHashLookup(list);
@@ -153,15 +169,21 @@ public class DisplayFormat extends AbstractFormat
 	      {
 		// writePositionMarker will return the index to which is was enqueued
 		posn = pout.writePositionMarker(true);
-		if (posnStack == null) 
+		if (posnStack == null) {
 		  posnStack = new int[128]; // should be plently for most cases.
+                  tailStack = new Object[128];
+                }
 		else if (stackTail >= posnStack.length)
 		  {
-		    int[] newStack = new int[posnStack.length << 1];
-		    System.arraycopy(posnStack, 0, newStack, 0, stackTail);
-		    posnStack = newStack;
+		    int[] newPStack = new int[posnStack.length << 1];
+		    System.arraycopy(posnStack, 0, newPStack, 0, stackTail);
+		    posnStack = newPStack;
+                    Object[] newTStack = new Object[posnStack.length << 1];
+		    System.arraycopy(tailStack, 0, newTStack, 0, stackTail);
+		    tailStack = newTStack;
 		  }
-		posnStack[stackTail++] = posn;
+		posnStack[stackTail] = posn;
+                tailStack[stackTail++] = list;
 		// Mark (hash) this object
 		pout.IDHashPutAtIndex(list, posn, hashIndex);
 	      }
@@ -175,8 +197,11 @@ public class DisplayFormat extends AbstractFormat
 	      }
 	  }
       }
-    for (;--stackTail >= 0;)
+    for (;--stackTail >= 0;) {
       pout.writePairEnd(posnStack[stackTail]);
+      if (checkSharing == 0)
+          pout.IDHashRemove(tailStack[stackTail]);
+    }
 
     out.endLogicalBlock(")");
   }
@@ -201,7 +226,8 @@ public class DisplayFormat extends AbstractFormat
         ((OutPort) out).writeWordStart();
         space = true;
       }
-    if (checkSharing && isInteresting(obj))
+    boolean removeNeeded = false;
+    if (checkSharing >= 0 && isInteresting(obj))
       {
 	// The value returned from this hash is the respective index in the
 	// queueInts[] from PrettyWriter to which this object should reference.
@@ -211,9 +237,10 @@ public class DisplayFormat extends AbstractFormat
 	  {
 	    // Find the position in the queueInts that future (if any) backreferences
 	    // should reference
-	    posn =  pout.writePositionMarker(false);
+	    int nposn = pout.writePositionMarker(false);
 	    // Mark (hash) this object
-	    pout.IDHashPutAtIndex(obj, posn, hashIndex);
+	    pout.IDHashPutAtIndex(obj, nposn, hashIndex);
+            removeNeeded = checkSharing == 0;
 	    // Print the object, instead of emitting print-circle notation
 	    skip = false;
 	  }
@@ -231,6 +258,8 @@ public class DisplayFormat extends AbstractFormat
       }
     if (!skip)
       writeObjectRaw(obj, out);
+    if (removeNeeded)
+        pout.IDHashRemove(obj);
     if (space)
       ((OutPort) out).writeWordEnd();
   }

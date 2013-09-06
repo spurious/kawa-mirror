@@ -4,6 +4,7 @@ import gnu.expr.*;
 import java.io.*;
 import gnu.lists.*;
 import java.util.Vector;
+import gnu.kawa.functions.DisplayFormat;
 import gnu.text.*;
 
 /** This encodes a pattern from a Scheem syntax-case or syntax-rules. */
@@ -81,7 +82,7 @@ public class SyntaxPattern extends Pattern implements Externalizable
       {
 	OutPort err = OutPort.errDefault();
 	err.print("{match ");
-	kawa.standard.Scheme.writeFormat.writeObject(obj, err);
+	DisplayFormat.schemeWriteFormat.writeObject(obj, err);
 	err.print(" in ");
 	err.print(((Translator) Compilation.getCurrent()).getCurrentSyntax());
 	if (r)
@@ -91,7 +92,7 @@ public class SyntaxPattern extends Pattern implements Externalizable
 	      {
 		err.println();
 		err.print("  " + i +" : ");
-		kawa.standard.Scheme.writeFormat.writeObject(vars[i], err);
+		DisplayFormat.schemeWriteFormat.writeObject(vars[i], err);
 	      }
 	    err.println('}');
 	  }

@@ -1,3 +1,7 @@
+2013-09-06  Per Bothner  <per@bothner.com>
+
+	* srfi-38-test.scm: Use write-shared to match R7RS semantics.
+
 2013-09-05  Per Bothner  <per@bothner.com>
 
 	* lib-test.scm: Fix thinko in bytevector constructor.

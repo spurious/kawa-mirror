@@ -212,27 +212,6 @@
   (lambda ((x :: <double>)) :: <double>
 	  (java.lang.Math:sqrt x)))
 
-(define (exact-integer-sqrt (i :: integer))
-  (if (< i 0)
-      (primitive-throw (java.lang.IllegalArgumentException
-                        (format #f "negative argument: ~A" i)))
-      (let* ((s :: real (sqrt i))
-             (r :: integer (exact (floor s)))
-             (d :: integer (- i (* r r))))
-        ; This loop is necessary because the <real> sqrt loses
-        ; precision for large values of i. r might start out too small
-        ; (and d too large). This happens, for example, with
-        ; (sqrt 10000000000000000000000000000000000000000000000). I
-        ; haven't noticed any cases in which the initial computed r is
-        ; too large, but I haven't exhaustively tested all the natural
-        ; numbers.
-        (let loop ((r r) (d d))
-          (let* ((r+1 (+ r 1))
-                 (r+1-squared (* r+1 r+1)))
-            (if (< i r+1-squared)
-                (values r d)
-                (loop r+1 (- i r+1-squared))))))))
-
 (define (square x::quantity) ::quantity
   (* x x))
 
@@ -363,3 +342,42 @@
 
 (define (duration duration) :: <gnu.math.Duration>
   (gnu.math.Duration:parseDuration duration))
+
+#| The algorithm of exact-integer-sqrt is from chibi-scheme,
+which has:
+Copyright (c) 2009-2012 Alex Shinn
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
+1. Redistributions of source code must retain the above copyright
+   notice, this list of conditions and the following disclaimer.
+2. Redistributions in binary form must reproduce the above copyright
+   notice, this list of conditions and the following disclaimer in the
+   documentation and/or other materials provided with the distribution.
+3. The name of the author may not be used to endorse or promote products
+   derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+|#
+
+(define (exact-integer-sqrt (i ::integer))
+  (if (< i 0)
+      (primitive-throw (java.lang.IllegalArgumentException
+                        (format #f "negative argument: ~A" i)))
+      (let ((res (sqrt i)))
+        (let lp ((res ::integer (inexact->exact (truncate res))))
+          (let ((rem ::integer (- i (* res res))))
+            (if (negative? rem)
+                (lp (quotient (+ res (quotient i res)) 2))
+                (values res rem)))))))

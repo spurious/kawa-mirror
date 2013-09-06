@@ -1,4 +1,10 @@
 2013-09-06  Per Bothner  <per@bothner.com>
+	    Alex Shinn
+
+	* numbers.scm (exact-integer-sqrt): Import
+	fixed algorithm from chibi-scheme.
+
+2013-09-06  Per Bothner  <per@bothner.com>
 
 	* ports.scm (display, write, write-simple, write-shared,
 	write-with-shared-structure): Re-implement for R7RS write semantics.

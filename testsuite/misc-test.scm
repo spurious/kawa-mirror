@@ -554,7 +554,7 @@
       (lambda (form)
 	(list-cond
 	 (lambda (a b)
-	   (string<? (cadr a) (car b)))
+	   (string<? (cadr a) (caar b)))
 	 forms
 	 (list form)))
       forms))

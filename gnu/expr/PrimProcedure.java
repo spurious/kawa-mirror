@@ -532,21 +532,19 @@ public class PrimProcedure extends MethodProc implements Inlineable {
     // at run-time, in which case we set createVarargsArrayIfNeeded.
     // FIXME This is needless and unreliable complexity.  We should by default
     // create a varargs array - even if the actual argument is an array.
-   boolean createVarargsArrayIfNeeded = false;
+    boolean createVarargsArrayIfNeeded = false;
     if (variable && (method.getModifiers() & Access.VARARGS) != 0
         && nargs > 0 && argTypes.length > 0
         && nargs == arg_count + (is_static ? 0 : 1))
       {
         Type lastType = args[args.length-1].getType();
         Type lastParam = argTypes[argTypes.length-1];
-        if (lastType instanceof ObjectType
-            && lastParam instanceof ArrayType // should always be true
-            && ! (((ArrayType) lastParam).getComponentType()
-                  instanceof ArrayType))
+        if (lastParam.isCompatibleWithValue(lastType) >= 0)
           {
-            if (! (lastType instanceof ArrayType))
-              createVarargsArrayIfNeeded = true;
-            variable = false;
+            if (lastParam instanceof ArrayType // should always be true
+                && (((ArrayType) lastParam).getComponentType()).isCompatibleWithValue(lastType) >= 0)
+                createVarargsArrayIfNeeded = true; 
+             variable = false;
           }
       }
     int fix_arg_count = variable ? arg_count - (is_static ? 1 : 0) : args.length - startArg;

@@ -1,3 +1,7 @@
+2013-09-05  Per Bothner  <per@bothner.com>
+
+	* PrimProcedure.java (compileArgs): Better handling of varargs.
+
 2013-09-04  Per Bothner  <per@bothner.com>
 
 	* Compilation.java (warnVoidUsed): New option.

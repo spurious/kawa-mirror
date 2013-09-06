@@ -641,8 +641,14 @@
 
 (define (%test-approximimate= error)
   (lambda (value expected)
-    (and (>= value (- expected error))
-         (<= value (+ expected error)))))
+    (let ((rval (real-part value))
+          (ival (imag-part value))
+          (rexp (real-part expected))
+          (iexp (imag-part expected)))
+      (and (>= rval (- rexp error))
+           (>= ival (- iexp error))
+           (<= rval (+ rexp error))
+           (<= ival (+ iexp error))))))
 
 (define-syntax %test-comp1body
   (syntax-rules ()

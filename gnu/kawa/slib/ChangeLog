@@ -1,3 +1,8 @@
+2013-09-06  Per Bothner  <per@bothner.com>
+
+	* testing.scm: Generalize test-approximimate to complex.
+	(%test-approximimate=): Handle non-real complex numbers.
+
 2013-06-02  Per Bothner  <per@bothner.com>
 
 	* conditions.scm: Minor tweaks.

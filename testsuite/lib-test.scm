@@ -41,7 +41,7 @@
 (test-end)
 
 (test-begin "bytevectors") ;; Some bytevector tests
-(define bytes1 (bytevector #u8(#xCE #xBB)))
+(define bytes1 (bytevector #xCE #xBB))
 (define lambda-char #\x3bb)
 (define lambda-string (string lambda-char))
 (test-equal #t (bytevector? bytes1))

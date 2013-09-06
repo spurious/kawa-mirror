@@ -1,3 +1,7 @@
+2013-09-05  Per Bothner  <per@bothner.com>
+
+	* LangObjType.java (getConstructor): Add case for bytevector.
+
 2013-08-31  Per Bothner  <per@bothner.com>
 
 	* LispReader.java (parseNumber): Allow arbitrary-case for inf and nan.

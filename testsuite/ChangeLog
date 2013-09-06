@@ -1,3 +1,7 @@
+2013-09-05  Per Bothner  <per@bothner.com>
+
+	* lib-test.scm: Fix thinko in bytevector constructor.
+
 2013-09-04  Per Bothner  <per@bothner.com>
 
 	* mac-test.scm: New test for Savannah bug #39946

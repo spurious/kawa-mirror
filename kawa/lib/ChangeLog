@@ -1,5 +1,10 @@
 2013-09-05  Per Bothner  <per@bothner.com>
 
+	* bytevectors.scm ($make$bytevector$): New helper function
+	for bytevector constructor function.
+	(make-bytevector): Need to use U8Vector directly,
+	instead of bytevector varargs constructor.
+
 	* numbers.scm (quantity?, complex?, real?, rational?):
 	Generalize so they return true for java.lang.Integer etc.
 	(finite?, infinite?, nan?): Handle java.lang.Number objects

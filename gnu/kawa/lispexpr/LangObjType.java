@@ -139,13 +139,7 @@ public class LangObjType extends ObjectType implements TypeValue
                     REGEX_TYPE_CODE);
 
   public static final LangObjType stringType =
-    new LangObjType("string",
-                    /* #ifdef use:java.lang.CharSequence */
-                    "java.lang.CharSequence",
-                    /* #else */
-                    // /* better would be a union of CharSeq and j.l.String. */
-                    // "gnu.lists.CharSeq",
-                    /* #endif */
+    new LangObjType("string", "java.lang.CharSequence",
                     STRING_TYPE_CODE);
 
   public static final LangObjType listType =
@@ -734,6 +728,8 @@ public class LangObjType extends ObjectType implements TypeValue
         return new PrimProcedure("gnu.text.URIPath", "makeURI", 1);
       case VECTOR_TYPE_CODE:
         return new PrimProcedure("gnu.lists.FVector", "make", 1);
+      case U8VECTOR_TYPE_CODE:
+        return new PrimProcedure("kawa.lib.bytevectors", "$make$bytevector$"+VARARGS_SUFFIX, 1);
       case LIST_TYPE_CODE:
         return gnu.kawa.functions.MakeList.list;
       case STRING_TYPE_CODE:

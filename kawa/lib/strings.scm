@@ -1,7 +1,32 @@
+(module-export string? make-string $make$string$ string-length
+               string-ref string-set!
+               char=? char<? char>? char<=? char>=?
+               char-ci=? char-ci<? char-ci>? char-ci<=? char-ci>=?
+               string=? string<? string>? string<=? string>=?
+	       string-ci=? string-ci<? string-ci>? string-ci<=? string-ci>=?
+               substring string->list list->string string-copy string-copy!
+               string-fill! string-upcase! string-downcase!
+               string-capitalize string-capitalize!
+               string-append string-append/shared)
+
 (require <kawa.lib.prim_syntax>)
 (require <kawa.lib.std_syntax>)
 (require <kawa.lib.syntax>)
 (require <kawa.lib.lists>)
+
+(define-syntax define-compare
+  (syntax-rules ()
+    ((_ NAME TYPE OP COMP2)
+     (define (NAME (str1 ::TYPE) (str2 ::TYPE)
+                          #!rest (strs ::TYPE[]))
+       ::boolean
+       (and (OP (COMP2 str1 str2) 0)
+            (let ((n ::int strs:length))
+              (let loop ((i ::int 0) (prev ::TYPE str2))
+                (or (= i n)
+                    (let ((next (strs i)))
+                      (and (OP (COMP2 prev next) 0)
+                           (loop (+ i 1) next)))))))))))
 
 (define (string? x) :: <boolean>
   (instance? x <string>))
@@ -26,20 +51,14 @@
   ::void
   (invoke string 'setCharAt k char))
 
-(define (string=? x y) ::boolean
-  ((x:toString):equals (y:toString)))
+(define (%string-compare2 (str1 :: string) (str2 :: string)) ::int
+  ((str1:toString):compareTo (str2:toString)))
 
-(define (string<? x y) ::boolean
-  (< (invoke (invoke x 'toString) 'compareTo (invoke y 'toString)) 0))
-
-(define (string>? x y) :: <boolean>
-  (> (invoke (invoke x 'toString) 'compareTo (invoke y 'toString)) 0))
-
-(define (string<=? x y) :: <boolean>
-  (<= (invoke (invoke x 'toString) 'compareTo (invoke y 'toString)) 0))
-
-(define (string>=? x y) :: <boolean>
-  (>= (invoke (invoke x 'toString) 'compareTo (invoke y 'toString)) 0))
+(define-compare string<? string < %string-compare2)
+(define-compare string=? string = %string-compare2)
+(define-compare string>? string > %string-compare2)
+(define-compare string<=? string <= %string-compare2)
+(define-compare string>=? string >= %string-compare2)
 
 (define (substring (str <string>) (start <int>) (end <int>))
   :: <string>
@@ -118,3 +137,33 @@
 			(string-copy arg1))))
 	  (invoke fstr 'addAllStrings args 1)
 	  fstr))))
+
+(define (%string-compare-ci2 (str1 :: string) (str2 :: string)) ::int
+  (invoke (gnu.kawa.functions.UnicodeUtils:foldCase str1)
+          'compareTo
+          (gnu.kawa.functions.UnicodeUtils:foldCase str2)))
+
+(define-compare string-ci<? string < %string-compare-ci2)
+(define-compare string-ci=? string = %string-compare-ci2)
+(define-compare string-ci>? string > %string-compare-ci2)
+(define-compare string-ci<=? string <= %string-compare-ci2)
+(define-compare string-ci>=? string >= %string-compare-ci2)
+
+(define (%char-compare (c1 :: character) (c2 :: character)) ::int
+  (- (invoke c1 'intValue) (invoke c2 'intValue)))
+
+(define-compare char=? character = %char-compare)
+(define-compare char<? character < %char-compare)
+(define-compare char>? character > %char-compare)
+(define-compare char<=? character <= %char-compare)
+(define-compare char>=? character >= %char-compare)
+
+(define (%char-compare-ci (c1 :: character) (c2 :: character)) ::int
+  (- (java.lang.Character:toUpperCase (c1:intValue))
+     (java.lang.Character:toUpperCase (c2:intValue))))
+
+(define-compare char-ci=? character = %char-compare-ci)
+(define-compare char-ci<? character < %char-compare-ci)
+(define-compare char-ci>? character > %char-compare-ci)
+(define-compare char-ci<=? character <= %char-compare-ci)
+(define-compare char-ci>=? character >= %char-compare-ci)

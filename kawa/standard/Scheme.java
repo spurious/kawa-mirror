@@ -350,16 +350,16 @@ public class Scheme extends LispLanguage
 
       //-- Section 6.6  -- complete
       defProcStFld("char?", "kawa.lib.characters");
-      defProcStFld("char=?", "kawa.lib.characters");
-      defProcStFld("char<?", "kawa.lib.characters");
-      defProcStFld("char>?", "kawa.lib.characters");
-      defProcStFld("char<=?", "kawa.lib.characters");
-      defProcStFld("char>=?", "kawa.lib.characters");
-      defProcStFld("char-ci=?", "kawa.lib.rnrs.unicode");
-      defProcStFld("char-ci<?", "kawa.lib.rnrs.unicode");
-      defProcStFld("char-ci>?", "kawa.lib.rnrs.unicode");
-      defProcStFld("char-ci<=?", "kawa.lib.rnrs.unicode");
-      defProcStFld("char-ci>=?", "kawa.lib.rnrs.unicode");
+      defProcStFld("char=?", "kawa.lib.strings");
+      defProcStFld("char<?", "kawa.lib.strings");
+      defProcStFld("char>?", "kawa.lib.strings");
+      defProcStFld("char<=?", "kawa.lib.strings");
+      defProcStFld("char>=?", "kawa.lib.strings");
+      defProcStFld("char-ci=?", "kawa.lib.strings");
+      defProcStFld("char-ci<?", "kawa.lib.strings");
+      defProcStFld("char-ci>?", "kawa.lib.strings");
+      defProcStFld("char-ci<=?", "kawa.lib.strings");
+      defProcStFld("char-ci>=?", "kawa.lib.strings");
       defProcStFld("char-alphabetic?", "kawa.lib.rnrs.unicode");
       defProcStFld("char-numeric?", "kawa.lib.rnrs.unicode");
       defProcStFld("char-whitespace?", "kawa.lib.rnrs.unicode");
@@ -388,11 +388,11 @@ public class Scheme extends LispLanguage
       defProcStFld("string<=?", "kawa.lib.strings");
       defProcStFld("string>=?", "kawa.lib.strings");
 
-      defProcStFld("string-ci=?", "kawa.lib.rnrs.unicode");
-      defProcStFld("string-ci<?", "kawa.lib.rnrs.unicode");
-      defProcStFld("string-ci>?", "kawa.lib.rnrs.unicode");
-      defProcStFld("string-ci<=?", "kawa.lib.rnrs.unicode");
-      defProcStFld("string-ci>=?", "kawa.lib.rnrs.unicode");
+      defProcStFld("string-ci=?", "kawa.lib.strings");
+      defProcStFld("string-ci<?", "kawa.lib.strings");
+      defProcStFld("string-ci>?", "kawa.lib.strings");
+      defProcStFld("string-ci<=?", "kawa.lib.strings");
+      defProcStFld("string-ci>=?", "kawa.lib.strings");
       defProcStFld("string-normalize-nfd", "kawa.lib.rnrs.unicode");
       defProcStFld("string-normalize-nfkd", "kawa.lib.rnrs.unicode");
       defProcStFld("string-normalize-nfc", "kawa.lib.rnrs.unicode");

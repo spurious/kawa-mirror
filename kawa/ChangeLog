@@ -1,5 +1,8 @@
 2013-09-06  Per Bothner  <per@bothner.com>
 
+	* standard/Scheme.java (initScheme): Various functions
+	got moved to strings.scm.
+
 	* standard/Scheme.java (initScheme): Add "digit-value",
 	"get-environment-variable", and "get-environment-variables".
 

@@ -1,5 +1,19 @@
 2013-09-06  Per Bothner  <per@bothner.com>
 
+	* strings.scm (define-compare): New non-exported helper macro.
+	Use it to generalize various compare functions to varargs.
+	(string=?, string<?, string>?, string<=?, string>=?): Re-implement.
+	(string-ci=?, string-ci<?, string-ci>?, string-ci<=?, string-ci>=?,
+	char-ci=?, char-ci<?, char-ci>?, char-ci<=?, char-ci>=?):
+	Moved from unicode.scm and re-implement using define-compare.
+	(char=,? char<? char>?, char<=?, char>=?): Moved from
+	characters.scm and re-imlement.
+	* unicode.scm (string-ci=?, string-ci<?, string-ci>?, string-ci<=?,
+	string-ci>=?, char-ci=?, char-ci<?, char-ci>?, char-ci<=?,
+	char-ci>=?): Moved to strings.scm, because of define-compare.
+	* characters.scm (char=,? char<? char>?, char<=?, char>=?):
+	Moved to strings.scm, because of define-compare.
+
 	* characters.scm (digit-value): New function.
 	* system.scm (get-environment-variable, get-environment-variables):
 	New functions.

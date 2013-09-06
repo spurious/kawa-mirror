@@ -50,7 +50,7 @@ check1:  check-num check-arr check-java-array check-lazy check-lib \
   check-knucleotide check-mandelbrot check-meteor check-nbody \
   check-nsieve check-pidigits check-regexdna check-revcomp \
   check-spectralnorm check-threadring
-check2:  check-scm check-misc check-mac check-obj check-polytype
+check2:  check-scm check-r7rs check-misc check-mac check-obj check-polytype
 
 check-run-test-scripts:
 	CLASSPATH=$(top_builddir) $(JAVA) gnu.kawa.util.RunTestScript \
@@ -65,6 +65,9 @@ check-scm: testing.zip
 	  -e '(define this-file-name "$(srcdir)/test.scm")' \
 	  -e "(set! symbol-read-case 'D)" --no-warn-undefined-variable \
 	  -f $(srcdir)/test.scm -e '(test-report)'
+
+check-r7rs:
+	$(KAWA) --no-warn-void-used -f $(srcdir)/r7rs-tests.scm
 
 check-num:
 	$(KAWA) $(OPTIONS) "$(srcdir)/num-test.scm"

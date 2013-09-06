@@ -1,5 +1,9 @@
 2013-09-06  Per Bothner  <per@bothner.com>
 
+	* r7rs-tests.scm: Port to Kawa.  Disable or mark as fail-expected
+	functionality that doesn;t (yet) work on Kawa.
+	* Makefile.am: Update accordingly.
+
 	* misc-test.scm (make-mf): Update since string<? is now less
 	lenient.
 

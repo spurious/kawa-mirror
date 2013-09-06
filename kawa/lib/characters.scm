@@ -19,3 +19,7 @@
   (<= (invoke c1 'intValue) (invoke c2 'intValue)))
 (define (char>=? (c1 :: <character>) (c2 :: <character>))
   (>= (invoke c1 'intValue) (invoke c2 'intValue)))
+
+(define (digit-value ch::character)
+  (let ((r (java.lang.Character:digit (ch:intValue) (->int 10))))
+    (if (< r 0) #f (->integer r))))

@@ -366,6 +366,7 @@ public class Scheme extends LispLanguage
       defProcStFld("char-upper-case?", "kawa.lib.rnrs.unicode");
       defProcStFld("char-lower-case?", "kawa.lib.rnrs.unicode");
       defProcStFld("char-title-case?", "kawa.lib.rnrs.unicode");
+      defProcStFld("digit-value", "kawa.lib.characters");
       defProcStFld("char->integer", "kawa.lib.characters");
       defProcStFld("integer->char", "kawa.lib.characters");
       defProcStFld("char-upcase", "kawa.lib.rnrs.unicode");
@@ -707,6 +708,8 @@ public class Scheme extends LispLanguage
       defProcStFld("tokenize-string-using-shell", "kawa.lib.system");
       defProcStFld("command-parse", "kawa.lib.system");
       defProcStFld("process-command-line-assignments", "kawa.lib.system");
+      defProcStFld("get-environment-variable", "kawa.lib.system");
+      defProcStFld("get-environment-variables", "kawa.lib.system");
       defProcStFld("current-second", "kawa.lib.system");
       defProcStFld("current-jiffy", "kawa.lib.system");
       defProcStFld("jiffies-per-second", "kawa.lib.system");

@@ -1,5 +1,8 @@
 2013-09-06  Per Bothner  <per@bothner.com>
 
+	* standard/Scheme.java (initScheme): Add "digit-value",
+	"get-environment-variable", and "get-environment-variables".
+
 	* standard/Scheme.java (writeFormat, sharedWriteFormat,
 	displayFormat): Removed fields, replaced by fields in DisplayFormat.
 	* lang/SyntaxPattern.java:  Update accordingly.

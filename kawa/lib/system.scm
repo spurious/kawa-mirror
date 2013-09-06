@@ -107,6 +107,18 @@
 (define (process-command-line-assignments)
   (gnu.expr.ApplicationMainSupport:processSetProperties))
 
+(define (get-environment-variable name::string)
+  (let ((r (java.lang.System:getenv (name:toString))))
+    (if (eq? r #!null) #f r)))
+
+(define (get-environment-variables)
+  (let ((it (((java.lang.System:getenv):entrySet):iterator)))
+    (let loop ((r '()))
+      (if (it:hasNext)
+          (let ((e (it:next)))
+            (loop (cons (cons (e:getKey) (e:getValue)) r)))
+          r))))
+
 (define (current-second) ::double
   (* (java.lang.System:currentTimeMillis) 0.001))
 

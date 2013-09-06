@@ -1,3 +1,14 @@
+2013-09-05  Per Bothner  <per@bothner.com>
+
+	* PrettyWriter.java (resolveBackReferences): Copy into the GapBuffer
+	any text up to the current position *before* processing
+	QITEM_POSNMARKER_TYPE or QITEM_BACKREF_TYPE or other types of items.
+
+	* PrettyWriter.java (GapBuffer.expandBuffer): Was inconsistent
+	about expecting a minimum new size, but is passed an increment.
+	(GapBuffer.adUpTo): Was inconsistent about taking a count or
+	an upper index,
+
 2013-08-16  Alex Mitchell <lexaay@gmail.com>
 
 	* Path.java (probeContentType): Fix thinko.

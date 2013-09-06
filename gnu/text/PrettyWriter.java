@@ -360,9 +360,11 @@ public class PrettyWriter extends java.io.Writer
    * types
    * The only exception to this rule is QITEM_NOP_TYPE, which acts as a marker
    * for when there isn't enough space in the rest of the buffer.
+   * All other QITEMs have in the second word (at offset QITEM_POSN)
+   * the corresponding text position as a POSN.
    */
 
-  /** The first it QITEM contains it type code and size. */
+  /** The first int of a QITEM contains its type code and size. */
   static final int QITEM_TYPE_AND_SIZE = 0;
   private int getQueueType(int index) { return queueInts[index] & 0xFF; }
   private int getQueueSize(int index) { return queueInts[index] >> 16; }
@@ -437,6 +439,12 @@ public class PrettyWriter extends java.io.Writer
   static final int QITEM_POSNMARKER_TYPE = 7;
   static final int QITEM_POSNMARKER_GROUP_TYPE = 8;
   static final int QITEM_POSNMARKER_SIZE = QITEM_BASE_SIZE + 1;
+  /** The datum label to use for this object, or 0 if no label.
+   * The label is initially 0, indicating no back-references.
+   * It is set to 1 when a back-reference is seen.
+   * Finally resolveBackReferences sets it to a ordinal that gets written
+   * out - i.e. the N in {@code #N#}.
+   */
   static final int QITEM_POSNMARKER_LOC = QITEM_BASE_SIZE;
 
   /**
@@ -1674,7 +1682,6 @@ public class PrettyWriter extends java.io.Writer
     int delta = 0;
     // Used to compute the relative delta of an SRFI-38 specific token.
     int oldDelta;
-    int newBufferIndex;
     int relativeAddress;   
 
     //log ("resolveBackReferences: Starting at tail = "+queueTail);
@@ -1687,6 +1694,13 @@ public class PrettyWriter extends java.io.Writer
 
 	int next = tail;
 	int type = getQueueType(next);
+
+        // The QITEM_POSN offset will return the position this QITEM occupies
+        // in the output buffer. Since this QITEM is not SRFI-38 specific, the
+	// printer must output all characters up to this token into the new
+	// buffer.
+        if (type != QITEM_NOP_TYPE)
+          gbuffer.addUpTo(posnIndex(queueInts[next + QITEM_POSN]));
 
 	switch (type)
 	  {
@@ -1751,25 +1765,12 @@ public class PrettyWriter extends java.io.Writer
 	    //log("RESOLVE-PAIREND: rel=" + relativeAddress + "@:" + next + "(" + (next + relativeAddress) + ")");
 	    if (posnMarkerActive(relativeAddress))
 	      {
-		newBufferIndex = posnIndex(queueInts[next + QITEM_POSN]);
-		gbuffer.addUpTo(newBufferIndex);
 		gbuffer.add(')');
 		delta++;
 		queueInts[next + QITEM_POSN] += 1;
 	      }
 	    break;
-	  case QITEM_EOE_TYPE:
-	    newBufferIndex = posnIndex(queueInts[next + QITEM_POSN]);
-	    gbuffer.addUpTo(newBufferIndex);
-	    queueInts[next + QITEM_POSN] += delta;
-	    break;
 	  default:
-	    // The QITEM_POSN offset will return the position this QITEM occupies
-	    // in the output buffer. Since this QITEM is not SRFI-38 specific, the
-	    // printer must output all characters up to this token into the new
-	    // buffer.
-	    newBufferIndex = posnIndex(queueInts[next + QITEM_POSN]);
-	    gbuffer.addUpTo(newBufferIndex);
 	    // Now update the token position information with the current delta.
 	    queueInts[next + QITEM_POSN] += delta;
 	    break;
@@ -1925,16 +1926,17 @@ public class PrettyWriter extends java.io.Writer
     }
 
     /**
-     * Copy the next {@code n} characters from the existing buffer to the gap buffer.
-     * @param n The number of characters to copy.
+     * Copy characters from the existing buffer to the gap buffer.
+     * @param end the upper index of the characters to copy
      */
-    public void addUpTo (int n)
+    public void addUpTo(int end)
     {
+      int n = end - existingIndex;
       if (point + n >= buffer.length)
 	{
 	  expandBuffer(n);
 	}
-      while (existingIndex < n)
+      while (existingIndex < end)
 	{
 	  buffer[point++] = existingBuffer[existingIndex++];
 	}
@@ -1950,9 +1952,10 @@ public class PrettyWriter extends java.io.Writer
       return retBuffer;
     }
 
-    private void expandBuffer (int minimum)
+    private void expandBuffer(int n)
     {
       int newLength = buffer.length;
+      int minimum = newLength + n;
       do
 	{
 	  newLength <<= 1;
@@ -2024,6 +2027,10 @@ public class PrettyWriter extends java.io.Writer
 	    out.print("(block-end)");  break;
 	  case QITEM_TAB_TYPE:  out.print("(tab)");
 	    break;
+          case QITEM_POSNMARKER_TYPE:
+            out.print("(posnmarker)");  break;
+          case QITEM_BACKREF_TYPE:
+            out.print("(backref)");  break;
 	  case QITEM_NOP_TYPE:
 	    out.print("(nop)");  break;
 	  }

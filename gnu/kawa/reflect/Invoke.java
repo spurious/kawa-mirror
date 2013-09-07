@@ -13,7 +13,7 @@ public class Invoke extends ProcedureN
    *  'P' - invoke-special.
    *  'S' - invoke-static (static or non-static):
    *        The first operand is a Class or Type, the second is the name,
-   *        and if the is non-static the 3rd is the receiver.
+   *        and if the method is non-static the 3rd is the receiver.
    *  's' - Like 'S' but only allow static methods. [not used]
    *  'V' - non-static invoke, only allow non-static methods. [not used]
    *  '*' - non-static invoke, can match static methods also.

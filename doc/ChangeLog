@@ -1,3 +1,8 @@
+2013-09-07  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Strings): Update string->list for R7RS
+	(end,end) arguments. Minor update.
+
 2013-08-20  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Type tests and conversions): Document (->TYPE VAL) syntax.

@@ -5035,16 +5035,15 @@ Return a newly allocated string whose characters form the concatenation
 of the given strings.
 @end deffn
 
-@deffn Procedure string->list @var{string}
+@deffn Procedure string->list @var{string} [@var{start} [@var{end}]]
 @deffnx Procedure list->string @var{list}
-@var{list} must be a list of characters.
+It is an error if any element of @var{list} is not a character.
 
 The @func{string->list} procedure returns a newly allocated list of the
-characters that make up the given string.
-
+characters of @var{string} between @var{start} and @var{end}.
 The @func{list->string} procedure returns a newly allocated string
 formed from the characters in @var{list}.
-
+In both procedures, order is preserved.
 The @func{string->list} and @func{list->string} procedures are inverses
 so far as @func{equal?} is concerned.
 @end deffn

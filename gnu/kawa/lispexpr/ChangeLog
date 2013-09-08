@@ -1,3 +1,10 @@
+2013-07-05  Charles Turner  <chturne@gmail.com>
+
+	* LispPackage.java (valueOf, valueOfNoCreate, findSymbol)
+	(exportPkg, importPkg, allSymbols, allExternalSymbols)
+	(allInternalSymbols, signal): New methods adding extra support for
+	CL packages.
+
 2013-09-05  Per Bothner  <per@bothner.com>
 
 	* LangObjType.java (getConstructor): Add case for bytevector.

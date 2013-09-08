@@ -65,6 +65,11 @@ public class CommonLisp extends Lisp2
   public static final NumberCompare numLEq;
 
   public static final gnu.kawa.functions.IsEq isEq;
+  
+  /** Package location symbols. */
+  public static final Symbol internalKeyword = Keyword.make("INTERNAL");
+  public static final Symbol inheritedKeyword = Keyword.make("INHERITED");
+  public static final Symbol externalKeyword = Keyword.make("EXTERNAL");
 
   static
   {

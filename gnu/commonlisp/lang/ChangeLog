@@ -1,3 +1,8 @@
+2013-07-05  Charles Turner  <chturne@gmail.com>
+
+	* CommonLisp.java: Added new keywords for CL: INHERITED, EXTERNAL
+	and INTERNAL for use in package lookups.
+
 2013-08-25  Per Bothner  <per@bothner.com>
 
 	* Lisp2.java (createReadTable): Specify that '#' is non-terminating.

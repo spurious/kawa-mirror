@@ -1,6 +1,9 @@
 package gnu.kawa.lispexpr;
+import gnu.commonlisp.lang.CommonLisp;
 import gnu.mapping.*;
 import gnu.lists.*;
+import java.util.Iterator;
+import java.util.Stack;
 
 /** Implement a Common Lisp "package" value.
  * 
@@ -13,7 +16,7 @@ public class LispPackage extends Namespace
   /** The set of exported symbols.
    * This is one of the packages in importing.
    */
-  Namespace exported = new Namespace();
+  public Namespace exported = new Namespace();
   
   public void setExportedNamespace (Namespace exp)
   {
@@ -135,6 +138,275 @@ public class LispPackage extends Namespace
     usePackages(used, newpack);
     return newpack;    
   }
+  
+  /** Look up a given package in the {@link Namespace} map.
+   * 
+   * This method creates a new Lisp package in the namespace if it does not
+   * already exist.
+   * 
+   * @param name The name of the package to look up.
+   * 
+   * @return The {@link LispPackage} named by {@code name} or {@code null} if a
+   *   {@link Namespace} is already named by {@code name} but is not a lisp
+   *   package.
+   */
+  public static LispPackage valueOf (String name)
+  {
+    return (LispPackage) Namespace.valueOf(name);
+  }
+  
+  public static Namespace valueOfNoCreate (String name)
+  {
+    return (LispPackage) Namespace.valueOfNoCreate(name);
+  }
+  
+  public Values findSymbol (Object name)
+  {
+    String sname = name.toString();
+
+    Symbol sym = exported.lookup(sname);
+    if (sym != null)
+    {
+      return new Values(new Object[]
+      {
+        sym, CommonLisp.externalKeyword
+      });
+    }
+    
+    sym = lookupInternal(sname, sname.hashCode());
+    if (sym != null)
+    {
+      return new Values(new Object[]
+      {
+        sym, CommonLisp.internalKeyword
+      });
+    }
+    
+    // It's not an exported or an imported symbol, let's check the inheritance
+    // chain.
+    NamespaceUse U = imported;
+    while (U != null)
+    {
+      if (U.imported == LispPackage.KawaNamespace)
+        sym = U.imported.exported.lookup(sname.toLowerCase());
+      else
+        sym = U.imported.exported.lookup(sname);
+
+      if (sym != null)
+      {
+        return new Values(new Object[]
+        {
+          sym, CommonLisp.inheritedKeyword
+        });
+      }
+
+      U = U.nextImported;
+    }
+
+    return new Values(new Object[]
+    {
+      CommonLisp.FALSE, CommonLisp.FALSE
+    });
+  }
+  
+  /** Export a list of symbols from a package, checking for conflicts.
+   * 
+   * @param syms The list of symbols to export.
+   * @param pkg The package to export the symbols from.
+   * 
+   */
+  public static void exportPkg (LList syms, LispPackage pkg)
+  {
+    Stack<Symbol> validSyms = new Stack<Symbol>();
+    Iterator symiter = syms.getIterator();
+    Symbol s;
+    Values v;
+
+    while (symiter.hasNext())
+    {
+      s = (Symbol) symiter.next();
+      v = pkg.findSymbol(s.getName());//uc
+      if (v.get(1) != CommonLisp.FALSE
+          && !validSyms.contains(s))
+      {
+        validSyms.push(s);
+      }
+    }
+
+    NamespaceUse usedBy = pkg.imported;
+    symiter = syms.getIterator();
+
+    while (symiter.hasNext())
+    {
+      s = (Symbol) symiter.next();
+      String sname = s.getName();//uc
+      while (usedBy != null)
+      {
+        v = usedBy.imported.findSymbol(sname);
+        if (v.get(1) != CommonLisp.FALSE
+            && v.get(0) != s
+            && !usedBy.imported.shadowingSymbols.contains(v.get(0)))
+        {
+          // name conflict in usedBy.imported! Correctable, ask user
+          // which name to nuke.
+          signal("Name conflict from package " + usedBy.imported + "on symbol"
+              + s);
+        }
+        usedBy = usedBy.nextImported;
+      }
+    }
+
+    // Check that all symbols are accessible. If not, ask to import them.
+    Stack<Symbol> missing = new Stack<Symbol>();
+    // syms accessible in the inheritance chain, but not in this package
+    Stack<Symbol> imports = new Stack<Symbol>();
+
+    symiter = syms.getIterator();
+    while (symiter.hasNext())
+    {
+      s = (Symbol) symiter.next();
+      v = pkg.findSymbol(s.getName());//uc
+      if ((v.get(1) == CommonLisp.FALSE)
+          && (!(v.get(0).hashCode() == s.hashCode())))
+      {
+        missing.push(s);
+      }
+      else if (v.get(1) == KeywordNamespace.valueOf("inherited"))
+      {
+        imports.push(s);
+      }
+    }
+
+    if (!missing.isEmpty())
+    {
+      // correctable error, ask user if they want ot import these
+      // missing symbols into the package
+      signal("The following symbols are missing: " + missing.toString());
+    }
+
+    while (!imports.isEmpty())
+    {
+      Symbol sym = imports.pop();
+      pkg.exported.add(sym, sym.hashCode());
+    }
+
+    while (!validSyms.isEmpty())
+    {
+      s = validSyms.pop();
+      pkg.remove(s); // remove internal
+      pkg.exported.add(s, s.hashCode()); // add to external
+    }
+  }
+  
+  /**
+   * Import a list of symbols into the internal table of a package.
+   *
+   * This method checks for conflicts, and should in the future allow the user
+   * to shadow import any conflicts.
+   *
+   * @param syms the list of symbols to import.
+   * @param pkg the package to import into.
+   */
+  public static void importPkg (LList syms, LispPackage pkg)
+  {
+    Stack<Symbol> validSyms = new Stack<Symbol>();
+    Iterator symiter = syms.getIterator();
+    Symbol s;
+    Values v;
+
+    while (symiter.hasNext())
+    {
+      s = (Symbol) symiter.next();
+      v = pkg.findSymbol(s.getName());
+
+      if (v.get(1) == CommonLisp.FALSE)
+      {
+        Iterator symiter2 = syms.getIterator();
+        boolean found = false;
+        while (symiter2.hasNext())
+        {
+          Symbol s2 = (Symbol) symiter2.next();
+          if (s.getName().equals(s2.getName()))
+          {
+            if (s != s2)
+            {
+              validSyms.remove(s2);
+              // name conflict
+              signal("Symbol " + s2 + " conflicts with this package.");
+            }
+          }
+        }
+
+        if (!found)
+        {
+          validSyms.push(s);
+        }
+      }
+      else if (v.get(0) != s)
+      {
+        // name conflict
+        signal("Symbol " + v.get(0) + " conflicts in this package");
+      }
+      else if (v.get(1) == KeywordNamespace.valueOf("inherited"))
+      {
+        validSyms.add(s);
+      }
+    }
+
+    while (!validSyms.isEmpty())
+    {
+      Symbol sym = validSyms.pop();
+      pkg.add(sym, sym.hashCode());
+    }
+    // make any uninterned symbols owned by PKG
+    symiter = syms.getIterator();
+    while (symiter.hasNext())
+    {
+      s = (Symbol) symiter.next();
+      if (s.getNamespace() == null)
+      {
+        s.setNamespace(pkg);
+      }
+    }
+  }
+  
+  /**
+   * The list of symbols managed by a given namespace.
+   *
+   * @param ns The namespace whose symbol table we query
+   * @return The list of symbols managed by the given namespace.
+   */
+  public LList allSymbols (Namespace ns)
+  {
+    LList res = LList.Empty;
+    java.util.Iterator symNameIter = ns.entrySet().iterator();
+    while (symNameIter.hasNext())
+    {
+      res = Pair.make(symNameIter.next(), res);
+    }
+    return res;
+  }
+ 
+  /**
+   * The list of symbols exported from this package.
+   *
+   * @return A list of the the exported symbols from the current package.
+   *
+   */
+  public LList allExternalSymbols ()
+  {
+    return allSymbols(this.exported);
+  }
+
+  /**
+   * The list of symbols interned into this package.
+   *
+   * @return A list of the interned symbols in this package.
+   */
+  public LList allInternalSymbols ()
+  {
+    return allSymbols(this);
+  }
 
   public static void use (LispPackage importing, LispPackage imported)
   {
@@ -151,6 +423,7 @@ public class LispPackage extends Namespace
       }
   }
 
+  @Override
   public Symbol lookup(String name, int hash, boolean create)
   {
     Symbol sym = exported.lookup(name, hash, false);
@@ -255,17 +528,25 @@ public class LispPackage extends Namespace
       unintern(old);
     addToShadowingSymbols(symbol);
   }
+  
+  /**
+   * Temporary stub until Kawa supports conditional restarts.
+   */
+  public static void signal (String msg)
+  {
+    throw new RuntimeException(msg);
+  }
 
 }
 
-
-/** This is used to implement two linked lists.
- * For performance they're combined into one object. */
+/**
+ * This is used to implement two linked lists. For performance they're combined
+ * into one object.
+ */
 class NamespaceUse
 {
-  Namespace imported;
+  LispPackage imported = new LispPackage();
   NamespaceUse nextImported;
-
-  Namespace importing;
+  LispPackage importing = new LispPackage();
   NamespaceUse nextImporting;
 }

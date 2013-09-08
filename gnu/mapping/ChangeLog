@@ -1,3 +1,8 @@
+2013-09-07  Per Bothner  <per@bothner.com>
+
+	* MethodProc.java (overrideEquivalent): New method.
+	(mostSpecific(MethodProc[],int)): Moved to PrimProcedure.
+
 2013-08-31  Per Bothner  <per@bothner.com>
 
 	* CharArrayOutPort.java (close): Set IS_CLOSED flag, so

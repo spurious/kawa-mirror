@@ -1,5 +1,9 @@
 2013-09-07  Per Bothner  <per@bothner.com>
 
+	* sva39947.scm: Added testcase for Savannah bug #39947
+	"Bad resolution of java.util.HashSet.addAll()".
+	* Makefile.am: Updated accordingly.
+
 	* sva39945.scm: New testcase for Savannah bug #39945: "Too few
 	arguments" warning when declaring an anonymous class in a let block"
 

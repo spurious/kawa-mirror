@@ -4,6 +4,7 @@
 package gnu.mapping;
 import gnu.bytecode.Type;
 import gnu.bytecode.ArrayType;
+import gnu.expr.PrimProcedure;
 
 /** Similar to a CLOS method.
  * Can check if arguments "match" before committing to calling method. */
@@ -174,60 +175,18 @@ public abstract class MethodProc extends ProcedureN
     return not2 ? proc1 : not1 ? proc2 : null;
   }
 
-  /** Return the index of the most specific method. */
-  public static int mostSpecific(MethodProc[] procs, int length)
-  {
-    if (length <= 1) // Handles length==0 and length==1.
-      return length - 1;
-    // best is non-null if there is a single most specific method.
-    MethodProc best = procs[0];
-    // This array (which is allocated lazily) is used if there is is a set
-    // of bestn methods none of which are more specific than the others.
-    MethodProc[] bests = null;
-    // If best==null, then the index of the most specific method;
-    // otherwise the active length of the bests array.
-    int bestn = 0;
-  outer:
-    for (int i = 1;  i < length;  i++)
-      {
-        MethodProc method = procs[i];
-	if (best != null)
-	  {
-	    MethodProc winner = mostSpecific(best, method);
-	    if (winner == null)
-	      {
-		if (bests == null)
-		  bests = new MethodProc[length];
-		bests[0] = best;
-		bests[1] = method;
-		bestn = 2;
-		best = null;
-	      }
-	    else if (winner == method)
-	      {
-		best = method;
-		bestn = i;
-	      }
-	  }
-	else
-	  {
-	    for (int j = 0;  j < bestn;  j++)
-	      {
-		MethodProc old = bests[j];
-		MethodProc winner = mostSpecific(old, method);
-		if (winner == old)
-		  continue outer;
-		if (winner == null)
-		  {
-		    bests[bestn++] = method;
-		    continue outer;
-		  }
-	      }
-	    // At this point method is more specific than bests[0..bestn-1].
-	    best = method;
-	    bestn = i;
-	  }
-      }
-    return best == null ? -1 : bestn;
-  }
+    /** An approximation of "override-equivalent" as defined in the JLS. */
+    public static boolean overrideEquivalent(MethodProc proc1, MethodProc proc2) {
+        int num1 = proc1.numParameters();
+        int num2 = proc2.numParameters();
+        if (num1 != num2)
+            return false;
+        for (int i = 1;  i < num1;  i++) {
+            Type t1 = proc1.getParameterType(i);
+            Type t2 = proc2.getParameterType(i);
+            if (t1.compare(t2) != 0)
+                return false;
+        }
+        return true;
+    }
 }

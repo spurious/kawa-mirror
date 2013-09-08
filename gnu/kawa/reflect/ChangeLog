@@ -1,3 +1,7 @@
+2013-09-07  Per Bothner  <per@bothner.com>
+
+	* CompileReflect.java: Update for mostSpecific metho being moved.
+
 2013-06-02  Per Bothner  <per@bothner.com>
 
 	* CompileInvoke.java (validateApplyInvoke): Use Language.unionType.

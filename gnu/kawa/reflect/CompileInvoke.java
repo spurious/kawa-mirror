@@ -333,7 +333,7 @@ public class CompileInvoke
           index = 0;
         else if (okCount > 0)
           {
-            index = MethodProc.mostSpecific(methods, okCount);
+            index = PrimProcedure.mostSpecific(methods, okCount);
             if (index < 0)
               {
                 if (kind == 'S')
@@ -480,7 +480,7 @@ public class CompileInvoke
     if (methods == null)
       index = -1;
     else if (okCount > 0)
-      index = MethodProc.mostSpecific(methods, okCount);
+      index = PrimProcedure.mostSpecific(methods, okCount);
     else if (maybeCount == 1)
       index = 0;
     else

@@ -105,6 +105,11 @@ public class PrimProcedure extends MethodProc implements Inlineable {
     return app;
   }
 
+    public boolean isAbstract() {
+        return method != null 
+            && (method.getModifiers() & Access.ABSTRACT) != 0;
+    }
+
   public final boolean isConstructor()
   {
     // invokespecial == primitive-constructor
@@ -840,6 +845,72 @@ public class PrimProcedure extends MethodProc implements Inlineable {
   // This is null in JDK 1.1 and something else in JDK 1.2.
   private static ClassLoader systemClassLoader
   = PrimProcedure.class.getClassLoader();
+
+    /** Return the index of the most specific method.
+     * An approximation of the algorithm in JLS3
+     * 15.12.2.5 "Choosing the Most Specific Method." */
+    public static int mostSpecific(PrimProcedure[] procs, int length) {
+        if (length <= 1) // Handles length==0 and length==1.
+            return length - 1;
+        // best is non-negative if there is a single most specific method.
+        int best = 0;
+        // This array (which is allocated lazily) is used if there is is a
+        // set of bestn methods none of which are more specific
+        // than the others.
+        int[] bests = null;
+        // The active length of the bests array.
+        int bestn = 0;
+        outer:
+        for (int i = 1;  i < length;  i++) {
+            PrimProcedure method = procs[i];
+            if (best >= 0) {
+                PrimProcedure winner
+                    = (PrimProcedure) mostSpecific(procs[best], method);
+                if (winner == null) {
+                    if (bests == null)
+                        bests = new int[length];
+                    bests[0] = best;
+                    bests[1] = i;
+                    bestn = 2;
+                    best = -1;
+                } else if (winner == method) {
+                    best = i;
+                    bestn = i;
+                }
+            } else {
+                for (int j = 0;  j < bestn;  j++) {
+                    PrimProcedure old = procs[bests[j]];
+                    PrimProcedure winner
+                        = (PrimProcedure) mostSpecific(old, method);
+                    if (winner == old)
+                        continue outer;
+                    if (winner == null) {
+                        bests[bestn++] = i;
+                        continue outer;
+                    }
+                }
+                // At this point method is more specific than bests[0..bestn-1].
+                best = i;
+                bestn = i;
+            }
+        }
+        if (best < 0 && bestn > 1) {
+            PrimProcedure first = procs[bests[0]];
+            for (int j = 0;  j < bestn;  j++) {
+                int m = bests[j];
+                PrimProcedure method = procs[m];
+                if (j > 0 && ! overrideEquivalent(first, method))
+                    return -1;
+                if (! method.isAbstract()) {
+                    if (best >= 0)
+                        return -1;
+                    best = m;
+                }
+            }
+            return best >= 0 ? best : bests[0];
+        }
+        return best;
+    }
 
   public static PrimProcedure getMethodFor (Procedure pproc, Expression[] args)
   {

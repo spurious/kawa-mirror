@@ -1,3 +1,9 @@
+2013-09-07  Per Bothner  <per@bothner.com>
+
+	* Language.java (getTypeor): Don't treat ObjectExp as
+	a type specifier.  This fixes  Savannah bug #39945: "Too few
+	arguments" warning when declaring an anonymous class in a let block"
+
 2013-09-05  Per Bothner  <per@bothner.com>
 
 	* PrimProcedure.java (compileArgs): Better handling of varargs.

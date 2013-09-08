@@ -1,3 +1,8 @@
+2013-09-07  Per Bothner  <per@bothner.com>
+
+	* sva39945.scm: New testcase for Savannah bug #39945: "Too few
+	arguments" warning when declaring an anonymous class in a let block"
+
 2013-09-06  Per Bothner  <per@bothner.com>
 
 	* r7rs-tests.scm: Port to Kawa.  Disable or mark as fail-expected

@@ -831,7 +831,9 @@ public abstract class Language
 		Object val = ((QuoteExp) exp).getValue();
                 return getTypeFor(val, lenient);
               }
-            else if (exp instanceof ClassExp || exp instanceof ModuleExp)
+            else if ((exp instanceof ClassExp
+                      && ! (exp instanceof ObjectExp))
+                     || exp instanceof ModuleExp)
               {
                 decl.setCanRead(true);
                 return ((LambdaExp) exp).getClassType();
@@ -863,7 +865,8 @@ public abstract class Language
             && name.charAt(len-1) == '>')
           return getTypeFor(name.substring(1, len-1));
       }
-    else if (exp instanceof ClassExp || exp instanceof ModuleExp)
+    else if ((exp instanceof ClassExp && ! (exp instanceof ObjectExp))
+             || exp instanceof ModuleExp)
       {
 	return ((LambdaExp) exp).getClassType();
       }

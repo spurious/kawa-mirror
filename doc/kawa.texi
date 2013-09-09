@@ -4401,6 +4401,16 @@ arguments.
                                                 ; if -0.0 is distinguished
 @end example
 @end deffn
+
+@deffn Procedure square z
+Returns the square of @var{z}.
+This is equivalent to @code{(* @var{z} @var{z})}.
+@example
+(square 42)    @result{} 1764
+(square 2.0)   @result{} 4.0
+@end example
+@end deffn
+
 @deffn Procedure sqrt @var{z}
 Return the principal square root of @var{z}.  For rational @var{z}, the
 result has either positive real part, or zero real part and
@@ -5040,8 +5050,26 @@ Analogous to @func{for-each}.
 @end example
 @end deffn
 
-@deffn Procedure string-copy @var{string}
-Returns a newly allocated copy of the given @var{string}.
+@deffn Procedure string-copy @var{string} [@var{start} [@var{end}]]
+Returns a newly allocated copy of the the part of the given @var{string}
+between @var{start} and @var{end}.
+@end deffn
+
+@deffn Procedure string-copy!  @var{to}  @var{at}  @var{from} [@var{start} [@var{end}]]
+Copies the characters of the string @var{from} that are between
+@var{start} end @var{end} into the string @var{to},
+starting at index @var{at}.  The order in which characters are copied
+is unspecified, except that if the source and destination overlap,
+copying takes places as if the source is first copied into a
+temporary string and then into the destination.
+(This is achieved without allocating storage by making sure to copy in
+the correct direction in such circumstances.)
+@example
+(define a "12345")
+(define b (string-copy "abcde"))
+(string-copy! b 1 a 0 2)
+b  @result{}  "a12de"
+@end example
 @end deffn
 
 @subsection String Comparisons
@@ -5723,6 +5751,8 @@ vec1 @result{} #(5 9 x 8)
 @node Lists
 @section Lists
 
+@emph{Needs work!}
+
 The @uref{http://srfi.schemers.org/srfi-1/srfi-1.html, SRFI-1 List Library}
 is available, though not enabled by default.  To use its functions you
 must @code{(require 'list-lib)} or @code{(require 'srfi-1)}.
@@ -5730,6 +5760,15 @@ must @code{(require 'list-lib)} or @code{(require 'srfi-1)}.
 (require 'list-lib)
 (iota 5 0 -0.5) @result{} (0.0 -0.5 -1.0 -1.5 -2.0)
 @end example
+
+@deffn Procedure make-list k [fill]
+Returns a newly allocated list of @var{k} elements.  If a second argument
+is given, the each element is initialized to @var{fill}.
+Otherwise the initial contents of each element is unspecified.
+@example
+(make-list 2 3)   @result{} (3 3)
+@end example
+@end deffn
 
 @deffn Procedure reverse! list
 The result is a list consisting of the elements of @var{list} in reverse order.

@@ -1,5 +1,9 @@
 2013-09-08  Per Bothner  <per@bothner.com>
 
+	* kawa.texi (Numbers); Document proceure. square.
+	(String): Document string-copy and string-copy!.
+	(Lists): Document make-list.
+
 	* kawa.texi (Strings): Some re-organization.
 
 2013-09-07  Per Bothner  <per@bothner.com>

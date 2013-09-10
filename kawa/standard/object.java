@@ -297,6 +297,14 @@ public class object extends Syntax
 		  decl.setFlag(allocationFlag);
 		if (accessFlag != 0)
 		  decl.setFlag(accessFlag);
+                // FIXME Shouldn't need to noteValueUnknown when
+                // the field is private or otherwise module-local.
+                // However, this can trigger a bug if the field is
+                // non-static but doesn't need a closure environment.
+                // See Savannah bug #39940.
+                // Fixing this properly is difficult.
+                /* if ((accessFlag & Declaration.PRIVATE_ACCESS) == 0) */
+                  decl.noteValueUnknown();
 		decl.setCanRead(true);
 		decl.setCanWrite(true);
 	      }
@@ -623,7 +631,7 @@ public class object extends Syntax
         Declaration decl = (Declaration) d;
         SetExp sexp = new SetExp(decl, initValue);
         sexp.setLocation(decl);
-        decl.noteValueUnknown();
+        decl.noteValueFromSet(sexp);
         initValue = sexp;
       }
     else

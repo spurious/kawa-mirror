@@ -1,3 +1,9 @@
+2013-09-10  Per Bothner  <per@bothner.com>
+
+	* standard/object.java (scanClassDef): Note that field value
+	is unknown.  This fixes Savannah bug#39940
+	"Class member of type <procedure> compilation exception".
+
 2013-09-06  Per Bothner  <per@bothner.com>
 
 	* standard/Scheme.java (initScheme): Various functions

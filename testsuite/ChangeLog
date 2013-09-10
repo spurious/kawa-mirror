@@ -1,3 +1,10 @@
+2013-09-10  Matthieu Vachon  <matthieu.o.vachon@gmail.com>
+	    Per Bothner  <per@bothner.com>
+
+	* sva39940.scm: New test based on Savannah bug#39940
+	"Class member of type <procedure> compilation exception".
+	Also some variations.
+
 2013-09-07  Per Bothner  <per@bothner.com>
 
 	* sva39947.scm: Added testcase for Savannah bug #39947

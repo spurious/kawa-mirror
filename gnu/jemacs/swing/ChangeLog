@@ -1,3 +1,7 @@
+2013-09-15  Per Bothner  <per@bothner.com>
+
+	* SwingWindow.java (getHeight): Fix copy-and-paste error.
+
 2011-05-02  Shad Gregory <captshadg@gmail.com>
 
 	* SwingFrame.java (showInfoMessage): New method.

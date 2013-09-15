@@ -303,9 +303,24 @@ public abstract class EWindow
 	      }
             else if (interactive == LList.Empty)
               proc.apply0();
+            else if (interactive instanceof Procedure)
+              {
+                Object args = ((Procedure) interactive).apply0();
+                int nargs = LList.listLength(args, false);
+                if (nargs < 0)
+                    throw new IllegalArgumentException("'interactive' returns non-list");
+                Object[] xargs = new Object[nargs];
+                for (int iarg  = nargs;  --iarg >= 0;  )
+                  {
+                    Pair p = (Pair) args;
+                    xargs[iarg] = p.getCar();
+                    args = p.getCdr();
+                  }
+                proc.applyN(xargs);
+              }
 	    else
-	      {
-		System.err.println("not implemented: interactive not a string");
+              {
+		System.err.println("not implemented: interactive not a string or procedure");
 		proc.apply0();
 	      }
 	  }

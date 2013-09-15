@@ -1,5 +1,8 @@
 2013-09-15  Per Bothner  <per@bothner.com>
 
+	* lambda.java (rewriteBody): Set NO_FIELD on interactive lambda
+	property - we don't need a field, and this avoids an ordering problem.
+
 	* ELisp.java (asNumber): Use Arithmetic.asNumeric.
 
 2012-12-31  Per Bothner  <per@bothner.com>

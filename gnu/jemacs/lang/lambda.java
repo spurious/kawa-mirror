@@ -116,6 +116,7 @@ public class lambda extends Lambda
                 LambdaExp ilexp = new LambdaExp();
                 rewrite(ilexp, LList.Empty, interactive, tr, null);
                 ilexp.setCanRead(true);
+                ilexp.setFlag(LambdaExp.NO_FIELD);
                 interactive = ilexp;
               }
           }

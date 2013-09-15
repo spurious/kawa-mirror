@@ -5,8 +5,9 @@ import gnu.expr.*;
 import gnu.text.*;
 import kawa.standard.Scheme;
 import gnu.bytecode.Type;
-import gnu.kawa.lispexpr.*;
 import gnu.commonlisp.lang.*;
+import gnu.kawa.lispexpr.*;
+import gnu.kawa.functions.Arithmetic;
 
 public class ELisp extends Lisp2
 {
@@ -27,7 +28,7 @@ public class ELisp extends Lisp2
       return gnu.math.IntNum.make(((Char) arg).intValue());
     if (arg instanceof javax.swing.text.Position)
       return gnu.math.IntNum.make(1 + ((javax.swing.text.Position) arg).getOffset());
-    return (gnu.math.Numeric) arg;
+    return Arithmetic.asNumeric(arg);
   }
 
   public static int asChar (Object x)

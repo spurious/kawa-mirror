@@ -202,17 +202,17 @@ public class StableVector extends GapVector
 	high = low + delta;
 	adjust = (oldGapStart - low) << 1;
 	// The position corresponding to the new endGap should be adjusted
-	// only if it has the isAfter (low-order) bit is clear.  Hence the -1.
+	// only if it has the isAfter (low-order) bit is clear.
 	low = low << 1;
-	high = (high << 1) - 1;
+	high = high << 1;
       }
     else if (newGapStart == oldGapStart)
       return;
     else // newGapStart < gapStart:
       {
-	// Positions at the newgapStart should be adjust only if isAfter.
+	// Positions at the newgapEnd should be adjust only if isAfter.
 	low = (newGapStart << 1) + 1;
-	high = oldGapStart << 1;
+	high = (oldGapStart << 1) + 1;
 	adjust = (gapEnd - oldGapStart) << 1;
       }
     super.shiftGap(newGapStart);

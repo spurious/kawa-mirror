@@ -1,5 +1,7 @@
 2013-09-15  Per Bothner  <per@bothner.com>
 
+	* StableVector.java (adjustPositions): Fix off-by-one calculations.
+
 	* CharBuffer.java (dump): Adjust for gap size when printing positions.
 
 2013-09-03  Per Bothner  <per@bothner.com>

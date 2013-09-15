@@ -293,8 +293,12 @@ public class CharBuffer extends StableVector
     for (int i = 0;  i < poslen;  i++)
       {
 	int pos = positions[i];
-	if (free == -2 ? pos != FREE_POSITION : ! isFree[i])
-	  System.err.println("position#"+i+": "+(pos>>1)+" isAfter:"+(pos&1));
+	if (free == -2 ? pos != FREE_POSITION : ! isFree[i]) {
+            int p = pos>>1;
+            if (p > gapStart)
+                p -= gapEnd-gapStart;
+	  System.err.println("position#"+i+": "+p+" isAfter:"+(pos&1));
+        }
       }
   }
 }

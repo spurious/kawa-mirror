@@ -873,6 +873,7 @@ to get different commands to edit and resubmit."
 ;; next-complete-history-element
 ;; previous-complete-history-element
 
+#|
 (defun goto-line (arg)
   "Goto line ARG, counting from line 1 at beginning of buffer."
   (interactive "NGoto line: ")
@@ -883,6 +884,7 @@ to get different commands to edit and resubmit."
     (if (eq selective-display t)
 	(re-search-forward "[\n\C-m]" nil 'end (1- arg))
       (forward-line (1- arg)))))
+|#
 
 ;Put this on C-x u, so we can force that rather than C-_ into startup msg
 (define-function 'advertised-undo 'undo)

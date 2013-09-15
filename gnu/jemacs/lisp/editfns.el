@@ -37,6 +37,8 @@
 
 (defvar selective-display nil)
 
+(defvar current-prefix-arg nil)
+
 (defun barf-if-buffer-read-only (&optional buffer start end)
   nil) ;; FIXME
 

@@ -75,3 +75,7 @@
 
 (define (prin1 value #!optional (out (current-output-port))) :: <void>
   (gnu.jemacs.lang.ELisp:writeFormat:format value out))
+
+(define (prefix-numeric-value arg)
+  ;; FIXME
+  arg)

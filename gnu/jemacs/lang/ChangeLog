@@ -1,5 +1,7 @@
 2013-09-15  Per Bothner  <per@bothner.com>
 
+	* MiscOps.scm (prefix-numeric-value): New function stub.
+
 	* lambda.java (rewriteBody): Set NO_FIELD on interactive lambda
 	property - we don't need a field, and this avoids an ordering problem.
 

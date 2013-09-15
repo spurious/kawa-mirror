@@ -1,5 +1,9 @@
 2013-09-15  Per Bothner  <per@bothner.com>
 
+	* SwingBuffer.java (defaultStyle): Rename to "plain" - a style
+	named "default" is set by Swing current Look & Feel.
+	Don't depend on ancient java.version values.
+
 	* SwingWindow.java (getHeight): Fix copy-and-paste error.
 
 2011-05-02  Shad Gregory <captshadg@gmail.com>

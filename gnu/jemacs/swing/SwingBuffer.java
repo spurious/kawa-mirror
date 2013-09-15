@@ -22,24 +22,21 @@ public class SwingBuffer extends Buffer
   public BufferContent content;
   public StyledDocument modelineDocument;
 
-  public static javax.swing.text.StyleContext styles
-  = new javax.swing.text.StyleContext();
-  static public Style defaultStyle = styles.addStyle("default",null);
-  public Style inputStyle = defaultStyle;
-  public static Style redStyle = styles.addStyle("red", null);
-  static Style blueStyle = styles.addStyle("blue", null);
-  static
-  {
-    String version = System.getProperty("java.version");
-    if (version != null
-	&& (version.startsWith("1.2") || version.startsWith("1.3")))
-      {
-	StyleConstants.setFontFamily(defaultStyle, "Lucida Sans TypeWriter");
-	StyleConstants.setFontSize(defaultStyle, 14);
-      }
-    StyleConstants.setForeground(redStyle, Color.red);
-    StyleConstants.setForeground(blueStyle, Color.blue);
-  }
+    public static javax.swing.text.StyleContext styles
+        = new javax.swing.text.StyleContext();
+    // The style name "default" is special in Swing - it inherits
+    // from the current Look & Feel - but we prefer a MonoSpace font.
+    static public Style defaultStyle = styles.addStyle("plain",null);
+    public Style inputStyle = defaultStyle;
+    public static Style redStyle = styles.addStyle("red", null);
+    static Style blueStyle = styles.addStyle("blue", null);
+    static {
+        StyleConstants.setFontFamily(defaultStyle,
+                                     "Lucida Sans TypeWriter");
+        StyleConstants.setFontSize(defaultStyle, 14);
+        StyleConstants.setForeground(redStyle, Color.red);
+        StyleConstants.setForeground(blueStyle, Color.blue);
+    }
 
   public SwingBuffer(String name)
   {

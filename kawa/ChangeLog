@@ -1,3 +1,11 @@
+2013-09-15  Per Bothner  <per@bothner.com>
+
+	* standard/define_autoload.java (findAutoloadComments): Don't
+	setProcedureDecl - it's not.
+	(process): Update test for symbol.
+	* lang/AutoloadProcedure.java (load): Invoke defineAll even if we
+	find existing module instance.
+
 2013-09-10  Per Bothner  <per@bothner.com>
 
 	* standard/object.java (scanClassDef): Note that field value

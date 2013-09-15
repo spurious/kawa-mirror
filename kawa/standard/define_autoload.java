@@ -202,8 +202,6 @@ public class define_autoload extends Syntax
 			Expression ex = new QuoteExp(value);
 			decl.setFlag(Declaration.IS_CONSTANT);
 			decl.noteValue(ex);
-			decl.setProcedureDecl(true);
-			decl.setType(Compilation.typeProcedure);
 		      }
 		  }
 		lineStart = false;
@@ -271,8 +269,8 @@ public class define_autoload extends Syntax
       {
 	String name = names.toString();
 	Declaration decl = defs.getDefine(name, 'w', tr);
-	if (filename instanceof String
-	    && (len = (fn = (String) filename).length()) > 2
+	if (filename instanceof SimpleSymbol
+	    && (len = (fn = filename.toString()).length()) > 2
 	    && fn.charAt(0) == '<' && fn.charAt(len-1) == '>')
 	  filename = fn.substring(1, len-1);
 	Object value = new AutoloadProcedure(name, filename.toString(),

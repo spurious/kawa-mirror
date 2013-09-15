@@ -111,11 +111,11 @@ public class AutoloadProcedure extends Procedure implements Externalizable
                     // Not a static module - create a new instance.
                     mod = procClass.newInstance();
                   }
-                ClassMemberLocation.defineAll(mod, lang, env);
-                if (mod instanceof ModuleBody)
-                  ((ModuleBody)mod).run();
-
               }
+            ClassMemberLocation.defineAll(mod, lang, env);
+            if (mod instanceof ModuleBody)
+              ((ModuleBody)mod).run();
+
             Object value = env.getFunction(sym, null);
             if (value == null
                 || !(value instanceof Procedure))
@@ -146,7 +146,7 @@ public class AutoloadProcedure extends Procedure implements Externalizable
           loaded.setSymbol(name);
       }
     catch (ClassNotFoundException ex)
-      {	throw_error ("failed to find class "); }
+      { throw_error ("failed to find class "); }
     catch (InstantiationException ex)
       { throw_error ("failed to instantiate class "); }
     catch (IllegalAccessException ex)

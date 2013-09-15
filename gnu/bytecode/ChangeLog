@@ -1967,11 +1967,11 @@
 
 1999-08-22  Per Bothner  <per@bothner.com>
 
-	* ClassType.java (adMethods, getMatchingMethods):  New methods.
+	* ClassType.java (addMethods, getMatchingMethods):  New methods.
 
 	* CodeAttr.java (setReachable, setUnreachable):  New methods.
 	(emitNewArray):  Use anewarray even if element type is ArrayType.
-	* Method.java (toSTring):  Make safe even if arg_types is null.
+	* Method.java (toString):  Make safe even if arg_types is null.
 
 	* ZipArchive.java (append):  Remove version using byte[] name.
 

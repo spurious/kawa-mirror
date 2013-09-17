@@ -1,3 +1,7 @@
+2013-09-16  Per Bothner  <per@bothner.com>
+
+	* PreProcess.java: Add java8 support.
+
 2013-09-06  Per Bothner  <per@bothner.com>
 
 	* IntHashTable.java: Implement deletion support.

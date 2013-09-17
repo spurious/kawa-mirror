@@ -1,3 +1,7 @@
+2013-09-16  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (defaultClassFileVersion): Add JAVA8 support.
+
 2013-09-07  Per Bothner  <per@bothner.com>
 
 	* PrimProcedure.java (mostSpecific): Moved from MethodProc.

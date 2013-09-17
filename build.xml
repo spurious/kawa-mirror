@@ -354,6 +354,17 @@
     </java>
   </target>
 
+  <target name="select-java8" depends="build-settings">
+    <pathconvert property="fileList" pathSep=" " dirSep="${file.separator}">
+      <path><fileset refid="build.selectjava"/></path>
+    </pathconvert>
+    <java classname="gnu.kawa.util.PreProcess">
+      <classpath location="${build.tools}"/>
+      <arg line="%java8 ${preprocess-xml} ${preprocess-HttpServer}"/>
+      <arg line="${fileList}"/>
+    </java>
+  </target>
+
   <target name="-maybe-select-java1" unless="has-java2">
     <antcall target="select-java1"/>
   </target>
@@ -372,6 +383,9 @@
   <target name="-maybe-select-java7" if="has-java7">
     <antcall target="select-java7"/>
   </target>
+  <target name="-maybe-select-java8" if="has-java8">
+    <antcall target="select-java8"/>
+  </target>
   <target name="-maybe-select-android" if="${enable-android}">
     <antcall target="select-android"/>
   </target>
@@ -387,12 +401,14 @@
     <available property="has-java5" classname="java.lang.Appendable"/>
     <available property="has-java6" classname="javax.script.AbstractScriptEngine"/>
     <available property="has-java7" classname="java.lang.invoke.MethodHandle"/>
+    <available property="has-java8" classname="java.util.stream.Stream"/>
     <antcall target="-maybe-select-java1"/>
     <antcall target="-maybe-select-java2"/>
     <antcall target="-maybe-select-java4"/>
     <antcall target="-maybe-select-java5"/>
     <antcall target="-maybe-select-java6"/>
     <antcall target="-maybe-select-java7"/>
+    <antcall target="-maybe-select-java8"/>
   </target>
   
   <!-- 

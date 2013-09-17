@@ -1,3 +1,10 @@
+2013-09-16  Per Bothner  <per@bothner.com>
+
+	* Makefile.am: Add Java8 support.
+	(select-java8): New rule.
+	* condigure.ac: Add Java8 support.
+	* build.xml: Likewise.
+
 2013-06-16  Per Bothner  <per@bothner.com>
 
 	* configure.ac (AC_CONFIG_FILES): Remove kawa/lang/Makefile

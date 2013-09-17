@@ -1,5 +1,7 @@
 2013-09-16  Per Bothner  <per@bothner.com>
 
+	* ClassType.java (JDK_1_8_VERSION): New constant.
+
 	* CodeAttr.java (emitNewArray): Fix logic error noted by
 	Charles Turner.
 

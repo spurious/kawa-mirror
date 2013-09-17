@@ -1,3 +1,8 @@
+2013-09-16  Per Bothner  <per@bothner.com>
+
+	* CodeAttr.java (emitNewArray): Fix logic error noted by
+	Charles Turner.
+
 2013-07-18  Per Bothner  <per@bothner.com>
 
 	* Variable.java (freeLocal): Avoid out-of-bounds indexing of

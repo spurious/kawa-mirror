@@ -1198,6 +1198,7 @@ public class CodeAttr extends Attribute implements AttrContainer
   /** Compile code to allocate a new array.
    * The size should have been already pushed on the stack.
    * @param element_type type of the array elements
+   * @params dims number of dimensions - more than 1 is untested
    */
   public void emitNewArray (Type element_type, int dims)
   {
@@ -1221,13 +1222,7 @@ public class CodeAttr extends Attribute implements AttrContainer
 	  }
 	emitNewArray(code);
       }
-    else if (element_type instanceof ObjectType)
-      {
-	reserve(3);
-	put1(189); // anewarray
-	putIndex2(getConstants().addClass((ObjectType) element_type));
-      }
-    else if (element_type instanceof ArrayType)
+    else if (element_type instanceof ArrayType && dims > 1) // untested
     {
       reserve(4);
       put1(197); // multianewarray
@@ -1239,6 +1234,12 @@ public class CodeAttr extends Attribute implements AttrContainer
 	if (popType ().promote () != Type.intType)
 	  throw new Error ("non-int dim. spec. in emitNewArray");
     }
+    else if (element_type instanceof ObjectType)
+      {
+	reserve(3);
+	put1(189); // anewarray
+	putIndex2(getConstants().addClass((ObjectType) element_type));
+      }
     else
       throw new Error ("unimplemented type in emitNewArray");
 

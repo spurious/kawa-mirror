@@ -43,7 +43,6 @@ public class ApplicationMainSupport
   public static void setArgs (String[] args, int arg_start)
   {
     int nargs = args.length - arg_start;
-    Object[] array = new Object[nargs];
     if (arg_start == 0)
      commandLineArgArray = args;
     else
@@ -53,12 +52,10 @@ public class ApplicationMainSupport
 	  strings[i] = args[i+arg_start];
 	commandLineArgArray = strings;
       }
-    for (int i = nargs;  --i >= 0; )
-      array[i] = new FString (args[i + arg_start]);
-    commandLineArguments = new FVector (array);  // FIXME scsh has list
-    // FIXME scsh also has command-line proc
-    Environment.getCurrent().put("command-line-arguments",
-                                 commandLineArguments);
+    
+    Object[] array = new Object[nargs];
+    System.arraycopy(args, arg_start, array, 0, nargs);
+    commandLineArguments = new ConstVector(array);  // FIXME scsh has list
   }
 
   public static boolean processSetProperty (String arg)

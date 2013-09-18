@@ -1,3 +1,7 @@
+2013-09-18  Per Bothner  <per@bothner.com>
+
+	* standard/Scheme.java (initScheme): Define "command-line-arguments".
+
 2013-09-15  Per Bothner  <per@bothner.com>
 
 	* standard/define_autoload.java (findAutoloadComments): Don't

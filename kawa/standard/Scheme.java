@@ -565,6 +565,8 @@ public class Scheme extends LispLanguage
 
       defProcStFld("exit", "kawa.lib.rnrs.programs");
       defProcStFld("command-line", "kawa.lib.rnrs.programs");
+      defAliasStFld("command-line-arguments", 
+                    "gnu.expr.ApplicationMainSupport", "commandLineArguments");
 
       defProcStFld("bitwise-arithmetic-shift",
                    "gnu.kawa.functions.BitwiseOp", "ashift");

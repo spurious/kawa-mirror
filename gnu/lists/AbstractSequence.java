@@ -9,7 +9,7 @@ import java.util.*;
  * classes that extend AbstractSequence will implement Sequence.
  * However, AbstractSequence itself does not implement Sequence.
  * This is so we can use AbstractSequence to implement classes that are
- * "sequence-like" (such as multi-dimesnional arrays) but are not Sequences.
+ * "sequence-like" (such as multi-dimensional arrays) but are not Sequences.
  *
  * Additionally, a sequence may have zero or more attributes, which are
  * name-value pairs.  A sequence may also have a named "type".  These

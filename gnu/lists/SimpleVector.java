@@ -185,6 +185,15 @@ public abstract class SimpleVector<E> extends AbstractSequence<E>
 
   protected abstract E setBuffer(int index, E value);
 
+    /* #ifdef JAVA8 */
+    // @Override
+    // public void forEach(java.util.function.Consumer<? super E> action) {
+    //     int len = size;
+    //     for (int i = 0;  i < len;  i++)
+    //         action.accept(getBuffer(i));
+    // }
+    /* #endif */
+
   public void fill(E value)
   {
     checkCanWrite();

@@ -259,9 +259,3 @@ public class TreePosition extends SeqPosition implements Cloneable
       }
   }
 }
-// This is for people using the Emacs editor:
-// Local Variables:
-// c-file-style: "gnu"
-// tab-width: 8
-// indent-tabs-mode: t
-// End:

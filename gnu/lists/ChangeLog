@@ -1,3 +1,9 @@
+2013-09-20  Per Bothner  <per@bothner.com>
+
+	* Consumer.java: If JAVA8 implement java.util.function.Consumer and
+	java.util.function.PInt,Long,Double}Consumer.
+	* SimpleVector.java (forEach): New method (optimization) if JAVA8.
+
 2013-09-15  Per Bothner  <per@bothner.com>
 
 	* StableVector.java (adjustPositions): Fix off-by-one calculations.

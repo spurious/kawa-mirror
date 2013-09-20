@@ -26,6 +26,7 @@ implements
     java.util.ListIterator<E>,
     /* #endif */
     java.util.Enumeration<E>
+// Maybe implement Spliterator?
 {
   /**
    * The Sequence relative to which ipos and xpos have meaning.
@@ -110,6 +111,20 @@ implements
   {
     return sequence.hasNext(getPos());
   }
+
+    // FUTURE: /* #ifdef JAVA8 */
+    // public boolean tryAdvance(java.util.function.Consumer<? super E> action) {
+    //     if (hasNext()) {
+    //         action.accept(next());
+    //         return true;
+    //     }
+    //     return false;
+    // }
+    // public int characteristics() {
+    //     /* Should call sequence.spliterator$characteristics(); */
+    //     return ORDERED | SIZED | SUBSIZED;
+    // }
+    // /* #endif */
 
   /** Return a code (defined in Sequence) for the type of the next element. */
   public int getNextKind()
@@ -366,9 +381,3 @@ implements
     return sbuf.toString();
   }
 }
-// This is for people using the Emacs editor:
-// Local Variables:
-// c-file-style: "gnu"
-// tab-width: 8
-// indent-tabs-mode: t
-// End:

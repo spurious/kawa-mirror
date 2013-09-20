@@ -1,3 +1,10 @@
+2013-09-18  Per Bothner  <per@bothner.com>
+
+	* ApplicationMainSupport.java (setArgs): Don't set
+	command-line-arguments in environment - use normal Scheme.initScheme
+	mechanism.  This makes variable available at compile-time,
+	avoiding warnings.
+
 2013-09-16  Per Bothner  <per@bothner.com>
 
 	* Compilation.java (defaultClassFileVersion): Add JAVA8 support.

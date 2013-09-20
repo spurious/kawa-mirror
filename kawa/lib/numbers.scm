@@ -86,7 +86,9 @@
 
 (define (infinite? (z ::java.lang.Number)) ::boolean
   (if (gnu.math.Complex? z)
-      (= ((->gnu.math.Complex z):classifyFinite) 0)
+      (let ((zc ::gnu.math.Complex z))
+        (or (= ((zc:re):classifyFinite) 0)
+            (= ((zc:im):classifyFinite) 0)))
       (and (java.lang.real? z)
            (let ((d (z:doubleValue)))
              (java.lang.Double:isInfinite d)))))

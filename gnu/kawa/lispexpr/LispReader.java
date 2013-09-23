@@ -1275,12 +1275,35 @@ public class LispReader extends Lexer
       reader.eofError("unexpected EOF in #! special form");
 
     /* Handle Unix #!PROGRAM line at start of file. */
-    if (ch == '/'
+    if ((ch == '/' || ch == ' ')
 	&& reader.getLineNumber() == 0
 	&& reader.getColumnNumber() == 3)
       {
-	ReaderIgnoreRestOfLine.getInstance().read(reader, '#', 1);
-	return Values.empty;
+        String filename = reader.getName();
+        if (filename != null
+            && ApplicationMainSupport.commandName.get(null) == null)
+          {
+            ApplicationMainSupport.commandName.set(filename);
+          }
+
+        boolean sawBackslash = false;
+        for (;;)
+          {
+            ch = reader.read();
+            if (ch < 0)
+              break;
+            if (ch == '\\')
+              sawBackslash = true;
+            else if (ch == '\n' || ch == '\r')
+              {
+                if (! sawBackslash)
+                  break;
+                sawBackslash = false;
+              }
+            else if (sawBackslash && ch != ' ' && ch != '\t')
+              sawBackslash = false;
+          }
+        return Values.empty;
       }
 
     int startPos = reader.tokenBufferLength;

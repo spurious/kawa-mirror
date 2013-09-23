@@ -13,6 +13,9 @@ public class ApplicationMainSupport
 
   public static FVector commandLineArguments;
 
+     public static ThreadLocation<String> commandName
+         = new ThreadLocation<String>("command-name");
+
   public static void processSetProperties ()
   {
     String[] args = commandLineArgArray;
@@ -40,23 +43,31 @@ public class ApplicationMainSupport
     setArgs(args, iarg);
   }
 
-  public static void setArgs (String[] args, int arg_start)
-  {
-    int nargs = args.length - arg_start;
-    if (arg_start == 0)
-     commandLineArgArray = args;
-    else
-      {
-	String[] strings = new String[nargs];
-	for (int i = nargs;  --i >= 0; )
-	  strings[i] = args[i+arg_start];
-	commandLineArgArray = strings;
-      }
+    public static void setArgs (String[] args, int arg_start) {
+        if (commandName.get(null) == null) {
+            try {
+                String name = System.getProperty("kawa.command.name");
+                if (name != null)
+                    commandName.set(name);   
+            } catch (Throwable ex) {
+              // Leave commandName unset.
+            }
+        }
+
+        int nargs = args.length - arg_start;
+        if (arg_start == 0)
+            commandLineArgArray = args;
+        else {
+            String[] strings = new String[nargs];
+            for (int i = nargs;  --i >= 0; )
+                strings[i] = args[i+arg_start];
+            commandLineArgArray = strings;
+        }
     
-    Object[] array = new Object[nargs];
-    System.arraycopy(args, arg_start, array, 0, nargs);
-    commandLineArguments = new ConstVector(array);  // FIXME scsh has list
-  }
+        Object[] array = new Object[nargs];
+        System.arraycopy(args, arg_start, array, 0, nargs);
+        commandLineArguments = new ConstVector(array);  // FIXME scsh has list
+    }
 
   public static boolean processSetProperty (String arg)
   {

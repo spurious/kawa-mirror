@@ -1,3 +1,10 @@
+2013-09-22  Per Bothner  <per@bothner.com>
+
+	* LispReader (readSpecial): Allow ' ' after '#!'.
+	If lines ends with '\', skip next line as well.
+	This helps with handling the scsh-style "meta-arg".
+	Also ApplicationMainSupport.commandName if unset.
+
 2013-07-05  Charles Turner  <chturne@gmail.com>
 
 	* LispPackage.java (valueOf, valueOfNoCreate, findSymbol)

@@ -1,3 +1,9 @@
+2013-09-22  Per Bothner  <per@bothner.com>
+
+	* rnrs/programs.scm (command-line): Also check kawa.command.line
+	property and ApplicationMainSupport:commandName variable when
+	trying to figure out command name.
+
 2013-09-20  Per Bothner  <per@bothner.com>
 
 	* numbers.scm (infinite?): Change to match R7RS specification.

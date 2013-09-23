@@ -1,3 +1,9 @@
+2013-09-22  Per Bothner  <per@bothner.com>
+
+	* ApplicationMainSupport.java (commandName): New field.
+	(setArgs): Set commandName if unset and the
+	kawa.command.name property is set.
+
 2013-09-18  Per Bothner  <per@bothner.com>
 
 	* ApplicationMainSupport.java (setArgs): Don't set

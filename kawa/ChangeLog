@@ -1,3 +1,11 @@
+2013-09-22  Per Bothner  <per@bothner.com>
+
+	* repl.java (processArgs): Fix handling of meta-arg "\" - don't
+	process injected arguments, but instead adjust args array and
+	continue.  This is more flexible, and simpler.
+
+	* repl.java (processArgs): Update copyright year.
+
 2013-09-18  Per Bothner  <per@bothner.com>
 
 	* standard/Scheme.java (initScheme): Define "command-line-arguments".

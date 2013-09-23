@@ -7,9 +7,9 @@ import gnu.text.SourceMessages;
 import gnu.text.SyntaxException;
 import gnu.text.Path;
 import gnu.lists.*;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Vector;
 import gnu.bytecode.ClassType;
 import gnu.kawa.servlet.HttpRequestContext;
 
@@ -282,6 +282,7 @@ public class repl extends Procedure0or1
 	    if (++iArg == maxArg)
 	      bad_option (arg);
 	    String filename = args[iArg];
+            ApplicationMainSupport.commandName.set(filename);
 	    InPort freader;
             SourceMessages messages = new SourceMessages();
 	    try
@@ -291,7 +292,7 @@ public class repl extends Procedure0or1
 		if (ch == '#')
 		  {
 		    StringBuffer sbuf = new StringBuffer(100);
-		    Vector xargs = new Vector(10);
+		    ArrayList<String> xargs = new ArrayList<String>(10);
 		    int state = 0;
 		    while (ch != '\n' && ch != '\r' && ch >= 0)
 		      ch = fstream.read();
@@ -316,7 +317,7 @@ public class repl extends Procedure0or1
 			      {
 				if (sbuf.length() > 0)
 				  {
-				    xargs.addElement(sbuf.toString());
+				    xargs.add(sbuf.toString());
 				    sbuf.setLength(0);
 				  }
 				continue;
@@ -332,40 +333,22 @@ public class repl extends Procedure0or1
 			sbuf.append((char) ch);
 		      }
 		    if (sbuf.length() > 0)
-		      xargs.addElement(sbuf.toString());
+		      xargs.add(sbuf.toString());
 		    int nxargs = xargs.size();
-		    if (nxargs > 0)
-		      {
-			String[] sargs = new String[nxargs];
-			xargs.copyInto(sargs);
-			int ixarg = processArgs(sargs, 0, nxargs);
-			if (ixarg >= 0 && ixarg < nxargs)
-			  { // FIXME
-			    System.err.println(""+(nxargs-ixarg)+" unused meta args");
-			  }
-		      }
+                    iArg--;
+                    String[] nargs = new String[maxArg+nxargs-1];
+                    System.arraycopy(args, 0, nargs, 0, iArg);
+                    System.err.println("meta iArg:"+iArg+" -> "+args[iArg]);
+                    for (int i = 0;  i < nxargs;  i++)
+                        nargs[iArg+i] = xargs.get(i);
+                    System.arraycopy(args, iArg+1, nargs, iArg+nxargs,
+                                     maxArg-iArg-1);
+                    System.err.println("new args "+new FVector(nargs));
+                    maxArg = maxArg+nxargs-1;
+                    args = nargs;
+                    iArg--;
+                    continue;
 		  }
-		getLanguageFromFilenameExtension(filename);
-		freader = InPort.openFile(fstream, Path.valueOf(filename));
-		// FIXME adjust line number
-		setArgs(args, iArg+1);
-		checkInitFile();
-                OutPort err = OutPort.errDefault();
-                Throwable ex = Shell.run(Language.getDefaultLanguage(),
-                                         Environment.getCurrent(),
-                                         freader, OutPort.outDefault(), null,
-                                         messages);
-                messages.printAll(err, 20);
-                if (ex != null)
-                  {
-                    if (ex instanceof SyntaxException)
-                      {
-                        SyntaxException se = (SyntaxException) ex;
-                        if (se.getMessages() == messages)
-                          System.exit(1);
-                      }
-                    throw ex;
-                  }
 	      }
 	    catch (Throwable ex)
 	      {
@@ -679,7 +662,7 @@ public class repl extends Procedure0or1
 	    System.out.print("Kawa ");
 	    System.out.print(Version.getVersion());
 	    System.out.println();
-	    System.out.println("Copyright (C) 2012 Per Bothner");
+	    System.out.println("Copyright (C) 2013 Per Bothner");
 	    something_done = true;
 	  }
 	else if (arg.length () > 0 && arg.charAt(0) == '-')

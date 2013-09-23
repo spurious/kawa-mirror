@@ -1,3 +1,9 @@
+2013-09-22  Per Bothner  <per@bothner.com>
+
+	* DisplayFormat.java (writeObjectRaw): Extend logic used for
+	printing RatNum (including radix handling) to Integer, Long,
+	Short, Byte, and BigInteger.
+
 2013-09-06  Per Bothner  <per@bothner.com>
 
 	* DisplayFormat.java (schemeDisplayFormat, schemeWriteSimpleFormat,

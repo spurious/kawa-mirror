@@ -393,7 +393,13 @@ public class DisplayFormat extends AbstractFormat
       ((Consumable) obj).consume(out);
     else if (obj instanceof Printable)
       ((Printable) obj).print(out);
-    else if (obj instanceof RatNum)
+    else if (obj instanceof RatNum
+             || (obj instanceof Number
+                 && (obj instanceof Long
+                     || obj instanceof Integer
+                     || obj instanceof Short
+                     || obj instanceof Byte
+                     || obj instanceof java.math.BigInteger)))
       {
         int b = 10;
         boolean showRadix = false;
@@ -407,7 +413,7 @@ public class DisplayFormat extends AbstractFormat
           b = ((IntNum) base).intValue();
         else if (base != null)
           b = Integer.parseInt(base.toString());
-        String asString = ((RatNum) obj).toString(b);
+        String asString = Arithmetic.asRatNum(obj).toString(b);
         if (showRadix)
           {
             if (b == 16)

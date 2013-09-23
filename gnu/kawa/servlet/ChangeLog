@@ -1,3 +1,9 @@
+2013-09-23  Per Bothner  <per@bothner.com>
+
+	* CGIServletWrapper.java: Update to servlet API 3.0.
+	(CGIRequest, CGIResponse, CGIContext): New member classes.
+	Move methods to appropriate member classes.
+
 2013-08-07  Per Bothner  <per@bothner.com>
 
 	* KawaAutoHandler.java (getModule): Call new Path#probeContentType.

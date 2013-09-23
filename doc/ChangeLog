@@ -1,3 +1,13 @@
+2013-09-23  Per Bothner  <per@bothner.com>
+
+	* kawa.texi: Numerous updates and additions.
+	(Scripts): Major re-write.
+	(Compatibility): Update note on tailcalls.
+	(Options):  Document -D and -J olptions to kawa front-end
+	(Strings): Update string-fill! for R7RS semantics.
+	(Arithmetic operations): Likewise for finite?, infinite?, and nan?.
+	(Processes): More details on command-name procedure.
+
 2013-09-08  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Numbers); Document proceure. square.

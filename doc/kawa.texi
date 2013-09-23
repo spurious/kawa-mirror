@@ -49,13 +49,13 @@
 @code{@b{\TEXT\}}
 @end macro
 @macro stxlitlbrace
-@t{@b{@{}}
+@code{@b{@{}}
 @end macro
 @macro stxlitrbrace
-@t{@b{@}}}
+@code{@b{@}}}
 @end macro
 @macro stxlitat
-@t{@b{@@}}
+@code{@b{@@}}
 @end macro
 
 @macro arbno{THING}
@@ -691,8 +691,9 @@ The @var{filename-or-url} is interpreted as a URL
 if it is absolute - it starts with a "URI scheme" like @code{http:}.
 @item -s
 @itemx --
-The global variable @samp{command-line-arguments} is set to the remaining
-arguments (if any), and an interactive read-eval-print loop is started.
+The remaining arguments (if any) are passed to @samp{command-line-arguments}
+and (the @code{cdr} of) @code{(command-line}),
+and an interactive read-eval-print loop is started.
 This uses the same "console" as where you started up Kawa;
 use @samp{-w} to get a new window.
 @item --script @var{filename-or-url}
@@ -984,35 +985,74 @@ requests that start with @code{http://localhost:@var{port}@var{context-path}}.
 Start the web server, listing on the specified @var{port}.
 @end table
 
+@subsection Options for the JVM
+
+The @code{kawa} front-end can pass options to the @code{java} launcher,
+using @code{-J} or @code{-D} options.
+These must be given @emph{before} any other arguments.
+For example:
+@example
+kawa -J-Xms48m -Dkawa.command.name=foo foo.scm --
+@end example
+is equivalent to (ignoring classpath issues):
+@example
+java -Xms48m -Dkawa.command.name=foo kawa.repl foo.scm --
+@end example
+
+
+@table @code
+@item -J@var{jvm-option}
+Passes the @var{jvm-option} to the @code{java} command,
+before the class-name (@code{kawa.repl}) and Kawa options.
+@item -D@var{variable-name}=@var{variable-value}
+Sets the JVM property @var{variable-name} to @var{variable-value}.
+Equivalent to @code{-J-D@var{variable-name}=@var{variable-value}}.
+@end table
+
 @node Scripts, New-Window, Options, Running
 @section Running Command Scripts
 
+If you write a Kawa application it is convenient to be able
+to execute it directly (from the command line or clicking an icon, say),
+without have to explicitly run @code{kawa} or @code{java}.
+On Unix-like systems the easiest way to do this is to
+write a small shell script that runs your Kawa application.
+
+For modest-sized applications it is convenient if the shell script
+and the Kawa code can be in the same file.
 Unix-like systems support a mechanism where a @dfn{script} can
 specify a program that should execute it.  The convention
 is that the first line of the file should start with the two characters
 @samp{#!} followed by the absolute path of the program that should
 process (interpret) the script.
 
+(Windows has @dfn{batch files}, which are similar.)
+
 This is convention works well for script languages that use @samp{#}
 to indicate the start of a comment, since the interpreter will
 automatically ignore the line specifying the interpreter filename.
-Scheme, however, uses @samp{#} for various special objects,
+Scheme, however uses @samp{#} as a multi-purpose prefix,
 and Kawa specifically uses @samp{#!} as a prefix for
 various @ref{Special named constants} such as @code{#!optional}.
 
 Kawa does recognize the three-character sequence @samp{#!/} at the
-beginning of a file as special, and ignores it.  So you can
-specify command interpreters, as long as you don't put a space
-between the @samp{#!} and the interpreter filename.
+beginning of a file as special, and ignores it.
 Here is an example:
 @example
 #!/usr/local/bin/kawa
-(format #t "The time is ~s~%" (make <java.util.Date>))
+(format #t "The command-line was:~@{ ~w~@}~%" (command-line))
 @end example
 
-If this file has the execute permission set and is in your @code{PATH},
-then you can execute it just by naming it on command line.  The
-system kernel will automatically execute @code{kawa}, passing it the
+If you copy this text to a file named @code{/home/me/bin/scm-echo},
+set the execute permission, and make sure it in your @code{PATH},
+then you can execute it just by naming it on command line:
+@example
+$ chmod +x /home/me/bin/scm-echo
+$ PATH=/home/me/bin:$PATH
+$ scm-env a b
+The command-line was: "/home/me/bin/scm-echo" "a" "b"
+@end example
+The system kernel will automatically execute @code{kawa}, passing it the
 filename as an argument.
 
 Note that the full path-name of the @code{kawa} interpreter
@@ -1026,31 +1066,137 @@ most modern Unix-like systems:
 
 @example
 #!/usr/bin/env kawa
-(format #t "The time is ~s~%" (make <java.util.Date>))
+(format #t "The command-line was:~@{ ~w~@}~%" (command-line))
 @end example
 
+This works the same way, but assumes @code{kawa} is in the
+command @code{PATH}.
+
+@subsection Setting kawa options in the script
+
 If you need to specify extra arguments to @code{kawa},
-you can use the following trick:
+you can run arbitrary shell command inside Scheme block comments.
+Here is an example:
+@example
+#!/bin/sh
+#|
+exec kawa out:base=16 out:radix=yes "$0" "$*"
+|#
+(format #t "The command-line is:~@{ ~w~@}.~%" (command-line))
+(display "It has ")
+(display (apply + (map string-length (command-line))))
+(display " characters.")
+(newline)
+@end example
+
+The trick is to hide the shell code from Kawa inside
+a @code{#|...|#} block-comment.  The start of the block comment
+is a line starting with a @code{#}, so it is treated as a comment by the shell.
+You can then invoke @code{kawa} (or @code{java} directly)
+as you prefer, setting up class-path and jars as needed,
+and passing whatever arguments you want.
+(The shell replaces the @code{"$0"} by the name the script, and
+replaces the @code{"$@@"} by the remaining arguments passed to the script.)
+You need to make sure the shell finishes before it reaches
+the end of the block comment or the Scheme code, which would confuse it.
+The example uses @code{exec}, which tells the shell to @emph{replace}
+itself by @var{kawa};
+an alternative is to use the shell @code{exit} command.
+
+If you copy the above file to @code{/tmp/sch-echo} and make
+that file executate, you can run it directly:
+@example
+$ /tmp/scm-echo "a b" "c d"
+The command-line is: "/tmp/scm-echo" "a b c d".
+It has #x14 characters.
+@end example
+
+When the Kawa reader sees the initial @code{#/} it sets
+the command name to the file name, so it can be used by a future
+call to @code{(command-name)}.  If you want to override
+this you can use the @code{-Dkawa.command.name=@var{name}} option.
+
+Using comments this way has the advantage that you have the
+option of running the script ``manually'' if you prefer:
+@example
+$ kawa /tmp/scm-echo out:base=8 "x y"
+The command-line is: "/tmp/scm-echo" "out:base=8" "x y".
+It has 26 characters.
+@end example
+
+@subsection Other ways to pass options using meta-arg or --script
+
+An arguments consistening of just a @code{\} (backslash)
+causes Kawa to read the @emph{second} line looking for
+options.  (Quotes and backslahes work like in the shell.)
+These replace the backslash in the command line.
+
+This is a less verbose mechanism, but it requires an
+aboslute path to @code{kawa}, due to shell limitations.
+
+@example
+#!/usr/bin/bin/kawa \
+  --scheme --full-tailcalls
+(format #t "The command-line is:~@{ ~w~@}.~%" (command-line))
+@end example
+
+In this case the efective command line received by Kawa will
+be @code{--scheme}, @code{--full-tailcalls}, followed by the
+script filename, followed by other arguments specified when
+running the script.
+
+The backslash used this way originated in
+@uref{http://www.scsh.net, scsh} where it is called the @dfn{meta-arg}.
+(Unlike scsh, Kawa's @code{#!} is not a block comment,
+but a rest-of-line, though the backslash causes the following line
+to also be skipped.) 
+
+An alternative method is to use the @code{--script2} option,
+which tells Kawa to execute the script after ignoring
+the initial two lines.  For example:
+
 @example
 #!/bin/sh
 exec kawa --commonlisp out:base=16 --script2 "$0" "$@@"
 (setq xx 20) (display xx) (newline)
 @end example
-This causes the shell to invoke the @code{kawa} program.
-This assumes @code{kawa} is in the command path;
-if not replace @code{kawa} by the appropriate incantation,
-which can be multiple words (for example @code{java kawa.repl}).
-The @code{exec} tells the shell to @emph{replace} itself by @var{kawa};
-this is important so the shell doesn't continue with this file
-when done with @code{kawa}.
-The rest of the line can contain whatever commands and options you
-want when executing Kawa.  The important part is @code{--script2 "$0"}.
-The shell replaces the @code{"$0"} by the name the script, and
-replaces the @code{"$@@"} by the remaining arguments passed to the script.
-So what Kawa sees is the @code{--script2} option followed the script name,
-followed by remaining command-line arguments.
-The @code{--script2} tells Kawa to execute the script, after ignoring
-the initial two lines, which would confuse it terribly.
+
+This slightly more compact than using block-comments as shown earlier,
+but it has the disadvantage that you can't explicitly
+use @code{kawa} or @code{java} to run the script unless you
+make sure to pass it the @code{--script2} option.
+
+@subsection Scripts for compiled code
+It your compile your Kawa application to class files (or better:
+a @code{jar} file), you probably still want to write a small
+shell script to set things up.  Here is one method:
+
+@example
+#!/bin/sh
+export CLASSPATH=/my/path
+exec kawa -Dkawa.command.name="$0" foo "$@@"
+@end example
+
+Using the @code{kawa} is a convenience, since it automatically
+sets up the paths for the Kawa classes, and (if enabled) if
+provides readline support for the default input port.
+
+Setting the @code{kawa.command.name} property to @code{"$0"}
+(the filename used to invoke the script) enables
+@code{(command-line}) to use the script name as command name.
+
+You can invoke @code{java} directly, which is necessary when
+running a @code{jar} file:
+
+@example
+#!/bin/sh
+exec java -cp /path/to/kawa -Dkawa.command.name="$0" foo.jar "$@@"
+@end example
+
+(It is in principle possible to compile a Kawa application to
+``a native executable'', for example using @code{gcj}.
+However, this is no longer supported, as gcj is no longer
+being actively developed.)
 
 @node New-Window, Exiting, Scripts, Running
 @section Running a Command Interpreter in a new Window
@@ -1558,10 +1704,10 @@ Code compiled with @code{--full-tail-calls} can call code
 Even without @code{--full-tail-calls}, if the
 compiler can prove that the procedure being called is the current
 function, then the tail call will be replaced by a jump.
-This means the procedure must be defined using a letrec, not a
-define (because the compiler does not know if someone might
-re-define a global definition), and there must be no assignments
-(using @code{set!}) to the procedure binding.
+This includes must ``obvious'' cases of calls to the
+current function named using @code{define} or @code{letrec},
+and many cases of mutual tail-recursion (including
+state-machines using @code{letrec}).
 
 By default, symbols are case sensitive.
 
@@ -1755,11 +1901,22 @@ character of Scheme.
                 or @var{paragraph-separator}
          | @stxref{nested-comment}
          | @stxlit{#;} @stxref{interlexeme-space} @stxref{datum}
+         | @stxref{shebang-comment}
 @stxdef{nested-comment}  @stxlit{#|} @stxref{comment-text} @stxref{comment-cont}* @stxlit{|#}
 @stxdef{comment-text} character sequence not containing @stxlit{#|} or @stxlit{|#}
 @stxdef{comment-cont} @stxref{nested-comment} @stxref{comment-text}
 @stxdef{atmosphere} @stxref{whitespace} | @stxref{comment}
 @stxdef{interlexeme-space} @var{atmosphere}*
+@end display
+
+As a special case the characters @stxlit{#!/} are treated as starting a comment,
+but only at the beginning of file.  These characters are used on
+Unix systems as an @uref{http://en.wikipedia.org/wiki/Shebang_(Unix), Shebang interpreter directive}.
+The Kawa reader skips the entire line.
+If the last non-whitespace character is @code{@b{\}} (backslash)
+then the following line is also skipped, and so on.
+@display
+@stxdef{shebang-comment} @stxlit{#!} @var{absolute-filename} text up to non-escaped @var{line-ending}
 @end display
 
 @noindent
@@ -3983,15 +4140,22 @@ objects is unreliable, because any inaccuracy may affect the result.
 @end deffn
 
 @deffn Procedure {finite?} @var{x}
-Tests whether it is not an infinity and not a NaN.
+Returns @code{#t} if @var{x} is finite real number
+(i.e. an infinity and not a NaN),
+or if @var{x} is a complex number
+whose real and imaginary parts are both finite.
 @example
 (finite? 3)             @result{} #t
-(finite? +inf.0)        @result{} #t
+(finite? +inf.0)        @result{} #f
+(finite? 3.0+inf.0i)    @result{} #f
 @end example
 @end deffn
 
 @deffn Procedure {infinite?} @var{x}
-Tests whether it is an infinity.
+Return @code{#t} if @var{x} is
+an infinite real number (@code{+int.0} or @code{-inf.0}),
+or if @var{x} is a complex number where either
+real or imaginary parts or both are infinite.
 @example
 (infinite? 5.0)         @result{} #f
 (infinite? +inf.0)      @result{} #t
@@ -5070,6 +5234,12 @@ the correct direction in such circumstances.)
 (string-copy! b 1 a 0 2)
 b  @result{}  "a12de"
 @end example
+@end deffn
+
+@deffn Procedure string-fill! @var{string} @var{fill} [@var{start} [@var{end}]]
+The @code{string-fill!} procedure stores @var{fill} in the elements
+of @var{string} between @var{start} and @var{end}.
+It is an error if @var{fill} is not a character or is forbidden in strings.
 @end deffn
 
 @subsection String Comparisons
@@ -13858,10 +14028,43 @@ A string containing the home directory of the user.
 @deffn Procedure command-line
 Returns a nonempty list of strings. The first element is
 an implementation-specific name for the running top-level
-program. (For now this is just @code{"kawa"}, but it may
-become something more useful in the future.)
+program.
 The remaining elements are the command-line arguments,
-as passed to the @code{main} method.
+as passed to the @code{main} method (except for those
+flags processed by Kawa itself).
+
+The first element will depend on how the Kawa module was invoked.
+Kawa uses the following rules to determine the command name:
+
+@enumerate
+@item
+If the property @code{kawa.command.name} is set, that is used.
+This variable can be set on the @code{kawa} command line,
+for example from a script:
+@example
+kawa -Dkawa.command.name="$0" foo "$@@"
+@end example
+This variable is also set implicitly by the meta-arg option.  FIXME.
+@item
+If we're reading a source file that starts with the Unix command-file prefix
+@samp{#!/} then we use the name of the source file.
+The assumption is that such a file is an executable script.
+@item
+If the Java property @code{kawa.command.line} is set,
+then we use that (after stripping off text that duplicates
+the remaining arguments).
+The @code{kawa} program sets this property to the
+command line used to invoke it
+(specifically the contents of the entire @code{argv} array),
+before invoking the @code{java} program.
+@item
+If the Java property @code{sun.java.command} is set,
+then we use that (after stripping off text that duplicates
+the remaining arguments), and then prepending the string @code{"java "}.
+The OpenJDK @code{java} program sets this property.
+@item
+If all else fails, the command name is @code{"kawa"}.
+@end enumerate
 @end deffn
 
 @defvar command-line-arguments
@@ -13876,12 +14079,12 @@ These have the form @code{@var{name}=@var{value}}.
 Any such command-line options (at the start of the command-line)
 are processed and removed from the command-line.
 @example
-$ kawa -- abc=123 def
-#|kawa:1|# (command-line)
-(kawa abc=123 def)
+$ java kawa.repl -- abc=123 def
+#|kawa:1|# (write (command-line))
+("java kawa.repl --" "abc=123" "def")
 #|kawa:2|# (process-command-line-assignments)
-#|kawa:3|# (command-line)
-(kawa def)
+#|kawa:3|# (write (command-line))
+("java kawa.repl -- abc=123" "def")
 #|kawa:4|# abc
 123
 @end example
@@ -13897,6 +14100,36 @@ system.  If @var{code} is not specified, zero is returned,
 indicating normal (non-error) termination.
 If the @var{code} is @code{#f}, it
 is treated as -1, which means an abnormal exit.
+@end deffn
+
+@deffn Procedure get-environment-variable name
+Many operating systems provide each running process with
+an environment conisting of environment variables.
+(This environment is not to be confused with the
+Scheme environments that can be passed to @code{eval}.)
+Both the name and value of an environment variable are
+strings. The procedure @code{get-environment-variable}
+returns the value of the environment variable @var{name},
+or @code{#f} if the environment variable is not found.
+@c It may use locale information to encode the name and
+@c decode the value of the environment variable.
+(This uses the @code{java.lang.System:getenv} method.)
+It is an error to mutate the resulting string.
+@example
+(get-environment-variable "PATH")
+    @result{} "/usr/local/bin:/usr/bin:/bin"
+@end example
+@end deffn
+
+@deffn Procedure get-environment-variables
+Returns the names and values of all the environment variables as an alist,
+where the car of each entry is the name of an environment variable,
+and the cdr is its value, both as strings.
+It is an error to mutate any of the strings or the alist itself.
+@example
+(get-environment-variables)
+  @result{} (("USER" . "root") ("HOME" . "/"))
+@end example
 @end deffn
 
 @deffn Procedure make-process command envp

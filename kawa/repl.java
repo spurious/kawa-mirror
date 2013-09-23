@@ -212,6 +212,7 @@ public class repl extends Procedure0or1
   public static int processArgs(String[] args, int iArg, int maxArg)
   {
     boolean something_done = false;
+    int returnDelta = 0;
     for ( ;  iArg < maxArg;  iArg++)
       {
 	String arg = args[iArg];
@@ -338,13 +339,12 @@ public class repl extends Procedure0or1
                     iArg--;
                     String[] nargs = new String[maxArg+nxargs-1];
                     System.arraycopy(args, 0, nargs, 0, iArg);
-                    System.err.println("meta iArg:"+iArg+" -> "+args[iArg]);
                     for (int i = 0;  i < nxargs;  i++)
                         nargs[iArg+i] = xargs.get(i);
                     System.arraycopy(args, iArg+1, nargs, iArg+nxargs,
                                      maxArg-iArg-1);
-                    System.err.println("new args "+new FVector(nargs));
                     maxArg = maxArg+nxargs-1;
+                    returnDelta += nargs.length-args.length;
                     args = nargs;
                     iArg--;
                     continue;
@@ -730,7 +730,9 @@ public class repl extends Procedure0or1
 	else if (! ApplicationMainSupport.processSetProperty(arg))
           break;
       }
-    return something_done ? -1 : iArg;
+    // Adjust return value to index in *incoming* array.
+    // This is a hack to compensate for meta-arg handling.
+    return something_done ? -1 : iArg-returnDelta;
   }
 
   public static void compileFiles (String[] args, int iArg, int maxArg)

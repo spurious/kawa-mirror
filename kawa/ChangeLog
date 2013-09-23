@@ -1,3 +1,8 @@
+2013-09-23  Per Bothner  <per@bothner.com>
+
+	* repl.java (processArgs): Fix a bug in previous change
+	in handling of meta-arg.
+
 2013-09-22  Per Bothner  <per@bothner.com>
 
 	* repl.java (processArgs): Fix handling of meta-arg "\" - don't

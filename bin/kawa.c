@@ -83,9 +83,6 @@ extern char * get_classpath(const char *);
 #define COMMAND JAVA
 #endif
 #endif
-#if ! defined(COMMAND_ARGS) && ! defined(GCJ_COMPILED)
-#define COMMAND_ARGS COMMAND, "kawa.repl"
-#endif
 
 #ifdef GCJ_COMPILED
 /* Make COMMAND relative to PROGNAME, which is main's argv[0]. */
@@ -504,32 +501,65 @@ main(int argc, char** argv)
   fd_set in_set;
   static char empty_string[1] = "";
   char *prompt = empty_string;
+  int out_argc = 0;
+  int in_argc = 1;
 
 #ifdef COMMAND_ARGS
   static char* command_args[] = { COMMAND_ARGS };
   char** out_argv = (char **)
     malloc (sizeof(command_args) + (5 + argc) * sizeof(char*));
-#else
-  char** out_argv = (char **) malloc ((6 + argc) * sizeof(char*));
-#endif
-  int out_argc = 0;
-
-#if defined(GCJ_COMPILED) && ! defined(COMMAND_ARGS)
-  out_argv[out_argc++] = get_command (argv[0]);
-#else
   for (i = 0;  i < sizeof(command_args)/sizeof(char*);  i++)
     out_argv[out_argc++] = command_args[i];
+#else
+  char** out_argv = (char **) malloc ((7 + argc) * sizeof(char*));
+
+#if defined(GCJ_COMPILED)
+  out_argv[out_argc++] = get_command (argv[0]);
+#else
+  putenv (get_classpath(argv[0]));
+  out_argv[out_argc++] = "java";
 #endif
 
-#ifndef GCJ_COMPILED
-  putenv (get_classpath(argv[0]));
+  /* Calculate and set the kawa.command.line property. */
+  char command_prop[] = { "-Dkawa.command.line=" };
+  int command_prop_len = sizeof(command_prop)-1;
+  int sum_length = command_prop_len;
+  for (i = 0;  i < argc;  i++)
+    sum_length += strlen(argv[i])+1;
+  char* command_line = malloc(sum_length);
+  strcpy(command_line, command_prop);
+  sum_length = command_prop_len;
+  for (i = 0; ;)
+    {
+      char* arg = argv[i];
+      int arglen = strlen(arg);
+      strcpy(command_line+sum_length, arg);
+      sum_length += arglen;
+      if (++i == argc)
+        break;
+      command_line[sum_length++] = ' ';
+    }
+  out_argv[out_argc++] = command_line;
+
+  /* Pass initial -D and -J flags to java. */
+  for (; in_argc < argc; in_argc++)
+    {
+      char* arg = argv[in_argc];
+      if (arg[0] != '-' || (arg[1] != 'D' && arg[1] != 'J'))
+        break;
+      if (arg[1] == 'J')
+        arg = arg+2;
+      out_argv[out_argc++] = arg;
+    }
+
+  out_argv[out_argc++] = "kawa.repl";
 #endif
 
   if (! isatty(0) || ! isatty(1))
     {
       out_argv[out_argc++] = "--no-console";
-      for (i = 1;  i < argc;  i++)
-	out_argv[out_argc++] = argv[i];
+      for (;  in_argc < argc;  in_argc++)
+	out_argv[out_argc++] = argv[in_argc];
       out_argv[out_argc] = NULL;
       execvp(out_argv[0], out_argv);
       perror ("failed to exec " COMMAND);
@@ -717,8 +747,8 @@ main(int argc, char** argv)
 	  out_argv[out_argc++] = "--connect";
 	  sprintf (port_buf, "%d", port);
 	  out_argv[out_argc++] = port_buf;
-	  for (i = 1;  i < argc;  i++)
-	    out_argv[out_argc++] = argv[i];
+	  for (;  in_argc < argc;  in_argc++)
+	    out_argv[out_argc++] = argv[in_argc];
 	  out_argv[out_argc] = NULL;
 
 	  child = fork();

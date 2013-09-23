@@ -1,3 +1,8 @@
+2013-09-22  Per Bothner  <per@bothner.com>
+
+	* kawa.c: Pass -J and -D flags to java launcher.
+	Calculate and set kawa.command.line property..
+
 2012-05-25  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (EXTRA_DIST): New rule, needed for CygWin builds.

@@ -1,3 +1,7 @@
+2013-09-24  Per Bothner  <per@bothner.com>
+
+	* std_syntax.scm (%case): Add support for => in non-else clauses.
+
 2013-09-22  Per Bothner  <per@bothner.com>
 
 	* rnrs/programs.scm (command-line): Also check kawa.command.line

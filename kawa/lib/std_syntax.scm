@@ -61,9 +61,19 @@
 				    (%syntax-error
 				     "junk following else (in case)"))
 				   ((%case key
+					   ((datum ...) => expression))
+				    (if (%case-match key datum ...)
+					(expression key)))
+				   ((%case key
 					   ((datum ...) expression ...))
 				    (if (%case-match key datum ...)
 					(begin expression ...)))
+				   ((%case key
+					   ((datum ...) => expression)
+					   clause more ...)
+				    (if (%case-match key datum ...)
+					(expression key)
+					(%case key clause more ...)))
 				   ((%case key
 					   ((datum ...) expression ...)
 					   clause more ...)

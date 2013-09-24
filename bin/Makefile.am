@@ -83,42 +83,42 @@ EXTRA_LIB_SERVLET = -l-javax-servlet
 endif
 
 kawa.sh:
-	echo '#!/bin/sh' >tmp
-	echo 'thisfile=`which $$0`' >>tmp
-	echo 'thisdir=`dirname $$thisfile`' >>tmp
+	echo '#!/bin/sh' >tmp-kawa.sh
+	echo 'thisfile=`which $$0`' >>tmp-kawa.sh
+	echo 'thisdir=`dirname $$thisfile`' >>tmp-kawa.sh
 if ENABLE_KAWA_FRONTEND
 # In this case kawa.sh is only used for pre-install testing.
 # We don't need to set KAWALIB, since kawapath.c looks for it in "..".
-	echo 'LD_LIBRARY_PATH=$$LD_LIBRARY_PATH:$$thisdir' >>tmp
-	echo 'export LD_LIBRARY_PATH' >>tmp
-	echo 'exec $$thisdir/kawa "$$@"' >>tmp
+	echo 'LD_LIBRARY_PATH=$$LD_LIBRARY_PATH:$$thisdir' >>tmp-kawa.sh
+	echo 'export LD_LIBRARY_PATH' >>tmp-kawa.sh
+	echo 'exec $$thisdir/kawa "$$@"' >>tmp-kawa.sh
 else
 if WITH_GCJ_NO_DBTOOL
-	echo 'LD_LIBRARY_PATH=$$LD_LIBRARY_PATH:$$thisdir:$(libdir)' >>tmp
-	echo 'export LD_LIBRARY_PATH' >>tmp
-	echo 'exec $$thisdir/kawa-bin "$$@"' >>tmp
+	echo 'LD_LIBRARY_PATH=$$LD_LIBRARY_PATH:$$thisdir:$(libdir)' >>tmp-kawa.sh
+	echo 'export LD_LIBRARY_PATH' >>tmp-kawa.sh
+	echo 'exec $$thisdir/kawa-bin "$$@"' >>tmp-kawa.sh
 else
-	echo 'if test -f $$thisdir/../$(KAWAJAR)' >>tmp
-	echo 'then KAWALIB=$${KAWALIB-"`$(CYGPATH_W) "$$thisdir/../$(KAWAJAR)"`"}' >>tmp
-	echo 'else KAWALIB=$${KAWALIB-$(KAWALIB)}; fi' >>tmp
-	echo 'CLASSPATH="$${KAWALIB}$(CLASSPATH_SEPARATOR)$(conf_classpath)$${CLASSPATH-$(CLASSPATH)}"' >>tmp
-	echo 'export CLASSPATH' >>tmp
+	echo 'if test -f $$thisdir/../$(KAWAJAR)' >>tmp-kawa.sh
+	echo 'then KAWALIB=$${KAWALIB-"`$(CYGPATH_W) "$$thisdir/../$(KAWAJAR)"`"}' >>tmp-kawa.sh
+	echo 'else KAWALIB=$${KAWALIB-$(KAWALIB)}; fi' >>tmp-kawa.sh
+	echo 'CLASSPATH="$${KAWALIB}$(CLASSPATH_SEPARATOR)$(conf_classpath)$${CLASSPATH-$(CLASSPATH)}"' >>tmp-kawa.sh
+	echo 'export CLASSPATH' >>tmp-kawa.sh
 	if JAVA=`which $(JAVA)`; then true; else JAVA=$(JAVA); fi; \
-	  echo 'exec $${JAVA-"'$${JAVA}'"} kawa.repl "$$@"' >>tmp
+	  echo 'exec $${JAVA-"'$${JAVA}'"} kawa.repl "$$@"' >>tmp-kawa.sh
 endif
 endif
-	chmod +x tmp
-	mv tmp kawa.sh
+	chmod +x tmp-kawa.sh
+	mv tmp-kawa.sh kawa.sh
 
 gckawa: Makefile
-	echo '#!/bin/sh' >tmp
-	echo 'LD_LIBRARY_PATH=$(libdir):$$LD_LIBRARY_PATH' >>tmp
-	echo 'KAWALIB=$${KAWALIB-$(KAWALIB)}' >>tmp
-	echo 'CLASSPATH=$${KAWALIB}:$${CLASSPATH-$(CLASSPATH)}' >>tmp
-	echo 'export CLASSPATH LD_LIBRARY_PATH' >>tmp
-	echo 'exec gcj $(EXTRA_GCJFLAGS) "$$@" -L$(libdir) $(LDFLAGS_DBTOOL) -lkawa' >>tmp
-	chmod +x tmp
-	mv tmp gckawa
+	echo '#!/bin/sh' >tmp-gckawa
+	echo 'LD_LIBRARY_PATH=$(libdir):$$LD_LIBRARY_PATH' >>tmp-gckawa
+	echo 'KAWALIB=$${KAWALIB-$(KAWALIB)}' >>tmp-gckawa
+	echo 'CLASSPATH=$${KAWALIB}:$${CLASSPATH-$(CLASSPATH)}' >>tmp-gckawa
+	echo 'export CLASSPATH LD_LIBRARY_PATH' >>tmp-gckawa
+	echo 'exec gcj $(EXTRA_GCJFLAGS) "$$@" -L$(libdir) $(LDFLAGS_DBTOOL) -lkawa' >>tmp-gckawa
+	chmod +x tmp-gckawa
+	mv tmp-gckawa gckawa
 
 kawa.bat: $(srcdir)/kawa.bat.in
 	sed -e 's|%DEFAULT_KAWA_VERSION%|$(VERSION)|' \
@@ -126,23 +126,23 @@ kawa.bat: $(srcdir)/kawa.bat.in
 	  <$(srcdir)/kawa.bat.in > kawa.bat
 
 qexo:
-	echo '#!/bin/sh' >tmp
-	echo 'case $$0 in' >>tmp
-	echo '  */qexo)' >>tmp
-	echo '    kawa=`echo $$0 | sed -e '"'"'s|qexo$$|kawa|'"'"'`' >>tmp
-	echo '    if test -x $$kawa.sh; then' >>tmp
-	echo '      kawa=$$kawa.sh' >>tmp
-	echo '    elif test -x $$kawa; then true' >>tmp
-	echo '    else' >>tmp
-	echo '      kawa="kawa"' >>tmp
-	echo '    fi' >>tmp
-	echo '  ;;' >>tmp
-	echo '  *)' >>tmp
-	echo '    kawa="kawa";' >>tmp
-	echo 'esac' >>tmp
-	echo 'exec $$kawa --xquery "$$@"' >>tmp
-	chmod +x tmp
-	mv tmp qexo
+	echo '#!/bin/sh' >tmp-qexo
+	echo 'case $$0 in' >>tmp-qexo
+	echo '  */qexo)' >>tmp-qexo
+	echo '    kawa=`echo $$0 | sed -e '"'"'s|qexo$$|kawa|'"'"'`' >>tmp-qexo
+	echo '    if test -x $$kawa.sh; then' >>tmp-qexo
+	echo '      kawa=$$kawa.sh' >>tmp-qexo
+	echo '    elif test -x $$kawa; then true' >>tmp-qexo
+	echo '    else' >>tmp-qexo
+	echo '      kawa="kawa"' >>tmp-qexo
+	echo '    fi' >>tmp-qexo
+	echo '  ;;' >>tmp-qexo
+	echo '  *)' >>tmp-qexo
+	echo '    kawa="kawa";' >>tmp-qexo
+	echo 'esac' >>tmp-qexo
+	echo 'exec $$kawa --xquery "$$@"' >>tmp-qexo
+	chmod +x tmp-qexo
+	mv tmp-qexo qexo
 
 gnu-commonlisp-lang$(OEXT):
 	cd ../gnu/commonlisp/lang && $(MAKE)

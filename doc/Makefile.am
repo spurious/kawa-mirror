@@ -23,18 +23,18 @@ TEXI2PDF = texi2pdf
 
 man_MANS = kawa.1 qexo.1
 kawa.1: $(srcdir)/kawa.man
-	nroff -man $(srcdir)/kawa.man > kawa1.tmp
-	mv kawa1.tmp kawa.1
+	nroff -man $(srcdir)/kawa.man > tpm-kawa.1
+	mv tpm-kawa.1 kawa.1
 
 qexo.1: $(srcdir)/qexo.man
-	nroff -man $(srcdir)/qexo.man > qexo1.tmp
-	mv qexo1.tmp qexo.1
+	nroff -man $(srcdir)/qexo.man > tpm-qexo1
+	mv tpm-qexo1 qexo.1
 
 ../kawa-doc-$(VERSION).tar.gz: kawa/index.html kawa.pdf
 	tar cf - kawa/*.html kawa.pdf|gzip -c --best >$@
 
 clean-local:
-	-rm -rf $(KAWA_HTMLDIR) kawa1.tmp kawa.1 qexo.1
+	-rm -rf $(KAWA_HTMLDIR) tpm-qexo1 tpm-qexo1 kawa.1 qexo.1
 
 EXTRA_DIST = scm2java.html kawa.man qexo.man mdate-sh
 info_TEXINFOS = kawa.texi

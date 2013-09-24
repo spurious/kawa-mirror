@@ -117,7 +117,7 @@ EXTRA_DIST = debian/control debian/rules debian/changelog debian/dirs \
   gnu/jemacs/jar-manifest gnu/jemacs/status.html \
   kawa/Version.java jar-manifest Make-rules classes-to-skip-for-runtime
 
-MOSTLYCLEANFILES = tmp *.o kawa1$(exeext) *.stamp classes.list classes-rt.list
+MOSTLYCLEANFILES = tmp* *.o kawa1$(exeext) *.stamp classes.list classes-rt.list
 CLEANFILES = *.jar kawa/Version.java $(META_ScriptEngineFactory)
 DISTCLEANFILES = selected-java-source
 

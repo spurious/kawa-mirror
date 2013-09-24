@@ -1,3 +1,7 @@
+2013-09-24  Per Bothner  <per@bothner.com>
+
+	* srfi-38-test.scm: Update - datum labels now start at 0.
+
 2013-09-23  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (EXTRA_DIST ): Belatedly add r7rs-tests.scm.

@@ -1,3 +1,9 @@
+2013-09-24  Per Bothner  <per@bothner.com>
+
+	* PrettyWriter.java (resolveBackReferences) Start datum labels at
+	0 rather than 1, for better compatibility with other
+	implementations and specs.
+
 2013-09-06  Per Bothner  <per@bothner.com>
 
 	* PrettyWriter.java (IDHashRemove): New method.

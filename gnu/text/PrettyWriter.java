@@ -1679,7 +1679,7 @@ public class PrettyWriter extends java.io.Writer
   {
     if (!reallySharing)
       return;
-    int posnMarkerCount = 1;
+    int posnMarkerCount = 0;
     GapBuffer gbuffer = new GapBuffer(buffer, buffer.length);
     // The delta variable records how many extra characters have been emitted
     // to the {@link #buffer}.

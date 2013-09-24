@@ -780,10 +780,6 @@ the XQuery parser, but that will hopefully change.
 @table @code
 @cindex --warn-@var{whatever}
 @cindex --no-warn-@var{whatever}
-@pindex warn-unreachable
-@item --warn-unreachable
-Emit a warning if the code can never be executed. This defaults to on;
-to turn it off use the @code{--no-warn-unreachable} flag.
 @pindex warn-undefined-variable
 @item --warn-undefined-variable
 Emit a warning if the code references a variable which is neither in
@@ -809,6 +805,20 @@ to turn it off use the @code{--no-warn-invoke-unknown-method} flag.
 @item --warn-unused
 Emit a warning if a variable is usused or code never executed. This defaults 
 to on; to turn it off use the @code{--no-warn-unused} flag.
+@cindex warn-unreachable
+@item --warn-unreachable
+Emit a warning if the code can never be executed. This defaults to on;
+to turn it off use the @code{--no-warn-unreachable} flag.
+@cindex warn-void-used
+@item --warn-void-used
+Emit a warning if an expression depends on an expression
+that is void (always has zero values), including call to @code{void}
+functions and method.  Also warn if an expression depends on a
+conditional (@code{if}) that has no ``else'' clause.
+Examples include using the value of @code{set-car!} as
+an argument to a function, or to initialize a variable.
+This defaults to on;
+to turn it off use the @code{--no-warn-void-used} flag.
 @pindex warn-as-error
 @item --warn-as-error
 Treat a compilation warning as if it were an error and halt compilation.
@@ -10750,7 +10760,7 @@ This will likely change.)
 Certain compilation options can be be specified @emph{either}
 on the command-line when compiling, or in the module itself.
 
-@deffn Syntax module-compile-options [key: value] ...
+@deffn Syntax module-compile-options [key@stxlit{:} value] ...
 This sets the value of the @code{key} option to @code{value}
 for the current module (source file).  It takes effect as
 soon it is seen during the first macro-expansion pass,
@@ -10762,32 +10772,33 @@ option keys are:
 
 @itemize @bullet
 @item
-@var{main:} - Generate an application, with a main method.
+@stxlit{main:} - Generate an application, with a main method.
 @end itemize
 
 @itemize @bullet
 @item
-@var{full-tailcalls:} - Use a calling convention that supports proper tail recursion.
+@stxlit{full-tailcalls:} - Use a calling convention that supports proper tail recursion.
 @end itemize
 
 @itemize @bullet
 @item
-@var{warn-unreachable:} - Warn if this code can never be executed.
+@stxlit{warn-undefined-variable:} - Warn if no compiler-visible binding for a variable.
 
 @item
-@var{warn-undefined-variable:} - Warn if no compiler-visible binding for a variable.
+@stxlit{warn-unknown-member:} - Warn if referencing an unknown method or field.
 
 @item
-@var{warn-unknown-member:} - Warn if referencing an unknown method or field.
+@stxlit{warn-invoke-unknown-method:} - Warn if invoke calls an unknown method (subsumed by warn-unknown-member).
 
 @item
-@var{warn-invoke-unknown-method:} - Warn if invoke calls an unknown method (subsumed by warn-unknown-member).
+@stxlit{warn-unused:} - Warn if a variable is usused or code never executed.
 
 @item
-@var{warn-unsued:} - Warn if a variable is usused or code never executed.
-
+@stxlit{warn-unreachable:} - Warn if this code can never be executed.
 @item
-@var{warn-as-error:} - Treat a compilation warning as if it were an error.
+@stxlit{warn-void-used:} - Warn if an expression depends on the value of a void sub-expression (one that never returns a value).
+@item
+@stxlit{warn-as-error:} - Treat a compilation warning as if it were an error.
 @end itemize
 
 The @var{value} must be a literal value: either a boolean

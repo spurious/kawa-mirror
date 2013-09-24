@@ -1,3 +1,10 @@
+2013-09-23  Per Bothner  <per@bothner.com>
+
+	* CompilationHelpers.java (validateIsEqv): Use language-sensitive
+	PrimProcedure constructure, which get right return type.
+	This fixes Savannah bug#40077 "Boolean logical `not` on float
+	number can result in ClassCastException".
+
 2013-09-22  Per Bothner  <per@bothner.com>
 
 	* DisplayFormat.java (writeObjectRaw): Extend logic used for

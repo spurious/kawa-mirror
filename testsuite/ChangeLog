@@ -1,4 +1,9 @@
-2013-09-22  Per Bothner  <per@bothner.com>
+2013-09-21  Matthieu Vachon  <matthieu.o.vachon@gmail.com>
+
+	* sva40077.scm: New test based on Savannah bug#40077 "Boolean
+	logical `not` on float number can result in ClassCastException".
+
+22013-09-22  Per Bothner  <per@bothner.com>
 
 	* command1.scm, commands2.scm, command3.scm: New tests to
 	check behavior of (command-line).

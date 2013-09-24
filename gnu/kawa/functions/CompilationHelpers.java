@@ -190,7 +190,8 @@ public class CompilationHelpers
     Method meth =
         ClassType.make("gnu.kawa.functions.IsEqv")
         .getDeclaredMethod("apply", 2);
-    return new ApplyExp(meth, args).setLine(exp);
+    return new ApplyExp(new PrimProcedure(meth, visitor.getLanguage()),
+                        args).setLine(exp);
   }
 }
 

@@ -168,12 +168,11 @@ This package has nothing to do with the defunct Kawa commercial Java IDE.
 * Eval and Environments::
 * Debugging::
 * Program structure::
-* Miscellaneous::
 * Input-Output::         Input, output, and file handling
 * Types::
 * Objects Classes and Modules::
 * XML tools::            XML, HTML, and the web
-* Special topics::
+* Miscellaneous::
 * Framework::            The Kawa language framework
 * FAQs::                 Frequently Asked Questions
 * Community::
@@ -8276,31 +8275,7 @@ Equivalent to the Java @code{synchronized} statement,
 except that it may return a result.
 @end deffn
 
-@deffn Procedure sleep time
-Suspends the current thread for the specified time.
-The @var{time} can be either a pure number (in secords),
-or a quantity whose unit is a time unit (such as @code{10s}).
-@end deffn
-
-@node Miscellaneous
-@chapter Miscellaneous
-
-@deffn Procedure scheme-implementation-version
-Returns the Kawa version number as a string.
-@c (Compatible with slib.)
-@end deffn
-
-@deffn Procedure scheme-window [shared]
-Create a read-eval-print-loop in a new top-level window.
-If @var{shared} is true, it uses the same environment as the
-current @code{(interaction-environment)};  if not (the default),
-a new top-level environment is created.
-
-You can create multiple top-level window that can co-exist.
-They run in separate threads.
-@end deffn
-
-@node Input-Output, Types, Miscellaneous, Top
+@node Input-Output
 @chapter Input, output, and file handling
 
 Kawa has a number of useful tools for controlling input and output:
@@ -13675,8 +13650,23 @@ BRL has an extensive utility library.  Most of this has not yet been ported
 to KRL, even in BRL-compatibility mode.
 @end itemize
 
-@node Special topics
-@chapter Special topics
+@node Miscellaneous topics
+@chapter Miscellaneous topics
+
+@deffn Procedure scheme-implementation-version
+Returns the Kawa version number as a string.
+@c (Compatible with slib.)
+@end deffn
+
+@deffn Procedure scheme-window [shared]
+Create a read-eval-print-loop in a new top-level window.
+If @var{shared} is true, it uses the same environment as the
+current @code{(interaction-environment)};  if not (the default),
+a new top-level environment is created.
+
+You can create multiple top-level window that can co-exist.
+They run in separate threads.
+@end deffn
 
 @menu
 * Building JavaFX applications::
@@ -14178,6 +14168,54 @@ into an array of words.  This splits the @var{command} using spaces
 to delimit words; there is no special processing for quotes or other
 special characters.
 (This is the same as what @code{java.lang.Runtime.exec(String)} does.)
+@end deffn
+
+@node Time-related functions
+@section Time-related functions
+
+@deffn Procedure current-second
+Returns an inexact number represent the current time on the
+@uref{http://en.wikipedia.org/wiki/International_Atomic_Time,International Atomic Time (TAI)} scale.
+The value 0.0 represents midnight on January 1, 1070 TAI (equivalent
+to 10 seconds before midnight Universal Time), and
+the value 1.0 represents on TAI second later.
+Neither high acuracy nor high precision are required; in particular
+returning Coordinated Universal Time plus a suitable
+constant might be the best an implementation cat do.
+The Kawa implementation just multiplies by 0.001 the result of calling
+the method @code{currentTimeMillis} in class @code{java.lang.System}.
+@end deffn
+
+@deffn Procedure current-jiffy
+Returns the number of @dfn{jiffies} as an exact integer that have
+elapses since an arbitrary implementation-defined epoch (instant).
+A jiffy is an implementation-defined fraction of a second which is
+defined by the return value of the @code{jiffies-per-second} procedure.
+The starting epoch (instant 0) is guaranteed to be constant during
+a run of the program, but may vary between runs.
+(At the time of writing, Kawa's jiffy is one nano-second.)
+
+@emph{Rationale:} Jiffies are allowed to be implementation-dependent
+so that @code{current-jiffy} can execute with minimal overhead.
+It should be very likely that a compactly represented integer will
+suffice as the return value.  Any particular jiffy size will be
+inappropriate some some implementations: a microsecond is too long for
+a very fast machine, while a much smaller unit would force many
+implementations to return integers which have to allocated for most calls,
+rendering @code{current-jiffy} less useful for accurate timing measurements.
+@end deffn
+
+@deffn Procedure jiffies-per-second
+Returns an exact integer representing the number of jiffies
+per SI second. This value is an implementation-specified
+constant.
+(At the time of writing, the value in Kawa is 1,000,000,000.)
+@end deffn
+
+@deffn Procedure sleep time
+Suspends the current thread for the specified time.
+The @var{time} can be either a pure number (in secords),
+or a quantity whose unit is a time unit (such as @code{10s}).
 @end deffn
 
 @node Low-level functions

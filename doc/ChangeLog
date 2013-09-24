@@ -1,5 +1,11 @@
 2013-09-23  Per Bothner  <per@bothner.com>
 
+	* kawa.texi (Time-related functions): New node, documents
+	current-second, current-jiffy, and jiffies-per-second.
+	Also move sleep here.
+	(Miscellaneous, Special topic): Merge into single chapter
+	Miscellaneous topics.
+
 	* kawa.texi (Options, Module classes): Document --warn-void-used,
 	plus some minor tweaks.
 

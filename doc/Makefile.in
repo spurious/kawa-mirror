@@ -761,8 +761,8 @@ qexo.1: $(srcdir)/qexo.man
 	nroff -man $(srcdir)/qexo.man > tpm-qexo1
 	mv tpm-qexo1 qexo.1
 
-../kawa-doc-$(VERSION).tar.gz: kawa/index.html kawa.pdf
-	tar cf - kawa/*.html kawa.pdf|gzip -c --best >$@
+../kawa-doc-$(VERSION).tar.gz: kawa.info $(KAWA_HTMLDIR)/index.html kawa.pdf
+	tar cf - $(KAWA_HTMLDIR)/*.html kawa.pdf|gzip -c --best >$@
 
 clean-local:
 	-rm -rf $(KAWA_HTMLDIR) tpm-qexo1 tpm-qexo1 kawa.1 qexo.1

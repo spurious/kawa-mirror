@@ -1,3 +1,8 @@
+2013-09-23  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (kawa-doc-$(VERSION).tar.gz): Update,
+	since kawa-tour.texi is now gone.
+
 2013-09-16  Per Bothner  <per@bothner.com>
 
 	* Makefile.am: Add Java8 support.

@@ -1,3 +1,7 @@
+2013-09-23  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (../kawa-doc-$(VERSION).tar.gz): Update.
+
 2013-09-23  Matthieu Vachon  <matthieu.o.vachon@gmail.com>
 	    Per Bothner  <per@bothner.com>
 

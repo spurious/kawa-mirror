@@ -64,7 +64,7 @@ endif
 
 kawa-doc.tar.gz: kawa-doc-$(VERSION).tar.gz
 
-kawa-doc-$(VERSION).tar.gz:  doc/kawa.texi doc/kawa-tour.texi
+kawa-doc-$(VERSION).tar.gz:  doc/kawa.texi
 	cd doc; $(MAKE) ../kawa-doc-$(VERSION).tar.gz
 
 dist-kawa-@VERSION@.jar: $(DIST_ARCHIVES)

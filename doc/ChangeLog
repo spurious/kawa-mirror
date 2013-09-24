@@ -1,3 +1,9 @@
+2013-09-24  Per Bothner  <per@bothner.com>
+
+	* kawa.texi: Fix some sectioning and node name errors.
+	(Arithmetic operations): Document finite?, infinite?, and nan?
+	according to R7RS - which generalizes to complex numbers.
+
 2013-09-23  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Time-related functions): New node, documents

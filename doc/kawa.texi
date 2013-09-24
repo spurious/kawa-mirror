@@ -4148,10 +4148,10 @@ objects is unreliable, because any inaccuracy may affect the result.
 @end quotation
 @end deffn
 
-@deffn Procedure {finite?} @var{x}
-Returns @code{#t} if @var{x} is finite real number
+@deffn Procedure {finite?} @var{z}
+Returns @code{#t} if @var{z} is finite real number
 (i.e. an infinity and not a NaN),
-or if @var{x} is a complex number
+or if @var{z} is a complex number
 whose real and imaginary parts are both finite.
 @example
 (finite? 3)             @result{} #t
@@ -4160,22 +4160,27 @@ whose real and imaginary parts are both finite.
 @end example
 @end deffn
 
-@deffn Procedure {infinite?} @var{x}
-Return @code{#t} if @var{x} is
+@deffn Procedure {infinite?} @var{z}
+Return @code{#t} if @var{z} is
 an infinite real number (@code{+int.0} or @code{-inf.0}),
-or if @var{x} is a complex number where either
+or if @var{z} is a complex number where either
 real or imaginary parts or both are infinite.
 @example
 (infinite? 5.0)         @result{} #f
 (infinite? +inf.0)      @result{} #t
+(infinite? +nan.0)      @result{} #f
+(infinite? 3.0+inf.0i)  @result{} #t
 @end example
 @end deffn
 
-@deffn Procedure {nan?} @var{x}
-Tests whether it is a NaN.
+@deffn Procedure {nan?} @var{z}
+For a real numer returns whether its is a NaN;
+for a complex number if the real or imaginary parts or both is a NaN.
 @example
 (nan? +nan.0)           @result{} #t
 (nan? 32)               @result{} #f
+(nan? +nan.0+5.0i)      @result{} #t
+(nan? 1+2i)             @result{} #f
 @end example
 @end deffn
 
@@ -12242,7 +12247,7 @@ scheme> (cadr '(3 4 5))
 (Of course the @code{jrunscript} REPL isn't as  nice as the one that
 Kawa provides.  For example the latter can handle multi-line inputs.)
 
-@node XML tools, Special topics, Objects Classes and Modules, Top
+@node XML tools
 @chapter Working with XML and HTML
 
 Kawa has a number of features for working with XML, HTML,
@@ -13650,7 +13655,7 @@ BRL has an extensive utility library.  Most of this has not yet been ported
 to KRL, even in BRL-compatibility mode.
 @end itemize
 
-@node Miscellaneous topics
+@node Miscellaneous
 @chapter Miscellaneous topics
 
 @deffn Procedure scheme-implementation-version
@@ -13673,6 +13678,7 @@ They run in separate threads.
 * Building for Android::  Building for Android devices
 * Android view construction::
 * Processes::
+* Time-related functions::
 * Low-level functions:: Deprecated low-level functions
 @end menu
 

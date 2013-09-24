@@ -1,5 +1,8 @@
 2013-09-24  Per Bothner  <per@bothner.com>
 
+	* kawa.texi (Conditionals): Update documentation of 'case'
+	to mentioned '=>' forms.
+
 	* kawa.texi: Fix some sectioning and node name errors.
 	(Arithmetic operations): Document finite?, infinite?, and nan?
 	according to R7RS - which generalizes to complex numbers.

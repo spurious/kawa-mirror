@@ -7748,13 +7748,13 @@ The @meta{consequent} and @meta{alternate} expressions are in tail
 context if the @func{if} expression itself is.
 @end deffn
 
-@display
-@stxdef{cond-clause} @stxlit{(}@stxref{test-expression} @stxref{expression} @dots{}@stxlit{)}
-  | @stxlit{(}@meta{test} @stxlit{=>} @meta{expression}@stxlit{)}
-@end display
+@deffn Syntax cond @atleastone{@stxref{cond-clause}}
+@deffnx Syntax cond @arbno{@stxref{cond-clause}} @stxlit{(else} @meta{expression}@dots{}@stxlit{)} 
 
-@deffn Syntax cond @stxref{cond-clause} @stxref{cond-clause} @dots{}
-@deffnx Syntax cond @stxref{cond-clause} @dots{} @stxlit{(else} @meta{expression}@dots{}@stxlit{)} 
+@display
+@stxdef{cond-clause} @stxlit{(}@stxref{test-expression} @arbno{@stxref{expression}}@stxlit{)}
+    | @stxlit{(}@meta{test} @stxlit{=>} @meta{expression}@stxlit{)}
+@end display
 
 A @func{cond} expression is evaluated by evaluating the @meta{test-expression}s
 of successive @meta{cond-clause}s in order until one of them
@@ -7790,8 +7790,8 @@ evaluated, and the values of the last one are returned.
 
 For a @meta{cond-clause} of one of the following forms:
 @example
-(@meta{test} @stxref{expression} @dots{})
-(else @stxref{expression} @stxref{expression} @dots{})
+(@meta{test} @arbno{@stxref{expression}})
+(else @stxref{expression} @arbno{@stxref{expression}})
 @end example
 
 @noindent
@@ -7808,42 +7808,49 @@ the (implied) call to the procedure that results from the evaluation of
 is.
 @end deffn
 
-@deffn Syntax case @meta{key} @stxref{case-clause} @stxref{case-clause} @dots{}
-@meta{key} must be an expression.
-
+@deffn Syntax case @stxref{case-key} @atleastone{@stxref{case-clause}}
+@deffnx Syntax case @stxref{case-key} @arbno{@stxref{case-clause}} @stxref{case-else-clause} 
 
 @display
-@stxdef{case-clause} ((@stxref{datum} @dots{}) @stxref{expression} @stxref{expression} @dots{})
-  | (else @stxref{expression} @stxref{expression} @dots{})
+@stxdef{case-key} @stxref{expression}
+@stxdef{case-clause} @stxlit{((}@arbno{@stxref{datum}}@stxlit{)} @atleastone{@stxref{expression}}@stxlit{)}
+    | @stxlit{((}@arbno{@stxref{datum}}@stxlit{)} @stxlit{=>} @stxref{expression}@stxlit{)}
+@stxdef{case-else-clause} @stxlit{(else}  @atleastone{@stxref{expression}}@stxlit{)}
+    | @stxlit{(else =>} @stxref{expression}@stxlit{)}
 @end display
 
-The second form, which specifies an ``@code{else} clause'', may only
-appear as the last @meta{case-clause}.  Each @meta{datum} is an external
-representation of some object.  The data represented by the
-@meta{datum}s need not be distinct.
+Each @meta{datum} is an external representation of some object.
+Each @meta{datum} in the entire @code{case} expression should be distinct.
 
 A @func{case} expression is evaluated as follows.
 
 @enumerate
 @item
-@meta{key} is evaluated and its result is compared using @func{eqv?}
-against the data represented by the @meta{datum}s of each @meta{case
-clause} in turn, proceeding in order from left to right through the set
-of clauses.
+The @meta{case-key} is evaluated and its result is compared using
+@func{eqv?} against the data represented by the @meta{datum}s of
+each @meta{case-clause} in turn, proceeding in order from left to
+right through the set of clauses.
 
 @item
-If the result of evaluating @meta{key} is equivalent to a datum of a
-@meta{case clause}, the corresponding @meta{expression}s are evaluated
+If the result of evaluating @meta{case-key} is equivalent to a datum of a
+@meta{case-clause}, the corresponding @meta{expression}s are evaluated
 from left to right and the results of the last expression in the
-@meta{case clause} are returned as the results of the @func{case}
+@meta{case-clause} are returned as the results of the @func{case}
 expression.  Otherwise, the comparison process continues.
 @item
 If the result of evaluating @meta{key} is different from every datum in
-each set, then if there is an @code{else} clause its expressions are
+each set, then if there is an @meta{case-else-clause} its expressions are
 evaluated and the results of the last are the results of the @func{case}
-expression; otherwise the @func{case} expression returns unspecified
-values.
+expression; otherwise the result of @func{case} expression is unspecified.
 @end enumerate
+
+If the selected @meta{case-clause} or @meta{case-else-clause}
+uses the @code{=>} alternate
+form, then the @meta{expression} is evaluated. It is an error if
+its value is not a procedure accepting one argument. This
+procedure is then called on the value of the @meta{key} and the
+values returned by this procedure are returned by the @code{case}
+expression.
 
 @example
 (case (* 2 3)
@@ -7855,7 +7862,7 @@ values.
 (case (car '(c d))
   ((a e i o u) 'vowel)
   ((w y) 'semivowel)
-  (else 'consonant))           @result{} consonant
+  (else => (lambda (x) x)))    @result{} c
 @end example
 
 The last @meta{expression} of a @meta{case clause} is in tail context if

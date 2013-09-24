@@ -1,5 +1,8 @@
 2013-09-24  Per Bothner  <per@bothner.com>
 
+	* kawa.texi (Datum syntax): New subsection on Datum labels.
+	(Ports): Update write to note use of datum-levels.
+
 	* kawa.texi (Conditionals): Update documentation of 'case'
 	to mentioned '=>' forms.
 

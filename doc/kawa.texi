@@ -2130,11 +2130,8 @@ Syntax'':
 @stxdef{datum} @stxref{defining-datum}
          | @stxref{nondefining-datum}
          | @stxref{defined-datum}
-@stxdef{defining-datum} @stxlit{#}@stxref{indexnum}@stxlit{=}@stxref{nondefining-datum}
-@stxdef{defined-datum} @stxlit{#}@var{indexnum}@stxlit{#}
 @stxdef{nondefining-datum} @stxref{lexeme-datum}
          | @stxref{compound-datum}
-@stxdef{indexnum} @stxref{digit}+
 
 @stxdef{lexeme-datum} @meta{boolean} | @meta{number}
          | @meta{character} | @meta{string} | @stxref{symbol}
@@ -2147,6 +2144,44 @@ Syntax'':
 @stxdef{uniform-vector} TODO
 @end display
 @c FIXME: add to abbrev-prefix: @stxlit{#,} | @stxlit{#,@@}
+
+@anchor{datum labels}
+@subsection Datum labels
+
+@display
+@stxdef{datum-label} @stxlit{#}@stxref{indexnum}@stxlit{=}
+@stxdef{defining-datum} @atleastone{@stxref{datum-label}}@stxref{nondefining-datum}
+@stxdef{defined-datum} @stxlit{#}@stxref{indexnum}@stxlit{#}
+@stxdef{indexnum} @atleastone{@stxref{digit}}
+@end display
+
+The lexical syntax @code{#@meta{n}=@meta{datum}} reads the
+same as @meta{datum}, but also results in @meta{datum} being
+labelled by @meta{n}, which must a sequence of digits.
+
+The lexical syntax @code{#@meta{n}#} serves as a reference to some
+object labelled by @code{#@meta{n}=}; the result is the same object
+(in the sense of @code{eq?}) as the @code{#@meta{n}=}.
+
+Together, these syntaxes permit the notation of structures
+with shared or circular substructure.
+
+@example
+(let ((x (list 'a 'b 'c)))
+  (set-cdr! (cddr x) x)
+  x)    @result{} #0=(a b c . #0#)
+@end example
+
+The scope of a datum label is the portion of the outermost
+datum in which it appears that is to the right of the label.
+Consequently, a reference @code{#@meta{n}#} can occur
+only after a label @code{#@meta{n}=};
+it is an error to attempt a forward reference.
+In addition, it is an error if the reference appears as the labelled
+object itself (as in @code{#@meta{n}=#@var{n}#}), because the object
+labelled by @code{#@var{n}=} is not well defined in this case.
+
+
 
 @subsection Abbreviations
 
@@ -9092,11 +9127,11 @@ Symbols that contain non-ASCII characters
 are escaped with vertical lines.
 Character objects are written using the @code{#\} notation.
 
-@c If @var{obj} contains cycles which would cause an infinite loop
-@c using the normal written representation, then at least the
-@c objects that form part of the cycle must be represented
-@c using datum labels as described in XXXX. Datum
-@c labels must not be used if there are no cycles.
+If @var{obj} contains cycles which would cause an infinite loop
+using the normal written representation, then at least the
+objects that form part of the cycle must be represented
+using @ref{datum labels}. Datum
+labels must not be used if there are no cycles.
 @end deffn
 
 @deffn Procedure write-shared obj [port]
@@ -9929,7 +9964,7 @@ and @code{#f} otherwise:
 @end example
 
 To convert (coerce) the result of an expression @var{value} to a
-type @var{T} use the syntax: @code{->@var{T} @var{value})}.
+type @var{T} use the syntax: @code{(->@var{T} @var{value})}.
 @example
 (->float 12) @result{} 12.0f0
 @end example

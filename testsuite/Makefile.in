@@ -218,7 +218,7 @@ SCRIPTS_TO_RUN = uninit1.scm errors1.scm errors2.scm \
   sva40077.scm
 
 EXTRA_DIST = testing.scm test-utils.scm \
-  test.scm num-test.scm mac-test.scm mac1.scm \
+  test.scm num-test.scm mac-test.scm mac1.scm r7rs-tests.scm \
   classes1.scm classes2.scm SimpleB.java obj-test.scm arr-test.scm \
   lib-test.scm srfi-38-test.scm srfi-64-test.scm srfi-69-test.scm \
   srfi-108-test.scm srfi-109-test.scm \

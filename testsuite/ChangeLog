@@ -1,3 +1,7 @@
+2013-09-23  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (EXTRA_DIST ): Belatedly add r7rs-tests.scm.
+
 2013-09-21  Matthieu Vachon  <matthieu.o.vachon@gmail.com>
 
 	* sva40077.scm: New test based on Savannah bug#40077 "Boolean

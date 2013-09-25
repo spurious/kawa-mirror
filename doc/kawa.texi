@@ -2728,6 +2728,23 @@ You can use @code{class-exists:@var{ClassName}} to check
 if @code{@var{ClassName}} exists at compile-time.
 @end deffn
 
+
+@deffn Procedure features
+Returns a list of feature identifiers which @code{cond-expand}
+treats as true.
+This not a complete list - for example @code{class-exists:@var{ClassName}}
+feature identifiers are not included.
+It is an error to modify this list.
+Here is example of what @code{features} might return:
+@example
+(features)  @result{}
+(complex exact-complex full-unicode java-6 kawa
+ ratios srfi-0 srfi-4 srfi-6  srfi-8 srfi-9 srfi-11
+ srfi-16 srfi-17 srfi-23 srfi-25 srfi-26 srfi-28 srfi-30
+ srfi-39 string-normalize-unicode threads)
+@end example
+@end deffn
+
 @anchor{include}
 @deffn Syntax include path
 Read the contents of the file at @var{path} as a sequence of forms,
@@ -5119,6 +5136,20 @@ according to their Unicode scalar values.
 (char<? #\z #\ß)      @result{} #t
 (char<? #\z #\Z)      @result{} #f
 @end example
+@end deffn
+
+@deffn Procedure digit-value char
+This procedure returns the numeric value (0 to 9) of its
+argument if it is a numeric digit (that is, if @code{char-numeric?}
+returns @code{#t}), or @code{#f} on any other character.
+
+@example
+(digit-value #\3)        @result{} 3
+(digit-value #\x0664)    @result{} 4
+(digit-value #\x0AE6)    @result{} 0
+(digit-value #\x0EA6)    @result{} #f
+@end example
+
 @end deffn
 
 @node Character sets
@@ -7683,6 +7714,7 @@ Returns a string representation of the disassembled bytecode
 for @var{procedure}, when known.
 @end deffn
 
+@ c FIXME May rename: Control structure
 @node Program structure
 @chapter Program structure
 
@@ -13719,6 +13751,7 @@ They run in separate threads.
 * Building JavaFX applications::
 * Building for Android::  Building for Android devices
 * Android view construction::
+* System inquiry::
 * Processes::
 * Time-related functions::
 * Low-level functions:: Deprecated low-level functions
@@ -14067,8 +14100,8 @@ single-method classes, so you can use a lambda expression
 and @ref{SAM-conversion} will automatically create the needed
 listener class.
 
-@node Processes
-@section Processes
+@node System inquiry
+@section System inquiry
 
 @defvar home-directory
 A string containing the home directory of the user.
@@ -14142,15 +14175,6 @@ compiled with the @code{--main} option.
 (It is used to set XQuery @code{external} variables.)
 @end deffn
 
-@deffn Procedure exit [code]
-Exits the Kawa interpreter, and ends the Java session.
-The integer value @var{code} is returned to the operating
-system.  If @var{code} is not specified, zero is returned,
-indicating normal (non-error) termination.
-If the @var{code} is @code{#f}, it
-is treated as -1, which means an abnormal exit.
-@end deffn
-
 @deffn Procedure get-environment-variable name
 Many operating systems provide each running process with
 an environment conisting of environment variables.
@@ -14179,6 +14203,18 @@ It is an error to mutate any of the strings or the alist itself.
 (get-environment-variables)
   @result{} (("USER" . "root") ("HOME" . "/"))
 @end example
+@end deffn
+
+@node Processes
+@section Processes
+
+@deffn Procedure exit [code]
+Exits the Kawa interpreter, and ends the Java session.
+The integer value @var{code} is returned to the operating
+system.  If @var{code} is not specified, zero is returned,
+indicating normal (non-error) termination.
+If the @var{code} is @code{#f}, it
+is treated as -1, which means an abnormal exit.
 @end deffn
 
 @deffn Procedure make-process command envp

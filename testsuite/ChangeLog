@@ -1,5 +1,8 @@
 2013-09-24  Per Bothner  <per@bothner.com>
 
+	* r7rs-tests.scm: More complex test for case including =>.
+	Already accepted upstream.
+
 	* srfi-38-test.scm: Update - datum labels now start at 0.
 
 2013-09-23  Per Bothner  <per@bothner.com>

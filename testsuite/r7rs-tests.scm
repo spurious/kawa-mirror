@@ -914,12 +914,10 @@
 (test 'c (list-ref '(a b c d)
           (exact (round 1.8))))
 
-(skip-if-kawa "list-set! not implemented"
 (test '(0 ("Sue" "Sue") "Anna")
     (let ((lst (list 0 '(2 2 2 2) "Anna")))
       (list-set! lst 1 '("Sue" "Sue"))
       lst))
-)
 
 (test '(a b c) (memq 'a '(a b c)))
 (test '(b c) (memq 'b '(a b c)))
@@ -940,9 +938,18 @@
 (test '(2 4) (assoc 2.0 '((1 1) (2 4) (3 9)) =))
 (test '(5 7) (assv 5 '((2 3) (5 7) (11 13))))
 
-(skip-if-kawa "list-copy not implemented"
 (test '(1 2 3) (list-copy '(1 2 3)))
-)
+(test "foo" (list-copy "foo"))
+(test '() (list-copy '()))
+(test '(3 . 4) (list-copy '(3 . 4)))
+(test '(6 7 8 . 9) (list-copy '(6 7 8 . 9)))
+(let* ((l1 '((a b) (c d) e))
+       (l2 (list-copy l1)))
+  (test l2 '((a b) (c d) e))
+  (test #t (eq? (car l1) (car l2)))
+  (test #t (eq? (cadr l1) (cadr l2)))
+  (test #f (eq? (cdr l1) (cdr l2)))
+  (test #f (eq? (cddr l1) (cddr l2))))
 
 (test-end)
 
@@ -1465,13 +1472,11 @@
        "abcde")
       v))
 
-(skip-if-kawa "list-set! not implemented"
 (test '(0 1 4 9 16) (let ((v (make-list 5)))
   (vector-for-each
    (lambda (i) (list-set! v i (* i i)))
    '#(0 1 2 3 4))
   v))
-)
 
 (test -3 (call-with-current-continuation
   (lambda (exit)

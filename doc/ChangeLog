@@ -1,3 +1,7 @@
+2013-09-25  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Strings): Merge documentation from R7RS.
+
 2013-09-24  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Syntax and conditional compilation): Add 'features'.

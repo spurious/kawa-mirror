@@ -5209,18 +5209,24 @@ Return @true{} if @var{obj} is a string, @false{} otherwise.
 @end deffn
 
 
+@deffn Type string
+The type of string objects.
+@end deffn
+
+@deffn Constructor string @var{char} @dots{}
+Return a newly allocated string composed of the arguments.
+This is analogous to @var{list}.
+The underlying type is the interface @code{java.lang.CharSequence}.
+Immultable strings are @code{java.lang.String},
+while mutable strings are @code{gnu.lists.FString}.
+@end deffn
+
 @deffn Procedure make-string @var{k}
 @deffnx Procedure make-string @var{k} @var{char}
 Return a newly allocated string of length @var{k}.  If @var{char} is
 given, then all elements of the string are initialized to @var{char},
 otherwise the contents of the @var{string} are unspecified.
 @end deffn
-
-
-@deffn Procedure string @var{char} @dots{}
-Return a newly allocated string composed of the arguments.
-@end deffn
-
 
 @deffn Procedure string-length @var{string}
 Return the number of characters in the given @var{string} as an exact
@@ -5235,8 +5241,21 @@ indexing.
 
 @c @quotation
 @c @emph{Note:} Implementors should make @func{string-ref} run in constant
-time.
+@c time.
 @c @end quotation
+@end deffn
+
+@deffn Procedure string-set! string k char
+This procedure stores @var{char} in element @var{k} of @var{string}.
+
+@example
+(define s1 (make-string 3 #\*))
+(define s2 "***")
+(string-set! s1 0 #\?) @result{} @emph{void}
+s1 @result{} "?**"
+(string-set! s2 0 #\?) @result{} @emph{error}
+(string-set! (symbol->string 'immutable) 0 #\?) @result{} @emph{error}
+@end example
 @end deffn
 
 
@@ -5339,6 +5358,11 @@ procedure returns @false{}.
 @deffnx Procedure {string>?} @vari{string} @varii{string} @variii{string} @dots{}
 @deffnx Procedure {string<=?} @vari{string} @varii{string} @variii{string} @dots{}
 @deffnx Procedure {string>=?} @vari{string} @varii{string} @variii{string} @dots{}
+These procedures return @code{#t} if their arguments are (respectively):
+monotonically increasing, monotonically decreasing,
+monotonically non-decreasing, or monotonically nonincreasing.
+These predicates are required to be transitive.
+
 These procedures are the lexicographic extensions to strings of the
 corresponding orderings on characters.  For example, @func{string<?} is
 the lexicographic ordering on strings induced by the ordering

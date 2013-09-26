@@ -231,6 +231,7 @@
 ;    (if (not (pair? x)) x
 ;	(cons (recur (car x)) (recur (cdr x))))))
 
+#|
 ;;; Make a list of length LEN.
 
 (define (make-list len . maybe-elt)
@@ -243,7 +244,7 @@
     (do ((i len (- i 1))
 	 (ans '() (cons elt ans)))
 	((<= i 0) ans))))
-
+|#
 
 ;(define (list . ans) ans)	; R4RS
 
@@ -267,22 +268,8 @@
 
 ;;; (unfold not-pair? car cdr lis values)
 
-;;; Re-written to be non-recursive (sorry!).  --Per
-
-(define (list-copy (lis :: <list>)) :: <list>
-  (let* ((null :: <list> '())
-	 (result :: <list> null)
-	 (prev :: <list> null))
-    (let recur ((lis :: <list> lis))
-      (if (pair? lis)
-	  (let ((p :: <pair> (cons (car lis) '())))
-	    (if (eq? prev null)
-		(set! result p)
-		(set-cdr! prev p))
-	    (set! prev p)
-	    (recur (cdr lis)))
-	  result))))
 #|
+(define (list-copy (lis :: <list>)) :: <list>
   (let recur ((lis lis))			
     (if (pair? lis)				
 	(cons (car lis) (recur (cdr lis)))	

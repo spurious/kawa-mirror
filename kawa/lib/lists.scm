@@ -4,8 +4,9 @@
 	       caaar caadr cadar caddr cdaar cdadr cddar cdddr
 	       caaaar caaadr caadar caaddr cadaar cadadr caddar cadddr
 	       cdaaar cdaadr cdadar cdaddr cddaar cddadr cdddar cddddr
-	       length reverse list-tail list-ref list? make-list reverse!
-	       memq memv member assq assv assoc)
+	       length reverse list-tail list-ref list-set!
+               list? make-list reverse!
+	       memq memv member assq assv assoc list-copy)
 
 (require <kawa.lib.prim_syntax>)
 (require <kawa.lib.std_syntax>)
@@ -115,6 +116,9 @@
 (define (list-ref list (index :: <int>))
   (car (list-tail list index)))
 
+(define (list-set! list index::int obj)::void
+  (set-car! (list-tail list index) obj))
+
 (define (list? obj) :: <boolean>
   (>= (invoke-static <list> 'listLength obj #f) 0))
 
@@ -177,3 +181,20 @@
 	(let ((pair :: <pair> (car list)))
 	  (if (test key pair:car) pair
 	      (lp (cdr list)))))))
+
+(define (list-copy obj)
+  (let ((result obj)
+        (prev ::pair #!null))
+    (let recur ((x obj))
+      (if (pair? x)
+	  (let* ((pold ::pair x)
+                 (pnew (cons (pold:getCar) #!null)))
+	    (if (eq? prev #!null)
+		(set! result pnew)
+		(set-cdr! prev pnew))
+	    (set! prev pnew)
+	    (recur (pold:getCdr)))
+           (if (not (eq? prev #!null))
+               (set-cdr! prev x))))
+    result))
+

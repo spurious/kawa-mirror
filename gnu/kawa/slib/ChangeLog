@@ -1,3 +1,8 @@
+2013-09-25  Per Bothner  <per@bothner.com>
+
+	* srfi1.scm (make-list, list-copy): Commented out, since
+	now in lists.scm.
+
 2013-09-06  Per Bothner  <per@bothner.com>
 
 	* testing.scm: Generalize test-approximimate to complex.

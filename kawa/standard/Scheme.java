@@ -259,6 +259,8 @@ public class Scheme extends LispLanguage
       defProcStFld("reverse!", "kawa.lib.lists");  // Not R5RS.
       defProcStFld("list-tail", "kawa.lib.lists");
       defProcStFld("list-ref", "kawa.lib.lists");
+      defProcStFld("list-set!", "kawa.lib.lists");
+      defProcStFld("list-copy", "kawa.lib.lists");
 
       defProcStFld("memq", "kawa.lib.lists");
       defProcStFld("memv", "kawa.lib.lists");

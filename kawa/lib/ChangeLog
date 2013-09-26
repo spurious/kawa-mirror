@@ -1,3 +1,8 @@
+2013-09-25  Per Bothner  <per@bothner.com>
+
+	* lists.scm (list-set!): New R7RS procedure.
+	(list-copy): Moved from srfi1.scm, and fixed handling of non-lists.
+
 2013-09-24  Per Bothner  <per@bothner.com>
 
 	* std_syntax.scm (%case): Add support for => in non-else clauses.

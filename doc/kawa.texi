@@ -1873,7 +1873,7 @@ of the input.
 
 @display
 @stxdef{lexeme} @stxref{identifier} | @var{boolean} | @stxref{number}
-         | @var{character} | @var{string}
+         | @var{character} | @stxref{string}
          | @stxlit{(} |  @stxlit{)} |  @stxlit{[} |  @stxlit{]} |  @stxlit{#(}
          | @stxlit{'} | @stxlit{`} | @stxlit{,} | @stxlit{,@@} | @stxlit{.}
          | @stxlit{#'} |  @stxlit{#`} |  @stxlit{#,} |  @stxlit{#,@@}
@@ -1899,11 +1899,12 @@ character of Scheme.
 @subsection Whitespace and comments
 
 @display
-@stxdef{whitespace} @var{character-tabulation}
+@stxdef{intraline-whitespace} @var{space} | @var{character-tabulation}
+@stxdef{whitespace}  @stxref{intraline-whitespace}
          | @var{linefeed} | @var{line-tabulation} | @var{form-feed}
          | @var{carriage-return} | @var{next-line}
          | @i{any character whose category is Zs, Zl, or Zp}
-@stxdef{line ending} @var{linefeed} | @var{carriage return}
+@stxdef{line-ending} @var{linefeed} | @var{carriage return}
          | @var{carriage-return} @var{linefeed} | @var{next-line}
          | @var{carriage-return} @var{next-line} | @var{line-separator}
 @stxdef{comment}  @stxlit{;} all subsequent characters up to a @var{line-ending}
@@ -1990,6 +1991,7 @@ Block comments may be indicated with properly nested @code{#|} and
          | @i{any character whose category is Nd, Mc, or Me}
          | @stxref{special-subsequent}
 @stxdef{digit} @stxlit{0} | @stxlit{1} | @stxlit{2} | @stxlit{3} | @stxlit{4} | @stxlit{5} | @stxlit{6} | @stxlit{7} | @stxlit{8} | @stxlit{9}
+@stxdef{oct-digit} @stxlit{0} | @stxlit{1} | @stxlit{2} | @stxlit{3} | @stxlit{4} | @stxlit{5} | @stxlit{6} | @stxlit{7}
 @stxdef{hex-digit} @stxref{digit}
          | @stxlit{a} | @stxlit{A} | @stxlit{b} | @stxlit{B} | @stxlit{c} | @stxlit{C} | @stxlit{d} | @stxlit{D} | @stxlit{e} | @stxlit{E} | @stxlit{f} | @stxlit{F}
 @stxdef{special-subsequent} @stxlit{+} | @stxlit{-} | @stxlit{.} | @stxlit{@@}
@@ -5188,10 +5190,17 @@ Other operations may take time proportional to the number of inversions.
 @section Strings
 
 Strings are sequences of characters.  The @emph{length} of a string is
-the number of characters that it contains.  This number is fixed when
+the number of characters that it contains, as an exact non-negative integer.
+This number is fixed when
 the string is created.  The @emph{valid indices} of a string are the
-integers less than the length of the string.  The first character of a
+exact non-negative integers less than the length of the string.
+The first character of a
 string has index 0, the second has index 1, and so on.
+
+Some of the procedures that operate on strings ignore the
+difference between upper and lower case. The names of
+the versions that ignore case end with “@code{-ci}” (for “case
+insensitive”).
 
 @quotation
 @emph{Kawa note:}
@@ -5204,10 +5213,92 @@ between performance, compatibility with R6RS, and
 interoperability with Java APIs.
 @end quotation
 
+@subsection String literals
+
+@display
+@stxdef{string} @stxlit{"}@arbno{@stxref{string-element}}@stxlit{"}
+@stxdef{string-element} @i{any character other than} @stxlit{"} @i{or} @code{@b{\}}
+    | @stxref{mnemonic-escape} | @code{@b{\"}} | @code{@b{\\}}
+    | @code{@b{\}}@arbno{@stxref{intraline-whitespace}}@stxref{line-ending} @stxref{intraline-whitespace}
+    | @stxref{inline-hex-escape}
+@stxdef{mnemonic-escape} @code{@b{\a}} | @code{@b{\b}} | @code{@b{\t}} | @code{@b{\n}} | @code{@b{\r}} | ... @i{(see below)}
+@end display
+
+A string is written as a sequence of characters enclosed
+within quotation marks (@stxlit{``}).
+Within a string literal, various escape sequence represent characters
+other than themselves.
+Escape sequences always start with a backslash (@code{@b{\}}):
+@table @asis
+@item @code{@b{\a}}
+Alarm (bell), @code{#\x0007}.
+@item @code{@b{\b}}
+Backspace, @code{#\x0008}.
+@item @code{@b{\e}}
+Escape, @code{#\x001B}.
+@item @code{@b{\f}}
+Form feed, @code{#\x000C}.
+@item @code{@b{\n}}
+Linefeed (newline), @code{#\x000A}.
+@item @code{@b{\r}}
+Return, @code{#\x000D}.
+@item @code{@b{\t}}
+Character tabulation, @code{#\x0009}.
+@item @code{@b{\v}}
+Vertical tab, @code{#\x000B}.
+@item @code{@b{\C-}@meta{x}}
+@itemx @code{@b{\^}@meta{x}}
+Returns the scalar value of @meta{x} masked (anded) with @code{#x9F}.
+An alternative way to write the Ascii control characters:
+For example @code{"\C-m"} or @code{"\^m"} is
+the same as @code{"#\x000D"} (which the same as @code{"\r"}).
+As a special case @code{\^?} is rubout (delete) (@code{\x7f;}).
+@item @code{@b{\x}} @stxref{hex-scalar-value}@stxlit{;}
+@itemx @code{@b{\X}} @stxref{hex-scalar-value}@stxlit{;}
+A hex encoding that gives the scalar value of a character.
+@item @code{@b{\\}} @atleastone{@stxref{oct-digit}}
+At most three octal digits that give the scalar value of a character.
+(Historical, for C compatibility.)
+@item @code{@b{\u}} @atleastone{@stxref{hex-digit}}
+Exactly four hex digits that give the scalar value of a character.
+(Historical, for Java compatibility.)
+@item @code{@b{\M-}}@meta{x}
+(Historical, for Emacs Lisp.)
+Set the meta-bit (high-bit of single byte) of the following character @var{x}.
+@c @item @code{@b{\|}}
+@c Vertical line, @code{#\x007c}.
+@item @code{@b{\"}}
+Double quote, @code{#\x0022}.
+@item @code{@b{\\}}
+Backslah, @code{#\005C}.
+@item @code{@b{\}}@arbno{@stxref{intraline-whitespace}}@stxref{line-ending} @arbno{@stxref{intraline-whitespace}}
+Nothing (ignored).  Allows you to split up a long string over multiple
+lines; ignoring initial whitespace on the continuation lines allows
+you to indent them.
+@end table
+
+Except for a line ending, any character outside of an escape
+sequence stands for itself in the string literal. A line ending
+which is preceded by  @code{@b{\}}@arbno{@meta{intraline-whitespace}}
+expands to nothing (along with any trailing @meta{intraline-whitespace}),
+and can be used to indent strings for improved legibility.
+Any other line ending has the same effect as inserting a @code{@b{\n}}
+character into the string.
+
+Examples:
+@example
+"The word \"recursion\" has many meanings."
+"Another example:\ntwo lines of text"
+"Here’s text \
+containing just one line"
+"\x03B1; is named GREEK SMALL LETTER ALPHA."
+@end example
+
+@subsection Basic string procedures
+
 @deffn Procedure {string?} @var{obj}
 Return @true{} if @var{obj} is a string, @false{} otherwise.
 @end deffn
-
 
 @deffn Type string
 The type of string objects.
@@ -6025,15 +6116,72 @@ vec1 @result{} #(5 9 x 8)
 @node Lists
 @section Lists
 
-@emph{Needs work!}
+A pair (sometimes called a @dfn{dotted pair}) is a record structure
+with two fields called the car and cdr fields (for historical
+reasons). Pairs are created by the procedure @code{cons}. The
+car and cdr fields are accessed by the procedures @code{car} and
+@code{cdr}. The car and cdr fields are assigned by the procedures
+@code{set-car!} and @code{set-cdr!}.
 
-The @uref{http://srfi.schemers.org/srfi-1/srfi-1.html, SRFI-1 List Library}
-is available, though not enabled by default.  To use its functions you
-must @code{(require 'list-lib)} or @code{(require 'srfi-1)}.
+Pairs are used primarily to represent lists. A @dfn{list} can be
+defined recursively as either the empty list or a pair whose
+cdr is a list. More precisely, the set of lists is defined as
+the smallest set @var{X} such that:
+@itemize
+@item
+The empty list is in @var{X}.
+@item
+If @var{list} is in @var{X}, then any pair whose cdr field contains
+@var{list} is also in @var{X}.
+@end itemize
+
+The objects in the car fields of successive pairs of a list are
+the elements of the list. For example, a two-element list
+is a pair whose car is the first element and whose cdr is a
+pair whose car is the second element and whose cdr is the
+empty list. The length of a list is the number of elements,
+which is the same as the number of pairs.
+
+The empty list is a special object of its own type. It is not
+a pair, it has no elements, and its length is zero.
+
+@emph{Note:} The above definitions imply that all lists have finite
+length and are terminated by the empty list.
+
+The most general notation (external representation) for
+Scheme pairs is the “dotted” notation @code{(@var{c1} . @var{c2} )}
+where @var{c1} is the value of the car field and
+@var{c2} is the value of the cdr field.
+For example @code{(4 . 5)} is a pair whose car is 4 and
+whose cdr is 5. Note that @code{(4 . 5)} is the external representation
+of a pair, not an expression that evaluates to a pair.
+
+A more streamlined notation can be used for lists: the
+elements of the list are simply enclosed in parentheses and
+separated by spaces. The empty list is written @code{()}.
+For example,
 @example
-(require 'list-lib)
-(iota 5 0 -0.5) @result{} (0.0 -0.5 -1.0 -1.5 -2.0)
+(a b c d e)
 @end example
+and
+@example
+(a . (b . (c . (d . (e . ())))))
+@end example
+are equivalent notations for a list of symbols.
+
+A chain of pairs not ending in the empty list is called an
+@dfn{improper list}. Note that an improper list is not a list.
+The list and dotted notations can be combined to represent
+improper lists:
+@example
+(a b c . d)
+@end example
+is equivalent to
+@example
+(a . (b . (c . d)))
+@end example
+
+@emph{Needs to finish merging from R7RS!}
 
 @deffn Procedure make-list k [fill]
 Returns a newly allocated list of @var{k} elements.  If a second argument
@@ -6043,6 +6191,16 @@ Otherwise the initial contents of each element is unspecified.
 (make-list 2 3)   @result{} (3 3)
 @end example
 @end deffn
+
+@subsection SRFI-1 list library
+
+The @uref{http://srfi.schemers.org/srfi-1/srfi-1.html, SRFI-1 List Library}
+is available, though not enabled by default.  To use its functions you
+must @code{(require 'list-lib)} or @code{(require 'srfi-1)}.
+@example
+(require 'list-lib)
+(iota 5 0 -0.5) @result{} (0.0 -0.5 -1.0 -1.5 -2.0)
+@end example
 
 @deffn Procedure reverse! list
 The result is a list consisting of the elements of @var{list} in reverse order.
@@ -6643,6 +6801,8 @@ containing elements computed only on demand. A stream is either null
 or is a pair with a stream in its cdr. Since elements of a stream are
 computed only when accessed, streams can be infinite. Once computed,
 the value of a stream element is cached in case it is needed again.
+
+@emph{Note:} These are not the same as Java 8 streams.
 
 @example
 (require 'srfi-41)

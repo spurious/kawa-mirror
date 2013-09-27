@@ -1,3 +1,8 @@
+2013-09-27  Per Bothner  <per@bothner.com>
+
+	* kawa.texti (String): Document string literal syntax.
+	(Lists): Merge documentation from R7RS.
+
 2013-09-25  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Strings): Merge documentation from R7RS.

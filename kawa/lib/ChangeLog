@@ -1,4 +1,4 @@
-2013-09-27  Per Bothner  <per@bothner.com>
+2013-09-27  Jamison Hope <jrh@theptrgroup.com>
 
 	* lists.scm (list-ref): Change to procedure with setter property.
 

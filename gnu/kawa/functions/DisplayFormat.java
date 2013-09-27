@@ -562,44 +562,77 @@ public class DisplayFormat extends AbstractFormat
       out.write(':');
   }
 
-  void writeSymbol (String sym, Consumer out, boolean readable)
-  {
-    /* #ifdef use:java.util.regex */
-    /* Use |...| if symbol doesn't follow R5RS conventions
-       for identifiers or has a colon in the interior. */
-    if (readable && ! r5rsIdentifierMinusInteriorColons.matcher(sym).matches())
-      {
-        int len = sym.length();
-        if (len == 0)
-          {
-            write("||", out);
-          }
-        else
-          {
-            boolean inVerticalBars = false;
-            for (int i = 0;  i < len;  i++)
-              {
-                char ch = sym.charAt(i);
-                if (ch == '|')
-                  {
-                    write(inVerticalBars ? "|\\" : "\\", out);
-                    inVerticalBars = false;
-                  }
-                else if (! inVerticalBars)
-                  {
+    void writeSymbol (String sym, Consumer out, boolean readable) {
+        /* #ifdef use:java.util.regex */
+        /* Use |...| if symbol doesn't follow R5RS conventions
+           for identifiers or has a colon in the interior. */
+        if (readable
+            && ! r5rsIdentifierMinusInteriorColons.matcher(sym).matches()) {
+            int len = sym.length();
+            boolean r7rsStyle = true; // FIXME
+            if (r7rsStyle) {
+                out.write('|');
+                for (int i = 0;  i < len;  i++) {
+                    int ch = sym.charAt(i);
+                    // check for surrogates
+                    if (ch >= 0xD800 && ch <= 0xDBFF) {
+                        char next = sym.charAt(++i);
+                        if (next >= 0xDC00 && next <= 0xDFFF)
+                           ch = ((ch - 0xD800) << 10)
+                               + (next - 0xDC00) + 0x10000;
+                    }
+                    if (ch == '|' || ch == '\\' || ch < ' ' || ch == 127) {
+                        out.write('\\');
+                        switch(ch) {
+                        case '\007': out.write('a'); break;
+                        case '\b': out.write('b'); break;
+                        case '\n': out.write('n'); break;
+                        case '\r': out.write('r'); break;
+                        case '\t': out.write('t'); break;
+                        case '\\': out.write('\\'); break;
+                        case '|': out.write('|'); break;
+                        default:
+                            out.write('x');
+                            writeHexDigits(ch, out);
+                            out.write(';');
+                        }
+                    }
+                    else
+                        Char.print(ch, out);
+                }
+                out.write('|');
+            } else if (len == 0) {
+                write("||", out);
+            } else {
+                boolean inVerticalBars = false;
+                for (int i = 0;  i < len;  i++) {
+                    char ch = sym.charAt(i);
+                    if (ch == '|') {
+                        write(inVerticalBars ? "|\\" : "\\", out);
+                        inVerticalBars = false;
+                    } else if (! inVerticalBars) {
+                        out.write('|');
+                        inVerticalBars = true;
+                    }
+                    out.write(ch);
+                }
+                if (inVerticalBars)
                     out.write('|');
-                    inVerticalBars = true;
-                  }
-                out.write(ch);
-              }
-            if (inVerticalBars)
-              out.write('|');
-          }
-        return;
-      }
-    /* #endif */
-    write(sym, out);
-  }
+            }
+            return;
+        }
+        /* #endif */
+        write(sym, out);
+    }
+
+    static void writeHexDigits(int i, Consumer out) {
+        int high = i >>> 4;
+        if (high != 0) {	  
+            writeHexDigits(high, out);
+            i &= 15;
+	}
+        out.write("0123456789ABCDEF".charAt(i));
+    }
   
   /**
    * An "interesting" object is one where object identity is significant.

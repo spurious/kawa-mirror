@@ -1,3 +1,8 @@
+2013-09-27  Per Bothner  <per@bothner.com>
+
+	* DisplayFormat.java (writeSymbol): Follow r7rs syntax
+	when writing a symbol readably.
+
 2013-09-23  Per Bothner  <per@bothner.com>
 
 	* CompilationHelpers.java (validateIsEqv): Use language-sensitive

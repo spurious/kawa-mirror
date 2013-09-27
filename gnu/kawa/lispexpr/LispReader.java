@@ -354,10 +354,15 @@ public class LispReader extends Lexer
 	    if (ch < 0)
 	      eofError("unexpected EOF after single escape");
             if (rtable.hexEscapeAfterBackslash
-                && (ch == 'x' || ch == 'X'))
-              ch = readHexEscape();
-	    tokenBufferAppend(TOKEN_ESCAPE_CHAR);
-	    tokenBufferAppend(ch);
+                // We've allowed hex escapes for a while.
+                // Allow R7RS general escapes - but only inside |bars|.
+                && (inEscapes || ch == 'x' || ch == 'X'))
+                ch = readEscape(ch);
+            if (ch >= 0)
+              {
+                tokenBufferAppend(TOKEN_ESCAPE_CHAR);
+                tokenBufferAppend(ch);
+              }
 	    seenEscapes = true;
 	    continue;
 	  }

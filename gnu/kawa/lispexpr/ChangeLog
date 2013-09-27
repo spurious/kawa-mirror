@@ -1,3 +1,8 @@
+2013-09-27  Per Bothner  <per@bothner.com>
+
+	* LispReader.java (readToken): Allow r7rs-style general escape
+	inside |bars| when reading a symbol.
+
 2013-09-22  Per Bothner  <per@bothner.com>
 
 	* LispReader (readSpecial): Allow ' ' after '#!'.

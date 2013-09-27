@@ -1,3 +1,7 @@
+2013-09-27  Per Bothner  <per@bothner.com>
+
+	* lists.scm (list-ref): Change to procedure with setter property.
+
 2013-09-25  Per Bothner  <per@bothner.com>
 
 	* lists.scm (list-set!): New R7RS procedure.

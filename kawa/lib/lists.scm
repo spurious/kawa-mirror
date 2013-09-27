@@ -113,11 +113,13 @@
                  (loop ((as gnu.lists.Pair flst):getCdr))
                  (primitive-throw (java.lang.IndexOutOfBoundsException "List is too short."))))))))
 
-(define (list-ref list (index :: <int>))
-  (car (list-tail list index)))
-
 (define (list-set! list index::int obj)::void
   (set-car! (list-tail list index) obj))
+
+(define-procedure list-ref
+  setter: list-set!
+  (lambda (list index::int) name: 'list-ref
+          (car (list-tail list index))))
 
 (define (list? obj) :: <boolean>
   (>= (invoke-static <list> 'listLength obj #f) 0))

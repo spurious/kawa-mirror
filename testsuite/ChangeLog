@@ -1,3 +1,9 @@
+2013-09-27  Matthieu Vachon  <matthieu.o.vachon@gmail.com>
+	    Per Bothner  <per@bothner.com>
+
+	* unreach.scm: Test for Savannah bug #40123
+	"Nested with-compile-options problem".
+
 2013-09-26  Per Bothner  <per@bothner.com>
 
 	* r7rs-tests.scm: Enabled list-set! and list-copy tests.

@@ -100,14 +100,18 @@ public class Options
     set(key, value, null);
   }
 
-  /** Set the value of a named option. */
-  public void set (String key, Object value, SourceMessages messages)
+  /** Set the value of a named option.
+   * Return old value, in form suitable for reset.  */
+  public Object set(String key, Object value, SourceMessages messages)
   {
+    if (valueTable == null)
+      valueTable = new HashMap<String,Object>();
+    Object oldValue = valueTable.get(key);
     OptionInfo info = getInfo(key);
     if (info == null)
       {
 	error("invalid option key: "+key, messages);
-	return;
+	return oldValue;
       }
     if ((info.kind & BOOLEAN_OPTION) != 0)
       {
@@ -118,14 +122,13 @@ public class Options
 	    error("value for option "+key
 		  +" must be boolean or yes/no/true/false/on/off/1/0",
 		  messages);
-	    return;
+	    return oldValue;
 	  }
       }
     else if (value == null)
       value = "";
-    if (valueTable == null)
-      valueTable = new HashMap<String,Object>();
     valueTable.put(key, value);
+    return oldValue;
   }
 
   /** Reset the value of a named option. */
@@ -247,18 +250,17 @@ public class Options
   /** Set a list of options, remember the old value.
    * @param options is vector of triples, echo of which is consisting of:
    * a String option key;
-   * an entry whose valus is ignores and is used to store the old value; and
-   * a new value for the options.
+   * an entry whose value is ignored and is used to store the old value; and
+   * a new value for the option.
    */
   public void pushOptionValues (Vector options)
   {
     int len = options.size();
-    for (int i = 0;  i < len;  )
+    for (int i = 0;  i < len;  i=i+3)
       {
-	String key = (String) options.elementAt(i++);
-	Object newValue = options.elementAt(i);
-	options.setElementAt(newValue, i++);
-	set(key, options.elementAt(i++));
+	String key = (String) options.elementAt(i);
+	Object oldValue = set(key, options.elementAt(i+2), null);
+	options.setElementAt(oldValue, i+1);
       }
   }
 

@@ -1,3 +1,9 @@
+2013-09-27  Per Bothner  <per@bothner.com>
+
+	* Options.java (pushOptionValues): Fix logic bug.
+	(set): Chaneg to return old value, to vaoid fix in pushOptionValues.
+	This fixes Savannah bug #40123 "Nested with-compile-options problem".
+
 2013-09-24  Per Bothner  <per@bothner.com>
 
 	* PrettyWriter.java (resolveBackReferences) Start datum labels at

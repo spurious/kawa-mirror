@@ -54,3 +54,17 @@
         (b (list x y)))
     (list a b)))
 ;; Diagnostic: unreach1.scm:53:12: warning - initialization of a never finishes
+
+;;; Savannah bug #40123: Nested with-compile-options problem
+(define (nested-with-compile-options)
+  (with-compile-options warn-unreachable: #f
+   (let ((one "one") (two "two"))
+     (with-compile-options warn-unreachable: #f
+      (if (primitive-throw (java.lang.NullPointerException)) one two)))
+   (if (primitive-throw (java.lang.NullPointerException)) 1 2)))
+(try-catch
+ (begin (nested-with-compile-options)
+        (format #t "nested-with-compile-options finished.~%"))
+ (ex java.lang.NullPointerException
+     (format #t "nested-with-compile-options threw NullPointerException.~%")))
+;; Output: nested-with-compile-options threw NullPointerException.

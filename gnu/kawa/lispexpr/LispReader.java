@@ -998,6 +998,7 @@ public class LispReader extends Lexer
       case 'r':  c = 13;  break;  // carriage return
       case 'e':  c = 27;  break;  // escape
       case '\"': c = 34;  break;  // quote
+      case '|':  c = '|';  break;  // vertical bar
       case '\\': c = 92;  break;  // backslash
       case ' ':  // Skip to end of line, inclusive.
       case '\n': // Skip initial whitespace on following line.

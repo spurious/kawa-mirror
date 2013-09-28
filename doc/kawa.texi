@@ -48,22 +48,13 @@
 @macro stxlit{TEXT}
 @code{@b{\TEXT\}}
 @end macro
-@macro stxlitlbrace
-@code{@b{@{}}
-@end macro
-@macro stxlitrbrace
-@code{@b{@}}}
-@end macro
-@macro stxlitat
-@code{@b{@@}}
-@end macro
 
 @macro arbno{THING}
-\THING\*
+\THING\@math{^*}
 @end macro
 
 @macro atleastone{THING}
-\THING\+
+\THING\@math{^+}
 @end macro
 
 @macro meta{THING}
@@ -1679,6 +1670,10 @@ using @uref{http://srfi.schemers.org/srfi-16/srfi-16.html, @code{case-lambda}}.
 @uref{http://srfi.schemers.org/srfi-95/srfi-95.html, SRFI 95}: Sorting and Merging.
 @item
 @uref{http://srfi.schemers.org/srfi-97/srfi-97.html, SRFI 97}: Names for SRFI Libraries.
+@item
+@uref{http://srfi.schemers.org/srfi-108/,SRFI 108}: Named quasi-literal constructors.
+@item
+@uref{http://srfi.schemers.org/srfi-109/srfi-109.html, SRFI-109}: Extended string quasi-literals - @pxref{string quasi-literals}.
 @end itemize
 
 @node Compatibility
@@ -1923,8 +1918,8 @@ As a special case the characters @stxlit{#!/} are treated as starting a comment,
 but only at the beginning of file.  These characters are used on
 Unix systems as an @uref{http://en.wikipedia.org/wiki/Shebang_(Unix), Shebang interpreter directive}.
 The Kawa reader skips the entire line.
-If the last non-whitespace character is @code{@b{\}} (backslash)
-then the following line is also skipped, and so on.
+If the last non-whitespace character is @stxlit{@backslashchar{}}
+(backslash) then the following line is also skipped, and so on.
 @display
 @stxdef{shebang-comment} @stxlit{#!} @var{absolute-filename} text up to non-escaped @var{line-ending}
 @end display
@@ -2000,10 +1995,10 @@ Block comments may be indicated with properly nested @code{#|} and
          | @stxref{multi-escape-sequence}
 @stxdef{inline-hex-escape} @stxlit{\\x}@stxref{hex-scalar-value}@stxlit{;}
 @stxdef{hex-scalar-value} @stxref{hex-digit}+
-@stxdef{multi-escape-sequence} @stxlit{|}@stxref{character-except-vbar}...@stxlit{|}
+@stxdef{multi-escape-sequence} @stxlit{|}@arbno{@stxref{character-except-vbar}}@stxlit{|}
 @stxdef{character-except-vbar} @i{any character except @code{|}}
 @stxdef{character-except-x} @i{any character except @code{x}}
-@stxdef{peculiar-identifier} @stxlit{+} | @stxlit{-} | @stxlit{...} | @stxlit{->} @var{subsequent}*
+@stxdef{peculiar-identifier} @stxlit{+} | @stxlit{-} | @stxlit{...} | @stxlit{->} @arbno{@var{subsequent}}
 @end display
 
 Most identifiers allowed by other programming languages are also
@@ -2573,7 +2568,7 @@ Deprecated; usually you can just write:
 @subsubsection Type cast
 
 @display
-@stxlit{(}@stxref{type}@stxlit{:}@stxlitat{} @stxref{expression}@stxlit{)}
+@stxlit{(}@stxref{type}@stxlit{:}@stxlit{@atchar{}} @stxref{expression}@stxlit{)}
 @end display
 Performs a cast.
 
@@ -5217,61 +5212,62 @@ interoperability with Java APIs.
 
 @display
 @stxdef{string} @stxlit{"}@arbno{@stxref{string-element}}@stxlit{"}
-@stxdef{string-element} @i{any character other than} @stxlit{"} @i{or} @code{@b{\}}
-    | @stxref{mnemonic-escape} | @code{@b{\"}} | @code{@b{\\}}
-    | @code{@b{\}}@arbno{@stxref{intraline-whitespace}}@stxref{line-ending} @stxref{intraline-whitespace}
+@stxdef{string-element} @i{any character other than} @stxlit{"} @i{or} @stxlit{@backslashchar{}}
+    | @stxref{mnemonic-escape} | @stxlit{@backslashchar{}"} | @stxlit{@backslashchar{}@backslashchar{}}
+    | @stxlit{@backslashchar{}}@arbno{@stxref{intraline-whitespace}}@stxref{line-ending} @stxref{intraline-whitespace}
     | @stxref{inline-hex-escape}
-@stxdef{mnemonic-escape} @code{@b{\a}} | @code{@b{\b}} | @code{@b{\t}} | @code{@b{\n}} | @code{@b{\r}} | ... @i{(see below)}
+@stxdef{mnemonic-escape} @stxlit{@backslashchar{}a} | @stxlit{@backslashchar{}b} | @stxlit{@backslashchar{}t} | @stxlit{@backslashchar{}n} | @stxlit{@backslashchar{}r} | ... @i{(see below)}
 @end display
 
 A string is written as a sequence of characters enclosed
-within quotation marks (@stxlit{``}).
+within quotation marks (@stxlit{"}).
 Within a string literal, various escape sequence represent characters
 other than themselves.
-Escape sequences always start with a backslash (@code{@b{\}}):
+Escape sequences always start with a backslash (@stxlit{@backslashchar{}}):
 @table @asis
-@item @code{@b{\a}}
+@item @stxlit{@backslashchar{}a}
 Alarm (bell), @code{#\x0007}.
-@item @code{@b{\b}}
+@item @stxlit{@backslashchar{}b}
 Backspace, @code{#\x0008}.
-@item @code{@b{\e}}
+@item @stxlit{@backslashchar{}e}
 Escape, @code{#\x001B}.
-@item @code{@b{\f}}
+@item @stxlit{@backslashchar{}f}
 Form feed, @code{#\x000C}.
-@item @code{@b{\n}}
+@item @stxlit{@backslashchar{}n}
 Linefeed (newline), @code{#\x000A}.
-@item @code{@b{\r}}
+@item @stxlit{@backslashchar{}r}
 Return, @code{#\x000D}.
-@item @code{@b{\t}}
+@item @stxlit{@backslashchar{}t}
 Character tabulation, @code{#\x0009}.
-@item @code{@b{\v}}
+@item @stxlit{@backslashchar{}v}
 Vertical tab, @code{#\x000B}.
-@item @code{@b{\C-}@meta{x}}
-@itemx @code{@b{\^}@meta{x}}
+@item @stxlit{@backslashchar{}C-}@meta{x}
+@itemx @stxlit{@backslashchar{}^}@meta{x}
 Returns the scalar value of @meta{x} masked (anded) with @code{#x9F}.
 An alternative way to write the Ascii control characters:
 For example @code{"\C-m"} or @code{"\^m"} is
 the same as @code{"#\x000D"} (which the same as @code{"\r"}).
 As a special case @code{\^?} is rubout (delete) (@code{\x7f;}).
-@item @code{@b{\x}} @stxref{hex-scalar-value}@stxlit{;}
-@itemx @code{@b{\X}} @stxref{hex-scalar-value}@stxlit{;}
+@item @stxlit{@backslashchar{}x} @stxref{hex-scalar-value}@stxlit{;}
+@itemx @stxlit{@backslashchar{}X} @stxref{hex-scalar-value}@stxlit{;}
 A hex encoding that gives the scalar value of a character.
-@item @code{@b{\\}} @atleastone{@stxref{oct-digit}}
+@item @stxlit{@backslashchar{}@backslashchar{}} @atleastone{@stxref{oct-digit}}
 At most three octal digits that give the scalar value of a character.
 (Historical, for C compatibility.)
-@item @code{@b{\u}} @atleastone{@stxref{hex-digit}}
+@item @stxlit{@backslashchar{}u} @atleastone{@stxref{hex-digit}}
 Exactly four hex digits that give the scalar value of a character.
 (Historical, for Java compatibility.)
-@item @code{@b{\M-}}@meta{x}
+@item @stxlit{@backslashchar{}M-}@meta{x}
 (Historical, for Emacs Lisp.)
 Set the meta-bit (high-bit of single byte) of the following character @var{x}.
-@c @item @code{@b{\|}}
-@c Vertical line, @code{#\x007c}.
-@item @code{@b{\"}}
+@item @stxlit{@backslashchar{}|}
+Vertical line, @code{#\x007c}.
+(Not useful for string literals, but useful for symbols.)
+@item @stxlit{@backslashchar{}"}
 Double quote, @code{#\x0022}.
-@item @code{@b{\\}}
+@item @stxlit{@backslashchar{}@backslashchar{}}
 Backslah, @code{#\005C}.
-@item @code{@b{\}}@arbno{@stxref{intraline-whitespace}}@stxref{line-ending} @arbno{@stxref{intraline-whitespace}}
+@item @stxlit{@backslashchar{}}@arbno{@stxref{intraline-whitespace}}@stxref{line-ending} @arbno{@stxref{intraline-whitespace}}
 Nothing (ignored).  Allows you to split up a long string over multiple
 lines; ignoring initial whitespace on the continuation lines allows
 you to indent them.
@@ -5279,10 +5275,10 @@ you to indent them.
 
 Except for a line ending, any character outside of an escape
 sequence stands for itself in the string literal. A line ending
-which is preceded by  @code{@b{\}}@arbno{@meta{intraline-whitespace}}
+which is preceded by  @stxlit{@backslashchar{}}@arbno{@meta{intraline-whitespace}}
 expands to nothing (along with any trailing @meta{intraline-whitespace}),
 and can be used to indent strings for improved legibility.
-Any other line ending has the same effect as inserting a @code{@b{\n}}
+Any other line ending has the same effect as inserting a @stxlit{@backslashchar{}n}
 character into the string.
 
 Examples:
@@ -5293,6 +5289,245 @@ Examples:
 containing just one line"
 "\x03B1; is named GREEK SMALL LETTER ALPHA."
 @end example
+
+@anchor{string quasi-literals}
+@subsection String templates
+
+The following syntax is a @dfn{string template} (also called
+a string quasi-literal or
+``@uref{http://en.wikipedia.org/wiki/Here_document, here document}''):
+@example
+&@{Hello &[name]!@}
+@end example
+Assuming the variable @code{name} evaluates to @code{"John"}
+then the example evaluates to @code{"Hello John!"}.
+
+The Kawa reader converts the above example to:
+@example
+($string$ "Hello " $<<$ name $>>$ "!")
+@end example
+See the @uref{http://srfi.schemers.org/srfi-109/srfi-109.html,SRFI-109}
+specification for details.
+
+@display
+@stxdef{extended-string-literal} @stxlit{&@lbracechar{}} [@stxref{initial-ignored}] @arbno{@stxref{string-literal-part}} @stxlit{@rbracechar{}}
+@stxdef{string-literal-part}  @i{any character except} @stxlit{&}, @stxlit{@lbracechar{}} @i{or} @stxlit{@rbracechar{}}
+    | @stxlit{@lbracechar{}} @arbno{@stxref{string-literal-part}} @stxlit{@rbracechar{}}
+    | @stxref{char-ref}
+    | @stxref{entity-ref}
+    | @stxref{special-escape}
+    | @stxref{enclosed-part}
+@end display
+
+You can use the plain @code{"@var{string}"} syntax for
+longer multiline strings, but @code{&@{@var{string}@}} has
+various advantages.
+The syntax is less error-prone because the start-delimiter is
+different from the end-delimiter.  Also note that nested braces
+are allowed: a right brace @code{@rbracechar{}} is only an end-delimiter
+if it is unbalanced, so you would seldom need to escape it:
+@example
+&@{This has a @{braced@} section.@}
+  @result{} "This has a @{braced@} section."
+@end example
+
+The escape character used for special characters is
+@stxlit{&}.  This is compatible with XML syntax and @ref{XML literals}.
+
+@subsubsection Special characters
+
+@display
+@stxdef{char-ref}
+    @stxlit{&#} @atleastone{@stxref{digit}} @stxlit{;}
+  | @stxlit{&#x} @atleastone{@stxref{hex-digit}}  @stxlit{;}
+@stxdef{entity-ref}
+    @stxlit{&} @stxref{char-or-entity-name} @stxlit{;}
+@stxdef{char-or-entity-name} @meta{tagname}
+@end display
+
+You can the standard XML syntax for character references, using
+either decimal or hexadecimal values. The following string has two
+instances of the Ascii escape character, as either decimal 27 or hex 1B:
+@example
+&@{&#27;&#x1B;@} @result{} "\e\e"
+@end example
+
+You can also use the pre-defined XML entity names:
+@example
+&@{&amp; &lt; &gt; &quot; &apos;@} @result{} "& < > \" '"
+@end example
+In addition, @code{&lbrace;} @code{&rbrace;} can be used for left and
+right curly brace, though you don't need them for balanced parentheses:
+@example
+&@{ &rbrace;_&lbrace; / @{_@} @}  @result{} " @}_@{ / @{_@} "
+@end example
+
+You can use the @uref{http://www.w3.org/2003/entities/2007/w3centities-f.ent,standard XML entity names}. For example:
+@example
+&@{L&aelig;rdals&oslash;yri@}
+  @result{} "Lærdalsøyri"
+@end example
+
+You can also use the standard R7RS character names @code{null},
+@code{alarm}, @code{backspace}, @code{tab}, @code{newline}, @code{return},
+@code{escape}, @code{space}, and @code{delete}.
+For example:
+@example
+&@{&escape;&space;@}
+@end example
+
+The syntax @code{&@var{name};} is actually syntactic sugar
+(specifically reader syntax) to the variable reference
+@code{$entity$:@var{name}}.
+Hence you can also define your own entity names:
+@example
+(define $entity$:crnl "\r\n")
+&@{&crnl;@} ⟹ "\r\n"
+@end example
+
+@subsubsection Multiline string literals
+
+@example
+@stxdef{initial-ignored}
+    @stxref{intraline-whitespace} @stxref{line-ending} @stxref{intraline-whitespace} @stxlit{&|}
+@stxdef{special-escape}
+    @stxref{intraline-whitespace} @stxlit{&|}
+  | @stxlit{&} @stxref{nested-comment}
+  | @stxlit{&-} @stxref{intraline-whitespace} @stxref{line-ending}
+@end example
+
+A line-ending directly in the text is becomes a newline,
+as in a simple string literal:
+@example
+(string-capitalize &@{one two three
+uno dos tres
+@}) @result{} "One Two Three\nUno Dos Tres\n"
+@end example
+However, you have extra control over layout.
+If the string is in a nested expression, it is confusing
+(and ugly) if the string cannot be indented to match
+the surrounding context. The indentation marker @stxlit{&|}
+is used to mark the end of insignificant initial whitespace.
+The @code{&|} characters and all the preceding whitespace are removed.
+In addition, it also suppresses an initial newline.  Specifically,
+when the initial left-brace is followed by optional (invisible)
+intraline-whitespace, then a newline, then optional
+intraline-whitespace (the indentation), and finally the indentation
+marker @code{&|} - all of which is removed from the output.
+Otherwise the @code{&|} only removes initial intraline-whitespace
+on the same line (and itself).
+
+@example
+(write (string-capitalize &@{
+     &|one two three
+     &|uno dos tres
+@}) out)
+    @result{} @i{prints} "One Two Three\nUno Dos Tres\n"
+@end example
+
+As a matter of style, all of the indentation lines should line up.
+It is an error if there are any non-whitespace characters between
+the previous newline and the indentation marker.
+It is also an error to write an indentation marker before the
+first newline in the literal.
+
+The line-continuation marker @stxlit{&-} is used to suppress a newline:
+@example
+&@{abc&-
+  def@} @result{} "abc  def"
+@end example
+
+You can write a @code{#|...|#}-style comment following a @code{&}.
+This could be useful for annotation, or line numbers:
+@example
+&@{&#|line 1|#one two
+  &#|line 2|# three
+  &#|line 3|#uno dos tres
+@} @result{} "one two\n three\nuno dos tres\n"
+@end example
+
+@subsubsection Embedded expressions
+
+@example
+@stxdef{enclosed-part}
+    @stxlit{&} enclosed-modifier @stxlit{[} @arbno{@stxref{expression}} @stxlit{]}
+  | @stxlit{&} enclosed-modifier @stxlit{(} @atleastone{@stxref{expression}} @stxlit{)}
+@end example
+
+An embedded expression has the form @code{&[@var{expression}]}.
+It is evaluated, the result converted to a string (as by @code{display}),
+and the result added in the result string.
+(If there are multiple expressions, they are all evaluated and
+the corresponding strings inserted in the result.)
+@example
+&@{Hello &[(string-capitalize name)]!@}
+@end example
+
+You can leave out the square brackets when the expression
+is a parenthesized expression:
+@example
+&@{Hello &(string-capitalize name)!@}
+@end example
+
+@subsubsection Formatting
+
+@example
+@stxdef{enclosed-modifier}
+  @arbno{@stxlit{~} @meta{format-specifier-after-tilde}}
+@end example
+
+Using @ref{Format,@code{format}} allows finer-grained control over the
+output, but a problem is that the association between format
+specifiers and data expressions is positional, which is hard-to-read
+and error-prone. A better solution places the specifier adjacant to
+the data expression:
+@example
+&@{The response was &~,2f(* 100.0 (/ responses total))%.@}
+@end example
+
+The following escape forms are equivalent to the corresponding
+forms withput the @stxlit{~}@meta{fmt-spec}, except the
+expression(s) are formatted using @code{format}:
+@display
+@stxlit{&~}@meta{fmt-spec}@stxlit{[}@arbno{@meta{expression}}@stxlit{]} 
+@end display
+Again using parentheses like this:
+@display
+@stxlit{&~}@meta{fmt-spec}@stxlit{(}@atleastone{@meta{expression}}@stxlit{)}
+@end display
+is equivalent to:
+@display
+@stxlit{&~}@meta{fmt-spec}@stxlit{[(}@atleastone{@meta{expression}}@stxlit{)]}
+@end display
+
+The syntax of @code{format} specifications is arcane, but it allows you
+to do some pretty neat things in a compact space.
+For example to include @code{"_"} between each element of
+the array @code{arr} you can use the @code{~@{...~@}} format speciers:
+@example
+(define arr [5 6 7])
+&@{&~@{&[arr]&~^_&~@}@} @result{} "5_6_7"
+@end example
+
+If no format is specified for an enclosed expression,
+the that is equivalent to a @code{~a} format specifier,
+so this is equivalent to:
+@example
+&@{&~@{&~a[arr]&~^_&~@}@} @result{} "5_6_7"
+@end example
+which is in turn equivalent to:
+@example
+(format #f "~@{~a~^_~@}" arr)
+@end example
+
+The fine print that makes this work:
+If there are multiple expressions in a @code{&[...]} with
+no format specifier then there is an implicit @code{~a} for
+each expression.
+On the other hand, if there is an explicit format specifier,
+it is not repeated for each enclosed expression: it appears
+exactly once in the effective format string, whether
+there are zero, one, or many expressions.
 
 @subsection Basic string procedures
 
@@ -12788,7 +13023,7 @@ comments, and CDATA section) we'll cover later.
 @stxdef{xml-name-form} @stxref{QName}
   | @stxref{xml-enclosed-expression}
 @stxdef{xml-enclosed-expression}
-    @stxlitlbrace{}@stxref{expression}@stxlitrbrace{}
+    @stxlit{@lbracechar{}}@stxref{expression}@stxlit{@rbracechar{}}
   | @stxlit{(}@stxref{expression}...@stxlit{)}
 @end display
 

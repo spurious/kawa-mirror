@@ -1,5 +1,7 @@
 2013-09-28  Per Bothner  <per@bothner.com>
 
+	* kawa.texi (Lexical syntax): Document R7RS symbol-element syntax.
+
 	* kawa.texi (Program structure): Re-arrange - moove earlier.
 	(Boolean values): New section.
 

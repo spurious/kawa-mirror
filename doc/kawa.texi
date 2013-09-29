@@ -1995,8 +1995,10 @@ Block comments may be indicated with properly nested @code{#|} and
          | @stxref{multi-escape-sequence}
 @stxdef{inline-hex-escape} @stxlit{\\x}@stxref{hex-scalar-value}@stxlit{;}
 @stxdef{hex-scalar-value} @stxref{hex-digit}+
-@stxdef{multi-escape-sequence} @stxlit{|}@arbno{@stxref{character-except-vbar}}@stxlit{|}
-@stxdef{character-except-vbar} @i{any character except @code{|}}
+@stxdef{multi-escape-sequence} @stxlit{|}@arbno{@stxref{symbol-element}}@stxlit{|}
+@stxdef{symbol-element}  @i{any character except} @stxlit{|} @i{or} @stxlit{@backslashchar{}}
+         | @stxref{inline-hex-escape} | @stxref{mnemonic-escape} | @stxlit{@backslashchar{}|}
+
 @stxdef{character-except-x} @i{any character except @code{x}}
 @stxdef{peculiar-identifier} @stxlit{+} | @stxlit{-} | @stxlit{...} | @stxlit{->} @arbno{@var{subsequent}}
 @end display

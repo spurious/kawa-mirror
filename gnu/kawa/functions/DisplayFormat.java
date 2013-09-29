@@ -574,8 +574,7 @@ public class DisplayFormat extends AbstractFormat
                 out.write('|');
                 for (int i = 0;  i < len;  i++) {
                     int ch = sym.charAt(i);
-                    // check for surrogates
-                    if (ch >= 0xD800 && ch <= 0xDBFF) {
+                    if (ch >= 0xD800 && ch <= 0xDBFF) { // surrogates
                         char next = sym.charAt(++i);
                         if (next >= 0xDC00 && next <= 0xDFFF)
                            ch = ((ch - 0xD800) << 10)

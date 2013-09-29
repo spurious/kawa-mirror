@@ -1,3 +1,7 @@
+2013-09-29  Per Bothner  <per@bothner.com>
+
+	* texinfo.tex: Update to texinfo-5.2.
+
 2013-09-28  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Lexical syntax): Document R7RS symbol-element syntax.

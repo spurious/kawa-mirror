@@ -1,5 +1,9 @@
 2013-09-28  Per Bothner  <per@bothner.com>
 
+	* ReaderDispatchMisc.java (read): Support R7RS's #true/#false.
+	* LispReader.java (readSimpleVector): Split into two methods.
+	(readTokenString): Utility method to reduce some duplication.
+
 	* LispReader.java: Allow '\|' (vertical-bar), useful in symbols.
 
 2013-09-27  Per Bothner  <per@bothner.com>

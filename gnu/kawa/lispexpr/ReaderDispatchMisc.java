@@ -48,23 +48,30 @@ public class ReaderDispatchMisc extends ReadTableEntry
       case ':':
 	// Handle Guile-style keyword syntax: '#:KEYWORD'
 	// Note this conflicts with Common Lisp uninterned symbols.  FIXME
-	int startPos = reader.tokenBufferLength;
-	reader.readToken(reader.read(), ReadTable.getCurrent());
-	length = reader.tokenBufferLength - startPos;
-	name = new String(reader.tokenBuffer, startPos, length);
-	reader.tokenBufferLength = startPos;
-	return gnu.expr.Keyword.make(name.intern());
+        name = reader.readTokenString(-1, ReadTable.getCurrent());
+        return gnu.expr.Keyword.make(name.intern());
       case '\\':
 	return LispReader.readCharacter(reader);
       case '!':
 	return LispReader.readSpecial(reader);
       case 'T':
-	return Boolean.TRUE;
       case 'F':
-	ch = in.peek();
-	if (Character.isDigit((char) ch))
-	  return LispReader.readSimpleVector(reader, 'F');
-	return Boolean.FALSE;
+          name = reader.readTokenString(ch, ReadTable.getCurrent());
+          String nameLC = name.toLowerCase();
+          if (nameLC.equals("t") || nameLC.equals("true"))
+              return Boolean.TRUE;
+          if (nameLC.equals("f") || nameLC.equals("false"))
+              return Boolean.FALSE;
+          int size;
+          if (nameLC.equals("f32")) size = 32;
+          else if (nameLC.equals("f64")) size = 64;
+          else
+            {
+              in.error("unexpected characters following '#'");
+              return Boolean.FALSE;
+            }
+          return LispReader.readSimpleVector(reader, 'F',
+                                             reader.read(), size);
       case 'S':
       case 'U':
 	return LispReader.readSimpleVector(reader, (char) ch);

@@ -406,6 +406,18 @@ public class LispReader extends Lexer
       }
   }
 
+    public String readTokenString(int ch, ReadTable rtable)
+            throws java.io.IOException, SyntaxException {
+        int startPos = tokenBufferLength;
+        if (ch >= 0)
+            tokenBufferAppend(ch);
+        readToken(read(), rtable);
+        int length = tokenBufferLength - startPos;
+        String str = new String(tokenBuffer, startPos, length);
+        tokenBufferLength = startPos;
+        return str;
+    }
+
     public Object readObject() throws java.io.IOException, SyntaxException {
 	return readObject(-1, false);
     }
@@ -1312,11 +1324,7 @@ public class LispReader extends Lexer
         return Values.empty;
       }
 
-    int startPos = reader.tokenBufferLength;
-    reader.tokenBufferAppend(ch);
-    reader.readToken(reader.read(), ReadTable.getCurrent());
-    int length = reader.tokenBufferLength - startPos;
-    String name = new String(reader.tokenBuffer, startPos, length);
+    String name = reader.readTokenString(ch, ReadTable.getCurrent());
     if (name.equals("optional"))
       return Special.optional;
     if (name.equals("rest"))
@@ -1368,6 +1376,13 @@ public class LispReader extends Lexer
 	  break;
 	size = size * 10 + digit;
       }
+    return readSimpleVector(reader, kind, ch, size);
+  }
+
+  public static SimpleVector
+      readSimpleVector(LispReader reader, char kind, int ch, int size)
+    throws java.io.IOException, SyntaxException
+  {
     if (! (size == 8 || size == 16 || size == 32 || size == 64)
         || (kind == 'F' && size < 32)
         || ch != '(')

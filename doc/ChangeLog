@@ -1,7 +1,11 @@
 2013-09-28  Per Bothner  <per@bothner.com>
 
+	* kawa.texi (Program structure): Re-arrange - moove earlier.
+	(Boolean values): New section.
+
 	* kawa.texi (Strings): Document both simple string literals
 	and SRFI-109 squasi-literals.
+
 	* kawa.texi: Clean up use of macros.  Specifically use
 	new texinfo commands like @lbracechar so we can use @stxlit
 	where appropriate without kludges or hand-expanding it.

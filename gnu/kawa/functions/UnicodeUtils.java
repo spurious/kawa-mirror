@@ -59,49 +59,61 @@ public class UnicodeUtils
     return sbuf.toString();
   }
 
-  public static String foldCase (CharSequence str)
-  {
-    int len = str.length();
-    if (len == 0)
-      return "";
-    /* #ifdef JAVA5 */
-    StringBuilder sbuf = null;
-    /* #else */
-    // StringBuffer sbuf = null;
-    /* #endif */
-    int start = 0;
-    for (int i = 0;  ;  i++)
-      {
-        int ch = i == len ? -1 : str.charAt(i);
-        boolean sigma = ch == 0x3A3 || ch == 0x3C3 || ch == 0x3C2;
-          if (ch < 0 || ch == 0x130 || ch == 0x131 || sigma)
-          {
-            if (sbuf == null && ch >= 0)
-              {
-                /* #ifdef JAVA5 */
-                sbuf = new StringBuilder();
-                /* #else */
-                // sbuf = new StringBuffer();
-                /* #endif */
-              }
-            if (i > start)
-              {
-                String converted = (str.subSequence(start, i).toString()
-                                    .toUpperCase().toLowerCase());
-                if (sbuf == null)
-                  return converted;
-                sbuf.append(converted);
-              }
-            if (ch < 0)
-              break;
-            if (sigma)
-              ch = 0x3c3;
-            sbuf.append((char) ch);
-            start = i+1;
-          }
-      }
-    return sbuf.toString();
-  }
+    public static CharSequence foldCase(CharSequence str) {
+        int len = str.length();
+        if (len == 0)
+            return "";
+        StringBuilder sbuf = null;
+        int start = 0;
+        for (int i = 0;  ; ) {
+            int ch = i == len ? -1 : str.charAt(i);
+            int w = 1;
+            if (ch >= 0xD800 && ch <= 0xDBFF && i + 1 < len) {
+                char next = str.charAt(i+1);
+                w++;
+                if (next >= 0xDC00 && next <= 0xDFFF)
+                    ch = ((ch - 0xD800) << 10) + (ch - 0xDC00) + 0x10000;
+            }
+            int chl;
+            if (ch == -1) // || ch == 0x130 || ch == 0x131)
+                chl = ch;
+            else if (ch == 0xDF || ch == 0x130) // Special handling needed
+                chl = -2; // Handled below
+            else if (ch == 0x3A3 || ch == 0x3C3 || ch == 0x3C2) { // greek sigma
+                if (i+1 == len || ! Character.isLetter(str.charAt(i+1)))
+                    chl = 0x03C2; // greek small letter final sigma
+                else
+                    chl = 0x03C3; // greek small letter sigma
+
+            } else
+                chl = Character.toLowerCase(Character.toUpperCase(ch));
+            if (ch != chl || sbuf != null) {
+                if (sbuf == null) {
+                    sbuf = new StringBuilder();
+                    sbuf.append(str, 0, i);
+                }
+                if (chl == -1)
+                    return sbuf;
+                if (chl == -2) {
+                    if (ch == 0xDF) {  // German SS
+                        sbuf.append('s');
+                        sbuf.append('s');
+                    } else { // latin capital letter i with dot above
+                        sbuf.append('i');
+                        sbuf.append('\u0307');
+                    }
+                } else if (chl >= 0x10000) {
+                    sbuf.append((char) (((i - 0x10000) >> 10) + 0xD800));
+                    sbuf.append((char) ((i & 0x3FF) + 0xDC00));
+                } else {
+                    sbuf.append((char) chl);
+                }
+            }
+            else if (ch < 0)
+                return str;
+            i += w;
+        }
+    }
 
   public static Symbol generalCategory (int ch)
   {

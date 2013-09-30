@@ -1,3 +1,9 @@
+2013-09-29  Per Bothner  <per@bothner.com>
+
+	* UnicodeUtils.java (foldCase); Re-write to be more efficient,
+	and fix some corner-case errors.
+	Also change return type to CharSequence.
+
 2013-09-27  Per Bothner  <per@bothner.com>
 
 	* DisplayFormat.java (writeSymbol): Follow r7rs syntax

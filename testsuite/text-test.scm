@@ -55,7 +55,7 @@
 (test-equal "χαος" (string-downcase "ΧΑΟΣ"))
 (test-equal "χαοσς" (string-downcase "ΧΑΟΣΣ"))
 (test-equal "χαος σ" (string-downcase "ΧΑΟΣ Σ"))
-(test-equal "χαοσσ" (string-foldcase "ΧΑΟΣΣ"))
+(test-equal "χαοσς" (string-foldcase "ΧΑΟΣΣ"))
 (test-equal "ΧΑΟΣ" (string-upcase "χαος"))
 (test-equal "ΧΑΟΣ" (string-upcase "χαοσ"))
 (test-equal "Knock Knock" (string-titlecase "kNock KNoCK"))

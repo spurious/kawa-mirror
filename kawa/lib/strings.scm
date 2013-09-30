@@ -139,9 +139,11 @@
 	  fstr))))
 
 (define (%string-compare-ci2 (str1 :: string) (str2 :: string)) ::int
-  (invoke (gnu.kawa.functions.UnicodeUtils:foldCase str1)
+  ;; The obvious doesn't handle German SS correctly.
+  ;;((str1:toString):compareToIgnoreCase (str2:toString)))
+  (invoke ((gnu.kawa.functions.UnicodeUtils:foldCase str1):toString)
           'compareTo
-          (gnu.kawa.functions.UnicodeUtils:foldCase str2)))
+          ((gnu.kawa.functions.UnicodeUtils:foldCase str2):toString)))
 
 (define-compare string-ci<? string < %string-compare-ci2)
 (define-compare string-ci=? string = %string-compare-ci2)

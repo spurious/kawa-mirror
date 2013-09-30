@@ -1151,6 +1151,7 @@
 (test #t (string-ci<=? "ΑΒΓ" "αβγ"))
 (test #t (string-ci>=? "ΑΒΓ" "αβγ"))
 
+;; latin
 (test "ABC" (string-upcase "abc"))
 (test "ABC" (string-upcase "ABC"))
 (test "abc" (string-downcase "abc"))
@@ -1158,12 +1159,31 @@
 (test "abc" (string-foldcase "abc"))
 (test "abc" (string-foldcase "ABC"))
 
+;; cyrillic
 (test "ΑΒΓ" (string-upcase "αβγ"))
 (test "ΑΒΓ" (string-upcase "ΑΒΓ"))
 (test "αβγ" (string-downcase "αβγ"))
 (test "αβγ" (string-downcase "ΑΒΓ"))
 (test "αβγ" (string-foldcase "αβγ"))
 (test "αβγ" (string-foldcase "ΑΒΓ"))
+
+;; special cases
+(test "SSA" (string-upcase "ßa"))
+(test "ßa" (string-downcase "ßa"))
+(test "ssa" (string-downcase "SSA"))
+(test "İ" (string-upcase "İ"))
+(test "i̇" (string-downcase "İ"))
+(test "i̇" (string-foldcase "İ"))
+(test "J̌" (string-upcase "ǰ"))
+
+;; context-sensitive (final sigma)
+(test "ΓΛΏΣΣΑ" (string-upcase "γλώσσα"))
+(test "γλώσσα" (string-downcase "ΓΛΏΣΣΑ"))
+(test "γλώσσα" (string-foldcase "ΓΛΏΣΣΑ"))
+(test "ΜΈΛΟΣ" (string-upcase "μέλος"))
+(test "μέλος" (string-downcase "ΜΈΛΟΣ"))
+(test "μέλος" (string-foldcase "ΜΈΛΟΣ"))
+(test "μέλος ενός" (string-downcase "ΜΈΛΟΣ ΕΝΌΣ"))
 
 (test "" (substring "" 0 0))
 (test "" (substring "a" 0 0))
@@ -1728,14 +1748,16 @@
     (flush-output-port out)
     (get-output-bytevector out)))
 
-(test #f
-      (not (member
-            (let ((out (open-output-string))
-                  (x (list 1)))
-              (set-cdr! x x)
-              (write x out)
-              (get-output-string out))
-            '("#0=(1 . #0#)" "#1=(1 . #1#)"))))
+(test #t
+    (and (member
+          (let ((out (open-output-string))
+                (x (list 1)))
+            (set-cdr! x x)
+            (write x out)
+            (get-output-string out))
+          ;; labels not guaranteed to be 0 indexed, spacing may differ
+          '("#0=(1 . #0#)" "#1=(1 . #1#)"))
+         #t))
 
 (test "((1 2 3) (1 2 3))"
     (let ((out (open-output-string))
@@ -1749,20 +1771,29 @@
       (write-simple (list x x) out)
       (get-output-string out)))
 
-(test #f
-      (not (member
-            (let ((out (open-output-string))
-                  (x (list 1 2 3)))
-              (write-shared (list x x) out)
-              (get-output-string out))
-            '("(#0=(1 2 3) #0#)" "(#1=(1 2 3) #1#)"))))
+(test #t
+    (and (member (let ((out (open-output-string))
+                       (x (list 1 2 3)))
+                   (write-shared (list x x) out)
+                   (get-output-string out))
+                 '("(#0=(1 2 3) #0#)" "(#1=(1 2 3) #1#)"))
+         #t))
 
 (test-begin "Read syntax")
 
+;; check reading boolean followed by eof
 (test #t (read (open-input-string "#t")))
 (test #t (read (open-input-string "#true")))
 (test #f (read (open-input-string "#f")))
 (test #f (read (open-input-string "#false")))
+(define (read2 port)
+  (let* ((o1 (read port)) (o2 (read port)))
+    (cons o1 o2)))
+;; check reading boolean followed by delimiter
+(test '(#t . (5)) (read2 (open-input-string "#t(5)")))
+(test '(#t . 6) (read2 (open-input-string "#true 6 ")))
+(test '(#f . 7) (read2 (open-input-string "#f 7")))
+(test '(#f . "8") (read2 (open-input-string "#false\"8\"")))
 
 (test '() (read (open-input-string "()")))
 (test '(1 2) (read (open-input-string "(1 2)")))

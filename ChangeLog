@@ -1,3 +1,8 @@
+2013-10-04  Per Bothner  <per@bothner.com>
+
+	* configure.in (AC_INIT): Set version to 1.14.1.
+	* build.xml (version.release): Likewise.
+
 2013-09-28  Per Bothner  <per@bothner.com>
 
 	* configure.in (AC_INIT): Set version to 1.14.

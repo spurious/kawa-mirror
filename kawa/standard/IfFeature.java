@@ -76,7 +76,7 @@ public class IfFeature
     }
 
     /** Check if we implement a named feature.
-     * @param an interned feature name
+     * @param name an interned feature name
      */
     public static boolean hasFeature (String name) {
         for (int i = coreFeatures.size();  --i>= 0; ) {

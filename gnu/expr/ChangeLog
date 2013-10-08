@@ -1,3 +1,10 @@
+2013-10-07  Per Bothner  <per@bothner.com>
+
+	* PrimProcedure.java: Use methodForInvoke for reflective
+	application as well as compilation - i.e. generally when
+	calling Method#getDeclaringClass.
+	(getDeclaringClass): New convenience method.
+
 2013-10-05  Jamison Hope  <jrh@theptrgroup.com>
 
 	* PrimProcedure.java (disassemble): Fall back to system

@@ -47,6 +47,11 @@ public class PrimProcedure extends MethodProc implements Inlineable {
 
     public Type getReturnType (Expression[] args) { return retType; }
 
+    public ClassType getDeclaringClass() {
+        return methodForInvoke == null ? null
+            : methodForInvoke.getDeclaringClass();
+    }
+
     public Method getMethod () { return method; }
 
     public void setMethodForInvoke(Method m) {
@@ -217,7 +222,7 @@ public class PrimProcedure extends MethodProc implements Inlineable {
       {
 	try
 	  {
-            extraArg = method.getDeclaringClass().coerceFromObject(args[0]);
+            extraArg = getDeclaringClass().coerceFromObject(args[0]);
 	  }
 	catch (ClassCastException ex)
           {
@@ -256,18 +261,18 @@ public class PrimProcedure extends MethodProc implements Inlineable {
   {
     int arg_count = argTypes.length;
     boolean is_constructor = isConstructor();
-    boolean slink = is_constructor && method.getDeclaringClass().hasOuterLink();
+    boolean slink = is_constructor && getDeclaringClass().hasOuterLink();
 
     try
       {
 	if (member == null)
 	  {
-	    Class clas = method.getDeclaringClass().getReflectClass();
+	    Class clas = getDeclaringClass().getReflectClass();
 	    Class[] paramTypes = new Class[arg_count+(slink?1:0)];
 	    for (int i = arg_count; --i >= 0; )
 	      paramTypes[i+(slink?1:0)] = argTypes[i].getReflectClass();
             if (slink)
-              paramTypes[0] = method.getDeclaringClass().getOuterLinkType().getReflectClass();
+              paramTypes[0] = getDeclaringClass().getOuterLinkType().getReflectClass();
 	    if (is_constructor)
 	      member = clas.getConstructor(paramTypes);
 	    else if (method != Type.clone_method)
@@ -402,7 +407,7 @@ public class PrimProcedure extends MethodProc implements Inlineable {
     if (argTypes == null)
       argTypes = pTypes;
     if (isConstructor())
-      retType = method.getDeclaringClass();
+      retType = getDeclaringClass();
     else if (method.getName().endsWith("$X"))
       retType = Type.objectType;
     else
@@ -619,7 +624,7 @@ public class PrimProcedure extends MethodProc implements Inlineable {
   public void compile (ApplyExp exp, Compilation comp, Target target)
   {
     gnu.bytecode.CodeAttr code = comp.getCode();
-    ClassType mclass = method == null ? null : methodForInvoke.getDeclaringClass();
+    ClassType mclass = getDeclaringClass();
     Expression[] args = exp.getArgs();
     if (isConstructor())
       {
@@ -682,7 +687,7 @@ public class PrimProcedure extends MethodProc implements Inlineable {
     int startArg = 0;
     if (isConstructor())
       {
-        ClassType mclass = method == null ? null :  method.getDeclaringClass();
+        ClassType mclass = getDeclaringClass();
         if (mclass.hasOuterLink())
           {
             ClassExp.loadSuperStaticLink(args[0], mclass, comp);
@@ -695,7 +700,7 @@ public class PrimProcedure extends MethodProc implements Inlineable {
     else if (opcode() == 183 && mode == 'P' && "<init>".equals(method.getName()))
       {
         // Specifically handle passing a static-link.
-        ClassType mclass = method == null ? null :  method.getDeclaringClass();
+        ClassType mclass = getDeclaringClass();
         if (mclass.hasOuterLink())
           {
             code.emitPushThis();
@@ -826,7 +831,7 @@ public class PrimProcedure extends MethodProc implements Inlineable {
       {
         if (index == 0)
           return isConstructor() ? Type.objectType
-            : method.getDeclaringClass();
+            : getDeclaringClass();
         index--;
       }
     int lenTypes = argTypes.length;
@@ -1002,7 +1007,7 @@ public class PrimProcedure extends MethodProc implements Inlineable {
       cl = ((ModuleMethod) proc).module.getClass();
     else if (proc instanceof PrimProcedure)
       {
-        Method pmethod = ((PrimProcedure) proc).method;
+        Method pmethod = ((PrimProcedure) proc).methodForInvoke;
         if (pmethod != null)
           {
             cl = pmethod.getDeclaringClass().getReflectClass();
@@ -1188,7 +1193,7 @@ public class PrimProcedure extends MethodProc implements Inlineable {
       }
     else
       {
-	buf.append(method.getDeclaringClass().getName());
+	buf.append(getDeclaringClass().getName());
 	buf.append('.');
 	buf.append(method.getName());
       }

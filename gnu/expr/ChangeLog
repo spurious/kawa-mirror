@@ -1,3 +1,8 @@
+2013-10-07  Per Bothner  <per@bothner.com>
+
+	* QuoteExp.java (compilation):  Optimization for primitive value,
+	if the target is objectType.
+
 2013-09-22  Per Bothner  <per@bothner.com>
 
 	* ApplicationMainSupport.java (commandName): New field.

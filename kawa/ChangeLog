@@ -1,5 +1,7 @@
 2013-10-07  Per Bothner  <per@bothner.com>
 
+	* standard/Scheme.java (booleanType): Initialize eagerly.
+
 	* repl.java (processArgs): Support '--target 8' and '--target 1.8'.
 
 2013-09-25  Per Bothner  <per@bothner.com>

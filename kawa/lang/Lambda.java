@@ -20,6 +20,7 @@ public class Lambda extends Syntax
 
   public static final Keyword nameKeyword = Keyword.make("name");
 
+  // This should technically have the type of Scheme.booleanType.
   public Expression defaultDefault = QuoteExp.falseExp;
 
   public void setKeywords(Object optional, Object rest, Object key)

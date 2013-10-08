@@ -51,7 +51,7 @@ public class QuoteExp extends Expression
     return getFlag(SHARED_CONSTANT);
   }
 
-  static public QuoteExp undefined_exp =  makeShared(Special.undefined);
+  static public QuoteExp undefined_exp = makeShared(Special.undefined);
   static public QuoteExp abstractExp = makeShared(Special.abstractSpecial);
   static public QuoteExp nativeExp = makeShared(Special.nativeSpecial);
   static public QuoteExp voidExp = makeShared(Values.empty, Type.voidType);
@@ -113,22 +113,24 @@ public class QuoteExp extends Expression
     ctx.writeValue(value);
   }
 
-  public void compile (Compilation comp, Target target)
-  {
-    if (type == null || type == Type.pointer_type
-        || target instanceof IgnoreTarget
-        || (type instanceof ObjectType
-            && type.isInstance(value))
-        || (type instanceof PrimType
-            && target.getType() == ((PrimType) type).boxedType()))
-      comp.compileConstant(value, target);
-    else
-      {
-        Type vtype = type.isVoid() ? Type.objectType : type;
-        comp.compileConstant(value, StackTarget.getInstance(vtype));
-        target.compileFromStack(comp, vtype);
-      }
-  }
+    public void compile (Compilation comp, Target target) {
+        Type targetType;
+        if (type == null || type == Type.pointer_type
+            || target instanceof IgnoreTarget
+            || (type instanceof ObjectType
+                && type.isInstance(value))
+            || (type instanceof PrimType
+                // In this case the value is assumed to be an instance
+                // of ((PrimType) type).boxedType().
+                && ((targetType = target.getType()) == Type.objectType
+                    || targetType == ((PrimType) type).boxedType()))) {
+            comp.compileConstant(value, target);
+        } else {
+            Type vtype = type.isVoid() ? Type.objectType : type;
+            comp.compileConstant(value, StackTarget.getInstance(vtype));
+            target.compileFromStack(comp, vtype);
+        }
+    }
  
   public Expression deepCopy (gnu.kawa.util.IdentityHashTable mapper)
   {

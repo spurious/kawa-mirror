@@ -20,7 +20,7 @@ public class Scheme extends LispLanguage
   public static final Environment r6Environment;
   protected static final SimpleEnvironment kawaEnvironment;
 
-  public static LangPrimType booleanType;
+  public static final LangPrimType booleanType;
 
   public static final int FOLLOW_R5RS = 5;
   public static final int FOLLOW_R6RS = 6;
@@ -92,6 +92,8 @@ public class Scheme extends LispLanguage
 
     instance.initScheme();
 
+    booleanType = new LangPrimType(Type.booleanType, instance);
+            
     int withServlets = HttpRequestContext.importServletDefinitions;
     if (withServlets > 0)
       {
@@ -1051,8 +1053,6 @@ public class Scheme extends LispLanguage
     @Override
     protected synchronized HashMap<String, Type> getTypeMap() {
         if (types == null) {
-            booleanType = new LangPrimType(Type.booleanType,
-                                           Scheme.getInstance());
             types = new HashMap<String, Type>(128); // Bit more wiggle room
             types.put("boolean", booleanType);
             types.putAll(super.getTypeMap());

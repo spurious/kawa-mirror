@@ -1010,6 +1010,7 @@ public class PrimProcedure extends MethodProc implements Inlineable {
           }
       }
     ClassLoader loader = cl.getClassLoader();
+    if (loader == null) loader = ClassLoader.getSystemClassLoader();
     String cname = cl.getName();
     String rname = cname.replace('.', '/') + ".class";
     ClassType ctype = new ClassType();

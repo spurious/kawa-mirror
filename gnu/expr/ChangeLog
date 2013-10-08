@@ -1,3 +1,10 @@
+2013-10-05  Jamison Hope  <jrh@theptrgroup.com>
+
+	* PrimProcedure.java (disassemble): Fall back to system
+	ClassLoader if Class#getClassLoader returns null.  This avoids a
+	NullPointerException when invoking disassemble on methods of
+	system classes.
+
 2013-10-07  Per Bothner  <per@bothner.com>
 
 	* Declaration.java (patchSymbolFromSet): New method.
@@ -28,7 +35,7 @@
 
 	* PrimProcedure.java (mostSpecific): Moved from MethodProc.
 	Limited arguments to PrimProcedure, so we can implement
-	the cjeck-for-abstract-methods part of the JLS specification.
+	the check-for-abstract-methods part of the JLS specification.
 	(isAbstract): New method.
 
 	* Language.java (getTypeor): Don't treat ObjectExp as

@@ -1,3 +1,7 @@
+2013-10-07  Per Bothner  <per@bothner.com>
+
+	* module2.scm, obj-test.scm: Add tests for export with rename.
+
 2013-09-29  Per Bothner  <per@bothner.com>
 
 	* r7rs-tests.scm: Merge some updates from upstream.

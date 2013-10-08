@@ -1,5 +1,9 @@
 2013-10-07  Per Bothner  <per@bothner.com>
 
+	* standard/export.java (scanForDefinitions): Handle renaming.
+	* lang/Translator.java (resolveModule): Call patchSymbolFromSet
+	as needed for renamed exported variables.
+
 	* standard/Scheme.java (booleanType): Initialize eagerly.
 
 	* repl.java (processArgs): Support '--target 8' and '--target 1.8'.

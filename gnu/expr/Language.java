@@ -903,7 +903,7 @@ public abstract class Language
     // FIXME if fvalue is FieldLocation, and field is final,
     // get name from value of field.
     boolean isImportedInstance;
-    boolean externalAccess = false;
+    boolean externalAccess = fname.startsWith(Declaration.PRIVATE_PREFIX);
     boolean isFinal = (fld.getModifiers() & Access.FINAL) != 0;
     if ((isImportedInstance = fname.endsWith("$instance")))
       fdname = fname;
@@ -913,11 +913,8 @@ public abstract class Language
     else
       {
 	// FIXME move this to demangleName
-	if (fname.startsWith(Declaration.PRIVATE_PREFIX))
-          {
-            externalAccess = true;
+          if (externalAccess)
             fname = fname.substring(Declaration.PRIVATE_PREFIX.length());
-          }
 	fdname = Compilation.demangleName(fname, true).intern();
       }
     try

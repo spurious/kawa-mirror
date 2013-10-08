@@ -1505,6 +1505,17 @@ public class Declaration
       noteValue(new ValueSource(ValueSource.APPLY_KIND, app, index));
   }
 
+    /** Set symbol from initializing SetExp.
+     * Used for an export-only alias, for handling export-with-rename.
+     */
+    public boolean patchSymbolFromSet() {
+        if (nvalues != 1 || values[0].kind != ValueSource.SET_RHS_KIND)
+            return false;
+        SetExp sexp = (SetExp) values[0].base;
+        setSymbol(((SetExp) values[0].base).getSymbol());
+        return true;
+    }
+
   private void checkNameDecl (Expression value)
   {
     if (nvalues == 1 && values[0].kind == ValueSource.GENERAL_KIND)

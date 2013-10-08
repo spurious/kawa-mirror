@@ -1798,6 +1798,15 @@ public class Translator extends Compilation
         // In immediate mode need to preserve Declaration for current "session".
         if (! immediate)
 	  lexical.pop(mexp);
+
+        // Patch up renamed exports - see export.
+        for (Declaration decl = mexp.firstDecl();  decl != null;
+             decl = decl.nextDecl()) {
+            if (decl.getSymbol() == null
+                && decl.getFlag(Declaration.EXPORT_SPECIFIED)) {
+                decl.patchSymbolFromSet();
+            }
+        }
       }
     finally
       {

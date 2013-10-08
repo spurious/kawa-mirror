@@ -1,5 +1,9 @@
 2013-10-07  Per Bothner  <per@bothner.com>
 
+	* Declaration.java (patchSymbolFromSet): New method.
+	* Language.java (declFromField): May need to set EXTERNAL_ACCESS
+	for module-methods as well as variables.
+
 	* QuoteExp.java (compilation):  Optimization for primitive value,
 	if the target is objectType.
 

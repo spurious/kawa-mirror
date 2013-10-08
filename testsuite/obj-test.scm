@@ -1,4 +1,4 @@
-(test-init "Objects" 138)
+(test-init "Objects" 141)
 
 ;; Force procedure to be applied without being inlined:
 (define-syntax force-eval
@@ -159,8 +159,11 @@
 
 (define-variable internal-node-name list)
 (require <module2>)
+(test "fun2" fun1)
+(test "fun1" 'fun2 (fun2))
+(test '("fun1" "fun2") fun1fun2)
 (test 4 list-length-1 '(a b c d))
-(test 2 list-length-3 '(a b))
+(test 2 list-length-5 '(a b))
 (test 0 length (classify))
 
 (test 3 length-diff1 "abcdef" "abc")

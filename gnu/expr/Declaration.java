@@ -528,7 +528,7 @@ public class Declaration
   // This should be a type property, not a variable property, at some point!
   public static final int IS_SINGLE_VALUE = 0x40000;
 
-  /** This flag bit is set if this can be be acceessed from other modules.
+  /** This flag bit is set if this can be be accessed from other modules.
    * Ignored unless PRIVATE.
    * Used when an exported macro references a non-exported name. */
   public static final int EXTERNAL_ACCESS = 0x80000;

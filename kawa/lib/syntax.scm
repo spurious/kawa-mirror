@@ -73,8 +73,10 @@
 (define (import-handle-prefix name prefix)
   ;; FIXME handle if list element is a syntax object
   (if (eq? name #!null) #!null
-      #!null))
-;;      (string->symbol (string-append (prefix:toString) (name:toString)))))
+      (let ((str (make java.lang.StringBuilder)))
+        (str:append (prefix:toString))
+        (str:append (name:toString))
+        (gnu.mapping.SimpleSymbol:valueOf (str:toString)))))
 (define (import-handle-rename name rename-pairs)
   (if (pair? rename-pairs)
       (if (eq? name (caar rename-pairs))

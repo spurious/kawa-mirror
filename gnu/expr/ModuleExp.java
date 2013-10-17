@@ -449,7 +449,7 @@ public class ModuleExp extends LambdaExp
 	if (decl.field != null)
 	  continue;
 	Expression value = decl.getValue();
-	if (((decl.isSimple() && ! decl.isPublic()))
+        if (((decl.isSimple() && decl.isModuleLocal()))
             // Kludge - needed for macros - see Savannah bug #13601.
             && ! decl.isNamespaceDecl()
             && ! (decl.getFlag(Declaration.IS_CONSTANT)

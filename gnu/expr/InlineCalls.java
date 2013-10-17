@@ -319,7 +319,7 @@ public class InlineCalls extends ExpExpVisitor<Type> {
   protected Expression visitReferenceExp (ReferenceExp exp, Type required)
   {
     Declaration decl = exp.getBinding();
-    if (decl != null)
+    if (decl != null && ! exp.getDontDereference())
       {
         IntNum vals = valueTracker.declValueUsage.get(decl);
         if (vals != null)
@@ -339,7 +339,7 @@ public class InlineCalls extends ExpExpVisitor<Type> {
             valueTracker.checkUninitializedVariables(lval, exp, null);
           }
         Expression dval = decl.getValue();
-        if (! exp.getDontDereference() && deferableInit(dval) && ! dval.getFlag(Expression.VALIDATED))
+        if (deferableInit(dval) && ! dval.getFlag(Expression.VALIDATED))
           {
             visit(dval, required);
           }
@@ -352,11 +352,11 @@ public class InlineCalls extends ExpExpVisitor<Type> {
         if (type != null && type.isVoid())
           return QuoteExp.voidExp;
       }
-    if (decl != null && decl.field == null && ! decl.getCanWrite())
-      {
+    if (decl != null && decl.field == null && ! decl.getCanWrite()
+        && ! exp.getDontDereference())
+     {
         Expression dval = decl.getValue();
-        if (dval instanceof QuoteExp && dval != QuoteExp.undefined_exp
-            && ! exp.getDontDereference())
+        if (dval instanceof QuoteExp && dval != QuoteExp.undefined_exp)
           return visitQuoteExp(new QuoteExp(((QuoteExp) dval).getValue(), decl.getType()), required);
         // We don't want to visit the body of a named function yet.
         // Though not doing so does hurt optimization.
@@ -372,8 +372,7 @@ public class InlineCalls extends ExpExpVisitor<Type> {
             if (rdecl != null && ! rdecl.getCanWrite()
                 && (dtype == null || dtype == Type.objectType
                     // We could also allow (some) widening conversions.
-                    || dtype == rdecl.getType())
-                && ! rval.getDontDereference())
+                    || dtype == rdecl.getType()))
               return visitReferenceExp(rval, required);
           }
         if (dval instanceof ClassExp && processingAnnotations())

@@ -1,3 +1,9 @@
+2013-10-17  Per Bothner  <per@bothner.com>
+
+	* ModuleExp.java (allocFields): Make field also if needsExternalAccess.
+	* InlineCalls.javav (visitReferenceExp): Better handling of
+	getDontDereference case.
+
 2013-10-07  Per Bothner  <per@bothner.com>
 
 	* PrimProcedure.java: Use methodForInvoke for reflective

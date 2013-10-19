@@ -39,6 +39,7 @@ java_sources = \
   PositionConsumer.java \
   PositionManager.java \
   PrintConsumer.java \
+  RAPair.java \
   S8Vector.java \
   S16Vector.java \
   S32Vector.java \

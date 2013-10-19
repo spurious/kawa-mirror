@@ -74,7 +74,8 @@ public class ImportFromLibrary extends Syntax
     { "78", "lightweight-testing", MISSING },
     { "86", "mu-and-nu", MISSING },
     { "87", "case", MISSING },
-    { "95", "sorting-and-merging", "kawa.lib.srfi95" }
+    { "95", "sorting-and-merging", "kawa.lib.srfi95" },
+    { "101", "random-access-lists", "gnu.kawa.slib.ralists" }
   };
 
   public boolean scanForDefinitions (Pair st, Vector forms,

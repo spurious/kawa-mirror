@@ -101,6 +101,9 @@ public class require extends Syntax
     map("basic-hash-tables", SLIB_PREFIX + "srfi69");
     map("srfi-95", "kawa.lib.srfi95");
     map("sorting-and-merging", "kawa.lib.srfi95");
+    map("srfi-101", SLIB_PREFIX + "ralists");
+    map("random-access-lists", SLIB_PREFIX + "ralists");
+    map("ra-lists", SLIB_PREFIX + "ralists");
     map("regex", "kawa.lib.kawa.regex");
     map("pregexp", SLIB_PREFIX + "pregexp");
     map("gui", SLIB_PREFIX + "gui");

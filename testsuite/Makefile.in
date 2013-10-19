@@ -458,7 +458,7 @@ check-no-inline:
 
 check1:  check-num check-arr check-java-array check-lazy check-lib \
   check-srfi-16 check-srfi-38 check-srfi-64 check-srfi-69 \
-  check-srfi-108 check-srfi-109 \
+  check-srfi-101 check-srfi-108 check-srfi-109 \
   check-format check-ppfile check-text check-regex check-xml scribble.class \
   check-run-test-scripts check-moduleM \
   check-annotations1 check-annotations2\
@@ -511,6 +511,9 @@ check-srfi-64:
 
 check-srfi-69:
 	$(KAWA) $(OPTIONS) "$(srcdir)/srfi-69-test.scm"
+
+check-srfi-101:
+	$(KAWA) $(OPTIONS) "$(srcdir)/srfi-101-test.scm"
 
 check-srfi-108:
 	$(KAWA) $(OPTIONS) "$(srcdir)/srfi-108-test.scm"

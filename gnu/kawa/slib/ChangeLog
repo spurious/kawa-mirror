@@ -1,3 +1,11 @@
+2013-10-19  David Van Horn
+	    Per Bothner  <per@bothner.com>
+
+	* ralists.scm: Port of SRFI-101 "Purely Functional Random-Access
+	Pairs and Lists" reference implementation.  Low-level code
+	re-written in Java as gnu/lists/RAPair.java.
+	* Makefile.am: Update accordingly.
+
 2013-09-25  Per Bothner  <per@bothner.com>
 
 	* srfi1.scm (make-list, list-copy): Commented out, since

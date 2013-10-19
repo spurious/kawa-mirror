@@ -1,3 +1,8 @@
+2013-10-19  Per Bothner  <per@bothner.com>
+
+	* standard/ImportFromLibrary.java (SRFI97Map): Add SRFI-101 entry.
+	* standard/require.java: Likewise.
+
 2013-10-07  Per Bothner  <per@bothner.com>
 
 	* standard/export.java (scanForDefinitions): Handle renaming.

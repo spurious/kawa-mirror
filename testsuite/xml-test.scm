@@ -49,4 +49,10 @@ me">abc&-
                        ($xml-attribute$ (quote id) "name") "abc  def")
        &{<em id="name">abc  def</em>})
 
+(xtest #<em>
+  &|abc
+  &| def</em>
+       '($xml-element$ () ($resolve-qname$ em) "abc\n def")
+       &{<em>abc&newline; def</em>})
+
 (test-end)

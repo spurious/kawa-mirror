@@ -16,7 +16,7 @@ public class ReaderXmlElement extends ReaderExtendedLiteral
     static final Symbol xmlCommentSymbol = Symbol.valueOf("$xml-comment$");
     static final Symbol xmlElementSymbol = Symbol.valueOf("$xml-element$");
     static final Symbol xmlCDATASymbol = Symbol.valueOf("$xml-CDATA$");
-    static final Symbol xmlProcInstSymbol = Symbol.valueOf("xml-processing-instruction$");
+    static final Symbol xmlProcInstSymbol = Symbol.valueOf("$xml-processing-instruction$");
     static final Symbol xmlAttributeSymbol = Symbol.valueOf("$xml-attribute$");
     static final Symbol resolveQNameSymbol = Symbol.valueOf("$resolve-qname$");
 

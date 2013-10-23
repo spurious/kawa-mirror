@@ -1,5 +1,7 @@
 2013-10-23  Per Bothner  <per@bothner.com>
 
+	* LispLanguage.java (parse): Remove unused local variable 'forms'.
+
 	* ReaderXmlElement.java (xmlProcInstSymbol): Fix typo - missing '$'.
 
 2013-09-28  Per Bothner  <per@bothner.com>

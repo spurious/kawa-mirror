@@ -67,7 +67,6 @@ public abstract class LispLanguage extends Language
     kawa.lang.Translator tr = (kawa.lang.Translator) comp;
     Lexer lexer = tr.lexer;
     ModuleExp mexp = tr.mainLambda;
-    Values forms = new Values();
     LispReader reader = (LispReader) lexer;
     Compilation saveComp = Compilation.setSaveCurrent(tr);
     try

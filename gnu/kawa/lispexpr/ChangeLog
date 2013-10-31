@@ -1,3 +1,10 @@
+2013-10-30  Per Bothner  <per@bothner.com>
+
+	* ReaderXmlElement.java (readElementConstructor): Allow an unquoted
+	enclosed expression for the value (only) of an attribute.
+	Report error if value not otherwise starts with '\'' or '"'.
+	In namespace-declaration the prefix becomes a symbol, not a string.
+
 2013-10-23  Per Bothner  <per@bothner.com>
 
 	* LispLanguage.java (parse): Remove unused local variable 'forms'.

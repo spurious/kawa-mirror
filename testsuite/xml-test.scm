@@ -8,13 +8,13 @@
          &{<a id="mine" />})
 
 (xtest #<x:a xmlns:x="X" x:id="mine">text</x:a>
-         '($xml-element$ (("x" "X")) ($resolve-qname$ a x)
+         '($xml-element$ ((x "X")) ($resolve-qname$ a x)
                          ($xml-attribute$ ($resolve-qname$ id x) "mine")
                          "text")
          &{<x:a xmlns:x="X" x:id="mine">text</x:a>})
 
 (xtest #<a xmlns="X" id="mine"/>
-         '($xml-element$ (("" "X")) ($resolve-qname$ a)
+         '($xml-element$ ((|| "X")) ($resolve-qname$ a)
                          ($xml-attribute$ 'id "mine"))
          &{<a xmlns="X" id="mine" />})
 
@@ -34,6 +34,14 @@
            '($xml-element$ () ($resolve-qname$ ab)
                            idatr ($xml-attribute$ 'x "name"))
            &{<ab id="myId" x="name" />}))
+
+(let ((val1 "VAL1"))
+  (xtest #<ab at1=[val1] at2=[val1 "/" val1] at3=(string-downcase val1)/>
+         '($xml-element$ () ($resolve-qname$ ab)
+                         ($xml-attribute$ (quote at1) val1)
+                         ($xml-attribute$ (quote at2) val1 "/" val1)
+                         ($xml-attribute$ (quote at3) (string-downcase val1)))
+         &{<ab at1="VAL1" at2="VAL1/VAL1" at3="val1" />}))
 
 ;; Test &#|comment|#
 (xtest #<ab id="n&#|comment1|#ame">12&#|comment2|#9</>

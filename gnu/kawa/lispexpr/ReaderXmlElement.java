@@ -7,7 +7,6 @@ import gnu.text.*;
 import gnu.lists.*;
 import gnu.xml.*;
 import gnu.kawa.xml.*;
-import java.io.*;
 import gnu.expr.*;
 
 public class ReaderXmlElement extends ReaderExtendedLiteral
@@ -262,11 +261,18 @@ public class ReaderXmlElement extends ReaderExtendedLiteral
                                             reader.getName(), startLine, startColumn);
                 reader.setCdr(attrList, attrPair);
                 Pair attrTail = attrPair;
-                attrTail = readContent(reader, (char) ch, attrTail);
+                if (ch == '[' || ch == '(') {
+                    ReadTable rtable = ReadTable.getCurrent();
+                    attrTail = readEnclosed(reader, rtable, attrTail, ch,
+                                            ch == '[' ? ']' : ')');
+                } else if (ch == '"' || ch == '\'')
+                    attrTail = readContent(reader, (char) ch, attrTail);
+                else
+                    reader.error("missing attribute value");
                 attrExpr = attrList;
                 if (definingNamespace != null) {
                     namespaceList = new PairWithPosition(attrPair,
-                                                         Pair.make(definingNamespace, attrPair.getCdr()),
+                                                         Pair.make(Symbol.valueOf(definingNamespace), attrPair.getCdr()),
                                                          namespaceList);
                 }
                 sawSpace = false;

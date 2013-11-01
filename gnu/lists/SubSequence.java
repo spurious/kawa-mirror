@@ -7,13 +7,13 @@ package gnu.lists;
  * The start and end positions are position triples (on the same sequence).
  */
 
-public class SubSequence
-extends AbstractSequence implements Sequence
+public class SubSequence<E>
+extends AbstractSequence<E> implements Sequence<E>
 {
   /** Normally the Sequence this a sub-sequence of.
    * Actually the sequence that provides context for the
    * start and end position pairs. */
-  AbstractSequence base;
+  AbstractSequence<E> base;
 
   /** Integer part of start position. */
   int ipos0;
@@ -25,19 +25,20 @@ extends AbstractSequence implements Sequence
   {
   }
 
-  public SubSequence(AbstractSequence base, int startPos, int endPos)
+  public SubSequence(AbstractSequence<E> base, int startPos, int endPos)
   {
     this.base = base;
     this.ipos0 = startPos;
     this.ipos1 = endPos;
   }
 
-  public SubSequence(AbstractSequence base)
+  public SubSequence(AbstractSequence<E> base)
   {
     this.base = base;
   }
 
-  public Object get (int index)
+  @Override
+  public E get(int index)
   {
     if (index < 0 || index >=size())
       throw new IndexOutOfBoundsException();
@@ -113,9 +114,10 @@ extends AbstractSequence implements Sequence
     return base.getPosPrevious(ipos);
   }
 
-  protected Sequence subSequencePos(int ipos0, int ipos1)
+  @Override
+  protected Sequence<E> subSequencePos(int ipos0, int ipos1)
   {
-    return new SubSequence(base, ipos0, ipos1);
+    return new SubSequence<E>(base, ipos0, ipos1);
   }
 
   public void clear()

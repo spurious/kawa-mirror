@@ -9,13 +9,13 @@ package gnu.lists;
  * type depends on the sub-class of SimpleVector used.
  */
 
-public class GapVector extends AbstractSequence implements Sequence
+public class GapVector<E> extends AbstractSequence<E> implements Sequence<E>
 {
-  public SimpleVector base;
+  public SimpleVector<E> base;
   public int gapStart;
   public int gapEnd;
 
-  public GapVector(SimpleVector base)
+  public GapVector(SimpleVector<E> base)
   {
     this.base = base;
     this.gapStart = 0;
@@ -44,7 +44,8 @@ public class GapVector extends AbstractSequence implements Sequence
     return hasNext(ipos) ? base.getElementKind() : EOF_VALUE;
   }
 
-  public Object get (int index)
+  @Override
+  public E get(int index)
   {
     // If index is out of bounds, the base.get will catch that.
     if (index >= gapStart)
@@ -52,7 +53,8 @@ public class GapVector extends AbstractSequence implements Sequence
     return base.get(index);
   }
 
-  public Object set (int index, Object value)
+  @Override
+  public E set(int index, E value)
   {
     // If index is out of bounds, the base.set will catch that.
     if (index >= gapStart)
@@ -60,13 +62,15 @@ public class GapVector extends AbstractSequence implements Sequence
     return base.set(index, value);
   }
 
-  public void fill (Object value)
+  @Override
+  public void fill(E value)
   {
     base.fill(gapEnd, base.size, value);
     base.fill(0, gapStart, value);
   }
 
-  public void fillPosRange(int fromPos, int toPos, Object value)
+  @Override
+  public void fillPosRange(int fromPos, int toPos, E value)
   {
     int from = fromPos == -1 ? base.size : fromPos >>> 1;
     int to = toPos == -1 ? base.size : toPos >>> 1;
@@ -170,7 +174,8 @@ public class GapVector extends AbstractSequence implements Sequence
       }
   }
 
-  protected int addPos (int ipos, Object value)
+  @Override
+  protected int addPos(int ipos, E value)
   {
     int index = ipos >>> 1;
     if (index >= gapStart)
@@ -179,7 +184,8 @@ public class GapVector extends AbstractSequence implements Sequence
     return ((index + 1) << 1) | 1;
   }
 
-  public void add(int index, Object o)
+  @Override
+  public void add(int index, E o)
   {
     gapReserve(index, 1);
     base.set(index, o);

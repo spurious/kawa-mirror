@@ -1,3 +1,8 @@
+2013-10-31  Per Bothner  <per@bothner.com>
+
+	* GapVector.java: Add generic parameter.
+	* SubSequence.java: Likewise.
+
 2013-10-19  David Van Horn
 	    Per Bothner  <per@bothner.com>
 

@@ -395,7 +395,8 @@ public class TreeList extends AbstractSequence
     data[index+1] = (char) i;
   }
 
-  public void consume (SeqPosition position)
+  @Override
+  public void writePosition(SeqPosition position)
   {
     ensureSpace(3);
     // FIXME - no need for find to search in this case!
@@ -1230,7 +1231,7 @@ public class TreeList extends AbstractSequence
 	  case POSITION_REF_FOLLOWS:
 	    if (out instanceof PositionConsumer)
 	      {
-		((PositionConsumer) out).consume((SeqPosition) objects[getIntN(pos)]);
+		((PositionConsumer) out).writePosition((SeqPosition) objects[getIntN(pos)]);
 		pos += 2;
 		continue;
 	      }

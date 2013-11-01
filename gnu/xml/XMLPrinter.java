@@ -23,7 +23,7 @@ public class XMLPrinter extends OutPort
    * -1: don't add indentation; 0: pretty-print (avoid needless newlines);
    * 1: indent (force). */
   public int printIndent = -1;
-  /** When indentating, should attributes be lined up? */
+  /** When indenting, should attributes be lined up? */
   public boolean indentAttributes;
 
   boolean printXMLdecl = false;
@@ -926,7 +926,8 @@ public class XMLPrinter extends OutPort
     prev = PROC_INST;
   }
 
-  public void consume (SeqPosition position)
+  @Override
+  public void writePosition(SeqPosition position)
   {
     position.sequence.consumeNext(position.ipos, this);
   }

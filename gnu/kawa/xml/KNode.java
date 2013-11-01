@@ -444,7 +444,7 @@ public abstract class KNode extends SeqPosition
   public void consume(Consumer out)
   {
     if (out instanceof PositionConsumer)
-      ((PositionConsumer) out).consume(this);
+      ((PositionConsumer) out).writePosition(this);
     else
       ((NodeTree) sequence).consumeNext(ipos, out);
   }

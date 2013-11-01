@@ -1,3 +1,8 @@
+2013-11-01  Per Bothner  <per@bothner.com>
+
+	* XMLFilter.java (consume): Rename to writePosition.
+	* XMLPrinter.java: Likewise.
+
 2013-02-23  Per Bothner  <per@bothner.com>
 
 	* TextUtils.java (stingValue): Special handling for gnu.text.Char

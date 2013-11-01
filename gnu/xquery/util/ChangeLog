@@ -1,3 +1,8 @@
+2013-11-01  Per Bothner  <per@bothner.com>
+
+	* DistinctValues.java (consume): Rename to writePosition.
+	* RelativeStepFilter.java: Likewise.
+
 2012-07-15  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (SCM_COMPILE_FLAGS): New macro.

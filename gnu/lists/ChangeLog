@@ -1,3 +1,9 @@
+2013-11-01  Per Bothner  <per@bothner.com>
+
+	* PositionConsumer.java (consume(SeqPosition)): Rename
+	to writePosition.
+	* TreeList.java: Update accordingly.
+
 2013-10-31  Per Bothner  <per@bothner.com>
 
 	* SimpleVector.java (consumeNext): Remove redundant method - it

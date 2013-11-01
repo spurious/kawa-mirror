@@ -17,8 +17,7 @@ public interface PositionConsumer
    * The caller may invalidate or change the position after consume returns,
    * so if the consumer wants to save it, it needs to copy it.
    */
-  // FIXME rename to add or writePosition?
-  public void consume(SeqPosition position);
+  public void writePosition(SeqPosition position);
 
   /** Consume a single position pair.
    * This PositionConsumer may assume the sequence does no reference

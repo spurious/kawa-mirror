@@ -58,11 +58,10 @@ public class S8Vector extends ByteVector
     return Convert.toObject(data[index]);
   }
 
-  public Object setBuffer(int index, Object value)
+  @Override
+  public void setBuffer(int index, Object value)
   {
-    byte old = data[index];
     data[index] = Convert.toByte(value);
-    return Convert.toObject(old);
   }
 
   public int getElementKind()

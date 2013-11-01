@@ -108,11 +108,10 @@ public class F64Vector extends SimpleVector
     data[index] = value;
   }
 
-  public final Object setBuffer(int index, Object value)
+  @Override
+  public final void setBuffer(int index, Object value)
   {
-    Object old = Convert.toObject(data[index]);
     data[index] = Convert.toDouble(value);
-    return old;
   }
 
   /*

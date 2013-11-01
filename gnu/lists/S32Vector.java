@@ -91,11 +91,10 @@ public class S32Vector extends SimpleVector
     return Convert.toObject(data[index]);
   }
 
-  public Object setBuffer(int index, Object value)
+  @Override
+  public void setBuffer(int index, Object value)
   {
-    int old = data[index];
     data[index] = Convert.toInt(value);
-    return Convert.toObject(old);
   }
 
   public final void setIntAt(int index, int value)

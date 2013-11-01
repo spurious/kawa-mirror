@@ -95,11 +95,10 @@ public class U16Vector extends SimpleVector
     return Convert.toObjectUnsigned(data[index]);
   }
 
-  public Object setBuffer(int index, Object value)
+  @Override
+  public void setBuffer(int index, Object value)
   {
-    short old = data[index];
     data[index] = Convert.toShortUnsigned(value);
-    return Convert.toObjectUnsigned(old);
   }
 
   public final void setShortAt(int index, short value)

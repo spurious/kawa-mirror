@@ -95,11 +95,10 @@ public class U32Vector extends SimpleVector
     return Convert.toObjectUnsigned(data[index]);
   }
 
-  public Object setBuffer(int index, Object value)
+  @Override
+  public void setBuffer(int index, Object value)
   {
-    int old = data[index];
     data[index] = Convert.toIntUnsigned(value);
-    return Convert.toObjectUnsigned(old);
   }
 
   public final void setIntAt(int index, int value)

@@ -81,11 +81,10 @@ public class U8Vector extends ByteVector
     return Convert.toObjectUnsigned(data[index]);
   }
 
-  public Object setBuffer(int index, Object value)
+  @Override
+  public void setBuffer(int index, Object value)
   {
-    byte old = data[index];
     data[index] = Convert.toByteUnsigned(value);
-    return Convert.toObjectUnsigned(old);
   }
 
   public int getElementKind()

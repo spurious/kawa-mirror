@@ -146,11 +146,10 @@ public class FString extends SimpleVector
     return Convert.toObject(data[index]);
   }
 
-  public final Object setBuffer(int index, Object value)
+  @Override
+  public final void setBuffer(int index, Object value)
   {
-    Object old = Convert.toObject(data[index]);
     data[index] = Convert.toChar(value);
-    return old;
   }
 
   public final Object get (int index)

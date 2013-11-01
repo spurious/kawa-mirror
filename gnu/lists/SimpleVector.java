@@ -183,7 +183,7 @@ public abstract class SimpleVector<E> extends AbstractSequence<E>
     return old;
   }
 
-  protected abstract E setBuffer(int index, E value);
+  protected abstract void setBuffer(int index, E value);
 
     /* #ifdef JAVA8 */
     // @Override

@@ -95,11 +95,10 @@ public class U64Vector extends SimpleVector
     return Convert.toObjectUnsigned(data[index]);
   }
 
-  public Object setBuffer(int index, Object value)
+  @Override
+  public void setBuffer(int index, Object value)
   {
-    long old = data[index];
     data[index] = Convert.toLongUnsigned(value);
-    return Convert.toObjectUnsigned(old);
   }
 
   public final void setLongAt(int index, long value)

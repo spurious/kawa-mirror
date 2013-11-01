@@ -114,12 +114,11 @@ public class FVector<E> extends SimpleVector<E>
     return (E) data[index];
   }
 
-  public final Object setBuffer(int index, Object value)
+  @Override
+  public final void setBuffer(int index, Object value)
   {
     checkCanWrite();
-    Object old = data[index];
     data[index] = value;
-    return old;
   }
 
   protected void clearBuffer(int start, int count)

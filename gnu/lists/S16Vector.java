@@ -96,11 +96,10 @@ public class S16Vector extends SimpleVector
     return Convert.toObject(data[index]);
   }
 
-  public Object setBuffer(int index, Object value)
+  @Override
+  public void setBuffer(int index, Object value)
   {
-    short old = data[index];
     data[index] = Convert.toShort(value);
-    return Convert.toObject(old);
   }
 
   public final void setShortAt(int index, short value)

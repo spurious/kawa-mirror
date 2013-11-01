@@ -439,15 +439,6 @@ public abstract class SimpleVector<E> extends AbstractSequence<E>
     consumePosRange(start << 1, (start + length) << 1, out);
   }
 
-  public boolean consumeNext(int ipos, Consumer out)
-  {
-    int index = ipos >>> 1;
-    if (index >= size)
-      return false;
-    out.writeObject(getBuffer(index));
-    return true;
-  }
-
   public void consumePosRange(int iposStart, int iposEnd, Consumer out)
   {
     if (out.ignoring())

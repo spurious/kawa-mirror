@@ -121,15 +121,6 @@ public class BitVector extends SimpleVector implements Externalizable
 
   public String getTag() { return "b"; }
 
-  public boolean consumeNext(int ipos, Consumer out)
-  {
-    int index = ipos >>> 1;
-    if (index >= size)
-      return false;
-    out.writeBoolean(data[index]);
-    return true;
-  }
-
   public void consumePosRange(int iposStart, int iposEnd, Consumer out)
   {
     if (out.ignoring())

@@ -182,15 +182,6 @@ public class FVector<E> extends SimpleVector<E>
         Arrays.fill(data, start, end, new_value);
     }
 
-  public boolean consumeNext(int ipos, Consumer out)
-  {
-    int index = ipos >>> 1;
-    if (index >= size)
-      return false;
-    out.writeObject(data[index]);
-    return true;
-  }
-
   public void consumePosRange (int iposStart, int iposEnd, Consumer out)
   {
     if (out.ignoring())

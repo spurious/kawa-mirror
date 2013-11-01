@@ -441,15 +441,6 @@ public class FString extends SimpleVector
     out.write(data, 0, data.length);
   }
 
-  public boolean consumeNext (int ipos, Consumer out)
-  {
-    int index = ipos >>> 1;
-    if (index >= size)
-      return false;
-    out.write(data[index]);
-    return true;
-  }
-
   public void consumePosRange (int iposStart, int iposEnd, Consumer out)
   {
     if (out.ignoring())

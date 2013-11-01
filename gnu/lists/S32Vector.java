@@ -122,15 +122,6 @@ public class S32Vector extends SimpleVector
 
   public String getTag() { return "s32"; }
 
-  public boolean consumeNext (int ipos, Consumer out)
-  {
-    int index = ipos >>> 1;
-    if (index >= size)
-      return false;
-    out.writeInt(data[index]);
-    return true;
-  }
-
   public void consumePosRange (int iposStart, int iposEnd, Consumer out)
   {
     if (out.ignoring())

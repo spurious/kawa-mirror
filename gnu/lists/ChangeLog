@@ -1,5 +1,12 @@
 2013-10-31  Per Bothner  <per@bothner.com>
 
+	* SimpleVector.java (consumeNext): Remove redundant method - it
+	doesn't really buy anything compared to the inherited default.
+	* BitVector.java, ByteVector.java, F32Vector.java, F64Vector.java,
+	FString.java, FVector.java, S16Vector.java, S32Vector.java,
+	S64Vector.java, U16Vector.java, U32Vector.java, U64Vector.java:
+	Likewise.
+
 	* GapVector.java: Add generic parameter.
 	* SubSequence.java: Likewise.
 

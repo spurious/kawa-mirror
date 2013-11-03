@@ -13,7 +13,7 @@ import gnu.text.Char;
  * It is a reasonable choice for a "DOM" for XML data.
  */
 
-public class TreeList extends AbstractSequence
+public class TreeList extends AbstractSequence<Object>
   implements
   /* #ifdef JAVA5 */
   Appendable,
@@ -130,7 +130,7 @@ public class TreeList extends AbstractSequence
   /** Followed by 2 chars that provide an index into objects. */
   static final char POSITION_REF_FOLLOWS = 0xF10E;
 
-  /** A position triple referenceing some other "nodes".
+  /** A position triple referencing some other "nodes".
    * Followed by index of sequence (2 chars), and ipos (2 chars). */
   protected static final char POSITION_PAIR_FOLLOWS = 0xF10F;
 
@@ -1626,12 +1626,6 @@ public class TreeList extends AbstractSequence
     else
       return null;
     return index < 0 ? null : objects[index];
-  }
-
-  public String getNextTypeName(int ipos)
-  {
-    Object type = getNextTypeObject(ipos);
-    return type == null ? null : type.toString();
   }
 
   public Object getPosPrevious(int ipos)

@@ -4,7 +4,7 @@
 package gnu.mapping;
 import gnu.lists.*;
 
-public class ValueStack extends Values implements Sequence
+public class ValueStack extends Values implements Sequence<Object>
 {
   public void clear()
   {

@@ -191,19 +191,19 @@ public abstract class AbstractSequence<E>
     return getIterator();
   }
 
-  public final SeqPosition<E> getIterator()
+  public final SeqPosition<E, AbstractSequence<E>> getIterator()
   {
     return getIterator(0);
   }
 
-  public SeqPosition<E> getIterator(int index)
+  public SeqPosition<E, AbstractSequence<E>> getIterator(int index)
   {
-    return new SeqPosition<E>(this, index, false);
+      return new SeqPosition<E,AbstractSequence<E>>(this, index, false);
   }
 
-  public SeqPosition<E> getIteratorAtPos(int ipos)
+  public SeqPosition<E, AbstractSequence<E>> getIteratorAtPos(int ipos)
   {
-    return new SeqPosition<E>(this, copyPos(ipos));
+    return new SeqPosition<E,AbstractSequence<E>>(this, copyPos(ipos));
   }
 
   /* #ifdef JAVA2 */
@@ -325,10 +325,10 @@ public abstract class AbstractSequence<E>
     if (index < 0 || index >= size())
       throw new IndexOutOfBoundsException();
     int ipos = createPos(index, false);
-    Object result = getPosNext(ipos);
+    E result = (E) getPosNext(ipos);
     removePos(ipos, 1);
     releasePos(ipos);
-      return (E) result;
+    return result;
   }
 
   public boolean remove(Object o)
@@ -469,7 +469,8 @@ public abstract class AbstractSequence<E>
 
   public String getNextTypeName(int ipos)
   {
-    return null;
+    Object type = getNextTypeObject(ipos);
+    return type == null ? null : type.toString();
   }
 
   public E getNextTypeObject(int ipos)
@@ -766,13 +767,13 @@ public abstract class AbstractSequence<E>
     return subSequencePos(start.ipos, end.ipos);
   }
 
-  protected Sequence subSequencePos(int ipos0, int ipos1)
+  protected Sequence<E> subSequencePos(int ipos0, int ipos1)
   {
-    return new SubSequence(this, ipos0, ipos1);
+    return new SubSequence<E>(this, ipos0, ipos1);
   }
 
   /* #ifdef JAVA2 */
-  public List subList(int fromIx, int toIx)
+  public List<E> subList(int fromIx, int toIx)
   {
     return subSequencePos(createPos(fromIx, false),
                           createPos(toIx, true));

@@ -9,7 +9,7 @@ package gnu.lists;
  * than a regular SeqPosition does.
  */
 
-public class ExtPosition extends SeqPosition
+public class ExtPosition<E,ESEQ extends AbstractSequence<E>> extends SeqPosition<E,ESEQ>
 {
   /** Index into PositionManager.positions, if >= 0.
    * This is used if we need a single Pos integer for this position. */

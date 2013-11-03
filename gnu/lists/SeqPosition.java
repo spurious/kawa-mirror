@@ -20,7 +20,7 @@ import java.util.NoSuchElementException;
  * for more information.
  */
 
-public class SeqPosition<E>
+public class SeqPosition<E, ESEQ extends AbstractSequence<E>>
 implements
     /* #ifdef JAVA2 */
     java.util.ListIterator<E>,
@@ -33,7 +33,7 @@ implements
    * This is normally the same as the Sequence we iterate through.
    * However, if this is a TreePosition, it may an ancestor instead.
    */
-  public AbstractSequence<E> sequence;
+  public ESEQ sequence;
 
   /**
    * An integer that (together with xpos) indicates the current position.
@@ -45,18 +45,18 @@ implements
   {
   }
 
-  public SeqPosition(AbstractSequence<E> seq)
+  public SeqPosition(ESEQ seq)
   {
     this.sequence = seq;
   }
 
-  public SeqPosition(AbstractSequence<E> seq, int offset, boolean isAfter)
+  public SeqPosition(ESEQ seq, int offset, boolean isAfter)
   {
     this.sequence = seq;
     ipos = seq.createPos(offset, isAfter);
   }
 
-  public SeqPosition(AbstractSequence seq, int ipos)
+  public SeqPosition(ESEQ seq, int ipos)
   {
     this.sequence = seq;
     this.ipos = ipos;
@@ -65,22 +65,22 @@ implements
   /** Creates a new SeqPosition, from a position pair.
    * The position pair is copied (using copyPos).
    */
-  public static SeqPosition make(AbstractSequence seq, int ipos)
+  public static <E,ESEQ extends AbstractSequence<E>> SeqPosition<E,ESEQ> make(ESEQ seq, int ipos)
   {
-    return new SeqPosition(seq, seq.copyPos(ipos));
+    return new SeqPosition<E,ESEQ>(seq, seq.copyPos(ipos));
   }
 
-  public SeqPosition copy ()
+  public SeqPosition<E,ESEQ> copy ()
   {
-    return new SeqPosition(sequence, sequence.copyPos(getPos()));
+    return new SeqPosition<E,ESEQ>(sequence, sequence.copyPos(getPos()));
   }
  
-  public final void gotoStart(AbstractSequence seq)
+  public final void gotoStart(ESEQ seq)
   {
     setPos(seq, seq.startPos());
   }
 
-  public final void gotoEnd(AbstractSequence seq)
+  public final void gotoEnd(ESEQ seq)
   {
     setPos(seq, seq.endPos());
   }
@@ -303,7 +303,7 @@ implements
     return ipos;
   }
 
-  public void setPos (AbstractSequence seq, int ipos)
+  public void setPos (ESEQ seq, int ipos)
   {
     if (sequence != null)
       sequence.releasePos(getPos());
@@ -318,7 +318,7 @@ implements
     this.ipos = ipos;
   }
 
-  public void set (AbstractSequence seq, int index, boolean isAfter)
+  public void set (ESEQ seq, int index, boolean isAfter)
   {
     if (sequence != null)
       sequence.releasePos(ipos);
@@ -326,7 +326,7 @@ implements
     ipos = seq.createPos(index, isAfter);
   }
 
-  public void set (SeqPosition pos)
+  public void set (SeqPosition<E,ESEQ> pos)
   {
     if (sequence != null)
       sequence.releasePos(ipos);

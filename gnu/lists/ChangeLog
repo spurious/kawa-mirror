@@ -1,5 +1,17 @@
 2013-11-03  Per Bothner  <per@bothner.com>
 
+	* SeqPosition.java: Make generic.
+	* ExtPosition.java: Likewise.
+	* LListPosition.java: Update accordingly.
+	(set): Remove now-redundant method.
+	* LList.java: Add needed generic parameters.
+	* TreeList.java: Likewise.
+	* AbstractSequence.java: Likewise.
+
+	* AbstractSequence.java (getNextTypeName): Replace null-turning
+	default implementation with one that calls getNextTypeObject.
+	* TreeList.java (getNextTypeName): Remove now-redundant method.
+
 	* AbstractSequence.java (createPos): Add default implementation.
 	* SimpleVector.java (createPos): Remove redundant implemengtation.
 	* GeneralArray1.java (createPos): Likewise.

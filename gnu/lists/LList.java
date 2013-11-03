@@ -16,8 +16,8 @@ import java.io.*;
  * @author	Per Bothner
  */
 
-public class LList extends ExtSequence
-  implements Sequence, Externalizable
+public class LList extends ExtSequence<Object>
+  implements Sequence<Object>, Externalizable
   /* #ifdef JAVA2 */
   , Comparable
   /* #endif */

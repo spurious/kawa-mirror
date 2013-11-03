@@ -22,7 +22,7 @@ package gnu.lists;
  * invariant, then xpos==null.
  */
 
-class LListPosition extends ExtPosition
+class LListPosition extends ExtPosition<Object, LList>
 {
   Object xpos;
 
@@ -33,7 +33,7 @@ class LListPosition extends ExtPosition
     xpos = old.xpos;
   }
 
-  public SeqPosition copy ()
+  public LListPosition copy()
   {
     return new LListPosition(this);
   }
@@ -67,11 +67,6 @@ class LListPosition extends ExtPosition
       }
     else
       xpos = null;
-  }
-
-  public void set (AbstractSequence seq, int index, boolean isAfter)
-  {
-    set((LList) seq, index, isAfter);
   }
 
   public boolean hasNext()
@@ -155,7 +150,7 @@ class LListPosition extends ExtPosition
     return pair == null ? LList.eofValue : pair.car;
   }
 
-  public void setPrevious (Object value)
+  public void setPrevious(Object value)
   {
     Pair pair = getPreviousPair();
     pair.car = value;

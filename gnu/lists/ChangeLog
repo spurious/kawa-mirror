@@ -1,3 +1,10 @@
+2013-11-03  Per Bothner  <per@bothner.com>
+
+	* GapVector.java (add): Use setBuffer rather than set.  The
+	former may be more efficient, as it doesn't get the old value.
+
+	* GapVector.java (consumePosRange): Fix infinite-recursion thinko.
+
 2013-11-01  Per Bothner  <per@bothner.com>
 
 	* PositionConsumer.java (consume(SeqPosition)): Rename

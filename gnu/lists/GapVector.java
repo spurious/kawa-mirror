@@ -188,7 +188,7 @@ public class GapVector<E> extends AbstractSequence<E> implements Sequence<E>
   public void add(int index, E o)
   {
     gapReserve(index, 1);
-    base.set(index, o);
+    base.setBuffer(index, o);
     gapStart++;
   }
 
@@ -250,13 +250,13 @@ public class GapVector<E> extends AbstractSequence<E> implements Sequence<E>
     int end = iposEnd >>> 1;
     if (i < gapStart)
       {
-	int lim = end > gapStart ? end : gapStart;
-	consumePosRange(iposStart, lim << 1, out);
+	int lim = end < gapStart ? end : gapStart;
+	base.consumePosRange(iposStart, lim << 1, out);
       }
     if (end > gapEnd)
       {
 	i = i < gapEnd ? gapEnd : i;
-	consumePosRange(i << 1, iposEnd, out);
+	base.consumePosRange(i << 1, iposEnd, out);
       }
   }
 

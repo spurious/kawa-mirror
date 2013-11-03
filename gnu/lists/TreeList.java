@@ -2357,9 +2357,16 @@ public class TreeList extends AbstractSequence<Object>
 		  {
 		    ch = ch - OBJECT_REF_SHORT;
 		    Object obj = objects[ch];
-		    out.print("=Object#"+((int)ch)+'='
-			      +obj+':'+obj.getClass().getName()
-			      +'@'+Integer.toHexString(System.identityHashCode(obj)));
+		    out.print("=Object#");
+                    out.print((int)ch);
+                    out.print('=');
+		    out.print(obj);
+                    if (obj != null) {
+                      out.print(':');
+                      out.print(obj.getClass().getName());
+                    }
+                    out.print('@');
+                    out.print(Integer.toHexString(System.identityHashCode(obj)));
 		  }
 		else if (ch >= BEGIN_ELEMENT_SHORT
 			 && ch <= BEGIN_ELEMENT_SHORT+BEGIN_ELEMENT_SHORT_INDEX_MAX)

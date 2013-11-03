@@ -1,5 +1,7 @@
 2013-11-03  Per Bothner  <per@bothner.com>
 
+	* TreeList.java (dump): Handle null object entry.
+
 	* SeqPosition.java: Make generic.
 	* ExtPosition.java: Likewise.
 	* LListPosition.java: Update accordingly.

@@ -10,7 +10,7 @@
 <ul>
 <li>
 The classes and interfaces are compatible with the Java2 Collections
-framework, but do not rquire them.  A configuration option allows you
+framework, but do not require them.  A configuration option allows you
 to specify whether Sequence extends java.util.List or not.</li>
 <li>
 Positions in a Sequence and iterators are the same kind of object,
@@ -26,7 +26,7 @@ as XML elements), or remember sets of positions (such as XML node-sets).</li>
 The classes are designed for efficiency, especially concentrating on
 minimizing object allocation.</li>
 <li>
-The framework supports general muli-dimensional arrays.</li>
+The framework supports general multi-dimensional arrays.</li>
 <li>
 The package is self-contained; it does not depend on classes or
 features not in JDK 1.1.</li>
@@ -37,7 +37,7 @@ lists; arrays with various element types; adjustable arrays that use a
 adjustable arrays that automatically update positions on insertions
 and deletions.</li>
 <li> The <a href="TreeList.html"><code>TreeList</code></a> class can compactly represent
-a nested hetrogenous tree.  One intended usage is as a very efficient
+a nested heterogenous tree.  One intended usage is as a very efficient
 representation for XML data.</li>
 <li>
 The <a href="Consumer.html"><code>Consumer</code></a> interface is an abstraction of "data sinks" -
@@ -46,7 +46,7 @@ similar to SAX's DocumentHandler but at a more abstract (and sometimes
 more efficient) level.
 </ul>
 
-<a id="iteration"><h2>The iteration and position framework</h2>
+<h2 id="iteration">The iteration and position framework</h2>
 <p>
 A <i>position</i> points <em>between</em> two elements in its "containing"
 sequence, or it points before the first element (if any), or after the last.
@@ -57,7 +57,7 @@ immediately before the element.
 An <i>iterator</i> is an object that has a current position,
 but that can be moved so it gets a new position.
  What needs to be emphasized is that <em>all</em>
-<a href="Sequence.html"><ode>Sequence</code></a> implementations.
+<a href="Sequence.html"><code>Sequence</code></a> implementations.
 use the <em>same</em> <a href="SeqPosition.html"><code>SeqPosition</code></a>
 class to implement positions and iteration.
 In other "collections frameworks" each sequence class has its corresponding

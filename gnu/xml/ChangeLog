@@ -1,3 +1,8 @@
+2013-11-03  Per Bothner  <per@bothner.com>
+
+	* TextUtils.java (stringValue): Rewrite to avoid Values
+	dependency on TreeList internals.
+
 2013-11-01  Per Bothner  <per@bothner.com>
 
 	* XMLFilter.java (consume): Rename to writePosition.

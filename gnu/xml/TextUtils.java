@@ -24,19 +24,12 @@ public class TextUtils
     StringBuffer sbuf = new StringBuffer(100);
     if (node instanceof Values)
       {
-	TreeList tlist = (TreeList) node;
+	Values vals = (Values) node;
 	int index = 0;
-	for (;;)
-	  {
-	    int kind = tlist.getNextKind(index);
-	    if (kind == Sequence.EOF_VALUE)
-	      break;
-	    if (kind == Sequence.OBJECT_VALUE)
-	      stringValue(tlist.getPosNext(index), sbuf);
-	    else
-	      tlist.stringValue(tlist.posToDataIndex(index), sbuf);
-	    index = tlist.nextPos(index);
-	  }
+        for (int ipos = 0; (ipos = vals.nextPos(ipos)) != 0; )
+          {
+            stringValue(vals.getPosPrevious(ipos), sbuf);
+          }
       }
     else
       stringValue(node, sbuf);

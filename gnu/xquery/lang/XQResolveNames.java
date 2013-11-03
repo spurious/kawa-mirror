@@ -858,9 +858,12 @@ public class XQResolveNames extends ResolveNames
                   Method meth = cl.getDeclaredMethod(mname, 2);
                   if ((err = checkArgCount(args, decl, 1, 1)) != null)
                     return err;
+                  PrimProcedure pproc = new PrimProcedure(meth);
+                  if (code == DOC_BUILTIN)
+                      pproc.setSideEffectFree();
                   Expression base = getBaseUriExpr();
                   ApplyExp aexp
-                    = new ApplyExp(meth, new Expression[]{ args[0], base });
+                    = new ApplyExp(pproc, new Expression[]{args[0], base});
                   if (code == DOC_BUILTIN)
                     aexp.setType(NodeType.documentNodeTest);
                   else

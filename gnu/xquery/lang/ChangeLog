@@ -1,3 +1,8 @@
+2013-11-02  Per Bothner  <per@bothner.com>
+
+	* XQResolveNames.java: Mark docCached method as side-effect free.
+	This avoids a long timeout in XQTS's K2-SeqDocFunc-13 test.
+
 2012-10-20  Charles Turner <chturne@gmail.com>
 	    Per Bothner  <per@bothner.com>
 

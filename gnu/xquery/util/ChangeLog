@@ -1,3 +1,8 @@
+2013-11-03  Per Bothner  <per@bothner.com>
+
+	* SequenceUtils.java (subList$C): Re-write to not depend on
+	TreeList internals.
+
 2013-11-02  Per Bothner  <per@bothner.com>
 
 	Reduce dependences on the implementation of the Values class.

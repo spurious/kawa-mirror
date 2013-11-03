@@ -806,6 +806,14 @@ public abstract class AbstractSequence<E>
     releasePos(it);
   }
 
+    public void consume(int fromIndex, int toIndex, Consumer out) {
+        int ipos0 = createPos(fromIndex, false);
+        int ipos1 = createPos(toIndex, true);
+        consumePosRange(ipos0, ipos1, out);
+        releasePos(ipos0);
+        releasePos(ipos1);
+    }
+
   public void consume(Consumer out)
   {
     boolean isSequence = this instanceof Sequence;

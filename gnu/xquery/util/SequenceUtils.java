@@ -336,25 +336,16 @@ public class SequenceUtils
   {
     if (seq instanceof Values)
       {
+        int istart = (int) (start - 1.0);
+        int iend = (int) (end - 1.0);
 	Values vals = (Values) seq;
-        int n = 0;
-	int i = 0;
-	while (++n < start)
-	  {
-	    i = vals.nextDataIndex(i);
-	    if (i < 0)
-	      return;
-	  }
-	int startPosition = i;
-	int endPosition = i;
-	while (n++ < end)
-	  {
-	    i = vals.nextDataIndex(i);
-	    if (i < 0)
-	      break;
-	    endPosition = i;
-	  }
-	vals.consumeIRange(startPosition, endPosition, out);
+        int sz = vals.size();
+        if (istart < 0)
+            istart = 0;
+        if (iend > sz)
+            iend = sz;
+        if (iend > istart)
+            vals.consume(istart, iend, out);
       }
     else
       {

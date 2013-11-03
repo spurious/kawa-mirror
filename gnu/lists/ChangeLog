@@ -1,5 +1,7 @@
 2013-11-03  Per Bothner  <per@bothner.com>
 
+	* AbstractSequence.java (consume(int,int.Consumer)): New method.
+
 	* TreeList.java (dump): Handle null object entry.
 
 	* SeqPosition.java: Make generic.

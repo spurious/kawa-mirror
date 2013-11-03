@@ -22,7 +22,7 @@ public class Average extends Procedure1
     int count = 0;
     if (arg instanceof Values)
       {
-	TreeList tlist = (TreeList) arg;
+	Values tlist = (Values) arg;
 	int index = 0;
 	for (;;)
 	  {

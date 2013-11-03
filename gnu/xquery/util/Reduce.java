@@ -20,7 +20,7 @@ public class Reduce
   {
     if (arg instanceof Values)
       {
-	TreeList tlist = (TreeList) arg;
+	Values tlist = (Values) arg;
 	int pos = 0;
         Object next = tlist.getPosNext(pos);
         if (next == Sequence.eofValue)

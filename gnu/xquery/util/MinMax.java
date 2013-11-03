@@ -25,7 +25,7 @@ public class MinMax
   {
     if (arg instanceof Values)
       {
-	TreeList tlist = (TreeList) arg;
+	Values tlist = (Values) arg;
 	int pos = 0;
         int flags = returnMax ? Compare.TRUE_IF_GRT :  Compare.TRUE_IF_LSS;
         Object cur = tlist.getPosNext(pos);

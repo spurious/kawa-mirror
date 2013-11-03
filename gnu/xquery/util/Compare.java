@@ -62,29 +62,27 @@ public class Compare extends Procedure2
     if (arg1 instanceof Values)
       {
 	Values values1 = (Values) arg1;
-	int index = 0;
+	int iter = 0;
 	for (;;)
 	  {
-	    int next = values1.nextDataIndex(index);
-	    if (next < 0)
+	    iter = values1.nextPos(iter);
+	    if (iter == 0)
 	      return false;
-	    if (apply(flags, values1.getPosNext(index << 1), arg2, collator))
+	    if (apply(flags, values1.getPosPrevious(iter), arg2, collator))
 	      return true;
-	    index = next;
 	  }
       }
     if (arg2 instanceof Values)
       {
 	Values values2 = (Values) arg2;
-	int index = 0;
+	int iter = 0;
 	for (;;)
 	  {
-	    int next = values2.nextDataIndex(index);
-	    if (next < 0)
+	    iter = values2.nextPos(iter);
+	    if (iter == 0)
 	      return false;
-	    if (apply(flags, arg1, values2.getPosNext(index << 1), collator))
+	    if (apply(flags, arg1, values2.getPosPrevious(iter), collator))
 	      return true;
-	    index = next;
 	  }
       }
     return atomicCompare(flags,

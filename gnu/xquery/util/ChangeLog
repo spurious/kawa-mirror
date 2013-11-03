@@ -1,3 +1,12 @@
+2013-11-02  Per Bothner  <per@bothner.com>
+
+	Reduce dependences on the implementation of the Values class.
+	* Average.java: Remove needlessly-precise downcast.
+	* MinMax.java: Likewise.
+	* Reduce.java: Likewise.
+	* BooleanValue.java: Use generic AbstractSequence position API.
+	* Compare.java: Likewise.
+
 2013-11-01  Per Bothner  <per@bothner.com>
 
 	* DistinctValues.java (consume): Rename to writePosition.

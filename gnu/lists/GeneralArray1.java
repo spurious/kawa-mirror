@@ -5,11 +5,6 @@ package gnu.lists;
 
 public class GeneralArray1 extends GeneralArray implements Sequence
 {
-  public int createPos(int index, boolean isAfter)
-  {
-    return (index << 1) | (isAfter ? 1 : 0);
-  }
-
   protected int nextIndex(int ipos)
   {
     return ipos == -1 ? size() : ipos >>> 1;

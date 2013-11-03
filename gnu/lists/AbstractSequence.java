@@ -119,7 +119,7 @@ public abstract class AbstractSequence<E>
     int i = 0;
     for (int iter = startPos();  (iter = nextPos(iter)) != 0;  i++)
       {
-	Object v = getPosPrevious(iter);
+        Object v = getPosPrevious(iter);
         if (o==null ? v==null : o.equals(v))
 	  {
 	    releasePos(iter);
@@ -393,7 +393,9 @@ public abstract class AbstractSequence<E>
    * @param isAfter should the position have the isAfter property
    * @exception IndexOutOfBoundsException if index is out of bounds
    */
-  public abstract int createPos (int index, boolean isAfter);
+  public int createPos (int index, boolean isAfter) {
+      return (index << 1) | (isAfter ? 1 : 0);
+  }
 
   public int createRelativePos(int pos, int delta, boolean isAfter)
   {

@@ -1,5 +1,9 @@
 2013-11-03  Per Bothner  <per@bothner.com>
 
+	* AbstractSequence.java (createPos): Add default implementation.
+	* SimpleVector.java (createPos): Remove redundant implemengtation.
+	* GeneralArray1.java (createPos): Likewise.
+
 	* GapVector.java (add): Use setBuffer rather than set.  The
 	former may be more efficient, as it doesn't get the old value.
 

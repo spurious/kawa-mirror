@@ -101,11 +101,6 @@ public abstract class SimpleVector<E> extends AbstractSequence<E>
     return ipos == -1 ? size : ipos >>> 1;
   }
 
-  public int createPos(int index, boolean isAfter)
-  {
-    return (index << 1) | (isAfter ? 1 : 0);
-  }
-
   public int nextPos (int ipos)
   {
     if (ipos == -1)
@@ -113,7 +108,7 @@ public abstract class SimpleVector<E> extends AbstractSequence<E>
     int index = ipos >>> 1;
     if (index == size)
       return 0;
-    return  (index << 1) + 3;
+    return (index << 1) + 3;
   }
 
   /*

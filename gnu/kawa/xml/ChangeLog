@@ -1,3 +1,7 @@
+2013-11-03  Per Bothner  <per@bothner.com>
+
+	* KNode.java: Add generic parameters on inherited SeqPosition.
+
 2013-01-23  Per Bothner  <per@bothner.com>
 
 	* MakeElement.java (startElement): Require qname argument to be Symbol.

@@ -10,7 +10,7 @@ import org.w3c.dom.*;
 import gnu.mapping.*;
 import gnu.text.Path;
 
-public abstract class KNode extends SeqPosition
+public abstract class KNode extends SeqPosition<Object,NodeTree>
   implements
   /* #ifdef use:org.w3c.dom.Node */
   org.w3c.dom.Node,

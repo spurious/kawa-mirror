@@ -1,5 +1,11 @@
 2013-11-03  Per Bothner  <per@bothner.com>
 
+	* AbstractSequence.java (nextIndex): Make abstract, rather than
+	a circular default that depends on getIndexDifference which
+	depends on nextIndex.
+	* GeneralArray.java (nextIndex): New implementation.
+	* TreeList.java (nextIndex): New implementation.
+
 	* AbstractSequence.java (consume(int,int.Consumer)): New method.
 
 	* TreeList.java (dump): Handle null object entry.

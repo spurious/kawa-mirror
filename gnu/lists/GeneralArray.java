@@ -25,6 +25,8 @@ implements Array //, Consumable
   static final int[] zeros = new int[8];
   int offset;
   boolean simple = true;
+  
+  protected int nextIndex(int ipos) { return ipos>>>1; }
 
   public static Array makeSimple(int[] lowBounds, int[] dimensions,
 				 SimpleVector base)

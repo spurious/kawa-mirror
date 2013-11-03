@@ -437,10 +437,7 @@ public abstract class AbstractSequence<E>
   /**
    * Get the offset from the beginning corresponding to a position cookie.
    */
-  protected int nextIndex(int ipos)
-  {
-    return getIndexDifference(ipos, startPos());
-  }
+  protected abstract int nextIndex(int ipos);
 
   protected int fromEndIndex(int ipos)
   {
@@ -591,7 +588,9 @@ public abstract class AbstractSequence<E>
   /** Get the element following the specified position.
    * @param ipos the specified position.
    * @return the following element, or eofValue if there is none.
-   * Called by SeqPosition.getNext. */
+   * Called by SeqPosition.getNext.
+   * FIXME Should change eof handling so return type can be E.
+   */
   public Object getPosNext(int ipos)
   {
     if (! hasNext(ipos))
@@ -601,7 +600,9 @@ public abstract class AbstractSequence<E>
 
   /** Get the element before the specified position.
    * @param ipos the specified position.
-   * @return the following element, or eofValue if there is none. */
+   * @return the following element, or eofValue if there is none.
+   * FIXME Should change eof handling so return type can be E.
+   */
   public Object getPosPrevious(int ipos)
   {
     int index = nextIndex(ipos);
@@ -799,13 +800,13 @@ public abstract class AbstractSequence<E>
     while (! equals(it, iposEnd))
       {
 	if (! hasNext(it))
-	  throw new RuntimeException();
+          throw new RuntimeException();
 	out.writeObject(getPosNext(it));
         it = nextPos(it);
       }
     releasePos(it);
   }
-
+  
     public void consume(int fromIndex, int toIndex, Consumer out) {
         int ipos0 = createPos(fromIndex, false);
         int ipos1 = createPos(toIndex, true);

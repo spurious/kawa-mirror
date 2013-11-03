@@ -2287,6 +2287,11 @@ public class TreeList extends AbstractSequence<Object>
     return negate ? -i : i;
   }
 
+  public int nextIndex(int ipos)
+  {
+    return getIndexDifference(ipos, startPos());
+  }
+  
   public int hashCode()
   {
     // Calculating a real hashCode is real pain.

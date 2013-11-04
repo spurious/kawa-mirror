@@ -69,12 +69,13 @@ public class TextUtils
         StringBuffer sbuf = new StringBuffer();
         if (arg instanceof Values)
           {
-            Object[] vals = ((Values) arg).getValues();
-            for (int i = 0;  i < vals.length; i++)
+            Values vals = (Values) arg;
+            int count = -1;
+            for (int ipos = 0; (ipos = vals.nextPos(ipos)) != 0; )
               {
-                if (i > 0)
+                if (++count > 0)
                   sbuf.append(' ');
-                stringValue(vals[i], sbuf);
+                stringValue(vals.getPosPrevious(ipos), sbuf);
               }
           }
         else

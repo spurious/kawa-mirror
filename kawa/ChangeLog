@@ -1,3 +1,10 @@
+2013-11-03  Per Bothner  <per@bothner.com>
+
+	* lang/Translator.java (scanForm): Use new Values.FromArray class.
+	* standard/call_with_values.java (apply): Use new
+	Values#check_with method - especially a win if we can use Values2.
+	* standard/read_line.java (apply): Optimize to use Values2.
+
 2013-10-19  Per Bothner  <per@bothner.com>
 
 	* standard/ImportFromLibrary.java (SRFI97Map): Add SRFI-101 entry.

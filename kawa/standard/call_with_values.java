@@ -31,8 +31,7 @@ public class call_with_values extends Procedure2
     Procedure consumer = LangObjType.coerceToProcedure(args[1]);
     if (values instanceof Values)
       {
-	args = ((Values) values).getValues();
-	consumer.checkN(args, ctx);
+        ((Values) values).check_with(consumer, ctx);
       }
     else
       {

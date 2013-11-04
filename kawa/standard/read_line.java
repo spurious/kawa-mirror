@@ -79,8 +79,7 @@ public class read_line
     if (handling == "split")
       {
         FString delimStr = new FString(sbuf, length-delim, delim);
-        Object[] values = { dataStr, delimStr };
-        return new Values(values);
+        return Values.values2(dataStr, delimStr);
       }
     else
       return dataStr;

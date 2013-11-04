@@ -245,14 +245,15 @@ public class CallContext // implements Runnable
   public final int startFromContext ()
   {
     ValueStack vst = vstack;
-    int oindex = vst.find(consumer);
-    vst.ensureSpace(3);
-    int gapStart = vst.gapStart;
-    vst.data[gapStart++] = TreeList.INT_FOLLOWS;
-    vst.setIntN(gapStart, oindex);
+    TreeList buffer = vst.buffer;
+    int oindex = buffer.find(consumer);
+    buffer.ensureSpace(3);
+    int gapStart = buffer.gapStart;
+    buffer.data[gapStart++] = TreeList.INT_FOLLOWS;
+    buffer.setIntN(gapStart, oindex);
     gapStart += 2;
     consumer = vst;
-    vst.gapStart = gapStart;
+    buffer.gapStart = gapStart;
     return gapStart;
   }
 
@@ -261,8 +262,8 @@ public class CallContext // implements Runnable
   public final Object getFromContext (int oldIndex) throws Throwable
   {
     runUntilDone();
-    ValueStack vst = vstack;
-    Object result = Values.make(vst, oldIndex, vst.gapStart);
+    TreeList buffer = vstack.buffer;
+    Object result = Values.make(buffer, oldIndex, buffer.gapStart);
     cleanupFromContext(oldIndex);
     return result;
   }
@@ -276,13 +277,13 @@ public class CallContext // implements Runnable
    */
   public final void cleanupFromContext (int oldIndex)
   {
-    ValueStack vst = vstack;
-    char[] data = vst.data;
+    TreeList buffer = vstack.buffer;
+    char[] data = buffer.data;
     int oindex = (data[oldIndex-2] << 16) | (data[oldIndex -1] & 0xFFFF);
-    consumer = (Consumer) vst.objects[oindex];
-    vst.objects[oindex] = null;
-    vst.oindex = oindex;
-    vst.gapStart = oldIndex - 3;
+    consumer = (Consumer) buffer.objects[oindex];
+    buffer.objects[oindex] = null;
+    buffer.oindex = oindex;
+    buffer.gapStart = oldIndex - 3;
   }
 
   /** Run until no more continuations, returning final result. */
@@ -290,19 +291,20 @@ public class CallContext // implements Runnable
   {
     Consumer consumerSave = consumer;
     ValueStack vst = vstack;
+    TreeList buffer = vst.buffer;
     consumer = vst;
-    int dindexSave = vst.gapStart;
-    int oindexSave = vst.oindex;
+    int dindexSave = buffer.gapStart;
+    int oindexSave = buffer.oindex;
     try
       {
 	runUntilDone();
-	return Values.make(vst, dindexSave, vst.gapStart);
+	return Values.make(buffer, dindexSave, buffer.gapStart);
       }
     finally
       {
 	consumer = consumerSave;
-	vst.gapStart = dindexSave;
-	vst.oindex = oindexSave;
+	buffer.gapStart = dindexSave;
+	buffer.oindex = oindexSave;
       }
   }
 

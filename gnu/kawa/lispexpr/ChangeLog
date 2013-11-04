@@ -1,3 +1,8 @@
+2013-11-03  Per Bothner  <per@bothner.com>
+
+	* LispPackage.java (findSymbol): Optimize by using new
+	Values.Values2 class.
+
 2013-10-30  Per Bothner  <per@bothner.com>
 
 	* ReaderXmlElement.java (readElementConstructor): Allow an unquoted

@@ -1329,10 +1329,10 @@ public class Translator extends Compilation
       r = formStack.elementAt(first);
     else
       {
-	Values vals = new Values();
-	for (int i = first; i < last;  i++)
-	  vals.writeObject(formStack.elementAt(i));
-	r = vals;
+        Object[] vals = new Object[last-first];
+        for (int i = first; i < last;  i++)
+            vals[i-first] = formStack.elementAt(i);
+        r = new Values.FromArray(vals);
       }
     formStack.setSize(first);
     return r;

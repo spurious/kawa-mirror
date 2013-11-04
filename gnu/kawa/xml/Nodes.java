@@ -1,4 +1,4 @@
-// Copyright (c) 2003  Per M.A. Bothner.
+// Copyright (c) 2003, 2013  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.kawa.xml;
@@ -9,77 +9,85 @@ import gnu.xml.*;
 import org.w3c.dom.*;
 /* #endif */
 
-/** Manages a sequence of node references. */
+/** Manages a sequence of node references.
+ */
 
-public class Nodes extends Values
-  /* #ifdef use:org.w3c.dom.Node */
-  implements org.w3c.dom.NodeList
-  /* #endif */
+public class Nodes extends Values.FromList<SeqPosition>
+    implements PositionConsumer,
+               /* #ifdef use:org.w3c.dom.Node */
+               org.w3c.dom.NodeList,
+               /* #endif */
+               Consumer
 {
-  /** Number of data elements for a POSITION_PAIR_FOLLOWS node reference. */
-  static final int POS_SIZE = 5;
+    protected GapVector<SeqPosition> vector;
+    protected NodeVector nvector;
 
-  int count;
+    private Nodes(GapVector<SeqPosition> vector) {
+        super(vector);
+        this.vector = vector;
+    }
 
-  int nesting = 0;
-  boolean inAttribute;
-  NodeTree curNode;
-  XMLFilter curFragment;
+    private Nodes(NodeVector nvector) {
+        this(new GapVector<SeqPosition>(nvector));
+        this.nvector = nvector;
+    }
 
-  public void writePosition (AbstractSequence seq, int ipos)
-  {
-    count++;
-    super.writePosition(seq, ipos);
-  }
+    public Nodes() {
+        this(new NodeVector());
+    }
 
-  public int find (Object seq)
-  {
-    // See if can re-use the object index of the position before the gap.
-    if (gapStart > 0)
-      {
-	int oindex = getIntN(gapStart - POS_SIZE + 1);
-	if (objects[oindex] == seq)
-	  return oindex;
-      }
-    // See if can re-use the object index of the position after the gap.
-    if (gapEnd < data.length)
-      {
-	int oindex = getIntN(gapEnd + 1);
-	if (objects[oindex] == seq)
-	  return oindex;
-      }
-    return super.find(seq);
-  }
+    public Consumer append(char c) {
+        maybeStartTextNode();
+        curFragment.append(c);
+        return this;
+    }
 
-  public void writeObject(Object v)
-  {
-    if (curFragment != null)
-      {
-	if (nesting == 0
-	    && (v instanceof SeqPosition || v instanceof TreeList))
-	  finishFragment();
-	else
-	  {
-	    curFragment.writeObject(v);
-	    return;
-	  }
-      }
-    if (v instanceof SeqPosition)
-      {
-	SeqPosition seq = (SeqPosition) v;
-	writePosition(seq.sequence, seq.ipos);
-	return;
-      }
-    if (v instanceof TreeList)
-      {
-	TreeList tlist = (TreeList) v;
-	writePosition(tlist, 0);
-	return;
-      }
-    handleNonNode();
-    curFragment.writeObject(v);
-    return;
-  }
+    public Consumer append(CharSequence csq) {
+        maybeStartTextNode();
+        curFragment.append(csq);
+        return this;
+    }
+
+    public boolean ignoring() {
+        return false;
+    }
+
+    int nesting = 0;
+    boolean inAttribute;
+    NodeTree curNode;
+    XMLFilter curFragment;
+
+    public void writePosition (AbstractSequence seq, int ipos) {
+        nvector.writePosition(seq, ipos);
+    }
+  
+    public void writePosition(SeqPosition position) {
+        nvector.writePosition(position);
+    }
+
+    public void writeObject(Object v) {
+        if (curFragment != null) {
+            if (nesting == 0
+                && (v instanceof SeqPosition || v instanceof TreeList))
+                finishFragment();
+            else {
+                curFragment.writeObject(v);
+                return;
+            }
+        }
+        if (v instanceof SeqPosition) {
+            writePosition((SeqPosition) v);
+            return;
+        }
+        if (v instanceof TreeList) {
+            TreeList tlist = (TreeList) v;
+            writePosition(tlist, 0);
+            return;
+        }
+        handleNonNode();
+        curFragment.writeObject(v);
+        return;
+    }
 
   void maybeStartTextNode ()
   {
@@ -133,14 +141,11 @@ public class Nodes extends Values
     curFragment.write(v);
   }
 
-  /* #ifdef use:java.lang.CharSequence */
-  public Consumer append (CharSequence csq, int start, int end)
-  { 
-    maybeStartTextNode();
-    curFragment.write(csq, start, end);
-    return this;
-  }
-  /* #endif */
+    public Consumer append (CharSequence csq, int start, int end) { 
+        maybeStartTextNode();
+        curFragment.append(csq, start, end);
+        return this;
+    }
 
   public void write(char[] buf, int off, int len)
   {
@@ -148,11 +153,7 @@ public class Nodes extends Values
     curFragment.write(buf, off, len);
   }
 
-  /* #ifdef use:java.lang.CharSequence */
   public void write(CharSequence str, int start, int length)
-  /* #else */
-  // public void write(String str, int start, int length)
-  /* #endif */
   {
     maybeStartTextNode();
     curFragment.write(str, start, length);
@@ -265,76 +266,165 @@ public class Nodes extends Values
     curFragment = null;
   }
 
+  /*
   public int size()
   {
     return count;
   }
+  */
 
   public int getLength()
   {
-    return count;
-  }
-
-  public Object get (int index)
-  {
-    int i = POS_SIZE * index;
-    if (i >= gapStart)
-      i += gapEnd - gapStart;
-    if (i < 0 || i >= data.length)
-      throw new IndexOutOfBoundsException();
-    // Inline of: return getPosNext(i << 1)
-    if (data[i] != POSITION_PAIR_FOLLOWS)
-      throw new RuntimeException("internal error - unexpected data");
-    return KNode.make((NodeTree) objects[getIntN(i+1)], getIntN(i+3));
+    return size();
   }
 
   /* #ifdef use:org.w3c.dom.Node */
   public Node item(int index)
   {
-    if (index >= count)
+    if (index >= size())
       return null;
     else
       return (Node) get(index);
   }
   /* #endif */
 
-  public Object getPosNext(int ipos)
-  {
-    int index = posToDataIndex(ipos);
-    if (index == data.length)
-      return Sequence.eofValue;
-    if (data[index] != POSITION_PAIR_FOLLOWS)
-      throw new RuntimeException("internal error - unexpected data");
-    return KNode.make((NodeTree) objects[getIntN(index+1)], getIntN(index+3));
-  }
+    /** Optimization of ((SeqPosition) get(index)).sequence.
+     * However returns null instead of throwing IndexOutOfBoundsException
+     * if index >= count. */
+    public AbstractSequence getSeq(int index) {
+        if (index >= vector.gapStart) {
+            index += vector.gapEnd - vector.gapStart;
+            if (index >= nvector.size())
+                return null;
+        }
+        return nvector.getSeq(index);
+    }
 
-  /** Optimization of ((SeqPosition) get(index)).sequence.
-   * However returns null instead of throwing IndexOutOfBoundsException
-   * if index >= count. */
-  public AbstractSequence getSeq (int index)
-  {
-    int i = POS_SIZE * index;
-    if (i >= gapStart)
-      i += gapEnd - gapStart;
-    if (i < 0 || i >= data.length)
-      return null;
-    // Inline of: return getPosNext(i << 1)
-    if (data[i] != POSITION_PAIR_FOLLOWS)
-      throw new RuntimeException("internal error - unexpected data");
-    return (AbstractSequence) objects[getIntN(i+1)];
-  }
+    /** Optimization of ((SeqPosition) get(index)). ipos. */
+    public int getPos(int index) {
+        if (index >= vector.gapStart)
+            index += vector.gapEnd - vector.gapStart;
+        return nvector.getPos(index);
+    }
 
-  /** Optimization of ((SeqPosition) get(index)). ipos. */
-  public int getPos (int index)
-  {
-    int i = POS_SIZE * index;
-    if (i >= gapStart)
-      i += gapEnd - gapStart;
-    // Inline of: return getPosNext(i << 1)
-    if (data[i] != POSITION_PAIR_FOLLOWS)
-      throw new RuntimeException("internal error - unexpected data");
-    return getIntN(i+3);
-  }
+    public void consumePosRange (int iposStart, int iposEnd, Consumer out) {
+        vector.consumePosRange(iposStart, iposEnd, out);
+    }
+
+    public static class NodeVector
+        extends SimpleVector<SeqPosition>
+        implements PositionConsumer {
+        Object[] odata;
+        int[] idata;
+
+        public int getBufferLength() {
+            return odata == null ? 0 : odata.length;
+        }
+
+        public void setBufferLength(int length) {
+            checkCanWrite();
+            int oldLength = odata == null ? 0 : odata.length;
+            if (oldLength != length) {
+                if (oldLength > length)
+                    oldLength = length;
+                Object[] otmp = new Object[length];
+                int[] itmp = new int[length];
+                if (oldLength != 0) {
+                    System.arraycopy(odata, 0, otmp, 0, oldLength);
+                    System.arraycopy(idata, 0, itmp, 0, oldLength);
+                }
+                odata = otmp;
+                idata = itmp;
+            }
+        }
+
+        protected Object getBuffer() { throw new Error(); }
+
+        protected SeqPosition getBuffer(int index) {
+            Object obj = odata[index];
+            if (obj instanceof SeqPosition)
+                return (SeqPosition) obj;
+            return makeSeqPos((AbstractSequence) obj, idata[index]);
+        }
+
+        public AbstractSequence getSeq(int index) {
+            Object obj = odata[index];
+            if (obj instanceof SeqPosition)
+                return ((SeqPosition) obj).sequence;
+            return (AbstractSequence) obj;
+        }
+
+        public int getPos(int index) {
+            Object obj = odata[index];
+            if (obj instanceof SeqPosition)
+                return ((SeqPosition) obj).ipos;
+            return idata[index];
+        }
+
+        protected SeqPosition makeSeqPos(AbstractSequence seq, int ipos) {
+            if (seq instanceof NodeTree)
+                return KNode.make((NodeTree) seq, ipos);
+            else
+                return new SeqPosition(seq, ipos);
+        }
+
+        protected void setBuffer(int index, SeqPosition value) {
+            checkCanWrite();
+            odata[index] = value;
+            idata[index] = 0;
+        }
+
+        protected void setBuffer(int index, AbstractSequence seq, int ipos) {
+            checkCanWrite();
+            odata[index] = seq;
+            idata[index] = ipos;
+        }
+
+        protected void clearBuffer(int start, int count) {
+            checkCanWrite();
+            Object[] d = odata;
+            while (--count >= 0)
+                d[start++] = null;
+        }
+
+        public void writePosition(SeqPosition seq) {
+            add(seq);
+        }
+
+        public void writePosition(AbstractSequence seq, int ipos) {
+            int sz = size;
+            add((SeqPosition) null);
+            odata[sz] = seq;
+            idata[sz] = ipos;
+        }
+
+        public void shift(int srcStart, int dstStart, int count) {
+            checkCanWrite();
+            System.arraycopy(odata, srcStart, odata, dstStart, count);
+            System.arraycopy(idata, srcStart, idata, dstStart, count);
+        }
+
+        public void consumePosRange (int iposStart, int iposEnd, Consumer out) {
+            if (out.ignoring())
+                return;
+            int i = iposStart >>> 1;
+            int end = iposEnd >>> 1;
+            if (end > size)
+                end = size;
+            for (;  i < end;  i++) {
+                if (out instanceof PositionConsumer) {
+                    PositionConsumer pout = (PositionConsumer) out;
+                    Object obj = odata[i];
+                    if (obj instanceof SeqPosition)
+                        pout.writePosition((SeqPosition) obj);
+                    else
+                        pout.writePosition((AbstractSequence) obj, idata[i]);
+                }
+                else
+                    out.writeObject(getBuffer(i));
+            }
+        }
+    }
 
   public static KNode root (NodeTree seq, int ipos)
   {
@@ -345,15 +435,5 @@ public class Nodes extends Values
     else
       root = 0;
     return KNode.make(seq, root);
-    /*
-    int end = seq.endPos();
-    for (;;)
-      {
-	int parent = seq.parentPos(ipos);
-	if (parent == end)
-	  return KNode.make(seq, ipos);
-	ipos = parent;
-      }
-    */
   }
 }

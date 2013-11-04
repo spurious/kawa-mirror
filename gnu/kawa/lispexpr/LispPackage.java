@@ -160,26 +160,20 @@ public class LispPackage extends Namespace
     return (LispPackage) Namespace.valueOfNoCreate(name);
   }
   
-  public Values findSymbol (Object name)
+  public Values.Values2 findSymbol (Object name)
   {
     String sname = name.toString();
 
     Symbol sym = exported.lookup(sname);
     if (sym != null)
     {
-      return new Values(new Object[]
-      {
-        sym, CommonLisp.externalKeyword
-      });
+      return Values.values2(sym, CommonLisp.externalKeyword);
     }
     
     sym = lookupInternal(sname, sname.hashCode());
     if (sym != null)
     {
-      return new Values(new Object[]
-      {
-        sym, CommonLisp.internalKeyword
-      });
+      return Values.values2(sym, CommonLisp.internalKeyword);
     }
     
     // It's not an exported or an imported symbol, let's check the inheritance
@@ -194,19 +188,13 @@ public class LispPackage extends Namespace
 
       if (sym != null)
       {
-        return new Values(new Object[]
-        {
-          sym, CommonLisp.inheritedKeyword
-        });
+        return Values.values2(sym, CommonLisp.inheritedKeyword);
       }
 
       U = U.nextImported;
     }
 
-    return new Values(new Object[]
-    {
-      CommonLisp.FALSE, CommonLisp.FALSE
-    });
+    return Values.values2(CommonLisp.FALSE, CommonLisp.FALSE);
   }
   
   /** Export a list of symbols from a package, checking for conflicts.

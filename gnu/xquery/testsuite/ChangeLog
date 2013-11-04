@@ -1,3 +1,7 @@
+2013-11-03  Per Bothner  <per@bothner.com>
+
+	* RunXQTS.java: Update to new Values API.
+
 2012-10-06  Per Bothner  <per@bothner.com>
 
 	* RunXQTS.java (<init>): We now check for circular definitions,

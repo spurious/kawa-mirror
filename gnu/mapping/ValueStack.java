@@ -4,11 +4,9 @@
 package gnu.mapping;
 import gnu.lists.*;
 
-public class ValueStack extends Values implements Sequence<Object>
-{
-  public void clear()
-  {
-    oindex = 0;
-    super.clear();
-  }
+public class ValueStack extends Values.FromTreeList {
+    public void clear() {
+        buffer.oindex = 0;
+        buffer.clear();
+    }
 }

@@ -7,6 +7,8 @@ import gnu.kawa.reflect.Invoke;
 import gnu.kawa.reflect.OccurrenceType;
 import gnu.mapping.Values;
 import gnu.mapping.Procedure;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CastAs extends Convert
 {
@@ -38,21 +40,16 @@ public class CastAs extends Convert
                 Values vals = (Values) arg2;
                 int pos = vals.startPos();
                 int n = 0;
-                Values result = new Values();
-                for (;;)
+                List lst = new ArrayList();
+                while ((pos = vals.nextPos(pos)) != 0)
                   {
-                    pos = vals.nextPos(pos);
-                    if (pos == 0)
-                      {
-                        if (n >= min && (max < 0 || n <= max))
-                          return result.canonicalize();
-                        break;
-                      }
                     Object value = vals.getPosPrevious(pos);
                     value = ((XDataType) base).cast(value);
-                    result.writeObject(value);
+                    lst.add(value);
                     n++;
                   }
+                if (n >= min && (max < 0 || n <= max))
+                  return Values.make(lst);
               }
             else
               {

@@ -1,5 +1,10 @@
 2013-11-03  Per Bothner  <per@bothner.com>
 
+	* CastAs.java (apply2): Update for new Values API.
+	* CompileMisc.java (validateApplyValuesFilter): Update size
+	method no longer in Nodes class.
+	* OrderedTuples.java (ignoring): New method.
+
 	* SequenceUtils.java (subList$C): Re-write to not depend on
 	TreeList internals.
 

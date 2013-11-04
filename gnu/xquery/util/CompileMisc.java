@@ -134,7 +134,8 @@ public class CompileMisc
       {
         seqType = SortNodes.typeSortedNodes;
         seq = new ApplyExp(SortNodes.sortNodes, new Expression [] {seq});
-        sizeMethod = CoerceNodes.typeNodes.getDeclaredMethod("size", 0);
+        sizeMethod = ClassType.make("gnu.lists.AbstractSequence")
+            .getDeclaredMethod("size", 0);
       }
     Declaration sequence = comp.letVariable("sequence", seqType, seq);
     comp.letEnter();

@@ -64,7 +64,7 @@ public class RunXQTS extends FilterConsumer
   XMLPrinter xqlog;
 
   String collectionID;
-  Values collectionDocuments;
+  Values.FromTreeList collectionDocuments;
 
   private void summaryReport (int count, String label)
   {
@@ -415,7 +415,7 @@ public class RunXQTS extends FilterConsumer
     else if (tagMatches("collection"))
       {
         collectionID = attributes.getValue("ID");
-        collectionDocuments = new Values();
+        collectionDocuments = new Values.FromTreeList();
         sources.put(collectionID, collectionDocuments);
       }
     inStartTag = false;

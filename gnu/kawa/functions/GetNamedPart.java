@@ -31,10 +31,10 @@ public class GetNamedPart extends Procedure2 implements HasSetter
     if (container instanceof Values)
       {
         Object[] values = ((Values) container).getValues();
-        Values result = new Values();
+        Values.FromTreeList result = new Values.FromTreeList();
         for (int i = 0;  i < values.length;  i++)
           {
-            Values.writeValues(apply2(values[i], part), result);
+            result.writeObject(apply2(values[i], part));
           }
         return result.canonicalize();
       }

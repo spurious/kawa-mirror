@@ -17,12 +17,7 @@ public class SortNodes extends Procedure1 implements Inlineable
   {
     SortedNodes nodes = new SortedNodes();
     Values.writeValues(values, nodes);
-    if (nodes.count > 1)
-      return nodes;
-    else if (nodes.count == 0)
-      return Values.empty;
-    else
-      return nodes.get(0);
+    return nodes.canonicalize();
   }
 
   public void compile (ApplyExp exp, Compilation comp, Target target)

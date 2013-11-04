@@ -49,6 +49,8 @@ public class OrderedTuples extends FilterConsumer
   /** The return clause, encoded as a procedure on a tuple. */
   Procedure body;
 
+    public boolean ignoring() { return false; }
+
   public void writeObject(Object v)
   {
     if (n >= tuples.length)

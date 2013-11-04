@@ -1,5 +1,11 @@
 2013-11-03  Per Bothner  <per@bothner.com>
 
+	* Nodes.java: Update for new Values API.  An optimized
+	representation for position references.
+	(class NodeVector): Helper class for sequences of node references.
+	* SortedNodes.java: Use new Nodes implementation.
+	* SortNodes.java (apply1): Simplify by using canonicalize.
+
 	* KNode.java: Add generic parameters on inherited SeqPosition.
 
 2013-01-23  Per Bothner  <per@bothner.com>

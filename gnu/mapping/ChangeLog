@@ -1,5 +1,18 @@
 2013-11-03  Per Bothner  <per@bothner.com>
 
+	* Values.java: Change to an abstract class that extends
+	AbstractSequence rather than TreeList.
+	(class FromArray): Values implementation using an array.
+	(class FromList): Values implementation using a java.util.List.
+	(class Values): Values implementation using two fields.
+	(class FromTreeList): Values implementation using a TreeList;
+	* ValueStack.java: Change to extend Values.FromTreeList.
+	This means TreeList access needs indirection via the buffer field.
+	Also, no longer implement Sequence.
+	(clear): Update accordingly.
+	* CallContext.java (startFromContext, getFromContext,
+	cleanupFromContext, runUntilValue): Update accordingly.
+
 	* ValueStack.java: Add generic parameter.
 
 2013-09-07  Per Bothner  <per@bothner.com>

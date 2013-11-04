@@ -196,6 +196,7 @@ implements
   }
 
   /** See java.util.ListIterator. */
+  @SuppressWarnings("unchecked")
   public E previous()
   {
     Object result = getPrevious();

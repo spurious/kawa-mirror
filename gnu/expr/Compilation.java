@@ -564,18 +564,15 @@ public class Compilation implements SourceLocator
   {
     if (target instanceof IgnoreTarget)
       return;
-    if (value instanceof Values)
+    if (value instanceof Values && target instanceof ConsumerTarget)
       {
-	Object[] values = ((Values) value).getValues();
+        Object[] values = ((Values) value).getValues();
         int len = values.length;
-        if (target instanceof ConsumerTarget)
+        for (int i = 0;  i < len;  i++)
           {
-            for (int i = 0;  i < len;  i++)
-              {
-                compileConstant(values[i], target);
-              } 
-            return;
-          }
+            compileConstant(values[i], target);
+          } 
+        return;
       }
     if (target instanceof ConditionalTarget)
       {

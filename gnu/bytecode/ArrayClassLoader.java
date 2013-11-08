@@ -101,49 +101,37 @@ public class ArrayClassLoader extends ClassLoader
     return clas;
   }
 
-  /** Load named class.
-   * Note we deliberately don't follow the Java2 delegation model,
-   * in order to allow classes to be overridden and replaced.
-   * Specifically, we depend on this for the "session class-loader".
-   */
-  public Class loadClass (String name)
-    throws ClassNotFoundException
-  {
-    Object r = cmap.get(name);
-    if (r != null)
-      return (Class) r;
-    r = map.get(name);
-    if (r instanceof ClassType)
-      {
-        ClassType ctype = (ClassType) r;
-        if (ctype.isExisting())
-          r = ctype.reflectClass;
-        else
-          r = ctype.writeToArray();
-      }
-    Class clas;
-    if (r instanceof byte[])
-      {
-        // double-locking? is this safe?  or needed? FIXME.
-	synchronized (this)
-	  {
-	    r = map.get(name);
-	    if (r instanceof byte[])
-	      {
-		byte[] bytes = (byte[]) r;
-		clas = defineClass (name, bytes, 0, bytes.length);
-		cmap.put(name, clas);
-	      }
-	    else
-	      clas = (Class) r;
-	  }
-      }
-    else if (r == null)
-      clas = getParent().loadClass(name);
-    else
-      clas = (Class) r;
-    return clas;
-  }
+    /** Load named class.
+     * Note we deliberately don't follow the Java2 delegation model,
+     * in order to allow classes to be overridden and replaced.
+     * Specifically, we depend on this for the "session class-loader".
+     */
+    public Class loadClass (String name)
+        throws ClassNotFoundException {
+        Object r = cmap.get(name);
+        if (r != null)
+            return (Class) r;
+        synchronized (this) {
+            r = map.get(name);
+            if (r instanceof ClassType) {
+                ClassType ctype = (ClassType) r;
+                if (ctype.isExisting())
+                    r = ctype.reflectClass;
+                else
+                    r = ctype.writeToArray();
+            }
+            if (r instanceof byte[]) {
+                byte[] bytes = (byte[]) r;
+                Class clas = defineClass(name, bytes, 0, bytes.length);
+                cmap.put(name, clas);
+                return clas;
+            }
+            else if (r == null)
+                return getParent().loadClass(name);
+            else
+                return (Class) r;
+        }
+    }
 
   /* #ifdef JAVA2 */
   public static Package getContextPackage (String cname)

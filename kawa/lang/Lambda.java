@@ -3,7 +3,6 @@ import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.lists.*;
 import gnu.bytecode.Type;
-import gnu.kawa.functions.Convert;
 import gnu.kawa.lispexpr.LangObjType;
 import java.util.ArrayList;
 
@@ -578,19 +577,21 @@ public class Lambda extends Syntax
     LambdaExp saveLambda = tr.curLambda;
     tr.curLambda = lexp;
     Type rtype = lexp.returnType;
-    if (lexp.body instanceof LangExp)
-      {
-        Object[] tform = (Object[]) ((LangExp) lexp.body).getLangValue();
-        Expression texp = tr.rewrite_car((Pair) tform[0],
-                                         (SyntaxForm) tform[1]);
-        rtype = tr.getLanguage().getTypeFor(texp);
-      }
+    Object[] tform = lexp.body instanceof LangExp
+        ? (Object[]) ((LangExp) lexp.body).getLangValue()
+        : null;
     lexp.body = auxillaryRewrite(body, tr);
     tr.curLambda = saveLambda;
     Expression[] exps;
     int len;
     Object val;
-    if (lexp.body instanceof BeginExp
+    if (tform != null)
+      {
+        Expression texp = tr.rewrite_car((Pair) tform[0],
+                                         (SyntaxForm) tform[1]);
+        lexp.setCoercedReturnValue(texp, tr.getLanguage());
+      }
+    else if (lexp.body instanceof BeginExp
         && (len = (exps = ((BeginExp) lexp.body).getExpressions()).length) > 1
         && (exps[0] instanceof ReferenceExp
             || ((val = exps[0].valueIfConstant()) instanceof Type

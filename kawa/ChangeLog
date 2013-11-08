@@ -1,3 +1,9 @@
+2013-11-07  Per Bothner  <per@bothner.com>
+
+	* lang/Lambda.java (reqriteBody): Fix handling ':: TYPESPEC' in
+	the general when it isn't a simple type - which also means
+	we catch typos.
+
 2013-10-23 Matthieu Vachon <matthieu.o.vachon@gmail.com>
 
 	* standard/define_alias.java: Fixed a small typo in static

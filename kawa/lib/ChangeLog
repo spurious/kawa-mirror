@@ -1,3 +1,9 @@
+2013-11-07  Per Bothner  <per@bothner.com>
+
+	* ports.scm (open-binary-input-file, open-binary-output-file):
+	Fix typo (wrong class name) in return type specifier.
+	* rnrs/programs.scm (exit): Fix another typo.
+
 2013-10-17  Per Bothner  <per@bothner.com>
 
 	* syntax.scm (import-handle-prefix): Adding working implementation.

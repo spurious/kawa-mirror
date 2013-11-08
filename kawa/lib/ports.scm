@@ -8,13 +8,13 @@
 (define (open-input-file (name :: path)) :: <input-port>
   (invoke-static <input-port> 'openFile name))
 
-(define (open-binary-input-file (name :: path)) ::gnu.mapping.BinaryInputPort
+(define (open-binary-input-file (name :: path)) ::gnu.mapping.BinaryInPort
   (gnu.mapping.BinaryInPort:openFile name))
 
 (define (open-output-file (name :: path)) :: <output-port>
   (invoke-static <output-port> 'openFile name))
 
-(define (open-binary-output-file (name ::path)) ::gnu.mapping.BinaryOutputPort
+(define (open-binary-output-file (name ::path)) ::gnu.mapping.BinaryOutPort
   (gnu.mapping.BinaryOutPort:openFile name))
 
 (define (call-with-port (port ::java.io.Closeable) (proc ::procedure))

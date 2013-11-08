@@ -44,7 +44,7 @@
               command-name)))
     (cons arg0 rest)))
 
-(define (exit #!optional (code 0)) :: #!void
+(define (exit #!optional (code 0)) :: void
   (invoke-static <output-port> 'runCleanups)
   (let ((status :: int
 		(cond ((integer? code) code)

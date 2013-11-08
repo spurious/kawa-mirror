@@ -13,7 +13,7 @@ public class define_alias extends Syntax {
       define_alias.setName("define-alias");
 
       define_private_alias.setName("define-private-alias");
-      define_private_alias.makePrivate = false;
+      define_private_alias.makePrivate = true;
     }
 
     private boolean makePrivate = false;

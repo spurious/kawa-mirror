@@ -1,3 +1,9 @@
+2013-10-23 Matthieu Vachon <matthieu.o.vachon@gmail.com>
+
+	* standard/define_alias.java: Fixed a small typo in static
+	initializer, the `define-private-alias` field should have
+	`makePrivate` set to true by default.
+
 2013-11-03  Per Bothner  <per@bothner.com>
 
 	* lang/Translator.java (scanForm): Use new Values.FromArray class.

@@ -212,4 +212,9 @@ public class BeginExp extends Expression
   {
     return exps[length - 1].getType();
   }
+
+    /* DEBUGGING:
+    private static int counter; int id = ++counter;
+    public String toString() { return "BeginExp#"+id+"[len:"+length+"]"; }
+    END DEBUGGING */
 }

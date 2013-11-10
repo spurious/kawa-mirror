@@ -631,7 +631,7 @@ public class InlineCalls extends ExpExpVisitor<Type> {
                  app = app.nextCall)
               countApply++;
             if (countApply == ldecl.numReferences
-                // Date-flow from calls to a non-inlined module-level function
+                // Data-flow from calls to a non-inlined module-level function
                 // isn't wrong, but it can lead to problems in captured
                 // variables if the actual argument is an inlined lambda,
                 // We don't implement the necessary re-writing.

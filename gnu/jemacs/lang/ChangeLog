@@ -1,3 +1,8 @@
+2013-11-10  Per Bothner  <per@bothner.com>
+
+	* defgroup.java: Update for new 'formStack' and scanDefinitions API.
+	* defcustom.java: Likewise.
+
 2013-09-15  Per Bothner  <per@bothner.com>
 
 	* MiscOps.scm (prefix-numeric-value): New function stub.

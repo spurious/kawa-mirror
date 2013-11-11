@@ -5,8 +5,8 @@ import gnu.expr.*;
 
 public class defgroup extends Syntax
 {
-  public boolean scanForDefinitions (Pair st, java.util.Vector forms,
-                                     ScopeExp defs, Translator tr)
+  @Override
+  public boolean scanForDefinitions(Pair st, ScopeExp defs, Translator tr)
   {
     // ignore, for now.  FIXME!
     return true;

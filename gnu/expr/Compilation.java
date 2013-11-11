@@ -12,6 +12,8 @@ import java.util.zip.*;
 import java.util.Stack;
 import gnu.kawa.functions.Convert;
 import gnu.kawa.reflect.LazyType;
+import gnu.lists.Pair;
+import kawa.lang.Translator.FormStack;
 
 /** State for a single expression or module.
  * For each top-level thing (expression or file) we compile or evaluate
@@ -94,7 +96,7 @@ public class Compilation implements SourceLocator
   /** Stack of quads of (ModuleInfo, ScopeExp, position, formSize). */
   public java.util.Stack<Object> pendingImports;
 
-  public void pushPendingImport (ModuleInfo info, ScopeExp defs, int formSize)
+  public void pushPendingImport(ModuleInfo info, ScopeExp defs, FormStack forms)
   {
     if (pendingImports == null)
       pendingImports = new java.util.Stack<Object>();
@@ -103,7 +105,7 @@ public class Compilation implements SourceLocator
     Expression posExp = new ReferenceExp((Object) null);
     posExp.setLine(this);
     pendingImports.push(posExp);
-    pendingImports.push(Integer.valueOf(formSize));
+    pendingImports.push(forms.lastPair());
   }
 
   /** If true, print out expressions after parsing and before optimizations. */

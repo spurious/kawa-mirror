@@ -55,7 +55,7 @@ public class module_name extends Syntax
     else
       err = "un-implemented expression in module-name";
     if (err != null)
-      tr.formStack.add(tr.syntaxError(err));
+      tr.pushForm(tr.syntaxError(err));
     else
       {
         int index = name.lastIndexOf('.');

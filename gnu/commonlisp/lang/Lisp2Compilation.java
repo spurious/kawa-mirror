@@ -116,7 +116,7 @@ public class Lisp2Compilation extends Translator
         decls = ((Pair) decls).getCdr();
       }
       letEnter();
-      formStack.add(letDone(super.rewrite_body(body)));
+      pushForm(letDone(super.rewrite_body(body)));
     } else
       super.rewriteBody(list);
   }

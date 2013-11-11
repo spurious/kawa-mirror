@@ -1,6 +1,40 @@
+2013-11-10  Per Bothner  <per@bothner.com>
+
+	* lang/Translator.java (class FormStack): Use new class to
+	implement formStack as linked list, rather than a java.util.Stack.
+	Using a linked list allows storing positions using PairWithPosition.
+	Moving lists back and forth actually works pretty well.
+	(formStack): An instance of FormStack rather than Stack.
+	(class ValuesFromLList): Helper class.
+	(popForm): Use ValuesFromLList.
+	(vectorReverse): Remove no-longer needed method.
+	* lang/Syntax.java (scanForDefinitions): Remove forms parameter.
+	* standard/begin.java: Have scanBody leave scanned forms
+	in the formStack, rather than a list - which then needs to
+	be pushed to the formStack. This fixes Savannah bug #40494
+	"internal error on kawa -C bug.scm, 1.14 and head".
+	* lang/Eval.java: Update for new APIs.
+	* standard/ImportFromLibrary.java: Likewise.
+	* standard/define.java: Likewise.
+	* standard/define_alias.java: Likewise.
+	* standard/define_class.java: Likewise.
+	* standard/define_member_alias.java: Likewise.
+	* standard/define_syntax.java: Likewise.
+	* standard/define_unit.java: Likewise.
+	* standard/define_variable.java: Likewise.
+	* standard/export.java: Likewise.
+	* standard/module_compile_options.java: Likewise.
+	* standard/module_name.java: Likewise.
+	* standard/module_static.java: Likewise.
+	* standard/with_compile_options.java: Likewise.
+	* standard/define_autoload.java: Likewise.
+	(process): Remove forms parameters - use from tr parameter.
+	* standard/require.java: Update for new APIs.
+	(importDefinitions): The formsStack is now a FormStack object.
+
 2013-11-07  Per Bothner  <per@bothner.com>
 
-	* lang/Lambda.java (reqriteBody): Fix handling ':: TYPESPEC' in
+	* lang/Lambda.java (rewriteBody): Fix handling ':: TYPESPEC' in
 	the general when it isn't a simple type - which also means
 	we catch typos.
 

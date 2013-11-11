@@ -11,11 +11,11 @@ public class define_variable extends Syntax
   public static final define_variable define_variable = new define_variable();
   static { define_variable.setName("define-variable"); }
 
-  public boolean scanForDefinitions (Pair st, java.util.Vector forms,
-                                     ScopeExp defs, Translator tr)
+  @Override
+  public boolean scanForDefinitions (Pair st, ScopeExp defs, Translator tr)
   {
     if (! (st.getCdr() instanceof Pair))
-      return super.scanForDefinitions(st, forms, defs, tr);
+      return super.scanForDefinitions(st, defs, tr);
     Pair p = (Pair) st.getCdr();
     Object sym = p.getCar();
     if (sym instanceof String || sym instanceof Symbol)
@@ -34,7 +34,7 @@ public class define_variable extends Syntax
 	p = Translator.makePair(p, decl, p.getCdr());
 	st = Translator.makePair(st, this, p);
       }
-    forms.addElement (st);
+    tr.pushForm(st);
     return true;
   }
 

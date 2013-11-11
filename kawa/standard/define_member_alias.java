@@ -11,21 +11,20 @@ public class define_member_alias extends Syntax
     = new define_member_alias();
   static { define_member_alias.setName("define-member-alias"); }
 
-
-  public boolean scanForDefinitions (Pair st, java.util.Vector forms,
-                                     ScopeExp defs, Translator tr)
+  @Override
+  public boolean scanForDefinitions(Pair st, ScopeExp defs, Translator tr)
   {
     Pair p;
     if (! (st.getCdr() instanceof Pair)
         || (tr.currentScope() instanceof ModuleExp)
         || ! ((p = (Pair) st.getCdr()).getCar() instanceof String))
-      return super.scanForDefinitions(st, forms, defs, tr);
+      return super.scanForDefinitions(st, defs, tr);
     Object name = p.getCar();
     Declaration decl = defs.addDeclaration((String) name,
                                            Compilation.typeSymbol);
     decl.setIndirectBinding(true);
     st = Translator.makePair(st, this, Translator.makePair(p, decl, p.getCdr()));
-    forms.addElement(st);
+    tr.pushForm(st);
     return true;
   }
 

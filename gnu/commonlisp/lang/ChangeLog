@@ -1,3 +1,9 @@
+2013-11-10  Per Bothner  <per@bothner.com>
+
+	* defun.java:  Update for new 'formStack' and scanDefinitions API.
+	* defvar.java: Likewise.
+	* Lisp2Compilation.java: Likewise.
+
 2013-07-05  Charles Turner  <chturne@gmail.com>
 
 	* CommonLisp.java: Added new keywords for CL: INHERITED, EXTERNAL

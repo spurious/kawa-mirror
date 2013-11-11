@@ -14,11 +14,11 @@ public class defvar extends Syntax
     this.force = force;
   }
 
-  public boolean scanForDefinitions (Pair st, java.util.Vector forms,
-                                     ScopeExp defs, Translator tr)
+  @Override
+  public boolean scanForDefinitions(Pair st, ScopeExp defs, Translator tr)
   {
     if (! (st.getCdr() instanceof Pair))
-      return super.scanForDefinitions(st, forms, defs, tr);
+      return super.scanForDefinitions(st, defs, tr);
     Pair p = (Pair) st.getCdr();
     Object name = p.getCar();
     if (name instanceof String || name instanceof Symbol)
@@ -42,7 +42,7 @@ public class defvar extends Syntax
 	    decl.setCanWrite(true);
           }
       }
-    forms.addElement (st);
+    tr.pushForm(st);
     return true;
   }
 

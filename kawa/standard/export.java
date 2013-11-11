@@ -11,8 +11,8 @@ public class export extends Syntax {
     public static final export export = new export();
     static { module_export.setName("export"); }
 
-    public boolean scanForDefinitions (Pair st, java.util.Vector forms,
-                                       ScopeExp defs, Translator tr) {
+    @Override
+    public boolean scanForDefinitions (Pair st, ScopeExp defs, Translator tr) {
         Object list = st.getCdr();
         Object savePos = tr.pushPositionOf(st);
         try {
@@ -78,7 +78,7 @@ public class export extends Syntax {
                                 decl2.noteValueFromSet(sexp);
                                 sexp.setDefining(true);
                                 list = st.getCdr();
-                                forms.add(sexp);
+                                tr.pushForm(sexp);
                                 continue;
                             }
                         }

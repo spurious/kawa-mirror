@@ -28,8 +28,8 @@ public class define_class extends Syntax
     this.isSimple = isSimple;
   }
 
-  public boolean scanForDefinitions (Pair st, java.util.Vector forms,
-                                     ScopeExp defs, Translator tr)
+  @Override
+  public boolean scanForDefinitions(Pair st, ScopeExp defs, Translator tr)
   {
     Object st_cdr = st.getCdr();
     SyntaxForm nameSyntax = null;
@@ -106,7 +106,7 @@ public class define_class extends Syntax
     if (saved == null)
 	return false;
     st = Translator.makePair(st, this, Translator.makePair(p, decl, saved));
-    forms.addElement (st);
+    tr.pushForm(st);
     return true;
   }
 

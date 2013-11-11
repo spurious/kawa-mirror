@@ -18,14 +18,14 @@ public class defun extends Syntax
     this.lambdaSyntax = lambdaSyntax;
   }
 
-  public boolean scanForDefinitions (Pair st, java.util.Vector forms,
-                                     ScopeExp defs, Translator tr)
+  @Override
+  public boolean scanForDefinitions(Pair st, ScopeExp defs, Translator tr)
   {
     Pair p;
     if (! (st.getCdr() instanceof Pair)
 	|| ! (((p = (Pair) st.getCdr()).getCar() instanceof String)
 	      || p.getCar() instanceof Symbol))
-      return super.scanForDefinitions(st, forms, defs, tr);
+      return super.scanForDefinitions(st, defs, tr);
     Object sym = p.getCar();
     Declaration decl = defs.lookup(sym, tr.getLanguage(),
                                    Language.FUNCTION_NAMESPACE);
@@ -42,7 +42,7 @@ public class defun extends Syntax
     if (defs instanceof ModuleExp)
       decl.setCanRead(true);
     st = Translator.makePair(st, this, Translator.makePair(p, decl, p.getCdr()));
-    forms.addElement (st);
+    tr.pushForm(st);
     return true;
   }
 

@@ -66,8 +66,6 @@ public class Translator extends Compilation
   /** A stack of aliases pushed by <code>pushRenamedAlias</code>. */
   private Stack<Declaration> renamedAliasStack;
 
-  public Stack formStack = new Stack();
-  public int firstForm;
   public Object pendingForm;
 
   public LambdaExp curMethodLambda;
@@ -569,6 +567,18 @@ public class Translator extends Compilation
 	    setPopCurrentScope(save_scope);
 	  }
       }
+    else if (exp instanceof ValuesFromLList)
+      {
+          // Optimization of following case.
+          // More importantly, we make use of the line number information.
+          for (Object vs = ((ValuesFromLList) exp).values;
+               vs != LList.Empty; )
+          {
+              Pair p = (Pair) vs;
+              pushForm(rewrite_car(p, false));
+              vs = p.getCdr();
+          }
+      }
     else if (exp instanceof Values)
       {
 	Object[] vals = ((Values) exp).getValues();
@@ -576,7 +586,7 @@ public class Translator extends Compilation
 	  rewriteInBody(vals[i]);
       }
     else
-      formStack.add(rewrite(exp, false));
+      pushForm(rewrite(exp, false));
   }
 
     public Object namespaceResolve(Object name) {
@@ -1319,23 +1329,14 @@ public class Translator extends Compilation
       return SyntaxForms.fromDatumIfNeeded(form, syntax);
   }
 
-  public Object popForms (int first)
+  /** Pop from formStack all forms that come after beforeFirst.
+   */
+  public Values popForms(Pair beforeFirst)
   {
-    int last = formStack.size();
-    if (last == first)
+    Object tail = formStack.popTail(beforeFirst);
+    if (tail == LList.Empty)
       return Values.empty;
-    Object r;
-    if (last == first + 1)
-      r = formStack.elementAt(first);
-    else
-      {
-        Object[] vals = new Object[last-first];
-        for (int i = first; i < last;  i++)
-            vals[i-first] = formStack.elementAt(i);
-        r = new Values.FromArray(vals);
-      }
-    formStack.setSize(first);
-    return r;
+    return new ValuesFromLList((LList) tail);
   }
 
   public void scanForm (Object st, ScopeExp defs)
@@ -1346,9 +1347,9 @@ public class Translator extends Compilation
 	ScopeExp save_scope = setPushCurrentScope(sf.getScope());
 	try
 	  {
-	    int first = formStack.size();
+	    Pair beforeFirst = formStack.last;
 	    scanForm(sf.getDatum(), defs);
-	    formStack.add(wrapSyntax(popForms(first), sf));
+	    pushForm(wrapSyntax(popForms(beforeFirst), sf));
 	    return;
 	  }
 	finally
@@ -1360,6 +1361,18 @@ public class Translator extends Compilation
       {
 	if (st == Values.empty)
 	  st = QuoteExp.voidExp; // From #!void
+        else if (st instanceof ValuesFromLList)
+        {
+          for (Object vs = ((ValuesFromLList) st).values;
+               vs != LList.Empty; )
+            {
+              Pair p = (Pair) vs;
+              Object save = pushPositionOf(p);
+              scanForm(p.getCar(), defs);
+              popPositionOf(save);
+              vs = p.getCdr();
+            }
+        }
 	else
 	  {
 	    Object[] vals = ((Values) st).getValues();
@@ -1459,7 +1472,7 @@ public class Translator extends Compilation
 	      }
 	  }
       }
-    formStack.add(st);
+    pushForm(st);
   }
 
   /** Recursive helper method for rewrite_body.
@@ -1483,7 +1496,8 @@ public class Translator extends Compilation
 	    ScopeExp save_scope = setPushCurrentScope(sf.getScope());
 	    try
 	      {
-		int first = formStack.size();
+		Pair first = formStack.last;
+
 		LList f = scanBody(sf.getDatum(), defs, makeList);
                 if (makeList)
                   {
@@ -1493,7 +1507,7 @@ public class Translator extends Compilation
                     lastPair.setCdrBackdoor(f);
                     return list;
                   }
-		formStack.add(wrapSyntax(popForms(first), sf));
+		pushForm(wrapSyntax(popForms(first), sf));
 		return null;
 	      }
 	    finally
@@ -1504,8 +1518,10 @@ public class Translator extends Compilation
 	else if (body instanceof Pair)
 	  {
 	    Pair pair = (Pair) body;
-	    int first = formStack.size();
+	    Pair first = formStack.last;
+            Object savePos = pushPositionOf(pair);
 	    scanForm(pair.getCar(), defs);
+            popPositionOf(savePos);
             if (getState() == Compilation.PROLOG_PARSED)
               {
                 // We've seen a require form during the initial pass when
@@ -1514,30 +1530,26 @@ public class Translator extends Compilation
                 if (pair.getCar() != pendingForm)
                   pair = makePair(pair, pendingForm, pair.getCdr());
                 pendingForm = new Pair(kawa.standard.begin.begin, pair);
-                if (list != LList.Empty)
-                  formStack.add(new Pair(kawa.standard.begin.begin, list));
+                if (makeList)
+                  formStack.pushAll(list);
                 return LList.Empty;
               }
-	    int fsize = formStack.size();
 	    if (makeList)
 	      {
-		for (int i = first;  i < fsize;  i++)
-		  {
-		    Pair npair
-		      = makePair(pair, formStack.elementAt(i), LList.Empty);
-		    if (lastPair == null)
-		      list = npair;
-		    else
-		      lastPair.setCdrBackdoor(npair);
-		    lastPair = npair;
-		  }
-		formStack.setSize(first);
+                Pair last = formStack.lastPair();
+                LList nlist = (LList) formStack.popTail(first);
+                if (lastPair == null)
+		  list = nlist;
+		else
+		  lastPair.setCdrBackdoor(nlist);
+                if (last != first)
+                  lastPair = last;
 	      }
 	    body = pair.getCdr();
 	  }
 	else
 	  {
-	    formStack.add(syntaxError ("body is not a proper list"));
+	    pushForm(syntaxError("body is not a proper list"));
 	    break;
 	  }
       }
@@ -1561,14 +1573,14 @@ public class Translator extends Compilation
     // This is confusing, at the least.  FIXME.
     Object saved = pushPositionOf(exp);
     LetExp defs = new LetExp();
-    int first = formStack.size();
+    Pair first = formStack.last;
     defs.outer = current_scope;
     current_scope = defs;
     try
       {
         LList list = scanBody(exp, defs, true);
 	if (list.isEmpty())
-	  formStack.add(syntaxError ("body with no expressions"));
+	  pushForm(syntaxError("body with no expressions"));
         int ndecls = 0;
         for (Declaration decl = defs.firstDecl(); decl != null; decl = decl.nextDecl())
           {
@@ -1613,22 +1625,22 @@ public class Translator extends Compilation
   }
 
   /** Combine a list of zero or more expression forms into a "body". */
-  protected Expression makeBody(int first, ScopeExp scope)
+  protected Expression makeBody(Pair head, ScopeExp scope)
   {
-    int nforms = formStack.size() - first;
+    Object tail = formStack.popTail(head);
+    int nforms = LList.length(tail);
     if (nforms == 0)
-      return QuoteExp.voidExp; 
-    else if (nforms == 1)
+      return QuoteExp.voidExp;
+    Pair first = (Pair) tail;
+     if (nforms == 1)
       {
-	return (Expression) formStack.pop();
+	return (Expression) first.getCar();
       }
     else
       {
 	Expression[] exps = new Expression[nforms];
-	for (int i = 0; i < nforms; i++)
-	  exps[i] = (Expression) formStack.elementAt(first + i);
-	formStack.setSize(first);
-	if (scope instanceof ModuleExp)
+        first.toArray(exps);
+        if (scope instanceof ModuleExp)
 	  return new ApplyExp(gnu.kawa.functions.AppendValues.appendValues,
 			      exps);
 	else
@@ -1740,19 +1752,6 @@ public class Translator extends Compilation
         mexp.setFlag(false, ModuleExp.USE_DEFINED_CLASS);
   }
 
-  static void vectorReverse (Vector vec, int start, int count)
-  {
-    // See http://www.azillionmonkeys.com/qed/case8.html
-    int j = count / 2;
-    int last = start + count - 1;
-    for (int i = 0; i < j; i++)
-      {
-        Object tmp = vec.elementAt(start + i);
-        vec.setElementAt(vec.elementAt(last - i), start+i);
-        vec.setElementAt(tmp, last - i);
-      }
-  }
-
   public void resolveModule(ModuleExp mexp)
   {
     int numPending = pendingImports == null ? 0 : pendingImports.size();
@@ -1761,26 +1760,27 @@ public class Translator extends Compilation
         ModuleInfo info = (ModuleInfo) pendingImports.elementAt(i++);
         ScopeExp defs = (ScopeExp) pendingImports.elementAt(i++);
         Expression posExp = (Expression) pendingImports.elementAt(i++);
-        Integer savedSize = (Integer) pendingImports.elementAt(i++);
+        Pair beforeGoal = (Pair) pendingImports.elementAt(i++);
         if (mexp == defs)
           {
             // process(BODY_PARSED);
             Expression savePos = new ReferenceExp((Object) null);
             savePos.setLine(this);
             setLine(posExp);
-            int beforeSize = formStack.size();
+            Pair beforeImports = formStack.last;
             kawa.standard.require.importDefinitions(null, info, null,
                                                     formStack, defs, this);
-            int desiredPosition = savedSize.intValue();
-            if (savedSize != beforeSize)
+            if (beforeGoal != beforeImports
+                && beforeImports != formStack.last)
               {
-                // Move the forms resulting from the import to desiredPosition:
-                int curSize = formStack.size();
-                int count = curSize - desiredPosition;
-                // See http://www.azillionmonkeys.com/qed/case8.html
-                vectorReverse(formStack, desiredPosition, beforeSize-desiredPosition);
-                vectorReverse(formStack, beforeSize, curSize - beforeSize);
-                vectorReverse(formStack, desiredPosition, count);
+                // Move forms derived from the import forwards in the list,
+                // just following beforeGoal.
+                Object firstGoal = beforeGoal.getCdr();
+                Object firstImports = beforeImports.getCdr();
+                beforeGoal.setCdrBackdoor(firstImports);
+                formStack.last.setCdrBackdoor(firstGoal);
+                beforeImports.setCdrBackdoor(LList.Empty);
+                formStack.last = beforeImports;
               }
             setLine(savePos);
           }
@@ -1793,7 +1793,7 @@ public class Translator extends Compilation
     Compilation save_comp = Compilation.setSaveCurrent(this);
     try
       {
-        rewriteInBody(popForms(firstForm));
+        rewriteBody((LList) formStack.popTail(firstForm));
 	mexp.body = makeBody(firstForm, mexp);
         // In immediate mode need to preserve Declaration for current "session".
         if (! immediate)
@@ -1908,4 +1908,85 @@ public class Translator extends Compilation
     return "objectSyntax".equals(fieldName)
       &&  "kawa.standard.object".equals(declaringClass.getName());
   }
+
+    public FormStack formStack = new FormStack(this);
+    public void pushForm(Object value) { formStack.push(value); }
+    // FIXME rename - maybe to effectiveFormsHead ?
+    public Pair firstForm = formStack.getHead();
+  
+    /** A list of "forms" to be further processed.
+     * It is implemented as an LList so we can save position information.
+     */
+    public static class FormStack extends Pair {
+        private Pair last = this;
+        SourceLocator sloc;
+    
+        public FormStack(SourceLocator sloc) {
+            this.sloc = sloc;
+            this.cdr = LList.Empty;
+        }
+
+        /** Return the "head" of the list.
+         * The cdr of the head is the first element.
+         */
+        public Pair getHead() { return this; }
+        public Object getFirst() { return cdr; }
+        /** The Pair whose car is the last form in the list.
+         * If the list is empty, this returns the list head.
+         */
+        @Override
+        public Pair lastPair() { return last; }
+
+        /* DEBUGGING:
+        public void dump() {
+            int i=0;
+            System.err.println("formStack len:"+LList.length(getFirst()));
+            for(Object x = getFirst(); x instanceof Pair; i++) {
+                Pair p = (Pair) x;
+                //if (! (p.getCar() instanceof SetExp))
+                    System.err.println("- #"+i+": "+p.getCar());
+                x = p.getCdr();
+            }
+        }
+        */
+
+        public Object popTail(Pair oldTail) {
+            Object r = oldTail.getCdr();
+            oldTail.setCdrBackdoor(LList.Empty);
+            last = oldTail;
+            return r;
+        }
+    
+        public void push(Object value) {
+            Pair pair = new PairWithPosition(sloc, value, LList.Empty);
+            last.setCdrBackdoor(pair);
+            last = pair;
+        }
+
+        public void pushAll(LList values) {
+            if (values == LList.Empty)
+                return;
+            last.setCdrBackdoor(values);
+            last = ((Pair) values).lastPair();
+        }
+    
+        public void pushAfter(Object value, Pair position) {
+            Pair pair = new PairWithPosition(sloc, value, position.getCdr());
+            position.setCdrBackdoor(pair);
+            if(last == position)
+                last = pair;
+        }
+    }
+
+    /** An implementationof Values using a linked list.
+     */
+    public static class ValuesFromLList extends Values.FromList<Object> {
+        public LList values;
+
+        public ValuesFromLList(LList values) {
+            super(values);
+            this.values = values;
+        }
+    }
+
 }

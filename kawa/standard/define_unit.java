@@ -25,8 +25,8 @@ public class define_unit extends Syntax
     this.base = base;
   }
 
-  public boolean scanForDefinitions (Pair st, java.util.Vector forms,
-                                     ScopeExp defs, Translator tr)
+  @Override
+  public boolean scanForDefinitions(Pair st, ScopeExp defs, Translator tr)
   {
     if (st.getCdr() instanceof Pair)
       {
@@ -63,7 +63,7 @@ public class define_unit extends Syntax
 	      decl.noteValue(new QuoteExp(unit));
 	    p = Translator.makePair(p, decl, p.getCdr());
 	    st = Translator.makePair(st, this, p);
-	    forms.addElement (st);
+	    tr.pushForm(st);
 	    return true;
 	  }
       }

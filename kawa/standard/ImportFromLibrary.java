@@ -7,6 +7,7 @@ import gnu.expr.*;
 import gnu.lists.*;
 import gnu.mapping.*;
 import java.util.*;
+import kawa.lang.Translator.FormStack;
 
 /** Implement R6RS import form.
  * This actually only implements simplified import;
@@ -78,8 +79,8 @@ public class ImportFromLibrary extends Syntax
     { "101", "random-access-lists", "gnu.kawa.slib.ralists" }
   };
 
-  public boolean scanForDefinitions (Pair st, Vector forms,
-                                     ScopeExp defs, Translator tr)
+  @Override
+  public boolean scanForDefinitions(Pair st, ScopeExp defs, Translator tr)
   {
     Procedure mapper = null;
     Object args = st.getCdr();
@@ -232,7 +233,7 @@ public class ImportFromLibrary extends Syntax
 	return false;
       }
     require.importDefinitions(null, minfo, mapper,
-                              forms, defs, tr);
+                              tr.formStack, defs, tr);
     return true;
   }
 

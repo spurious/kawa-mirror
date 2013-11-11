@@ -12,6 +12,7 @@ import gnu.kawa.reflect.*;
 import gnu.kawa.functions.Convert;
 import gnu.text.*;
 import java.util.*;
+import kawa.lang.Translator.FormStack;
 
 public class require extends Syntax
 {
@@ -124,8 +125,8 @@ public class require extends Syntax
       .findWithClassName(typeName).getInstance();
   }
 
-  public boolean scanForDefinitions (Pair st, Vector forms,
-                                     ScopeExp defs, Translator tr)
+  @Override
+  public boolean scanForDefinitions (Pair st, ScopeExp defs, Translator tr)
   {
     if (tr.getState() == Compilation.PROLOG_PARSING)
       {
@@ -172,7 +173,7 @@ public class require extends Syntax
             tr.error('e', "malformed URL: "+sourceName);
             return false;
           }
-        return importDefinitions(null, info, null, forms, defs, tr);
+        return importDefinitions(null, info, null, tr.formStack, defs, tr);
       }
     else if (name instanceof Symbol && ! tr.selfEvaluatingSymbol(name))
       {
@@ -200,7 +201,7 @@ public class require extends Syntax
                     return false;
                   }
                 return importDefinitions(cname, info, null,
-                                         forms, defs, tr);
+                                         tr.formStack, defs, tr);
               }
 	  }
       }
@@ -220,7 +221,7 @@ public class require extends Syntax
 	return false;
       }
     importDefinitions(null, minfo, null,
-                      forms, defs, tr);
+                      tr.formStack, defs, tr);
     return true;
   }
 
@@ -239,7 +240,8 @@ public class require extends Syntax
    */
   public static boolean
   importDefinitions (String className, ModuleInfo info, Procedure renamer,
-                     Vector forms, ScopeExp defs, Compilation tr)
+                     FormStack forms, 
+                     ScopeExp defs, Compilation tr)
   {
     ModuleManager manager = ModuleManager.getInstance();
     long now;
@@ -288,7 +290,7 @@ public class require extends Syntax
             && info.getState() < Compilation.RESOLVED)
           {
             // Oops.  We found a cycle.
-            tr.pushPendingImport(info, defs, forms.size());
+            tr.pushPendingImport(info, defs, forms);
             return true;
           }
       }
@@ -306,7 +308,7 @@ public class require extends Syntax
     Field instanceField = null;
     Language language = tr.getLanguage();
     dofind.setLine(tr);
-    int formsStart = forms.size();
+    Pair formsStart = forms.lastPair();
 
     ModuleExp mod = info.setupModuleExp();
 
@@ -352,8 +354,8 @@ public class require extends Syntax
             SetExp sexp = new SetExp(decl, dofind);
             sexp.setLine(tr);
             sexp.setDefining(true);
-            forms.addElement(sexp);
-            formsStart = forms.size();
+            forms.push(sexp);
+            formsStart = forms.lastPair();
             decl.setFlag(Declaration.EARLY_INIT);
             // If Runnable, we need to set decl value in initializer,
             // and later 'run' it, so it needs to be stored in a field.
@@ -444,11 +446,11 @@ public class require extends Syntax
             // initialized first, since we may need then for
             // imported declarations that are re-exported.  (The
             // instance may be needed for FieldLocation values.)
-            forms.insertElementAt(sexp, formsStart);
-            formsStart++;
+            forms.pushAfter(sexp, formsStart);
+            formsStart = forms.lastPair();
           }
         else
-          forms.addElement(sexp);
+          forms.push(sexp);
 
         declPairs.add(adecl);
         declPairs.add(fdecl);
@@ -500,7 +502,7 @@ public class require extends Syntax
           }
         dofind = new ApplyExp(run, new Expression[] { dofind });
         dofind.setLine(tr);
-        forms.addElement(dofind);
+        forms.push(dofind);
       }
 
     return true;

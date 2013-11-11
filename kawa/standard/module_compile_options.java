@@ -9,8 +9,8 @@ public class module_compile_options extends Syntax
     = new module_compile_options();
   static { module_compile_options.setName("module-compile-options"); }
 
-  public boolean scanForDefinitions (Pair st, java.util.Vector forms,
-                                     ScopeExp defs, Translator tr)
+  @Override
+  public boolean scanForDefinitions(Pair st, ScopeExp defs, Translator tr)
   {
     Object rest = with_compile_options.getOptions(st.getCdr(), null, this, tr);
     if (rest != LList.Empty)

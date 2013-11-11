@@ -82,7 +82,7 @@ public class Eval
         Compilation saveComp = Compilation.setSaveCurrent(tr);
         try
           {
-            int first = tr.formStack.size();
+            Pair first = tr.formStack.lastPair();
             tr.scanBody(body, mod, false);
             tr.firstForm = first;
             tr.finishModule(mod);

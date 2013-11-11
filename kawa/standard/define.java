@@ -107,7 +107,7 @@ public class define extends Syntax
 			     Translator.makePair(p1, sexp, p2));
     Translator.setLine(decl, p1);
 
-    tr.formStack.addElement(st);
+    tr.pushForm(st);
   }
 
   public Expression rewriteForm (Pair form, Translator tr)

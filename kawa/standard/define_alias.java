@@ -52,7 +52,7 @@ public class define_alias extends Syntax {
 
                 if (formSyntax != null)
                     f2 = SyntaxForms.makeForm(f2, formSyntax.getScope());
-                tr.formStack.addElement(Translator.makePair(st, this,
+                tr.pushForm(Translator.makePair(st, this,
                         Translator.makePair(p1, decl, f2)));
                 return;
             }

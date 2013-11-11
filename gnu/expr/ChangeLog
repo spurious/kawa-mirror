@@ -1,3 +1,7 @@
+2013-11-10  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (pushPendingImport): Update to new formStack API.
+
 2013-11-03  Per Bothner  <per@bothner.com>
 
 	* Compilation.java (compileConstant): Minor optimization.

@@ -10,8 +10,8 @@ public class module_static extends Syntax
   public static final module_static module_static = new module_static();
   static { module_static.setName("module-static"); }
 
-  public boolean scanForDefinitions (Pair st, java.util.Vector forms,
-                                     ScopeExp defs, Translator tr)
+  @Override
+  public boolean scanForDefinitions(Pair st, ScopeExp defs, Translator tr)
   {
     Object list = st.getCdr();
     if (! (defs instanceof ModuleExp))

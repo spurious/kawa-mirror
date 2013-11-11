@@ -85,12 +85,12 @@ public class define_syntax extends Syntax
     name = tr.namespaceResolve(name);
     if (! (name instanceof Symbol))
       {
-        tr.formStack.addElement(tr.syntaxError("missing macro name for "+Translator.safeCar(st)));
+        tr.pushForm(tr.syntaxError("missing macro name for "+Translator.safeCar(st)));
         return;
       }
     if (p == null || Translator.safeCdr(p) != LList.Empty)
       {
-        tr.formStack.addElement(tr.syntaxError("invalid syntax for "+getName()));
+        tr.pushForm(tr.syntaxError("invalid syntax for "+getName()));
         return;
       }
 
@@ -133,13 +133,13 @@ public class define_syntax extends Syntax
 	if (tr.getLanguage().hasSeparateFunctionNamespace())
 	  result.setFuncDef(true);
 
-	tr.formStack.addElement(result);
+	tr.pushForm(result);
 
         if (tr.immediate)
           {
             Expression[] args =
                 { new ReferenceExp(decl), new QuoteExp(defs) };
-            tr.formStack.addElement(new ApplyExp(setCapturedScope, args));
+            tr.pushForm(new ApplyExp(setCapturedScope, args));
           }
       }
   }

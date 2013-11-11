@@ -15,12 +15,14 @@ import gnu.bytecode.*;
 import gnu.kawa.reflect.OccurrenceType;
 import gnu.kawa.reflect.SingletonType;
 import gnu.kawa.functions.Convert;
+import gnu.lists.LList;
 import gnu.xquery.util.NamedCollator;
 import gnu.xquery.util.CastableAs;
 import gnu.xquery.util.QNameUtils;
 import gnu.xquery.util.RelativeStep;
 import gnu.xquery.util.ValuesFilter;
 import kawa.standard.require;
+import kawa.lang.Translator.FormStack;
 
 /** A class to read xquery forms. */
 
@@ -3951,7 +3953,7 @@ public class XQParser extends Lexer
 
         String at;
  	ModuleExp module = comp.getModule();
-	Vector forms = new Vector();
+	FormStack formStack = new FormStack(comp);
         String packageName = Compilation.mangleURI(uri);
         comp.setLine(port.getName(), startLine, startColumn);
 	if (match("at"))
@@ -3969,7 +3971,7 @@ public class XQParser extends Lexer
                 if (info == null)
                   comp.error('e', "malformed URL: "+at);
                 require.importDefinitions(className, info,
-                                          null, forms, module, comp);
+                                          null, formStack, module, comp);
                 next = skipSpace(nesting != 0);
                 if (next != ',')
                   {
@@ -4004,7 +4006,7 @@ public class XQParser extends Lexer
                 if (! uri.equals(info.getNamespaceUri()))
                   continue;
                 n++;
-                require.importDefinitions(info.getClassName(), info, null, forms, module, comp);
+                require.importDefinitions(info.getClassName(), info, null, formStack, module, comp);
               }
             if (n == 0)
               error('e', "no module found for "+uri);
@@ -4016,6 +4018,7 @@ public class XQParser extends Lexer
           {
             error('e', "module import forms a cycle", "XQST0073");
           }
+        LList forms = (LList) formStack.getFirst();
 	Expression[] inits = new Expression[forms.size()];
 	forms.toArray(inits);
 	return BeginExp.canonicalize(inits);

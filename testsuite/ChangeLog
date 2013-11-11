@@ -1,3 +1,10 @@
+2013-11-10  John <anonymous>
+	    Per Bothner  <per@bothner.com>
+
+	* sva40494.scm: New test for Savannah bug #40494
+	"internal error on kawa -C bug.scm, 1.14 and head".
+	* Makefile.am: Update accordingly.
+
 2013-10-30  Per Bothner  <per@bothner.com>
 
 	* xml-test.scm: Update prefix in namespace-declaration is symbol,

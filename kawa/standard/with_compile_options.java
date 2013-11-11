@@ -24,7 +24,7 @@ public class with_compile_options extends Syntax
     rest = tr.scanBody(rest, defs, true);
     rest = new Pair(stack, rest);
     tr.currentOptions.popOptionValues(stack);
-    tr.formStack.add(Translator.makePair(form, form.getCar(), rest));
+    tr.pushForm(Translator.makePair(form, form.getCar(), rest));
   }
 
   public static Object getOptions (Object form, Stack stack,

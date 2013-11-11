@@ -118,7 +118,7 @@ public abstract class LispLanguage extends Language
 
         if ((options & PARSE_PROLOG) == 0)
           {
-            tr.firstForm = 0;
+            tr.firstForm = tr.formStack.getHead();
           }
         tr.setState(Compilation.BODY_PARSED);
       }

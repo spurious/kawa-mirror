@@ -1,3 +1,7 @@
+2013-11-10  Per Bothner  <per@bothner.com>
+
+	* XQParser.java: Update for new FormStack APIs.
+
 2013-11-02  Per Bothner  <per@bothner.com>
 
 	* XQResolveNames.java: Mark docCached method as side-effect free.

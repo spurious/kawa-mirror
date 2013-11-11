@@ -25,8 +25,8 @@ public class DefineNamespace extends Syntax
     define_xml_namespace.makeXML = true;
   }
 
-  public boolean scanForDefinitions (Pair st, java.util.Vector forms,
-                                     ScopeExp defs, Translator tr)
+  @Override
+  public boolean scanForDefinitions(Pair st, ScopeExp defs, Translator tr)
   {
     Pair p1, p2;
     if (! (st.getCdr() instanceof Pair)
@@ -85,7 +85,7 @@ public class DefineNamespace extends Syntax
     else
       value = tr.rewrite_car (p2, false);
     decl.noteValue(value);
-    forms.addElement(SetExp.makeDefinition(decl, value));
+    tr.pushForm(SetExp.makeDefinition(decl, value));
     return true;
   }
 

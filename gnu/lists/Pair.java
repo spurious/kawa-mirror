@@ -129,7 +129,7 @@ public class Pair extends LList implements Externalizable
     return PositionManager.getPositionObject(ipos).getPrevious();
   }
 
-  public final Pair lastPair()
+  public Pair lastPair()
   {
     Pair pair = this;
     for (;;)

@@ -82,16 +82,12 @@ public class Eval
         Compilation saveComp = Compilation.setSaveCurrent(tr);
         try
           {
-            LList savedForms
-                = (LList) tr.formStack.popTail(tr.formStack.getHead());
-            Pair savedLast = tr.formStack.lastPair();
             tr.scanBody(body, mod, false);
             tr.finishModule(mod);
             if (body instanceof PairWithPosition)
                 mod.setFile(((PairWithPosition) body).getFileName());
             tr.setEvalName();
             tr.process(Compilation.RESOLVED);
-            tr.formStack.pushAll(savedForms, savedLast);
           }
         finally
           {

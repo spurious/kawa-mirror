@@ -1,5 +1,11 @@
 2013-11-11  Per Bothner  <per@bothner.com>
 
+	* lang/Eval.java (evalBody): Even simpler, just remove the
+	save/restore of the formStack.  Not sure why it would be needed,
+	since eval creates a fresh Translator and thus FormStack each time.
+
+2013-11-11  Per Bothner  <per@bothner.com>
+
 	* lang/Eval.java (evalBody): Instead of setting the magic variable
 	firstForm, just save and restore the formStack.
 	* lang/Translator.java (firstForm): Remove field.

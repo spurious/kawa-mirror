@@ -1793,6 +1793,7 @@ public class Translator extends Compilation
     Compilation save_comp = Compilation.setSaveCurrent(this);
     try
       {
+        Pair firstForm = formStack.getHead();
         rewriteBody((LList) formStack.popTail(firstForm));
 	mexp.body = makeBody(firstForm, mexp);
         // In immediate mode need to preserve Declaration for current "session".
@@ -1911,8 +1912,6 @@ public class Translator extends Compilation
 
     public FormStack formStack = new FormStack(this);
     public void pushForm(Object value) { formStack.push(value); }
-    // FIXME rename - maybe to effectiveFormsHead ?
-    public Pair firstForm = formStack.getHead();
   
     /** A list of "forms" to be further processed.
      * It is implemented as an LList so we can save position information.
@@ -1968,6 +1967,13 @@ public class Translator extends Compilation
                 return;
             last.setCdrBackdoor(values);
             last = ((Pair) values).lastPair();
+        }
+    
+        public void pushAll(LList values, Pair valuesLast) {
+            if (values == LList.Empty)
+                return;
+            last.setCdrBackdoor(values);
+            last = valuesLast;
         }
     
         public void pushAfter(Object value, Pair position) {

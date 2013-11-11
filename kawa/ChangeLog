@@ -1,3 +1,10 @@
+2013-11-11  Per Bothner  <per@bothner.com>
+
+	* lang/Eval.java (evalBody): Instead of setting the magic variable
+	firstForm, just save and restore the formStack.
+	* lang/Translator.java (firstForm): Remove field.
+	(FormStack.pushAll): New method.
+
 2013-11-10  Per Bothner  <per@bothner.com>
 
 	* lang/Translator.java (class FormStack): Use new class to

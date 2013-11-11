@@ -1167,7 +1167,7 @@ use @code{kawa} or @code{java} to run the script unless you
 make sure to pass it the @code{--script2} option.
 
 @subsection Scripts for compiled code
-It your compile your Kawa application to class files (or better:
+If you compile your Kawa application to class files (or better:
 a @code{jar} file), you probably still want to write a small
 shell script to set things up.  Here is one method:
 
@@ -1177,13 +1177,13 @@ export CLASSPATH=/my/path
 exec kawa -Dkawa.command.name="$0" foo "$@@"
 @end example
 
-Using the @code{kawa} is a convenience, since it automatically
+Using the @code{kawa} front-end is a convenience, since it automatically
 sets up the paths for the Kawa classes, and (if enabled) if
 provides readline support for the default input port.
 
 Setting the @code{kawa.command.name} property to @code{"$0"}
 (the filename used to invoke the script) enables
-@code{(command-line}) to use the script name as command name.
+@code{(command-line}) to use the script name as the command name.
 
 You can invoke @code{java} directly, which is necessary when
 running a @code{jar} file:
@@ -1652,6 +1652,9 @@ using @uref{http://srfi.schemers.org/srfi-16/srfi-16.html, @code{case-lambda}}.
 @item
 @uref{http://srfi.schemers.org/srfi-37/srfi-37.html, SRFI 37}: @uref{http://srfi.schemers.org/srfi-37/srfi-37.html,@code{args-fold} - a program argument processor}, if @code{(require 'args-fold)}.
 @item
+@uref{http://srfi.schemers.org/srfi-38/srfi-38.html, SRFI 39}: External Representation for Data With Shared Structure.
+The @code{read-with-shared-structure} is missing, but subsumed by @code{read}.
+@item
 @uref{http://srfi.schemers.org/srfi-39/srfi-39.html, SRFI 39}:
 @xref{Parameter objects}.
 @item
@@ -1659,17 +1662,26 @@ using @uref{http://srfi.schemers.org/srfi-16/srfi-16.html, @code{case-lambda}}.
 @item
 @uref{http://srfi.schemers.org/srfi-45/srfi-45.html, SRFI 45}: Primitives for Expressing Iterative Lazy Algorithms - @pxref{Lazy evaluation}.
 @item
+@uref{http://srfi.schemers.org/srfi-60/srfi-60.html, SRFI 60}:
+Integers as Bits.
+Mostly implemented.  A few functions are missing,
+and a few are only available under other names.
+@item
 @uref{http://srfi.schemers.org/srfi-62/srfi-62.html, SRFI 62}: S-expression comments.
 @item
 @uref{http://srfi.schemers.org/srfi-64/srfi-64.html, SRFI 64}: A Scheme API for test suites.
 @item
 @uref{http://srfi.schemers.org/srfi-69/srfi-69.html, SRFI 69}: Basic hash tables - @pxref{Hash tables}.
 @item
+@uref{http://srfi.schemers.org/srfi-87/srfi-87.html, SRFI 87}: @code{=>} in case clauses.
+@item
 @uref{http://srfi.schemers.org/srfi-88/srfi-88.html, SRFI 88}: Keyword objects - @pxref{Keywords}.
 @item
 @uref{http://srfi.schemers.org/srfi-95/srfi-95.html, SRFI 95}: Sorting and Merging.
 @item
 @uref{http://srfi.schemers.org/srfi-97/srfi-97.html, SRFI 97}: Names for SRFI Libraries.
+@item
+@uref{http://srfi.schemers.org/srfi-98/srfi-98.html, SRFI 98}: An interface to access environment variables
 @item
 @uref{http://srfi.schemers.org/srfi-108/,SRFI 108}: Named quasi-literal constructors.
 @item
@@ -7740,6 +7752,25 @@ the concatenation of the elements in the given bytevectors.
 @end example
 @end deffn
 
+@deffn Procedure utf8->string bytevector [start [end]]
+This procedure decodes the bytes of a bytevector between @var{start}
+and @var{end}, interpreting as a UTF-8-encoded string,
+and returns the corresponding string.
+It is an error for @var{bytevector} to contain invalid UTF-8 byte sequences.
+@example
+(utf8->string #u8(#x41))  @result{} "A"
+@end example
+@end deffn
+
+@deffn Procedure string->utf8 string [start [end]]
+This procedure encodes the characters of a string between
+@var{start} and @var{end} and returns the corresponding bytevector,
+in UTF-8 encoding.
+@example
+(string->utf8 "λ")     @result{} " #u8(#xCE #xBB)
+@end example
+@end deffn
+
 @node Streams
 @section Streams - lazy lists
 
@@ -11094,6 +11125,8 @@ name conflicts between separately developed modules.  An even more
 important reason is to enforce an interface:  Client modules should
 only use the names that are part of a documented interface, and should
 not use internal implementation procedures (since those may change).
+
+FIXME --main changes the default.
 
 If there is a @code{module-export} declaration in the module, then
 only those names listed in a @code{module-export} are exported.

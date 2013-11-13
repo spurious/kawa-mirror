@@ -1,3 +1,7 @@
+2013-11-13  Per Bothner  <per@bothner.com>
+
+	* syntax.scm (%simple-construct-builder): Fix logic error.
+
 2013-11-07  Per Bothner  <per@bothner.com>
 
 	* ports.scm (open-binary-input-file, open-binary-output-file):

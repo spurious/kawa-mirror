@@ -377,4 +377,4 @@
     ((%simple-construct-builder fun mkstr (seen ...) x . rest)
      (%simple-construct-builder fun mkstr (seen ... x) . rest))
     ((%simple-construct-builder fun mkstr (seen ...))
-     (fun seen ... (mkstr)))))
+     (fun (mkstr seen ... )))))

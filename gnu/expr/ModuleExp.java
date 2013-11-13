@@ -27,8 +27,8 @@ public class ModuleExp extends LambdaExp
   public static final int IMMEDIATE = LAZY_DECLARATIONS << 1;
 
   /** True of a read-eval-print interface where each module is only partial.
-   * Conceptually, each statement is a fragent of a imagined super-module
-   * for the whole interaction, thugh current there is no super-module object.
+   * Conceptually, each statement is a fragment of a imagined super-module
+   * for the whole interaction, though currently there is no super-module object.
    * IMMEDIATE is also set in this case.
    */
   public static final int INTERACTIVE = IMMEDIATE << 1;

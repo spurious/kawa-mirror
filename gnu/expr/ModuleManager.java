@@ -58,7 +58,7 @@ public class ModuleManager
     }
 
   public static final long LAST_MODIFIED_CACHE_TIME = 1000;
-  /** Number millseconds before we re-check file's modified time. */
+  /** Number of milliseconds before we re-check file's modified time. */
   public long lastModifiedCacheTime = LAST_MODIFIED_CACHE_TIME;
 
   /** List of all modules managed by this ModuleManager. */

@@ -1,3 +1,9 @@
+2013-11-13  Per Bothner  <per@bothner.com>
+
+	* lang/Translator.java (resolveModule): Reset current line
+	position, so we don't have "dangling" line numbers from a
+	previous phase.
+
 2013-11-12  Per Bothner  <per@bothner.com>
 
 	* lang/SyntaxTemplate.java (print_template_program): Update

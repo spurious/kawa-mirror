@@ -55,7 +55,7 @@ public class Translator extends Compilation
    * This is (more-or-less) the mark specified by the syntax-case
    * specification (in r6rs-lib), applied to the output of a transformer.
    * However, instead of "applying" a mark to the transformer output,
-   * we remember in the TemlateScope an object unique to the application.
+   * we remember in the TemplateScope an object unique to the application.
    */
   Object currentMacroMark = null;
 
@@ -1754,6 +1754,7 @@ public class Translator extends Compilation
 
   public void resolveModule(ModuleExp mexp)
   {
+    setLine(null, -1, -1);
     int numPending = pendingImports == null ? 0 : pendingImports.size();
     for (int i = 0;  i < numPending;  )
       {

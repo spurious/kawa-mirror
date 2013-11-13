@@ -1,3 +1,8 @@
+2013-11-13  Per Bothner  <per@bothner.com>
+
+	* ObjectType.java (getReflectClass): Simplify since we can
+	now assume that Throwable#getCause is available.
+
 2013-11-07  Per Bothner  <per@bothner.com>
 
 	* ArrayClassLoader.java (loadClass): Fix logic error from change

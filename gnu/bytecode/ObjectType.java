@@ -126,12 +126,7 @@ public class ObjectType extends Type
       {
         if ((flags & EXISTING_CLASS) != 0)
           {
-	    RuntimeException rex
-              = new RuntimeException("no such class: "+getName());
-            /* #ifdef use:java.lang.Throwable.getCause */
-            rex.initCause(ex);
-            /* #endif */
-            throw rex;
+            throw new RuntimeException("no such class: "+getName(), ex);
           }
       }
     return reflectClass;

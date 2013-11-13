@@ -127,7 +127,7 @@ public class SyntaxTemplate implements Externalizable
 		|| lit_num < 0)
 	      ps.print("??");
 	    else
-	      kawa.standard.Scheme.writeFormat.writeObject(literal_values [lit_num], (Consumer) ps);
+	      DisplayFormat.schemeWriteFormat.writeObject(literal_values[lit_num], (Consumer) ps);
 	    ps.println();
 	  }
 	else if ((ch & 6) == BUILD_VAR) // Also catches BUILD_VAR_CAR.

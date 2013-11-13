@@ -1,3 +1,8 @@
+2013-11-12  Per Bothner  <per@bothner.com>
+
+	* lang/SyntaxTemplate.java (print_template_program): Update
+	commented-out debugging helper.
+
 2013-11-11  Per Bothner  <per@bothner.com>
 
 	* lang/Eval.java (evalBody): Even simpler, just remove the

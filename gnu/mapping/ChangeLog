@@ -1,3 +1,8 @@
+2013-11-13  Per Bothner  <per@bothner.com>
+
+	* CharArrayInPort.java (<init>): New constructor taking FString.
+	(make): Make method static.  Use new constructor.
+
 2013-11-03  Per Bothner  <per@bothner.com>
 
 	* Values.java: Change to an abstract class that extends

@@ -1,5 +1,8 @@
 2013-11-13  Per Bothner  <per@bothner.com>
 
+	* ports.scm (open-input-string, call-with-input-string):
+	Use more-general factory method CharArrayInPort:make.
+
 	* syntax.scm (%simple-construct-builder): Fix logic error.
 
 2013-11-07  Per Bothner  <per@bothner.com>

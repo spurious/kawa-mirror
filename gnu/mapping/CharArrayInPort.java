@@ -10,7 +10,7 @@ public class CharArrayInPort extends InPort
 {
   static final Path stringPath = Path.valueOf("<string>");
 
-  public CharArrayInPort make
+  public static CharArrayInPort make
   /* #ifdef use:java.lang.CharSequence */
   (CharSequence seq)
   /* #else */ 
@@ -18,10 +18,7 @@ public class CharArrayInPort extends InPort
   /* #endif */
   {
     if (seq instanceof FString)
-      {
-        FString fstr = (FString) seq;
-        return new CharArrayInPort(fstr.data, fstr.size);
-      }
+      return new CharArrayInPort((FString) seq);
     else
       {
         int len = seq.length();
@@ -62,6 +59,10 @@ public class CharArrayInPort extends InPort
   {
     this(string.toCharArray());
   }
+
+    public CharArrayInPort(FString string) {
+        this(string.data, string.size());
+    }
 
   public int read () throws java.io.IOException
   {

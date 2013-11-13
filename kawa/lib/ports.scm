@@ -112,7 +112,7 @@
 
 ;; SRFI-6
 (define (open-input-string (str ::string)) ::string-input-port
-  (gnu.mapping.CharArrayInPort str))
+  (gnu.mapping.CharArrayInPort:make str))
 
 (define (open-output-string) :: <string-output-port>
   (<string-output-port>))
@@ -134,7 +134,7 @@
     (gnu.lists.U8Vector (bo:toByteArray))))
 
 (define (call-with-input-string (str :: <string>) (proc :: <procedure>))
-  (let* ((port ::string-input-port (gnu.mapping.CharArrayInPort str))
+  (let* ((port ::string-input-port (gnu.mapping.CharArrayInPort:make str))
 	 (result (proc port)))
     (close-input-port port)
     result))

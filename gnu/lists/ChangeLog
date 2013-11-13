@@ -1,3 +1,7 @@
+2013-11-13  Per Bothner  <per@bothner.com>
+
+	* SimpleVector.java (size): Make protected.
+
 2013-11-10  Per Bothner  <per@bothner.com>
 
 	* Pair.java (lastPair): Make non-final.

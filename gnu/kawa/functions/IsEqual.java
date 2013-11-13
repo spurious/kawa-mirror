@@ -138,8 +138,8 @@ public class IsEqual extends gnu.mapping.Procedure2
           return false;
         FVector vec1 = (FVector) arg1;
         FVector vec2 = (FVector) arg2;
-        int n = vec1.size;
-        if (vec2.data == null || vec2.size != n)
+        int n = vec1.size();
+        if (vec2.data == null || vec2.size() != n)
           return false;
         Object[] data1 = vec1.data;
         Object[] data2 = vec2.data;

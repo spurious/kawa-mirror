@@ -20,7 +20,7 @@ public abstract class SimpleVector<E> extends AbstractSequence<E>
 {
   /** The (current) number of elements.
    * Must always have size() >= 0 && size() <= getBufferLength(). */
-  public int size;
+  protected int size;
 
   public final int size() { return size; }
 

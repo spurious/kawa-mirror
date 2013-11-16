@@ -284,6 +284,8 @@
     ((($format$ fstr . args) . rest)
      (let ((xd (syntax->datum #'fstr)))
        (cons #'fstr (%string-format-format #'rest))))
+    (((x . y) . rest)
+      (cons "~a" (%string-format-format #'rest)))
     ((x . rest)
      (cons #'(constant-fold invoke (constant-fold invoke x 'toString)
                             'replace "~" "~~")
@@ -307,6 +309,8 @@
      (%string-format-enclosed-args #'rest))
     ((($format$ fstr arg ...) . rest)
      #`(arg ... . #,(%string-format-args #'rest)))
+    (((x . y) . rest)
+     #`((x . y) . #,(%string-format-args #'rest)))
     ((x . rest)
      (%string-format-args #'rest))))
                          

@@ -1,3 +1,11 @@
+2013-11-15  Per Bothner  <per@bothner.com>
+
+	* syntax.scm (%string-format-format, %string-format-args): Fix
+	implementation of $string$ to better handle direct non-enclosed
+	expressions (such as nested $construct$ forms not inside an
+	enclosed expression). These should be treated as enclosed forms,
+	formatted using "~a", rather than just calling toString.
+
 2013-11-13  Per Bothner  <per@bothner.com>
 
 	* ports.scm (open-input-string, call-with-input-string):

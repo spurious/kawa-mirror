@@ -1,3 +1,7 @@
+2013-11-18  Per Bothner  <per@bothner.com>
+
+	* mac-test.scm: Add example from Kawa "internals" documentation.
+
 2013-11-18   John Tobey <jtobey@john-edwin-tobey.org>
 	     Per Bothner  <per@bothner.com>
 

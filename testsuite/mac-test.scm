@@ -1,4 +1,4 @@
-(test-init "macros" 125)
+(test-init "macros" 126)
 
 (test 'ok 'letxx (let ((xx #f)) (cond (#t xx 'ok))))
 
@@ -796,6 +796,16 @@
 
 ;; Savannah bug report #39946 "NullPointerException when using syntax->datum"
 (test '(+ 1 2) 'savannah-39946 (syntax->datum (syntax (+ 1 2))))
+
+;; This example is in the Kawa internals documentation.
+(define-syntax mac1
+  (syntax-rules ()
+    ((mac1-nest v1 init exp)
+     (let ((v1 init))
+       (let ((i 2))
+         (list exp i))))))
+(define j 10)
+(test '(11 2) 'test-mac1 (mac1 i 1 (+ i j)))
 
 ;; Savannah bug report #40616 "Unhygienic syntax-rules"
 (define-syntax def-a

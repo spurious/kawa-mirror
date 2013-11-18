@@ -1891,19 +1891,19 @@ public class Translator extends Compilation
       }
   }
 
-  public Declaration define (Object name, SyntaxForm nameSyntax, ScopeExp defs)
-  {
-    boolean aliasNeeded = nameSyntax != null && nameSyntax.getScope() != currentScope();
-    Object declName = aliasNeeded ? new String(name.toString()) : name;
-    Declaration decl = defs.getDefine(declName, 'w', this);
-    if (aliasNeeded)
-      {
-	Declaration alias = makeRenamedAlias(name, decl, nameSyntax.getScope());
-        nameSyntax.getScope().addDeclaration(alias);
-      }
-    push(decl);
-    return decl;
-  }
+    public Declaration define(Object name, SyntaxForm nameSyntax,
+                              ScopeExp defs) {
+        ScopeExp scope = nameSyntax != null ? nameSyntax.getScope()
+            : currentScope();
+        boolean aliasNeeded = scope != defs;
+        Object declName = aliasNeeded ? new String(name.toString()) : name;
+        Declaration decl = defs.getDefine(declName, 'w', this);
+        if (aliasNeeded) {
+            scope.addDeclaration(makeRenamedAlias(name, decl, scope));
+        }
+        push(decl);
+        return decl;
+    }
 
   static boolean isObjectSyntax (ClassType declaringClass, String fieldName)
   {

@@ -1,4 +1,4 @@
-(test-init "macros" 124)
+(test-init "macros" 125)
 
 (test 'ok 'letxx (let ((xx #f)) (cond (#t xx 'ok))))
 
@@ -292,7 +292,7 @@
 (test 2 'mzscheme-lang-12.3.5-1 (def-and-use-of-x 2))
 (test 1 'mzscheme-lang-12.3.5-2 x1)
 
-;; From FLT MzScheme Manual section 12.3.5 Macro-Gnerated Top-Level
+;; From FLT MzScheme Manual section 12.3.5 Macro-Generated Top-Level
 (define-syntax def-and-use
   (syntax-rules ()
     ((def-and-use x val)
@@ -796,3 +796,10 @@
 
 ;; Savannah bug report #39946 "NullPointerException when using syntax->datum"
 (test '(+ 1 2) 'savannah-39946 (syntax->datum (syntax (+ 1 2))))
+
+;; Savannah bug report #40616 "Unhygienic syntax-rules"
+(define-syntax def-a
+  (syntax-rules ()
+    ((_) (define a 'wrong))))
+(test 'correct 'savannah-40616
+      (let ((a 'correct)) (def-a) a))

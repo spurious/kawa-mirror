@@ -1,3 +1,9 @@
+2013-11-18  Per Bothner  <per@bothner.com>
+
+	* lang/Translator.java (define): We may need an alias if the
+	current scope is not the scope for the definition.
+	This fixes Savannah bug #40616 "Unhygienic syntax-rules".
+
 2013-11-13  Per Bothner  <per@bothner.com>
 
 	* lang/Translator.java (resolveModule): Reset current line

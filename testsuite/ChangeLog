@@ -1,3 +1,9 @@
+2013-11-18   John Tobey <jtobey@john-edwin-tobey.org>
+	     Per Bothner  <per@bothner.com>
+
+	* mac-test.scm: Test from Savannah bug #40616
+	"Unhygienic syntax-rules".
+
 2013-11-10  John Tobey <jtobey@john-edwin-tobey.org>
 	    Per Bothner  <per@bothner.com>
 

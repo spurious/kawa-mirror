@@ -1,4 +1,4 @@
-(test-init "macros" 126)
+(test-init "macros" 127)
 
 (test 'ok 'letxx (let ((xx #f)) (cond (#t xx 'ok))))
 
@@ -813,3 +813,14 @@
     ((_) (define a 'wrong))))
 (test 'correct 'savannah-40616
       (let ((a 'correct)) (def-a) a))
+
+(begin
+  (define xlist '())
+  (define-syntax def-b
+    (syntax-rules ()
+      ((_ val)
+       (begin (define a val)
+              (set! xlist (cons a xlist))))))
+  (def-b 12)
+  (def-b 42)
+  (test '(42 12) 'savannah-40616-2 xlist))

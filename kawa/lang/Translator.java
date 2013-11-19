@@ -1896,7 +1896,9 @@ public class Translator extends Compilation
         ScopeExp scope = nameSyntax != null ? nameSyntax.getScope()
             : currentScope();
         boolean aliasNeeded = scope != defs;
-        Object declName = aliasNeeded ? new String(name.toString()) : name;
+        Object declName = aliasNeeded
+            ? Symbol.makeUninterned(name.toString())
+            : name;
         Declaration decl = defs.getDefine(declName, 'w', this);
         if (aliasNeeded) {
             scope.addDeclaration(makeRenamedAlias(name, decl, scope));

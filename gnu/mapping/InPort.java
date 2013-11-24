@@ -2,6 +2,8 @@ package gnu.mapping;
 import java.io.*;
 import gnu.text.*;
 import gnu.lists.Consumer;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
 
 public class InPort extends gnu.text.LineBufferedReader implements Printable
 {
@@ -68,7 +70,11 @@ public class InPort extends gnu.text.LineBufferedReader implements Printable
         else if (! (strm instanceof BufferedInputStream))
             strm = new BufferedInputStream(strm);
         Reader rdr;
-        if (conv != null && conv != Boolean.TRUE) {
+        if (conv instanceof Charset)
+            rdr = new InputStreamReader(strm, (Charset) conv);
+        else if (conv instanceof CharsetDecoder)
+            rdr = new InputStreamReader(strm, (CharsetDecoder) conv);
+        else if (conv != null && conv != Boolean.TRUE) {
             String enc = conv.toString();
             try {
                 rdr = new InputStreamReader(strm, enc);

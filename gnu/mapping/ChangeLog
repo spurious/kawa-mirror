@@ -1,3 +1,8 @@
+2013-11-24  Per Bothner  <per@bothner.com>
+
+	* InPort.java (openFile): Allow conversion specifier to be a
+	Charset or a CharsetDecoder.
+
 2013-11-13  Per Bothner  <per@bothner.com>
 
 	* CharArrayInPort.java (<init>): New constructor taking FString.

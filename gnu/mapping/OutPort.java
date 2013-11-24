@@ -92,9 +92,12 @@ public class OutPort extends PrintConsumer implements Printable
 
   public boolean printReadable;
 
-  static OutPort outInitial = new OutPort (new LogWriter (new BufferedWriter(new OutputStreamWriter(System.out))), true, true, Path.valueOf("/dev/stdout"));
+  static OutPort outInitial
+    = BinaryOutPort.makeStandardPort(System.out, "/dev/stdout");
+
   static { outInitial.finalizeAction = FLUSH_ON_FINALIZE; }
-  private static OutPort errInitial = new OutPort (new LogWriter(new OutputStreamWriter(System.err)), true, true, Path.valueOf("/dev/stderr"));
+  private static OutPort errInitial
+    = BinaryOutPort.makeStandardPort(System.err, "/dev/stderr");
   static { errInitial.finalizeAction = FLUSH_ON_FINALIZE; }
 
   public static final ThreadLocation outLocation
@@ -137,6 +140,8 @@ public class OutPort extends PrintConsumer implements Printable
         Path path = Path.valueOf(fname);
         java.io.OutputStream strm = path.openOutputStream();
         strm = new java.io.BufferedOutputStream(strm);
+        // Do we need to wrap the OutputStreamWriter in a BufferedWriter?
+        // There is buffering in PrettyWriter, but not always.  FIXME.
         OutPort op = conv == Boolean.FALSE
             ? new BinaryOutPort(strm, path)
             : new OutPort(conv == null || conv == Boolean.TRUE

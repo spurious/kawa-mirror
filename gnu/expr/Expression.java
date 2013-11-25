@@ -377,6 +377,19 @@ public abstract class Expression extends Procedure0
         return getType() == Type.neverReturnsType;
     }
 
+    /** Is this a keyword argument?
+     * In the future this will return non-null only for explicit
+     * literal non-quoted Keywords.
+     */
+    public Keyword checkLiteralKeyword() {
+        if (this instanceof QuoteExp) {
+            Object val = ((QuoteExp) this).getValue();
+            if (val instanceof Keyword)
+                return (Keyword) val;
+        }
+        return null;
+    }
+
   public boolean isSingleValue()
   {
     return OccurrenceType.itemCountIsOne(getType());

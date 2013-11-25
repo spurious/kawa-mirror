@@ -193,11 +193,10 @@ public class CompileMisc implements Inlineable
     for (int i = 0;  i < alen;  i++)
       {
 	Expression arg = args[i];
-        Object key;
-	if (arg instanceof QuoteExp
-            && (key = ((QuoteExp) arg).getValue()) instanceof Keyword)
+        Keyword key = arg.checkLiteralKeyword();
+	if (key != null)
 	  {
-	    String keyword = ((Keyword) key).getName();
+	    String keyword = key.getName();
 	    Expression next = args[++i];
 	    if (keyword == "name")
               {
@@ -224,11 +223,10 @@ public class CompileMisc implements Inlineable
         for (int i = 0;  i < alen;  i++)
           {
             Expression arg = args[i];
-            Object key;
-            if (arg instanceof QuoteExp
-                && (key = ((QuoteExp) arg).getValue()) instanceof Keyword)
+            Keyword key = arg.checkLiteralKeyword();
+            if (key != null)
               {
-                String keyword = ((Keyword) key).getName();
+                String keyword = key.getName();
                 Expression next = args[++i];
                 if (keyword == "name")
                   lexp.setName(name);

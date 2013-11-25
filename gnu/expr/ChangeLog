@@ -1,3 +1,7 @@
+2013-11-24  Per Bothner  <per@bothner.com>
+
+	* Expression.java (checkLiteralKeyword): New method.
+
 2013-11-10  Per Bothner  <per@bothner.com>
 
 	* Compilation.java (pushPendingImport): Update to new formStack API.

@@ -301,6 +301,8 @@
 (set! x 2)
 (test 3 'mzscheme-lang-12.3.5-3 (def-and-use x 3))
 (set! fail-expected "mzscheme-lang-12.3.5-4 is 2 but should be 3")
+;; Note this works if def-and-use uses set! instead of define.
+;; Probably chalk this up to Kawa's top-level define being different.
 (test 3 'mzscheme-lang-12.3.5-4 x)
 
 ;; Example from Chez Scheme User's Guide by Kent Dybvig:

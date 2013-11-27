@@ -1,3 +1,8 @@
+2013-11-27  Per Bothner  <per@bothner.com>
+
+	* BinaryOutPort.java: Avoid dependency on Java 7 class
+	java.nio.charset.StandardCharsets.
+
 2013-11-24  Per Bothner  <per@bothner.com>
 
 	* BinaryOutPort.java: Generalize the text-port aspect so the

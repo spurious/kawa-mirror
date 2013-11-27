@@ -2,7 +2,6 @@ package gnu.mapping;
 import java.io.*;
 import gnu.text.*;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 
 /** An OutPort that provides access to an underlying OutputStream.
  * This supports hybrid "ports", that are both textual and binary.
@@ -60,8 +59,9 @@ public class BinaryOutPort extends OutPort {
      */
     private static Writer makeConvertWriter(MyBufferedOutputStream strm,
                                             Charset conv) {
-        boolean isUtf8 = StandardCharsets.UTF_8.equals(conv);
-        if (isUtf8 || StandardCharsets.ISO_8859_1.equals(conv))
+        String cname = conv.name();
+        boolean isUtf8 = "UTF-8".equals(cname);
+        if (isUtf8 || "ISO_8859_1".equals(cname))
             return new OutputStreamWriterSimple(strm, isUtf8);
         else
             return new OutputStreamWriter(strm, conv);

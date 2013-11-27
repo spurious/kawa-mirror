@@ -38,11 +38,8 @@ public class Q2Apply extends MethodProc
 	      vec.add(arg);  // requires collections FIXME
 	  }
 	arg = proc.applyN(vec.toArray());
-	if (arg instanceof Consumable)
-	  ((Consumable) arg).consume(ctx.consumer);
-	else
-	  ctx.writeValue(arg);
-	return;
+        Values.writeValues(arg, ctx.consumer);
+        return;
       }
     for (;;)
       {

@@ -1,3 +1,8 @@
+2013-11-26  Per Bothner  <per@bothner.com>
+
+	* Q2Apply.java (apply): Use Values.writeValues.  This makes
+	SRFI-108 and SRFI-109 literals work in Q2.
+
 2013-08-25  Per Bothner  <per@bothner.com>
 
 	* Q2.lang (createReadTable): Update ReaderDispatch.create call.

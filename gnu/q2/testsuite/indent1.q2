@@ -11,4 +11,4 @@ format #t "{~s}{~s}~%"
     define zz (yy + 100)
     zz + 100
   'f
-# Output: {(#vector a b (list 20 14 99) 214)}{f}
+# Output: {#(a b (20 14 99) 214)}{f}

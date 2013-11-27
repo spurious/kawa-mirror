@@ -1,3 +1,10 @@
+2013-11-26  John Tobey <jtobey@john-edwin-tobey.org>
+	    Per Bothner  <per@bothner.com>
+
+	* sva40649.scm: New test for Savannah bug #40649 "NPE in
+	inline-compiler for CallCC", plus some related tests.
+	* Makefile.am: Update accordingly.
+
 2013-11-18   John Tobey <jtobey@john-edwin-tobey.org>
 	     Per Bothner  <per@bothner.com>
 

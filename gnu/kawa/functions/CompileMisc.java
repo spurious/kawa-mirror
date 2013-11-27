@@ -571,6 +571,7 @@ public class CompileMisc implements Inlineable
     final Declaration param = lambda.firstDecl();
     if (param.isSimple() && ! param.getCanRead() && ! param.getCanWrite())
       {
+        param.setCanCall(false);
         CompileTimeContinuation contProxy = new CompileTimeContinuation();
         Type rtype = target instanceof StackTarget ? target.getType() : null;
         boolean runFinallyBlocks
@@ -579,7 +580,7 @@ public class CompileMisc implements Inlineable
         contProxy.exitableBlock = bl;
         contProxy.blockTarget = target;
         param.setValue(new QuoteExp(contProxy));
-        lambda.body.compile(comp, target);
+        (new ApplyExp(lambda, QuoteExp.nullExp)).compile(comp, target);
         code.endExitableBlock();
         return;
       }

@@ -1,3 +1,9 @@
+2013-11-26  Per Bothner  <per@bothner.com>
+
+	* CompileMisc.java (compileCallCC): When inlining function being
+	called, create a dummy ApplyExp rather than just callingf its body.
+	This fixes Savannah bug #40649 "NPE in inline-compiler for CallCC".
+
 2013-11-24  Per Bothner  <per@bothner.com>
 
 	* CompileMisc.java (validateApplyMakeProcedure):

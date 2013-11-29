@@ -650,13 +650,11 @@ public class XMLFilter implements
       ((TreeList) base).writeDocumentUri(uri);
   }
 
-  @Override
   public void writePosition(SeqPosition position)
   {
     writePosition(position.sequence, position.ipos);
   }
 
-  @Override
   public void writePosition(AbstractSequence seq, int ipos)
   {
     if (ignoringLevel > 0)

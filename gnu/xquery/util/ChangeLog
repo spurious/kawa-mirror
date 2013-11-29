@@ -1,3 +1,8 @@
+2013-11-28  Matthieu Vachon <matthieu.o.vachon@gmail.com>
+
+	* DistinctValues.java, RelativeStepFilter.java: Don't use @Override
+	for a method implementing an interface - Java 5 doesn't like it.
+
 2013-11-03  Per Bothner  <per@bothner.com>
 
 	* CastAs.java (apply2): Update for new Values API.

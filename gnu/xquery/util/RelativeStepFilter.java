@@ -27,7 +27,6 @@ public class RelativeStepFilter extends FilterConsumer
   }
 
   // Not sure if this is ever called ...
-  @Override
   public void writePosition(SeqPosition position)
   {
     writePosition(position.sequence, position.ipos);

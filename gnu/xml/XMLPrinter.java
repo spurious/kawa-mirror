@@ -926,7 +926,6 @@ public class XMLPrinter extends OutPort
     prev = PROC_INST;
   }
 
-  @Override
   public void writePosition(SeqPosition position)
   {
     position.sequence.consumeNext(position.ipos, this);

@@ -1,3 +1,8 @@
+2013-11-28  Matthieu Vachon <matthieu.o.vachon@gmail.com>
+
+	* TreeList.java: Don't use @Override for a method implementing
+	an interface - Java 5 doesn't like it.
+
 2013-11-13  Per Bothner  <per@bothner.com>
 
 	* SimpleVector.java (size): Make protected.

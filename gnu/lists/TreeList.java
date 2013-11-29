@@ -395,7 +395,6 @@ public class TreeList extends AbstractSequence<Object>
     data[index+1] = (char) i;
   }
 
-  @Override
   public void writePosition(SeqPosition position)
   {
     ensureSpace(3);

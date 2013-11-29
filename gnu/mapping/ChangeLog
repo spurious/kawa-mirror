@@ -1,3 +1,8 @@
+2013-11-28  Per Bothner  <per@bothner.com>
+
+	* BinaryOutPort.java (makeStandardPort, openFile): Don't need to
+	allocate a BufferedWriter, since PrettyWriter does buffering.
+
 2013-11-27  Per Bothner  <per@bothner.com>
 
 	* BinaryOutPort.java: Avoid dependency on Java 7 class

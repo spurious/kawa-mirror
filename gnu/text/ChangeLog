@@ -1,3 +1,9 @@
+2013-11-28  Per Bothner  <per@bothner.com>
+
+	* PrettyWriter.java (buffer): Allocate a non-zero-length buffer.
+	(setPrettyPrintingMode, setSharing): Don't need to ensure space.
+	(isPassingThrough): Add comment noting this is now always false.
+
 2013-09-27  Per Bothner  <per@bothner.com>
 
 	* Options.java (pushOptionValues): Fix logic bug.

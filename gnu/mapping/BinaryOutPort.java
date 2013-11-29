@@ -70,10 +70,8 @@ public class BinaryOutPort extends OutPort {
     public static BinaryOutPort makeStandardPort(OutputStream strm, String path) {
         MyBufferedOutputStream bufstrm = new MyBufferedOutputStream(strm);
         Writer wr = makeConvertWriter(bufstrm, Charset.defaultCharset());
-        // The BufferedWriter shouldn't be needed if we were smarter
-        // about buffering in PrettyPrinter.  FIXME.
         return new BinaryOutPort(bufstrm,
-                                 new LogWriter(new BufferedWriter(wr)),
+                                 new LogWriter(wr),
                                  Path.valueOf(path), true, true);
     }
 
@@ -81,11 +79,7 @@ public class BinaryOutPort extends OutPort {
                                          Charset conv) {
         MyBufferedOutputStream bufstrm = new MyBufferedOutputStream(strm);
         Writer wr = makeConvertWriter(bufstrm, conv);
-        // The BufferedWriter shouldn't be needed if we were smarter
-        // about buffering in PrettyPrinter.  FIXME.
-        return new BinaryOutPort(bufstrm,
-                                 new BufferedWriter(wr),
-                                 path);
+        return new BinaryOutPort(bufstrm, wr, path);
     }
 
     public static BinaryOutPort openFile(Object fname)

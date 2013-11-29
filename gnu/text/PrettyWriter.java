@@ -200,14 +200,10 @@ public class PrettyWriter extends java.io.Writer
    *   spaces are treated like enqueing NEWLINE_SPACE (essentiall a 'fill').
    */
     public void setPrettyPrintingMode (int mode) {
-        if (mode > 0)
-            ensureSpaceInBuffer(initialBufferSize);
         prettyPrintingMode = mode;
     }
 
     public void setSharing (boolean sharing) {
-        if (sharing)
-            ensureSpaceInBuffer(initialBufferSize);
         this.sharing = sharing;
     }
 
@@ -227,15 +223,16 @@ public class PrettyWriter extends java.io.Writer
     setPrettyPrintingMode(mode ? 0 : 1);
   }
 
-    /** Should we write directly to out without using buffer? */
+    /** Should we write directly to out without using buffer?
+     * Currently, this is always false, but if you want to support
+     * "unbuffered mode", you need to change this.
+     */
     private boolean isPassingThrough() {
         return buffer.length == 0 && out != null;
     }
 
-  public static int initialBufferSize = 126;
-
   /** Holds all the text that has been output but not yet printed. */
-  public /* FIXME */ char[] buffer = new char[0];
+  public /* FIXME */ char[] buffer = new char[2048];
 
   /** The index into BUFFER where more text should be put. */
   public /* FIXME */ int bufferFillPointer;
@@ -313,12 +310,12 @@ public class PrettyWriter extends java.io.Writer
   /** Buffer holding the per-line prefix active at the buffer start.
    * Indentation is included in this. The length of this is stored
    * in the logical block stack. */
-  char[] prefix = new char[initialBufferSize];
+  char[] prefix = new char[128];
 
   /** Buffer holding the total remaining suffix active at the buffer start.
    * The characters are right-justified in the buffer to make it easier
    * to output the buffer. The length is stored in the logical block stack. */
-  char[] suffix = new char[initialBufferSize];
+  char[] suffix = new char[128];
 
   static final int QUEUE_INIT_ALLOC_SIZE = 300; // FIXME
 

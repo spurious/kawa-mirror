@@ -1,3 +1,12 @@
+2013-11-30  Per Bothner  <per@bothner.com>
+
+	* lang/Translator.java (define): When alias is needed, do a
+	pushRenamedAlias, so we can later pop it.
+	(rewrite_body): Pop aliases.  Needed in case of nested definitions
+	with the same pattern variable inside a template.
+	This fixes Savannah bug #40729 "NPE in inline-compiler
+	for AppendValues".
+
 2013-11-18  Per Bothner  <per@bothner.com>
 
 	* lang/Translator.java (define): When creating an alias, the

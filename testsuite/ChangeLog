@@ -1,3 +1,9 @@
+2013-11-30  John Tobey <jtobey@john-edwin-tobey.org>
+
+	* sva40729.scm: New test for Savannah bug #40729 "NPE in
+	inline-compiler for AppendValues".
+	* Makefile.am (SCRIPTS_TO_RUN): Update accordingly.
+
 2013-11-26  John Tobey <jtobey@john-edwin-tobey.org>
 	    Per Bothner  <per@bothner.com>
 

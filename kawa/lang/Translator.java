@@ -1573,6 +1573,8 @@ public class Translator extends Compilation
     // This is confusing, at the least.  FIXME.
     Object saved = pushPositionOf(exp);
     LetExp defs = new LetExp();
+    int renamedAliasOldSize =
+        renamedAliasStack == null ? 0 : renamedAliasStack.size();
     Pair first = formStack.last;
     defs.outer = current_scope;
     current_scope = defs;
@@ -1591,6 +1593,9 @@ public class Translator extends Compilation
               }
           }
         rewriteBody(list);
+        int renamedAliasNewSize =
+            renamedAliasStack == null ? 0 : renamedAliasStack.size();
+        popRenamedAlias((renamedAliasNewSize - renamedAliasOldSize) >> 1);
 	Expression body = makeBody(first, null);
 	setLineOf(body);
 	if (ndecls == 0)
@@ -1901,7 +1906,11 @@ public class Translator extends Compilation
             : name;
         Declaration decl = defs.getDefine(declName, 'w', this);
         if (aliasNeeded) {
-            scope.addDeclaration(makeRenamedAlias(name, decl, scope));
+            Declaration alias = makeRenamedAlias(name, decl, scope);
+            if (defs instanceof LetExp)
+                pushRenamedAlias(alias);
+            else
+                scope.addDeclaration(alias);
         }
         push(decl);
         return decl;

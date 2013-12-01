@@ -1,3 +1,7 @@
+2013-11-30  Per Bothner  <per@bothner.com>
+
+	* SetExp.java (print): Handle null symbol.
+
 2013-11-24  Per Bothner  <per@bothner.com>
 
 	* Expression.java (checkLiteralKeyword): New method.

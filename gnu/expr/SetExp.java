@@ -441,7 +441,8 @@ public class SetExp extends AccessExp
     out.startLogicalBlock(isDefining () ? "(Define" : "(Set", ")", 2);
     out.writeSpaceFill();
     printLineColumn(out);
-    if (binding == null || symbol.toString() != binding.getName())
+    if (symbol != null
+        && (binding == null || symbol.toString() != binding.getName()))
       {
 	out.print('/');
 	out.print(symbol);

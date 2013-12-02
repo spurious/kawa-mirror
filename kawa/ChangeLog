@@ -1,3 +1,7 @@
+2013-12-01  Per Bothner  <per@bothner.com>
+
+	* standard/Scheme.java (initScheme): Add 'letrec*'.
+
 2013-11-30  Per Bothner  <per@bothner.com>
 
 	* lang/Translator.java (define): When alias is needed, do a

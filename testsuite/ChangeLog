@@ -1,3 +1,10 @@
+2013-12-01  Jussi Piitulainen <jpiitula@ling.helsinki.fi>
+	    John Cowan <cowan@mercury.ccil.org>
+            Per Bothner  <per@bothner.com>
+
+	* r7rs-tests.scm: Add a test for letrec*.
+	Enable existing letrec* test.
+
 2013-11-30  John Tobey <jtobey@john-edwin-tobey.org>
 
 	* sva40729.scm: New test for Savannah bug #40729 "NPE in

@@ -186,6 +186,7 @@ public class Scheme extends LispLanguage
       defSntxStFld("let", "kawa.lib.std_syntax");
       defSntxStFld("let*", "kawa.lib.std_syntax");
       defSntxStFld("letrec", "kawa.lib.prim_syntax");
+      defSntxStFld("letrec*", "kawa.lib.prim_syntax", "letrec");
 
       defSntxStFld("begin", "kawa.standard.begin", "begin");
       defSntxStFld("do", "kawa.lib.std_syntax");

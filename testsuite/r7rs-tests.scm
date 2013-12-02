@@ -193,7 +193,6 @@
                     (even? (- n 1))))))
       (even? 88)))
 
-(skip-if-kawa "letrec* not implemented"
 (test 5
     (letrec* ((p
                (lambda (x)
@@ -206,7 +205,6 @@
               (x (p 5))
               (y x))
              y))
-)
 
 (let*-values (((root rem) (exact-integer-sqrt 32)))
   (test 35 (* root rem)))
@@ -2063,5 +2061,46 @@
 )
 
 (test-end)
+
+;; By Jussi Piitulainen <jpiitula@ling.helsinki.fi>
+;; and John Cowan <cowan@mercury.ccil.org>:
+;; http://lists.scheme-reports.org/pipermail/scheme-reports/2013-December/003876.html
+;;; Since letrec* was introduced to have the desired top-levelish
+;;; meaning of internal definitions, a best example will consist of
+;;; internal definitions that are not equivalent to any other _let_
+;;; family syntax.
+
+;;; I think the following is reasonable and not too contrived. It
+;;; returns the arithmetic, geometric, and harmonic means of a tree (a
+;;; list structure) of numbers (positive numbers, and there must be at
+;;; least one in the tree). Of the internal definitions, _sum_ is
+;;; recursive, the other two (_n_, _mean_) depend on _sum_, and _sum_
+;;; must be initialized before _n_. Hence only a _letrec*_ will do.
+
+;;; (Rearranged to define _mean_ before _sum_ so a straightwordard
+;;; nesting of _letrec_'s would not work. Mutual recursion would be a
+;;; stronger example.)
+
+(define (means ton)
+  (letrec*
+     ((mean
+        (lambda (f g)
+          (f (/ (sum g ton) n))))
+      (sum
+        (lambda (g ton)
+          (if (null? ton)
+            (+)
+            (if (number? ton)
+                (g ton)
+                (+ (sum g (car ton))
+                   (sum g (cdr ton)))))))
+      (n (sum (lambda (x) 1) ton)))
+    (values (mean values values)
+            (mean exp log)
+            (mean / /))))
+(let*-values (((a b c) (means '(8 5 99 1 22))))
+  (test 27 a)
+  (test 9.728 b)
+  (test 1800/497 c))
 
 (test-end)

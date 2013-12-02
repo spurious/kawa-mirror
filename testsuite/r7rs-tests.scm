@@ -16,6 +16,13 @@
      (begin (test-expect-fail 1)
             (test-assert message #f)))))
 
+(define-syntax guard
+  (syntax-rules ()
+    ((guard (exn (else handler)) body)
+     (try-catch
+      body
+      (exn java.lang.Throwable handler)))))
+
 ;; Using 3-operand datum->syntax enables line numbers in reporting.
 (define-syntax test
   (lambda (form)
@@ -847,6 +854,8 @@
 (test #t (boolean=? #t #t))
 (test #t (boolean=? #f #f))
 (test #f (boolean=? #t #f))
+(test #t (boolean=? #f #f #f))
+(test #f (boolean=? #t #t #f))
 
 (test-end)
 
@@ -962,6 +971,8 @@
 
 (test #t (symbol=? 'a 'a))
 (test #f (symbol=? 'a 'A))
+(test #t (symbol=? 'a 'a 'a))
+(test #f (symbol=? 'a 'a 'A))
 
 (test "flying-fish"     
 (symbol->string 'flying-fish))
@@ -1558,28 +1569,26 @@
           23))))
 )
 
-(skip-if-kawa "error-object?, error-object-message, error-object-irritants, guard not implemented"
 (test #t
     (error-object? (guard (exn (else exn)) (error "BOOM!" 1 2 3))))
 (test "BOOM!"
     (error-object-message (guard (exn (else exn)) (error "BOOM!" 1 2 3))))
 (test '(1 2 3)
     (error-object-irritants (guard (exn (else exn)) (error "BOOM!" 1 2 3))))
-)
 
-(skip-if-kawa "file-error? and guard not implemented"
+;(skip-if-kawa "file-error? and guard not implemented"
 (test #f
     (file-error? (guard (exn (else exn)) (error "BOOM!"))))
 (test #t
     (file-error? (guard (exn (else exn)) (open-input-file " no such file "))))
-)
+;)
 
-(skip-if-kawa "read-error? and guard not implemented"
+;(skip-if-kawa "read-error? and guard not implemented"
 (test #f
     (read-error? (guard (exn (else exn)) (error "BOOM!"))))
 (test #t
     (read-error? (guard (exn (else exn)) (read (open-input-string ")")))))
-)
+;)
 
 (test-end)
 

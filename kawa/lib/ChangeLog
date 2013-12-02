@@ -1,3 +1,15 @@
+2013-12-01  Per Bothner  <per@bothner.com>
+
+	* exceptions.scm: New file.
+	(error-object?, error-object-message, error-object-irritants,
+	read-error?, file-error?): New procedures.
+	(catch, throw, error): Moved from elsewhere.
+	(error): Don't format to string here.
+	* Makefile.am: Update accordingly.
+	* system.scm (catch): Moved to exceptions.scm.
+	* misc.scm (throw, error): Likewise.
+	(scheme-report-environment): Use NamedException:makeError.
+
 2013-11-15  Per Bothner  <per@bothner.com>
 
 	* syntax.scm (%string-format-format, %string-format-args): Fix

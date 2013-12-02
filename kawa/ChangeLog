@@ -1,5 +1,12 @@
 2013-12-01  Per Bothner  <per@bothner.com>
 
+	* lang/NamedException.java: Some re-working to make it more robust
+	and correct for both Guile-style catch/throw and R7RS error.
+	(toString): Do formatting here (rather than in error function).
+	* standard/Scheme.java (initScheme): Added error-object?,
+	error-object-message, error-object-irritants, read-error?,
+	and file-error?.  Updated catch, throw, error.
+
 	* standard/Scheme.java (initScheme): Add 'letrec*'.
 
 2013-11-30  Per Bothner  <per@bothner.com>

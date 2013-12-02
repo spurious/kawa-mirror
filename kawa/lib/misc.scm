@@ -81,7 +81,9 @@
   (case version
     ((4) (static-field <kawa.standard.Scheme> 'r4Environment))
     ((5) (static-field <kawa.standard.Scheme> 'r5Environment))
-    (else (error "scheme-report-environment version must be 4 or 5"))))
+    (else (primitive-throw
+           (kawa.lang.NamedException:makeError
+            "scheme-report-environment version must be 4 or 5")))))
 
 (define (interaction-environment)
   (invoke-static <gnu.mapping.Environment> 'user))
@@ -127,26 +129,6 @@
   (if (gnu.mapping.Promise? value)
       (gnu.mapping.Promise value: value)
       value))
-
-(define (throw #!rest (args ::Object[])) ::never-returns
-  (let ((len args:length))
-    (if (> len 0)
-        (let ((key (args 0)))
-          (cond ((symbol? key)
-                 (primitive-throw (kawa.lang.NamedException key args)))
-                ((and (java.lang.Throwable? key) (= len 1))
-                 (gnu.kawa.reflect.Throw:doThrow key)))))
-    (primitive-throw (kawa.lang.GenericError "bad arguments to throw"))))
-              
-;;; The one-argument case is a standard DSSSL procedure.
-;;; The multi-argument extension matches Guile.
-(define (error msg . args)  ::never-returns
-  (set! msg (call-with-output-string (lambda (port) (display msg port))))
-  (set! args (map
-	      (lambda (arg)
-		(call-with-output-string (lambda (port) (write arg port))))
-	      args))
-  (apply throw 'misc-error msg args))
 
 (define (base-uri #!optional (node #!null))
   (let ((uri (if (eq? node #!null)

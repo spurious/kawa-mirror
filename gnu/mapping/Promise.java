@@ -175,6 +175,18 @@ public class Promise<T> implements Printable, Lazy<T> {
 	return arg;
     }
 
+    /** If argument is Lazy, force it, unless already an instance of target.
+     */
+    public static Object force (Object arg, Class target) {
+	while (arg instanceof Lazy && ! target.isInstance(arg)) {
+            Object val = ((Lazy) arg).getValue();
+            if (arg == val)
+                break;
+            arg = val;
+        }
+	return arg;
+    }
+
     public String toString() {
         StringBuilder sb = new StringBuilder();
         try {

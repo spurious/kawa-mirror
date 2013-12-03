@@ -1,5 +1,8 @@
 2013-12-02  Per Bothner  <per@bothner.com>
 
+	* inlining.expected: Update - StackTarget#forceLazyIfNeeded now
+	emits call to 2-argument Promise#force.
+
 	* inlining.expected: Update - we avoid some needless calls
 	to Promise.force.
 

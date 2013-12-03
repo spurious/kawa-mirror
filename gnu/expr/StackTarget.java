@@ -26,17 +26,26 @@ public class StackTarget extends Target
 
     public static void forceLazyIfNeeded(Compilation comp, Type stackType, Type type) {
 	CodeAttr code = comp.getCode();
-	if (LazyType.maybeLazy(stackType) && ! LazyType.maybeLazy(type)
-            && type.getRawType().compare(stackType.getRawType()) < 0) {
-	    Method forceMethod;
-	    if (stackType instanceof LazyType) {
-		forceMethod = LazyType.lazyType.getDeclaredMethod("getValue", 0);
-	    }
-	    else
-		forceMethod = ClassType.make("gnu.mapping.Promise").getDeclaredStaticMethod("force", 1);
-	    code.emitInvoke(forceMethod); // 
-	    stackType = stackType instanceof LazyType ? ((LazyType) stackType).getValueType() : Type.objectType;
-	}
+	if (LazyType.maybeLazy(stackType) && ! LazyType.maybeLazy(type)) {
+            Type rawType = type.getRawType();
+            if (rawType.compare(stackType.getRawType()) < 0) {
+                Method forceMethod;
+                if (stackType instanceof LazyType) {
+                    forceMethod = LazyType.lazyType.getDeclaredMethod("getValue", 0);
+                } else {
+                    int nargsforce;
+                    if (rawType instanceof ClassType) {
+                        nargsforce = 2;
+                        comp.loadClassRef((ClassType) rawType);
+                    } else
+                        nargsforce = 1;
+                    forceMethod = ClassType.make("gnu.mapping.Promise")
+                        .getDeclaredStaticMethod("force", nargsforce);
+                }
+                code.emitInvoke(forceMethod);
+                stackType = stackType instanceof LazyType ? ((LazyType) stackType).getValueType() : Type.objectType;
+            }
+        }
     }
 
   protected boolean compileFromStack0(Compilation comp, Type stackType)

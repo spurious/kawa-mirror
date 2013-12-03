@@ -1,5 +1,8 @@
 2013-12-02  Per Bothner  <per@bothner.com>
 
+	* StackTarget.java (forceLazyIfNeeded): Only force Lazy value if it
+	isn't already an instance of the target type.
+
 	* PrimProcedure.java (compile): Don't convert TypeVariable to raw type
 	here.
 	(compileInlive): Instead maybe do it here.  But preferentially

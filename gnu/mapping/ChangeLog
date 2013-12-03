@@ -1,3 +1,7 @@
+2013-12-02  Per Bothner  <per@bothner.com>
+
+	* Promise.java (force(Object,Class)): New method.
+
 2013-11-28  Per Bothner  <per@bothner.com>
 
 	* BinaryOutPort.java (makeStandardPort, openFile): Don't need to

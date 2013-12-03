@@ -2025,8 +2025,7 @@ public class CodeAttr extends Attribute implements AttrContainer
 
   public static boolean castNeeded (Type top, Type required)
   {
-    if (top instanceof UninitializedType)
-      top = ((UninitializedType) top).getRawType();
+    top = top.getRawType();
     for (;;)
       {
         if (top == required)

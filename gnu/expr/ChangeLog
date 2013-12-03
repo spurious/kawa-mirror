@@ -1,3 +1,10 @@
+2013-12-02  Per Bothner  <per@bothner.com>
+
+	* PrimProcedure.java (compile): Don't convert TypeVariable to raw type
+	here.
+	(compileInlive): Instead maybe do it here.  But preferentially
+	to an emitCheckcast instead - see comment for rationale.
+
 2013-11-30  Per Bothner  <per@bothner.com>
 
 	* SetExp.java (print): Handle null symbol.

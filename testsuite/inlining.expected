@@ -88,8 +88,8 @@ InliningTest.constantPropagation1()int: 3 bytes
 InliningTest.constantPropagation2()int: 3 bytes
 InliningTest.constantPropagation3()int: 6 bytes
 InliningTest.factorialInfer1(int)java.lang.Object: 25 bytes
-InliningTest.getFromVector1(gnu.lists.FVector,int)java.lang.Integer: 12 bytes
-InliningTest.getFromVector2(gnu.lists.FVector,int)java.lang.Integer: 12 bytes
+InliningTest.getFromVector1(gnu.lists.FVector,int)java.lang.Integer: 9 bytes
+InliningTest.getFromVector2(gnu.lists.FVector,int)java.lang.Integer: 9 bytes
 InliningTest.topLevelRecurse1(gnu.lists.Pair)gnu.bytecode.Type$NeverReturns: 10 bytes
 InliningTest.topLevelRecurse2(java.lang.Object,java.lang.Object)gnu.bytecode.Type$NeverReturns: 7 bytes
 InliningTest.sum1(gnu.math.IntNum)java.lang.Object: 34 bytes

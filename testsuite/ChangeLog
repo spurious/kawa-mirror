@@ -1,3 +1,8 @@
+2013-12-02  Per Bothner  <per@bothner.com>
+
+	* inlining.expected: Update - we avoid some needless calls
+	to Promise.force.
+
 2013-12-01  Per Bothner  <per@bothner.com>
 
 	* r7rs-tests.scm: Add a skeletal definition of guard so we can use

@@ -1,3 +1,8 @@
+2013-12-02  Per Bothner  <per@bothner.com>
+
+	* CodeAttr.java (castNeeded): Force top-type to raw type.
+	This is needed for TypeVariable in addition to UninitializedType.
+
 2013-11-13  Per Bothner  <per@bothner.com>
 
 	* ObjectType.java (getReflectClass): Simplify since we can

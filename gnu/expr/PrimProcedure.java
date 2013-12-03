@@ -681,9 +681,6 @@ public class PrimProcedure extends MethodProc implements Inlineable {
   {
     Expression[] args = exp.getArgs();
     gnu.bytecode.CodeAttr code = comp.getCode();
-    Type stackType = retType;
-    if (method != null && method.getReturnType() instanceof TypeVariable)
-	stackType = method.getReturnType().getRawType();
     int startArg = 0;
     if (isConstructor())
       {
@@ -717,12 +714,12 @@ public class PrimProcedure extends MethodProc implements Inlineable {
     if (method == null)
       {
         code.emitPrimop (opcode(), args.length, retType);
-        target.compileFromStack(comp, stackType);
+        target.compileFromStack(comp, retType);
       }
     else
       {
         compileInvoke(comp, methodForInvoke, target,
-                      exp.isTailCall(), op_code, stackType);
+                      exp.isTailCall(), op_code, retType);
       }
   }
 
@@ -732,7 +729,7 @@ public class PrimProcedure extends MethodProc implements Inlineable {
    */
   public static void
   compileInvoke (Compilation comp, Method method, Target target,
-                 boolean isTailCall, int op_code, Type stackType)
+                 boolean isTailCall, int op_code, Type returnType)
   {
     CodeAttr code = comp.getCode();
     comp.usedClass(method.getDeclaringClass());
@@ -785,7 +782,7 @@ public class PrimProcedure extends MethodProc implements Inlineable {
     else
       {
         comp.loadCallContext();
-        stackType = Type.objectType;
+        returnType = Type.objectType;
         code.pushScope();
         Variable saveIndex = code.addLocal(Type.intType);
         comp.loadCallContext();
@@ -813,8 +810,23 @@ public class PrimProcedure extends MethodProc implements Inlineable {
         // that take a context (and whose return type is thus void).
         compileReachedUnexpected(code);
       }
-    else
-      target.compileFromStack(comp, stackType);
+    else {
+        if (method.getReturnType() instanceof TypeVariable) {
+            if (returnType instanceof ClassType) {
+                // This avoids an unneeded exception handler (if the
+                // target is a CheckedTarget), and a needless call to
+                // Promise.force.  Also, if the target.getType() is
+                // different from the returnType, it's probably better
+                // to convert to returnType first - it might make it
+                // easier to find the right conversion, or emit a more
+                // accurate error message.
+                code.emitCheckcast(returnType);
+            } else
+                returnType = method.getReturnType().getRawType();
+        }
+
+      target.compileFromStack(comp, returnType);
+    }
   }
 
     public static void compileReachedUnexpected(CodeAttr code) {

@@ -1,3 +1,10 @@
+2013-12-05  Per Bothner  <per@bothner.com>
+
+	* lang/SyntaxTemplate.java: Update support for '(... ...)' - which
+	was added 2005-06-26 - in that we no longer use java.lang.String
+	for Scheme symbols.
+	This fixes Savannah bug #40814 "R6RS/R7RS ellipsis escapes".
+
 2013-12-01  Per Bothner  <per@bothner.com>
 
 	* lang/NamedException.java: Some re-working to make it more robust

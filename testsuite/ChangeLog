@@ -1,3 +1,9 @@
+2013-12-05  John Tobey <jtobey@john-edwin-tobey.org>
+
+	* sva40729.scm: Test for Savannah bug #40814
+	"R6RS/R7RS ellipsis escapes".
+	* Makefile.am: Update accordingly.
+
 2013-12-02  Per Bothner  <per@bothner.com>
 
 	* inlining.expected: Update - StackTarget#forceLazyIfNeeded now

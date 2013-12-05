@@ -78,6 +78,7 @@ public class SyntaxTemplate implements Externalizable
   Object[] literal_values;
 
   static final String dots3 = "...";
+  static final SimpleSymbol dots3Symbol = Symbol.valueOf(dots3);
 
   /* DEBUGGING:
   void print_template_program (java.util.Vector patternNames,
@@ -239,7 +240,6 @@ public class SyntaxTemplate implements Externalizable
     if (form instanceof Pair)
       {
 	Pair pair = (Pair) form;
-	int ret_cdr = -2;;
 	int save_pc = template_program.length();
 	Object car = pair.getCar();
 
@@ -250,9 +250,9 @@ public class SyntaxTemplate implements Externalizable
             if (cdr instanceof Pair)
               {
                 Pair cdr_pair = (Pair) cdr;
-                if (cdr_pair.getCar() == dots3 && cdr_pair.getCdr() == LList.Empty)
+                if (tr.matches(cdr_pair.getCar(), dots3) && cdr_pair.getCdr() == LList.Empty)
                   {
-                    form = dots3;
+                    form = dots3Symbol;
                     break check_form;
                   }
               }
@@ -277,7 +277,7 @@ public class SyntaxTemplate implements Externalizable
 	int ret_car = convert_template(car, syntax, template_program,
 				       nesting + num_dots3,
 				       literals_vector, seen, false, tr);
-
+        int ret_cdr = -2;
 	if (rest != LList.Empty)
 	  {
 	    int delta = template_program.length() - save_pc - 1;
@@ -354,10 +354,10 @@ public class SyntaxTemplate implements Externalizable
 	literals_index = literals_vector.size ();
 	literals_vector.addElement(form);
       }
-    if (! (form instanceof SyntaxForm) && form != dots3)
+    if (! (form instanceof SyntaxForm) && form != dots3Symbol)
       template_program.append((char) (BUILD_SYNTAX));
     template_program.append((char) (BUILD_LITERAL + 8 * literals_index));
-    return  form == dots3 ? -1 : -2;
+    return  form == dots3Symbol ? -1 : -2;
   }
 
   /** Similar to vec.indexOf(elem), but uses == (not equals) to compare. */

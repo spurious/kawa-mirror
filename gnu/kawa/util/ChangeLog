@@ -1,3 +1,7 @@
+2013-12-07  Per Bothner  <per@bothner.com>
+
+	* IntHashTable.java (hash): Remove needless test.
+
 2013-09-16  Per Bothner  <per@bothner.com>
 
 	* PreProcess.java: Add java8 support.

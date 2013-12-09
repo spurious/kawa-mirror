@@ -1,3 +1,10 @@
+2013-12-08  Per Bothner  <per@bothner.com>
+
+	* rnrs/lists.scm (find, filter, partition, remp, remove, remv, remq,
+	remp): Rename parameter 'list' to not conflict with type-specifier.
+	This fixes Savannah bug #40835 "Return types cause class cast
+	exceptions".
+
 2013-12-01  Per Bothner  <per@bothner.com>
 
 	* exceptions.scm: New file.

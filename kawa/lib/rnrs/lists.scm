@@ -62,14 +62,14 @@ just abort and return '()."
 ;;; Exported Functions
 
 ;;; find
-(define (find (proc ::procedure) (list ::list))
+(define (find (proc ::procedure) (lst ::list))
   "PROC should accept one argument and return a single value. PROC
-should not mutate LIST. The `find' procedure applies PROC to the
-elements of LIST in order. If PROC returns a true value for an
+should not mutate LST. The `find' procedure applies PROC to the
+elements of LST in order. If PROC returns a true value for an
 element, `find' immediately returns that element. If PROC returns #f
 for all elements of the list, `find' returns #f. PROC is always called
 in the same dynamic environment as `find' itself."
-  (let loop ((list list))
+  (let loop ((list lst))
     (if (null? list) #f
         (let ((x (car list)))
           (if (proc x) x
@@ -143,18 +143,18 @@ itself."
                  (or (proc head) (lp (car tail) (cdr tail))))))))
 
 ;;; filter, partition
-(define (filter (proc ::procedure) (list ::list))
+(define (filter (proc ::procedure) (lst ::list))
   "PROC should accept one argument and return a single value. PROC
-should not mutate LIST.
+should not mutate LST.
 
-The `filter' procedure applies PROC to each element of LIST and
-returns a list of the elements of LIST for which PROC returned a true
+The `filter' procedure applies PROC to each element of LST and
+returns a list of the elements of LST for which PROC returned a true
 value. The elements of the result list are in the same order as they
 appear in the input list. PROC is always called in the same dynamic
 environment as `filter' itself. If multiple returns occur from
 `filter', the return values returned by earlier returns are not
 mutated."
-  (let recur ((list list) (res '()))
+  (let recur ((list lst) (res '()))
     (if (null? list)
         (reverse! res)
         (let ((head (car list))
@@ -163,19 +163,19 @@ mutated."
               (recur tail (cons head res))
               (recur tail res))))))
 
-(define (partition (proc ::procedure) (list ::list))
+(define (partition (proc ::procedure) (lst ::list))
   "PROC should accept one argument and return a single value. PROC
-should not mutate LIST.
+should not mutate LST.
 
-The `partition' procedure applies PROC to each element of LIST, and
-returns two values, the first one a list of the elements of LIST for
+The `partition' procedure applies PROC to each element of LST, and
+returns two values, the first one a list of the elements of LST for
 which PROC returned a true value, and the second a list of the
-elements of LIST for which PROC returned #f. The elements of the
+elements of LST for which PROC returned #f. The elements of the
 result lists are in the same order as they appear in the input
 list. PROC is always called in the same dynamic environment as
 `partition' itself. If multiple returns occur from `partition', the
 return values returned by earlier returns are not mutated."
-  (let loop ((list list) (in '()) (out '()))
+  (let loop ((list lst) (in '()) (out '()))
     (if (null? list)
         (values (reverse! in) (reverse! out))
         (let ((head (car list))
@@ -239,7 +239,7 @@ returned. PROC is always called in the same dynamic environment as
               (combine head (recur (cdr list))))))))
 
 ;;; remp, remove, remv, remq
-(define (remp (proc ::procedure) (list ::list)) ::list
+(define (remp (proc ::procedure) (lst ::list)) ::list
   "PROC should accept one argument and return a single value. PROC
 should not mutate LIST.
 
@@ -249,51 +249,51 @@ always called in the same dynamic environment as `remp' itself. The
 elements of the result list are in the same order as they appear in
 the input list. If multiple returns occur from `remp', the return
 values returned by earlier returns are not mutated."
-  (filter (complement proc) list))
+  (filter (complement proc) lst))
 
-(define (remove obj (list ::list)) ::list
+(define (remove obj (lst ::list)) ::list
   "The `remove' procedure returns a list of the elements that are not
 OBJ. `remove' uses `equal?' to compare OBJ with the elements of
-LIST. The elements of the result list are in the same order as they
+LST. The elements of the result list are in the same order as they
 appear in the input list."
-  (filter (lambda (o) (not (equal? o obj))) list))
+  (filter (lambda (o) (not (equal? o obj))) lst))
 
-(define (remv obj (list ::list)) ::list
+(define (remv obj (lst ::list)) ::list
   "The `remv' procedure returns a list of the elements that are not
-OBJ. `remv' uses `eqv?' to compare OBJ with the elements of LIST. The
+OBJ. `remv' uses `eqv?' to compare OBJ with the elements of LST. The
 elements of the result list are in the same order as they appear in
 the input list."
-  (filter (lambda (o) (not (eqv? o obj))) list))
+  (filter (lambda (o) (not (eqv? o obj))) lst))
 
-(define (remq obj (list ::list)) ::list
+(define (remq obj (lst ::list)) ::list
   "The `remq' procedure returns a list of the elements that are not
 OBJ. `remq' uses `eq?' to compare OBJ with the elements of LIST. The
 elements of the result list are in the same order as they appear in
 the input list."
-  (filter (lambda (o) (not (eq? o obj))) list))
+  (filter (lambda (o) (not (eq? o obj))) lst))
 
 ;;; memp, member, memv, memq
-(define (memp (proc ::procedure) (list ::list))
+(define (memp (proc ::procedure) (lst ::list))
   "PROC should accept one argument and return a single value. PROC
-should not mutate LIST.
+should not mutate LST.
 
-`memp' returns the first sublist of LIST whose car satisfies a given
-condition, where the sublists of LIST are the lists returned by
-(`list-tail' LIST K) for K less than the length of LIST. The `memp'
-procedure applies PROC to the cars of the sublists of LIST until it
+`memp' returns the first sublist of LST whose car satisfies a given
+condition, where the sublists of LST are the lists returned by
+(`list-tail' LST K) for K less than the length of LST. The `memp'
+procedure applies PROC to the cars of the sublists of LST until it
 finds one for which PROC returns a true value. PROC is always called
-in the same dynamic environment as `memp' itself. If LIST does not
+in the same dynamic environment as `memp' itself. If LST does not
 contain an element satisfying the condition, then #f (not the empty
 list) is returned."
-  (let recur ((list list))
+  (let recur ((list lst))
     (cond ((null? list) #f)
           ((proc (car list)) list)
           (else (recur (cdr list))))))
 
 ;; member, memv, and memq are defined in kawa.lib.lists
-;; (define (member obj (list ::list)))
-;; (define (memv obj (list ::list)))
-;; (define (memq obj (list ::list)))
+;; (define (member obj (lst ::list)))
+;; (define (memv obj (lst ::list)))
+;; (define (memq obj (lst ::list)))
 
 ;;; assp, assoc, assv, assq
 (define (assp (proc ::procedure) (alist ::list))

@@ -1,3 +1,9 @@
+2013-12-08   John Tobey <jtobey@john-edwin-tobey.org>
+	     Per Bothner  <per@bothner.com>
+
+	* module3.scm, obj-test.scm: Testcase for Savannah bug #40822
+	"Exporting macro-defined macro:	Internal error".
+
 2013-12-05  John Tobey <jtobey@john-edwin-tobey.org>
 
 	* sva40729.scm: Test for Savannah bug #40814

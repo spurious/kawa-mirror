@@ -1,3 +1,10 @@
+2013-12-08  Per Bothner  <per@bothner.com>
+
+	* ModuleExp.java (valueOf): New static Method.  This allows writing
+	a macro-generated SyntaxTemplate to a compiled class.
+	This helps fix Savannah bug #40822 "Exporting macro-defined macro:
+	Internal error".
+
 2013-12-02  Per Bothner  <per@bothner.com>
 
 	* StackTarget.java (forceLazyIfNeeded): Only force Lazy value if it

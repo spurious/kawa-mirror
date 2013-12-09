@@ -1,3 +1,11 @@
+2013-12-08  Per Bothner  <per@bothner.com>
+
+	* lang/SyntaxForms.java (class SimpleSyntaxForm):
+	Implement Externalizable.
+	(class PairSyntaxForm): Likewise.
+	This helps fix Svannah bug #40822 "Exporting macro-defined macro:
+	Internal error".
+
 2013-12-05  Per Bothner  <per@bothner.com>
 
 	* lang/SyntaxTemplate.java: Update support for '(... ...)' - which

@@ -40,6 +40,10 @@ public class ModuleExp extends LambdaExp
   {
   }
 
+    public static ModuleExp valueOf(ClassType type) {
+        return ModuleInfo.find(type).getModuleExp();
+    }
+
   /** Used to control which .zip file dumps are generated. */
   public static String dumpZipPrefix;
 

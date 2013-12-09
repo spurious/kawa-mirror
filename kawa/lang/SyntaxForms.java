@@ -6,6 +6,7 @@ import gnu.expr.*;
 import gnu.mapping.Symbol;
 import gnu.lists.*;
 import gnu.text.SourceLocator;
+import java.io.*;
 
 /**
  * Helper method and implementation classes for SyntaxForm.
@@ -183,15 +184,26 @@ public class SyntaxForms {
     return sbuf.toString();
   }
 
-  static class SimpleSyntaxForm implements SyntaxForm {
+    public static class SimpleSyntaxForm implements SyntaxForm, Externalizable {
     private Object datum;
     private TemplateScope scope;
-    
+
+        public void writeExternal(ObjectOutput out) throws IOException {
+            out.writeObject(datum);
+            out.writeObject(scope);
+        }
+
+        public void readExternal(ObjectInput in)
+            throws IOException, ClassNotFoundException {
+            datum = in.readObject();
+            scope = (TemplateScope) in.readObject();
+        }
+
     // DEBUGGING:
     static int counter;
     int id = ++counter;
 
-    SimpleSyntaxForm (Object datum, TemplateScope scope)
+    public SimpleSyntaxForm (Object datum, TemplateScope scope)
     {
        this.datum = datum;
        this.scope = scope;
@@ -214,45 +226,53 @@ public class SyntaxForms {
     }
   }
 
-  static class PairSyntaxForm extends ImmutablePair implements SyntaxForm
-  {
-    private Pair datum;
-    private TemplateScope scope;
+    public static class PairSyntaxForm extends ImmutablePair
+        implements SyntaxForm, Externalizable {
 
-    public PairSyntaxForm(Pair datum, TemplateScope scope)
-    {
-      this.datum = datum;
-      this.scope = scope;
-    }
+        private Pair datum;
+        private TemplateScope scope;
 
-    public Object getDatum()
-    {
-      return datum;
-    }
+        public PairSyntaxForm(Pair datum, TemplateScope scope) {
+            this.datum = datum;
+            this.scope = scope;
+        }
 
-    public TemplateScope getScope()
-    {
-      return scope;
-    }
+        public Object getDatum() {
+            return datum;
+        }
 
-    public Object getCar ()
-    {
-      if (car == null)
-        car = SyntaxForms.makeForm(datum.getCar(), scope);
-      return car;
+        public TemplateScope getScope() {
+            return scope;
+        }
+
+        public Object getCar() {
+            if (car == null)
+                car = SyntaxForms.makeForm(datum.getCar(), scope);
+            return car;
+        }
+
+        public Object getCdr() {
+            if (cdr == null)
+                cdr = SyntaxForms.makeForm(datum.getCdr(), scope);
+            return cdr;
+        }
+
+        public String toString() {
+            //String sid = DEBUGGING ? Integer.toString(id) : null;
+            return SyntaxForms.toString(this, null);
+        }
+
+        public void writeExternal(ObjectOutput out) throws IOException {
+            out.writeObject(datum);
+            out.writeObject(scope);
+        }
+
+        public void readExternal(ObjectInput in)
+            throws IOException, ClassNotFoundException {
+            datum = (Pair) in.readObject();
+            scope = (TemplateScope) in.readObject();
+        }
     }
-    public Object getCdr ()
-    {
-      if (cdr == null)
-        cdr = SyntaxForms.makeForm(datum.getCdr(), scope);
-      return cdr;
-    }
-    public String toString ()
-    {
-      //String sid = DEBUGGING ? Integer.toString(id) : null;
-      return SyntaxForms.toString(this, null);
-    }
-  }
 
     static class PairWithPositionSyntaxForm extends PairWithPosition
         implements SyntaxForm, SourceLocator {

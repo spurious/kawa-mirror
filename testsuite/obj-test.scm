@@ -1,4 +1,4 @@
-(test-init "Objects" 141)
+(test-init "Objects" 142)
 
 ;; Force procedure to be applied without being inlined:
 (define-syntax force-eval
@@ -182,6 +182,8 @@
 (define-variable dvar1 2)
 (define-variable dvar2 3)
 (require <module3>)
+
+(test 13 'Savannah-bug-40822 (macro2))
 
 (define-variable dvar3 4)
 (test '(2 3 13) 'dvar-test-1 dvar-test-1)

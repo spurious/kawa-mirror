@@ -5,7 +5,8 @@
 (module-export dvar-test-1 factorial-4 check-fluid-let *VAR* check-thunk
 	       namespace-syntax-call list-length-4 my-compare test3-import2
 	       test3-import1 get3-mod0-v2 set3-mod0-v2 counter-test-result
-	       pa-new pa-getter pa-setter pa-length iarr-set mB test1-import0)
+	       pa-new pa-getter pa-setter pa-length iarr-set mB test1-import0
+               macro2)
 
 (define (get3-mod0-v1) :: <object> mod0-v1)
 (define (set3-mod0-v1 x) (set! mod0-v1 x))
@@ -96,3 +97,11 @@
   (call-thunk (lambda () x)))
 (define (check-thunk)
   (call-call-thunk 1))
+
+(define-syntax macro1
+  (syntax-rules ()
+    ((macro1 name)
+     (define-syntax name
+       (syntax-rules ()
+	 ((name) dvar3))))))
+(macro1 macro2)

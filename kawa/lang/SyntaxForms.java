@@ -62,7 +62,7 @@ public class SyntaxForms {
         return makeWithTemplate(template, form, null);
     }
 
-    /** Utility method to implement Schene free-identifier=? and bound-identifier=?.
+    /** Utility method to implement Scheme free-identifier=? and bound-identifier=?.
      * @param id1 An identifier - either a symbol or a SyntaxForm whose form is a symbol.  We assume it satisfies the Scheme predicate identifier?.
      * @param id2 The other identifier to compare against.
      * @param checkBound true for bound-identifier=? and false for free-identifier=?.

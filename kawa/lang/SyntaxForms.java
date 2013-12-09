@@ -185,8 +185,30 @@ public class SyntaxForms {
   }
 
     public static class SimpleSyntaxForm implements SyntaxForm, Externalizable {
-    private Object datum;
-    private TemplateScope scope;
+        private Object datum;
+        private TemplateScope scope;
+
+        // DEBUGGING:
+        static int counter;
+        int id = ++counter;
+
+        public SimpleSyntaxForm(Object datum, TemplateScope scope) {
+            this.datum = datum;
+            this.scope = scope;
+        }
+
+        public Object getDatum() {
+            return datum;
+        }
+
+        public TemplateScope getScope() {
+            return scope;
+        }
+
+        public String toString() {
+            String sid = DEBUGGING ? Integer.toString(id) : null;
+            return SyntaxForms.toString(this, sid);
+        }
 
         public void writeExternal(ObjectOutput out) throws IOException {
             out.writeObject(datum);
@@ -198,33 +220,7 @@ public class SyntaxForms {
             datum = in.readObject();
             scope = (TemplateScope) in.readObject();
         }
-
-    // DEBUGGING:
-    static int counter;
-    int id = ++counter;
-
-    public SimpleSyntaxForm (Object datum, TemplateScope scope)
-    {
-       this.datum = datum;
-       this.scope = scope;
     }
-
-    public Object getDatum()
-    {
-      return datum;
-    }
-
-    public TemplateScope getScope()
-    {
-      return scope;
-    }
-
-    public String toString ()
-    {
-      String sid = DEBUGGING ? Integer.toString(id) : null;
-      return SyntaxForms.toString(this, sid);
-    }
-  }
 
     public static class PairSyntaxForm extends ImmutablePair
         implements SyntaxForm, Externalizable {
@@ -275,7 +271,7 @@ public class SyntaxForms {
     }
 
     static class PairWithPositionSyntaxForm extends PairWithPosition
-        implements SyntaxForm, SourceLocator {
+        implements SyntaxForm, SourceLocator, Externalizable {
         private PairWithPosition datum;
         private TemplateScope scope;
 
@@ -318,6 +314,17 @@ public class SyntaxForms {
         public String toString () {
             //String sid = DEBUGGING ? Integer.toString(id) : null;
             return SyntaxForms.toString(this, null);
+        }
+
+        public void writeExternal(ObjectOutput out) throws IOException {
+            out.writeObject(datum);
+            out.writeObject(scope);
+        }
+
+        public void readExternal(ObjectInput in)
+            throws IOException, ClassNotFoundException {
+            datum = (PairWithPosition) in.readObject();
+            scope = (TemplateScope) in.readObject();
         }
     }
 

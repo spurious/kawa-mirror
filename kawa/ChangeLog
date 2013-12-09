@@ -1,3 +1,8 @@
+2013-12-09  Per Bothner  <per@bothner.com>
+
+	* lang/SyntaxForms.java (class PairWithPositionSyntaxForm):
+	Implement Externalizable.
+
 2013-12-08  Per Bothner  <per@bothner.com>
 
 	* lang/SyntaxForms.java (class SimpleSyntaxForm):

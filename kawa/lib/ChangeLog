@@ -1,3 +1,14 @@
+2013-12-12  Per Bothner  <per@bothner.com>
+
+	Implement R6RS/R7RS-style exception handling.
+	* ExceptionClasses.scm: New file.  Implement classes and a ThreadLocal
+	used for exception handling.
+	* Makefile.am: Update accordingly.
+	* exceptions.scm (guard, guard-aux): Implementation taken from
+	the R7RS specification document,
+	* exceptions.scm (with-exception-handler, raise, raise-continuable,
+	guard, simple-guard): New implementations.
+
 2013-12-08  Per Bothner  <per@bothner.com>
 
 	* rnrs/lists.scm (find, filter, partition, remp, remove, remv, remq,

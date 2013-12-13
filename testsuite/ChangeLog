@@ -1,3 +1,9 @@
+2013-12-13  Per Bothner  <per@bothner.com>
+
+	* r7rs-tests.scm: Enable tests for exception-handling.
+	Add new tests for exception-handling.
+	(guard): Remove ad-hoc definition.
+
 2013-12-08   John Tobey <jtobey@john-edwin-tobey.org>
 	     Per Bothner  <per@bothner.com>
 

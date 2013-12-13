@@ -1,3 +1,8 @@
+2013-12-13  Per Bothner  <per@bothner.com>
+
+	* standard/Scheme.java (initScheme):  Add definitions for r6rs/r7rs
+	exception handling.
+
 2013-12-09  Per Bothner  <per@bothner.com>
 
 	* lang/SyntaxForms.java (class PairWithPositionSyntaxForm):

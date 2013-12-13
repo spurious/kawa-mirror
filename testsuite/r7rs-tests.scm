@@ -16,13 +16,6 @@
      (begin (test-expect-fail 1)
             (test-assert message #f)))))
 
-(define-syntax guard
-  (syntax-rules ()
-    ((guard (exn (else handler)) body)
-     (try-catch
-      body
-      (exn java.lang.Throwable handler)))))
-
 ;; Using 3-operand datum->syntax enables line numbers in reporting.
 (define-syntax test
   (lambda (form)
@@ -1560,14 +1553,12 @@
 
 (test-begin "6.11 Exceptions")
 
-(skip-if-kawa "with-exception-handler and raise-continuable not implemented"
 (test 65
     (with-exception-handler
      (lambda (con) 42)
      (lambda ()
        (+ (raise-continuable "should be a number")
           23))))
-)
 
 (test #t
     (error-object? (guard (exn (else exn)) (error "BOOM!" 1 2 3))))
@@ -1576,19 +1567,15 @@
 (test '(1 2 3)
     (error-object-irritants (guard (exn (else exn)) (error "BOOM!" 1 2 3))))
 
-;(skip-if-kawa "file-error? and guard not implemented"
 (test #f
     (file-error? (guard (exn (else exn)) (error "BOOM!"))))
 (test #t
     (file-error? (guard (exn (else exn)) (open-input-file " no such file "))))
-;)
 
-;(skip-if-kawa "read-error? and guard not implemented"
 (test #f
     (read-error? (guard (exn (else exn)) (error "BOOM!"))))
 (test #t
     (read-error? (guard (exn (else exn)) (read (open-input-string ")")))))
-;)
 
 (test-end)
 
@@ -2111,5 +2098,62 @@
   (test 27 a)
   (test 9.728 b)
   (test 1800/497 c))
+
+(define something-went-wrong #f)
+(define (test-exception-handler-1 v)
+  (call-with-current-continuation
+   (lambda (k)
+     (with-exception-handler
+      (lambda (x)
+        (set! something-went-wrong (list "condition: " x))
+        (k 'exception))
+      (lambda ()
+        (+ 1 (if (> v 0) (+ v 100) (raise 'an-error))))))))
+(test 106 (test-exception-handler-1 5))
+(test #f something-went-wrong)
+(test 'exception (test-exception-handler-1 -1))
+(test '("condition: " an-error) something-went-wrong)
+
+(set! something-went-wrong #f)
+(define (test-exception-handler-2 v)
+  (guard (ex (else 'caught-another-exception))
+         (with-exception-handler
+          (lambda (x)
+            (set! something-went-wrong #t)
+            (list "exception:" x))
+          (lambda ()
+            (+ 1 (if (> v 0) (+ v 100) (raise 'an-error)))))))
+(test 106 (test-exception-handler-2 5))
+(test #f something-went-wrong)
+(test 'caught-another-exception (test-exception-handler-2 -1))
+(test #t something-went-wrong)
+
+(let* ((out (open-output-string))
+       (value
+        (with-exception-handler
+         (lambda (con)
+           (cond
+            ((string? con)
+             (display con out))
+            (else
+             (display "a warning has been issued" out)))
+           42)
+         (lambda ()
+           (+ (raise-continuable "should be a number")
+              23)))))
+  (test 65 value)
+  (test "should be a number" (get-output-string out)))
+
+(test 42
+      (guard (condition
+              ((assq 'a condition) => cdr)
+              ((assq 'b condition)))
+             (raise (list (cons 'a 42)))))
+
+(test '(b . 23)
+      (guard (condition
+              ((assq 'a condition) => cdr)
+              ((assq 'b condition)))
+             (raise (list (cons 'b 23)))))
 
 (test-end)

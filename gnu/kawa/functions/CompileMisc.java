@@ -551,6 +551,12 @@ public class CompileMisc implements Inlineable
         Declaration contDecl = lexp.firstDecl();
         if (! contDecl.getFlag(Declaration.TYPE_SPECIFIED))
           contDecl.setType(typeContinuation);
+        if (lexp.returnType == null && required != null
+            && ! (required instanceof InlineCalls.ValueNeededType))
+          lexp.setCoercedReturnType(required);
+
+        // FIXME (future): (after visiting lexp), do:
+        // exp.setType(lexp.body.getType() UNION continuation-arguments);
       }
     exp.visitArgs(visitor);
     return exp;
@@ -642,6 +648,81 @@ public class CompileMisc implements Inlineable
       }
     return null;
   }
+
+    public static Expression validateApplyWithExceptionHandler
+        (ApplyExp exp, InlineCalls visitor, Type required, Procedure proc) {
+        Expression[] args = exp.getArgs();
+        Expression handler = visitor.visit(args[0], null);
+        args[0] = handler;
+        Expression thunk = args[1];
+        if (thunk instanceof LambdaExp) {
+            LambdaExp lthunk = (LambdaExp) thunk;
+            if (lthunk.min_args == 0 && lthunk.max_args == 0) {
+                if (lthunk.returnType == null && required != null
+                    && ! (required instanceof InlineCalls.ValueNeededType))
+                    lthunk.setCoercedReturnType(required);
+                thunk = visitor.visit(lthunk, required);
+                args[1] = thunk;
+
+                /* Rewrite to:
+                     (let ((link (HandlerLink:push handler)))
+                      (try-catch
+                              (let ((v (thunk)))
+                               (link:pop)
+                               v)
+                       (ex java.lang.Throwable
+                        (primitive-throw (link:handle ex)))))
+                * This allows the thunk to be inlined.
+                */
+                Compilation comp = visitor.getCompilation();
+                comp.letStart();
+                ClassType handlerLinkType =
+                    ClassType.make("kawa.lib.HandlerLink");
+                Method pushMethod =
+                    handlerLinkType.getDeclaredMethod("push", 1);
+                Method popMethod =
+                    handlerLinkType.getDeclaredMethod("pop", 0);
+                Declaration linkDecl =
+                    comp.letVariable(null, handlerLinkType,
+                                     new ApplyExp(pushMethod, handler));
+                comp.letEnter();
+                Expression tryClause;
+                Type bodyType = lthunk.getReturnType();
+                Expression bodyCall = new ApplyExp(thunk);
+                Expression popHandler =
+                    new ApplyExp(popMethod, new ReferenceExp(linkDecl));
+                if (bodyType.isVoid()) {
+                    tryClause = new BeginExp(bodyCall, popHandler);
+                } else {
+                    comp.letStart();
+                    Declaration resultDecl =
+                        comp.letVariable(null, bodyType, bodyCall);
+                    comp.letEnter();
+                    tryClause =
+                        comp.letDone
+                        (new BeginExp(popHandler,
+                                      new ReferenceExp(resultDecl)));
+                }
+                TryExp texp = new TryExp(tryClause, null);
+                Declaration exDecl =
+                    new Declaration(null, Type.javalangThrowableType);
+
+                Expression doHandle =
+                    new ApplyExp(handlerLinkType
+                                 .getDeclaredMethod("handle", 1),
+                                 new ReferenceExp(linkDecl),
+                                 new ReferenceExp(exDecl));
+                texp.addCatchClause(exDecl,
+                                    new ApplyExp(Throw.primitiveThrow,
+                                                 doHandle));
+                return visitor.visit(comp.letDone(texp), required);
+            }
+        }
+        thunk = visitor.visit(thunk, null);
+        args[1] = thunk;
+        return exp;
+    }
+
 
   /** An ExpVisitor class to check if callcc exits through a try-finally. */
   static class ExitThroughFinallyChecker extends ExpVisitor<Expression,TryExp>

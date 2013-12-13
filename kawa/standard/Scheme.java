@@ -648,6 +648,11 @@ public class Scheme extends LispLanguage
       defProcStFld("error-object-irritants", "kawa.lib.exceptions");
       defProcStFld("file-error?", "kawa.lib.exceptions");
       defProcStFld("read-error?", "kawa.lib.exceptions");
+      defProcStFld("raise", "kawa.lib.exceptions");
+      defProcStFld("raise-continuable", "kawa.lib.exceptions");
+      defProcStFld("with-exception-handler", "kawa.lib.exceptions");
+      defSntxStFld("guard", "kawa.lib.exceptions");
+      defSntxStFld("simple-guard", "kawa.lib.exceptions");
       defProcStFld("as", "gnu.kawa.functions.Convert", "as");
       defProcStFld("instance?", "kawa.standard.Scheme", "instanceOf");
       defSntxStFld("synchronized", "kawa.lib.syntax");

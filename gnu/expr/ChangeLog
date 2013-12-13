@@ -1,3 +1,9 @@
+2013-12-12  Per Bothner  <per@bothner.com>
+
+	* CatchClause.java (<init>(Declaration,Expression)),
+	(<init>(Object,Type,Expression)): New constructors.
+	* TryExp.java (addCatchClause): New method.
+
 2013-12-08  Per Bothner  <per@bothner.com>
 
 	* ModuleExp.java (valueOf): New static Method.  This allows writing

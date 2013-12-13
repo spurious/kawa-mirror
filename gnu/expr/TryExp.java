@@ -22,6 +22,18 @@ public class TryExp extends Expression
     this.catch_clauses = catch_clauses;
   }
 
+    public void addCatchClause(Declaration decl, Expression body) {
+        CatchClause clause = new CatchClause(decl, body);
+        CatchClause last = catch_clauses;
+        if (last == null)
+            catch_clauses = clause;
+        else {
+            while (last.next != null)
+                last = last.next;
+            last.next = clause;
+        }
+    }
+
   public TryExp (Expression try_clause, Expression finally_clause)
   {
     this.try_clause = try_clause;

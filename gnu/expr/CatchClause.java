@@ -14,16 +14,25 @@ public class CatchClause extends LetExp
   {
   }
 
-  /** "Convert" a <code>LambdaExp</code> to a <code>CatchClause</code>. */
-  public CatchClause (LambdaExp lexp)
-  {
-    this();
-    Declaration decl = lexp.firstDecl();
-    decl.setInitValue(QuoteExp.undefined_exp);
-    lexp.remove(null, decl);
-    add(decl);
-    body = lexp.body;
-  }
+    public CatchClause(Declaration decl, Expression body) {
+        decl.setInitValue(QuoteExp.undefined_exp);
+        add(decl);
+        this.body = body;
+    }  
+
+    public CatchClause(Object name, Type type, Expression body) {
+        this(new Declaration(name, type), body);
+    }  
+
+    /** "Convert" a <code>LambdaExp</code> to a <code>CatchClause</code>. */
+    public CatchClause (LambdaExp lexp) {
+        this();
+        Declaration decl = lexp.firstDecl();
+        decl.setInitValue(QuoteExp.undefined_exp);
+        lexp.remove(null, decl);
+        add(decl);
+        body = lexp.body;
+    }
 
   public final CatchClause getNext() { return next; }
   public final void setNext (CatchClause next) { this.next = next; }

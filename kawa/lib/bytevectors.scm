@@ -69,4 +69,3 @@
    (((v:toString):substring start end):getBytes
     (cond-expand (java-7 java.nio.charset.StandardCharsets:UTF_8)
                  (else "UTF-8")))))
-

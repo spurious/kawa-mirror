@@ -270,7 +270,7 @@ public class SyntaxForms {
         }
     }
 
-    static class PairWithPositionSyntaxForm extends PairWithPosition
+    public static class PairWithPositionSyntaxForm extends PairWithPosition
         implements SyntaxForm, SourceLocator, Externalizable {
         private PairWithPosition datum;
         private TemplateScope scope;

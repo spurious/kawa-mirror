@@ -65,59 +65,61 @@ public class PrintConsumer extends PrintWriter
   }
   /* #endif */
 
-  /* #ifdef use:java.lang.CharSequence */
-  public void write(CharSequence csq, int start, int length)
-  {
-    if (length == 0)
-      csq = "";
-    if (csq instanceof String)
-      write((String) csq, start, length);
-    else
-      {
-        int end = start+length;
-        for (int i = start; i < end;  i++)
-          write(csq.charAt(i));
-      }
-  }
-  /* #endif */
+    /* #ifdef use:java.lang.CharSequence */
+    public void write(CharSequence csq, int start, int length) {
+        if (length == 0)
+            csq = "";
+        if (csq instanceof String)
+            write((String) csq, start, length);
+        else {
+            synchronized (lock) {
+                int end = start+length;
+                for (int i = start; i < end;  i++)
+                    write(csq.charAt(i));
+            }
+        }
+    }
+    /* #endif */
 
-  public void writeBoolean(boolean v)
-  {
-    print(v);
-  }
+    public void writeBoolean(boolean v) {
+        print(v);
+    }
 
-  public void writeFloat(float v)
-  {
-    startNumber();
-    print(v);
-    endNumber();
-  }
+    public void writeFloat(float v) {
+        synchronized (lock) {
+            startNumber();
+            print(v);
+            endNumber();
+        }
+    }
 
-  public void writeDouble(double v)
-  {
-    startNumber();
-    print(v);
-    endNumber();
-  }
+    public void writeDouble(double v) {
+        synchronized (lock) {
+            startNumber();
+            print(v);
+            endNumber();
+        }
+    }
 
-  public void writeInt(int v)
-  {
-    startNumber();
-    print(v);
-    endNumber();
-  }
+    public void writeInt(int v) {
+        synchronized (lock) {
+            startNumber();
+            print(v);
+            endNumber();
+        }
+    }
 
-  public void writeLong(long v)
-  {
-    startNumber();
-    print(v);
-    endNumber();
-  }
+    public void writeLong(long v) {
+        synchronized (lock) {
+            startNumber();
+            print(v);
+            endNumber();
+        }
+    }
 
   public void startDocument () { }
 
   public void endDocument() { }
-
 
   public void startElement (Object type) { }
 

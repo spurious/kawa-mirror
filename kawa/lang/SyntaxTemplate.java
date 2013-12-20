@@ -167,11 +167,7 @@ public class SyntaxTemplate implements Externalizable
       : tr.patternScope.patternNesting.toString();
     StringBuffer program = new StringBuffer ();
     java.util.Vector literals_vector = new java.util.Vector ();
-    /* #ifdef use:java.util.IdentityHashMap */ 
     IdentityHashMap seen = new IdentityHashMap();
-    /* #else */
-    // Object seen = null;
-    /* #endif */
     convert_template(template, syntax,
 		     program, 0, literals_vector, seen, false, tr);
     this.template_program = program.toString();
@@ -213,28 +209,25 @@ public class SyntaxTemplate implements Externalizable
 			       StringBuffer template_program,
 			       int nesting,
 			       java.util.Vector literals_vector,
-			       Object seen,
+			       IdentityHashMap seen,
 			       boolean isVector,
 			       Translator tr)
   {
-    while (form instanceof SyntaxForm)
-      {
-	syntax = (SyntaxForm) form;
-	form = syntax.getDatum();
-      }
-    /* #ifdef use:java.util.IdentityHashMap */ 
     if (form instanceof Pair || form instanceof FVector)
       {
-        IdentityHashMap seen_map = (IdentityHashMap) seen;
-        if (seen_map.containsKey(form))
+        if (seen.containsKey(form))
           {
             /* FIXME cycles are OK if data are literal. */
             tr.syntaxError("self-referential (cyclic) syntax template");
             return -2;
           }
-        seen_map.put(form, form);
+        seen.put(form, form);
       }
-    /* #endif */
+    while (form instanceof SyntaxForm)
+      {
+	syntax = (SyntaxForm) form;
+	form = syntax.getDatum();
+      }
 
   check_form:
     if (form instanceof Pair)

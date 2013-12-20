@@ -1,3 +1,12 @@
+2013-12-20  Per Bothner  <per@bothner.com>
+
+	* lang/SyntaxTemplate.java (convert_template):  Check for cycle
+	before (rather than after) dereferencing SyntaxForms. This fixes
+	Savannah bug #40869 "self-referential (cyclic) syntax template".
+
+	* lang/SyntaxTemplate.java (seen): Unconditionally
+	assume availability of java.util.IdentityHashMap.
+
 2013-12-15  John Tobey <jtobey@john-edwin-tobey.org>
 
 	* lang/SyntaxForms.java (class PairWithPositionSyntaxForm):

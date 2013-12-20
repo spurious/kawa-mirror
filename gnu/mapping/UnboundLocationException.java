@@ -82,7 +82,7 @@ public class UnboundLocationException extends RuntimeException
     Symbol name = location == null ? null : location.getKeySymbol();
     if (name != null)
       {
-	sbuf.append("unbound location ");
+	sbuf.append("unbound location: ");
 	sbuf.append(name);
 	Object property = location.getKeyProperty();
 	if (property != null)
@@ -94,7 +94,7 @@ public class UnboundLocationException extends RuntimeException
       }
     else if (symbol != null)
       {
-	sbuf.append("unbound location ");
+	sbuf.append("unbound location: ");
 	sbuf.append(symbol);
       }
     else

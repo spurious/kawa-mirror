@@ -1,4 +1,5 @@
 package kawa.lang;
+import gnu.bytecode.ClassType;
 import gnu.expr.*;
 import java.io.*;
 
@@ -49,16 +50,45 @@ public class TemplateScope extends LetExp implements Externalizable
         return templateScope;
     }
 
-  public String toString() { return super.toString()+"(for "+syntax+")"; }
+    public static TemplateScope make(ModuleExp module, String mname) {
+        TemplateScope templateScope = new TemplateScope();
+        templateScope.outer = module;
+        return templateScope;
+    }
+
+    void init(Macro macro) {
+        outer = macro.getCapturedScope();
+        macroContext = outer.lookup(macro.getName());
+        syntax = macro;
+        macroMark = macro;
+    }
+
+    public static TemplateScope make(String moduleClassName) {
+        TemplateScope templateScope = new TemplateScope();
+        templateScope.setOuter(moduleClassName);
+        return templateScope;
+    }
+
+    void setOuter(String moduleClassName) {
+        outer = ModuleInfo.find(ClassType.make(moduleClassName)).getModuleExp();
+    }
+
+    public String toString() { return super.toString()+"(for "+syntax+")"; }
 
   public void writeExternal(ObjectOutput out) throws IOException
   {
-    out.writeObject(outer);
+      String moduleClassName = null;
+      if (outer instanceof ModuleExp) {
+          ClassType moduleClass = ((ModuleExp) outer).getClassType();
+          if (moduleClass != null)
+              moduleClassName = moduleClass.getName();
+      }
+      out.writeObject(moduleClassName);
   }
 
   public void readExternal(ObjectInput in)
     throws IOException, ClassNotFoundException
   {
-    outer = (ScopeExp) in.readObject();
+    in.readObject(); // ignore, for now
   }
 }

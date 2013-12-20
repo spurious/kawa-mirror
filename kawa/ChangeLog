@@ -1,5 +1,9 @@
 2013-12-20  Per Bothner  <per@bothner.com>
 
+	* lang/TemplateScope.java: Make writeExternal/readExternal work
+	for a TemplateScope from a ModuleLevel macro - the important case
+	for compiling macro-generating macros.
+
 	* lang/SyntaxTemplate.java (convert_template):  Check for cycle
 	before (rather than after) dereferencing SyntaxForms. This fixes
 	Savannah bug #40869 "self-referential (cyclic) syntax template".

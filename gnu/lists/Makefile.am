@@ -8,6 +8,7 @@ java_sources = \
   Array.java \
   AttributePredicate.java \
   BitVector.java \
+  Blob.java \
   ByteVector.java \
   CharBuffer.java \
   CharSeq.java \

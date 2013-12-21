@@ -108,6 +108,10 @@ public abstract class ByteVector extends SimpleVector
     this.size = size;
   }
 
+    public InputStream getInputStream() {
+        return new ByteArrayInputStream(data, 0, size);
+    }
+
     public int readFrom(int start, int count, InputStream in)
         throws IOException {
         return in.read(data, start, count);

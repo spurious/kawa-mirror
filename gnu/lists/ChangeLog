@@ -1,3 +1,9 @@
+2013-12-21  Per Bothner  <per@bothner.com>
+
+	* Blob.java: New class, extends U8Vector.
+	* Makefile.am: Update accordingly.
+	* ByteVector.java (getInputStream): New method.
+
 2013-12-20  Per Bothner  <per@bothner.com>
 
 	* Strings.java (printQuoted): Add escape option value.

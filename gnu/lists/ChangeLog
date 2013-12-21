@@ -1,5 +1,7 @@
 2013-12-20  Per Bothner  <per@bothner.com>
 
+	* Strings.java (printQuoted): Add escape option value.
+
 	* PrintConsumer.java: Add synchronization.
 
 2013-11-28  Matthieu Vachon <matthieu.o.vachon@gmail.com>

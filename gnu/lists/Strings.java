@@ -41,6 +41,11 @@ public class Strings
       }
   }
 
+    /** Print a string with quotes and escapes.
+     * @param escapes The value 0 means only escape '"' and '\\';
+     *   the value 1 means escape standard escape characters like '\\b';
+     *   the value 2 means escape all non-asci or control characters.
+     */
     public static void printQuoted(CharSequence str,
                                    Appendable ps, int escapes) {
         int len = str.length();
@@ -66,6 +71,13 @@ public class Strings
                     { ps.append("\\v"); continue; }
                     else if (ch == '\f')
                     { ps.append("\\f"); continue; }
+                    else if (escapes > 1 && (ch < ' ' || ch >= 127))
+                    {
+                        ps.append("\\x");
+                        ps.append(Integer.toHexString(ch));
+                        ps.append(';');
+                        continue;
+                    }
                 }
                 ps.append(ch);
             }

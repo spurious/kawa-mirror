@@ -443,12 +443,15 @@ public class OutPort extends PrintConsumer implements Printable
     bout.startLogicalBlock(prefix, perLine, suffix);
   }
 
-  public void startLogicalBlock (String prefix, String suffix, int indent)
-  {
-    bout.startLogicalBlock(prefix, false, suffix);
-    bout.addIndentation(prefix == null ? indent :  indent - prefix.length(),
-			false);
-  }
+    public void startLogicalBlock(String prefix, String suffix,
+                                  int indent) {
+        synchronized(lock) {
+            bout.startLogicalBlock(prefix, false, suffix);
+            bout.addIndentation(prefix == null ? indent
+                                :  indent - prefix.length(),
+                                false);
+        }
+    }
 
   public void endLogicalBlock (String suffix)
   {
@@ -460,11 +463,12 @@ public class OutPort extends PrintConsumer implements Printable
     bout.writeBreak(kind);
   }
 
-  public void writeSpaceLinear()
-  {
-    write(' ');
-    writeBreak(PrettyWriter.NEWLINE_LINEAR);
-  }
+    public void writeSpaceLinear() {
+        synchronized(lock) {
+            write(' ');
+            writeBreak(PrettyWriter.NEWLINE_LINEAR);
+        }
+    }
 
   /** Write a new-line iff the containing section cannot be printed
    * on one line.  Either all linear-style newlines in a logical
@@ -475,12 +479,13 @@ public class OutPort extends PrintConsumer implements Printable
     writeBreak(PrettyWriter.NEWLINE_LINEAR);
   }
 
-  /** Write a new-line if needed, space otherwise. */
-  public void writeSpaceFill()
-  {
-    write(' ');
-    writeBreak(PrettyWriter.NEWLINE_FILL);
-  }
+    /** Write a new-line if needed, space otherwise. */
+    public void writeSpaceFill() {
+        synchronized (lock) {
+            write(' ');
+            writeBreak(PrettyWriter.NEWLINE_FILL);
+        }
+    }
 
   public void writeBreakFill()
   {

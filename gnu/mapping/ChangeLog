@@ -1,5 +1,7 @@
 2013-12-20  Per Bothner  <per@bothner.com>
 
+	* OutPort.java: Add synchronization.
+
 	* UnboundLocationException.java: Tweak message formatting.
 
 2013-12-02  Per Bothner  <per@bothner.com>

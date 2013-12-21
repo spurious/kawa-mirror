@@ -1,3 +1,7 @@
+2013-12-21  Per Bothner  <per@bothner.com>
+
+	* ReaderExtendedLiteral.java (readContent): Warn about ']]>'.
+
 2013-11-11  Per Bothner  <per@bothner.com>
 
 	* LispLanguage.java (parse): No longer need to set firstForm.

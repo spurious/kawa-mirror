@@ -153,7 +153,7 @@ public class ReaderExtendedLiteral extends ReaderConstituent {
                     }
                     else
                         reader.tokenBufferLength = lineStart;
-                     reader.skip();
+                    reader.skip();
                     continue;
                 } else if (next1 == '-') {
                     reader.skip();
@@ -185,6 +185,16 @@ public class ReaderExtendedLiteral extends ReaderConstituent {
                 if (isNestableStartDelim(next))
                     braceNesting++;
                 reader.tokenBufferAppend(next);
+                if (next == ']' && delimiter == '<') {
+                    if (reader.peek() == ']') {
+                        reader.skip();
+                        reader.tokenBufferAppend(']');
+                        if (reader.peek() == '>') {
+                            reader.error('w', reader.getName(), line, column+1,
+                                         "literal ']]>' is only valid following '<![CDATA['");
+                        }
+                    }
+                }
                 next = ' ';
             }
             if (reader.tokenBufferLength > 0

@@ -1,3 +1,7 @@
+2013-12-20  Per Bothner  <per@bothner.com>
+
+	* Language.java (defProcStFld): Add overload variant taking Symbol.
+
 2013-12-12  Per Bothner  <per@bothner.com>
 
 	* CatchClause.java (<init>(Declaration,Expression)),

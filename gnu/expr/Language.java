@@ -355,9 +355,13 @@ public abstract class Language
    */
   protected void defProcStFld(String name, String cname, String fname)
   {
+    defProcStFld(getSymbol(name), cname, fname);
+  }
+
+  protected void defProcStFld(Symbol sym, String cname, String fname)
+  {
     Object property = (hasSeparateFunctionNamespace() ? EnvironmentKey.FUNCTION
 		       : null);
-    Symbol sym = getSymbol(name);
     StaticFieldLocation loc
       = StaticFieldLocation.define(environ, sym, property, cname, fname);
     loc.setProcedure();

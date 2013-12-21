@@ -8,6 +8,7 @@ import gnu.mapping.*;
 /* #ifdef JAVA7 */
 // import java.nio.file.Files;
 /* #endif */
+import java.nio.charset.Charset;
  
 /** A generalized path/location, including File and URIs. */
 
@@ -314,13 +315,36 @@ implements javax.tools.FileObject
     return new OutputStreamWriter(openOutputStream());
   }
 
-  /* #ifdef use:java.lang.CharSequence */
-  public CharSequence getCharContent (boolean ignoreEncodingErrors)
-    throws IOException
-  {
-    throw new UnsupportedOperationException(); // FIXME
-  }
-  /* #endif */
+    public CharSequence getCharContent(boolean ignoreEncodingErrors)
+        throws IOException {
+        byte[] bytes = readAllBytes();
+        /* #ifdef JAVA6 */
+        return new String(bytes, Charset.defaultCharset());
+        /* #else */
+        // return new String(bytes,
+        //                   System.getProperty("sun.jnu.encoding", 
+        //                                      "UTF-8"));
+        /* #endif */
+    }
+
+
+    public byte[] readAllBytes() throws IOException {
+        long len = getContentLength();
+        // See comment for MAX_BUFFER_SIZE in java.nio.file.Files.
+        if (len > Integer.MAX_VALUE - 8)
+            throw new Error("path contents too big");
+        int ilen = (int) len;
+        byte[] buffer = new byte[ilen];
+        int sofar = 0;
+        InputStream in = openInputStream();
+        while (sofar < ilen) {
+            int cnt = in.read(buffer, sofar, ilen-sofar);
+            if (cnt <= 0)
+                throw new IOException("unable to read enture file");
+            sofar += cnt;
+        }
+        return buffer;
+    }
 
   /** Convert an absolute URI to one relatve to a given base.
    * This goes beyond java.net.URI.relativize in that if the arguments
@@ -428,5 +452,4 @@ implements javax.tools.FileObject
         }
         return contentType;
     }
-
 }

@@ -1,3 +1,11 @@
+2013-12-21  Per Bothner  <per@bothner.com>
+
+	* Path.java (getCharContent): Add implementation.
+	(readAllBytes): New method.
+	* FilePath.java (toFileRaw): Renamed from toFile.
+	(toFile): Change to possible adjust for currentPath.
+	(readAllBytes): New method.
+
 2013-11-28  Per Bothner  <per@bothner.com>
 
 	* PrettyWriter.java (buffer): Allocate a non-zero-length buffer.

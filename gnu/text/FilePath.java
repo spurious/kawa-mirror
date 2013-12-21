@@ -196,9 +196,18 @@ public class FilePath
     return path;
   }
 
-  public File toFile ()
+  public File toFileRaw ()
   {
     return file;
+  }
+
+  public File toFile() {
+      if (file.isAbsolute())
+          return file;
+      Path cur = currentPath();
+      if (cur == defaultPath)
+          return file;
+      return ((FilePath) cur.resolve(this)).toFileRaw();
   }
 
   public URL toURL ()
@@ -325,6 +334,16 @@ public class FilePath
     // @Override
     // public java.nio.file.Path toNPath() {
     //     return file.toPath();
+    // }
+    // @Override
+    // public byte[] readAllBytes() throws IOException {
+    //     Path rpath = this;
+    //     if (! isAbsolute()) {
+    //         Path cur = currentPath();
+    //         if (cur != Path.userDirPath)
+    //             rpath = cur.resolve(this);
+    //     }
+    //     return java.nio.file.Files.readAllBytes(rpath.toNPath());
     // }
     /* #endif */
 }

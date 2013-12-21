@@ -1,3 +1,7 @@
+2013-12-20  Per Bothner  <per@bothner.com>
+
+	* Invoke.java (lookupMethods): Minor tweaks.
+
 2013-09-07  Per Bothner  <per@bothner.com>
 
 	* CompileReflect.java: Update for mostSpecific metho being moved.

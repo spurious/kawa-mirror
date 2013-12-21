@@ -267,12 +267,12 @@ public class Invoke extends ProcedureN
       mname = "<init>";
     else
       {
-        if (name instanceof String || name instanceof FString)
+        if (name instanceof CharSequence)
           mname = name.toString();
 	else if (name instanceof Symbol)
 	  mname = ((Symbol) name).getName();
         else
-          throw new WrongType(this, 1, null);
+          throw new WrongType(this, 1, name, "string-or-symbol");
         mname = Compilation.mangleName(mname);
       }
     MethodProc proc = ClassMethods.apply(dtype, mname,

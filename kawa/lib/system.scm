@@ -123,3 +123,15 @@
 (define (jiffies-per-second) ::long
   1000000000)
 
+(define-simple-constructor cmd run-process $string-with-delimiter-marks$)
+(define-simple-constructor sh run-process-using-sh $string-with-delimiter-marks$)
+(define-syntax run-process-using-sh
+  (syntax-rules ()
+    ((run-process-using-sh . args)
+     (run-process shell: #t . args))))
+
+(define (process-exit-wait process::java.lang.Process) ::int
+  ((->java.lang.Process process):waitFor))
+
+(define (process-exit-ok? process::java.lang.Process) ::boolean
+  (= ((->java.lang.Process process):waitFor) 0))

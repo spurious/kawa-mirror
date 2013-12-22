@@ -1,3 +1,8 @@
+2013-12-22  Per Bothner  <per@bothner.com>
+
+	* standard/Scheme.java (initScheme): Add 'run-process',
+	'process-exit-wait', 'process-exit-ok?', '&cmd', '&`', '&sh'.
+
 2013-12-21  Per Bothner  <per@bothner.com>
 
 	* standard/Scheme.java (initScheme): New procedures 'path-bytes'

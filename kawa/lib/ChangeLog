@@ -1,3 +1,13 @@
+2013-12-22  Per Bothner  <per@bothner.com>
+
+	* syntax.scm ($string-with-delimiter-marks$): New macro.  Similar
+	to $string$, used for simple named quasi-literals, but add hooks
+	to generate subitution marks in resulting string.
+	($string-with-default-format$): Generalized from $string$ to
+	provide a default format specifier.
+	* system.scm (process-exit-wait, process-exit-ok?): New procedures.
+	(cmd, sh): New simple constructors.
+
 2013-12-21  Per Bothner  <per@bothner.com>
 
 	* files.scm (path-bytes, path-data): New functions.

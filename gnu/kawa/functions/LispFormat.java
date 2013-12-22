@@ -15,6 +15,10 @@ public class LispFormat extends CompoundFormat
   public static final String paramFromCount = "<from count>";
   public static final String paramUnspecified = "<unspecified>";
 
+    static final DelimitSubstitutionFormat delimitSubstitutionInstance
+        = DelimitSubstitutionFormat
+        .getInstance(ObjectFormat.getInstance(false));
+
   public LispFormat(char[] format, int offset, int length)
     throws ParseException
   {
@@ -428,6 +432,9 @@ public class LispFormat extends CompoundFormat
 	    fmt = LispNewlineFormat.getInstance(count,
 						PrettyWriter.NEWLINE_LITERAL);
 	    break;
+          case 'Q':
+              fmt = delimitSubstitutionInstance;
+              break;
           default:
 	    throw new ParseException("unrecognized format specifier ~"+ch, i);
           }

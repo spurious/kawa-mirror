@@ -155,6 +155,7 @@ public class Scheme extends LispLanguage
       defSntxStFld("lambda", "kawa.standard.SchemeCompilation", "lambda");
       defSntxStFld("$bracket-apply$", "gnu.kawa.lispexpr.BracketApply", "instance");
       defSntxStFld("$string$", "kawa.lib.syntax");
+      defSntxStFld("$string-with-default-format$", "kawa.lib.syntax");
       defSntxStFld("$format$", "kawa.lib.syntax");
       defSntxStFld("$sprintf$", "kawa.lib.syntax");
       defSntxStFld("define-simple-constructor", "kawa.lib.syntax");
@@ -721,6 +722,15 @@ public class Scheme extends LispLanguage
 
       defProcStFld("system", "kawa.lib.system");
       defProcStFld("make-process", "kawa.lib.system");
+      defProcStFld("run-process", "gnu.kawa.functions.RunProcess", "instance");
+      defProcStFld("process-exit-wait", "kawa.lib.system");
+      defProcStFld("process-exit-ok?", "kawa.lib.system");
+      defProcStFld(LispLanguage.constructNamespace.getSymbol("cmd"),
+                   "kawa.lib.system", "cmd");
+      defProcStFld(LispLanguage.constructNamespace.getSymbol("`"),
+                   "kawa.lib.system", "cmd");
+      defProcStFld(LispLanguage.constructNamespace.getSymbol("sh"),
+                   "kawa.lib.system", "sh");
       defProcStFld("tokenize-string-to-string-array", "kawa.lib.system");
       defProcStFld("tokenize-string-using-shell", "kawa.lib.system");
       defProcStFld("command-parse", "kawa.lib.system");

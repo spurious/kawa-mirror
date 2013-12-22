@@ -276,30 +276,30 @@
 ;; Helper macros for $string$:
 ;; Collect format string (assuming we're *not* inside $<<$ ... $>>$)
 ;; Returns list of format string fragments, to be concatenated.
-(define (%string-format-format forms)
+(define (%string-format-format default-format forms)
   (syntax-case forms ($format$ $<<$ $>>$)
     (() '())
     (($<<$ . rest)
-     (%string-format-enclosed-format #'rest))
+     (%string-format-enclosed-format default-format #'rest))
     ((($format$ fstr . args) . rest)
      (let ((xd (syntax->datum #'fstr)))
-       (cons #'fstr (%string-format-format #'rest))))
+       (cons #'fstr (%string-format-format default-format #'rest))))
     (((x . y) . rest)
-      (cons "~a" (%string-format-format #'rest)))
+      (cons "~a" (%string-format-format default-format #'rest)))
     ((x . rest)
      (cons #'(constant-fold invoke (constant-fold invoke x 'toString)
                             'replace "~" "~~")
-           (%string-format-format #'rest)))))
+           (%string-format-format default-format #'rest)))))
 
 ;; Collect format string, assuming we're inside $<<$ ... $>>$
 ;; Returns list of format string fragments, to be concatenated.
-(define (%string-format-enclosed-format forms)
+(define (%string-format-enclosed-format default-format forms)
   (syntax-case forms ($<<$ $>>$)
     (() '())
     (($>>$ . rest)
-     (%string-format-format #'rest))
+     (%string-format-format default-format #'rest))
     ((arg1 . rest)
-     (cons "~a" (%string-format-enclosed-format #'rest)))))
+     (cons default-format (%string-format-enclosed-format default-format #'rest)))))
 
 ;; Collect format arguments (assuming we're *not* inside $<<$ ... $>>$)
 (define (%string-format-args forms)
@@ -323,16 +323,27 @@
     ((arg . rest)
      #`(arg . #,(%string-format-enclosed-args #'rest)))))
 
-(define-syntax $string$
+(define-syntax $string-with-default-format$
   (lambda (form)
     (syntax-case form ()
-      (($string$ . forms)
+      (($string$ default-format . forms)
        #`($format$ (constant-fold invoke
                                   (constant-fold string-append
                                                  . #,(%string-format-format
+                                                      #'default-format
                                                       #'forms))
                                   'toString)
                    . #,(%string-format-args #'forms))))))
+
+(define-syntax $string$
+  (syntax-rules ()
+    ((_ . args)
+     ($string-with-default-format$ "~a" . args))))
+
+(define-syntax $string-with-delimiter-marks$
+  (syntax-rules ()
+    ((_ . args)
+     ($string-with-default-format$ "~Q" . args))))
 
 (define-syntax $format$
   (syntax-rules ()

@@ -27,15 +27,7 @@ public class ReaderExtendedLiteral extends ReaderConstituent {
         int startColumn = reader.getColumnNumber() - 2;
         in.tokenBufferAppend(ch);
         int next = reader.read();
-        if (XName.isNameStart(next)) {
-            for (;;) {
-                reader.tokenBufferAppend(next);
-                next = reader.read();
-                if (! XName.isNamePart(next)) {
-                    break;
-                }
-            }
-        }
+        next = scanTag(reader, next);
         Object result;
         if (next == '{' || next == '[') {
             int len = reader.tokenBufferLength - startPos - 1;
@@ -274,8 +266,12 @@ public class ReaderExtendedLiteral extends ReaderConstituent {
                     item = fhead;
                 }
                 else {
-                    String str = readName(reader, next);
-                    next = reader.peek();
+                    int startPos = reader.tokenBufferLength;
+                    next = scanTag(reader, next);
+                    String str = new String(reader.tokenBuffer, startPos,
+                                         reader.tokenBufferLength-startPos);
+                    reader.tokenBufferLength = startPos;
+                    reader.unread(next);
                     if (next == '[' || next == '{') {
                         item = readNamedLiteral(reader, rtable, str, reader.read(),
                                                 line, column);
@@ -369,22 +365,24 @@ public class ReaderExtendedLiteral extends ReaderConstituent {
           }
     }
 
-    protected String readName(LispReader reader, int next)
+    private int scanTag(LispReader reader, int next)
         throws IOException, SyntaxException {
-	int saveLength = reader.tokenBufferLength;
-	while (next >= 0)
-	  {
-	    char ch = (char) next;
-	    if (! XName.isNamePart(ch)) {
-                reader.unread(ch);
-                break;
+        if (XName.isNameStart(next)) {
+            for (;;) {
+                reader.tokenBufferAppend(next);
+                next = reader.read();
+                if (! XName.isNamePart(next)) {
+                    break;
+                }
             }
-	    reader.tokenBufferAppend(ch);
-	    next = reader.read();
-	  }
-        int len = reader.tokenBufferLength - saveLength;
-        reader.tokenBufferLength = saveLength;
-        return new String(reader.tokenBuffer, saveLength, len);
+        } else if (next == '`' || next == '<') {
+            int nextnext = reader.peek();
+            if (nextnext == '{' || nextnext == '[') {
+                reader.tokenBufferAppend(next);
+                next = reader.read();
+            }
+        }
+        return next;
     }
 
     Object checkEntity(LispReader reader, String str)
@@ -395,14 +393,6 @@ public class ReaderExtendedLiteral extends ReaderConstituent {
             reader. error("invalid entity reference");
         }
         return LispLanguage.entityNamespace.getSymbol(str);
-    }
-
-    /** Read entity following {@code '&'}.
-     * If result is null, it was appended to the token-buffer.
-     */
-    Object readEntity (LispReader reader, int next)
-        throws IOException, SyntaxException {
-        return checkEntity(reader, readName(reader, next));
     }
 
     /** Read a character reference, assuming {@code "&#"} have been read. */

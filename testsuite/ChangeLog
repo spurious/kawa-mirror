@@ -1,3 +1,9 @@
+2013-12-22  Per Bothner  <per@bothner.com>
+
+	* system-test.scm: Test process-related and system-related
+	functionality.
+	* Makefile.am: Update accordingly.
+
 2013-12-13  Per Bothner  <per@bothner.com>
 
 	* r7rs-tests.scm: Enable tests for exception-handling.

@@ -18,6 +18,7 @@ java_sources=\
   CompileArith.java \
   CompileNamedPart.java \
   CompileMisc.java \
+  CompileProcess.java \
   ConstantFunction0.java \
   Convert.java \
   CurryExp.java \
@@ -30,6 +31,7 @@ java_sources=\
   GetNamedPart.java \
   IntegerFormat.java \
   IsEq.java IsEqual.java IsEqv.java \
+  LProcess.java \
   MakeList.java \
   MakeProcedure.java \
   MakePromise.java \
@@ -39,6 +41,7 @@ java_sources=\
   Not.java \
   NumberCompare.java \
   NumberPredicate.java \
+  RunProcess.java \
   SetNamedPart.java \
   Setter.java \
   UnicodeUtils.java \

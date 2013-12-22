@@ -1,3 +1,11 @@
+2013-12-22  Per Bothner  <per@bothner.com>
+
+	* LangObjType.java: Add some handling for coercing an LProcess
+	or a Blog to a vtevector.
+	* ReaderExtendedLiteral.java (scanTag): New method to handle
+	tag name.  Extend from just allowing NCName to also allowing
+	'&`' and '&<'.
+
 2013-12-21  Per Bothner  <per@bothner.com>
 
 	* ReaderExtendedLiteral.java (readContent): Warn about ']]>'.

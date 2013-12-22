@@ -5,8 +5,11 @@ import gnu.expr.*;
 import gnu.math.*;
 import gnu.text.*;
 import gnu.kawa.functions.Arithmetic;
+import gnu.kawa.functions.LProcess;
 import gnu.kawa.reflect.Invoke;
 import gnu.kawa.reflect.LazyType;
+import gnu.lists.Blob;
+import gnu.lists.U8Vector;
 import java.util.*;
 
 /** A wrapper around a class type.
@@ -417,6 +420,14 @@ public class LangObjType extends ObjectType implements TypeValue
     return coerced;  
   }
 
+    public static U8Vector coerceToU8Vector(Object obj) {
+        if (obj instanceof LProcess)
+            return ((LProcess) obj).getValue().asPlainBytevector();
+        if (obj instanceof Blob)
+            return ((Blob) obj).asPlainBytevector();
+        return (U8Vector) obj;
+    }
+
   Method coercionMethod ()
   {
     switch (typeCode)
@@ -439,10 +450,11 @@ public class LangObjType extends ObjectType implements TypeValue
         return typeLangObjType.getDeclaredMethod("coerceIntNum", 1);
       case DFLONUM_TYPE_CODE:
         return typeLangObjType.getDeclaredMethod("coerceDFloNum", 1);
+      case U8VECTOR_TYPE_CODE:
+        return typeLangObjType.getDeclaredMethod("coerceToU8Vector", 1);
       case VECTOR_TYPE_CODE:
       case CONST_VECTOR_TYPE_CODE:
       case S8VECTOR_TYPE_CODE:
-      case U8VECTOR_TYPE_CODE:
       case S16VECTOR_TYPE_CODE:
       case U16VECTOR_TYPE_CODE:
       case S32VECTOR_TYPE_CODE:
@@ -682,7 +694,6 @@ public class LangObjType extends ObjectType implements TypeValue
       case CONST_VECTOR_TYPE_CODE:
       case VECTOR_TYPE_CODE:
       case S8VECTOR_TYPE_CODE:
-      case U8VECTOR_TYPE_CODE:
       case S16VECTOR_TYPE_CODE:
       case U16VECTOR_TYPE_CODE:
       case S32VECTOR_TYPE_CODE:

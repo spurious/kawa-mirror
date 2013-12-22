@@ -1,3 +1,13 @@
+2013-12-22  Per Bothner  <per@bothner.com>
+
+	* RunProcess.java: New class extends MethodProc,
+	implements the Scheme 'run-process'.
+	* CompileProcess.java: New class optimizes of RunProcess.
+	* LProcess.java: new class, etends Process.
+	* Makefile.am: Update for new files.
+
+	* LispFormat.java (<init>): Implement new 'Q' specifier.
+
 2013-12-12  Per Bothner  <per@bothner.com>
 
 	* CompileMisc.java (validateApplyWithExceptionHandler): New method.

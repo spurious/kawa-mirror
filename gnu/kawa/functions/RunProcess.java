@@ -1,0 +1,552 @@
+// Copyright (c) 2013  Per M.A. Bothner.
+// This is free software;  for terms and warranty disclaimer see COPYING.
+
+package gnu.kawa.functions;
+
+import gnu.expr.Keyword;
+import gnu.lists.ByteVector;
+import gnu.lists.Consumer;
+import gnu.lists.Strings;
+import gnu.mapping.*;
+import gnu.text.DelimitSubstitutionFormat;
+import gnu.text.FilePath;
+import gnu.text.Path;
+import java.io.*;
+import java.util.*;
+import java.util.Map;
+/* #ifdef JAVA7 */
+// import java.lang.ProcessBuilder.Redirect;
+/* #endif */
+
+/** The Kawa run-process command builds and runs a Process.
+ */
+
+public class RunProcess extends MethodProc {
+
+    public static final RunProcess instance = new RunProcess("run-process");
+
+    public RunProcess(String name) {
+        setName(name);
+        setProperty(Procedure.validateApplyKey,
+                    "gnu.kawa.functions.CompileProcess:validateApplyRunProcess");
+    }
+
+    public void apply (CallContext ctx) throws Throwable {
+        doit(ctx.getArgs(), ctx.consumer);
+    }
+
+    protected void error(String message) {
+        throw new RuntimeException("run-process: "+message);
+    }
+
+    public static final SimpleSymbol inheritSymbol = Symbol.valueOf("inherit");
+    public static final SimpleSymbol pipeSymbol = Symbol.valueOf("pipe");
+    public static final SimpleSymbol outSymbol = Symbol.valueOf("out");
+
+    public void doit(Object[] args, Consumer consumer) throws Throwable {
+        ProcessBuilder builder = new ProcessBuilder();
+        int nargs = args.length;
+        boolean useShell = false;
+        boolean returnBlob = true;
+        Object inRedirect = null;
+        Object outRedirect = null;
+        Object errRedirect = null;
+        InputStream inputBytes = null;
+        boolean directorySet = false;
+        Object command = null;
+        for (int iarg = 0; iarg < nargs;  iarg++) {
+            Object arg = args[iarg];
+            if (arg instanceof Keyword) {
+                String key = ((Keyword) arg).getName();
+                boolean outSpecifier = key.startsWith("out");
+                if (++iarg >= nargs)
+                    error("missing keyword value for keyword "+arg);
+                Object kval = args[iarg];
+                Object newRedirect = null;
+                if (key.equals("shell")) {
+                    useShell = ((Boolean) kval).booleanValue();
+                } else if (key.equals("in")) {
+                    inputBytes = getGetInputStreamFrom(kval);
+                }
+                // FIXME should support a subset of the following functionality
+                // even on Java 5 or Java 5.
+                else if (key.equals("out-to")
+                           || key.equals("err-to")
+                           || key.equals("in-from")) {
+                    boolean inSpecifier = key.equals("in-from");
+                    /* #ifdef JAVA7 */
+                    // if (kval == inheritSymbol) {
+                    //     newRedirect = Redirect.INHERIT;
+                    // }
+                    // else if (kval == pipeSymbol) {
+                    //     newRedirect = Redirect.PIPE;
+                    // }
+                    /* #else */
+                    if (kval == inheritSymbol || kval == pipeSymbol) {
+                        newRedirect = kval;
+                    }
+                    /* #endif */
+                    else if (! outSpecifier && ! inSpecifier
+                             && kval == outSymbol) {
+                        /* #ifdef JAVA7 */
+                        // builder.redirectErrorStream(true);
+                        /* #else */
+                        error("err-to: 'out redirect requires Java 7");
+                        newRedirect = null;
+                        /* #endif */
+                    }  else {
+                        FilePath fpath = FilePath.coerceToFilePathOrNull(kval);
+                        File file = fpath.toFile();
+                        if (fpath != null) {
+                            /* #ifdef JAVA7 */
+                            // newRedirect = inSpecifier ? Redirect.from(file)
+                            //          : Redirect.to(file);
+                            /* #else */
+                            if (inSpecifier) {
+                                inputBytes = new FileInputStream(file);
+                            } else {
+                                newRedirect = new FileOutputStream(file, false);
+                            }
+                            /* #endif */
+                        } else
+                            error("unimplemented keyword value for "+arg);
+                    }
+                    if (inSpecifier) {
+                        inRedirect = newRedirect;
+                        newRedirect = null;
+                    }
+                }
+                else if (key.equals("out-append-to")
+                         || key.equals("err-append-to")) {
+                    FilePath fpath = FilePath.coerceToFilePathOrNull(kval);
+                    if (fpath != null) {
+                        File file = fpath.toFile();
+                        /* #ifdef JAVA7 */
+                        //     newRedirect =
+                        //         ProcessBuilder.Redirect.appendTo(file);
+                        /* #else */
+                        newRedirect = new FileOutputStream(file, true);
+                        /* #endif */
+                    } else
+                        error("unimplemented keyword value for "+arg);
+                 }
+                else if (key.startsWith("env-") && key.length() > 0) {
+                    String evar = key.substring(4);
+                    String evalue = kval.toString();
+                    builder.environment().put(evar, evalue);
+                } else if (key.toUpperCase().equals(key)) {
+                    String evalue = kval.toString();
+                    builder.environment().put(key, evalue);
+                } else if (key.equals("env")) {
+                    Map<String,String> env = builder.environment();
+                    env.clear();
+                    env.putAll((Map<String,String>) kval);
+                } else if (key.equals("directory")) {
+                    try {
+                        directorySet = true;
+                        if (kval != inheritSymbol) {
+                            FilePath fpath =
+                                FilePath.coerceToFilePathOrNull(kval);
+                            builder.directory(fpath.toFile());
+                        }
+                    } catch (Throwable ex) {
+                        throw new IllegalArgumentException("invalid directory");
+                    }
+                } else
+                    error("unknown keyword "+arg);
+                if (outSpecifier)
+                    returnBlob = false;
+                if (newRedirect != null) {
+                    /* MAYBE error if duplicate redirect? */
+                    if (outSpecifier) {
+                        outRedirect = newRedirect;
+                    }
+                    else {
+                        errRedirect = newRedirect;
+                    }
+                }
+            } else {
+                if (inputBytes == null && iarg+2==nargs)
+                    inputBytes = getGetInputStreamFrom(arg);
+                else if (command == null)
+                    command = arg;
+                else
+                    error("multiple command arguments");
+            }
+        }
+        List<String> cmd = null;
+        if (command instanceof CharSequence)
+            ; // We'll tokenize it below
+        else if (command instanceof List) {
+            cmd = new ArrayList<String>();
+            for (Object arg : (List) command) {
+                if (arg instanceof CharSequence)
+                    cmd.add(arg.toString());
+                else
+                    error("element in command sequence is not a string");
+            }
+            if (cmd.isEmpty())
+                command = null;
+        } else
+            error("command is neither string nor string sequence");
+        if (command == null)
+            error("missing command");
+        if (useShell) {
+            if (cmd != null) {
+                StringBuilder sbuf = new StringBuilder(cmd.get(0));
+                int ncmds = cmd.size();
+                for (int i = 1;  i < ncmds;  i++) {
+                    sbuf.append(' ');
+                    sbuf.append(cmd.get(i));
+                }
+                command = sbuf;
+            }
+            cmd = new ArrayList<String>();
+            cmd.add("/bin/sh");
+            cmd.add("-c");
+            String expanded = handleMarks(command.toString());
+            //System.err.println("expanded '"+command+"' -> '"+expanded+"'");
+            cmd.add(expanded);
+        } else {
+            if (cmd == null) {
+                cmd = tokenize(command.toString());
+                //System.err.println("tokenize '"+command+"' -> "+cmd);
+            }
+        }
+        builder.command(cmd);
+        if (! directorySet) {
+             Path cur = Path.currentPath();
+             if (cur != Path.userDirPath)
+                 builder.directory(((FilePath) cur).toFile());
+        }
+        if (inRedirect != null) {
+            /* #ifdef JAVA7 */
+            // builder.redirectInput((ProcessBuilder.Redirect)inRedirect);
+            /* #else */
+            /* #endif */
+        }
+        /* #ifdef JAVA7 */
+        // if (outRedirect != null)
+        //     builder.redirectOutput((ProcessBuilder.Redirect)outRedirect);
+        // if (errRedirect != null)
+        //     builder.redirectError((ProcessBuilder.Redirect)errRedirect);
+        /* #endif */
+        final Process proc = builder.start();
+        /* #ifndef JAVA7 */
+        if (outRedirect != null) {
+            if (outRedirect == pipeSymbol) 
+                ; // do nothing
+            else if (outRedirect instanceof FileOutputStream) {
+                copyStreamInThread(proc.getInputStream(),
+                                   (OutputStream) outRedirect);
+            }
+            /*FIXME also handle inherit*/
+        }
+        if (errRedirect != null) {
+            /*FIXME*/
+            if (outRedirect == pipeSymbol) 
+                ; // do nothing
+            else if (outRedirect instanceof FileOutputStream) {
+                copyStreamInThread(proc.getErrorStream(),
+                                   (OutputStream) errRedirect);
+            }
+        }
+        /* #endif */
+        if (inputBytes != null) {
+            final InputStream inb = inputBytes;
+            copyStreamInThread(inputBytes, proc.getOutputStream());
+        }
+        if (returnBlob) {
+            LProcess lproc = new LProcess(proc);
+            if (consumer instanceof OutPort
+                && isDisplayConsumer(consumer)) {
+                InputStream in = proc.getInputStream();
+                if (consumer instanceof BinaryOutPort) {
+                    BinaryOutPort bout = (BinaryOutPort) consumer;
+                    byte[] buffer = new byte[2048];
+                    for (;;) {
+                        int cnt = in.read(buffer, 0, buffer.length);
+                        if (cnt < 0)
+                            break;
+                        bout.writeBytes(buffer, 0, cnt);
+                        bout.flush();
+                    }
+                    in.close();
+                }
+                else {
+                    // InputStreamReader automatically buffers the InputStream.
+                    Reader inr = new InputStreamReader(in);
+                    char[] buffer = new char[2048];
+                    for (;;) {
+                        int cnt = inr.read(buffer, 0, buffer.length);
+                        if (cnt < 0)
+                            break;
+                        consumer.write(buffer, 0, cnt);
+                        ((OutPort) consumer).flush();
+                    }
+                    inr.close();
+                }
+            }
+            else
+                consumer.writeObject(lproc);
+        }
+        else
+            consumer.writeObject(proc);
+    }
+
+    public boolean isDisplayConsumer(Consumer out) {
+        if (out instanceof OutPort) {
+            OutPort outp = (OutPort) out;
+            if (outp.objectFormat instanceof DisplayFormat) {
+                return ! ((DisplayFormat) outp.objectFormat)
+                    .getReadableOutput();
+            }
+        }
+        return false;
+    }
+
+    /** Handle substitution marks when using a shell.
+     * This means adjusting quotation/escaping as appropriate.
+     */
+    String handleMarks(String str) {
+        StringBuilder sbuf = null;
+        int len = str.length();
+        int inGroup = 0;
+        int inSubstitution = 0;
+        // The variable 'quoted' is -1, 0, '\'', or '"'.
+        // If quoted=='"', we're inside '"', for both input str and sbuf.
+        // If quoted=='\'',we're inside '\'', for both input str and sbuf;
+        // if quoted==0 (which is only if inSubstitution>0) then
+        // we're inside '\'' in the output sbuf only.
+        // Otherwise, quoted is -1.
+        int quoted = -1;
+        for (int i = 0;  i < len;  i++) {
+            char ch = str.charAt(i);
+            if (sbuf == null
+                && (ch == DelimitSubstitutionFormat.MARK_GROUP_START
+                    || ch == DelimitSubstitutionFormat.MARK_SUBSTITUTION_START)) {
+                sbuf = new StringBuilder();
+                sbuf.append(str, 0, i);
+            }
+            if (ch == DelimitSubstitutionFormat.MARK_GROUP_START) {
+                if (inGroup > 0)
+                    sbuf.append(ch);
+                inGroup++;
+                continue;
+            }
+            if (ch == DelimitSubstitutionFormat.MARK_GROUP_END) {
+                inGroup--;
+                if (inGroup > 0)
+                    sbuf.append(ch);
+                continue;
+            }
+            if (ch == DelimitSubstitutionFormat.MARK_SUBSTITUTION_START) {
+                if (inSubstitution > 0)
+                    sbuf.append(ch);
+                //else if (quoted < 0)
+                //    sbuf.append('\'');
+                inSubstitution++;
+                continue;
+            }
+            if (ch == DelimitSubstitutionFormat.MARK_SUBSTITUTION_END) {
+                inSubstitution--;
+                if (inSubstitution > 0)
+                    sbuf.append(ch);
+                else {
+                    if (quoted == 0) {
+                        sbuf.append('\'');
+                        quoted = -1;
+                    }
+                    if (inGroup > 0 && i+1 < len
+                        && str.charAt(i+1) == DelimitSubstitutionFormat.MARK_SUBSTITUTION_START) {
+                        sbuf.append(' '); // IFS
+                    }
+                }
+                continue;
+            }
+            if (inSubstitution > 0) {
+                if (ch == '\n' && inGroup == 0
+                    && i+1<len && str.charAt(i+1) == DelimitSubstitutionFormat.MARK_SUBSTITUTION_END) {
+                    // Skip final '\n'.
+                    continue;
+                }
+                if (quoted == '"') {
+                    if (ch == '$' || ch == '\\')
+                        sbuf.append('\\');
+                } else if (ch == '\'') {
+                    if (quoted == -1)
+                        sbuf.append("\\'");
+                    else
+                        sbuf.append("'\\''");
+                }
+                else if (quoted <= 0 && inGroup == 0
+                         && (ch == ' ' || ch == '\t'
+                             || ch == '\n' || ch == '\r')) {
+                    if (quoted == 0)
+                        sbuf.append('\'');
+                    quoted = -1;
+                    sbuf.append(ch);
+                }
+                else if (quoted == -1) {
+                    sbuf.append('\'');
+                    quoted = 0;
+                }
+            } else if (ch == '\\' && quoted != '\'' && i+1 < len) {
+                sbuf.append(ch);
+                i++;
+                ch = str.charAt(i);
+            } else if (quoted < 0) {
+                if (ch == '\"' || ch == '\'')
+                    quoted = ch;
+            }
+            else if (ch == quoted) {
+                quoted = -1;
+            }
+            if (sbuf != null)
+                sbuf.append(ch);
+        }
+        return sbuf == null ? str : sbuf.toString();
+    }
+
+    /** Parse strings into token, handling substitution marks.
+     * This is used when *not* using a shell.
+     */
+    public List<String> tokenize(String str) {
+        // The buffer for building the current command-line argument.
+        StringBuffer sbuf = new StringBuffer(100);
+        // If state is '"' or '\'' then we're inside a quoted string.
+        // If state==0, we have seen a quoted possibly-empty string.
+        // Otherwise, -1 if we haven't seen a quoted string this arg.
+        // The distinction matters because "" should create an argument,
+        // so we can't just check sbuf.length()>0 in deciding that
+        // we have a new argument; we also check if state >= 0.
+        int state = -1;
+        List<String> arr = new ArrayList<String>();
+        int len = str.length();
+        int inGroup = 0;
+        int inSubstitution = 0;
+        for (int i = 0;  i < len; i++) {
+            char ch = str.charAt(i);
+            if (ch == DelimitSubstitutionFormat.MARK_GROUP_START) {
+                if (inGroup > 0)
+                    sbuf.append(ch);
+                inGroup++;
+                continue;
+            }
+            if (ch == DelimitSubstitutionFormat.MARK_GROUP_END) {
+                inGroup--;
+                if (inGroup > 0)
+                    sbuf.append(ch);
+                continue;
+            }
+            if (ch == DelimitSubstitutionFormat.MARK_SUBSTITUTION_START) {
+                if (inSubstitution > 0)
+                    sbuf.append(ch);
+                inSubstitution++;
+                continue;
+            }
+            if (ch == DelimitSubstitutionFormat.MARK_SUBSTITUTION_END) {
+                inSubstitution--;
+                if (inSubstitution > 0)
+                    sbuf.append(ch);
+                else if (inGroup > 0 && i+1 < len
+                    && str.charAt(i+1) == DelimitSubstitutionFormat.MARK_SUBSTITUTION_START) {
+                    if (state == '\"' || state == '\'') {
+                        sbuf.append(' '); // IFS
+                    } else {
+                        arr.add(sbuf.toString());
+                        sbuf.setLength(0);
+                    }
+                }
+                continue;
+            }
+            
+            if (state <= 0 && inGroup == 0
+                && (ch == ' ' || ch == '\t'
+                    || ch == '\n' || ch == '\r')) {
+                if (sbuf.length() > 0 || state == 0) {
+                    arr.add(sbuf.toString());
+                    sbuf.setLength(0);
+                    state = -1;
+                }
+                continue;
+            } else if (inSubstitution > 0) {
+                if (ch == '\n' && inGroup == 0
+                    && i+1<len && str.charAt(i+1) == DelimitSubstitutionFormat.MARK_SUBSTITUTION_END) {
+                    // Skip final '\n'.
+                    continue;
+                }
+            }
+            else if (state <= 0) {
+                if (ch == '\\' || ch == '\'' || ch == '\"') {
+                    state = ch;
+                    continue;
+                }
+            } else if (state == '\\')
+                state = 0;
+            else if (ch == state) {
+                state = 0;
+                continue;
+            }
+            sbuf.append(ch);
+        }
+        if (sbuf.length() > 0 || state >= 0)
+            arr.add(sbuf.toString());
+        if (state > 0 || inSubstitution > 0 || inGroup > 0)
+            error("bad quotes");
+        return arr;
+    }
+
+    static InputStream getGetInputStreamFrom(Object val) {
+        if (val instanceof ByteVector)
+            return ((ByteVector) val).getInputStream();
+        if (val instanceof Process)
+            return ((Process) val).getInputStream();
+        if (val instanceof InputStream)
+            return (InputStream) val;
+        if (val instanceof byte[])
+            return new ByteArrayInputStream((byte[]) val);
+        if (val instanceof CharSequence)
+            // FIXME should be able to override Charset
+            // FIXME can perhaps optimize for CharSeq by using writeTo.
+            return new ByteArrayInputStream(((CharSequence) val).toString().getBytes());
+        throw new ClassCastException("invalid input");
+    }
+
+    static void copyStreamInThread(final InputStream in,
+                                   final OutputStream out) {
+        Thread thread = 
+            new Thread() {
+                public void run() {
+                    try {
+                        copyStream(in, out);
+                    } catch (IOException ex) {
+                        // FIXME - need to do better
+                        throw new RuntimeException(ex);
+                    }
+                }
+            };
+        thread.run();
+    }
+
+    static void copyStream(InputStream in, OutputStream out)
+            throws IOException {
+        byte[] buffer = new byte[2048];
+        for (;;) {
+            int cnt = in.read(buffer, 0, buffer.length);
+            if (cnt < 0)
+                break;
+            try {
+                out.write(buffer, 0, cnt);
+            } catch (IOException ex) {
+                if ("Broken pipe".equals(ex.getMessage())) {
+                    in.close();
+                    return;
+                }
+                throw ex;
+            }
+        }
+        in.close();
+        out.close();
+    }
+}

@@ -12,6 +12,7 @@ java_sources = \
   QueueReader.java SourceMessages.java NullReader.java \
   ReportFormat.java LiteralFormat.java PadFormat.java CompoundFormat.java \
   IntegerFormat.java RomanIntegerFormat.java EnglishIntegerFormat.java \
+  DelimitSubstitutionFormat.java \
   CaseConvertFormat.java FlushFormat.java WriterManager.java
 
 STANDARD_NAMED_CHARS_URL = http://www.w3.org/2003/entities/2007/w3centities-f.ent

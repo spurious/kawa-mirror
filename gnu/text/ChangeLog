@@ -1,3 +1,8 @@
+2013-12-22  Per Bothner  <per@bothner.com>
+
+	* DelimitSubstitutionFormat.java: New class, extends ReportFormat.
+	* Makefile.am: Update accordingly.
+
 2013-12-21  Per Bothner  <per@bothner.com>
 
 	* Path.java (getCharContent): Add implementation.

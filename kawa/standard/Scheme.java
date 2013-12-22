@@ -920,6 +920,12 @@ public class Scheme extends LispLanguage
       defProcStFld("path-extension", "kawa.lib.files");
       defProcStFld("path-fragment", "kawa.lib.files");
       defProcStFld("path-query", "kawa.lib.files");
+      defProcStFld("path-bytes", "kawa.lib.files");
+      defProcStFld("path-data", "kawa.lib.files");
+      defProcStFld(LispLanguage.constructNamespace.getSymbol("PD"),
+                   "kawa.lib.files", "PD");
+      defProcStFld(LispLanguage.constructNamespace.getSymbol("<"),
+                   "kawa.lib.files", "PD");
 
       defProcStFld("annotation", "gnu.kawa.reflect.MakeAnnotation", "instance");
 

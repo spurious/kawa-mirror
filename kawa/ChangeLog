@@ -1,3 +1,8 @@
+2013-12-21  Per Bothner  <per@bothner.com>
+
+	* standard/Scheme.java (initScheme): New procedures 'path-bytes'
+	and 'path-data'.  New named quasi-literals 'PD' and '<'.
+
 2013-12-20  Per Bothner  <per@bothner.com>
 
 	* lang/TemplateScope.java: Make writeExternal/readExternal work

@@ -58,6 +58,21 @@
 (simplify-path)
 |#
 
+(define-procedure path-bytes
+  setter: (lambda ((p ::path) b::bytevector)::void
+                  (let ((out (p:openOutputStream)))
+                    (try-finally
+                     (b:writeTo 0 (b:size) out)
+                     (out:close))))
+  (lambda (p ::path) ::bytevector name: 'path-bytes
+          (gnu.lists.U8Vector (p:readAllBytes))))
+
+(define-procedure path-data
+   (lambda (p ::path) ::gnu.lists.Blob name: 'path-data
+           (gnu.lists.Blob (p:readAllBytes))))
+
+(define-simple-constructor PD path-data $string$)
+
 (define (file-exists? (file :: path)) :: <boolean>
   (file:exists))
 

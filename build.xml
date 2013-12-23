@@ -537,6 +537,8 @@
         <file name="bytevectors.scm"/>
         <file name="arrays.scm"/>
         <file name="system.scm"/>
+        <file name="ExceptionClasses.scm"/>
+        <file name="exceptions.scm"/>
         <file name="kawa/hashtable.scm"/>
         <file name="kawa/regex.scm"/>
         <file name="rnrs/hashtables.scm"/>

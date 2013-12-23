@@ -1,5 +1,8 @@
 2013-12-22  Per Bothner  <per@bothner.com>
 
+	* system.scm: Add missing require.
+	* exceptions.scm: Likewise.
+
 	* syntax.scm ($string-with-delimiter-marks$): New macro.  Similar
 	to $string$, used for simple named quasi-literals, but add hooks
 	to generate subitution marks in resulting string.

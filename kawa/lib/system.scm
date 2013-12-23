@@ -2,6 +2,7 @@
 (require <kawa.lib.std_syntax>)
 (require <kawa.lib.syntax>)
 (require <kawa.lib.vectors>)
+(require <kawa.lib.exceptions>)
 
 (define (make-process args env)
   (let* ((arargs

@@ -1,4 +1,4 @@
-(require ExceptionClasses)
+(require <kawa.lib.ExceptionClasses>)
 
 (define-procedure with-exception-handler
   validate-apply:  "gnu.kawa.functions.CompileMisc:validateApplyWithExceptionHandler"

@@ -1,3 +1,7 @@
+2013-12-25  Per Bothner  <per@bothner.com>
+
+	* system-test.scm: More tests, some re-factoring.
+
 2013-12-22  Per Bothner  <per@bothner.com>
 
 	* system-test.scm: Test process-related and system-related

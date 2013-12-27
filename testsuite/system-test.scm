@@ -17,7 +17,9 @@
 (define p3 (run-process "echo foo baz"))
 (test-equal "[foo baz\n]" (format #f "[~a]" p3))
 
-(define p4 &`{sh -c 'for x in $*; do echo $x; sleep 1; done; echo Done' "-" "α" "β" "γ"})
+;; Run this manually in the REPL (perhaps with a longer sleep time)
+;; to verify incremental output.
+(define p4 &`{sh -c 'for x in $*; do echo $x; sleep 0.1; done; echo Done' "-" "α" "β" "γ"})
 (test-equal "[α\nβ\nγ\nDone\n]" (format #f "[~a]" p4))
 
 (test-str-equal "|abc|def ghi|\n" &`{&[split-with-kawa] abc "def ghi"})
@@ -56,6 +58,19 @@
   &`[out-append-to: tmp1]{echo gh ij}
   (test-equal "cd ef\ngh ij\n" (utf8->string (path-bytes tmp1)))
   (tmp1:delete))
+
+(let ((strport (open-output-string)))
+  (write-string "(* " strport)
+  &`[out-to: strport]{echo -n foo bar}
+  (write-string " *)" strport)
+  (test-equal "(* foo bar *)" (get-output-string strport)))
+
+(let ((strport (open-output-string)))
+  (write-string "(* " strport)
+  &`[err-to: strport]{grep foo file-does-not-exist}
+  (write-string " *)" strport)
+  (test-equal "(* grep: file-does-not-exist: No such file or directory\n *)"
+              (get-output-string strport)))
 
 (test-equal 0 (process-exit-wait (run-process "echo foo")))
 (test-equal #t (process-exit-ok? (run-process "echo foo")))

@@ -51,6 +51,8 @@ public class RunProcess extends MethodProc {
         Object inRedirect = null;
         Object outRedirect = null;
         Object errRedirect = null;
+        boolean outNeedsClose = false;
+        boolean errNeedsClose = false;
         InputStream inputBytes = null;
         boolean directorySet = false;
         Object command = null;
@@ -66,10 +68,8 @@ public class RunProcess extends MethodProc {
                 if (key.equals("shell")) {
                     useShell = ((Boolean) kval).booleanValue();
                 } else if (key.equals("in")) {
-                    inputBytes = getGetInputStreamFrom(kval);
+                    inputBytes = getInputStreamFrom(kval);
                 }
-                // FIXME should support a subset of the following functionality
-                // even on Java 5 or Java 5.
                 else if (key.equals("out-to")
                            || key.equals("err-to")
                            || key.equals("in-from")) {
@@ -82,18 +82,26 @@ public class RunProcess extends MethodProc {
                     //     newRedirect = Redirect.PIPE;
                     // }
                     /* #else */
-                    if (kval == inheritSymbol || kval == pipeSymbol) {
+                    if ( kval == pipeSymbol) {
                         newRedirect = kval;
+                    }
+                    else if (kval == inheritSymbol && ! inSpecifier) {
+                        newRedirect = outSpecifier ? OutPort.getSystemOut()
+                            : OutPort.getSystemErr();
                     }
                     /* #endif */
                     else if (! outSpecifier && ! inSpecifier
-                             && kval == outSymbol) {
+                             && kval == outSymbol) { // i.e. err-to: 'out
                         /* #ifdef JAVA7 */
                         // builder.redirectErrorStream(true);
                         /* #else */
                         error("err-to: 'out redirect requires Java 7");
                         newRedirect = null;
                         /* #endif */
+                    } else if ((kval instanceof OutputStream
+                                || kval instanceof Writer)
+                               && ! inSpecifier) {
+                         newRedirect = kval;
                     }  else {
                         FilePath fpath = FilePath.coerceToFilePathOrNull(kval);
                         File file = fpath.toFile();
@@ -106,6 +114,10 @@ public class RunProcess extends MethodProc {
                                 inputBytes = new FileInputStream(file);
                             } else {
                                 newRedirect = new FileOutputStream(file, false);
+                                if (outSpecifier)
+                                    outNeedsClose = true;
+                                else
+                                    errNeedsClose = true;
                             }
                             /* #endif */
                         } else
@@ -167,7 +179,7 @@ public class RunProcess extends MethodProc {
                 }
             } else {
                 if (inputBytes == null && iarg+2==nargs)
-                    inputBytes = getGetInputStreamFrom(arg);
+                    inputBytes = getInputStreamFrom(arg);
                 else if (command == null)
                     command = arg;
                 else
@@ -226,35 +238,29 @@ public class RunProcess extends MethodProc {
             /* #endif */
         }
         /* #ifdef JAVA7 */
-        // if (outRedirect != null)
+        // if (outRedirect instanceof ProcessBuilder.Redirect)
         //     builder.redirectOutput((ProcessBuilder.Redirect)outRedirect);
-        // if (errRedirect != null)
+        // if (errRedirect instanceof ProcessBuilder.Redirect)
         //     builder.redirectError((ProcessBuilder.Redirect)errRedirect);
         /* #endif */
         final Process proc = builder.start();
-        /* #ifndef JAVA7 */
-        if (outRedirect != null) {
-            if (outRedirect == pipeSymbol) 
-                ; // do nothing
-            else if (outRedirect instanceof FileOutputStream) {
-                copyStreamInThread(proc.getInputStream(),
-                                   (OutputStream) outRedirect);
-            }
-            /*FIXME also handle inherit*/
+        if (outRedirect instanceof OutputStream) {
+            copyStreamInThread(proc.getInputStream(),
+                               (OutputStream) outRedirect, outNeedsClose);
+        } else if (outRedirect instanceof Writer) {
+            copyWriterInThread(proc.getInputStream(),
+                                (Writer) outRedirect, outNeedsClose);
         }
-        if (errRedirect != null) {
-            /*FIXME*/
-            if (outRedirect == pipeSymbol) 
-                ; // do nothing
-            else if (outRedirect instanceof FileOutputStream) {
-                copyStreamInThread(proc.getErrorStream(),
-                                   (OutputStream) errRedirect);
-            }
+        if (errRedirect instanceof OutputStream) {
+            copyStreamInThread(proc.getErrorStream(),
+                               (OutputStream) errRedirect, errNeedsClose);
+        } else if (errRedirect instanceof Writer) {
+            copyWriterInThread(proc.getErrorStream(),
+                                (Writer) errRedirect, errNeedsClose);
         }
-        /* #endif */
         if (inputBytes != null) {
             final InputStream inb = inputBytes;
-            copyStreamInThread(inputBytes, proc.getOutputStream());
+            copyStreamInThread(inputBytes, proc.getOutputStream(), true);
         }
         if (returnBlob) {
             LProcess lproc = new LProcess(proc);
@@ -290,8 +296,9 @@ public class RunProcess extends MethodProc {
             else
                 consumer.writeObject(lproc);
         }
-        else
+        else {
             consumer.writeObject(proc);
+        }
     }
 
     public boolean isDisplayConsumer(Consumer out) {
@@ -497,13 +504,11 @@ public class RunProcess extends MethodProc {
         return arr;
     }
 
-    static InputStream getGetInputStreamFrom(Object val) {
+    static InputStream getInputStreamFrom(Object val) {
         if (val instanceof ByteVector)
             return ((ByteVector) val).getInputStream();
         if (val instanceof Process)
             return ((Process) val).getInputStream();
-        if (val instanceof InputStream)
-            return (InputStream) val;
         if (val instanceof byte[])
             return new ByteArrayInputStream((byte[]) val);
         if (val instanceof CharSequence)
@@ -513,15 +518,20 @@ public class RunProcess extends MethodProc {
         throw new ClassCastException("invalid input");
     }
 
+    /** Copy bytes from InputStream to OutputStream using separate Thread.
+     * Continue copying until EOF or exception.
+     * At end, the input stream is closed, but the output stream is not.
+     */
     static void copyStreamInThread(final InputStream in,
-                                   final OutputStream out) {
+                                   final OutputStream out,
+                                   final boolean closeOut) {
         Thread thread = 
             new Thread() {
                 public void run() {
                     try {
-                        copyStream(in, out);
+                        copyStream(in, out, closeOut);
                     } catch (IOException ex) {
-                        // FIXME - need to do better
+                        // FIXME - should do better
                         throw new RuntimeException(ex);
                     }
                 }
@@ -529,24 +539,68 @@ public class RunProcess extends MethodProc {
         thread.run();
     }
 
-    static void copyStream(InputStream in, OutputStream out)
-            throws IOException {
-        byte[] buffer = new byte[2048];
-        for (;;) {
-            int cnt = in.read(buffer, 0, buffer.length);
-            if (cnt < 0)
-                break;
+    /** Copy bytes from InputStream to a Writer using separate thread.
+     * The InputStream is wrapped in a InputStreamWriter, unless
+     * the Writer is a BinaryOutPort (in which case bytes are copied).
+     * Continue copying until EOF or exception.
+     * At end, the InputStream is closed, but the Writer is not.
+     */
+    void copyWriterInThread(final InputStream in,
+                            final Writer out, boolean closeOut) throws IOException {
+        if (out instanceof BinaryOutPort) {
+            BinaryOutPort bout = (BinaryOutPort) out;
+            copyStreamInThread(in, bout.getOutputStream(), closeOut);
+        } else {
+            InputStreamReader ins = new InputStreamReader(in);
+            char[] buffer = new char[2048];
             try {
-                out.write(buffer, 0, cnt);
-            } catch (IOException ex) {
-                if ("Broken pipe".equals(ex.getMessage())) {
-                    in.close();
-                    return;
+                for (;;) {
+                    int cnt = ins.read(buffer, 0, buffer.length);
+                    if (cnt < 0)
+                        break;
+                    try {
+                        out.write(buffer, 0, cnt);
+                    } catch (IOException ex) {
+                        if ("Broken pipe".equals(ex.getMessage())) {
+                            break;
+                        }
+                        throw ex;
+                    }
                 }
-                throw ex;
+            } finally {
+                ins.close();
+                if (closeOut)
+                    out.close();
             }
         }
-        in.close();
-        out.close();
+    }
+
+    /** Copy bytes from InputStream to OutputStream using current Thread.
+     * Continue copying until EOF or exception.
+     * At end, the input stream is closed, but the output stream is not.
+     */
+    static void copyStream(InputStream in,
+                           OutputStream out, boolean closeOut)
+            throws IOException {
+        byte[] buffer = new byte[2048];
+        try {
+            for (;;) {
+                int cnt = in.read(buffer, 0, buffer.length);
+                if (cnt < 0)
+                    break;
+                try {
+                    out.write(buffer, 0, cnt);
+                } catch (IOException ex) {
+                    if ("Broken pipe".equals(ex.getMessage())) {
+                        break;
+                    }
+                    throw ex;
+                }
+            }
+        } finally {
+            in.close();
+            if (closeOut)
+                out.close();
+        }
     }
 }

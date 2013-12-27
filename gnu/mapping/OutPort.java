@@ -10,7 +10,7 @@ import gnu.lists.*;
 public class OutPort extends PrintConsumer implements Printable
 {
   Path path;
-  private Writer base;
+  protected Writer base;
   static final int FLUSH_ON_FINALIZE = 1;
   static final int CLOSE_ON_FINALIZE = 2;
   static final int IS_CLOSED = 4;
@@ -92,13 +92,16 @@ public class OutPort extends PrintConsumer implements Printable
 
   public boolean printReadable;
 
-  static OutPort outInitial
-    = BinaryOutPort.makeStandardPort(System.out, "/dev/stdout");
+    static BinaryOutPort outInitial
+        = BinaryOutPort.makeStandardPort(System.out, "/dev/stdout");
+    static { outInitial.finalizeAction = FLUSH_ON_FINALIZE; }
 
-  static { outInitial.finalizeAction = FLUSH_ON_FINALIZE; }
-  private static OutPort errInitial
-    = BinaryOutPort.makeStandardPort(System.err, "/dev/stderr");
-  static { errInitial.finalizeAction = FLUSH_ON_FINALIZE; }
+    private static BinaryOutPort errInitial
+        = BinaryOutPort.makeStandardPort(System.err, "/dev/stderr");
+    static { errInitial.finalizeAction = FLUSH_ON_FINALIZE; }
+
+    public static BinaryOutPort getSystemOut() { return outInitial; }
+    public static BinaryOutPort getSystemErr() { return errInitial; }
 
   public static final ThreadLocation outLocation
     = new ThreadLocation("out-default");

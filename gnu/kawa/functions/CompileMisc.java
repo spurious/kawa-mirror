@@ -324,25 +324,42 @@ public class CompileMisc implements Inlineable
       }
   }
 
-  public static void compileEq (Expression[] args, Compilation comp,
-			      Target target, Language language)
-  {
-    CodeAttr code = comp.getCode();
-    args[0].compile(comp, Target.pushObject);
-    args[1].compile(comp, Target.pushObject);
-    if (target instanceof ConditionalTarget)
-      {
-	ConditionalTarget ctarget = (ConditionalTarget) target;
-	if (ctarget.trueBranchComesFirst)
-	  code.emitGotoIfNE(ctarget.ifFalse);
-	else
-	  code.emitGotoIfEq(ctarget.ifTrue);
-	ctarget.emitGotoFirstBranch(code);
-      }
+    public static void compileEq(Expression[] args, Compilation comp,
+                                 Target target, Language language) {
+        CodeAttr code = comp.getCode();
+        Expression arg0 = args[0];
+        Expression arg1 = args[1];
+        if (arg0==QuoteExp.nullExp) {
+            Expression tmp = arg1; arg1 = arg0; arg0 = tmp;
+        }
+        arg0.compile(comp, Target.pushObject);
+        boolean isNull = arg1==QuoteExp.nullExp;
+        if (! isNull)
+            arg1.compile(comp, Target.pushObject);
+
+        if (target instanceof ConditionalTarget) {
+            ConditionalTarget ctarget = (ConditionalTarget) target;
+            if (ctarget.trueBranchComesFirst) {
+                if (isNull)
+                    code.emitGotoIfNonNull(ctarget.ifFalse);
+                else
+                    code.emitGotoIfNE(ctarget.ifFalse);
+            } else {
+                if (isNull)
+                    code.emitGotoIfNull(ctarget.ifTrue);
+                else
+                    code.emitGotoIfEq(ctarget.ifTrue);
+            }
+            ctarget.emitGotoFirstBranch(code);
+        }
     else
       {
 	Type type;
-	code.emitIfEq();
+        if (isNull)
+            code.emitIfNull();
+        else {
+            code.emitIfEq();
+        }
 	if (target.getType() instanceof ClassType)
 	  {
 	    Object trueValue = language.booleanObject(true);

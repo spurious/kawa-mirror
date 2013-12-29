@@ -1,3 +1,7 @@
+2013-12-29  Per Bothner  <per@bothner.com>
+
+	* CodeAttr.java (emitGotoIfNull, emitGotoIfNonNull): New methods.
+
 2013-12-02  Per Bothner  <per@bothner.com>
 
 	* CodeAttr.java (castNeeded): Force top-type to raw type.

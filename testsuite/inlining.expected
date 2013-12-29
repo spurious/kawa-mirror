@@ -104,7 +104,7 @@ cycle1.isIsEven(int)boolean: 17 bytes
 cycle2.isIsOdd(int)boolean: 17 bytes
 binarytrees.bottomUpTree(int,int)binarytrees$TreeNode: 60 bytes
 binarytrees.test(int)void: 214 bytes
-binarytrees$TreeNode.itemCheck()int: 36 bytes
+binarytrees$TreeNode.itemCheck()int: 35 bytes
 fannkuch.vectorReverseSlice$Ex(int[],int,int)void: 35 bytes
 fannkuch.countFlips(int[],int[])int: 46 bytes
 fannkuch.fannkuch(int)int: 230 bytes

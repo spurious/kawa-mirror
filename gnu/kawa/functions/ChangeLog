@@ -1,3 +1,8 @@
+2013-12-29  Per Bothner  <per@bothner.com>
+
+	* CompileMisc.java (compileEq): Optimize to use ifnull/ifnonnull
+	instructions if comparing against #!null.
+
 2013-12-26  Per Bothner  <per@bothner.com>
 
 	* RunProcess.java: Add near-complete support for Java 6-or-older.

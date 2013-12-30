@@ -45,7 +45,7 @@ READLINE_INCLUDE_PATH =
 READLINE_LIB_PATH =
 kawa_EXTRA_LIBS = -lncurses  # For Linux
 #kawa_EXTRA_LIBS = -lcurses -lsocket # For Solaris2
-INCLUDES = $(READLINE_INCLUDE_PATH)
+AM_CPPFLAGS = $(READLINE_INCLUDE_PATH)
 kawa_LDADD = $(READLINE_LIB_PATH) -lreadline -lhistory $(kawa_EXTRA_LIBS)
 
 if WITH_LIBTOOL

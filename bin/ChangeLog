@@ -1,3 +1,7 @@
+2013-12-30  Per Bothner  <per@bothner.com>
+
+	* Makefile.am: Update for new automake convention.
+
 2013-09-23  Matthieu Vachon  <matthieu.o.vachon@gmail.com>
 	    Per Bothner  <per@bothner.com>
 

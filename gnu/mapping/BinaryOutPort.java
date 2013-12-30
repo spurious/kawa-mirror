@@ -13,7 +13,7 @@ import java.nio.charset.Charset;
  * be flushed to the OutputStream-side before doing byte output,
  * to make sure bytes are interleaved sanely.
  * This is optimized for Latin-1 and UTF-8 to avoid any buffering
- * in the text-to-binary encoding (except if a non-BMP-character
+ * in the text-to-binary encoding (except if a non-BMP-character is seen).
  */
 
 public class BinaryOutPort extends OutPort {
@@ -47,7 +47,7 @@ public class BinaryOutPort extends OutPort {
         this.strm = strm;
     }
 
-    /** Create a Writer that encodes it text to a given OutputStream.
+    /** Create a Writer that encodes its text to a given OutputStream.
      * Equivalent to creating a new OutputStreamWriter, but is optimized
      * to use OutputStreamWriterSimple if the converstion is UTF-8
      * or ISO_8859_1.

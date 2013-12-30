@@ -1,3 +1,11 @@
+2013-12-30  Per Bothner  <per@bothner.com>
+
+	* BinaryInPort.java (class BinaryInputStream): New member class,
+	extends BufferedInputStream.  Use it instead of "doing it by hand".
+	(getInputStream): New method.
+	(bstrm): New field.
+	(bbuffer, bpos, blimit, strm): Remove fields.
+
 2013-12-26  Per Bothner  <per@bothner.com>
 
 	* OutPort.java (getSystemOut, getSystemErr): New methods.

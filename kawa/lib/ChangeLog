@@ -1,3 +1,7 @@
+2013-12-30  Per Bothner  <per@bothner.com>
+
+	* ports.scm (read-bytevector!): Use new BinaryInPort#getInputStream.
+
 2013-12-22  Per Bothner  <per@bothner.com>
 
 	* system.scm: Add missing require.

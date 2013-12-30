@@ -8,16 +8,11 @@ import gnu.lists.ByteVector;
  */
 
 public class BinaryInPort extends InPort {
-    /** Underlying InputStream. */
-    private InputStream strm;
 
-    private byte[] bbuffer;
-    private int bpos;
-    private int blimit;
+    private BinaryInputStream bstrm;
     
     public BinaryInPort(InputStream strm, Path path) {
         super((Reader) null, path);
-        this.strm = strm;
         // Use a fixed-size buffer.  This prevents really-long "lines"
 	// from causing the buffer to grow to accomodate them.
 	try
@@ -25,7 +20,8 @@ public class BinaryInPort extends InPort {
 	    setBuffer(new char[2048]);
 	  }
 	catch (java.io.IOException ex) { /* ignored */ }
-        bbuffer = new byte[8192];
+
+        bstrm = new BinaryInputStream(strm);
     }
 
     public BinaryInPort(byte[] buffer, int length, Path path) {
@@ -37,117 +33,90 @@ public class BinaryInPort extends InPort {
 	    setBuffer(new char[2048]);
 	  }
 	catch (java.io.IOException ex) { /* ignored */ }
-        bbuffer = buffer;
-        blimit = length;
+
+        // It would be more element to use a ByteArrayInputStream,
+        // but that doesn't support some extensions we need.
+        bstrm = new BinaryInputStream(buffer, length);
+    }
+
+    public InputStream getInputStream() {
+        return bstrm;
     }
 
     @Override
-    protected int fill (int len) throws java.io.IOException {
-        if (! bfill())
-            return -1;
-        int n = 0;
-        while (n < len && bpos < blimit) {
-            buffer[pos+(n++)] = (char) ((bbuffer[bpos++]) & 0xFF);
-        }
-        return n;
-    }
-
-    /** Read some bytes into byte buffer bbuffer.  Return false on EOF. */
-    private boolean bfill() throws IOException {
-        while (bpos >= blimit) {
-            if (strm == null)
-                return false;
-            int n = strm.read(bbuffer, 0, bbuffer.length);
-            bpos = 0;
-            if (n < 0) {
-                blimit = 0;
-                return false;
-            }
-            blimit = n;
-        }
-        return true;
+    protected int fill(int len) throws java.io.IOException {
+        return bstrm.fillTo(buffer, pos, len);
     }
 
     public int readByte() throws IOException {
-        if (pos < limit)
-            return read();
-        else if (bfill())
-            return bbuffer[bpos++] & 0xFF;
-        else
-            return -1;
+        return bstrm.read();
     }
 
     public int peekByte() throws IOException {
-        if (pos < limit)
-            return peek();
-        else if (bfill())
-            return bbuffer[bpos] & 0xFF;
-        else
-            return -1;
+        return bstrm.peek();
     }
 
     public int readBytes(byte[] buf, int offset, int count)
             throws IOException {
-        int rcount = 0;
-        while (pos < limit) {
-            if (rcount == count)
-                return rcount;
-            int r = read();
-            if (r < 0)
-                return rcount > 0 ? rcount : -1;
-            buf[offset+(rcount++)] = (byte) r;
-        }
-        if (rcount > 0)
-            return rcount;
-        if (! bfill())
-            return -1;
-        int n = blimit - bpos;
-        if (n > count)
-            n = count;
-        System.arraycopy(bbuffer, bpos, buf, offset, n);
-        bpos += n;
-        return n;
-    }
-
-    public int readByteVector(ByteVector bvector, int offset, int count)
-            throws IOException {
-        int rcount = 0;
-        while (pos < limit) {
-            if (rcount == count)
-                return rcount;
-            int r = read();
-            if (r < 0)
-                return rcount > 0 ? rcount : -1;
-            bvector.setByteAt(offset+(rcount++), (byte) r);
-        }
-        if (rcount > 0)
-            return rcount;
-        if (! bfill())
-            return -1;
-        int n = blimit - bpos;
-        if (n > count)
-            n = count;
-        bvector.copyFrom(bbuffer, bpos, offset, n);
-        bpos += n;
-        return n;
+        return bstrm.read(buf, offset, count);
     }
 
     @Override
     public void close() throws IOException {
-        if (strm != null)
-            strm.close();
-        strm = null;
-        bbuffer = null;
+        if (bstrm != null)
+            bstrm.close();
+        bstrm = null;
         super.close();
     }
 
     @Override
     protected boolean sourceReady() throws IOException {
-        return bpos < blimit || (strm != null && strm.available() > 0);
+        return bstrm.sourceReady();
     }
 
     public static BinaryInPort openFile(Object fname)
         throws IOException {
         return (BinaryInPort) InPort.openFile(fname, Boolean.FALSE);
+    }
+
+    static class BinaryInputStream extends BufferedInputStream {
+        public BinaryInputStream(InputStream strm) {
+            super(strm);
+        }
+        public BinaryInputStream(byte[] buffer, int length) {
+            super(nullInputStream, 1);
+            buf = buffer;
+            count = length;
+        }
+
+        public static final InputStream nullInputStream
+            = new ByteArrayInputStream(new byte[0]);
+
+        public synchronized boolean sourceReady() throws IOException {
+            return pos < count || in.available() > 0;
+        }
+
+        public synchronized int peek() throws IOException {
+            int r = read();
+            if (r >= 0)
+                pos--;
+            return r;
+        }
+
+        synchronized int fillTo(char[] cbuffer, int cstart, int len)
+                throws IOException {
+            int r = read();
+            if (r < 0)
+                return r;
+            int p = pos-1;
+            int n = count - p;
+            if (n < len)
+                n = len;
+            for (int i = 0;  i < n;  i++) {
+                cbuffer[pos+i] = (char) ((buf[p++]) & 0xFF);
+            }
+            pos = p;
+            return n;
+        }
     }
 }

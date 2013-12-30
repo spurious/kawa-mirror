@@ -225,11 +225,11 @@
                           (end ::int (bv:size)))
   (let loop ((seen ::int 0))
     (let* ((want ::int (- end start seen))
-           (n ::int (if (gnu.mapping.BinaryInPort? port)
-                        ((as gnu.mapping.BinaryInPort port):readByteVector
-                         bv (+ start seen) want)
-                        (bv:readFrom (+ start seen) want
-                                     ((as java.io.InputStream port))))))
+           (is ::java.io.InputStream
+               (if (gnu.mapping.BinaryInPort? port)
+                   ((as gnu.mapping.BinaryInPort port):getInputStream)
+                   port))
+           (n ::int (bv:readFrom (+ start seen) want is)))
       (cond ((< n 0)
              (if (> seen 0)
                  seen

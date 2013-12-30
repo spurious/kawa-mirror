@@ -1,3 +1,9 @@
+2013-12-30  Per Bothner  <per@bothner.com>
+
+	* RunProcess.java (doit): Add support for reading from a port.
+	Add suport for 'current as a port specifier.
+	Copy output/error to ports in a thread.
+
 2013-12-29  Per Bothner  <per@bothner.com>
 
 	* CompileMisc.java (compileEq): Optimize to use ifnull/ifnonnull

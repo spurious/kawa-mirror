@@ -62,15 +62,33 @@
 (let ((strport (open-output-string)))
   (write-string "(* " strport)
   &`[out-to: strport]{echo -n foo bar}
+  (sleep 0.1) ;; This is rather clunky.
   (write-string " *)" strport)
   (test-equal "(* foo bar *)" (get-output-string strport)))
+
+(parameterize
+ ((current-output-port (open-output-string)))
+ (write-string "(* ")
+ &`[out-to: 'current]{echo -n bar baz}
+ (write-string " *)")
+ (test-equal "(* bar baz *)" (get-output-string (current-output-port))))
 
 (let ((strport (open-output-string)))
   (write-string "(* " strport)
   &`[err-to: strport]{grep foo file-does-not-exist}
+  (sleep 0.1) ;; This is rather clunky.
   (write-string " *)" strport)
   (test-equal "(* grep: file-does-not-exist: No such file or directory\n *)"
               (get-output-string strport)))
+
+(parameterize ((current-input-port (open-input-bytevector (string->utf8 "Hællø World!\n"))))
+              (test-str-equal "HÆLLø WorLD!\n" &`[in-from: 'current]{tr a-mæ A-MÆ}))
+
+(parameterize ((current-input-port (open-input-string "Hællø World!\n")))
+              (test-str-equal  "HÆLLø WorLD!\n" &`[in-from: 'current]{tr a-mæ A-MÆ}))
+
+(let ((strport (open-input-string "Hello World!\n")))
+  (test-str-equal "HELLo WorLD!\n" &`[in-from: strport]{tr a-m A-M}))
 
 (test-equal 0 (process-exit-wait (run-process "echo foo")))
 (test-equal #t (process-exit-ok? (run-process "echo foo")))

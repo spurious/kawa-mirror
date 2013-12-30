@@ -849,21 +849,10 @@ threadring.class: $(srcdir)/threadring.scm
 	CLASSPATH="@conf_classpath@.$(CLASSPATH_SEPARATOR)$$CLASSPATH" \
 	$(KAWA) $(WARN_FLAGS) --main -C $(srcdir)/threadring.scm
 
-threadring2.class: $(srcdir)/threadring2.scm
-	CLASSPATH="@conf_classpath@.$(CLASSPATH_SEPARATOR)$$CLASSPATH" \
-	$(KAWA) $(WARN_FLAGS) --main -C $(srcdir)/threadring2.scm
-
 check-threadring: threadring.class
 	CLASSPATH="$(KAWARTLIB)$(CLASSPATH_SEPARATOR)@conf_classpath@.$(CLASSPATH_SEPARATOR)$$CLASSPATH" \
 	$(JAVA) threadring 1000 >threadring1000.log
 	@if $(DIFF) $(srcdir)/threadring-output.txt threadring1000.log; \
-	  then echo '# threadring test passes'; \
-	  else echo FAIL threadring test; fi
-
-check-threadring2: threadring2.class
-	CLASSPATH="$(KAWARTLIB)$(CLASSPATH_SEPARATOR)@conf_classpath@.$(CLASSPATH_SEPARATOR)$$CLASSPATH" \
-	$(JAVA) threadring2 1000 >threadring1000.log2
-	@if $(DIFF) $(srcdir)/threadring-output.txt threadring1000.log2; \
 	  then echo '# threadring test passes'; \
 	  else echo FAIL threadring test; fi
 

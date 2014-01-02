@@ -1,5 +1,7 @@
 2014-01-02  Per Bothner  <per@bothner.com>
 
+	* repl.java: Update year to 2014.
+
 	* standard/Scheme.java (initScheme): Remove 'simple-guard',
 	since re-implemented 'guard' is (almost) equally simple.
 

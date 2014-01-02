@@ -1,3 +1,10 @@
+2014-01-02  Per Bothner  <per@bothner.com>
+
+	* exceptions.scm (guard, simple-guard): Re-implement guard
+	similar to old simple-guard, but setting current-handler to null.
+	(raise-continuable): If current-handler is null (i.e. comes from
+	a guard, treat as plain raise.
+
 2013-12-30  Per Bothner  <per@bothner.com>
 
 	* ports.scm (read-bytevector!): Use new BinaryInPort#getInputStream.

@@ -1,3 +1,8 @@
+2014-01-02  Per Bothner  <per@bothner.com>
+
+	* standard/Scheme.java (initScheme): Remove 'simple-guard',
+	since re-implemented 'guard' is (almost) equally simple.
+
 2013-12-22  Per Bothner  <per@bothner.com>
 
 	* standard/Scheme.java (initScheme): Add 'run-process',

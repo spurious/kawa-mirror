@@ -1359,7 +1359,7 @@ public class PrettyWriter extends java.io.Writer
     int available = length - fillPtr;
     if (available > 0)
       return available;
-    else if (prettyPrintingMode > 0 && fillPtr > lineLength && !sharing)
+    else if (out != null && fillPtr > lineLength && !sharing)
       {
 	if (! maybeOutput(false, false))
 	  outputPartialLine();

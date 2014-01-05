@@ -1,3 +1,10 @@
+2014-01-04  Per Bothner  <per@bothner.com>
+
+	* LineBufferedReader.java (setSaveStart): New method.
+	(markPos, readAheadLimit): Changed invariants.
+	* PrettyWriter.java (ensureSpaceInBuffer): Write out buffer also 
+	when pretty-printing is disabled, so we can handle big files.
+
 2013-12-22  Per Bothner  <per@bothner.com>
 
 	* DelimitSubstitutionFormat.java: New class, extends ReportFormat.

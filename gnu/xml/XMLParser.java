@@ -198,7 +198,7 @@ public class XMLParser
     int dstart = -1;
     String message = null;
 
-    int start = limit;
+    int start = -1;
   mainLoop:
     for (;;)
       {
@@ -236,6 +236,7 @@ public class XMLParser
 
           case SAW_ERROR:
             in.pos = pos;
+            start = -1;
             out.error('e', message);
             for (;;)
               {
@@ -340,14 +341,14 @@ public class XMLParser
                 in.pos = pos;
                 out.textFromParser(buffer, start, length);
               }
-	    start = buffer.length;
+	    start = -1;
             break handleChar;
 
           case PREV_WAS_CR_STATE:
             // The previous character was a '\r', and we passed along '\n'
             // to out.  If the new character is '\n' or 0x85 ignore it.
             state = TEXT_STATE;
-            if (ch == '\n' | ch == 0x85)
+            if (ch == '\n' || ch == 0x85)
               {
                 in.incrLineNumber(1, pos);
                 break handleChar;
@@ -370,7 +371,7 @@ public class XMLParser
 		|| ch == '\u0085' || ch == '\u2028')
               {
                 in.incrLineNumber(1, pos);
-break handleChar;
+                break handleChar;
               }
             // Not a space, so "return" to next state.
             state -= SKIP_SPACES_MODIFIER;
@@ -489,7 +490,7 @@ break handleChar;
             if (ch != ';')
               out.error('w', "missing ';'");
             out.emitEntityReference(buffer, start, length);
-	    start = limit;
+	    start = -1;
             state = TEXT_STATE;
             break handleChar;
 
@@ -519,7 +520,7 @@ break handleChar;
             in.pos = pos-length;  // position of start of name, for errors.
             out.emitStartElement(buffer, start, length);
             state = SKIP_SPACES_MODIFIER + MAYBE_ATTRIBUTE_STATE;
-	    start = limit;
+	    start = -1;
             continue mainLoop;
 
           case SAW_LEFT_QUEST_STATE: // Seen '<?' Name Spaces
@@ -742,7 +743,7 @@ break handleChar;
                     else
                       out.processingInstructionFromParser(buffer, start, length,
                                                           dstart, end - dstart);
-		    start = limit;
+		    start = -1;
 		    dstart = -1;
 		    state = TEXT_STATE;
 		    break handleChar;
@@ -769,6 +770,7 @@ break handleChar;
 			  {
                             in.pos = pos;
 			    out.commentFromParser(buffer, start + 2, length - 4);
+                            start = -1;
 			    break exclLoop;
 			  }
 		      }
@@ -786,6 +788,7 @@ break handleChar;
 			  {
                             in.pos = pos;
 			    out.writeCDATA(buffer, start + 7, pos - 10 - start);
+                            start = -1;
 			    break exclLoop;
 			  }
 		      }
@@ -804,7 +807,7 @@ break handleChar;
 			 &&  buffer[start+5] == 'P'
 			 &&  ch == 'E')
 		  {
-		    start = limit;
+                    start = -1;
 		    state = SKIP_SPACES_MODIFIER + DOCTYPE_SEEN_STATE;
 		    break handleChar;
 		  }
@@ -813,7 +816,7 @@ break handleChar;
 		else
 		  break handleChar;
 	      }
-	    start = limit;
+	    start = -1;
 	    state = TEXT_STATE;
 	    break handleChar;
 
@@ -855,7 +858,7 @@ break handleChar;
                         out.emitDoctypeDecl(buffer, start, length,
                                             dstart, pos - 1 - dstart);
                         terminator = (char) '<';
-                        start = limit;
+                        start = -1;
                         dstart = -1;
                         state = TEXT_STATE;
                         break handleChar;
@@ -894,7 +897,7 @@ break handleChar;
               break handleChar;
             in.pos = pos-length; // position of start of name, for errors.
             out.emitStartAttribute(buffer, start, length);
-	    start = limit;
+	    start = -1;
             if (ch == '=')
               {
                 state = ATTRIBUTE_SEEN_EQ_STATE;
@@ -915,6 +918,7 @@ break handleChar;
             if (ch == ' ' || ch == '\t' || ch == '\r' || ch == '\n'
 		|| ch == '\u0085' || ch == '\u2028')
               break handleChar;
+            out.emitEndAttributes();
             message = "missing or unquoted attribute value";
             state = SAW_ERROR;
             continue mainLoop;
@@ -928,7 +932,7 @@ break handleChar;
           case END_ELEMENT_STATE:  // Seen '</' Name.
             in.pos = pos;
             out.emitEndElement(buffer, start, length);
-	    start = limit;
+	    start = -1;
             // Skip spaces then goto EXPECT_RIGHT_STATE.
             state = SKIP_SPACES_MODIFIER + EXPECT_RIGHT_STATE;
             continue mainLoop;
@@ -945,20 +949,17 @@ break handleChar;
           }
 
         // After 'break handleChar', we get here.
-        if (pos < limit)
-          ch = buffer[pos++];
-        else
+        if (pos >= limit)
           {
 	    int saved = pos - start;
             try
               {
-                if (saved > 0)
+                if (start >= 0)
                   {
-                    in.pos = start;
-                    in.mark(saved + 1);
+                      in.setSaveStart(start);
                   }
                 in.pos = pos;
-                int x = in.read();
+                int x = in.peek();
                 if (x < 0)
                   {
                     if (state == TEXT_STATE || state == PREV_WAS_CR_STATE)
@@ -966,13 +967,10 @@ break handleChar;
                     state = SAW_EOF_ERROR;
                     continue;
                   }
-                if (saved > 0)
+                if (start >= 0)
                   {
-                    in.reset();
-                    in.skip(saved);
+                    in.setSaveStart(-1);
                   }
-                else
-                  in.unread_quick();
               }
             catch (java.io.IOException ex)
               {
@@ -982,9 +980,9 @@ break handleChar;
             buffer = in.buffer;
 
             limit = in.limit;
-            start = saved > 0 ? pos - saved : limit;
-            ch = buffer[pos++];
+            start = start >= 0 ? pos - saved : limit;
           }
+        ch = buffer[pos++];
       }
   }
 }

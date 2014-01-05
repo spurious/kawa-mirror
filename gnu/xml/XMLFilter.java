@@ -39,7 +39,8 @@ public class XMLFilter implements
    * In contrast, base may be either {@code ==out} or {@code ==tlist}. */
   public Consumer out;
 
-  Consumer base;
+  /** Either tlist or out. */
+  private Consumer base;
 
   public static final int COPY_NAMESPACES_PRESERVE = 1;
   public static final int COPY_NAMESPACES_INHERIT = 2;
@@ -52,7 +53,7 @@ public class XMLFilter implements
    * For each nested document or element there is the saved value of
    * namespaceBindings followed by a either a MappingInfo or Symbol
    * from the emitBeginElement/startElement.  This is followed by a MappingInfo
-   * or Symbol for each attribute we seen for the current element. */
+   * or Symbol for each attribute we have seen for the current element. */
   Object[] workStack;
   NamespaceBinding namespaceBindings;
 
@@ -79,6 +80,7 @@ public class XMLFilter implements
    * (In the future it should also count begun comment and
    * processing-instruction constructors, when those support nesting.) */
   protected int stringizingLevel;
+
   /** Value of {@code nesting} just before outermost startElement
    * while {@code stringizingLevel > 0}.
    * I.e. if we're nested inside a element nested inside an attribute
@@ -87,8 +89,9 @@ public class XMLFilter implements
   protected int stringizingElementNesting = -1;
   /** Postive if all output should be ignored.
    * This happens if we're inside an attribute value inside an element which
-   * is stringized because it is in turm inside an outer attribute. Phew.
-   * If gets increment by nested attributes so we can tell when to stop. */
+   * is stringized because it is in turn inside an outer attribute. Phew.
+   * It gets incremented by nested attributes so we can tell when to stop.
+   */
   protected int ignoringLevel;
 
   // List of indexes in tlist.data of begin of attribute.
@@ -800,7 +803,8 @@ public class XMLFilter implements
   {
     previous = 0;
     if (ignoringLevel == 0)
-      ((TreeList) base).writeJoiner();
+        if (base instanceof TreeList) // Always true for well-formed data
+            ((TreeList) base).writeJoiner();
   }
 
   /** Process a CDATA section.

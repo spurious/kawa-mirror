@@ -132,12 +132,14 @@ public class LineBufferedReader extends Reader
   protected int lineNumber;
 
   /** If mark has been called, and not invalidated, the read ahead limit.
-    * Zero if mark has not been called, or had been invalidated
-    * (due to either calling reset or excessive reading ahead). */
-  protected int readAheadLimit = 0;
+    * Negative if mark has not been called, or had been invalidated
+    * (due to either calling reset or excessive reading ahead).
+    * Zero means we should save buffer data starting at markPos,
+    * but lineStartPos and lineNumber are based on pos, not markPos. */
+  protected int readAheadLimit = -1;
 
-  /** The position of the mark (assuming {@code readAheadLinit > 0}).
-    * (Garbage if {@code readAheadLimit <= 0}). */
+  /** The position of the mark (assuming {@code readAheadLinit >= 0}).
+    * (Garbage if {@code readAheadLimit < 0}). */
   protected int markPos;
 
   public LineBufferedReader (InputStream in)
@@ -172,7 +174,10 @@ public class LineBufferedReader extends Reader
   private void clearMark ()
   {
     // Invalidate the mark.
-    readAheadLimit = 0;
+    int oldLimit = readAheadLimit;
+    readAheadLimit = -1;
+    if (oldLimit <= 0)
+        return;
     // Need to maintain the lineStartPos invariant.
     int i = lineStartPos < 0 ? 0 : lineStartPos;
     for (;;)
@@ -225,9 +230,9 @@ public class LineBufferedReader extends Reader
     else
       {
 	saveStart = pos;
-	if (readAheadLimit > 0 && markPos < pos)
+	if (readAheadLimit >= 0 && markPos < pos)
 	  {
-	    if (pos - markPos > readAheadLimit
+            if ((readAheadLimit > 0 && pos - markPos > readAheadLimit)
 		|| ((flags & USER_BUFFER) != 0
 		    && reserve - markPos > buffer.length))
 	      clearMark();
@@ -275,7 +280,7 @@ public class LineBufferedReader extends Reader
       prev = '\0';
     if (prev == '\r' || prev == '\n')
       {
-	if (lineStartPos < pos && (readAheadLimit == 0 || pos <= markPos))
+	if (lineStartPos < pos && (readAheadLimit <= 0 || pos <= markPos))
 	  {
 	    lineStartPos = pos;
 	    lineNumber++;
@@ -416,7 +421,7 @@ public class LineBufferedReader extends Reader
   public int getLineNumber ()
   {
     int lineno = lineNumber;
-    if (readAheadLimit == 0) // Normal, fast case:
+    if (readAheadLimit <= 0) // Normal, fast case:
       {
 	if (pos > 0 && pos > lineStartPos)
 	  {
@@ -440,6 +445,15 @@ public class LineBufferedReader extends Reader
     lineNumber += lineDelta;
     this.lineStartPos = lineStartPos;
   }
+
+    /** Note that we should save part the buffer when it is next filled.
+     * This is used by XMLParser as a backddor for higher performance.
+     * @param saveStart offset into buffer - save characters starting here.
+     */
+    public void setSaveStart(int saveStart) {
+        markPos = saveStart;
+        readAheadLimit = saveStart < 0 ? -1 : 0;
+    }
 
   /** Return the current (zero-based) column number. */
   public int getColumnNumber ()
@@ -475,7 +489,7 @@ public class LineBufferedReader extends Reader
 
   public synchronized void mark (int readAheadLimit)
   {
-    if (this.readAheadLimit > 0)
+    if (this.readAheadLimit >= 0)
       clearMark();
     this.readAheadLimit = readAheadLimit;
     markPos = pos;
@@ -483,12 +497,12 @@ public class LineBufferedReader extends Reader
 
   public void reset ()  throws IOException
   {
-    if (readAheadLimit <= 0)
+    if (readAheadLimit < 0)
       throw new IOException ("mark invalid");
     if (pos > highestPos)
       highestPos = pos;
     pos = markPos;
-    readAheadLimit = 0;
+    readAheadLimit = -1;
   }
 
   /** Read a line.

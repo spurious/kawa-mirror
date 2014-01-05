@@ -1,3 +1,11 @@
+2014-01-04  Per Bothner  <per@bothner.com>
+
+	* XMLParser.java: Fixed a number of little bugs found when
+	processing a huge file.  Also improve error robustness.
+	Fixed convention for 'start' variable, since before we couldn't
+	distinguish it from being unset vs set at end of buffer.
+	* XMLFilter.java (writeJoiner): Make more robust.
+
 2013-11-28  Matthieu Vachon <matthieu.o.vachon@gmail.com>
 
 	* XMLFilter.java, XMLPrinter.java: Don't use @Override for a method

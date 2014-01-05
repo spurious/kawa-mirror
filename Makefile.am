@@ -2,8 +2,8 @@
 
 SUBDIRS = doc testsuite gnu/bytecode gnu/math gnu/lists gnu/text \
   gnu/mapping $(XML_SUBDIRS) gnu/expr \
-  gnu/kawa/util gnu/kawa/reflect gnu/kawa/functions gnu/kawa/lispexpr \
-  gnu/kawa/models gnu/kawa/swingviews gnu/kawa/swtviews \
+  gnu \
+  gnu/kawa/swingviews gnu/kawa/swtviews \
   kawa gnu/kawa/slib gnu/commonlisp gnu/q2 gnu/ecmascript $(JAVAFX_SUBDIRS) \
   gnu/kawa/servlet $(ECHO2_SUBDIRS) $(SAX_SUBDIR) gnu/kawa/ant \
   $(JEMACS_SUBDIRS) $(XQUERY_SUBDIR) $(BRL_SUBDIRS) $(ANDROID_SUBDIRS) bin

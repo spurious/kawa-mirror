@@ -4704,7 +4704,7 @@ Make_rules="$srcdir/Make-rules"
 ac_config_links="$ac_config_links gnu/xquery/testsuite/outline.xml:gnu/xquery/testsuite/outline.xml.in gnu/xquery/testsuite/tab.xml:gnu/xquery/testsuite/tab.xml.in gnu/xquery/testsuite/bib.xml:gnu/xquery/testsuite/bib.xml.in gnu/xquery/testsuite/auction.xml:gnu/xquery/testsuite/auction.xml.in gnu/xquery/testsuite/book1.xml:gnu/xquery/testsuite/book1.xml.in gnu/xquery/testsuite/report1.xml:gnu/xquery/testsuite/report1.xml.in gnu/xquery/testsuite/reviews.xml:gnu/xquery/testsuite/reviews.xml.in gnu/xquery/testsuite/items.xml:gnu/xquery/testsuite/items.xml.in gnu/xquery/testsuite/bids.xml:gnu/xquery/testsuite/bids.xml.in gnu/xquery/testsuite/users.xml:gnu/xquery/testsuite/users.xml.in testsuite/scribble.html:testsuite/scribble.html.in"
 
 
-ac_config_files="$ac_config_files Makefile gnu/bytecode/Makefile gnu/math/Makefile gnu/lists/Makefile gnu/text/Makefile gnu/mapping/Makefile gnu/expr/Makefile gnu/kawa/util/Makefile gnu/kawa/reflect/Makefile gnu/kawa/functions/Makefile gnu/kawa/servlet/Makefile gnu/xml/Makefile gnu/kawa/xml/Makefile gnu/kawa/xslt/Makefile gnu/kawa/sax/Makefile gnu/brl/Makefile gnu/kawa/brl/Makefile gnu/kawa/lispexpr/Makefile gnu/kawa/slib/Makefile gnu/ecmascript/Makefile gnu/commonlisp/Makefile gnu/commonlisp/lang/Makefile gnu/commonlisp/lisp/Makefile gnu/commonlisp/testsuite/Makefile gnu/jemacs/lang/Makefile gnu/jemacs/buffer/Makefile gnu/jemacs/lisp/Makefile gnu/jemacs/testsuite/Makefile gnu/jemacs/swing/Makefile gnu/jemacs/swt/Makefile kawa/Makefile kawa/lib/Makefile gnu/q2/Makefile gnu/q2/lang/Makefile gnu/q2/testsuite/Makefile gnu/xquery/Makefile gnu/xquery/lang/Makefile gnu/xquery/util/Makefile gnu/xquery/testsuite/Makefile gnu/kawa/ant/Makefile gnu/kawa/models/Makefile gnu/kawa/swingviews/Makefile gnu/kawa/swtviews/Makefile gnu/kawa/echo2/Makefile gnu/kawa/android/Makefile gnu/kawa/javafx/Makefile doc/Makefile testsuite/Makefile bin/Makefile"
+ac_config_files="$ac_config_files Makefile gnu/bytecode/Makefile gnu/math/Makefile gnu/lists/Makefile gnu/text/Makefile gnu/mapping/Makefile gnu/expr/Makefile gnu/Makefile gnu/kawa/servlet/Makefile gnu/xml/Makefile gnu/kawa/xml/Makefile gnu/kawa/xslt/Makefile gnu/kawa/sax/Makefile gnu/brl/Makefile gnu/kawa/brl/Makefile gnu/kawa/slib/Makefile gnu/ecmascript/Makefile gnu/commonlisp/Makefile gnu/commonlisp/lang/Makefile gnu/commonlisp/lisp/Makefile gnu/commonlisp/testsuite/Makefile gnu/jemacs/lang/Makefile gnu/jemacs/buffer/Makefile gnu/jemacs/lisp/Makefile gnu/jemacs/testsuite/Makefile gnu/jemacs/swing/Makefile gnu/jemacs/swt/Makefile kawa/Makefile kawa/lib/Makefile gnu/q2/Makefile gnu/q2/lang/Makefile gnu/q2/testsuite/Makefile gnu/xquery/Makefile gnu/xquery/lang/Makefile gnu/xquery/util/Makefile gnu/xquery/testsuite/Makefile gnu/kawa/ant/Makefile gnu/kawa/swingviews/Makefile gnu/kawa/swtviews/Makefile gnu/kawa/echo2/Makefile gnu/kawa/android/Makefile gnu/kawa/javafx/Makefile doc/Makefile testsuite/Makefile bin/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -5566,9 +5566,7 @@ do
     "gnu/text/Makefile") CONFIG_FILES="$CONFIG_FILES gnu/text/Makefile" ;;
     "gnu/mapping/Makefile") CONFIG_FILES="$CONFIG_FILES gnu/mapping/Makefile" ;;
     "gnu/expr/Makefile") CONFIG_FILES="$CONFIG_FILES gnu/expr/Makefile" ;;
-    "gnu/kawa/util/Makefile") CONFIG_FILES="$CONFIG_FILES gnu/kawa/util/Makefile" ;;
-    "gnu/kawa/reflect/Makefile") CONFIG_FILES="$CONFIG_FILES gnu/kawa/reflect/Makefile" ;;
-    "gnu/kawa/functions/Makefile") CONFIG_FILES="$CONFIG_FILES gnu/kawa/functions/Makefile" ;;
+    "gnu/Makefile") CONFIG_FILES="$CONFIG_FILES gnu/Makefile" ;;
     "gnu/kawa/servlet/Makefile") CONFIG_FILES="$CONFIG_FILES gnu/kawa/servlet/Makefile" ;;
     "gnu/xml/Makefile") CONFIG_FILES="$CONFIG_FILES gnu/xml/Makefile" ;;
     "gnu/kawa/xml/Makefile") CONFIG_FILES="$CONFIG_FILES gnu/kawa/xml/Makefile" ;;
@@ -5576,7 +5574,6 @@ do
     "gnu/kawa/sax/Makefile") CONFIG_FILES="$CONFIG_FILES gnu/kawa/sax/Makefile" ;;
     "gnu/brl/Makefile") CONFIG_FILES="$CONFIG_FILES gnu/brl/Makefile" ;;
     "gnu/kawa/brl/Makefile") CONFIG_FILES="$CONFIG_FILES gnu/kawa/brl/Makefile" ;;
-    "gnu/kawa/lispexpr/Makefile") CONFIG_FILES="$CONFIG_FILES gnu/kawa/lispexpr/Makefile" ;;
     "gnu/kawa/slib/Makefile") CONFIG_FILES="$CONFIG_FILES gnu/kawa/slib/Makefile" ;;
     "gnu/ecmascript/Makefile") CONFIG_FILES="$CONFIG_FILES gnu/ecmascript/Makefile" ;;
     "gnu/commonlisp/Makefile") CONFIG_FILES="$CONFIG_FILES gnu/commonlisp/Makefile" ;;
@@ -5599,7 +5596,6 @@ do
     "gnu/xquery/util/Makefile") CONFIG_FILES="$CONFIG_FILES gnu/xquery/util/Makefile" ;;
     "gnu/xquery/testsuite/Makefile") CONFIG_FILES="$CONFIG_FILES gnu/xquery/testsuite/Makefile" ;;
     "gnu/kawa/ant/Makefile") CONFIG_FILES="$CONFIG_FILES gnu/kawa/ant/Makefile" ;;
-    "gnu/kawa/models/Makefile") CONFIG_FILES="$CONFIG_FILES gnu/kawa/models/Makefile" ;;
     "gnu/kawa/swingviews/Makefile") CONFIG_FILES="$CONFIG_FILES gnu/kawa/swingviews/Makefile" ;;
     "gnu/kawa/swtviews/Makefile") CONFIG_FILES="$CONFIG_FILES gnu/kawa/swtviews/Makefile" ;;
     "gnu/kawa/echo2/Makefile") CONFIG_FILES="$CONFIG_FILES gnu/kawa/echo2/Makefile" ;;

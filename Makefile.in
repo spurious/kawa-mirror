@@ -150,12 +150,11 @@ ETAGS = etags
 CTAGS = ctags
 CSCOPE = cscope
 DIST_SUBDIRS = doc testsuite gnu/bytecode gnu/math gnu/lists gnu/text \
-	gnu/mapping gnu/xml gnu/kawa/xml gnu/expr gnu/kawa/util \
-	gnu/kawa/reflect gnu/kawa/functions gnu/kawa/lispexpr \
-	gnu/kawa/models gnu/kawa/swingviews gnu/kawa/swtviews kawa \
-	gnu/kawa/slib gnu/commonlisp gnu/q2 gnu/ecmascript \
-	gnu/kawa/javafx gnu/kawa/servlet gnu/kawa/echo2 gnu/kawa/sax \
-	gnu/kawa/ant gnu/jemacs/lang gnu/jemacs/buffer gnu/jemacs/lisp \
+	gnu/mapping gnu/xml gnu/kawa/xml gnu/expr gnu \
+	gnu/kawa/swingviews gnu/kawa/swtviews kawa gnu/kawa/slib \
+	gnu/commonlisp gnu/q2 gnu/ecmascript gnu/kawa/javafx \
+	gnu/kawa/servlet gnu/kawa/echo2 gnu/kawa/sax gnu/kawa/ant \
+	gnu/jemacs/lang gnu/jemacs/buffer gnu/jemacs/lisp \
 	gnu/jemacs/testsuite gnu/jemacs/swing gnu/jemacs/swt \
 	gnu/xquery gnu/kawa/xslt gnu/brl gnu/kawa/brl gnu/kawa/android \
 	bin
@@ -321,8 +320,8 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 SUBDIRS = doc testsuite gnu/bytecode gnu/math gnu/lists gnu/text \
   gnu/mapping $(XML_SUBDIRS) gnu/expr \
-  gnu/kawa/util gnu/kawa/reflect gnu/kawa/functions gnu/kawa/lispexpr \
-  gnu/kawa/models gnu/kawa/swingviews gnu/kawa/swtviews \
+  gnu \
+  gnu/kawa/swingviews gnu/kawa/swtviews \
   kawa gnu/kawa/slib gnu/commonlisp gnu/q2 gnu/ecmascript $(JAVAFX_SUBDIRS) \
   gnu/kawa/servlet $(ECHO2_SUBDIRS) $(SAX_SUBDIR) gnu/kawa/ant \
   $(JEMACS_SUBDIRS) $(XQUERY_SUBDIR) $(BRL_SUBDIRS) $(ANDROID_SUBDIRS) bin

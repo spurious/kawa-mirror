@@ -1,3 +1,7 @@
+2014-01-05  Per Bothner  <per@bothner.com>
+
+	* Makefile.am: Merge into ../../../gnu/Makefile.am and remove.
+
 2013-12-30  Per Bothner  <per@bothner.com>
 
 	* RunProcess.java (doit): Add support for reading from a port.

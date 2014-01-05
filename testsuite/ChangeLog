@@ -1,3 +1,7 @@
+2014-01-05  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (EXTRA_DIST): Belatedly add system-test.scm.
+
 2014-01-04  Per Bothner  <per@bothner.com>
 
 	* r7rs-tests.scm: Re-order and update to match upstream Chibi.

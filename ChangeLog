@@ -1,5 +1,9 @@
 2014-01-05  Per Bothner  <per@bothner.com>
 
+	Fold the Makefile.am of gnu/xml, gnu/kawa/xml, gnu/ecmascript,
+	gnu/kawa/swingviews, gnu/kawa/swtviews, gnu/kawa/ant, and
+	gnu/kawa/sax into gnu/Makefile.am.
+
 	Fold the Makefile.am of gnu/kawa/util, gnu/kawa/reflect,
 	gnu/kawa/functions, gnu/kawa/lispexpr, and gnu/kawa/models
 	into new gnu/Makefile.am

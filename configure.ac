@@ -293,10 +293,9 @@ AC_CONFIG_LINKS(
 AC_CONFIG_FILES([Makefile gnu/bytecode/Makefile gnu/math/Makefile
   gnu/lists/Makefile gnu/text/Makefile gnu/mapping/Makefile gnu/expr/Makefile
   gnu/Makefile
-  gnu/kawa/servlet/Makefile gnu/xml/Makefile gnu/kawa/xml/Makefile
-  gnu/kawa/xslt/Makefile gnu/kawa/sax/Makefile
+  gnu/kawa/servlet/Makefile gnu/kawa/xslt/Makefile
   gnu/brl/Makefile gnu/kawa/brl/Makefile
-  gnu/kawa/slib/Makefile gnu/ecmascript/Makefile
+  gnu/kawa/slib/Makefile
   gnu/commonlisp/Makefile gnu/commonlisp/lang/Makefile
   gnu/commonlisp/lisp/Makefile gnu/commonlisp/testsuite/Makefile
   gnu/jemacs/lang/Makefile gnu/jemacs/buffer/Makefile
@@ -306,9 +305,7 @@ AC_CONFIG_FILES([Makefile gnu/bytecode/Makefile gnu/math/Makefile
   gnu/q2/Makefile gnu/q2/lang/Makefile gnu/q2/testsuite/Makefile
   gnu/xquery/Makefile gnu/xquery/lang/Makefile
   gnu/xquery/util/Makefile gnu/xquery/testsuite/Makefile
-  gnu/kawa/ant/Makefile
-  gnu/kawa/swingviews/Makefile
-  gnu/kawa/swtviews/Makefile gnu/kawa/echo2/Makefile gnu/kawa/android/Makefile
+  gnu/kawa/echo2/Makefile gnu/kawa/android/Makefile
   gnu/kawa/javafx/Makefile
   doc/Makefile testsuite/Makefile bin/Makefile])
 AC_OUTPUT

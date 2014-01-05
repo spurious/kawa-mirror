@@ -1,3 +1,7 @@
+2014-01-05  Per Bothner  <per@bothner.com>
+
+	* Makefile.am: Merge into ../../../gnu/Makefile.am and remove.
+
 2012-12-14  Jamison Hope  <jrh@theptrgroup.com>
 
        * Kawac.java: Add support for FileList.

@@ -1,3 +1,7 @@
+2014-01-05  Per Bothner  <per@bothner.com>
+
+	* Makefile.am: Merge into ../../../gnu/Makefile.am and remove.
+
 2013-11-03  Per Bothner  <per@bothner.com>
 
 	* Nodes.java: Update for new Values API.  An optimized

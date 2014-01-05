@@ -1,3 +1,7 @@
+2014-01-05  Per Bothner  <per@bothner.com>
+
+	* Makefile.am: Merge into ../../gnu/Makefile.am and remove.
+
 2005-05-18  Per Bothner  <per@bothner.com>
 
 	* Parser.java (main): Don't set current Environment from Language.

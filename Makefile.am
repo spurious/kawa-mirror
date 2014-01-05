@@ -1,26 +1,21 @@
 # Process this with automake to create Makefile.in
 
 SUBDIRS = doc testsuite gnu/bytecode gnu/math gnu/lists gnu/text \
-  gnu/mapping $(XML_SUBDIRS) gnu/expr \
+  gnu/mapping gnu/expr \
   gnu \
-  gnu/kawa/swingviews gnu/kawa/swtviews \
-  kawa gnu/kawa/slib gnu/commonlisp gnu/q2 gnu/ecmascript $(JAVAFX_SUBDIRS) \
-  gnu/kawa/servlet $(ECHO2_SUBDIRS) $(SAX_SUBDIR) gnu/kawa/ant \
+  kawa gnu/kawa/slib gnu/commonlisp gnu/q2 $(JAVAFX_SUBDIRS) \
+  gnu/kawa/servlet $(ECHO2_SUBDIRS) \
   $(JEMACS_SUBDIRS) $(XQUERY_SUBDIR) $(BRL_SUBDIRS) $(ANDROID_SUBDIRS) bin
 if ENABLE_JEMACS
 JEMACS_SUBDIRS = gnu/jemacs/lang gnu/jemacs/buffer gnu/jemacs/lisp \
   gnu/jemacs/testsuite gnu/jemacs/swing gnu/jemacs/swt
 endif
 if ENABLE_XML
-XML_SUBDIRS = gnu/xml gnu/kawa/xml
 if ENABLE_BRL
 BRL_SUBDIRS = gnu/brl gnu/kawa/brl
 endif
 if ENABLE_XQUERY
 XQUERY_SUBDIR = gnu/xquery gnu/kawa/xslt
-endif
-if WITH_SAX2
-SAX_SUBDIR = gnu/kawa/sax
 endif
 endif
 if ENABLE_ECHO2

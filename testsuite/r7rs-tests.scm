@@ -44,8 +44,8 @@
 ;; provided.
 ;;
 ;; Uses the (chibi test) library which is written in portable R7RS.
-;; This provides test-begin, test-end and test, which could be defined
-;; as something like:
+;; This is mostly a subset of SRFI-64, providing test-begin, test-end
+;; and test, which could be defined as something like:
 ;;
 ;;   (define (test-begin . o) #f)
 ;;
@@ -205,6 +205,32 @@
               (x (p 5))
               (y x))
              y))
+
+;; By Jussi Piitulainen <jpiitula@ling.helsinki.fi>
+;; and John Cowan <cowan@mercury.ccil.org>:
+;; http://lists.scheme-reports.org/pipermail/scheme-reports/2013-December/003876.html
+
+(define (means ton)
+  (letrec*
+     ((mean
+        (lambda (f g)
+          (f (/ (sum g ton) n))))
+      (sum
+        (lambda (g ton)
+          (if (null? ton)
+            (+)
+            (if (number? ton)
+                (g ton)
+                (+ (sum g (car ton))
+                   (sum g (cdr ton)))))))
+      (n (sum (lambda (x) 1) ton)))
+    (values (mean values values)
+            (mean exp log)
+            (mean / /))))
+(let*-values (((a b c) (means '(8 5 99 1 22))))
+  (test 27 a)
+  (test 9.728 b)
+  (test 1800/497 c))
 
 (let*-values (((root rem) (exact-integer-sqrt 32)))
   (test 35 (* root rem)))
@@ -790,7 +816,7 @@
 (test 1764 (square 42))
 (test 4 (square 2))
 
-(test 3.0 (sqrt 9))
+(test 3.0 (inexact (sqrt 9)))
 (test 1.4142135623731 (sqrt 2))
 (test +1.0i (sqrt -1))
 
@@ -1577,6 +1603,115 @@
 (test #t
     (read-error? (guard (exn (else exn)) (read (open-input-string ")")))))
 
+(define something-went-wrong #f)
+(define (test-exception-handler-1 v)
+  (call-with-current-continuation
+   (lambda (k)
+     (with-exception-handler
+      (lambda (x)
+        (set! something-went-wrong (list "condition: " x))
+        (k 'exception))
+      (lambda ()
+        (+ 1 (if (> v 0) (+ v 100) (raise 'an-error))))))))
+(test 106 (test-exception-handler-1 5))
+(test #f something-went-wrong)
+(test 'exception (test-exception-handler-1 -1))
+(test '("condition: " an-error) something-went-wrong)
+
+(set! something-went-wrong #f)
+(define (test-exception-handler-2 v)
+  (guard (ex (else 'caught-another-exception))
+    (with-exception-handler
+     (lambda (x)
+       (set! something-went-wrong #t)
+       (list "exception:" x))
+     (lambda ()
+       (+ 1 (if (> v 0) (+ v 100) (raise 'an-error)))))))
+(test 106 (test-exception-handler-2 5))
+(test #f something-went-wrong)
+(test 'caught-another-exception (test-exception-handler-2 -1))
+(test #t something-went-wrong)
+
+;; Based on an example from R6RS-lib section 7.1 Exceptions.
+;; R7RS section 6.11 Exceptions has a simplified version.
+(let* ((out (open-output-string))
+       (value (with-exception-handler
+               (lambda (con)
+                 (cond
+                  ((not (list? con))
+                   (raise con))
+                  ((list? con)
+                   (display (car con) out))
+                  (else
+                   (display "a warning has been issued" out)))
+                 42)
+               (lambda ()
+                 (+ (raise-continuable
+                     (list "should be a number"))
+                    23)))))
+  (test "should be a number" (get-output-string out))
+  (test 65 value))
+
+;; From SRFI-34 "Examples" section - #3
+(define (test-exception-handler-3 v out)
+  (guard (condition
+          (else
+           (display "condition: " out)
+           (write condition out)
+           (newline out)
+           'exception))
+         (+ 1 (if (= v 0) (raise 'an-error) (/ 10 v)))))
+(let* ((out (open-output-string))
+       (value (test-exception-handler-3 0 out)))
+  (test 'exception value)
+  (test "condition: an-error\n" (get-output-string out)))
+
+(define (test-exception-handler-4 v out)
+  (call-with-current-continuation
+   (lambda (k)
+     (with-exception-handler
+      (lambda (x)
+        (display "reraised " out)
+        (write x out) (newline out)
+        (k 'zero))
+      (lambda ()
+        (guard (condition
+                ((positive? condition)
+                 'positive)
+                ((negative? condition)
+                 'negative))
+          (raise v)))))))
+
+;; From SRFI-34 "Examples" section - #5
+(let* ((out (open-output-string))
+       (value (test-exception-handler-4 1 out)))
+  (test "" (get-output-string out))
+  (test 'positive value))
+;; From SRFI-34 "Examples" section - #6
+(let* ((out (open-output-string))
+       (value (test-exception-handler-4 -1 out)))
+  (test "" (get-output-string out))
+  (test 'negative value))
+;; From SRFI-34 "Examples" section - #7
+(let* ((out (open-output-string))
+       (value (test-exception-handler-4 0 out)))
+  (test "reraised 0\n" (get-output-string out))
+  (test 'zero value))
+
+;; From SRFI-34 "Examples" section - #8
+(test 42
+    (guard (condition
+            ((assq 'a condition) => cdr)
+            ((assq 'b condition)))
+      (raise (list (cons 'a 42)))))
+
+;; From SRFI-34 "Examples" section - #9
+(test '(b . 23)
+    (guard (condition
+            ((assq 'a condition) => cdr)
+            ((assq 'b condition)))
+      (raise (list (cons 'b 23)))))
+
 (test-end)
 
 (test-begin "6.12 Environments and evaluation")
@@ -2050,110 +2185,11 @@
 (test #t (file-exists? "."))
 (test #f (file-exists? " no such file "))
 
-(skip-if-kawa "file-error? and guard missing"
+(test-expect-fail 1) ;; exn is java.io.IOException: cannot delete  no such file
 (test #t (file-error?
           (guard (exn (else exn))
             (delete-file " no such file "))))
-)
 
 (test-end)
-
-;; By Jussi Piitulainen <jpiitula@ling.helsinki.fi>
-;; and John Cowan <cowan@mercury.ccil.org>:
-;; http://lists.scheme-reports.org/pipermail/scheme-reports/2013-December/003876.html
-;;; Since letrec* was introduced to have the desired top-levelish
-;;; meaning of internal definitions, a best example will consist of
-;;; internal definitions that are not equivalent to any other _let_
-;;; family syntax.
-
-;;; I think the following is reasonable and not too contrived. It
-;;; returns the arithmetic, geometric, and harmonic means of a tree (a
-;;; list structure) of numbers (positive numbers, and there must be at
-;;; least one in the tree). Of the internal definitions, _sum_ is
-;;; recursive, the other two (_n_, _mean_) depend on _sum_, and _sum_
-;;; must be initialized before _n_. Hence only a _letrec*_ will do.
-
-;;; (Rearranged to define _mean_ before _sum_ so a straightwordard
-;;; nesting of _letrec_'s would not work. Mutual recursion would be a
-;;; stronger example.)
-
-(define (means ton)
-  (letrec*
-     ((mean
-        (lambda (f g)
-          (f (/ (sum g ton) n))))
-      (sum
-        (lambda (g ton)
-          (if (null? ton)
-            (+)
-            (if (number? ton)
-                (g ton)
-                (+ (sum g (car ton))
-                   (sum g (cdr ton)))))))
-      (n (sum (lambda (x) 1) ton)))
-    (values (mean values values)
-            (mean exp log)
-            (mean / /))))
-(let*-values (((a b c) (means '(8 5 99 1 22))))
-  (test 27 a)
-  (test 9.728 b)
-  (test 1800/497 c))
-
-(define something-went-wrong #f)
-(define (test-exception-handler-1 v)
-  (call-with-current-continuation
-   (lambda (k)
-     (with-exception-handler
-      (lambda (x)
-        (set! something-went-wrong (list "condition: " x))
-        (k 'exception))
-      (lambda ()
-        (+ 1 (if (> v 0) (+ v 100) (raise 'an-error))))))))
-(test 106 (test-exception-handler-1 5))
-(test #f something-went-wrong)
-(test 'exception (test-exception-handler-1 -1))
-(test '("condition: " an-error) something-went-wrong)
-
-(set! something-went-wrong #f)
-(define (test-exception-handler-2 v)
-  (guard (ex (else 'caught-another-exception))
-         (with-exception-handler
-          (lambda (x)
-            (set! something-went-wrong #t)
-            (list "exception:" x))
-          (lambda ()
-            (+ 1 (if (> v 0) (+ v 100) (raise 'an-error)))))))
-(test 106 (test-exception-handler-2 5))
-(test #f something-went-wrong)
-(test 'caught-another-exception (test-exception-handler-2 -1))
-(test #t something-went-wrong)
-
-(let* ((out (open-output-string))
-       (value
-        (with-exception-handler
-         (lambda (con)
-           (cond
-            ((string? con)
-             (display con out))
-            (else
-             (display "a warning has been issued" out)))
-           42)
-         (lambda ()
-           (+ (raise-continuable "should be a number")
-              23)))))
-  (test 65 value)
-  (test "should be a number" (get-output-string out)))
-
-(test 42
-      (guard (condition
-              ((assq 'a condition) => cdr)
-              ((assq 'b condition)))
-             (raise (list (cons 'a 42)))))
-
-(test '(b . 23)
-      (guard (condition
-              ((assq 'a condition) => cdr)
-              ((assq 'b condition)))
-             (raise (list (cons 'b 23)))))
 
 (test-end)

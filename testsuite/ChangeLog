@@ -1,3 +1,7 @@
+2014-01-04  Per Bothner  <per@bothner.com>
+
+	* r7rs-tests.scm: Re-order and update to match upstream Chibi.
+
 2013-12-30  Per Bothner  <per@bothner.com>
 
 	* system-test.scm: Some tests of reading or writing from/to ports.

@@ -7,6 +7,9 @@ import gnu.text.*;
 import gnu.lists.*;
 import gnu.bytecode.ArrayClassLoader;
 import gnu.bytecode.ZipLoader;
+import gnu.kawa.io.InPort;
+import gnu.kawa.io.OutPort;
+import gnu.kawa.io.TtyInPort;
 import java.net.URL;
 
 /** Utility functions (static methods) for kawa.repl.
@@ -25,9 +28,8 @@ public class Shell
   private static Class[] noClasses = { };
   private static  Class[] boolClasses = { Boolean.TYPE };
   private static  Class[] xmlPrinterClasses
-    = {gnu.mapping.OutPort.class,  java.lang.Object.class };
-  private static  Class[] httpPrinterClasses
-    = {gnu.mapping.OutPort.class };
+    = {OutPort.class, Object.class };
+  private static  Class[] httpPrinterClasses = {OutPort.class };
   private static Object portArg = "(port)";
 
   /** A table of names of known output formats.

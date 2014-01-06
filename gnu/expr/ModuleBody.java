@@ -2,6 +2,8 @@ package gnu.expr;
 import gnu.mapping.*;
 import gnu.lists.*;
 import gnu.kawa.reflect.ClassMemberLocation;
+import gnu.kawa.io.OutPort;
+import gnu.kawa.io.WriterManager;
 
 /**
  * Class for the dummy top-level function of a module.
@@ -134,7 +136,7 @@ public abstract class ModuleBody extends Procedure0 implements RunnableModule
   /** This is invoked by main when ModuleBody is compiled with --main. */
   public static void runAsMain (RunnableModule module)
   {
-    boolean registered = gnu.text.WriterManager.instance.registerShutdownHook();
+    boolean registered = WriterManager.instance.registerShutdownHook();
     try
       {
 	CallContext ctx = CallContext.getInstance();
@@ -153,13 +155,13 @@ public abstract class ModuleBody extends Procedure0 implements RunnableModule
 	    ctx.runUntilDone();
 	  }
         if (! registered)
-          gnu.mapping.OutPort.runCleanups();
+          gnu.kawa.io.OutPort.runCleanups();
 	exitDecrement();
       }
     catch (Throwable ex)
       {
 	ex.printStackTrace();
-	gnu.mapping.OutPort.runCleanups();
+	gnu.kawa.io.OutPort.runCleanups();
 	System.exit(-1);
       }
   }

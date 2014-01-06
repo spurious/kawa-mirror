@@ -1,5 +1,5 @@
 package gnu.expr;
-import gnu.mapping.*;
+import gnu.kawa.io.OutPort;
 import gnu.text.SourceMessages;
 
 /**

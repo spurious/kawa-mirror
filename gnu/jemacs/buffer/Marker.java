@@ -1,4 +1,5 @@
 package gnu.jemacs.buffer;
+import gnu.kawa.io.InPort;
 import gnu.lists.*;
 import gnu.mapping.*;
 import gnu.expr.*;

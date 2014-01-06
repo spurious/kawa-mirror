@@ -6,7 +6,7 @@ import gnu.jemacs.buffer.Buffer;
 import gnu.jemacs.buffer.Marker;
 import gnu.lists.CharSeq;
 import gnu.lists.FString;
-import gnu.mapping.InPort;
+import gnu.kawa.io.InPort;
 
 import java.io.Reader;
 import java.io.Writer;

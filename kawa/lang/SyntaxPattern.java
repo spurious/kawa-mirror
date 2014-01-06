@@ -1,11 +1,12 @@
 package kawa.lang;
 import gnu.mapping.*;
 import gnu.expr.*;
-import java.io.*;
+import gnu.kawa.io.OutPort;
 import gnu.lists.*;
 import java.util.Vector;
 import gnu.kawa.functions.DisplayFormat;
 import gnu.text.*;
+import java.io.*;
 
 /** This encodes a pattern from a Scheem syntax-case or syntax-rules. */
 

@@ -1,0 +1,16 @@
+2014-01-06  Per Bothner  <per@bothner.com>
+
+	* BinaryInPort.java: Moved from gnu.mapping.
+	* BinaryOutPort.java: Likewise.
+	* CharArrayInPort.java: Likewise.
+	* CharArrayOutPort.java: Likewise.
+	* InPort.java: Likewise.
+	* OutPort.java: Likewise.
+	* LogWriter.java: Likewise.
+	* TtyInPort.java: Likewise.
+	* LineBufferedReader.java: Moved from gnu.text.
+	* LineInputStreamReader.java: Likewise.
+	* NullReader.java: Likewise.
+	* PrettyWriter.java: Likewise.
+	* QueueReader.java: Likewise.
+	* WriterManager.java: Likewise.

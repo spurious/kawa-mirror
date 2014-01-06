@@ -12,6 +12,10 @@ import java.util.Collections;
 import java.util.List;
 import gnu.bytecode.ClassType;
 import gnu.kawa.servlet.HttpRequestContext;
+import gnu.kawa.io.CharArrayInPort;
+import gnu.kawa.io.InPort;
+import gnu.kawa.io.OutPort;
+import gnu.kawa.io.WriterManager;
 
 /** Start a "Read-Eval-Print-Loop" for the Kawa Scheme evaluator. */
 
@@ -207,7 +211,7 @@ public class repl extends Procedure0or1
   }
 
   static boolean shutdownRegistered
-    = gnu.text.WriterManager.instance.registerShutdownHook();
+    = WriterManager.instance.registerShutdownHook();
 
   public static int processArgs(String[] args, int iArg, int maxArg)
   {
@@ -882,7 +886,7 @@ public class repl extends Procedure0or1
 	if (! shutdownRegistered)
 	  {
 	    // Redundant if registerShutdownHook succeeded (e.g on JDK 1.3).
-	    gnu.mapping.OutPort.runCleanups();
+	    OutPort.runCleanups();
 	  }
 	ModuleBody.exitDecrement();
       }

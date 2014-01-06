@@ -2,9 +2,10 @@ package kawa.lang;
 import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.lists.*;
-import java.io.*;
 import gnu.kawa.functions.DisplayFormat;
+import gnu.kawa.io.OutPort;
 import gnu.text.*;
+import java.io.*;
 
 public class SyntaxRules extends Procedure1 implements Printable, Externalizable 
 {

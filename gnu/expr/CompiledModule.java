@@ -3,6 +3,7 @@
 
 package gnu.expr;
 import gnu.mapping.*;
+import gnu.kawa.io.OutPort;
 import gnu.lists.*;
 import kawa.Shell;
 import java.io.Writer;

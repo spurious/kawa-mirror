@@ -3,6 +3,7 @@
 
 package gnu.expr;
 import gnu.bytecode.*;
+import gnu.kawa.io.OutPort;
 import gnu.mapping.*;
 import java.util.*;
 import java.lang.annotation.ElementType;

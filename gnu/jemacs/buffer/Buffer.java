@@ -3,6 +3,7 @@
 
 package gnu.jemacs.buffer;
 import java.io.*;
+import gnu.kawa.io.InPort;
 import gnu.mapping.*;
 import gnu.lists.*;
 import gnu.text.*;

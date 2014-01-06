@@ -1,10 +1,12 @@
 package gnu.kawa.functions;
+import gnu.kawa.io.CharArrayOutPort;
+import gnu.kawa.io.OutPort;
 import gnu.lists.*;
+import gnu.mapping.*;
+import gnu.text.ReportFormat;
 import java.io.OutputStream;
 import java.io.Writer;
 import java.text.MessageFormat;
-import gnu.text.ReportFormat;
-import gnu.mapping.*;
 
 public class Format extends ProcedureN
 {

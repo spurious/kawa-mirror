@@ -1,4 +1,6 @@
 package gnu.mapping;
+import gnu.kawa.io.InPort;
+import gnu.kawa.io.OutPort;
 
 public class Future<T> extends Thread implements Lazy<T>
                     // FUTURE: implements java.util.concurrent.Future

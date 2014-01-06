@@ -1,4 +1,5 @@
 package gnu.kawa.brl;
+import gnu.kawa.io.InPort;
 import gnu.kawa.lispexpr.*;
 import gnu.text.SyntaxException;
 import gnu.mapping.*;

@@ -3,8 +3,6 @@
 include $(top_srcdir)/Make-rules
 
 java_sources=\
-  BinaryInPort.java \
-  BinaryOutPort.java \
   CallContext.java \
   ConstrainedLocation.java \
   Environment.java \
@@ -14,21 +12,16 @@ java_sources=\
   HasSetter.java \
   IndirectableLocation.java \
   InheritingEnvironment.java \
-  InPort.java \
   KeyPair.java \
   Lazy.java \
   LazyPropertyKey.java \
   Location.java \
   LocationEnumeration.java \
   LocationProc.java \
-  LogWriter.java \
   MethodProc.java \
   Named.java \
   NamedLocation.java \
   Namespace.java \
-  OutPort.java \
-  CharArrayInPort.java \
-  CharArrayOutPort.java \
   PlainLocation.java \
   Procedure.java \
   Procedure0.java \
@@ -55,7 +48,6 @@ java_sources=\
   Symbol.java \
   Table2D.java \
   ThreadLocation.java \
-  TtyInPort.java \
   UnboundLocationException.java \
   Values.java \
   ValueStack.java \

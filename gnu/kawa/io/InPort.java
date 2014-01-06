@@ -1,11 +1,13 @@
-package gnu.mapping;
+package gnu.kawa.io;
 import java.io.*;
+import gnu.mapping.Environment;
+import gnu.mapping.ThreadLocation;
 import gnu.text.*;
 import gnu.lists.Consumer;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 
-public class InPort extends gnu.text.LineBufferedReader implements Printable
+public class InPort extends LineBufferedReader implements Printable
 {
   public InPort (Reader in)
   {

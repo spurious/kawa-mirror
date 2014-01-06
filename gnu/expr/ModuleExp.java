@@ -3,9 +3,10 @@ import gnu.mapping.*;
 import gnu.bytecode.*;
 import gnu.mapping.Location; // As opposed to gnu.bytecode.Location
 import gnu.text.*;
-import java.io.*;
+import gnu.kawa.io.OutPort;
 import gnu.kawa.reflect.StaticFieldLocation;
 import gnu.kawa.reflect.FieldLocation;
+import java.io.*;
 import java.net.URL;
 
 /**

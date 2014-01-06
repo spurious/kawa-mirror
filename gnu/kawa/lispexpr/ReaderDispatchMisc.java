@@ -6,6 +6,9 @@ import gnu.text.*;
 import gnu.mapping.*;
 import gnu.bytecode.Type;
 import gnu.lists.*;
+import gnu.kawa.io.InPort;
+import gnu.kawa.io.LineBufferedReader;
+import gnu.kawa.io.OutPort;
 import gnu.kawa.util.GeneralHashTable;
 /* #ifdef use:java.util.regex */
 import java.util.regex.*;

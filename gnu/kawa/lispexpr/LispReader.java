@@ -4,6 +4,8 @@ import gnu.mapping.*;
 import gnu.lists.*;
 import gnu.math.*;
 import gnu.expr.*;
+import gnu.kawa.io.InPort;
+import gnu.kawa.io.LineBufferedReader;
 import gnu.kawa.util.GeneralHashTable;
 
 /** A Lexer for reading S-expressions in generic Lisp-like syntax.

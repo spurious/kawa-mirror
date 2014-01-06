@@ -6,6 +6,8 @@ import gnu.text.*;
 import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.xml.*;
+import gnu.kawa.io.CharArrayOutPort;
+import gnu.kawa.io.InPort;
 import gnu.kawa.xml.*;
 import gnu.mapping.Symbol;
 import gnu.xquery.lang.*;

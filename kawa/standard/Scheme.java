@@ -9,6 +9,8 @@ import gnu.text.SourceMessages;
 import gnu.kawa.lispexpr.*;
 import gnu.lists.AbstractFormat;
 import gnu.kawa.functions.*;
+import gnu.kawa.io.CharArrayInPort;
+import gnu.kawa.io.InPort;
 import gnu.kawa.reflect.LazyType;
 import gnu.kawa.servlet.HttpRequestContext;
 
@@ -892,10 +894,10 @@ public class Scheme extends LispLanguage
       defAliasStFld("*print-radix*", "gnu.kawa.functions.DisplayFormat",
                     "outRadix");
       defAliasStFld("*print-right-margin*",
-                    "gnu.text.PrettyWriter", "lineLengthLoc");
+                    "gnu.kawa.io.PrettyWriter", "lineLengthLoc");
       defAliasStFld("*print-miser-width*",
-                    "gnu.text.PrettyWriter", "miserWidthLoc");
-      defAliasStFld("*print-circle*", "gnu.text.PrettyWriter", "isSharing");
+                    "gnu.kawa.io.PrettyWriter", "miserWidthLoc");
+      defAliasStFld("*print-circle*", "gnu.kawa.io.PrettyWriter", "isSharing");
       defAliasStFld("*print-xml-indent*",
                     "gnu.xml.XMLPrinter", "indentLoc");
       defAliasStFld("html", "gnu.kawa.xml.XmlNamespace", "HTML");

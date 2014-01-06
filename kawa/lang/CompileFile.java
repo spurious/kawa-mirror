@@ -2,6 +2,7 @@ package kawa.lang;
 import gnu.mapping.*;
 import gnu.bytecode.ClassType;
 import gnu.expr.*;
+import gnu.kawa.io.InPort;
 import gnu.text.SourceMessages;
 
 /** Procedure to read and compile and entire file.

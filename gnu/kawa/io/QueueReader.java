@@ -1,4 +1,4 @@
-package gnu.text;
+package gnu.kawa.io;
 import java.io.*;
 import gnu.lists.CharSeq;
 

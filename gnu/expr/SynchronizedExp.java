@@ -1,5 +1,6 @@
 package gnu.expr;
 import gnu.bytecode.*;
+import gnu.kawa.io.OutPort;
 import gnu.mapping.*;
 
 public class SynchronizedExp extends Expression

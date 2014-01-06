@@ -1,11 +1,13 @@
 package gnu.kawa.functions;
 import gnu.text.*;
+import gnu.mapping.*;
+import gnu.kawa.io.CharArrayOutPort;
+import gnu.kawa.io.OutPort;
+import gnu.lists.AbstractFormat;
+import kawa.standard.Scheme;
 import java.text.*;
 import java.io.Writer;
 import java.io.CharArrayWriter;
-import gnu.mapping.*;
-import kawa.standard.Scheme;
-import gnu.lists.AbstractFormat;
 
 public class ObjectFormat extends ReportFormat
 {

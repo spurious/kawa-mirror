@@ -1,4 +1,6 @@
 package gnu.mapping;
+import gnu.kawa.io.InPort;
+import gnu.kawa.io.OutPort;
 
 public class RunnableClosure<T>
   implements

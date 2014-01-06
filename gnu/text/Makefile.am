@@ -3,17 +3,16 @@
 include $(top_srcdir)/Make-rules
 
 java_sources = \
-  Char.java PrettyWriter.java NamedCharTable.java Options.java \
+  Char.java NamedCharTable.java Options.java \
   Printable.java StandardNamedChars.java \
   Path.java FilePath.java URIPath.java URLPath.java \
   ResourceStreamHandler.java SourceLocator.java \
-  LineBufferedReader.java LineInputStreamReader.java \
   SourceError.java Lexer.java SyntaxException.java \
-  QueueReader.java SourceMessages.java NullReader.java \
+  SourceMessages.java \
   ReportFormat.java LiteralFormat.java PadFormat.java CompoundFormat.java \
   IntegerFormat.java RomanIntegerFormat.java EnglishIntegerFormat.java \
   DelimitSubstitutionFormat.java \
-  CaseConvertFormat.java FlushFormat.java WriterManager.java
+  CaseConvertFormat.java FlushFormat.java
 
 STANDARD_NAMED_CHARS_URL = http://www.w3.org/2003/entities/2007/w3centities-f.ent
 

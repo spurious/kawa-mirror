@@ -1,5 +1,6 @@
 package gnu.xquery.util;
 import gnu.mapping.*;
+import gnu.kawa.io.OutPort;
 import gnu.xml.XMLPrinter;
 
 public class Debug

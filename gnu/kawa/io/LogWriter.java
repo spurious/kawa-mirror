@@ -1,4 +1,4 @@
-package gnu.mapping;
+package gnu.kawa.io;
 import java.io.*;
 
 /** A class that supports an optional log file that output is duplicated to.

@@ -1,5 +1,21 @@
 include $(top_srcdir)/Make-rules
 
+GNU_KAWA_IO_JSOURCES = \
+  kawa/io/BinaryInPort.java \
+  kawa/io/BinaryOutPort.java \
+  kawa/io/CharArrayInPort.java \
+  kawa/io/CharArrayOutPort.java \
+  kawa/io/InPort.java \
+  kawa/io/LineBufferedReader.java \
+  kawa/io/LineInputStreamReader.java \
+  kawa/io/LogWriter.java \
+  kawa/io/NullReader.java \
+  kawa/io/OutPort.java \
+  kawa/io/PrettyWriter.java \
+  kawa/io/QueueReader.java \
+  kawa/io/TtyInPort.java \
+  kawa/io/WriterManager.java
+
 GNU_KAWA_UTIL_JSOURCES = \
   kawa/util/AbstractHashTable.java \
   kawa/util/AbstractWeakHashTable.java \
@@ -267,6 +283,7 @@ PACKAGE_FNAME = gnu
 GCJ_INPUTS = $(java_Java)
 
 java_sources = \
+  $(GNU_KAWA_IO_JSOURCES) \
   $(GNU_KAWA_UTIL_JSOURCES) \
   $(GNU_KAWA_REFLECT_JSOURCES) \
   $(GNU_KAWA_FUNCTIONS_JSOURCES) \

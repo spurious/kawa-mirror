@@ -1,4 +1,4 @@
-package gnu.text;
+package gnu.kawa.io;
 
 /** A reader for an empty stream (similar to /dev/null). */
 

@@ -3,7 +3,8 @@
 
 package gnu.kawa.lispexpr;
 import gnu.text.*;
-import gnu.mapping.InPort;
+import gnu.kawa.io.InPort;
+import gnu.kawa.io.LineBufferedReader;
 import gnu.mapping.Values;
 import gnu.lists.FVector;
 import gnu.lists.ConstVector;

@@ -3,11 +3,12 @@
 
 package kawa.standard;
 import gnu.expr.*;
-import kawa.lang.*;
 import gnu.lists.*;
-import java.io.File;
 import gnu.mapping.*;
+import gnu.kawa.io.InPort;
 import gnu.kawa.lispexpr.*;
+import kawa.lang.*;
+import java.io.File;
 
 public class define_autoload extends Syntax
 {

@@ -7,6 +7,7 @@ import gnu.lists.*;
 import gnu.expr.*;
 import gnu.text.*;
 import gnu.xquery.lang.*;
+import gnu.kawa.io.InPort;
 import gnu.kawa.xml.*;
 
 /** New Kawa language XSLT (XML Stylesheet Language Tranformations). */

@@ -6,7 +6,7 @@ package gnu.kawa.util;
  * This is a custom hash table optimised for the Object -> int
  * maps. This is done to avoid unnecessary object allocation in the image set.
  * 
- * @see gnu.mapping.OutPort
+ * @see gnu.kawa.io.OutPort
  * @author Charles Turner
  */
 public class IntHashTable {

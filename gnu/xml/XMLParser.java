@@ -3,6 +3,8 @@ import java.io.*;
 import gnu.text.*;
 import gnu.lists.*;
 import gnu.text.Path;
+import gnu.kawa.io.LineInputStreamReader;
+import gnu.kawa.io.LineBufferedReader;
 /* #ifdef use:java.nio */
 import java.nio.charset.*;
 /* #endif */

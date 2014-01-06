@@ -6,6 +6,7 @@ import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.text.*;
 import java.util.ArrayList;
+import gnu.kawa.io.QueueReader;
 import gnu.kawa.swingviews.SwingContent;
 import gnu.text.Path;
 import gnu.expr.Language;
@@ -39,7 +40,7 @@ public class ReplDocument extends DefaultStyledDocument
 
   SwingContent content;
 
-  final gnu.text.QueueReader in_r;
+  final QueueReader in_r;
   final GuiInPort in_p;
   final ReplPaneOutPort out_stream, err_stream;
 
@@ -74,7 +75,7 @@ public class ReplDocument extends DefaultStyledDocument
 
     this.language = language;
 
-    in_r = new gnu.text.QueueReader() {
+    in_r = new QueueReader() {
         @Override
         public void checkAvailable()
         {

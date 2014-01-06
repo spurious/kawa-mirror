@@ -4,6 +4,7 @@
 package gnu.expr;
 import gnu.bytecode.*;
 import gnu.mapping.*;
+import gnu.kawa.io.OutPort;
 import gnu.text.SourceMessages;
 
 /** This class is used to represent "combination" or "application".

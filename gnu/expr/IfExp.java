@@ -3,7 +3,9 @@
 
 package gnu.expr;
 import gnu.bytecode.*;
-import gnu.mapping.*;
+import gnu.kawa.io.OutPort;
+import gnu.mapping.CallContext;
+import gnu.mapping.Values;
 
 /**
  * This class represents a conditional.

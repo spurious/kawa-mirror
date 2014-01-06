@@ -1,5 +1,6 @@
 package gnu.ecmascript;
-import gnu.mapping.*;
+import gnu.kawa.io.InPort;
+import gnu.mapping.Procedure1;
 
 class Prompter extends Procedure1
 {

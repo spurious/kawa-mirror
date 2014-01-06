@@ -1,6 +1,6 @@
 package gnu.kawa.functions;
 import java.io.*;
-import gnu.mapping.InPort;
+import gnu.kawa.io.InPort;
 
 public class FileUtils
 {

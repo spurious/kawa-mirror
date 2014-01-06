@@ -1,4 +1,4 @@
-package gnu.mapping;
+package gnu.kawa.io;
 import gnu.lists.Consumer;
 import gnu.lists.FString;
 import java.io.IOException;

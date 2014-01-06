@@ -8,6 +8,8 @@ import gnu.mapping.Location; // As opposed to gnu.bytecode.Location
 import gnu.lists.*;
 import gnu.bytecode.*;
 import gnu.expr.*;
+import gnu.kawa.io.InPort;
+import gnu.kawa.io.OutPort;
 import gnu.kawa.reflect.*;
 import gnu.kawa.functions.Convert;
 import gnu.text.*;

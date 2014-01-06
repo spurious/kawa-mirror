@@ -4,6 +4,10 @@
 package gnu.kawa.functions;
 
 import gnu.expr.Keyword;
+import gnu.kawa.io.BinaryInPort;
+import gnu.kawa.io.BinaryOutPort;
+import gnu.kawa.io.InPort;
+import gnu.kawa.io.OutPort;
 import gnu.lists.ByteVector;
 import gnu.lists.Consumer;
 import gnu.lists.Strings;

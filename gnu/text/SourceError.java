@@ -1,4 +1,5 @@
 package gnu.text;
+import gnu.kawa.io.LineBufferedReader;
 import java.io.File;
 
 /** Represents an error message from processing a "source" file.

@@ -2,6 +2,7 @@ package gnu.expr;
 import gnu.mapping.*;
 import gnu.bytecode.*;
 import gnu.text.SourceLocator;
+import gnu.kawa.io.OutPort;
 import gnu.kawa.reflect.MakeAnnotation;
 
 /**

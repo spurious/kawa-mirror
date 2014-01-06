@@ -1,6 +1,6 @@
 package gnu.expr;
 import gnu.bytecode.*;
-import gnu.mapping.OutPort;
+import gnu.kawa.io.OutPort;
 import gnu.mapping.CallContext;
 
 /** A "catch" clause of a "try-catch" form.

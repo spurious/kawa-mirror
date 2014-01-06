@@ -5,6 +5,8 @@ import gnu.text.*;
 import gnu.mapping.*;
 import gnu.lists.*;
 import gnu.expr.Keyword;
+import gnu.kawa.io.InPort;
+import gnu.kawa.io.LineBufferedReader;
 import gnu.kawa.xml.MakeAttribute;
 import kawa.lang.*;
 

@@ -4,8 +4,9 @@
 package gnu.kawa.xml;
 import gnu.lists.*;
 import gnu.xml.*;
-import java.io.*;
 import gnu.mapping.*;
+import gnu.kawa.io.OutPort;
+import java.io.*;
 import java.util.Vector;
 
 /** Output as an Http response.

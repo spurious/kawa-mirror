@@ -1,8 +1,9 @@
 package gnu.expr;
 import gnu.mapping.*;
-import java.util.Vector;
 import gnu.lists.*;
 import gnu.bytecode.CodeAttr;
+import gnu.kawa.io.OutPort;
+import java.util.Vector;
 
 /**
  * This class represents a sequence of Expressions.

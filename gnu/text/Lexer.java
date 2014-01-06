@@ -2,6 +2,7 @@
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.text;
+import gnu.kawa.io.LineBufferedReader;
 import java.io.*;
 
 /**

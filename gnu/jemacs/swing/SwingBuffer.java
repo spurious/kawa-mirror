@@ -2,14 +2,15 @@
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.jemacs.swing;
-import java.io.*;
-import java.lang.reflect.InvocationTargetException;
 
 import gnu.jemacs.buffer.*;
 import gnu.mapping.*;
+import gnu.kawa.io.InPort;
 import gnu.lists.CharSeq;
-import javax.swing.text.*;
 import java.awt.Color;
+import java.io.*;
+import java.lang.reflect.InvocationTargetException;
+import javax.swing.text.*;
 
 /** An Emacs buffer implemented using the Swing toolkits. */
 

@@ -2,10 +2,11 @@
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.kawa.sax;
-import org.xml.sax.*;
+import gnu.kawa.io.LineBufferedReader;
 import gnu.xml.*;
-import java.io.*;
 import gnu.text.*;
+import java.io.*;
+import org.xml.sax.*;
 
 /** An implementation of SAX2 XMLReader.
  */

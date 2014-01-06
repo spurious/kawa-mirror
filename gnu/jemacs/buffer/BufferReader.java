@@ -1,6 +1,8 @@
 package gnu.jemacs.buffer;
 import gnu.mapping.*;
 import java.io.*;
+import gnu.kawa.io.InPort;
+import gnu.kawa.io.NullReader;
 import gnu.lists.CharBuffer;
 import gnu.text.*;
 
@@ -12,7 +14,7 @@ public class BufferReader extends InPort
 
   public BufferReader(CharBuffer content, Path path, int start, int count)
   {
-    super(gnu.text.NullReader.nullReader, path);
+    super(NullReader.nullReader, path);
     this.content = content;
     buffer = content.getArray();
     rangeStart = start;

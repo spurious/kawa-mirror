@@ -5,7 +5,8 @@ import java.text.Format;
 import java.text.FieldPosition;
 import java.text.ParseException;
 import gnu.math.*;
-import gnu.mapping.OutPort;
+import gnu.kawa.io.OutPort;
+import gnu.kawa.io.PrettyWriter;
 
 /** A representation of a parsed Common Lisp-style format. */
 
@@ -676,7 +677,8 @@ class LispNewlineFormat extends ReportFormat
     = System.getProperty("line.separator", "\n");
 
   /** One of NEWLINE_LITERAL, NEWLINE_LINEAR, NEWLINE_FILL, NEWLINE_MISER
-   * or NEWLINE_MANDATORY.  These are defined in gnu.text.PrettyWriter. */
+   * or NEWLINE_MANDATORY.  These are defined in gnu.kawa.io.PrettyWriter.
+   */
   int kind;
 
   int count;

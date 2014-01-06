@@ -8,6 +8,7 @@ import gnu.text.*;
 import gnu.lists.*;
 import gnu.bytecode.*;
 import gnu.mapping.EnvironmentKey;
+import gnu.kawa.io.InPort;
 import gnu.kawa.reflect.StaticFieldLocation;
 import java.util.HashMap;
 import kawa.lang.Translator; // FIXME
@@ -225,12 +226,12 @@ public abstract class LispLanguage extends Language
             types.put("list", LangObjType.listType);
             types.put("function", ClassType.make("gnu.mapping.Procedure"));
             types.put("procedure", LangObjType.procedureType);
-            types.put("input-port", ClassType.make("gnu.mapping.InPort"));
-            types.put("output-port", ClassType.make("gnu.mapping.OutPort"));
+            types.put("input-port", ClassType.make("gnu.kawa.io.InPort"));
+            types.put("output-port", ClassType.make("gnu.kawa.io.OutPort"));
             types.put("string-output-port",
-                      ClassType.make("gnu.mapping.CharArrayOutPort"));
+                      ClassType.make("gnu.kawa.io.CharArrayOutPort"));
             types.put("string-input-port",
-                      ClassType.make("gnu.mapping.CharArrayInPort"));
+                      ClassType.make("gnu.kawa.io.CharArrayInPort"));
             types.put("record", ClassType.make("kawa.lang.Record"));
             types.put("type", LangObjType.typeType);
             types.put("class-type", LangObjType.typeClassType);

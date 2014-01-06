@@ -1,3 +1,12 @@
+2014-01-06  Per Bothner  <per@bothner.com>
+
+	* LineBufferedReader.java: Moved to new package gnu.kawa.io.
+	* LineInputStreamReader.java: Likewise.
+	* NullReader.java: Likewise.
+	* PrettyWriter.java: Likewise.
+	* QueueReader.java: Likewise.
+	* WriterManager.java: Likewise.
+
 2014-01-04  Per Bothner  <per@bothner.com>
 
 	* LineBufferedReader.java (setSaveStart): New method.

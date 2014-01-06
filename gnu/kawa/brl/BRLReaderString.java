@@ -5,7 +5,8 @@ package gnu.kawa.brl;
 // See the file COPYING for license terms.
 
 import gnu.text.*;
-import gnu.mapping.InPort;
+import gnu.kawa.io.InPort;
+import gnu.kawa.io.LineBufferedReader;
 import gnu.lists.*;
 
 public class BRLReaderString extends gnu.kawa.lispexpr.ReadTableEntry

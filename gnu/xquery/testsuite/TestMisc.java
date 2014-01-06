@@ -1,6 +1,9 @@
 package gnu.xquery.testsuite;
 import gnu.expr.*;
 import gnu.mapping.*;
+import gnu.kawa.io.CharArrayInPort;
+import gnu.kawa.io.CharArrayOutPort;
+import gnu.kawa.io.InPort;
 import gnu.xquery.lang.*;
 import gnu.text.*;
 

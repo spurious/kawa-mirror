@@ -3,6 +3,8 @@
 
 package gnu.expr;
 import gnu.bytecode.*;
+import gnu.kawa.functions.*;
+import gnu.kawa.io.OutPort;
 import gnu.mapping.*;
 import gnu.text.SourceLocator;
 import gnu.math.*;
@@ -10,7 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.lang.reflect.Proxy;
 import java.lang.annotation.ElementType;
-import gnu.kawa.functions.*;
 
 /**
  * The static information associated with a local variable binding.

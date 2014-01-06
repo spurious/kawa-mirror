@@ -5,6 +5,8 @@ import gnu.text.Printable;
 import gnu.text.SourceLocator;
 import gnu.lists.Consumer;
 import java.io.PrintWriter;
+import gnu.kawa.io.CharArrayOutPort;
+import gnu.kawa.io.OutPort;
 import gnu.kawa.util.IdentityHashTable;
 import gnu.kawa.reflect.OccurrenceType;
 

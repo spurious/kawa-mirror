@@ -1,5 +1,6 @@
-package gnu.mapping;
+package gnu.kawa.io;
 import java.io.*;
+import gnu.mapping.Procedure;
 import gnu.text.*;
 
 /** An interactive input-port.

@@ -4,6 +4,7 @@ import java.io.*;
 import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.kawa.functions.DisplayFormat;
+import gnu.kawa.io.OutPort;
 import java.util.*;
 
 /** The translated form of a <code>(syntax <var>template</var>)</code>. */

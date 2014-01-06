@@ -1,4 +1,5 @@
 package gnu.expr;
+import gnu.kawa.io.OutPort;
 import gnu.mapping.*;
 import gnu.lists.Consumer;
 

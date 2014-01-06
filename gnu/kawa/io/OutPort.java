@@ -1,5 +1,7 @@
-package gnu.mapping;
+package gnu.kawa.io;
 import java.io.*;
+import gnu.mapping.Environment;
+import gnu.mapping.ThreadLocation;
 import gnu.text.*;
 import gnu.lists.*;
 

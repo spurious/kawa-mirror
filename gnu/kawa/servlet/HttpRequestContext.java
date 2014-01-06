@@ -7,7 +7,7 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 import gnu.lists.*;
-import gnu.mapping.InPort;
+import gnu.kawa.io.InPort;
 
 /** A representation of an http request as it is being handled.
  * It abstracts over different http server's API - specially, there are are

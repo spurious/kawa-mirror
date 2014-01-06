@@ -13,9 +13,10 @@ import gnu.expr.Keyword;
 import gnu.kawa.xml.KNode;
 import gnu.xml.XMLPrinter;
 /* #endif */
+import gnu.kawa.io.OutPort;
+import gnu.kawa.io.PrettyWriter;
 import gnu.kawa.xml.XmlNamespace;
 import gnu.kawa.lispexpr.LispLanguage;
-import gnu.text.PrettyWriter;
 import gnu.text.Printable;
 /* #ifdef use:java.util.regex */
 import java.util.regex.*;

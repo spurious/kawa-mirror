@@ -1,4 +1,5 @@
 package gnu.kawa.util;
+import gnu.kawa.io.*;
 import gnu.mapping.*;
 import java.io.*;
 import java.net.*;

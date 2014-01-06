@@ -1,6 +1,7 @@
 package kawa.lang;
 
 import gnu.kawa.functions.DisplayFormat;
+import gnu.kawa.io.CharArrayOutPort;
 import gnu.lists.LList;
 import gnu.mapping.*;
 

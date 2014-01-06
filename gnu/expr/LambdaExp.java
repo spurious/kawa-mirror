@@ -5,8 +5,9 @@ package gnu.expr;
 import gnu.bytecode.*;
 import gnu.mapping.*;
 import gnu.lists.LList;
-import java.util.*;
 import gnu.kawa.functions.Convert;
+import gnu.kawa.io.OutPort;
+import java.util.*;
 
 /**
  * Class used to implement Scheme lambda expressions.

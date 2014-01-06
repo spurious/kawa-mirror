@@ -4,6 +4,7 @@ import kawa.standard.Scheme;
 import gnu.lists.*;
 import gnu.xml.*;
 import gnu.expr.*;
+import gnu.kawa.io.InPort;
 import gnu.kawa.lispexpr.ReadTable;
 
 public class BRL extends Scheme

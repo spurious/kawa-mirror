@@ -2,7 +2,7 @@ package gnu.xquery.testsuite;
 import java.util.Stack;
 import gnu.lists.*;
 import gnu.xml.*;
-import gnu.mapping.CharArrayOutPort;
+import gnu.kawa.io.CharArrayOutPort;
 import gnu.kawa.xml.Document;
 
 /** Run a suite of XQuery tests, as read from an xml file. */

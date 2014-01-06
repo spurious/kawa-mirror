@@ -1,3 +1,14 @@
+2014-01-06  Per Bothner  <per@bothner.com>
+
+	* BinaryInPort.java: Moved to new package gnu.kawa.io.
+	* BinaryOutPort.java: Likewise.
+	* CharArrayInPort.java: Likewise.
+	* CharArrayOutPort.java: Likewise.
+	* InPort.java: Likewise.
+	* OutPort.java: Likewise.
+	* LogWriter.java: Likewise.
+	* TtyInPort.java: Likewise.
+
 2013-12-30  Per Bothner  <per@bothner.com>
 
 	* BinaryInPort.java (class BinaryInputStream): New member class,

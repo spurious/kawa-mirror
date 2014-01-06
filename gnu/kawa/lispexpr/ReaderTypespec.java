@@ -3,7 +3,8 @@
 
 package gnu.kawa.lispexpr;
 import gnu.text.*;
-import gnu.mapping.InPort;
+import gnu.kawa.io.InPort;
+import gnu.kawa.io.LineBufferedReader;
 
 /** Reader table entry for '<' to treat '[' and ']' as constituents.
  * Lets us use (say) '<char[]>' as a token even if  '[' and ']' are parens.

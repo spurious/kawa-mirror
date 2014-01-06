@@ -2,6 +2,7 @@
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.kawa.lispexpr;
+import gnu.kawa.io.LineBufferedReader;
 import gnu.text.*;
 import gnu.mapping.Values;
 

@@ -1,6 +1,8 @@
 package kawa;
 
 import java.io.Reader;
+import gnu.kawa.io.OutPort;
+import gnu.kawa.io.TtyInPort;
 import gnu.mapping.*;
 import gnu.text.Path;
 

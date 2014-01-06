@@ -3,7 +3,7 @@
 
 package gnu.expr;
 import gnu.bytecode.*;
-import gnu.mapping.*;
+import gnu.kawa.io.OutPort;
 
 /**
  * Class used to implement "fluid-let" for Scheme and "let" for Emacs.

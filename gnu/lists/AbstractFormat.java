@@ -1,7 +1,9 @@
 package gnu.lists;
 import gnu.mapping.*;
-import java.text.FieldPosition;
+import gnu.kawa.io.CharArrayOutPort;
+import gnu.kawa.io.OutPort;
 import gnu.text.Path;
+import java.text.FieldPosition;
 
 public abstract class AbstractFormat extends java.text.Format
 {

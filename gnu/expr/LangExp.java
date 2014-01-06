@@ -2,6 +2,7 @@
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.expr;
+import gnu.kawa.io.OutPort;
 import gnu.mapping.*;
 
 /** A language-specific expression. */

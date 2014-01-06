@@ -1,4 +1,4 @@
-package gnu.mapping;
+package gnu.kawa.io;
 import gnu.text.*;
 import gnu.lists.*;
 

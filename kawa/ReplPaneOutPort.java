@@ -4,6 +4,7 @@ import javax.swing.*;
 import javax.swing.text.*;
 import gnu.mapping.*;
 import gnu.text.Path;
+import gnu.kawa.io.OutPort;
 import gnu.kawa.models.Paintable;
 import gnu.kawa.models.Viewable;
 import gnu.kawa.swingviews.SwingDisplay;

@@ -1,11 +1,11 @@
 package kawa.standard;
 
-import gnu.text.Char;
+import gnu.kawa.io.InPort;
 import gnu.lists.*;
 import gnu.mapping.Procedure0or1;
 import gnu.mapping.WrongType;
-import gnu.mapping.InPort;
-import gnu.text.LineBufferedReader;
+import gnu.text.Char;
+import gnu.kawa.io.LineBufferedReader;
 import java.io.Reader;
 import java.io.InputStream;
 

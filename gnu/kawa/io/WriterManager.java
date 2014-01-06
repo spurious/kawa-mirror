@@ -1,9 +1,8 @@
 // Copyright (c) 2001, 2006  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
-package gnu.text;
+package gnu.kawa.io;
 import java.io.*;
-import gnu.mapping.OutPort;
 
 /** Manages a collection of Writers, handling automatic closing.
  * This class is useful for making sure that a Writer is closed (and its

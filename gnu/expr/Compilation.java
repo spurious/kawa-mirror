@@ -11,6 +11,7 @@ import gnu.text.*;
 import java.util.zip.*;
 import java.util.Stack;
 import gnu.kawa.functions.Convert;
+import gnu.kawa.io.OutPort;
 import gnu.kawa.reflect.LazyType;
 import gnu.lists.Pair;
 import kawa.lang.Translator.FormStack;

@@ -3,7 +3,13 @@
 
 package gnu.expr;
 import gnu.bytecode.*;
-import gnu.mapping.*;
+import gnu.kawa.io.OutPort;
+import gnu.mapping.CallContext;
+import gnu.mapping.Environment;
+import gnu.mapping.EnvironmentKey;
+import gnu.mapping.Procedure;
+import gnu.mapping.Symbol;
+import gnu.mapping.UnboundLocationException;
 import gnu.math.IntNum;
 
 /**

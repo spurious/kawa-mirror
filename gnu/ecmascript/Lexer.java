@@ -1,6 +1,8 @@
 package gnu.ecmascript;
-import gnu.mapping.*;
 import gnu.expr.*;
+import gnu.kawa.io.InPort;
+import gnu.kawa.io.OutPort;
+import gnu.mapping.*;
 import gnu.lists.Sequence;
 import gnu.text.Char;
 

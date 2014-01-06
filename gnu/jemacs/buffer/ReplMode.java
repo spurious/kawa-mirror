@@ -1,8 +1,11 @@
 package gnu.jemacs.buffer;
 import gnu.mapping.*;
 import gnu.expr.Language;
-import java.io.*;
+import gnu.kawa.io.InPort;
+import gnu.kawa.io.OutPort;
+import gnu.kawa.io.TtyInPort;
 import gnu.text.*;
+import java.io.*;
 
 public class ReplMode extends ProcessMode
 {

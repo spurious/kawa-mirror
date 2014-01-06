@@ -1,7 +1,8 @@
 // Copyright (c) 2004, 2007  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
-package gnu.text;
+package gnu.kawa.io;
+import gnu.text.Path;
 import java.io.*;
 
 /** A LineNumberReader with some extra features:

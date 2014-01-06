@@ -3,6 +3,7 @@
 
 package gnu.kawa.servlet;
 import gnu.expr.*;
+import gnu.kawa.io.InPort;
 import gnu.mapping.*;
 import gnu.text.*;
 import java.io.*;

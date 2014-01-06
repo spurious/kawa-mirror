@@ -8,14 +8,14 @@
 (define (open-input-file (name :: path)) :: <input-port>
   (invoke-static <input-port> 'openFile name))
 
-(define (open-binary-input-file (name :: path)) ::gnu.mapping.BinaryInPort
-  (gnu.mapping.BinaryInPort:openFile name))
+(define (open-binary-input-file (name :: path)) ::gnu.kawa.io.BinaryInPort
+  (gnu.kawa.io.BinaryInPort:openFile name))
 
 (define (open-output-file (name :: path)) :: <output-port>
   (invoke-static <output-port> 'openFile name))
 
-(define (open-binary-output-file (name ::path)) ::gnu.mapping.BinaryOutPort
-  (gnu.mapping.BinaryOutPort:openFile name))
+(define (open-binary-output-file (name ::path)) ::gnu.kawa.io.BinaryOutPort
+  (gnu.kawa.io.BinaryOutPort:openFile name))
 
 (define (call-with-port (port ::java.io.Closeable) (proc ::procedure))
   (try-finally
@@ -35,25 +35,25 @@
      (close-output-port port))))
 
 (define (with-input-from-file (pathname :: path) (proc :: <procedure>))
-  (let ((port :: <input-port> (gnu.mapping.InPort:openFile pathname))
-	(save :: <input-port> (gnu.mapping.InPort:inDefault)))
+  (let ((port :: <input-port> (gnu.kawa.io.InPort:openFile pathname))
+	(save :: <input-port> (gnu.kawa.io.InPort:inDefault)))
     (try-finally
      (begin
-       (gnu.mapping.InPort:setInDefault port)
+       (gnu.kawa.io.InPort:setInDefault port)
        (proc))
      (begin
-       (gnu.mapping.InPort:setInDefault save)
+       (gnu.kawa.io.InPort:setInDefault save)
        (*:close port)))))       
 
 (define (with-output-to-file (path :: path) (proc :: <procedure>))
-  (let* ((port :: <output-port> (gnu.mapping.OutPort:openFile path))
-	 (save :: <output-port> (gnu.mapping.OutPort:outDefault)))
+  (let* ((port :: <output-port> (gnu.kawa.io.OutPort:openFile path))
+	 (save :: <output-port> (gnu.kawa.io.OutPort:outDefault)))
     (try-finally
      (begin
-       (gnu.mapping.OutPort:setOutDefault port)
+       (gnu.kawa.io.OutPort:setOutDefault port)
        (proc))
      (begin
-       (gnu.mapping.OutPort:setOutDefault save)
+       (gnu.kawa.io.OutPort:setOutDefault save)
        (invoke port 'close)))))
 
 (define (input-port? x) :: <boolean>
@@ -66,7 +66,7 @@
   (or (input-port? obj) (output-port? obj)))
 
 (define (binary-port? obj) ::boolean
-  (or (gnu.mapping.BinaryInPort? obj) (gnu.mapping.BinaryOutPort? obj)))
+  (or (gnu.kawa.io.BinaryInPort? obj) (gnu.kawa.io.BinaryOutPort? obj)))
 
 (define (port? x)
   (or (input-port? x) (output-port? x)))
@@ -99,7 +99,7 @@
   (port:append str start end))
 
 (define (write-u8 byte::int #!optional (port (current-output-port))) ::void
-  ((gnu.mapping.BinaryOutPort:asOutputStream port):write byte))
+  ((gnu.kawa.io.BinaryOutPort:asOutputStream port):write byte))
 
 (define (write-bytevector (bytes ::bytevector)
                           #!optional
@@ -108,11 +108,11 @@
                           (end ::int (bytes:size)))
   ::void
   (bytes:writeTo start (- end start)
-                 (gnu.mapping.BinaryOutPort:asOutputStream port)))
+                 (gnu.kawa.io.BinaryOutPort:asOutputStream port)))
 
 ;; SRFI-6
 (define (open-input-string (str ::string)) ::string-input-port
-  (gnu.mapping.CharArrayInPort:make str))
+  (gnu.kawa.io.CharArrayInPort:make str))
 
 (define (open-output-string) :: <string-output-port>
   (<string-output-port>))
@@ -121,27 +121,27 @@
   (<gnu.lists.FString> (output-port:toCharArray)))
 
 (define (open-input-bytevector (bvector ::bytevector))
-  ::gnu.mapping.BinaryInPort
-  (gnu.mapping.BinaryInPort (bvector:getBuffer) (bvector:size) "<bytevector>"))
+  ::gnu.kawa.io.BinaryInPort
+  (gnu.kawa.io.BinaryInPort (bvector:getBuffer) (bvector:size) "<bytevector>"))
 
-(define (open-output-bytevector) ::gnu.mapping.BinaryOutPort
+(define (open-output-bytevector) ::gnu.kawa.io.BinaryOutPort
   (let* ((bo (java.io.ByteArrayOutputStream))
-         (out (gnu.mapping.BinaryOutPort bo "<bytevector>")))
+         (out (gnu.kawa.io.BinaryOutPort bo "<bytevector>")))
         out))
 
-(define (get-output-bytevector port::gnu.mapping.BinaryOutPort) ::bytevector
+(define (get-output-bytevector port::gnu.kawa.io.BinaryOutPort) ::bytevector
   (let ((bo ::java.io.ByteArrayOutputStream (port:getOutputStream)))
     (gnu.lists.U8Vector (bo:toByteArray))))
 
 (define (call-with-input-string (str :: <string>) (proc :: <procedure>))
-  (let* ((port ::string-input-port (gnu.mapping.CharArrayInPort:make str))
+  (let* ((port ::string-input-port (gnu.kawa.io.CharArrayInPort:make str))
 	 (result (proc port)))
     (close-input-port port)
     result))
 
 (define (call-with-output-string (proc :: <procedure>))
-  (let ((port :: <gnu.mapping.CharArrayOutPort>
-	      (make <gnu.mapping.CharArrayOutPort>)))
+  (let ((port :: <gnu.kawa.io.CharArrayOutPort>
+	      (make <gnu.kawa.io.CharArrayOutPort>)))
     (proc port)
     (let ((chars :: <char[]> (invoke port 'toCharArray)))
       (invoke port 'close)
@@ -185,20 +185,20 @@
               (else (loop (+ seen n))))))))
 
 (define (read-u8 #!optional (port (current-input-port)))
-  (let ((b ::int (if (gnu.mapping.BinaryInPort? port)
-                     ((as gnu.mapping.BinaryInPort port):readByte)
+  (let ((b ::int (if (gnu.kawa.io.BinaryInPort? port)
+                     ((as gnu.kawa.io.BinaryInPort port):readByte)
                      ((as java.io.InputStream port):read))))
     (if (< b 0) #!eof b)))
 
 (define (peek-u8 #!optional (port (current-input-port)))
-  (let ((b ::int (if (gnu.mapping.BinaryInPort? port)
-                     ((as gnu.mapping.BinaryInPort port):peekByte)
+  (let ((b ::int (if (gnu.kawa.io.BinaryInPort? port)
+                     ((as gnu.kawa.io.BinaryInPort port):peekByte)
                      (kawa.standard.readchar:readByte port #t))))
     (if (< b 0) #!eof b)))
 
 (define (u8-ready? #!optional (port (current-input-port)))
-  (if (gnu.mapping.BinaryInPort? port)
-      ((as gnu.mapping.BinaryInPort port):ready)
+  (if (gnu.kawa.io.BinaryInPort? port)
+      ((as gnu.kawa.io.BinaryInPort port):ready)
       (> ((as java.io.InputStream port):available) 0)))
   
 (define (read-bytevector (k ::int)
@@ -206,8 +206,8 @@
   (let ((arr (byte[] length: k)))
     (let loop ((seen ::int 0))
       (let* ((m ::int (- k seen))
-             (n ::int (if (gnu.mapping.BinaryInPort? port)
-                          ((as gnu.mapping.BinaryInPort port):readBytes
+             (n ::int (if (gnu.kawa.io.BinaryInPort? port)
+                          ((as gnu.kawa.io.BinaryInPort port):readBytes
                            arr seen m)
                           ((as java.io.InputStream port):read arr seen m))))
         (cond ((< n 0)
@@ -226,8 +226,8 @@
   (let loop ((seen ::int 0))
     (let* ((want ::int (- end start seen))
            (is ::java.io.InputStream
-               (if (gnu.mapping.BinaryInPort? port)
-                   ((as gnu.mapping.BinaryInPort port):getInputStream)
+               (if (gnu.kawa.io.BinaryInPort? port)
+                   ((as gnu.kawa.io.BinaryInPort port):getInputStream)
                    port))
            (n ::int (bv:readFrom (+ start seen) want is)))
       (cond ((< n 0)
@@ -284,14 +284,14 @@
    port))
 
 (define (set-port-line! port line)
-  ((primitive-virtual-method <gnu.text.LineBufferedReader> "setLineNumber"
+  ((primitive-virtual-method <gnu.kawa.io.LineBufferedReader> "setLineNumber"
 			     <void> (<int>))
    port line))
 
 (define-procedure port-line
   setter: set-port-line!
   (begin
-    (define (port-line (port :: <gnu.text.LineBufferedReader>))
+    (define (port-line (port :: <gnu.kawa.io.LineBufferedReader>))
       (invoke port 'getLineNumber))
     port-line))
 
@@ -301,12 +301,12 @@
 (define-procedure input-port-line-number
   setter: set-input-port-line-number!
   (begin
-    (define (input-port-line-number (port :: <gnu.text.LineBufferedReader>))
+    (define (input-port-line-number (port :: <gnu.kawa.io.LineBufferedReader>))
       (+ 1 (port-line port)))
     input-port-line-number))
 
 (define (port-column port)
-  ((primitive-virtual-method <gnu.text.LineBufferedReader>
+  ((primitive-virtual-method <gnu.kawa.io.LineBufferedReader>
 			     "getColumnNumber" <int> ())
    port))
 
@@ -324,13 +324,13 @@
 		       "|# "))))
 
 (define (set-input-port-prompter!
-	 (port :: <gnu.mapping.TtyInPort>) (prompter :: <procedure>))
+	 (port :: <gnu.kawa.io.TtyInPort>) (prompter :: <procedure>))
   (invoke port 'setPrompter prompter))
 
 (define-procedure input-port-prompter
   setter: set-input-port-prompter!
   (begin
-    (define (input-port-prompter (port :: <gnu.mapping.TtyInPort>))
+    (define (input-port-prompter (port :: <gnu.kawa.io.TtyInPort>))
       (invoke port 'getPrompter))
     input-port-prompter))
 
@@ -356,7 +356,7 @@
 	 (primitive-throw ex)))))
 
 (define (read-line #!optional
-		   (port :: <gnu.text.LineBufferedReader> (current-input-port))
+		   (port :: <gnu.kawa.io.LineBufferedReader> (current-input-port))
 		   (handling :: <symbol> 'trim))
   (kawa.standard.read_line:apply port handling))
 

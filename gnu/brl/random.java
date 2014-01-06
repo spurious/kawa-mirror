@@ -7,7 +7,7 @@ package gnu.brl;
 import kawa.lang.*;
 import gnu.mapping.Procedure1;
 import gnu.mapping.WrongType;
-import gnu.mapping.InPort;
+import gnu.kawa.io.InPort;
 import gnu.math.*;
 
 public class random extends Procedure1 {

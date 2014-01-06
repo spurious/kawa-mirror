@@ -6,6 +6,7 @@ import gnu.mapping.*;
 import gnu.mapping.Location; // As opposed to gnu.bytecode.Location
 import gnu.bytecode.*;
 import gnu.kawa.functions.AddOp;
+import gnu.kawa.io.OutPort;
 import gnu.math.IntNum;
 
 /** An Expression to set (bind) or define a new value to a named variable.

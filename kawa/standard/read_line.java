@@ -1,6 +1,6 @@
 package kawa.standard;
+import gnu.kawa.io.LineBufferedReader;
 import gnu.lists.FString;
-import gnu.text.LineBufferedReader;
 import gnu.mapping.*;
 
 public class read_line

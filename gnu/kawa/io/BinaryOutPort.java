@@ -1,4 +1,4 @@
-package gnu.mapping;
+package gnu.kawa.io;
 import java.io.*;
 import gnu.text.*;
 import java.nio.charset.Charset;

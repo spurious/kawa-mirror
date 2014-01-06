@@ -2,6 +2,9 @@ package gnu.expr;
 import javax.script.*;
 import java.io.*;
 import gnu.mapping.*;
+import gnu.kawa.io.CharArrayInPort;
+import gnu.kawa.io.InPort;
+import gnu.kawa.io.OutPort;
 import gnu.text.*;
 
 public class KawaScriptEngine extends AbstractScriptEngine

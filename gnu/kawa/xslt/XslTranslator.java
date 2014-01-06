@@ -10,6 +10,8 @@ import gnu.text.*;
 import gnu.mapping.*;
 import java.util.Stack;
 import gnu.xml.*;
+import gnu.kawa.io.CharArrayInPort;
+import gnu.kawa.io.InPort;
 import gnu.kawa.xml.*;
 import gnu.xquery.lang.*;
 import gnu.kawa.functions.AppendValues;

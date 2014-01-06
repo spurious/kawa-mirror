@@ -4,6 +4,7 @@
 package gnu.xml;
 import gnu.lists.*;
 import gnu.text.*;
+import gnu.kawa.io.LineBufferedReader;
 import gnu.mapping.Symbol;
 /* #ifdef SAX2 */
 import org.xml.sax.*;

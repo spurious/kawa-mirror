@@ -58,12 +58,12 @@ public class BufferReader extends InPort
 
   public void reset ()  throws IOException
   {
-    if (readAheadLimit <= 0)
+    if (readAheadLimit < 0)
       throw new IOException ("mark invalid");
     if (pos >= content.gapEnd && markPos <= content.gapStart)
       limit = content.gapEnd;
     pos = markPos;
-    readAheadLimit = 0;
+    readAheadLimit = -1;
   }
 
   public int getLineNumber ()

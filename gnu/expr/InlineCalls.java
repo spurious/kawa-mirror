@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.lang.reflect.Proxy;
 import java.lang.annotation.ElementType;
 /* #ifdef use:java.lang.invoke */
-// import java.lang.invoke.*;
+import java.lang.invoke.*;
 /* #endif */
 
 /**
@@ -822,28 +822,28 @@ public class InlineCalls extends ExpExpVisitor<Type> {
   }
 
   /* #ifdef use:java.lang.invoke */
-  // static final MethodType validateApplyMType =
-  //   MethodType.methodType(gnu.expr.Expression.class,
-  //                            gnu.expr.ApplyExp.class,
-  //                            gnu.expr.InlineCalls.class,
-  //                            gnu.bytecode.Type.class,
-  //                            gnu.mapping.Procedure.class);
+  static final MethodType validateApplyMType =
+    MethodType.methodType(gnu.expr.Expression.class,
+                             gnu.expr.ApplyExp.class,
+                             gnu.expr.InlineCalls.class,
+                             gnu.bytecode.Type.class,
+                             gnu.mapping.Procedure.class);
   /* #else */
-  private static Class[] inlinerMethodArgTypes;
-  private static synchronized Class[] getInlinerMethodArgTypes()
-    throws Exception
-  {
-    Class[] t = inlinerMethodArgTypes;
-    if (t == null)
-      {
-        t = new Class[] { Class.forName("gnu.expr.ApplyExp"),
-                         Class.forName("gnu.expr.InlineCalls"),
-                         Class.forName("gnu.bytecode.Type"),
-                         Class.forName("gnu.mapping.Procedure") };
-        inlinerMethodArgTypes = t;
-      }
-    return t;
-  }
+  // private static Class[] inlinerMethodArgTypes;
+  // private static synchronized Class[] getInlinerMethodArgTypes()
+  //   throws Exception
+  // {
+  //   Class[] t = inlinerMethodArgTypes;
+  //   if (t == null)
+  //     {
+  //       t = new Class[] { Class.forName("gnu.expr.ApplyExp"),
+  //                        Class.forName("gnu.expr.InlineCalls"),
+  //                        Class.forName("gnu.bytecode.Type"),
+  //                        Class.forName("gnu.mapping.Procedure") };
+  //       inlinerMethodArgTypes = t;
+  //     }
+  //   return t;
+  // }
   /* #endif */
 
   public Expression maybeInline (ApplyExp exp, Type required, Procedure proc)
@@ -859,9 +859,9 @@ public class InlineCalls extends ExpExpVisitor<Type> {
                 String inliners = (String) inliner;
                 int colon = inliners.indexOf(':');
                 /* #ifdef use:java.lang.invoke */
-                // MethodHandle method = null;
+                MethodHandle method = null;
                 /* #else */
-                java.lang.reflect.Method method = null;
+                // java.lang.reflect.Method method = null;
                 /* #endif */
                 if (colon > 0)
                   {
@@ -869,9 +869,9 @@ public class InlineCalls extends ExpExpVisitor<Type> {
                     String mname = inliners.substring(colon+1);
                     Class clas = Class.forName(cname, true, proc.getClass().getClassLoader());
                     /* #ifdef use:java.lang.invoke */
-                    // method = MethodHandles.lookup().findStatic(clas, mname, validateApplyMType);
+                    method = MethodHandles.lookup().findStatic(clas, mname, validateApplyMType);
                     /* #else */
-                    method = clas.getDeclaredMethod(mname, getInlinerMethodArgTypes());
+                    // method = clas.getDeclaredMethod(mname, getInlinerMethodArgTypes());
                     /* #endif */
                   }
                 if (method == null)
@@ -885,16 +885,16 @@ public class InlineCalls extends ExpExpVisitor<Type> {
         if (inliner != null)
           {
             /* #ifdef use:java.lang.invoke */
-            // if (inliner instanceof MethodHandle)
-            //   return (Expression) ((MethodHandle) inliner).invokeExact(exp, this, required, proc);
+            if (inliner instanceof MethodHandle)
+              return (Expression) ((MethodHandle) inliner).invokeExact(exp, this, required, proc);
             /* #endif */
             Object[] vargs = new Object[] { exp, this, required, proc };
             if (inliner instanceof Procedure)
               return (Expression) ((Procedure) inliner).applyN(vargs);
             /* #ifndef use:java.lang.invoke */
-            else if (inliner instanceof java.lang.reflect.Method)
-              return (Expression) ((java.lang.reflect.Method) inliner)
-                .invoke(null, vargs);
+            // else if (inliner instanceof java.lang.reflect.Method)
+            //   return (Expression) ((java.lang.reflect.Method) inliner)
+            //     .invoke(null, vargs);
             /* #endif */
           }
       }

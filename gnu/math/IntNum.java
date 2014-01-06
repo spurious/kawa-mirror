@@ -1350,9 +1350,9 @@ public class IntNum extends RatNum implements Externalizable
     if (len + radix <= 28)
       {
         /* #ifndef JAVA7 */
-        if (len > 1 && s.charAt(0) == '+'
-            && Character.digit(s.charAt(1), radix) >= 0)
-          s = s.substring(1);
+        // if (len > 1 && s.charAt(0) == '+'
+        //     && Character.digit(s.charAt(1), radix) >= 0)
+        //   s = s.substring(1);
         /* #endif */
         return IntNum.make (Long.parseLong (s, radix));
       }

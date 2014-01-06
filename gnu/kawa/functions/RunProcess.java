@@ -19,7 +19,7 @@ import java.io.*;
 import java.util.*;
 import java.util.Map;
 /* #ifdef JAVA7 */
-// import java.lang.ProcessBuilder.Redirect;
+import java.lang.ProcessBuilder.Redirect;
 /* #endif */
 
 /** The Kawa run-process command builds and runs a Process.
@@ -85,28 +85,28 @@ public class RunProcess extends MethodProc {
                             : OutPort.errDefault();
                     }
                     /* #ifdef JAVA7 */
-                    // else if (kval == inheritSymbol) {
-                    //     newRedirect = Redirect.INHERIT;
-                    // }
-                    // else if (kval == pipeSymbol) {
-                    //     newRedirect = Redirect.PIPE;
-                    // }
-                    /* #else */
+                    else if (kval == inheritSymbol) {
+                        newRedirect = Redirect.INHERIT;
+                    }
                     else if (kval == pipeSymbol) {
-                        newRedirect = kval;
+                        newRedirect = Redirect.PIPE;
                     }
-                    else if (kval == inheritSymbol && ! inSpecifier) {
-                        newRedirect = outSpecifier ? OutPort.getSystemOut()
-                            : OutPort.getSystemErr();
-                    }
+                    /* #else */
+                    // else if (kval == pipeSymbol) {
+                    //     newRedirect = kval;
+                    // }
+                    // else if (kval == inheritSymbol && ! inSpecifier) {
+                    //     newRedirect = outSpecifier ? OutPort.getSystemOut()
+                    //         : OutPort.getSystemErr();
+                    // }
                     /* #endif */
                     else if (! outSpecifier && ! inSpecifier
                              && kval == outSymbol) { // i.e. err-to: 'out
                         /* #ifdef JAVA7 */
-                        // builder.redirectErrorStream(true);
+                        builder.redirectErrorStream(true);
                         /* #else */
-                        error("err-to: 'out redirect requires Java 7");
-                        newRedirect = null;
+                        // error("err-to: 'out redirect requires Java 7");
+                        // newRedirect = null;
                         /* #endif */
                     } else if (inSpecifier
                                ? (kval instanceof InputStream
@@ -119,18 +119,18 @@ public class RunProcess extends MethodProc {
                         if (fpath != null) {
                             File file = fpath.toFile();
                             /* #ifdef JAVA7 */
-                            // newRedirect = inSpecifier ? Redirect.from(file)
-                            //          : Redirect.to(file);
+                            newRedirect = inSpecifier ? Redirect.from(file)
+                                     : Redirect.to(file);
                             /* #else */
-                            if (inSpecifier) {
-                                inputBytes = new FileInputStream(file);
-                            } else {
-                                newRedirect = new FileOutputStream(file, false);
-                                if (outSpecifier)
-                                    outNeedsClose = true;
-                                else
-                                    errNeedsClose = true;
-                            }
+                            // if (inSpecifier) {
+                            //     inputBytes = new FileInputStream(file);
+                            // } else {
+                            //     newRedirect = new FileOutputStream(file, false);
+                            //     if (outSpecifier)
+                            //         outNeedsClose = true;
+                            //     else
+                            //         errNeedsClose = true;
+                            // }
                             /* #endif */
                         } else
                             error("unimplemented keyword value for "+arg);
@@ -146,10 +146,10 @@ public class RunProcess extends MethodProc {
                     if (fpath != null) {
                         File file = fpath.toFile();
                         /* #ifdef JAVA7 */
-                        //     newRedirect =
-                        //         ProcessBuilder.Redirect.appendTo(file);
+                            newRedirect =
+                                ProcessBuilder.Redirect.appendTo(file);
                         /* #else */
-                        newRedirect = new FileOutputStream(file, true);
+                        // newRedirect = new FileOutputStream(file, true);
                         /* #endif */
                     } else
                         error("unimplemented keyword value for "+arg);
@@ -244,25 +244,25 @@ public class RunProcess extends MethodProc {
                  builder.directory(((FilePath) cur).toFile());
         }
         /* #ifdef JAVA7 */
-        // if (inRedirect instanceof ProcessBuilder.Redirect) {
-        //     builder.redirectInput((ProcessBuilder.Redirect)inRedirect);
-        // }
+        if (inRedirect instanceof ProcessBuilder.Redirect) {
+            builder.redirectInput((ProcessBuilder.Redirect)inRedirect);
+        }
         /* #else */
         /* #endif */
         if (errRedirect == null) {
             errRedirect = OutPort.errDefault();
         }
         /* #ifdef JAVA7 */
-        // if (outRedirect == OutPort.getSystemOut()) {
-        //     outRedirect = Redirect.INHERIT;
-        // }
-        // if (errRedirect == OutPort.getSystemErr()) {
-        //     errRedirect = Redirect.INHERIT;
-        // }
-        // if (outRedirect instanceof ProcessBuilder.Redirect)
-        //     builder.redirectOutput((ProcessBuilder.Redirect)outRedirect);
-        // if (errRedirect instanceof ProcessBuilder.Redirect)
-        //     builder.redirectError((ProcessBuilder.Redirect)errRedirect);
+        if (outRedirect == OutPort.getSystemOut()) {
+            outRedirect = Redirect.INHERIT;
+        }
+        if (errRedirect == OutPort.getSystemErr()) {
+            errRedirect = Redirect.INHERIT;
+        }
+        if (outRedirect instanceof ProcessBuilder.Redirect)
+            builder.redirectOutput((ProcessBuilder.Redirect)outRedirect);
+        if (errRedirect instanceof ProcessBuilder.Redirect)
+            builder.redirectError((ProcessBuilder.Redirect)errRedirect);
         /* #endif */
         final Process proc = builder.start();
         if (inRedirect instanceof Reader) {

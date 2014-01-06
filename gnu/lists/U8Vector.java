@@ -103,13 +103,13 @@ public class U8Vector extends ByteVector
     public String toUtf8(int start, int length) {
       if (start+length>size) throw new IndexOutOfBoundsException();
       /* #ifdef JAVA7 */  
-      // return new String(data, start, length, java.nio.charset.StandardCharsets.UTF_8);
+      return new String(data, start, length, java.nio.charset.StandardCharsets.UTF_8);
       /* #else */
-      try {
-        return new String(data, start, length, "UTF-8");
-      } catch (UnsupportedEncodingException ex) {
-          throw new RuntimeException(ex);
-      }
+      // try {
+      //   return new String(data, start, length, "UTF-8");
+      // } catch (UnsupportedEncodingException ex) {
+      //     throw new RuntimeException(ex);
+      // }
       /* #endif */
   }
 }

@@ -34,7 +34,7 @@ public class IfFeature
         /* #endif */
 
         /* #ifdef JAVA7 */
-        // coreFeatures.add("java-7");
+        coreFeatures.add("java-7");
         /* #endif */
 
         coreFeatures.add("kawa");

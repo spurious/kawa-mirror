@@ -6,7 +6,7 @@ import java.io.*;
 import java.net.*;
 import gnu.mapping.*;
 /* #ifdef JAVA7 */
-// import java.nio.file.Files;
+import java.nio.file.Files;
 /* #endif */
 import java.nio.charset.Charset;
  
@@ -421,31 +421,31 @@ implements javax.tools.FileObject
   }
 
     /* #ifdef JAVA7 */
-    // /** Convert if possible to a {@code java.nio.file.Path} instance.
-    //  * Use caution if this is a relative path and the {@code currentPath()}
-    //  * is not the default path, since {@code java.nio} assumes a relative path
-    //  * is relative to the default directory.
-    //  * Uses {@code java.nio.file.Paths#get(URI)}, and thus
-    //  * throws whatever that method throws.
-    //  * @throws FileSystemNotFoundException - no nio file system provider
-    //  *   was found for the URI scheme
-    //  */
-    // public java.nio.file.Path toNPath()
-    //     throws java.nio.file.FileSystemNotFoundException {
-    //     return java.nio.file.Paths.get(toUri());
-    // }
+    /** Convert if possible to a {@code java.nio.file.Path} instance.
+     * Use caution if this is a relative path and the {@code currentPath()}
+     * is not the default path, since {@code java.nio} assumes a relative path
+     * is relative to the default directory.
+     * Uses {@code java.nio.file.Paths#get(URI)}, and thus
+     * throws whatever that method throws.
+     * @throws FileSystemNotFoundException - no nio file system provider
+     *   was found for the URI scheme
+     */
+    public java.nio.file.Path toNPath()
+        throws java.nio.file.FileSystemNotFoundException {
+        return java.nio.file.Paths.get(toUri());
+    }
     /* #endif */
 
     public String probeContentType() {
         String contentType;
         /* #ifdef JAVA7 */
-        // try {
-        //     contentType = Files.probeContentType(getAbsolute().toNPath());
-        // } catch (Throwable ex) {
-        //     contentType = null;
-        // }
+        try {
+            contentType = Files.probeContentType(getAbsolute().toNPath());
+        } catch (Throwable ex) {
+            contentType = null;
+        }
         /* #else */
-        contentType = null;
+        // contentType = null;
         /* #endif */
         if (contentType == null) {
             contentType = URLConnection.guessContentTypeFromName(getPath());

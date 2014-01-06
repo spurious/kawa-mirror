@@ -101,7 +101,7 @@ case "/${with_java_source}/" in
         test -z "$with_swing" && with_swing="no"
         test -z "$with_awt" && with_awt="no"
         ;;
-  //) JAVA_SOURCE=6 ;;
+  //) JAVA_SOURCE=7 ;;
   /*/) AC_MSG_ERROR([Invalid version for --with-java-version.
   (Must be 1, 2, 5, 6, 7, 8, or a JDK version such as 1.5.)]) ;;
 esac

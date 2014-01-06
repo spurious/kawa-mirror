@@ -69,7 +69,7 @@ dist-kawa-@VERSION@.jar: $(DIST_ARCHIVES)
 	  && cd tmpdir \
 	  && tar xzf ../$(distdir).tar.gz \
 	  && rm -f ./patch-source-list \
-	  && ./kawa-@VERSION@/configure --with-java-source=6compat5 \
+	  && ./kawa-@VERSION@/configure --with-java-source=7 \
 	    --with-servlet=@WITH_SERVLET_ARG@ --with-javafx=@WITH_JAVAFX_ARG@ \
 	  && CLASSPATH=@conf_classpath@.$(CLASSPATH_SEPARATOR)$$CLASSPATH $(MAKE) \
 	  && mv kawa-@VERSION@.jar ../dist-kawa-@VERSION@.jar \

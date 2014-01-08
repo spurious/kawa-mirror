@@ -2,7 +2,7 @@
 // This is free software;  for terms and warranty disclaimer see ../../../COPYING.
 
 package gnu.kawa.lispexpr;
-import gnu.kawa.io.LineBufferedReader;
+import gnu.kawa.io.InPort;
 import gnu.mapping.*;
 import gnu.lists.*;
 import gnu.expr.*;
@@ -342,7 +342,7 @@ public class ReaderExtendedLiteral extends ReaderConstituent {
      */
     protected Pair readEnclosedExpressions(LispReader reader, ReadTable readTable, Pair last, int endDelimiter)
             throws IOException, SyntaxException {
-        LineBufferedReader port = reader.getPort();
+        InPort port = reader.getPort();
         char saveReadState = reader.pushNesting('[');
         int startLine = port.getLineNumber();
         int startColumn = port.getColumnNumber();

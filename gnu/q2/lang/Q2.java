@@ -6,7 +6,6 @@ import gnu.xml.*;
 import gnu.expr.*;
 import gnu.text.*;
 import gnu.kawa.io.InPort;
-import gnu.kawa.io.LineBufferedReader;
 import gnu.kawa.lispexpr.*;
 
 /** Support for the experimental Q2 language.

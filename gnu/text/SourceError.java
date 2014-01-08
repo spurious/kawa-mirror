@@ -1,5 +1,5 @@
 package gnu.text;
-import gnu.kawa.io.LineBufferedReader;
+import gnu.kawa.io.InPort;
 import java.io.File;
 
 /** Represents an error message from processing a "source" file.
@@ -58,8 +58,8 @@ public class SourceError
   }
 
   /** Create a new SourceError using the current line/column from
-   * a <code>LineBufferedReader</code>. */
-  public SourceError(LineBufferedReader port, char severity, String message)
+   * a <code>InPort</code>. */
+  public SourceError(InPort port, char severity, String message)
   {
     this(severity, port.getName(),
 	 port.getLineNumber() + 1, port.getColumnNumber(),

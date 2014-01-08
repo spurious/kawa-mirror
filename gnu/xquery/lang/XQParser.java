@@ -14,7 +14,6 @@ import gnu.xml.*;
 import gnu.bytecode.*;
 import gnu.kawa.io.CharArrayInPort;
 import gnu.kawa.io.InPort;
-import gnu.kawa.io.LineBufferedReader;
 import gnu.kawa.io.TtyInPort;
 import gnu.kawa.reflect.OccurrenceType;
 import gnu.kawa.reflect.SingletonType;
@@ -121,7 +120,7 @@ public class XQParser extends Lexer
               path = URIPath.valueOf(value.toString());
           }
 
-        LineBufferedReader port;
+        InPort port;
         if (path == null && (port = getPort()) != null)
           {
             path = port.getPath();

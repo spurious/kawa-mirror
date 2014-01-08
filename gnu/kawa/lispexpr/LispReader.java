@@ -5,24 +5,23 @@ import gnu.lists.*;
 import gnu.math.*;
 import gnu.expr.*;
 import gnu.kawa.io.InPort;
-import gnu.kawa.io.LineBufferedReader;
 import gnu.kawa.util.GeneralHashTable;
 
 /** A Lexer for reading S-expressions in generic Lisp-like syntax.
  * This class may have outlived its usefulness: It's mostly just a
- * wrapper around a LineBufferedReader plus a helper token-buffer.
+ * wrapper around an InPort plus a helper token-buffer.
  * The functionality should be moved to ReadTable, though it is
  * unclear what to do about the tokenBuffer.
  */
 
 public class LispReader extends Lexer
 {
-  public LispReader(LineBufferedReader port)
+  public LispReader(InPort port)
   {
     super(port);
   }
 
-  public LispReader(LineBufferedReader port, SourceMessages messages)
+  public LispReader(InPort port, SourceMessages messages)
   {
     super(port, messages);
   }

@@ -2,7 +2,7 @@
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.kawa.lispexpr;
-import gnu.kawa.io.LineBufferedReader;
+import gnu.kawa.io.InPort;
 import gnu.text.*;
 import gnu.mapping.Values;
 
@@ -64,7 +64,7 @@ public final class ReaderParens extends ReadTableEntry
     Object p = null;
     if (command != null)
       {
-        LineBufferedReader port = in.getPort();
+        InPort port = in.getPort();
         int startLine = port.getLineNumber();
         int startColumn = port.getColumnNumber();
         // startColumn is the 0-based position *after* reading ch.
@@ -82,7 +82,7 @@ public final class ReaderParens extends ReadTableEntry
 				 int ch, int count, int close, int sharingIndex)
     throws java.io.IOException, SyntaxException
   {
-    LineBufferedReader port = lexer.getPort();
+    InPort port = lexer.getPort();
     char saveReadState = lexer.pushNesting(close == ']' ? '[' : '(');
     int startLine = port.getLineNumber();
     int startColumn = port.getColumnNumber();

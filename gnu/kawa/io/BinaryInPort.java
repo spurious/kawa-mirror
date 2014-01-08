@@ -10,9 +10,10 @@ import gnu.lists.ByteVector;
 public class BinaryInPort extends InPort {
 
     private BinaryInputStream bstrm;
-    
-    public BinaryInPort(InputStream strm, Path path) {
-        super((Reader) null, path);
+
+    private BinaryInPort(BinaryInputStream bstrm, Path path) {
+        super(bstrm, path);
+        this.bstrm = bstrm;
         // Use a fixed-size buffer.  This prevents really-long "lines"
 	// from causing the buffer to grow to accomodate them.
 	try
@@ -20,23 +21,14 @@ public class BinaryInPort extends InPort {
 	    setBuffer(new char[2048]);
 	  }
 	catch (java.io.IOException ex) { /* ignored */ }
-
-        bstrm = new BinaryInputStream(strm);
+    }
+    
+    public BinaryInPort(InputStream strm, Path path) {
+        this(new BinaryInputStream(strm), path);
     }
 
     public BinaryInPort(byte[] buffer, int length, Path path) {
-        super((Reader) null, path);
-        // Use a fixed-size buffer.  This prevents really-long "lines"
-	// from causing the buffer to grow to accomodate them.
-	try
-	  {
-	    setBuffer(new char[2048]);
-	  }
-	catch (java.io.IOException ex) { /* ignored */ }
-
-        // It would be more element to use a ByteArrayInputStream,
-        // but that doesn't support some extensions we need.
-        bstrm = new BinaryInputStream(buffer, length);
+        this(new BinaryInputStream(buffer, length), path);
     }
 
     public InputStream getInputStream() {

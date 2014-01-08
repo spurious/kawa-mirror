@@ -3,8 +3,8 @@ import java.io.*;
 import gnu.text.*;
 import gnu.lists.*;
 import gnu.text.Path;
+import gnu.kawa.io.InPort;
 import gnu.kawa.io.LineInputStreamReader;
-import gnu.kawa.io.LineBufferedReader;
 /* #ifdef use:java.nio */
 import java.nio.charset.*;
 /* #endif */
@@ -97,7 +97,7 @@ public class XMLParser
           {
             char[] buffer = in.buffer;
             if (buffer == null)
-              in.buffer = buffer = new char[LineBufferedReader.BUFFER_SIZE];
+              in.buffer = buffer = new char[InPort.BUFFER_SIZE];
             int pos = 0;
             int quote = 0;
             for (;;)
@@ -139,7 +139,7 @@ public class XMLParser
     in.close();
   }
 
-  public static void parse (LineBufferedReader in, SourceMessages messages, Consumer out)
+  public static void parse (InPort in, SourceMessages messages, Consumer out)
     throws java.io.IOException
   {
     XMLFilter filter = new XMLFilter(out);
@@ -153,7 +153,7 @@ public class XMLParser
     filter.endDocument();
   }
 
-  public static void parse (LineBufferedReader in, SourceMessages messages, XMLFilter filter)
+  public static void parse (InPort in, SourceMessages messages, XMLFilter filter)
     throws java.io.IOException
   {
     filter.setMessages(messages);
@@ -167,7 +167,7 @@ public class XMLParser
     in.close();
   }
 
-  public static void parse (LineBufferedReader in, XMLFilter out)
+  public static void parse (InPort in, XMLFilter out)
   {
     // Cache fields in local variables, for speed.
     char[] buffer = in.buffer;

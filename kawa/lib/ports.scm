@@ -283,15 +283,13 @@
   ((primitive-virtual-method <input-port> "getReadState" <char> ())
    port))
 
-(define (set-port-line! port line)
-  ((primitive-virtual-method <gnu.kawa.io.LineBufferedReader> "setLineNumber"
-			     <void> (<int>))
-   port line))
+(define (set-port-line! (port ::input-port) (line ::int)) ::void
+  (port:setLineNumber line))
 
 (define-procedure port-line
   setter: set-port-line!
   (begin
-    (define (port-line (port :: <gnu.kawa.io.LineBufferedReader>))
+    (define (port-line (port :: input-port))
       (invoke port 'getLineNumber))
     port-line))
 
@@ -301,14 +299,12 @@
 (define-procedure input-port-line-number
   setter: set-input-port-line-number!
   (begin
-    (define (input-port-line-number (port :: <gnu.kawa.io.LineBufferedReader>))
+    (define (input-port-line-number (port ::input-port))
       (+ 1 (port-line port)))
     input-port-line-number))
 
-(define (port-column port)
-  ((primitive-virtual-method <gnu.kawa.io.LineBufferedReader>
-			     "getColumnNumber" <int> ())
-   port))
+(define (port-column (port ::input-port)) ::int
+  (port:getColumnNumber))
 
 (define (input-port-column-number port)
   (+ 1 (port-column port)))
@@ -356,7 +352,7 @@
 	 (primitive-throw ex)))))
 
 (define (read-line #!optional
-		   (port :: <gnu.kawa.io.LineBufferedReader> (current-input-port))
+		   (port ::input-port (current-input-port))
 		   (handling :: <symbol> 'trim))
   (kawa.standard.read_line:apply port handling))
 

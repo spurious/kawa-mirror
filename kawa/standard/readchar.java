@@ -5,7 +5,7 @@ import gnu.lists.*;
 import gnu.mapping.Procedure0or1;
 import gnu.mapping.WrongType;
 import gnu.text.Char;
-import gnu.kawa.io.LineBufferedReader;
+import gnu.kawa.io.InPort;
 import java.io.Reader;
 import java.io.InputStream;
 
@@ -25,9 +25,9 @@ public class readchar extends Procedure0or1
         try {
             int ch;
             if (peeking)
-                ch = LineBufferedReader.peekCodePoint(port);
+                ch = InPort.peekCodePoint(port);
             else
-                ch = LineBufferedReader.readCodePoint(port);
+                ch = InPort.readCodePoint(port);
             return ch < 0 ? Sequence.eofValue : Char.make(ch);
         } catch (java.io.IOException e) {
             throw new RuntimeException ("IO Exception caught");

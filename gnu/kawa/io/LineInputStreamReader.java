@@ -9,14 +9,14 @@ import java.nio.*;
 import java.nio.charset.*;
 /* #endif */
 
-/** A LineBufferedReader that wraps an InputStream.
+/** An InPort that wraps an InputStream.
  * Similar functionality as using an InputStreamReader, but provides hooks
  * to read at the byte level before setting the charset.
  * Optionally uses java.nio.charset directly, for extra flexibility
  * and a possible (but slight and unverified) performance improvement.
  */
 
-public class LineInputStreamReader extends LineBufferedReader
+public class LineInputStreamReader extends InPort
 {
   InputStream istrm;
   /* #ifdef use:java.nio */
@@ -59,7 +59,7 @@ public class LineInputStreamReader extends LineBufferedReader
 
   public LineInputStreamReader (InputStream in)
   {
-    super((Reader) null);
+    super(in, (Reader) null);
     /* #ifdef use:java.nio */
     bbuf = ByteBuffer.wrap(barr);
     bbuf.position(barr.length);

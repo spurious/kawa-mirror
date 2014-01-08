@@ -2,7 +2,7 @@
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.text;
-import gnu.kawa.io.LineBufferedReader;
+import gnu.kawa.io.InPort;
 import java.io.*;
 
 /**
@@ -12,15 +12,15 @@ import java.io.*;
 
 public class Lexer extends Reader
 {
-  protected LineBufferedReader port;
+  protected InPort port;
   protected boolean interactive;
 
-  public Lexer(LineBufferedReader port)
+  public Lexer(InPort port)
   {
     this.port = port;
   }
 
-  public Lexer(LineBufferedReader port, SourceMessages messages)
+  public Lexer(InPort port, SourceMessages messages)
   {
     this.port = port;
     this.messages = messages;
@@ -35,7 +35,7 @@ public class Lexer extends Reader
   public char pushNesting (char promptChar)
   {
     nesting++;
-    LineBufferedReader port = getPort();
+    InPort port = getPort();
     char save = port.readState;
     port.readState = promptChar;
     return save;
@@ -46,14 +46,14 @@ public class Lexer extends Reader
    */
   public void popNesting (char save)
   {
-    LineBufferedReader port = getPort();
+    InPort port = getPort();
     port.readState = save;
     nesting--;
   }
 
   protected int nesting;
 
-  public final LineBufferedReader getPort() { return port; }
+  public final InPort getPort() { return port; }
 
   public void close() throws java.io.IOException
   {
@@ -280,7 +280,7 @@ public class Lexer extends Reader
   /** Read digits, up to the first non-digit or the buffer limit
     * @return the digits seen as a non-negative long, or -1 on overflow
     */
-  public static long readDigitsInBuffer (LineBufferedReader port, int radix)
+  public static long readDigitsInBuffer (InPort port, int radix)
   {
     long ival = 0;
     boolean overflow = false;

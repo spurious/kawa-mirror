@@ -2,7 +2,7 @@
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.kawa.lispexpr;
-import gnu.kawa.io.LineBufferedReader;
+import gnu.kawa.io.InPort;
 import gnu.text.*;
 import gnu.mapping.*;
 import gnu.lists.*;
@@ -53,7 +53,7 @@ public class ReaderDispatchSyntaxQuote extends ReadTableEntry {
 
     public static Object readNamedConstructor(LispReader reader)
         throws java.io.IOException, SyntaxException {
-	LineBufferedReader port = reader.getPort();
+	InPort port = reader.getPort();
         int length;
         String name;
         Object list;

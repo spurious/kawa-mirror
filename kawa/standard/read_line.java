@@ -1,11 +1,11 @@
 package kawa.standard;
-import gnu.kawa.io.LineBufferedReader;
+import gnu.kawa.io.InPort;
 import gnu.lists.FString;
 import gnu.mapping.*;
 
 public class read_line
 {
-  public static Object apply(LineBufferedReader in, String handling)
+  public static Object apply(InPort in, String handling)
     throws java.io.IOException
   {
     int ch = in.read();
@@ -47,7 +47,7 @@ public class read_line
       }
 
     // Ok, we haven't found the end-of-line yet, so use the general
-    // readLine method in LineBufferedReader.
+    // readLine method in InPort.
     StringBuffer sbuf = new StringBuffer(100);
     if (pos > start)
       sbuf.append(buffer, start, pos - start);

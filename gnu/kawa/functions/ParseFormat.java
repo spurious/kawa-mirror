@@ -4,7 +4,6 @@ import java.text.Format;
 import java.util.ArrayList;
 import gnu.kawa.io.CharArrayInPort;
 import gnu.kawa.io.InPort;
-import gnu.kawa.io.LineBufferedReader;
 import gnu.mapping.*;
 import gnu.math.FixedRealFormat;
 import gnu.lists.*;
@@ -29,13 +28,13 @@ public class ParseFormat extends Procedure1
   public static final int SEEN_ZERO  = 8;
   public static final int SEEN_HASH = 16;
 
-  public ReportFormat parseFormat(LineBufferedReader fmt)
+  public ReportFormat parseFormat(InPort fmt)
     throws java.text.ParseException, java.io.IOException
   {
     return parseFormat(fmt, emacsStyle ? '?' : '~');
   }
 
-  public static ReportFormat parseFormat(LineBufferedReader fmt, char magic)
+  public static ReportFormat parseFormat(InPort fmt, char magic)
     throws java.text.ParseException, java.io.IOException
   {
     StringBuffer fbuf = new StringBuffer(100);

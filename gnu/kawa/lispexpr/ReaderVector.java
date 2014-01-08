@@ -4,7 +4,6 @@
 package gnu.kawa.lispexpr;
 import gnu.text.*;
 import gnu.kawa.io.InPort;
-import gnu.kawa.io.LineBufferedReader;
 import gnu.mapping.Values;
 import gnu.lists.FVector;
 import gnu.lists.ConstVector;
@@ -26,7 +25,7 @@ public class ReaderVector extends ReadTableEntry
     return readVector((LispReader) in, in.getPort(), count, close, sharingIndex);
   }
 
-    public static FVector readVector(LispReader lexer, LineBufferedReader port, int count, char close, int sharingIndex)
+    public static FVector readVector(LispReader lexer, InPort port, int count, char close, int sharingIndex)
     throws java.io.IOException, SyntaxException
   {
     char saveReadState = ' ';

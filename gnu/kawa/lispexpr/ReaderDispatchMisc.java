@@ -7,7 +7,6 @@ import gnu.mapping.*;
 import gnu.bytecode.Type;
 import gnu.lists.*;
 import gnu.kawa.io.InPort;
-import gnu.kawa.io.LineBufferedReader;
 import gnu.kawa.io.OutPort;
 import gnu.kawa.util.GeneralHashTable;
 /* #ifdef use:java.util.regex */
@@ -41,7 +40,7 @@ public class ReaderDispatchMisc extends ReadTableEntry
   {
     LispReader reader = (LispReader) in;
     char saveReadState = '\0';
-    LineBufferedReader port;
+    InPort port;
     int length;
     String name;
     if (code >= 0)
@@ -149,7 +148,7 @@ public class ReaderDispatchMisc extends ReadTableEntry
 
     public static void readNestedComment(LispReader reader)
             throws java.io.IOException, SyntaxException {
-	LineBufferedReader port = reader.getPort();
+	InPort port = reader.getPort();
         char saveReadState = '\0';
 	if (port instanceof InPort) {
 	    saveReadState = ((InPort) port).readState;
@@ -168,7 +167,7 @@ public class ReaderDispatchMisc extends ReadTableEntry
     throws java.io.IOException, SyntaxException
   {
     int startPos = in.tokenBufferLength;
-    LineBufferedReader port = in.getPort();
+    InPort port = in.getPort();
     char saveReadState = '\0';
     int flags = 0;
     if (port instanceof InPort)

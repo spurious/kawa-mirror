@@ -4,7 +4,7 @@
 package gnu.xml;
 import gnu.lists.*;
 import gnu.text.*;
-import gnu.kawa.io.LineBufferedReader;
+import gnu.kawa.io.InPort;
 import gnu.mapping.Symbol;
 /* #ifdef SAX2 */
 import org.xml.sax.*;
@@ -60,9 +60,9 @@ public class XMLFilter implements
 
   private SourceMessages messages;
   SourceLocator locator;
-  LineBufferedReader in;
+  InPort in;
 
-  public void setSourceLocator (LineBufferedReader in)
+  public void setSourceLocator (InPort in)
   { this.in = in;  this.locator = this; }
   public void setSourceLocator (SourceLocator locator)
   { this.locator = locator; }

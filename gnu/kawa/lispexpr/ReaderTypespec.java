@@ -4,7 +4,6 @@
 package gnu.kawa.lispexpr;
 import gnu.text.*;
 import gnu.kawa.io.InPort;
-import gnu.kawa.io.LineBufferedReader;
 
 /** Reader table entry for '<' to treat '[' and ']' as constituents.
  * Lets us use (say) '<char[]>' as a token even if  '[' and ']' are parens.
@@ -22,7 +21,7 @@ public class ReaderTypespec extends ReadTableEntry
     throws java.io.IOException, SyntaxException
   {
     int startPos = in.tokenBufferLength;
-    LineBufferedReader port = in.getPort();
+    InPort port = in.getPort();
     ReadTable rtable = ReadTable.getCurrent();
     char saveReadState = '\0';
     in.tokenBufferAppend(ch);

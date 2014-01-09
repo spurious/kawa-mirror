@@ -37,13 +37,7 @@ public class BinaryInPort extends InPort {
     private BinaryInPort(BinaryInputStream bstrm, Path path) {
         super(bstrm, path);
         this.bstrm = bstrm;
-        // Use a fixed-size buffer.  This prevents really-long "lines"
-	// from causing the buffer to grow to accomodate them.
-	try
-	  {
-	    setBuffer(new char[2048]);
-	  }
-	catch (java.io.IOException ex) { /* ignored */ }
+        setKeepFullLines(false);
     }
     
     public BinaryInPort(InputStream strm) {

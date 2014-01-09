@@ -1,5 +1,8 @@
 2014-01-09  Per Bothner  <per@bothner.com>
 
+	* BinaryInPort.java (<init>): Don't force using a fixed buffer.
+	Instead setKeepFullLines(false).
+
 	* LineInputStreamReader.java: Merge into BinaryInPort.java, and remove.
 
 2014-01-08  Per Bothner  <per@bothner.com>

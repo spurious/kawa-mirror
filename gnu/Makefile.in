@@ -256,7 +256,6 @@ GNU_KAWA_IO_JSOURCES = \
   kawa/io/CharArrayInPort.java \
   kawa/io/CharArrayOutPort.java \
   kawa/io/InPort.java \
-  kawa/io/LineInputStreamReader.java \
   kawa/io/LogWriter.java \
   kawa/io/NullReader.java \
   kawa/io/OutPort.java \

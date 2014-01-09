@@ -3,11 +3,8 @@ import java.io.*;
 import gnu.text.*;
 import gnu.lists.*;
 import gnu.text.Path;
+import gnu.kawa.io.BinaryInPort;
 import gnu.kawa.io.InPort;
-import gnu.kawa.io.LineInputStreamReader;
-/* #ifdef use:java.nio */
-import java.nio.charset.*;
-/* #endif */
 
 /** Reads XML from a char array.
  * Assumes a state-less character encoding containing ascii as a sub-set,
@@ -50,6 +47,7 @@ public class XMLParser
   private static final int INVALID_VERSION_DECL = 35;
   private static final int SAW_ERROR = 36;
   private static final int SAW_EOF_ERROR = 37;  // Unexpected end-of-file.
+  private static final int MISSING_XML_DECL = 38;
 
   static final String BAD_ENCODING_SYNTAX = "bad 'encoding' declaration";
   static final String BAD_STANDALONE_SYNTAX = "bad 'standalone' declaration";
@@ -60,34 +58,31 @@ public class XMLParser
     parse(Path.openInputStream(uri), uri, messages, out);
   }
 
-  public static LineInputStreamReader XMLStreamReader (InputStream strm)
+  public static BinaryInPort XMLStreamReader(InputStream strm)
     throws java.io.IOException
   {
-    LineInputStreamReader in = new LineInputStreamReader(strm);
-    /* #ifndef use:java.nio */
-    // in.markStart();
-    /* #endif */
-    int b1 = in.getByte();
-    int b2 = b1 < 0 ? -1 : in.getByte();
-    int b3 = b2 < 0 ? -1 : in.getByte();
-    if (b1 == 0xEF && b2 == 0xBB && b3 == 0xBF)
+    BinaryInPort in = new BinaryInPort(strm);
+    int b1 = in.readByte();
+    int b2 = b1 < 0 ? -1 : in.readByte();
+    int b3 = b2 < 0 ? -1 : in.readByte();
+    if (b1 == 0xEF && b2 == 0xBB && b3 == 0xBF) // UTF-8 Byte Order Mark // UTF-8 Byte Order Mark
       {
         in.resetStart(3);
         in.setCharset("UTF-8");
       }
-    else if (b1 == 0xFF && b2 == 0xFE && b3 != 0)
+    else if (b1 == 0xFF && b2 == 0xFE && b3 != 0) // UTF-16LE Byte Order Mark
       {
         in.resetStart(2);
         in.setCharset("UTF-16LE");
       }
-    else if (b1 == 0xFE && b2 == 0xFF && b3 != 0)
+    else if (b1 == 0xFE && b2 == 0xFF && b3 != 0) // UTF-16BE Byte Order Mark
       {
         in.resetStart(2);
         in.setCharset("UTF-16BE");
       }
-    else
+    else // No recognizable Byte Order Mark
       {
-        int b4 = b3 < 0 ? -1 : in.getByte();
+        int b4 = b3 < 0 ? -1 : in.readByte();
         if (b1 == 0x4C && b2 == 0x6F && b3 == 0xA7 && b4 == 0x94)
           throw new RuntimeException("XMLParser: EBCDIC encodings not supported");
         in.resetStart(0);
@@ -95,18 +90,24 @@ public class XMLParser
                            || (b2 == 0 && b3 == '?' && b4 == 0)))
             || (b1 == 0 && b2 == '<' && b3 == 0 && b4 == '?'))
           {
+            // Read-ahead until the end of the XML declaration,
+            // treating it as Latin-1. Thus we can read the encoding
+            // specification before committing to a specific charset.
             char[] buffer = in.buffer;
             if (buffer == null)
               in.buffer = buffer = new char[InPort.BUFFER_SIZE];
             int pos = 0;
             int quote = 0;
+            int limit = buffer.length;
             for (;;)
               {
-                int b = in.getByte();
+                int b = in.readByte();
                 if (b == 0)
                   continue;
                 if (b < 0) // Unexpected EOF - handled later.
                   break;
+                if (pos >= limit) // Only on error
+                    break;
                 buffer[pos++] = (char) (b & 0xFF);
                 if (quote == 0)
                   {
@@ -132,7 +133,7 @@ public class XMLParser
                             SourceMessages messages, Consumer out)
     throws java.io.IOException
   {
-    LineInputStreamReader in = XMLStreamReader(strm);
+    BinaryInPort in = XMLStreamReader(strm);
     if (uri != null)
       in.setName(uri);
     parse(in, messages, out);
@@ -167,12 +168,13 @@ public class XMLParser
     in.close();
   }
 
-  public static void parse (InPort in, XMLFilter out)
+  public static void parse(InPort in, XMLFilter out)
   {
     // Cache fields in local variables, for speed.
     char[] buffer = in.buffer;
     int pos = in.pos;
     int limit = in.limit;
+    boolean strict = false;
 
     // The flow logic of this method is unusual.  It is one big state machine,
     // but with two "subroutines": SKIP_SPACES_MODIFIER and EXPECT_NAME_MODIFIER.
@@ -208,7 +210,6 @@ public class XMLParser
         switch (state)
           {
           case INIT_STATE:
-            state = TEXT_STATE;
             state = INIT_TEXT_STATE;
             break handleChar;
 
@@ -218,7 +219,7 @@ public class XMLParser
                 state = INIT_LEFT_STATE;
                 break handleChar;
               }
-            state = TEXT_STATE;
+            state = strict ?  MISSING_XML_DECL : TEXT_STATE;
             continue mainLoop;
 
           case INIT_LEFT_STATE:
@@ -228,13 +229,19 @@ public class XMLParser
                 state = EXPECT_NAME_MODIFIER + SKIP_SPACES_MODIFIER + INIT_LEFT_QUEST_STATE;
                 break handleChar;
               }
-            state = SAW_LEFT_STATE;
+            state = strict ?  MISSING_XML_DECL : SAW_LEFT_STATE;
             continue mainLoop;
+
+          case MISSING_XML_DECL:
+             message = "missing XML declaration";
+             state = SAW_ERROR;
+             continue mainLoop;
 
           case INVALID_VERSION_DECL:
             pos = dstart;
             message = "invalid xml version specifier";
-            /* ... fall thorugh ... */
+            state = SAW_ERROR;
+            continue mainLoop;
 
           case SAW_ERROR:
             in.pos = pos;
@@ -553,6 +560,7 @@ public class XMLParser
                                 || buffer[dstart+5] != 'o'
                                 || buffer[dstart+6] != 'n')
                               {
+                                // FIXME should allow if !strict
                                 pos = dstart;
                                 message = "xml declaration without version";
                                 state = SAW_ERROR;
@@ -651,8 +659,8 @@ public class XMLParser
                                       break;
                                   }
                                 String encoding = new String(buffer,dstart, i-dstart);
-                                if (in instanceof LineInputStreamReader)
-                                  ((LineInputStreamReader) in).setCharset(encoding);
+                                if (in instanceof BinaryInPort)
+                                  ((BinaryInPort) in).setCharset(encoding);
                                 dstart = i+1;
                                 while (dstart < end
                                        && Character.isWhitespace(buffer[dstart]))
@@ -741,6 +749,11 @@ public class XMLParser
                             state = SAW_ERROR;
                             continue mainLoop;
                           }
+                      }
+                    else if (strict && state == INIT_LEFT_QUEST_STATE)
+                      {
+                        state = MISSING_XML_DECL;
+                        continue mainLoop;
                       }
                     else
                       out.processingInstructionFromParser(buffer, start, length,

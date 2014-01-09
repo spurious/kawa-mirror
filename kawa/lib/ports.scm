@@ -122,7 +122,10 @@
 
 (define (open-input-bytevector (bvector ::bytevector))
   ::gnu.kawa.io.BinaryInPort
-  (gnu.kawa.io.BinaryInPort (bvector:getBuffer) (bvector:size) "<bytevector>"))
+  (let ((p (gnu.kawa.io.BinaryInPort (bvector:getBuffer) (bvector:size)
+                                     "<bytevector>")))
+    (p:setCharset "ISO-8859-1")
+    p))
 
 (define (open-output-bytevector) ::gnu.kawa.io.BinaryOutPort
   (let* ((bo (java.io.ByteArrayOutputStream))

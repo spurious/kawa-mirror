@@ -1,3 +1,8 @@
+2014-01-09  Per Bothner  <per@bothner.com>
+
+	* XMLParser.java: Update to use BinaryInPort.
+	Add (non-enabled) hook for requiring an XML declaration.
+
 2014-01-05  Per Bothner  <per@bothner.com>
 
 	* Makefile.am: Merge into ../../gnu/Makefile.am and remove.

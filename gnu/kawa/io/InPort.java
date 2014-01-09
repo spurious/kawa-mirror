@@ -112,7 +112,6 @@ public class InPort extends Reader implements Printable
 
     public boolean isOpen() { return (flags & IS_CLOSED) == 0; }
 
-  // Not used by LineInputStreamReader subclass!
   protected Reader in;
 
   /** Default (initial buffer) size. */

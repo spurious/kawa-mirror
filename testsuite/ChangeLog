@@ -1,3 +1,7 @@
+2014-01-08  Per Bothner  <per@bothner.com>
+
+	* r7rs-tests.scm: Add nested guard-in-guard test.
+
 2014-01-05  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (EXTRA_DIST): Belatedly add system-test.scm.

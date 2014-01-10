@@ -146,7 +146,7 @@ public class BinaryInPort extends InPort {
             return r;
         }
 
-        public int read() throws java.io.IOException {
+        public synchronized int read() throws java.io.IOException {
             if (! bbuf.hasRemaining()) {
                 int n = fillBytes(0);
                 if (n <= 0)
@@ -181,11 +181,12 @@ public class BinaryInPort extends InPort {
         }
 
         public synchronized boolean ready() throws IOException {
-            return bbuf.hasRemaining() || base.available() > 0;
+            return bbuf.hasRemaining()
+                || (base != null && base.available() > 0);
         }
 
         public synchronized int available() throws IOException {
-            return bbuf.remaining() + base.available();
+            return bbuf.remaining() + (base == null ? 0 : base.available());
         }
     }
 }

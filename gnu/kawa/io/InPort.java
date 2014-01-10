@@ -103,10 +103,16 @@ public class InPort extends Reader implements Printable
   }
 
     public void close () throws IOException {
-        flags |= IS_CLOSED;
-        if (in != null) {
-            in.close();
-            in = null;
+        synchronized (lock) {
+            flags |= IS_CLOSED;
+            if (in != null) {
+                try {
+                    in.close();
+                } finally {
+                    in = null;
+                    buffer = null;
+                }
+            }
         }
     }
 
@@ -358,134 +364,122 @@ public class InPort extends Reader implements Printable
     this.buffer = buffer;
   }
 
-  public int read () throws java.io.IOException
-  {
-    char prev;
-    if (pos > 0)
-      prev = buffer[pos-1];
-    else if ((flags & PREV_WAS_CR) != 0)
-      prev = '\r';
-    else if (lineStartPos >= 0)
-      prev = '\n';
-    else
-      prev = '\0';
-    if (prev == '\r' || prev == '\n')
-      {
-	if (lineStartPos < pos && (readAheadLimit <= 0 || pos <= markPos))
-	  {
-	    lineStartPos = pos;
-	    lineNumber++;
-	  }
-	boolean revisited = pos < highestPos;
-	if (prev != '\n'
-	    || (pos <= 1 ? (flags & PREV_WAS_CR) == 0 : buffer[pos-2] != '\r'))
-	  {
-	    lineStart(revisited);
-	  }
-	if (! revisited)
-	  highestPos = pos + 1;  // Add one for this read().
-      }
+    public int read() throws java.io.IOException {
+        synchronized (lock) {
+            char prev;
+            if (pos > 0)
+                prev = buffer[pos-1];
+            else if ((flags & PREV_WAS_CR) != 0)
+                prev = '\r';
+            else if (lineStartPos >= 0)
+                prev = '\n';
+            else
+                prev = '\0';
+            if (prev == '\r' || prev == '\n') {
+                if (lineStartPos < pos
+                    && (readAheadLimit <= 0 || pos <= markPos)) {
+                    lineStartPos = pos;
+                    lineNumber++;
+                }
+                boolean revisited = pos < highestPos;
+                if (prev != '\n'
+                    || (pos <= 1 ? (flags & PREV_WAS_CR) == 0 
+                        : buffer[pos-2] != '\r')) {
+                    lineStart(revisited);
+                }
+                if (! revisited)
+                    highestPos = pos + 1;  // Add one for this read().
+            }
 
-    if (pos >= limit)
-      {
-	if (buffer == null)
-	  buffer = new char[BUFFER_SIZE];
-	else if (limit == buffer.length)
-	  reserve(buffer, 1);
-	if (pos == 0)
-	  {
-	    if (prev == '\r')
-	      flags |= PREV_WAS_CR;
-	    else
-	      flags &= ~PREV_WAS_CR;
-	  }
-	int readCount = fill(buffer.length - pos);
-	if (readCount <= 0)
-          {
-            flags |= EOF_SEEN;
-            return -1;
-          }
-	limit += readCount;
-      }
+            if (pos >= limit) {
+                if (buffer == null)
+                    buffer = new char[BUFFER_SIZE];
+                else if (limit == buffer.length)
+                    reserve(buffer, 1);
+                if (pos == 0) {
+                    if (prev == '\r')
+                        flags |= PREV_WAS_CR;
+                    else
+                        flags &= ~PREV_WAS_CR;
+                }
+                int readCount = fill(buffer.length - pos);
+                if (readCount <= 0) {
+                    flags |= EOF_SEEN;
+                    return -1;
+                }
+                limit += readCount;
+            }
 
-    int ch = buffer[pos++];
-    if (ch == '\n')
-      {
-	if (prev == '\r')
-	  {
-	    // lineNumber is the number of lines before lineStartPos.
-	    // If lineStartPos is between '\r and '\n', we will count
-	    // an extra line for the '\n', which gets the count off.
-	    // Hence compensate.
-	    if (lineStartPos == pos - 1)
-	      {
-		lineNumber--;
-		lineStartPos--;
-	      }
-	    if (getConvertCR())
-	      return read();
-	  }
-      }
-    else if (ch == '\r')
-      {
-	if (getConvertCR())
-	  return '\n';
-      }
-    return ch;
-  }
+            int ch = buffer[pos++];
+            if (ch == '\n') {
+                if (prev == '\r') {
+                    // lineNumber is the number of lines before lineStartPos.
+                    // If lineStartPos is between '\r and '\n', we will count
+                    // an extra line for the '\n', which gets the count off.
+                    // Hence compensate.
+                    if (lineStartPos == pos - 1) {
+                        lineNumber--;
+                        lineStartPos--;
+                    }
+                    if (getConvertCR())
+                        return read();
+                }
+            } else if (ch == '\r') {
+                if (getConvertCR())
+                    return '\n';
+            }
+            return ch;
+        }
+    }
 
-  public int read (char[] cbuf, int off, int len) throws java.io.IOException
-  {
-    // Same logic as in skip(n), when n>0.
-    int ch;
-    if (pos >= limit)
-      ch = '\0';
-    else if (pos > 0)
-      ch = buffer[pos-1];
-    else if ((flags & PREV_WAS_CR) != 0 || lineStartPos >= 0)
-      ch = '\n';
-    else
-      ch = '\0';
-    int to_do = len;
-    while (to_do > 0)
-      {
-	if (pos >= limit || ch == '\n' || ch == '\r')
-	  {
-	    // Return if there is no more in the input buffer, and we got
-	    // at least one char.  This is desirable for interactive input.
-	    if (pos >= limit && to_do < len)
-	      return len - to_do;
-	    ch = read();
-	    if (ch < 0)
-	      {
-		len -= to_do;
-		return len <= 0 ? -1 : len;
-	      }
-	    cbuf[off++] = (char) ch;
-	    to_do--;
-	  }
-	else
-	  {
-	    int p = pos;
-	    int lim = limit;
-	    if (to_do < lim - p)
-	      lim = p + to_do;
-	    while (p < lim)
-	      {
-		ch = buffer[p];
-		// For simplicity and correctness we defer handling of
-		// newlines (including previous character) to read().
-		if (ch == '\n' || ch == '\r')
-		  break;
-		cbuf[off++] = (char) ch;
-		p++;
-	      }
-	    to_do -= p - pos;
-	    pos = p;
-	  }
-      }
-    return len;
-  }
+    public int read(char[] cbuf, int off, int len) throws java.io.IOException {
+        synchronized (lock) {
+            // Same logic as in skip(n), when n>0.
+            int ch;
+            if (pos >= limit)
+                ch = '\0';
+            else if (pos > 0)
+                ch = buffer[pos-1];
+            else if ((flags & PREV_WAS_CR) != 0 || lineStartPos >= 0)
+                ch = '\n';
+            else
+                ch = '\0';
+            int to_do = len;
+            while (to_do > 0) {
+                if (pos >= limit || ch == '\n' || ch == '\r') {
+                    // Return if there is no more in the input buffer,
+                    // and we got at least one char.
+                    // This is desirable for interactive input.
+                    if (pos >= limit && to_do < len)
+                        return len - to_do;
+                    ch = read();
+                    if (ch < 0) {
+                        len -= to_do;
+                        return len <= 0 ? -1 : len;
+                    }
+                    cbuf[off++] = (char) ch;
+                    to_do--;
+                } else {
+                    int p = pos;
+                    int lim = limit;
+                    if (to_do < lim - p)
+                        lim = p + to_do;
+                    while (p < lim) {
+                        ch = buffer[p];
+                        // For simplicity and correctness we defer handling of
+                        // newlines (including previous character) to read().
+                        if (ch == '\n' || ch == '\r')
+                            break;
+                        cbuf[off++] = (char) ch;
+                        p++;
+                    }
+                    to_do -= p - pos;
+                    pos = p;
+                }
+            }
+            return len;
+        }
+    }
 
   public Path getPath ()
   {
@@ -507,238 +501,224 @@ public class InPort extends Reader implements Printable
     setPath(Path.valueOf(name));
   }
 
-  /** Get the current line number.
-    * The "first" line is number number 0. */
-  public int getLineNumber ()
-  {
-    int lineno = lineNumber;
-    if (readAheadLimit <= 0) // Normal, fast case:
-      {
-	if (pos > 0 && pos > lineStartPos)
-	  {
-	    char prev = buffer[pos-1];
-	    if (prev == '\n' || prev == '\r')
-	      lineno++;
-	  }
-      }
-    else
-      lineno += countLines(buffer, lineStartPos < 0 ? 0 : lineStartPos, pos);
-    return lineno;
-  }
+    /** Get the current line number.
+     * The "first" line is number number 0. */
+    public int getLineNumber() {
+        synchronized (lock) {
+            int lineno = lineNumber;
+            if (readAheadLimit <= 0) { // Normal, fast case:
+                if (pos > 0 && pos > lineStartPos) {
+                    char prev = buffer[pos-1];
+                    if (prev == '\n' || prev == '\r')
+                        lineno++;
+                }
+            }
+            else
+                lineno += countLines(buffer,
+                                     lineStartPos < 0 ? 0 : lineStartPos, pos);
+            return lineno;
+        }
+    }
 
-  public void setLineNumber (int lineNumber)
-  {
-    this.lineNumber += lineNumber - getLineNumber();
-  }
+    public void setLineNumber(int lineNumber) {
+        synchronized (lock) {
+            this.lineNumber += lineNumber - getLineNumber();
+        }
+    }
 
-  public void incrLineNumber (int lineDelta, int lineStartPos)
-  {
-    lineNumber += lineDelta;
-    this.lineStartPos = lineStartPos;
-  }
+    public void incrLineNumber(int lineDelta, int lineStartPos) {
+        synchronized (lock) {
+            lineNumber += lineDelta;
+            this.lineStartPos = lineStartPos;
+        }
+    }
 
     /** Note that we should save part the buffer when it is next filled.
      * This is used by XMLParser as a backddor for higher performance.
      * @param saveStart offset into buffer - save characters starting here.
      */
     public void setSaveStart(int saveStart) {
-        markPos = saveStart;
-        readAheadLimit = saveStart < 0 ? -1 : 0;
+        synchronized (lock) {
+            markPos = saveStart;
+            readAheadLimit = saveStart < 0 ? -1 : 0;
+        }
     }
 
-  /** Return the current (zero-based) column number. */
-  public int getColumnNumber ()
-  {
-    if (pos > 0)
-      {
-	char prev = buffer[pos-1];
-	if (prev == '\n' || prev == '\r')
-	  return 0;
-      }
-    if (readAheadLimit <= 0) // Normal, fast case:
-      return pos - lineStartPos;
+    /** Return the current (zero-based) column number. */
+    public int getColumnNumber() {
+        synchronized (lock) {
+            if (pos > 0) {
+                char prev = buffer[pos-1];
+                if (prev == '\n' || prev == '\r')
+                    return 0;
+            }
+            if (readAheadLimit <= 0) // Normal, fast case:
+                return pos - lineStartPos;
 
-    // Somebody did a mark().  Thus lineStartPos is not necessarily the
-    // start of the current line, so we have to search.
-    int start = lineStartPos < 0 ? 0 : lineStartPos;
-    for (int i = start;  i < pos; )
-      {
-	char ch = buffer[i++];
-	if (ch == '\n' || ch == '\r')
-	  start = i;
-      }
-    int col = pos - start;
-    if (lineStartPos < 0)
-      col -= lineStartPos;
-    return col;
-  }
+            // Somebody did a mark().  Thus lineStartPos is not necessarily the
+            // start of the current line, so we have to search.
+            int start = lineStartPos < 0 ? 0 : lineStartPos;
+            for (int i = start;  i < pos; ) {
+                char ch = buffer[i++];
+                if (ch == '\n' || ch == '\r')
+                    start = i;
+            }
+            int col = pos - start;
+            if (lineStartPos < 0)
+                col -= lineStartPos;
+            return col;
+        }
+    }
 
-  public boolean markSupported ()
-  {
-    return true;
-  }
+    public boolean markSupported() {
+        return true;
+    }
 
-  public synchronized void mark (int readAheadLimit)
-  {
-    if (this.readAheadLimit >= 0)
-      clearMark();
-    this.readAheadLimit = readAheadLimit;
-    markPos = pos;
-  }
+    public void mark(int readAheadLimit) {
+        synchronized (lock) {
+            if (this.readAheadLimit >= 0)
+                clearMark();
+            this.readAheadLimit = readAheadLimit;
+            markPos = pos;
+        }
+    }
 
-  public void reset ()  throws IOException
-  {
-    if (readAheadLimit < 0)
-      throw new IOException ("mark invalid");
-    if (pos > highestPos)
-      highestPos = pos;
-    pos = markPos;
-    readAheadLimit = -1;
-  }
+    public void reset()  throws IOException {
+        if (readAheadLimit < 0)
+            throw new IOException ("mark invalid");
+        synchronized (lock) {
+            if (pos > highestPos)
+                highestPos = pos;
+            pos = markPos;
+            readAheadLimit = -1;
+        }
+    }
 
-  /** Read a line.
-   * If mode is 'I' ("ignore") ignore delimiters.
-   * If mode is 'P' ("peek") leave delimiter in input stream.
-   * If mode is 'A' ("append") append delimiter to result.
-   */
-
-  public void readLine(StringBuffer sbuf, char mode)
-    throws IOException
-  {
-    for (;;)
-      {
-	int ch = read();
-	if (ch < 0)
-	  return;
-        int start = --pos;
-        while (pos < limit)
-          {
-            ch = buffer[pos++];
-	    if (ch == '\r' || ch == '\n')
-              {
-                sbuf.append(buffer, start, pos - 1 - start);
-                if (mode == 'P')
-                  {
-                    pos--;
+    /** Read a line.
+     * If mode is 'I' ("ignore") ignore delimiters.
+     * If mode is 'P' ("peek") leave delimiter in input stream.
+     * If mode is 'A' ("append") append delimiter to result.
+     */
+    public void readLine(StringBuffer sbuf, char mode) throws IOException {
+        synchronized (lock) {
+            for (;;) {
+                int ch = read();
+                if (ch < 0)
                     return;
-                  }
-                if (getConvertCR () || ch == '\n')
-                  {
-                    if (mode != 'I')
-                      sbuf.append('\n');
-                  }
-                else
-                  {
-                    if (mode != 'I')
-                      sbuf.append('\r');
-                    ch = read();
-                    if (ch == '\n')
-                      {
-                        if (mode != 'I')
-                          sbuf.append('\n');
-                      }
-                    else if (ch >= 0)
-                      unread_quick();
-                  }
-                return;
-              }
-          }
-	sbuf.append(buffer, start, pos - start);
-      }
-  }
+                int start = --pos;
+                while (pos < limit) {
+                    ch = buffer[pos++];
+                    if (ch == '\r' || ch == '\n') {
+                        sbuf.append(buffer, start, pos - 1 - start);
+                        if (mode == 'P') {
+                            pos--;
+                            return;
+                        }
+                        if (getConvertCR () || ch == '\n') {
+                            if (mode != 'I')
+                                sbuf.append('\n');
+                        } else {
+                            if (mode != 'I')
+                                sbuf.append('\r');
+                            ch = read();
+                            if (ch == '\n') {
+                                if (mode != 'I')
+                                    sbuf.append('\n');
+                            } else if (ch >= 0)
+                                unread_quick();
+                        }
+                        return;
+                    }
+                }
+                sbuf.append(buffer, start, pos - start);
+            }
+        }
+    }
 
-  public String readLine() throws IOException
-  {
-    int ch = read();
-    if (ch < 0)
-      return null;
-    if (ch == '\r' || ch == '\n')
-      return "";
-    int start = pos - 1;
-    while (pos < limit)
-      {
-	ch = buffer[pos++];
-	if (ch == '\r' || ch == '\n')
-          {
-            int end = pos - 1;
-            if (ch != '\n' && ! getConvertCR())
-              {
+    public String readLine() throws IOException {
+        synchronized (lock) {
+            int ch = read();
+            if (ch < 0)
+                return null;
+            if (ch == '\r' || ch == '\n')
+                return "";
+            int start = pos - 1;
+            while (pos < limit) {
+                ch = buffer[pos++];
+                if (ch == '\r' || ch == '\n') {
+                    int end = pos - 1;
+                    if (ch != '\n' && ! getConvertCR()) {
+                        if (pos >= limit) {
+                            pos--;
+                            break;
+                        }
+                        if (buffer[pos] == '\n')
+                            pos++;
+                    }
+                    return new String(buffer, start, end - start);
+                }
+            }
+            StringBuffer sbuf = new StringBuffer(100);
+            sbuf.append(buffer, start, pos - start);
+            readLine(sbuf, 'I');
+            return sbuf.toString();
+        }
+    }
+
+    /** Skip forwards or backwards a number of characters. */
+    public int skip(int n) throws IOException {
+        synchronized (lock) {
+            if (n < 0) {
+                int to_do = -n;
+                for (; to_do > 0 && pos > 0;  to_do--)
+                    unread();
+                return n + to_do;
+            } else {
+                // Same logic as in read(char[],int,int).
+                int to_do = n;
+                int ch;
                 if (pos >= limit)
-                  {
-                    pos--;
-                    break;
-                  }
-                if (buffer[pos] == '\n')
-                  pos++;
-              }
-            return new String(buffer, start, end - start);
-          }
-      }
-    StringBuffer sbuf = new StringBuffer(100);
-    sbuf.append(buffer, start, pos - start);
-    readLine(sbuf, 'I');
-    return sbuf.toString();
-  }
+                    ch = '\0';
+                else if (pos > 0)
+                    ch = buffer[pos-1];
+                else if ((flags & PREV_WAS_CR) != 0 || lineStartPos >= 0)
+                    ch = '\n';
+                else
+                    ch = '\0';
+                while (to_do > 0) {
+                    if (ch == '\n' || ch == '\r' || pos >= limit) {
+                        ch = read();
+                        if (ch < 0)
+                            return n - to_do;
+                        to_do--;
+                    } else {
+                        int p = pos;
+                        int lim = limit;
+                        if (to_do < lim - p)
+                            lim = p + to_do;
+                        while (p < lim) {
+                            ch = buffer[p];
+                            // For simplicity and correctness we delegate
+                            // handlingof newlines (including previous
+                            // character) to read().
+                            if (ch == '\n' || ch == '\r')
+                                break;
+                            p++;
+                        }
+                        to_do -= p - pos;
+                        pos = p;
+                    }
+                }
+                return n;
+            }
+        }
+    }
 
-  /** Skip forwards or backwards a number of characters. */
-  public int skip(int n) throws IOException
-  {
-    if (n < 0)
-      {
-	int to_do = -n;
-	for (; to_do > 0 && pos > 0;  to_do--)
-	  unread();
-	return n + to_do;
-      }
-    else
-      {
-	// Same logic as in read(char[],int,int).
-	int to_do = n;
-	int ch;
-	if (pos >= limit)
-	  ch = '\0';
-	else if (pos > 0)
-	  ch = buffer[pos-1];
-	else if ((flags & PREV_WAS_CR) != 0 || lineStartPos >= 0)
-	  ch = '\n';
-	else
-	  ch = '\0';
-	while (to_do > 0)
-	  {
-	    if (ch == '\n' || ch == '\r' || pos >= limit)
-	      {
-		ch = read();
-		if (ch < 0)
-		  return n - to_do;
-		to_do--;
-	      }
-	    else
-	      {
-		int p = pos;
-		int lim = limit;
-		if (to_do < lim - p)
-		  lim = p + to_do;
-		while (p < lim)
-		  {
-		    ch = buffer[p];
-		    // For simplicity and correctness we defer handling of
-		    // newlines (including previous character) to read().
-		    if (ch == '\n' || ch == '\r')
-		      break;
-		    p++;
-		  }
-		to_do -= p - pos;
-		pos = p;
-	      }
-	  }
-	return n;
-      }
-  }
-
-  public boolean ready () throws java.io.IOException
-  {
-    return pos < limit || (flags & EOF_SEEN) != 0 || sourceReady();
-  }
+    public boolean ready() throws java.io.IOException {
+        synchronized (lock) {
+            return pos < limit || (flags & EOF_SEEN) != 0 || sourceReady();
+        }
+    }
   
   protected boolean sourceReady() throws java.io.IOException {
       return in.ready();
@@ -769,84 +749,75 @@ public class InPort extends Reader implements Printable
     return count;
   }
 
-  /** Skips the rest of the current line, including the line terminator. */
-  public void skipRestOfLine ()
-       throws java.io.IOException
-  {
-    for (;;)
-      {
-        int c = read();
-        if (c < 0)
-          return;
-        if (c == '\r')
-          {
-            c = read();
-            if (c >= 0 && c != '\n')
-              unread();
-            break;
-          }
-        else if (c == '\n')
-          break;
-      }
-  }
+    /** Skips the rest of the current line, including the line terminator. */
+    public void skipRestOfLine() throws java.io.IOException {
+        synchronized (lock) {
+            for (;;) {
+                int c = read();
+                if (c < 0)
+                    return;
+                if (c == '\r') {
+                    c = read();
+                    if (c >= 0 && c != '\n')
+                        unread();
+                    break;
+                } else if (c == '\n')
+                    break;
+            }
+        }
+    }
 
-  /* Move one character backwards. */
-  public void unread ()
-       throws java.io.IOException
-  {
-    if (pos == 0)
-      throw new java.io.IOException("unread too much");
-    pos--;
-    char ch = buffer[pos];
-    if (ch == '\n' || ch == '\r')
-      {
-	if (pos > 0 && ch == '\n' && getConvertCR() && buffer[pos-1] == '\r')
-	  pos--;
-	if (pos < lineStartPos)
-	  {
-	    lineNumber--;
-	    int i;
-	    for (i = pos;  i > 0; )
-	      {
-		ch = buffer[--i];
-		if (ch == '\r' || ch == '\n')
-		  {
-		    i++;
-		    break;
-		  }
-	      }
-	    lineStartPos = i;
-	  }
-      }
-  }
+    /* Move one character backwards. */
+    public void unread() throws java.io.IOException {
+        synchronized (lock) {
+            if (pos == 0)
+                throw new java.io.IOException("unread too much");
+            pos--;
+            char ch = buffer[pos];
+            if (ch == '\n' || ch == '\r') {
+                if (pos > 0 && ch == '\n' && getConvertCR()
+                    && buffer[pos-1] == '\r')
+                    pos--;
+                if (pos < lineStartPos) {
+                    lineNumber--;
+                    int i;
+                    for (i = pos;  i > 0; ) {
+                        ch = buffer[--i];
+                        if (ch == '\r' || ch == '\n') {
+                            i++;
+                            break;
+                        }
+                    }
+                    lineStartPos = i;
+                }
+            }
+        }
+    }
 
-  /** Same as unread, but only allowed after non-EOF-returning read().
-   * Also allowed after an intervening peek(), but only if the read()
-   * did not return '\r' or '\n'. */
-  public void unread_quick ()
-  {
-    pos--;
-  }
+    /** Same as unread, but only allowed after non-EOF-returning read().
+     * Also allowed after an intervening peek(), but only if the read()
+     * did not return '\r' or '\n'. */
+    public void unread_quick() {
+        pos--;
+    }
 
-  public int peek ()
-       throws java.io.IOException
-  {
-    if (pos < limit && pos > 0)
-      {
-	char ch = buffer[pos - 1];
-	if (ch != '\n' && ch != '\r')
-	  {
-	    ch = buffer[pos];
-	    if (ch == '\r' && getConvertCR())
-	      ch = '\n';
-	    return ch;
-	  }
-      }
-    int c = read ();
-    if (c >= 0)
-      unread_quick();
-    return c;
-  }
+    public int peek() throws java.io.IOException {
+        synchronized (lock) {
+            if (pos < limit && pos > 0) {
+                char ch = buffer[pos - 1];
+                if (ch != '\n' && ch != '\r') {
+                    ch = buffer[pos];
+                    if (ch == '\r' && getConvertCR())
+                        ch = '\n';
+                    return ch;
+                }
+            }
+            int c = read ();
+            if (c >= 0)
+                unread_quick();
+            return c;
+        }
+    }
 
     /** Reads a Unicode character (codepoint) by checking for surrogates.
      * An invalid surrogate pair retruns 0xFFFD.
@@ -864,7 +835,9 @@ public class InPort extends Reader implements Printable
     }
 
     public int readCodePoint() throws java.io.IOException {
-        return readCodePoint(this);
+        synchronized (lock) {
+            return readCodePoint(this);
+        }
     }
 
     public static int peekCodePoint(Reader in) throws java.io.IOException {
@@ -877,24 +850,27 @@ public class InPort extends Reader implements Printable
             return ch;
         }
     }
+
     public int peekCodePoint() throws java.io.IOException {
-        int ch = peek();
-        if (ch < 0xD800 || ch > 0xDBFF)
+        synchronized (lock) {
+            int ch = peek();
+            if (ch < 0xD800 || ch > 0xDBFF)
+                return ch;
+            if (readAheadLimit > 0 && pos + 2 - markPos > readAheadLimit)
+                clearMark();
+            if (readAheadLimit == 0) {
+                mark(2);
+                ch = readCodePoint(this);
+                reset();
+            } else {
+                // Here we know that pos + 2 - markPos <= readAheadLimit.
+                int savePos = pos;
+                ch = readCodePoint(this);
+                if (pos > highestPos)
+                    highestPos = pos;
+                pos = savePos;
+            }
             return ch;
-        if (readAheadLimit > 0 && pos + 2 - markPos > readAheadLimit)
-            clearMark();
-        if (readAheadLimit == 0) {
-            mark(2);
-            ch = readCodePoint(this);
-            reset();
-        } else {
-            // Here we know that pos + 2 - markPos <= readAheadLimit.
-            int savePos = pos;
-            ch = readCodePoint(this);
-            if (pos > highestPos)
-                highestPos = pos;
-            pos = savePos;
         }
-        return ch;
     }
 }

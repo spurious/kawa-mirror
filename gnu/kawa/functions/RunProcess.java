@@ -229,12 +229,12 @@ public class RunProcess extends MethodProc {
             cmd.add("/bin/sh");
             cmd.add("-c");
             String expanded = handleMarks(command.toString());
-            //System.err.println("expanded '"+command+"' -> '"+expanded+"'");
+            //Strings.printQuoted("expanded '"+command+"' -> '"+expanded+"'", System.err, 2); System.err.println();
             cmd.add(expanded);
         } else {
             if (cmd == null) {
                 cmd = tokenize(command.toString());
-                //System.err.println("tokenize '"+command+"' -> "+cmd);
+                //Strings.printQuoted("tokenize '"+command+"' -> "+cmd, System.err, 2); System.err.println();
             }
         }
         builder.command(cmd);
@@ -405,10 +405,27 @@ public class RunProcess extends MethodProc {
                 continue;
             }
             if (inSubstitution > 0) {
-                if (ch == '\n' && inGroup == 0
-                    && i+1<len && str.charAt(i+1) == DelimitSubstitutionFormat.MARK_SUBSTITUTION_END) {
-                    // Skip final '\n'.
-                    continue;
+                if (ch == '\n' && inGroup == 0) {
+                    // Check for final newline(s) in substitution.
+                    int nlCount = 1;  // Count of '\n'
+                    for (;;) {
+                        ch = str.charAt(i+nlCount);
+                        if (ch != '\n')
+                            break;
+                        nlCount++;
+                    }
+                    i += nlCount-1;
+                    if (ch == DelimitSubstitutionFormat.MARK_SUBSTITUTION_END) {
+                        // We saw nlCount final newlines.  Skip them,
+                        continue;
+                    }
+                    if (quoted > 0) {
+                        ch = '\n';
+                        while (--nlCount > 0) {
+                            sbuf.append('\n');
+                        }
+                    } else
+                        ch = ' ';
                 }
                 if (quoted == '"') {
                     if (ch == '$' || ch == '\\')
@@ -501,6 +518,29 @@ public class RunProcess extends MethodProc {
                 continue;
             }
             
+            if (ch == '\n' && inSubstitution > 0 && inGroup == 0) {
+                // Check for final newline(s) in substitution.
+                int nlCount = 1;  // Count of '\n'
+                for (;;) {
+                    ch = str.charAt(i+nlCount);
+                    if (ch != '\n')
+                        break;
+                    nlCount++;
+                }
+                i += nlCount-1;
+                if (ch == DelimitSubstitutionFormat.MARK_SUBSTITUTION_END) {
+                    // We saw nlCount final newlines.  Skip them,
+                    continue;
+                }
+                ch = '\n';
+                if (state <= 0) {
+                    // Token separator - handled below
+                } else {
+                    while (--nlCount > 0) {
+                        sbuf.append('\n');
+                    }
+                }
+            }
             if (state <= 0 && inGroup == 0
                 && (ch == ' ' || ch == '\t'
                     || ch == '\n' || ch == '\r')) {
@@ -511,11 +551,6 @@ public class RunProcess extends MethodProc {
                 }
                 continue;
             } else if (inSubstitution > 0) {
-                if (ch == '\n' && inGroup == 0
-                    && i+1<len && str.charAt(i+1) == DelimitSubstitutionFormat.MARK_SUBSTITUTION_END) {
-                    // Skip final '\n'.
-                    continue;
-                }
             }
             else if (state <= 0) {
                 if (ch == '\\' || ch == '\'' || ch == '\"') {

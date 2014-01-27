@@ -1,3 +1,7 @@
+2014-01-27  Per Bothner  <per@bothner.com>
+
+	* system-test.scm: Add tests of final-newline-removal.
+
 2014-01-08  Per Bothner  <per@bothner.com>
 
 	* r7rs-tests.scm: Add nested guard-in-guard test.

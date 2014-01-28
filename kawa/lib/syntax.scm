@@ -285,7 +285,7 @@
      (let ((xd (syntax->datum #'fstr)))
        (cons #'fstr (%string-format-format default-format #'rest))))
     (((x . y) . rest)
-      (cons "~a" (%string-format-format default-format #'rest)))
+      (cons default-format (%string-format-format default-format #'rest)))
     ((x . rest)
      (cons #'(constant-fold invoke (constant-fold invoke x 'toString)
                             'replace "~" "~~")

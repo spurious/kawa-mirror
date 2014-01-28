@@ -40,10 +40,9 @@ public class URIPath
       return URIPath.valueOf((URI) path);
     /* #endif */
     String str;
-    if (path instanceof File || path instanceof Path || path instanceof FString)
+    if (path instanceof CharSequence ||
+        path instanceof File || path instanceof Path)
       str = path.toString();
-    else if (path instanceof String)
-      str = (String) path;
     else
       return null;
     return URIPath.valueOf(str);

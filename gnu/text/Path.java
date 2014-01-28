@@ -65,12 +65,10 @@ implements javax.tools.FileObject
     if (path instanceof File)
       return FilePath.valueOf((File) path);
     String str;
-    if (path instanceof gnu.lists.FString) // FIXME: || UntypedAtomic
+    if (path instanceof CharSequence) // FIXME: || UntypedAtomic
       str = path.toString();
-    else if (! (path instanceof String))
-      return null;
     else
-      str = (String) path;
+      return null;
     if (Path.uriSchemeSpecified(str))
       return URIPath.valueOf(str);
     else

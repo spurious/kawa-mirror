@@ -85,10 +85,8 @@ public class FilePath
     if (path instanceof File)
       return FilePath.valueOf((File) path);
     String str;
-    if (path instanceof gnu.lists.FString) // FIXME: || UntypedAtomic
+    if (path instanceof CharSequence) // FIXME: || UntypedAtomic
       str = path.toString();
-    else if (path instanceof String)
-      str = (String) path;
     else
       return null;
     return FilePath.valueOf(str);

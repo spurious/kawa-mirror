@@ -1,3 +1,7 @@
+2014-01-29  Mark H Weaver <mhw@netris.org>
+
+	* testing.scm: Patches to better support Guile-2.
+
 2013-10-19  David Van Horn
 	    Per Bothner  <per@bothner.com>
 

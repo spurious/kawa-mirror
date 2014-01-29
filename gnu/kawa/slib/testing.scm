@@ -2,6 +2,7 @@
 ;; Added "full" support for Chicken, Gauche, Guile and SISC.
 ;;   Alex Shinn, Copyright (c) 2005.
 ;; Modified for Scheme Spheres by Álvaro Castro-Castilla, Copyright (c) 2012.
+;; Support for Guile 2 by Mark H Weaver <mhw@netris.org>, Copyright (c) 2014.
 ;;
 ;; Permission is hereby granted, free of charge, to any person
 ;; obtaining a copy of this software and associated documentation
@@ -26,6 +27,12 @@
 (cond-expand
  (chicken
   (require-extension syntax-case))
+ (guile-2
+  (use-modules (srfi srfi-9)
+               ;; In 2.0.9, srfi-34 and srfi-35 are not well integrated
+               ;; with either Guile's native exceptions or R6RS exceptions.
+               ;;(srfi srfi-34) (srfi srfi-35)
+               (srfi srfi-39)))
  (guile
   (use-modules (ice-9 syncase) (srfi srfi-9)
 	       ;;(srfi srfi-34) (srfi srfi-35) - not in Guile 1.6.7
@@ -236,7 +243,7 @@
 	 (else #t)))
     r))
 
-(define (%test-specificier-matches spec runner)
+(define (%test-specifier-matches spec runner)
   (spec runner))
 
 (define (test-runner-create)
@@ -247,7 +254,7 @@
     (let loop ((l list))
       (cond ((null? l) result)
 	    (else
-	     (if (%test-specificier-matches (car l) runner)
+	     (if (%test-specifier-matches (car l) runner)
 		 (set! result #t))
 	     (loop (cdr l)))))))
 
@@ -609,6 +616,21 @@
 	   (line-pair (if line (list (cons 'source-line line)) '())))
       (cons (cons 'source-form (syntax-object->datum form))
 	    (if file (cons (cons 'source-file file) line-pair) line-pair)))))
+ (guile-2
+  (define (%test-source-line2 form)
+    (let* ((src-props (syntax-source form))
+           (file (and src-props (assq-ref src-props 'filename)))
+           (line (and src-props (assq-ref src-props 'line)))
+           (file-alist (if file
+                           `((source-file . ,file))
+                           '()))
+           (line-alist (if line
+                           `((source-line . ,(+ line 1)))
+                           '())))
+      (datum->syntax (syntax here)
+                     `((source-form . ,(syntax->datum form))
+                       ,@file-alist
+                       ,@line-alist)))))
  (else
   (define (%test-source-line2 form)
     '())))
@@ -662,12 +684,12 @@
        (%test-report-result)))))
 
 (cond-expand
- ((or kawa mzscheme)
+ ((or kawa mzscheme guile-2)
   ;; Should be made to work for any Scheme with syntax-case
   ;; However, I haven't gotten the quoting working.  FIXME.
   (define-syntax test-end
     (lambda (x)
-      (syntax-case (list x (list 'quote (%test-source-line2 x))) ()
+      (syntax-case (list x (list (syntax quote) (%test-source-line2 x))) ()
 	(((mac suite-name) line)
 	 (syntax
 	  (%test-end suite-name line)))
@@ -676,7 +698,7 @@
 	  (%test-end #f line))))))
   (define-syntax test-assert
     (lambda (x)
-      (syntax-case (list x (list 'quote (%test-source-line2 x))) ()
+      (syntax-case (list x (list (syntax quote) (%test-source-line2 x))) ()
 	(((mac tname expr) line)
 	 (syntax
 	  (let* ((r (test-runner-get))
@@ -689,7 +711,7 @@
 	    (test-result-alist! r line)
 	    (%test-comp1body r expr)))))))
   (define (%test-comp2 comp x)
-    (syntax-case (list x (list 'quote (%test-source-line2 x)) comp) ()
+    (syntax-case (list x (list (syntax quote) (%test-source-line2 x)) comp) ()
       (((mac tname expected expr) line comp)
        (syntax
 	(let* ((r (test-runner-get))
@@ -709,7 +731,7 @@
     (lambda (x) (%test-comp2 (syntax equal?) x)))
   (define-syntax test-approximate ;; FIXME - needed for non-Kawa
     (lambda (x)
-      (syntax-case (list x (list 'quote (%test-source-line2 x))) ()
+      (syntax-case (list x (list (syntax quote) (%test-source-line2 x))) ()
       (((mac tname expected expr error) line)
        (syntax
 	(let* ((r (test-runner-get))
@@ -774,7 +796,21 @@
   (define-syntax %test-error
     (syntax-rules ()
       ((%test-error r etype expr)
-       (%test-comp1body r (catch #t (lambda () expr) (lambda (key . args) #t)))))))
+       (cond ((%test-on-test-begin r)
+              (let ((et etype))
+                (test-result-set! r 'expected-error et)
+                (%test-on-test-end r
+                                   (catch #t
+                                     (lambda ()
+                                       (test-result-set! r 'actual-value expr)
+                                       #f)
+                                     (lambda (key . args)
+                                       ;; TODO: decide how to specify expected
+                                       ;; error types for Guile.
+                                       (test-result-set! r 'actual-error
+                                                         (cons key args))
+                                       #t)))
+                (%test-report-result))))))))
  (mzscheme
   (define-syntax %test-error
     (syntax-rules ()
@@ -830,12 +866,12 @@
 		  ((equal? etype #t)
 		   #t)
 		  (else #t))
-	      expr))))))
+	      expr #f))))))
  (srfi-34
   (define-syntax %test-error
     (syntax-rules ()
       ((%test-error r etype expr)
-       (%test-comp1body r (guard (ex (else #t)) expr))))))
+       (%test-comp1body r (guard (ex (else #t)) expr #f))))))
  (else
   (define-syntax %test-error
     (syntax-rules ()
@@ -846,11 +882,11 @@
 	 (%test-report-result)))))))
 
 (cond-expand
- ((or kawa mzscheme)
+ ((or kawa mzscheme guile-2)
 
   (define-syntax test-error
     (lambda (x)
-      (syntax-case (list x (list 'quote (%test-source-line2 x))) ()
+      (syntax-case (list x (list (syntax quote) (%test-source-line2 x))) ()
 	(((mac tname etype expr) line)
 	 (syntax
 	  (let* ((r (test-runner-get))
@@ -987,7 +1023,9 @@
   (let* ((port (open-input-string string))
 	 (form (read port)))
     (if (eof-object? (read-char port))
-	(eval form)
+	(cond-expand
+	 (guile (eval form (current-module)))
+	 (else (eval form)))
 	(cond-expand
 	 (srfi-23 (error "(not at eof)"))
 	 (else "error")))))

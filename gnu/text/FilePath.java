@@ -10,12 +10,10 @@ import gnu.mapping.*;
 
 public class FilePath
   extends Path
-  /* #ifdef JAVA2 */
   /* #ifdef JAVA5 */
   implements Comparable<FilePath>
   /* #else */
   // implements Comparable
-  /* #endif */
   /* #endif */
 {
   final File file;
@@ -203,7 +201,7 @@ public class FilePath
       if (file.isAbsolute())
           return file;
       Path cur = currentPath();
-      if (cur == defaultPath)
+      if (cur == userDirPath)
           return file;
       return ((FilePath) cur.resolve(this)).toFileRaw();
   }
@@ -216,16 +214,7 @@ public class FilePath
       return getAbsolute().toURL();
     try
       {
-        /* #ifdef JAVA2 */
-        /* #ifdef use:java.net.URI */
         return file.toURI().toURL();
-        /* #else */
-        // return file.toURL();
-        /* #endif */
-        /* #else */
-        // char fileSep = File.separatorChar;
-        // return new URL("file:" + file.getAbsolutePath().replace(fileSep, '/'));
-        /* #endif */
       }
     catch (Throwable ex)
       {
@@ -233,17 +222,6 @@ public class FilePath
       }
   }
 
-  /* #ifndef use:java.net.URI */
-  // public String toURIString ()
-  // {
-  //   if (file.isAbsolute())
-  //     return toURL().toString();
-  //   else
-  //     return file.toString().replace(File.separatorChar, '/');
-  // }
-  /* #endif */
-
-  /* #ifdef use:java.net.URI */
   private static URI toUri (File file)
   {
     try
@@ -271,7 +249,6 @@ public class FilePath
       return resolve("").toURI();
     return toUri(file);
   }
-  /* #endif */
 
   public InputStream openInputStream () throws IOException
   {

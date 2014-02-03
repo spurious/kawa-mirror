@@ -23,11 +23,7 @@ implements javax.tools.FileObject
   public static final FilePath userDirPath =
     FilePath.valueOf(new File("."));
 
-  public static Path defaultPath = userDirPath;
-
-  /* #ifdef JAVA2 */
   private static ThreadLocal<Path> pathLocation = new ThreadLocal<Path>();
-  /* #endif */
 
   protected Path ()
   {
@@ -35,21 +31,17 @@ implements javax.tools.FileObject
 
   public static Path currentPath ()
   {
-    /* #ifdef JAVA2 */
     Path path = pathLocation.get();
     if (path != null)
       return path;
-    /* #endif */
-    return defaultPath;
+    return userDirPath;
   }
 
   public static void setCurrentPath (Path path)
   {
-    /* #ifdef JAVA2 */
+    if (! path.isAbsolute())
+      path = path.getAbsolute();
     pathLocation.set(path);
-    /* #else */
-    // defaultPath = path;
-    /* #endif */
   }
 
   public static Path coerceToPathOrNull (Object path)

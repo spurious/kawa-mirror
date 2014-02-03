@@ -1,3 +1,10 @@
+2014-02-03  Per Bothner  <per@bothner.com>
+
+	* Path.java: Get rid of pre-JAVA2 and pre-JAVA4 support.
+	(defaultPath): Remove - just use userDirPath instead.
+
+	* Path.java (setCurrentPath): Make argument absolute.
+
 2014-01-27  Jamison Hope  <jrh@theptrgroup.com>
 
 	* Path.java (coerceToPathOrNull): Handle CharSequence argument.

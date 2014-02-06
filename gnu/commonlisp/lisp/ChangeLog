@@ -1,3 +1,13 @@
+2014-02-06  Per Bothner  <per@bothner.com>
+
+	* PrimOps.scm (car): Remove.
+
+2014-02-06  Charles Turner  <chturne@gmail.com>
+
+	* primitives.lisp (new file): Make a start on the translation of
+	PrimOps.scm to primitives.lisp.
+	* Makefile.am: Update accordingly.
+
 2012-12-31  Per Bothner  <per@bothner.com>
 
 	* PrimOps.scm (princ, prin1): New functions.

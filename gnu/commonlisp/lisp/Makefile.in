@@ -246,11 +246,11 @@ CLEANFILES = $(java_BUILT) *.class *.stamp *.jar $(PACKAGE_OFILE) $(EXTRA_CLEAN)
 KAWA_COMPILER = $(JAVA) -classpath "$(CLASSPATH)" kawa.repl -d $(top_builddir) \
   -P `echo $(PACKAGE_FNAME)|sed -e s/-/./g`.
 
-
-#java_CLISP = lists.lisp
+java_CLISP = primitives.lisp
+# Required for Elisp
 java_SCM = PrimOps.scm
 PACKAGE_FNAME = gnu-commonlisp-lisp
-EXTRA_DIST = $(java_SCM)
+EXTRA_DIST = $(java_CLISP) $(java_SCM)
 EXTRA_GCJ_INPUTS = *.class
 all: all-am
 
@@ -470,7 +470,7 @@ elisp-classes.stamp: $(java_ELISP)
 	$(KAWA_COMPILER) --elisp -C $?
 	echo timestamp > elisp-classes.stamp
 	echo timestamp > $(TO_TOPDIR)/kawa-jar.stamp
-all: Makefile ../../../kawa/java-classes.stamp scm-classes.stamp $(@GCJ_COMPILED_SELECTED@)
+all: Makefile ../../../kawa/java-classes.stamp scm-classes.stamp clisp-classes.stamp $(@GCJ_COMPILED_SELECTED@)
 
 ../../../kawa/java-classes.stamp:
 	cd ../../../kawa; $(MAKE)

@@ -152,6 +152,7 @@ public class CommonLisp extends Lisp2
     defun("eq", new gnu.kawa.functions.IsEq(this, "eq"));
     defun("equal", new gnu.kawa.functions.IsEqual(this, "equal"));
     defun("typep", new gnu.kawa.reflect.InstanceOf(this));
+    defProcStFld("the", "gnu.kawa.functions.Convert", "as");
     defun("%flet", new kawa.standard.let("flet", true));
     defProcStFld("princ", "gnu.commonlisp.lisp.PrimOps");
     defProcStFld("prin1", "gnu.commonlisp.lisp.PrimOps");
@@ -164,6 +165,7 @@ public class CommonLisp extends Lisp2
     defProcStFld(">=", "gnu.commonlisp.lang.CommonLisp", "numGEq");
 
     defProcStFld("functionp", "gnu.commonlisp.lisp.PrimOps");
+    defProcStFld("car", "gnu.commonlisp.lisp.primitives");
   }
 
   public static CommonLisp getInstance()

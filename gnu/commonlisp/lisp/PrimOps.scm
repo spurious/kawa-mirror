@@ -2,9 +2,6 @@
 ;;; They should be re-written in Common Lisp, but there are still some
 ;;; limitations in the Common Lisp support making that difficult.
 
-(define (car x)
-  (if (eq? x '()) x ((as <pair> x):getCar)))
-
 (define (cdr x)
   (if (eq? x '()) x ((as <pair> x):getCdr)))
 

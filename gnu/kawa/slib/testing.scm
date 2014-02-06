@@ -573,7 +573,12 @@
   (define-syntax %test-evaluate-with-catch
     (syntax-rules ()
       ((%test-evaluate-with-catch test-expression)
-       (catch #t (lambda () test-expression) (lambda (key . args) #f))))))
+       (catch #t
+         (lambda () test-expression)
+         (lambda (key . args)
+           (test-result-set! (test-runner-current) 'actual-error
+                             (cons key args))
+           #f))))))
  (kawa
   (define-syntax %test-evaluate-with-catch
     (syntax-rules ()
@@ -661,7 +666,7 @@
 			   (%test-on-test-end r (comp exp res)))))
 		   (%test-report-result)))))
 
-(define (%test-approximimate= error)
+(define (%test-approximate= error)
   (lambda (value expected)
     (let ((rval (real-part value))
           (ival (imag-part value))
@@ -737,12 +742,12 @@
 	(let* ((r (test-runner-get))
 	       (name tname))
 	  (test-result-alist! r (cons (cons 'test-name tname) line))
-	  (%test-comp2body r (%test-approximimate= error) expected expr))))
+	  (%test-comp2body r (%test-approximate= error) expected expr))))
       (((mac expected expr error) line)
        (syntax
 	(let* ((r (test-runner-get)))
 	  (test-result-alist! r line)
-	  (%test-comp2body r (%test-approximimate= error) expected expr))))))))
+	  (%test-comp2body r (%test-approximate= error) expected expr))))))))
  (else
   (define-syntax test-end
     (syntax-rules ()
@@ -787,9 +792,9 @@
   (define-syntax test-approximate
     (syntax-rules ()
       ((test-approximate tname expected expr error)
-       (%test-comp2 (%test-approximimate= error) tname expected expr))
+       (%test-comp2 (%test-approximate= error) tname expected expr))
       ((test-approximate expected expr error)
-       (%test-comp2 (%test-approximimate= error) expected expr))))))
+       (%test-comp2 (%test-approximate= error) expected expr))))))
 
 (cond-expand
  (guile
@@ -908,13 +913,16 @@
     (syntax-rules ()
       ((test-error name etype expr)
        (let ((r (test-runner-get)))
-         (test-assert name (%test-error r etype expr))))
+         (test-result-alist! r `((test-name . ,name)))
+         (%test-error r etype expr)))
       ((test-error etype expr)
        (let ((r (test-runner-get)))
-         (test-assert (%test-error r etype expr))))
+         (test-result-alist! r '())
+         (%test-error r etype expr)))
       ((test-error expr)
        (let ((r (test-runner-get)))
-         (test-assert (%test-error r #t expr))))))))
+         (test-result-alist! r '())
+         (%test-error r #t expr)))))))
 
 (define (test-apply first . rest)
   (if (test-runner? first)

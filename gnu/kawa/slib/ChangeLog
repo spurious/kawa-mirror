@@ -1,3 +1,14 @@
+2014-01-30   Mark H Weaver <mhw@netris.org>
+
+	* testing.scm (%test-evaluate-with-catch): Improved Guile's
+	implementation to record 'actual-error' if there's an error.
+
+	* testing.scm: Fix typo '%test-approximimate=' -> '%test-approximate='.
+
+	* testing.scm (test-error): In the default implementation
+	'%test-report-result' was being called twice: once by '%test-error',
+	and once by 'test-assert'.
+
 2014-01-29  Mark H Weaver <mhw@netris.org>
 
 	* testing.scm: Patches to better support Guile-2.

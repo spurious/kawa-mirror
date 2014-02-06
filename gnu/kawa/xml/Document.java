@@ -36,8 +36,8 @@ public class Document
     return new KDocument(tree, TreeList.BEGIN_ENTITY_SIZE << 1);
   }
 
-  private static ThreadLocation docMapLocation
-    = new ThreadLocation("document-map");
+  private static ThreadLocal<HashMap<Path,KDocument>> docMapLocation
+    = new ThreadLocal<HashMap<Path,KDocument>>();
 
   /* #ifdef JAVA2 */
   private static HashMap cache
@@ -58,8 +58,7 @@ public class Document
   /** Clear the thread-local uri-to-document map. */
   public static void clearLocalCache ()
   {
-    Location loc = docMapLocation.getLocation();
-    loc.set(null);
+    docMapLocation.set(null);
   }
 
   /** Clear the global uri-to-document "soft" cache. */
@@ -88,14 +87,13 @@ public class Document
         cache.remove(oldref.key);
       }
     /* #endif */
-    Location loc = docMapLocation.getLocation();
-    Hashtable map = (Hashtable) loc.get(null);
+    HashMap<Path,KDocument> map = docMapLocation.get();
     if (map == null)
       {
-        map = new Hashtable();
-        loc.set(map);
+        map = new HashMap<Path,KDocument>();
+        docMapLocation.set(map);
       }
-    KDocument doc = (KDocument) map.get(uri);
+    KDocument doc = map.get(uri);
     if (doc != null)
       return doc;
     /* #ifdef JAVA2 */

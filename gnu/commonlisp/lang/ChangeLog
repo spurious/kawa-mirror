@@ -1,3 +1,7 @@
+2014-02-05  Charles Turner  <chturne@gmail.com>
+
+	* CommonLisp.java: Expose *package* variable to the CL language.
+
 2013-11-10  Per Bothner  <per@bothner.com>
 
 	* defun.java:  Update for new 'formStack' and scanDefinitions API.

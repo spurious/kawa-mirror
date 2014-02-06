@@ -1,3 +1,8 @@
+2014-02-05  Charles Turner  <chturne@gmail.com>
+
+	* LispPackage.java: Manage Lisp packages explicity in the
+	namespace map.
+
 2014-01-05  Per Bothner  <per@bothner.com>
 
 	* Makefile.am: Merge into ../../../gnu/Makefile.am and remove.

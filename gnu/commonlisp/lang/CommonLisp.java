@@ -156,6 +156,7 @@ public class CommonLisp extends Lisp2
     defProcStFld("princ", "gnu.commonlisp.lisp.PrimOps");
     defProcStFld("prin1", "gnu.commonlisp.lisp.PrimOps");
 
+    defAliasStFld("*package*", "gnu.kawa.lispexpr.LispPackage", "currentPackage");
     defProcStFld("=", "gnu.commonlisp.lang.CommonLisp", "numEqu");
     defProcStFld("<", "gnu.commonlisp.lang.CommonLisp", "numLss");
     defProcStFld(">", "gnu.commonlisp.lang.CommonLisp", "numGrt");

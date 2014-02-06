@@ -152,7 +152,18 @@ public class LispPackage extends Namespace
    */
   public static LispPackage valueOf (String name)
   {
-    return (LispPackage) Namespace.valueOf(name);
+    if (name == null)
+      name = "";
+    
+    synchronized (nsTable) {
+      Namespace ns = (Namespace) nsTable.get(name);
+      if (ns != null)
+        return (LispPackage) ns;
+      ns = new LispPackage();
+      ns.setName(name.intern());
+      Namespace.nsTable.put(name, ns);
+      return (LispPackage) ns;
+    }
   }
   
   public static Namespace valueOfNoCreate (String name)

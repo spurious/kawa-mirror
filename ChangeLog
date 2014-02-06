@@ -1,5 +1,8 @@
 2014-02-06  Per Bothner  <per@bothner.com>
 
+	* build.xml (commonlisp-scm-classes): Make sure to compile
+	primitives.lisp.
+
 	* Makefile.am (COMMENT_IN, COMMENT_OUT): Remove unused macros.
 
 2014-01-06  Per Bothner  <per@bothner.com>

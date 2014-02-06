@@ -554,16 +554,20 @@
       </fileset>
     </kawac>
   </target>
-  
-  <fileset id="commonlisp-scm" dir="${src.dir}/gnu/commonlisp/lisp"> 
-    <include name="PrimOps.scm"/>
-  </fileset>
 
   <target name="commonlisp-scm-classes"
           depends="java-classes">
     <kawac failonerror="true" destdir="${build.classes}"
 	   prefix="gnu.commonlisp.lisp." modulestatic="run" language="scheme">
-      <fileset refid="commonlisp-scm"/>
+       <filelist dir="${src.dir}/gnu/commonlisp/lisp">
+         <file name="PrimOps.scm"/>
+       </filelist>
+    </kawac>
+    <kawac failonerror="true" destdir="${build.classes}"
+	   prefix="gnu.commonlisp.lisp." modulestatic="run" language="clisp">
+       <filelist dir="${src.dir}/gnu/commonlisp/lisp">
+         <file name="primitives.lisp"/>
+       </filelist>
     </kawac>
   </target>
 

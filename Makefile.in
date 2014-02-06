@@ -368,8 +368,6 @@ JAVADOC_EXTRA_PATH = $(JAVADOC_ECLIPSE_JARS):$(JAVADOC_ANT_JARS)
 @WITH_HTTPSERVER_TRUE@PREPROCESS_HTTPSERVER = +use:com.sun.net.httpserver
 @ENABLE_XML_FALSE@PREPROCESS_XML = -enable:XML
 @ENABLE_XML_TRUE@PREPROCESS_XML = +enable:XML
-COMMENT_IN = s|^\([[:space:]]*\)//[ ]*|\1|
-COMMENT_OUT = s|^\([[:space:]]*\)\([^/[:space:]]\)|\1// \2|
 all: all-recursive
 
 .SUFFIXES:

@@ -251,9 +251,6 @@ $(srcdir)/patch-source-list:
 	find . -name '*.java' -exec grep -lE ' #endif ' '{}' ';') \
 	  | sed -e 's|./||' | sort > $@
 
-COMMENT_IN = s|^\([[:space:]]*\)//[ ]*|\1|
-COMMENT_OUT = s|^\([[:space:]]*\)\([^/[:space:]]\)|\1// \2|
-
 gnu/kawa/util/PreProcess.class: $(srcdir)/gnu/kawa/util/PreProcess.java
 	$(JAVAC) -d . $(srcdir)/gnu/kawa/util/PreProcess.java
 

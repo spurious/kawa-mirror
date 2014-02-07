@@ -1,5 +1,12 @@
 2014-02-06  Per Bothner  <per@bothner.com>
 
+	* ThreadLocation.java: Re-write "anonymous mode" to use a direct
+	ThreadLocal - i.e. one that stores the actual value, rather than
+	a Location holding the value.  This means a parent thread can't
+	change values in a child after child is created - for good (mostly)
+	or ill.  One advantage is performance; another is we can wrap
+	an existing ThreadLocal; another is we're hopefully more thread-safe.
+
 	* NamedLocation.java (setWithSave): Simplify - don't make expensive
 	call to ThreadLocation#makeAnonymous.  This does change the semantics,
 	but it seems worth it.

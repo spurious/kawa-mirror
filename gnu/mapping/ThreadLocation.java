@@ -16,13 +16,19 @@ public class ThreadLocation<T> extends NamedLocation<T> implements Named
    * that are not tied to a specfic name. */
   public static final String ANONYMOUS = new String("(dynamic)");
 
+  static final Object NULL_PROXY = new Object();
+
+  // Only used when property!=ANONYMOUS.
   SharedLocation<T> global;
 
   // Only used when property==ANONYMOUS.
-  private ThreadLocal<NamedLocation<T>> thLocal;
+  private ThreadLocal thLocal;
 
-  // Only used when property!=ANONYMOUS.
+  // Only used as a hashcode when property!=ANONYMOUS.
+  // Used for importedThreadLocal when property==ANONYMOUS.
   private int hash;
+
+  private boolean importedThreadLocal() { return hash < 0; }
 
 
   /** A new anonymous fluid location. */
@@ -31,22 +37,22 @@ public class ThreadLocation<T> extends NamedLocation<T> implements Named
     this("param#"+nextCounter());
   }
 
-  /** A new anonymous fluid location but used a given name for printing.
-   * However, the binding is not bound to the name as a visible binding. */
-  public ThreadLocation (String name)
-  {
-    super(Symbol.makeUninterned(name), ANONYMOUS);
-    thLocal = new InheritingLocation<T>();
-    global = new SharedLocation<T>(this.name, null, 0);
-  }
+    /** A new anonymous fluid location but used a given name for printing.
+     * However, the binding is not bound to the name as a visible binding. */
+    public ThreadLocation(String name) {
+        this(Symbol.makeUninterned(name));
+    }
 
-  private ThreadLocation (Symbol name)
-  {
-    super(name, ANONYMOUS);
-    thLocal = new InheritingLocation<T>();
-    String str = name == null ? null : name.toString();
-    global = new SharedLocation(Symbol.makeUninterned(str), null, 0);
-  }
+    public ThreadLocation(Symbol name) {
+        super(name, ANONYMOUS);
+        thLocal = new ThreadLocalWithDefault<Object>(null);
+    }
+
+    public ThreadLocation(Symbol name, ThreadLocal<T> thLocal) {
+        super(name, ANONYMOUS);
+        this.thLocal = thLocal;
+        hash = -1; // set importedThreadLocal() to true.
+    }
 
   public ThreadLocation (Symbol name, Object property, SharedLocation global)
   {
@@ -71,63 +77,87 @@ public class ThreadLocation<T> extends NamedLocation<T> implements Named
     return new ThreadLocation(name);
   }
 
-  /** Set the default/global value. */
-  public void setGlobal (T value)
-  {
-    synchronized (this)
-      {
-	if (global == null)
-	  global = new SharedLocation<T>(this.name, null, 0);
-	global.set(value);
-      }
-  }
+    /** Set the default/global value. */
+    public void setGlobal(T value) {
+        synchronized (this) {
+            if (property == ANONYMOUS) {
+                ((ThreadLocalWithDefault) thLocal).setDefault(value);
+            } else {
+                if (global == null)
+                    global = new SharedLocation<T>(this.name, null, 0);
+                global.set(value);
+            }
+        }
+    }
 
-  /** Get the thread-specific Location for this Location. */
-  public NamedLocation<T> getLocation ()
-  {
-    if (property != ANONYMOUS)
-      {
+    /** Get the thread-specific Location for this Location. */
+    public NamedLocation<T> getLocation() {
+        if (property == ANONYMOUS)
+            throw new Error("getLocation not allowed for ANONYMOUS ThreadLocation");
         return Environment.getCurrent().getLocation(name, property, hash, true);
-      }
-    NamedLocation entry = (NamedLocation) thLocal.get();
-    if (entry == null)
-      {
-        entry = new SharedLocation(name, property, 0);
-        if (global != null)
-          entry.setBase(global);
-	thLocal.set(entry);
-      }
-    return entry;
-  }
+    }
 
-  public T get()
-  {
-    return getLocation().get();
-  }
+    public T get() {
+        if (property != ANONYMOUS)
+            return getLocation().get();
+        Object value = thLocal.get();
+        if (importedThreadLocal())
+            return (T) value;
+        if (value == Location.UNBOUND)
+            throw new UnboundLocationException(this);
+        return value == NULL_PROXY ? null : (T) value;
+    }
 
-  public T get(T defaultValue)
-  {
-    return getLocation().get(defaultValue);
-  }
+    public T get(T defaultValue) {
+        if (property != ANONYMOUS)
+            return getLocation().get(defaultValue);
+        Object value = thLocal.get();
+        if (importedThreadLocal())
+            return (T) value;
+        if (value == UNBOUND)
+            return defaultValue;
+        return value == NULL_PROXY ? null : (T) value;
+    }
 
-  public boolean isBound()
-  {
-    return getLocation().isBound();
-  }
+    public boolean isBound() {
+        if (property != ANONYMOUS)
+            return getLocation().isBound();
+        return importedThreadLocal() || thLocal.get() != Location.UNBOUND;
+    }
 
-  public void set (T value)
-  {
-    getLocation().set(value);
-  }
-  public Object setWithSave (T newValue)
-  {
-    return getLocation().setWithSave(newValue);
-  }
+    public void set(T value) {
+        if (property != ANONYMOUS)
+            getLocation().set(value);
+        else
+            thLocal.set(value == null && ! importedThreadLocal() ? NULL_PROXY
+                        : value);
+    }
 
-  public void setRestore (Object oldValue)
-  {
-    getLocation().setRestore(oldValue);
-  }
+    public Object setWithSave (T newValue) {
+        if (property != ANONYMOUS)
+            return getLocation().setWithSave(newValue);
+        Object old = thLocal.get();
+        thLocal.set(newValue == null && ! importedThreadLocal() ? NULL_PROXY : newValue);
+        return old;
+    }
+
+    public void setRestore(Object oldValue) {
+        if (property != ANONYMOUS)
+            getLocation().setRestore(oldValue);
+        else
+            thLocal.set(oldValue);
+    }
+
+    public void undefine() {
+        if (property != ANONYMOUS)
+            getLocation().undefine();
+        else if (importedThreadLocal())
+            thLocal.remove();
+        else
+            thLocal.set(UNBOUND); // FIXME - maybe use remove?
+    }
+
+
 
   public String getName () { return name == null ? null : name.toString(); }
   public Object getSymbol () // Implements Named
@@ -162,28 +192,15 @@ public class ThreadLocation<T> extends NamedLocation<T> implements Named
     return tloc;
   }
 
-  public class InheritingLocation<T>
-    extends InheritableThreadLocal<NamedLocation<T>>
-  {
-    protected SharedLocation childValue(NamedLocation<T> parentValue)
-    {
-      if (property != ANONYMOUS)
-        throw new Error();
-      if (parentValue == null)
-        parentValue = (SharedLocation) getLocation();
-      NamedLocation<T> nloc = parentValue;
-      if (nloc.base == null)
-        {
-          SharedLocation<T> sloc = new SharedLocation<T>(name, property, 0);
-          sloc.value = nloc.value;
-          nloc.base = sloc;
-          nloc.value = null;
-          nloc = sloc;
+    static class ThreadLocalWithDefault<T> extends InheritableThreadLocal<T> {
+        T defaultValue;
+
+        public ThreadLocalWithDefault(T defaultValue) {
+            this.defaultValue = defaultValue;
         }
-      SharedLocation<T> sloc = new SharedLocation<T>(name, property, 0);
-      sloc.value = null;
-      sloc.base = nloc;
-      return sloc;
+
+        public void setDefault(T value) { defaultValue = value; }
+
+        protected T initialValue() { return defaultValue; }
     }
-  }
 }

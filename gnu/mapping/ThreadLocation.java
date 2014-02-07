@@ -137,7 +137,8 @@ public class ThreadLocation<T> extends NamedLocation<T> implements Named
         if (property != ANONYMOUS)
             return getLocation().setWithSave(newValue);
         Object old = thLocal.get();
-        thLocal.set(newValue == null && ! importedThreadLocal() ? NULL_PROXY : newValue);
+        // Don't inline set, since set may be overridden.
+        set(newValue);
         return old;
     }
 

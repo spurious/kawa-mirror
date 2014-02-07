@@ -1,3 +1,7 @@
+2014-02-07  Per Bothner  <per@bothner.com>
+
+	* ThreadLocation.java (setWithSave): Delate to set method.
+
 2014-02-06  Per Bothner  <per@bothner.com>
 
 	* ThreadLocation.java: Re-write "anonymous mode" to use a direct

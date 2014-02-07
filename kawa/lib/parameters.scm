@@ -11,12 +11,9 @@
     (gnu.mapping.LocationProc:new loc converter)))
 
 (define (as-location% param) :: <gnu.mapping.Location>
-  (let ((loc (if (instance? param <gnu.mapping.LocationProc>)
-		 (gnu.mapping.LocationProc:getLocation param)
-		 (as <gnu.mapping.Location> param))))
-    (if (instance? loc <gnu.mapping.ThreadLocation>)
-	(set! loc (gnu.mapping.ThreadLocation:getLocation loc)))
-    loc))
+  (if (instance? param <gnu.mapping.LocationProc>)
+      (gnu.mapping.LocationProc:getLocation param)
+      (as <gnu.mapping.Location> param)))
 
 (define-syntax parameterize%
   (syntax-rules ()

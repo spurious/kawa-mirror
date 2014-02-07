@@ -7,6 +7,7 @@ import gnu.lists.*;
 import gnu.expr.*;
 import gnu.text.Char;
 import kawa.standard.Scheme;
+import gnu.kawa.functions.*;
 import gnu.bytecode.Type;
 import gnu.kawa.lispexpr.LangPrimType;
 import gnu.kawa.functions.DisplayFormat;
@@ -64,7 +65,8 @@ public class CommonLisp extends Lisp2
   public static final NumberCompare numLss;
   public static final NumberCompare numLEq;
 
-  public static final gnu.kawa.functions.IsEq isEq;
+  public static final Not not;
+  public static final IsEq isEq;
   
   /** Package location symbols. */
   public static final Symbol internalKeyword = Keyword.make("INTERNAL");
@@ -77,6 +79,7 @@ public class CommonLisp extends Lisp2
 
     instance.define("t", TRUE);
     instance.define("nil", FALSE);
+    not = new Not(instance, "not");
     numEqu = NumberCompare.make(instance, "=",
                                 NumberCompare.TRUE_IF_EQU);
     numGrt = NumberCompare.make(instance, ">",
@@ -146,11 +149,9 @@ public class CommonLisp extends Lisp2
     defun("prog2", prog1.prog2);
     defun("progn", new kawa.standard.begin());
     defun("unwind-protect", new gnu.commonlisp.lang.UnwindProtect());
-    Procedure not = new gnu.kawa.functions.Not(this);
-    defun("not", not);
     defun("null", not);
-    defun("eq", new gnu.kawa.functions.IsEq(this, "eq"));
-    defun("equal", new gnu.kawa.functions.IsEqual(this, "equal"));
+    defun("eq", new IsEq(this, "eq"));
+    defun("equal", new IsEqual(this, "equal"));
     defun("typep", new gnu.kawa.reflect.InstanceOf(this));
     defProcStFld("the", "gnu.kawa.functions.Convert", "as");
     defun("%flet", new kawa.standard.let("flet", true));
@@ -163,9 +164,18 @@ public class CommonLisp extends Lisp2
     defProcStFld(">", "gnu.commonlisp.lang.CommonLisp", "numGrt");
     defProcStFld("<=", "gnu.commonlisp.lang.CommonLisp", "numLEq");
     defProcStFld(">=", "gnu.commonlisp.lang.CommonLisp", "numGEq");
-
+    defProcStFld("not", "gnu.commonlisp.lang.CommonLisp");
     defProcStFld("functionp", "gnu.commonlisp.lisp.PrimOps");
     defProcStFld("car", "gnu.commonlisp.lisp.primitives");
+    defProcStFld("first", "gnu.commonlisp.lisp.primitives");
+    defProcStFld("cdr", "gnu.commonlisp.lisp.primitives");
+    defProcStFld("rest", "gnu.commonlisp.lisp.primitives");
+    defProcStFld("second", "gnu.commonlisp.lisp.primitives");
+    defProcStFld("third", "gnu.commonlisp.lisp.primitives");
+    defProcStFld("nthcdr", "gnu.commonlisp.lisp.primitives");
+    defProcStFld("nth", "gnu.commonlisp.lisp.primitives");
+    defProcStFld("1-", "gnu.commonlisp.lisp.primitives");
+    defProcStFld("1+", "gnu.commonlisp.lisp.primitives");
   }
 
   public static CommonLisp getInstance()

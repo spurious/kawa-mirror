@@ -1,4 +1,4 @@
-(test-init "Common Lisp tests" 18)
+(test-init "Common Lisp tests" 35)
 
 (setq y 100)
 (defun foo1 (x)
@@ -52,3 +52,21 @@
 
 ;; # is a non-terminating macro character in Common Lisp.
 (test '(|a#com#b|) 'sharp-in-token '(a#|com|#b))
+
+(test nil 'car-1 (car nil))
+(test 1 'car-2 (car '(1 . 2)))
+(test nil 'cdr-1 (cdr nil))
+(test 2 'cdr-2 (cdr '(1 . 2)))
+(test nil 'first-1 (first nil))
+(test 1 'first-2 (first '(1 . 2)))
+(test nil 'rest-1 (rest nil))
+(test 2 'rest-2 (rest '(1 . 2)))
+(test 'foo 'nth-1 (nth 0 '(foo bar baz)))
+(test 'bar 'nth-2 (nth 1 '(foo bar baz)))
+(test nil 'nth-3 (nth 3 '(foo bar baz)))
+(test nil 'nthcdr-1 (nthcdr 0 '()))
+(test nil 'nthcdr-2 (nthcdr 3 '()))
+(test '(a b c) 'nthcdr-3 (nthcdr 0 '(a b c)))
+(test '(c) 'nthcdr-4 (nthcdr 2 '(a b c)))
+(test '() 'nthcdr-5 (nthcdr 4 '(a b c)))
+(test 1 'nthcdr-6 (nthcdr 1 '(0 . 1)))

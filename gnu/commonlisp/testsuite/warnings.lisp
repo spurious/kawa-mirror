@@ -9,8 +9,7 @@
 (defun list-of-numbers (start end)
   (if (> start end)
       nil
-    (cons start (list-of-numbers (+ 1 start) end))))
-; TODO: use the standard library function #'1+ instead
+    (cons start (list-of-numbers (1+ start) end))))
 (defvar list-of-numbers (list-of-numbers 1 3))
 
 (write list-of-numbers) (newline)
@@ -20,7 +19,7 @@
   (let* ((x y)
          (x (cdr (list-of-numbers x (+ x 3)))))
     (write (/ (car (cdr x)) 2)) (newline)))
-;; Diagnostic: warnings.lisp:20:13: warning - no declaration seen for y
+;; Diagnostic: warnings.lisp:19:13: warning - no declaration seen for y
 
 (write (apply #'list-of-numbers '(1 5))) (newline)
 ;; Output: (1 2 3 4 5)

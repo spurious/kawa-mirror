@@ -1,3 +1,9 @@
+2014-02-07  Charles Turner  <chturne@gmail.com>
+
+	* CommonLisp.java: Change NOT to be defined as in Scheme, so that
+	it gets picked up as a procedure. Also added first, cdr, rest,
+	second, third, nthcdr, nth, 1- and 1+.
+
 2014-02-06  Charles Turner  <chturne@gmail.com>
 
 	* CommonLisp.java: Proof-of-concept start to loading the CL

@@ -1,3 +1,9 @@
+2014-02-07  Charles Turner  <chturne@gmail.com>
+
+	* lang-test.lisp: New tests for car, cdr, first, rest, nth and
+	nthcdr.
+	* warnings.lisp: Fix TODO item by using the new 1+ procedure.
+
 2013-08-25  Per Bothner  <per@bothner.com>
 
 	* lang-test.lisp: Add test for '#' in token.

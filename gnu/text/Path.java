@@ -23,26 +23,34 @@ implements javax.tools.FileObject
   public static final FilePath userDirPath =
     FilePath.valueOf(new File("."));
 
-  private static ThreadLocal<Path> pathLocation = new ThreadLocal<Path>();
+    public final static ThreadLocal<Path> pathLocation
+        = new InheritableThreadLocal<Path>() {
+        @Override
+        protected Path initialValue() { return userDirPath; }
+
+        @Override
+        public void set(Path path) {
+            if (path == null)
+                super.remove();
+            else {
+                if (! path.isAbsolute())
+                    path = path.getAbsolute();
+                super.set(path);
+            }
+        }
+    };
 
   protected Path ()
   {
   }
 
-  public static Path currentPath ()
-  {
-    Path path = pathLocation.get();
-    if (path != null)
-      return path;
-    return userDirPath;
-  }
+    public static Path currentPath() {
+        return pathLocation.get();
+    }
 
-  public static void setCurrentPath (Path path)
-  {
-    if (! path.isAbsolute())
-      path = path.getAbsolute();
-    pathLocation.set(path);
-  }
+    public static void setCurrentPath(Path path) {
+        pathLocation.set(path);
+    }
 
   public static Path coerceToPathOrNull (Object path)
   {

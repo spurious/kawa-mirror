@@ -1,3 +1,9 @@
+2014-02-06  Per Bothner  <per@bothner.com>
+
+	* Path.java (pathLocation): Use an anonymous ThreadLocal subclass.
+	(currentPath setCurrentPath): Simplify, since functionality
+	folded into pathLocation.
+
 2014-02-03  Per Bothner  <per@bothner.com>
 
 	* Path.java: Get rid of pre-JAVA2 and pre-JAVA4 support.

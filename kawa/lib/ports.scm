@@ -83,6 +83,17 @@
   (static-field <output-port> 'outLocation))
 (define-alias-parameter current-error-port <output-port>
   (static-field <output-port> 'errLocation))
+
+(define-constant current-path ::gnu.mapping.LocationProc
+  (gnu.mapping.LocationProc:makeNamed
+   'current-path (object (gnu.mapping.ThreadLocation)
+                         ((*init*)
+                          (invoke-special gnu.mapping.ThreadLocation (this)
+                                          '*init* 'current-path gnu.text.Path:pathLocation))
+                         ((set new-value)::void
+                          (invoke-special gnu.mapping.ThreadLocation (this)
+                                          'set
+                                          (gnu.text.Path:valueOf new-value))))))
 	 
 (define (write-char ch #!optional
 		    (port :: <output-port>

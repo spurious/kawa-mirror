@@ -738,6 +738,7 @@ public class Scheme extends LispLanguage
       defProcStFld("process-command-line-assignments", "kawa.lib.system");
       defProcStFld("get-environment-variable", "kawa.lib.system");
       defProcStFld("get-environment-variables", "kawa.lib.system");
+      defProcStFld("current-path", "kawa.lib.ports");
       defProcStFld("current-second", "kawa.lib.system");
       defProcStFld("current-jiffy", "kawa.lib.system");
       defProcStFld("jiffies-per-second", "kawa.lib.system");

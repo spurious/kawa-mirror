@@ -1,3 +1,9 @@
+2014-02-06  Per Bothner  <per@bothner.com>
+
+	* NamedLocation.java (setWithSave): Simplify - don't make expensive
+	call to ThreadLocation#makeAnonymous.  This does change the semantics,
+	but it seems worth it.
+
 2014-01-06  Per Bothner  <per@bothner.com>
 
 	* BinaryInPort.java: Moved to new package gnu.kawa.io.

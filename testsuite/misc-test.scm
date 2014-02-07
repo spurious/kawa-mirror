@@ -1,4 +1,4 @@
-(test-init "Miscellaneous" 221)
+(test-init "Miscellaneous" 223)
 
 ;;; DSSSL spec example 11
 (test '(3 4 5 6) (lambda x x) 3 4 5 6)
@@ -666,12 +666,20 @@
 		 (append r1 (list (param1) param1v))))))
 	(append r0 (list (param1) param1v))))
 
-(define var1 1)
-(test 2 'test-fluid-future-1a
+(begin
+  (define var1 1)
+  (test 2 'test-fluid-future-1a
+        (force
+         (fluid-let ((var1 2))
+           (future (begin  (sleep 0.1s) var1)))))
+  (test 1 'test-fluid-future-1b var1))
+
+(define-variable var2 1)
+(test 2 'test-fluid-future-2a
       (force
-       (fluid-let ((var1 2))
-	 (future (begin  (sleep 0.1s) var1)))))
-(test 1 'test-fluid-future-1b var1)
+       (fluid-let ((var2 2))
+         (future (begin  (sleep 0.1s) var2)))))
+(test 1 'test-fluid-future-2b var2)
 
 ;; Bug reported 2005-05-08 by dominique.boucher@nuecho.com.
 (require <moduleFT>)

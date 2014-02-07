@@ -1,3 +1,8 @@
+2014-02-06  Seth Alves
+
+	* srfi13.scm (string-trim-right):  Import bug-fix from reference
+	implementation.
+
 2014-01-30   Mark H Weaver <mhw@netris.org>
 
 	* testing.scm (%test-evaluate-with-catch): Improved Guile's

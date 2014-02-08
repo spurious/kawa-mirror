@@ -89,6 +89,10 @@
 	(probeContentType): New method.
 	* FilePath.java (toNPath): New method override.
 
+2013-07-26  Per Bothner  <per@bothner.com>
+
+	* LiteralFormat.java (separator): New constant.
+
 2013-03-04  Per Bothner  <per@bothner.com>
 
 	* ReportFormat.java (format): Generalize to write to Appendable.

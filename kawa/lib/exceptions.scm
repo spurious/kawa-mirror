@@ -114,4 +114,14 @@
   (instance? obj gnu.text.SyntaxException))
 
 (define (file-error? obj) ::boolean
-  (instance? obj java.io.FileNotFoundException))
+  (or
+   (java.io.FileNotFoundException? obj)
+   (cond-expand (java-7
+                 (or (java.nio.file.NoSuchFileException? obj)
+                     (java.nio.file.AccessDeniedException? obj)
+                     (java.nio.file.DirectoryNotEmptyException? obj)))
+                (else
+                 (and (java.io.IOException? obj)
+                      (((->java.io.IOException obj):getMessage):startsWith
+                       "cannot delete"))))))
+

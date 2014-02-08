@@ -1,3 +1,9 @@
+2014-02-08  Per Bothner  <per@bothner.com>
+
+	* files.scm (delete-file): Use Path:deleteFile (which throws
+	exception) rather than Path:delete (which returns boolean).
+	* exceptions.scm (file-error?): Make more precise.
+
 2014-02-07  Per Bothner  <per@bothner.com>
 
 	* files.scm (path-data): Add setter.

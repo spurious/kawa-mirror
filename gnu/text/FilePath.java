@@ -119,10 +119,15 @@ public class FilePath
     return false;
   }
 
-  public boolean delete ()
-  {
-    return toFile().delete();
-  }
+    @Override
+    public void deleteFile() throws IOException {
+        /* #ifdef JAVA7 */
+        java.nio.file.Files.delete(toNPath());
+        /* #else */
+        // if (! toFile().delete())
+        //     throw new IOException("cannot delete - "+this);
+        /* #endif */
+    }
 
   public long getLastModified ()
   {

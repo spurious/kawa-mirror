@@ -2196,7 +2196,6 @@
 (test #t (file-exists? "."))
 (test #f (file-exists? " no such file "))
 
-(test-expect-fail 1) ;; exn is java.io.IOException: cannot delete  no such file
 (test #t (file-error?
           (guard (exn (else exn))
             (delete-file " no such file "))))

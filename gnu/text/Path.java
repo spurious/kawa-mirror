@@ -159,10 +159,21 @@ implements javax.tools.FileObject
     return false;
   }
 
-  public boolean delete ()
-  {
-    return false;
-  }
+    /** Delete file - for compatibility with FileObject. */
+    @Override
+    public boolean delete() {
+        try {
+            deleteFile();
+            return true;
+        } catch (Throwable ex) {
+            return false;
+        }
+    }
+
+    /** Delete file. */
+    public void deleteFile() throws IOException {
+        throw new UnsupportedOperationException();
+    }
 
   public boolean exists ()
   {

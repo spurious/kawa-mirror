@@ -1,5 +1,7 @@
 2014-02-07  Per Bothner  <per@bothner.com>
 
+	* files.scm (path-data): Add setter.
+
 	* parameters.scm (as-location%): Simplify - don't special-case
 	ThreadLocation.
 

@@ -68,7 +68,11 @@
           (gnu.lists.U8Vector (p:readAllBytes))))
 
 (define-procedure path-data
-   (lambda (p ::path) ::gnu.lists.Blob name: 'path-data
+  setter: (lambda ((p ::path) newvalue)::void
+                  (let ((out (p:openOutputStream))
+                        (in (gnu.kawa.functions.RunProcess:getInputStreamFrom newvalue)))
+                    (gnu.kawa.functions.RunProcess:copyStream in out #t)))
+  (lambda (p ::path) ::gnu.lists.Blob name: 'path-data
            (gnu.lists.Blob (p:readAllBytes))))
 
 (define-simple-constructor PD path-data $string$)

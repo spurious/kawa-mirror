@@ -572,7 +572,7 @@ public class RunProcess extends MethodProc {
         return arr;
     }
 
-    static InputStream getInputStreamFrom(Object val) {
+    public static InputStream getInputStreamFrom(Object val) {
         if (val instanceof ByteVector)
             return ((ByteVector) val).getInputStream();
         if (val instanceof Process)
@@ -663,7 +663,7 @@ public class RunProcess extends MethodProc {
      * Continue copying until EOF or exception.
      * At end, the input stream is closed, but the output stream is not.
      */
-    static void copyStream(InputStream in,
+    public static void copyStream(InputStream in,
                            OutputStream out, boolean closeOut)
             throws IOException {
         byte[] buffer = new byte[2048];

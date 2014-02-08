@@ -1,3 +1,8 @@
+2014-02-07  Per Bothner  <per@bothner.com>
+
+	* RunProcess.java (getInputStreamFrom, copyStream):  Make public -
+	used by path-data setter.
+
 2014-01-27  Per Bothner  <per@bothner.com>
 
 	* RunProcess.java (handleMarks, tokenize): Fix some problems

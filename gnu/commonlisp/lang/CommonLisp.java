@@ -169,6 +169,34 @@ public class CommonLisp extends Lisp2
     defProcStFld("car", "gnu.commonlisp.lisp.primitives");
     defProcStFld("first", "gnu.commonlisp.lisp.primitives");
     defProcStFld("cdr", "gnu.commonlisp.lisp.primitives");
+    defProcStFld("caar", "kawa.lib.lists");
+    defProcStFld("cadr", "kawa.lib.lists");
+    defProcStFld("cdar", "kawa.lib.lists");
+    defProcStFld("cddr", "kawa.lib.lists");
+    defProcStFld("caaar", "kawa.lib.lists");
+    defProcStFld("caadr", "kawa.lib.lists");
+    defProcStFld("cadar", "kawa.lib.lists");
+    defProcStFld("caddr", "kawa.lib.lists");
+    defProcStFld("cdaar", "kawa.lib.lists");
+    defProcStFld("cdadr", "kawa.lib.lists");
+    defProcStFld("cddar", "kawa.lib.lists");
+    defProcStFld("cdddr", "kawa.lib.lists");
+    defProcStFld("caaaar", "kawa.lib.lists");
+    defProcStFld("caaadr", "kawa.lib.lists");
+    defProcStFld("caadar", "kawa.lib.lists");
+    defProcStFld("caaddr", "kawa.lib.lists");
+    defProcStFld("cadaar", "kawa.lib.lists");
+    defProcStFld("cadadr", "kawa.lib.lists");
+    defProcStFld("caddar", "kawa.lib.lists");
+    defProcStFld("cadddr", "kawa.lib.lists");
+    defProcStFld("cdaaar", "kawa.lib.lists");
+    defProcStFld("cdaadr", "kawa.lib.lists");
+    defProcStFld("cdadar", "kawa.lib.lists");
+    defProcStFld("cdaddr", "kawa.lib.lists");
+    defProcStFld("cddaar", "kawa.lib.lists");
+    defProcStFld("cddadr", "kawa.lib.lists");
+    defProcStFld("cdddar", "kawa.lib.lists");
+    defProcStFld("cddddr", "kawa.lib.lists");
     defProcStFld("rest", "gnu.commonlisp.lisp.primitives");
     defProcStFld("second", "gnu.commonlisp.lisp.primitives");
     defProcStFld("third", "gnu.commonlisp.lisp.primitives");
@@ -176,6 +204,12 @@ public class CommonLisp extends Lisp2
     defProcStFld("nth", "gnu.commonlisp.lisp.primitives");
     defProcStFld("1-", "gnu.commonlisp.lisp.primitives");
     defProcStFld("1+", "gnu.commonlisp.lisp.primitives");
+    defProcStFld("acons", "gnu.commonlisp.lisp.primitives");
+    defProcStFld("listp", "gnu.commonlisp.lisp.primitives");
+    defProcStFld("numberp", "gnu.commonlisp.lisp.primitives");
+    defProcStFldAs("zerop", "kawa.lib.numbers", "zero?");
+    defProcStFldAs("consp", "kawa.lib.lists", "pair?");
+    defProcStFld("atom", "gnu.commonlisp.lisp.primitives");
   }
 
   public static CommonLisp getInstance()

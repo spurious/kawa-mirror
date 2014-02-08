@@ -31,3 +31,15 @@
 
 (defun 1- (x) (- x 1))
 (defun 1+ (x) (+ x 1))
+
+(defun acons (key datum alist)
+  (cons (cons key datum) alist))
+
+(defun listp (obj)
+  (typep obj 'list))
+
+(defun numberp (obj)
+  (typep obj 'number))
+
+(defun atom (obj)
+  (not (consp obj)))

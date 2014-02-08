@@ -379,6 +379,17 @@ public abstract class Language
   {
     defProcStFld(name, cname, mangleNameIfNeeded(name));
   }
+  
+  /**
+   * Declare by name in the current environment a procedure bound to a static field.
+   * 
+   * @param asName The procedure's source-level name.
+   * @param cname The name of the class containing the field.
+   * @param mname The name of the (mangled) field in {@code cname}
+   */
+  protected void defProcStFldAs(String asName, String cname, String mname) {
+    defProcStFld(asName, cname, mangleNameIfNeeded(mname));
+  }
 
   /** Enter a named function into the current environment. */
   public final void defineFunction(Named proc)

@@ -1,4 +1,4 @@
-(test-init "Common Lisp tests" 35)
+(test-init "Common Lisp tests" 59)
 
 (setq y 100)
 (defun foo1 (x)
@@ -70,3 +70,42 @@
 (test '(c) 'nthcdr-4 (nthcdr 2 '(a b c)))
 (test '() 'nthcdr-5 (nthcdr 4 '(a b c)))
 (test 1 'nthcdr-6 (nthcdr 1 '(0 . 1)))
+
+(setq alist '())
+(test '((1 . "one")) 'acons-1 (acons 1 "one" alist))
+(test nil 'acons-2 alist)
+(test '((1 . "one") (2 . "two"))
+      'acons-3
+      (setq alist (acons 1 "one" (acons 2 "two" alist))))
+(test '(1 . "one")
+      'acons-4
+      (assoc 1 alist))
+(test '((1 . "uno") (1 . "one") (2 . "two"))
+      'acons-5
+      (setq alist (acons 1 "uno" alist)))
+(test '(1 . "uno")
+      'assoc-6
+      (assoc 1 alist))
+
+(test t 'listp-1 (listp nil))
+(test t 'listp-2 (listp (cons 1 2)))
+(test nil 'listp-3 (listp t))
+
+(test t 'numberp-1 (numberp 12))
+(test t 'numberp-2 (numberp (expt 2 130)))
+(test nil 'numberp-3 (numberp nil))
+(test nil 'numberp-4 (numberp (cons 1 2)))
+
+(test t 'zerop-1 (zerop 0))
+(test nil 'zerop-2 (zerop 1))
+(test t 'zerop-3 (zerop -0.0))
+(test t 'zerop-4 (zerop 0/100))
+
+(test nil 'consp-1 (consp nil))
+(test t 'consp-2 (consp (cons 1 2)))
+
+(test t 'atomp-1 (atom 'sss))
+(test nil 'atomp-2 (atom (cons 1 2)))
+(test t 'atomp-3 (atom nil))
+(test t 'atomp-4 (atom '()))
+(test t 'atomp-5 (atom 3))

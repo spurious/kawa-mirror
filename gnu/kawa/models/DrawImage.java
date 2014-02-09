@@ -30,7 +30,7 @@ public class DrawImage extends Model
           {
             image = javax.imageio.ImageIO.read(src.openInputStream());
           }
-        catch (Throwable ex)
+        catch (Exception ex)
           {
             throw WrappedException.wrapIfNeeded(ex);
           }

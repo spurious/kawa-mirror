@@ -79,7 +79,7 @@ public class URLPath extends URIPath
         // return new URI(url.toString());
         /* #endif */
       }
-    catch (Throwable ex)
+    catch (Exception ex)
       {
         throw WrappedException.wrapIfNeeded(ex);
       }
@@ -98,7 +98,7 @@ public class URLPath extends URIPath
       {
         return valueOf(new URL(url, relative));
       }
-    catch (Throwable ex)
+    catch (Exception ex)
       {
         throw WrappedException.wrapIfNeeded(ex);
       }
@@ -160,7 +160,7 @@ public class URLPath extends URIPath
             url = clas.getClassLoader().getResource(classFileName);
           }
       }
-    catch (Throwable ex)
+    catch (Exception ex)
       {
         throw WrappedException.wrapIfNeeded(ex);
       }

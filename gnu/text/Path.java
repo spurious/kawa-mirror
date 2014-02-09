@@ -97,7 +97,7 @@ implements javax.tools.FileObject
           }
         return new URL(str);
       }
-    catch (Throwable ex)
+    catch (Exception ex)
       {
         throw WrappedException.wrapIfNeeded(ex);
       }

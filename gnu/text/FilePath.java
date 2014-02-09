@@ -221,7 +221,7 @@ public class FilePath
       {
         return file.toURI().toURL();
       }
-    catch (Throwable ex)
+    catch (Exception ex)
       {
         throw WrappedException.wrapIfNeeded(ex);
       }
@@ -241,7 +241,7 @@ public class FilePath
           fname = fname.replace(fileSep, '/');
         return new URI(null, null, fname, null);
       }
-    catch (Throwable ex)
+    catch (Exception ex)
       {
         throw WrappedException.wrapIfNeeded(ex);
       }

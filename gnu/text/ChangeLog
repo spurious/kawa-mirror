@@ -1,5 +1,10 @@
 2014-02-08  Per Bothner  <per@bothner.com>
 
+	* Path.java: Catch Exception rather than Throwable, so we
+	don't needlessly wrap an Error.
+	* FIlePath.java: Likewise.
+	* URLPath.java: Likewise.
+
 	* Path.java (deleteFile): New method.  Like delete, but throws
 	exception on failure, rather than returning false.
 	Default implementation throws UnsupportedOperationException.

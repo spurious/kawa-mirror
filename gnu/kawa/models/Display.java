@@ -50,7 +50,7 @@ public abstract class Display
               throw new RuntimeException("no display toolkit: "+d);
             name = rest;
           }
-        catch (Throwable ex)
+        catch (Exception ex)
           {
             throw gnu.mapping.WrappedException.wrapIfNeeded(ex);
           }

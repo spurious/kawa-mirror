@@ -77,19 +77,13 @@ public final class WriterManager implements Runnable
   }
 
   /** Try to register this as a shutdown hook.
-   * @return true on success; false if failure (e.g. if not JDK1.3-compatible).
+   * @return true on success; false if failure
    */
   public boolean registerShutdownHook()
   {
     try
       {
-	Runtime runtime = Runtime.getRuntime();
-	Class rclass = runtime.getClass();
-	Class[] params = { Thread.class };
-	java.lang.reflect.Method method
-	  = rclass.getDeclaredMethod("addShutdownHook", params);
-	Object[] args = { new Thread(this) };
-	method.invoke(runtime, args);
+	Runtime.getRuntime().addShutdownHook(new Thread(this));
 	return true;
       }
     catch (Throwable ex)

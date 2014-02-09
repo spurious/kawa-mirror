@@ -2,12 +2,6 @@
 ;;; They should be re-written in Common Lisp, but there are still some
 ;;; limitations in the Common Lisp support making that difficult.
 
-(define (setcar (p <pair>) x)
-  (set-car! p x))
-
-(define (setcdr (p <pair>) x)
-  (set-cdr! p x))
-
 ;; ANSI: This should be inclosed in "an implicit block whose name is
 ;; the function block name of the function-name or name, as
 ;; appropriate." But we don't have support for CL blocks yet.

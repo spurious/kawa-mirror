@@ -1,5 +1,9 @@
 2014-02-08  Charles Turner  <chturne@gmail.com>
 
+	* lang-test.lisp: New tests for member, apply, complement and eql.
+
+2014-02-08  Charles Turner  <chturne@gmail.com>
+
 	* lang-test.lisp: New test for acons, listp, numberp, zerop,
 	consp, and atom.
 

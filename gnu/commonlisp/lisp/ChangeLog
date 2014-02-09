@@ -1,5 +1,10 @@
 2014-02-08  Charles Turner  <chturne@gmail.com>
 
+	* PrimsOps.scm (setcar, setcdr): Remove non-CL symbols.
+	* primitives.lisp (eql, complement, member, apply): New procedures.
+
+2014-02-08  Charles Turner  <chturne@gmail.com>
+
 	* primitives.lisp (acons, listp, numberp, atom): Added new functions.
 
 2014-02-07  Charles Turner  <chturne@gmail.com>

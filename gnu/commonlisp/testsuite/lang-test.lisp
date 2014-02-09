@@ -1,4 +1,4 @@
-(test-init "Common Lisp tests" 59)
+(test-init "Common Lisp tests" 80)
 
 (setq y 100)
 (defun foo1 (x)
@@ -71,7 +71,7 @@
 (test '() 'nthcdr-5 (nthcdr 4 '(a b c)))
 (test 1 'nthcdr-6 (nthcdr 1 '(0 . 1)))
 
-(setq alist '())
+(defvar alist '())
 (test '((1 . "one")) 'acons-1 (acons 1 "one" alist))
 (test nil 'acons-2 alist)
 (test '((1 . "one") (2 . "two"))
@@ -109,3 +109,35 @@
 (test t 'atomp-3 (atom nil))
 (test t 'atomp-4 (atom '()))
 (test t 'atomp-5 (atom 3))
+
+(test nil 'eql-1 (eql 'a 'b))
+(test t 'eql-2 (eql 'a 'a))
+(test t 'eql-3 (eql 3 3))
+(test nil 'eql-4 (eql 3 3.0))
+(test t 'eql-5 (eql 3.0 3.0))
+(test nil 'eql-6 (eql (cons 'a 'b) (cons 'a 'c)))
+(test nil 'eql-7 (eql (cons 'a 'b) (cons 'a 'b)))
+(test t 'eql-8 (eql #\A #\A))
+(test nil 'eql-9 (eql "Foo" "FOO"))
+(test t 'eql-10 (let ((x (cons 'a 'b))) (eql x x)))
+(test t 'eql-11 (let ((x '(a . b))) (eql x x)))
+
+; BUG! Using Scheme booleans (via zerop).
+;(test t 'complement-1 (funcall (complement #'zerop) 1))
+(test nil 'complement-2 (funcall (complement #'member) 'a '(a b c)))
+(test t 'complement-3 (funcall (complement #'member) 'd '(a b c)))
+
+(test '(2 3) 'member-1 (member 2 '(1 2 3)))
+(test '((3 . 4)) 'member-2
+      (member 2 '((1 . 2) (3 . 4))
+	      :test-not #'=
+	      :key #'cdr))
+(test nil 'member-3 (member 'e '(a b c d)))
+
+(defvar f '+)
+(test 3 'apply-1 (apply f '(1 2)))
+(setq f #'-)
+(test -1 'apply-2 (apply f '(1 2)))
+(test 7 'apply-3 (apply #'max 3 5 '(2 7 3)))
+(test '((+ 2 3) . 4) 'apply-4 (apply 'cons '((+ 2 3) 4)))
+(test 0 'apply-5 (apply #'+ '()))

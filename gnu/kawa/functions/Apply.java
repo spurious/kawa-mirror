@@ -14,6 +14,11 @@ public class Apply extends ProcedureN {
         super(name);
         this.applyToArgs = applyToArgs;
     }
+    
+    public static Object[] getArguments(LList args, int skip,
+                                        Procedure proc) {
+      return getArguments(args.toArray(), skip, proc);
+    }
 
     public static Object[] getArguments(Object[] args, int skip,
                                         Procedure proc) {

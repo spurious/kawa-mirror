@@ -67,6 +67,7 @@ public class CommonLisp extends Lisp2
 
   public static final Not not;
   public static final IsEq isEq;
+  public static final IsEqv isEqv;
   
   /** Package location symbols. */
   public static final Symbol internalKeyword = Keyword.make("INTERNAL");
@@ -90,7 +91,9 @@ public class CommonLisp extends Lisp2
                                 NumberCompare.TRUE_IF_LSS);
     numLEq = NumberCompare.make(instance, "<=",
                                 NumberCompare.TRUE_IF_LSS|NumberCompare.TRUE_IF_EQU);
-    isEq = new gnu.kawa.functions.IsEq(instance, "eq?");
+    isEq = new IsEq(instance, "eq?");
+    isEqv = new IsEqv(instance, "eqv?", isEq);
+    
     Environment saveEnv = Environment.setSaveCurrent(clispEnvironment);
     try
       {
@@ -165,6 +168,8 @@ public class CommonLisp extends Lisp2
     defProcStFld("<=", "gnu.commonlisp.lang.CommonLisp", "numLEq");
     defProcStFld(">=", "gnu.commonlisp.lang.CommonLisp", "numGEq");
     defProcStFld("not", "gnu.commonlisp.lang.CommonLisp");
+    defProcStFld("eq?", "gnu.commonlisp.lang.CommonLisp", "isEq");
+    defProcStFld("eqv?", "gnu.commonlisp.lang.CommonLisp", "isEqv");
     defProcStFld("functionp", "gnu.commonlisp.lisp.PrimOps");
     defProcStFld("car", "gnu.commonlisp.lisp.primitives");
     defProcStFld("first", "gnu.commonlisp.lisp.primitives");
@@ -210,6 +215,10 @@ public class CommonLisp extends Lisp2
     defProcStFldAs("zerop", "kawa.lib.numbers", "zero?");
     defProcStFldAs("consp", "kawa.lib.lists", "pair?");
     defProcStFld("atom", "gnu.commonlisp.lisp.primitives");
+    defProcStFld("eql", "gnu.commonlisp.lisp.primitives");
+    defProcStFld("member", "gnu.commonlisp.lisp.primitives");
+    defProcStFld("complement", "gnu.commonlisp.lisp.primitives");
+    defProcStFld("apply", "gnu.commonlisp.lisp.primitives");
   }
 
   public static CommonLisp getInstance()

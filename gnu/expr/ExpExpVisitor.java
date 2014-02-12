@@ -2,6 +2,7 @@
 // This is free software; for terms and warranty disclaimer see ../../COPYING.
 
 package gnu.expr;
+import gnu.text.SourceLocator;
 
 /** Specialization of {@code ExpVisitor<R,D>} to {@code R=Expression}. */
 
@@ -16,4 +17,16 @@ public abstract class ExpExpVisitor<D> extends ExpVisitor<Expression,D>
   {
     return r;
   }
+
+    /** Report an error. */
+    public ErrorExp error(String msg) {
+        return comp.syntaxError(msg);
+    }
+
+    /** Report an error. */
+    public ErrorExp error(char severity, String message,
+                            SourceLocator location) {
+        comp.error(severity, message, location);
+        return new ErrorExp(message);
+    }
 }

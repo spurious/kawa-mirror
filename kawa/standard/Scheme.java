@@ -723,6 +723,7 @@ public class Scheme extends LispLanguage
 
       defProcStFld("system", "kawa.lib.system");
       defProcStFld("make-process", "kawa.lib.system");
+      defProcStFld("pipe-process", "kawa.lib.system");
       defProcStFld("run-process", "gnu.kawa.functions.RunProcess", "instance");
       defProcStFld("process-exit-wait", "kawa.lib.system");
       defProcStFld("process-exit-ok?", "kawa.lib.system");

@@ -1,3 +1,9 @@
+2014-02-12  Per Bothner  <per@bothner.com>
+
+	* system.scm (pipe-process): New syntax.
+	(%pipe-process): New helper function.
+	(pipeProcessValidateApply): New validate method.
+
 2014-02-08  Per Bothner  <per@bothner.com>
 
 	* files.scm (delete-file): Use Path:deleteFile (which throws

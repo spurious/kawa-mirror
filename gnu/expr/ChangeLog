@@ -1,5 +1,8 @@
 2014-02-12  Per Bothner  <per@bothner.com>
 
+	* ExpExpVisitor.java (error): Two new convenience methods.
+	* Compilation.java (syntaxError): Change return type.
+
 	* ModuleManager.java: Catch Exception only so we don't wrap Error.
 
 2014-02-08  Charles Turner <chturne@gmail.com>

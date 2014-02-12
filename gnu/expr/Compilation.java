@@ -2647,7 +2647,7 @@ public class Compilation implements SourceLocator
    * @param message an error message to print out
    * @return an ErrorExp
    */
-  public Expression syntaxError (String message)
+  public ErrorExp syntaxError (String message)
   {
     error('e', message);
     return new ErrorExp (message);

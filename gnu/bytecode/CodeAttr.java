@@ -1727,7 +1727,7 @@ public class CodeAttr extends Attribute implements AttrContainer
    * The value of <var>x</var> must already have been pushed. */
   public final void emitIfCompare1 (int opcode)
   {
-    IfState new_if = new IfState(this);
+    IfState new_if = pushIfState();
     if (popType().promote() != Type.intType)
       throw new Error ("non-int type to emitIfCompare1");
     reserve(3);
@@ -1760,7 +1760,7 @@ public class CodeAttr extends Attribute implements AttrContainer
    * reference type. */
   public final void emitIfRefCompare1 (int opcode)
   {
-    IfState new_if = new IfState(this);
+    IfState new_if = pushIfState();
     if (! (popType() instanceof ObjectType))
       throw new Error ("non-ref type to emitIfRefCompare1");
     reserve(3);
@@ -1784,7 +1784,7 @@ public class CodeAttr extends Attribute implements AttrContainer
    * The value of x and y must already have been pushed. */
   public final void emitIfIntCompare(int opcode)
   {
-    IfState new_if = new IfState(this);
+    IfState new_if = pushIfState();
     popType();
     popType();
     reserve(3);
@@ -1802,7 +1802,7 @@ public class CodeAttr extends Attribute implements AttrContainer
    * The values of x and y must already have been pushed. */
   public final void emitIfNEq ()
   {
-    IfState new_if = new IfState (this);
+    IfState new_if = pushIfState();
     emitGotoIfEq(new_if.end_label);
     new_if.start_stack_size = SP;
   }
@@ -1811,7 +1811,7 @@ public class CodeAttr extends Attribute implements AttrContainer
    * The values of x and y must already have been pushed. */
   public final void emitIfEq ()
   {
-    IfState new_if = new IfState (this);
+    IfState new_if = pushIfState();
     emitGotoIfNE(new_if.end_label);
     new_if.start_stack_size = SP;
   }
@@ -1820,7 +1820,7 @@ public class CodeAttr extends Attribute implements AttrContainer
    * The values of x and y must already have been pushed. */
   public final void emitIfLt ()
   {
-    IfState new_if = new IfState (this);
+    IfState new_if = pushIfState();
     emitGotoIfGe(new_if.end_label);
     new_if.start_stack_size = SP;
   }
@@ -1829,7 +1829,7 @@ public class CodeAttr extends Attribute implements AttrContainer
    * The values of x and y must already have been pushed. */
   public final void emitIfGe ()
   {
-    IfState new_if = new IfState (this);
+    IfState new_if = pushIfState();
     emitGotoIfLt(new_if.end_label);
     new_if.start_stack_size = SP;
   }
@@ -1838,7 +1838,7 @@ public class CodeAttr extends Attribute implements AttrContainer
    * The values of x and y must already have been pushed. */
   public final void emitIfGt ()
   {
-    IfState new_if = new IfState (this);
+    IfState new_if = pushIfState();
     emitGotoIfLe(new_if.end_label);
     new_if.start_stack_size = SP;
   }
@@ -1847,7 +1847,7 @@ public class CodeAttr extends Attribute implements AttrContainer
    * The values of x and y must already have been pushed. */
   public final void emitIfLe ()
   {
-    IfState new_if = new IfState (this);
+    IfState new_if = pushIfState();
     emitGotoIfGt(new_if.end_label);
     new_if.start_stack_size = SP;
   }
@@ -1945,6 +1945,31 @@ public class CodeAttr extends Attribute implements AttrContainer
     // Pop the if_stack.
     if_stack = if_stack.previous;
   }
+
+    /** Convenience for compiling {@code if P1 && P2 then S1 else S2}.
+     * Compile that as:
+     * <pre>
+     * compile P1, including an appropriate emitIfXxx
+     * emitAndThen()
+     * compile P2, including an appropriate emitIfXxx
+     * compile S1
+     * emitElse
+     * compile S2
+     * emitFi
+     * </pre>
+     */
+    public void emitAndThen() {
+        if (if_stack==null||if_stack.andThenSet) throw new InternalError();
+        if_stack.andThenSet = true;
+    }
+
+    private IfState pushIfState() {
+        if (if_stack!=null && if_stack.andThenSet) {
+            if_stack.andThenSet = false;
+            return if_stack;
+        }
+        return new IfState(this);
+    }
 
   public final void emitConvert (Type from, Type to)
   {

@@ -28,6 +28,8 @@ public class IfState {
   /** The types that were pushed by the then-clause. */
   Type[] then_stacked_types;
 
+  boolean andThenSet;
+
   public IfState (CodeAttr code)
   {
     this(code, new Label(code));

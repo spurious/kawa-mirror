@@ -1,3 +1,9 @@
+2014-02-12  Per Bothner  <per@bothner.com>
+
+	* CodeAttr.java (emitAndThen): New method.
+	(pushIfState): New private convenience method.  Use as needed.
+	* IfState.java (andThenSet): New field.
+
 2013-12-29  Per Bothner  <per@bothner.com>
 
 	* CodeAttr.java (emitGotoIfNull, emitGotoIfNonNull): New methods.

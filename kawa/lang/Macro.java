@@ -168,7 +168,7 @@ public class Macro extends Syntax implements Printable, Externalizable
               {
                 System.err.println("expand "+this+" expander:"+exp);
                 System.err.flush();
-                OutPort dout = OutPort.errDefault();
+                gnu.kawa.io.OutPort dout = gnu.kawa.io.OutPort.errDefault();
 		dout.flush();
                 ((Expression) exp).print(dout);
                 dout.println(']');

@@ -94,7 +94,7 @@ public class LangPrimType extends PrimType implements TypeValue
 	break;
       case 'C':
 	ClassType scmCharType = ClassType.make("gnu.text.Char");
-	code.emitInstanceof(scmCharType);
+	code.emitInvokeStatic(scmCharType.getDeclaredMethod("isChar",1));
 	break;
       default:
 	super.emitIsInstance(code);
@@ -113,9 +113,8 @@ public class LangPrimType extends PrimType implements TypeValue
 	// We handle char specially, because Kawa does not use standard
 	// java.lang.Character type.
 	ClassType scmCharType = ClassType.make("gnu.text.Char");
-	Method charValueMethod = scmCharType.getDeclaredMethod("charValue", 0);
-	code.emitCheckcast(scmCharType);
-	code.emitInvokeVirtual(charValueMethod);
+	Method charValueMethod = scmCharType.getDeclaredMethod("castToChar",1);
+	code.emitInvokeStatic(charValueMethod);
 	break;
       default:
 	super.emitCoerceFromObject(code);

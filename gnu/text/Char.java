@@ -46,6 +46,17 @@ public class Char
     print(value, out);
   }
 
+    public static char castToChar(Object obj) {
+        if (obj instanceof Char)
+            return ((Char) obj).charValue();
+        else
+            return ((Character) obj).charValue();
+    }
+
+    public static boolean isChar(Object obj) {
+        return obj instanceof Char || obj instanceof Character;
+    }
+
     public static void print(int i, Appendable out) {
         try {
             append(i, out);

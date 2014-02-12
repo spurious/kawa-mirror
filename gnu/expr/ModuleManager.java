@@ -128,7 +128,7 @@ public class ModuleManager
       {
         return findWithClass(ClassType.getContextClass(className));
       }
-    catch (Throwable ex)
+    catch (Exception ex)
       {
         throw WrappedException.wrapIfNeeded(ex);
       }

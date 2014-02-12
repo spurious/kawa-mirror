@@ -1,3 +1,7 @@
+2014-02-12  Per Bothner  <per@bothner.com>
+
+	* ClassNamespace.java: Use WrappedException.rethrow.
+
 2014-02-05  Charles Turner  <chturne@gmail.com>
 
 	* LispPackage.java: Manage Lisp packages explicity in the

@@ -56,7 +56,7 @@ public class ConstrainedLocation<T> extends Location<T>
       }
     catch (Throwable ex)
       {
-	throw WrappedException.wrapIfNeeded(ex);
+	throw WrappedException.rethrow(ex);
       }
   }
 

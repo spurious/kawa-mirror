@@ -1,3 +1,10 @@
+2014-02-12  Per Bothner  <per@bothner.com>
+
+	* SlotGet.java: Use WrappedException.rethrow.
+	* SlotSet.java: Likewise..
+	* FieldLocation.java (getFieldValue): Likewise.
+	(set): Catch Exception only so we don't wrap Error.
+
 2014-01-05  Per Bothner  <per@bothner.com>
 
 	* Makefile.am: Merge into ../../../gnu/Makefile.am and remove.

@@ -1,3 +1,9 @@
+2014-02-12  Per Bothner  <per@bothner.com>
+
+	* WrappedException.java (rethrow): Change return type from
+	void to RuntimeException.
+	* ConstrainedLocation.java: Use rethrow.
+
 2014-02-07  Per Bothner  <per@bothner.com>
 
 	* ThreadLocation.java (setWithSave): Delate to set method.

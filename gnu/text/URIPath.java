@@ -68,7 +68,7 @@ public class URIPath
       {
         return new URIStringPath(new URI(encodeForUri(uri, 'I')), uri);
       }
-    catch (Throwable ex)
+    catch (Exception ex)
       {
         throw WrappedException.wrapIfNeeded(ex);
       }
@@ -143,7 +143,7 @@ public class URIPath
       {
         resolved = uri.resolve(new URI(null, rstr, null));
       }
-    catch (Throwable ex)
+    catch (Exception ex)
       {
         throw WrappedException.wrapIfNeeded(ex);
       }

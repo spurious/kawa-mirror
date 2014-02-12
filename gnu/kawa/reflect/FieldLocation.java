@@ -243,7 +243,7 @@ public class FieldLocation<T> extends ClassMemberLocation<T>
       }
     catch (Throwable ex)
       {
-	throw WrappedException.wrapIfNeeded(ex);
+	throw WrappedException.rethrow(ex);
       }
   }
 
@@ -256,7 +256,7 @@ public class FieldLocation<T> extends ClassMemberLocation<T>
 	  {
 	    rfield.set(instance, newValue);
 	  }
-	catch (Throwable ex)
+	catch (Exception ex)
 	  {
 	    throw WrappedException.wrapIfNeeded(ex);
 	  }

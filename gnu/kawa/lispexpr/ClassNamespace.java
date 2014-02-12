@@ -44,7 +44,7 @@ public class ClassNamespace extends Namespace implements Externalizable
       }
     catch (Throwable ex)
       {
-        throw WrappedException.wrapIfNeeded(ex);
+        throw WrappedException.rethrow(ex);
       }
   }
 

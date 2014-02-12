@@ -95,8 +95,10 @@ public class WrappedException extends RuntimeException
   // private Throwable exception;
   /* #endif */
 
-  /** Coerce argument to a RuntimeException. */
-  public static RuntimeException wrapIfNeeded (Throwable ex)
+  /** Coerce argument to a RuntimeException.
+   * Using rethrow may be preferable as it doesn't require wrapping an Error.
+   */
+  public static RuntimeException wrapIfNeeded (Exception ex)
   {
     if (ex instanceof RuntimeException)
       return (RuntimeException) ex;
@@ -104,7 +106,13 @@ public class WrappedException extends RuntimeException
       return new WrappedException(ex);
   }
 
-    public static void rethrow (Throwable ex) {
+    /** Re-throw as a non-checked exception.
+     * This method never returns, in spite of the return type.
+     * This allows the call to be written as:
+     * {@code throw WrappedExcepton.rethrow(ex)}
+     * so javac and the verifier can know the code doesn't return.
+     */
+    public static RuntimeException rethrow (Throwable ex) {
 	if (ex instanceof Error)
 	    throw (Error) ex;
 	else if (ex instanceof RuntimeException)

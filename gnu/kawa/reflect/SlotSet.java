@@ -99,7 +99,7 @@ public class SlotSet extends Procedure3 implements Inlineable
       }
     catch (java.lang.reflect.InvocationTargetException ex)
       {
-        throw WrappedException.wrapIfNeeded(ex.getTargetException());
+        WrappedException.rethrow(ex.getTargetException());
       }
     catch (IllegalAccessException ex)
       {

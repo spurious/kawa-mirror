@@ -178,7 +178,7 @@ public class SlotGet extends Procedure2
       }
     catch (java.lang.reflect.InvocationTargetException ex)
       {
-        throw WrappedException.wrapIfNeeded(ex.getTargetException());
+        WrappedException.rethrow(ex.getTargetException());
       }
     catch (IllegalAccessException ex)
       {

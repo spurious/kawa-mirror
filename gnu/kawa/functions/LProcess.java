@@ -1,5 +1,6 @@
 package gnu.kawa.functions;
 import gnu.mapping.Lazy;
+import gnu.mapping.WrappedException;
 import gnu.lists.Blob;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -81,7 +82,7 @@ public class LProcess extends Process
             
             }
             if (exception != null)
-                throw new RuntimeException(exception);
+                WrappedException.rethrow(exception);
         }
         return value;
     }

@@ -155,7 +155,7 @@ public class MakeAnnotation extends ProcedureN
               {
                 aentry.addMember(name, arg, eltype);
               }
-            catch (Throwable ex)
+            catch (Exception ex)
               {
                 aentry = null;
                 comp.error(mustBeConstant ? 'e' : 'w',

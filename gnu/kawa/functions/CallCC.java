@@ -42,7 +42,7 @@ public class CallCC extends MethodProc implements Inlineable
 	ctx.runUntilDone();
 	cont.invoked = true;
       }
-    catch (Throwable ex)
+    catch (Exception ex)
       {
         Continuation.handleException$X(ex, cont, ctx);
       }

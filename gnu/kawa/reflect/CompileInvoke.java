@@ -108,7 +108,7 @@ public class CompileInvoke
                 int sz = ((Number) sizeArg.valueIfConstant()).intValue();
                 constantValue = Array.newInstance(elementType.getReflectClass(), sz);
               }
-            catch (Throwable ex)
+            catch (Exception ex)
               {
                 comp.error('e', "bad array size: "+ex.getMessage());
               }
@@ -137,7 +137,7 @@ public class CompileInvoke
                         index = Integer.parseInt(kname);
                         arg = args[++i];
                       }
-                    catch (Throwable ex)
+                    catch (Exception ex)
                       {
                         comp.error('e', "non-integer keyword '"+kname+"' in array constructor");
                         return exp;
@@ -154,7 +154,7 @@ public class CompileInvoke
                   {
                     Array.set(constantValue, index, arg.valueIfConstant());
                   }
-                catch (Throwable ex)
+                catch (Exception ex)
                   {
                     constantValue = null;
                   }

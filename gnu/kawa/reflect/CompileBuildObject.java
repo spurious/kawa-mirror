@@ -92,7 +92,7 @@ public class CompileBuildObject {
             try {
                 builder = (CompileBuildObject) Class.forName(builderName).newInstance();
             }
-            catch (Throwable ex) {
+            catch (Exception ex) {
                 comp.error('w', "while creating JavafxObjectBuilder for "+ctype+" - caught "+ex);
                 builder = new CompileBuildObject();
             }

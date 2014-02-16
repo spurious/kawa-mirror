@@ -215,7 +215,7 @@ public class CompileNamedPart
                 Class cl = ClassType.getContextClass(name);
                 clas = QuoteExp.getInstance(Type.make(cl));
               }
-            catch (Throwable ex)
+            catch (Exception ex)
               {
               }
           }

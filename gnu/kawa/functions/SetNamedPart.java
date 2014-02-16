@@ -43,7 +43,7 @@ public class SetNamedPart extends Procedure3 implements HasSetter
             gnu.kawa.reflect.SlotSet.setStaticField(container, part.toString(), value);
             return Values.empty;
           }
-        catch (Throwable ex)
+        catch (Exception ex)
           {
             // FIXME!
           }

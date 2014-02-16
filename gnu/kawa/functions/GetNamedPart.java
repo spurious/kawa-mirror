@@ -47,7 +47,7 @@ public class GetNamedPart extends Procedure2 implements HasSetter
   }
 
   public static Object getTypePart (Type type, String name)
-    throws Throwable
+    throws Exception
   {
     if (name.equals(CLASSTYPE_FOR))
       return type;
@@ -72,7 +72,7 @@ public class GetNamedPart extends Procedure2 implements HasSetter
           {
             return gnu.kawa.reflect.SlotGet.staticField(type, name);
           }
-        catch (Throwable ex)
+        catch (Exception ex)
           {
             // FIXME!
           }
@@ -82,7 +82,7 @@ public class GetNamedPart extends Procedure2 implements HasSetter
   }
 
   public static Object getNamedPart (Object container, Symbol part)
-    throws Throwable
+    throws Exception
   {
     String name = part.getName();
     container = Promise.force(container);
@@ -97,7 +97,7 @@ public class GetNamedPart extends Procedure2 implements HasSetter
             String pname = ((Package) container).getName();
             return ClassType.getContextClass(pname + '.' + name);
           }
-        catch (Throwable ex)
+        catch (Exception ex)
           {
           }
       }
@@ -107,13 +107,13 @@ public class GetNamedPart extends Procedure2 implements HasSetter
   }
 
   public static Object getMemberPart(Object container, String name)
-    throws Throwable
+    throws Exception
   {
     try
       {
         return gnu.kawa.reflect.SlotGet.field(container, name);
       }
-    catch (Throwable ex)
+    catch (Exception ex)
       {
         // FIXME!
       }

@@ -173,7 +173,7 @@ public class RunProcess extends MethodProc {
                                 FilePath.coerceToFilePathOrNull(kval);
                             builder.directory(fpath.toFile());
                         }
-                    } catch (Throwable ex) {
+                    } catch (Exception ex) {
                         throw new IllegalArgumentException("invalid directory");
                     }
                 } else

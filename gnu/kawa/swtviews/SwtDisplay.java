@@ -97,7 +97,7 @@ class SwtButton
       }
     catch (Throwable ex)
       {
-	throw new gnu.mapping.WrappedException(ex);
+	gnu.mapping.WrappedException.rethrow(ex);
       }
   }
 

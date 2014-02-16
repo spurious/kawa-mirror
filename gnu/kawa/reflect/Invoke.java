@@ -166,7 +166,7 @@ public class Invoke extends ProcedureN
                       {
                         index =  Integer.parseInt(kname);
                       }
-                    catch (Throwable ex)
+                    catch (Exception ex)
                       {
                         throw new RuntimeException("non-integer keyword '"+kname+"' in array constructor");
                       }

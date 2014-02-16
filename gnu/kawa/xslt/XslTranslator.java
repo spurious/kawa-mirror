@@ -306,7 +306,7 @@ public class XslTranslator extends Lexer implements Consumer
 	else
 	  throw new InternalError("too many xpath expressions"); // FIXME
       }
-    catch (Throwable ex)
+    catch (Exception ex)
       {
 	ex.printStackTrace();
 	throw new InternalError ("caught "+ex);

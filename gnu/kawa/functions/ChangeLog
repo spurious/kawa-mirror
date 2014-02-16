@@ -1,5 +1,12 @@
 2014-02-16  Per Bothner  <per@bothner.com>
 
+	* CallCC.java: Make sure Error is uncaught or re-thrown.
+	* CompileNamedPart.java: Likewise.
+	* GetNamedPart.java: Likewise.
+	* LProcess.java: Likewise.
+	* RunProcess.java: Likewise.
+	* SetNamedPart.java: Likewise.
+
 	* CompileMisc.java (compileCallCC): Pass appropriate type
 	for emitTryStart.
 

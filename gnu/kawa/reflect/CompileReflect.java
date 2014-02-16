@@ -173,7 +173,7 @@ public class CompileReflect
                     return new QuoteExp(field.getReflectField().get(null),
                                         field.getType());
                   }
-                catch (Throwable ex)
+                catch (Exception ex)
                   {
                   }
               }
@@ -225,7 +225,7 @@ public class CompileReflect
                       {
                         return new QuoteExp(mcl.getReflectClass());
                       }
-                    catch (Throwable ex)
+                    catch (Exception ex)
                       {
                       }
                   }

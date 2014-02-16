@@ -1,3 +1,12 @@
+2014-02-16  Per Bothner  <per@bothner.com>
+
+	* CompileBuildObject.java: Likewise.
+	* CompileInvoke.java: Likewise.
+	* CompileReflect.java: Likewise.
+	* FieldLocation.java: Likewise.
+	* Invoke.java: Likewise.
+	* MakeAnnotation.java: Likewise.
+
 2014-02-12  Per Bothner  <per@bothner.com>
 
 	* SlotGet.java: Use WrappedException.rethrow.

@@ -195,7 +195,7 @@ public class FieldLocation<T> extends ClassMemberLocation<T>
       {
         setup();
       }
-    catch (Throwable ex)
+    catch (Exception ex)
       {
         if (throwIfUnbound) throw new UnboundLocationException(this); 
         return defaultValue;
@@ -241,7 +241,7 @@ public class FieldLocation<T> extends ClassMemberLocation<T>
       {
         return (T) rfield.get(instance);
       }
-    catch (Throwable ex)
+    catch (Exception ex)
       {
 	throw WrappedException.rethrow(ex);
       }
@@ -322,7 +322,7 @@ public class FieldLocation<T> extends ClassMemberLocation<T>
               {
                 setup();
               }
-            catch (Throwable ex)
+            catch (Exception ex)
               {
                 return false;
               }
@@ -350,7 +350,7 @@ public class FieldLocation<T> extends ClassMemberLocation<T>
           {
             setup();
           }
-        catch (Throwable ex)
+        catch (Exception ex)
           {
             return false;
           }

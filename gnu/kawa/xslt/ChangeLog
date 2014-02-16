@@ -1,3 +1,7 @@
+2014-02-16  Per Bothner  <per@bothner.com>
+
+	* XslTranslator.java: Make sure Error is uncaught or re-thrown.
+
 2013-02-23  Per Bothner  <per@bothner.com>
 
 	* ApplyTemplates.java: New class, extends NodeConstructor.

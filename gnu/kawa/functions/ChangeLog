@@ -1,3 +1,8 @@
+2014-02-16  Per Bothner  <per@bothner.com>
+
+	* CompileMisc.java (compileCallCC): Pass appropriate type
+	for emitTryStart.
+
 2014-02-08  Charles Turner  <chturne@gmail.com>
 
 	* Apply.java (getArguments): New overload to allow getArguments to

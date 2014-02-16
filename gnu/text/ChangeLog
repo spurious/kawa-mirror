@@ -1,3 +1,10 @@
+2014-02-16  Per Bothner  <per@bothner.com>
+
+	* Path.java: Make sure Error is uncaught or re-thrown.
+	* FilePath.java: Likewise.
+	* URIPath.java: Likewise.
+	* URLPath.java: Likewise.
+
 2014-02-12  Per Bothner  <per@bothner.com>
 
 	* Char.java (isChar, castToChar): New methods.

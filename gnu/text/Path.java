@@ -165,7 +165,7 @@ implements javax.tools.FileObject
         try {
             deleteFile();
             return true;
-        } catch (Throwable ex) {
+        } catch (Exception ex) {
             return false;
         }
     }
@@ -450,7 +450,7 @@ implements javax.tools.FileObject
         /* #ifdef JAVA7 */
         try {
             contentType = Files.probeContentType(getAbsolute().toNPath());
-        } catch (Throwable ex) {
+        } catch (Exception ex) {
             contentType = null;
         }
         /* #else */

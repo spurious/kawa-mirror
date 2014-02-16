@@ -403,7 +403,7 @@ public class NodeUtils
           {
             throw new RuntimeException("invalid collection-resolver: class "+cname+" not found");
           }
-        catch (Throwable ex)
+        catch (Exception ex)
           {
             throw new RuntimeException("invalid collection-resolver: "+ex);
           }
@@ -461,7 +461,7 @@ public class NodeUtils
         Document.parseCached(uri);
         return true;
       }
-    catch (Throwable ex)
+    catch (Exception ex)
       {
         return false;
       }

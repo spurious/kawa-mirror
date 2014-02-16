@@ -1,3 +1,7 @@
+2014-02-16  Per Bothner  <per@bothner.com>
+
+	* XQParser.java: Make sure Error is uncaught or re-thrown.
+
 2013-11-10  Per Bothner  <per@bothner.com>
 
 	* XQParser.java: Update for new FormStack APIs.

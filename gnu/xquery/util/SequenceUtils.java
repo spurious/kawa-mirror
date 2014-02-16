@@ -297,7 +297,7 @@ public class SequenceUtils
                 if (! deepEqualItems(arg1, arg2, collator))
                   return false;
               }
-            catch (Throwable ex)
+            catch (Exception ex)
               {
                 return false;
               }

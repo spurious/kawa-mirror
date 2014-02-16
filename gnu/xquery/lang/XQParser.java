@@ -89,11 +89,12 @@ public class XQParser extends Lexer
       {
         baseURI = fixupStaticBaseUri(URIPath.valueOf(uri));
       }
-    catch (Throwable ex)
+    catch (Exception ex)
       {
-        if (ex instanceof WrappedException)
-          ex = ((WrappedException) ex).getCause();
-        error('e', "invalid URI: "+ex.getMessage());
+        Throwable th = (ex instanceof WrappedException
+                        ? ((WrappedException) ex).getCause()
+                        : ex);
+        error('e', "invalid URI: "+th.getMessage());
       }
   }
 
@@ -2982,7 +2983,7 @@ public class XQParser extends Lexer
               val = new java.lang.Double(str);
             exp = new QuoteExp(val);
           }
-        catch (Throwable ex)
+        catch (Exception ex)
           {
             exp = syntaxError("invalid decimal literal: '"+str+"'");
           }
@@ -3997,7 +3998,7 @@ public class XQParser extends Lexer
                 // Do nothing.  If there is no such module,
                 // that will be reported below.
               }
-            catch (Throwable ex)
+            catch (Exception ex)
               {
                 error('e', "error loading map for "+uri+" - "+ex);
               }

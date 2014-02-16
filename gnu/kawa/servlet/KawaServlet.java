@@ -82,6 +82,10 @@ extends HttpServlet
 	run(sctx, ctx);
         ctx.consumer.endDocument();
       }
+    catch (Error ex)
+      {
+        throw ex;
+      }
     catch (Throwable throwable)
       {
 	// Clear partial output on an error.

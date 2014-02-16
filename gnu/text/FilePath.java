@@ -297,7 +297,7 @@ public class FilePath
         if (! canon.equals(file))
           return valueOf(canon);
       }
-    catch (Throwable ex)
+    catch (Exception ex)
       {
       }
     return this;

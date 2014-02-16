@@ -60,6 +60,10 @@ public class KawaHttpHandler
 
         KawaAutoHandler.run(hctx, ctx);
       }
+    catch (Error ex)
+      {
+        throw ex;
+      }
     catch (Throwable ex)
       {
         hctx.log("Caught an exception: ", ex);

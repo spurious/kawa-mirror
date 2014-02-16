@@ -30,7 +30,7 @@ public class NumberValue extends Procedure1
           {
             return numberValue(arg);
           }
-        catch (Throwable ex)
+        catch (Exception ex)
           {
             // fall through to return NaN;
           }
@@ -71,7 +71,7 @@ public class NumberValue extends Procedure1
             return XDataType.doubleType
               .valueOf(TextUtils.stringValue(value));
           }
-        catch (Throwable ex)
+        catch (Exception ex)
           {
             d = Double.NaN;
           }

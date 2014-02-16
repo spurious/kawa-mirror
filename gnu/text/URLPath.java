@@ -40,7 +40,7 @@ public class URLPath extends URIPath
       {
         return url.openConnection().getLastModified();
       }
-    catch (Throwable ex)
+    catch (Exception ex)
       {
         return 0;
       }
@@ -57,7 +57,7 @@ public class URLPath extends URIPath
       {
         return url.openConnection().getContentLength();
       }
-    catch (Throwable ex)
+    catch (Exception ex)
       {
         return -1;
       }
@@ -124,7 +124,7 @@ public class URLPath extends URIPath
       {
         /* #ifdef use:java.net.URI */
         try { return new FileOutputStream(new File(new URI(str))); }
-        catch (Throwable ex) { }
+        catch (Exception ex) { }
         /* #else */
         // return new FileOutputStream(new File(str.substring(5)));
         /* #endif */

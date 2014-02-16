@@ -174,7 +174,7 @@ public abstract class HttpRequestContext
       {
         return InetAddress.getLocalHost();
       }
-    catch (Throwable ex)
+    catch (Exception ex)
       {
         throw new RuntimeException(ex);
       }

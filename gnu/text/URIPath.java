@@ -97,7 +97,7 @@ public class URIPath
         else
           return conn.getLastModified() != 0;
       }
-    catch (Throwable ex)
+    catch (Exception ex)
       {
         return false;
       }

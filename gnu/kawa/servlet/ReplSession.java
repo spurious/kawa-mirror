@@ -93,7 +93,7 @@ public class ReplSession extends Writer
               {
                 wait(30000);
               }
-            catch (Throwable ex)
+            catch (Exception ex)
               {
                 ex.printStackTrace();
               }

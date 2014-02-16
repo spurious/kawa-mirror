@@ -61,7 +61,7 @@ public class CompileMisc
               {
                 return BooleanValue.booleanValue(value) ? XQuery.trueExp : XQuery.falseExp;
               }
-            catch (Throwable ex)
+            catch (Exception ex)
               {
                 String message = "cannot convert to a boolean";
                 visitor.getMessages().error('e', message);

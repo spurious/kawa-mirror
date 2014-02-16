@@ -278,7 +278,7 @@ public class CGIServletWrapper
             if (port != null) {
                 try {
                     return Integer.parseInt(port);
-                } catch (Throwable ex) {
+                } catch (Exception ex) {
                 }
             }
             return -1;
@@ -371,7 +371,7 @@ public class CGIServletWrapper
             if (length != null) {
                 try {
                     return Integer.parseInt(length);
-                } catch (Throwable ex) {
+                } catch (Exception ex) {
                 }
             }
             return 0;

@@ -1,3 +1,7 @@
+2014-02-16  Per Bothner  <per@bothner.com>
+
+	* SwtHelper.java: Make sure Error is uncaught or re-thrown.
+
 2012-12-09  Per Bothner  <per@bothner.com>
 
 	Remove some useless javadoc comments.  These cause warnings when

@@ -113,6 +113,10 @@ public final class Marker extends SeqPosition
               {
                 return language.eval(sb.toString()).toString();
               }
+            catch (Error ex)
+              {
+                throw ex;
+              }
             catch (Throwable ex)
               {
                 return "Lisp error: " + ex;

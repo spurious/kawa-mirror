@@ -1,3 +1,8 @@
+2014-02-16  Per Bothner  <per@bothner.com>
+
+	* EWindow.java: Make sure Error is uncaught or re-thrown.
+	* Marker.java: Likewise.
+
 2014-01-06  Per Bothner  <per@bothner.com>
 
 	* BufferReader.java (reset): Update for new LineBufferedReader API.

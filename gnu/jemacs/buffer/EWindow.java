@@ -334,17 +334,9 @@ public abstract class EWindow
       {
 	// Do nothing.
       }
-    catch (RuntimeException ex)
-      {
-	throw ex;
-      }
-    catch (Error ex)
-      {
-	throw ex;
-      }
     catch (Throwable ex)
       {
-	throw new WrappedException(ex);
+        WrappedException.rethrow(ex);
       }
 
   }

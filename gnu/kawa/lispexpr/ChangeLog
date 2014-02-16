@@ -1,3 +1,8 @@
+2014-02-16  Per Bothner  <per@bothner.com>
+
+	* ReaderDispatchMacro.java: Make sure Error is uncaught or re-thrown.
+	* ReaderDispatchSyntaxQuote.java: Likewise.
+
 2014-02-12  Per Bothner  <per@bothner.com>
 
 	* LangPrimType.java: Change charType to recognize both gnu.text.Char

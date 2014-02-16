@@ -64,7 +64,7 @@ public class Echo2Display extends Display
       }
     catch (Throwable ex)
       {
-        throw gnu.mapping.WrappedException.wrapIfNeeded(ex);
+        gnu.mapping.WrappedException.rethrow(ex);
       }
   }
 
@@ -338,7 +338,7 @@ class Echo2Button
       }
     catch (Throwable ex)
       {
-	throw new gnu.mapping.WrappedException(ex);
+	WrappedException.rethrow(ex);
       }
   }
 }

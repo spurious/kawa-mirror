@@ -1,3 +1,9 @@
+2014-02-16  Per Bothner  <per@bothner.com>
+
+	* Echo2Display.java: Make sure Error is uncaught or re-thrown.
+	* Echo2Servlet.java: Likewise.
+	* Echo2Window.java: Likewise.
+
 2008-04-08  Per Bothner  <per@bothner.com>
 
 	* Echo2Display.java (<init>): Fix constructor.

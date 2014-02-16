@@ -35,7 +35,7 @@ public class Echo2Window extends nextapp.echo2.app.Window
       }
     catch (Throwable ex)
       {
-        throw WrappedException.wrapIfNeeded(ex);
+        WrappedException.rethrow(ex);
       }
   }
 }

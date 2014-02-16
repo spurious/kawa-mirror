@@ -82,7 +82,7 @@ extends WebContainerServlet
           }
         catch (Throwable ex)
           {
-            throw WrappedException.wrapIfNeeded(ex);
+            WrappedException.rethrow(ex);
           }
         window = (Echo2Window) session.getValue(MAIN_WINDOW_KEY);
         //if (window == null) ...
@@ -112,7 +112,7 @@ extends WebContainerServlet
           }
         catch (Throwable ex)
           {
-            throw WrappedException.wrapIfNeeded(ex);
+            WrappedException.rethow(ex);
           }
       }
     */

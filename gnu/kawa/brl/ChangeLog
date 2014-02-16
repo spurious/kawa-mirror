@@ -1,3 +1,7 @@
+2014-02-16  Per Bothner  <per@bothner.com>
+
+	* BRL.java: Make sure Error is uncaught or re-thrown.
+
 2012-10-02  Per Bothner  <per@bothner.com>
 
 	* BRLRead.java (readCommand): New override, needed because of new

@@ -85,6 +85,9 @@ public class ReaderDispatchSyntaxQuote extends ReadTableEntry {
                     }
                     return ((Procedure) proc).applyN(args);
                 }
+                catch (Error ex) {
+                    throw ex;
+                }
                 catch (Throwable ex) {
                     reader.error("caught "+ex+" applying reader constructor "+name);
                 }

@@ -42,6 +42,10 @@ public class ReaderDispatchMacro extends ReaderMisc
       {
 	throw ex;
       }
+    catch (Error ex)
+      {
+	throw ex;
+      }
     catch (Throwable ex)
       {
 	in.fatal("reader macro '"+procedure+"' threw: "+ex);

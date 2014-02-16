@@ -52,7 +52,7 @@ public class BRL extends Scheme
 	loadClass("gnu.kawa.brl.progfun");
 	loadClass("gnu.kawa.servlet.HTTP");
       }
-    catch (Throwable ex)
+    catch (Exception ex)
       {
 	System.err.println("caught "+ex);
       }

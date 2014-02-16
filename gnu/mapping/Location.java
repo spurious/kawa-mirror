@@ -134,7 +134,7 @@ public abstract class Location<T>
           {
             ps.print(get());
           }
-        catch (Throwable ex)
+        catch (Exception ex)
           {
             ps.print("<caught "+ex+">");
           }

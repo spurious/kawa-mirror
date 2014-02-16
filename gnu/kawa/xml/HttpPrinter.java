@@ -142,9 +142,9 @@ public class HttpPrinter extends FilterConsumer
 	  {
 	    printHeaders();
 	  }
-	catch (Throwable ex)
+	catch (Exception ex)
 	  {
-	    throw new RuntimeException(ex.toString());
+	    throw new RuntimeException(ex);
 	  }
       }
     /* #ifdef use:java.lang.CharSequence */
@@ -243,7 +243,7 @@ public class HttpPrinter extends FilterConsumer
 	if (ostream != null)
 	  ostream.flush();
       }
-    catch (Throwable ex)
+    catch (Exception ex)
       {
       }
   }

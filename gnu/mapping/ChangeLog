@@ -1,3 +1,10 @@
+2014-02-16  Per Bothner  <per@bothner.com>
+
+	* LazyPropertyKey.java: Make sure Error is uncaught or re-thrown.
+	* Location.java: Likewise.
+	* ProcLocation.java: Likewise.
+	* RunnableClosure.java: Likewise.
+
 2014-02-12  Per Bothner  <per@bothner.com>
 
 	* WrappedException.java (rethrow): Change return type from

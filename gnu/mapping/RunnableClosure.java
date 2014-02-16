@@ -79,6 +79,10 @@ public class RunnableClosure<T>
 	  OutPort.setErrDefault(err);
 	result = (T) action.apply0 ();
       }
+    catch (Error ex)
+      {
+        throw ex;
+      }
     catch (Throwable ex)
       {
 	exception = ex;

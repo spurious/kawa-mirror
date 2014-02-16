@@ -1,3 +1,9 @@
+2014-02-16  Per Bothner  <per@bothner.com>
+
+	* HttpPrinter.java: Make sure Error is uncaught or re-thrown.
+	* WriteTo.java: Likewise.
+	* XDataType.java: Likewise.
+
 2014-02-06  Per Bothner  <per@bothner.com>
 
 	* Document.java (docMapLocation): Change from ThreadLocation

@@ -53,7 +53,7 @@ public class LazyPropertyKey<T> extends PropertyKey<T>
                   .invoke(null, container);
               }
           }
-        catch (Throwable ex)
+        catch (Exception ex)
           {
             throw new RuntimeException("lazy property "+this+" has specifier \""+str+"\" but there is no such "+(cstart==0?"field":"method"), ex);
           }

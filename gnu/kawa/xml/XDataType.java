@@ -322,7 +322,7 @@ public class XDataType extends Type implements TypeValue
         cast(value);
         return true;
       }
-    catch (Throwable ex)
+    catch (Exception ex)
       {
         return false;
       }

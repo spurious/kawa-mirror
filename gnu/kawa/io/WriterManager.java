@@ -66,7 +66,7 @@ public final class WriterManager implements Runnable
               {
                 ((OutPort) port).finalize();
               }
-            catch (Throwable ex)
+            catch (Exception ex)
               {
                 // ignore
               }
@@ -86,7 +86,7 @@ public final class WriterManager implements Runnable
 	Runtime.getRuntime().addShutdownHook(new Thread(this));
 	return true;
       }
-    catch (Throwable ex)
+    catch (Exception ex)
       {
 	return false;
       }

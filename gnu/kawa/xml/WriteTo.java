@@ -63,7 +63,7 @@ public class WriteTo extends Procedure2 // FIXME: implements Inlineable
           }
         ins.close();
       }
-    catch (Throwable ex)
+    catch (Exception ex)
       {
         // fall through
       }

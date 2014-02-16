@@ -26,17 +26,9 @@ public class ProcLocation extends Location<Object>
       {
 	return proc.applyN(args);
       }
-    catch (RuntimeException ex)
-      {
-	throw ex;
-      }
-    catch (Error ex)
-      {
-	throw ex;
-      }
     catch (Throwable ex)
       {
-	throw new WrappedException(ex);
+	throw WrappedException.rethrow(ex);
       }
   }
 
@@ -50,17 +42,9 @@ public class ProcLocation extends Location<Object>
       {
 	proc.setN(xargs);
       }
-    catch (RuntimeException ex)
-      {
-	throw ex;
-      }
-    catch (Error ex)
-      {
-	throw ex;
-      }
     catch (Throwable ex)
       {
-	throw new WrappedException(ex);
+	throw WrappedException.rethrow(ex);
       }
   }
 

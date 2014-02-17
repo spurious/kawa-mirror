@@ -84,7 +84,7 @@ public class ArrayClassLoader extends ClassLoader
             url.openConnection().connect();
             return url;
           }
-        catch (Throwable ex)
+        catch (Exception ex)
           {
             // Fall through ...
           }

@@ -72,7 +72,7 @@ public class ObjectType extends Type
   //       thisClassLoader
   //         = Class.forName("gnu.mapping.ObjectType").getClassLoader();
   //     }
-  //   catch (Throwable ex)
+  //   catch (Exception ex)
   //     {
   //     }
   // }

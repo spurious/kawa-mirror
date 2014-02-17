@@ -124,7 +124,7 @@ public class ClassType extends ObjectType
           {
             return reflectClass.getSimpleName();
           }
-        catch (Throwable ex)
+        catch (Exception ex)
           { /* ... fall thorugh ... */ }
       }
     /* #endif */

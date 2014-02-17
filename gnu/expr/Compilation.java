@@ -2566,13 +2566,20 @@ public class Compilation implements SourceLocator
    * It is used to ensure that we can inherit from classes defined when in
    * immediate mode (in Scheme using define-class or similar).
    */
-  public void usedClass (Type type)
-  {
-    while (type instanceof ArrayType)
-      type = ((ArrayType) type).getComponentType();
-    if (immediate && type instanceof ClassType)
-      loader.addClass((ClassType) type);
-  }
+    public void usedClass(Type type) {
+        while (type instanceof ArrayType)
+            type = ((ArrayType) type).getComponentType();
+        if (immediate && type instanceof ClassType) {
+            ClassType cl = (ClassType) type;
+            for (;;) {
+                loader.addClass(cl);
+                ClassType enc = cl.getDeclaringClass();
+                if (enc == null)
+                    break;
+                cl = enc;
+            }
+        }
+    }
 
     /** Set moudle name - which sets name of generated class. */
     public void setModuleName(String name) {

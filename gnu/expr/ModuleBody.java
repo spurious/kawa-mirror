@@ -69,11 +69,7 @@ public abstract class ModuleBody extends Procedure0 implements RunnableModule
     ctx.consumer = save;
     if (th != null)
       {
-	if (th instanceof RuntimeException)
-	  throw (RuntimeException) th;
-	if (th instanceof Error)
-	  throw (Error) th;
-	throw new WrappedException(th);
+        WrappedException.rethrow(th);
       }
   }
 

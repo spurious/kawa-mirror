@@ -49,7 +49,7 @@ public class ApplicationMainSupport
                 String name = System.getProperty("kawa.command.name");
                 if (name != null)
                     commandName.set(name);   
-            } catch (Throwable ex) {
+            } catch (Exception ex) {
               // Leave commandName unset.
             }
         }
@@ -93,7 +93,7 @@ public class ApplicationMainSupport
                 loc.setGlobal(value);
                 break;
               }
-            catch (Throwable ex)
+            catch (Exception ex)
               {
                 System.err.println("error setting property " + key
                                    +" field "+cname+'.'+fname+": "+ex);

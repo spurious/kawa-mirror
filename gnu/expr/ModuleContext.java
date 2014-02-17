@@ -79,7 +79,7 @@ public class ModuleContext
                 inst = clas.newInstance();
               }
           }
-        catch (Throwable ex)
+        catch (Exception ex)
           {
             throw new WrappedException
               ("exception while initializing module " + clas.getName(), ex);

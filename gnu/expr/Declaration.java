@@ -1310,7 +1310,7 @@ public class Declaration
                 String fname = Compilation.mangleNameIfNeeded(name);
                 procField = procType.getDeclaredField(fname);
               }
-            catch (Throwable ex)
+            catch (Exception ex)
               {
                 System.err.println("CAUGHT "+ex+" in getDeclaration for "+proc);
                 return null;
@@ -1386,7 +1386,7 @@ public class Declaration
                 noteValue(value);
                 return value;
               }
-            catch (Throwable ex)
+            catch (Exception ex)
               {
               }
           }

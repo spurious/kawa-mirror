@@ -213,7 +213,7 @@ public class ModuleManager
             info.sourceAbsPath = sourceAbsPath;
             info.sourceAbsPathname = sourceAbsPath.toString();
           }
-        catch (Throwable ex)
+        catch (Exception ex)
           {
             return;
           }

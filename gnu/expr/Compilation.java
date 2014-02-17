@@ -1238,7 +1238,7 @@ public class Compilation implements SourceLocator
                 clas = ((ClassType)
                         Type.make(Class.forName(clas.getName() + "$class")));
               }
-            catch (Throwable ex)
+            catch (Exception ex)
               {
                 return;
               }
@@ -2232,7 +2232,7 @@ public class Compilation implements SourceLocator
             else
               litTable.emit();
 	  }
-	catch (Throwable ex)
+	catch (Exception ex)
 	  {
 	    error('e', "Literals: Internal error:" + ex);
 	  }
@@ -2297,7 +2297,7 @@ public class Compilation implements SourceLocator
               {
                 // Do nothing.
               }
-            catch (Throwable ex)
+            catch (Exception ex)
               {
                 error('e', "error loading map for "+mainPackage+" - "+ex);
               }
@@ -2351,7 +2351,7 @@ public class Compilation implements SourceLocator
                       Path.toURL(mi.getSourceAbsPathname()).toString();
                   moduleSource = Path.relativize(sourcePath, path);
                 }
-              catch (Throwable ex)
+              catch (Exception ex)
                 {
                   throw new WrappedException("exception while fixing up '"
                                              +moduleSource+'\'',
@@ -2963,7 +2963,7 @@ public class Compilation implements SourceLocator
       }
     catch (Throwable ex)
       {
-        throw new WrappedException("internal error", ex);
+        WrappedException.rethrow(ex);
       }
   }
 

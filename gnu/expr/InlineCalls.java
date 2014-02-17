@@ -91,7 +91,7 @@ public class InlineCalls extends ExpExpVisitor<Type> {
                         try {
                             iface = reqraw.getReflectClass();
                         }
-                        catch (Throwable ex) {
+                        catch (Exception ex) {
                             iface = null;
                         }
                         if (iface == null)
@@ -898,10 +898,14 @@ public class InlineCalls extends ExpExpVisitor<Type> {
             /* #endif */
           }
       }
+    catch (Error ex)
+      {
+        throw ex;
+      }
     catch (Throwable ex)
       {
         if (ex instanceof InvocationTargetException)
-          ex = ((InvocationTargetException) ex).getTargetException();
+            ex = ((InvocationTargetException) ex).getTargetException();
         messages.error('e', "caught exception in inliner for "+proc+" - "+ex, ex);
       }
     return null;

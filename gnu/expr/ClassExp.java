@@ -379,7 +379,7 @@ public class ClassExp extends LambdaExp
                 // Class implClass = Class.forName(implTypeName);
                 /* #endif */
                 implType = (ClassType) Type.make(implClass);
-            } catch (Throwable ex) {
+            } catch (Exception ex) {
                 return;
             }
         }

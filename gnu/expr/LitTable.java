@@ -331,7 +331,7 @@ public class LitTable implements ObjectOutput
 			    if (value == litValue)
 			      literal = lit;
 			  }
-			catch (Throwable ex)
+			catch (Exception ex)
 			  {
 			    error("caught "+ex+" getting static field "+fld);
 			  }

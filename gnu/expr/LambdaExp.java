@@ -1830,6 +1830,10 @@ public class LambdaExp extends ScopeExp
       {
         return param.getInitValue().eval(ctx);
       }
+    catch (Error ex)
+      {
+        throw ex;
+      }
     catch (Throwable ex)
       {
         throw new WrappedException("error evaluating default argument", ex);

@@ -83,7 +83,7 @@ public class ModuleMethod extends MethodProc
                   }
               }
           }
-        catch (Throwable ex)
+        catch (Exception ex)
           {
           }
       }

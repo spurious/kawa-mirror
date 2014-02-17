@@ -164,7 +164,7 @@ public class ModuleExp extends LambdaExp
       {
 	throw new WrappedException("class not found in lambda eval", ex);
       }
-    catch (Throwable ex)
+    catch (Exception ex)
       {
         messages.error('f', "internal compile error - caught "+ex, ex);
         throw new SyntaxException(messages);
@@ -189,7 +189,7 @@ public class ModuleExp extends LambdaExp
                     // while using kawart - i.e. the Kawa "runtime" jar.
                     Class.forName("gnu.expr.TryExp");
                     haveCompiler = 1;
-                } catch (Throwable ex) {
+                } catch (Exception ex) {
                     haveCompiler = -1;
                 }
             }
@@ -262,7 +262,7 @@ public class ModuleExp extends LambdaExp
                     savedLoader = thread.getContextClassLoader();
                     thread.setContextClassLoader(clas.getClassLoader());
                   }
-                catch (Throwable ex)
+                catch (Exception ex)
                   {
                     thread = null;
                   }

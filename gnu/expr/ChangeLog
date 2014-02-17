@@ -1,3 +1,20 @@
+2014-02-16  Per Bothner  <per@bothner.com>
+
+	* ApplyExp.java: Make sure Error is uncaught or re-thrown.
+	* ClassExp.java: Likewise.
+	* Compilation.java: Likewise.
+	* Declaration.java: Likewise.
+	* InlineCalls.java: Likewise.
+	* LambdaExp.java: Likewise.
+	* Language.java: Likewise.
+	* LitTable.java: Likewise.
+	* ModuleBody.java: Likewise.
+	* ModuleContext.java: Likewise.
+	* ModuleExp.java: Likewise.
+	* ModuleManager.java: Likewise.
+	* ModuleMethod.java: Likewise.
+	* ApplicationMainSupport.java: Likewise.
+
 2014-02-12  Per Bothner  <per@bothner.com>
 
 	* ExpExpVisitor.java (error): Two new convenience methods.

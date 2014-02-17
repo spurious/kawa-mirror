@@ -943,7 +943,7 @@ public abstract class Language
             fdname = Symbol.valueOf(sourceName.name(), sourceName.uri(), sourceName.prefix());
           }
       }
-    catch (Throwable ex)
+    catch (Exception ex)
       {
       }
     if (fdname instanceof String)

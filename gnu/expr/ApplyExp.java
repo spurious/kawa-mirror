@@ -197,6 +197,10 @@ public class ApplyExp extends Expression
             if (inlineCompile(proc, exp, comp, target))
               return;
           }
+        catch (Error ex)
+          {
+            throw ex;
+          }
         catch (Throwable ex)
           {
             comp.getMessages().error('e', "caught exception in inline-compiler for "+quotedValue+" - "+ex, ex);
@@ -661,6 +665,10 @@ public class ApplyExp extends Expression
     try
       {
 	return new QuoteExp(proc.applyN(vals), type).setLine(this);
+      }
+    catch (Error ex)
+      {
+        throw ex;
       }
     catch (Throwable ex)
       {

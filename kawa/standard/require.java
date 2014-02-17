@@ -329,6 +329,10 @@ public class require extends Syntax
               {
                 mapped = renamer.apply1(aname);
               }
+            catch (Error ex)
+              {
+                throw ex;
+              }
             catch (Throwable ex)
               {
                 mapped = ex;

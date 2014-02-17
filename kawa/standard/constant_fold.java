@@ -54,6 +54,10 @@ public class constant_fold extends Syntax
       {
 	return new QuoteExp(((Procedure) func).applyN(vals));
       }
+    catch (Error ex)
+      {
+        throw ex;
+      }
     catch (Throwable ex)
       {
 	exp = tr.syntaxError("caught exception in constant-fold:");

@@ -284,6 +284,10 @@ public class Translator extends Compilation
               macroContext = ((TemplateScope) current_scope).macroContext;
             obj = dval.eval(env);
           }
+        catch (Error ex)
+          {
+            throw ex;
+          }
         catch (Throwable ex)
           {
             ex.printStackTrace();
@@ -818,7 +822,7 @@ public class Translator extends Compilation
                     else
                       decl = null;
                   }
-                catch (Throwable ex)
+                catch (Exception ex)
                   {
                     error('e',
                           "exception loading '" + exp
@@ -1164,7 +1168,7 @@ public class Translator extends Compilation
     } catch (NoClassDefFoundError ex)
     {
       tr.error('w', "error loading class " + cname + " - " + ex.getMessage() + " not found");
-    } catch (Throwable ex)
+    } catch (Exception ex)
     {
     }
     return null;
@@ -1276,6 +1280,10 @@ public class Translator extends Compilation
                   type = Type.make((Class) t);
                 else if (t instanceof Type)
                   type = (Type) t;
+              }
+            catch (Error ex)
+              {
+                throw ex;
               }
             catch (Throwable ex)
               {
@@ -1417,7 +1425,7 @@ public class Translator extends Compilation
                         if (obj instanceof Syntax)
                           syntax = (Syntax) obj;
                       }
-                    catch (Throwable ex)
+                    catch (Exception ex)
                       {
                         obj = null;
                       }

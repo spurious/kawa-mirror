@@ -51,7 +51,7 @@ public class load extends Procedure1 {
               { 
                 clas = Class.forName(name.toString());
               }
-            catch (Throwable e2)
+            catch (Exception e2)
               {
                 // Handled below since clas==null
               }

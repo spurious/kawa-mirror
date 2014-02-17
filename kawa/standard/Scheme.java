@@ -104,7 +104,7 @@ public class Scheme extends LispLanguage
             instance.loadClass(withServlets > 1 ? "gnu.kawa.servlet.servlets"
                                : "gnu.kawa.servlet.HTTP");
           }
-        catch (Throwable ex)
+        catch (Exception ex)
           {
           }
       }
@@ -1010,17 +1010,9 @@ public class Scheme extends LispLanguage
 	throw new RuntimeException("eval: I/O exception: "
 				   + e.toString ());
       }
-    catch (RuntimeException ex)
-      {
-	throw ex;
-      }
-    catch (Error ex)
-      {
-	throw ex;
-      }
     catch (Throwable ex)
       {
-	throw new WrappedException(ex);
+	throw WrappedException.rethrow(ex);
       }
   }
 
@@ -1034,17 +1026,9 @@ public class Scheme extends LispLanguage
       {
 	return Eval.eval (sexpr, env);
       }
-    catch (RuntimeException ex)
-      {
-	throw ex;
-      }
-    catch (Error ex)
-      {
-	throw ex;
-      }
     catch (Throwable ex)
       {
-	throw new WrappedException(ex);
+	throw WrappedException.rethrow(ex);
       }
   }
 

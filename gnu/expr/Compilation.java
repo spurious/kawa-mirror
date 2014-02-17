@@ -2581,7 +2581,7 @@ public class Compilation implements SourceLocator
         }
     }
 
-    /** Set moudle name - which sets name of generated class. */
+    /** Set module name - which sets name of generated class. */
     public void setModuleName(String name) {
         getModule().setName(name);
     }

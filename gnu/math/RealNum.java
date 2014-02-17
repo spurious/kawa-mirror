@@ -13,6 +13,11 @@ public abstract class RealNum extends Complex
   public final RealNum im() { return IntNum.zero(); }
   public final RealNum angle() { return IntNum.zero(); }
 
+    public static boolean isReal(Object value) {
+        return (value instanceof Number
+                && (value instanceof RealNum || ! (value instanceof Numeric)));
+    }
+
   public static RealNum asRealNumOrNull (Object value)
   {
     if (value instanceof RealNum)
@@ -365,7 +370,7 @@ public abstract class RealNum extends Complex
     boolean neg = dstr.charAt(0) == '-';
     if (dstr.charAt(indexE+1) != '-')
       {
-        throw new Error("not implemented: toStringDecimal given non-negative exponent: "+dstr);
+        throw new UnsupportedOperationException("not implemented: toStringDecimal given non-negative exponent: "+dstr);
       }
     else
       {

@@ -1,3 +1,14 @@
+2014-02-16  Per Bothner  <per@bothner.com>
+
+	* RealNum.java (isReal): New static method.
+	* DFloNum.java: Use RealNum.isReal.
+	* RealNum.java (asRealNumOrNull): Don't throw Error.
+	* DateTime.java: Likewise.
+	* Duration.java: Likewise.
+	* ExponentialFormat.java: Likewise.
+	* FixedRealFormat.java: Likewise.
+	* IntNum.java: Likewise.
+
 2013-09-03  Per Bothner  <per@bothner.com>
 
 	* RealNum.java (angle): New method - return exact zero.

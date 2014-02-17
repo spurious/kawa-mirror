@@ -351,7 +351,7 @@ public class XDataType extends Type implements TypeValue
         if (value instanceof Boolean)
           return (((Boolean)value).booleanValue() ? Boolean.TRUE
                   : Boolean.FALSE);
-        if (value instanceof Number)
+        if (RealNum.isReal(value))
           {
             double d = ((Number) value).doubleValue();
             return d == 0.0 || Double.isNaN(d) ? Boolean.FALSE : Boolean.TRUE;
@@ -363,15 +363,8 @@ public class XDataType extends Type implements TypeValue
           return value;
         if (value instanceof gnu.math.RealNum)
           return ((gnu.math.RealNum) value).asBigDecimal();
-        if (value instanceof Float || value instanceof Double)
-          {
-            double d = ((Number) value).doubleValue();
-            /* #ifdef JAVA5 */
-            return BigDecimal.valueOf(d);
-            /* #else */
-            // return new BigDecimal(d);
-            /* #endif */
-          }
+        if (RealNum.isReal(value))
+          return BigDecimal.valueOf(((Number) value).doubleValue());
         if (value instanceof Boolean)
           return cast(((Boolean)value).booleanValue() ? IntNum.one()
                       : IntNum.zero());
@@ -379,8 +372,7 @@ public class XDataType extends Type implements TypeValue
       case FLOAT_TYPE_CODE:
         if (value instanceof java.lang.Float)
           return value;
-        if (value instanceof java.lang.Number)
-          // Wrong for complex numbers with non-zero imaginary part.  FIXME.
+        if (RealNum.isReal(value))
           return makeFloat(((Number) value).floatValue());
         if (value instanceof Boolean)
           return ((Boolean)value).booleanValue() ? FLOAT_ONE : FLOAT_ZERO;
@@ -388,8 +380,7 @@ public class XDataType extends Type implements TypeValue
       case DOUBLE_TYPE_CODE:
         if (value instanceof java.lang.Double)
           return value;
-        if (value instanceof java.lang.Number)
-          // Wrong for complex numbers with non-zero imaginary part.  FIXME.
+        if (RealNum.isReal(value))
           return makeDouble(((Number) value).doubleValue());
         if (value instanceof Boolean)
           return ((Boolean)value).booleanValue() ? DOUBLE_ONE : DOUBLE_ZERO;

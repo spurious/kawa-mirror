@@ -262,13 +262,13 @@ public class FixedRealFormat extends java.text.Format
     */
   }
 
-  public java.lang.Number parse(String text, java.text.ParsePosition status)
-  {
-    throw new Error("RealFixedFormat.parse - not implemented");
-  }
-  public Object parseObject(String text, java.text.ParsePosition status)
-  {
-    throw new Error("RealFixedFormat.parseObject - not implemented");
-  }
+    public java.lang.Number parse(String text, java.text.ParsePosition status) {
+        throw new UnsupportedOperationException
+            ("RealFixedFormat.parse - not implemented");
+    }
+    public Object parseObject(String text, java.text.ParsePosition status) {
+        throw new UnsupportedOperationException
+            ("RealFixedFormat.parseObject - not implemented");
+    }
 
 }

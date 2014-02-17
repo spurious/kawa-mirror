@@ -727,12 +727,13 @@ public class DateTime extends Quantity implements Cloneable
 
   public boolean isZero ()
   {
-    throw new Error("DateTime.isZero not meaningful!");
+    throw new UnsupportedOperationException("DateTime.isZero not meaningful!");
   }
 
-  public Unit unit() { return unit; }
-  public Complex number ()
-  {
-    throw new Error("number needs to be implemented!");
-  }
+    public Unit unit() { return unit; }
+
+    public Complex number() {
+        throw new UnsupportedOperationException
+            ("number needs to be implemented!");
+    }
 }

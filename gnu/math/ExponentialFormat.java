@@ -307,13 +307,13 @@ public class ExponentialFormat extends java.text.Format
     return format(((Number) num).doubleValue(), sbuf, fpos);
   }
 
-  public java.lang.Number parse(String text, java.text.ParsePosition status)
-  {
-    throw new Error("ExponentialFormat.parse - not implemented");
-  }
-  public Object parseObject(String text, java.text.ParsePosition status)
-  {
-    throw new Error("ExponentialFormat.parseObject - not implemented");
-  }
+    public java.lang.Number parse(String text, java.text.ParsePosition status) {
+        throw new UnsupportedOperationException
+            ("ExponentialFormat.parse - not implemented");
+    }
+    public Object parseObject(String text, java.text.ParsePosition status) {
+        throw new UnsupportedOperationException
+            ("ExponentialFormat.parseObject - not implemented");
+    }
 
 }

@@ -887,7 +887,7 @@ public class IntNum extends RatNum implements Externalizable
 	if (y == 0)
 	  return one ();
 	else
-	  throw new Error ("negative exponent");
+	  throw new IllegalArgumentException("negative exponent");
       }
     if (x.isZero ())
       return x;

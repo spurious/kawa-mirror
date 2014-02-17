@@ -47,7 +47,7 @@ public class DFloNum extends RealNum implements Externalizable
   {
     if (value instanceof DFloNum)
       return (DFloNum) value;
-    if (value instanceof RealNum || value instanceof Number)
+    if (RealNum.isReal(value))
       return new DFloNum(((Number) value).doubleValue());
     return null;
   }

@@ -496,7 +496,7 @@ public class Duration extends Quantity implements Externalizable
   public Unit unit() { return unit; }
   public Complex number ()
   {
-    throw new Error("number needs to be implemented!");
+    throw new UnsupportedOperationException("number needs to be implemented!");
   }
 
   public int hashCode ()

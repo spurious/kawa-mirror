@@ -1,3 +1,7 @@
+2014-02-16  Per Bothner  <per@bothner.com>
+
+	* lang/AutoloadProcedure.java: Simplify as we now require Java5.
+
 2014-02-12  Per Bothner  <per@bothner.com>
 
 	* standard/Scheme.java (initScheme): Define 'pipe-process'.

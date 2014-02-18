@@ -74,8 +74,9 @@ public class ImportFromLibrary extends Syntax
     { "74", "blobs", MISSING },
     { "78", "lightweight-testing", MISSING },
     { "86", "mu-and-nu", MISSING },
-    { "87", "case", MISSING },
+    { "87", "case", BUILTIN },
     { "95", "sorting-and-merging", "kawa.lib.srfi95" },
+    { "98", "os-environment-variables", BUILTIN },
     { "101", "random-access-lists", "gnu.kawa.slib.ralists" }
   };
 

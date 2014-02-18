@@ -1515,6 +1515,9 @@ Consider some alternative to applets, such as
 @node Compiling to executable, , Applet compilation, Compiling
 @subsection Compiling to a native executable
 
+@emph{Using GCJ with Kawa is no longer supported,
+as GCJ is no longer being actively maintained.}
+
 You can compile your Scheme program to native code using GCJ,
 as long as you have built Kawa using GCJ.
 
@@ -4019,7 +4022,7 @@ saved for future calls.
 This parameterized type is the type of promises that evaluate to
 an value of type @code{T}.
 It is equivalent to the Java interface @code{gnu.mapping.Lazy<T>}.
-The implementation class fro promises is usually @code{gnu.mapping.Promise},
+The implementation class for promises is usually @code{gnu.mapping.Promise},
 though there are other classes that implement @code{Lazy},
 most notably @code{gnu.mapping.Future}, used for futures,
 which are promises evaluated in a separate thread.
@@ -8605,9 +8608,10 @@ of a source file, which is read and evaluated line-by-line.
 The @var{path} can also be a fully-qualified class name.
 (Mostly acts like the @code{-f} command-line option,
 but with different error handling.)
-Since @code{load} is a run-time function it doesn't work well
-with Kawa's orientation towards compilation.
-It is highly recommended that you use instead use
+Since @code{load} is a run-time function it doesn't know
+about the enclosing lexical environment, and the latter
+can't know about definitions introduced by @code{load}.
+For those reasons it is highly recommended that you use instead use
 @code{@ref{require, require}} or @code{@ref{include, include}}.
 @end deffn
 
@@ -14632,7 +14636,7 @@ A string containing the home directory of the user.
 @end defvar
 
 @deffn Procedure command-line
-Returns a nonempty list of strings. The first element is
+Returns a nonempty list of immutable strings. The first element is
 an implementation-specific name for the running top-level
 program.
 The remaining elements are the command-line arguments,
@@ -14734,11 +14738,30 @@ It is an error to mutate any of the strings or the alist itself.
 
 @deffn Procedure exit [code]
 Exits the Kawa interpreter, and ends the Java session.
-The integer value @var{code} is returned to the operating
-system.  If @var{code} is not specified, zero is returned,
-indicating normal (non-error) termination.
-If the @var{code} is @code{#f}, it
-is treated as -1, which means an abnormal exit.
+Returns the value of @var{code} to the operating system:
+The @var{code} must be integer, or the special
+values @code{#f} (equivalent to -1), or
+@code{#t} (equivalent to 0).
+If @var{code} is not specified, zero is returned.
+The @var{code} is a status code; by convention a non-zero
+value indicates a non-standard (error) return.
+
+Before exiting, finally-handlers (as in @code{try-finally},
+or the @var{after} procedure of @code{dynamic-wind}) are
+executed, but only in the current thread, and only if
+the current thread was started normally. (Specifically
+if we're inside an @code{ExitCalled} block with non-zero
+nesting - see @code{gnu.kawa.util.ExitCalled}.)
+Also, JVM shutdown hooks are executed - which includes
+flushing buffers of output ports.  (Specifically
+@code{Writer} objects registered with the @code{WriterManager}.)
+@end deffn
+
+@deffn Procedure emergency-exit [code]
+Exits the Kawa interpreter, and ends the Java session.
+Communicates an exit value in the same manner as @code{exit}.
+Unlike @code{exit}, neither finally-handlers nor
+shutdown hooks are executed.
 @end deffn
 
 @deffn Procedure make-process command envp
@@ -15609,10 +15632,6 @@ It would be nice to enhance the pretty-printer to handle
 variable-width fonts and other ``rich'' text.
 Figuring out how to make the output formatter more flexible,
 more efficient, and more customizable are also desirable.
-
-@subsection Shell/process syntax
-See @uref{http://sourceware.org/ml/kawa/2012-q1/msg00084.html,this message}
-for a rough design.
 
 @subsection Hop-style web programming
 @uref{http://hop.inria.fr/,Hop} is an interesting design

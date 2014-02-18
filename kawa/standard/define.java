@@ -12,7 +12,7 @@ import gnu.lists.*;
  * <code>Symbol</code>) or </code>Declaration</code>.
  * The <code>code</code> is an integer mask,
  * where 1 means type specified, 2 means a function definition,
- * 4 means private, and 8 means constant.
+ * 4 means private, 8 means constant, and 16 means an early constant.
  * The <code>type</code> is the declarated type or <code>null</code>.
  * The <code>value</code> is the initializing value. * 
  * @author	Per Bothner
@@ -73,6 +73,8 @@ public class define extends Syntax
       }
     if (makeConstant)
       decl.setFlag(Declaration.IS_CONSTANT);
+    if ((options & 16) != 0)
+      decl.setFlag(Declaration.EARLY_INIT);
     decl.setFlag(Declaration.IS_SINGLE_VALUE);
 
     Expression value;

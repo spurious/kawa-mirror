@@ -52,6 +52,17 @@
     ((define-constant name value)
      (%define name 8 #!null value))))
 
+(%define-syntax define-early-constant
+  (syntax-rules (:: $lookup$)
+    ((define-early-constant ($lookup$ part1 'part2) :: type value)
+     (%define ($lookup$ part1 'part2) 25 type value))
+    ((define-early-constant ($lookup$ part1 'part2) value)
+     (%define ($lookup$ part1 'part2) 24 #!null value))
+    ((define-early-constant name :: type value)
+     (%define name 25 type value))
+    ((define-early-constant name value)
+     (%define name 24 #!null value))))
+
 (%define syntax-error 2 #!null (id #!rest (msg :: <Object[]>))
   (invoke-static <kawa.standard.syntax_error> 'error id msg))
 

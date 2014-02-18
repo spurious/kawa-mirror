@@ -564,6 +564,7 @@ public class Scheme extends LispLanguage
  
       defSntxStFld("define-private", "kawa.lib.prim_syntax");
       defSntxStFld("define-constant", "kawa.lib.prim_syntax");
+      defSntxStFld("define-early-constant", "kawa.lib.prim_syntax");
 
       defSntxStFld("define-autoload",
                    "kawa.standard.define_autoload", "define_autoload");

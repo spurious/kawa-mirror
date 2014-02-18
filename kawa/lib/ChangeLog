@@ -1,5 +1,8 @@
 2014-02-17  Per Bothner  <per@bothner.com>
 
+	* prim_syntax.scm (define-early-constant): New syntax.
+	* std_syntax.scm (define_procedure): Use define-early-constant.
+
 	* rnrs/programs.scm (exit): Use ExitCalled utility class,
 	so that finally-handlers can be executed.
 	(mergency-exit): New method.

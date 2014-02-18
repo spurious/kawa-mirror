@@ -269,7 +269,7 @@
 		   ;; The GenericProc has to be allocated at init time, for
 		   ;; the sake of require, while the actual properties may
 		   ;; need to be evaluated at module-run-time.
-		   (define-constant name :: <gnu.expr.GenericProc>
+		   (define-early-constant name :: <gnu.expr.GenericProc>
 		     (make <gnu.expr.GenericProc> 'name))
 		   (invoke name 'setProperties (java.lang.Object[] args ...))))))
 

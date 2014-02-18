@@ -1,3 +1,8 @@
+2014-02-17  Per Bothner  <per@bothner.com>
+
+	* standard/define.java: Implement 'define-early-constant'.
+	* standard/Scheme.java (initScheme): Define 'define-early-constant'.
+
 2014-02-17  Jamison Hope  <jrh@theptrgroup.com>
 
 	* standard/ImportFromLibrary.java (SRFI97Map): Update for SRFI-87

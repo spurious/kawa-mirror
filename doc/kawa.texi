@@ -1655,7 +1655,7 @@ using @uref{http://srfi.schemers.org/srfi-16/srfi-16.html, @code{case-lambda}}.
 @item
 @uref{http://srfi.schemers.org/srfi-37/srfi-37.html, SRFI 37}: @uref{http://srfi.schemers.org/srfi-37/srfi-37.html,@code{args-fold} - a program argument processor}, if @code{(require 'args-fold)}.
 @item
-@uref{http://srfi.schemers.org/srfi-38/srfi-38.html, SRFI 39}: External Representation for Data With Shared Structure.
+@uref{http://srfi.schemers.org/srfi-38/srfi-38.html, SRFI 38}: External Representation for Data With Shared Structure.
 The @code{read-with-shared-structure} is missing, but subsumed by @code{read}.
 @item
 @uref{http://srfi.schemers.org/srfi-39/srfi-39.html, SRFI 39}:

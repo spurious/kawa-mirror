@@ -15511,18 +15511,6 @@ to make make random-access indexing fast.  Also, support for updating
 is insufficient.  (This needs someone into designing and hacking on
 low-level data-structures, along with lots of profiling and testing.)
 
-@subsection Implement R7RS exceptions
-R6RS and R7RS specify an exception handling
-mechanism using the procedure @code{with-exception-handler}
-and syntax @code{guard}.
-This needs to be implemented.
-We also need to figure out how and if the R6RS exception handling
-model should co-exist with the Java exception handling model;
-the @code{guard} form may co-exist better.
-Kawa-generated exception should be caught by @code{with-exception-handler}
-and syntax @code{guard}, though that may be difficult to achieve.
-@uref{http://lists.scheme-reports.org/pipermail/scheme-reports/2012-March/001982.html,This message} has some suggestions.
-
 @subsection Asynchronous evaluation
 
 C# recently added @code{asynch} and @code{await} keywords
@@ -15622,11 +15610,7 @@ For an IDE it is desirable to have both start and end position of an element,
 for example so it can put a squiggly line under an erroneous form.
 
 @subsection Output formatting and pretty printing
-Kawa's @code{write} should support back-references, as in
-@uref{http://srfi.schemers.org/srfi-38/srfi-38.html,SRFI-38}.
-This isn't difficult, but requires understanding and modifying the
-existing pretty-printer data structures.  One you figured that out,
-it would be nice to integrate the pretty-printer with the REPL,
+It would be nice to integrate the pretty-printer with the REPL,
 so that window re-sizing re-breaks the output lines.
 It would be nice to enhance the pretty-printer to handle
 variable-width fonts and other ``rich'' text.

@@ -1,5 +1,7 @@
 2014-02-17  Per Bothner  <per@bothner.com>
 
+	* ModuleBody.java (runAsMain): Push/pop/handle ExitCalled.
+
 	* Compilation.java (usedClass): Also add encloding class.
 
 2014-02-16  Per Bothner  <per@bothner.com>

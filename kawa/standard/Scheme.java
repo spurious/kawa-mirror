@@ -572,6 +572,7 @@ public class Scheme extends LispLanguage
                    "define_autoloads_from_file");
 
       defProcStFld("exit", "kawa.lib.rnrs.programs");
+      defProcStFld("emergency-exit", "kawa.lib.rnrs.programs");
       defProcStFld("command-line", "kawa.lib.rnrs.programs");
       defAliasStFld("command-line-arguments", 
                     "gnu.expr.ApplicationMainSupport", "commandLineArguments");

@@ -17,6 +17,7 @@ GNU_KAWA_IO_JSOURCES = \
 GNU_KAWA_UTIL_JSOURCES = \
   kawa/util/AbstractHashTable.java \
   kawa/util/AbstractWeakHashTable.java \
+  kawa/util/ExitCalled.java \
   kawa/util/FixupHtmlToc.java \
   kawa/util/GeneralHashTable.java \
   kawa/util/IdentityHashTable.java \

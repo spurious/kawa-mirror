@@ -16,6 +16,7 @@ import gnu.kawa.io.CharArrayInPort;
 import gnu.kawa.io.InPort;
 import gnu.kawa.io.OutPort;
 import gnu.kawa.io.WriterManager;
+import gnu.kawa.util.ExitCalled;
 
 /** Start a "Read-Eval-Print-Loop" for the Kawa Scheme evaluator. */
 
@@ -174,6 +175,10 @@ public class repl extends Procedure0or1
             Environment env = Environment.getCurrent();
             Shell.runFile(fs, path, env, true, 0);
           }
+        catch (Error e)
+          {
+            throw e;
+          }
         catch (Throwable e)
           {
             return "An error occurred while loading '" + initFile +"' : " + e;
@@ -266,7 +271,7 @@ public class repl extends Procedure0or1
                   {
                     skipLines = Integer.parseInt(count);
                   }
-                catch (Throwable ex)
+                catch (Exception ex)
                   {
                     iArg = maxArg; // force bad_option.
                   }
@@ -785,7 +790,7 @@ public class repl extends Procedure0or1
             comps[i-iArg] = comp;
 
           }
-        catch (Throwable ex)
+        catch (Exception ex)
           {
             if (! (ex instanceof SyntaxException)
                 || ((SyntaxException) ex).getMessages() != messages)
@@ -818,7 +823,7 @@ public class repl extends Procedure0or1
             if (sawErrors)
               System.exit(-1);
           }
-        catch (Throwable ex)
+        catch (Exception ex)
           {
             internalError(ex, comp, arg);
           }
@@ -828,7 +833,7 @@ public class repl extends Procedure0or1
   static void internalError (Throwable ex, Compilation comp, Object arg)
   {
     try { comp.getMessages().checkErrors(System.err, 50); }
-    catch (Throwable e) { }
+    catch (Exception e) { }
     StringBuffer sbuf = new StringBuffer();
     if (comp != null)
       {
@@ -853,6 +858,7 @@ public class repl extends Procedure0or1
   {
     try
       {
+        ExitCalled.push();
 	int iArg = processArgs(args, 0, args.length);
 	if (iArg < 0)
 	  return;
@@ -889,6 +895,7 @@ public class repl extends Procedure0or1
 	    OutPort.runCleanups();
 	  }
 	ModuleBody.exitDecrement();
+        ExitCalled.pop();
       }
   }
 
@@ -905,7 +912,7 @@ public class repl extends Procedure0or1
              .invoke(new Object[0])) == null)
           return true;
       }
-    catch (Throwable ex)
+    catch (Exception ex)
       {
       }
     return false;

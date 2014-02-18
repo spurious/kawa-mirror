@@ -10,6 +10,7 @@ import gnu.bytecode.ZipLoader;
 import gnu.kawa.io.InPort;
 import gnu.kawa.io.OutPort;
 import gnu.kawa.io.TtyInPort;
+import gnu.kawa.util.ExitCalled;
 import java.net.URL;
 
 /** Utility functions (static methods) for kawa.repl.
@@ -152,7 +153,7 @@ public class Shell
 	else
 	  return (Consumer) format;
       }
-    catch (Throwable ex)
+    catch (Exception ex)
       {
 	throw new RuntimeException("cannot get output-format '"
 				   + defaultFormatName + "' - caught " + ex);
@@ -285,7 +286,11 @@ public class Shell
 		if (ch < 0)
 		  break;
 	      }
-	    catch (Throwable e)
+            catch (Error e)
+              {
+                throw e;
+              }
+            catch (Throwable e)
 	      {
 		if (! interactive)
 		  return e;
@@ -421,11 +426,19 @@ public class Shell
             Environment env = Environment.getCurrent();
             return runFile(fs, path, env, lineByLine, skipLines);
           }
+        catch (Error e)
+          {
+            throw e;
+          }
         catch (Throwable e)
           {
             e.printStackTrace(System.err);
             return false;
           }
+      }
+    catch (Error e)
+      {
+        throw e;
       }
     catch (Throwable e)
       {
@@ -434,7 +447,7 @@ public class Shell
           {
             clas = Class.forName(fname);
           }
-        catch (Throwable ex)
+        catch (Exception ex)
           {
             System.err.println("Cannot read file "+e.getMessage());
             return false;
@@ -444,8 +457,13 @@ public class Shell
             runClass(clas, Environment.getCurrent());
             return true;
           }
+        catch (Error ex)
+          {
+            throw ex;
+          }
         catch (Throwable ex)
           {
+              //ExitCalled.check(e);
             ex.printStackTrace();
             return false;
           }
@@ -523,6 +541,9 @@ public class Shell
             if (inst == null || messages.seenErrors())
                 return null;
             return new CompiledModule(comp.getModule(), inst, language);
+        }
+        catch (Error ex) {
+            throw ex;
         }
         catch (Throwable ex) {
             if (! (ex instanceof SyntaxException)

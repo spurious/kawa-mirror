@@ -1,5 +1,5 @@
 (module-name <kawa.lib.rnrs.programs>)
-(module-export command-line exit)
+(module-export command-line exit emergency-exit)
 (require <kawa.lib.prim_syntax>)
 
 (define (command-line) :: list
@@ -45,10 +45,15 @@
     (cons arg0 rest)))
 
 (define (exit #!optional (code 0)) :: void
-  (invoke-static <output-port> 'runCleanups)
   (let ((status :: int
 		(cond ((integer? code) code)
 		      (code 0)
 		      (else -1))))
-    (invoke-static <java.lang.System> 'exit status)))
+    (gnu.kawa.util.ExitCalled:doExit status)))
 
+(define (emergency-exit #!optional (code 0)) :: void
+  (let ((status :: int
+		(cond ((integer? code) code)
+		      (code 0)
+		      (else -1))))
+    ((java.lang.Runtime:getRuntime):halt status)))

@@ -1,3 +1,7 @@
+2014-02-17  Per Bothner  <per@bothner.com>
+
+	* ExitCalled.java: New utility class - extends Error.
+
 2014-01-05  Per Bothner  <per@bothner.com>
 
 	* Makefile.am: Merge into ../../../gnu/Makefile.am and remove.

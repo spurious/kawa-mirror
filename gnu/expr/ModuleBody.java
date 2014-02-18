@@ -4,6 +4,7 @@ import gnu.lists.*;
 import gnu.kawa.reflect.ClassMemberLocation;
 import gnu.kawa.io.OutPort;
 import gnu.kawa.io.WriterManager;
+import gnu.kawa.util.ExitCalled;
 
 /**
  * Class for the dummy top-level function of a module.
@@ -135,6 +136,7 @@ public abstract class ModuleBody extends Procedure0 implements RunnableModule
     boolean registered = WriterManager.instance.registerShutdownHook();
     try
       {
+        ExitCalled.push();
 	CallContext ctx = CallContext.getInstance();
 	if (getMainPrintValues())
 	  {
@@ -154,11 +156,19 @@ public abstract class ModuleBody extends Procedure0 implements RunnableModule
           gnu.kawa.io.OutPort.runCleanups();
 	exitDecrement();
       }
+    catch (ExitCalled ex)
+      {
+         throw ex; // handled by ExitCalled.pop below.
+      }
     catch (Throwable ex)
       {
 	ex.printStackTrace();
 	gnu.kawa.io.OutPort.runCleanups();
 	System.exit(-1);
+      }
+    finally
+      {
+        ExitCalled.pop();
       }
   }
 

@@ -21,7 +21,7 @@ endif
 java_SCM = DefineRecordType.scm enums.scm readtable.scm \
   srfi1.scm srfi2.scm \
   conditions.scm srfi13.scm srfi14.scm srfi34.scm \
-  srfi37.scm srfi69.scm pregexp.scm \
+  srfi37.scm srfi60.scm srfi69.scm pregexp.scm \
   Streams.scm StreamsDerived.scm StreamsPrimitive.scm StreamsType.scm \
   genwrite.scm pp.scm ppfile.scm printf.scm ralists.scm syntaxutils.scm \
   cut.scm testing.scm $(XML_SCM) $(AWT_SCM) $(SWING_SCM)

@@ -1,3 +1,5 @@
+;; Test that exit calls finally-handler.
+
 (define (fun x)
   (try-finally
    (begin

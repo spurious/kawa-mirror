@@ -310,8 +310,8 @@
 (define (logop-compare result op x y)
   (do ((i 0 (+ i 1)))
       ((or (= i 100)
-	   (not (eq? (logop-bits op (logbit? x i) (logbit? y i))
-		     (logbit? result i))))
+	   (not (eq? (logop-bits op (bitwise-bit-set? x i) (bitwise-bit-set? y i))
+		     (bitwise-bit-set? result i))))
        i)
     #t))
 

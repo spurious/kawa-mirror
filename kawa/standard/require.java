@@ -97,6 +97,7 @@ public class require extends Syntax
     map("srfi-41-streams-type", SLIB_PREFIX + "StreamsType");
     map("srfi-41-streams-primitive", SLIB_PREFIX + "StreamsPrimitive");
     map("srfi-41-streams-derived", SLIB_PREFIX + "StreamsDerived");
+    map("srfi-60", SLIB_PREFIX + "srfi60");
     map("srfi-64", SLIB_PREFIX + "testing");
     map("testing", SLIB_PREFIX + "testing");
     map("srfi-69", SLIB_PREFIX + "srfi69");

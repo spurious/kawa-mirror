@@ -1,3 +1,11 @@
+2014-02-18  Jamison Hope  <jrh@theptrgroup.com>
+
+	* standard/Scheme.java (initScheme): Remove 'logbit?', since it
+	just an alias for 'bitwise-bit-set?' and happens to conflict with
+	the semantics of SRFI-60 'logbit?'.
+	* standard/ImportFromLibrary.java (SRFI97Map): Update for SRFI-60.
+	* standard/require.java (featureMap): Likewise.
+
 2014-02-17  Per Bothner  <per@bothner.com>
 
 	* standard/define.java: Implement 'define-early-constant'.

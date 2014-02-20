@@ -63,7 +63,7 @@ public class ImportFromLibrary extends Syntax
     { "54", "cat", MISSING },
     { "57", "records", MISSING },
     { "59", "vicinities", MISSING },
-    { "60", "integer-bits", MISSING },
+    { "60", "integer-bits", "gnu.kawa.slib.srfi60" },
     { "61", "cond", MISSING },
     { "63", "arrays", MISSING },
     { "64", "testing", "gnu.kawa.slib.testing" },

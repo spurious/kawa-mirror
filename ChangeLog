@@ -1,3 +1,7 @@
+2014-02-18  Jamison Hope  <jrh@theptrgroup.com>
+
+	* build.xml (slib-scm-classes): Add srfi60.scm.
+
 2014-02-06  Per Bothner  <per@bothner.com>
 
 	* build.xml (commonlisp-scm-classes): Make sure to compile

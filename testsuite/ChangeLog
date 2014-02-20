@@ -1,3 +1,8 @@
+2014-02-19  Per Bothner  <per@bothner.com>
+
+	* num-test.scm (logop-compare): Use bitwise-bit-set? instead of
+	logbit? which had non-standard argument order.
+
 2014-02-17  Per Bothner  <per@bothner.com>
 
 	* exit1.scm: New test of 'exit'.

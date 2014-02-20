@@ -1,3 +1,8 @@
+2014-02-18  Jamison Hope  <jrh@theptrgroup.com>
+
+	* srfi60.scm: New implementation of SRFI-60.
+	* Makefile.am: Update accordingly.
+
 2014-02-06  Seth Alves
 
 	* srfi13.scm (string-trim-right):  Import bug-fix from reference

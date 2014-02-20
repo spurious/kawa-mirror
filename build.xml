@@ -586,6 +586,7 @@
         <file name="srfi14.scm"/>
         <file name="srfi34.scm"/>
         <file name="srfi37.scm"/>
+        <file name="srfi60.scm"/>
         <file name="srfi69.scm"/>
         <file name="pregexp.scm"/>
         <file name="Streams.scm"/>

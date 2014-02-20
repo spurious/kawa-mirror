@@ -599,8 +599,6 @@ public class Scheme extends LispLanguage
       defProcStFld("lognot", "gnu.kawa.functions.BitwiseOp", "not");
       defProcStFld("logop", "kawa.lib.numbers");
       defProcStFld("bitwise-bit-set?", "kawa.lib.numbers");
-      defProcStFld("logbit?", "kawa.lib.numbers",
-                   Language.mangleNameIfNeeded("bitwise-bit-set?"));
       defProcStFld("logtest", "kawa.lib.numbers");
       defProcStFld("bitwise-bit-count", "kawa.lib.numbers");
       defProcStFld("logcount", "kawa.lib.numbers");

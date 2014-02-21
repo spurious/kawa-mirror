@@ -1,3 +1,7 @@
+2014-02-20  Jamison Hope  <jrh@theptrgroup.com>
+
+	* RealNum.java (angle): The angle of a negative real is pi.
+
 2014-02-16  Per Bothner  <per@bothner.com>
 
 	* RealNum.java (isReal): New static method.

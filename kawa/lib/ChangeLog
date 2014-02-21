@@ -1,3 +1,7 @@
+2014-02-20  Jamison Hope  <jrh@theptrgroup.com>
+
+	* numbers.scm (angle): The angle of a negative real is pi.
+
 2014-02-17  Per Bothner  <per@bothner.com>
 
 	* prim_syntax.scm (define-early-constant): New syntax.

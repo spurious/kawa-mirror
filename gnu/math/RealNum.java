@@ -11,7 +11,10 @@ public abstract class RealNum extends Complex
 {
   public final RealNum re() { return this; }
   public final RealNum im() { return IntNum.zero(); }
-  public final RealNum angle() { return IntNum.zero(); }
+
+  public final RealNum angle() {
+    return isNegative() ? DFloNum.make(Math.PI) :IntNum.zero();
+  }
 
     public static boolean isReal(Object value) {
         return (value instanceof Number

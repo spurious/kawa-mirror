@@ -75,8 +75,6 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-build_triplet = @build@
-host_triplet = @host@
 DIST_COMMON = $(top_srcdir)/Make-rules $(srcdir)/Makefile.in \
 	$(srcdir)/Makefile.am $(top_srcdir)/mkinstalldirs ChangeLog
 subdir = gnu/jemacs/lang
@@ -115,26 +113,12 @@ AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
 BYTECODE_VERSION = @BYTECODE_VERSION@
-CC = @CC@
-CCDEPMODE = @CCDEPMODE@
-CFLAGS = @CFLAGS@
 CLASSPATH_SEPARATOR = @CLASSPATH_SEPARATOR@
-CPPFLAGS = @CPPFLAGS@
-CXX = @CXX@
-CXXDEPMODE = @CXXDEPMODE@
-CXXFLAGS = @CXXFLAGS@
 CYGPATH_W = @CYGPATH_W@
 DEFS = @DEFS@
-DEPDIR = @DEPDIR@
 ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
-EXEEXT = @EXEEXT@
-GCJ = gcj
-GCJDEPMODE = @GCJDEPMODE@
-GCJFLAGS = -g -O $(EXTRA_DBTOOL_GCJFLAGS)
-GCJ_COMPILED_SELECTED = @GCJ_COMPILED_SELECTED@
-GCJ_SELECTED = @GCJ_SELECTED@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
@@ -145,7 +129,6 @@ JAVAC = @JAVAC@
 JAVACFLAGS = @JAVACFLAGS@
 JAVA_SOURCE = @JAVA_SOURCE@
 JEMACS_VERSION = @JEMACS_VERSION@
-LDFLAGS = @LDFLAGS@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
 LN_S = @LN_S@
@@ -153,7 +136,6 @@ LTLIBOBJS = @LTLIBOBJS@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 MKDIR_P = @MKDIR_P@
-OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
 PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
 PACKAGE_NAME = @PACKAGE_NAME@
@@ -175,19 +157,11 @@ abs_builddir = @abs_builddir@
 abs_srcdir = @abs_srcdir@
 abs_top_builddir = @abs_top_builddir@
 abs_top_srcdir = @abs_top_srcdir@
-ac_ct_CC = @ac_ct_CC@
-ac_ct_CXX = @ac_ct_CXX@
-am__include = @am__include@
 am__leading_dot = @am__leading_dot@
-am__quote = @am__quote@
 am__tar = @am__tar@
 am__untar = @am__untar@
 bindir = @bindir@
-build = @build@
 build_alias = @build_alias@
-build_cpu = @build_cpu@
-build_os = @build_os@
-build_vendor = @build_vendor@
 builddir = @builddir@
 conf_classpath = @conf_classpath@
 datadir = @datadir@
@@ -196,11 +170,7 @@ docdir = @docdir@
 dvidir = @dvidir@
 exec_prefix = @exec_prefix@
 filesep = @filesep@
-host = @host@
 host_alias = @host_alias@
-host_cpu = @host_cpu@
-host_os = @host_os@
-host_vendor = @host_vendor@
 htmldir = @htmldir@
 includedir = @includedir@
 infodir = @infodir@
@@ -220,6 +190,7 @@ psdir = @psdir@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 srcdir = @srcdir@
+subdirs = @subdirs@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
@@ -231,16 +202,12 @@ CLASSPATH = $(JAVAROOT)$(CLASSPATH_SEPARATOR)$(srcdir)@filesep@$(JAVAROOT)$(CLAS
 CLASSPATH_ENV = CLASSPATH="$(CLASSPATH)"
 JAVAROOT = $(top_builddir)
 JAR = fastjar
-#GCJFLAGS = -gdwarf-2 -O
-@WITH_GCJ_DBTOOL_TRUE@EXTRA_DBTOOL_GCJFLAGS = -findirect-dispatch
 OFILES_DIR = $(TO_TOPDIR)/bin
 TO_TOPDIR = $(top_builddir)
 @WITH_LIBTOOL_TRUE@LIBTOOL = libtool
 @WITH_LIBTOOL_FALSE@PACKAGE_OFILE = $(OFILES_DIR)/$(PACKAGE_FNAME).o
 @WITH_LIBTOOL_TRUE@PACKAGE_OFILE = $(OFILES_DIR)/$(PACKAGE_FNAME).lo
-ENABLE_GCJ_COMPILED = $(EXTRA_GCJ_COMPILED) $(PACKAGE_OFILE)
 java_Java = $(java_BUILT) $(java_sources)
-GCJ_DEPS = $(java_Java) $(EXTRA_GCJ_DEPS)
 DISTFILES = $(DIST_COMMON)  $(java_sources) $(java_SCM) $(TEXINFOS) $(EXTRA_DIST)
 CLEANFILES = $(java_BUILT) *.class *.stamp *.jar $(PACKAGE_OFILE) $(EXTRA_CLEAN)
 KAWA_COMPILER = $(JAVA) -classpath "$(CLASSPATH)" kawa.repl -d $(top_builddir) \
@@ -455,11 +422,6 @@ uninstall-am:
 	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
 	tags-am uninstall uninstall-am
 
-
-$(PACKAGE_OFILE):  $(GCJ_DEPS)
-@WITH_LIBTOOL_TRUE@	$(CLASSPATH_ENV) $(LIBTOOL) --mode=compile $(GCJ) $(GCJFLAGS) -c \
-@WITH_LIBTOOL_TRUE@	  *.class -o $(PACKAGE_OFILE)
-@WITH_LIBTOOL_FALSE@	$(CLASSPATH_ENV) $(GCJ) $(GCJFLAGS) -c -fPIC *.class -o $(PACKAGE_OFILE)
 
 java-classes.stamp: $(java_Java)
 	$(JAVAC) -d $(JAVAROOT) -classpath "$(CLASSPATH)" $(JAVACFLAGS) $?

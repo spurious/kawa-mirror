@@ -1,3 +1,7 @@
+2014-02-20  Per Bothner  <per@bothner.com>
+
+	* Makefile.am: Merged echo2 support from kawa/echo2/Makefile.am.
+
 2010-11-14  Per Bothner  <per@bothner.com>
 
 	* q2/testsuite: New directory.

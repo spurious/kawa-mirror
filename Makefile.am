@@ -1,36 +1,49 @@
 # Process this with automake to create Makefile.in
 
-SUBDIRS = doc testsuite gnu/bytecode gnu/math gnu/lists gnu/text \
-  gnu/mapping gnu/expr \
-  gnu \
-  kawa gnu/kawa/slib gnu/commonlisp gnu/q2 $(JAVAFX_SUBDIRS) \
-  gnu/kawa/servlet $(ECHO2_SUBDIRS) \
-  $(JEMACS_SUBDIRS) $(XQUERY_SUBDIR) $(BRL_SUBDIRS) $(ANDROID_SUBDIRS) bin
-if ENABLE_JEMACS
+FIXED_SUBDIRS = doc testsuite gnu/bytecode gnu/math gnu/lists gnu/text \
+  gnu/mapping gnu/expr gnu \
+  kawa gnu/kawa/slib gnu/kawa/servlet gnu/commonlisp gnu/q2
+ANDROID_SUBDIRS = gnu/kawa/android
+BRL_SUBDIRS = gnu/brl gnu/kawa/brl
+JAVAFX_SUBDIRS = gnu/kawa/javafx
 JEMACS_SUBDIRS = gnu/jemacs/lang gnu/jemacs/buffer gnu/jemacs/lisp \
   gnu/jemacs/testsuite gnu/jemacs/swing gnu/jemacs/swt
+XQUERY_SUBDIRS = gnu/xquery gnu/kawa/xslt
+
+SUBDIRS = $(FIXED_SUBDIRS)
+if ENABLE_JEMACS
+  SUBDIRS += $(JEMACS_SUBDIRS)
 endif
 if ENABLE_XML
 if ENABLE_BRL
-BRL_SUBDIRS = gnu/brl gnu/kawa/brl
+SUBDIRS += $(BRL_SUBDIRS)
 endif
 if ENABLE_XQUERY
-XQUERY_SUBDIR = gnu/xquery gnu/kawa/xslt
+SUBDIRS += $(XQUERY_SUBDIRS)
 endif
-endif
-if ENABLE_ECHO2
-ECHO2_SUBDIRS = gnu/kawa/echo2
 endif
 if WITH_ANDROID
-ANDROID_SUBDIRS = gnu/kawa/android
+SUBDIRS += $(ANDROID_SUBDIRS)
 endif
 if WITH_JAVAFX
-JAVAFX_SUBDIRS = gnu/kawa/javafx
+SUBDIRS += $(JAVAFX_SUBDIRS)
 endif
+if ENABLE_KAWA_FRONTEND
+SUBDIRS += bin
+endif
+
+DIST_SUBDIRS = $(FIXED_SUBDIRS) \
+  $(ANDROID_SUBDIRS) \
+  $(BRL_SUBDIRS) \
+  $(JAVAFX_SUBDIRS) \
+  $(JEMACS_SUBDIRS) \
+  $(XQUERY_SUBDIRS)
+
 javadir=$(datadir)/java
 
 JAR = jar
-GCJ_DBTOOL = gcj-dbtool
+KAWAJAR = kawa-@VERSION@.jar
+KAWALIB = $(datadir)/java/$(KAWAJAR)
 
 META_ScriptEngineFactory = META-INF/services/javax.script.ScriptEngineFactory
 if WITH_JAVAX_SCRIPT
@@ -110,10 +123,13 @@ EXTRA_DIST = debian/control debian/rules debian/changelog debian/dirs \
   patch-source-list selected-java-source \
   build.xml build.properties \
   gnu/jemacs/jar-manifest gnu/jemacs/status.html \
-  kawa/Version.java jar-manifest Make-rules classes-to-skip-for-runtime
+  kawa/Version.java jar-manifest Make-rules classes-to-skip-for-runtime \
+  bin/configure.ac bin/configure bin/Makefile.am bin/Makefile.in \
+  bin/ChangeLog bin/kawa.bat.in bin/kawa.c bin/kawapath.c bin/cgi-servlet.c \
+  bin/qexo.in
 
-MOSTLYCLEANFILES = tmp* *.o kawa1$(exeext) *.stamp classes.list classes-rt.list
-CLEANFILES = *.jar kawa/Version.java $(META_ScriptEngineFactory)
+MOSTLYCLEANFILES = tmp* *.o bin/*.o *.stamp classes.list classes-rt.list
+CLEANFILES = *.jar bin/qexo bin/kawa.sh kawa/Version.java bin/kawa.bat $(META_ScriptEngineFactory)
 DISTCLEANFILES = selected-java-source
 
 HTML_HOME = $$HOME/public_html
@@ -167,6 +183,14 @@ install-javadoc-html:
 install-html: install-javadoc-html
 	cd doc;  make install-html HTML_HOME="$(HTML_HOME)"
 
+install-binSCRIPTS: $(bin_SCRIPTS)
+	@$(NORMAL_INSTALL)
+	test -z "$(bindir)" || $(mkdir_p) "$(DESTDIR)$(bindir)"
+	$(INSTALL_SCRIPT) bin/qexo $(DESTDIR)$(bindir)/qexo
+if ! ENABLE_KAWA_FRONTEND
+	$(INSTALL_SCRIPT) bin/kawa.sh $(DESTDIR)$(bindir)/kawa
+endif
+
 install-data-am:  install-jar
 install-jar:
 	@$(NORMAL_INSTALL)
@@ -175,9 +199,6 @@ install-jar:
 	  $(DESTDIR)$(javadir)/kawa-@VERSION@.jar
 	cd $(DESTDIR)$(javadir) && rm -f kawa.jar \
 	  && $(LN_S) kawa-@VERSION@.jar kawa.jar
-if WITH_GCJ_DBTOOL
-	$(GCJ_DBTOOL) -f $(DESTDIR)`$(GCJ_DBTOOL) -p` $(DESTDIR)$(javadir)/kawa-@VERSION@.jar $(libdir)/libkawa-$(VERSION).so
-endif
 
 install-bytecode-jar: bytecode-@BYTECODE_VERSION@.jar
 	@$(NORMAL_INSTALL)
@@ -187,10 +208,13 @@ install-bytecode-jar: bytecode-@BYTECODE_VERSION@.jar
 	cd $(DESTDIR)$(javadir) && rm -f bytecode.jar \
 	  && $(LN_S) bytecode-@BYTECODE_VERSION@.jar bytecode.jar
 
-uninstall-local: uninstall-jar
+uninstall-local: uninstall-jar uninstall-exec-bindir
 uninstall-jar:
 	rm -f $(DESTDIR)$(javadir)/kawa-@VERSION@.jar \
 	  $(DESTDIR)$(javadir)/kawa.jar
+
+uninstall-exec-bindir:
+	rm -f $(DESTDIR)$(bindir)/kawa $(DESTDIR)$(bindir)/qexo
 
 uninstall-bytecode-jar:
 	rm -f $(DESTDIR)$(javadir)/bytecode-@BYTECODE_VERSION@.jar \
@@ -307,6 +331,42 @@ set-selected-java-source:
 	   test "$(JAVA_SOURCE)" != "`cat selected-java-source`"; \
 	   then echo "$(JAVA_SOURCE)" >selected-java-source; \
 	fi
+
+if ON_WINDOWS
+# kawa.sh is still needed for 'make check', even on Windows.
+KAWASCRIPTS_KAWA = bin/kawa.bat bin/kawa.sh
+else
+KAWASCRIPTS_KAWA = bin/kawa.sh
+endif
+noinst_SCRIPTS = bin/kawa.sh
+bin_SCRIPTS = bin/qexo $(KAWASCRIPTS_KAWA)
+
+bin/kawa.sh:
+	echo '#!/bin/sh' >tmp-kawa.sh
+	echo 'thisfile=`which $$0`' >>tmp-kawa.sh
+	echo 'thisdir=`dirname $$thisfile`' >>tmp-kawa.sh
+if ENABLE_KAWA_FRONTEND
+# In this case kawa.sh is only used for pre-install testing.
+# We don't need to set KAWALIB, since kawapath.c looks for it in "..".
+	echo 'LD_LIBRARY_PATH=$$LD_LIBRARY_PATH:$$thisdir' >>tmp-kawa.sh
+	echo 'export LD_LIBRARY_PATH' >>tmp-kawa.sh
+	echo 'exec $$thisdir/kawa "$$@"' >>tmp-kawa.sh
+else
+	echo 'if test -f $$thisdir/../$(KAWAJAR)' >>tmp-kawa.sh
+	echo 'then KAWALIB=$${KAWALIB-"`$(CYGPATH_W) "$$thisdir/../$(KAWAJAR)"`"}' >>tmp-kawa.sh
+	echo 'else KAWALIB=$${KAWALIB-$(KAWALIB)}; fi' >>tmp-kawa.sh
+	echo 'CLASSPATH="$${KAWALIB}$(CLASSPATH_SEPARATOR)$(conf_classpath)$${CLASSPATH-$(CLASSPATH)}"' >>tmp-kawa.sh
+	echo 'export CLASSPATH' >>tmp-kawa.sh
+	if JAVA=`which $(JAVA)`; then true; else JAVA=$(JAVA); fi; \
+	  echo 'exec $${JAVA-"'$${JAVA}'"} kawa.repl "$$@"' >>tmp-kawa.sh
+endif
+	chmod +x tmp-kawa.sh
+	mv tmp-kawa.sh bin/kawa.sh
+
+bin/kawa.bat: $(srcdir)/bin/kawa.bat.in
+	sed -e 's|%DEFAULT_KAWA_VERSION%|$(VERSION)|' \
+	    -e 's|%DEFAULT_EXTRA_PATH%|'`echo '$(conf_classpath)'| sed -e 's|[\]|\\\\|g' -e 's|\&|\\&|g'`'|' \
+	  <$(srcdir)/bin/kawa.bat.in > bin/kawa.bat
 
 distall:  distcheck dist-kawa-@VERSION@.jar kawa-doc-$(VERSION).tar.gz
 # Consider also:

@@ -1,3 +1,10 @@
+2014-02-20  Per Bothner  <per@bothner.com>
+
+	* configure.ac: New file, used for enable-kawa-frontend support.
+	* Makefile.am: Remove GCJ support. Only used for compiling executables.
+	Scripts like kawa.sh are generated from toplevel.
+	* qexo.in: New file - template for qexo script.
+
 2013-12-30  Per Bothner  <per@bothner.com>
 
 	* Makefile.am: Update for new automake convention.

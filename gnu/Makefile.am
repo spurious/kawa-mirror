@@ -14,6 +14,12 @@ GNU_KAWA_IO_JSOURCES = \
   kawa/io/TtyInPort.java \
   kawa/io/WriterManager.java
 
+GNU_KAWA_ECHO2_JSOURCES = \
+  Echo2AppInstance.java \
+  Echo2Display.java \
+  Echo2Servlet.java \
+  Echo2Window.java
+
 GNU_KAWA_UTIL_JSOURCES = \
   kawa/util/AbstractHashTable.java \
   kawa/util/AbstractWeakHashTable.java \
@@ -279,7 +285,6 @@ EXTRA_DIST = kawa/util/PreProcess.java kawa/reflect/package.html \
 EXTRA_CLEAN = */*.class kawa/*/*.class
 
 PACKAGE_FNAME = gnu
-GCJ_INPUTS = $(java_Java)
 
 java_sources = \
   $(GNU_KAWA_IO_JSOURCES) \
@@ -301,5 +306,8 @@ if WITH_SAX2
 java_sources += $(GNU_KAWA_SAX_JSOURCES)
 endif
 endif
+if ENABLE_ECHO2
+java_sources += $(GNU_KAWA_ECHO2_JSOURCES)
+endif
 
-all:  Makefile java-classes.stamp $(@GCJ_COMPILED_SELECTED@)
+all:  Makefile java-classes.stamp

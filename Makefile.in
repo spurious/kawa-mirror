@@ -15,6 +15,7 @@
 @SET_MAKE@
 
 # Process this with automake to create Makefile.in
+
 VPATH = @srcdir@
 am__is_gnu_make = test -n '$(MAKEFILE_LIST)' && test -n '$(MAKELEVEL)'
 am__make_running_with_option = \
@@ -77,14 +78,18 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-build_triplet = @build@
-host_triplet = @host@
+@ENABLE_JEMACS_TRUE@am__append_1 = $(JEMACS_SUBDIRS)
+@ENABLE_BRL_TRUE@@ENABLE_XML_TRUE@am__append_2 = $(BRL_SUBDIRS)
+@ENABLE_XML_TRUE@@ENABLE_XQUERY_TRUE@am__append_3 = $(XQUERY_SUBDIRS)
+@WITH_ANDROID_TRUE@am__append_4 = $(ANDROID_SUBDIRS)
+@WITH_JAVAFX_TRUE@am__append_5 = $(JAVAFX_SUBDIRS)
+@ENABLE_KAWA_FRONTEND_TRUE@am__append_6 = bin
 subdir = .
 DIST_COMMON = INSTALL NEWS README AUTHORS ChangeLog \
 	$(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(top_srcdir)/configure $(am__configure_deps) mkinstalldirs \
-	COPYING TODO config.guess config.sub depcomp install-sh \
-	missing
+	$(top_srcdir)/bin/qexo.in COPYING TODO config.guess config.sub \
+	depcomp install-sh missing
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
@@ -92,8 +97,37 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno config.status.lineno
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
-CONFIG_CLEAN_FILES =
+CONFIG_CLEAN_FILES = bin/qexo
 CONFIG_CLEAN_VPATH_FILES =
+am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
+am__vpath_adj = case $$p in \
+    $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
+    *) f=$$p;; \
+  esac;
+am__strip_dir = f=`echo $$p | sed -e 's|^.*/||'`;
+am__install_max = 40
+am__nobase_strip_setup = \
+  srcdirstrip=`echo "$(srcdir)" | sed 's/[].[^$$\\*|]/\\\\&/g'`
+am__nobase_strip = \
+  for p in $$list; do echo "$$p"; done | sed -e "s|$$srcdirstrip/||"
+am__nobase_list = $(am__nobase_strip_setup); \
+  for p in $$list; do echo "$$p $$p"; done | \
+  sed "s| $$srcdirstrip/| |;"' / .*\//!s/ .*/ ./; s,\( .*\)/[^/]*$$,\1,' | \
+  $(AWK) 'BEGIN { files["."] = "" } { files[$$2] = files[$$2] " " $$1; \
+    if (++n[$$2] == $(am__install_max)) \
+      { print $$2, files[$$2]; n[$$2] = 0; files[$$2] = "" } } \
+    END { for (dir in files) print dir, files[dir] }'
+am__base_list = \
+  sed '$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;s/\n/ /g' | \
+  sed '$$!N;$$!N;$$!N;$$!N;s/\n/ /g'
+am__uninstall_files_from_dir = { \
+  test -z "$$files" \
+    || { test ! -d "$$dir" && test ! -f "$$dir" && test ! -r "$$dir"; } \
+    || { echo " ( cd '$$dir' && rm -f" $$files ")"; \
+         $(am__cd) "$$dir" && rm -f $$files; }; \
+  }
+am__installdirs = "$(DESTDIR)$(bindir)"
+SCRIPTS = $(bin_SCRIPTS) $(noinst_SCRIPTS)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -149,13 +183,6 @@ am__define_uniq_tagged_files = \
 ETAGS = etags
 CTAGS = ctags
 CSCOPE = cscope
-DIST_SUBDIRS = doc testsuite gnu/bytecode gnu/math gnu/lists gnu/text \
-	gnu/mapping gnu/expr gnu kawa gnu/kawa/slib gnu/commonlisp \
-	gnu/q2 gnu/kawa/javafx gnu/kawa/servlet gnu/kawa/echo2 \
-	gnu/jemacs/lang gnu/jemacs/buffer gnu/jemacs/lisp \
-	gnu/jemacs/testsuite gnu/jemacs/swing gnu/jemacs/swt \
-	gnu/xquery gnu/kawa/xslt gnu/brl gnu/kawa/brl gnu/kawa/android \
-	bin
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 distdir = $(PACKAGE)-$(VERSION)
 top_distdir = $(distdir)
@@ -206,26 +233,12 @@ AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
 BYTECODE_VERSION = @BYTECODE_VERSION@
-CC = @CC@
-CCDEPMODE = @CCDEPMODE@
-CFLAGS = @CFLAGS@
 CLASSPATH_SEPARATOR = @CLASSPATH_SEPARATOR@
-CPPFLAGS = @CPPFLAGS@
-CXX = @CXX@
-CXXDEPMODE = @CXXDEPMODE@
-CXXFLAGS = @CXXFLAGS@
 CYGPATH_W = @CYGPATH_W@
 DEFS = @DEFS@
-DEPDIR = @DEPDIR@
 ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
-EXEEXT = @EXEEXT@
-GCJ = @GCJ@
-GCJDEPMODE = @GCJDEPMODE@
-GCJFLAGS = @GCJFLAGS@
-GCJ_COMPILED_SELECTED = @GCJ_COMPILED_SELECTED@
-GCJ_SELECTED = @GCJ_SELECTED@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
@@ -236,7 +249,6 @@ JAVAC = @JAVAC@
 JAVACFLAGS = @JAVACFLAGS@
 JAVA_SOURCE = @JAVA_SOURCE@
 JEMACS_VERSION = @JEMACS_VERSION@
-LDFLAGS = @LDFLAGS@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
 LN_S = @LN_S@
@@ -244,7 +256,6 @@ LTLIBOBJS = @LTLIBOBJS@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 MKDIR_P = @MKDIR_P@
-OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
 PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
 PACKAGE_NAME = @PACKAGE_NAME@
@@ -266,19 +277,11 @@ abs_builddir = @abs_builddir@
 abs_srcdir = @abs_srcdir@
 abs_top_builddir = @abs_top_builddir@
 abs_top_srcdir = @abs_top_srcdir@
-ac_ct_CC = @ac_ct_CC@
-ac_ct_CXX = @ac_ct_CXX@
-am__include = @am__include@
 am__leading_dot = @am__leading_dot@
-am__quote = @am__quote@
 am__tar = @am__tar@
 am__untar = @am__untar@
 bindir = @bindir@
-build = @build@
 build_alias = @build_alias@
-build_cpu = @build_cpu@
-build_os = @build_os@
-build_vendor = @build_vendor@
 builddir = @builddir@
 conf_classpath = @conf_classpath@
 datadir = @datadir@
@@ -287,11 +290,7 @@ docdir = @docdir@
 dvidir = @dvidir@
 exec_prefix = @exec_prefix@
 filesep = @filesep@
-host = @host@
 host_alias = @host_alias@
-host_cpu = @host_cpu@
-host_os = @host_os@
-host_vendor = @host_vendor@
 htmldir = @htmldir@
 includedir = @includedir@
 infodir = @infodir@
@@ -311,29 +310,37 @@ psdir = @psdir@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 srcdir = @srcdir@
+subdirs = @subdirs@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-SUBDIRS = doc testsuite gnu/bytecode gnu/math gnu/lists gnu/text \
-  gnu/mapping gnu/expr \
-  gnu \
-  kawa gnu/kawa/slib gnu/commonlisp gnu/q2 $(JAVAFX_SUBDIRS) \
-  gnu/kawa/servlet $(ECHO2_SUBDIRS) \
-  $(JEMACS_SUBDIRS) $(XQUERY_SUBDIR) $(BRL_SUBDIRS) $(ANDROID_SUBDIRS) bin
+FIXED_SUBDIRS = doc testsuite gnu/bytecode gnu/math gnu/lists gnu/text \
+  gnu/mapping gnu/expr gnu \
+  kawa gnu/kawa/slib gnu/kawa/servlet gnu/commonlisp gnu/q2
 
-@ENABLE_JEMACS_TRUE@JEMACS_SUBDIRS = gnu/jemacs/lang gnu/jemacs/buffer gnu/jemacs/lisp \
-@ENABLE_JEMACS_TRUE@  gnu/jemacs/testsuite gnu/jemacs/swing gnu/jemacs/swt
+ANDROID_SUBDIRS = gnu/kawa/android
+BRL_SUBDIRS = gnu/brl gnu/kawa/brl
+JAVAFX_SUBDIRS = gnu/kawa/javafx
+JEMACS_SUBDIRS = gnu/jemacs/lang gnu/jemacs/buffer gnu/jemacs/lisp \
+  gnu/jemacs/testsuite gnu/jemacs/swing gnu/jemacs/swt
 
-@ENABLE_BRL_TRUE@@ENABLE_XML_TRUE@BRL_SUBDIRS = gnu/brl gnu/kawa/brl
-@ENABLE_XML_TRUE@@ENABLE_XQUERY_TRUE@XQUERY_SUBDIR = gnu/xquery gnu/kawa/xslt
-@ENABLE_ECHO2_TRUE@ECHO2_SUBDIRS = gnu/kawa/echo2
-@WITH_ANDROID_TRUE@ANDROID_SUBDIRS = gnu/kawa/android
-@WITH_JAVAFX_TRUE@JAVAFX_SUBDIRS = gnu/kawa/javafx
+XQUERY_SUBDIRS = gnu/xquery gnu/kawa/xslt
+SUBDIRS = $(FIXED_SUBDIRS) $(am__append_1) $(am__append_2) \
+	$(am__append_3) $(am__append_4) $(am__append_5) \
+	$(am__append_6)
+DIST_SUBDIRS = $(FIXED_SUBDIRS) \
+  $(ANDROID_SUBDIRS) \
+  $(BRL_SUBDIRS) \
+  $(JAVAFX_SUBDIRS) \
+  $(JEMACS_SUBDIRS) \
+  $(XQUERY_SUBDIRS)
+
 javadir = $(datadir)/java
 JAR = jar
-GCJ_DBTOOL = gcj-dbtool
+KAWAJAR = kawa-@VERSION@.jar
+KAWALIB = $(datadir)/java/$(KAWAJAR)
 META_ScriptEngineFactory = META-INF/services/javax.script.ScriptEngineFactory
 @WITH_JAVAX_SCRIPT_TRUE@META_INF_FILES = $(META_ScriptEngineFactory)
 EXTRA_DIST = debian/control debian/rules debian/changelog debian/dirs \
@@ -341,10 +348,13 @@ EXTRA_DIST = debian/control debian/rules debian/changelog debian/dirs \
   patch-source-list selected-java-source \
   build.xml build.properties \
   gnu/jemacs/jar-manifest gnu/jemacs/status.html \
-  kawa/Version.java jar-manifest Make-rules classes-to-skip-for-runtime
+  kawa/Version.java jar-manifest Make-rules classes-to-skip-for-runtime \
+  bin/configure.ac bin/configure bin/Makefile.am bin/Makefile.in \
+  bin/ChangeLog bin/kawa.bat.in bin/kawa.c bin/kawapath.c bin/cgi-servlet.c \
+  bin/qexo.in
 
-MOSTLYCLEANFILES = tmp* *.o kawa1$(exeext) *.stamp classes.list classes-rt.list
-CLEANFILES = *.jar kawa/Version.java $(META_ScriptEngineFactory)
+MOSTLYCLEANFILES = tmp* *.o bin/*.o *.stamp classes.list classes-rt.list
+CLEANFILES = *.jar bin/qexo bin/kawa.sh kawa/Version.java bin/kawa.bat $(META_ScriptEngineFactory)
 DISTCLEANFILES = selected-java-source
 HTML_HOME = $$HOME/public_html
 JAVADOC_DIR = $$HOME/Kawa/api
@@ -368,6 +378,12 @@ JAVADOC_EXTRA_PATH = $(JAVADOC_ECLIPSE_JARS):$(JAVADOC_ANT_JARS)
 @WITH_HTTPSERVER_TRUE@PREPROCESS_HTTPSERVER = +use:com.sun.net.httpserver
 @ENABLE_XML_FALSE@PREPROCESS_XML = -enable:XML
 @ENABLE_XML_TRUE@PREPROCESS_XML = +enable:XML
+@ON_WINDOWS_FALSE@KAWASCRIPTS_KAWA = bin/kawa.sh
+
+# kawa.sh is still needed for 'make check', even on Windows.
+@ON_WINDOWS_TRUE@KAWASCRIPTS_KAWA = bin/kawa.bat bin/kawa.sh
+noinst_SCRIPTS = bin/kawa.sh
+bin_SCRIPTS = bin/qexo $(KAWASCRIPTS_KAWA)
 all: all-recursive
 
 .SUFFIXES:
@@ -405,6 +421,15 @@ $(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
 $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
 	$(am__cd) $(srcdir) && $(ACLOCAL) $(ACLOCAL_AMFLAGS)
 $(am__aclocal_m4_deps):
+bin/qexo: $(top_builddir)/config.status $(top_srcdir)/bin/qexo.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+
+uninstall-binSCRIPTS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(bin_SCRIPTS)'; test -n "$(bindir)" || exit 0; \
+	files=`for p in $$list; do echo "$$p"; done | \
+	       sed -e 's,.*/,,;$(transform)'`; \
+	dir='$(DESTDIR)$(bindir)'; $(am__uninstall_files_from_dir)
 
 # This directory's subdirectories are mostly independent; you can cd
 # into them and run 'make' without going through this Makefile.
@@ -695,9 +720,12 @@ distcleancheck: distclean
 	       exit 1; } >&2
 check-am: all-am
 check: check-recursive
-all-am: Makefile
+all-am: Makefile $(SCRIPTS)
 installdirs: installdirs-recursive
 installdirs-am:
+	for dir in "$(DESTDIR)$(bindir)"; do \
+	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
+	done
 install: install-recursive
 install-exec: install-exec-recursive
 install-data: install-data-recursive
@@ -756,7 +784,7 @@ install-dvi: install-dvi-recursive
 
 install-dvi-am:
 
-install-exec-am:
+install-exec-am: install-binSCRIPTS
 
 install-html-am:
 
@@ -794,7 +822,7 @@ ps: ps-recursive
 
 ps-am:
 
-uninstall-am: uninstall-local
+uninstall-am: uninstall-binSCRIPTS uninstall-local
 
 .MAKE: $(am__recursive_targets) install-am install-strip
 
@@ -804,15 +832,15 @@ uninstall-am: uninstall-local
 	dist-gzip dist-lzip dist-shar dist-tarZ dist-xz dist-zip \
 	distcheck distclean distclean-generic distclean-tags \
 	distcleancheck distdir distuninstallcheck dvi dvi-am html \
-	html-am info info-am install install-am install-data \
-	install-data-am install-dvi install-dvi-am install-exec \
-	install-exec-am install-html install-html-am install-info \
-	install-info-am install-man install-pdf install-pdf-am \
-	install-ps install-ps-am install-strip installcheck \
-	installcheck-am installdirs installdirs-am maintainer-clean \
-	maintainer-clean-generic mostlyclean mostlyclean-generic pdf \
-	pdf-am ps ps-am tags tags-am uninstall uninstall-am \
-	uninstall-local
+	html-am info info-am install install-am install-binSCRIPTS \
+	install-data install-data-am install-dvi install-dvi-am \
+	install-exec install-exec-am install-html install-html-am \
+	install-info install-info-am install-man install-pdf \
+	install-pdf-am install-ps install-ps-am install-strip \
+	installcheck installcheck-am installdirs installdirs-am \
+	maintainer-clean maintainer-clean-generic mostlyclean \
+	mostlyclean-generic pdf pdf-am ps ps-am tags tags-am uninstall \
+	uninstall-am uninstall-binSCRIPTS uninstall-local
 
 
 classes.list: ./kawa-jar.stamp
@@ -912,6 +940,12 @@ install-javadoc-html:
 install-html: install-javadoc-html
 	cd doc;  make install-html HTML_HOME="$(HTML_HOME)"
 
+install-binSCRIPTS: $(bin_SCRIPTS)
+	@$(NORMAL_INSTALL)
+	test -z "$(bindir)" || $(mkdir_p) "$(DESTDIR)$(bindir)"
+	$(INSTALL_SCRIPT) bin/qexo $(DESTDIR)$(bindir)/qexo
+@ENABLE_KAWA_FRONTEND_FALSE@	$(INSTALL_SCRIPT) bin/kawa.sh $(DESTDIR)$(bindir)/kawa
+
 install-data-am:  install-jar
 install-jar:
 	@$(NORMAL_INSTALL)
@@ -920,7 +954,6 @@ install-jar:
 	  $(DESTDIR)$(javadir)/kawa-@VERSION@.jar
 	cd $(DESTDIR)$(javadir) && rm -f kawa.jar \
 	  && $(LN_S) kawa-@VERSION@.jar kawa.jar
-@WITH_GCJ_DBTOOL_TRUE@	$(GCJ_DBTOOL) -f $(DESTDIR)`$(GCJ_DBTOOL) -p` $(DESTDIR)$(javadir)/kawa-@VERSION@.jar $(libdir)/libkawa-$(VERSION).so
 
 install-bytecode-jar: bytecode-@BYTECODE_VERSION@.jar
 	@$(NORMAL_INSTALL)
@@ -930,10 +963,13 @@ install-bytecode-jar: bytecode-@BYTECODE_VERSION@.jar
 	cd $(DESTDIR)$(javadir) && rm -f bytecode.jar \
 	  && $(LN_S) bytecode-@BYTECODE_VERSION@.jar bytecode.jar
 
-uninstall-local: uninstall-jar
+uninstall-local: uninstall-jar uninstall-exec-bindir
 uninstall-jar:
 	rm -f $(DESTDIR)$(javadir)/kawa-@VERSION@.jar \
 	  $(DESTDIR)$(javadir)/kawa.jar
+
+uninstall-exec-bindir:
+	rm -f $(DESTDIR)$(bindir)/kawa $(DESTDIR)$(bindir)/qexo
 
 uninstall-bytecode-jar:
 	rm -f $(DESTDIR)$(javadir)/bytecode-@BYTECODE_VERSION@.jar \
@@ -1037,6 +1073,30 @@ set-selected-java-source:
 	   test "$(JAVA_SOURCE)" != "`cat selected-java-source`"; \
 	   then echo "$(JAVA_SOURCE)" >selected-java-source; \
 	fi
+
+bin/kawa.sh:
+	echo '#!/bin/sh' >tmp-kawa.sh
+	echo 'thisfile=`which $$0`' >>tmp-kawa.sh
+	echo 'thisdir=`dirname $$thisfile`' >>tmp-kawa.sh
+# In this case kawa.sh is only used for pre-install testing.
+# We don't need to set KAWALIB, since kawapath.c looks for it in "..".
+@ENABLE_KAWA_FRONTEND_TRUE@	echo 'LD_LIBRARY_PATH=$$LD_LIBRARY_PATH:$$thisdir' >>tmp-kawa.sh
+@ENABLE_KAWA_FRONTEND_TRUE@	echo 'export LD_LIBRARY_PATH' >>tmp-kawa.sh
+@ENABLE_KAWA_FRONTEND_TRUE@	echo 'exec $$thisdir/kawa "$$@"' >>tmp-kawa.sh
+@ENABLE_KAWA_FRONTEND_FALSE@	echo 'if test -f $$thisdir/../$(KAWAJAR)' >>tmp-kawa.sh
+@ENABLE_KAWA_FRONTEND_FALSE@	echo 'then KAWALIB=$${KAWALIB-"`$(CYGPATH_W) "$$thisdir/../$(KAWAJAR)"`"}' >>tmp-kawa.sh
+@ENABLE_KAWA_FRONTEND_FALSE@	echo 'else KAWALIB=$${KAWALIB-$(KAWALIB)}; fi' >>tmp-kawa.sh
+@ENABLE_KAWA_FRONTEND_FALSE@	echo 'CLASSPATH="$${KAWALIB}$(CLASSPATH_SEPARATOR)$(conf_classpath)$${CLASSPATH-$(CLASSPATH)}"' >>tmp-kawa.sh
+@ENABLE_KAWA_FRONTEND_FALSE@	echo 'export CLASSPATH' >>tmp-kawa.sh
+@ENABLE_KAWA_FRONTEND_FALSE@	if JAVA=`which $(JAVA)`; then true; else JAVA=$(JAVA); fi; \
+@ENABLE_KAWA_FRONTEND_FALSE@	  echo 'exec $${JAVA-"'$${JAVA}'"} kawa.repl "$$@"' >>tmp-kawa.sh
+	chmod +x tmp-kawa.sh
+	mv tmp-kawa.sh bin/kawa.sh
+
+bin/kawa.bat: $(srcdir)/bin/kawa.bat.in
+	sed -e 's|%DEFAULT_KAWA_VERSION%|$(VERSION)|' \
+	    -e 's|%DEFAULT_EXTRA_PATH%|'`echo '$(conf_classpath)'| sed -e 's|[\]|\\\\|g' -e 's|\&|\\&|g'`'|' \
+	  <$(srcdir)/bin/kawa.bat.in > bin/kawa.bat
 
 distall:  distcheck dist-kawa-@VERSION@.jar kawa-doc-$(VERSION).tar.gz
 # Consider also:

@@ -1,9 +1,8 @@
-dnl Process this with autoconf to create configure
+qdnl Process this with autoconf to create configure
 AC_INIT([kawa],[1.14.1]) dnl Also update build.xml.
 AC_CONFIG_SRCDIR([doc/kawa.texi])
 
 AM_MAINTAINER_MODE
-AC_CANONICAL_HOST
 
 AM_INIT_AUTOMAKE
 
@@ -11,12 +10,6 @@ dnl AC_ARG_WITH(classpath,[  --with-classpath          Path to Java classes], cl
 AC_ARG_ENABLE(kawa-frontend,
   [  --enable-kawa-frontend  Build "kawa" front-end program using readline],
   enable_kawa_frontend=$enableval, enable_kawa_frontend=no)
-
-AC_ARG_WITH(gcj,
-  AS_HELP_STRING(--with-gcj,Compile Kawa using GCJ (GNU Compiler for Java)))
-
-AC_ARG_WITH(gcj-dbtool,
-  AS_HELP_STRING(--with-gcj-dbtool,Compile Kawa using GCJ and gcj-dbtool))
 
 AC_ARG_WITH(libtool,
   AS_HELP_STRING(--with-libtool, Use libtool))
@@ -91,7 +84,6 @@ case "/${with_java_source}/" in
   /1.3*/) JAVA_SOURCE=2 ;;
   /1.4*+jaxp1.3/) JAVA_SOURCE=4x ;;
   /1.4*/) JAVA_SOURCE=4 ;;
-  /gcj4/) JAVA_SOURCE=4x ;;
   /1.5*/) JAVA_SOURCE=5 ;;
   /1.6*/) JAVA_SOURCE=6 ;;
   /1.7*/) JAVA_SOURCE=7 ;;
@@ -130,43 +122,12 @@ fi
 AC_PROG_INSTALL
 AC_PROG_LN_S
 
-AC_EXEEXT
-AC_OBJEXT
-
-AC_PROG_CC
-AC_PROG_CXX
-
 TOP_BUILDDIR=`pwd`
 
-test "${with_gcj_dbtool}" = "yes" -a -z "${with_gcj}" && with_gcj="yes"
-case ${with_gcj} in
-  yes)
-    test -z "$enable_kawa_frontend" && enable_kawa_frontend="yes"
-    test -z "${with_gcj_dbtool}" && with_gcj_dbtool=no
+JAVA=${JAVA-java}
+JAVAC=${JAVAC-javac}
+dnl needed to match _AM_DEPENDENCIES
 
-    GCJ_COMPILED_SELECTED=ENABLE_GCJ_COMPILED
-    GCJ_SELECTED=WITH_GCJ
-    JAVA=${JAVA-gij}
-    JAVAC=${JAVAC-"gcj -C"}
-
-    AC_CHECK_TOOL(GCJ, gcj)
-    test -z "$GCJ" && AC_MSG_ERROR([no acceptable gcj found in \$PATH])
-    if test "x${GCJFLAGS-unset}" = xunset; then
-       GCJFLAGS="-g -O2"
-    fi
-    AC_SUBST(GCJFLAGS)
-
-   _AM_DEPENDENCIES(GCJ)
-    ;;
-  *)
-    GCJ_COMPILED_SELECTED=DISABLE_GCJ_COMPILED
-    GCJ_SELECTED=WITHOUT_GCJ
-    JAVA=${JAVA-java}
-    JAVAC=${JAVAC-javac}
-    dnl needed to match _AM_DEPENDENCIES
-    am__fastdepGCJ_TRUE='#'
-    ;;
-esac
 JAVACFLAGS=${JAVACFLAGS--g}
 case "$JAVA_SOURCE" in
   6compat5) JAVACFLAGS="${JAVACFLAGS} -target 1.5 -source 1.5" ;;
@@ -185,10 +146,6 @@ filesep='/'
 # want to clutter up configure --help with --enable-servlet.
 enable_servlet=${enable_servlet-${with_servlet}}
 
-AM_CONDITIONAL(WITH_GCJ, test "$with_gcj" = "yes")
-AM_CONDITIONAL(WITH_GCJ_DBTOOL, test "$with_gcj_dbtool" = "yes")
-AM_CONDITIONAL(WITH_GCJ_NO_DBTOOL,
-  test "$with_gcj" = "yes" -a "$with_gcj_dbtool" != "yes")
 AM_CONDITIONAL(ENABLE_ECHO2, test "$enable_echo2" = "yes")
 AM_CONDITIONAL(WITH_ANDROID,
   test "$with_android" != "" -a "$with_android" != "no")
@@ -263,12 +220,7 @@ AC_SUBST(JAVAC)
 AC_SUBST(JAVACFLAGS)
 #These don't do anything, because Make-rules can't contain autoconf
 #substitutions.  Perhaps fix when new automake is out.
-#AC_SUBST(GCJ) AC_SUBST(GCJFLAGS)
-AC_SUBST(GCJ_COMPILED_SELECTED)
-AC_SUBST(GCJ_SELECTED)
 AC_SUBST(TOP_BUILDDIR)
-AC_SUBST(CC)
-AC_SUBST(CFLAGS)
 AC_SUBST(PACKAGE)
 AC_SUBST(VERSION)
 AC_SUBST(JEMACS_VERSION)
@@ -290,9 +242,12 @@ AC_CONFIG_LINKS(
   gnu/xquery/testsuite/users.xml:gnu/xquery/testsuite/users.xml.in
   testsuite/scribble.html:testsuite/scribble.html.in)
 
+AM_COND_IF([ENABLE_KAWA_FRONTEND],
+        [AC_CONFIG_SUBDIRS([bin])])
+
 AC_CONFIG_FILES([Makefile gnu/bytecode/Makefile gnu/math/Makefile
   gnu/lists/Makefile gnu/text/Makefile gnu/mapping/Makefile gnu/expr/Makefile
-  gnu/Makefile
+  gnu/Makefile bin/qexo
   gnu/kawa/servlet/Makefile gnu/kawa/xslt/Makefile
   gnu/brl/Makefile gnu/kawa/brl/Makefile
   gnu/kawa/slib/Makefile
@@ -305,7 +260,8 @@ AC_CONFIG_FILES([Makefile gnu/bytecode/Makefile gnu/math/Makefile
   gnu/q2/Makefile gnu/q2/lang/Makefile gnu/q2/testsuite/Makefile
   gnu/xquery/Makefile gnu/xquery/lang/Makefile
   gnu/xquery/util/Makefile gnu/xquery/testsuite/Makefile
-  gnu/kawa/echo2/Makefile gnu/kawa/android/Makefile
+  gnu/kawa/android/Makefile
   gnu/kawa/javafx/Makefile
-  doc/Makefile testsuite/Makefile bin/Makefile])
+  doc/Makefile testsuite/Makefile])
 AC_OUTPUT
+chmod +x bin/qexo

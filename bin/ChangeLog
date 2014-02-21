@@ -1,3 +1,7 @@
+2014-02-21  Per Bothner  <per@bothner.com>
+
+	* configure.ac: Add substitution for JAVA - needed by cgi-servlet.c.
+
 2014-02-20  Per Bothner  <per@bothner.com>
 
 	* configure.ac: New file, used for enable-kawa-frontend support.

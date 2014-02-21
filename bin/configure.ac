@@ -38,9 +38,11 @@ AM_CONDITIONAL(ENABLE_KAWA_FRONTEND, test "$enable_kawa_frontend" = "yes")
 AM_CONDITIONAL(WITH_LIBTOOL, test "$with_libtool" = "yes")
 AM_CONDITIONAL(ON_WINDOWS, test "$CLASSPATH_SEPARATOR" = ";")
 
+JAVA=${JAVA-java}
+
 AC_SUBST(CC)
 AC_SUBST(CFLAGS)
-
+AC_SUBST(JAVA)
 
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT

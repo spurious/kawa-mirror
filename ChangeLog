@@ -1,5 +1,7 @@
 2014-02-20  Per Bothner  <per@bothner.com>
 
+	* configure.ac: Add missing AC_CANONICAL_HOST.
+
 	* configure.ac: Add test for Posix find, setting FIND variable.
 	* Makefile.am (FIND): New variable.  Use it.
 

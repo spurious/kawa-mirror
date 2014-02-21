@@ -3,6 +3,7 @@ AC_INIT([kawa],[1.14.1]) dnl Also update build.xml.
 AC_CONFIG_SRCDIR([doc/kawa.texi])
 
 AM_MAINTAINER_MODE
+AC_CANONICAL_HOST
 
 AM_INIT_AUTOMAKE
 

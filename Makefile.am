@@ -42,6 +42,7 @@ DIST_SUBDIRS = $(FIXED_SUBDIRS) \
 javadir=$(datadir)/java
 
 JAR = jar
+FIND = @FIND@
 KAWAJAR = kawa-@VERSION@.jar
 KAWALIB = $(datadir)/java/$(KAWAJAR)
 
@@ -51,10 +52,10 @@ META_INF_FILES = $(META_ScriptEngineFactory)
 endif
 
 classes.list: ./kawa-jar.stamp
-	find gnu kawa -name '*.class' -print >classes.list
+	$(FIND) gnu kawa -name '*.class' -print >classes.list
 
 classes-rt.list: ./kawa-jar.stamp $(srcdir)/classes-to-skip-for-runtime 
-	find gnu kawa -name '*.class' -print | grep -v -f $(srcdir)/classes-to-skip-for-runtime >classes-rt.list
+	$(FIND) gnu kawa -name '*.class' -print | grep -v -f $(srcdir)/classes-to-skip-for-runtime >classes-rt.list
 
 kawa-@VERSION@.jar: ./kawa-jar.stamp $(META_INF_FILES) classes.list
 	$(JAR) cmf $(srcdir)/jar-manifest $@ $(META_INF_FILES) @classes.list
@@ -97,13 +98,13 @@ jemacs-@JEMACS_VERSION@.jar:
 	  && $(MAKE) \
 	  && $(JAR) cmf $$srcdir/gnu/jemacs/jar-manifest \
 	      ../jemacs-@JEMACS_VERSION@.jar \
-	      `find . -name '*.class' -print` \
+	      `$(FIND) . -name '*.class' -print` \
 	  && cd .. && rm -rf tmpdir
 
 bytecode-@BYTECODE_VERSION@.jar: ./gnu/bytecode/java-classes.stamp
 	$(JAR) cmf $(srcdir)/gnu/bytecode/jar-manifest \
 	  bytecode-@BYTECODE_VERSION@.jar \
-	  `find gnu/bytecode -name '*.class' -print` 
+	  `$(FIND) gnu/bytecode -name '*.class' -print` 
 
 kawa-@VERSION@-src.zip: kawa-@VERSION@.tar.gz
 	mkdir zip-temp
@@ -156,7 +157,7 @@ JAVADOC_FLAGS = -use
 #   cd ~/Kawa/api && cvs ci -m 'Re-run javadoc.'
 javadoc-cvs.log:
 	cd $(JAVADOC_DIR) \
-	  && find . -name CVS -prune -o -type f -exec echo rm '{}' ';'
+	  && $(FIND) . -name CVS -prune -o -type f -exec echo rm '{}' ';'
 	$(MAKE) install-javadoc-html >&LOG.JAVADOC
 	(cd $(JAVADOC_DIR) && cvs -n update -d .>&/tmp/cvs-changes \
 	  && (grep '^[?] ' /tmp/cvs-changes |sed -e 's|[?] ||') >/tmp/cvs-adds \
@@ -174,8 +175,8 @@ JAVADOC_EXTRA_PATH = $(JAVADOC_ECLIPSE_JARS):$(JAVADOC_ANT_JARS)
 
 install-javadoc-html:
 	-mkdir $(JAVADOC_DIR)
-	-#rm `find $(JAVADOC_DIR)/ -name CVS -prune -o '(' '!' -type d ')' -print`
-	-rm `find $(JAVADOC_DIR)/ -name '*.html'`
+	-#rm `$(FIND) $(JAVADOC_DIR)/ -name CVS -prune -o '(' '!' -type d ')' -print`
+	-rm `$(FIND) $(JAVADOC_DIR)/ -name '*.html'`
 	CLASSPATH=$(JAVADOC_EXTRA_PATH)$(CLASSPATH_SEPARATOR)@conf_classpath@$$CLASSPATH \
 	$(JAVADOC) $(JAVADOC_FLAGS) -sourcepath .:$(top_srcdir) -d $(JAVADOC_DIR) $(JAVADOC_PACKAGES)
 	cp $(srcdir)/COPYING  $(JAVADOC_DIR)/COPYING
@@ -272,7 +273,7 @@ selected-java-source: Makefile
 
 $(srcdir)/patch-source-list:
 	(cd $(srcdir); \
-	find . -name '*.java' -exec grep -lE ' #endif ' '{}' ';') \
+	$(FIND) . -name '*.java' -exec grep -lE ' #endif ' '{}' ';') \
 	  | sed -e 's|./||' | sort > $@
 
 gnu/kawa/util/PreProcess.class: $(srcdir)/gnu/kawa/util/PreProcess.java

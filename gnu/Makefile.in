@@ -124,6 +124,7 @@ DEFS = @DEFS@
 ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
+FIND = @FIND@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
@@ -502,7 +503,6 @@ EXTRA_DIST = kawa/util/PreProcess.java kawa/reflect/package.html \
 
 EXTRA_CLEAN = */*.class kawa/*/*.class
 PACKAGE_FNAME = gnu
-GCJ_INPUTS = $(java_Java)
 java_sources = $(GNU_KAWA_IO_JSOURCES) $(GNU_KAWA_UTIL_JSOURCES) \
 	$(GNU_KAWA_REFLECT_JSOURCES) $(GNU_KAWA_FUNCTIONS_JSOURCES) \
 	$(GNU_KAWA_LISPEXPR_JSOURCES) $(GNU_KAWA_MODELS_JSOURCES) \
@@ -722,7 +722,7 @@ elisp-classes.stamp: $(java_ELISP)
 	echo timestamp > elisp-classes.stamp
 	echo timestamp > $(TO_TOPDIR)/kawa-jar.stamp
 
-all:  Makefile java-classes.stamp $(@GCJ_COMPILED_SELECTED@)
+all:  Makefile java-classes.stamp
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

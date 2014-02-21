@@ -612,10 +612,10 @@ WITH_HTTPSERVER_FALSE
 WITH_HTTPSERVER_TRUE
 WITH_JAVAX_SCRIPT_FALSE
 WITH_JAVAX_SCRIPT_TRUE
-WITH_AWT_FALSE
-WITH_AWT_TRUE
 WITH_SAX2_FALSE
 WITH_SAX2_TRUE
+WITH_AWT_FALSE
+WITH_AWT_TRUE
 WITH_SWT_FALSE
 WITH_SWT_TRUE
 WITH_JAVAFX_FALSE
@@ -636,6 +636,7 @@ WITH_ANDROID_FALSE
 WITH_ANDROID_TRUE
 ENABLE_ECHO2_FALSE
 ENABLE_ECHO2_TRUE
+FIND
 LN_S
 JAVA_SOURCE
 AM_BACKSLASH
@@ -2614,6 +2615,45 @@ filesep='/'
 # want to clutter up configure --help with --enable-servlet.
 enable_servlet=${enable_servlet-${with_servlet}}
 
+# Windows has a non-suitable find command.
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for Posix find command" >&5
+$as_echo_n "checking for Posix find command... " >&6; }
+if ${ac_cv_path_FIND+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  if test -z "$FIND"; then
+  ac_path_FIND_found=false
+  # Loop through the user's path and test for each of PROGNAME-LIST
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_prog in find; do
+    for ac_exec_ext in '' $ac_executable_extensions; do
+      ac_path_FIND="$as_dir/$ac_prog$ac_exec_ext"
+      as_fn_executable_p "$ac_path_FIND" || continue
+findout=`$ac_path_FIND . -maxdepth 0 -type d -exec echo '{}' ';'`
+                test "x$findout" = x"." \
+                && ac_cv_path_FIND=$ac_path_FIND ac_path_FIND_found=:
+      $ac_path_FIND_found && break 3
+    done
+  done
+  done
+IFS=$as_save_IFS
+  if test -z "$ac_cv_path_FIND"; then
+    as_fn_error $? "could not find Posix find" "$LINENO" 5
+  fi
+else
+  ac_cv_path_FIND=$FIND
+fi
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_path_FIND" >&5
+$as_echo "$ac_cv_path_FIND" >&6; }
+          FIND=$ac_cv_path_FIND
+
+
  if test "$enable_echo2" = "yes"; then
   ENABLE_ECHO2_TRUE=
   ENABLE_ECHO2_FALSE='#'
@@ -2694,20 +2734,20 @@ else
   WITH_SWT_FALSE=
 fi
 
- if test "$with_sax2" != "no"; then
-  WITH_SAX2_TRUE=
-  WITH_SAX2_FALSE='#'
-else
-  WITH_SAX2_TRUE='#'
-  WITH_SAX2_FALSE=
-fi
-
  if test "$with_awt" != "no"; then
   WITH_AWT_TRUE=
   WITH_AWT_FALSE='#'
 else
   WITH_AWT_TRUE='#'
   WITH_AWT_FALSE=
+fi
+
+ if test "$with_sax2" != "no"; then
+  WITH_SAX2_TRUE=
+  WITH_SAX2_FALSE='#'
+else
+  WITH_SAX2_TRUE='#'
+  WITH_SAX2_FALSE=
 fi
 
  if test "$with_javax_script" = "yes"; then
@@ -3030,12 +3070,12 @@ if test -z "${WITH_SWT_TRUE}" && test -z "${WITH_SWT_FALSE}"; then
   as_fn_error $? "conditional \"WITH_SWT\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
-if test -z "${WITH_SAX2_TRUE}" && test -z "${WITH_SAX2_FALSE}"; then
-  as_fn_error $? "conditional \"WITH_SAX2\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
 if test -z "${WITH_AWT_TRUE}" && test -z "${WITH_AWT_FALSE}"; then
   as_fn_error $? "conditional \"WITH_AWT\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${WITH_SAX2_TRUE}" && test -z "${WITH_SAX2_FALSE}"; then
+  as_fn_error $? "conditional \"WITH_SAX2\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${WITH_JAVAX_SCRIPT_TRUE}" && test -z "${WITH_JAVAX_SCRIPT_FALSE}"; then

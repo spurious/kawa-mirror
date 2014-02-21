@@ -1,5 +1,8 @@
 2014-02-20  Per Bothner  <per@bothner.com>
 
+	* configure.ac: Add test for Posix find, setting FIND variable.
+	* Makefile.am (FIND): New variable.  Use it.
+
 	* configure.ac: Separately configure bin, and move code that needs
 	a C compiler there, requried only enable_kawa_frontend is set.
 	Remove GCJ support.

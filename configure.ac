@@ -146,6 +146,15 @@ filesep='/'
 # want to clutter up configure --help with --enable-servlet.
 enable_servlet=${enable_servlet-${with_servlet}}
 
+# Windows has a non-suitable find command.
+AC_CACHE_CHECK([for Posix find command], [ac_cv_path_FIND],
+            [AC_PATH_PROGS_FEATURE_CHECK([FIND], [find],
+              [[findout=`$ac_path_FIND . -maxdepth 0 -type d -exec echo '{}' ';'`
+                test "x$findout" = x"." \
+                && ac_cv_path_FIND=$ac_path_FIND ac_path_FIND_found=:]],
+              [AC_MSG_ERROR([could not find Posix find])])])
+          AC_SUBST([FIND], [$ac_cv_path_FIND])
+
 AM_CONDITIONAL(ENABLE_ECHO2, test "$enable_echo2" = "yes")
 AM_CONDITIONAL(WITH_ANDROID,
   test "$with_android" != "" -a "$with_android" != "no")

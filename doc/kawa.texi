@@ -15437,14 +15437,14 @@ can start by optimizing arithmetic when the types are unknown
 at compile-time.  They could make implementing
 generic functions (multimethods) more efficient.
 At some point we want to compile lambdas in the same way
-as the experimental Java 8 branch does. This can potenitally
+as the Java 8 preview does. This can potenitally
 be more efficient than Kawa's current mechanism.
 
 @subsection R6RS and R7RS libraries and syntax
-Kawa supports most of the functionality of R6RS and (draft) R7RS.
+Kawa supports most of the functionality of R6RS and R7RS.
 However, various R6R7 or (more importantly) R7RS features
 are missing, and should be added.
-For eaxmple, both R6RS or R7RS library definition syntax are unimplemented.
+For example, both R6RS or R7RS library definition syntax are unimplemented.
 In a related matter, Kawa supports most of the functionality of
 @code{syntax-case}, but some pieces are missing, and no
 doubt some of it is incorrect.  Adding the missing pieces
@@ -15519,6 +15519,8 @@ the Kawa programmer would write a function that returns a @code{lazy[T]}.
 This involves some design work, and modifying the compiler to
 rewrite the function body as needed.
 
+This is related to full continuations, as the re-writing is similar.
+
 @anchor{task-REPL-improvements}
 @subsection REPL console and other REPL improvement
 Improvements to the read-eval-print console.
@@ -15568,6 +15570,8 @@ Or one may look at basic editing primitives.
 Enhancements may be needed to core Emacs Lisp language primitives
 (enhancing @ref{task-common-lisp, Common Lisp support} may help),
 or to the display engine.
+
+Emacs now supports @uref{http://www.gnu.org/software/emacs/manual/html_node/elisp/Lexical-Binding.html,lexical bindings} - we should do the same.
 
 @subsection Improved IDE integration
 There is some Kawa support for Eclipse (Schemeway), and possibly
@@ -15620,6 +15624,13 @@ more efficient, and more customizable are also desirable.
 for integrating server-side and client-side programming using
 a Scheme dialect.  These ideas seem like they would port
 quite well to Kawa.
+
+@subsection Quaternions
+Add @uref{http://en.wikipedia.org/wiki/Quaternion,quaternions}
+to the numerical tower, such that @code{Complex} extends a new abstract class
+@code{Quaternion} extends @code{Quantity}.
+These are useful for 3D rotations.
+A reasonable design is @uref{http://www.ccs.neu.edu/home/dorai/squat/squat.html,here}.
 
 @subsection String localization
 Support localization by extending the

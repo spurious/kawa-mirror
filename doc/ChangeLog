@@ -1,3 +1,7 @@
+2014-02-21  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Ideas and tasks): Various updates.
+
 2014-02-20  Jamison Hope  <jrh@theptrgroup.com>
 
 	* kawa.texi (Implemented SRFIs): SRFI-60 is now fully supported.

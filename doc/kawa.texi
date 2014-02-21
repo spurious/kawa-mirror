@@ -1667,8 +1667,6 @@ The @code{read-with-shared-structure} is missing, but subsumed by @code{read}.
 @item
 @uref{http://srfi.schemers.org/srfi-60/srfi-60.html, SRFI 60}:
 Integers as Bits.
-Mostly implemented.  A few functions are missing,
-and a few are only available under other names.
 @item
 @uref{http://srfi.schemers.org/srfi-62/srfi-62.html, SRFI 62}: S-expression comments.
 @item

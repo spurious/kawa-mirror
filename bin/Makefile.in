@@ -203,6 +203,7 @@ INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
+JAVA = @JAVA@
 LDFLAGS = @LDFLAGS@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
@@ -285,7 +286,7 @@ cgi_servlet_SOURCES = cgi-servlet.c kawapath.c
 KAWAJAR = kawa-$(VERSION).jar
 KAWALIB = $(datadir)/java/$(KAWAJAR)
 CDEFS = -DJAVA='"$(JAVA)"' -DKAWALIB='"$(KAWALIB)"' -DKAWAJAR='"$(KAWAJAR)"' -DEXTRAPATH='"$(conf_classpath)"'
-CLEANFILES = qexo kawa$(EXEEXT) kawa.sh kawa.bat kawa-bin$(EXEEXT) tmp *.stamp *.so *.la
+CLEANFILES = kawa$(EXEEXT) tmp *.stamp
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 all: all-am
 
@@ -687,7 +688,7 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am: uninstall-binPROGRAMS uninstall-local
+uninstall-am: uninstall-binPROGRAMS
 
 .MAKE: install-am install-strip
 
@@ -705,8 +706,7 @@ uninstall-am: uninstall-binPROGRAMS uninstall-local
 	install-strip installcheck installcheck-am installdirs \
 	maintainer-clean maintainer-clean-generic mostlyclean \
 	mostlyclean-compile mostlyclean-generic pdf pdf-am ps ps-am \
-	tags tags-am uninstall uninstall-am uninstall-binPROGRAMS \
-	uninstall-local
+	tags tags-am uninstall uninstall-am uninstall-binPROGRAMS
 
 
 kawa$(EXEEXT): $(kawa_OBJECTS)
@@ -720,11 +720,6 @@ install-binPROGRAMS: $(bin_PROGRAMS)
 	test -z "$(bindir)" || $(mkdir_p) "$(DESTDIR)$(bindir)"
 @ENABLE_KAWA_FRONTEND_TRUE@	$(INSTALL_PROGRAM_ENV) $(LIBTOOL_INSTALL) $(binPROGRAMS_INSTALL) kawa$(EXEEXT) $(DESTDIR)$(bindir)/kawa$(EXEEXT)
 @ENABLE_SERVLET_TRUE@	$(INSTALL_PROGRAM_ENV) $(LIBTOOL_INSTALL) $(binPROGRAMS_INSTALL) cgi-servlet$(EXEEXT) $(DESTDIR)$(bindir)/cgi-servlet$(EXEEXT)
-
-uninstall-local: uninstall-exec-bindir
-
-uninstall-exec-bindir:
-	rm -f $(DESTDIR)$(bindir)/kawa $(DESTDIR)$(bindir)/qexo
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

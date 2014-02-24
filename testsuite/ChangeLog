@@ -1,3 +1,10 @@
+2014-02-23  Per Bothner  <per@bothner.com>
+
+	* threadring.scm (m): New variable, from command-line.
+	(MAX_NODES, MAX_THREADS): Initialize from m.
+	* Makefile.am: Call threadring with m=103, instead of default 503,
+	which tends to run out the thread stack memory.
+
 2014-02-19  Per Bothner  <per@bothner.com>
 
 	* num-test.scm (logop-compare): Use bitwise-bit-set? instead of

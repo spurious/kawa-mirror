@@ -8,10 +8,13 @@
 ;;; This implementation shows using a simple thread pool solves the
 ;;; thread context switch issue.
 
-(define-constant MAX_NODES :: int 503)
-(define-constant MAX_THREADS :: int 503)
 
 (define n :: int (string->number (cadr (command-line))))
+(define m :: int (if (null? (cddr (command-line))) 503
+                     (string->number (caddr (command-line)))))
+
+(define-constant MAX_NODES :: int m)
+(define-constant MAX_THREADS :: int m)
 
 (define-class TokenMessage ()
   (node-id :: int)

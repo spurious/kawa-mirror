@@ -9,6 +9,7 @@ GNU_KAWA_IO_JSOURCES = \
   kawa/io/LogWriter.java \
   kawa/io/NullReader.java \
   kawa/io/OutPort.java \
+  kawa/io/NBufferedInputStream.java \
   kawa/io/PrettyWriter.java \
   kawa/io/QueueReader.java \
   kawa/io/TtyInPort.java \

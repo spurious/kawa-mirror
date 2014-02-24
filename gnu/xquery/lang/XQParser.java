@@ -12,6 +12,7 @@ import java.util.Stack;
 import gnu.kawa.xml.*;
 import gnu.xml.*;
 import gnu.bytecode.*;
+import gnu.kawa.io.BinaryInPort;
 import gnu.kawa.io.CharArrayInPort;
 import gnu.kawa.io.InPort;
 import gnu.kawa.io.TtyInPort;
@@ -4243,6 +4244,16 @@ public class XQParser extends Lexer
                   }
                 if (bad)
                   error('e', "invalid encoding name syntax", "XQST0087");
+                InPort port = getPort();
+                if (port instanceof BinaryInPort) {
+                    try {
+                        ((BinaryInPort) port).setCharset(encoding);
+                    } catch (java.nio.charset.UnsupportedCharsetException ex) {
+                        error('e', "unrecognized encoding name");
+                    } catch (Exception ex) {
+                        error('e', "cannot set encoding name here");
+                    }
+                }
                 // ignore encoding specification.
                 getRawToken();
               }

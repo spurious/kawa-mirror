@@ -763,7 +763,8 @@ public class repl extends Procedure0or1
             InPort fstream;
             try
               {
-                fstream = InPort.openFile(arg);
+                Path path = Path.valueOf(arg);
+                fstream = Shell.openFile(path.openInputStream(), path);
               }
             catch (java.io.FileNotFoundException ex)
               {

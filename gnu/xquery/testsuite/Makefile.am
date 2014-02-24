@@ -10,6 +10,7 @@ java_sources = TestMisc.java TestSuite.java RunXQTS.java
 
 EXTRA_DIST = tab.xml.in maketab1.xql tab.html usemod.exp \
   multab.xql expectedmul.xml descend.xql expdescend.xml \
+  latin1a.xql latin1a.expected latin1b.xml \
   auction.xml.in outline.xml.in usemod.xql mod1.xql mod2.xql mod2a.xql \
   bad-1.xql expected-1.errs XQTS-trace.exp xsltest1.xsl xsltest1.expected\
   bib.xml.in use-cases.xml book1.xml.in reviews.xml.in report1.xml.in \
@@ -38,7 +39,7 @@ check-XQTS: RunXQTS.class
 	  else echo FAIL XQuery trace output mismatch; fi
 
 check-misc: TestMisc.class
-	CLASSPATH=$(KAWALIB) $(JAVA) gnu.xquery.testsuite.TestMisc
+	CLASSPATH=$(KAWALIB) $(JAVA) -Dsrcdir=$(srcdir) gnu.xquery.testsuite.TestMisc
 
 check-suite:  TestSuite.class
 	CLASSPATH=$(KAWALIB) \
@@ -71,6 +72,10 @@ descend.class:  descend.xql
 check-descend:  descend.class
 	CLASSPATH=".$(CLASSPATH_SEPARATOR)$(KAWALIB)" $(JAVA) descend >tmpdesc
 	@if diff -b $(srcdir)/expdescend.xml tmpdesc; then echo '# descend test passes'; else echo FAIL descend test; fi
+
+check-latin1a:
+	$(KAWA) --xquery $(srcdir)/latin1a.xql >tmplatin1a
+	@if diff -b $(srcdir)/latin1a.expected tmplatin1a; then echo '# latin1a test passes'; else echo FAIL latin1a test; fi
 
 check-xsltest1:
 	$(KAWA) --xslt -f $(srcdir)/xsltest1.xsl outline.xml >tmp-xsltest1.log
@@ -106,7 +111,8 @@ check-bad-1: bad-1.log
 	  else echo FAIL bad-1 test; fi
 
 check-without-XQTS:  check-misc check-suite check-maketab1 check-multab \
-	  check-descend check-format-users check-mod check-bad-1 check-xsltest1
+	  check-descend check-latin1a \
+	  check-format-users check-mod check-bad-1 check-xsltest1
 
 if WITH_XQTS
 check: check-without-XQTS check-XQTS

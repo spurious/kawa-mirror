@@ -1,3 +1,14 @@
+2014-02-23  Per Bothner  <per@bothner.com>
+
+	* BinaryInPort.java (class BinaryInputStream): Rename to
+	NBufferedInputStream and moved to separate file.
+	(fill): If charset not set, defer defaulting to UTF-8 as long
+	as we only see ASCII.  This allows handing encoding declarations.
+	(setFromByteOrderMark): New method.
+	(openHeuristicFile): New static method.
+	* NBufferedInputStream.java: New file.
+	Add suppot for mark/reset.
+
 2014-02-16  Per Bothner  <per@bothner.com>
 
 	* WriterManager.java: Make sure Error is uncaught or re-thrown.

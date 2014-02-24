@@ -1,3 +1,9 @@
+2014-02-23  Per Bothner  <per@bothner.com>
+
+	* LispReader.java (checkEncodingSpec): New method.
+	(readNestedComment): Check for "coding" spec.
+	* ReaderIgnoreRestOfLine.java (read): Likewise.
+
 2014-02-16  Per Bothner  <per@bothner.com>
 
 	* ReaderDispatchMacro.java: Make sure Error is uncaught or re-thrown.

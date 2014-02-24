@@ -14,12 +14,13 @@ import java.nio.charset.*;
 
 public class BinaryInPort extends InPort {
 
-    private BinaryInputStream bstrm;
-    char[] carr;
+    private NBufferedInputStream bstrm;
     CharBuffer cbuf = null;
 
     Charset cset;
     CharsetDecoder decoder;
+
+    public Charset getCharset() { return cset; }
 
     public void setCharset(Charset cset) {
         this.cset = cset;
@@ -34,22 +35,33 @@ public class BinaryInPort extends InPort {
             throw new RuntimeException("encoding "+name+" does not match previous "+this.cset);
     }
 
-    private BinaryInPort(BinaryInputStream bstrm, Path path) {
+    private BinaryInPort(NBufferedInputStream bstrm, Path path) {
         super(bstrm, path);
         this.bstrm = bstrm;
         setKeepFullLines(false);
     }
     
     public BinaryInPort(InputStream strm) {
-        this(new BinaryInputStream(strm), null);
+        this(new NBufferedInputStream(strm), null);
     }
 
     public BinaryInPort(InputStream strm, Path path) {
-        this(new BinaryInputStream(strm), path);
+        this(new NBufferedInputStream(strm), path);
     }
 
     public BinaryInPort(byte[] buffer, int length, Path path) {
-        this(new BinaryInputStream(buffer, length), path);
+        this(new NBufferedInputStream(buffer, length), path);
+    }
+
+    /** Check if we're looking at a Byte Order Mark.
+     * If set, set encoding, and set position to just after the mark.
+     */
+    public boolean setFromByteOrderMark()  throws IOException {
+        String enc = bstrm.checkByteOrderMark();
+        if (enc == null)
+            return false;
+        setCharset(enc);
+        return true;
     }
 
     public InputStream getInputStream() {
@@ -62,11 +74,44 @@ public class BinaryInPort extends InPort {
 
     @Override
     protected int fill(int len) throws java.io.IOException {
-        if (cset == null)
-            setCharset("UTF-8");
-        if (buffer != carr) {
+        if (cset == null) {
+            byte[] barr = bstrm.barr;
+            ByteBuffer bbuf = bstrm.bbuf;
+            int count = 0;
+            int bpos = bbuf.position();
+            int blim = bbuf.limit();
+            for (;;) {
+                if (count >= len) {
+                    bbuf.position(bpos);
+                    return count;
+                }
+                if (bpos >= blim) {
+                    bbuf.position(bpos);
+                    if (count > 0)
+                        return count;
+                    int nb = bstrm.fillBytes();
+                    if (nb < 0)
+                        return -1;
+                    bpos = bbuf.position();
+                    blim = bbuf.limit();
+                }
+                byte b = barr[bpos];
+                if (b >= 0) {
+                    // If it's an ASCII character we accept it.
+                    buffer[pos+count] = (char) b;
+                    bpos++;
+                    count++;
+                } else if (count > 0) {
+                    bbuf.position(bpos);
+                    return count;
+                } else {
+                    setCharset("UTF-8");
+                    break;
+                }
+            }
+        }
+        if (cbuf == null) {
             cbuf = CharBuffer.wrap(buffer);
-            carr = buffer;
         }
         cbuf.limit(pos+len);
         cbuf.position(pos);
@@ -78,10 +123,7 @@ public class BinaryInPort extends InPort {
             if (count > 0 || ! cres.isUnderflow())
                 break;
             int rem = bstrm.bbuf.remaining();
-            if (rem > 0) {
-                bstrm.bbuf.compact();
-            }
-            int n = bstrm.fillBytes(rem);
+            int n = bstrm.fillBytes();
             if (n < 0) {
                 eof = true;
                 break;
@@ -124,69 +166,16 @@ public class BinaryInPort extends InPort {
         return p;
     }
 
-    static class BinaryInputStream extends InputStream {
-        InputStream base;
-        byte[] barr = new byte[8192];
-        ByteBuffer bbuf;
-
-        public BinaryInputStream(InputStream base) {
-            this.base = base;
-            bbuf = ByteBuffer.wrap(barr);
-            bbuf.position(barr.length);
-        }
-
-        public BinaryInputStream(byte[] buffer, int length) {
-            bbuf = ByteBuffer.wrap(buffer, 0, length);
-        }
-
-        public synchronized int peek() throws IOException {
-            int r = read();
-            if (r >= 0)
-                bbuf.position(bbuf.position()-1);
-            return r;
-        }
-
-        public synchronized int read() throws java.io.IOException {
-            if (! bbuf.hasRemaining()) {
-                int n = fillBytes(0);
-                if (n <= 0)
-                    return -1;
-            }
-            return bbuf.get() & 0xFF;
-        }
-
-        public synchronized int read(byte[] buf, int offset, int count)
-            throws IOException {
-            int remaining = bbuf.remaining();
-            if (remaining == 0) {
-                int n = fillBytes(0);
-                if (n <= 0)
-                    return -1;
-                remaining = bbuf.remaining();
-            }
-            if (count > remaining)
-                count = remaining;
-            bbuf.get(buf, offset, count);
-            return count;
-        }
-
-        private synchronized int fillBytes(int remaining)
-                throws java.io.IOException {
-            if (base == null)
-                return -1;
-            int n = base.read(barr, remaining, barr.length-remaining);
-            bbuf.position(0);
-            bbuf.limit(remaining + (n < 0 ? 0 : n));
-            return n;
-        }
-
-        public synchronized boolean ready() throws IOException {
-            return bbuf.hasRemaining()
-                || (base != null && base.available() > 0);
-        }
-
-        public synchronized int available() throws IOException {
-            return bbuf.remaining() + (base == null ? 0 : base.available());
-        }
+    public static BinaryInPort openHeuristicFile(InputStream strm, Path path)
+            throws java.io.IOException {
+        NBufferedInputStream bstrm =
+            strm instanceof NBufferedInputStream ? (NBufferedInputStream) strm
+            : new NBufferedInputStream(strm);
+        BinaryInPort inp = new BinaryInPort(bstrm, path);
+        inp.setFromByteOrderMark();
+        inp.setKeepFullLines(true);
+        inp.setConvertCR(true);
+        return inp;
     }
+
 }

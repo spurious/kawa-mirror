@@ -1,3 +1,8 @@
+2014-02-23  Per Bothner  <per@bothner.com>
+
+	* XMLParser.java (XMLStreamReader): Majorly simplify since
+	BinaryInPort makes reading encoding declaration easier now.
+
 2014-01-09  Per Bothner  <per@bothner.com>
 
 	* XMLParser.java: Update to use BinaryInPort.

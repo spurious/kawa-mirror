@@ -1,3 +1,9 @@
+2014-02-23  Per Bothner  <per@bothner.com>
+
+	* Shell.java (openFile): New method, use openHeuristicFile.
+	(runFile): Use openFile.
+	* repl.java: Likewise.
+
 2014-02-18  Jamison Hope  <jrh@theptrgroup.com>
 
 	* standard/Scheme.java (initScheme): Remove 'logbit?', since it

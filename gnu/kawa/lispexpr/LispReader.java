@@ -4,8 +4,10 @@ import gnu.mapping.*;
 import gnu.lists.*;
 import gnu.math.*;
 import gnu.expr.*;
+import gnu.kawa.io.BinaryInPort;
 import gnu.kawa.io.InPort;
 import gnu.kawa.util.GeneralHashTable;
+import java.util.regex.*;
 
 /** A Lexer for reading S-expressions in generic Lisp-like syntax.
  * This class may have outlived its usefulness: It's mostly just a
@@ -49,39 +51,57 @@ public class LispReader extends Lexer
 	return value;
     }
 
-  /** Read a #|...|#-style comment (which may contain other nested comments).
-    * Assumes the initial "#|" has already been read.
-    */
-  final public void readNestedComment (char c1, char c2)
-       throws java.io.IOException, SyntaxException
-  {
-    int commentNesting = 1;
-    int startLine = port.getLineNumber();
-    int startColumn = port.getColumnNumber();
-    do
-      {
-	int c = read ();
-	if (c == '|')
-	  {
-	    c = read();
-	    if (c == c1)
-	      commentNesting--;
-	  }
-	else if (c == c1)
-	  {
-	    c = read();
-	    if (c == c2)
-	      commentNesting++;
-	  }
-	if (c < 0)
-	  {
-            eofError("unexpected end-of-file in " + c1 + c2
-                     + " comment starting here",
-                     startLine + 1, startColumn - 1);
-	    return;
-	  }
-      } while (commentNesting > 0);
-  }
+    /** Read a #|...|#-style comment (which may contain other nested comments).
+     * Assumes the initial "#|" has already been read.
+     */
+    final public void readNestedComment (char c1, char c2)
+        throws java.io.IOException, SyntaxException {
+        int commentNesting = 1;
+        int startLine = port.getLineNumber();
+        int startColumn = port.getColumnNumber();
+        StringBuilder buf = null;
+        if (port instanceof BinaryInPort && (startLine == 0 || startLine == 1))
+            buf = new StringBuilder();
+        do {
+            int c = read ();
+            if (buf != null)
+                buf.append((char) c);
+            if (c == '|') {
+                c = read();
+                if (buf != null)
+                    buf.append((char) c);
+                if (c == c1)
+                    commentNesting--;
+            } else if (c == c1) {
+                c = read();
+                if (c == c2)
+                    commentNesting++;
+            }
+            if (c < 0) {
+                eofError("unexpected end-of-file in " + c1 + c2
+                         + " comment starting here",
+                         startLine + 1, startColumn - 1);
+                return;
+            }
+        } while (commentNesting > 0);
+        if (buf != null)
+            checkEncodingSpec(buf.toString());
+    }
+
+    public void checkEncodingSpec(String line) {
+        Matcher m = Pattern.compile("coding[:=]\\s*([-a-zA-Z0-9]+)")
+            .matcher(line);
+        if (m.find()) {
+            String enc = m.group(1);
+            try {
+                ((BinaryInPort) getPort()).setCharset(enc);
+            } catch (java.nio.charset.UnsupportedCharsetException ex) {
+                error('e', "unrecognized encoding name "+enc);
+            } catch (Exception ex) {
+                error('e', "cannot set encoding name here");
+            }
+        }
+    }
 
     boolean inQuasiSyntax;
 

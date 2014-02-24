@@ -58,76 +58,13 @@ public class XMLParser
     parse(Path.openInputStream(uri), uri, messages, out);
   }
 
-  public static BinaryInPort XMLStreamReader(InputStream strm)
-    throws java.io.IOException
-  {
-    BinaryInPort in = new BinaryInPort(strm);
-    int b1 = in.readByte();
-    int b2 = b1 < 0 ? -1 : in.readByte();
-    int b3 = b2 < 0 ? -1 : in.readByte();
-    if (b1 == 0xEF && b2 == 0xBB && b3 == 0xBF) // UTF-8 Byte Order Mark // UTF-8 Byte Order Mark
-      {
-        in.resetStart(3);
-        in.setCharset("UTF-8");
-      }
-    else if (b1 == 0xFF && b2 == 0xFE && b3 != 0) // UTF-16LE Byte Order Mark
-      {
-        in.resetStart(2);
-        in.setCharset("UTF-16LE");
-      }
-    else if (b1 == 0xFE && b2 == 0xFF && b3 != 0) // UTF-16BE Byte Order Mark
-      {
-        in.resetStart(2);
-        in.setCharset("UTF-16BE");
-      }
-    else // No recognizable Byte Order Mark
-      {
-        int b4 = b3 < 0 ? -1 : in.readByte();
-        if (b1 == 0x4C && b2 == 0x6F && b3 == 0xA7 && b4 == 0x94)
-          throw new RuntimeException("XMLParser: EBCDIC encodings not supported");
-        in.resetStart(0);
-        if ((b1 == '<' && ((b2 == '?' && b3 == 'x' && b4 == 'm')
-                           || (b2 == 0 && b3 == '?' && b4 == 0)))
-            || (b1 == 0 && b2 == '<' && b3 == 0 && b4 == '?'))
-          {
-            // Read-ahead until the end of the XML declaration,
-            // treating it as Latin-1. Thus we can read the encoding
-            // specification before committing to a specific charset.
-            char[] buffer = in.buffer;
-            if (buffer == null)
-              in.buffer = buffer = new char[InPort.BUFFER_SIZE];
-            int pos = 0;
-            int quote = 0;
-            int limit = buffer.length;
-            for (;;)
-              {
-                int b = in.readByte();
-                if (b == 0)
-                  continue;
-                if (b < 0) // Unexpected EOF - handled later.
-                  break;
-                if (pos >= limit) // Only on error
-                    break;
-                buffer[pos++] = (char) (b & 0xFF);
-                if (quote == 0)
-                  {
-                    if (b == '>')
-                      break;
-                    if (b == '\'' || b == '\"')
-                      quote = b;
-                  }
-                else if (b == quote)
-                  quote = 0;
-              }
-            in.pos = 0;
-            in.limit = pos;
-          }
-        else
-          in.setCharset("UTF-8");
-      }
-    in.setKeepFullLines(false);
-    return in;
-  }
+    public static BinaryInPort XMLStreamReader(InputStream strm)
+        throws java.io.IOException {
+        BinaryInPort in = new BinaryInPort(strm);
+        in.setFromByteOrderMark();
+        in.setKeepFullLines(false);
+        return in;
+    }
 
   public static void parse (InputStream strm, Object uri,
                             SourceMessages messages, Consumer out)

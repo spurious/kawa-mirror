@@ -22,6 +22,9 @@ public class TestMisc
 
   public static void main(String[] args)
   {
+      String srcdir = System.getProperty("srcdir");
+      String srcprefix = srcdir == null ? "" : (srcdir+"/");
+
     // gnu.expr.ModuleExp.dumpZipPrefix = "kawa-zip-dump-";
     // Compilation.debugPrintExpr = true;
     // Compilation.debugPrintFinalExpr = true;
@@ -390,6 +393,8 @@ public class TestMisc
 
     evalTest("unescaped-data('<?--->'),let $x:=unescaped-data('an &amp;oslash;') return <b>{unescaped-data('<![CDATA[saw]]>')} {$x}</b>",
 	     "<?---><b><![CDATA[saw]]> an &oslash;</b>");
+
+    evalTest("doc('"+srcprefix+"latin1b.xml')", "<p>Hell ae:&#xE6; oe:&#xF8; aa:&#xE5;</p>");
 
     evalTestIdAttrs("doc('outline.xml')/book/part/chapter/ancestor::*",
 		    "b1;P1;");

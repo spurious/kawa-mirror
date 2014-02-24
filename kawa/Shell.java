@@ -7,7 +7,9 @@ import gnu.text.*;
 import gnu.lists.*;
 import gnu.bytecode.ArrayClassLoader;
 import gnu.bytecode.ZipLoader;
+import gnu.kawa.io.BinaryInPort;
 import gnu.kawa.io.InPort;
+import gnu.kawa.io.NBufferedInputStream;
 import gnu.kawa.io.OutPort;
 import gnu.kawa.io.TtyInPort;
 import gnu.kawa.util.ExitCalled;
@@ -390,6 +392,16 @@ public class Shell
       }
   }
 
+    static InPort openFile(InputStream fs, Path path) throws IOException {
+        Object conv = Environment.user().get("port-char-encoding");
+        InPort src;
+        if (conv == null || conv == Boolean.TRUE)
+            return BinaryInPort.openHeuristicFile(fs, path);
+        else
+            return InPort.openFile(fs, path, conv);
+    }
+
+
   /** Run a named source file, compiled .zip, or class.
    * We try in order if {@code fname} names a compiled zip file,
    * or names some other file (in which case it is assumed to be source),
@@ -479,15 +491,16 @@ public class Shell
                                         Environment env,
                                         boolean lineByLine, int skipLines)
             throws Throwable {
-        if (! (fs instanceof BufferedInputStream))
-            fs = new BufferedInputStream(fs);
+        if (! (fs instanceof BufferedInputStream)
+            && ! (fs instanceof NBufferedInputStream))
+            fs = new NBufferedInputStream(fs);
         Language language = Language.getDefaultLanguage();
         Path savePath = (Path) currentLoadPath.get();
         try {
             currentLoadPath.set(path);
             CompiledModule cmodule = checkCompiledZip(fs, path, env, language);
             if (cmodule == null) {
-                InPort src = InPort.openFile(fs, path);
+                InPort src = openFile(fs, path);
                 while (--skipLines >= 0)
                     src.skipRestOfLine();
                 try {

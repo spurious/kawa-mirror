@@ -118,6 +118,7 @@
    (java.io.FileNotFoundException? obj)
    (cond-expand (java-7
                  (or (java.nio.file.NoSuchFileException? obj)
+                     (java.nio.file.InvalidPathException? obj)
                      (java.nio.file.AccessDeniedException? obj)
                      (java.nio.file.DirectoryNotEmptyException? obj)))
                 (else

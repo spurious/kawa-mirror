@@ -1,3 +1,7 @@
+2014-02-23  Per Bothner  <per@bothner.com>
+
+	* exceptions.scm (file-error?): Also match InvalidPathException.
+
 2014-02-20  Jamison Hope  <jrh@theptrgroup.com>
 
 	* numbers.scm (angle): The angle of a negative real is pi.

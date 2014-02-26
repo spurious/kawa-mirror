@@ -1126,13 +1126,13 @@ It has 26 characters.
 
 @subsection Other ways to pass options using meta-arg or --script
 
-An arguments consistening of just a @code{\} (backslash)
+An argument consisting of just a @code{\} (backslash)
 causes Kawa to read the @emph{second} line looking for
 options.  (Quotes and backslahes work like in the shell.)
 These replace the backslash in the command line.
 
 This is a less verbose mechanism, but it requires an
-aboslute path to @code{kawa}, due to shell limitations.
+absolute path to @code{kawa}, due to shell limitations.
 
 @example
 #!/usr/bin/bin/kawa \
@@ -5672,48 +5672,112 @@ Same as @code{(not (zero? (bitwise-and @var{i} @var{j})))},
 but is more efficient.
 @end deffn
 
-@subsection Deprecated Logical Number Operations
+@subsection SRFI-60 Logical Number Operations
 
-These older functions are still available, but we
-recommand using the R6RS-compatible functions.
-
-@deffn Procedure lognot i
-Equivalent to @code{(bitwise-not @var{i})}.
-@end deffn
+Kawa supports SRFI-60 ``Integers as Bits'' as well, although we
+generally recommend using the R6RS-compatible functions instead when
+possible.  Unless noted as being a builtin function, to use these you
+must first @code{(require 'srfi-60)} or @code{(import (srfi :60))}
+(or @code{(import (srfi :60 integer-bits))}).
 
 @deffn Procedure logand i ...
-Equivalent to @code{(bitwise-and @var{i} ...)}.
+Equivalent to @code{(bitwise-and @var{i} ...)}.  Builtin.
 @end deffn
 
 @deffn Procedure logior i ...
-Equivalent to @code{(bitwise-ior @var{i} ...)}.
+Equivalent to @code{(bitwise-ior @var{i} ...)}.  Builtin.
 @end deffn
 
 @deffn Procedure logxor i ...
-Equivalent to @code{(bitwise-xor @var{i} ...)}.
+Equivalent to @code{(bitwise-xor @var{i} ...)}.  Builtin.
+@end deffn
+
+@deffn Procedure lognot i
+Equivalent to @code{(bitwise-not @var{i})}.  Builtin.
+@end deffn
+
+@deffn Procedure bitwise-merge mask i j
+Equivalent to @code{(bitwise-if @var{mask} @var{i} @var{j})}.
+@end deffn
+
+@deffn Procedure any-bits-set? i j
+Equivalent to @code{(logtest @var{i} @var{j})}.
 @end deffn
 
 @deffn Procedure logcount i
+@deffnx Procedure bit-count i
 Count the number of 1-bits in @var{i}, if it is non-negative.
 If @var{i} is negative, count number of 0-bits.
 Same as @code{(bitwise-bit-count @var{i})} if @var{i} is non-negative.
+Builtin as @func{logcount}.
 @end deffn
 
 @deffn Procedure integer-length i
-Equivalent to @code{(bitwise-length @var{i})}.
+Equivalent to @code{(bitwise-length @var{i})}.  Builtin.
 @end deffn
 
-@deffn Procedure logbit? i pos
-Equivalent to @code{bitwise-bit-set? @var{i} @var{pos})}.
+@deffn Procedure log2-binary-factors i
+@deffnx Procedure first-set-bit i
+Equivalent to @code{(bitwise-first-bit-set @var{i})}.
+@end deffn
+
+@deffn Procedure logbit? pos i
+@deffnx Procedure bit-set? pos i
+Equivalent to @code{(bitwise-bit-set? @var{i} @var{pos})}.
+@end deffn
+
+@deffn Procedure copy-bit bitno i bool
+Equivalent to @code{(bitwise-copy-bit @var{i} @var{bitno} (if @var{bool} 1 0))}.
+@end deffn
+
+@deffn Procedure bit-field n start end
+Equivalent to @code{(bitwise-bit-field @var{n} @var{start} @var{end})}.
+@end deffn
+
+@deffn Procedure copy-bit-field to from start end
+Equivalent to @code{(bitwise-copy-bit-field @var{to} @var{start} @var{end} @var{from})}.
 @end deffn
 
 @deffn Procedure arithmetic-shift i j
-Equivalent to @code{bitwise-arithmetic-shift @var{i} @var{j})}.
+Equivalent to @code{(bitwise-arithmetic-shift @var{i} @var{j})}.  Builtin.
 @end deffn
 
 @deffn Procedure ash i j
-Alias for @code{arithmetic-shift}.
+Alias for @code{arithmetic-shift}.  Builtin.
 @end deffn
+
+@deffn Procedure rotate-bit-field n count start end
+Equivalent to @code{(bitwise-rotate-bit-field @var{n} @var{start} @var{end} @var{count})}.
+@end deffn
+
+@deffn Procedure reverse-bit-field i start end
+Equivalent to @code{(bitwise-reverse-bit-field @var{i} @var{start} @var{end})}.
+@end deffn
+
+@deffn Procedure integer->list @var{k} [@var{length}]
+@deffnx Procedure list->integer @var{list}
+The @func{integer->list} procedure returns a list of @var{length}
+booleans corresponding to the bits of the non-negative integer @var{k},
+with @code{#t} for @code{1} and @code{#f} for @code{0}.  @var{length}
+defaults to @code{(bitwise-length @var{k})}.  The list will be in order
+from MSB to LSB, with the value of @code{(odd? @var{k})} in the last
+car.
+
+The @func{list->integer} procedure returns the integer corresponding to
+the booleans in the list @var{list}.
+The @func{integer->list} and @func{list->integer} procedures are
+inverses so far as @func{equal?} is concerned.
+@end deffn
+
+@deffn Procedure booleans->integer bool1 ...
+Returns the integer coded by the @var{bool1} ... arguments.
+Equivalent to @code{(list->integer (list @var{bool1} ...))}.
+@end deffn
+
+@subsection Deprecated Logical Number Operations
+
+This older function is still available, but we
+recommend using the R6RS-compatible function.
 
 @deffn Procedure bit-extract n start end
 Equivalent to @code{(bitwise-bit-field @var{n} @var{start} @var{end})}.

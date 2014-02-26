@@ -1,3 +1,10 @@
+2014-02-22  Jamison Hope  <jrh@theptrgroup.com>
+
+	* kawa.texi (Logical Number Operations): New subsection 'SRFI-60
+	Logical Number Operations' documenting the non-R6RS functions in
+	the SRFI.  Many of the functions are moved here from the
+	subsection 'Deprecated Logical Number Operations'.
+
 2014-02-21  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Ideas and tasks): Various updates.

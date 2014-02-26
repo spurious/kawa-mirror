@@ -92,3 +92,47 @@
 			 '|getArguments|
 			 args
 			 0 #'apply)))
+
+(defun funcall (func &rest args)
+  (apply func args))
+
+(defun minusp (x)
+  (< x 0))
+
+(defun plusp (x)
+  (> x 0))
+
+;; ANSI: This should be inclosed in "an implicit block whose name is
+;; the function block name of the function-name or name, as
+;; appropriate." But we don't have support for CL blocks yet.
+(define-syntax flet
+  (syntax-rules ()
+    ((_ ((fname parameters body ...) ...)
+	e ...)
+     (%flet ((fname (lambda parameters body ...)) ...)
+	    e ...))))
+
+(define-syntax labels
+  (syntax-rules ()
+    ((labels ((fname parameters body ...) ...) e ...)
+     (flet ((fname parameters #!void) ...)
+        (set! #'fname (lambda parameters body ...)) ...
+	e ...))))
+
+;; This is a hack. The calling conventions of Kawa will need to
+;; be adjusted to make this conform to ANSI CL.
+;; To wit (t-woo)
+;; (multiple-value-bind (x) (values 1 2 3) (list x)) ;=> <error>. In
+;; fact, passing an improper number of arguments to a continuation
+;; implicitly accepting a single value is undefined in Scheme.
+;;
+;; The workaround of course is to provide superfluous arguments,
+;; (multiple-value-bind (x y z) (values 1 2 3) (list x)) ;=> (1)
+(define-syntax multiple-value-bind
+  (syntax-rules ()
+    ((_ parameters producer body ...)
+     (call-with-values (lambda () producer)
+       (lambda parameters body ...)))))
+
+(defun floor (number &optional (divisor 1))
+  (values (div number divisor) (remainder number divisor)))

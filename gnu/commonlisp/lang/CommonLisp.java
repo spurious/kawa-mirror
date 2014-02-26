@@ -219,6 +219,13 @@ public class CommonLisp extends Lisp2
     defProcStFld("member", "gnu.commonlisp.lisp.primitives");
     defProcStFld("complement", "gnu.commonlisp.lisp.primitives");
     defProcStFld("apply", "gnu.commonlisp.lisp.primitives");
+    defProcStFld("funcall", "gnu.commonlisp.lisp.primitives");
+    defProcStFld("minusp", "gnu.commonlisp.lisp.primitives");
+    defProcStFld("plusp", "gnu.commonlisp.lisp.primitives");
+    defProcStFld("flet", "gnu.commonlisp.lisp.primitives");
+    defProcStFld("labels", "gnu.commonlisp.lisp.primitives");
+    defProcStFld("multiple-value-bind", "gnu.commonlisp.lisp.primitives");
+    defProcStFld("floor", "gnu.commonlisp.lisp.primitives");
   }
 
   public static CommonLisp getInstance()

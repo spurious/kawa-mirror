@@ -1,3 +1,9 @@
+2014-02-25  Charles Turner  <chturne@gmail.com>
+
+	* PrimOps.scm (flet, apply, funcall): Move to primitives.lisp
+	* primitives.lisp (funcall, minusp, plusp, flet, labels)
+	(multiple-value-bind, floor): New procedures.
+
 2014-02-08  Charles Turner  <chturne@gmail.com>
 
 	* PrimsOps.scm (setcar, setcdr): Remove non-CL symbols.

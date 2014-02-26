@@ -1,3 +1,8 @@
+2014-02-25  Charles Turner  <chturne@gmail.com>
+
+	* CommonLisp.java: Added funcall, minusp, plusp, flet, labels,
+	multiple-value-bind, and floor.
+
 2014-02-08  Charles Turner  <chturne@gmail.com>
 
 	* CommonLisp.java: Added member, apply, complement and eql.

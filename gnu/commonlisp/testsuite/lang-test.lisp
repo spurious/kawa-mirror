@@ -1,4 +1,4 @@
-(test-init "Common Lisp tests" 80)
+(test-init "Common Lisp tests" 87)
 
 (setq y 100)
 (defun foo1 (x)
@@ -141,3 +141,26 @@
 (test 7 'apply-3 (apply #'max 3 5 '(2 7 3)))
 (test '((+ 2 3) . 4) 'apply-4 (apply 'cons '((+ 2 3) 4)))
 (test 0 'apply-5 (apply #'+ '()))
+
+(defun recursive-times (k n)
+  (labels ((temp (n)
+	     (if (zerop n) 0 (+ k (temp (1- n))))))
+    (temp n)))
+
+(test 6 'labels-1 (recursive-times 2 3))
+
+(multiple-value-bind (f r) (floor 3/2)
+  (test '(1 1/2) 'floor-1 (list f r)))
+(multiple-value-bind (f r) (floor 3 2)
+  (test '(1 1) 'floor-2 (list f r)))
+(multiple-value-bind (f r) (floor 5 2)
+  (test '(2 1) 'floor-3 (list f r)))
+(multiple-value-bind (f r) (floor (/ 5 2))
+  (test '(2 1/2) 'floor-4 (list f r)))
+
+(test '(1) 'multiple-value-bind-1
+      (multiple-value-bind (x y z) (values 1 2 3) (list x)))
+(test '(11 9) 'multiple-value-bind-2
+      (multiple-value-bind (f r)
+	  (floor 130 11)
+	(list f r)))

@@ -70,7 +70,6 @@ abstract public class Syntax implements Printable, Named
   /** Check if a statement is a definition, for initial pass.
    * Semi-deprecated - should convert calls to use scanForm.
    * @param st the statement to check
-   * @param forms where to append the (possibly-modified) statement
    * @param defs where to add Declarations for found definitions
    * @param tr the compilation state
    * @return true on success

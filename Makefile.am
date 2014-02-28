@@ -132,6 +132,7 @@ EXTRA_DIST = debian/control debian/rules debian/changelog debian/dirs \
 MOSTLYCLEANFILES = tmp* *.o bin/*.o *.stamp classes.list classes-rt.list
 CLEANFILES = *.jar bin/qexo bin/kawa.sh kawa/Version.java bin/kawa.bat $(META_ScriptEngineFactory)
 DISTCLEANFILES = selected-java-source
+MAINTAINERCLEANFILES = $(srcdir)/patch-source-list
 
 HTML_HOME = $$HOME/public_html
 JAVADOC_DIR = $$HOME/Kawa/api
@@ -271,7 +272,7 @@ selected-java-source: Makefile
 	else echo Unrecognized JAVA_SOURCE: $(JAVA_SOURCE); exit 1; \
 	fi
 
-$(srcdir)/patch-source-list:
+$(srcdir)/patch-source-list: $(top_srcdir)/configure
 	(cd $(srcdir); \
 	$(FIND) . -name '*.java' -exec grep -lE ' #endif ' '{}' ';') \
 	  | sed -e 's|./||' | sort > $@

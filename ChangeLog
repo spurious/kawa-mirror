@@ -1,3 +1,8 @@
+2014-02-27  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (patch-source-list): Add dependency on configure.
+	(MAINTAINERCLEANFILES): New macro, bound to patch-source-list.
+
 2014-02-20  Per Bothner  <per@bothner.com>
 
 	* configure.ac: Add missing AC_CANONICAL_HOST.

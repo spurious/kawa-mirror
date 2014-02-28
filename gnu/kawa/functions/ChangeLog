@@ -1,3 +1,8 @@
+2014-02-28  Per Bothner  <per@bothner.com>
+
+	* FileUtils.java: Removed class.
+	(createTempFile): Inlined into make-temporary-file in files.scm.
+
 2014-02-16  Per Bothner  <per@bothner.com>
 
 	* CallCC.java: Make sure Error is uncaught or re-thrown.

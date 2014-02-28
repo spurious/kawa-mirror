@@ -141,6 +141,15 @@
   (base:resolve uri))
 
 ; From MzLib.  Scsh has (create-temp-file [prefix]).
-(define (make-temporary-file #!optional (fmt :: <string> "kawa~d.tmp"))
+(define (make-temporary-file #!optional (format :: <string> "kawa~d.tmp"))
   :: filepath
-  (filepath (gnu.kawa.functions.FileUtils:createTempFile (fmt:toString))))
+  (let* ((fmt (format:toString))
+         (tilde (fmt:indexOf #\~))
+         (prefix::java.lang.String (if (< tilde 0) fmt (fmt:substring 0 tilde)))
+         (suffix (if (< tilde 0) ".tmp" (fmt:substring (+ 2 tilde))))
+         (sep (prefix:indexOf java.io.File:separatorChar))
+         (directory #!null))
+    (cond ((>= sep 0)
+           (set! directory (java.io.File (prefix:substring 0 sep)))
+           (set! prefix (prefix:substring (+ sep 1)))))
+    (java.io.File:createTempFile prefix suffix directory)))

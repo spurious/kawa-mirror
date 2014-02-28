@@ -1,3 +1,8 @@
+2014-02-28  Per Bothner  <per@bothner.com>
+
+	* files.scm (make-temporary-file): Translated Java code from
+	FileUtils#createTempFile to Scheme and inlined it.
+
 2014-02-23  Per Bothner  <per@bothner.com>
 
 	* exceptions.scm (file-error?): Also match InvalidPathException.

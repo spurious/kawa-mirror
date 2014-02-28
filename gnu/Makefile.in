@@ -314,7 +314,6 @@ GNU_KAWA_FUNCTIONS_JSOURCES = \
   kawa/functions/Curry1.java \
   kawa/functions/DisplayFormat.java \
   kawa/functions/DivideOp.java \
-  kawa/functions/FileUtils.java \
   kawa/functions/GetModuleClass.java \
   kawa/functions/GetNamedInstancePart.java \
   kawa/functions/GetNamedPart.java \

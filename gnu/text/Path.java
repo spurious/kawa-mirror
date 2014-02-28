@@ -17,12 +17,17 @@ public abstract class Path
 implements javax.tools.FileObject
 /* #endif */
 {
-  /** This is equivalent to the System {@code "user.dir"} property.
-   * However, the getProperty is tracked dynamically and resolved
-   * as needed.  */
-  public static final FilePath userDirPath =
-    FilePath.valueOf(new File("."));
+    /** This is equivalent to the System {@code "user.dir"} property.
+     * It is the initial (default) value of pathLocalation.
+     */
+    public static final FilePath userDirPath =
+        FilePath.valueOf(System.getProperty("user.dir"));
 
+    /** This is the current default path.
+     * The initial value matches the {@code "user.dir"} property.
+     * If a relative path is made absolute, it is resolved
+     * relative to the current path.
+     */
     public final static ThreadLocal<Path> pathLocation
         = new InheritableThreadLocal<Path>() {
         @Override

@@ -165,7 +165,6 @@ implements javax.tools.FileObject
   }
 
     /** Delete file - for compatibility with FileObject. */
-    @Override
     public boolean delete() {
         try {
             deleteFile();

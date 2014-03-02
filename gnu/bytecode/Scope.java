@@ -2,7 +2,7 @@
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.bytecode;
-
+import java.util.HashMap;
 public class Scope
 {
   /** The enclosing scope. */
@@ -105,6 +105,26 @@ public class Scope
       var = var.next;
     return var;
   }
+
+    /** Fix duplicate names.
+     * This is needed for Android, since otherwise dex complains.
+     */
+    public void fixParamNames(HashMap<String,Variable> map) {
+        for (Variable var = firstVar();  var != null;
+             var = var.nextVar()) {
+            String name = var.getName();
+            if (name != null) {
+                String xname = name;
+                Variable old;
+                for (int i = 0; (old = map.get(xname)) != null;  i++)
+                    xname = name + '$' + i;
+                if (name != xname)
+                    var.setName(xname);
+                map.put(xname, var);
+            }
+        }
+    }
+
 
   static boolean equals (byte[] name1, byte[] name2) {
     if (name1.length != name2.length)

@@ -605,7 +605,10 @@ public class LambdaExp extends ScopeExp
 	    && (getCallConvention() < Compilation.CALL_WITH_TAILCALLS
 		|| isModuleBody() || isClassMethod() || isHandlingTailCalls()))
 	  code.emitReturn();
+        HashMap<String,Variable> varMap = new HashMap<String,Variable>();
+        code.getCurrentScope().fixParamNames(varMap);
 	popScope(code);        // Undoes enterScope in allocParameters
+        code.getCurrentScope().fixParamNames(varMap);
         code.popScope(); // Undoes pushScope in method.initCode.
       }
 

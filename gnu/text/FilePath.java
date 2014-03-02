@@ -102,22 +102,20 @@ public class FilePath
     return this == Path.userDirPath || file.isAbsolute();
   }
 
-  public boolean isDirectory ()
-  {
-    if (file.isDirectory())
-      return true;
-    if (! file.exists())
-      {
+    /** Does this path represent a directory?
+     * It is assumed to be a directory if the path ends with '/'
+     * or File.separatorChar - or if the file exists and is a directory.
+     */
+    @Override
+    public boolean isDirectory() {
         int len = path.length();
-        if (len > 0)
-          {
+        if (len > 0) {
             char last = path.charAt(len - 1);
             if (last == '/' || last == File.separatorChar)
-              return true;
-          }
-      }
-    return false;
-  }
+                return true;
+        }
+        return toFile().isDirectory();
+    }
 
     @Override
     public void deleteFile() throws IOException {
@@ -227,32 +225,24 @@ public class FilePath
       }
   }
 
-  private static URI toUri (File file)
-  {
-    try
-      {
-        if (file.isAbsolute())
-          return file.toURI();
-        /* We don't want to just use File.toURI(),
-           because that turns a relative File into an absolute URI. */
-        String fname = file.toString();
-        char fileSep = File.separatorChar;
-        if (fileSep != '/')
-          fname = fname.replace(fileSep, '/');
-        return new URI(null, null, fname, null);
+  public URI toUri() {
+      try {
+          if (file.isAbsolute())
+              return file.toURI();
+          /* We don't want to just use File.toURI(),
+             because that turns a relative File into an absolute URI. */
+          String fname = path;
+          char fileSep = File.separatorChar;
+          if (fileSep != '/')
+              fname = fname.replace(fileSep, '/');
+          int len = fname.length();
+          if (len > 0 && fname.charAt(len-1) != '/'
+              && isDirectory())
+              fname = fname + '/';
+          return new URI(null, null, fname, null);
+      } catch (Exception ex) {
+          throw WrappedException.wrapIfNeeded(ex);
       }
-    catch (Exception ex)
-      {
-        throw WrappedException.wrapIfNeeded(ex);
-      }
-
-  }
-
-  public URI toUri ()
-  {
-    if (this == Path.userDirPath)
-      return resolve("").toURI();
-    return toUri(file);
   }
 
   public InputStream openInputStream () throws IOException
@@ -274,19 +264,14 @@ public class FilePath
   {
     if (Path.uriSchemeSpecified(relative))
       return URLPath.valueOf(relative);
-    File rfile = new File(relative);
-    if (rfile.isAbsolute())
-      return FilePath.valueOf(rfile);
+    URI uri = toUri().resolve(relative);
+    if (uri.isAbsolute())
+        return FilePath.valueOf(new File(uri));
+    String ustr = uri.toString();
     char sep = File.separatorChar;
     if (sep != '/')
-      relative = relative.replace('/', sep);
-    // FIXME? Or: if (file.getPath().length() == 0) return relative;
-    File nfile;
-    if (this == Path.userDirPath)
-      nfile = new File(System.getProperty("user.dir"), relative);
-    else
-      nfile = new File(isDirectory() ? file : file.getParentFile(), relative);
-    return valueOf(nfile);
+        ustr = ustr.replace('/', sep);
+    return new FilePath(new File(ustr));
   }
 
   public Path getCanonical ()

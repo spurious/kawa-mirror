@@ -9040,7 +9040,7 @@ as if using the @code{path} function below.  For example:
 @deffn Type path
 A general path, which can be a @code{filename} or a @code{URI}.
 It can be either a @code{filename} or a @code{URI}.
-Represented using the abstract Java class @code{java.text.Path}.
+Represented using the abstract Java class @code{gnu.text.Path}.
 
 Coercing a value to a @code{Path} is equivalent to
 calling the @code{path} constructor documented below.
@@ -15488,6 +15488,38 @@ The Kawa compiler currently uses reflection to determine properties
 It would be better to read class files.
 This should not be too difficult, since the @code{gnu.bytecode} library
 abstracts over class information read by reflection or class reading.
+
+@subsection Mutually dependent Java and Scheme modules
+
+We'd like a command for compiling compile a list of Java and Scheme
+source files thar may have mutual dependencies.  A good way
+to do this is to hook into @code{javac}, which is quite extensible
+and pluggable.
+
+One could do something like:
+@enumerate
+@item
+Read the "header" of each Kawa source file, to determine the
+name of the generated main class.
+@item
+Enter these class names into the javac tables as ``uncompleted''
+classes.
+@item
+Start compiling the Java files.  When this requires the members
+of the of the Kawa classes, switch to the Kawa files.  From javac,
+treat these as pre-compiled .class files.  I.e. we treat the Kawa
+compiler as a black box that produces Symbols in the same way as
+reading class files.  At this point we should only need to the
+initial ``scan'' phase on Kawa.
+@item
+If necessary, finish compiling remaining Kawa files.
+@end enumerate
+
+This approach may not immediately provide as robust mixed-language
+support as ideal, but it is more amenable to incremental improvement
+that a standalone stub-generator.
+
+This project is good if you know or want to learn how @code{javac} works.
 
 @subsection Make use of Java-7 MethodHandles
 Java 7 supports MethodHandles which are meant to provide better

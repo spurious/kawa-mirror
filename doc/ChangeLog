@@ -1,3 +1,9 @@
+2014-03-04  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Ideas and tasks): New idea for multi-langauge compilation.
+
+	* kawa.texi (Paths): Fix error.
+
 2014-02-22  Jamison Hope  <jrh@theptrgroup.com>
 
 	* kawa.texi (Logical Number Operations): New subsection 'SRFI-60

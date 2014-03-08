@@ -67,15 +67,22 @@
   (lambda (p ::path) ::bytevector name: 'path-bytes
           (gnu.lists.U8Vector (p:readAllBytes))))
 
+(define (path-data-setter (p ::path) newvalue)::void
+  (let ((out (p:openOutputStream))
+        (in (gnu.kawa.functions.RunProcess:getInputStreamFrom newvalue)))
+    (gnu.kawa.functions.RunProcess:copyStream in out #t)))
+
 (define-procedure path-data
-  setter: (lambda ((p ::path) newvalue)::void
-                  (let ((out (p:openOutputStream))
-                        (in (gnu.kawa.functions.RunProcess:getInputStreamFrom newvalue)))
-                    (gnu.kawa.functions.RunProcess:copyStream in out #t)))
+  setter: path-data-setter
   (lambda (p ::path) ::gnu.lists.Blob name: 'path-data
            (gnu.lists.Blob (p:readAllBytes))))
 
+(define-syntax path-data-setter-curried
+  (syntax-rules ()
+    ((_ p) (lambda (newvalue) ::void (path-data-setter p newvalue)))))
+
 (define-simple-constructor PD path-data $string$)
+(define-simple-constructor set_PD path-data-setter-curried $string$)
 
 (define (file-exists? (file :: path)) :: <boolean>
   (file:exists))

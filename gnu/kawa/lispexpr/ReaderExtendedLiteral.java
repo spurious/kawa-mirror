@@ -376,7 +376,7 @@ public class ReaderExtendedLiteral extends ReaderConstituent {
                     break;
                 }
             }
-        } else if (next == '`' || next == '<') {
+        } else if (next == '`' || next == '<' || next == '>') {
             int nextnext = reader.peek();
             if (nextnext == '{' || nextnext == '[') {
                 reader.tokenBufferAppend(next);

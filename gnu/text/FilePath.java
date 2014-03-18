@@ -61,46 +61,48 @@ public class FilePath
     return new FilePath(new File(str), orig);
   }
 
-  public static FilePath valueOf (File file)
-  {
-    return new FilePath(file);
-  }
+    public static FilePath valueOf(File file) {
+        return new FilePath(file);
+    }
 
-  public static FilePath coerceToFilePathOrNull (Object path)
-  {
-    if (path instanceof FilePath)
-      return (FilePath) path;
-    if (path instanceof URIPath)
-      return FilePath.valueOf(new File(((URIPath) path).uri));
-    /*
-    if (path instanceof URL)
-      return URLPath.valueOf((URL) path);
-    */
-    /* #ifdef use:java.net.URI */
-    if (path instanceof URI)
-      return FilePath.valueOf(new File((URI) path));
-    /* #endif */
-    if (path instanceof File)
-      return FilePath.valueOf((File) path);
-    String str;
-    if (path instanceof CharSequence) // FIXME: || UntypedAtomic
-      str = path.toString();
-    else
-      return null;
-    return FilePath.valueOf(str);
-  }
-  public static FilePath makeFilePath (Object arg)
-  {
-    FilePath path = coerceToFilePathOrNull(arg);
-    if (path == null)
-      throw new WrongType((String) null, WrongType.ARG_CAST, arg, "filepath");
-    return path;
-  }
+    public static FilePath valueOf(URI uri) {
+        if (uri.isAbsolute())
+            return FilePath.valueOf(new File(uri));
+        String ustr = uri.toString();
+        char sep = File.separatorChar;
+        if (sep != '/')
+            ustr = ustr.replace('/', sep);
+        return new FilePath(new File(ustr));
+    }
 
-  public boolean isAbsolute ()
-  {
-    return this == Path.userDirPath || file.isAbsolute();
-  }
+    public static FilePath coerceToFilePathOrNull(Object path) {
+        if (path instanceof FilePath)
+            return (FilePath) path;
+        if (path instanceof URIPath)
+            path = ((URIPath) path).uri;
+        if (path instanceof URI)
+            return FilePath.valueOf((URI) path);
+        if (path instanceof File)
+            return FilePath.valueOf((File) path);
+        String str;
+        if (path instanceof CharSequence) // FIXME: || UntypedAtomic
+            str = path.toString();
+        else
+            return null;
+        return FilePath.valueOf(str);
+    }
+
+    public static FilePath makeFilePath(Object arg) {
+        FilePath path = coerceToFilePathOrNull(arg);
+        if (path == null)
+            throw new WrongType((String) null, WrongType.ARG_CAST,
+                                arg, "filepath");
+        return path;
+    }
+
+    public boolean isAbsolute() {
+        return this == Path.userDirPath || file.isAbsolute();
+    }
 
     /** Does this path represent a directory?
      * It is assumed to be a directory if the path ends with '/'
@@ -129,18 +131,19 @@ public class FilePath
 
   public long getLastModified ()
   {
-    return file.lastModified();
+    return toFile().lastModified();
   }
 
   public boolean exists ()
   {
-    return file.exists();
+    return toFile().exists();
   }
 
   public long getContentLength ()
   {
-    long length = file.length();
-    return length == 0 && ! file.exists() ? -1 : length;
+    File f = toFile();
+    long length = f.length();
+    return length == 0 && ! f.exists() ? -1 : length;
   }
  
   public String getPath ()
@@ -245,34 +248,27 @@ public class FilePath
       }
   }
 
-  public InputStream openInputStream () throws IOException
-  {
-    return new FileInputStream(file);
-  }
+    public InputStream openInputStream() throws IOException {
+        return new FileInputStream(toFile());
+    }
 
-  public OutputStream openOutputStream () throws IOException
-  {
-    return new FileOutputStream(file);
-  }
+    public OutputStream openOutputStream() throws IOException {
+        return new FileOutputStream(toFile());
+    }
 
-  public String getScheme ()
-  {
-    return isAbsolute() ? "file" : null;
-  }
+    public OutputStream openAppendStream() throws IOException {
+        return new FileOutputStream(toFile(), true);
+    }
 
-  public Path resolve (String relative)
-  {
-    if (Path.uriSchemeSpecified(relative))
-      return URLPath.valueOf(relative);
-    URI uri = toUri().resolve(relative);
-    if (uri.isAbsolute())
-        return FilePath.valueOf(new File(uri));
-    String ustr = uri.toString();
-    char sep = File.separatorChar;
-    if (sep != '/')
-        ustr = ustr.replace('/', sep);
-    return new FilePath(new File(ustr));
-  }
+    public String getScheme() {
+        return isAbsolute() ? "file" : null;
+    }
+
+    public Path resolve(String relative) {
+        if (Path.uriSchemeSpecified(relative))
+            return URLPath.valueOf(relative);
+        return valueOf(toUri().resolve(relative));
+    }
 
   public Path getCanonical ()
   {

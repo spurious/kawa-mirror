@@ -7,15 +7,17 @@ import java.nio.*;
 
 public class NBufferedInputStream extends InputStream {
     InputStream base;
-    byte[] barr = new byte[8192];
+    byte[] barr;
     ByteBuffer bbuf;
 
     public NBufferedInputStream(InputStream base) {
         this.base = base;
+        barr = new byte[8192];
         bbuf = ByteBuffer.wrap(barr, 0, 0);
     }
 
     public NBufferedInputStream(byte[] buffer, int length) {
+        barr = buffer;
         bbuf = ByteBuffer.wrap(buffer, 0, length);
     }
 

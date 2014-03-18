@@ -2,8 +2,8 @@ package kawa;
 import gnu.expr.*;
 import gnu.mapping.*;
 import gnu.kawa.io.OutPort;
+import gnu.kawa.io.FilePath;
 import gnu.kawa.io.TtyInPort;
-import gnu.text.*;
 
 public class TelnetRepl extends Procedure0
 {

@@ -2,7 +2,10 @@ package gnu.kawa.functions;
 import gnu.bytecode.*;
 import gnu.mapping.*;
 import gnu.expr.*;
-import gnu.text.*;
+import gnu.kawa.io.Path;
+import gnu.kawa.io.URLPath;
+import java.net.URL;
+import gnu.text.ResourceStreamHandler;
 
 /** Special procedure to get the Class of the current module.
  * Since "current module" is defined by lexical scope,
@@ -29,8 +32,10 @@ public class GetModuleClass extends ProcedureN
   public static final GetModuleClass getModuleUriDummy
     = new GetModuleClass();
 
-  static final ClassType typeURLPath = ClassType.make("gnu.text.URLPath");
-  static final Method maker = typeURLPath.getDeclaredMethod("classResourcePath", 1);
+  static final ClassType typeURLPath = ClassType.make("gnu.kawa.io.URLPath");
+    static final Method maker =
+        ClassType.make("gnu.kawa.functions.GetModuleClass")
+        .getDeclaredMethod("classResourcePath", 1);
 
   public Object applyN (Object[] args)
   {
@@ -110,4 +115,24 @@ public class GetModuleClass extends ProcedureN
     else
       return new ApplyExp(getModuleUriDummy, ref);
   }
+
+    public static URLPath classResourcePath(Class clas) {
+        URL url;
+        try {
+            try {
+                // This throws a SecurityException in the applet case.
+                url = ResourceStreamHandler.makeURL(clas);
+            } catch (SecurityException ex) {
+                // The following assumes we have an actual .class file
+                // (possibly inside a .jar) available in the classpath.
+                // That would be the case in a normal Java environment,
+                // though not (for example) on Android.
+                String classFileName = clas.getName().replace('.', '/')+".class";
+                url = clas.getClassLoader().getResource(classFileName);
+            }
+        } catch (Exception ex) {
+            throw WrappedException.wrapIfNeeded(ex);
+        }
+        return URLPath.valueOf(url);
+    }
 }

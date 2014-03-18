@@ -4,9 +4,10 @@
 package gnu.xml;
 import gnu.lists.*;
 import gnu.mapping.*;
-import gnu.text.*;
 import gnu.kawa.xml.KNode;
 import gnu.kawa.io.CharArrayOutPort;
+import gnu.kawa.io.Path;
+import gnu.kawa.io.URIPath;
 import gnu.xml.XName;
 import gnu.kawa.xml.UntypedAtomic;  // FIXME - bad cross-package dependency.
 import gnu.kawa.xml.ElementType; // FIXME - bad cross-package dependency.

@@ -1,3 +1,7 @@
+2014-03-18  Per Bothner  <per@bothner.com>
+
+	* GetModuleClass.java (classResourcePath): Moved from URLPath.java.
+
 2014-02-28  Per Bothner  <per@bothner.com>
 
 	* FileUtils.java: Removed class.

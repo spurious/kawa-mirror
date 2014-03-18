@@ -3,16 +3,20 @@ package kawa;
 import gnu.mapping.*;
 import gnu.expr.*;
 import java.io.*;
-import gnu.text.*;
 import gnu.lists.*;
 import gnu.bytecode.ArrayClassLoader;
 import gnu.bytecode.ZipLoader;
 import gnu.kawa.io.BinaryInPort;
+import gnu.kawa.io.FilePath;
 import gnu.kawa.io.InPort;
 import gnu.kawa.io.NBufferedInputStream;
 import gnu.kawa.io.OutPort;
+import gnu.kawa.io.Path;
 import gnu.kawa.io.TtyInPort;
 import gnu.kawa.util.ExitCalled;
+import gnu.text.Lexer;
+import gnu.text.SourceMessages;
+import gnu.text.SyntaxException;
 import java.net.URL;
 
 /** Utility functions (static methods) for kawa.repl.

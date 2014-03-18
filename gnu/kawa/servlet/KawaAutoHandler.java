@@ -4,8 +4,11 @@
 package gnu.kawa.servlet;
 import gnu.expr.*;
 import gnu.kawa.io.InPort;
+import gnu.kawa.io.Path;
+import gnu.kawa.io.URLPath;
 import gnu.mapping.*;
-import gnu.text.*;
+import gnu.text.SourceMessages;
+import gnu.text.SyntaxException;
 import java.io.*;
 import java.net.*;
 import java.util.*;

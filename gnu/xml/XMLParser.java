@@ -2,9 +2,9 @@ package gnu.xml;
 import java.io.*;
 import gnu.text.*;
 import gnu.lists.*;
-import gnu.text.Path;
 import gnu.kawa.io.BinaryInPort;
 import gnu.kawa.io.InPort;
+import gnu.kawa.io.Path;
 
 /** Reads XML from a char array.
  * Assumes a state-less character encoding containing ascii as a sub-set,

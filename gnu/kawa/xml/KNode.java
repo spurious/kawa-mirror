@@ -3,13 +3,13 @@
 
 package gnu.kawa.xml;
 import gnu.kawa.io.CharArrayOutPort;
+import gnu.kawa.io.Path;
 import gnu.lists.*;
 import gnu.xml.*;
 /* #ifdef use:org.w3c.dom.Node */
 import org.w3c.dom.*;
 /* #endif */
 import gnu.mapping.*;
-import gnu.text.Path;
 
 public abstract class KNode extends SeqPosition<Object,NodeTree>
   implements

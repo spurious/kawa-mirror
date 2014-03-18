@@ -2,10 +2,12 @@ package gnu.expr;
 import gnu.mapping.*;
 import gnu.bytecode.*;
 import gnu.mapping.Location; // As opposed to gnu.bytecode.Location
-import gnu.text.*;
 import gnu.kawa.io.OutPort;
+import gnu.kawa.io.Path;
 import gnu.kawa.reflect.StaticFieldLocation;
 import gnu.kawa.reflect.FieldLocation;
+import gnu.text.SourceMessages;
+import gnu.text.SyntaxException;
 import java.io.*;
 import java.net.URL;
 

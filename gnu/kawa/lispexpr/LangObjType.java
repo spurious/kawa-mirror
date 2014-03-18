@@ -3,7 +3,9 @@ import gnu.bytecode.*;
 import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.math.*;
-import gnu.text.*;
+import gnu.kawa.io.FilePath;
+import gnu.kawa.io.Path;
+import gnu.kawa.io.URIPath;
 import gnu.kawa.functions.Arithmetic;
 import gnu.kawa.functions.LProcess;
 import gnu.kawa.reflect.Invoke;
@@ -50,13 +52,13 @@ public class LangObjType extends ObjectType implements TypeValue
   private static final int PROMISE_TYPE_CODE = 28;
 
   public static final LangObjType pathType =
-    new LangObjType("path", "gnu.text.Path",
+    new LangObjType("path", "gnu.kawa.io.Path",
                     PATH_TYPE_CODE);
   public static final LangObjType filepathType =
-    new LangObjType("filepath", "gnu.text.FilePath",
+    new LangObjType("filepath", "gnu.kawa.io.FilePath",
                     FILEPATH_TYPE_CODE);
   public static final LangObjType URIType =
-    new LangObjType("URI", "gnu.text.URIPath",
+    new LangObjType("URI", "gnu.kawa.io.URIPath",
                     URI_TYPE_CODE);
 
   public static final LangObjType typeClass =
@@ -732,11 +734,11 @@ public class LangObjType extends ObjectType implements TypeValue
     switch (typeCode)
       {
       case PATH_TYPE_CODE:
-        return new PrimProcedure("gnu.text.Path", "valueOf", 1);
+        return new PrimProcedure("gnu.kawa.io.Path", "valueOf", 1);
       case FILEPATH_TYPE_CODE:
-        return new PrimProcedure("gnu.text.FilePath", "makeFilePath", 1);
+        return new PrimProcedure("gnu.kawa.io.FilePath", "makeFilePath", 1);
       case URI_TYPE_CODE:
-        return new PrimProcedure("gnu.text.URIPath", "makeURI", 1);
+        return new PrimProcedure("gnu.kawa.io.URIPath", "makeURI", 1);
       case VECTOR_TYPE_CODE:
         return new PrimProcedure("gnu.lists.FVector", "make", 1);
       case U8VECTOR_TYPE_CODE:

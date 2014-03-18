@@ -9,7 +9,7 @@ import gnu.xml.*;
 import java.io.*;
 import java.util.*;
 import java.net.*;
-import gnu.text.Path;
+import gnu.kawa.io.Path;
 
 /** Generic HttpServlet wrapper that support the Kawa web page script APIs. */
 

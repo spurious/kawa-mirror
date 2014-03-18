@@ -4,10 +4,11 @@
 package gnu.jemacs.buffer;
 import java.io.*;
 import gnu.kawa.io.InPort;
+import gnu.kawa.io.Path;
 import gnu.mapping.*;
 import gnu.lists.*;
-import gnu.text.*;
 import gnu.commonlisp.lang.Symbols; // FIXME
+import gnu.text.Char;
 
 public abstract class Buffer extends AbstractSequence implements CharSeq
 {

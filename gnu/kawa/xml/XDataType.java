@@ -9,10 +9,10 @@ import gnu.expr.*;
 import gnu.text.Printable;
 import gnu.math.*;
 import java.math.BigDecimal;
+import gnu.kawa.io.URIPath;
 import gnu.lists.SeqPosition;
 import gnu.lists.Consumer;
 import gnu.xml.TextUtils;
-import gnu.text.URIPath;
 
 /** An atomic type as used in XML Schema and related languages.
  * For example the {code xs:decimal} type is {@code XDataType.decimalType}.
@@ -141,7 +141,7 @@ public class XDataType extends Type implements TypeValue
                   BOOLEAN_TYPE_CODE);
 
   public static final XDataType anyURIType =
-    new XDataType("anyURI", ClassType.make("gnu.text.Path"), ANY_URI_TYPE_CODE);
+    new XDataType("anyURI", ClassType.make("gnu.kawa.io.Path"), ANY_URI_TYPE_CODE);
 
   public static final XDataType NotationType =
     new XDataType("NOTATION",
@@ -271,7 +271,7 @@ public class XDataType extends Type implements TypeValue
       case UNTYPED_ATOMIC_TYPE_CODE:
         return obj instanceof gnu.kawa.xml.UntypedAtomic;
       case ANY_URI_TYPE_CODE:
-        return obj instanceof gnu.text.Path;
+        return obj instanceof gnu.kawa.io.Path;
       case BOOLEAN_TYPE_CODE:
         return obj instanceof java.lang.Boolean;
       case FLOAT_TYPE_CODE:

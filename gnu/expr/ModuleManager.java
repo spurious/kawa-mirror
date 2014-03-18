@@ -1,8 +1,9 @@
 package gnu.expr;
 import java.net.*;
+import gnu.kawa.io.Path;
+import gnu.kawa.io.URLPath;
 import gnu.mapping.WrappedException;
 import gnu.bytecode.ClassType;
-import gnu.text.*;
 
 /** A database of known modules as represented by {@link ModuleInfo}.
  * Currently there is only a single global instance of {@code ModuleManager};

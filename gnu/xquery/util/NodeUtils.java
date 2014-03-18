@@ -4,13 +4,13 @@
 package gnu.xquery.util;
 import gnu.mapping.*;
 import gnu.xml.*;
+import gnu.kawa.io.Path;
 import gnu.kawa.xml.*;
 import gnu.lists.*;
 import java.util.Stack;
 import java.net.*;
 import gnu.bytecode.ClassType;
 import gnu.xquery.lang.XQuery;
-import gnu.text.Path;
 
 public class NodeUtils
 {

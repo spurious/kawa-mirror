@@ -3,8 +3,8 @@ import gnu.mapping.*;
 import gnu.expr.Language;
 import gnu.kawa.io.InPort;
 import gnu.kawa.io.OutPort;
+import gnu.kawa.io.Path;
 import gnu.kawa.io.TtyInPort;
-import gnu.text.*;
 import java.io.*;
 
 public class ReplMode extends ProcessMode

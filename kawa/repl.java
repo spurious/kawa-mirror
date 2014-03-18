@@ -5,7 +5,6 @@ import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.text.SourceMessages;
 import gnu.text.SyntaxException;
-import gnu.text.Path;
 import gnu.lists.*;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,6 +14,7 @@ import gnu.kawa.servlet.HttpRequestContext;
 import gnu.kawa.io.CharArrayInPort;
 import gnu.kawa.io.InPort;
 import gnu.kawa.io.OutPort;
+import gnu.kawa.io.Path;
 import gnu.kawa.io.WriterManager;
 import gnu.kawa.util.ExitCalled;
 

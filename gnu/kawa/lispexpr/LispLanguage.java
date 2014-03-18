@@ -4,12 +4,13 @@
 package gnu.kawa.lispexpr;
 import gnu.expr.*;
 import gnu.mapping.*;
-import gnu.text.*;
 import gnu.lists.*;
 import gnu.bytecode.*;
 import gnu.mapping.EnvironmentKey;
 import gnu.kawa.io.InPort;
 import gnu.kawa.reflect.StaticFieldLocation;
+import gnu.text.Lexer;
+import gnu.text.SourceMessages;
 import java.util.HashMap;
 import kawa.lang.Translator; // FIXME
 import kawa.lang.Syntax; // FIXME
@@ -302,11 +303,11 @@ public abstract class LispLanguage extends Language
             return LangObjType.vectorType;
         if ("gnu.lists.LList".equals(name))
             return LangObjType.listType;
-        if ("gnu.text.Path".equals(name))
+        if ("gnu.kawa.io.Path".equals(name))
             return LangObjType.pathType;
-        if ("gnu.text.URIPath".equals(name))
+        if ("gnu.kawa.io.URIPath".equals(name))
             return LangObjType.URIType;
-        if ("gnu.text.FilePath".equals(name))
+        if ("gnu.kawa.io.FilePath".equals(name))
             return LangObjType.filepathType;
         if ("java.lang.Class".equals(name))
             return LangObjType.typeClass;

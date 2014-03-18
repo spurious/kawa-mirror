@@ -2,17 +2,19 @@
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.xquery.util;
+
 import gnu.lists.*;
 import gnu.math.*;
 import gnu.mapping.*;
 import gnu.xml.TextUtils;
+import gnu.kawa.io.Path;
+import gnu.kawa.io.URIPath;
 import gnu.kawa.xml.KNode;
 import gnu.kawa.xml.UntypedAtomic;
 /* #ifdef use:java.util.regex */
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 /* #endif */
-import gnu.text.*;
 /* #ifdef use:java.text.Normalizer */
 import java.text.Normalizer;
 /* #endif */

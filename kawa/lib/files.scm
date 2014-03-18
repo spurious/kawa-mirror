@@ -5,11 +5,11 @@
 (require <kawa.lib.ports>)
 
 (define (path? path) :: <boolean>
-  (instance? path <gnu.text.Path>))
+  (instance? path gnu.kawa.io.Path))
 (define (filepath? path) :: <boolean>
-  (instance? path <gnu.text.FilePath>))
+  (instance? path gnu.kawa.io.FilePath))
 (define (URI? path) :: <boolean>
-  (instance? path <gnu.text.URIPath>))
+  (instance? path gnu.kawa.io.URIPath))
 (define (absolute-path? (path :: path)) :: <boolean>
   (path:isAbsolute))
 (define (path-scheme (p :: path))

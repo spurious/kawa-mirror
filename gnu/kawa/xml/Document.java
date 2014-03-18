@@ -2,13 +2,15 @@
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.kawa.xml;
+import gnu.kawa.io.Path;
 import gnu.mapping.*;
 import gnu.lists.*;
+import gnu.text.SourceMessages;
+import gnu.text.SyntaxException;
 import gnu.xml.*;
 import java.net.URL;
 import java.lang.ref.*;
 import java.util.*;
-import gnu.text.*;
 
 /** Implement the XQuery function 'document'. */
 

@@ -7,13 +7,17 @@ import gnu.mapping.*;
 import java.util.*;
 import java.io.*;
 import kawa.Shell;
-import gnu.text.*;
 import java.util.zip.*;
 import java.util.Stack;
 import gnu.kawa.functions.Convert;
 import gnu.kawa.io.OutPort;
+import gnu.kawa.io.Path;
 import gnu.kawa.reflect.LazyType;
 import gnu.lists.Pair;
+import gnu.text.Lexer;
+import gnu.text.Options;
+import gnu.text.SourceLocator;
+import gnu.text.SourceMessages;
 import kawa.lang.Translator.FormStack;
 
 /** State for a single expression or module.

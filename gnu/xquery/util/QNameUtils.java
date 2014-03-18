@@ -1,8 +1,10 @@
 package gnu.xquery.util;
+
+import gnu.kawa.io.Path;
+import gnu.kawa.io.URIPath;
+import gnu.kawa.xml.*;
 import gnu.mapping.*;
 import gnu.xml.*;
-import gnu.kawa.xml.*;
-import gnu.text.*;
 
 public class QNameUtils
 {

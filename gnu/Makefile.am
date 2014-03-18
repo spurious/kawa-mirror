@@ -5,14 +5,18 @@ GNU_KAWA_IO_JSOURCES = \
   kawa/io/BinaryOutPort.java \
   kawa/io/CharArrayInPort.java \
   kawa/io/CharArrayOutPort.java \
+  kawa/io/FilePath.java \
   kawa/io/InPort.java \
   kawa/io/LogWriter.java \
   kawa/io/NullReader.java \
+  kawa/io/Path.java \
   kawa/io/OutPort.java \
   kawa/io/NBufferedInputStream.java \
   kawa/io/PrettyWriter.java \
   kawa/io/QueueReader.java \
   kawa/io/TtyInPort.java \
+  kawa/io/URIPath.java \
+  kawa/io/URLPath.java \
   kawa/io/WriterManager.java
 
 GNU_KAWA_ECHO2_JSOURCES = \

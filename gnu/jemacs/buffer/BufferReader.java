@@ -3,8 +3,8 @@ import gnu.mapping.*;
 import java.io.*;
 import gnu.kawa.io.InPort;
 import gnu.kawa.io.NullReader;
+import gnu.kawa.io.Path;
 import gnu.lists.CharBuffer;
-import gnu.text.*;
 
 public class BufferReader extends InPort
 {

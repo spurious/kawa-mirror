@@ -5,7 +5,10 @@ import gnu.mapping.*;
 import gnu.kawa.io.CharArrayInPort;
 import gnu.kawa.io.InPort;
 import gnu.kawa.io.OutPort;
-import gnu.text.*;
+import gnu.kawa.io.Path;
+import gnu.text.SourceError;
+import gnu.text.SourceMessages;
+import gnu.text.SyntaxException;
 
 public class KawaScriptEngine extends AbstractScriptEngine
   implements Compilable //, Invocable

@@ -4,7 +4,7 @@
 package gnu.expr;
 import gnu.mapping.*;
 import gnu.bytecode.*;
-import gnu.text.*;
+import gnu.kawa.io.Path;
 import java.util.*;
 import gnu.kawa.util.AbstractWeakHashTable;
 

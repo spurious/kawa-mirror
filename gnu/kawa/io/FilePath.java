@@ -1,7 +1,7 @@
-// Copyright (c) 2007  Per M.A. Bothner.
+// Copyright (c) 2007, 2014  Per M.A. Bothner.
 // This is free software; for terms and warranty disclaimer see ../../COPYING.
 
-package gnu.text;
+package gnu.kawa.io;
 import java.io.*;
 import java.net.*;
 import gnu.mapping.*;

@@ -36,7 +36,7 @@
 (define-syntax resource-url
   (syntax-rules ()
     ((resource-url uri)
-     (gnu.text.URLPath:valueOf
+     (gnu.kawa.io.URLPath:valueOf
       (((((module-uri):resolve uri):toURL):openConnection):getURL)))))
 
 ;;; The definition of include is based on that in the portable implementation

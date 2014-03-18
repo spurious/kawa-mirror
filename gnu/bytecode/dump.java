@@ -320,7 +320,7 @@ public class dump extends ClassFileInput
    * @return The length of the scheme component, not counting the colon,
    * (or alternatively the index of the colon), or -1 if the is no scheme.
    *
-   * Duplicates gnu.text.Path.uriSchemeLength, to make gnu.bytecode standalone.
+   * Duplicates gnu.kawa.io.Path.uriSchemeLength, to make gnu.bytecode standalone.
    */
   static int uriSchemeLength (String uri)
   {
@@ -342,7 +342,7 @@ public class dump extends ClassFileInput
    * For convenience, we treat a 1-character "scheme" as an
    * MS-DOS-style "drive letter" - i.e. not a scheme.
    *
-   * Duplicates gnu.text.Path.uriSchemeSpecified, to make gnu.bytecode
+   * Duplicates gnu.kawa.io.Path.uriSchemeSpecified, to make gnu.bytecode
    * standalone.
    */
   static boolean uriSchemeSpecified (String name)

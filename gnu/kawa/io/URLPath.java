@@ -1,4 +1,4 @@
-package gnu.text;
+package gnu.kawa.io;
 import java.io.*;
 import java.net.*;
 import gnu.mapping.WrappedException; // FIXME - move to gnu.kawa.util
@@ -138,32 +138,5 @@ public class URLPath extends URIPath
   public OutputStream openOutputStream () throws IOException
   {
     return openOutputStream(url);
-  }
-
-  public static URLPath classResourcePath (Class clas)
-  {
-    URL url;
-    try
-      {
-        try
-          {
-            // This throws a SecurityException in the applet case.
-            url = ResourceStreamHandler.makeURL(clas);
-          }
-        catch (SecurityException ex)
-          {
-            // The following assumes we have an actual .class file
-            // (possibly inside a .jar) available in the classpath.
-            // That would be the case in a normal Java environment,
-            // though not (for example) on Android.
-            String classFileName = clas.getName().replace('.', '/')+".class";
-            url = clas.getClassLoader().getResource(classFileName);
-          }
-      }
-    catch (Exception ex)
-      {
-        throw WrappedException.wrapIfNeeded(ex);
-      }
-    return valueOf(url);
   }
 }

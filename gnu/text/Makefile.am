@@ -5,7 +5,6 @@ include $(top_srcdir)/Make-rules
 java_sources = \
   Char.java NamedCharTable.java Options.java \
   Printable.java StandardNamedChars.java \
-  Path.java FilePath.java URIPath.java URLPath.java \
   ResourceStreamHandler.java SourceLocator.java \
   SourceError.java Lexer.java SyntaxException.java \
   SourceMessages.java \

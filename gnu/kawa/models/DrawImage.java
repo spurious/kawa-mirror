@@ -2,9 +2,9 @@ package gnu.kawa.models;
 import java.awt.*;
 import java.awt.geom.*;
 import java.awt.image.*;
+import gnu.kawa.io.Path;
 import gnu.mapping.WrappedException;
 import java.net.URL;
-import gnu.text.*;
 
 public class DrawImage extends Model
   implements Paintable, java.io.Serializable

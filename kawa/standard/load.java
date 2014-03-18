@@ -2,6 +2,7 @@ package kawa.standard;
 import java.io.*;
 import gnu.mapping.*;
 import gnu.expr.*;
+import gnu.kawa.io.Path;
 import gnu.text.SourceMessages;
 import gnu.text.SyntaxException;
 import gnu.lists.*;

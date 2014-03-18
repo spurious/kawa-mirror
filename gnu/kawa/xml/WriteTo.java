@@ -3,9 +3,9 @@
 
 package gnu.kawa.xml;
 import gnu.kawa.io.OutPort;
+import gnu.kawa.io.Path;
 import gnu.mapping.Procedure2;
 import gnu.mapping.Values;
-import gnu.text.Path;
 import gnu.xml.*;
 import java.io.*;
 

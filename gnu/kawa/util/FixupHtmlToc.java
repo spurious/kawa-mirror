@@ -207,7 +207,7 @@ class FileInfo
             linkMatcher.find();
             String hrefText = linkMatcher.group(1);
             URI linkURI = currentURI.resolve(hrefText);
-            linkText = linkMatcher.replaceFirst(" href=\""+gnu.text.Path.relativize(linkURI.toString(), thisURI.toString())+"\"");
+            linkText = linkMatcher.replaceFirst(" href=\""+Path.relativize(linkURI.toString(), thisURI.toString())+"\"");
             int hash = hrefText.indexOf('#');
             if (hash >= 0)
               hrefText = hrefText.substring(0, hash);

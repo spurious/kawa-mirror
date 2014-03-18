@@ -4,12 +4,14 @@
 package gnu.xml;
 import gnu.lists.*;
 import java.io.*;
-import gnu.text.*;
 import gnu.math.RealNum;
 import gnu.kawa.io.PrettyWriter;
 import gnu.kawa.io.OutPort;
+import gnu.kawa.io.Path;
 import gnu.mapping.ThreadLocation;
 import gnu.mapping.Symbol;
+import gnu.text.Char;
+import gnu.text.Lexer;
 import java.math.BigDecimal;
 import gnu.expr.Keyword;
 import gnu.kawa.xml.XmlNamespace;

@@ -5,10 +5,10 @@ package gnu.kawa.servlet;
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import gnu.expr.ModuleBody;
 import gnu.mapping.*;
 import gnu.lists.Consumer;
-import gnu.text.Path;
-import gnu.expr.ModuleBody;
+import gnu.kawa.io.Path;
 import com.sun.net.httpserver.*;
 
 /** Web server support glue built on JDK 6's built-in HttpServer.

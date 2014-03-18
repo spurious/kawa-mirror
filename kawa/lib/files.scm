@@ -72,6 +72,11 @@
         (in (gnu.kawa.functions.RunProcess:getInputStreamFrom newvalue)))
     (gnu.kawa.functions.RunProcess:copyStream in out #t)))
 
+(define (path-data-appender (p ::filepath) newvalue)::void
+  (let ((out (p:openAppendStream))
+        (in (gnu.kawa.functions.RunProcess:getInputStreamFrom newvalue)))
+    (gnu.kawa.functions.RunProcess:copyStream in out #t)))
+
 (define-procedure path-data
   setter: path-data-setter
   (lambda (p ::path) ::gnu.lists.Blob name: 'path-data
@@ -81,8 +86,13 @@
   (syntax-rules ()
     ((_ p) (lambda (newvalue) ::void (path-data-setter p newvalue)))))
 
+(define-syntax path-data-appender-curried
+  (syntax-rules ()
+    ((_ p) (lambda (newvalue) ::void (path-data-appender p newvalue)))))
+
 (define-simple-constructor PD path-data $string$)
 (define-simple-constructor set_PD path-data-setter-curried $string$)
+(define-simple-constructor append_PD path-data-appender-curried $string$)
 
 (define (file-exists? (file :: path)) :: <boolean>
   (file:exists))

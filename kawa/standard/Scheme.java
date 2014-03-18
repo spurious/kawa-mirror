@@ -941,6 +941,8 @@ public class Scheme extends LispLanguage
                    "kawa.lib.files", "PD");
       defProcStFld(LispLanguage.constructNamespace.getSymbol(">"),
                    "kawa.lib.files", "set_PD");
+      defProcStFld(LispLanguage.constructNamespace.getSymbol(">>"),
+                   "kawa.lib.files", "append_PD");
 
       defProcStFld("annotation", "gnu.kawa.reflect.MakeAnnotation", "instance");
 

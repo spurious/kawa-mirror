@@ -1,3 +1,7 @@
+2014-03-17  Per Bothner  <per@bothner.com>
+
+	* files.scm: Define constructor append_PD  - bound to &>>{...}.
+
 2014-03-08  Per Bothner  <per@bothner.com>
 
 	* files.scm (set_PD): New constructor, bound to ">".

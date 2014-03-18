@@ -378,6 +378,11 @@ public class ReaderExtendedLiteral extends ReaderConstituent {
             }
         } else if (next == '`' || next == '<' || next == '>') {
             int nextnext = reader.peek();
+            if (next == '>' && nextnext == '>') {
+                reader.tokenBufferAppend(next);
+                reader.skip();
+                nextnext = reader.peek();
+            }
             if (nextnext == '{' || nextnext == '[') {
                 reader.tokenBufferAppend(next);
                 next = reader.read();

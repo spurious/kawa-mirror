@@ -9040,7 +9040,7 @@ as if using the @code{path} function below.  For example:
 @deffn Type path
 A general path, which can be a @code{filename} or a @code{URI}.
 It can be either a @code{filename} or a @code{URI}.
-Represented using the abstract Java class @code{gnu.text.Path}.
+Represented using the abstract Java class @code{gnu.kawa.io.Path}.
 
 Coercing a value to a @code{Path} is equivalent to
 calling the @code{path} constructor documented below.
@@ -9059,18 +9059,18 @@ and a @code{filepath} value is returned otherwise.
 @end deffn
 
 @deffn Predicate path? arg
-True if @var{arg} is a @code{path} - i.e. an instance of a @code{gnu.text.Path}.
+True if @var{arg} is a @code{path} - i.e. an instance of a @code{gnu.kawa.io.Path}.
 @end deffn
 
 @deffn Type filepath
 The name of a local file.
-Represented using the Java class @code{gnu.text.FilePath},
+Represented using the Java class @code{gnu.kawa.io.FilePath},
 which is a wrapper around @code{java.io.File}.
 @end deffn
 
 @deffn Predicate filepath? arg
 True if @var{arg} is a @code{filepath} - i.e. an instance of
-a @code{gnu.text.FilePath}.
+a @code{gnu.kawa.io.FilePath}.
 @end deffn
 
 @deffn Type URI
@@ -9078,21 +9078,21 @@ A Uniform Resource Indicator, which is a generalization of
 the more familiar URL.  The general format is specified by
 @uref{http://www.ietf.org/rfc/rfc2396.txt,
 RFC 2396: Uniform Resource Identifiers (URI): Generic Syntax}.
-Represented using the Java class @code{gnu.text.URIPath},
+Represented using the Java class @code{gnu.kawa.io.URIPath},
 which is a wrapper around @code{java.net.URI}.
 A URI can be a URL, or it be a relative URI.
 @end deffn
 
 @deffn Predicate URI? arg
 True if @var{arg} is a @code{URI} - i.e. an instance of
-a @code{gnu.text.URIPath}.
+a @code{gnu.kawa.io.URIPath}.
 @end deffn
 
 @deffn Type URL
 A Uniform Resource Locator - a subtype of @code{URI}.
-Represented using the Java class @code{gnu.text.URLPath},
+Represented using the Java class @code{gnu.kawa.io.URLPath},
 which is a wrapper around a @code{java.net.URL}, in
-addition to extending @code{gnu.text.URIPath}.
+addition to extending @code{gnu.kawa.io.URIPath}.
 @end deffn
 
 @subsection Extracting Path components

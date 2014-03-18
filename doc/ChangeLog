@@ -1,3 +1,7 @@
+2014-03-18  Per Bothner  <per@bothner.com>
+
+	* kawa.texi: Update package of gnu.text.*Path to gnu.kawa.io.
+
 2014-03-04  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Ideas and tasks): New idea for multi-langauge compilation.

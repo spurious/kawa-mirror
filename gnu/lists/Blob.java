@@ -1,4 +1,5 @@
 package gnu.lists;
+import gnu.kawa.io.BinaryInPort;
 import java.nio.charset.Charset;
 
 /** Binary data which may represent text or other information.
@@ -48,10 +49,30 @@ public class Blob
 
     public String toString() {
         synchronized (this) {
-            if (stringValue == null)
-                stringValue = new String(data, 0, size,
-                                         charset != null ? charset
-                                         : Charset.defaultCharset());
+            if (stringValue == null) {
+                BinaryInPort in = new BinaryInPort(data, size, null);
+                // Caching the string value may not be a good idea.
+                // Especially if we're just printing it.
+                StringBuilder buf = new StringBuilder();
+                try {
+                    boolean bomSeen = false;
+                    if (charset != null)
+                        bomSeen = in.setFromByteOrderMark();
+                    if (! bomSeen)
+                        // FIXME should do some sniffing to guess encoding.
+                        in.setCharset(charset != null ? charset
+                                      : Charset.defaultCharset());
+                    int ch;
+                    while ((ch = in.read()) >= 0) {
+                        buf.append((char) ch);
+                    }
+                } catch (Exception ex) {
+                    buf.append("[unexpected exception: ");
+                    buf.append(ex);
+                    buf.append(']');
+                }
+                stringValue = buf.toString();
+            }
             return stringValue;
         }
     }

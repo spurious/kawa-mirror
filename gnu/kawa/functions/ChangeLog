@@ -1,5 +1,10 @@
 2014-03-19  Per Bothner  <per@bothner.com>
 
+	* RunProcess.java (tokenize): Inside '"' treat a substituted newline
+	as an argument separator.
+
+2014-03-19  Per Bothner  <per@bothner.com>
+
 	* RunProcess.java (handleMarks): Merge into tokenize method.
 
 2014-03-18  Per Bothner  <per@bothner.com>

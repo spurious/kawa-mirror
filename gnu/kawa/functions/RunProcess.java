@@ -440,7 +440,18 @@ public class RunProcess extends MethodProc {
                     continue;
                 }
                 ch = '\n';
-                if (state <= 1) {
+                if (state == '"' && inGroup == 0) {
+                    // In '"' '\n' is a separator.
+                    while (--nlCount >= 0) {
+                        if (useShell) {
+                            sbuf.append("\" \"");
+                        } else {
+                            arr.add(sbuf.toString());
+                            sbuf.setLength(0);
+                        }
+                    }
+                    continue;
+                } else if (state <= 1) {
                     // Token separator - handled below
                     if (useShell)
                         ch = ' ';

@@ -1,3 +1,8 @@
+2014-03-19  Per Bothner  <per@bothner.com>
+
+	* system-test.scm: Update for newline inside '"' as
+	argument separator.
+
 2014-02-23  Per Bothner  <per@bothner.com>
 
 	* r7rs-tests.scm: Make more robust for Windows line endings.

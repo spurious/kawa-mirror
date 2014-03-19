@@ -65,12 +65,18 @@
                  &`{&[split-with-kawa] x&["a\n\nc"]y})
 (test-str-equal "|xa|cy|\n"
                  &`{&[split-with-kawa] x&["a\n\nc\n"]y})
-(test-str-equal "|xa\ncy|\n"
+(test-str-equal "|xa|cy|\n"
                  &`{&[split-with-kawa] "x&["a\nc"]y"})
-(test-str-equal "|xa\n\ncy|\n"
+(test-str-equal "|xa\ncy|\n"
+                 &`{&[split-with-kawa] 'x&["a\nc"]y'})
+(test-str-equal "|xa||cy|\n"
                  &`{&[split-with-kawa] "x&["a\n\nc"]y"})
 (test-str-equal "|xa\n\ncy|\n"
+                 &`{&[split-with-kawa] 'x&["a\n\nc"]y'})
+(test-str-equal "|xa||cy|\n"
                  &`{&[split-with-kawa] "x&["a\n\nc\n"]y"})
+(test-str-equal "|xa\n\ncy|\n"
+                 &`{&[split-with-kawa] 'x&["a\n\nc\n"]y'})
 (test-str-equal "|xa/by|\n"
                  &sh{&[split-with-kawa] x&["a/b"]y})
 (test-str-equal "|xa/by|\n"
@@ -83,12 +89,18 @@
                  &sh{&[split-with-kawa] x&["a\n\nc"]y})
 (test-str-equal "|xa|cy|\n"
                  &sh{&[split-with-kawa] x&["a\n\nc\n"]y})
-(test-str-equal "|xa\ncy|\n"
+(test-str-equal "|xa|cy|\n"
                  &sh{&[split-with-kawa] "x&["a\nc"]y"})
-(test-str-equal "|xa\n\ncy|\n"
+(test-str-equal "|xa\ncy|\n"
+                 &sh{&[split-with-kawa] 'x&["a\nc"]y'})
+(test-str-equal "|xa||cy|\n"
                  &sh{&[split-with-kawa] "x&["a\n\nc"]y"})
 (test-str-equal "|xa\n\ncy|\n"
+                 &sh{&[split-with-kawa] 'x&["a\n\nc"]y'})
+(test-str-equal "|xa||cy|\n"
                  &sh{&[split-with-kawa] "x&["a\n\nc\n"]y"})
+(test-str-equal "|xa\n\ncy|\n"
+                 &sh{&[split-with-kawa] 'x&["a\n\nc\n"]y'})
 
 (let ((tmp1 (java.io.File:createTempFile "kawa-test" #!null)))
   &`[out-to: tmp1]{echo ab cd}

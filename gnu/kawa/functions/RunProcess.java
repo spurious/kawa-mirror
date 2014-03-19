@@ -228,13 +228,30 @@ public class RunProcess extends MethodProc {
             cmd = new ArrayList<String>();
             cmd.add("/bin/sh");
             cmd.add("-c");
-            String expanded = handleMarks(command.toString());
-            //Strings.printQuoted("expanded '"+command+"' -> '"+expanded+"'", System.err, 2); System.err.println();
-            cmd.add(expanded);
+            String commands = command.toString();
+            tokenize(commands, true, cmd);
+            if (false) { // DEBUGGING
+                System.err.print("tokenize-with-shell: ");
+                Strings.printQuoted(commands, System.err, 2);
+                System.err.print(" -> ");
+                Strings.printQuoted(cmd.get(2), System.err, 2);
+                System.err.println();
+            }
         } else {
             if (cmd == null) {
-                cmd = tokenize(command.toString());
-                //Strings.printQuoted("tokenize '"+command+"' -> "+cmd, System.err, 2); System.err.println();
+                cmd = new ArrayList<String>();
+                String commands = command.toString();
+                tokenize(commands, false, cmd);
+                if (false) { // DEBUGGING
+                    System.err.print("tokenize: ");
+                    Strings.printQuoted(commands, System.err, 2);
+                    System.err.print(" ->");
+                    for (String c : cmd) {
+                        System.err.print(' ');
+                        Strings.printQuoted(c, System.err, 2);
+                    }
+                    System.err.println();
+                }
             }
         }
         builder.command(cmd);
@@ -345,140 +362,24 @@ public class RunProcess extends MethodProc {
         return false;
     }
 
-    /** Handle substitution marks when using a shell.
-     * This means adjusting quotation/escaping as appropriate.
-     */
-    String handleMarks(String str) {
-        StringBuilder sbuf = null;
-        int len = str.length();
-        int inGroup = 0;
-        int inSubstitution = 0;
-        // The variable 'quoted' is -1, 0, '\'', or '"'.
-        // If quoted=='"', we're inside '"', for both input str and sbuf.
-        // If quoted=='\'',we're inside '\'', for both input str and sbuf;
-        // if quoted==0 (which is only if inSubstitution>0) then
-        // we're inside '\'' in the output sbuf only.
-        // Otherwise, quoted is -1.
-        int quoted = -1;
-        for (int i = 0;  i < len;  i++) {
-            char ch = str.charAt(i);
-            if (sbuf == null
-                && (ch == DelimitSubstitutionFormat.MARK_GROUP_START
-                    || ch == DelimitSubstitutionFormat.MARK_SUBSTITUTION_START)) {
-                sbuf = new StringBuilder();
-                sbuf.append(str, 0, i);
-            }
-            if (ch == DelimitSubstitutionFormat.MARK_GROUP_START) {
-                if (inGroup > 0)
-                    sbuf.append(ch);
-                inGroup++;
-                continue;
-            }
-            if (ch == DelimitSubstitutionFormat.MARK_GROUP_END) {
-                inGroup--;
-                if (inGroup > 0)
-                    sbuf.append(ch);
-                continue;
-            }
-            if (ch == DelimitSubstitutionFormat.MARK_SUBSTITUTION_START) {
-                if (inSubstitution > 0)
-                    sbuf.append(ch);
-                //else if (quoted < 0)
-                //    sbuf.append('\'');
-                inSubstitution++;
-                continue;
-            }
-            if (ch == DelimitSubstitutionFormat.MARK_SUBSTITUTION_END) {
-                inSubstitution--;
-                if (inSubstitution > 0)
-                    sbuf.append(ch);
-                else {
-                    if (quoted == 0) {
-                        sbuf.append('\'');
-                        quoted = -1;
-                    }
-                    if (inGroup > 0 && i+1 < len
-                        && str.charAt(i+1) == DelimitSubstitutionFormat.MARK_SUBSTITUTION_START) {
-                        sbuf.append(' '); // IFS
-                    }
-                }
-                continue;
-            }
-            if (inSubstitution > 0) {
-                if (ch == '\n' && inGroup == 0) {
-                    // Check for final newline(s) in substitution.
-                    int nlCount = 1;  // Count of '\n'
-                    for (;;) {
-                        ch = str.charAt(i+nlCount);
-                        if (ch != '\n')
-                            break;
-                        nlCount++;
-                    }
-                    i += nlCount-1;
-                    if (ch == DelimitSubstitutionFormat.MARK_SUBSTITUTION_END) {
-                        // We saw nlCount final newlines.  Skip them,
-                        continue;
-                    }
-                    if (quoted > 0) {
-                        ch = '\n';
-                        while (--nlCount > 0) {
-                            sbuf.append('\n');
-                        }
-                    } else
-                        ch = ' ';
-                }
-                if (quoted == '"') {
-                    if (ch == '$' || ch == '\\')
-                        sbuf.append('\\');
-                } else if (ch == '\'') {
-                    if (quoted == -1)
-                        sbuf.append("\\'");
-                    else
-                        sbuf.append("'\\''");
-                }
-                else if (quoted <= 0 && inGroup == 0
-                         && (ch == ' ' || ch == '\t'
-                             || ch == '\n' || ch == '\r')) {
-                    if (quoted == 0)
-                        sbuf.append('\'');
-                    quoted = -1;
-                    sbuf.append(ch);
-                }
-                else if (quoted == -1) {
-                    sbuf.append('\'');
-                    quoted = 0;
-                }
-            } else if (ch == '\\' && quoted != '\'' && i+1 < len) {
-                sbuf.append(ch);
-                i++;
-                ch = str.charAt(i);
-            } else if (quoted < 0) {
-                if (ch == '\"' || ch == '\'')
-                    quoted = ch;
-            }
-            else if (ch == quoted) {
-                quoted = -1;
-            }
-            if (sbuf != null)
-                sbuf.append(ch);
-        }
-        return sbuf == null ? str : sbuf.toString();
-    }
-
     /** Parse strings into token, handling substitution marks.
-     * This is used when *not* using a shell.
+     * @param useShell true if result will be further tokenized by a shell.
+     *   (In this case we're basically just handling substiution marks.)
      */
-    public List<String> tokenize(String str) {
+    public void tokenize(String str, boolean useShell, List<String> arr) {
         // The buffer for building the current command-line argument.
         StringBuffer sbuf = new StringBuffer(100);
+        // The default is state==-1.
         // If state is '"' or '\'' then we're inside a quoted string.
-        // If state==0, we have seen a quoted possibly-empty string.
-        // Otherwise, -1 if we haven't seen a quoted string this arg.
-        // The distinction matters because "" should create an argument,
-        // so we can't just check sbuf.length()>0 in deciding that
-        // we have a new argument; we also check if state >= 0.
+        // If state==1 (only if useShell) then we're inside added '\''
+        // that aren't in the input string.
+        // If state==0 (only if !useShell), we have seen a quoted
+        // possibly-empty string, while state==-1 if we haven't seen a 
+        // quoted string this arg. The distinction matters because ""
+        // should create an argument, so we can't just check
+        // sbuf.length()>0 in deciding that we have a new argument;
+        // we also check if state >= 0.
         int state = -1;
-        List<String> arr = new ArrayList<String>();
         int len = str.length();
         int inGroup = 0;
         int inSubstitution = 0;
@@ -506,13 +407,19 @@ public class RunProcess extends MethodProc {
                 inSubstitution--;
                 if (inSubstitution > 0)
                     sbuf.append(ch);
-                else if (inGroup > 0 && i+1 < len
-                    && str.charAt(i+1) == DelimitSubstitutionFormat.MARK_SUBSTITUTION_START) {
-                    if (state == '\"' || state == '\'') {
-                        sbuf.append(' '); // IFS
-                    } else {
-                        arr.add(sbuf.toString());
-                        sbuf.setLength(0);
+                else {
+                    if (state == 1) {
+                        sbuf.append('\'');
+                        state = -1;
+                    }
+                    if (inGroup > 0 && i+1 < len
+                        && str.charAt(i+1) == DelimitSubstitutionFormat.MARK_SUBSTITUTION_START) {
+                        if (useShell || state == '\"' || state == '\'') {
+                            sbuf.append(' '); // IFS
+                        } else {
+                            arr.add(sbuf.toString());
+                            sbuf.setLength(0);
+                        }
                     }
                 }
                 continue;
@@ -533,43 +440,81 @@ public class RunProcess extends MethodProc {
                     continue;
                 }
                 ch = '\n';
-                if (state <= 0) {
+                if (state <= 1) {
                     // Token separator - handled below
+                    if (useShell)
+                        ch = ' ';
                 } else {
                     while (--nlCount > 0) {
                         sbuf.append('\n');
                     }
                 }
             }
-            if (state <= 0 && inGroup == 0
-                && (ch == ' ' || ch == '\t'
-                    || ch == '\n' || ch == '\r')) {
-                if (sbuf.length() > 0 || state == 0) {
-                    arr.add(sbuf.toString());
-                    sbuf.setLength(0);
+            if (useShell && inSubstitution > 0) {
+                // May need to quote special characters
+                if (state == '"') {
+                    if (ch == '$' || ch == '\\')
+                        sbuf.append('\\');
+                } else if (ch == '\'') {
+                    if (state == -1)
+                        sbuf.append("\\'");
+                    else
+                        sbuf.append("'\\''");
+                } else if (state <= 1 && inGroup == 0
+                         && (ch == ' ' || ch == '\t'
+                             || ch == '\n' || ch == '\r')) {
+                    if (state == 1)
+                        sbuf.append('\'');
+                    state = -1;
+                    sbuf.append(ch);
+                } else if (state == -1) {
+                    sbuf.append('\'');
+                    state = 1;
+                }
+            }
+            if (useShell && inSubstitution == 0) {
+                if (ch == '\\' && state != '\'' && i+1 < len) {
+                    sbuf.append(ch);
+                    i++;
+                    ch = str.charAt(i);
+                } else if (state < 0) {
+                    if (ch == '\"' || ch == '\'')
+                        state = ch;
+                }
+                else if (ch == state) {
                     state = -1;
                 }
-                continue;
-            } else if (inSubstitution > 0) {
             }
-            else if (state <= 0) {
-                if (ch == '\\' || ch == '\'' || ch == '\"') {
-                    state = ch;
+            if (! useShell) {
+                if (state <= 0 && inGroup == 0
+                    && (ch == ' ' || ch == '\t'
+                        || ch == '\n' || ch == '\r')) {
+                    if (sbuf.length() > 0 || state == 0) {
+                        arr.add(sbuf.toString());
+                        sbuf.setLength(0);
+                        state = -1;
+                    }
+                    continue;
+                } else if (inSubstitution > 0) {
+                }
+                else if (state <= 0) {
+                    if (ch == '\\' || ch == '\'' || ch == '\"') {
+                        state = ch;
+                        continue;
+                    }
+                } else if (state == '\\')
+                    state = 0;
+                else if (ch == state) {
+                    state = 0;
                     continue;
                 }
-            } else if (state == '\\')
-                state = 0;
-            else if (ch == state) {
-                state = 0;
-                continue;
             }
             sbuf.append(ch);
         }
-        if (sbuf.length() > 0 || state >= 0)
+        if (sbuf.length() > 0 || state >= 0 || useShell)
             arr.add(sbuf.toString());
-        if (state > 0 || inSubstitution > 0 || inGroup > 0)
+        if (! useShell && (state > 0 || inSubstitution > 0 || inGroup > 0))
             error("bad quotes");
-        return arr;
     }
 
     public static InputStream getInputStreamFrom(Object val) {

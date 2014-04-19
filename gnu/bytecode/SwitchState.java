@@ -251,7 +251,7 @@ public class SwitchState
 	code.fixupAdd(CodeAttr.FIXUP_SWITCH, null);
 	code.put1(171);  // lookupswitch
 	code.fixupAdd(CodeAttr.FIXUP_CASE, defaultLabel);
-	code.PC += 4;
+	code.PC += 4; // make room for defaultLabel
 	code.put4(numCases);
 	for (int index = 0;  index < numCases;  index++)
 	  {

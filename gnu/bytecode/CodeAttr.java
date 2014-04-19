@@ -2534,19 +2534,27 @@ public class CodeAttr extends Attribute implements AttrContainer
     emitTailCall(pop_args, scope.start);
   }
 
-  public void processFixups ()
-  {
-    if (fixup_count <= 0)
-      return;
+    public void processFixups() {
+        if (fixup_count <= 0)
+            return;
 
-    // For each label, set it to its maximum limit, assuming all
-    // fixups causes the code the be expanded.  We need a prepass
-    // for this, since FIXUP_MOVEs can cause code to be reordered.
-    // Also, convert each FIXUP_MOVE_TO_END to FIXUP_MOVE.
+        // For each label, set it to its maximum limit, assuming all
+        // fixups causes the code the be expanded.  We need a prepass
+        // for this, since FIXUP_MOVEs can cause code to be reordered.
+        // Also, convert each FIXUP_MOVE_TO_END to FIXUP_MOVE.
 
-    int delta = 0;
-    int instruction_tail = fixup_count;
-    fixupAdd(CodeAttr.FIXUP_MOVE, 0, null);
+        int delta = 0;
+        int instruction_tail = fixup_count;
+        fixupAdd(CodeAttr.FIXUP_MOVE, 0, null);
+
+        /* DEBUGGING:
+        System.err.println("processFixups for "+getMethod());
+        ClassTypeWriter writer =
+            new ClassTypeWriter(getMethod().getDeclaringClass(), System.err, 0);
+        writer.println("processFixups for "+getMethod());
+        disAssembleWithFixups(writer);
+        writer.flush();
+        */
 
   loop1:
    for (int i = 0;  ;  )
@@ -2619,7 +2627,7 @@ public class CodeAttr extends Attribute implements AttrContainer
 
     // Number of bytes to be inserted or (if negative) removed, so far.
     int new_size = PC;
-    // Current delta between final PC and offset in generate code array.
+    // Current delta between final PC and offset in generated code array.
     delta = 0;
   loop2:
     for (int i = 0;  i < fixup_count;  )
@@ -2936,88 +2944,90 @@ public class CodeAttr extends Attribute implements AttrContainer
     dst.printAttributes(this);
   }
 
-  /* DEBUGGING:
-  public void disAssembleWithFixups (ClassTypeWriter dst)
-  {
-    if (fixup_count <= 0)
-      {
-	disAssemble(dst, 0, PC);
-	return;
-      }
-    int prev_pc = 0;
-    for (int i = 0;  i < fixup_count; )
-      {
-	int offset = fixup_offsets[i];
-	int kind = offset & 15;
-	Label label = fixup_labels[i];
-	offset = offset >> 4;
-	int pc = offset;
-	if (kind == FIXUP_MOVE || kind == FIXUP_MOVE_TO_END)
-	  pc = (i+1 >= fixup_count) ? PC : fixup_offsets[i+1] >> 4;
-	disAssemble(dst, prev_pc, offset);
-	prev_pc = pc;
-	dst.print("fixup#");  dst.print(i);
-	dst.print(" @");  dst.print(offset);
-	switch (kind)
-	  {
-	  case FIXUP_NONE:
-	    dst.println(" NONE");
-	    break;
-	  case FIXUP_DEFINE:
-	    dst.print(" DEFINE ");
-	    dst.println(label);
-	    break;
-	  case FIXUP_SWITCH:
-	    dst.println(" SWITCH");
-	    break;
-	  case FIXUP_CASE:
-	    dst.println(" CASE");
-	    break;
-	  case FIXUP_GOTO:
-	    dst.print(" GOTO ");
-	    dst.println(label);
-	    break;
-	  case FIXUP_TRANSFER:
-	    dst.print(" TRANSFER ");
-	    dst.println(label);
-	    break;
-	  case FIXUP_TRANSFER2:
-	    dst.print(" TRANSFER2 ");
-	    dst.println(label);
-	    break;
-	  case FIXUP_DELETE3:
-	    dst.println(" DELETE3");
-	    break;
-	  case FIXUP_MOVE:
-	    dst.print(" MOVE ");
-	    dst.println(label);
-	    break;
-	  case FIXUP_MOVE_TO_END:
-	    dst.print(" MOVE_TO_END ");
-	    dst.println(label);
-	    break;
-	  case FIXUP_TRY:
-	    dst.print(" TRY start: ");
-	    dst.println(label);
-	    i++;
-	    dst.print(" - end: ");
-	    dst.print(fixup_labels[i]);
-	    dst.print(" type: ");
-	    dst.println(fixup_offsets[i] >> 4);
+    /* DEBUGGING:
+    public void disAssembleWithFixups(ClassTypeWriter dst) {
+        if (fixup_count <= 0) {
+            disAssemble(dst, 0, PC);
+            return;
+        }
+        int prev_pc = 0;
+        for (int i = 0;  i < fixup_count; ) {
+            int offset = fixup_offsets[i];
+            int kind = offset & 15;
+            Label label = fixup_labels[i];
+            offset = offset >> 4;
+            int pc = offset;
+            if (kind == FIXUP_MOVE || kind == FIXUP_MOVE_TO_END)
+                pc = (i+1 >= fixup_count) ? PC : fixup_offsets[i+1] >> 4;
+            else if (kind == FIXUP_CASE)
+                pc = prev_pc;
+            disAssemble(dst, prev_pc, pc);
+
+            dst.print("fixup#");  dst.print(i);
+            dst.print(" @");  dst.print(offset);
+            prev_pc = pc;
+            switch (kind) {
+            case FIXUP_NONE:
+                dst.println(" NONE");
+                break;
+            case FIXUP_DEFINE:
+                dst.print(" DEFINE ");
+                dst.println(label);
+                break;
+            case FIXUP_SWITCH:
+                dst.println(" SWITCH");
+                break;
+            case FIXUP_CASE:
+                dst.print(" CASE ");
+                dst.println(label);
+                break;
+            case FIXUP_GOTO:
+                dst.print(" GOTO ");
+                dst.println(label);
+                break;
+            case FIXUP_TRANSFER:
+                dst.print(" TRANSFER ");
+                dst.println(label);
+                break;
+            case FIXUP_TRANSFER2:
+                dst.print(" TRANSFER2 ");
+                dst.println(label);
+                break;
+            case FIXUP_DELETE3:
+                dst.println(" DELETE3");
+                break;
+            case FIXUP_MOVE:
+                dst.print(" MOVE ");
+                dst.println(label);
+                break;
+            case FIXUP_MOVE_TO_END:
+                dst.print(" MOVE_TO_END ");
+                dst.println(label);
+                break;
+            case FIXUP_TRY:
+                dst.print(" TRY start: ");
+                dst.println(label);
+                i++;
+                dst.print(" - end: ");
+                dst.print(fixup_labels[i]);
+                dst.print(" type: ");
+                dst.println(fixup_offsets[i] >> 4);
+                i++;
+                break;
+            case FIXUP_LINE_PC:
+                dst.print(" LINE ");
+                i++;
+                dst.println(fixup_offsets[i] >> 4);
+                break;
+            default:
+                dst.println(" kind:"+fixupKind(i)+" offset:"+fixupOffset(i)
+                            +" "+fixup_labels[i]);
+            }
             i++;
-	    break;
-	  case FIXUP_LINE_PC:
-	    dst.print(" LINE ");
-	    i++;
-	    dst.println(fixup_offsets[i] >> 4);
-	    break;
-	  default:
-	    dst.println(" kind:"+fixupKind(i)+" offset:"+fixupOffset(i)+" "+fixup_labels[i]);
-	  }
-	i++;
-      }
-  }
-  */
+        }
+        disAssemble(dst, prev_pc, PC);
+    }
+    */
 
   public void disAssemble (ClassTypeWriter dst, int start, int limit)
   {

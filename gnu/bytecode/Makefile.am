@@ -11,9 +11,12 @@ ClassType.java \
 ConstantPool.java \
 CpoolClass.java \
 CpoolEntry.java \
+CpoolInvokeDynamic.java \
 CpoolValue1.java \
 CpoolValue2.java \
 CpoolNameAndType.java \
+CpoolMethodHandle.java \
+CpoolMethodType.java \
 CpoolRef.java \
 CpoolString.java \
 CpoolUtf8.java \

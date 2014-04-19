@@ -7,19 +7,23 @@ package gnu.bytecode;
  * @author Per Bothner
  */
 
-public class ConstantPool
-{
-  static public final byte CLASS = 7;
-  static public final byte FIELDREF = 9;
-  static public final byte METHODREF = 10;
-  static public final byte INTERFACE_METHODREF = 11;
-  static public final byte STRING = 8;
-  static public final byte INTEGER = 3;
-  static public final byte FLOAT = 4;
-  static public final byte LONG = 5;
-  static public final byte DOUBLE = 6;
-  static public final byte NAME_AND_TYPE = 12;
-  static public final byte UTF8 = 1;
+public class ConstantPool {
+    static public final byte CLASS = 7;
+    static public final byte FIELDREF = 9;
+    static public final byte METHODREF = 10;
+    static public final byte INTERFACE_METHODREF = 11;
+    /** Any one of the XXX_REF types. */
+    static public final byte ANY_REF = -1;
+    static public final byte STRING = 8;
+    static public final byte INTEGER = 3;
+    static public final byte FLOAT = 4;
+    static public final byte LONG = 5;
+    static public final byte DOUBLE = 6;
+    static public final byte METHOD_HANDLE = 15;
+    static public final byte METHOD_TYPE = 16;
+    static public final byte INVOKE_DYNAMIC = 18;
+    static public final byte NAME_AND_TYPE = 12;
+    static public final byte UTF8 = 1;
 
   /** The entries in the constant pool.
    * The first element (constant_pool[0]) is an unused dummy. */
@@ -298,39 +302,44 @@ public class ConstantPool
     locked = true;
   }
 
-  /** Get or create a CpoolEntry at a given index.
-   * If there is an existing entry, it must match the tag.
-   * If not, a new one is create of the class appropriate for the tag.
-   */
-  CpoolEntry getForced(int index, int tag)
-  {
-    index = index & 0xffff;
-    CpoolEntry entry = pool[index];
-    if (entry == null)
-      {
-	if (locked)
-	  throw new Error("adding new entry to locked contant pool");
-	switch (tag)
-	  {
-	  case UTF8: entry = new CpoolUtf8(); break;
-	  case INTEGER:
-	  case FLOAT: entry = new CpoolValue1(tag);  break;
-	  case LONG:
-	  case DOUBLE: entry = new CpoolValue2(tag);  break;
-	  case CLASS: entry = new CpoolClass(); break;
-	  case STRING: entry = new CpoolString(); break;
-	  case FIELDREF:
-	  case METHODREF:
-	  case INTERFACE_METHODREF: entry = new CpoolRef(tag); break;
-	  case NAME_AND_TYPE: entry = new CpoolNameAndType();
-	  }
-	pool[index] = entry;
-	entry.index = index;
-      }
-    else if (entry.getTag() != tag)
-      throw new ClassFormatError("conflicting constant pool tags at "+index);
-    return entry;
-  }
+    /** Get or create a CpoolEntry at a given index.
+     * If there is an existing entry, it must match the tag.
+     * If not, a new one is create of the class appropriate for the tag.
+     */
+    CpoolEntry getForced(int index, int tag) {
+        index = index & 0xffff;
+        CpoolEntry entry = pool[index];
+        if (entry == null) {
+            if (locked)
+                throw new Error("adding new entry to locked contant pool");
+            switch (tag) {
+            case UTF8: entry = new CpoolUtf8(); break;
+            case INTEGER:
+            case FLOAT: entry = new CpoolValue1(tag);  break;
+            case LONG:
+            case DOUBLE: entry = new CpoolValue2(tag);  break;
+            case CLASS: entry = new CpoolClass(); break;
+            case STRING: entry = new CpoolString(); break;
+            case ANY_REF:
+            case FIELDREF:
+            case METHODREF:
+            case INTERFACE_METHODREF: entry = new CpoolRef(tag); break;
+            case NAME_AND_TYPE: entry = new CpoolNameAndType(); break;
+            case INVOKE_DYNAMIC: entry = new CpoolInvokeDynamic(); break;
+            case METHOD_HANDLE: entry = new CpoolMethodHandle(); break;
+            case METHOD_TYPE: entry = new CpoolMethodType(); break;
+            default: System.err.println("tag: "+tag);
+            }
+            pool[index] = entry;
+            entry.index = index;
+        } else if (entry.getTag() != tag) {
+	    if (entry.getTag() == ANY_REF)
+		((CpoolRef) entry).tag = tag;
+	    else if (tag != ANY_REF)
+		throw new ClassFormatError("conflicting constant pool tags at "+index);
+	}
+        return entry;
+    }
 
   CpoolClass getForcedClass (int index)
   {
@@ -378,6 +387,29 @@ public class ConstantPool
 	    ref.nameAndType = (CpoolNameAndType)
 	      getForced(dstr.readUnsignedShort(), NAME_AND_TYPE);
 	    break;
+	  case METHOD_HANDLE:
+	      CpoolMethodHandle mh = (CpoolMethodHandle) entry;
+
+	      mh.kind = dstr.readUnsignedByte();
+	      /*
+	      int kindtag = mh.kind <= 4 ? FIELDREF
+		  : mh.kid == 5 ? METHODREF
+		  : ...;
+	      */
+	      mh.reference = (CpoolRef)
+		  getForced(dstr.readUnsignedShort(), ANY_REF);
+	      break;
+	  case METHOD_TYPE:
+	      CpoolMethodType mt = (CpoolMethodType) entry;
+	      mt.descriptor =
+		  (CpoolUtf8) getForced(dstr.readUnsignedShort(), UTF8);
+	      break;
+	  case INVOKE_DYNAMIC:
+	      CpoolInvokeDynamic idyn = (CpoolInvokeDynamic) entry;
+	      idyn.bootstrapMethodIndex = dstr.readUnsignedShort();
+	      idyn.nameAndType = (CpoolNameAndType)
+		  getForced(dstr.readUnsignedShort(), NAME_AND_TYPE);
+	      break;
 	  case NAME_AND_TYPE:
 	    CpoolNameAndType ntyp = (CpoolNameAndType) entry;
 	    ntyp.name = (CpoolUtf8) getForced(dstr.readUnsignedShort(), UTF8);

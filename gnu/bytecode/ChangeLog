@@ -1,3 +1,14 @@
+2014-04-18  Per Bothner  <per@bothner.com>
+
+	Support new Java8 constant pool entry types.
+	* ConstantPool.java (METHOD_HANDLE, METHOD_TYPE, INVOKE_DYNAMIC,
+	ANY_REF): New constants.
+	(getForced): Handle new types.
+	* CpoolInvokeDynamic.java: New class, extends CpoolEntry.
+	* CpoolMethodHandle.java: New class, extends CpoolEntry.
+	* CpoolMethodType.java: New class, extends CpoolEntry.
+	* Makefile.am: Update accordingly.
+
 2014-03-01  Per Bothner  <per@bothner.com>
 
 	* Scope.java (fixParamNames): New method to rename parameter names.

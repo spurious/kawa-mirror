@@ -882,7 +882,7 @@ class LispEscapeFormat extends ReportFormat
   public final static int ESCAPE_ALL = 0xF2;
 }
 
-/** Handle <code>~&lt;...~&gt;</code> - pretty-printing logical block.
+/** Handle {@code ~<...~:>} - pretty-printing logical block.
  * (Justification is not implemented.) */
 
 class LispPrettyFormat extends ReportFormat

@@ -1,3 +1,8 @@
+2014-04-23  Per Bothner  <per@bothner.com>
+
+	* char-tables.iscm: New file - soon to be auto-generated.
+	* srfi14.scm: Move the actual character tables into separate file.
+
 2014-02-18  Jamison Hope  <jrh@theptrgroup.com>
 
 	* srfi60.scm: New implementation of SRFI-60.

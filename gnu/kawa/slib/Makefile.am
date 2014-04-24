@@ -17,6 +17,13 @@ if WITH_AWT
 AWT_SCM = gui.scm
 endif
 
+$(srcdir)/char-tables.iscm:
+	$(JAVA) -classpath "$(CLASSPATH)" kawa.repl \
+	  $(top_srcdir)/gnu/kawa/util/generate-charsets.scm \
+	  > $(srcdir)/char-tables.iscm
+
+scm-classes.stamp: $(srcdir)/char-tables.iscm
+
 # NOTE if this list is changed, also update build.xml.
 java_SCM = DefineRecordType.scm enums.scm readtable.scm \
   srfi1.scm srfi2.scm \

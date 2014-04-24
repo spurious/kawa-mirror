@@ -455,6 +455,13 @@ elisp-classes.stamp: $(java_ELISP)
 	echo timestamp > elisp-classes.stamp
 	echo timestamp > $(TO_TOPDIR)/kawa-jar.stamp
 
+$(srcdir)/char-tables.iscm:
+	$(JAVA) -classpath "$(CLASSPATH)" kawa.repl \
+	  $(top_srcdir)/gnu/kawa/util/generate-charsets.scm \
+	  > $(srcdir)/char-tables.iscm
+
+scm-classes.stamp: $(srcdir)/char-tables.iscm
+
 all: Makefile scm-classes.stamp $(@GCJ_COMPILED_SELECTED@)
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.

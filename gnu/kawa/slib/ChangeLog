@@ -1,5 +1,8 @@
 2014-04-23  Per Bothner  <per@bothner.com>
 
+	* Makefile.am: New rules to regenerate char-tables.iscm using
+	gnu/kawa/util/generate-charsets.scm.
+
 	* char-tables.iscm: New file - soon to be auto-generated.
 	* srfi14.scm: Move the actual character tables into separate file.
 

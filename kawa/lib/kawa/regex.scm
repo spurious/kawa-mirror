@@ -49,8 +49,16 @@
 
 (define (regex-split re (str :: string))
   (let* ((rex :: regex (if (instance? re regex) re (regex (re:toString)))) 
-	 (parts (rex:split str -1)))
-    (gnu.lists.LList:makeList parts 0)))
+	 (parts (rex:split str -1))
+         (plen parts:length)
+         (rlist (gnu.lists.LList:makeList parts 0)))
+    ;; Work around a Java 8 change.
+    (if (and (> plen 1)
+             (equal? (parts (- plen 1)) "")
+             (not (equal? (parts 0) ""))
+             ((rex:matcher ""):matches))
+        (cons "" rlist)
+        rlist)))
 
 (define (regex-replace re (str :: string) repl) :: string
   (let* ((rex :: regex (if (instance? re regex) re (regex (re:toString))))

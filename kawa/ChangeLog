@@ -1,3 +1,9 @@
+2014-04-23  Per Bothner  <per@bothner.com>
+
+	* standard/define.java (rewriteForm): If checking that make-private
+	is top-level, is Declarations's context, rather than current scope.
+	The latter may not work if we're in a macro template scope.
+
 2014-03-17  Per Bothner  <per@bothner.com>
 
 	* standard/Scheme.java (initScheme): Define ">>" constructor.

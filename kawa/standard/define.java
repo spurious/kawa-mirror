@@ -157,9 +157,8 @@ public class define extends Syntax
       decl.noteValueFromSet(sexp);
 
     sexp.setDefining (true);
-    if (makePrivate && ! (tr.currentScope() instanceof ModuleExp))
-      tr.error('w', "define-private not at top level "
-	       +tr.currentScope());
+    if (makePrivate && ! (decl.getContext() instanceof ModuleExp))
+      tr.error('w', "define-private not at top level");
     return sexp;
   }
 }

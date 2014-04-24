@@ -587,7 +587,7 @@
                  (lambda (c) (java.lang.Character:title-case?
                               (char->integer c))) char-set:full)))
 
-; Some of these tests only succeed on Java 7, which supports
+; Some of these tests only succeed on Java 7 (or later), which supports
 ; Unicode 6. On earlier Javas, the java.lang.Character predicates will
 ; disagree with the char-set definitions.
 (define-syntax expect-fail-unless-unicode-6

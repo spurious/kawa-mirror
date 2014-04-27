@@ -164,8 +164,18 @@ public abstract class LispLanguage extends Language
     defSntxStFld(name, cname, mangleNameIfNeeded(name));
   }
 
+    /**
+     * Are keywords self-evaluating?
+     * True in CommonLisp.  Used to be true for Scheme also, but now
+     * in Scheme literal keywords should only be used for keyword arguments;
+     * if you want a Keyword value if should be quoted.
+     * @return true if we should treat keywords as self-evaluating.
+     */
+    public boolean keywordsAreSelfEvaluating() { return true; }
+
   public boolean selfEvaluatingSymbol (Object obj)
   {
+    // FUTURE: return keywordsAreSelfEvaluating() && obj instanceof Keyword;
     return obj instanceof Keyword;
   }
 

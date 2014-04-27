@@ -16,6 +16,9 @@ public class SyntaxForms {
 
     public static Object makeForm (Object datum, TemplateScope scope) {
         if (datum instanceof SyntaxForm || datum == LList.Empty
+            // Self-evaluating values don't need to be wrapped
+            // This is an approximation - can be tweaked later.
+            || datum instanceof Number || datum instanceof Keyword
             || scope == null)
             return datum;
         if (datum instanceof PairWithPosition)

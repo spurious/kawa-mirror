@@ -1,3 +1,11 @@
+2014-04-27  Per Bothner  <per@bothner.com>
+
+	* lang/SyntaxForms.java (makeForm): Don't need to wrap
+	self-evaluating values. Needed for Keywords due to change below.
+	* lang/Translator.java (rewrite_pair, rewrite): Add warnings
+	if keywords are misused.
+	* standard/Scheme.java (keywordsAreSelfEvaluating): New override.
+
 2014-04-23  Per Bothner  <per@bothner.com>
 
 	* standard/define.java (rewriteForm): If checking that make-private

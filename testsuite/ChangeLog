@@ -1,3 +1,8 @@
+2014-04-27  Per Bothner  <per@bothner.com>
+
+	* bad-keywords1.scm: New test for keyword mis-use.
+	* Makefile.am: Update accordingly.
+
 2014-03-19  Per Bothner  <per@bothner.com>
 
 	* system-test.scm: Update for newline inside '"' as

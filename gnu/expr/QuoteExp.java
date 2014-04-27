@@ -20,6 +20,7 @@ public class QuoteExp extends Expression
 
   public static final int EXPLICITLY_TYPED = Expression.NEXT_AVAIL_FLAG;
   public static final int SHARED_CONSTANT = EXPLICITLY_TYPED << 1;
+  public static final int IS_KEYWORD = EXPLICITLY_TYPED << 2;
 
   public final gnu.bytecode.Type getRawType() { return type; }
   protected final gnu.bytecode.Type calculateType()

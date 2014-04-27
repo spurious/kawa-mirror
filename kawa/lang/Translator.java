@@ -169,6 +169,10 @@ public class Translator extends Compilation
     return null;
   }
 
+    public final boolean keywordsAreSelfEvaluating() {
+        return ((LispLanguage) getLanguage()).keywordsAreSelfEvaluating();
+    }
+
   public final boolean selfEvaluatingSymbol (Object obj)
   {
     return ((LispLanguage) getLanguage()).selfEvaluatingSymbol(obj);
@@ -380,6 +384,8 @@ public class Translator extends Compilation
     Stack vec = new Stack();
 
     ScopeExp save_scope = current_scope;
+    int first_keyword = -1;
+    int last_keyword = -1;
     for (int i = 0; i < cdr_length;)
       {
 	if (cdr instanceof SyntaxForm)
@@ -391,8 +397,25 @@ public class Translator extends Compilation
               lexical.pushSaveTopLevelRedefs();
 	    setCurrentScope(sf.getScope());
 	  }
+        Object save_pos = pushPositionOf(cdr);
 	Pair cdr_pair = (Pair) cdr;
-	Expression arg = rewrite_car (cdr_pair, false);
+        Object cdr_car = cdr_pair.getCar();
+        Expression arg;
+        if (cdr_car instanceof Keyword) {
+            if (first_keyword < 0)
+                first_keyword = i;
+            else if (keywordsAreSelfEvaluating())
+                ;
+            else if (i == last_keyword + 1 || i + 1 == cdr_length)
+                error('w', "missing keyword value");
+            else if (i != last_keyword + 2)
+                error('w', "keyword separated from other keyword arguments");
+            last_keyword = i;
+            arg = QuoteExp.getInstance(cdr_car, this);
+            arg.setFlag(QuoteExp.IS_KEYWORD);
+        }
+        else
+            arg = rewrite_car (cdr_pair, false);
         i++;
 
         if (mapKeywordsToAttributes)
@@ -418,7 +441,9 @@ public class Translator extends Compilation
 
         vec.addElement(arg);
 	cdr = cdr_pair.getCdr();
+        popPositionOf(save_pos);
       }
+            
     Expression[] args = new Expression[vec.size()];
     vec.copyInto(args);
 
@@ -877,7 +902,12 @@ public class Translator extends Compilation
     else if (exp == Special.nativeSpecial)
       return QuoteExp.nativeExp;
     else
-      return QuoteExp.getInstance(Quote.quote(exp, this), this);
+      {
+        if (exp instanceof Keyword && ! keywordsAreSelfEvaluating())
+          error('w', "keyword should be quoted if not in argument position");
+
+        return QuoteExp.getInstance(Quote.quote(exp, this), this);
+      }
   }
 
   /** 
@@ -2014,5 +2044,4 @@ public class Translator extends Compilation
             this.values = values;
         }
     }
-
 }

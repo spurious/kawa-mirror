@@ -1,3 +1,7 @@
+2014-04-27  Per Bothner  <per@bothner.com>
+
+	* QuoteExp.java (IS_KEYWORD): New constant.
+
 2014-03-04  Per Bothner  <per@bothner.com>
 
 	* Compilation.java (cleanupAfterCompilation): Set className of

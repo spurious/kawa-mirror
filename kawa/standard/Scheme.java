@@ -1129,6 +1129,9 @@ public class Scheme extends LispLanguage
    */
   public boolean appendBodyValues () { return false; }
 
+    @Override
+    public boolean keywordsAreSelfEvaluating() { return false; }
+
   public ReadTable createReadTable ()
   {
     ReadTable tab = ReadTable.createInitial();

@@ -379,8 +379,6 @@ public class Translator extends Compilation
       return syntaxError("circular list is not allowed after "+p.getCar());
     if (cdr_length < 0)
       return syntaxError("dotted list ["+cdr+"] is not allowed after "+p.getCar());
-
-    boolean mapKeywordsToAttributes = false;
     Stack vec = new Stack();
 
     ScopeExp save_scope = current_scope;
@@ -417,27 +415,6 @@ public class Translator extends Compilation
         else
             arg = rewrite_car (cdr_pair, false);
         i++;
-
-        if (mapKeywordsToAttributes)
-          {
-            if ((i & 1) == 0) // Previous iteration was a keyword
-              {
-                Expression[] aargs = new Expression[2];
-                aargs[0] = (Expression) vec.pop();
-                aargs[1] = arg;
-                arg = new ApplyExp(gnu.kawa.xml.MakeAttribute.makeAttribute, aargs);
-              }
-            else
-              {
-                Object value;
-                if (arg instanceof QuoteExp
-                    && (value = ((QuoteExp) arg).getValue()) instanceof Keyword
-                    && i < cdr_length)
-                  arg = new QuoteExp(((Keyword) value).asSymbol());
-                else
-                  mapKeywordsToAttributes = false;
-              }
-          }
 
         vec.addElement(arg);
 	cdr = cdr_pair.getCdr();

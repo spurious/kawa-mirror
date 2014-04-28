@@ -1,3 +1,9 @@
+2014-04-28  Per Bothner  <per@bothner.com>
+
+	* lang/Translator.java (rewrite_pair): Remove some unused code
+	left-over from 2006-06-16 (see ../ChangeLog) for handling
+	xml namespaces.
+
 2014-04-27  Per Bothner  <per@bothner.com>
 
 	* lang/SyntaxForms.java (makeForm): Don't need to wrap

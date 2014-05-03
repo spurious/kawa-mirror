@@ -299,7 +299,7 @@ public class XQResolveNames extends ResolveNames
             if (mname != null)
               {
                 Method meth =
-                  ClassType.make("gnu.kawa.servlet.ServletRequestContext")
+                  ClassType.make("gnu.kawa.servlet.KawaServlet")
                   .getDeclaredMethod(mname, 0);
                 return new ApplyExp(meth, Expression.noExpressions);
               }

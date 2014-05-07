@@ -11,7 +11,7 @@
    ;;     (@javax.jws.soap.InitParam name: (make-string 4)  value: 0)
    ;; Also array of annotation: SOAPMessageHandler
    ;(@javax.xml.bind.annotation.XmlSchemaTypes({ @javax.xml.bind.annotation.XmlSchemaType(...), @XmlSchemaType(...) })
-   (@MyAnnotType
+   (|@MyAnnotType| ;; Test deprecated single-symbol form
     svalue: 4324
     name: "myName"
     ;names: #("name1" "name2")

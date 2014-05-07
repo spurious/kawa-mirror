@@ -191,7 +191,7 @@ public class QuoteExp extends Expression
             comp.error('e', msg, args[0]);
           }
       }
-    if (comp.inlineOk(proc))
+    if (comp.inlineOk(proc) && exp.firstSpliceArg < 0)
       {
 	if (ApplyExp.asInlineable(proc) != null)
           {

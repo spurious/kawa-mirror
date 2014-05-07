@@ -465,7 +465,9 @@ public class object extends Syntax
 		memberCarSyntax = (SyntaxForm) pair_car;
 		pair_car = memberCarSyntax.getDatum();
 	      }
-	    if (pair_car instanceof String || pair_car instanceof Symbol
+            if (Lambda.isAnnotationSymbol(pair_car))
+                ; // Skip
+	    else if (pair_car instanceof String || pair_car instanceof Symbol
 		|| pair_car instanceof Keyword)
 	      { // Field declaration.
 		Object type = null;

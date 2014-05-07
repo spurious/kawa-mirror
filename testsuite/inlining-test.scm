@@ -63,11 +63,11 @@
 (define (is-pair16 x) (Pair3? x))
 
 (define (cast-to-pair1 x) (<pair>:@ x))
-(define (cast-to-pair2 x) (gnu.lists.Pair:@ x))
+(define (cast-to-pair2 x) (->gnu.lists.Pair x))
 (define (cast-to-pair3 x) (<gnu.lists.Pair>:@ x))
 (define (cast-to-pair4 x) (Pair1:@ x))
 (define (cast-to-pair5 x) (Pair2:@ x))
-(define (cast-to-pair6 x) (Pair3:@ x))
+(define (cast-to-pair6 x) (->Pair3 x))
 (define (cast-to-pair7 x) (as <pair> x))
 (define (cast-to-pair9 x) (as <gnu.lists.Pair> x))
 (define (cast-to-pair10 x) (as Pair1:<> x))

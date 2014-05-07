@@ -49,9 +49,9 @@
     ((! name obj args ...)
      (invoke obj 'name args ...))))
 
-(define-syntax @
+(define-syntax |@|
   (syntax-rules ()
-    ((@ name obj)
+    ((|@| name obj)
      (field obj 'name))))
 
 (define-syntax packing
@@ -91,7 +91,7 @@
      `(set ,(! get-symbol exp) ,(unrewrite (! get-new-value exp))))
     (<gnu.expr.LambdaExp>
      `(lambda ,(unrewrite-arglist exp)
-	,(unrewrite (@ body exp))))
+	,(unrewrite (|@| body exp))))
     (<gnu.expr.ReferenceExp> (! get-symbol exp))
     (<gnu.expr.ApplyExp> (unrewrite-apply exp))
     (<gnu.expr.BeginExp> `(begin . ,(unrewrite* (! get-expressions exp))))
@@ -104,10 +104,10 @@
     (#t exp)))
 
 (define (unrewrite-arglist (exp <gnu.expr.LambdaExp>))
-  (let* ((min (@ min_args exp))
-	 (rest? (negative? (@ max_args exp)))
-	 (key? (not (eq? (@ keywords exp) #!null)))
-	 (opt (@ opt_args exp))
+  (let* ((min (|@| min_args exp))
+	 (rest? (negative? (|@| max_args exp)))
+	 (key? (not (eq? (|@| keywords exp) #!null)))
+	 (opt (|@| opt_args exp))
 	 (required '())
 	 (optional '())
 	 (key '())
@@ -126,7 +126,7 @@
 	       (set! rest var))
 	      ((and key? (< i (+ min opt 
 				 (if rest? 1 0)
-				 (@ length (@ keywords exp)))))
+				 (|@| length (|@| keywords exp)))))
 	       (set! key (cons var key)))
 	      (#t 
 	       (error "nyi")))))
@@ -140,7 +140,7 @@
 
 (define (unrewrite* (exps <gnu.expr.Expression[]>))
   (packing (pack)
-    (do ((len (@ length exps))
+    (do ((len (|@| length exps))
 	 (i 0 (+ i 1)))
 	((= i len))
       (pack (unrewrite (exps i))))))
@@ -153,10 +153,10 @@
                ((eq? decl #!null))
              (pack (list (! get-symbol decl)
                          (unrewrite (! getInitValue decl))))))
-     ,(unrewrite (@ body exp))))
+     ,(unrewrite (|@| body exp))))
 
 (define (unrewrite-quote (exp <gnu.expr.QuoteExp>))
-  (let ((val (@ value exp))
+  (let ((val (|@| value exp))
         (type-name (lambda (name) (string->symbol (format "<~a>" name)))))
     (typecase val
       ((or <number> <boolean> <character> <keyword> <string> 
@@ -177,8 +177,8 @@
          (fval (! get-function-value exp)))
     (cond ((and (not (eq? fbinding #!null))
 		(not (eq? apply-to-args #!null))
-                (eq? (@ field fbinding)
-		     (@ field apply-to-args)))
+                (eq? (|@| field fbinding)
+		     (|@| field apply-to-args)))
            args)
           ((typecase fval
              (<gnu.kawa.functions.Convert>

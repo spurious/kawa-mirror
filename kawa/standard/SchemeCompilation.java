@@ -17,14 +17,10 @@ public class SchemeCompilation extends Translator
   public static final Declaration applyFieldDecl =
     Declaration.getDeclarationFromStatic("kawa.standard.Scheme", "applyToArgs");
 
-  @Override
-  public ApplyExp makeApply (Expression func, Expression[] args)
-  {
-    Expression[] exps = new Expression[args.length+1];
-    exps[0] = func;
-    System.arraycopy(args, 0, exps, 1, args.length);
-    return new ApplyExp(new ReferenceExp(applyFieldDecl), exps);
-  }
+    @Override
+    public Expression applyFunction(Expression func) {
+        return new ReferenceExp(applyFieldDecl);
+    }
 
   @Override
   public boolean isApplyFunction (Expression exp)

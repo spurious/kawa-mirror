@@ -14,6 +14,7 @@ import gnu.kawa.lispexpr.*;
 import java.util.*;
 import gnu.kawa.functions.GetNamedPart;
 import gnu.kawa.functions.CompileNamedPart;
+import gnu.kawa.functions.MakeSplice;
 import gnu.kawa.functions.MultiplyOp;
 import gnu.kawa.xml.XmlNamespace;
 import gnu.math.DFloNum;
@@ -308,7 +309,17 @@ public class Translator extends Compilation
 
   public Expression rewrite_pair (Pair p, boolean function)
   {
-    Expression func = rewrite_car (p, true);
+    Object p_car = p.getCar();
+    Expression func;
+    boolean useHelper = true;
+    if (p_car instanceof Pair
+        && ((Pair) p_car).getCar() == LispLanguage.splice_sym) {
+        func = gnu.kawa.reflect.MakeAnnotation.makeAnnotationMaker
+            (rewrite_car((Pair) ((Pair) p_car).getCdr(), false));
+        useHelper = false;
+    }
+    else
+        func = rewrite_car (p, true);
     Object proc = null;
     if (func instanceof QuoteExp)
       {
@@ -372,6 +383,11 @@ public class Translator extends Compilation
 	  func.setFlag(ReferenceExp.PREFER_BINDING2);
       }
 
+    boolean isNamedPartDecl = func instanceof ReferenceExp
+        && (((ReferenceExp) func).getBinding()==getNamedPartDecl);
+    if (isNamedPartDecl)
+      useHelper = false;
+
     Object cdr = p.getCdr();
     int cdr_length = listLength(cdr);
 
@@ -379,11 +395,18 @@ public class Translator extends Compilation
       return syntaxError("circular list is not allowed after "+p.getCar());
     if (cdr_length < 0)
       return syntaxError("dotted list ["+cdr+"] is not allowed after "+p.getCar());
+    Expression applyFunction =  useHelper ? applyFunction(func) : null;
+
     Stack vec = new Stack();
+    if (applyFunction != null) {
+        vec.add(func);
+        func = applyFunction;
+    }
 
     ScopeExp save_scope = current_scope;
     int first_keyword = -1;
     int last_keyword = -1;
+    int firstSpliceArg = -1;
     for (int i = 0; i < cdr_length;)
       {
 	if (cdr instanceof SyntaxForm)
@@ -412,26 +435,42 @@ public class Translator extends Compilation
             arg = QuoteExp.getInstance(cdr_car, this);
             arg.setFlag(QuoteExp.IS_KEYWORD);
         }
-        else
-            arg = rewrite_car (cdr_pair, false);
+        else {
+            if (cdr_car instanceof Pair
+                && ((Pair) cdr_car).getCar() == LispLanguage.splice_sym) {
+                arg = rewrite_car((Pair) ((Pair) cdr_car).getCdr(), false);
+                arg = new ApplyExp(MakeSplice.quoteInstance, arg);
+                if (firstSpliceArg < 0)
+                    firstSpliceArg = i + (applyFunction != null ? 1 : 0);
+            }
+            else 
+                arg = rewrite_car (cdr_pair, false);
+        }
         i++;
 
         vec.addElement(arg);
 	cdr = cdr_pair.getCdr();
         popPositionOf(save_pos);
       }
-            
+
+
     Expression[] args = new Expression[vec.size()];
     vec.copyInto(args);
 
     if (save_scope != current_scope)
       setPopCurrentScope(save_scope);
 
-    if (func instanceof ReferenceExp
-        && (((ReferenceExp) func).getBinding()==getNamedPartDecl))
+    if (isNamedPartDecl)
         return rewrite_lookup(args[0], args[1], function);
 
-    return makeApply(func, args);
+    ApplyExp app = new ApplyExp(func, args);
+    app.firstSpliceArg = firstSpliceArg;
+    if (first_keyword >= 0)
+      {
+        app.numKeywordArgs = (last_keyword - first_keyword) / 2 + 1;
+        app.firstKeywordArgIndex = first_keyword + (applyFunction != null ? 2 : 1);
+      }
+    return app;
   }
 
     public Expression rewrite_lookup(Expression part1, Expression part2, boolean function) {
@@ -442,10 +481,11 @@ public class Translator extends Compilation
         return CompileNamedPart.makeExp(part1, part2);
     }
 
-  public ApplyExp makeApply (Expression func, Expression[] args)
-  { 
-    return new ApplyExp(func, args);
-  }
+    /** A language-dependent "apply" function for generic application.
+     */
+    public Expression applyFunction(Expression func) {
+        return null;
+    }
 
   public Namespace namespaceResolvePrefix (Expression context)
   {
@@ -933,7 +973,7 @@ public class Translator extends Compilation
 
     char ch0 = name.charAt(0);
 
-    if (ch0 == '@')
+    if (ch0 == '@') // Deprecated - reader now returns ($splice$ ATYPE).
     {
       String rest = name.substring(1);
       Expression classRef = tr.rewrite(Symbol.valueOf(rest));

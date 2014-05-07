@@ -1,3 +1,8 @@
+2014-05-05  Per Bothner  <per@bothner.com>
+
+	* syntaxutils.scm: Add quotation for @ symbol (i.e. |@|)
+	since @ is now used for $splice$ read syntax.
+
 2014-04-23  Per Bothner  <per@bothner.com>
 
 	* Makefile.am: New rules to regenerate char-tables.iscm using

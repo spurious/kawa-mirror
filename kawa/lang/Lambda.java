@@ -4,6 +4,7 @@ import gnu.expr.*;
 import gnu.lists.*;
 import gnu.bytecode.Type;
 import gnu.kawa.lispexpr.LangObjType;
+import gnu.kawa.lispexpr.LispLanguage;
 import java.util.ArrayList;
 
 /**
@@ -633,7 +634,13 @@ public class Lambda extends Syntax
 
   public static boolean isAnnotationSymbol (Object key)
   {
-    if (key instanceof SimpleSymbol)
+    if (key instanceof Pair)
+      {
+        Pair keyp = (Pair) key;
+        if (keyp.getCar() == LispLanguage.splice_sym)
+          return true;
+      }
+    if (key instanceof SimpleSymbol) // Deprecated: Symbol starting with '@'
       {
         String name = ((SimpleSymbol) key).getName();
         if (name.length() > 1 && name.charAt(0) == '@')

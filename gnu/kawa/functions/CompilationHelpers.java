@@ -36,14 +36,12 @@ public class CompilationHelpers
     return false;
   }
 
-  public static Expression validateApplyToArgs
-  (ApplyExp exp, InlineCalls visitor,
-   Type required, Procedure applyToArgs)
-  {
-    Expression[] args = exp.getArgs();
-    int nargs = args.length - 1;
-    if (nargs >= 0)
-      {
+    public static Expression validateApplyToArgs
+        (ApplyExp exp, InlineCalls visitor,
+         Type required, Procedure applyToArgs) {
+        Expression[] args = exp.getArgs();
+        int nargs = args.length - 1;
+        if (nargs >= 0) {
         Expression proc = args[0];
         if (! proc.getFlag(Expression.VALIDATED))
           {
@@ -54,7 +52,8 @@ public class CompilationHelpers
                 if (decl != null)
                   pval = decl.getValue();
               }
-            if (pval != null && pval.getClass() == LambdaExp.class)
+            if (pval != null && pval.getClass() == LambdaExp.class
+                && exp.firstSpliceArg < 0 /* for now */)
               {
                 Expression[] rargs = new Expression[nargs];
                 System.arraycopy(args, 1, rargs, 0, nargs);
@@ -72,6 +71,10 @@ public class CompilationHelpers
             Expression[] rargs = new Expression[nargs];
             System.arraycopy(args, 1, rargs, 0, nargs);
             exp.setFuncArgs(proc, rargs);
+            if (exp.firstSpliceArg >= 0)
+                exp.firstSpliceArg = exp.firstSpliceArg - 1;
+            if (exp.firstKeywordArgIndex > 0)
+                exp.firstKeywordArgIndex = exp.firstKeywordArgIndex - 1;
             return proc.validateApply(exp, visitor, required, null);
           }
 

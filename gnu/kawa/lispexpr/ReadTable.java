@@ -82,7 +82,7 @@ public class ReadTable extends RangeTable
     set('=',  entry);
     set('>',  entry);
     set('?',  entry);
-    set('@',  entry);
+    //set('@',  entry);
     set('^',  entry);
     set('_',  entry);
     set('{',  ReadTableEntry.brace);
@@ -101,24 +101,26 @@ public class ReadTable extends RangeTable
         new ReaderQuote(makeSymbol(LispLanguage.unquote_str),
                         '@', makeSymbol(LispLanguage.unquotesplicing_str));
     set(',',  unquoteEntry);
+    set('@', new ReaderQuote(LispLanguage.splice_sym,
+                             ReadTable.NON_TERMINATING_MACRO));
 
     setBracketMode();  // Sets the entries for '[', ']', and '<'.
   }
 
-  /** Create a new ReadTable and initialize it appropriately for Common Lisp. */
-  public static ReadTable createInitial ()
-  {
-    ReadTable tab = new ReadTable();
-    tab.initialize(true);
-    return tab;
-  }
+    /** Create a new ReadTable and initialize it appropriately for Common Lisp. */
+    public static ReadTable createInitial ()
+    {
+        ReadTable tab = new ReadTable();
+        tab.initialize(true);
+        return tab;
+    }
 
-  /** Specify how '[' and ']' (and '<') are handled.
-   * The value -2 means {@code [a b c]} is {@code ($bracket-list$ a b c)}
-   * and {@code f[a b]} is {@code ($bracket-apply$ f a b)}.
-   * The value -1 means that '[' and ']' are plain token constituents.
-   * The value 0 means that '[' and ']' are equivalent to '(' and ')'.
-   * The value 1 means that '[' and ']' are equivalent to '(' and ')', except
+    /** Specify how '[' and ']' (and '<') are handled.
+     * The value -2 means {@code [a b c]} is {@code ($bracket-list$ a b c)}
+     * and {@code f[a b]} is {@code ($bracket-apply$ f a b)}.
+     * The value -1 means that '[' and ']' are plain token constituents.
+     * The value 0 means that '[' and ']' are equivalent to '(' and ')'.
+     * The value 1 means that '[' and ']' are equivalent to '(' and ')', except
    * within a token starting with '<', in which case they are constituents.
    * This is so '[' is non-terminating when reading say '<char[]>'
    */

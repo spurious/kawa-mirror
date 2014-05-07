@@ -1,3 +1,12 @@
+2014-05-05  Per Bothner  <per@bothner.com>
+
+	* ApplyExp.java	(compile): Add support for splice arguments.
+	(firstKeywordArgIndex, numKeywordArgs, firstSpliceArg):	New fields.
+	* InlineCalls.java (maybeInline): First look for validateXApplyKey;
+	if not found, try validateApplyKey but only if no splice.
+	* QuoteExp.java (validateApply): Don't allow compile-time inline
+	if there is a splice - the compile methods don't handle that.
+
 2014-04-27  Per Bothner  <per@bothner.com>
 
 	* QuoteExp.java (IS_KEYWORD): New constant.

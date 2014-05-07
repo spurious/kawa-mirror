@@ -329,6 +329,7 @@ GNU_KAWA_FUNCTIONS_JSOURCES = \
   kawa/functions/MakeList.java \
   kawa/functions/MakeProcedure.java \
   kawa/functions/MakePromise.java \
+  kawa/functions/MakeSplice.java \
   kawa/functions/Map.java \
   kawa/functions/MultiplyOp.java \
   kawa/functions/NamedPart.java \

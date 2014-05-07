@@ -1,3 +1,11 @@
+2014-05-07  Per Bothner  <per@bothner.com>
+
+	* splice1.scm: New tests for splice feature.
+	* Makefile.am: Update accordingly
+	* annotations1.scm: Add symbol-quoting to test deprecated syntax..
+	* bad-keywords1.scm: Add a test.
+	* inlining-test.scm: Update syntax for some deprecated TYPE:@ tests.
+
 2014-04-27  Per Bothner  <per@bothner.com>
 
 	* bad-keywords1.scm: New test for keyword mis-use.

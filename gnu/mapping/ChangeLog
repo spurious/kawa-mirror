@@ -1,3 +1,7 @@
+2014-05-05  Per Bothner  <per@bothner.com>
+
+	* Procedure.java (validateXApplyKey): New static field.
+
 2014-02-16  Per Bothner  <per@bothner.com>
 
 	* LazyPropertyKey.java: Make sure Error is uncaught or re-thrown.

@@ -485,6 +485,8 @@ public class LispReader extends Lexer
             return false;
         if (ch == ',')
             return true;
+        if (ch == '@')
+            return true; // To support deprecated (TYPE:@ EXP)
         int kind = rtable.lookup(ch).getKind();
         return kind == ReadTable.CONSTITUENT
             || kind == ReadTable.NON_TERMINATING_MACRO
@@ -512,12 +514,19 @@ public class LispReader extends Lexer
                 // A kludge to map PreOpWord to ($lookup$ Pre 'Word).
                 port.read();
                 int ch2 = port.peek();
-                if (! validPostfixLookupStart(ch2, rtable)) {
-                    unread();
-                    break;
+                Object rightOperand;
+                if (ch2 == '@') {
+                    error('w',
+                          "deprecated cast syntax TYPE:@ (use ->TYPE instead)");
+                    rightOperand = readAndHandleToken('\\', 0, rtable);
+                } else {
+                    if (! validPostfixLookupStart(ch2, rtable)) {
+                        unread();
+                        break;
+                    }
+                    ch = port.read();
+                    rightOperand = readValues(ch, rtable.lookup(ch), rtable, -1);
                 }
-                ch = port.read();
-                Object rightOperand = readValues(ch, rtable.lookup(ch), rtable, -1);
                 value = LList.list2(value,
                                     LList.list2(rtable.makeSymbol(LispLanguage.quote_str), rightOperand));
                 value = PairWithPosition.make(LispLanguage.lookup_sym, value,

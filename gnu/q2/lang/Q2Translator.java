@@ -115,18 +115,10 @@ public class Q2Translator extends SchemeCompilation
       return rewrite(partitioned, function);
   }
 
-  public ApplyExp makeApply (Expression func, Expression[] args)
-  {
-    /*
-    if (func instanceof QuoteExp
-	&& ((QuoteExp) func).getValue() instanceof Procedure)
-      return super.makeApply(func, args);
-    */
-    Expression[] exps = new Expression[args.length+1];
-    exps[0] = func;
-    System.arraycopy(args, 0, exps, 1, args.length);
-    return new ApplyExp(Q2Apply.q2Apply, exps);
-  }
+    @Override
+    public Expression applyFunction(Expression func) {
+        return new QuoteExp(Q2Apply.q2Apply);
+    }
 
   public boolean isApplyFunction (Expression exp)
   {

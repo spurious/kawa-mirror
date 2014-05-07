@@ -4,6 +4,7 @@
 package gnu.expr;
 import gnu.bytecode.*;
 import gnu.mapping.*;
+import gnu.kawa.functions.MakeSplice;
 import gnu.kawa.io.OutPort;
 import gnu.text.SourceMessages;
 
@@ -27,10 +28,23 @@ public class ApplyExp extends Expression
   /** The next ApplyExp in ((ReferenceExp)func).binding.firstCall list. */
   public ApplyExp nextCall;
 
+    /** Index of argument for first keyword argument.
+     * If zero, no keyword arguments.  If non-zero, then
+     * {@code firstKeywordArgIndex-1} is the index in the {@code args}
+     * array of the first keyword.
+     */
+    public int firstKeywordArgIndex;
+    public int numKeywordArgs;
+
+    /** Index of first argument that is a MakeSplice.
+     * The value is -1 is no argument is a splice.
+     */
+    public int firstSpliceArg = -1;
+
   public final Expression getFunction() { return func; }
   public final Expression[] getArgs() { return args; }
   public final int getArgCount() { return args.length; }
-  public void setFunction(Expression func) { this.func = func; }
+    public void setFunction(Expression func) { this.func = func; }
   public void setFunction(Procedure proc) { this.func = new QuoteExp(proc); }
   public void setArgs(Expression[] args) { this.args = args; }
   public Expression getArg(int i) { return args[i]; }
@@ -138,15 +152,49 @@ public class ApplyExp extends Expression
     compile(exp, comp, target, false);
   }
 
-  static void compile (ApplyExp exp, Compilation comp, Target target,
-                       boolean checkInlineable)
-  {
-    int args_length = exp.args.length;
-    Expression exp_func = exp.func;
-    LambdaExp func_lambda = null;
-    String func_name = null;
-    Declaration owner = null;
-    Object quotedValue = null;
+    static void compile (ApplyExp exp, Compilation comp, Target target,
+                         boolean checkInlineable) {
+        int args_length = exp.args.length;
+        Expression exp_func = exp.func;
+        LambdaExp func_lambda = null;
+        String func_name = null;
+        Declaration owner = null;
+        Object quotedValue = null;
+        if (exp.firstSpliceArg >= 0) {
+            CodeAttr code = comp.getCode();
+            Expression[] args = exp.getArgs();
+            code.pushScope();
+            exp_func.compile(comp, Target.pushObject);
+            ClassType arrayClass = ClassType.make("java.util.ArrayList");
+            Variable arr = code.addLocal(arrayClass);
+            code.emitNew(arrayClass);
+            code.emitDup(arrayClass);
+            code.emitInvokeSpecial(arrayClass.getDeclaredMethod("<init>", 0));
+            code.emitStore(arr);
+            for (int i = 0;  i < args_length; i++) {
+                Expression arg = args[i];
+                Expression argIfSplice = MakeSplice.argIfSplice(arg);
+                if (argIfSplice != null) {
+                    code.emitLoad(arr);
+                    argIfSplice.compile(comp, Target.pushObject);
+                    Method m = ClassType.make("gnu.kawa.functions.MakeSplice")
+                        .getDeclaredMethod("addAll", 2);
+                    code.emitInvokeStatic(m);
+                } else {
+                    code.emitLoad(arr);
+                    arg.compile(comp, Target.pushObject);
+                    code.emitInvoke(arrayClass.getDeclaredMethod("add", 1));
+                    code.emitPop(1);
+                }
+            }
+            code.emitLoad(arr);
+            code.emitInvoke(arrayClass.getDeclaredMethod("toArray", 0));
+            code.emitInvoke(Compilation.typeProcedure.getDeclaredMethod("applyN", 1));
+            target.compileFromStack(comp, Type.pointer_type);
+            code.popScope();
+            return;
+            
+        }
     if (exp_func instanceof LambdaExp)
       {
 	func_lambda = (LambdaExp) exp_func;

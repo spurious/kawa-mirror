@@ -1,3 +1,15 @@
+2014-05-06  Per Bothner  <per@bothner.com>
+
+	* lang/Lambda.java (isAnnotationSymbol): Check for ($splice$ ...).
+	* lang/Translator.java (rewritePair): Handle splice forms,
+	as well as annotation forms.
+	(appltFunction): New method.
+	(makeApply): Remove method - use applyFunctio instead.
+	* standard/object.java (rewriteClassDef): Expliciylhy skip annotations.
+	Needed now that annotations are read as (($splice$ ATYPE) ...).
+	* standard/SchemeCompilation.java (applyFunction): New override,
+	(makeApply): Remove method.
+
 2014-04-28  Per Bothner  <per@bothner.com>
 
 	* lang/Translator.java (rewrite_pair): Remove some unused code

@@ -853,7 +853,9 @@ public class InlineCalls extends ExpExpVisitor<Type> {
         Object inliner;
         synchronized (proc)
           {
-            inliner = proc.getProperty(Procedure.validateApplyKey, null);
+            inliner = proc.getProperty(Procedure.validateXApplyKey, null);
+            if (inliner == null && exp.firstSpliceArg < 0)
+                inliner = proc.getProperty(Procedure.validateApplyKey, null);
             if (inliner instanceof String)
               {
                 String inliners = (String) inliner;

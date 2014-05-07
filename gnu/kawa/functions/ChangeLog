@@ -1,3 +1,12 @@
+2014-05-05  Per Bothner  <per@bothner.com>
+
+	* MakeSplice.java: New class, extends Procedure1.
+	(addAll): Static helper method.
+	* CompilationHelpers.java (validateApplyToArgs): Check and update
+	firstSpliceArg field.
+	* ApplyToArgs.java (<init>): Set new validateXApplyKey property since
+	validateApplyToArgs may not handle splice arguments.
+
 2014-03-19  Per Bothner  <per@bothner.com>
 
 	* RunProcess.java (tokenize): Inside '"' treat a substituted newline

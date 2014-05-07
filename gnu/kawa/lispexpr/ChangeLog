@@ -1,3 +1,12 @@
+2014-05-05  Per Bothner  <per@bothner.com>
+
+	* ReadTable.java (initialize): Read @FOO as ($splice$ FOO).
+	* LispLanguage.java (splice_str, splice_sym): New static fields.
+	* ReaderQuote.java (kind): New field.
+	(getKind): Return kind.
+	* LispReader.java (handlePostfix): Warn for deprecated TYPE:@ syntax.
+	(validPostfixLookupStart): Check for '@'.
+
 2014-04-27  Per Bothner  <per@bothner.com>
 
 	* LispLanguage.java (keywordsAreSelfEvaluating): New method.

@@ -1,3 +1,7 @@
+2014-05-06  Per Bothner  <per@bothner.com>
+
+	* Invoke.java (applyN): Add support for constructing a ConstVector.
+
 2014-02-16  Per Bothner  <per@bothner.com>
 
 	* CompileBuildObject.java: Likewise.

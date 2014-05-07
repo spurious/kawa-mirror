@@ -2,9 +2,11 @@ package gnu.kawa.reflect;
 import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.bytecode.*;
+import gnu.lists.ConstVector;
 import gnu.lists.FString;
 import java.lang.reflect.Array;
 import gnu.kawa.lispexpr.ClassNamespace; // FIXME
+import gnu.kawa.lispexpr.LangObjType;
 
 public class Invoke extends ProcedureN
 {
@@ -130,9 +132,9 @@ public class Invoke extends ProcedureN
 	    PairClassType ptype = (PairClassType) dtype;
 	    dtype = ptype.instanceType;
 	  }
-        if (dtype instanceof ArrayType)
+        if (dtype instanceof ArrayType
+            || dtype == LangObjType.constVectorType)
           {
-            Type elementType = ((ArrayType) dtype).getComponentType();
             int len;
             len = args.length-1;
             String name;
@@ -153,6 +155,9 @@ public class Invoke extends ProcedureN
                 i = 1;
                 lengthSpecified = false;
               }
+            Type elementType = (dtype == LangObjType.constVectorType
+                                ? Type.objectType
+                                : ((ArrayType) dtype).getComponentType());
             Object arr = Array.newInstance(elementType.getReflectClass(),
                                            length);
             int index = 0;
@@ -175,6 +180,8 @@ public class Invoke extends ProcedureN
                 Array.set(arr, index, elementType.coerceFromObject(arg));
                 index++;
               }
+            if (dtype == LangObjType.constVectorType)
+                return new ConstVector((Object[]) arr);
             return arr;
           }
       }

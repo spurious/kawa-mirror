@@ -29,13 +29,25 @@ public class IfFeature
         coreFeatures.add("exact-complex");
         coreFeatures.add("full-unicode");
 
-        /* #ifdef JAVA6 */
-        coreFeatures.add("java-6");
-        /* #endif */
-
-        /* #ifdef JAVA7 */
-        coreFeatures.add("java-7");
-        /* #endif */
+        String javaVersion = System.getProperty("java.version");
+        if (javaVersion != null && javaVersion.length() >= 3
+            && javaVersion.charAt(0) == '1'
+            && javaVersion.charAt(1) == '.') {
+            switch (javaVersion.charAt(2)) {
+            case '9':
+                coreFeatures.add("java-9");
+                /* fall through */
+            case '8':
+                coreFeatures.add("java-8");
+                /* fall through */
+            case '7':
+                coreFeatures.add("java-7");
+                /* fall through */
+            case '6':
+                coreFeatures.add("java-6");
+                /* fall through */
+            }
+        }
 
         coreFeatures.add("kawa");
         coreFeatures.add("ratios");

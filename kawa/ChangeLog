@@ -1,3 +1,8 @@
+2014-05-09  Per Bothner  <per@bothner.com>
+
+	* standard/IfFeature.java (coreFeatures): Add java-8 and java-9.
+	Use System.getProperty to set java-6 thtough java-9.
+
 2014-05-06  Per Bothner  <per@bothner.com>
 
 	* lang/Lambda.java (isAnnotationSymbol): Check for ($splice$ ...).

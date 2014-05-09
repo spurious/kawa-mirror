@@ -1,5 +1,8 @@
 2014-05-09  Per Bothner  <per@bothner.com>
 
+	* r7rs-tests.scm: Note that downcasing uppercase dotted I
+	is expected to fail on Java 8. See Java bug JDK-8041791.
+
 	* splice1.scm: Two tests for vararg method calls with splice.
 
 2014-05-07  Per Bothner  <per@bothner.com>

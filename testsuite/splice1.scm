@@ -19,3 +19,11 @@
 
 (format #t "sum-xb: ~w~%" (+ 100 @xa @xa 13))
 ;; Output: sum-xb: 137
+
+; Call static varargs method:
+(display (java.lang.String:format "<x: %s y: %s z: %s>" @oarr)) (newline)
+;; Output: <x: 5 y: 4 z: 3>
+;; Static varargs with non-matching splice:
+(define xoarr (object[] "<x: %s y: %s>" @oarr))
+(display (java.lang.String:format @xoarr)) (newline)
+;; Output: <x: 5 y: 4>

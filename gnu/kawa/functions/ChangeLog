@@ -1,3 +1,8 @@
+2014-05-09  Per Bothner  <per@bothner.com>
+
+	* CompileNamedPart.java (GetNamedExp#validatApply): Set
+	firstSpliceArg of result ApplyExp from argument.
+
 2014-05-05  Per Bothner  <per@bothner.com>
 
 	* MakeSplice.java: New class, extends Procedure1.

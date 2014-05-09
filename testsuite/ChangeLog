@@ -1,3 +1,7 @@
+2014-05-09  Per Bothner  <per@bothner.com>
+
+	* splice1.scm: Two tests for vararg method calls with splice.
+
 2014-05-07  Per Bothner  <per@bothner.com>
 
 	* splice1.scm: New tests for splice feature.

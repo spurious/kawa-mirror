@@ -424,6 +424,7 @@ class GetNamedExp extends ApplyExp
     Expression context = pargs[0];
     Expression[] args = exp.getArgs();
     Expression[] xargs;
+    int adjust;
     switch (kind)
       {
       case 'M':
@@ -432,12 +433,14 @@ class GetNamedExp extends ApplyExp
         xargs[0] = pargs[0];
         xargs[1] = pargs[1];
         System.arraycopy(args, 0, xargs, 2, args.length);
+        adjust = 2;
         break;
       case 'N': // new
         decl = makeDecl;
         xargs = new Expression[args.length+1];
         System.arraycopy(args, 0, xargs, 1, args.length);
         xargs[0] = context;
+        adjust = 1;
         break;
       case 'I': // instance-of
         decl = instanceOfDecl;
@@ -445,13 +448,14 @@ class GetNamedExp extends ApplyExp
         System.arraycopy(args, 1, xargs, 2, args.length-1);
         xargs[0] = args[0];
         xargs[1] = context;
+        adjust = exp.firstSpliceArg > 0 ? 1 : 0;
         break;
       case 'C': // cast
         decl = castDecl;
         xargs = new Expression[args.length+1];
-        System.arraycopy(args, 1, xargs, 2, args.length-1);
+        System.arraycopy(args, 0, xargs, 1, args.length);
         xargs[0] = context;
-        xargs[1] = args[0];
+        adjust = 1;
         break;
       case 'S': // invoke-static
         decl = invokeStaticDecl;
@@ -459,11 +463,14 @@ class GetNamedExp extends ApplyExp
         xargs[0] = context;
         xargs[1] = pargs[1];
         System.arraycopy(args, 0, xargs, 2, args.length);
+        adjust = 2;
         break;
       default:
         return exp;
       }
     ApplyExp result = new ApplyExp(new ReferenceExp(decl), xargs);
+    if (exp.firstSpliceArg >= 0)
+      result.firstSpliceArg = exp.firstSpliceArg + adjust;
     result.setLine(exp);
     return visitor.visit(result, required);
   }

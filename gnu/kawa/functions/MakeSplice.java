@@ -30,6 +30,33 @@ public class MakeSplice extends Procedure1 {
         throw new UnsupportedOperationException("$splice$ function should not be called");
     }
 
+    public static int count(Object values) {
+        if (values instanceof Object[])
+            return ((Object[]) values).length;
+        else if (values instanceof List<?>)
+            return ((List<?>) values).size();
+        else if (values.getClass().isArray())
+            return Array.getLength(values);
+        else
+            throw new ClassCastException("value is neither List or array");
+    }
+
+    public static void copyTo(Object[] target, int start, int size,
+                              Object values) {
+        if (values instanceof Object[]) {
+            Object[] arr = (Object[]) values;
+            int nlen = arr.length;
+            System.arraycopy(arr, 0, target, start, size);
+        } else if (values instanceof List<?>) {
+            for (Object val : (List<?>) values)
+                target[start++] = val;
+         } else if (values.getClass().isArray()) {
+            for (int i = 0; i < size;  i++)
+                target[start++] = Array.get(values, i);
+        } else
+            throw new ClassCastException("value is neither List or array");
+    }
+
     /** Helper method called by compiled code. */
     public static void addAll(ArrayList<Object> list, Object values) {
         if (values instanceof Object[]) {

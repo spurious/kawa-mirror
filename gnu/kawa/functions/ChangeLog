@@ -1,3 +1,8 @@
+2014-05-12  Per Bothner  <per@bothner.com>
+
+	* MakeSplice.java (count, copyTo): New static helper methods, used
+	by compiled code.
+
 2014-05-09  Per Bothner  <per@bothner.com>
 
 	* CompileNamedPart.java (GetNamedExp#validatApply): Set

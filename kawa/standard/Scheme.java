@@ -1154,6 +1154,8 @@ public class Scheme extends LispLanguage
       {
         tab.postfixLookupOperator = ':';
         tab.setFinalColonIsKeyword(true);
+        tab.set('@', new ReaderQuote(LispLanguage.splice_sym,
+                                     ReadTable.NON_TERMINATING_MACRO));
       }
     return tab;
   }

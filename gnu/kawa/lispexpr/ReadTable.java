@@ -82,7 +82,7 @@ public class ReadTable extends RangeTable
     set('=',  entry);
     set('>',  entry);
     set('?',  entry);
-    //set('@',  entry);
+    set('@',  entry);
     set('^',  entry);
     set('_',  entry);
     set('{',  ReadTableEntry.brace);
@@ -101,8 +101,6 @@ public class ReadTable extends RangeTable
         new ReaderQuote(makeSymbol(LispLanguage.unquote_str),
                         '@', makeSymbol(LispLanguage.unquotesplicing_str));
     set(',',  unquoteEntry);
-    set('@', new ReaderQuote(LispLanguage.splice_sym,
-                             ReadTable.NON_TERMINATING_MACRO));
 
     setBracketMode();  // Sets the entries for '[', ']', and '<'.
   }

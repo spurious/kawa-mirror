@@ -1,3 +1,8 @@
+2014-05-12  Per Bothner  <per@bothner.com>
+
+	* ReadTable.java (initialize): Revert previous change.  Instead
+	handle '@' as splice operator in Scheme's createReadTable.
+
 2014-05-05  Per Bothner  <per@bothner.com>
 
 	* ReadTable.java (initialize): Read @FOO as ($splice$ FOO).

@@ -1,3 +1,8 @@
+2014-05-12  Per Bothner  <per@bothner.com>
+
+	* standard/Scheme.java (createReadTable): Bind '@' to handling splice,
+	but only if not FOLLOW_R5R/FOLLOW_R6RS/FOLLOW_R7R.
+
 2014-05-09  Per Bothner  <per@bothner.com>
 
 	* standard/IfFeature.java (coreFeatures): Add java-8 and java-9.

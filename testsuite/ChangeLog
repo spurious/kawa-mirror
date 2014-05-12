@@ -1,3 +1,8 @@
+2014-05-12  Per Bothner  <per@bothner.com>
+
+	* standards1.scm: New test for --r7rs flag.
+	* Makefile.am: Update accordingly.
+
 2014-05-09  Per Bothner  <per@bothner.com>
 
 	* r7rs-tests.scm: Note that downcasing uppercase dotted I

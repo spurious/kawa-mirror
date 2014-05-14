@@ -1,5 +1,8 @@
 2014-05-13  Per Bothner  <per@bothner.com>
 
+	* standard/require.java (scanForDefinitions): Better error message
+	if a symbol does not match an existing class.
+
 	* standard/require.java (lookupModuleFromSourcePath): Don't resolve
 	if the base filename is the default InPort.
 

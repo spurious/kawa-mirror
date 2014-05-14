@@ -147,21 +147,21 @@ public class require extends Syntax
     if (name instanceof Pair
         && tr.matches((p = (Pair) name).getCar(), Scheme.quote_str))
       {
-	name = p.getCdr();
-	if (! (name instanceof Pair)
-	    || (p = (Pair) name).getCdr() != LList.Empty
+	Object fname = p.getCdr();
+	if (! (fname instanceof Pair)
+	    || (p = (Pair) fname).getCdr() != LList.Empty
 	    || ! (p.getCar() instanceof Symbol))
 	  {
 	    tr.error('e', "invalid quoted symbol for 'require'");
 	    return false;
 	  }
-	name = mapFeature(p.getCar().toString());
-	if (name == null)
+	fname = mapFeature(p.getCar().toString());
+	if (fname == null)
 	  {
 	    tr.error('e', "unknown feature name '"+p.getCar()+"' for 'require'");
 	    return false;
 	  }
-	type = ClassType.make((String) name);
+	type = ClassType.make((String) fname);
       }
     else if
       /* #ifdef use:java.lang.CharSequence */
@@ -189,15 +189,10 @@ public class require extends Syntax
           cname = ((SimpleSymbol) name).getName();
         if (cname != null && args.getCdr() instanceof Pair)
           {
-            name = ((Pair) args.getCdr()).getCar();
-            if
-              /* #ifdef use:java.lang.CharSequence */
-              (name instanceof CharSequence)
-              /* #else */
-              // (name instanceof String || name instanceof CharSeq)
-              /* #endif */
+            Object sname = ((Pair) args.getCdr()).getCar();
+            if (sname instanceof CharSequence)
               {
-                String sourceName = name.toString();
+                String sourceName = sname.toString();
                 ModuleInfo info = lookupModuleFromSourcePath(sourceName, defs);
                 if (info == null)
                   {
@@ -211,7 +206,12 @@ public class require extends Syntax
       }
     if (! (type instanceof ClassType))
       {
-	tr.error('e', "invalid specifier for 'require'");
+        if (type != null)
+          tr.error('e', "specifier for 'require' is not a classname");
+        else if (name instanceof SimpleSymbol)
+          tr.error('e', "class '"+name+"' for 'require' not found");
+        else
+          tr.error('e', "invalid specifier for 'require'");
 	return false;
       }
     ModuleInfo minfo;

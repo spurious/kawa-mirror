@@ -655,6 +655,7 @@ public abstract class Language
   /** Compilation explicitly requested, not just because of an import. */
   public static final int PARSE_EXPLICIT = 64;
   public static final int PARSE_INTERACTIVE_MODULE = 128;
+  public static final int PARSE_EMIT_MAIN = 256;
 
   public static boolean requirePedantic;
 
@@ -705,6 +706,8 @@ public abstract class Language
       tr.mustCompile = true;
     tr.immediate = immediate;
     tr.langOptions = options;
+    if ((options & PARSE_EMIT_MAIN) != 0)
+      tr.currentOptions.set("main", null);
     if ((options & PARSE_EXPLICIT) != 0)
       tr.explicit = true;
     if ((options & PARSE_PROLOG) != 0)

@@ -431,6 +431,10 @@ public class repl extends Procedure0or1
 	      bad_option (arg);
 	    compilationTopname = args[iArg];
 	  }
+        else if (arg.equals ("--main"))
+          {
+	    defaultParseOptions |= Language.PARSE_EMIT_MAIN;
+          }
 	else if (arg.equals ("-C"))
 	  {
 	    ++iArg;
@@ -789,7 +793,6 @@ public class repl extends Procedure0or1
                                defaultParseOptions, minfo);
             infos[i-iArg] = minfo;
             comps[i-iArg] = comp;
-
           }
         catch (Exception ex)
           {

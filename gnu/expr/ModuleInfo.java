@@ -293,10 +293,14 @@ public class ModuleInfo
       return;
     comp.setState(state+1);
     int ndeps = numDependencies;
+    int depWanted = ((Compilation.writeImplicitClasses
+                      && wantedState >= Compilation.CLASS_WRITTEN)
+                     ? Compilation.COMPILED
+                     : wantedState);
     for (int idep = 0;  idep < ndeps;  idep++)
       {
         ModuleInfo dep = dependencies[idep];
-        dep.loadByStages(wantedState);
+        dep.loadByStages(depWanted);
       }
     state = getState();
     if (state >= wantedState) // Most likely? if ERROR_SEEN.

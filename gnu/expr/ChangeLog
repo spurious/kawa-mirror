@@ -1,3 +1,9 @@
+2014-05-13  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (writeImplicitClasses):  New static field.
+	* ModuleInfo.java (loadByStages): Don't write of class files for
+	dependencies unless writeImplicitClasses.
+
 2014-05-12  Per Bothner  <per@bothner.com>
 
 	* ApplyExp.java (createArray): New method to compile splice-containing

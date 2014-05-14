@@ -113,6 +113,11 @@ public class Compilation implements SourceLocator
     pendingImports.push(forms.lastPair());
   }
 
+    /* Write out implicitly-compiled classes.
+     * Compare javac's -implicit:class flag.  Current not set.
+     */
+    public static boolean writeImplicitClasses = false;
+    
   /** If true, print out expressions after parsing and before optimizations. */
   public static boolean debugPrintExpr = false;
 

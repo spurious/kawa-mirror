@@ -67,8 +67,8 @@ public class Declaration
    * It is null if the type is un-specified and not yet inferred.
    * Will get set implicitly by getType, to avoid inconsistencies.
    */
-  protected Type type;
-  protected Expression typeExp;
+    public/*protected*/ Type type;
+    public/*protected*/ Expression typeExp;
   public final Expression getTypeExp()
   {
     if (typeExp == null)
@@ -590,7 +590,21 @@ public class Declaration
    */
   public static final long ALLOCATE_ON_STACK = 0x2000000000l;
 
-  protected long flags = IS_SIMPLE;
+    /** True for a variable inside a pattern, but not the top of the pattern.
+     * E.g. for a pattern [a [b c]] there is a main declaration for the
+     * incoming value - which does not have PATTERN_NESTED set.  There are
+     * three declarations a, b, and c - which do have PATTERN_NESTED set.
+     * In addition there may be helper variables which are anonymous
+     * (i.e. getSymbol() returns null), like the match for the sequence [b c];
+     * these also have PATTERN_NESTED set. */
+    public static final long PATTERN_NESTED = 0x4000000000l;
+
+    /** See parameterForMethod() */
+    public static final long SKIP_FOR_METHOD_PARAMETER = 0x8000000000l;
+    public static final long IS_REST_PARAMETER = 0x10000000000l;
+    public static final long IS_PARAMETER = 0x20000000000l;
+
+    protected long flags = IS_SIMPLE;
 
   public final boolean getFlag (long flag)
   {
@@ -675,6 +689,17 @@ public class Declaration
   {
     return (flags & IS_NAMESPACE_PREFIX) != 0;
   }   
+
+    /** Is this a parameter for the generated method?
+     * For example if a lambda's parameter is the pattern {@code [x y]}
+     * then there is an anonymous parameter p0 that is the incoming 2-element
+     * sequence plus named parameters {@code x} and {@code y}.
+     * The later two are parameters for the generated method,
+     * but the anonymous p0 is not.
+     */
+    public final boolean parameterForMethod() {
+        return ! getFlag(SKIP_FOR_METHOD_PARAMETER);
+    }
 
   /** True if the value of the variable is the contents of a Location.
    * @see #INDIRECT_BINDING */
@@ -1490,7 +1515,7 @@ public class Declaration
       }
   }
 
-  public void noteValueFromLet (LetExp letter)
+  public void noteValueFromLet (ScopeExp letter)
   {
     Expression init = getInitValue();
     if (init != QuoteExp.undefined_exp && values != unknownValueValues)

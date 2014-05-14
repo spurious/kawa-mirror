@@ -563,8 +563,6 @@ public class LambdaExp extends ScopeExp
     ClassType curType;
     if (curLambda.closureEnv != null)
       {
-	  if (curLambda.closureEnv.dead())
-	      System.err.println("dead clEnv "+curLambda.closureEnv+" curL:"+curLambda+" in "+this);
         code.emitLoad(curLambda.closureEnv);
         curType = (ClassType) curLambda.closureEnv.getType();
       }
@@ -606,11 +604,7 @@ public class LambdaExp extends ScopeExp
 	if (comp.method.reachableHere()
 	    && (getCallConvention() < Compilation.CALL_WITH_TAILCALLS
 		|| isModuleBody() || isClassMethod() || isHandlingTailCalls()))
-        {
-            // if (code.getSP()==0)
-            System.err.println("compileEnd "+this+" meth:"+code.getMethod()+" ret:"+code.getMethod().getReturnType()+" SP:"+code.getSP());
 	  code.emitReturn();
-        }
         HashMap<String,Variable> varMap = new HashMap<String,Variable>();
         code.getCurrentScope().fixParamNames(varMap);
 	popScope(code);        // Undoes enterScope in allocParameters
@@ -637,13 +631,9 @@ public class LambdaExp extends ScopeExp
 
   public void generateApplyMethods(Compilation comp)
   {
-      if (Compilation.supportPatterns)
-          comp.generateCheckMethods(this);
-      else {
-          comp.generateMatchMethods(this);
-          comp.generateApplyMethodsWithContext(this);
-          comp.generateApplyMethodsWithoutContext(this);
-      }
+    comp.generateMatchMethods(this);
+    comp.generateApplyMethodsWithContext(this);
+    comp.generateApplyMethodsWithoutContext(this);
   }
 
   Field allocFieldFor (Compilation comp)
@@ -1098,7 +1088,6 @@ public class LambdaExp extends ScopeExp
               mflags |= Access.VARARGS;
             else 
               nameBuf.append("$V");
-            if (! Compilation.supportPatterns) {
 	    if (key_args > 0 || numStubs < opt_args
                 // We'd like to support the the #!rest parameter an arbitrary
                 // array type or implementation of java.util.List.  However,
@@ -1113,7 +1102,6 @@ public class LambdaExp extends ScopeExp
 					 Compilation.objArrayType);
 		argsArray.setParameter(true);
 	      }
-            }
 	    firstArgsArrayArg = var;
 	    atypes[atypes.length-(withContext ? 2 : 1)] = lastType;
 	  }

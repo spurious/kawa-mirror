@@ -11,10 +11,9 @@ public abstract class ScopeExp extends Expression
   Declaration decls;
   Declaration last;
 
-    public/*private*/ Scope scope;
+  private Scope scope;
 
   public Declaration firstDecl () { return decls; }
-  public Declaration lastDecl() { return last; }
 
   public Scope getVarScope ()
   {

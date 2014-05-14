@@ -72,13 +72,18 @@
 	       ((_ filename)
 		(let* ((path-pair :: <gnu.lists.PairWithPosition>
 				  (syntax-object->datum (syntax (filename))))
-		       (base :: path (path-pair:getFileName))
-		       (fname ((path-pair:getCar):toString)))
+                       (base ::java.lang.String (path-pair:getFileName))
+                       (fname ((path-pair:getCar):toString))
+                       (rname (if (or (eq? base #!null)
+                                      ;; i.e. filename is the default input
+                                      ;; see InPort.systemInFilename
+                                      (base:startsWith "/dev/"))
+                                  fname
+                                  ((path base):resolve fname))))
 		  (list
 		   (datum->syntax-object (syntax filename) 'include)
 		   (datum->syntax-object
-		    (syntax filename)
-		    ((base:resolve fname):toString)))))))
+		    (syntax filename) (rname:toString)))))))
 
 #|
 (define-syntax source-file

@@ -1,3 +1,7 @@
+2014-05-13  Per Bothner  <per@bothner.com>
+
+	* InPort.java (systemInFilename): New constant.
+
 2014-03-18  Per Bothner  <per@bothner.com>
 
 	* Path.java: Moved from gnu/text.

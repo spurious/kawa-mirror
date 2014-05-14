@@ -31,8 +31,10 @@ import java.nio.charset.CharsetDecoder;
 
 public class InPort extends Reader implements Printable
 {
+  public static final String systemInFilename = "/dev/stdin";
   private static InPort systemInPort
-  = new TtyInPort (System.in, Path.valueOf("/dev/stdin"), OutPort.outInitial);
+  = new TtyInPort (System.in, Path.valueOf(systemInFilename),
+                   OutPort.outInitial);
   public static final ThreadLocation inLocation
     = new ThreadLocation("in-default");
   static { inLocation.setGlobal(systemInPort); }

@@ -1,3 +1,8 @@
+2014-05-13  Per Bothner  <per@bothner.com>
+
+	* misc_syntax.scm (include-relative): If source path is the default
+	input stream, use the current path as the base.
+
 2014-04-23  Per Bothner  <per@bothner.com>
 
 	* kawa/regex.scm (regex-split): Work around Java 8 change.

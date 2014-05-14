@@ -233,7 +233,7 @@ public class require extends Syntax
   {
     ModuleManager manager = ModuleManager.getInstance();
     String baseName = defs.getFileName();
-    if (baseName != null)
+    if (baseName != null && baseName != InPort.systemInFilename)
       sourceName = Path.valueOf(baseName).resolve(sourceName).toString();
     return manager.findWithSourcePath(sourceName);
   }

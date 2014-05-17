@@ -1,3 +1,9 @@
+2014-05-17  Per Bothner  <per@bothner.com>
+
+	* InlineCalls.java (inineCall): Do noteValue for parameter on
+	inlined let initializer - even if parameter is written to.
+	Fixes Savannah bug #42377 "ClassFormatError".
+
 2014-05-14  Per Bothner  <per@bothner.com>
 
 	* Language.java (PARSE_EMIT_MAIN): New constant.

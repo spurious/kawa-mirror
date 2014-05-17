@@ -988,8 +988,8 @@ public class InlineCalls extends ExpExpVisitor<Type> {
             if ( ! param.getCanWrite()) {
                 param.nvalues = 0;
                 param.values = null;
-                param.noteValueFromLet(let);
             }
+            param.noteValueFromLet(let);
             prev = param;
             param = next;
           }

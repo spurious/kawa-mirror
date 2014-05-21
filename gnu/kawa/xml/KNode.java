@@ -63,9 +63,9 @@ public abstract class KNode extends SeqPosition<Object,NodeTree>
         index += TreeList.BEGIN_ENTITY_SIZE;
         if (index == seq.gapStart)
           index = seq.gapEnd;
-        ipos = index << 1;
       }
-    int kind = seq.getNextKindI(seq.posToDataIndex(ipos));
+    ipos = index << 1;
+    int kind = seq.getNextKindI(index);
     switch (kind)
       {
       case Sequence.ELEMENT_VALUE:

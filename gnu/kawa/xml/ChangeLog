@@ -1,5 +1,7 @@
 2014-05-21  Per Bothner  <per@bothner.com>
 
+	* KNode.java (make): Fix bug in ENTITY skipping.  Add optimization.
+
 	* MakeWithBaseUri.java (apply): Remove bogus debug call.
 
 2014-02-16  Per Bothner  <per@bothner.com>

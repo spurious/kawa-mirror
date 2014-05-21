@@ -35,8 +35,6 @@ public class MakeWithBaseUri extends NodeConstructor
       {
         if (out instanceof XConsumer)
           ((XConsumer) out).endEntity();
-        if (out instanceof TreeList)
-          ((TreeList)out).dump();
 	NodeConstructor.popNodeContext(saved, ctx);
       }
   }

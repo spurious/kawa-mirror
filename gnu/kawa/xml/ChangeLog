@@ -1,3 +1,7 @@
+2014-05-21  Per Bothner  <per@bothner.com>
+
+	* MakeWithBaseUri.java (apply): Remove bogus debug call.
+
 2014-02-16  Per Bothner  <per@bothner.com>
 
 	* XDataType.java: Use RealNum.isReal.

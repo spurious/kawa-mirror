@@ -88,7 +88,7 @@ public class XMLFilter implements
    * then {@code stringizingElementNesting >= 0},
    * otherwise {@code stringizingElementNesting == -1}. */
   protected int stringizingElementNesting = -1;
-  /** Postive if all output should be ignored.
+  /** Positive if all output should be ignored.
    * This happens if we're inside an attribute value inside an element which
    * is stringized because it is in turn inside an outer attribute. Phew.
    * It gets incremented by nested attributes so we can tell when to stop.
@@ -955,9 +955,9 @@ public class XMLFilter implements
         String uri = sym.getNamespaceURI();
         if (uri == "http://www.w3.org/2000/xmlns/"
             || (uri == "" && local == "xmlns"))
-          error('e', "arttribute name cannot be 'xmlns' or in xmlns namespace");
+          error('e', "attribute name cannot be 'xmlns' or in xmlns namespace");
 
-        if (nesting == 2 && workStack[1] == null)
+        if (nesting == 2 && workStack[1] == null && stringizingLevel == 0)
             error('e', "attribute not allowed at document level");
         if (attrCount < 0 && nesting > 0)
             error('e', "attribute '"+attrType+"' follows non-attribute content");

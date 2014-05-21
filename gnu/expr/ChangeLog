@@ -1,3 +1,8 @@
+2014-05-21  Per Bothner  <per@bothner.com>
+
+	* KawaScriptEngine.java (compile): Don't try to get the URL
+	from a CharrArrayInPort.
+
 2014-05-17  Per Bothner  <per@bothner.com>
 
 	* InlineCalls.java (inineCall): Do noteValue for parameter on

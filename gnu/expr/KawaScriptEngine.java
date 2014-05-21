@@ -111,6 +111,8 @@ public class KawaScriptEngine extends AbstractScriptEngine
         java.net.URL url;
         if (filename != null)
           url = Path.toURL(filename);
+        else if (port instanceof CharArrayInPort)
+          url = null;
         else
           {
             Path portpath = port.getPath();

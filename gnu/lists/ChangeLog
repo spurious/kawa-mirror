@@ -1,3 +1,7 @@
+2014-05-21  Per Bothner  <per@bothner.com>
+
+	* TreeList.java (posToDataIndex): Fix thinko in gap handling.
+
 2014-03-17  Per Bothner  <per@bothner.com>
 
 	* Blob.java (toString): Added some heuristics - for now just

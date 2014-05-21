@@ -235,8 +235,8 @@ public class TreeList extends AbstractSequence<Object>
   /** End of a document. */
   protected static final int END_DOCUMENT = 0xF111;
 
-  /** End of an entity (typically a file, possibly included).
-   * [base_uri], 2 short, given an index of a base-uri object
+  /** Start of an entity (typically a file, possibly included).
+   * [base_uri], 2 shorts, given an index of a base-uri object
    * [parent_offset], in 2 shorts, encoded as for BEGIN_DOCUMENT.
    */
   public static final int BEGIN_ENTITY = 0xF112;
@@ -882,7 +882,7 @@ public class TreeList extends AbstractSequence<Object>
     int index = ipos >>> 1;
     if ((ipos & 1) != 0)
       index--;
-    if (index >= gapStart)
+    if (index == gapStart)
       index += gapEnd - gapStart;
     if ((ipos & 1) != 0)
       {

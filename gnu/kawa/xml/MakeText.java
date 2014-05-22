@@ -51,40 +51,8 @@ public class MakeText extends NodeConstructor
     ApplyExp.compile(exp, comp, target);
   }
 
-  public void compileToNode (ApplyExp exp, Compilation comp,
-				      ConsumerTarget target)
-  {
-    // This only gets called via NodeConstructor's compileChild.
-    CodeAttr code = comp.getCode();
-    Expression[] args = exp.getArgs();
-    Expression texp = args[0];
-    Variable cvar = target.getConsumerVariable();
-    if (texp instanceof QuoteExp)
-      {
-        Object tval = ((QuoteExp) texp).getValue();
-        if (tval instanceof CharSequence)
-          {
-            String str = tval.toString();
-            String segments = CodeAttr.calculateSplit(str);
-            int numSegments = segments.length();
-            ClassType ctype = (ClassType) cvar.getType();
-            Method writer = ctype.getMethod("write",
-                                            new Type[] { Type.string_type });
-            int segStart = 0;
-            for (int seg = 0;  seg < numSegments;  seg++)
-              {
-                code.emitLoad(cvar);
-                int segEnd = segStart + (int) segments.charAt(seg);
-                code.emitPushString(str.substring(segStart, segEnd));
-                code.emitInvoke(writer);
-                segStart = segEnd;
-              }
-            return;
-          }
-      }
-    texp.compile(comp, Target.pushObject);
-    code.emitLoad(cvar);
-    code.emitInvokeStatic(ClassType.make("gnu.xml.TextUtils")
-                          .getDeclaredMethod("textValue", 2));
-  }
+    public void compileToNode (ApplyExp exp, Compilation comp,
+                               ConsumerTarget target) {
+        throw new Error("MakeText.compileToNode called!");
+    }
 }

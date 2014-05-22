@@ -1,3 +1,8 @@
+2014-05-21  Per Bothner  <per@bothner.com>
+
+	* XQParser.java (parseContent): Literal direct attribute or element
+	content is now presented by a quoted FString, to fix some corner cases.
+
 2014-05-03  Per Bothner  <per@bothner.com>
 
 	* XQResolveNames.java (visitReference): Update to use KawaServlet.

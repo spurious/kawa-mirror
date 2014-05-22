@@ -1,5 +1,14 @@
 2014-05-21  Per Bothner  <per@bothner.com>
 
+	Change handling of text nodes to fix some corner cases.
+	The rules rules for computed constructors and white-space is added
+	in XQuery are complex, so just use an FString for literal content.
+	* NodeConstructor.java (compileChild):  Use more general valueIfConstant
+	rather than just QuoteExp's getValue.
+	Don't call compileToNode if child is a MakeText
+	Optimize case where argument is a quoted FString - from literal content.
+	* MakeText.java (compileToNode): Replace body by throwing an exception.
+
 	* KNode.java (make): Fix bug in ENTITY skipping.  Add optimization.
 
 	* MakeWithBaseUri.java (apply): Remove bogus debug call.

@@ -21,6 +21,7 @@ import gnu.kawa.io.URIPath;
 import gnu.kawa.reflect.OccurrenceType;
 import gnu.kawa.reflect.SingletonType;
 import gnu.kawa.functions.Convert;
+import gnu.lists.FString;
 import gnu.lists.LList;
 import gnu.text.Lexer;
 import gnu.text.SourceError;
@@ -2297,9 +2298,10 @@ public class XQParser extends Lexer
                 Expression text = null;
                 if (tokenBufferLength > 0)
                   {
-                    String str = new String(tokenBuffer, 0, tokenBufferLength);
-                    Expression[] args = { new QuoteExp(str) };
-                    text = new ApplyExp(makeText, args);
+                    // Literal text is represent by an FString, to distinguish
+                    // from a string atomic value.
+                    FString str = new FString(tokenBuffer, 0, tokenBufferLength);
+                    text = new QuoteExp(str);
                   }
                 tokenBufferLength = 0;
                 if (next == '/')
@@ -2349,17 +2351,16 @@ public class XQParser extends Lexer
               }
           addText:
             {
-              String text;
+              FString text;
               if (tokenBufferLength > 0 && ! skippable)
-                text = new String(tokenBuffer, 0, tokenBufferLength);
+                text = new FString(tokenBuffer, 0, tokenBufferLength);
               else if (next == '{' && prevEnclosed == result.size())
                 // Handle the <a>{E1}{E2}</a> case - we must insert a
                 // joiner between E1 ad E2 to avoid a space being inserted.
-                text = "";
+                text = new FString();
               else
                 break addText; // Don't need to add anything.
-              Expression[] args = { new QuoteExp(text) };
-              result.addElement(new ApplyExp(makeText, args));
+              result.addElement(new QuoteExp(text));
             }
 	    tokenBufferLength = 0;
             if (next == delimiter)
@@ -2579,9 +2580,9 @@ public class XQParser extends Lexer
     // Instead we defer namespaced lookup until XQResolveNames.  (Mostly -
     // some places still incorrectly do premature namespace resolution.)
     String startTag = new String(tokenBuffer, 0, tokenBufferLength);
-    Vector vec = new Vector();
+    Vector<Expression> vec = new Vector<Expression>();
     Expression[] args;
-    vec.addElement(castQName(new QuoteExp(startTag), true));
+    vec.add(castQName(new QuoteExp(startTag), true));
     errorIfComment = "comment not allowed in element start tag";
     NamespaceBinding nsBindings = null;
     int ch;
@@ -2646,13 +2647,8 @@ public class XQParser extends Lexer
 	      syntaxError("enclosed expression not allowed in namespace declaration");
 	    else
               {
-                Object x = vec.elementAt(vecSize+1);
-                ApplyExp ax;
-                if (x instanceof ApplyExp
-                    && (ax = (ApplyExp) x).getFunction() == makeText)
-                  x = ax.getArg(0);
-                ns = ((QuoteExp) x).getValue()
-		.toString().intern();
+                ns = vec.get(vecSize+1)
+                  .valueIfConstant().toString().intern();
               }
 	    vec.setSize(vecSize);
             checkAllowedNamespaceDeclaration(definingNamespace, ns, true);

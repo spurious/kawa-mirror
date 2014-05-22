@@ -70,28 +70,38 @@ implements Inlineable
   }
 
     public static void compileChild (Expression arg, boolean stringIsText,
-				   Compilation comp, ConsumerTarget target)
-  {
-    if (arg instanceof ApplyExp)
-      {
-	ApplyExp app = (ApplyExp) arg;
-	Expression func = app.getFunction();
-	if (func instanceof QuoteExp)
-	  {
-	    Object proc = ((QuoteExp) func).getValue();
-	    if (proc instanceof NodeConstructor)
-	      {
-		((NodeConstructor) proc).compileToNode(app, comp, target);
-		return;
-	      }
-	  }
-      }
-    CodeAttr code = comp.getCode();
-    arg.compileWithPosition(comp, Target.pushObject);
-    code.emitLoad(target.getConsumerVariable());
-    code.emitInvokeStatic(ClassType.make("gnu.kawa.xml.NodeConstructor")
-                          .getDeclaredMethod(stringIsText ? "writeContentS" : "writeContent", 2));
-  }
+                                     Compilation comp, ConsumerTarget target) {
+        if (arg instanceof ApplyExp) {
+            ApplyExp app = (ApplyExp) arg;
+            Expression func = app.getFunction();
+            Object proc = func.valueIfConstant();
+            // Don't call compileToNode if child is a MakeText, because
+            // XQuery's rules for space-separating computed text nodes are
+            // non-trivial and context-dependent.
+            if (proc instanceof NodeConstructor
+                && ! (proc instanceof MakeText)) {
+                ((NodeConstructor) proc).compileToNode(app, comp, target);
+                return;
+            }
+        }
+        CodeAttr code = comp.getCode();
+        if (arg instanceof QuoteExp) {
+            Object value = ((QuoteExp) arg).getValue();
+            if (value instanceof FString) {
+                code.emitLoad(target.getConsumerVariable());
+                code.emitPushString(value.toString());
+                code.emitInvoke(Compilation.typeConsumer
+                                .getDeclaredMethod("write",
+                                    new Type[] { Type.javalangStringType }));
+                return;
+          }
+        }
+        arg.compileWithPosition(comp, Target.pushObject);
+        code.emitLoad(target.getConsumerVariable());
+        code.emitInvokeStatic(ClassType.make("gnu.kawa.xml.NodeConstructor")
+                              .getDeclaredMethod(stringIsText ? "writeContentS"
+                                                 : "writeContent", 2));
+    }
 
   /** Compile an expression using a fresh NodeTree.
    * Compare with ConsumerTarget.compileUsingConsumer, but creates a NodeTree.

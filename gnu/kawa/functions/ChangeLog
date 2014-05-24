@@ -1,3 +1,15 @@
+2014-05-24  Per Bothner  <per@bothner.com>
+
+	* CompileMisc.java: No longer implement Inlineable.
+	Instead change to use new Procedure.compilerXKey protocol.
+	* Convert.java: Update accordingly.
+	* IsEq.java: Update accordingly.
+	* Not.java: Update accordingly.
+	* NumberCompare.java: Update accordingly.
+	* NumberPredicate.java: Update accordingly.
+
+	* CompilationHelpers.java: Use New adjustSplice method.
+
 2014-05-12  Per Bothner  <per@bothner.com>
 
 	* MakeSplice.java (count, copyTo): New static helper methods, used

@@ -191,14 +191,9 @@ public class QuoteExp extends Expression
             comp.error('e', msg, args[0]);
           }
       }
-    if (comp.inlineOk(proc) && exp.firstSpliceArg < 0)
+    if (comp.inlineOk(proc) && exp.isSimple()
+        && ! ApplyExp.isInlineable(proc))
       {
-	if (ApplyExp.asInlineable(proc) != null)
-          {
-            if (exp.getFunction() == this)
-              return exp;
-            return new ApplyExp(this, exp.getArgs()).setLine(exp);
-          }
 	PrimProcedure mproc
 	  = PrimProcedure.getMethodFor(proc, decl, exp.args,
 				       comp.getLanguage());

@@ -16,7 +16,8 @@ public class IsEq extends Procedure2
     setName(name);
     setProperty(Procedure.validateApplyKey,
                    "gnu.kawa.functions.CompileMisc:validateApplySimpleBoolean");
-    Procedure.compilerKey.set(this, "*gnu.kawa.functions.CompileMisc:forEq");
+    setProperty(Procedure.compilerXKey,
+                "gnu.kawa.functions.CompileMisc:compileEq");
   }
 
   public boolean apply(Object arg1, Object arg2)

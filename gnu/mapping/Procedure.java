@@ -24,6 +24,8 @@ public abstract class Procedure extends PropertySet
     /** Same as validateApplyKey but handles splice args. */
   public static final Symbol validateXApplyKey =
     Namespace.EmptyNamespace.getSymbol("validate-xapply");
+  public static final Symbol compilerXKey =
+    Namespace.EmptyNamespace.getSymbol("compile-apply");
 
   // This should be a LazyPropertyKey<gnu.expr.Inlineable>, but we want
   // to avoid any strict dependency on gnu.expr for run-time classes.

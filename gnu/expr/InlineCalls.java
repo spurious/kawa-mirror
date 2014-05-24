@@ -821,97 +821,85 @@ public class InlineCalls extends ExpExpVisitor<Type> {
     return exp;
   }
 
-  /* #ifdef use:java.lang.invoke */
-  static final MethodType validateApplyMType =
-    MethodType.methodType(gnu.expr.Expression.class,
-                             gnu.expr.ApplyExp.class,
-                             gnu.expr.InlineCalls.class,
-                             gnu.bytecode.Type.class,
-                             gnu.mapping.Procedure.class);
-  /* #else */
-  // private static Class[] inlinerMethodArgTypes;
-  // private static synchronized Class[] getInlinerMethodArgTypes()
-  //   throws Exception
-  // {
-  //   Class[] t = inlinerMethodArgTypes;
-  //   if (t == null)
-  //     {
-  //       t = new Class[] { Class.forName("gnu.expr.ApplyExp"),
-  //                        Class.forName("gnu.expr.InlineCalls"),
-  //                        Class.forName("gnu.bytecode.Type"),
-  //                        Class.forName("gnu.mapping.Procedure") };
-  //       inlinerMethodArgTypes = t;
-  //     }
-  //   return t;
-  // }
-  /* #endif */
+    /* #ifdef use:java.lang.invoke */
+    static final MethodType inlinerMethodType =
+        MethodType.methodType(gnu.expr.Expression.class,
+                              gnu.expr.ApplyExp.class,
+                              gnu.expr.InlineCalls.class,
+                              gnu.bytecode.Type.class,
+                              gnu.mapping.Procedure.class);
+    /* #else */
+    // private static final Class[] inlinerMethodType =
+    //     new Class[] { gnu.expr.ApplyExp.class,
+    //                   gnu.expr.InlineCalls.class,
+    //                   gnu.bytecode.Type.class,
+    //                   gnu.mapping.Procedure.class };
+    /* #endif */
 
-  public Expression maybeInline (ApplyExp exp, Type required, Procedure proc)
-  {
-    try
-      {
-        Object inliner;
-        synchronized (proc)
-          {
-            inliner = proc.getProperty(Procedure.validateXApplyKey, null);
-            if (inliner == null && exp.firstSpliceArg < 0)
-                inliner = proc.getProperty(Procedure.validateApplyKey, null);
-            if (inliner instanceof String)
-              {
-                String inliners = (String) inliner;
-                int colon = inliners.indexOf(':');
-                /* #ifdef use:java.lang.invoke */
-                MethodHandle method = null;
-                /* #else */
-                // java.lang.reflect.Method method = null;
-                /* #endif */
-                if (colon > 0)
-                  {
-                    String cname = inliners.substring(0, colon);
-                    String mname = inliners.substring(colon+1);
-                    Class clas = Class.forName(cname, true, proc.getClass().getClassLoader());
-                    /* #ifdef use:java.lang.invoke */
-                    method = MethodHandles.lookup().findStatic(clas, mname, validateApplyMType);
-                    /* #else */
-                    // method = clas.getDeclaredMethod(mname, getInlinerMethodArgTypes());
-                    /* #endif */
-                  }
-                if (method == null)
-                  {
-                    error('e', "inliner property string for "+proc+" is not of the form CLASS:METHOD");
-                    return null;
-                  }
-                inliner = method;
-              }
-          } /* end synchronized */
-        if (inliner != null)
-          {
+    static
+    /* #ifdef use:java.lang.invoke */
+        MethodHandle resolveInliner(Procedure proc, String inliner,
+                                    MethodType mtype)
+    /* #else */
+    // java.lang.reflect.Method resolveInliner(Procedure proc, String inliner,
+    //                                         Class[] mtype)
+    /* #endif */
+        
+            throws Throwable {
+        int colon = inliner.indexOf(':');
+        if (colon > 0) {
+            String cname = inliner.substring(0, colon);
+            String mname = inliner.substring(colon+1);
+            Class clas = Class.forName(cname, true, proc.getClass().getClassLoader());
             /* #ifdef use:java.lang.invoke */
-            if (inliner instanceof MethodHandle)
-              return (Expression) ((MethodHandle) inliner).invokeExact(exp, this, required, proc);
+            return MethodHandles.lookup().findStatic(clas, mname, mtype);
+            /* #else */
+            // return clas.getDeclaredMethod(mname, mtype);
             /* #endif */
-            Object[] vargs = new Object[] { exp, this, required, proc };
-            if (inliner instanceof Procedure)
-              return (Expression) ((Procedure) inliner).applyN(vargs);
-            /* #ifndef use:java.lang.invoke */
-            // else if (inliner instanceof java.lang.reflect.Method)
-            //   return (Expression) ((java.lang.reflect.Method) inliner)
-            //     .invoke(null, vargs);
-            /* #endif */
-          }
-      }
-    catch (Error ex)
-      {
-        throw ex;
-      }
-    catch (Throwable ex)
-      {
-        if (ex instanceof InvocationTargetException)
-            ex = ((InvocationTargetException) ex).getTargetException();
-        messages.error('e', "caught exception in inliner for "+proc+" - "+ex, ex);
-      }
-    return null;
-  }
+        }
+        return null;
+    }
+
+    public Expression maybeInline(ApplyExp exp, Type required, Procedure proc) {
+        try {
+            Object inliner;
+            synchronized (proc) {
+                inliner = proc.getProperty(Procedure.validateXApplyKey, null);
+                if (inliner == null && exp.firstSpliceArg < 0)
+                    inliner = proc.getProperty(Procedure.validateApplyKey, null);
+                if (inliner instanceof String) {
+                    inliner = resolveInliner(proc, (String) inliner,
+                                             inlinerMethodType);
+                    if (inliner == null) {
+                        error('e', "inliner property string for "+proc+" is not of the form CLASS:METHOD");
+                        return null;
+                    }
+                }
+            } /* end synchronized */
+            if (inliner != null) {
+                /* #ifdef use:java.lang.invoke */
+                if (inliner instanceof MethodHandle)
+                    return (Expression) ((MethodHandle) inliner).invokeExact(exp, this, required, proc);
+                /* #endif */
+                Object[] vargs = new Object[] { exp, this, required, proc };
+                if (inliner instanceof Procedure)
+                    return (Expression) ((Procedure) inliner).applyN(vargs);
+                /* #ifndef use:java.lang.invoke */
+                // else if (inliner instanceof java.lang.reflect.Method)
+                //   return (Expression) ((java.lang.reflect.Method) inliner)
+                //     .invoke(null, vargs);
+                /* #endif */
+            }
+        } catch (Error ex) {
+            throw ex;
+        } catch (Throwable ex) {
+            if (ex instanceof InvocationTargetException)
+                ex = ((InvocationTargetException) ex).getTargetException();
+            messages.error('e',
+                           "caught exception in inliner for "+proc+" - "+ex, ex);
+        }
+        return null;
+    }
 
   /** Attempt to inline a function call.
    * @param lexp function to inline

@@ -71,10 +71,7 @@ public class CompilationHelpers
             Expression[] rargs = new Expression[nargs];
             System.arraycopy(args, 1, rargs, 0, nargs);
             exp.setFuncArgs(proc, rargs);
-            if (exp.firstSpliceArg >= 0)
-                exp.firstSpliceArg = exp.firstSpliceArg - 1;
-            if (exp.firstKeywordArgIndex > 0)
-                exp.firstKeywordArgIndex = exp.firstKeywordArgIndex - 1;
+            exp.adjustSplice(exp, -1);
             return proc.validateApply(exp, visitor, required, null);
           }
 

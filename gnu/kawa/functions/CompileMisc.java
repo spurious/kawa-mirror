@@ -9,70 +9,8 @@ import gnu.lists.LList;
 import kawa.standard.Scheme;
 import kawa.standard.SchemeCompilation;
 
-public class CompileMisc implements Inlineable
+public class CompileMisc
 {
-  static final int CONVERT = 2;
-  static final int NOT = 3;
-  static final int EQ = 4;
-  static final int NUMBER_COMPARE = 5;
-  static final int NUMBER_PREDICATE = 6;
-  int code;
-  Procedure proc;
-
-  public CompileMisc(Procedure proc, int code)
-  {
-    this.proc = proc;
-    this.code = code;
-  }
-
-  public static CompileMisc forConvert(Object proc)
-  {
-    return new CompileMisc((Procedure) proc, CONVERT);
-  }
-
-  public static CompileMisc forNot(Object proc)
-  {
-    return new CompileMisc((Procedure) proc, NOT);
-  }
-
-  public static CompileMisc forEq(Object proc)
-  {
-    return new CompileMisc((Procedure) proc, EQ);
-  }
-
-  public static CompileMisc forNumberCompare(Object proc)
-  {
-    return new CompileMisc((Procedure) proc, NUMBER_COMPARE);
-  }
-
-  public static CompileMisc forNumberPredicate(Object proc)
-  {
-    return new CompileMisc((Procedure) proc, NUMBER_PREDICATE);
-  }
-
-  public void compile (ApplyExp exp, Compilation comp, Target target)
-  {
-    switch (code)
-      {
-      case CONVERT:
-        compileConvert((Convert) proc, exp, comp, target);
-        return;
-      case NOT:
-        compileNot((Not) proc, exp, comp, target);
-        return;
-      case EQ:
-        compileEq(exp.getArgs(), comp, target, ((IsEq) proc).language);
-        return;
-      case NUMBER_COMPARE:
-        compileNumberCompare((NumberCompare) proc, exp, comp, target);
-        return;
-      case NUMBER_PREDICATE:
-        compileNumberPredicate((NumberPredicate) proc, exp, comp, target);
-        return;
-      default: throw new Error();
-      }
-  }
-
   public static Expression validateApplyConstantFunction0
   (ApplyExp exp, InlineCalls visitor, Type required, Procedure proc)
   {
@@ -258,74 +196,77 @@ public class CompileMisc implements Inlineable
   static gnu.bytecode.ClassType typeType;
   static gnu.bytecode.Method coerceMethod;
 
-  public static void compileConvert (Convert proc, ApplyExp exp, Compilation comp, Target target)
-  {
-    Expression[] args = exp.getArgs();
-    if (args.length != 2)
-      throw new Error ("wrong number of arguments to "+proc.getName());
-    CodeAttr code = comp.getCode();
-    Type type = Scheme.getTypeValue(args[0]);
-    if (type == Type.neverReturnsType)
-      {
-        args[1].compile(comp, Target.Ignore);
-        PrimProcedure.compileReachedUnexpected(code);
-      }
-    else if (type != null)
-      {
-        args[1].compile(comp, Target.pushValue(type));
-	if (code.reachableHere())
-	  target.compileFromStack(comp, type);
-      }
-    else
-      {
-	if (typeType == null)
-	  {
-	    typeType = ClassType.make("gnu.bytecode.Type");
-          }
-        if (coerceMethod == null)
-          {
-	    coerceMethod = typeType.addMethod("coerceFromObject",
-					      Compilation.apply1args,
-					      Type.pointer_type,
-					      gnu.bytecode.Access.PUBLIC);
-	  }
-	args[0].compile(comp, LangObjType.typeClassType);
-	args[1].compile(comp, Target.pushObject);
-	code.emitInvokeVirtual(coerceMethod);
-	target.compileFromStack(comp, Type.pointer_type);
-      }
-  }
+    public static boolean compileConvert (ApplyExp exp, Compilation comp,
+                                          Target target, Procedure procedure) {
+        Convert proc = (Convert) procedure;
+        Expression[] args = exp.getArgs();
+        if (args.length != 2 || ! exp.isSimple())
+            return false;
+        CodeAttr code = comp.getCode();
+        Type type = Scheme.getTypeValue(args[0]);
+        if (type == Type.neverReturnsType) {
+            args[1].compile(comp, Target.Ignore);
+            PrimProcedure.compileReachedUnexpected(code);
+        } else if (type != null) {
+            args[1].compile(comp, Target.pushValue(type));
+            if (code.reachableHere())
+                target.compileFromStack(comp, type);
+        } else {
+            if (typeType == null) {
+                typeType = ClassType.make("gnu.bytecode.Type");
+            }
+            if (coerceMethod == null) {
+                coerceMethod = typeType.addMethod("coerceFromObject",
+                                                  Compilation.apply1args,
+                                                  Type.pointer_type,
+                                                  gnu.bytecode.Access.PUBLIC);
+            }
+            args[0].compile(comp, LangObjType.typeClassType);
+            args[1].compile(comp, Target.pushObject);
+            code.emitInvokeVirtual(coerceMethod);
+            target.compileFromStack(comp, Type.pointer_type);
+        }
+        return true;
+    }
 
-  public void compileNot (Not proc, ApplyExp exp, Compilation comp, Target target)
-  {
-    Expression arg = exp.getArgs()[0];
-    Language language = proc.language;
-    if (target instanceof ConditionalTarget)
-      {
-	ConditionalTarget ctarget = (ConditionalTarget) target;
-	ConditionalTarget sub_target
-	  = new ConditionalTarget(ctarget.ifFalse, ctarget.ifTrue, language);
-	sub_target.trueBranchComesFirst = ! ctarget.trueBranchComesFirst;
-	arg.compile(comp, sub_target);
-	return;
-      }
-    CodeAttr code = comp.getCode();
-    Type type = target.getType();
-    if (target instanceof StackTarget && type.getSignature().charAt(0) == 'Z')
-      {
-	arg.compile(comp, target);
-	code.emitNot(target.getType());
-      }
-    else
-      {
-        QuoteExp trueExp = QuoteExp.getInstance(language.booleanObject(true));
-        QuoteExp falseExp = QuoteExp.getInstance(language.booleanObject(false));
-	IfExp.compile(arg, falseExp, trueExp, comp, target);
-      }
-  }
+    public static boolean compileNot(ApplyExp exp, Compilation comp,
+                                     Target target, Procedure procedure) {
+        if (! exp.isSimple())
+            return false;
+        Not proc = (Not) procedure;
+        Expression arg = exp.getArgs()[0];
+        Language language = proc.language;
+        if (target instanceof ConditionalTarget) {
+            ConditionalTarget ctarget = (ConditionalTarget) target;
+            ConditionalTarget sub_target
+                = new ConditionalTarget(ctarget.ifFalse, ctarget.ifTrue,
+                                        language);
+            sub_target.trueBranchComesFirst = ! ctarget.trueBranchComesFirst;
+            arg.compile(comp, sub_target);
+            return true;
+        }
+        CodeAttr code = comp.getCode();
+        Type type = target.getType();
+        if (target instanceof StackTarget
+                && type.getSignature().charAt(0) == 'Z') {
+            arg.compile(comp, target);
+            code.emitNot(target.getType());
+        } else {
+            QuoteExp trueExp
+                = QuoteExp.getInstance(language.booleanObject(true));
+            QuoteExp falseExp
+                = QuoteExp.getInstance(language.booleanObject(false));
+            IfExp.compile(arg, falseExp, trueExp, comp, target);
+        }
+        return true;
+    }
 
-    public static void compileEq(Expression[] args, Compilation comp,
-                                 Target target, Language language) {
+    public static boolean compileEq(ApplyExp exp, Compilation comp,
+                                    Target target, Procedure proc) {
+        if (! exp.isSimple())
+            return false;
+        Expression[] args = exp.getArgs();
+        Language language = ((IsEq) proc).language;
         CodeAttr code = comp.getCode();
         Expression arg0 = args[0];
         Expression arg1 = args[1];
@@ -382,9 +323,13 @@ public class CompileMisc implements Inlineable
 	code.emitFi();
 	target.compileFromStack(comp, type);
       }
+      return true;
   }
 
-    public static void compileNumberCompare(NumberCompare proc, ApplyExp exp, Compilation comp, Target target) {
+    public static boolean compileNumberCompare(ApplyExp exp, Compilation comp, Target target, Procedure procedure) {
+        NumberCompare proc = (NumberCompare) procedure;
+        if (! exp.isSimple())
+            return false;
         CodeAttr code = comp.getCode();
         Expression[] args = exp.getArgs();
         if (args.length == 2) {
@@ -399,7 +344,7 @@ public class CompileMisc implements Inlineable
                 if (! (target instanceof ConditionalTarget)) {
                     IfExp.compile(exp, QuoteExp.trueExp, QuoteExp.falseExp,
                                   comp, target);
-                    return;
+                    return true;
                 }
                 int mask = proc.flags;
                 if (mask == NumberCompare.TRUE_IF_NEQ)
@@ -480,7 +425,7 @@ public class CompileMisc implements Inlineable
                     code.emitGotoIfCompare2(label1, opcode);
                 }
                 ctarget.emitGotoFirstBranch(code);
-                return;
+                return true;
             }
         }
 
@@ -507,9 +452,9 @@ public class CompileMisc implements Inlineable
                 : compclass.getDeclaredMethod(mname+"$V", 4);
             new ApplyExp(meth, args).setLine(exp)
                 .compile(comp, target);
-            return;
+            return true;
         }
-        ApplyExp.compile(exp, comp, target);
+        return false;
     }
 
   static int classifyForNumCompare (Expression exp)
@@ -529,32 +474,35 @@ public class CompileMisc implements Inlineable
     return kind;
   }
 
-  public static void compileNumberPredicate (NumberPredicate proc, ApplyExp exp, Compilation comp, Target target)
-  {
-    Expression[] args = exp.getArgs();
-    int op = proc.op;
-    if (args.length == 1 && (op == NumberPredicate.ODD || op == NumberPredicate.EVEN))
-      {
-	Expression arg0 = args[0];
-        int kind = Arithmetic.classifyType(arg0.getType());
-        if (kind <= Arithmetic.INTNUM_CODE)
-          {
-            PrimType wtype = Type.intType;
-            Target wtarget = StackTarget.getInstance(wtype);
-            CodeAttr code = comp.getCode();
-            if (op == NumberPredicate.EVEN)
-              code.emitPushInt(1);
-            arg0.compile(comp, wtarget);
-            code.emitPushInt(1);
-            code.emitAnd();
-            if (op == NumberPredicate.EVEN)
-              code.emitSub(Type.intType);
-            target.compileFromStack(comp, Type.booleanType);
-            return;
-          }
-      }
-   ApplyExp.compile(exp, comp, target);
-  }
+    public static boolean compileNumPredicate(ApplyExp exp, Compilation comp,
+                                              Target target,
+                                              Procedure procedure) {
+        NumberPredicate proc = (NumberPredicate) procedure;
+        if (! exp.isSimple())
+            return false;
+        Expression[] args = exp.getArgs();
+        int op = proc.op;
+        if (args.length == 1
+            && (op == NumberPredicate.ODD || op == NumberPredicate.EVEN)) {
+            Expression arg0 = args[0];
+            int kind = Arithmetic.classifyType(arg0.getType());
+            if (kind <= Arithmetic.INTNUM_CODE) {
+                PrimType wtype = Type.intType;
+                Target wtarget = StackTarget.getInstance(wtype);
+                CodeAttr code = comp.getCode();
+                if (op == NumberPredicate.EVEN)
+                    code.emitPushInt(1);
+                arg0.compile(comp, wtarget);
+                code.emitPushInt(1);
+                code.emitAnd();
+                if (op == NumberPredicate.EVEN)
+                    code.emitSub(Type.intType);
+                target.compileFromStack(comp, Type.booleanType);
+                return true;
+            }
+        }
+        return false;
+    }
 
   public static Expression validateApplyCallCC
   (ApplyExp exp, InlineCalls visitor, Type required, Procedure proc)

@@ -38,7 +38,8 @@ public class NumberPredicate extends Procedure1
     this.op = op;
     setProperty(Procedure.validateApplyKey,
                 "gnu.kawa.functions.CompileMisc:validateApplySimpleBoolean");
-    Procedure.compilerKey.set(this, "*gnu.kawa.functions.CompileMisc:forNumberPredicate");
+    setProperty(Procedure.compilerXKey,
+                "gnu.kawa.functions.CompileMisc:compileNumPredicate");
   }
 
   public int numArgs()

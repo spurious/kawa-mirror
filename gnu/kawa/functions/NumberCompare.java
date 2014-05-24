@@ -103,7 +103,8 @@ public class NumberCompare extends ProcedureN
     proc.flags = flags;
     proc.setProperty(Procedure.validateApplyKey,
                      "gnu.kawa.functions.CompileMisc:validateApplySimpleBoolean");
-    Procedure.compilerKey.set(proc, "*gnu.kawa.functions.CompileMisc:forNumberCompare");
+    proc.setProperty(Procedure.compilerXKey,
+                     "gnu.kawa.functions.CompileMisc:compileNumberCompare");
     return proc;
   }
 

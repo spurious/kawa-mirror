@@ -1,3 +1,16 @@
+2014-05-24  Per Bothner  <per@bothner.com>
+
+	* ApplyExp.java (adjustSplice, spliceCount, isSimple):
+	Some splicing-related helper methods.
+	(isInlineable): New method.
+	(asInlineable): Removed.
+	(inlineCompile): Use InlineCalls.resolveInliner.
+	Also check new Procedure.compilerXKey property.
+	(compile): Compile splice-using calls and checking for inlining.
+	* InlineCalls.java: Some refactoring of maybeInline.
+	(resolveInliner): New helper method.
+	* QuoteExp.java (validateApply): Simplify.
+
 2014-05-21  Per Bothner  <per@bothner.com>
 
 	* KawaScriptEngine.java (compile): Don't try to get the URL

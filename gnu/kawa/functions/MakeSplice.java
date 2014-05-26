@@ -1,4 +1,5 @@
 package gnu.kawa.functions;
+import gnu.bytecode.Type;
 import gnu.expr.*;
 import gnu.mapping.*;
 import java.lang.reflect.Array;
@@ -53,6 +54,25 @@ public class MakeSplice extends Procedure1 {
          } else if (values.getClass().isArray()) {
             for (int i = 0; i < size;  i++)
                 target[start++] = Array.get(values, i);
+        } else
+            throw new ClassCastException("value is neither List or array");
+    }
+
+   public static void copyTo(Object target, int start, int size,
+                             Object values, Type elementType) {
+        if (elementType == Type.objectType) {
+            copyTo((Object[]) target, start, size, values);
+        } else if (values instanceof List<?>) {
+            for (Object val : (List<?>) values) {
+                Object value = elementType.coerceFromObject(val);
+                java.lang.reflect.Array.set(target, start++, value);
+            }
+         } else if (values.getClass().isArray()) {
+            for (int i = 0; i < size;  i++) {
+                Object value = 
+                    elementType.coerceFromObject(Array.get(values, i));
+                java.lang.reflect.Array.set(target, start++, value);
+            }
         } else
             throw new ClassCastException("value is neither List or array");
     }

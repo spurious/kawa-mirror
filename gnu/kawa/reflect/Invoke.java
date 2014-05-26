@@ -42,8 +42,8 @@ public class Invoke extends ProcedureN
     super(name);
     this.kind = kind;
     this.language = language;
-    setProperty(Procedure.validateApplyKey,
-                   "gnu.kawa.reflect.CompileInvoke:validateApplyInvoke");
+    setProperty(Procedure.validateXApplyKey,
+                "gnu.kawa.reflect.CompileInvoke:validateApplyInvoke");
   }
 
   public static Object invoke$V(Object[] args) throws Throwable

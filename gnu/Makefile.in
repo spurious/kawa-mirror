@@ -271,6 +271,7 @@ GNU_KAWA_UTIL_JSOURCES = \
 GNU_KAWA_REFLECT_JSOURCES = \
   kawa/reflect/ArrayGet.java \
   kawa/reflect/ArrayLength.java \
+  kawa/reflect/ArrayMake.java \
   kawa/reflect/ArrayNew.java \
   kawa/reflect/ArraySet.java \
   kawa/reflect/ClassMemberLocation.java \

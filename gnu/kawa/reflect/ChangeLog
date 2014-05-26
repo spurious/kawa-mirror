@@ -1,3 +1,11 @@
+2014-05-26  Per Bothner  <per@bothner.com>
+
+	Improve bytecode for creating arrays with splices.
+	* ArrayMake.java: New class, extends ProcedureN.
+	* CompileArrays.java (compileMake, createArrays): New static methods.
+	* CompileInvoke.java: Handle splices when creating arrays.
+	* Invoke.java: Update since validateApplyInvoke handles splices.
+
 2014-05-06  Per Bothner  <per@bothner.com>
 
 	* Invoke.java (applyN): Add support for constructing a ConstVector.

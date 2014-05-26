@@ -2,6 +2,7 @@ package gnu.kawa.reflect;
 import gnu.bytecode.*;
 import gnu.mapping.*;
 import gnu.expr.*;
+import gnu.kawa.functions.MakeSplice;
 
 public class CompileArrays implements Inlineable
 {
@@ -129,4 +130,119 @@ public class CompileArrays implements Inlineable
     exp.setType(Type.void_type);
     return exp;
   }
+
+    public static boolean compileMake(ApplyExp exp, Compilation comp, Target target,
+                                  Procedure proc) {
+        Type elementType = ((ArrayMake) proc).elementType;
+        Expression[] args = exp.getArgs();
+        createArray(elementType, comp, args, 0, args.length);
+        target.compileFromStack(comp, ArrayType.make(elementType));
+        return true;
+    }
+
+    /* Optimized code generation of array creation with splices */
+    public static void createArray(Type elementType, Compilation comp,
+                                   Expression[] args, int start, int end) {
+        CodeAttr code = comp.getCode();
+        // Count non-splice arguments. 
+        int countNonSplice = 0;
+        int lastSplice = -1;
+        for (int i = start; i < end; i++) {
+            if (MakeSplice.argIfSplice(args[i]) == null)
+                countNonSplice++;
+            else
+                lastSplice = i;
+        }
+        //int countSplice = end - start - countNonSplice;
+        code.pushScope();
+        Variable arrSizeVar = code.addLocal(Type.intType);
+        code.emitPushInt(countNonSplice);
+        code.emitStore(arrSizeVar);
+
+        ClassType utilType = ClassType.make("gnu.kawa.functions.MakeSplice");
+        Method countMethod = utilType.getDeclaredMethod("count", 1);
+        Method copyToMethod4 = utilType.getDeclaredMethod("copyTo", 4);
+        Method copyToMethod5 = utilType.getDeclaredMethod("copyTo", 5);
+
+        Variable[] tmpVars = new Variable[end-start];
+        Variable[] sizeVars = new Variable[end-start];
+
+        for (int i = start; i < end; i++) {
+            Expression arg = args[i];
+            Expression argIfSplice = MakeSplice.argIfSplice(arg);
+            if (argIfSplice != null || (arg.side_effects() && i < lastSplice)) {
+                if (argIfSplice != null)
+                    argIfSplice.compile(comp, Target.pushObject);
+                else
+                    arg.compile(comp, elementType);
+                Variable tmpVar =
+                    code.addLocal(argIfSplice != null ? Type.objectType
+                                  : elementType);
+                code.emitStore(tmpVar);
+                tmpVars[i-start] = tmpVar;
+                if (argIfSplice != null) {
+                    Variable sizeVar = code.addLocal(Type.intType);
+                    sizeVars[i-start] = sizeVar;
+                    // emit: int size[i] = count(tmp[i]);
+                    code.emitLoad(tmpVar);
+                    code.emitInvoke(countMethod);
+                    code.emitDup();
+                    code.emitStore(sizeVar);
+                    // emit: arrSize += size[i];
+                    code.emitLoad(arrSizeVar);
+                    code.emitAdd();
+                    code.emitStore(arrSizeVar);
+                }
+            }
+        }
+        // emit: elementType[] arr = new elementType[arrSize];
+        code.emitLoad(arrSizeVar);
+        code.emitNewArray(elementType.getImplementationType());
+        // emit: int offset = 0;
+        Variable offsetVar = null;
+
+        for (int i = start; i < end; i++) {
+            // The target array is the top of the stack.
+            code.emitDup();
+            Expression arg = args[i];
+            Expression argIfSplice = MakeSplice.argIfSplice(arg);
+            if (argIfSplice != null) {
+                // emit: copy vari elements into arr[offset:offset+sizei];
+                if (offsetVar == null) {
+                    offsetVar = code.addLocal(Type.intType);
+                    code.emitPushInt(i-start);
+                    code.emitStore(offsetVar);
+                }
+                code.emitLoad(offsetVar);
+                code.emitLoad(sizeVars[i-start]);
+                code.emitLoad(tmpVars[i-start]);
+                if (elementType == Type.objectType)
+                    code.emitInvoke(copyToMethod4);
+                else {
+                    comp.compileConstant(elementType, Target.pushObject);
+                    code.emitInvoke(copyToMethod5);
+                }
+                //  emit: offset += sizei;
+                code.emitLoad(offsetVar);
+                code.emitLoad(sizeVars[i-start]);
+                code.emitAdd();
+                code.emitStore(offsetVar);
+            } else {
+                // emit: arr[offset++] = arg;
+                if (offsetVar == null)
+                    code.emitPushInt(i-start);
+                else
+                    code.emitLoad(offsetVar);
+                Variable savedValue = tmpVars[i-start];
+                if (savedValue != null)
+                    code.emitLoad(savedValue);
+                else
+                    arg.compile(comp, elementType);
+                code.emitArrayStore(elementType);
+                if (offsetVar != null)
+                    code.emitInc(offsetVar, (short) 1);
+            }
+        }
+        code.popScope();
+    }
 }

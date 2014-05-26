@@ -1,3 +1,7 @@
+2014-05-26  Per Bothner  <per@bothner.com>
+
+	* MakeSplice.java (copyTo): New helper method - for compiled code.
+
 2014-05-24  Per Bothner  <per@bothner.com>
 
 	* CompileMisc.java: No longer implement Inlineable.

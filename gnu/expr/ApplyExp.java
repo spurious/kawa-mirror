@@ -1,4 +1,4 @@
-// Copyright (c) 2003, 2004, 2006  Per M.A. Bothner.
+// Copyright (c) 2003, 2004, 2006, 2014  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.expr;
@@ -6,6 +6,7 @@ package gnu.expr;
 import gnu.bytecode.*;
 import gnu.mapping.*;
 import gnu.kawa.functions.MakeSplice;
+import gnu.kawa.reflect.CompileArrays;
 import gnu.kawa.io.OutPort;
 import gnu.text.SourceMessages;
 /* #ifdef use:java.lang.invoke */
@@ -184,94 +185,6 @@ public class ApplyExp extends Expression
     compile(exp, comp, target, false);
   }
 
-    /* Optimized code generation of array creation with splices */
-    public static void createArray(Type elementType, Compilation comp,
-                                   Expression[] args, int start, int end) {
-        CodeAttr code = comp.getCode();
-        // Count non-splice arguments. 
-        int countNonSplice = 0;
-        for (int i = start; i < end; i++) {
-            if (MakeSplice.argIfSplice(args[i]) == null)
-                countNonSplice++;
-        }
-        code.pushScope();
-        Variable arrSizeVar = code.addLocal(Type.intType);
-        code.emitPushInt(countNonSplice);
-        code.emitStore(arrSizeVar);
-
-        ClassType utilType = ClassType.make("gnu.kawa.functions.MakeSplice");
-        Method countMethod = utilType.getDeclaredMethod("count", 1);
-        Method copyToMethod = utilType.getDeclaredMethod("copyTo", 4);
-
-        Variable[] tmpVars = new Variable[end-start];
-        Variable[] sizeVars = new Variable[end-start];
-
-        for (int i = start; i < end; i++) {
-            Expression arg = args[i];
-            Expression argIfSplice = MakeSplice.argIfSplice(arg);
-            if (argIfSplice != null || arg.side_effects()) {
-                if (argIfSplice != null)
-                    argIfSplice.compile(comp, Target.pushObject);
-                else
-                    arg.compile(comp, elementType);
-                Variable tmpVar =
-                    code.addLocal(argIfSplice != null ? Type.objectType
-                                  : elementType);
-                code.emitStore(tmpVar);
-                tmpVars[i-start] = tmpVar;
-                if (argIfSplice != null) {
-                    Variable sizeVar = code.addLocal(Type.intType);
-                    sizeVars[i-start] = sizeVar;
-                    // emit: int size[i] = count(tmp[i]);
-                    code.emitLoad(tmpVar);
-                    code.emitInvoke(countMethod);
-                    code.emitDup();
-                    code.emitStore(sizeVar);
-                    // emit: arrSize += size[i];
-                    code.emitLoad(arrSizeVar);
-                    code.emitAdd();
-                    code.emitStore(arrSizeVar);
-                }
-            }
-        }
-        // emit: elementType[] arr = new elementType[arrSize];
-        code.emitLoad(arrSizeVar);
-        code.emitNewArray(elementType);
-        // emit: int offset = 0;
-        Variable offsetVar = code.addLocal(Type.intType);
-        code.emitPushInt(0);
-        code.emitStore(offsetVar);
-
-        for (int i = start; i < end; i++) {
-            // The target array is the top of the stack.
-            code.emitDup();
-            Expression arg = args[i];
-            Expression argIfSplice = MakeSplice.argIfSplice(arg);
-            if (argIfSplice != null) {
-                // emit: copy vari elements into arr[offset:offset+sizei];
-                code.emitLoad(offsetVar);
-                code.emitLoad(sizeVars[i-start]);
-                code.emitLoad(tmpVars[i-start]);
-                code.emitInvoke(copyToMethod);
-                //  emit: offset += sizei;
-                code.emitLoad(offsetVar);
-                code.emitLoad(sizeVars[i-start]);
-                code.emitAdd();
-                code.emitStore(offsetVar);
-            } else {
-                // emit: arr[offset++] = arg;
-                code.emitLoad(offsetVar);
-                if(arg.side_effects())
-                    code.emitLoad(tmpVars[i-start]);
-                else
-                    arg.compile(comp, elementType);
-                code.emitArrayStore(elementType);
-                code.emitInc(offsetVar, (short) 1);
-            }
-        }
-        code.popScope();
-    }
-
     static void compile (ApplyExp exp, Compilation comp, Target target,
                          boolean checkInlineable) {
         int args_length = exp.args.length;
@@ -336,7 +249,8 @@ public class ApplyExp extends Expression
         if (exp.firstSpliceArg >= 0) {
             Expression[] args = exp.getArgs();
             exp_func.compile(comp, Target.pushObject);
-            createArray(Type.objectType, comp, args, 0, args.length);
+            CompileArrays.createArray(Type.objectType, comp,
+                                      args, 0, args.length);
             code.emitInvoke(Compilation.typeProcedure
                             .getDeclaredMethod("applyN", 1));
             target.compileFromStack(comp, Type.pointer_type);

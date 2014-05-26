@@ -4,6 +4,7 @@ import gnu.bytecode.*;
 import gnu.expr.*;
 import gnu.kawa.functions.CompileArith;
 import gnu.kawa.functions.CompilationHelpers;
+import gnu.kawa.functions.MakeSplice;
 import gnu.kawa.lispexpr.LangObjType;
 import gnu.math.IntNum;
 import java.lang.reflect.Array;
@@ -113,14 +114,20 @@ public class CompileInvoke
                 comp.error('e', "bad array size: "+ex.getMessage());
               }
           }
+        boolean useArrayMake = exp.numKeywordArgs == 0 && constantValue == null;
         ApplyExp alloc = new ApplyExp(new ArrayNew(elementType),
                                       new Expression[] { sizeArg } );
         alloc.setType(type);
         if (lengthSpecified && args.length == 3)
           return alloc;
-        comp.letStart();
-        Declaration adecl = comp.letVariable((String) null, type, alloc);
-        adecl.setCanRead(true);
+        Declaration adecl;
+        if (useArrayMake)
+            adecl = null;
+        else {
+            comp.letStart();
+            adecl = comp.letVariable((String) null, type, alloc);
+            adecl.setCanRead(true);
+        }
         BeginExp begin = new BeginExp();
         int index = 0;
         for (int i = lengthSpecified ? 3 : 1; i < args.length;  i++)
@@ -144,11 +151,12 @@ public class CompileInvoke
                       }
                   }
               }
-            Expression xa = arg;
-            arg = visitor.visit(arg, elementType);
+            boolean isSplice = MakeSplice.argIfSplice(arg) != null;
+            arg = visitor.visit(arg, isSplice ? null : elementType);
+            args[i] = arg;
             if (! (arg instanceof QuoteExp))
               constantValue = null;
-            else if (constantValue != null)
+            else if (constantValue != null && ! useArrayMake)
               {
                 try
                   {
@@ -159,17 +167,29 @@ public class CompileInvoke
                     constantValue = null;
                   }
               }
-            begin.add(new ApplyExp(new ArraySet(elementType),
-                                   new Expression[] {
-                                     new ReferenceExp(adecl),
-                                     QuoteExp.getInstance(new Integer(index)),
-                                     arg}));
+            if (! useArrayMake)
+                begin.add(new ApplyExp(new ArraySet(elementType),
+                                       new Expression[] {
+                                           new ReferenceExp(adecl),
+                                           QuoteExp.getInstance(new Integer(index)),
+                                           arg}));
             index++;
           }
-        begin.add(new ReferenceExp(adecl));
-        LetExp let = comp.letDone(begin);
+
         if (constantValue != null)
           return new QuoteExp(constantValue, type);
+
+        if (useArrayMake) {
+            Expression[] xargs = new Expression[args.length-1];
+            System.arraycopy(args, 1, xargs, 0, xargs.length);
+            ApplyExp xexp = new ApplyExp(new ArrayMake(elementType), xargs);
+            xexp.adjustSplice(exp, -1);
+            xexp.setType(atype);
+            return xexp;
+        }
+
+        begin.add(new ReferenceExp(adecl));
+        LetExp let = comp.letDone(begin);
         return let;
       }
     else if (type != null && name != null)
@@ -181,7 +201,8 @@ public class CompileInvoke
               {
                 Expression[] xargs = new Expression[nargs-1];
                 System.arraycopy(args, 1, xargs, 0, nargs-1);
-                Expression xapp = new ApplyExp(constructor, xargs);
+                ApplyExp xapp = new ApplyExp(constructor, xargs);
+                xapp.adjustSplice(exp, -1);
                 return visitor.visit(xapp.setLine(exp), required);
               }
           }
@@ -214,7 +235,8 @@ public class CompileInvoke
                 ClassType creq;
                 if (tailArgs == 0 && required instanceof ClassType
                     && (creq = (ClassType) required).isSubclass(Compilation.typeList)
-                    && (defcons = creq.getDefaultConstructor()) != null)
+                    && (defcons = creq.getDefaultConstructor()) != null
+                    && exp.isSimple())
                   {
                     ctype = creq;
                     type = ctype;
@@ -230,13 +252,19 @@ public class CompileInvoke
                     Expression[] xargs = new Expression[nargs];
                     System.arraycopy(args, 1, xargs, 1, nargs-1);
                     xargs[0] = new QuoteExp(Compilation.objArrayType);
+                    ApplyExp mkArray = new ApplyExp(exp.getFunction(), xargs);
+                    mkArray.adjustSplice(exp, 0);
                     return visitor.visit(new ApplyExp(iproc,
                                                       new Expression[] {
                                                           new QuoteExp(Compilation.typeConstVector),
-                                                          new ApplyExp(exp.getFunction(), xargs).setLine(exp)}).setLine(exp), required);
+                                                          mkArray.setLine(exp)}).setLine(exp), required);
                   }
               }
-
+            if (exp.firstSpliceArg >= 0) // FIXME
+            {
+                exp.visitArgs(visitor);
+                return exp;
+            }
             CompileBuildObject builder = CompileBuildObject.make(exp, visitor, required, keywordStart, ctype, caller);
             if (usingConstVector)
               {
@@ -246,6 +274,12 @@ public class CompileInvoke
             else if (builder.useBuilder(numCode, visitor))
                return builder.build();
           }
+        if (exp.firstSpliceArg >= 0) // FIXME
+        {
+            exp.visitArgs(visitor);
+            return exp;
+        }
+
         int okCount = 0, maybeCount = 0;
 	if (kind == 'N' && tailArgs > 0)
 	  {

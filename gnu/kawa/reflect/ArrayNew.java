@@ -3,17 +3,16 @@ import gnu.bytecode.*;
 import gnu.mapping.*;
 import java.io.*;
 
-public class ArrayNew extends Procedure1 implements Externalizable
-{
-  Type element_type;
+public class ArrayNew extends Procedure1 implements Externalizable {
+    Type element_type;
 
-  public ArrayNew (Type element_type)
-  {
-    this.element_type = element_type;
-    setProperty(Procedure.validateApplyKey,
-                "gnu.kawa.reflect.CompileArrays:validateArrayNew");
-    Procedure.compilerKey.set(this, "*gnu.kawa.reflect.CompileArrays:getForArrayNew");
-  }
+    public ArrayNew(Type element_type) {
+        this.element_type = element_type;
+        setProperty(Procedure.validateApplyKey,
+                    "gnu.kawa.reflect.CompileArrays:validateArrayNew");
+         setProperty(Procedure.compilerXKey,
+                    "gnu.kawa.reflect.CompileArrays:compileNew");
+    }
 
   public boolean isSideEffectFree ()
   {

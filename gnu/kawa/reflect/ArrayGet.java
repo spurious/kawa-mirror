@@ -4,17 +4,16 @@ import gnu.mapping.*;
 import java.io.*;
 import java.lang.reflect.Array;
 
-public class ArrayGet extends Procedure2 implements Externalizable
-{
-  Type element_type;
+public class ArrayGet extends Procedure2 implements Externalizable {
+    Type element_type;
 
-  public ArrayGet (Type element_type)
-  {
-    this.element_type = element_type;
-    setProperty(Procedure.validateApplyKey,
-                "gnu.kawa.reflect.CompileArrays:validateArrayGet");
-    Procedure.compilerKey.set(this, "*gnu.kawa.reflect.CompileArrays:getForArrayGet");
-  }
+    public ArrayGet(Type element_type) {
+        this.element_type = element_type;
+        setProperty(Procedure.validateApplyKey,
+                    "gnu.kawa.reflect.CompileArrays:validateArrayGet");
+        setProperty(Procedure.compilerXKey,
+                    "gnu.kawa.reflect.CompileArrays:compileGet");
+    }
 
   public Object apply2 (Object array, Object index)
   {

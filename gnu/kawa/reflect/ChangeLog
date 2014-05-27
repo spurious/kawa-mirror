@@ -1,5 +1,11 @@
 2014-05-26  Per Bothner  <per@bothner.com>
 
+	* ArrayGet.java: Convert to use new compilerXKey protocol.
+	* ArrayLength.java: Likewise.
+	* ArrayNew.java: Likewise.
+	* ArraySet.java: Likewise.
+	* CompileArrays.java: No longer implements Inlineable.
+
 	Improve bytecode for creating arrays with splices.
 	* ArrayMake.java: New class, extends ProcedureN.
 	* CompileArrays.java (compileMake, createArrays): New static methods.

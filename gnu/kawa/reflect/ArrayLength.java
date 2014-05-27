@@ -3,19 +3,19 @@ import gnu.bytecode.*;
 import gnu.mapping.*;
 import java.io.*;
 
-public class ArrayLength 
+public class ArrayLength
   extends Procedure1
   implements Externalizable
 {
-  Type element_type;
+    Type element_type;
 
-  public ArrayLength (Type element_type)
-  {
-    this.element_type = element_type;
-    setProperty(Procedure.validateApplyKey,
-                "gnu.kawa.reflect.CompileArrays:validateArrayLength");
-    Procedure.compilerKey.set(this, "*gnu.kawa.reflect.CompileArrays:getForArrayLength");
-  }
+    public ArrayLength(Type element_type) {
+        this.element_type = element_type;
+        setProperty(Procedure.validateApplyKey,
+                    "gnu.kawa.reflect.CompileArrays:validateArrayLength");
+        setProperty(Procedure.compilerXKey,
+                    "gnu.kawa.reflect.CompileArrays:compileLength");
+    }
 
   public Object apply1 (Object array)
   {

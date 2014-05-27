@@ -9,6 +9,7 @@ import gnu.kawa.functions.MakeSplice;
 import gnu.kawa.reflect.CompileArrays;
 import gnu.kawa.io.OutPort;
 import gnu.text.SourceMessages;
+import gnu.text.SyntaxException;
 /* #ifdef use:java.lang.invoke */
 import java.lang.invoke.*;
 /* #endif */
@@ -236,10 +237,11 @@ public class ApplyExp extends Expression
             } catch (Error ex) {
                 throw ex;
             } catch (Throwable ex) {
-                comp.getMessages().error('e',
-                    "caught exception in inline-compiler for "
-                                         +quotedValue+" - "+ex, ex);
-                return;
+                SourceMessages msg = comp.getMessages();
+                msg.error('f',
+                          "caught exception in inline-compiler for "
+                          +quotedValue+" - "+ex, ex);
+                throw new SyntaxException(msg);
             }
         }
 

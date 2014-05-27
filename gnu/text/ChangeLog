@@ -1,3 +1,7 @@
+2014-05-26  Per Bothner  <per@bothner.com>
+
+	* SyntaxException.java: Change to inherit from RuntimeException.
+
 2014-03-18  Per Bothner  <per@bothner.com>
 
 	* Path.java: Moved to gnu/kawa/io.

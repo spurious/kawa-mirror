@@ -9,7 +9,7 @@ package gnu.text;
  * or well-formedness errors when reading an XML document.
  */
 
-public class SyntaxException extends Exception
+public class SyntaxException extends RuntimeException
 {
   /** If non-null, an extra one-line message printed before the messages.
    * Can be used to provide extra context.  */

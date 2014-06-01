@@ -126,7 +126,7 @@
 (define-alias Arrays java.util.Arrays)
 (define-alias Character java.lang.Character)
 
-(include "char-tables.iscm")
+(include-relative "char-tables.iscm")
 
 (define (%make-builtin nm arr::int[])
   (char-set inversion-list: arr

@@ -32,8 +32,7 @@ java_SCM = DefineRecordType.scm enums.scm readtable.scm \
   Streams.scm StreamsDerived.scm StreamsPrimitive.scm StreamsType.scm \
   genwrite.scm pp.scm ppfile.scm printf.scm ralists.scm syntaxutils.scm \
   cut.scm testing.scm $(XML_SCM) $(AWT_SCM) $(SWING_SCM)
-EXTRA_DIST = $(java_SCM) XML.scm swing.scm
+EXTRA_DIST = $(java_SCM) XML.scm swing.scm char-tables.iscm
 SCM_COMPILE_FLAGS = --warn-undefined-variable --warn-unknown-member --warn-as-error
 
 all: Makefile scm-classes.stamp $(@GCJ_COMPILED_SELECTED@)
-

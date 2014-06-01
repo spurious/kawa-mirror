@@ -1,3 +1,8 @@
+2014-05-31  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (EXTRA_DIST): Add char-tables.iscm.
+	* srfi14.scm: Use include-relative rather than include.
+
 2014-05-05  Per Bothner  <per@bothner.com>
 
 	* syntaxutils.scm: Add quotation for @ symbol (i.e. |@|)

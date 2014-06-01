@@ -231,14 +231,16 @@ You can also
 @section Getting and running Java
 
 Before installing Kawa, you will need a working Java system.
-Kawa has been reported to
-work with JDK from 1.1 through 1.6, Kaffe, Symantec Cafe, J++, and GCJ.
-The released Kawa jar file assumes JDK 1.5 or equivalent functionality.
-If those features are missing, you may need to build Kawa from source.
+The released Kawa jar file assumes Java 7 or newer.
+You need to build Kawa from source if you have Java 5, Java 6,
+or are targeting Android.
+(Older versions of Kawa have been reported to
+work with JDK from 1.1, Kaffe, Symantec Cafe, J++, and GCJ,
+but these are no longer supported.)
 
 The discussion below assumes you are using the Java Developer's Kit
-(JDK) from Sun.  You can download free copies of
-@uref{http://java.sun.com/javase/downloads/index.jsp, JDK 1.6} for various platforms.
+(JDK) from Oracle.  You can download free copies of
+@uref{http://www.oracle.com/technetwork/java/javase/downloads/index.html, JDK 8} for various platforms.
 
 If you want to run Kawa on a Macintosh, see
 @uref{http://rdsathene.org/scheme/mackawa.html}.
@@ -265,12 +267,9 @@ source release in addition to the binary release.  The purpose
 of the binary release is just to save you the time and trouble of
 compiling the sources.
 
-The binary release requires Java 5 (JDK 1.5) or later.
-It does include support for certain Java 6 features
-(@code{HttpServer}, @code{javax.script}, and Unicode normalization),
-but these feature only work if you use Java 6, not Java 5.
+The binary release requires Java 7 or later.
 If you have an older Java implementation, or build for a mobile
-environment like Android, or optimize for Java 6,
+environment like Android,
 then you will need to get the source distribution.
 
 The binary release comes as a @code{.jar} archive
@@ -361,24 +360,14 @@ If you have installed Kawa before, make sure your @code{CLASSPATH}
 does not include old versions of Kawa, or other classes that may
 conflict with the new ones.
 
-As-distributed, the Kawa source code requires Java 6.
-If you only have Java 5, use the @code{--with-have-source} option:
+As distributed, the Kawa source code requires Java 7.
+If you only have Java 6 or Java 5, use the @code{--with-have-source} option:
 @example
 ./configure --with-java-source=5
 @end example
 
-If you want to add support for certain Java 6 features,
-but produce a @code{.jar} file that will execute under Java 5 do:
-@example
-./configure --with-java-source=6compat5
-@end example
-Note this requires that you build Kawa with Java 6.
-
-In theory Kawa supports older versions of Java (such as JDK 1.4
-or even 1.1), though this has not been tested in a while.
-You use the appropriate @code{--with-java-source} option,
-but you still need a Java 5 or later version of @code{javac}
-to build Kawa.  You then need to use a tool
+Kawa no longer supports older verisons of Java (JDK 1.4 or older).
+It might be possible to use a tool
 like @uref{http://retroweaver.sourceforge.net/, Retroweaver}
 on the Kawa @code{.jar} to fix up Java 5 dependencies.
 Contact the Kawa author if you want to be a tester for this.
@@ -793,7 +782,7 @@ This defaults to the value of @code{--warn-unknown-member},
 to turn it off use the @code{--no-warn-invoke-unknown-method} flag.
 @pindex warn-unused
 @item --warn-unused
-Emit a warning if a variable is usused or code never executed. This defaults 
+Emit a warning if a variable is unused or code never executed. This defaults
 to on; to turn it off use the @code{--no-warn-unused} flag.
 @cindex warn-unreachable
 @item --warn-unreachable
@@ -893,7 +882,6 @@ when the pretty-printer decides where to break a line.
 @table @code
 @item --target @var{version}
 The @var{version} can be a JDK or Java specification version:
-@code{1.1}, @code{1.2}, @code{1.3}, @code{1.4},
 @code{5}, @code{6}, or @code{7}.
 The JDK versions @code{1.5} and @code{1.6} are equivalent to @code{5}
 or @code{6}, respectively.
@@ -970,8 +958,7 @@ Prints a stack trace with any warning found during compilation.
 
 @subsection Options for web servers
 
-JDK 6, the standard Java 6 distribution by Sun/Oracle,
-includes a complete web server library.
+JDK 6 (or later) includes a complete web server library.
 
 @table @code
 @item --http-auto-handler @var{context-path} @var{appdir}
@@ -2588,6 +2575,10 @@ Deprecated; usually you can just write:
 @stxlit{(}@stxref{type}@stxlit{:}@stxlit{@atchar{}} @stxref{expression}@stxlit{)}
 @end display
 Performs a cast.
+Deprecated; usually you can just write:
+@example
+->@var{type}
+@end example
 
 @subsubsection Type test
 
@@ -2735,8 +2726,12 @@ The second example assumes that @code{command-line} is an alias for some
 feature which gives access to command line arguments. Note that an error
 will be signaled at macro-expansion time if this feature is not present.
 
-You can use @code{java-6} or @code{java-6} to check for Java 6 or
-Java 7, respectively, at compile-time.
+You can use @code{java-6}, @code{java-7}, @code{java-8},
+or @code{java-9} to check check if the underlying Java
+is a specific version or newer.
+For example the name @code{java-7} matches for
+either Java 7, Java 8, or newer, as
+reported by @code{System} property @code{"java.version"}.
 
 You can use @code{class-exists:@var{ClassName}} to check
 if @code{@var{ClassName}} exists at compile-time.
@@ -2752,8 +2747,8 @@ It is an error to modify this list.
 Here is example of what @code{features} might return:
 @example
 (features)  @result{}
-(complex exact-complex full-unicode java-6 kawa
- ratios srfi-0 srfi-4 srfi-6  srfi-8 srfi-9 srfi-11
+(complex exact-complex full-unicode java-7 java-6 kawa
+ ratios srfi-0 srfi-4 srfi-6 srfi-8 srfi-9 srfi-11
  srfi-16 srfi-17 srfi-23 srfi-25 srfi-26 srfi-28 srfi-30
  srfi-39 string-normalize-unicode threads)
 @end example
@@ -3713,13 +3708,23 @@ Same as @code{define}, except that @code{name} is not exported.
 @end deffn
 
 @deffn Syntax define-constant name [:: type] value
-Definites @var{name} to have the given @var{value}.
+@deffnx Syntax define-early-constant name [:: type] value
+Defines @var{name} to have the given @var{value}.
 The value is readonly, and you cannot assign to it.
 (This is not fully enforced.)
-If the definition is at module level, then the compiler
-will create a @code{final} field with the given name and type.
-The @var{value} is evaluated as normal; however, if it is a
-compile-time constant, it defaults to being static.
+
+If @code{define-early-constant} is used
+@emph{or} the @var{value} is a compile-time constant,
+then the compiler will create a @code{final} field with
+the given name and type, and evaluate @var{value}
+in the module's class initializer (if the definition
+is static) or constructor (if the definition is non-static),
+before other definitions and expressions.
+Othewise, the @var{value} is evaluated in the module body
+where it appears.
+
+If the @var{value} is a compile-time constant,
+then the definition defaults to being static.
 @end deffn
 
 @deffn Syntax define-variable name [init]
@@ -7059,7 +7064,7 @@ to indicate substitutions.
 Also, @code{pregexp‑split} behaves differently from
 @code{regex‑split} if the pattern can match an empty string.
 
-See @uref{http://evalwhen.com/pregexp/index.html,here for details}.
+See @uref{http://www.ccs.neu.edu/home/dorai/pregexp/index.html,here for details}.
 
 @node Data structures, Exceptions, Characters and text, Top
 @chapter Data structures
@@ -11411,7 +11416,7 @@ soon it is seen during the first macro-expansion pass,
 and is active thereafter (unless overridden by @code{with-compile-options}).
 
 The @var{key:} is one of the supported option names 
-(The ending colon make it a Kawa keyword). Valid
+(The ending colon makes it a Kawa keyword). Valid
 option keys are:
 
 @itemize @bullet
@@ -13541,11 +13546,10 @@ that is relative to the current web application. Thus a request for
 servlet-path: /this/is/a/test
 @end example
 
-@subsection Using the JDK 6 built-in web server
+@subsection Using the OpenJDK built-in web server
 
 The easiest way to run a Kawa web server is to
-use the web server built in to JDK 6, the standard Java 6 distribution
-shipped by Sun/Oracle.
+use the web server built in to JDK 6 or later.
 
 @example
 kawa --http-auto-handler @var{context-path} @var{appdir} --http-start @var{port}
@@ -14350,6 +14354,7 @@ They run in separate threads.
 @node Building JavaFX applications
 @section Building JavaFX applications
 
+@cindex JavaFX
 Kawa makes it easy to build ``rich client'' (i.e. GUI) applications using
 @uref{http://www.oracle.com/technetwork/java/javafx/overview/index.html,JavaFX}.
 For example the following program will print up a window with a button;
@@ -14369,12 +14374,28 @@ event.
   on-action: (lambda (e) (format #t "Event: ~s~%~!" e))))
 @end example
 
-JDK 7 update 9 or later has JavaFX included, but it is a separate
-@code{jfxrt.jar} which not in the default @code{CLASSPATH}.
-JavaFX support is builtin to the pre-built
-@code{kawa-@value{VERSION}.jar}.
+JavaFX support is builtin to the pre-built @code{kawa-@value{VERSION}.jar}.
+It is easiest to use JDK 8; see below if you're using JDK 7.
+If you build Kawa from source, specify @code{--with-javafx} on the
+@code{configure} command line (assuming you're using JDK 8).
+
 Assume the above file is @code{HelloButton1.scm}, you can
 run it like this:
+@example
+$ kawa HelloButton1.scm
+@end example
+
+For more information and examples read this (slightly older)
+@uref{http://per.bothner.com/blog/2011/JavaFX-using-Kawa-intro/,introduction},
+and
+@uref{http://localhost/per/blog/2011/JavaFX-using-Kawa-animation/,this on animation}.
+
+@subsection Using JavaFX with JDK 7
+JDK 8 ships with JavaFX, and it is in the default @code{CLASSPATH}.
+JDK 7 update 9 or later does have JavaFX included, but it is a separate
+@code{jfxrt.jar} which not in the default @code{CLASSPATH}.
+Thus have have to eplicitly add @code{jfxrt.jar}.
+To run the previous @code{HelloButton1.scm} you can do:
 @example
 java -cp $JAVA_HOME/lib/jfxrt.jar:$KAWA_HOME/kawa.jar HelloButton1.scm
 @end example
@@ -14387,11 +14408,6 @@ The resulting Kawa binary sets up the path to @code{jfxrt.jar} so you just need 
 @example
 $ kawa HelloButton1.scm
 @end example
-
-For more information and examples read this (slightly older)
-@uref{http://per.bothner.com/blog/2011/JavaFX-using-Kawa-intro/,introduction},
-and
-@uref{http://localhost/per/blog/2011/JavaFX-using-Kawa-animation/,this on animation}.
 
 @node Building for Android
 @section Building for Android
@@ -15631,6 +15647,11 @@ Being able to hide and show different parts of the output might be nice.
 Being able to link from error messages to source might be nice.
 Better handling of redefinitions is discussed 
 @uref{http://per.bothner.com/blog/2009/REPL-for-JavaFX/, here in the context of JavaXF Script}; this is a general REPL issue, mostly independent of the GUI for it.
+
+An interesting possibility is to use the @uref{http://ipython.org/,IPython}
+framework.  There are existing ports for Scala: either
+@uref{https://github.com/mattpap/IScala,IScala}
+or @uref{https://github.com/Bridgewater/scala-notebook, Scala Notebook}.
 
 @subsection XQuery-1.1-functionality
 It would be nice to update the XQuery (Qexo) support

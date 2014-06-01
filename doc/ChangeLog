@@ -1,3 +1,7 @@
+2014-06-01  Per Bothner  <per@bothner.com>
+
+	* kawa.texi: Various updates.
+
 2014-03-18  Per Bothner  <per@bothner.com>
 
 	* kawa.texi: Update package of gnu.text.*Path to gnu.kawa.io.

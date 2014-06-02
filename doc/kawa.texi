@@ -4528,9 +4528,13 @@ The predefined @code{html} prefix could be defined thus:
 @node Keywords, Special named constants, Namespaces, Symbols and namespaces
 @section Keywords
 
-Keywords are similar to symbols.  The main difference is that keywords are
-self-evaluating and therefore do not need to be quoted in expressions.
+Keywords are similar to symbols.
 They are used mainly for specifying keyword arguments.
+
+Historically keywords have been self-evaluating (you did not need to
+quote them).  This is changing: you should quote a keyword if you
+want a literal keyword value, and not quote it if it is used
+with a keyword argument.  (This change is a work-in-progress.)
 
 @display
 @stxdef{keyword} @stxref{identifier}@stxlit{:}
@@ -8822,9 +8826,12 @@ evaluation is unspecified and the new bindings are only visible in the
 body of the parameterize special form).
 
 When a new thread is created using @code{future} or @code{runnable}
-then the child thread shares locations with its parents.
-This sharing is broken by a @code{parameterize} that changes
-the location, and restored when the @code{parameterize} exits.
+then the child thread inherits initial values from its parent.
+Once the child is running, changing the value in the child does not
+affect the value in the parent or vice versa.
+(In the past this was not the case: The child would share a location
+with the parent except within a @code{parameterize}.
+This was changed to avoid unsafe and inefficient coupling between threads.)
 
 Note that @code{parameterize} and @code{fluid-let} have similar
 binding and sharing behavior.

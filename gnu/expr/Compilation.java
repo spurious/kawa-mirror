@@ -701,12 +701,15 @@ public class Compilation implements SourceLocator
     code.emitFi();
   }
 
-  private void dumpInitializers (Initializer inits)
-  {
-    for (Initializer init = Initializer.reverse(inits);
-         init != null;  init = init.next)
-      init.emit(this);
-  }
+    boolean dumpingInitializers;
+
+    private void dumpInitializers(Initializer inits) {
+        dumpingInitializers = true;
+        for (Initializer init = Initializer.reverse(inits);
+             init != null;  init = init.next)
+            init.emit(this);
+        dumpingInitializers = false;
+    }
 
   /** Search this Compilation for a ClassType with a given name.
    * @param name the name of the class desired

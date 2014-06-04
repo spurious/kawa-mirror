@@ -69,7 +69,7 @@ public class ProcInitializer extends Initializer
       code.emitPushThis();
     else
       {
-	if (comp.moduleInstanceVar == null)
+        if (comp.moduleInstanceVar == null || comp.moduleInstanceVar.dead())
 	  {
 	    comp.moduleInstanceVar
 	      = code.locals.current_scope.addVariable(code,

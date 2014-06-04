@@ -607,7 +607,7 @@ SCRIPTS_TO_RUN = uninit1.scm errors1.scm errors2.scm \
   anonymous-lambda-1.scm unreach1.scm unreach2.scm unreach3.scm \
   bad-defclass.scm defclass1.scm defclass2.scm bad-voidexp.scm \
   srfi-45-test1.scm srfi-45-test2.scm bad-srfi-109.scm \
-  define1.scm mac-obj.scm overload1.scm symbol1.scm \
+  define1.scm define2.scm mac-obj.scm overload1.scm symbol1.scm \
   command1.scm command2.scm command3.scm exit1.scm exit2.scm \
   sva34005.scm sva35362.scm sva36039.scm sva36413.scm sva36556.scm \
   sva36853.scm sva36863.scm sva36917.scm sva37684.scm sva38026.scm \

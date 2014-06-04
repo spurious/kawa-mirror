@@ -1,3 +1,11 @@
+2014-06-04  Per Bothner  <per@bothner.com>
+
+	* LambdaExp.java (compile): Don't create field if in dumpInitializers.
+	* Compilation.java (dumpingInitializers): New field.
+	(dumpInitializers): Set dumpingInitializers.
+	* ProcInitializer.java (emitLoadModuleMethod): Handle the case
+	that moduleInstanceVar might be dead.
+
 2014-05-26  Per Bothner  <per@bothner.com>
 
 	* ApplyExp.java (compile): Re-throw if exception when inlining.

@@ -207,8 +207,11 @@
 	  (java.lang.Math:atan x)))
 
 (define-procedure sqrt
+#|
+  ;; Only when the "required type" is real:
   (lambda ((x :: <double>)) :: <double>
 	  (java.lang.Math:sqrt x))
+|#
   (lambda ((num :: <quantity>)) :: <quantity>
 	  (gnu.math.Quantity:make
 	   (invoke (invoke num 'number) 'sqrt)

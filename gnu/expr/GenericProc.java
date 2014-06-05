@@ -38,7 +38,7 @@ public class GenericProc extends MethodProc
     return minArgs | (maxArgs << 12);
   }
 
-  protected synchronized void add (MethodProc[] procs)
+  protected synchronized void addAll (MethodProc[] procs)
   {
     int n = procs.length;
     if (methods == null)

@@ -1,3 +1,10 @@
+2014-06-04  Per Bothner  <per@bothner.com>
+
+	Some incomplete hooks for overload resolution with splices.
+	* ClassMethods.java (selectApplicable): Take maybeMore parameter.
+	* CompileInvoke.java (validateApplyInvoke): Update.
+	* CompileBuildObject.java (hasAddChildMethod): Update.
+
 2014-05-26  Per Bothner  <per@bothner.com>
 
 	* ArrayGet.java: Convert to use new compilerXKey protocol.

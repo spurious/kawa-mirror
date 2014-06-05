@@ -214,11 +214,13 @@ public class CompileInvoke
         int numCode;
         int keywordStart = kind == 'N' ? hasKeywordArgument(1, args) : nargs;
         int tailArgs = nargs - keywordStart;
+        int spliceCount = exp.spliceCount();
         try
           {
             methods = getMethods(ctype, name, caller, iproc);
             numCode = ClassMethods.selectApplicable(methods,
-                                                    margsLength - tailArgs);
+                                                    margsLength - tailArgs - spliceCount,
+                                                    spliceCount > 0);
           }
         catch (Exception ex)
           {

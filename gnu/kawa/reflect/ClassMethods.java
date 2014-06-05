@@ -199,7 +199,8 @@ public class ClassMethods extends Procedure2
    * @return number of methods that apply, NO_MATCH_TOO_FEW_ARGS,
    *  or NO_MATCH_TOO_MANY_ARGS.
    */
-  public static int selectApplicable(PrimProcedure[] methods, int numArgs)
+  public static int selectApplicable(PrimProcedure[] methods,
+                                     int numArgs, boolean maybeMore)
   {
     int limit = methods.length;
     int numTooManyArgs = 0;
@@ -211,7 +212,7 @@ public class ClassMethods extends Procedure2
         int min = Procedure.minArgs(num);
         int max = Procedure.maxArgs(num);
         boolean ok = false;
-        if (numArgs < min)
+        if (numArgs < min && !maybeMore)
           numTooFewArgs++;
         else if (numArgs > max && max >= 0)
           numTooManyArgs++;

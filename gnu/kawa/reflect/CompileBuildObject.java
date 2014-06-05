@@ -134,7 +134,7 @@ public class CompileBuildObject {
     }
 
     public boolean hasAddChildMethod() {
-        return ClassMethods.selectApplicable(ClassMethods.getMethods(ctype, "add", 'V', null, getLanguage()), 2) > 0;
+        return ClassMethods.selectApplicable(ClassMethods.getMethods(ctype, "add", 'V', null, getLanguage()), 2, false/*??*/) > 0;
     }
 
     public Member findNamedMember (String name) {

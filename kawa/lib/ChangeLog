@@ -1,3 +1,7 @@
+2014-06-04  Per Bothner  <per@bothner.com>
+
+	* misc.scm (symbol=?): Simplify - don't need to use define-procedure.
+
 2014-05-13  Per Bothner  <per@bothner.com>
 
 	* misc_syntax.scm (include-relative): If source path is the default

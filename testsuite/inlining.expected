@@ -7,6 +7,17 @@ InliningTest.setCar6(gnu.lists.Pair,java.lang.Object)void: 6 bytes
 InliningTest.setCar7(gnu.lists.Pair,java.lang.Object)void: 6 bytes
 InliningTest.setCar8(gnu.lists.Pair,java.lang.Object)void: 6 bytes
 InliningTest.setCar9(java.lang.Object,java.lang.Object)void: 14 bytes
+InliningTest.getCar1(gnu.lists.Pair)java.lang.Object: 5 bytes
+InliningTest.getCar2(gnu.lists.Pair)java.lang.Object: 5 bytes
+InliningTest.getCar3(gnu.lists.Pair)java.lang.Object: 5 bytes
+InliningTest.getCar4(gnu.lists.Pair)java.lang.Object: 5 bytes
+InliningTest.getCar5(gnu.lists.Pair)java.lang.Object: 5 bytes
+InliningTest.getCar6(gnu.lists.Pair)java.lang.Object: 5 bytes
+InliningTest.getCar7(gnu.lists.Pair)java.lang.Object: 5 bytes
+InliningTest.getCar8(gnu.lists.Pair)java.lang.Object: 5 bytes
+InliningTest.getCar9(java.lang.Object)java.lang.Object: 13 bytes
+InliningTest.getCar10(java.lang.Object)java.lang.Object: 13 bytes
+InliningTest.getCar11(gnu.lists.Pair)java.lang.Object: 5 bytes
 InliningTest.getHome1()java.lang.String: 4 bytes
 InliningTest.getHome2()java.lang.String: 4 bytes
 InliningTest.getHome3()java.lang.String: 4 bytes

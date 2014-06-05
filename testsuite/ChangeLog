@@ -1,5 +1,9 @@
 2014-06-04  Per Bothner  <per@bothner.com>
 
+	* inlining-test.scm (get-car11): New test for calling car function.
+	* Makefile.am (inlining.log): Also measure size of get-carXX methods.
+	* inlining.expected: Update appropriately.
+
 	* define2.scm: New test for lambda in define-early-constant.
 
 2014-05-17  Helmut Eller  <eller.helmut@gmail.com>

@@ -263,15 +263,9 @@
                         (syntax->expression #'(lambda () expression))))))
 
 (define-syntax define-procedure
-  (syntax-rules (:: <gnu.expr.GenericProc>)
-		((define-procedure name args ...)
-		 (begin
-		   ;; The GenericProc has to be allocated at init time, for
-		   ;; the sake of require, while the actual properties may
-		   ;; need to be evaluated at module-run-time.
-		   (define-early-constant name :: <gnu.expr.GenericProc>
-		     (make <gnu.expr.GenericProc> 'name))
-		   (invoke name 'setProperties (java.lang.Object[] args ...))))))
+   (syntax-rules ()
+     ((_ name . rest)
+      (%define name 27 gnu.expr.GenericProc . rest))))
 
 (define (syntax->datum obj)
   (kawa.lang.Quote:quote obj))

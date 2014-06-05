@@ -1,8 +1,11 @@
 package kawa.standard;
 import kawa.lang.*;
 import gnu.mapping.*;
+import gnu.bytecode.ClassType;
+import gnu.bytecode.Method;
 import gnu.expr.*;
 import gnu.lists.*;
+import gnu.kawa.reflect.Invoke;
 
 /**
  * The Syntax transformer that re-writes the "%define" internal form.
@@ -13,8 +16,9 @@ import gnu.lists.*;
  * The <code>code</code> is an integer mask,
  * where 1 means type specified, 2 means a function definition,
  * 4 means private, 8 means constant, and 16 means an early constant.
+ * As a special case, define-procedure is 1+2+8+16=27
  * The <code>type</code> is the declarated type or <code>null</code>.
- * The <code>value</code> is the initializing value. * 
+ * The <code>value</code> is the initializing value.
  * @author	Per Bothner
  */
 
@@ -54,6 +58,7 @@ public class define extends Syntax
     int options = ((Number) Translator.stripSyntax(p2.getCar())).intValue();
     boolean makePrivate = (options & 4) != 0;
     boolean makeConstant = (options & 8) != 0;
+    boolean makeCompoundProcedure = options == 27;
 
     name = tr.namespaceResolve(name);
     if (! (name instanceof Symbol))
@@ -78,7 +83,7 @@ public class define extends Syntax
     decl.setFlag(Declaration.IS_SINGLE_VALUE);
 
     Expression value;
-    if ((options & 2) != 0)
+    if ((options & 2) != 0 && ! makeCompoundProcedure)
       {
 	LambdaExp lexp = new LambdaExp();
 	lexp.setSymbol(name);
@@ -121,6 +126,7 @@ public class define extends Syntax
     Object name = p1.getCar();
     int options = ((Number) Translator.stripSyntax(p2.getCar())).intValue();
     boolean makePrivate = (options & 4) != 0;
+    boolean makeCompoundProcedure = options == 27;
 
     if (! (name instanceof SetExp))
       return tr.syntaxError(getName(options) + " is only allowed in a <body>");
@@ -137,8 +143,9 @@ public class define extends Syntax
           }
       }
 
+    BeginExp bexp2 = null;
     boolean unknownValue;
-    if ((options & 2) != 0)
+    if ((options & 2) != 0 && ! makeCompoundProcedure)
       {
         LambdaExp lexp = (LambdaExp) sexp.getNewValue();
         Object formals = p4.getCar();
@@ -149,7 +156,89 @@ public class define extends Syntax
     else
       {
         unknownValue = decl.context instanceof ModuleExp && ! makePrivate && decl.getCanWrite();
-	sexp.setNewValue(tr.rewrite_car(p4, false));
+        if (makeCompoundProcedure) {
+            tr.letStart();
+            ClassType classGenericProc = ClassType.make("gnu.expr.GenericProc");
+            Declaration gproc =
+                tr.letVariable(null,
+                               classGenericProc,
+                               new ApplyExp(Invoke.make,
+                                   new Expression[] {
+                                       QuoteExp.getInstance(classGenericProc),
+                                       QuoteExp.getInstance(decl.getName()) }));
+            gproc.setFlag(Declaration.ALLOCATE_ON_STACK);
+            tr.letEnter();
+            BeginExp bexp1 = new BeginExp(); // early-init-code goes here
+            Method addMethod = classGenericProc.getDeclaredMethod("add", 1);
+            Method setPropMethod =
+                classGenericProc.getDeclaredMethod("setProperty", 2);
+            for (;;) {
+                Keyword key = null;
+                Object car = Translator.stripSyntax(p4.getCar());
+                if (car instanceof Keyword) {
+                    key = (Keyword) car;
+                    Object cdr = p4.getCdr();
+                    if (! (cdr instanceof Pair)
+                        || Translator.safeCar(cdr) instanceof Keyword) {
+                        tr.error('e', "missing value following keyword");
+                        break;
+                    }
+                    p4 = (Pair) cdr;
+                }
+                Expression arg = tr.rewrite_car(p4, false);
+                if (key != null) {
+                    if (bexp2 == null)
+                        bexp2 = new BeginExp();
+                    bexp2.add(new ApplyExp(setPropMethod,
+                                           new Expression[] {
+                                               new ReferenceExp(decl),
+                                               QuoteExp.getInstance(key),
+                                               arg }));
+                } else {
+                    Declaration gdecl = arg instanceof LambdaExp ? gproc : decl;
+                    Expression addCall =
+                        new ApplyExp(addMethod,
+                                     new Expression[] {
+                                         new ReferenceExp(gdecl),
+                                         arg });
+                    if (arg instanceof LambdaExp) {
+                        LambdaExp larg = (LambdaExp) arg;
+                        String lname = larg.getName();
+                        String dname = decl.getName();
+                        if (lname == null || lname.equals(dname)) {
+                            // Needed so PrimProcedure.getMethodFor
+                            // can find this method.
+                            if (decl.isPublic())
+                                larg.setFlag(LambdaExp.PUBLIC_METHOD);
+                            // FIXME Maybe set larg.nameDecl to decl?
+                            // At least if we have a single LambdaExp?
+                            // FIXME set the name?
+                            // This "enables" ModuleMethod#resolveParameterTypes
+                            // to search for the most specific method, which
+                            // is expensive - and pull in Compilation and
+                            // related classes.
+                            // if (lname == null)
+                            //    larg.setName(dname);
+                        }
+                        bexp1.add(addCall);
+                    } else {
+                        bexp2.add(addCall);
+                    }
+                }
+                Object cdr = p4.getCdr();
+                if (! (cdr instanceof Pair)) {
+                    if (cdr != LList.Empty)
+                        tr.error('e', "not a proper list");
+                    break;
+                }
+                p4 = (Pair) cdr;
+            }
+            ReferenceExp gref = new ReferenceExp(gproc);
+            gref.setFlag(ReferenceExp.ALLOCATE_ON_STACK_LAST);
+            bexp1.add(gref);
+            sexp.setNewValue(tr.letDone(BeginExp.canonicalize(bexp1)));
+        } else
+            sexp.setNewValue(tr.rewrite_car(p4, false));
       }
     if (unknownValue)
       decl.noteValueUnknown();
@@ -159,6 +248,8 @@ public class define extends Syntax
     sexp.setDefining (true);
     if (makePrivate && ! (decl.getContext() instanceof ModuleExp))
       tr.error('w', "define-private not at top level");
+    if (bexp2 != null)
+        return new BeginExp(sexp, bexp2);
     return sexp;
   }
 }

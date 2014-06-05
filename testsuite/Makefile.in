@@ -966,7 +966,7 @@ InliningTest.class: $(srcdir)/inlining-test.scm
 inlining.log: InliningTest.class cycle1.class cycle2.class \
   binarytrees.class fannkuch.class fannkuchredux.class fasta.class mandelbrot.class nbody.class pidigits.class regexdna.class revcomp1.class revcomp2.class spectralnorm.class Makefile
 	$(LIST_CODE_SIZE) InliningTest.class \
-	setCar getHome setHome isPair isEmpty castToPair newPair tohex \
+	setCar getCar getHome setHome isPair isEmpty castToPair newPair tohex \
 	makeIarr lengthIarr getIarr setIarr varargs \
 	factoriali1 factoriali2 factoriall1 plusLambda1 firstNegative \
 	inlineTwoCalls inlineTwoFunctions checkEven \

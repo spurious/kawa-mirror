@@ -1,5 +1,8 @@
 2014-06-04  Per Bothner  <per@bothner.com>
 
+	* LambdaExp.java (PUBLIC_METHOD): New field.
+	(addMethodFor): Use PUBLIC_METHOD.
+
 	* GenericProc.java (add(MethodProc[])): Rename unused method to addAll.
 
 	* LambdaExp.java (compile): Don't create field if in dumpInitializers.

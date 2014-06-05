@@ -152,7 +152,13 @@ public class LambdaExp extends ScopeExp
   public static final int OVERLOADABLE_FIELD = 2048;
   public static final int ATTEMPT_INLINE = 4096;
   public static final int IN_EXPWALKER = 0x2000;
-  protected static final int NEXT_AVAIL_FLAG = 0x4000;
+
+  /** True of emitted method should be public.
+   * Needed if PrimProcedure.getMethodFor shold be able to find it.
+   */
+  public static final int PUBLIC_METHOD = 0x4000;
+
+  protected static final int NEXT_AVAIL_FLAG = 0x8000;
 
   /** True iff this lambda is only "called" inline. */
   public final boolean getInlineOnly() { return (flags & INLINE_ONLY) != 0; }
@@ -938,7 +944,7 @@ public class LambdaExp extends ScopeExp
     if (nameDecl != null)
       {
 	if (nameDecl.needsExternalAccess())
-	  mflags |=  Access.PUBLIC;
+	  mflags |= Access.PUBLIC;
 	else
           {
             short defaultFlag = nameDecl.isPrivate() ? 0 : Access.PUBLIC;
@@ -947,6 +953,8 @@ public class LambdaExp extends ScopeExp
             mflags |= defaultFlag;
           }
       }
+    if (getFlag(PUBLIC_METHOD))
+        mflags |= Access.PUBLIC;
     if (! (outer.isModuleBody() || outer instanceof ClassExp)
 	|| name == null)
       {

@@ -45,6 +45,7 @@
 (define (get-car8 (p <pair>))  p:car)
 (define (get-car9 p)  (Pair3:.car p))
 (define (get-car10 p)  (<pair>:.car p))
+(define (get-car11 p::pair) (car p))
 
 (define (is-pair1 x) (<pair>:instance? x))
 (define (is-pair2 x) (gnu.lists.Pair:instance? x))

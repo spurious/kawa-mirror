@@ -1,5 +1,7 @@
 2014-06-04  Per Bothner  <per@bothner.com>
 
+	* numbers.scm (sqrt): Re-order so most specific method is first.
+
 	* misc.scm (symbol=?): Simplify - don't need to use define-procedure.
 
 2014-05-13  Per Bothner  <per@bothner.com>

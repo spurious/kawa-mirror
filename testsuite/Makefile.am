@@ -538,7 +538,8 @@ inlining.log: InliningTest.class cycle1.class cycle2.class \
 	inlineTwoCalls inlineTwoFunctions checkEven \
 	constantPropagation1 constantPropagation2 constantPropagation3 \
 	factorialInfer1 getFromVector1 getFromVector2 \
-	topLevelRecurse1 topLevelRecurse2 sum1 sum2 numcomp eqv >inlining.log
+	topLevelRecurse1 topLevelRecurse2 sum1 sum2 numcomp eqv \
+	raise >inlining.log
 	$(LIST_CODE_SIZE) cycle1.class isIsEven >>inlining.log
 	$(LIST_CODE_SIZE) cycle2.class isIsOdd >>inlining.log
 	$(LIST_CODE_SIZE) binarytrees.class bottomUpTree test >>inlining.log

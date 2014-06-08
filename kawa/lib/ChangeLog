@@ -1,3 +1,7 @@
+2014-06-07  Per Bothner  <per@bothner.com>
+
+	* exceptions.scm (raise): Add 'equivalent-syntax' property.
+
 2014-06-04  Per Bothner  <per@bothner.com>
 
 	* std_syntax.scm (define-procedure): Re-implement to use %define.

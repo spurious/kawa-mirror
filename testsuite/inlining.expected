@@ -111,6 +111,7 @@ InliningTest.numcomp3(java.lang.Object,java.lang.Object,java.lang.Object)int: 19
 InliningTest.numcomp4(java.lang.Object,java.lang.Object,java.lang.Object)int: 32 bytes
 InliningTest.numcomp5(java.lang.Object,java.lang.Object,java.lang.Object)int: 33 bytes
 InliningTest.eqv1(java.lang.Object,java.lang.Object)boolean: 6 bytes
+InliningTest.raise1(int,java.lang.Object)int: 13 bytes
 cycle1.isIsEven(int)boolean: 17 bytes
 cycle2.isIsOdd(int)boolean: 17 bytes
 binarytrees.bottomUpTree(int,int)binarytrees$TreeNode: 60 bytes

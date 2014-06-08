@@ -290,3 +290,6 @@
 
 (define (eqv1 x y)
   (eqv? y x))
+
+(define (raise1 x::int y)
+  (if (< x 0) (raise y) (* x 2)))

@@ -17,8 +17,15 @@
        (ex java.lang.Throwable
            (primitive-throw (link:handle ex)))))))
 
+(define (%%raise form)
+  (syntax-case form ()
+     ((_ obj)
+      #'(primitive-throw (invoke-static kawa.lib.ExceptionWithValue 'wrap obj)))))
+
 (define (raise obj)
-  (primitive-throw (ExceptionWithValue:wrap obj)))
+  equivalent-syntax: %%raise
+  ;; Would be nice to just write: (raise obj) and have that expand %%raise
+  (primitive-throw (invoke-static kawa.lib.ExceptionWithValue 'wrap obj)))
 
 (define (raise-continuable obj)
   (let ((save (current-handler:get)))

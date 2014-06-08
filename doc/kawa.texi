@@ -3375,6 +3375,7 @@ defined in terms of @func{syntax-case} as follows.
 * Boolean values::
 * Conditionals::
 * Definitions::
+* Local binding constructs::
 * Lazy evaluation::
 * Threads::
 * Exceptions::           Exception handling
@@ -3696,18 +3697,18 @@ returning the value of the last one.
 @node Definitions
 @section Definitions
 
-@deffn Syntax define [@stxlit{::} type] value
+@deffn Syntax define name [@stxlit{::} @stxref{type}] value
 @end deffn
 
 In addition to @code{define} (which can take an optional type specifier),
 Kawa has some extra definition forms.
 
-@deffn Syntax define-private name [:: type] value
+@deffn Syntax define-private name [:: @stxref{type}] value
 @deffnx Syntax define-private (name formals) body
 Same as @code{define}, except that @code{name} is not exported.
 @end deffn
 
-@deffn Syntax define-constant name [:: type] value
+@deffn Syntax define-constant name [:: @stxref{type}] value
 @deffnx Syntax define-early-constant name [:: type] value
 Defines @var{name} to have the given @var{value}.
 The value is readonly, and you cannot assign to it.
@@ -3744,6 +3745,103 @@ However, the Kawa version is (currently) only allowed at module level.
 
 For @code{define-namespace} and @code{define-private-namespace}
 see @ref{Namespaces}.
+
+@node Local binding constructs
+@section Local binding constructs
+
+The binding constructs @code{let}, @code{let*}, @code{letrec},
+and @code{letrec*} give Scheme a block structure, like Algol 60.
+The syntax of these four constructs
+is identical, but they differ in the regions they establish
+for their variable bindings. In a @code{let} expression, the initial
+values are computed before any of the variables become
+bound; in a @code{let*} expression, the bindings and evaluations
+are performed sequentially; while in @code{letrec} and @code{letrec*}
+expressions, all the bindings are in effect while their initial
+values are being computed, thus allowing mutually recursive definitions.
+@c The let-values and let*-values con-
+@c structs are analogous to let and let* respectively, but
+@c are designed to handle multiple-valued expressions, bind-
+@c ing different identifiers to the returned values.
+
+@deffn Syntax let @stxlit{((}variable [@stxlit{::} @stxref{type}] init@stxlit{)} ...@stxlit{)} @stxref{body}
+Declare new local variables with the given @var{name}, initial value
+@var{init}, and optional type specification @var{type}.
+The @var{init}s are evaluated in the current environment (in left-to-right
+onder), the @var{variable}s are bound to fresh locations holding the results,
+the @var{body} is evaluated in the extended environment, and the values of
+the last expression of body are returned.
+Each binding of a variable has @var{body} as its region.
+If @var{type} is specified, then after the expression @var{init} is evaluated,
+the result coerced to @var{type}, and then assigned to the variable.
+If @var{type} is not specified, it defaults to @code{Object}.
+
+@example
+(let ((x 2) (y 3))
+  (* x y)) @result{} 6
+@end example
+
+@example
+(let ((x 2) (y 3))
+  (let ((x 7)
+        (z (+ x y)))
+    (* z x)))   @result{} 35
+@end example
+@end deffn
+
+@deffn Syntax let* @stxlit{((}variable [@stxlit{::} @stxref{type}] init@stxlit{)} ...@stxlit{)} @stxref{body}
+
+The @code{let*} binding construct is similar to @code{let},
+but the bindings are performed sequentially from left to
+right, and the region of a @var{variable}
+is that part of the @code{let*} expression to the right of
+the binding. Thus the second binding is done in an environment
+in which the first binding is visible, and so on.
+The @var{variable}s need not be distinct.
+
+@example
+(let ((x 2) (y 3))
+  (let* ((x 7)
+         (z (+ x y)))
+    (* z x)))  @result{} 70
+@end example
+@end deffn
+
+@deffn Syntax letrec @stxlit{((}variable [@stxlit{::} @stxref{type}] init@stxlit{)} ...@stxlit{)} @stxref{body}
+@deffnx Syntax letrec* @stxlit{((}variable [@stxlit{::} @stxref{type}] init@stxlit{)} ...@stxlit{)} @stxref{body}
+The @var{variable}s are bound to fresh locations,
+each @var{variable} is assigned in left-to-right order
+to the result of the corresponding @var{init},
+the @var{body} is evaluated in the resulting environment,
+and the values of the last expression in body are returned.
+Despite the left-to-right evaluation and assignment order, each binding of a
+@var{variable} has the entire @code{letrec} or @code{letrec*}
+expression as its region,
+making it possible to define mutually recursive procedures.
+
+In Kawa @code{letrec} is defined as the same as @code{letrec*}.
+In standard Scheme the order of evaluation of the @var{init}s
+is undefined, as is the order of assignments.
+If the order matters, you should use @code{letrec*}.
+
+If it is not possible to evaluate each @var{init} without assigning
+or referring to the value of the corresponding @var{variable}
+or the variables that follow it , it is an error.
+@example
+(letrec ((even?
+          (lambda (n)
+            (if (zero? n)
+                #t
+                (odd? (- n 1)))))
+         (odd?
+          (lambda (n)
+            (if (zero? n)
+                #f
+                (even? (- n 1))))))
+  (even? 88))
+     @result{} #t
+@end example
+@end deffn
 
 @node Lazy evaluation
 @section Lazy evaluation
@@ -8075,7 +8173,7 @@ in @var{bytevector} between @var{start} and @var{end}.
 @end example
 @end deffn
 
-@deffn Procedure bytevector-copy! to at from start end 
+@deffn Procedure bytevector-copy! to at from [start [end]]
 Copies the bytes of bytevector@var{from} between @var{start} and @var{end}
 to bytevector @var{to}, starting at @var{at}. The order in which bytes
 are copied is unspecified, except that if the source and destination overlap,
@@ -10592,7 +10690,6 @@ that map to primitive Java types or java classes.
 @menu
 * Standard Types::
 * Parameterized Types::
-* Declaring Types of Variables::
 * Type tests and conversions::
 @end menu
 
@@ -10752,24 +10849,7 @@ fully-qualified class names, and also type aliases:
 (define v3 ::fvi [6 7 8])
 @end example
 
-@node Declaring Types of Variables
-@section Declaring Types of Variables
-
-@deffn Syntax let @stxlit{((}name [@stxlit{::} type] init@stxlit{)} ...@stxlit{)} body
-Declare new locals variables with the given @var{name}, initial value
-@var{init}, and optional type specification @var{type}.
-If @var{type} is specified, then the expression @var{init} is evaluated,
-the result coerced to @var{type}, and then assigned to the variable.
-If @var{type} is not specified, it defaults to @code{Object}.
-@end deffn
-
-@deffn Syntax let* @stxlit{((}name [@stxlit{::} type] init@stxlit{)} ...@stxlit{)} body
-@end deffn
-
-@deffn Syntax letrec @stxlit{((}name [@stxlit{::} type] init@stxlit{)} ...@stxlit{)} body
-@end deffn
-
-@node Type tests and conversions, , Declaring Types of Variables, Types
+@node Type tests and conversions
 @section Type tests and conversions
 
 Scheme defines a number of standard type testing predicates.

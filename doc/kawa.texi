@@ -156,7 +156,6 @@ This package has nothing to do with the defunct Kawa commercial Java IDE.
 * Numbers::              Quantities and Numbers
 * Characters and text::
 * Data structures::
-* Exceptions::           Exception handling
 * Eval and Environments::
 * Debugging::
 * Input-Output::         Input, output, and file handling
@@ -3378,6 +3377,7 @@ defined in terms of @func{syntax-case} as follows.
 * Definitions::
 * Lazy evaluation::
 * Threads::
+* Exceptions::           Exception handling
 @end menu
 
 @node Boolean values
@@ -4085,6 +4085,288 @@ an exception), the lock is released.
 Returns the result of the last @var{form}.
 Equivalent to the Java @code{synchronized} statement,
 except that it may return a result.
+@end deffn
+
+@node Exceptions
+@section Exception handling
+An @dfn{exception} is an object used to signal an error or
+other exceptional situation.  The program or run-time system
+can @dfn{throw} the exception when an error is discovered.
+An exception handler is a program construct that registers
+an action to handle exceptions when the handler is active.
+
+If an exception is thrown and not handled then the
+read-eval-print-loop will print a stack trace, and bring
+you back to the top level prompt.
+When not running interactively, an unhandled exception
+will normally cause Kawa to be exited.
+
+In the Scheme exception model (as of R6RS and R7RS)
+exception handlers are one-argument procedures that determine
+the action the program takes when an exceptional situation is signaled.
+The system implicitly maintains a
+current exception handler in the dynamic environment.
+The program raises an exception by invoking the current
+exception handler, passing it an object encapsulating information
+about the exception. Any procedure accepting
+one argument can serve as an exception handler and any
+object can be used to represent an exception.
+
+The Scheme exception model is implemented on top of the Java VM's
+native exception model where the only objects that
+can be thrown are instances of @code{java.lang.Throwable}.
+Kawa also provides direct access to this native model,
+as well as older Scheme exception models.
+
+@deffn Procedure with-exception-handler handler thunk
+It is an error if @var{handler} does not accept one argument.
+It is also an error if @var{thunk} does not accept zero arguments.
+The @code{with-exception-handler} procedure returns the results
+of invoking @var{thunk}. The @var{handler} is installed as the current
+exception handler in the dynamic environment used for the
+invocation of @var{thunk}.
+
+@example
+(call-with-current-continuation
+  (lambda (k)
+   (with-exception-handler
+    (lambda (x)
+     (display "condition: ")
+     (write x)
+     (newline)
+     (k 'exception))
+    (lambda ()
+     (+ 1 (raise ’an-error))))))
+       @result{} exception
+       @i{and prints} condition: an-error
+@end example
+
+@example
+(with-exception-handler
+ (lambda (x)
+  (display "something went wrong\n"))
+ (lambda ()
+  (+ 1 (raise ’an-error))))
+    @i{prints} something went wrong
+@end example
+
+After printing, the second example then raises another exception.
+
+@emph{Performance note:} The @var{thunk} is inlined if it is a
+lambda expression.  However, the @var{handler} cannot be inlined
+even if it is a lambda expression, because it could be called by
+@code{raise-continuable}.  Using the @code{guard} form is
+usually more efficient.
+@end deffn
+
+@deffn Procedure raise obj
+Raises an exception by invoking the current exception handler on @var{obj}.
+The handler is called with the same dynamic
+environment as that of the call to raise, except that the
+current exception handler is the one that was in place when
+the handler being called was installed. If the handler returns,
+then @var{obj} is re-raised in the same dynamic environment as the handler.
+
+If @var{obj} is an instance of @code{java.lang.Throwable},
+then @code{raise} has the same effect as @code{primitive-throw}.
+@end deffn
+
+@deffn Procedure raise-continuable obj
+Raises an exception by invoking the current exception handler on @var{obj}.
+The handler is called with the same dynamic
+environment as the call to @code{raise-continuable}, except
+that: (1) the current exception handler is the one that was
+in place when the handler being called was installed, and
+(2) if the handler being called returns, then it will again
+become the current exception handler.
+If the handler returns, the values it returns become the values
+returned by the call to @code{raise-continuable}.
+
+@example
+(with-exception-handler
+  (lambda (con)
+    (cond
+      ((string? con)
+       (display con))
+      (else
+       (display "a warning has been issued")))
+    42)
+  (lambda ()
+    (+ (raise-continuable "should be a number")
+       23)))
+      @i{prints:} should be a number
+      @result{} 65
+@end example
+@end deffn
+
+@deffn Syntax guard @var{variable} @atleastone{@stxref{cond-clause}} @stxref{body}
+The @meta{body} is evaluated with an exception handler that binds
+the raised object to @var{variable} and, within the scope of that binding,
+evaluates the clauses as if they were the clauses of a @code{cond} expression.
+That implicit @code{cond} expression is evaluated with
+the continuation and dynamic environment of the @code{guard}
+expression. If every cond-clause’s test evaluates to @code{#f}
+and there is no @code{else} clause, then @code{raise-continuable} is
+invoked on the raised object within the dynamic environment of the
+original call to @code{raise} or @code{raise-continuable},
+except that the current exception handler is that of the
+@code{guard} expression.
+
+@example
+(guard (condition
+         ((assq 'a condition) => cdr)
+         ((assq 'b condition)))
+  (raise (list (cons 'a 42))))
+      @result{} 42
+@end example
+
+@example
+(guard (condition
+         ((assq 'a condition) => cdr)
+         ((assq 'b condition)))
+  (raise (list (cons 'b 23))))
+      @result{} (b . 23)
+@end example
+
+@emph{Performance note:} Using @code{guard} is moderately efficient:
+there is some overhead compared to using native exception handling,
+but both the @var{body} and the handlers in the @var{cond-clause}
+are inlined.
+@end deffn
+
+@deffn Procedure dynamic-wind in-guard thunk out-guard
+All three arguments must be 0-argument procedures.
+First calls @var{in-guard}, then @var{thunk}, then @var{out-guard}.
+The result of the expression is that of @var{thunk}.
+If @var{thunk} is exited abnormally (by throwing an exception or
+invoking a continuation), @var{out-guard} is called.
+
+If the continuation of the dynamic-wind is re-entered (which
+is not yet possible in Kawa), the @var{in-guard} is called again.
+
+This function was added in R5RS.
+@end deffn
+
+@deffn Procedure read-error? obj
+Returns #t if @var{obj} is an object raised by the @code{read} procedure.
+(That is if @var{obj} is a @code{gnu.text.SyntaxException}.)
+
+@end deffn
+@deffn Procedure file-error? obj
+Returns #t if @var{obj} is an object raised by inability to open an input
+or output port on a file.
+(This includes @code{java.io.FileNotFoundException} as well
+as certain other exceptions.)
+@end deffn
+
+@subsection Simple error objects
+
+@deffn Procedure error message obj ...
+Raises an exception as if by calling @code{raise}
+on a newly allocated @dfn{simple error object},
+which encapsulates the information provided by @var{message}
+(which should a string), as well as any @var{obj} arguments,
+known as the irritants.
+
+The string representation of a simple error object is as if calling
+@code{(format "#<ERROR ~a~@{ ~w~@}>" @var{message} @var{irritants})}.
+(That is the @var{message} is formatted as if with @code{display}
+while each irritant @var{obj} is formatted as if with @code{write}.)
+
+This procedure is part of SRFI-23, and R7RS.
+It differs from (and is incompatible with) R6RS's @code{error} procedure.
+@end deffn
+
+@deffn Procedure error-object? obj
+Returns @code{#t} if @var{obj} is a simple error object.
+Specifically, that @var{obj} is an instance of @code{kawa.lang.NamedException}.
+Otherwise, it returns @code{#f}.
+@end deffn
+
+@deffn Procedure error-object-message error-object
+Returns the message encapsulated by error-object,
+which must be a simple error object.
+@end deffn
+
+@deffn Procedure error-object-irritants error-object
+Returns a list of the irritants (other arguments)
+encapsulated by error-object, which must be a simple error object.
+@end deffn
+
+@subsection Named exceptions
+
+These functions associate a symbol with exceptions
+and handlers: A handler catches an exception if the symbol matches.
+
+@deffn Procedure catch key thunk handler
+Invoke @var{thunk} in the dynamic context of @var{handler} for
+exceptions matching @var{key}.  If thunk throws to the symbol @var{key},
+then @var{handler} is invoked this way:
+
+@example
+(handler key args ...)
+@end example
+
+@var{key} may be a symbol.  The @var{thunk} takes no
+arguments.  If @var{thunk} returns normally, that is the return value of
+@code{catch}.
+
+Handler is invoked outside the scope of its own @code{catch}.  If
+@var{handler} again throws to the same key, a new handler from further
+up the call chain is invoked.
+
+If the key is @code{#t}, then a throw to @emph{any} symbol will match
+this call to @code{catch}.
+@end deffn
+
+@deffn procedure throw key arg ...
+Invoke the catch form matching @var{key}, passing the @var{arg}s to the
+current @var{handler}.  
+
+If the key is a symbol it will match catches of the same
+symbol or of @code{#t}.
+
+If there is no handler at all, an error is signaled.
+@end deffn
+
+@subsection Native exception handling
+
+@deffn Procedure primitive-throw exception
+Throws the @var{exception}, which must be an instance of a sub-class
+of @code{java.lang.Throwable}.
+@end deffn
+
+@deffn Syntax try-finally body handler
+Evaluate @var{body}, and return its result.
+However, before it returns, evaluate @var{handler}.
+Even if @var{body} returns abnormally (by throwing an exception),
+@var{handler} is evaluated.
+
+(This is implemented just like Java's @code{try}-@code{finally}.
+However, the current implementation does not duplicate the @var{handler}.)
+@end deffn
+
+@deffn Syntax try-catch body handler ...
+Evaluate @var{body}, in the context of the given @var{handler} specifications.
+Each @var{handler} has the form:
+@example
+@var{var} @var{type} @var{exp} ...
+@end example
+If an exception is thrown in @var{body}, the first @var{handler}
+is selected such that the thrown exception is an instance of
+the @var{handler}'s @var{type}. If no @var{handler} is selected,
+the exception is propagated through the dynamic execution context
+until a matching @var{handler} is found.  (If no matching @var{handler}
+is found, then an error message is printed, and the computation terminated.)
+
+Once a @var{handler} is selected,
+the @var{var} is bound to the thrown exception, and the @var{exp} in
+the @var{handler} are executed.  The result of the @code{try-catch}
+is the result of @var{body} if no exception is thrown, or the
+value of the last @var{exp} in the selected @var{handler} if an
+exception is thrown.
+
+(This is implemented just like Java's @code{try}-@code{catch}.)
 @end deffn
 
 @node Multiple values
@@ -7070,7 +7352,7 @@ Also, @code{pregexp‑split} behaves differently from
 
 See @uref{http://www.ccs.neu.edu/home/dorai/pregexp/index.html,here for details}.
 
-@node Data structures, Exceptions, Characters and text, Top
+@node Data structures
 @chapter Data structures
 
 @menu
@@ -8518,99 +8800,8 @@ to be acceptable for @code{eq?}.
 Kawa uses the @code{identityHashCode} method of @code{java.lang.System}.
 @end deffn 
 
-@node Exceptions, Eval and Environments, Data structures, Top
-@chapter Exception handling
 
-@deffn Procedure catch key thunk handler
-Invoke @var{thunk} in the dynamic context of @var{handler} for
-exceptions matching @var{key}.  If thunk throws to the symbol @var{key},
-then @var{handler} is invoked this way:
-
-@example
-(handler key args ...)
-@end example
-
-@var{key} may be a symbol.  The @var{thunk} takes no
-arguments.  If @var{thunk} returns normally, that is the return value of
-@code{catch}.
-
-Handler is invoked outside the scope of its own @code{catch}.  If
-@var{handler} again throws to the same key, a new handler from further
-up the call chain is invoked.
-
-If the key is @code{#t}, then a throw to @emph{any} symbol will match
-this call to @code{catch}.
-@end deffn
-
-@deffn Procedure throw key &rest args ...
-Invoke the catch form matching @var{key}, passing @var{args} to the
-@var{handler}.  
-
-If the key is a symbol it will match catches of the same
-symbol or of #t.
-
-If there is no handler at all, an error is signaled.
-@end deffn
-
-@deffn procedure error message args ...
-Raise an error with key @code{misc-error} and a message constructed by
-displaying @var{msg} and writing @var{args}.
-This normally prints a stack trace, and brings you back to
-the top level, or exits kawa if you are not running interactively.
-This procedure is part of SRFI-23, and other Scheme implementations.
-@end deffn
-
-@deffn Procedure primitive-throw exception
-Throws the @var{exception}, which must be an instance of a sub-class
-of @code{<java.lang.Throwable>}.
-@end deffn
-
-@deffn Syntax try-finally body handler
-Evaluate @var{body}, and return its result.
-However, before it returns, evaluate @var{handler}.
-Even if @var{body} returns abnormally (by throwing an exception),
-@var{handler} is evaluated.
-
-(This is implemented just like Java's @code{try}-@code{finally}.)
-@end deffn
-
-@deffn Syntax try-catch body handler ...
-Evaluate @var{body}, in the context of the given @var{handler} specifications.
-Each @var{handler} has the form:
-@example
-@var{var} @var{type} @var{exp} ...
-@end example
-If an exception is thrown in @var{body}, the first @var{handler}
-is selected such that the thrown exception is an instance of
-the @var{handler}'s @var{type}. If no @var{handler} is selected,
-the exception is propagated through the dynamic execution context
-until a matching @var{handler} is found.  (If no matching @var{handler}
-is found, then an error message is printed, and the computation terminated.)
-
-Once a @var{handler} is selected,
-the @var{var} is bound to the thrown exception, and the @var{exp} in
-the @var{handler} are executed.  The result of the @code{try-catch}
-is the result of @var{body} if no exception is thrown, or the
-value of the last @var{exp} in the selected @var{handler} if an
-exception is thrown.
-
-(This is implemented just like Java's @code{try}-@code{catch}.)
-@end deffn
-
-@deffn Procedure dynamic-wind in-guard thunk out-guard
-All three arguments must be 0-argument procedures.
-First calls @var{in-guard}, then @var{thunk}, then @var{out-guard}.
-The result of the expression is that of @var{thunk}.
-If @var{thunk} is exited abnormally (by throwing an exception or
-invoking a continuation), @var{out-guard} is called.
-
-If the continuation of the dynamic-wind is re-entered (which
-is not yet possible in Kawa), the @var{in-guard} is called again.
-
-This function was added in R5RS.
-@end deffn
-
-@node Eval and Environments, Debugging, Exceptions, Top
+@node Eval and Environments
 @chapter Eval and Environments
 
 @deffn Procedure eval expression [environment]
@@ -15781,6 +15972,36 @@ focus could be GUI programming and perhaps web programming.
 @c automatically converted to a string.  Conversion to a string
 @c is done on demand, for example on printing.
 @c (This is similar to values in the XML data model.)
+
+@subsection Better dynamic reload
+
+Kawa does a lot of optimizations and inlining.  This conflicts
+with being able to ``reload'' a module into an already-running
+interactive environment.
+
+We could add an option to load a module in ``reloadable'' mode.
+Kawa already patches an old function object (a @code{ModuleMethod})
+so existing references to the function get automatically updated.
+However, there are problems if the ``signature'' of the function
+changes - for example if the return type (declared or inferred)
+becomes more general.  In those cases the best thing is to
+re-compile any code that depends on the modified function.
+
+Reloading a module that defines a class is even trickier,
+at least if there are existing instances that should
+work as the updated class.  We can handle the special case
+where only method bodies change: In reloadable mode, each
+method body is compiled to a separate function, the
+actual body indirects to the function.  We must also
+recognize that we compiling a new version of the same
+class, which requires a textual comparison between the
+old and new versions, or a structural comparison
+between the old class and the new code.
+
+When it comes to top-level variables, an issue is when
+to re-evaluate the initializing expression.  It is reasonable
+to do so if and only if the expression is modified, which
+again requires a textual comparison.
 
 @node License
 @chapter License

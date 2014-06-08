@@ -491,7 +491,9 @@ public class Lambda extends Syntax
           }
 	else
 	  {
-	    tr.error('w', "unknown procedure property "+attrName);
+            Expression attrExpr = tr.rewrite_car(pair2, syntax1);
+            attrName = ((Keyword) attrName).asSymbol();
+            lexp.setProperty(attrName, attrExpr);
 	  }
 	body = pair2.getCdr();
       }

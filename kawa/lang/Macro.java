@@ -106,7 +106,8 @@ public class Macro extends Syntax implements Printable, Externalizable
   public Macro(Object name, Procedure expander)
   {
     super(name);
-    this.expander = new QuoteExp(expander);
+    this.expander = expander instanceof Expression ? expander
+        : new QuoteExp(expander);
   }
 
   public Macro(Object name)

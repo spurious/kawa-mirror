@@ -370,6 +370,21 @@ public class Translator extends Compilation
 	  {
             Declaration saveContext = macroContext;
             Syntax syntax = check_if_Syntax (decl);
+            if (syntax == null)
+            {
+                Expression dval = Declaration.followAliases(decl).getValue();
+                Object val = dval == null ? null : dval.valueIfConstant();
+                SimpleSymbol eqmacSymbol = Symbol.valueOf("equivalent-syntax");
+                Object syn;
+                if (dval instanceof LambdaExp)
+                    syn = ((LambdaExp) dval).getProperty(eqmacSymbol, null);
+                else if (val instanceof Procedure)
+                    syn = ((Procedure) val).getProperty(eqmacSymbol, null);
+                else
+                    syn = null;
+                if (syn instanceof Procedure)
+                    syntax = new Macro(null, (Procedure) syn);
+            }
             if (syntax != null)
               {
                 Expression e = apply_rewrite (syntax, p);

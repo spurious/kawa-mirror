@@ -57,6 +57,10 @@
 \THING\@math{^+}
 @end macro
 
+@macro sub{THING}
+@math{_\THING\}
+@end macro
+
 @macro meta{THING}
 @var{\THING\}
 @end macro
@@ -11468,6 +11472,8 @@ The definitions that a module exports are accessible to other modules.
 These are the "public" definitions, to use Java terminology.
 By default, all the identifiers declared at the top-level of a module
 are exported, except those defined using @code{define-private}.
+(If compiling with the @code{--main} flag,
+then by default no identifiers are exported.)
 However, a major purpose of using modules is to control the set of
 names exported.  One reason is to reduce the chance of accidental
 name conflicts between separately developed modules.  An even more
@@ -11475,18 +11481,36 @@ important reason is to enforce an interface:  Client modules should
 only use the names that are part of a documented interface, and should
 not use internal implementation procedures (since those may change).
 
-FIXME --main changes the default.
-
-If there is a @code{module-export} declaration in the module, then
-only those names listed in a @code{module-export} are exported.
+If there is a @code{module-export} (or @code{export})
+declaration in the module, then only those names listed are exported.
 There can be more than one @code{module-export}, and they can be
-anywhere in the Scheme file.  As a matter of good style, I recommend
+anywhere in the Scheme file.  The recommended style has
 a single @code{module-export} near the beginning of the file.
 
-@deffn Syntax module-export name ...
-Make the definition for each @var{name} be exported.
-Note that it is an error if there is no definition for @var{name}
+@deffn Syntax module-export @arbno{@stxref{export-spec}}
+@deffnx Syntax export @arbno{@stxref{export-spec}}
+The forms @code{export} and @code{module-export} are equivalent.
+(The older Kawa name is @code{module-export};
+@code{export} comes from R7RS.)
+Either form specifies a list of identifiers which
+can be made visible to other libraries or programs.
+@display
+@stxdef{export-spec} @var{identifier}
+  | @stxlit{(rename} @stxref{identifier}@sub{1} @stxref{identifier}@sub{2}@stxlit{)}
+@end display
+In the former variant, an @var{identifier} names a single binding
+defined within or imported into the library, where the
+external name for the export is the same as the name of
+the binding within the library.
+A @code{rename} spec exports the
+binding defined within or imported into the library and
+named by @var{identifier}@sub{1},
+using @var{identifier}@sub{2} as the external name.
+
+Note that it is an error if there is no definition for @var{identifier}
+(or @var{identifier}@sub{1})
 in the current module, or if it is defined using @code{define-private}.
+
 @end deffn
 
 In this module, @code{fact} is public and @code{worker} is private:
@@ -11795,16 +11819,16 @@ If a @code{'@var{featurename}} is specified then the
 which yields the implementing @var{classname}.
 @end deffn
 
-@deffn Syntax import import-set ...
+@deffn Syntax import @arbno{@stxref{import-set}}
 Similar functionality as @code{require}, but specified by R6RS.
 @display
-@stxdef{import-set} @var{library-reference}
-  | @stxlit{(library} @var{library-reference} @stxlit{)}
-  | @stxlit{(only} @var{import-set} @var{identifier} ...@stxlit{)}
-  | @stxlit{(except} @var{import-set} @var{identifier} ...@stxlit{)}
-  | @stxlit{(prefix} @var{import-set} @var{identifier} @stxlit{)}
-  | @stxlit{(rename} @var{import-set} @stxlit{(} @var{identifier1} @var{identifier2} @stxlit{)} ...@stxlit{)}
-@stxdef{library-reference} @stxlit{(} @var{identifier}+ @stxlit{)}
+@stxdef{import-set} @stxref{library-reference}
+  | @stxlit{(library} @stxref{library-reference} @stxlit{)}
+  | @stxlit{(only} @stxref{import-set} @arbno{@var{identifier}}@stxlit{)}
+  | @stxlit{(except} @stxref{import-set} @arbno{@var{identifier}}@stxlit{)}
+  | @stxlit{(prefix} @stxref{import-set} @var{identifier} @stxlit{)}
+  | @stxlit{(rename} @stxref{import-set} @arbno{@stxlit{(} @var{identifier1} @var{identifier2} @stxlit{)}}@stxlit{)}
+@stxdef{library-reference} @stxlit{(} @atleastone{@var{identifier}} @stxlit{)}
 @end display
 
 A @var{library-reference} is mapped to a class name by concatenating

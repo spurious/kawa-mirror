@@ -1664,7 +1664,7 @@ Integers as Bits.
 @item
 @uref{http://srfi.schemers.org/srfi-69/srfi-69.html, SRFI 69}: Basic hash tables - @pxref{Hash tables}.
 @item
-@uref{http://srfi.schemers.org/srfi-87/srfi-87.html, SRFI 87}: @code{=>} in case clauses.
+@uref{http://srfi.schemers.org/srfi-87/srfi-87.html, SRFI 87}: @code{=>} in @code{case} clauses.
 @item
 @uref{http://srfi.schemers.org/srfi-88/srfi-88.html, SRFI 88}: Keyword objects - @pxref{Keywords}.
 @item
@@ -1674,7 +1674,9 @@ Integers as Bits.
 @item
 @uref{http://srfi.schemers.org/srfi-98/srfi-98.html, SRFI 98}: An interface to access environment variables
 @item
-@uref{http://srfi.schemers.org/srfi-108/,SRFI 108}: Named quasi-literal constructors.
+@uref{http://srfi.schemers.org/srfi-107/,SRFI 107}: XML reader syntax - @pxref{XML literals}.
+@item
+@uref{http://srfi.schemers.org/srfi-108/,SRFI 108}: Named quasi-literal constructors - @pxref{Named quasi-literals}.
 @item
 @uref{http://srfi.schemers.org/srfi-109/srfi-109.html, SRFI-109}: Extended string quasi-literals - @pxref{string quasi-literals}.
 @end itemize
@@ -1743,6 +1745,7 @@ Quantities, keyword values, and the expanded @code{lambda} form
 * Bodies::
 * Syntax and conditional compilation::
 * Macros::
+* Named quasi-literals::
 @end menu
 
 @node Syntax notation, Lexical and datum syntax, , Syntax
@@ -2138,7 +2141,7 @@ Syntax'':
 @stxdef{lexeme-datum} @stxref{boolean} | @meta{number}
          | @meta{character} | @stxref{string} | @stxref{symbol}
 @stxdef{symbol} @stxref{identifier}
-@stxdef{compound-datum} @stxref{list} | @stxref{vector} | @stxref{uniform-vector} | @stxref{xml-literal}
+@stxdef{compound-datum} @stxref{list} | @stxref{vector} | @stxref{uniform-vector} | @stxref{extended-string-literal} | @stxref{xml-literal}
 @stxdef{list} @stxlit{(}@stxref{datum}*@stxlit{)}
          | @stxlit{(}@stxref{datum}+ @stxlit{.} @stxref{datum}@stxlit{)}
          | @stxref{abbreviation}
@@ -2424,70 +2427,6 @@ passed the resulting arguments.
 ((if #f + *) 3 4)      @result{}  12
 @end example
 
-@anchor{macro-reference}
-@subsection Macros
-Libraries and top--level programs can define and use new kinds of
-derived expressions and definitions called @emph{syntactic abstractions}
-or @emph{macros}.  A syntactic abstraction is created by binding a
-keyword to a @emph{macro transformer} or, simply, @emph{transformer}.
-
-The transformer determines how a use of the macro (called a @emph{macro
-use}) is transcribed into a more primitive form.
-
-Most macro uses have the form:
-
-@example
-(@meta{keyword} @meta{datum} @dots{})
-@end example
-@noindent
-where @meta{keyword} is an identifier that uniquely determines the kind
-of form.  This identifier is called the @emph{syntactic keyword}, or
-simply @emph{keyword}.  The number of @meta{datum}s and the syntax of
-each depends on the syntactic abstraction.
-
-Macro uses can also take the form of improper lists, singleton
-identifiers, or @func{set!} forms, where the second subform of the
-@func{set!} is the keyword:
-
-@example
-(@meta{keyword} @meta{datum} @dots{} . @meta{datum})
-@meta{keyword}
-(set! @meta{keyword} @meta{datum})
-@end example
-
-The @func{define-syntax}, @func{let-syntax} and @func{letrec-syntax}
-forms create bindings for keywords, associate them with macro
-transformers, and control the scope within which they are visible.
-
-The @func{syntax-rules} and @func{identifier-syntax} forms create
-transformers via a pattern language.  Moreover, the @func{syntax-case}
-form allows creating transformers via arbitrary Scheme code.
-
-Keywords occupy the same name space as variables.  That is, within the
-same scope, an identifier can be bound as a variable or keyword, or
-neither, but not both, and local bindings of either kind may shadow
-other bindings of either kind.
-
-Macros defined using @func{syntax-rules} and @func{identifier-syntax}
-are ``hygienic'' and ``referentially transparent'' and thus preserve
-Scheme's lexical scoping.
-
-@itemize
-@item 
-If a macro transformer inserts a binding for an identifier (variable or
-keyword) not appearing in the macro use, the identifier is in effect
-renamed throughout its scope to avoid conflicts with other identifiers.
-
-@item 
-If a macro transformer inserts a free reference to an identifier, the
-reference refers to the binding that was visible where the transformer
-was specified, regardless of any local bindings that may surround the
-use of the macro.
-@end itemize
-
-Macros defined using the @func{syntax-case} facility are also hygienic
-unless @func{datum->syntax} is used.
-
 @node Colon notation
 @section Property access using colon notation
 
@@ -2772,6 +2711,69 @@ path of the source-file containing the @code{include-file}.
 
 @node Macros
 @section Macros
+@anchor{macro-reference}
+
+Libraries and top--level programs can define and use new kinds of
+derived expressions and definitions called @emph{syntactic abstractions}
+or @emph{macros}.  A syntactic abstraction is created by binding a
+keyword to a @emph{macro transformer} or, simply, @emph{transformer}.
+
+The transformer determines how a use of the macro (called a @emph{macro
+use}) is transcribed into a more primitive form.
+
+Most macro uses have the form:
+
+@example
+(@meta{keyword} @meta{datum} @dots{})
+@end example
+@noindent
+where @meta{keyword} is an identifier that uniquely determines the kind
+of form.  This identifier is called the @emph{syntactic keyword}, or
+simply @emph{keyword}.  The number of @meta{datum}s and the syntax of
+each depends on the syntactic abstraction.
+
+Macro uses can also take the form of improper lists, singleton
+identifiers, or @func{set!} forms, where the second subform of the
+@func{set!} is the keyword:
+
+@example
+(@meta{keyword} @meta{datum} @dots{} . @meta{datum})
+@meta{keyword}
+(set! @meta{keyword} @meta{datum})
+@end example
+
+The @func{define-syntax}, @func{let-syntax} and @func{letrec-syntax}
+forms create bindings for keywords, associate them with macro
+transformers, and control the scope within which they are visible.
+
+The @func{syntax-rules} and @func{identifier-syntax} forms create
+transformers via a pattern language.  Moreover, the @func{syntax-case}
+form allows creating transformers via arbitrary Scheme code.
+
+Keywords occupy the same name space as variables.  That is, within the
+same scope, an identifier can be bound as a variable or keyword, or
+neither, but not both, and local bindings of either kind may shadow
+other bindings of either kind.
+
+Macros defined using @func{syntax-rules} and @func{identifier-syntax}
+are ``hygienic'' and ``referentially transparent'' and thus preserve
+Scheme's lexical scoping.
+
+@itemize
+@item 
+If a macro transformer inserts a binding for an identifier (variable or
+keyword) not appearing in the macro use, the identifier is in effect
+renamed throughout its scope to avoid conflicts with other identifiers.
+
+@item 
+If a macro transformer inserts a free reference to an identifier, the
+reference refers to the binding that was visible where the transformer
+was specified, regardless of any local bindings that may surround the
+use of the macro.
+@end itemize
+
+Macros defined using the @func{syntax-case} facility are also hygienic
+unless @func{datum->syntax} is used.
 
 Kawa supports most of the @code{syntax-case} feature.
 
@@ -3371,7 +3373,72 @@ defined in terms of @func{syntax-case} as follows.
 @end example
 @end quotation
 
-@ c FIXME May rename: Control structure
+@node Named quasi-literals
+@section Named quasi-literals
+
+Traditional Scheme has only a few kinds of values,
+and thus only a few builtin kinds of literals.
+Modern Scheme allows defining new types,
+so it is desirable to have a mechanism for defining literal values
+for the new types.
+
+Consider the @code{@ref{URI-type,,URI}} type.
+You can create a new instance of a @code{URI} using a
+constructor function:
+@example
+(URI "http://example.com/")
+@end example
+This isn't too bad, though the double-quote characters are an ugly distraction.
+However, if you need to construct the string it gets messy:
+@example
+(URI (string-append base-uri "icon.png"))
+@end example
+
+Instead use can write:
+@example
+&URI@{http://example.com/@}
+@end example
+or:
+@example
+&URI@{&[base-uri]icon.png@}
+@end example
+
+This syntax is translated by the Scheme reader
+to the more familiar but more verbose equivalent forms:
+@example
+($construct$:URI "http://example.com/")
+($construct$:URI $<<$ base-uri $>>$ "icon.png")
+@end example
+So for this to work there just needs to be a definition
+of @code{$construct$:URI}, usually a macro.
+Normal scope rules apply; typically you'd define @code{$construct$:URI} in
+a module.
+
+The names @code{$<<$} and @code{$>>$} are bound to unique zero-length strings.
+They are used to allow the implementation of @code{$construct$:URI}
+to determine which arguments are literal and which come from
+escaped expressions.
+
+If you want to define your own @code{$construct$:@var{tag}},
+or to read motivation and details, see the
+@uref{http://srfi.schemers.org/srfi-108/srfi-108.html, SRFI 108} specification.
+
+@display
+@stxdef{extended-datum-literal}
+    @stxlit{&} @stxref{cname} @stxlit{@lbracechar{}} [@stxref{initial-ignored}] @arbno{@stxref{named-literal-part}} @stxlit{@rbracechar{}}
+  | @stxlit{&} @stxref{cname} @stxlit{[} @arbno{@stxref{expression}} @stxlit{]@lbracechar{}} [@stxref{initial-ignored}] @arbno{@stxref{named-literal-part}} @stxlit{@rbracechar{}}
+@stxdef{cname} @stxref{identifier}
+@stxdef{named-literal-part}
+    @i{any character except} @stxlit{&}@i{,} @stxlit{@lbracechar{}} @i{or} @stxlit{@rbracechar{}}
+  | @stxlit{@lbracechar{}} @atleastone{@stxref{named-literal-part}} @stxlit{@rbracechar{}}
+  | @stxref{char-ref}
+  | @stxref{entity-ref}
+  | @stxref{special-escape}
+  | @stxref{enclosed-part}
+  | @stxref{extended-datum-literal}
+@end display
+
+@c FIXME May rename: Control structure
 @node Program structure
 @chapter Program structure
 
@@ -3707,12 +3774,12 @@ returning the value of the last one.
 In addition to @code{define} (which can take an optional type specifier),
 Kawa has some extra definition forms.
 
-@deffn Syntax define-private name [:: @stxref{type}] value
+@deffn Syntax define-private name [@stxlit{::} @stxref{type}] value
 @deffnx Syntax define-private (name formals) body
 Same as @code{define}, except that @code{name} is not exported.
 @end deffn
 
-@deffn Syntax define-constant name [:: @stxref{type}] value
+@deffn Syntax define-constant name [@stxlit{::} @stxref{type}] value
 @deffnx Syntax define-early-constant name [:: type] value
 Defines @var{name} to have the given @var{value}.
 The value is readonly, and you cannot assign to it.
@@ -9378,6 +9445,7 @@ True if @var{arg} is a @code{filepath} - i.e. an instance of
 a @code{gnu.kawa.io.FilePath}.
 @end deffn
 
+@anchor{URI-type}
 @deffn Type URI
 A Uniform Resource Indicator, which is a generalization of
 the more familiar URL.  The general format is specified by

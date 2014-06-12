@@ -1,4 +1,13 @@
+2014-06-11  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Named quasi-literals): New section.
+	(Macros):  Merge subsection Macros info section Macros and remove
+	the former.
+
 2014-06-08  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Module classes): Document 'export' with 'rename' spec.
+	(sub) New macro.
 
 	* kawa.texi (Local binding constructs): New section.
 	(Declaring Types of Variables): Removed section.

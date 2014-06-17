@@ -79,9 +79,7 @@ public class ModuleManager
     Path sourceAbsPath = ModuleInfo.absPath(fileName);
     ModuleInfo info = findWithSourcePath(sourceAbsPath, fileName);
     info.setClassName(ctype.getName());
-    info.exp = mexp;
-    comp.minfo = info;
-    info.comp = comp;
+    info.setCompilation(comp);
     return info;
   }
 

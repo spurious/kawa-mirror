@@ -28,14 +28,16 @@ public class ModuleInfo
   String uri;
 
   ModuleExp exp;
-  Compilation comp;
+  private Compilation comp;
 
   public Compilation getCompilation () { return comp; }
 
   public void setCompilation (Compilation comp)
   {
-    comp.minfo = this;
     this.comp = comp;
+    if (comp == null)
+        return;
+    comp.minfo = this;
     ModuleExp mod = comp.mainLambda;
     this.exp = mod;
     if (mod != null)
@@ -142,8 +144,6 @@ public class ModuleInfo
     ModuleExp m = exp;
     if (m == null)
       {
-        if (comp != null)
-          return comp.mainLambda;
         ClassType ctype = ClassType.make(className);
         m = new ModuleExp();
         m.compiledType = ctype;

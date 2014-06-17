@@ -993,7 +993,7 @@ public class Compilation implements SourceLocator
       classes[iClass].cleanupAfterCompilation();
     classes = null;
     minfo.className = mainClass.getName(); // In case it hasn't been set yet.
-    minfo.comp = null;
+    minfo.setCompilation(null);
     // We don't clear minfo.exp itself, since it might be re-required.
     if (minfo.exp != null)
       minfo.exp.body = null;

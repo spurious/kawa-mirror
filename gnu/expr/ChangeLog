@@ -1,3 +1,13 @@
+2014-06-16  Per Bothner  <per@bothner.com>
+
+	* ModuleInfo.java (comp): Make field private.
+	(setCompilation):  Allow setting to null.
+	(getModuleExp): comp is always null if m is.
+	* ModuleManager.java (find): Simplify to use setCompilation.
+	* Compilation.java (cleanupAfterCompilation):
+	Use ModileInfo#setCompilation.
+	* ModuleExp.java: Use getCompilation.
+
 2014-06-04  Per Bothner  <per@bothner.com>
 
 	* LambdaExp.java (PUBLIC_METHOD): New field.

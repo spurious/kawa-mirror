@@ -152,7 +152,7 @@ public class ModuleExp extends LambdaExp
             ModuleInfo dep = minfo.dependencies[idep];
             Class dclass = dep.getModuleClassRaw();
             if (dclass == null)
-              dclass = evalToClass(dep.comp, null);
+              dclass = evalToClass(dep.getCompilation(), null);
             comp.loader.addClass(dclass);
           }
 

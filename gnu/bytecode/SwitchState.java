@@ -73,6 +73,7 @@ public class SwitchState
    */
   public void switchValuePushed (CodeAttr code)
   {
+    switch_label.setTypes(code);
     code.popType();  // pop switch value
     cases_label.setTypes(code);
     code.fixupChain(cases_label, switch_label);
@@ -175,21 +176,24 @@ public class SwitchState
     return true;
   }
 
-  /** Break/exit from this switch.
-   * Doesn't allow exiting through a try - if you need that,
-   * use an {@link ExitableBlock}.
-   */
-  public void exitSwitch (CodeAttr code)
-  {
-    if (outerTry != code.try_stack)
-      throw new Error("exitSwitch cannot exit through a try");
-    code.emitGoto(after_label);
-  }
-
+    /** Break/exit from this switch.
+     * Doesn't allow exiting through a try - if you need that,
+     * use an {@link ExitableBlock}.
+     */
+    public void exitSwitch(CodeAttr code) {
+        if (code.reachableHere()) {
+            if (outerTry != code.try_stack)
+                throw new Error("exitSwitch cannot exit through a try");
+            code.emitGoto(after_label);
+        }
+    }
+  
   /** Handle the end of the switch statement.
    * Assume the case value is on the stack; go to the matching case label. */
   public void finish (CodeAttr code)
   {
+    if (code.reachableHere())
+       exitSwitch(code);
     if (defaultLabel == null)
       {
 	defaultLabel = new Label(code);
@@ -204,10 +208,11 @@ public class SwitchState
 	code.emitInvokeSpecial(con);
 	code.emitThrow();
       }
-    code.fixupChain(switch_label, after_label);
+    Label end_label = new Label(code);
+    code.fixupChain(switch_label, end_label);
+    code.setTypes(switch_label);
     if (numCases <= 1)
       {
-	code.pushType(Type.intType);
 	if (numCases == 1)
 	  {
             if (minValue == 0)
@@ -230,6 +235,7 @@ public class SwitchState
       }
     else if (2 * numCases >= maxValue - minValue)
       {
+        code.popType();
 	code.reserve(13 + 4 * (maxValue - minValue + 1));
 	code.fixupAdd(CodeAttr.FIXUP_SWITCH, null);
 	code.put1(170);  // tableswitch
@@ -247,6 +253,7 @@ public class SwitchState
       }
     else
       {
+        code.popType();
 	code.reserve(9 + 8 * numCases);
 	code.fixupAdd(CodeAttr.FIXUP_SWITCH, null);
 	code.put1(171);  // lookupswitch
@@ -260,6 +267,8 @@ public class SwitchState
 	    code.PC += 4;
 	  }
       }
-    code.fixupChain(after_label, cases_label);
+    code.fixupChain(end_label, cases_label);
+    code.setUnreachable();
+    after_label.define(code);
   }
 }

@@ -1,3 +1,8 @@
+2014-06-16  Per Bothner  <per@bothner.com>
+
+	* SwitchState.java: Various fixes, mainly becase fixupChain
+	doesn't attempt to manage and propagate type-states.
+
 2014-04-18  Per Bothner  <per@bothner.com>
 
 	* CodeAttr.java (disAssembleWithFixups): Fix some logic bugs,

@@ -41,42 +41,13 @@ public class CompileInvoke
       type = (ObjectType) type0;
     else
       type = null;
-    String name = getMethodName(args, kind);
-
-    int margsLength, argsStartIndex, objIndex;
-    if (kind == 'V' || kind == '*')      // Invoke virtual
-      {
-        margsLength = nargs - 1;
-        argsStartIndex = 2; // Skip receiver and method name.
-        objIndex = 0;
-      }
-    else if (kind == 'N')                // make new
-      {
-        margsLength = nargs;
-        argsStartIndex = 0; // Include class specifier
-        objIndex = -1;
-      }
-    else if (kind == 'S' || kind == 's') // Invoke static
-      {
-        margsLength = nargs - 2;
-        argsStartIndex = 2; // Skip class and method name.
-        objIndex = -1;
-      }
-    else if (kind == 'P')                // Invoke special
-      {
-        margsLength = nargs - 2;
-        argsStartIndex = 3;
-        objIndex = 1;
+    if (kind == 'P') {
         if (type0 == null)
           comp.error('e', "unknown class for invoke-special", arg0);
         else if (! (type instanceof ClassType) || type.isInterface())
           comp.error('e', "invalid class for invoke-special", arg0);
-      }
-    else
-      {
-        exp.visitArgs(visitor);
-        return exp;
-      }
+    }
+    String name = getMethodName(args, kind);
 
     if (kind == 'N' && type == LangObjType.constVectorType
         && required instanceof ArrayType)
@@ -193,7 +164,46 @@ public class CompileInvoke
         return let;
       }
     else if (type != null && name != null)
+        return validateNamedInvoke(exp, visitor, type, name, null, iproc, required);
+    exp.visitArgs(visitor);
+    return exp;
+  }
+
+    public static Expression validateNamedInvoke(ApplyExp exp, InlineCalls visitor, ObjectType type, String name, PrimProcedure[] methods, Invoke iproc, Type required) {
+        Expression[] args = exp.getArgs();
+        int nargs = args.length;
+        Compilation comp = visitor.getCompilation();
+        char kind = iproc.kind;
+        int margsLength, argsStartIndex, objIndex;
+    if (kind == 'V' || kind == '*')      // Invoke virtual
       {
+        margsLength = nargs - 1;
+        argsStartIndex = 2; // Skip receiver and method name.
+        objIndex = 0;
+      }
+    else if (kind == 'N')                // make new
+      {
+        margsLength = nargs;
+        argsStartIndex = 0; // Include class specifier
+        objIndex = -1;
+      }
+    else if (kind == 'S' || kind == 's') // Invoke static
+      {
+        margsLength = nargs - 2;
+        argsStartIndex = 2; // Skip class and method name.
+        objIndex = -1;
+      }
+    else if (kind == 'P')                // Invoke special
+      {
+        margsLength = nargs - 2;
+        argsStartIndex = 3;
+        objIndex = 1;
+      }
+    else
+      {
+        exp.visitArgs(visitor);
+        return exp;
+      }
         if (type instanceof TypeValue && kind == 'N')
           {
             Procedure constructor = ((TypeValue) type).getConstructor();
@@ -206,7 +216,6 @@ public class CompileInvoke
                 return visitor.visit(xapp.setLine(exp), required);
               }
           }
-        PrimProcedure[] methods;
         ClassType caller = comp == null ? null
           : comp.curClass != null ? comp.curClass
           : comp.mainClass;
@@ -217,7 +226,8 @@ public class CompileInvoke
         int spliceCount = exp.spliceCount();
         try
           {
-            methods = getMethods(ctype, name, caller, iproc);
+            if (methods == null)
+                methods = getMethods(ctype, name, caller, iproc);
             numCode = ClassMethods.selectApplicable(methods,
                                                     margsLength - tailArgs - spliceCount,
                                                     spliceCount > 0);
@@ -247,7 +257,7 @@ public class CompileInvoke
                     numCode = MethodProc.NO_MATCH_TOO_MANY_ARGS;
                     tailArgs = nargs-1;
                     methods[0] = new PrimProcedure(defcons, iproc.language);
-                    arg0 = new QuoteExp(ctype.getReflectClass());
+                    args[0] = new QuoteExp(ctype.getReflectClass());
                   }
                 else
                   {
@@ -432,10 +442,10 @@ public class CompileInvoke
             e.setLine(exp);
             return visitor.visitApplyOnly(e, required);
           }
-      }
-    exp.visitArgs(visitor);
-    return exp;
-  }
+        exp.visitArgs(visitor);
+        return exp;
+    }
+
 
   private static String getMethodName(Expression[] args, char kind)
   {

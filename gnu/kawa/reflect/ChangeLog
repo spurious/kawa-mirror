@@ -1,3 +1,11 @@
+2014-06-17  Per Bothner  <per@bothner.com>
+
+	* CompileInvoke.java (validateApplyInvoke): Move a good chunk
+	of the code into a new method.  This allows the latter to be
+	called directly from CompileNamedPart.
+	(validateNamedInvoke): New method.  Don't call getMethods
+	if methods were passed in parameter.
+
 2014-06-04  Per Bothner  <per@bothner.com>
 
 	Some incomplete hooks for overload resolution with splices.

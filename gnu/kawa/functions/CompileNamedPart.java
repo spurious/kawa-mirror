@@ -62,13 +62,16 @@ public class CompileNamedPart
           }
         if (CompileReflect.checkKnownClass(typeval, comp) < 0)
           return exp;
+        ObjectType otype = (ObjectType) typeval;
         PrimProcedure[] methods
-          = ClassMethods.getMethods((ObjectType) typeval,
+          = ClassMethods.getMethods(otype,
                                     Compilation.mangleName(mname),
                                     '\0', caller, language);
         if (methods != null && methods.length > 0)
           {
             nexp.methods = methods;
+            nexp.otype = otype;
+            nexp.mname = mname;
             return nexp.setProcedureKind('S');
           }
         ApplyExp aexp = new ApplyExp(SlotGet.staticField, args);
@@ -378,6 +381,8 @@ class GetNamedExp extends ApplyExp
    */
   char kind;
   PrimProcedure[] methods;
+  ObjectType otype;
+  String mname;
 
   public String combinedName;
 
@@ -472,6 +477,13 @@ class GetNamedExp extends ApplyExp
     if (exp.firstSpliceArg >= 0)
       result.firstSpliceArg = exp.firstSpliceArg + adjust;
     result.setLine(exp);
+    if (methods != null && kind == 'S') {
+        return CompileInvoke.validateNamedInvoke(result, visitor,
+                                                 otype, mname,
+                                                 methods,
+                                                 Invoke.invokeStatic,
+                                                 required);
+    }
     return visitor.visit(result, required);
   }
 

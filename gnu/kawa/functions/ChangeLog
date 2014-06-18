@@ -1,3 +1,10 @@
+2014-06-17  Per Bothner  <per@bothner.com>
+
+	* CompileNamedPart.java (GetNamedExp.validateApply):
+	Call new CompileInvoke.validateNamedInvoke.
+	This allows the latter to reuse the already-computed methods list.
+	(GetNamedExp.otype, GetNamedExp.mname): New fields in helper class.
+
 2014-05-26  Per Bothner  <per@bothner.com>
 
 	* MakeSplice.java (copyTo): New helper method - for compiled code.

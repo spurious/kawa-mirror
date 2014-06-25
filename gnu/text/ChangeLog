@@ -1,3 +1,7 @@
+2014-06-25  Per Bothner  <per@bothner.com>
+
+	* Char.java (class CharMap): Change to a static member class.
+
 2014-05-26  Per Bothner  <per@bothner.com>
 
 	* SyntaxException.java: Change to inherit from RuntimeException.

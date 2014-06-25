@@ -4,6 +4,7 @@ import gnu.math.IntNum;
 import gnu.math.DFloNum;
 import gnu.expr.*;
 import gnu.text.Char;
+import gnu.kawa.reflect.InstanceOf;
 import gnu.mapping.Procedure;
 import gnu.mapping.Values;
 
@@ -12,163 +13,145 @@ import gnu.mapping.Values;
  * arithmetic on a mix of Java and Kawa types.
  */
 
-public class LangPrimType extends PrimType implements TypeValue
-{
-  Language language;
-  PrimType implementationType;
+public class LangPrimType extends PrimType implements TypeValue {
+    Language language;
+    PrimType implementationType;
 
-  public static final PrimType byteType = Type.byteType;
-  public static final PrimType shortType = Type.shortType;
-  public static final PrimType intType = Type.intType;
-  public static final PrimType longType = Type.longType;
-  public static final PrimType floatType = Type.floatType;
-  public static final PrimType doubleType = Type.doubleType;
-  public static final LangPrimType charType
-    = new LangPrimType(Type.charType);
-  public static final LangPrimType voidType
-    = new LangPrimType(Type.voidType);
+    public static final PrimType byteType = Type.byteType;
+    public static final PrimType shortType = Type.shortType;
+    public static final PrimType intType = Type.intType;
+    public static final PrimType longType = Type.longType;
+    public static final PrimType floatType = Type.floatType;
+    public static final PrimType doubleType = Type.doubleType;
+    public static final LangPrimType charType
+        = new LangPrimType(Type.charType);
+    public static final LangPrimType voidType
+        = new LangPrimType(Type.voidType);
 
-  public LangPrimType (PrimType type)
-  {
-    super(type);
-    implementationType = type;
-  }
+    public LangPrimType(PrimType type) {
+        super(type);
+        implementationType = type;
+    }
 
-  public LangPrimType (PrimType type, Language language)
-  {
-    super(type);
-    this.language = language;
-    implementationType = type;
-  }
+    public LangPrimType(PrimType type, Language language) {
+        super(type);
+        this.language = language;
+        implementationType = type;
+    }
 
-  public LangPrimType (String nam, String sig, int siz, Class reflectClass)
-  {
-    super (nam, sig, siz, reflectClass);
-  }
+    public LangPrimType(String nam, String sig, int siz, Class reflectClass) {
+        super (nam, sig, siz, reflectClass);
+    }
 
-  public LangPrimType (String nam, String sig, int siz, Class reflectClass,
-		      Language language)
-  {
-    this(nam, sig, siz, reflectClass);
-    implementationType = Type.signatureToPrimitive(sig.charAt(0));
-    this.language = language;
-  }
+    public LangPrimType(String nam, String sig, int siz, Class reflectClass,
+                        Language language) {
+        this(nam, sig, siz, reflectClass);
+        implementationType = Type.signatureToPrimitive(sig.charAt(0));
+        this.language = language;
+    }
 
-  public Type getImplementationType()
-  {
-    return implementationType;
-  }
+    public Type getImplementationType() {
+        return implementationType;
+    }
 
-  public Object coerceFromObject (Object obj)
-  {
-    if (obj.getClass() == reflectClass)
-      return obj;
-    char sig1 = getSignature().charAt(0);
-    switch (sig1)
-      {
-      case 'Z':
-	return language.isTrue(obj) ? Boolean.TRUE : Boolean.FALSE;
-      case 'C':
-	return new Character(((Char) obj).charValue());
-      case 'V':
-        return Values.empty;
-      }
-    return super.coerceFromObject(obj);
-  }
+    public Object coerceFromObject(Object obj) {
+        if (obj.getClass() == reflectClass)
+            return obj;
+        char sig1 = getSignature().charAt(0);
+        switch (sig1) {
+        case 'Z':
+            return language.isTrue(obj) ? Boolean.TRUE : Boolean.FALSE;
+        case 'C':
+            return new Character(((Char) obj).charValue());
+        case 'V':
+            return Values.empty;
+        }
+        return super.coerceFromObject(obj);
+    }
 
-  public char charValue (Object value)
-  {
-    if (value instanceof Character)
-      return ((Character) value).charValue();
-    return  ((Char) value).charValue();
-  }
+    public char charValue(Object value) {
+        if (value instanceof Character)
+            return ((Character) value).charValue();
+        return  ((Char) value).charValue();
+    }
 
-  public void emitIsInstance (CodeAttr code)
-  {
-    char sig1 = getSignature().charAt(0);
-    switch (sig1)
-      {
-      case 'Z':
-	code.emitPop(1);
-	code.emitPushInt(1);
-	break;
-      case 'C':
-	ClassType scmCharType = ClassType.make("gnu.text.Char");
-	code.emitInvokeStatic(scmCharType.getDeclaredMethod("isChar",1));
-	break;
-      default:
-	super.emitIsInstance(code);
-      }
-  }
+    public void emitIsInstance(CodeAttr code) {
+        char sig1 = getSignature().charAt(0);
+        switch (sig1) {
+        case 'Z':
+            code.emitPop(1);
+            code.emitPushInt(1);
+            break;
+        case 'C':
+            ClassType scmCharType = ClassType.make("gnu.text.Char");
+            code.emitInvokeStatic(scmCharType.getDeclaredMethod("isChar",1));
+            break;
+        default:
+            super.emitIsInstance(code);
+        }
+    }
 
-  public void emitCoerceFromObject (CodeAttr code)
-  {
-    char sig1 = getSignature().charAt(0);
-    switch (sig1)
-      {
-      case 'Z':
-        Compilation.getCurrent().emitCoerceToBoolean();
-	break;
-      case 'C':
-	// We handle char specially, because Kawa does not use standard
-	// java.lang.Character type.
-	ClassType scmCharType = ClassType.make("gnu.text.Char");
-	Method charValueMethod = scmCharType.getDeclaredMethod("castToChar",1);
-	code.emitInvokeStatic(charValueMethod);
-	break;
-      default:
-	super.emitCoerceFromObject(code);
-      }
-  }
+    public void emitCoerceFromObject(CodeAttr code) {
+        char sig1 = getSignature().charAt(0);
+        switch (sig1) {
+        case 'Z':
+            Compilation.getCurrent().emitCoerceToBoolean();
+            break;
+        case 'C':
+            // We handle char specially, because Kawa does not use standard
+            // java.lang.Character type.
+            ClassType scmCharType = ClassType.make("gnu.text.Char");
+            Method charValueMethod = scmCharType.getDeclaredMethod("castToChar",1);
+            code.emitInvokeStatic(charValueMethod);
+            break;
+        default:
+            super.emitCoerceFromObject(code);
+        }
+    }
 
-  public Object coerceToObject (Object obj)
-  {
-    char sig1 = getSignature().charAt(0);
-    switch (sig1)
-      {
-      case 'Z':
-	return language.booleanObject(((Boolean) obj).booleanValue());
-      case 'C':
-	if (obj instanceof Char)
-	  return obj;
-	return Char.make(((Character) obj).charValue());
-      case 'V':
-        // Perhaps we should return Language.noValue() instead?
-	return gnu.mapping.Values.empty;
-      }
-    return super.coerceToObject(obj);
-  }
+    public Object coerceToObject(Object obj) {
+        char sig1 = getSignature().charAt(0);
+        switch (sig1) {
+        case 'Z':
+            return language.booleanObject(((Boolean) obj).booleanValue());
+        case 'C':
+            if (obj instanceof Char)
+                return obj;
+            return Char.make(((Character) obj).charValue());
+        case 'V':
+            // Perhaps we should return Language.noValue() instead?
+            return gnu.mapping.Values.empty;
+        }
+        return super.coerceToObject(obj);
+    }
 
-  public void emitCoerceToObject (CodeAttr code)
-  {
-    char sig1 = getSignature().charAt(0);
-    Type argType = null;
-    String cname = null;
-    switch (sig1)
-      {
-      case 'Z':
-        Compilation comp = Compilation.getCurrent();
-	code.emitIfIntNotZero();
-	comp.emitPushBoolean(true);
-	code.emitElse();
-	comp.emitPushBoolean(false);
-	code.emitFi();
-	break;
-      case 'C':
-	ClassType scmCharType = ClassType.make("gnu.text.Char");
-	Method makeCharMethod = scmCharType.getDeclaredMethod("make", 1);
-	code.emitInvokeStatic(makeCharMethod);
-	break;
-      default:
-	super.emitCoerceToObject(code);
-      }
-    if (cname != null)
-      {
-	ClassType clas = ClassType.make(cname);
-	Type[] args = { argType };
-	code.emitInvokeStatic(clas.getDeclaredMethod("make", args));
-      }
-  }
+    public void emitCoerceToObject(CodeAttr code) {
+        char sig1 = getSignature().charAt(0);
+        Type argType = null;
+        String cname = null;
+        switch (sig1) {
+        case 'Z':
+            Compilation comp = Compilation.getCurrent();
+            code.emitIfIntNotZero();
+            comp.emitPushBoolean(true);
+            code.emitElse();
+            comp.emitPushBoolean(false);
+            code.emitFi();
+            break;
+        case 'C':
+            ClassType scmCharType = ClassType.make("gnu.text.Char");
+            Method makeCharMethod = scmCharType.getDeclaredMethod("make", 1);
+            code.emitInvokeStatic(makeCharMethod);
+            break;
+        default:
+            super.emitCoerceToObject(code);
+        }
+        if (cname != null) {
+            ClassType clas = ClassType.make(cname);
+            Type[] args = { argType };
+            code.emitInvokeStatic(clas.getDeclaredMethod("make", args));
+        }
+    }
 
     @Override
     public int compare(Type other) {
@@ -200,40 +183,29 @@ public class LangPrimType extends PrimType implements TypeValue
         return super.isCompatibleWithValue(valueType);
     }
 
-  public void emitTestIf(Variable incoming, Declaration decl, Compilation comp)
-  {
-    char sig1 = getSignature().charAt(0);
-    /*
-    switch (sig1)
-      {
-      case 'Z':
-      }
-    */
-    CodeAttr code = comp.getCode();
-    if (incoming != null)
-      code.emitLoad(incoming);
-    if (decl != null)
-      {
-	code.emitDup();
-	decl.compileStore(comp);
-      }
-    emitIsInstance(code);
-    code.emitIfIntNotZero();
-  }
+    public void emitTestIf(Variable incoming, Declaration decl,
+                           Compilation comp) {
+        CodeAttr code = comp.getCode();
+        if (incoming != null)
+            code.emitLoad(incoming);
+        if (decl != null) {
+            code.emitDup();
+            decl.compileStore(comp);
+        }
+        emitIsInstance(code);
+        code.emitIfIntNotZero();
+    }
 
-  public Expression convertValue (Expression value)
-  {
-    return null;
-  }
+    public Expression convertValue(Expression value) {
+        return null;
+    }
 
-  public void emitIsInstance(Variable incoming,
-			     Compilation comp, Target target)
-  {
-    gnu.kawa.reflect.InstanceOf.emitIsInstance(this, incoming, comp, target);
-  }
+    public void emitIsInstance(Variable incoming,
+                               Compilation comp, Target target) {
+        InstanceOf.emitIsInstance(this, incoming, comp, target);
+    }
 
-  public Procedure getConstructor ()
-  {
-    return null;
-  }
+    public Procedure getConstructor() {
+        return null;
+    }
 }

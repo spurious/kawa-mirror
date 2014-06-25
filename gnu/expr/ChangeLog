@@ -1,3 +1,8 @@
+2014-06-25  Per Bothner  <per@bothner.com>
+
+	* LambdaExp.java (allocFieldFor): Only reuse nameDecl's field if
+	this LambdaExp is the only value of the nameDecl.
+
 2014-06-16  Per Bothner  <per@bothner.com>
 
 	* ModuleInfo.java (comp): Make field private.

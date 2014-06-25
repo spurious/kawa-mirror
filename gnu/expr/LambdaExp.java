@@ -644,7 +644,8 @@ public class LambdaExp extends ScopeExp
 
   Field allocFieldFor (Compilation comp)
   {
-    if (nameDecl != null && nameDecl.field != null)
+    if (nameDecl != null && nameDecl.field != null
+        && nameDecl.getValueRaw() == this)
       return nameDecl.field;
     boolean needsClosure = getNeedsClosureEnv();
     ClassType frameType = needsClosure ? getOwningLambda().getHeapFrameType()

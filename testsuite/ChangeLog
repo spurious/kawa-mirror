@@ -1,3 +1,7 @@
+2014-06-25  Per Bothner  <per@bothner.com>
+
+	* inner-1.scm: Add simplified test.  Fix incorrect expected output.
+
 2014-06-07  Per Bothner  <per@bothner.com>
 
 	* inlining-test.scm (raise1): New test functions.

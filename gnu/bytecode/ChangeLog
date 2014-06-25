@@ -1,3 +1,7 @@
+2014-06-25  Per Bothner  <per@bothner.com>
+
+	* ArrayType.java (getRawType): New method.
+
 2014-06-16  Per Bothner  <per@bothner.com>
 
 	* SwitchState.java: Various fixes, mainly becase fixupChain

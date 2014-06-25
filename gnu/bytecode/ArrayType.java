@@ -30,6 +30,12 @@ public class ArrayType extends ObjectType
         return elements == eltype ? this : make(eltype);
     }
 
+    @Override
+    public Type getRawType() {
+        Type eltype = elements.getRawType();
+        return elements == eltype ? this : make(eltype);
+    }
+
     /** Name assumed to end with "[]". */
     static ArrayType make(String name) {
         Type elements = Type.getType(name.substring(0, name.length()-2));

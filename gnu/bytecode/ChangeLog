@@ -1,5 +1,14 @@
 2014-06-25  Per Bothner  <per@bothner.com>
 
+	* Field.java (getAnnotation): New method.
+	* Method.java (rmethod): New field.
+	(getAnnotation): New method.
+	* ClassType.java (AddField): New convenience method.
+	It also sets rfield.
+	(addField): Use it.
+	(addMethod): Set Method's rmethod field.
+	* RuntimeAnnotationsAttr.java (getAnnotation *2): New methods.
+
 	* ArrayType.java (getRawType): New method.
 
 2014-06-16  Per Bothner  <per@bothner.com>

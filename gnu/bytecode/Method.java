@@ -26,6 +26,11 @@ public class Method implements AttrContainer, Member {
     Method next;
     ClassType classfile;
     CodeAttr code;
+    /* #ifdef JAVA8 */
+    // java.lang.reflect.Executable rmethod;
+    /* #else */
+    java.lang.reflect.Method rmethod;
+    /* #endif */
 
     Attribute attributes;
     public final Attribute getAttributes() { return attributes; }
@@ -289,6 +294,14 @@ public class Method implements AttrContainer, Member {
             getConstants().getForced(signature_index, ConstantPool.UTF8);
         this.signature_index = signature_index;
         setSignature(sigConstant.string);
+    }
+
+    public <T extends java.lang.annotation.Annotation>
+    T getAnnotation(Class<T> clas) {
+        T ann = RuntimeAnnotationsAttr.getAnnotation(this, clas);
+        if (ann != null)
+            return ann;
+        return rmethod == null ? null : rmethod.getAnnotation(clas);
     }
 
     void assignConstants() {

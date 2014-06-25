@@ -22,7 +22,7 @@ public class Field extends Location
     /** If non-null, the interned source-file (unmangled) name of the field. */
     String sourceName;
 
-    /** If non-null, a cached version of the Field for reflectivion. */
+    /** If non-null, a cached version of the Field for reflection. */
     java.lang.reflect.Field rfield;
 
     /** Add a new Field to a ClassType. */
@@ -96,6 +96,14 @@ public class Field extends Location
         if (rfield == null)
             rfield = owner.getReflectClass().getDeclaredField(getName());
         return rfield;
+    }
+
+    public <T extends java.lang.annotation.Annotation>
+    T getAnnotation(Class<T> clas) {
+        T ann = RuntimeAnnotationsAttr.getAnnotation(this, clas);
+        if (ann != null)
+            return ann;
+        return rfield == null ? null : rfield.getAnnotation(clas);
     }
 
     public void setSourceName(String name) {

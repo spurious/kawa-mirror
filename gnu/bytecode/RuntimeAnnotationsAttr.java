@@ -8,6 +8,7 @@ import java.lang.annotation.*;
 /* #ifdef use:javax.lang.model */
 import javax.lang.model.element.*;
 /* #endif */
+import java.lang.reflect.Proxy;
 
 /** Represents a "RuntimeVisibleAnnotations" or "RuntimeInvisibleAnnotations" attribute. */
 
@@ -48,6 +49,28 @@ public class RuntimeAnnotationsAttr extends Attribute
     public static RuntimeAnnotationsAttr
         getRuntimeInvisibleAnnotations (AttrContainer container) {
         return getAnnotationsAttr(container, "RuntimeInvisibleAnnotations");
+    }
+
+    public <T extends java.lang.annotation.Annotation> T getAnnotation(Class<T> clas) {
+        for (int i = 0;  i < numEntries;  i++) {
+            AnnotationEntry ann = entries[i];
+            if (ann.getAnnotationType().getReflectClass() == clas) {
+                return (T) Proxy.newProxyInstance(ann.getClass().getClassLoader(), new Class[] { clas }, ann);
+            }
+        }
+        return null;
+    }
+
+    public static <T extends java.lang.annotation.Annotation> T getAnnotation(AttrContainer container, Class<T> clas) {
+        for (Attribute attr = container.getAttributes();
+             attr != null;  attr = attr.getNext())  {
+            if (attr instanceof RuntimeAnnotationsAttr) {
+                T ann = ((RuntimeAnnotationsAttr) attr).getAnnotation(clas);
+                if (ann != null)
+                    return ann;
+            }
+        }
+        return null;
     }
 
     /** Add to appropriate annotations attribute.

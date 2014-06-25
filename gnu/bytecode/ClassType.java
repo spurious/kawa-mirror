@@ -616,6 +616,14 @@ public class ClassType extends ObjectType
     return field;
   }
 
+    public final Field addField(java.lang.reflect.Field field) {
+        Field fld = addField(field.getName(),
+                             Type.make(field.getType(), field.getGenericType()),
+                             field.getModifiers());
+        fld.rfield = field;
+        return fld;
+    }
+
   /** Use reflection to add all the declared fields of this class.
    * Does not add private or package-private fields.
    * Does not check for duplicate (already-known) fields.
@@ -638,8 +646,7 @@ public class ClassType extends ObjectType
         java.lang.reflect.Field field = fields[i];
         if ("this$0".equals(field.getName()))
           flags |= HAS_OUTER_LINK;
-        addField(field.getName(), Type.make(field.getType(), field.getGenericType()),
-                 field.getModifiers());
+        addField(field);
       }
     flags |= ADD_FIELDS_DONE;
   }
@@ -708,7 +715,9 @@ public class ClassType extends ObjectType
     while (--j >= 0)
 	args[j] = Type.make(paramTypes[j], gparamTypes[j]);
     Type rtype = Type.make(method.getReturnType(), method.getGenericReturnType());
-    return addMethod(method.getName(), modifiers, args, rtype);
+    Method meth = addMethod(method.getName(), modifiers, args, rtype);
+    meth.rmethod = method;
+    return meth;
   }
 
   public Method addMethod (java.lang.reflect.Constructor method)
@@ -719,7 +728,11 @@ public class ClassType extends ObjectType
     Type[] args = new Type[j];
     while (--j >= 0)
       args[j] = Type.make(paramTypes[j]);
-    return addMethod("<init>", modifiers, args, Type.voidType);
+    Method meth = addMethod("<init>", modifiers, args, Type.voidType);
+    /* #ifdef JAVA8 */
+    // meth.rmethod = method;
+    /* #endif */
+    return meth;
   }
 
   public Method addMethod (String name,  String signature, int flags)

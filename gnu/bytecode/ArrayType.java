@@ -6,155 +6,118 @@ import java.io.*;
 import java.util.*;
 
 public class ArrayType extends ObjectType
-  implements Externalizable
-{
-  public Type elements;
+    implements Externalizable {
 
-  public ArrayType (Type elements)
-  {
-    this(elements, elements.getName() + "[]");
-  }
+    public Type elements;
 
-  ArrayType (Type elements, String name)
-  {
-    this_name = name;
-    this.elements = elements;
-  }
+    public ArrayType(Type elements) {
+        this(elements, elements.getName() + "[]");
+    }
 
-  public String getSignature ()
-  {
-    if (signature == null)
-      setSignature("[" + elements.getSignature());
-    return signature;
-  }
+    ArrayType(Type elements, String name) {
+        this_name = name;
+        this.elements = elements;
+    }
 
-  public Type getImplementationType()
-  {
-    Type eltype = elements.getImplementationType();
-    return elements == eltype ? this : make(eltype);
-  }
+    public String getSignature() {
+        if (signature == null)
+            setSignature("[" + elements.getSignature());
+        return signature;
+    }
 
-  /** Name assumed to end with "[]". */
-  static ArrayType make(String name)
-  {
-    Type elements = Type.getType(name.substring(0, name.length()-2));
-    ArrayType array_type = elements.array_type;
-    if (array_type == null)
-      {
-	array_type = new ArrayType(elements, name);
-	elements.array_type = array_type;
-      }
-    return array_type;
-  }
+    public Type getImplementationType() {
+        Type eltype = elements.getImplementationType();
+        return elements == eltype ? this : make(eltype);
+    }
 
-  /** Find or create an ArrayType for the specified element type. */
-  public static ArrayType make(Type elements)
-  {
-    ArrayType array_type = elements.array_type;
-    if (array_type == null)
-      {
-	array_type = new ArrayType(elements, elements.getName() + "[]");
-	elements.array_type = array_type;
-      }
-    return array_type;
-  }
+    /** Name assumed to end with "[]". */
+    static ArrayType make(String name) {
+        Type elements = Type.getType(name.substring(0, name.length()-2));
+        ArrayType array_type = elements.array_type;
+        if (array_type == null) {
+            array_type = new ArrayType(elements, name);
+            elements.array_type = array_type;
+        }
+        return array_type;
+    }
 
-  public Type getComponentType() { return elements; }
+    /** Find or create an ArrayType for the specified element type. */
+    public static ArrayType make(Type elements) {
+        ArrayType array_type = elements.array_type;
+        if (array_type == null) {
+            array_type = new ArrayType(elements, elements.getName() + "[]");
+            elements.array_type = array_type;
+        }
+        return array_type;
+    }
 
-  public String getInternalName() { return getSignature(); }
+    public Type getComponentType() { return elements; }
 
-  /* #ifdef JAVA2 */
-  public Class getReflectClass()
-  {
-    try
-      {
-	if (reflectClass == null)
-          {
-            String cname = getInternalName().replace('/', '.');
-            Class elClass = elements.getReflectClass();
-            reflectClass = Class.forName(cname, false,
-                                         elClass.getClassLoader());
-          }
-        flags |= EXISTING_CLASS;
-      }
-    catch (java.lang.ClassNotFoundException ex)
-      {
-        if ((flags & EXISTING_CLASS) != 0)
-          {
-	    RuntimeException rex
-              = new RuntimeException("no such array class: "+getName());
-            /* #ifdef use:java.lang.Throwable.getCause */
-            rex.initCause(ex);
-            /* #endif */
-            throw rex;
-          }
-      }
-    return reflectClass;
-  }
-  /* #endif */
+    public String getInternalName() { return getSignature(); }
 
-  public int getMethods (Filter filter, int searchSupers,
-                         /* #ifdef JAVA5 */
-                         List<Method>
-                         /* #else */
-                         // Vector
-                         /* #endif */
-			 result)
-  {
-    if (searchSupers > 0)
-      {
-        int count = Type.objectType.getMethods(filter, 0, result);
-        if (searchSupers > 1 && filter.select(Type.clone_method))
-          {
-            if (result != null)
-              {
-                Method meth = Type.clone_method;
-                /* #ifdef JAVA2 */
-                result.add(meth);
-                /* #else */
-                // result.addElement(meth);
-                /* #endif */
-              }
-            count++;
-          }
-        return count;
-      }
-    return 0;
-  }
+    public Class getReflectClass() {
+        try {
+            if (reflectClass == null) {
+                String cname = getInternalName().replace('/', '.');
+                Class elClass = elements.getReflectClass();
+                reflectClass = Class.forName(cname, false,
+                                             elClass.getClassLoader());
+            }
+            flags |= EXISTING_CLASS;
+        } catch (java.lang.ClassNotFoundException ex) {
+            if ((flags & EXISTING_CLASS) != 0) {
+                RuntimeException rex
+                    = new RuntimeException("no such array class: "+getName());
+                rex.initCause(ex);
+                throw rex;
+            }
+        }
+        return reflectClass;
+    }
 
-  public int compare(Type other)
-  {
-    if (other == nullType)
-      return 1;
-    if (other instanceof ArrayType)
-      return elements.compare(((ArrayType) other).elements);
-    else if (other.getName().equals("java.lang.Object")
-	     || other == toStringType)
-      return -1;
-    else
-      return -3;
-  }
+    public int getMethods(Filter filter, int searchSupers, List<Method> result) {
+        if (searchSupers > 0) {
+            int count = Type.objectType.getMethods(filter, 0, result);
+            if (searchSupers > 1 && filter.select(Type.clone_method)) {
+                if (result != null) {
+                    Method meth = Type.clone_method;
+                    result.add(meth);
+                }
+                count++;
+            }
+            return count;
+        }
+        return 0;
+    }
 
-  public void writeExternal (ObjectOutput out) throws IOException
-  {
-    out.writeObject(elements);
-  }
+    public int compare(Type other) {
+        if (other == nullType)
+            return 1;
+        if (other instanceof ArrayType)
+            return elements.compare(((ArrayType) other).elements);
+        else if (other.getName().equals("java.lang.Object")
+                 || other == toStringType)
+            return -1;
+        else
+            return -3;
+    }
 
-  public void readExternal (ObjectInput in)
-    throws IOException, ClassNotFoundException
-  {
-    elements = (Type) in.readObject();
-  }
+    public void writeExternal(ObjectOutput out) throws IOException {
+        out.writeObject(elements);
+    }
 
-  public Object readResolve () throws ObjectStreamException
-  {
-    ArrayType array_type = elements.array_type;
-    if (array_type != null)
-      return array_type;
-    else
-      {
-	elements.array_type = this;
-        return this;
-      }
-  }
+    public void readExternal(ObjectInput in)
+            throws IOException, ClassNotFoundException {
+        elements = (Type) in.readObject();
+    }
+
+    public Object readResolve() throws ObjectStreamException {
+        ArrayType array_type = elements.array_type;
+        if (array_type != null)
+            return array_type;
+        else {
+            elements.array_type = this;
+            return this;
+        }
+    }
 }

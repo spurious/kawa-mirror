@@ -729,9 +729,7 @@ public class ClassType extends ObjectType
     while (--j >= 0)
       args[j] = Type.make(paramTypes[j]);
     Method meth = addMethod("<init>", modifiers, args, Type.voidType);
-    /* #ifdef JAVA8 */
-    // meth.rmethod = method;
-    /* #endif */
+    meth.rmethod = method;
     return meth;
   }
 

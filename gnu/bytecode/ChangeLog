@@ -1,5 +1,9 @@
 2014-06-25  Per Bothner  <per@bothner.com>
 
+	* Method.java (rmethod): Change type to AccessibleObject.
+
+2014-06-25  Per Bothner  <per@bothner.com>
+
 	* Field.java (getAnnotation): New method.
 	* Method.java (rmethod): New field.
 	(getAnnotation): New method.

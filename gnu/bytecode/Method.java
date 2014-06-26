@@ -29,7 +29,7 @@ public class Method implements AttrContainer, Member {
     /* #ifdef JAVA8 */
     // java.lang.reflect.Executable rmethod;
     /* #else */
-    java.lang.reflect.Method rmethod;
+    java.lang.reflect.AccessibleObject rmethod;
     /* #endif */
 
     Attribute attributes;

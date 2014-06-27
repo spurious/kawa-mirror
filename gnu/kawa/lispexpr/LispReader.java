@@ -1293,10 +1293,13 @@ public class LispReader extends Lexer
              if (v < 0)
                break;
              value = 16 * value + v;
-             if (value > 0x10FFFF)
-               break;
+             if (value > 0x10FFFF) {
+                 reader.error("character scalar value greater than #x10FFFF");
+                 return Char.make('?');
+             }
           }
       }
+    // FIXME remove - only used for BRL Perhaps a deprecation warning?
     ch = Character.digit(ch, 8);
     if (ch >= 0)
       {

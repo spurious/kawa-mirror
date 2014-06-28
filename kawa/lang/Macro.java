@@ -115,16 +115,9 @@ public class Macro extends Syntax implements Printable, Externalizable
     super(name);
   }
 
-  /* FIXME redundant */
-  public gnu.expr.Expression rewriteForm (Pair form, Translator tr)
-  {
-    return tr.rewrite(expand(form, tr));
-  }
-
-  public gnu.expr.Expression rewriteForm (Object form, Translator tr)
-  {
-    return tr.rewrite(expand(form, tr));
-  }
+    public gnu.expr.Expression rewriteForm(Pair form, Translator tr) {
+        return tr.rewrite(expand(form, tr), 'N');
+    }
 
   public String toString()
   {

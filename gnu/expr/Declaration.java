@@ -857,6 +857,32 @@ public class Declaration
     return annotations.get(i);
   }
 
+    public <T extends java.lang.annotation.Annotation>
+    T getAnnotation(Class<T> clas) {
+        int n = numAnnotations();
+        for (int i = 0;  i < n;  i++) {
+            Object ann = getAnnotation(i).valueIfConstant();
+            if (clas.isInstance(ann))
+                return (T) ann;
+        }
+        return null;
+    }
+
+    public AnnotationEntry getAnnotation(String className) {
+        int n = numAnnotations();
+        for (int i = 0;  i < n;  i++) {
+            Object ann = getAnnotation(i).valueIfConstant();
+            if (ann instanceof AnnotationEntry) {
+                AnnotationEntry ae =
+                    (AnnotationEntry) Proxy.getInvocationHandler(ann);
+                if (className.equals(ae.getAnnotationType())) {
+                    return ae;
+                }
+            }
+        }
+        return null;
+    }
+
   /** Replace one of the annotations associated with this declaration. */
   public void setAnnotation (int i, Expression ann)
   {

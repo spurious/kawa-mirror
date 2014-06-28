@@ -1,3 +1,9 @@
+2014-06-28  Per Bothner  <per@bothner.com>
+
+	* Declaration.java (getAnnotation *2): New method.
+	* LambdaExp.java (compileSetField): Emit field annotations.
+	(compileAsMethod): Emit method annotations.
+
 2014-06-25  Per Bothner  <per@bothner.com>
 
 	* LambdaExp.java (allocFieldFor): Only reuse nameDecl's field if

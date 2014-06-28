@@ -8,6 +8,7 @@ import gnu.lists.LList;
 import gnu.kawa.functions.Convert;
 import gnu.kawa.io.OutPort;
 import java.util.*;
+import java.lang.annotation.ElementType;
 
 /**
  * Class used to implement Scheme lambda expressions.
@@ -731,7 +732,8 @@ public class LambdaExp extends ScopeExp
 	compileAsMethod(comp);
 	addApplyMethod(comp, field);
       }
-
+    if (nameDecl != null)
+        nameDecl.compileAnnotations(field, ElementType.FIELD);
     return (new ProcInitializer(this, comp, field)).field;
   }
 
@@ -1641,6 +1643,9 @@ public class LambdaExp extends ScopeExp
     for (int i = 0;  i <= numStubs;  i++)
       {
 	comp.method = primMethods[i];
+        if (nameDecl != null && ! isClassMethod()) // Only if i == numStubs ???
+            nameDecl.compileAnnotations(comp.method, ElementType.METHOD);
+
 	if (i < numStubs)
 	  {
 	    CodeAttr code = comp.method.startCode();

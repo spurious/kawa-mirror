@@ -915,80 +915,71 @@ public abstract class Language
     return Type.objectType;
   }
 
-  public Declaration declFromField (ModuleExp mod, Object fvalue, Field fld)
-  {
-    String fname = fld.getName();
-    Type ftype = fld.getType();
-    boolean isAlias = ftype.isSubtype(Compilation.typeLocation);
-    Object fdname;
-    // FIXME if fvalue is FieldLocation, and field is final,
-    // get name from value of field.
-    boolean isImportedInstance;
-    boolean externalAccess = fname.startsWith(Declaration.PRIVATE_PREFIX);
-    boolean isFinal = (fld.getModifiers() & Access.FINAL) != 0;
-    if ((isImportedInstance = fname.endsWith("$instance")))
-      fdname = fname;
-    else if (isFinal && ftype == Compilation.typeModuleMethod
-             && fvalue instanceof Named /* should always be true */)
-      fdname = ((Named) fvalue).getSymbol();
-    else
-      {
-	// FIXME move this to demangleName
-          if (externalAccess)
-            fname = fname.substring(Declaration.PRIVATE_PREFIX.length());
-	fdname = Compilation.demangleName(fname, true).intern();
-      }
-    try
-      {
-        SourceName sourceName = fld.getReflectField().getAnnotation(SourceName.class);
-        if (sourceName != null)
-          {
-            fdname = Symbol.valueOf(sourceName.name(), sourceName.uri(), sourceName.prefix());
-          }
-      }
-    catch (Exception ex)
-      {
-      }
-    if (fdname instanceof String)
-      {
-        String uri = mod.getNamespaceUri();
-        String sname = (String) fdname;
-        Symbol sym;
-        if (uri == null)
-          fdname = SimpleSymbol.valueOf(sname);
-        else
-          fdname = Symbol.make(uri, sname);
-      }
-    Type dtype = isAlias ? Type.objectType
-	: getLangTypeFor(ftype);
-    Declaration fdecl = mod.addDeclaration(fdname, dtype);
-    boolean isStatic = (fld.getModifiers() & Access.STATIC) != 0;
-    if (isAlias)
-      {
-        fdecl.setIndirectBinding(true);
-        if (ftype instanceof ClassType
-            && ((ClassType) ftype).isSubclass("gnu.mapping.ThreadLocation"))
-          fdecl.setFlag(Declaration.IS_DYNAMIC);
-      }
-    else if (isFinal && ftype instanceof ClassType)
-      {
-        if (ftype.isSubtype(Compilation.typeProcedure))
-          fdecl.setProcedureDecl(true);
-        else if (((ClassType) ftype).isSubclass("gnu.mapping.Namespace"))
-          fdecl.setFlag(Declaration.IS_NAMESPACE_PREFIX);
-      }
-    if (isStatic)
-      fdecl.setFlag(Declaration.STATIC_SPECIFIED);
-    fdecl.field = fld; 
-    if (isFinal && ! isAlias) // FIXME? ok for location?
-      fdecl.setFlag(Declaration.IS_CONSTANT);
-    if (isImportedInstance)
-      fdecl.setFlag(Declaration.MODULE_REFERENCE);
-    fdecl.setSimple(false);
-    if (externalAccess)
-      fdecl.setFlag(Declaration.EXTERNAL_ACCESS|Declaration.PRIVATE);
-    return fdecl;
-  }
+    public Declaration declFromField(ModuleExp mod, Object fvalue, Field fld) {
+        String fname = fld.getName();
+        Type ftype = fld.getType();
+        boolean isAlias = ftype.isSubtype(Compilation.typeLocation);
+        Object fdname;
+        // FIXME if fvalue is FieldLocation, and field is final,
+        // get name from value of field.
+        boolean isImportedInstance;
+        boolean externalAccess = fname.startsWith(Declaration.PRIVATE_PREFIX);
+        boolean isFinal = (fld.getModifiers() & Access.FINAL) != 0;
+        if ((isImportedInstance = fname.endsWith("$instance")))
+            fdname = fname;
+        else if (isFinal && ftype == Compilation.typeModuleMethod
+                 && fvalue instanceof Named /* should always be true */)
+            fdname = ((Named) fvalue).getSymbol();
+        else {
+            // FIXME move this to demangleName
+            if (externalAccess)
+                fname = fname.substring(Declaration.PRIVATE_PREFIX.length());
+            fdname = Compilation.demangleName(fname, true).intern();
+        }
+        try {
+            SourceName sourceName = fld.getReflectField().getAnnotation(SourceName.class);
+            if (sourceName != null) {
+                fdname = Symbol.valueOf(sourceName.name(), sourceName.uri(), sourceName.prefix());
+            }
+        } catch (Exception ex) {
+        }
+        if (fdname instanceof String)  {
+            String uri = mod.getNamespaceUri();
+            String sname = (String) fdname;
+            Symbol sym;
+            if (uri == null)
+                fdname = SimpleSymbol.valueOf(sname);
+            else
+                fdname = Symbol.make(uri, sname);
+        }
+        Type dtype = isAlias ? Type.objectType
+            : getLangTypeFor(ftype);
+        Declaration fdecl = mod.addDeclaration(fdname, dtype);
+        boolean isStatic = (fld.getModifiers() & Access.STATIC) != 0;
+        if (isAlias) {
+            fdecl.setIndirectBinding(true);
+            if (ftype instanceof ClassType
+                && ((ClassType) ftype).isSubclass("gnu.mapping.ThreadLocation"))
+                fdecl.setFlag(Declaration.IS_DYNAMIC);
+        }
+        else if (isFinal && ftype instanceof ClassType) {
+            if (ftype.isSubtype(Compilation.typeProcedure))
+                fdecl.setProcedureDecl(true);
+            else if (((ClassType) ftype).isSubclass("gnu.mapping.Namespace"))
+                fdecl.setFlag(Declaration.IS_NAMESPACE_PREFIX);
+        }
+        if (isStatic)
+            fdecl.setFlag(Declaration.STATIC_SPECIFIED);
+        fdecl.field = fld; 
+        if (isFinal && ! isAlias) // FIXME? ok for location?
+            fdecl.setFlag(Declaration.IS_CONSTANT);
+        if (isImportedInstance)
+            fdecl.setFlag(Declaration.MODULE_REFERENCE);
+        fdecl.setSimple(false);
+        if (externalAccess)
+            fdecl.setFlag(Declaration.EXTERNAL_ACCESS|Declaration.PRIVATE);
+        return fdecl;
+    }
 
   public static final int VALUE_NAMESPACE = 1<<0;
   public static final int FUNCTION_NAMESPACE = 1<<1;

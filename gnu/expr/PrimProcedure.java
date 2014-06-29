@@ -379,50 +379,45 @@ public class PrimProcedure extends MethodProc implements Inlineable {
     }
 
     public PrimProcedure(Method method, char mode, Language language,
-			 ParameterizedType parameterizedType)
-  {
-    this.mode = mode;
+			 ParameterizedType parameterizedType) {
+        this.mode = mode;
 
-    init(method);
-    // This stuff deals with that a language may have its own mapping
-    // from Java types to language types, for coercions and other reasons.
-    Type[] pTypes = this.argTypes;
-    int nTypes = pTypes.length;
-    argTypes = null;
-    for (int i = nTypes;  --i >= 0; )
-      {
-	Type javaType = pTypes[i];
-	Type langType = resolveTypeVariables(javaType, parameterizedType);
-	langType = language.getLangTypeFor(langType);
-	if (javaType != langType)
-	  {
-	    if (argTypes == null)
-	      {
-		argTypes = new Type[nTypes];
-		System.arraycopy(pTypes, 0, argTypes, 0, nTypes); 
-	      }
-	    argTypes[i] = langType;
-	  }
-      }
-    if (argTypes == null)
-      argTypes = pTypes;
-    if (isConstructor())
-      retType = getDeclaringClass();
-    else if (method.getName().endsWith("$X"))
-      retType = Type.objectType;
-    else
-      {
-        retType = method.getReturnType();
-        retType = resolveTypeVariables(retType, parameterizedType);
-        retType = language.getLangTypeFor(retType);
+        init(method);
+        // This stuff deals with that a language may have its own mapping
+        // from Java types to language types, for coercions and other reasons.
+        Type[] pTypes = this.argTypes;
+        int nTypes = pTypes.length;
+        argTypes = null;
+        for (int i = nTypes;  --i >= 0; ) {
+            Type javaType = pTypes[i];
+            Type langType = resolveTypeVariables(javaType, parameterizedType);
+            langType = language.getLangTypeFor(langType);
+            if (javaType != langType) {
+                if (argTypes == null) {
+                    argTypes = new Type[nTypes];
+                    System.arraycopy(pTypes, 0, argTypes, 0, nTypes); 
+                }
+                argTypes[i] = langType;
+            }
+        }
+        if (argTypes == null)
+            argTypes = pTypes;
+        if (isConstructor())
+            retType = getDeclaringClass();
+        else if (method.getName().endsWith("$X"))
+            retType = Type.objectType;
+        else {
+            retType = method.getReturnType();
+            retType = resolveTypeVariables(retType, parameterizedType);
+            retType = language.getLangTypeFor(retType);
 
-        // Kludge - toStringType doesn't have methods.
-        // It shouldn't be used as the "type" of anything -
-        // it's just a type with a coercion.  FIXME.
-        if (retType == Type.toStringType)
-          retType = Type.javalangStringType;
-      }
-  }
+            // Kludge - toStringType doesn't have methods.
+            // It shouldn't be used as the "type" of anything -
+            // it's just a type with a coercion.  FIXME.
+            if (retType == Type.toStringType)
+                retType = Type.javalangStringType;
+        }
+    }
   
     private void setOpcode(Method m) {
         int flags = m.getModifiers();

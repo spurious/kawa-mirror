@@ -179,83 +179,69 @@ public class PrimProcedure extends MethodProc implements Inlineable {
     return matchN(args, ctx);
   }
 
-  public int matchN (Object[] args, CallContext ctx)
-  {
-    int nargs = args.length;
-    boolean takesVarArgs = takesVarArgs();
-    int fixArgs = minArgs();
-    if (nargs < fixArgs)
-      return NO_MATCH_TOO_FEW_ARGS|fixArgs;
-    if (! takesVarArgs && nargs > fixArgs)
-      return NO_MATCH_TOO_MANY_ARGS|fixArgs;
-    int paramCount = argTypes.length;
-    Type elementType = null;
-    Object[] restArray = null;
-    int extraCount = (takesTarget() || isConstructor()) ? 1 : 0;
-    boolean takesContext = takesContext();
-    Object[] rargs = new Object[paramCount];
-    if (takesContext)
-      rargs[--paramCount] = ctx;
-    Object extraArg;
-    if (takesVarArgs)
-      {
-	Type restType = argTypes[paramCount-1];
-        if (restType == Compilation.scmListType || restType == LangObjType.listType)
-	  { // FIXME
-	    rargs[paramCount-1] = gnu.lists.LList.makeList(args, fixArgs);
-	    nargs = fixArgs;
-            elementType = Type.objectType;
-	  }
-	else
-	  {
-	    ArrayType restArrayType = (ArrayType) restType;
-	    elementType = restArrayType.getComponentType();
-	    Class elementClass = elementType.getReflectClass();
-	    restArray = (Object[])
-	      java.lang.reflect.Array.newInstance(elementClass, nargs-fixArgs);
-	    rargs[paramCount-1] = restArray;
-	  }
-      }
-    if (isConstructor())
-      extraArg = args[0];
-    else if (extraCount != 0)
-      {
-	try
-	  {
-            extraArg = getDeclaringClass().coerceFromObject(args[0]);
-	  }
-	catch (ClassCastException ex)
-          {
-            return NO_MATCH_BAD_TYPE|1;
-          }
-      }
-    else
-      extraArg = null;
-    for (int i = extraCount;  i < args.length; i++)
-      {
-        Object arg = args[i];
-        Type type = i < fixArgs ? argTypes[i-extraCount] : elementType;
-        if (type != Type.objectType)
-          {
-            try
-              {
-                arg = type.coerceFromObject(arg);
-              }
-            catch (ClassCastException ex)
-              {
-                return NO_MATCH_BAD_TYPE|(i+1);
-              }
-          }
-        if (i < fixArgs)
-          rargs[i-extraCount] = arg;
-        else if (restArray != null) // I.e. using array rather than LList.
-          restArray[i - fixArgs] = arg;
-      }
-    ctx.value1 = extraArg;
-    ctx.values = rargs;
-    ctx.proc = this;
-    return 0;
-  }
+    public int matchN(Object[] args, CallContext ctx) {
+        int nargs = args.length;
+        boolean takesVarArgs = takesVarArgs();
+        int fixArgs = minArgs();
+        if (nargs < fixArgs)
+            return NO_MATCH_TOO_FEW_ARGS|fixArgs;
+        if (! takesVarArgs && nargs > fixArgs)
+            return NO_MATCH_TOO_MANY_ARGS|fixArgs;
+        int paramCount = argTypes.length;
+        Type elementType = null;
+        Object[] restArray = null;
+        int extraCount = (takesTarget() || isConstructor()) ? 1 : 0;
+        boolean takesContext = takesContext();
+        Object[] rargs = new Object[paramCount];
+        if (takesContext)
+            rargs[--paramCount] = ctx;
+        Object extraArg;
+        if (takesVarArgs) {
+            Type restType = argTypes[paramCount-1];
+            if (restType == Compilation.scmListType || restType == LangObjType.listType) {
+                // FIXME
+                rargs[paramCount-1] = gnu.lists.LList.makeList(args, fixArgs);
+                nargs = fixArgs;
+                elementType = Type.objectType;
+            } else {
+                ArrayType restArrayType = (ArrayType) restType;
+                elementType = restArrayType.getComponentType();
+                Class elementClass = elementType.getReflectClass();
+                restArray = (Object[])
+                    java.lang.reflect.Array.newInstance(elementClass, nargs-fixArgs);
+                rargs[paramCount-1] = restArray;
+            }
+        }
+        if (isConstructor())
+            extraArg = args[0];
+        else if (extraCount != 0) {
+            try {
+                extraArg = getDeclaringClass().coerceFromObject(args[0]);
+            } catch (ClassCastException ex) {
+                return NO_MATCH_BAD_TYPE|1;
+            }
+        } else
+            extraArg = null;
+        for (int i = extraCount;  i < args.length; i++) {
+            Object arg = args[i];
+            Type type = i < fixArgs ? argTypes[i-extraCount] : elementType;
+            if (type != Type.objectType) {
+                try {
+                    arg = type.coerceFromObject(arg);
+                } catch (ClassCastException ex) {
+                    return NO_MATCH_BAD_TYPE|(i+1);
+                }
+            }
+            if (i < fixArgs)
+                rargs[i-extraCount] = arg;
+            else if (restArray != null) // I.e. using array rather than LList.
+                restArray[i - fixArgs] = arg;
+        }
+        ctx.value1 = extraArg;
+        ctx.values = rargs;
+        ctx.proc = this;
+        return 0;
+    }
 
   public void apply (CallContext ctx) throws Throwable
   {

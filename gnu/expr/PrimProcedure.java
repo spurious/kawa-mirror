@@ -7,6 +7,7 @@ import gnu.mapping.*;
 import gnu.kawa.lispexpr.LangObjType;
 import gnu.lists.ConsumerWriter;
 import java.io.Writer;
+import java.lang.reflect.Array;
 
 /** A primitive Procedure implemented by a plain Java method. */
 
@@ -189,7 +190,7 @@ public class PrimProcedure extends MethodProc implements Inlineable {
             return NO_MATCH_TOO_MANY_ARGS|fixArgs;
         int paramCount = argTypes.length;
         Type elementType = null;
-        Object[] restArray = null;
+        Object restArray = null;
         int extraCount = (takesTarget() || isConstructor()) ? 1 : 0;
         boolean takesContext = takesContext();
         Object[] rargs = new Object[paramCount];
@@ -207,8 +208,7 @@ public class PrimProcedure extends MethodProc implements Inlineable {
                 ArrayType restArrayType = (ArrayType) restType;
                 elementType = restArrayType.getComponentType();
                 Class elementClass = elementType.getReflectClass();
-                restArray = (Object[])
-                    java.lang.reflect.Array.newInstance(elementClass, nargs-fixArgs);
+                restArray = Array.newInstance(elementClass, nargs-fixArgs);
                 rargs[paramCount-1] = restArray;
             }
         }
@@ -224,7 +224,8 @@ public class PrimProcedure extends MethodProc implements Inlineable {
             extraArg = null;
         for (int i = extraCount;  i < args.length; i++) {
             Object arg = args[i];
-            Type type = i < fixArgs ? argTypes[i-extraCount] : elementType;
+            Type type = i < fixArgs ? argTypes[i-extraCount]
+                : elementType == null ? null : elementType;
             if (type != Type.objectType) {
                 try {
                     arg = type.coerceFromObject(arg);
@@ -235,7 +236,7 @@ public class PrimProcedure extends MethodProc implements Inlineable {
             if (i < fixArgs)
                 rargs[i-extraCount] = arg;
             else if (restArray != null) // I.e. using array rather than LList.
-                restArray[i - fixArgs] = arg;
+                Array.set(restArray, i - fixArgs, arg);
         }
         ctx.value1 = extraArg;
         ctx.values = rargs;

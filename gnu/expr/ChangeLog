@@ -1,5 +1,8 @@
 2014-06-30  Per Bothner  <per@bothner.com>
 
+	* PrimProcedure.java (matchN): Support rest (varargs) arrays
+	of primitive type.
+
 	* PrimProcedure.java (compileArgs): Fix thinko re array type.
 
 	* ModuleInfo.java (setCompilation): Make sure filename is non-null.

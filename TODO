@@ -1,6 +1,9 @@
+Optimize splicing of methods calls.
+Remove createVarargsArrayIfNeeded logic from PrimProcedure.
+This is broken &{X&[@(list 3 4)]Y} because of createVarargsArrayIfNeeded.
+
 Document:
   in-http-server and in-servlet cond-expand options.
-  meta-arg \\
 
 Use Parboiled as parser library?  https://github.com/sirthias/parboiled/wiki
 
@@ -12,19 +15,13 @@ Before Kawa 1.12:
 - Evaluate reported JEmacs bugs.
 - Go through remaining "news" entries and update manual.
 - go through Evaluating-Scheme-expressions-from-Java.
-- R6RS exception handling - see message from March 15, patch from March 16.
 - gnu/bytecode:
 -- Document emitIf../emitThen else, at overview level.
 - Verify that Path is consistent with new javax.nio (JDR 203)
   http://openjdk.java.net/projects/nio
 - internals: Update about procedures, inlining, tail-calls.
 
-R6RS
-- string-for-each
-
 HTTP/SERVLETS
-* Support Java6 com.sun.net.httpserver
-http://java.sun.com/javase/6/docs/jre/api/net/httpserver/spec/com/sun/net/httpserver/package-frame.html
 * Fix formatting: Language format -> HttpPrinter
   #t should print correctly
   BRL should by default not HTML-quote strings
@@ -42,7 +39,6 @@ OPTIMIZATIONS
   have to call it again in setRestore.
   - In local references inside a fluid-let use the location from above.
 * case/switch
-* translate Scheme character->int
 * Optimize (make T) where T is a known non-simple class.
   This should not need to use reflection.
 * optimize zero? etc
@@ -54,7 +50,6 @@ OPTIMIZATIONS
 
 HIGH PRIORITY:
 * Allow co-variant return types.
-* Document meta-arg facility.
 * compile-file doesn't display warnings
 * When deferring imports (require) the 'run' actions shouldn't be deferred. FIXME
 * Optimize and/or in the case of ConditionalTarget or <boolean> target.
@@ -111,7 +106,6 @@ Remove Scheme.getTypeValue.
 
 Implement IntRange class.
 Use it to replace Char's hashtable.
-Replace Char by Character.
 
 Modules:
 * Infer parameter and return types when defaulted and otherwise match

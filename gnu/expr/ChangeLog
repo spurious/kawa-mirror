@@ -1,5 +1,7 @@
 2014-06-30  Per Bothner  <per@bothner.com>
 
+	* PrimProcedure.java (compileArgs): Fix thinko re array type.
+
 	* ModuleInfo.java (setCompilation): Make sure filename is non-null.
 
 	* InlineCalls.java (checkType): On type error, if type is PrimType,

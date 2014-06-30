@@ -606,7 +606,7 @@ public class PrimProcedure extends MethodProc implements Inlineable {
             code.emitPushInt(0); // Stack array array value 0
             code.emitSwap(); // Stack: array array 0 value
             eltype.emitCoerceFromObject(code);
-            code.emitArrayStore(arg_type); // Stack: array
+            code.emitArrayStore(eltype); // Stack: array
             code.emitFi();
           }
         if (i >= fix_arg_count)

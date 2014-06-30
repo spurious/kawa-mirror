@@ -1,5 +1,7 @@
 2014-06-30  Per Bothner  <per@bothner.com>
 
+	* ModuleInfo.java (setCompilation): Make sure filename is non-null.
+
 	* InlineCalls.java (checkType): On type error, if type is PrimType,
 	convert it to a boxed type to force a run-time exception.
 	* Compilation.java (makeCoercion): Change return type to ApplyExp.

@@ -40,9 +40,9 @@ public class ModuleInfo
     comp.minfo = this;
     ModuleExp mod = comp.mainLambda;
     this.exp = mod;
-    if (mod != null)
+    String fileName;
+    if (mod != null && (fileName = mod.getFileName()) != null)
       {
-        String fileName = mod.getFileName();
         this.sourcePath = fileName;
         Path abs = absPath(fileName);
         this.sourceAbsPath = abs;

@@ -549,10 +549,14 @@ public abstract class Type
    * Throw a ClassCastException when this is not possible. */
   public abstract Object coerceFromObject (Object obj);
 
-  public Object coerceToObject (Object obj)
-  {
-    return obj;
-  }
+    /** Given a raw JVM value convert it to an object of this type.
+     * I.e. the argument is an object of the type returned by
+     * {@code getRawType()}, boxed as needed.  The result may be
+     * a language-specific (boxed) value. Generally a no-op.
+     */
+    public Object coerceToObject(Object obj) {
+        return obj;
+    }
 
   /** Convert from stackType (usually PrimType) to this type.
    * However, we might only convert part-way, to some object type.

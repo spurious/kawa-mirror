@@ -1,3 +1,7 @@
+2014-06-30  Per Bothner  <per@bothner.com>
+
+	* PrimType.java (convertToRaw): New method.
+
 2014-06-25  Per Bothner  <per@bothner.com>
 
 	* Method.java (rmethod): Change type to AccessibleObject.

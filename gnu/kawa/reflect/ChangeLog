@@ -1,3 +1,7 @@
+2014-06-30  Per Bothner  <per@bothner.com>
+
+	* ArraySet (apply3): Add call to convertToRaw.
+
 2014-06-17  Per Bothner  <per@bothner.com>
 
 	* CompileInvoke.java (validateApplyInvoke): Move a good chunk

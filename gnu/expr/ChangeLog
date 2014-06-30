@@ -1,5 +1,7 @@
 2014-06-30  Per Bothner  <per@bothner.com>
 
+	* PrimProcedure.java (matchN): Add not-yet-needed call to convertToRaw.
+
 	* PrimProcedure.java (matchN): Support rest (varargs) arrays
 	of primitive type.
 

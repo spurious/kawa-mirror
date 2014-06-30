@@ -16,9 +16,12 @@ public class ArraySet extends Procedure3 implements Externalizable {
 
   public Object apply3 (Object array, Object index, Object value)
   {
+    value = element_type.coerceFromObject(value);
+    if (element_type instanceof PrimType)
+        value = ((PrimType) element_type).convertToRaw(value);
     java.lang.reflect.Array.set(array,
 				((Number) index).intValue(),
-				element_type.coerceFromObject(value));
+                                value);
     return Values.empty;
   }
 

@@ -235,8 +235,11 @@ public class PrimProcedure extends MethodProc implements Inlineable {
             }
             if (i < fixArgs)
                 rargs[i-extraCount] = arg;
-            else if (restArray != null) // I.e. using array rather than LList.
+            else if (restArray != null) { // I.e. using array rather than LList.
+                if (type instanceof PrimType)
+                    arg = ((PrimType) type).convertToRaw(arg);
                 Array.set(restArray, i - fixArgs, arg);
+            }
         }
         ctx.value1 = extraArg;
         ctx.values = rargs;

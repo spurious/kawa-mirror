@@ -50,6 +50,10 @@ public class PrimType extends Type {
 				 + getName());
   }
 
+    public Object convertToRaw(Object obj) {
+        return obj;
+    }
+
   /** Coerce value to a char.
    * Only defined if getSignature() is "C". */
   public char charValue (Object value)

@@ -127,6 +127,15 @@ public class InlineCalls extends ExpExpVisitor<Type> {
                         +" is incompatible with required type "
                         +language.formatType(required)),
                        exp);
+            if (expType instanceof PrimType) {
+                // Box the value to force a run-time ClassCastException.
+                ApplyExp expb =
+                    Compilation.makeCoercion(exp,
+                                             ((PrimType) expType).boxedType());
+                expb.setType(required);
+                expb.setFlag(Expression.VALIDATED);
+                return expb;
+            }
         }
         return exp;
     }

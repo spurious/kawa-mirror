@@ -1,3 +1,8 @@
+2014-06-30  Per Bothner  <per@bothner.com>
+
+	* errors3.scm: Add test to make sure runtime Exception happens.
+	* Makefile.am: Update.
+
 2014-06-25  Per Bothner  <per@bothner.com>
 
 	* inner-1.scm: Add simplified test.  Fix incorrect expected output.

@@ -1,3 +1,8 @@
+2014-06-30  Per Bothner  <per@bothner.com>
+
+	* InlineCalls.java (checkType): On type error, if type is PrimType,
+	convert it to a boxed type to force a run-time exception.
+
 2014-06-29  Per Bothner  <per@bothner.com>
 
 	* LambdaExp.java (class Closure): Change to a static member class.

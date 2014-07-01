@@ -304,6 +304,10 @@ public class OccurrenceType extends ObjectType
     maxOccurs = in.readInt();
   }
 
+    /* #ifndef JAVA8 */
+    public String encodeType(Language language) { return null; }
+    /* #endif */
+
   public static final ClassType typeOccurrenceType
     = ClassType.make("gnu.kawa.reflect.OccurrenceType");
   static final Method isInstanceMethod

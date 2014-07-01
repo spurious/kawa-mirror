@@ -379,9 +379,9 @@ KAWA_STANDARD_JAVA_FILES = \
   standard/ImportFromLibrary.java \
   standard/TracedProcedure.java
 
-java_sources = Shell.java repl.java Version.java \
-	TelnetInputStream.java TelnetOutputStream.java Telnet.java \
-	TelnetRepl.java $(KAWA_LANG_JAVA_FILES) \
+java_sources = Shell.java repl.java Version.java SourceMethodType.java \
+	SourceType.java TelnetInputStream.java TelnetOutputStream.java \
+	Telnet.java TelnetRepl.java $(KAWA_LANG_JAVA_FILES) \
 	$(KAWA_STANDARD_JAVA_FILES) $(am__append_1) $(am__append_2)
 EXTRA_DIST = Version.java.in $(java_WITH_AWT) $(JAVAX_SCRIPT_EXTRA)
 EXTRA_CLEAN = lang/*.class standard/*.class

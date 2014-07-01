@@ -754,6 +754,10 @@ public class LangObjType extends ObjectType implements TypeValue
       }
   }
 
+    /* #ifndef JAVA8 */
+    public String encodeType(Language language) { return null; }
+    /* #endif */
+
   public static final ClassType typeLangObjType =
     ClassType.make("gnu.kawa.lispexpr.LangObjType");
 }

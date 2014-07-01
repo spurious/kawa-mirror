@@ -208,4 +208,8 @@ public class LangPrimType extends PrimType implements TypeValue {
     public Procedure getConstructor() {
         return null;
     }
+
+    public String encodeType(Language language) {
+        return null;
+    }
 }

@@ -6,6 +6,7 @@ import gnu.bytecode.*;
 import gnu.mapping.*;
 import gnu.kawa.lispexpr.LangObjType;
 import gnu.lists.ConsumerWriter;
+import kawa.SourceMethodType;
 import java.io.Writer;
 import java.lang.reflect.Array;
 
@@ -328,46 +329,6 @@ public class PrimProcedure extends MethodProc implements Inlineable {
     this(method, '\0', language, null);
   }
 
-    static Type resolveTypeVariables(Type langType, ParameterizedType parameterizedType) {
-        if (langType instanceof TypeVariable)
-            return resolveTypeVariable((TypeVariable) langType, parameterizedType);
-        if (langType instanceof ParameterizedType) {
-            ParameterizedType ptype = (ParameterizedType) langType;
-            Type[] paramTypes = ptype.getTypeArgumentTypes();
-            int nparams = paramTypes.length;
-            Type[] resolvedTypes = new Type[nparams];
-            boolean changed = false;
-            for (int i = 0; i < nparams;  i++) {
-                Type t0 = paramTypes[i];
-                char bound = ptype.getTypeArgumentBound(i);
-                // FIXME Don't support wildcards here yet.
-                if (bound != '\0')
-                    return langType.getRawType();
-                Type t1 = resolveTypeVariables(t0, parameterizedType);
-                resolvedTypes[i] = t1;
-                if (t0 != t1)
-                    changed = true;
-            }
-            if (changed) {
-                return new ParameterizedType(ptype.getRawType(), resolvedTypes);
-            }
-        }
-        return langType;
-}
-
-    static Type resolveTypeVariable(TypeVariable tvar, ParameterizedType parameterizedType) {
-	if (parameterizedType != null) {
-	    TypeVariable[] tparams = parameterizedType.getRawType().getTypeParameters();
-	    int nparams = tparams.length;
-	    for (int i = 0;  i < nparams;  i++) {
-		if (tvar.getName().equals(tparams[i].getName())) {
-		    return parameterizedType.getTypeArgumentType(i);
-		}
-	    }
-	}
-	return tvar.getRawType();
-    }
-
     public PrimProcedure(Method method, char mode, Language language,
 			 ParameterizedType parameterizedType) {
         this.mode = mode;
@@ -378,10 +339,17 @@ public class PrimProcedure extends MethodProc implements Inlineable {
         Type[] pTypes = this.argTypes;
         int nTypes = pTypes.length;
         argTypes = null;
+        String[] annotTypes;
+        try {
+            SourceMethodType sourceType = method.getAnnotation(SourceMethodType.class);
+            annotTypes = sourceType == null ? null : sourceType.value();
+        } catch (Throwable ex) {
+            annotTypes = null;
+        }
         for (int i = nTypes;  --i >= 0; ) {
             Type javaType = pTypes[i];
-            Type langType = resolveTypeVariables(javaType, parameterizedType);
-            langType = language.getLangTypeFor(langType);
+            Type langType = decodeType(javaType, annotTypes, i+1,
+                                       parameterizedType, language);
             if (javaType != langType) {
                 if (argTypes == null) {
                     argTypes = new Type[nTypes];
@@ -397,10 +365,8 @@ public class PrimProcedure extends MethodProc implements Inlineable {
         else if (method.getName().endsWith("$X"))
             retType = Type.objectType;
         else {
-            retType = method.getReturnType();
-            retType = resolveTypeVariables(retType, parameterizedType);
-            retType = language.getLangTypeFor(retType);
-
+            retType = decodeType(method.getReturnType(),
+                                 annotTypes, 0, parameterizedType, language);
             // Kludge - toStringType doesn't have methods.
             // It shouldn't be used as the "type" of anything -
             // it's just a type with a coercion.  FIXME.
@@ -408,7 +374,15 @@ public class PrimProcedure extends MethodProc implements Inlineable {
                 retType = Type.javalangStringType;
         }
     }
-  
+
+    static Type decodeType(Type javaType, String[] annotTypes, int annotIndex,
+                           ParameterizedType parameterizedType,
+                           Language lang) {
+        String annotType = annotTypes != null && annotTypes.length > annotIndex
+            ? annotTypes[annotIndex] : null;
+        return lang.decodeType(javaType, annotType, parameterizedType);
+    }
+
     private void setOpcode(Method m) {
         int flags = m.getModifiers();
         if ((flags & Access.STATIC) != 0)

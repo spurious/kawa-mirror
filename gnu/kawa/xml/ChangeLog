@@ -1,3 +1,8 @@
+2014-06-30  Per Bothner  <per@bothner.com>
+
+	* NodeType.java (encodeType): New method.
+	* XDataType.java (encodeType): New method.
+
 2014-05-21  Per Bothner  <per@bothner.com>
 
 	Change handling of text nodes to fix some corner cases.

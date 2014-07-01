@@ -99,6 +99,8 @@ java_sources = \
   Shell.java \
   repl.java \
   Version.java \
+  SourceMethodType.java \
+  SourceType.java \
   TelnetInputStream.java \
   TelnetOutputStream.java \
   Telnet.java \

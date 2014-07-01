@@ -1,3 +1,8 @@
+2014-06-30  Per Bothner  <per@bothner.com>
+
+	* LangObjType.java (encodeType): New method.
+	* LangPrimType.java (encodeType): New method.
+
 2014-06-26  Per Bothner  <per@bothner.com>
 
 	* LispReader.java (readCharacter): Better error if character

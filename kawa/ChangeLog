@@ -1,3 +1,9 @@
+2014-06-30  Per Bothner  <per@bothner.com>
+
+	* SourceType.java: New annotation type.
+	* SourceMethodType.java: New annotation type.
+	* Makefile.am: Update accordingly.
+
 2014-06-28  Per Bothner  <per@bothner.com>
 
 	* lang/Syntax.java(rewriteForm(Object,Translator)):

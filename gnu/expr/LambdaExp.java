@@ -969,6 +969,8 @@ public class LambdaExp extends ScopeExp {
             : getReturnType().getImplementationType();
         int extraArg = (closureEnvType != null && closureEnvType != ctype) ? 1 : 0;
 
+        String rtypeEnc = comp.getLanguage().encodeType(getReturnType());
+
         int ctxArg = 0;
         if (getCallConvention () >= Compilation.CALL_WITH_CONSUMER
             && isInitMethod == '\0')
@@ -984,11 +986,21 @@ public class LambdaExp extends ScopeExp {
             Type[] atypes = new Type[extraArg + numArgs + ctxArg];
             if (extraArg > 0)
                 atypes[0] = closureEnvType;
+            Stack<String> encTypes = new Stack<String>();
+            int encTypesSize = rtypeEnc == null /* || not interesting */ ? 0 : 1;
+            encTypes.add(encTypesSize == 0 ? "" : rtypeEnc);
             Declaration var = firstDecl();
             if (var != null && var.isThisParameter())
                 var = var.nextDecl();
-            for (int itype = 0; itype < plainArgs; var = var.nextDecl())
+            for (int itype = 0; itype < plainArgs; var = var.nextDecl()) {
                 atypes[extraArg + itype++] = var.getType().getImplementationType();
+                String encType = comp.getLanguage().encodeType(var.getType());
+                if (encType == null /* || not interesting */)
+                    encType = "";
+                else
+                    encTypesSize = encTypes.size()+1;
+                encTypes.add(encType);
+            }
             if (ctxArg != 0)
                 atypes[atypes.length-1] = Compilation.typeCallContext;
             if (plainArgs < numArgs) {
@@ -999,6 +1011,13 @@ public class LambdaExp extends ScopeExp {
                     mflags |= Access.VARARGS;
                 else 
                     nameBuf.append("$V");
+                String encType = comp.getLanguage().encodeType(var.getType());
+                if (encType == null /* || not interesting */)
+                    encType = "";
+                else
+                    encTypesSize = encTypes.size()+1;
+                encTypes.add(encType);
+
                 if (key_args > 0 || numStubs < opt_args
                     // We'd like to support the the #!rest parameter an arbitrary
                     // array type or implementation of java.util.List.  However,
@@ -1050,6 +1069,20 @@ public class LambdaExp extends ScopeExp {
             }
 
             Method method = ctype.addMethod(name, atypes, rtype, mflags);
+
+            // Maybe emit kawa.SourceMethodType annotation.
+            if (encTypesSize > 0
+                && ! (nameDecl != null
+                      && nameDecl.getAnnotation(kawa.SourceMethodType.class) != null)) {
+                AnnotationEntry ae =
+                    new AnnotationEntry(ClassType.make("kawa.SourceMethodType"));
+                while (encTypes.size() > encTypesSize)
+                    encTypes.pop();
+                ae.addMember("value", encTypes,
+                             ArrayType.make(Type.javalangStringType));
+                RuntimeAnnotationsAttr.maybeAddAnnotation(method, ae);
+            }
+
             methods[i] = method;
 
             if (throwsSpecification != null && throwsSpecification.length > 0) {

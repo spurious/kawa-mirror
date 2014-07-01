@@ -1197,6 +1197,14 @@ public class Declaration
         while (frameType.getDeclaredField(fname) != null)
           fname = fname.substring(0, nlength) + '$' + (++ counter);
         field = frameType.addField (fname, ftype, fflags);
+        if (getAnnotation(kawa.SourceType.class) == null) {
+            String encType = comp.getLanguage().encodeType(getType());
+            if (encType != null && encType.length() > 0) {
+                AnnotationEntry ae = new AnnotationEntry(ClassType.make("kawa.SourceType"));
+                ae.addMember("value", encType, Type.javalangStringType);
+                RuntimeAnnotationsAttr.maybeAddAnnotation(field, ae);
+            }
+        }
         if (haveName)
           {
             Object fsymbol = getSymbol();

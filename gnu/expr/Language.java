@@ -16,6 +16,7 @@ import java.io.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import gnu.kawa.lispexpr.ClassNamespace; // FIXME
+import kawa.SourceType;
 
 /**
  * Contains various language-dependent methods.
@@ -811,6 +812,71 @@ public abstract class Language
     return null;
   }
 
+    /** Encode this type as a parseable string.
+     * Stored in SourceType or SourceMethodType annotations.
+     * @return A string suitable for {@link #decodeType},
+     * or null if the type is "uninteresting" in the sense we can
+     * infer it from the Java typing.
+     */
+    public String encodeType(Type type) {
+        if (type instanceof TypeValue)
+            return ((TypeValue) type).encodeType(this);
+        if (type instanceof ArrayType) {
+            String el = encodeType(((ArrayType) type).getComponentType());
+            if (el != null)
+                return el+"[]";
+        }
+        return null;
+    }
+
+    public Type decodeType(Type javaType, String annotType,
+                           ParameterizedType parameterizedType) {
+        if (annotType != null && annotType.length() > 0)
+            return getTypeFor(annotType);
+        return getLangTypeFor
+            (resolveTypeVariables(javaType, parameterizedType));
+    }
+
+    static Type resolveTypeVariables(Type langType, ParameterizedType parameterizedType) {
+        if (langType instanceof TypeVariable)
+            return resolveTypeVariable((TypeVariable) langType, parameterizedType);
+        if (langType instanceof ParameterizedType) {
+            ParameterizedType ptype = (ParameterizedType) langType;
+            Type[] paramTypes = ptype.getTypeArgumentTypes();
+            int nparams = paramTypes.length;
+            Type[] resolvedTypes = new Type[nparams];
+            boolean changed = false;
+            for (int i = 0; i < nparams;  i++) {
+                Type t0 = paramTypes[i];
+                char bound = ptype.getTypeArgumentBound(i);
+                // FIXME Don't support wildcards here yet.
+                if (bound != '\0')
+                    return langType.getRawType();
+                Type t1 = resolveTypeVariables(t0, parameterizedType);
+                resolvedTypes[i] = t1;
+                if (t0 != t1)
+                    changed = true;
+            }
+            if (changed) {
+                return new ParameterizedType(ptype.getRawType(), resolvedTypes);
+            }
+        }
+        return langType;
+    }
+
+    static Type resolveTypeVariable(TypeVariable tvar, ParameterizedType parameterizedType) {
+	if (parameterizedType != null) {
+	    TypeVariable[] tparams = parameterizedType.getRawType().getTypeParameters();
+	    int nparams = tparams.length;
+	    for (int i = 0;  i < nparams;  i++) {
+		if (tvar.getName().equals(tparams[i].getName())) {
+		    return parameterizedType.getTypeArgumentType(i);
+		}
+	    }
+	}
+	return tvar.getRawType();
+    }
+
   /** "Coerce" a language-specific "type specifier" object to a Type. */
   public final Type asType(Object spec)
   {
@@ -937,7 +1003,7 @@ public abstract class Language
             fdname = Compilation.demangleName(fname, true).intern();
         }
         try {
-            SourceName sourceName = fld.getReflectField().getAnnotation(SourceName.class);
+            SourceName sourceName = fld.getAnnotation(SourceName.class);
             if (sourceName != null) {
                 fdname = Symbol.valueOf(sourceName.name(), sourceName.uri(), sourceName.prefix());
             }
@@ -952,8 +1018,19 @@ public abstract class Language
             else
                 fdname = Symbol.make(uri, sname);
         }
-        Type dtype = isAlias ? Type.objectType
-            : getLangTypeFor(ftype);
+        Type dtype;
+        if (isAlias)
+            dtype = Type.objectType;
+        else {
+            String annotType = null;
+            try {
+                SourceType sourceType = fld.getAnnotation(SourceType.class);
+                if (sourceType != null)
+                    annotType = sourceType.value();
+            } catch (Throwable ex) {
+            }
+            dtype = decodeType(ftype, annotType, null);
+        }
         Declaration fdecl = mod.addDeclaration(fdname, dtype);
         boolean isStatic = (fld.getModifiers() & Access.STATIC) != 0;
         if (isAlias) {

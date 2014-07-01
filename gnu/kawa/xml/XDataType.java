@@ -532,6 +532,10 @@ public class XDataType extends Type implements TypeValue
     /* #endif */
   }
 
+    /* #ifndef JAVA8 */
+    public String encodeType(Language language) { return null; }
+    /* #endif */
+
   public static final Double DOUBLE_ZERO = makeDouble(0);
   public static final Double DOUBLE_ONE = makeDouble(1);
   public static final Float FLOAT_ZERO = makeFloat(0);

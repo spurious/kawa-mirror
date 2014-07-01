@@ -215,6 +215,10 @@ public class NodeType extends ObjectType implements TypeValue, NodePredicate, Ex
     kinds = in.readInt();
   }
 
+    /* #ifndef JAVA8 */
+    public String encodeType(Language language) { return null; }
+    /* #endif */
+
   public static final NodeType documentNodeTest =
     new NodeType("document-node", DOCUMENT_OK);
   public static final NodeType textNodeTest =

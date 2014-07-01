@@ -116,14 +116,14 @@
   ((oldname:toFile):renameTo (newname:toFile)))
 
 (define (copy-file (from :: path) (to :: path)) :: <void>
-  (let ((in (open-input-file from))
-	(out (open-output-file to)))
-    (do ((ch (read-char in) (read-char in)))
-	((eof-object? ch)
-	 (close-output-port out)
-	 (close-input-port in)
-	 #!void)
-      (write-char ch out))))
+  (let ((in (from:openInputStream))
+        (out (to:openOutputStream))
+        (buf (byte[] length: 8192)))
+    (let loop ()
+      (let ((n (in:read buf)))
+        (cond ((>= n 0)
+               (out:write buf 0 n)
+               (loop)))))))
 
 (define (create-directory (dirname :: filepath))
   ((dirname:toFile):mkdir))

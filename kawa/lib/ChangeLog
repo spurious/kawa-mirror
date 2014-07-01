@@ -1,3 +1,8 @@
+2014-06-30  Per Bothner  <per@bothner.com>
+
+	* files.scm (copy-file): Re-write to be more efficient.
+	Now byte-based so it handles binary files.
+
 2014-06-07  Per Bothner  <per@bothner.com>
 
 	* exceptions.scm (raise): Add 'equivalent-syntax' property.

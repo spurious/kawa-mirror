@@ -26,8 +26,10 @@ java_SCM_ALWAYS =\
   bytevectors.scm \
   arrays.scm \
   system.scm \
+  kawa/expressions.scm \
   kawa/hashtable.scm kawa/regex.scm rnrs/hashtables.scm rnrs/lists.scm \
   srfi95.scm rnrs/unicode.scm rnrs/sorting.scm rnrs/programs.scm \
+  compile_misc.scm \
   trace.scm
 
 scm_WITH_SWING = windows.scm

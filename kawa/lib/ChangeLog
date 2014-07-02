@@ -1,3 +1,11 @@
+2014-07-01  Per Bothner  <per@bothner.com>
+
+	* kawa/expressions.scm: Utilities for working with expressions.
+	* system.scm (pipeProcessValidateApply): Move to compile_misc.scm.
+	* compile_misc.scm: New file.
+	(pipeProcessValidateApply): Moved and rewrite to use expression API.
+	* Makefile.am: Update accordingly.
+
 2014-06-30  Per Bothner  <per@bothner.com>
 
 	* files.scm (copy-file): Re-write to be more efficient.

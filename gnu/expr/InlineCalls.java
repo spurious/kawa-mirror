@@ -35,9 +35,18 @@ import java.lang.invoke.*;
 
 public class InlineCalls extends ExpExpVisitor<Type> {
 
+    public static ThreadLocal<InlineCalls> currentVisitor
+        = new ThreadLocal<InlineCalls>();
+
     public static Expression inlineCalls (Expression exp, Compilation comp) {
         InlineCalls visitor = new InlineCalls(comp);
-        return visitor.visit(exp, null);
+        InlineCalls saved = currentVisitor.get(); // normally null
+        try {
+            currentVisitor.set(visitor);
+            return visitor.visit(exp, null);
+        } finally {
+            currentVisitor.set(saved);
+        }
     }
 
     public InlineCalls (Compilation comp) {

@@ -137,36 +137,8 @@
     ((_ e0 e1 . rest)
      (pipe-process (%pipe-process e0 e1) . rest))))
 
-(define (pipeProcessValidateApply
-         exp::gnu.expr.ApplyExp
-         visitor::gnu.expr.InlineCalls
-         required::gnu.bytecode.Type
-         proc::gnu.mapping.Procedure) ::gnu.expr.Expression
-         (exp:visitArgs visitor)
-         (cond ((gnu.expr.ErrorExp? exp)
-                exp)
-               ((= exp:arg-count 2)
-                (let ((e0 (exp:getArg 0))
-                      (e1 (exp:getArg 1)))
-                  (if (and (gnu.expr.ApplyExp? e1)
-                           (eq? ((->gnu.expr.ApplyExp e1):function:valueIfConstant)
-                                gnu.kawa.functions.RunProcess:instance))
-                      (let* ((ae1 ::gnu.expr.ApplyExp e1)
-                             (aeargs ae1:args)
-                             (xargs (gnu.expr.Expression[]
-                                                        length: (+ 2 aeargs:length))))
-                        (set! (xargs 0) (gnu.expr.QuoteExp:getInstance 'in:))
-                        (set! (xargs 1) e0)
-                        (java.lang.System:arraycopy aeargs 0 xargs 2 aeargs:length)
-                        (visitor:visitApplyOnly
-                         (gnu.expr.ApplyExp ae1:function xargs)
-                         required))
-                      (visitor:error #\e "pipe-process arg not run-process" e1))))
-               (else
-                (visitor:error "pipe-process - internal error - expected 2 args"))))
-
 (define-procedure %pipe-process
-  validate-apply: "kawa.lib.system:pipeProcessValidateApply"
+  validate-apply: "kawa.lib.compile_misc:pipeProcessValidateApply"
   (lambda (e1 e2)
     (java.lang.RuntimeException "%pipe-process called")))
 

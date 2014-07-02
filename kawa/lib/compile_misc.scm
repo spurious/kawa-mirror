@@ -1,0 +1,17 @@
+(require <kawa.lib.kawa.expressions>)
+
+(define-validate pipeProcessValidateApply (exp required proc)
+  ((= exp:arg-count 2)
+   (exp:visitArgs (get-visitor))
+   (let ((e0 (exp:getArg 0))
+         (e1 (exp:getArg 1))
+         (visitor (get-visitor)))
+     (if (and (gnu.expr.ApplyExp? e1)
+              (eq? ((->gnu.expr.ApplyExp e1):function:valueIfConstant)
+                   gnu.kawa.functions.RunProcess:instance))
+         (let* ((ae1 ::gnu.expr.ApplyExp e1)
+                (aeargs ae1:args))
+           (visit-exp
+            (apply-exp ae1:function in: e0 @aeargs)
+            require))
+         (visitor:error #\e "pipe-process arg not run-process" e1)))))

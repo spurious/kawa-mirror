@@ -1,3 +1,8 @@
+2014-07-01  Per Bothner  <per@bothner.com>
+
+	* InlineCalls.java (currentVisitor): New ThreadLocal.
+	(inlineCalls): Set currentVisitor.
+
 2014-06-30  Per Bothner  <per@bothner.com>
 
 	Use new annotations to record language-specific types in class files.

@@ -1,5 +1,7 @@
 2014-07-01  Per Bothner  <per@bothner.com>
 
+	* ApplyExp.java (isSimple *2): New helper methods.
+
 	* InlineCalls.java (currentVisitor): New ThreadLocal.
 	(inlineCalls): Set currentVisitor.
 

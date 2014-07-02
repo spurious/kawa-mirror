@@ -106,6 +106,15 @@ public class ApplyExp extends Expression
         return firstSpliceArg < 0 && firstKeywordArgIndex == 0;
     }
 
+    public boolean isSimple(int min) {
+        return isSimple() && getArgCount() >= min;
+    }
+
+    public boolean isSimple(int min, int max) {
+        int ac = getArgCount();
+        return isSimple() && ac >= min && ac <= max;
+    }
+
     public boolean isAppendValues() {
         return func instanceof QuoteExp
             && (((QuoteExp) func).getValue()

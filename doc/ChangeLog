@@ -1,3 +1,7 @@
+2014-07-02  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Characters): Various updates for character type.
+
 2014-06-11  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Named quasi-literals): New section.

@@ -7,6 +7,8 @@
 @syncodeindex fn cp
 @syncodeindex vr cp
 @syncodeindex pg cp
+@codequoteundirected on
+@codequotebacktick on
 @c version: %W% %G%
 @c %**end of header
 
@@ -6349,14 +6351,40 @@ points, but the surrogate code points do not have representations as
 characters.
 @end quotation
 
+@deffn Type character
+A Unicode scalar value (or a surrogate).
+This is implemented using a 32-bit @code{int}.
+When an object is needed (i.e. the @dfn{boxed} representation),
+it is implemented an instance of @code{gnu.text.Char}.
+@end deffn
+
+@deffn Type character-or-eof
+A @code{character} or the specical @code{#!eof} value (used to indicate
+end-of-file when reading from a port).
+This is implemented using a 32-bit @code{int},
+where the value -1 indicates end-of-file.
+When an object is needed, it is implemented an instance of
+@code{gnu.text.Char} or the special @code{#!eof} object.
+@end deffn
+
+@deffn Type char
+A UTF-16 code point.  Same as Java primitivce @code{char} type.
+Considered to be a sub-type of @code{character}.
+When an object is needed, it is implemented as an instance
+of @code{java.lang.Character}.  Note the unfortunate inconsistency
+(for historical reasons) of @code{char} boxed as @code{Character}
+vs @code{character} boxed as @code{Char}.
+@end deffn
+
 @deffn Procedure {char?} @var{obj}
 Return @true{} if @var{obj} is a character, @false{} otherwise.
 @end deffn
 
 @deffn Procedure {char->integer} @var{char}
 @deffnx Procedure {integer->char} @var{sv}
-@var{sv} must be a Unicode scalar value, i.e., a non--negative exact
+@var{sv} should be a Unicode scalar value, i.e., a non--negative exact
 integer object in @code{[0, #xD7FF] union [#xE000, #x10FFFF]}.
+(Kawa also allows values in the surrogate range.)
 
 Given a character, @func{char->integer} returns its Unicode scalar value
 as an exact integer object.  For a Unicode scalar value @var{sv},
@@ -6367,8 +6395,16 @@ as an exact integer object.  For a Unicode scalar value @var{sv},
 (char->integer (integer->char 5000))   @result{} 5000
 (integer->char #\xD800)                @result{} throws ClassCastException
 @end example
-@end deffn
 
+@emph{Performance note:} A call to @code{char->integer} is compiled as
+casting the argument to a @code{character}, and then re-interpreting
+that value as an @code{int}.
+A call to @code{integer->char} is compiled as
+casting the argument to an @code{int}, and then re-interpreting
+that value as an @code{character}.
+If the argument is the right type, no code is emitted: the value is
+just re-interpreted as the result type.
+@end deffn
 
 @deffn Procedure {char=?} @vari{char} @varii{char} @variii{char} @dots{}
 @deffnx Procedure {char<?} @vari{char} @varii{char} @variii{char} @dots{}
@@ -6382,6 +6418,10 @@ according to their Unicode scalar values.
 (char<? #\z #\ß)      @result{} #t
 (char<? #\z #\Z)      @result{} #f
 @end example
+
+@emph{Performance note:}  This is compiled as if converting each
+argument using @code{char->integer} (which requires no code)
+and the using the corresponing @code{int} comparison.
 @end deffn
 
 @deffn Procedure digit-value char
@@ -9735,6 +9775,7 @@ characters whose scalar value is in the range 0 to 255
 A native binary port is a @code{java.io.InputStream}
 or @code{java.io.OutputStream} instance.  These are not textual ports.
 You can use methods @code{read-u8} and @code{write-u8},
+@c not true?
 but not @code{read-char} and @code{write-char} on native binary ports.
 (The functions @code{input-port?}, @code{output-port?}, @code{binary-port?},
 and @code{port?} all currently return false on native binary ports,
@@ -9989,6 +10030,8 @@ Returns the next character available from the textual input
 @var{port}, updating the port to point to the following character.
 If no more characters are available, an end-of-file object is
 returned.
+
+The result type is @code{character-or-eof}.
 @end deffn
 
 @deffn Procedure peek-char [port]
@@ -10033,6 +10076,9 @@ followed by a linefeed character.
 @deffn Pocedure eof-object? obj
 Returns @code{#t} if @var{obj} is an end-of-file object,
 otherwise returns @code{#f}.
+
+@code{Performance note}: If @var{obj} has type @code{character-or-eof},
+this is compiled as an @code{int} comparison with -1.
 @end deffn
 
 @deffn Procedure eof-object
@@ -16280,7 +16326,7 @@ except that this permission notice may be stated in a translation approved
 by the author.
 
 Parts of this manual is copied from the @uref{http://www.r6rs.org/,R6RS}
-specifications, which states:
+or @uref{http://www.r7rs.org/,R7RS}, which both state:
 @quotation
 We intend this report to belong to the entire Scheme community, and so
 we grant permission to copy it in whole or in part without fee. In

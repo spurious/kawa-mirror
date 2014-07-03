@@ -67,21 +67,34 @@
 @var{\THING\}
 @end macro
 
+@ifinfo
 @macro vari{THING}
 @var{\THING\1}
 @end macro
-
 @macro varii{THING}
 @var{\THING\2}
 @end macro
-
 @macro variii{THING}
 @var{\THING\3}
 @end macro
-
 @macro variv{THING}
 @var{\THING\4}
 @end macro
+@end ifinfo
+@ifnotinfo
+@macro vari{THING}
+@var{\THING\}@math{_1}
+@end macro
+@macro varii{THING}
+@var{\THING\}@math{_2}
+@end macro
+@macro variii{THING}
+@var{\THING\}@math{_3}
+@end macro
+@macro variv{THING}
+@var{\THING\}@math{_4}
+@end macro
+@end ifnotinfo
 
 @include version.texi
 
@@ -5384,6 +5397,16 @@ objects is unreliable, because any inaccuracy may affect the result.
 @end quotation
 @end deffn
 
+@deffn Procedure exact-integer? z
+Returns @code{#t} if @var{z} is both exact and an integer; otherwise
+returns @code{#f}.
+@example
+(exact-integer? 32)                    @result{} #t
+(exact-integer? 32.0)                  @result{} #t
+(exact-integer? 32/5)                  @result{} #f
+@end example
+@end deffn
+
 @deffn Procedure {finite?} @var{z}
 Returns @code{#t} if @var{z} is finite real number
 (i.e. an infinity and not a NaN),
@@ -5535,118 +5558,107 @@ complex arguments, it either raises an exception with condition type
 object.
 @end deffn
 
-@deffn Procedure div @vari{x} @varii{x}
-@deffnx Procedure mod @vari{x} @varii{x}
-@deffnx Procedure div-and-mod @vari{x} @varii{x}
-
+@deffn Procedure floor/ x y
+@deffnx Procedure truncate/ x y
+@deffnx Procedure div-and-mod x y
+@deffnx Procedure div0-and-mod0 x y
 These procedures implement number--theoretic integer division.
-They accept two real numbers @vari{x} and @varii{x} as operands,
-where @varii{x} must be nonzero.
-(Kawa allows @varii{x} to be zero for @code{mod}.)
-@code{div} returns an integer, and @code{mod} returns a real.
-Their results are specified by:
-
+They accept two real numbers @var{x} and @var{y} as operands,
+where @var{y} must be nonzero.
+In all cases the result is two values @var{q} (an integer) and @var{r} (a real)
+that satisfy the equations:
 @example
-(div @vari{x} @varii{x}) @result{} @var{nd}
-(mod @vari{x} @varii{x}) @result{} @var{xm}
+@var{x} = @var{q} * @var{y} + @var{r}
+@var{q} = @var{rounding-op}(@var{x}/@var{y})
+@end example
+The result is inexact if either argument is inexact.
+
+For @code{floor/} the @var{rounding-op} is the @code{floor} function (below).
+@example
+(floor/ 123 10)         @result{}  12 3
+(floor/ 123 -10)        @result{}  -13 -7
+(floor/ -123 10)        @result{}  -13 7
+(floor/ -123 -10)       @result{}  12 -3
 @end example
 
-such that:
-
+For @code{truncate/} the @var{rounding-op} is the @code{truncate} function.
 @example
-@vari{x} = @var{nd} * @varii{x} + @var{xm}
-0  <= @var{xm} < |@varii{x}|
+(truncate/ 123 10)      @result{}  12 3
+(truncate/ 123 -10)     @result{}  -12 3
+(truncate/ -123 10)     @result{}  -12 -3
+(truncate/ -123 -10)    @result{}  12 -3
 @end example
 
-@c In the cases where the mathematical
-@c requirements cannot be satisfied by
-@c any number object, either an exception is raised with condition type
-@c @code{&implementation-restriction}, or unspecified number objects (one
-@c for for @func{div}, @func{mod}, @func{div0} and @func{mod0}, two for
-@c @func{div-and-mod} and @func{div0-and-mod0}) are returned.
-
+For @code{div-and-mod} the @var{rounding-op} is either @code{floor}
+(if @var{y} is positive) or @code{ceiling} (if @var{y} is negative).
+We have:
 @example
-(div-and-mod @vari{x} @varii{x})
-  @result{} (values (div @vari{x} @varii{x}) (mod @vari{x} @varii{x}))
+0  <= @var{r} < |@var{y}|
+@end example
+@example
+(div-and-mod 123 10)    @result{}  12 3
+(div-and-mod 123 -10)   @result{}  -12 3
+(div-and-mod -123 10)   @result{}  -13 7
+(div-and-mod -123 -10)  @result{}  13 7
+@end example
+
+For @code{div0-and-mod0} the @var{rounding-op} is the @code{round} function,
+and @code{r} lies within a half--open interval centered on zero.
+@example
+-|@var{y}/2| <= @var{r} < |@var{y}/2|
 @end example
 
 @example
-(div 123 10)    @result{}  12
-(mod 123 10)    @result{}  3
-(div 123 -10)   @result{}  -12
-(mod 123 -10)   @result{}  3
-(div -123 10)   @result{}  -13
-(mod -123 10)   @result{}  7
-(div -123 -10)  @result{}  13
-(mod -123 -10)  @result{}  7
+(div0-and-mod0 123 10)   @result{}  12 3
+(div0-and-mod0 123 -10)  @result{}  -12 3
+(div0-and-mod0 -123 10)  @result{}  -12 -3
+(div0-and-mod0 -123 -10) @result{}  12 -3
+(div0-and-mod0 127 10)   @result{}  13 -3
+(div0-and-mod0 127 -10)  @result{}  -13 -3
+(div0-and-mod0 -127 10)  @result{}  -13 3
+(div0-and-mod0 -127 -10) @result{}  13 3
+@end example
+
+The inconsistent naming is for historical reasons: @code{div-and-mod}
+and @code{div0-and-mod0} are from R6RS, while @code{floor/} and
+@code{truncate/} are from R7RS.
+@end deffn
+
+@deffn Procedure floor-quotient x y
+@deffnx Procedure truncate-quotient x y
+@deffnx Procedure div x y
+@deffnx Procedure div0 x y
+These procedures return the quotient part (first value)
+of respectively @code{floor/}, @code{truncate/},
+@code{div-and-mod}, and @code{div0-and-mod0}.
+@end deffn
+
+@deffn Procedure floor-remainder x y
+@deffnx Procedure truncate-remainder x y
+@deffnx Procedure mod x y
+@deffnx Procedure mod0 x y
+These procedures return the remainder part (second value)
+of respectively @code{floor/}, @code{truncate/},
+@code{div-and-mod}, and @code{div0-and-mod0}.
+
+As a Kawa extension @var{y} may be zero, in which case the result is @var{x}:
+@example
 (mod 123 0)     @result{}  123 ;; Kawa extension
 @end example
 @end deffn
 
-
-@deffn Procedure div0 @vari{x} @varii{x}
-@deffnx Procedure mod0 @vari{x} @varii{x}
-@deffnx Procedure div0-and-mod0 @vari{x} @varii{x}
-@code{div0} and @code{mod0} are like @code{div} and @code{mod}, except
-the result of @code{mod0} lies within a half--open interval centered on
-zero.  The results are specified by:
-@example
-(div0 @vari{x} @varii{x}) @result{} @var{nd}
-(mod0 @vari{x} @varii{x}) @result{} @var{xm}
-@end example
-such that:
-@example
-@vari{x} = @var{nd} * @varii{x} + @var{xm}
--|@varii{x}| <= @var{xm} < |@varii{x}/2|
-@end example
-
-@example
-(div0-and-mod0 @vari{x} @varii{x})
-  @result{} (values (div0 @vari{x} @varii{x}) (mod0 @vari{x} @varii{x}))
-@end example
-
-@example
-(div0 123 10)   @result{}  12
-(mod0 123 10)   @result{}  3
-(div0 123 -10)  @result{}  -12
-(mod0 123 -10)  @result{}  3
-(div0 -123 10)  @result{}  -12
-(mod0 -123 10)  @result{}  -3
-(div0 -123 -10) @result{}  12
-(mod0 -123 -10) @result{}  -3
-@end example
-@end deffn
-
 @deffn Procedure quotient x y
-Kawa generalizes @code{quotient} to arbitrary real numbers,
-using the definition:
-@code{(truncate (/ x y))}.
-@end deffn
-
-@deffn Procedure remainder x y
-Generalized to arbitrary real numbers, using the definition:
-@code{(- x (* y (truncate (/ x y))))}.
-If @code{y} is @code{0}, the result is @code{x} - i.e. we take
-@code{(* 0 (quotient x 0))} to be @code{0}.
-The result is inexact if either argument is inexact,
-even if @code{x} is exact and @code{y} is 0.
+@deffnx Procedure remainder x y
+@deffnx Procedure modulo x y
+These are equivalent to @code{truncate-quotient},
+@code{truncate-remainder}, and @code{floor-remainder}, respectively.
+These are provided for backward compatibility.
 @example
 (remainder 13 4)     @result{} 1
 (remainder -13 4)    @result{} -1
 (remainder 13 -4)    @result{} 1
 (remainder -13 -4)   @result{} -1
 (remainder -13 -4.0) @result{} -1.0
-@end example
-@end deffn
-
-@deffn Procedure modulo x y
-Generalized to arbitrary real numbers, using the definition:
-@code{(- x (* y (floor (/ x y))))}.
-If @code{y} is @code{0}, the result is @code{x}.
-The result is inexact if either argument is inexact,
-even if @code{x} is exact and @code{y} is 0.
-
-@example
 (modulo 13 4)   @result{} 1
 (modulo -13 4)  @result{} 3
 (modulo 13 -4)  @result{} -4

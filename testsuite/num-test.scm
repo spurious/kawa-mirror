@@ -1,4 +1,4 @@
-(test-begin "numbers" 1872)
+(test-begin "numbers" 1879)
 
 (test-equal 7 (+ 3 4))
 (test-equal 3 (+ 3))
@@ -298,6 +298,14 @@
 
 (test-eqv #t (exact? 5))
 (test-eqv #t (inexact? +inf.0))
+
+(test-eqv #t (integer? (java.math.BigDecimal "345")))
+(test-eqv #f (integer? (java.math.BigDecimal "345.01")))
+(test-eqv #t (integer? (java.lang.Long "345")))
+(test-eqv #t (integer? (java.lang.Double "345")))
+(test-eqv #t (exact-integer? (java.lang.Short "345")))
+(test-eqv #f (exact-integer? (java.lang.Double "345")))
+(test-eqv #f (exact-integer? (java.math.BigDecimal "345")))
 
 (test-end "numerical operations")
 

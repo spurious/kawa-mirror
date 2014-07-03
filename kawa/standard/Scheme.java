@@ -295,6 +295,7 @@ public class Scheme extends LispLanguage
       defProcStFld("real?", "kawa.lib.numbers");
       defProcStFld("rational?", "kawa.lib.numbers");
       defProcStFld("integer?", "kawa.lib.numbers");
+      defProcStFld("exact-integer?", "kawa.lib.numbers");
       defProcStFld("exact?", "kawa.lib.numbers");
       defProcStFld("inexact?", "kawa.lib.numbers");
       defProcStFld("=", "kawa.standard.Scheme", "numEqu");

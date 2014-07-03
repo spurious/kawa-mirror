@@ -1,5 +1,7 @@
 2014-07-02  Per Bothner  <per@bothner.com>
 
+	* standard/Scheme.java (initScheme): Define 'exact-integer?'.
+
 	* standard/Scheme.java: Update read-char and peek-char.
 	* standard/SchemeCompilation.java (checkDefaultBinding): For now at
 	least doesn't allow "re-interpret primitive type" conversions using

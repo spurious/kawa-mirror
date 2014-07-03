@@ -32,19 +32,39 @@
 	       (java.lang.Byte? x)
 	       (java.math.BigInteger? x)
 	       (java.math.BigDecimal? x)))))
+
 (define (integer? x) :: <boolean>
   (or (instance? x <gnu.math.IntNum>)
-      (and (instance? x <gnu.math.DFloNum>)
-	   (= (java.lang.Math:IEEEremainder
-	       (gnu.math.DFloNum:doubleValue x)
-	       1.0)
-	      0.0))
+      (and (instance? x <java.lang.Number>)
+           (cond ((or (java.lang.Long? x)
+                      (java.lang.Integer? x)
+                      (java.lang.Short? x)
+                      (java.lang.Byte? x)
+                      (java.math.BigInteger? x))
+                  #t)
+                 ((or (gnu.math.DFloNum? x)
+                      (java.lang.Float? x)
+                      (java.lang.Double? x))
+                  (= (java.lang.Math:IEEEremainder
+                      (java.lang.Number:doubleValue x)
+                      1.0)
+                     0.0))
+                 ((java.math.BigDecimal? x)
+                  (try-catch
+                   (begin
+                     ((->java.math.BigDecimal x):toBigIntegerExact)
+                     #t)
+                   (ex java.lang.ArithmeticException #f)))))))
+
+(define (exact-integer? x) :: <boolean>
+  (or (instance? x <gnu.math.IntNum>)
       (and (instance? x <java.lang.Number>)
 	   (or (instance? x <java.lang.Long>)
 	       (instance? x <java.lang.Integer>)
 	       (instance? x <java.lang.Short>)
 	       (instance? x <java.lang.Byte>)
 	       (instance? x <java.math.BigInteger>)))))
+
 (define (real-valued? x) ::boolean
   (and (complex? x) (zero? (imag-part x)) (real? (real-part x))))
 (define (rational-valued? x) ::boolean

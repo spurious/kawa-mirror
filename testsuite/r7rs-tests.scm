@@ -596,11 +596,10 @@
 (test #t (exact? #e3.0))
 (test #t (inexact? 3.))
 
-(skip-if-kawa "exact-integer? not implemented"
 (test #t (exact-integer? 32))
 (test #f (exact-integer? 32.0))
 (test #f (exact-integer? 32/5))
-)
+
 (test #t (finite? 3))
 (test #f (finite? +inf.0))
 (skip-if-kawa "3.0+inf.0i syntax not recognized"

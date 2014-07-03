@@ -1,5 +1,8 @@
 2014-07-02  Per Bothner  <per@bothner.com>
 
+	* numbers.scm (exact-integer?): New function.
+	(integer?): Some tweaks, including support for BigDecimal.
+
 	Change 'character' type to be implemented using primitive 'int'.
 	* characters.scm (char->integer. integer->char): These are now no-ops
 	when optimized.

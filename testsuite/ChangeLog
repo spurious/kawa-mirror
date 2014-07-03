@@ -1,5 +1,8 @@
 2014-07-02  Per Bothner  <per@bothner.com>
 
+	* num-test.scm: Add some integer? and exact-integer? tests.
+	* r7rs-tests.scm: Enable exact-integer? tests.
+
 	* inlining-test.scm (read1): New test for read-char and character
 	inlining.
 	* inlining.expected: Update appropriately.

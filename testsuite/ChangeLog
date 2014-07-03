@@ -1,5 +1,7 @@
 2014-07-03  Per Bothner  <per@bothner.com>
 
+	* srfi-109-test.scm: Add some tests involving splicing.
+
 	* r7rs-tests.scm: Enable tests for floor/ etc.
 
 2014-07-02  Per Bothner  <per@bothner.com>

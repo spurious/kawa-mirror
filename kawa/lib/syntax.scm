@@ -282,8 +282,7 @@
     (($<<$ . rest)
      (%string-format-enclosed-format default-format #'rest))
     ((($format$ fstr . args) . rest)
-     (let ((xd (syntax->datum #'fstr)))
-       (cons #'fstr (%string-format-format default-format #'rest))))
+     (cons #'fstr (%string-format-format default-format #'rest)))
     (((x . y) . rest)
       (cons default-format (%string-format-format default-format #'rest)))
     ((x . rest)
@@ -294,10 +293,13 @@
 ;; Collect format string, assuming we're inside $<<$ ... $>>$
 ;; Returns list of format string fragments, to be concatenated.
 (define (%string-format-enclosed-format default-format forms)
-  (syntax-case forms ($<<$ $>>$)
+  (syntax-case forms ($<<$ $>>$ $splice$)
     (() '())
     (($>>$ . rest)
      (%string-format-format default-format #'rest))
+    ((($splice$ seq) . rest)
+     (cons #`(constant-fold string-append "~{" #,default-format "~}")
+           (%string-format-enclosed-format default-format #'rest)))
     ((arg1 . rest)
      (cons default-format (%string-format-enclosed-format default-format #'rest)))))
 
@@ -320,6 +322,8 @@
     (() '())
     (($>>$ . rest)
      (%string-format-args #'rest))
+    ((($splice$ seq) . rest)
+     #`(seq . #,(%string-format-enclosed-args #'rest)))
     ((arg . rest)
      #`(arg . #,(%string-format-enclosed-args #'rest)))))
 

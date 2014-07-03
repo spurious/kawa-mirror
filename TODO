@@ -1,6 +1,5 @@
 Optimize splicing of methods calls.
 Remove createVarargsArrayIfNeeded logic from PrimProcedure.
-This is broken &{X&[@(list 3 4)]Y} because of createVarargsArrayIfNeeded.
 
 Document:
   in-http-server and in-servlet cond-expand options.

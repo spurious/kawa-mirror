@@ -178,4 +178,18 @@ b}
          '($string$ "_" ($format$ "~4t~w" "qwerty") "_")
          &{_   "qwerty"_})
 
+(cond-expand (kawa
+              (strtest &{X&[@(list 3 4)]Y}
+                       '($string$ "X" $<<$ ($splice$ (list 3 4)) $>>$ "Y")
+                       "X34Y")
+              (strtest &{X&~w[@(list "x" "y")]Y}
+                       '($string$ "X" ($format$ "~w" ($splice$ (list "x" "y")))
+                                  "Y")
+                       &{X"x"Y})
+              (strtest &{X&~w[@(list "x" "y")]&~w[]Y}
+                       '($string$ "X" ($format$ "~w" ($splice$ (list "x" "y")))
+                                  ($format$ "~w") "Y")
+                       &{X"x""y"Y})
+              ))
+
 (test-end)

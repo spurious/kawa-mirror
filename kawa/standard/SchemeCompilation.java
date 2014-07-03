@@ -107,7 +107,7 @@ public class SchemeCompilation extends Translator
             else if (! (texp instanceof QuoteExp))
                 texp = null;
             if (texp != null)
-                return new CurryExp(Curry1.makeConverter, Convert.as, texp);
+                return new CurryExp(Curry1.makeConverter, Convert.cast, texp);
         }
         return super.checkDefaultBinding(symbol, tr);
     }

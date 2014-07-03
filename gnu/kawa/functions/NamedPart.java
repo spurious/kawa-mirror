@@ -73,7 +73,7 @@ class NamedPart extends ProcedureN
       case 'I':
         return kawa.standard.Scheme.instanceOf.apply2(args[0], container);
       case 'C':
-        return gnu.kawa.functions.Convert.as.apply2(container, args[0]);
+        return gnu.kawa.functions.Convert.cast.apply2(container, args[0]);
       case 'N':
         xargs = new Object[args.length+1];
         xargs[0] = container;

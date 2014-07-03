@@ -1,3 +1,7 @@
+2014-07-02  Per Bothner  <per@bothner.com>
+
+	* classes-to-skip-for-runtime: Remove some new classes.
+
 2014-02-27  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (patch-source-list): Add dependency on configure.

@@ -1,3 +1,10 @@
+2014-07-02  Per Bothner  <per@bothner.com>
+
+	* inlining-test.scm (read1): New test for read-char and character
+	inlining.
+	* inlining.expected: Update appropriately.
+	* Makefile.am: Update accordingly.
+
 2014-06-30  Per Bothner  <per@bothner.com>
 
 	* errors3.scm: Add test to make sure runtime Exception happens.

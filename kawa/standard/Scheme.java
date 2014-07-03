@@ -472,8 +472,8 @@ public class Scheme extends LispLanguage
       defProcStFld("close-output-port", "kawa.lib.ports");
       defProcStFld("read", "kawa.lib.ports");
       defProcStFld("read-line", "kawa.lib.ports");
-      defProcStFld("read-char", "kawa.standard.readchar", "readChar");
-      defProcStFld("peek-char", "kawa.standard.readchar", "peekChar");
+      defProcStFld("read-char", "kawa.lib.ports");
+      defProcStFld("peek-char", "kawa.lib.ports");
       defProcStFld("eof-object?", "kawa.lib.ports");
       defProcStFld("eof-object", "kawa.lib.ports");
       defProcStFld("read-string", "kawa.lib.ports");

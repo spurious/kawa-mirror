@@ -1,3 +1,8 @@
+2014-07-02  Per Bothner  <per@bothner.com>
+
+	* Char.java (castToCharacter, castToCharacterOrEof, isCharOrEof,
+	makeOrEof): New static helper methods to support character-or-eof type.
+
 2014-06-25  Per Bothner  <per@bothner.com>
 
 	* Char.java (class CharMap): Change to a static member class.

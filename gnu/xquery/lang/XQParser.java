@@ -78,7 +78,7 @@ public class XQParser extends Lexer
   public static final gnu.kawa.reflect.InstanceOf instanceOf
   = new gnu.kawa.reflect.InstanceOf(XQuery.getInstance(), "instance");
   public static final CastableAs castableAs = CastableAs.castableAs;
-  public static final Convert treatAs = Convert.as;
+  public static final Convert treatAs = Convert.cast;
 
   NamedCollator defaultCollator = null;
 

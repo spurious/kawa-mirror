@@ -1,3 +1,7 @@
+2014-07-02  Per Bothner  <per@bothner.com>
+
+	* CastAs.java: Update for changes to super-type.
+
 2014-02-16  Per Bothner  <per@bothner.com>
 
 	* CompileMisc.java: Make sure Error is uncaught or re-thrown.

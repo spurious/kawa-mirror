@@ -38,17 +38,22 @@ public class ExpVisitor<R,D>
      * Expression's line number.  Should not need to be overridden;
      * if you do, you may also want to override visitExps. */
     public R visit(Expression exp, D d) {
+        return visit(this, exp, d);
+    }
+
+    public static <R,D> R visit(ExpVisitor<R,D> visitor, Expression exp, D d) {
         int line = exp.getLineNumber();
+        SourceMessages messages = visitor.messages;
         if (messages != null && line > 0) {
             String saveFile = messages.getFileName();
             int saveLine = messages.getLineNumber();
             int saveColumn = messages.getColumnNumber();
             messages.setLine(exp.getFileName(), line, exp.getColumnNumber());
-            R ret = exp.visit(this, d);
+            R ret = exp.visit(visitor, d);
             messages.setLine(saveFile, saveLine, saveColumn);
             return ret;
         }
-        return exp.visit(this, d);
+        return exp.visit(visitor, d);
     }
 
     protected Expression update(Expression exp, R r) {

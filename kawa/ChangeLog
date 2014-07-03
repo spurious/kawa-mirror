@@ -1,3 +1,13 @@
+2014-07-02  Per Bothner  <per@bothner.com>
+
+	* standard/Scheme.java: Update read-char and peek-char.
+	* standard/SchemeCompilation.java (checkDefaultBinding): For now at
+	least doesn't allow "re-interpret primitive type" conversions using
+	'->TYPE', only using 'as'.
+	only explicit 'as' but not '->TYPE'
+	* standard/readchar.java: Removed - no longer used.
+	* Makefile.am: Update accordingly.
+
 2014-06-30  Per Bothner  <per@bothner.com>
 
 	* SourceType.java: New annotation type.

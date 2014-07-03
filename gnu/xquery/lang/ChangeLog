@@ -1,3 +1,7 @@
+2014-07-02  Per Bothner  <per@bothner.com>
+
+	* XQParser.java (treatAs): Update for new Convert handling.
+
 2014-05-21  Per Bothner  <per@bothner.com>
 
 	* XQParser.java (parseContent): Literal direct attribute or element

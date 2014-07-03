@@ -1,3 +1,17 @@
+2014-07-02  Per Bothner  <per@bothner.com>
+
+	Change 'character' type to be implemented using primitive 'int'.
+	* characters.scm (char->integer. integer->char): These are now no-ops
+	when optimized.
+	(digit->char): Update.
+	* ports.scm: Update conversions since character is no longer an object.
+	(read-char, peek-char): Change return type of character-or-eof.
+	(u8): Inline readByte from kawa.standard.readchar.
+	* rnrs/unicode.scm: Update character/int conversions.
+	* strings.scm: Likewise.
+	Add validation hook for character comparions.
+	* compile_misc.scm: Implement various validation hooks.
+
 2014-07-01  Per Bothner  <per@bothner.com>
 
 	* kawa/expressions.scm: Utilities for working with expressions.

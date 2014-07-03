@@ -14,6 +14,7 @@ import gnu.math.BitOps;
 import gnu.text.Char;
 import java.lang.reflect.InvocationTargetException;
 import gnu.kawa.functions.MakePromise;
+import gnu.kawa.lispexpr.LangPrimType;
 import java.util.List;
 import java.util.HashMap;
 import java.lang.reflect.Proxy;
@@ -55,11 +56,11 @@ public class InlineCalls extends ExpExpVisitor<Type> {
 
     VarValueTracker valueTracker = new VarValueTracker(this);
 
-    public Expression visit (Expression exp, Type required) {
+    public Expression visit(Expression exp, Type required) {
         Expression exp0 = exp;
         if (! exp.getFlag(Expression.VALIDATED)) {
             exp.setFlag(Expression.VALIDATED); // Protect against cycles.
-            exp = super.visit(exp, required);
+            exp = ExpVisitor.visit(this, exp, required);
             exp.setFlag(Expression.VALIDATED);
         }
         if (required == ProcedureInCallContext.INSTANCE)
@@ -247,7 +248,9 @@ public class InlineCalls extends ExpExpVisitor<Type> {
             if (! exp.isExplicitlyTyped()) {
                 if ((primRequired = PrimType.unboxedType(required)) != null) {
                     char sig1 = primRequired.getSignature().charAt(0);
-                    if (value instanceof IntNum) {
+                    if (value instanceof IntNum
+                        && primRequired != LangPrimType.characterType
+                        && primRequired != LangPrimType.characterOrEofType) {
                         IntNum ivalue = (IntNum) value;
                         Object ival = null;
                         switch (sig1) {
@@ -299,14 +302,22 @@ public class InlineCalls extends ExpExpVisitor<Type> {
                         else
                             error('w', "saw float where "+required.getName()+" expected");
                     }
-                    if (value instanceof Char && sig1 == 'C') {
-                        int ival = ((Char) value).intValue();
-                        if (ival >= 0 && ival <= 0xFFFF)
-                            exp = new QuoteExp(Character.valueOf((char) ival), required);
+                    if (value instanceof Char) {
+                        if (sig1 == 'C') {
+                            int ival = ((Char) value).intValue();
+                            if (ival >= 0 && ival <= 0xFFFF)
+                                exp = new QuoteExp(Character.valueOf((char) ival), required);
+                            else
+                                error('w', "character scalar value "+ival+" not in range of "+required.getName());
+                        } else
+                            exp.setType(LangPrimType.characterType);
                     }
+
                 } else if ((value instanceof IntNum) && required != null &&
                            "java.math.BigInteger".equals(required.getName())) {
                     exp = new QuoteExp(((IntNum)value).asBigInteger(), required);
+                } else if (value instanceof Char) {
+                    exp.setType(LangPrimType.characterType);
                 }
             }
         }

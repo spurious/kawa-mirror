@@ -54,7 +54,6 @@ KAWA_STANDARD_JAVA_FILES = \
   standard/fluid_let.java \
   standard/expt.java \
   standard/vector_append.java \
-  standard/readchar.java \
   standard/read_line.java \
   standard/char_ready_p.java \
   standard/load.java \

@@ -1,3 +1,11 @@
+2014-07-02  Per Bothner  <per@bothner.com>
+
+	* LangPrimType.java (characterType, characterOrEofType): New instances.
+	Add support for the new types, whose implementation type is int.
+	* LispLanguage.java (getTypeMap): Update "character".
+	Add binding for "character-or-eof".
+	* LangObjType.java (compare): Minor tweak.
+
 2014-06-30  Per Bothner  <per@bothner.com>
 
 	* LangObjType.java (encodeType): New method.

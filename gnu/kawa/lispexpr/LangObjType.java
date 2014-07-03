@@ -203,7 +203,7 @@ public class LangObjType extends ObjectType implements TypeValue
           return 1;
         break;
       }
-    return getImplementationType().compare(other.getImplementationType());
+    return getImplementationType().compare(other);
   }
 
   public Field getField(String name, int mask)

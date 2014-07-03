@@ -1,3 +1,7 @@
+2014-07-02  Per Bothner  <per@bothner.com>
+
+	* srfi14.scm (char-set): Update since character is now primitive.
+
 2014-05-31  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (EXTRA_DIST): Add char-tables.iscm.

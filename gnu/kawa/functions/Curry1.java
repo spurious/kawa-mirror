@@ -9,7 +9,7 @@ import gnu.mapping.*;
  */
 
 public class Curry1 extends Procedure1 {
-    public static final Curry1 makeConverter = new Curry1("make-converter", Convert.as);
+    public static final Curry1 makeConverter = new Curry1("make-converter", Convert.cast);
     Procedure proc2;
 
     public Curry1(String name, Procedure proc2) {

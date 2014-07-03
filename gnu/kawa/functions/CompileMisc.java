@@ -29,6 +29,7 @@ public class CompileMisc
   {
     Compilation comp = visitor.getCompilation();
     Language language = comp.getLanguage();
+    Convert cproc = (Convert) proc;
     Expression[] args = exp.getArgs();
     if (args.length == 2)
       {
@@ -37,7 +38,15 @@ public class CompileMisc
         if (type instanceof Type)
           {
             args[0] = new QuoteExp(type);
-            args[1] = visitor.visit(args[1], type);
+            if (! args[1].getFlag(Expression.VALIDATED))
+                args[1] = ExpVisitor.visit(visitor, args[1], type);
+            if (cproc.lenient
+                && args[1].getType().getRawType().equals(type.getRawType())) {
+                // In lenient mode we allow matching raw types without
+                // further checking.
+            }
+            else
+                args[1] = visitor.checkType(args[1], type);
             CompileReflect.checkKnownClass(type, comp);
             exp.setType(type);
             if (args[1].getType() == type)

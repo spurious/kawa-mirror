@@ -1,3 +1,12 @@
+2014-07-02  Per Bothner  <per@bothner.com>
+
+	* Convert.java (lenient): New boolean field.
+	(cast): New static instance.
+	* Curry1.java: Update accordingly.
+	* NamedPart.java: Update accordingly.
+	* CompileMisc.java (validateApplyConvert):  If lenient we allow
+	implicit conversions if the raw types match.  Used for int<->character.
+
 2014-06-17  Per Bothner  <per@bothner.com>
 
 	* CompileNamedPart.java (GetNamedExp.validateApply):

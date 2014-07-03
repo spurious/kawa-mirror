@@ -13,13 +13,15 @@
 (require <kawa.lib.std_syntax>)
 (require <kawa.lib.syntax>)
 (require <kawa.lib.lists>)
+(require <kawa.lib.characters>)
+(require <kawa.lib.compile_misc>)
 
 (define-syntax define-compare
   (syntax-rules ()
-    ((_ NAME TYPE OP COMP2)
+    ((_ NAME TYPE OP COMP2 PROPS ...)
      (define (NAME (str1 ::TYPE) (str2 ::TYPE)
                           #!rest (strs ::TYPE[]))
-       ::boolean
+       ::boolean PROPS ...
        (and (OP (COMP2 str1 str2) 0)
             (let ((n ::int strs:length))
               (let loop ((i ::int 0) (prev ::TYPE str2))
@@ -39,7 +41,7 @@
 	 (str (<gnu.lists.FString> n)))
     (do ((i :: <int> 0 (+ i 1)))
 	((>= i n) str)
-	(str:setCharAt i ((as <character> (args i)):charValue)))))
+	(str:setCharAt i ((as gnu.text.Char (args i)):charValue))))) ;; FIXME
 
 (define (string-length str ::string) :: <int>
   (invoke str 'length))
@@ -152,20 +154,31 @@
 (define-compare string-ci>=? string >= %string-compare-ci2)
 
 (define (%char-compare (c1 :: character) (c2 :: character)) ::int
-  (- (invoke c1 'intValue) (invoke c2 'intValue)))
+  (let ((i1 (char->integer c1)) (i2 (char->integer c2)))
+    (cond ((> i1 i2) 1) ((< i1 i2) -1) (else 0))))
 
-(define-compare char=? character = %char-compare)
-(define-compare char<? character < %char-compare)
-(define-compare char>? character > %char-compare)
-(define-compare char<=? character <= %char-compare)
-(define-compare char>=? character >= %char-compare)
+(define-compare char=? character = %char-compare
+  validate-apply: "kawa.lib.compile_misc:charCompareValidateApply")
+(define-compare char<? character < %char-compare
+  validate-apply: "kawa.lib.compile_misc:charCompareValidateApply")
+(define-compare char>? character > %char-compare
+  validate-apply: "kawa.lib.compile_misc:charCompareValidateApply")
+(define-compare char<=? character <= %char-compare
+  validate-apply: "kawa.lib.compile_misc:charCompareValidateApply")
+(define-compare char>=? character >= %char-compare
+  validate-apply: "kawa.lib.compile_misc:charCompareValidateApply")
 
 (define (%char-compare-ci (c1 :: character) (c2 :: character)) ::int
-  (- (java.lang.Character:toUpperCase (c1:intValue))
-     (java.lang.Character:toUpperCase (c2:intValue))))
+  (- (java.lang.Character:toUpperCase (char->integer c1))
+     (java.lang.Character:toUpperCase (char->integer c2))))
 
-(define-compare char-ci=? character = %char-compare-ci)
-(define-compare char-ci<? character < %char-compare-ci)
-(define-compare char-ci>? character > %char-compare-ci)
-(define-compare char-ci<=? character <= %char-compare-ci)
-(define-compare char-ci>=? character >= %char-compare-ci)
+(define-compare char-ci=? character = %char-compare-ci
+  validate-apply: "kawa.lib.compile_misc:charCompareValidateApply")
+(define-compare char-ci<? character < %char-compare-ci
+  validate-apply: "kawa.lib.compile_misc:charCompareValidateApply")
+(define-compare char-ci>? character > %char-compare-ci
+  validate-apply: "kawa.lib.compile_misc:charCompareValidateApply")
+(define-compare char-ci<=? character <= %char-compare-ci
+  validate-apply: "kawa.lib.compile_misc:charCompareValidateApply")
+(define-compare char-ci>=? character >= %char-compare-ci
+  validate-apply: "kawa.lib.compile_misc:charCompareValidateApply")

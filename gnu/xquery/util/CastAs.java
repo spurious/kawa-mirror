@@ -16,6 +16,7 @@ public class CastAs extends Convert
 
   public CastAs ()
   {
+    super("cast-as", false);
     setProperty(Procedure.validateApplyKey,
                    "gnu.xquery.util.CompileMisc:validateApplyCastAs");
   }

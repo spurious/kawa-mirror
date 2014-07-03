@@ -95,7 +95,7 @@
                                           'set
                                           (gnu.kawa.io.Path:valueOf new-value))))))
 	 
-(define (write-char ch #!optional
+(define (write-char (ch ::character) #!optional
 		    (port :: <output-port>
 			  (invoke-static  <output-port> 'outDefault)))
   :: <void>
@@ -177,13 +177,33 @@
    port))
 
 (define (eof-object? obj)
-  (eq? obj #!eof))
+  validate-apply: "kawa.lib.compile_misc:isEofValidateApply"
+  (eq? (gnu.mapping.Promise:force obj) #!eof))
 
 (define (eof-object)
   #!eof)
 
 (define (char-ready? #!optional (port (current-input-port)))
   (invoke-static <kawa.standard.char_ready_p> 'ready port))
+
+(define (read-char #!optional (port (current-input-port)))
+  ::character-or-eof
+  (if (java.io.InputStream? port)
+      (as character-or-eof
+          (invoke (->java.io.InputStream port) 'read))
+      (as character-or-eof
+          (invoke (->gnu.kawa.io.InPort port) 'readCodePoint))))
+
+(define (peek-char #!optional (port (current-input-port)))
+  ::character-or-eof
+  (if (java.io.InputStream? port)
+      (let ((is ::java.io.InputStream port))
+        (is:mark 1)
+        (let ((ch (is:read)))
+          (is:reset)
+          (as character-or-eof ch)))
+      (as character-or-eof
+          (invoke (->gnu.kawa.io.InPort port) 'peekCodePoint))))
 
 (define (read-string (k ::int)
                      #!optional (port ::input-port (current-input-port)))
@@ -207,7 +227,11 @@
 (define (peek-u8 #!optional (port (current-input-port)))
   (let ((b ::int (if (gnu.kawa.io.BinaryInPort? port)
                      ((as gnu.kawa.io.BinaryInPort port):peekByte)
-                     (kawa.standard.readchar:readByte port #t))))
+                     (let ((ins ::java.io.InputStream port))
+                       (ins:mark 1)
+                       (let ((b ::int (ins:read)))
+                         (ins:reset)
+                         b)))))
     (if (< b 0) #!eof b)))
 
 (define (u8-ready? #!optional (port (current-input-port)))
@@ -375,4 +399,3 @@
 
 (define (transcript-off)
   (invoke-static <output-port> 'closeLogFile))
-

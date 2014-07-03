@@ -205,6 +205,8 @@ public abstract class LispLanguage extends Language
             types.put("void", LangPrimType.voidType);
             types.put("int", LangPrimType.intType);
             types.put("char", LangPrimType.charType);
+            types.put("character", LangPrimType.characterType);
+            types.put("character-or-eof", LangPrimType.characterOrEofType);
 
             types.put("byte", LangPrimType.byteType);
             types.put("short", LangPrimType.shortType);
@@ -232,7 +234,6 @@ public abstract class LispLanguage extends Language
                       ClassType.make("gnu.lists.PairWithPosition"));
             types.put("constant-string", ClassType.make("java.lang.String"));
             types.put("abstract-string", ClassType.make("gnu.lists.CharSeq"));
-            types.put("character", ClassType.make("gnu.text.Char"));
             types.put("vector", LangObjType.vectorType);
             types.put("string", LangObjType.stringType);
             types.put("empty-list", ClassType.make("gnu.lists.EmptyList"));

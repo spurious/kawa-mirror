@@ -3,6 +3,8 @@ import gnu.bytecode.*;
 import gnu.math.IntNum;
 import gnu.math.DFloNum;
 import gnu.expr.*;
+import gnu.kawa.reflect.LazyType;
+import gnu.lists.Sequence;
 import gnu.text.Char;
 import gnu.kawa.reflect.InstanceOf;
 import gnu.mapping.Procedure;
@@ -27,6 +29,15 @@ public class LangPrimType extends PrimType implements TypeValue {
         = new LangPrimType(Type.charType);
     public static final LangPrimType voidType
         = new LangPrimType(Type.voidType);
+
+    static final ClassType scmCharType = ClassType.make("gnu.text.Char");
+
+    public static final LangPrimType characterType
+       = new LangPrimType(Type.intType);
+    static { characterType.setName("character"); }
+    public static final LangPrimType characterOrEofType
+       = new LangPrimType(Type.intType);
+    static { characterOrEofType.setName("character-or-eof"); }
 
     public LangPrimType(PrimType type) {
         super(type);
@@ -54,11 +65,30 @@ public class LangPrimType extends PrimType implements TypeValue {
         return implementationType;
     }
 
+    @Override
+    public ClassType boxedType() {
+        if (this == characterType)
+            return scmCharType;
+        if (this == characterOrEofType)
+            return Type.objectType;
+        return super.boxedType();
+    }
+
     public Object coerceFromObject(Object obj) {
         if (obj.getClass() == reflectClass)
             return obj;
         char sig1 = getSignature().charAt(0);
         switch (sig1) {
+        case 'I':
+            if (this == characterType || this == characterOrEofType) {
+                if (obj instanceof Character) {
+                    return Char.make(((Character) obj).charValue());
+                }
+                if (obj instanceof Char
+                    || (obj == Sequence.eofValue && this == characterOrEofType))
+                    return obj;
+            }
+            break;
         case 'Z':
             return language.isTrue(obj) ? Boolean.TRUE : Boolean.FALSE;
         case 'C':
@@ -78,40 +108,65 @@ public class LangPrimType extends PrimType implements TypeValue {
     public void emitIsInstance(CodeAttr code) {
         char sig1 = getSignature().charAt(0);
         switch (sig1) {
+        case 'I':
+            String mname = this == characterType ? "isChar"
+                : this == characterOrEofType ? "isCharOrEof" : null;
+            if (mname != null) {
+                code.emitInvokeStatic(scmCharType.getDeclaredMethod(mname,1));
+                return;
+            }
+            break;
         case 'Z':
             code.emitPop(1);
             code.emitPushInt(1);
-            break;
+            return;
         case 'C':
             ClassType scmCharType = ClassType.make("gnu.text.Char");
             code.emitInvokeStatic(scmCharType.getDeclaredMethod("isChar",1));
-            break;
-        default:
-            super.emitIsInstance(code);
+            return;
         }
+        super.emitIsInstance(code);
     }
 
     public void emitCoerceFromObject(CodeAttr code) {
         char sig1 = getSignature().charAt(0);
         switch (sig1) {
+        case 'I':
+            String mname = this == characterType ? "castToCharacter"
+                : this == characterOrEofType ? "castToCharacterOrEof" : null;
+            if (mname != null) {
+                code.emitInvokeStatic(scmCharType.getDeclaredMethod(mname,1));
+                return;
+            }
+            break;
         case 'Z':
             Compilation.getCurrent().emitCoerceToBoolean();
-            break;
+            return;
         case 'C':
-            // We handle char specially, because Kawa does not use standard
-            // java.lang.Character type.
-            ClassType scmCharType = ClassType.make("gnu.text.Char");
             Method charValueMethod = scmCharType.getDeclaredMethod("castToChar",1);
             code.emitInvokeStatic(charValueMethod);
-            break;
-        default:
-            super.emitCoerceFromObject(code);
+            return;
         }
+        super.emitCoerceFromObject(code);
     }
 
     public Object coerceToObject(Object obj) {
         char sig1 = getSignature().charAt(0);
         switch (sig1) {
+        case 'I':
+            if (this == characterType || this == characterOrEofType) {
+                if (obj instanceof Integer) {
+                    int ival = ((Integer) obj).intValue();
+                    if (ival >= 0)
+                        return Char.make(ival);
+                    if (ival == -1 && this == characterOrEofType)
+                        return Sequence.eofValue;
+                }
+                if (obj instanceof Char
+                    && (obj == Sequence.eofValue && this == characterOrEofType))
+                    return obj;
+            }
+            break;
         case 'Z':
             return language.booleanObject(((Boolean) obj).booleanValue());
         case 'C':
@@ -125,11 +180,31 @@ public class LangPrimType extends PrimType implements TypeValue {
         return super.coerceToObject(obj);
     }
 
+    @Override
+    public Object convertToRaw(Object obj) {
+        if (this == characterType || this == characterOrEofType) {
+            if (obj instanceof Char)
+                return Integer.valueOf(((Char) obj).intValue());
+            if (obj == Sequence.eofValue && this == characterOrEofType)
+                return Integer.valueOf(-1);
+        }
+        return obj;
+    }
+
     public void emitCoerceToObject(CodeAttr code) {
         char sig1 = getSignature().charAt(0);
         Type argType = null;
         String cname = null;
         switch (sig1) {
+        case 'I':
+            String mname = this == characterType ? "make"
+                : this == characterOrEofType ? "makeOrEof" : null;
+            if (mname != null) {
+                Method makeCharMethod = scmCharType.getDeclaredMethod(mname, 1);
+                code.emitInvokeStatic(makeCharMethod);
+            } else
+                super.emitCoerceToObject(code);
+            break;
         case 'Z':
             Compilation comp = Compilation.getCurrent();
             code.emitIfIntNotZero();
@@ -155,11 +230,34 @@ public class LangPrimType extends PrimType implements TypeValue {
 
     @Override
     public int compare(Type other) {
+        if (other instanceof LazyType)
+            other = ((LazyType) other).getValueType();
         char sig1 = getSignature().charAt(0);
+        char sig2 = other.getSignature().charAt(0);
         if (sig1 == 'Z')
             return implementationType.compare(other);
+        if (this == other)
+            return 0;
+        if (this == charType) {
+            if (other == characterType || other == characterOrEofType
+                || other == scmCharType)
+                return -1;
+            return getImplementationType().compare(other);
+        }
+        if (this == characterType) {
+            if (other == characterOrEofType)
+                return -1;
+            if (other == charType || sig2 == 'C')
+                return 1;
+            return scmCharType.compare(other);
+        }
+        if (this == characterOrEofType) {
+            if (other == characterType
+                || other == charType || other == scmCharType || sig2 == 'C')
+                return 1;
+            return other == Type.objectType ? -1 : -3;
+        }
         if (other instanceof PrimType) {
-            char sig2 = other.getSignature().charAt(0);
             if (sig1 == sig2)
                 return 0;
             if (sig1 == 'V')
@@ -169,8 +267,6 @@ public class LangPrimType extends PrimType implements TypeValue {
         }
         if (sig1 == 'V')
             return 1;
-        if (sig1 == 'C' && other.getName().equals("gnu.text.Char"))
-            return -1;
         if (other instanceof LangObjType)
             return swappedCompareResult(other.compare(this));
         return super.compare(other);
@@ -210,6 +306,8 @@ public class LangPrimType extends PrimType implements TypeValue {
     }
 
     public String encodeType(Language language) {
+        if (this == characterType) return "character";
+        if (this == characterOrEofType) return "character-or-eof";
         return null;
     }
 }

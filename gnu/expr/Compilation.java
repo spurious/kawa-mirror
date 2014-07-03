@@ -12,8 +12,10 @@ import java.util.Stack;
 import gnu.kawa.functions.Convert;
 import gnu.kawa.io.OutPort;
 import gnu.kawa.io.Path;
+import gnu.kawa.lispexpr.LangPrimType;
 import gnu.kawa.reflect.LazyType;
 import gnu.lists.Pair;
+import gnu.text.Char;
 import gnu.text.Lexer;
 import gnu.text.Options;
 import gnu.text.SourceLocator;
@@ -631,6 +633,28 @@ public class Compilation implements SourceLocator
 			return;
 		      }
 		  }
+                // FIXME we should move this into a new method
+                // PrimType#pushValue(Object value), with LangPrimType override.
+                if (type == LangPrimType.characterType
+                    || type == LangPrimType.characterOrEofType)
+                  {
+                    if (value instanceof Char)
+                      {
+                        code.emitPushInt(((Char) value).intValue());
+                        return;
+                      }
+                    if (value instanceof Character)
+                      {
+                        code.emitPushInt(((Character) value).charValue());
+                        return;
+                      }
+                    if (value == gnu.lists.Sequence.eofValue
+                        && type == LangPrimType.characterOrEofType)
+                      {
+                        code.emitPushInt(-1);
+                        return;
+                     }
+                  }
 		if (sig1 == 'C')
 		  {
 		    code.emitPushInt((int) ((PrimType) type).charValue(value));
@@ -2522,12 +2546,12 @@ public class Compilation implements SourceLocator
       module.setFile(filename);
     if (generatingApplet() || generatingServlet())
       module.setFlag(ModuleExp.SUPERTYPE_SPECIFIED);
+    mainLambda = module;
     if (immediate)
       {
         module.setFlag(ModuleExp.IMMEDIATE);
         new ModuleInfo().setCompilation(this);
       }
-    mainLambda = module;
     push(module);
     return module;
   }

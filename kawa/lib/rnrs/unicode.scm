@@ -7,43 +7,45 @@
 	       string-normalize-nfd string-normalize-nfkd
 	       string-normalize-nfc string-normalize-nfkc)
 (require <kawa.lib.characters>)
+(require <kawa.lib.compile_misc>)
 
 (define (char-upcase (ch :: character)) :: character
-  (character:make (java.lang.Character:toUpperCase (ch:intValue))))
+  (integer->char (java.lang.Character:toUpperCase (char->integer ch))))
 
 (define (char-downcase (ch :: character)) :: character
-  (character:make (java.lang.Character:toLowerCase (ch:intValue))))
+  (integer->char (java.lang.Character:toLowerCase (char->integer ch))))
 
 (define (char-titlecase (ch :: character)) :: character
-  (character:make (java.lang.Character:toTitleCase (ch:intValue))))
+  (integer->char (java.lang.Character:toTitleCase (char->integer ch))))
 
 (define (char-alphabetic? (ch :: character)) :: boolean
-  (java.lang.Character:isLetter (ch:intValue)))
+  (java.lang.Character:isLetter (char->integer ch)))
 
 (define (char-numeric? (ch :: character)) :: boolean
-  (java.lang.Character:isDigit (ch:intValue)))
+  (java.lang.Character:isDigit (char->integer ch)))
 
 (define (char-whitespace? (ch :: character)) :: boolean
-  (gnu.kawa.functions.UnicodeUtils:isWhitespace (ch:intValue)))
+  (gnu.kawa.functions.UnicodeUtils:isWhitespace (char->integer ch)))
 
 (define (char-upper-case? (ch :: character)) :: boolean
-  (java.lang.Character:isUpperCase (ch:intValue)))
+  (java.lang.Character:isUpperCase (char->integer ch)))
 
 (define (char-lower-case? (ch :: character)) :: boolean
-  (java.lang.Character:isLowerCase (ch:intValue)))
+  (java.lang.Character:isLowerCase (char->integer ch)))
 
 (define (char-title-case? (ch :: character)) :: boolean
-  (java.lang.Character:isTitleCase (ch:intValue)))
+  (java.lang.Character:isTitleCase (char->integer ch)))
 
 (define (char-foldcase (ch :: character)) :: character
-  (let ((val (ch:intValue)))
+  (let ((val (char->integer ch)))
     (if (or (= val #x130) (= val #x131))
-	ch
-	(character:make (java.lang.Character:toLowerCase
-		    (java.lang.Character:toUpperCase val))))))
+        ch
+        (integer->char
+         (java.lang.Character:toLowerCase
+          (java.lang.Character:toUpperCase val))))))
 
 (define (char-general-category (ch :: character)) :: symbol
-  (gnu.kawa.functions.UnicodeUtils:generalCategory (ch:intValue)))
+  (gnu.kawa.functions.UnicodeUtils:generalCategory (char->integer ch)))
 
 (define (string-upcase (str :: string)) :: string
   (gnu.lists.FString ((str:toString):toUpperCase java.util.Locale:ENGLISH)))

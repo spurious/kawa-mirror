@@ -4,6 +4,7 @@
 package gnu.expr;
 import gnu.bytecode.*;
 import gnu.kawa.reflect.OccurrenceType;
+import gnu.kawa.lispexpr.LangPrimType;
 
 /**
  * A Target which is some variable that implements gnu.lists.Consumer.
@@ -107,11 +108,18 @@ public class ConsumerTarget extends Target
     Method method = null;
     Type methodArg = null;
     boolean islong = false;
-    stackType = stackType.getImplementationType();
     char sig;
-    if (stackType instanceof PrimType)
+    // We don't want to push a character as an int (which is it's
+    // implementation type) since it isn't an integer.  So we box it.
+    if (stackType == LangPrimType.characterType
+        || stackType == LangPrimType.characterOrEofType) {
+        stackType.emitCoerceToObject(code);
+        stackType = Type.objectType;
+    }
+    Type implType = stackType.getImplementationType();
+    if (implType instanceof PrimType)
       {
-	sig = stackType.getSignature().charAt(0);
+	sig = implType.getSignature().charAt(0);
 	switch (sig)
 	  {
 	  case 'B': case 'S': case 'I':
@@ -151,7 +159,7 @@ public class ConsumerTarget extends Target
     else
       {
         sig = '\0';
-	if (consumerPushed == 1 || OccurrenceType.itemCountIsOne(stackType))
+	if (consumerPushed == 1 || OccurrenceType.itemCountIsOne(implType))
           {
             methodName = "writeObject";
             methodArg = Type.pointer_type;
@@ -172,7 +180,7 @@ public class ConsumerTarget extends Target
     else if (islong)
       {
 	code.pushScope();
-	Variable temp = code.addLocal(stackType);
+	Variable temp = code.addLocal(implType);
 	code.emitStore(temp);
 	code.emitLoad(consumer);
 	code.emitLoad(temp);
@@ -199,14 +207,16 @@ public class ConsumerTarget extends Target
   {
     Type stackType = exp.getType();
     Type implType = stackType.getImplementationType();
-    if ((implType instanceof PrimType && ! implType.isVoid())
+    if ((implType instanceof PrimType && ! implType.isVoid()
+         && stackType != LangPrimType.characterType
+         && stackType != LangPrimType.characterOrEofType)
         || gnu.kawa.reflect.OccurrenceType.itemCountIsOne(implType))
       {
         // Optimization to avoid a 'swap'.
         comp.getCode().emitLoad(this.consumer);
         Target starget = StackTarget.getInstance(stackType);
         exp.compile(comp, starget);
-        compileFromStack(comp, implType, 1);
+        compileFromStack(comp, stackType, 1);
         return true;
       }
     return false;

@@ -293,3 +293,10 @@
 
 (define (raise1 x::int y)
   (if (< x 0) (raise y) (* x 2)))
+
+(define (read1 p::input-port) ::int
+  (let ((ch (read-char p)))
+    (cond ((eof-object? ch) 1)
+          ((char=? ch #\space) 2)
+          ((and (char-ci>=? ch #\A) (char-ci<=? ch #\Z)) 3)
+          (else 4))))

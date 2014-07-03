@@ -124,6 +124,8 @@ kawa/lib/prim_syntax.*.class
 kawa/lib/std_syntax.*.class
 kawa/lib/syntax.*.class
 kawa/lib/trace.*.class
+kawa/lib/compile_misc*.class
+kawa/lib/kawa/expressions*.class
 kawa/standard/begin.class
 kawa/standard/CompileTimeContinuation.class
 kawa/standard/constant_fold.class

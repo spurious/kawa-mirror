@@ -1,5 +1,6 @@
 package gnu.text;
 import gnu.lists.Consumer;
+import gnu.lists.Sequence;
 import gnu.kawa.util.*;
 import java.io.*;
 import java.util.Map;
@@ -44,8 +45,26 @@ public class Char implements Comparable, Externalizable {
             return ((Character) obj).charValue();
     }
 
+    public static int castToCharacter(Object obj) {
+        if (obj instanceof Char)
+            return ((Char) obj).intValue();
+        else
+            return ((Character) obj).charValue();
+    }
+
+    public static int castToCharacterOrEof(Object obj) {
+        if (obj == Sequence.eofValue)
+            return -1;
+        return castToCharacter(obj);
+    }
+
     public static boolean isChar(Object obj) {
         return obj instanceof Char || obj instanceof Character;
+    }
+
+    public static boolean isCharOrEof(Object obj) {
+        return obj instanceof Char || obj instanceof Character
+            || obj == Sequence.eofValue;
     }
 
     public static void print(int i, Appendable out) {
@@ -96,7 +115,13 @@ public class Char implements Comparable, Externalizable {
         }
     }
 
-    public boolean equals(Object obj) {
+    public static Object makeOrEof(int ch) {
+        if (ch < 0)
+            return Sequence.eofValue;
+        return make(ch);
+    }
+
+     public boolean equals(Object obj) {
         // This does not work for hashing in make!  Redo make!  FIXME
         // return this == obj;
         return obj != null && (obj instanceof Char)

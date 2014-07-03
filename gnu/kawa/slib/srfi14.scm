@@ -407,9 +407,10 @@ other character set is guaranteed not to be altered."
    "Return a character set containing the given characters."
    (if (> characters:length 0)
        (let ((chars ::character[]
-                    (array-copy characters characters:length)))
-         (Arrays:sort chars)
-         (let ((first-pt ::int ((chars 0):int-value)))
+                    (as character[]
+                        (array-copy (as int[] characters) characters:length))))
+         (Arrays:sort (as int[] chars))
+         (let ((first-pt ::int (char->integer (chars 0))))
            (let loop ((index ::int 1)
                       (pt ::int (+ 1 first-pt))
                       (inv-ls ::list `(,first-pt)))
@@ -424,8 +425,7 @@ other character set is guaranteed not to be altered."
                           ((= i len))
                         (set! (inversion-list i) (car inv-ls)))))
                    (else
-                    (let ((next-char-pt ::int
-                                        ((chars index):int-value)))
+                    (let ((next-char-pt ::int (char->integer (chars index))))
                       (cond ((< pt next-char-pt)
                              (loop (+ 1 index) (+ 1 next-char-pt)
                                    (cons next-char-pt
@@ -610,7 +610,7 @@ characters CHAR-LIST. If character set BASE-CS is provided, the
 characters from CHAR-LIST are added to it. `list->char-set!' is
 allowed, but not required, to side-effect and reuse the storage in
 BASE-CS; `list->char-set' produces a fresh character set."
-  (let ((res-cs ::char-set (apply char-set char-list)))
+  (let ((res-cs ::char-set (char-set @char-list)))
     (char-set-union! res-cs base-cs)))
 
 (define (list->char-set! (char-list ::list) (base-cs ::char-set))
@@ -620,7 +620,7 @@ characters CHAR-LIST. If character set BASE-CS is provided, the
 characters from CHAR-LIST are added to it. `list->char-set!' is
 allowed, but not required, to side-effect and reuse the storage in
 BASE-CS; `list->char-set' produces a fresh character set."
-  (apply char-set-adjoin! base-cs char-list))
+  (char-set-adjoin! base-cs @char-list))
 
 (define (string->char-set (s ::String)
                           #!optional
@@ -795,7 +795,7 @@ required, to side-effect its first parameter."
   (case chars:length
     ((0) cs)
     ((1) (*:adjoin! cs (chars 0)))
-    (else (*:union! cs (char-set chars)))))
+    (else (*:union! cs (char-set @chars)))))
 
 (define (char-set-delete! (cs ::char-set)
                           #!rest (chars ::character[]))
@@ -806,8 +806,9 @@ required, to side-effect its first parameter."
   (case chars:length
     ((0) cs)
     ((1) (*:delete! cs (chars 0)))
-    (else (let ((to-remove ::char-set (char-set chars)))
+    (else (let ((to-remove ::char-set (char-set @chars)))
             (*:intersection! cs (*:complement! to-remove))))))
+
 
 (define (char-set-complement (cs ::char-set)) ::char-set
   "Set complement for character sets."
@@ -868,7 +869,7 @@ boundary case (when n=0) is:
                                     #!rest (csets ::char-set[]))
   "`char-set-diff+intersection' returns both the difference and the
 intersection of the arguments -- it partitions its first parameter."
-  (let ((union ::char-set (apply char-set-union cs2 csets)))
+  (let ((union ::char-set (char-set-union cs2 @csets)))
     (values (char-set-intersection cs1 (char-set-complement union))
             (char-set-intersection cs1 union))))
 

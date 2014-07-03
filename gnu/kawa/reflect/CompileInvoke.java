@@ -272,8 +272,7 @@ public class CompileInvoke
                                                           mkArray.setLine(exp)}).setLine(exp), required);
                   }
               }
-            if (exp.firstSpliceArg >= 0) // FIXME
-            {
+            if (exp.firstSpliceArg >= 0) {// FIXME
                 exp.visitArgs(visitor);
                 return exp;
             }
@@ -286,11 +285,6 @@ public class CompileInvoke
             else if (builder.useBuilder(numCode, visitor))
                return builder.build();
           }
-        if (exp.firstSpliceArg >= 0) // FIXME
-        {
-            exp.visitArgs(visitor);
-            return exp;
-        }
 
         int okCount = 0, maybeCount = 0;
 	if (kind == 'N' && tailArgs > 0)
@@ -430,8 +424,12 @@ public class CompileInvoke
             PrimProcedure method = methods[index];
             boolean variable = method.takesVarArgs();
             int dst = 0;
-            if (objIndex >= 0)
+            int spdelta = -argsStartIndex;
+            if (objIndex >= 0) {
+                if (exp.firstSpliceArg == objIndex)
+                    spdelta = -objIndex;
               margs[dst++] = args[objIndex];
+            }
             for (int src = argsStartIndex; 
                  src < args.length && dst < margs.length; 
                  src++, dst++)
@@ -439,6 +437,7 @@ public class CompileInvoke
                 margs[dst] = args[src];
               }
             ApplyExp e = new ApplyExp(method, margs);
+            e.adjustSplice(exp, spdelta);
             e.setLine(exp);
             return visitor.visitApplyOnly(e, required);
           }

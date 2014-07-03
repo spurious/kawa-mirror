@@ -1,3 +1,8 @@
+2014-07-03  Per Bothner  <per@bothner.com>
+
+	* CompileInvoke.java (validateNamedInvoke): Optimize calls with
+	splices if the argument list only matches a single method.
+
 2014-06-30  Per Bothner  <per@bothner.com>
 
 	* OccurrenceType.java (encodeType): New method.

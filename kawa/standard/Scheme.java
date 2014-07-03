@@ -316,12 +316,19 @@ public class Scheme extends LispLanguage
       defProcStFld("/", "gnu.kawa.functions.DivideOp", "$Sl");
       defProcStFld("abs", "kawa.lib.numbers");
       defProcStFld("quotient", "gnu.kawa.functions.DivideOp", "quotient");
+      defProcStFld("truncate-quotient", "gnu.kawa.functions.DivideOp", "quotient");
       defProcStFld("remainder", "gnu.kawa.functions.DivideOp", "remainder");
+      defProcStFld("truncate-remainder", "gnu.kawa.functions.DivideOp", "remainder");
       defProcStFld("modulo", "gnu.kawa.functions.DivideOp", "modulo");
+      defProcStFld("floor-quotient",
+                   "gnu.kawa.functions.DivideOp", "floorQuotient");
+      defProcStFld("floor-remainder", "gnu.kawa.functions.DivideOp", "modulo");
       defProcStFld("div", "gnu.kawa.functions.DivideOp", "div");
       defProcStFld("mod", "gnu.kawa.functions.DivideOp", "mod");
       defProcStFld("div0", "gnu.kawa.functions.DivideOp", "div0");
       defProcStFld("mod0", "gnu.kawa.functions.DivideOp", "mod0");
+      defProcStFld("floor/", "kawa.lib.numbers");
+      defProcStFld("truncate/", "kawa.lib.numbers");
       defProcStFld("div-and-mod", "kawa.lib.numbers");
       defProcStFld("div0-and-mod0", "kawa.lib.numbers");
       defProcStFld("gcd", "kawa.lib.numbers");

@@ -1,3 +1,7 @@
+2014-07-03  Per Bothner  <per@bothner.com>
+
+	* r7rs-tests.scm: Enable tests for floor/ etc.
+
 2014-07-02  Per Bothner  <per@bothner.com>
 
 	* num-test.scm: Add some integer? and exact-integer? tests.

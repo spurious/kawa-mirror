@@ -1,3 +1,7 @@
+2014-07-03  Per Bothner  <per@bothner.com>
+
+	* DivideOp.java (floorQuotient): New static field.
+
 2014-07-02  Per Bothner  <per@bothner.com>
 
 	* Convert.java (lenient): New boolean field.

@@ -1,3 +1,7 @@
+2014-07-03  Per Bothner  <per@bothner.com>
+
+	* numbers.scm (floor/, truncate/): New functions (from R7RS).
+
 2014-07-02  Per Bothner  <per@bothner.com>
 
 	* numbers.scm (exact-integer?): New function.

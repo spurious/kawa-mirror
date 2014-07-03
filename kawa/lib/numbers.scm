@@ -144,6 +144,16 @@
 	(else
 	 (- x))))
 
+(define (floor/ (x :: real) (y :: real))
+  (let* ((q (floor-quotient x y))
+	 (r (- x (* q y))))
+    (values q r)))
+
+(define (truncate/ (x :: real) (y :: real))
+  (let* ((q (truncate-quotient x y))
+	 (r (- x (* q y))))
+    (values q r)))
+
 (define (div-and-mod (x :: real) (y :: real))
   (let* ((q (div x y))
 	 (r (- x (* q y))))

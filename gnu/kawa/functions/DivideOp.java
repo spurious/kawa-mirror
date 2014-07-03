@@ -18,6 +18,7 @@ public class DivideOp extends ArithOp
 
   public static final DivideOp $Sl = new DivideOp("/", DIVIDE_GENERIC);
   public static final DivideOp idiv = new DivideOp("idiv", QUOTIENT_EXACT);
+  public static final DivideOp floorQuotient = new DivideOp("floor-quotient", QUOTIENT);
   public static final DivideOp quotient = new DivideOp("quotient", QUOTIENT);
   public static final DivideOp remainder = new DivideOp("remainder", MODULO);
   public static final DivideOp modulo = new DivideOp("modulo", MODULO);
@@ -28,6 +29,7 @@ public class DivideOp extends ArithOp
   static {
     idiv.rounding_mode = Numeric.TRUNCATE;
     quotient.rounding_mode = Numeric.TRUNCATE;
+    floorQuotient.rounding_mode = Numeric.FLOOR;
     remainder.rounding_mode = Numeric.TRUNCATE;
     modulo.rounding_mode = Numeric.FLOOR;
     div.rounding_mode = Numeric.NONNEG_MOD;

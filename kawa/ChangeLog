@@ -1,3 +1,9 @@
+2014-07-03  Per Bothner  <per@bothner.com>
+
+	* standard/Scheme.java (initScheme): Define R7RS functions floor/,
+	floor-quotient, floor-remainder, truncate/, truncate-quotient,
+	and truncate-remainder.
+
 2014-07-02  Per Bothner  <per@bothner.com>
 
 	* standard/Scheme.java (initScheme): Define 'exact-integer?'.

@@ -38,6 +38,12 @@
                                       #'(test-equal exp val)
                                       #'rest1))))))))))
 
+(define-syntax test-values
+  (syntax-rules ()
+    ((_ expect expr)
+     (test (call-with-values (lambda () expect) (lambda results results))
+       (call-with-values (lambda () expr) (lambda results results))))))
+
 ;; R7RS test suite.  Covers all procedures and syntax in the small
 ;; language except `delete-file'.  Currently assumes full-unicode
 ;; support, the full numeric tower and all standard libraries
@@ -719,7 +725,6 @@
 (test 7 (abs -7))
 (test 7 (abs 7))
 
-(skip-if-kawa "floor/ etc not implemented"
 (test-values (values 2 1) (floor/ 5 2))
 (test-values (values -3 1) (floor/ -5 2))
 (test-values (values -3 -1) (floor/ 5 -2))
@@ -729,7 +734,6 @@
 (test-values (values -2 1) (truncate/ 5 -2))
 (test-values (values 2 -1) (truncate/ -5 -2))
 (test-values (values 2.0 -1.0) (truncate/ -5.0 -2))
-)
 
 (test 1 (modulo 13 4))
 (test 1 (remainder 13 4))

@@ -1,3 +1,8 @@
+2014-07-05  Per Bothner  <per@bothner.com>
+
+	* CompileArrays.java (createArray): Optimize the case when there are
+	no splices.
+
 2014-07-03  Per Bothner  <per@bothner.com>
 
 	* CompileInvoke.java (validateNamedInvoke): Optimize calls with

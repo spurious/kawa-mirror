@@ -99,7 +99,7 @@ public class CompileArrays
         return true;
     }
 
-    /* Optimized code generation of array creation with splices */
+    /** Optimized code generation of array creation with splicing support. */
     public static void createArray(Type elementType, Compilation comp,
                                    Expression[] args, int start, int end) {
         CodeAttr code = comp.getCode();
@@ -112,11 +112,16 @@ public class CompileArrays
             else
                 lastSplice = i;
         }
-        //int countSplice = end - start - countNonSplice;
         code.pushScope();
-        Variable arrSizeVar = code.addLocal(Type.intType);
         code.emitPushInt(countNonSplice);
-        code.emitStore(arrSizeVar);
+
+        Variable arrSizeVar;
+        if  (lastSplice < 0)
+            arrSizeVar = null;
+        else {
+            arrSizeVar = code.addLocal(Type.intType);
+            code.emitStore(arrSizeVar);
+        }
 
         ClassType utilType = ClassType.make("gnu.kawa.functions.MakeSplice");
         Method countMethod = utilType.getDeclaredMethod("count", 1);
@@ -126,36 +131,41 @@ public class CompileArrays
         Variable[] tmpVars = new Variable[end-start];
         Variable[] sizeVars = new Variable[end-start];
 
-        for (int i = start; i < end; i++) {
-            Expression arg = args[i];
-            Expression argIfSplice = MakeSplice.argIfSplice(arg);
-            if (argIfSplice != null || (arg.side_effects() && i < lastSplice)) {
-                if (argIfSplice != null)
-                    argIfSplice.compile(comp, Target.pushObject);
-                else
-                    arg.compile(comp, elementType);
-                Variable tmpVar =
-                    code.addLocal(argIfSplice != null ? Type.objectType
-                                  : elementType);
-                code.emitStore(tmpVar);
-                tmpVars[i-start] = tmpVar;
-                if (argIfSplice != null) {
-                    Variable sizeVar = code.addLocal(Type.intType);
-                    sizeVars[i-start] = sizeVar;
-                    // emit: int size[i] = count(tmp[i]);
-                    code.emitLoad(tmpVar);
-                    code.emitInvoke(countMethod);
-                    code.emitDup();
-                    code.emitStore(sizeVar);
-                    // emit: arrSize += size[i];
-                    code.emitLoad(arrSizeVar);
-                    code.emitAdd();
-                    code.emitStore(arrSizeVar);
+        if (lastSplice >= 0) {
+            // First pass to calculate sizes.
+            for (int i = start; i < end; i++) {
+                Expression arg = args[i];
+                Expression argIfSplice = MakeSplice.argIfSplice(arg);
+                if (argIfSplice != null
+                    || (arg.side_effects() && i < lastSplice)) {
+                    if (argIfSplice != null)
+                        argIfSplice.compile(comp, Target.pushObject);
+                    else
+                        arg.compile(comp, elementType);
+                    Variable tmpVar =
+                        code.addLocal(argIfSplice != null ? Type.objectType
+                                      : elementType);
+                    code.emitStore(tmpVar);
+                    tmpVars[i-start] = tmpVar;
+                    if (argIfSplice != null) {
+                        Variable sizeVar = code.addLocal(Type.intType);
+                        sizeVars[i-start] = sizeVar;
+                        // emit: int size[i] = count(tmp[i]);
+                        code.emitLoad(tmpVar);
+                        code.emitInvoke(countMethod);
+                        code.emitDup();
+                        code.emitStore(sizeVar);
+                        // emit: arrSize += size[i];
+                        code.emitLoad(arrSizeVar);
+                        code.emitAdd();
+                        code.emitStore(arrSizeVar);
+                    }
                 }
             }
         }
         // emit: elementType[] arr = new elementType[arrSize];
-        code.emitLoad(arrSizeVar);
+        if (lastSplice >= 0)
+            code.emitLoad(arrSizeVar);
         code.emitNewArray(elementType.getImplementationType());
         // emit: int offset = 0;
         Variable offsetVar = null;

@@ -688,11 +688,10 @@ public class Declaration
     setFlag(indirectBinding, INDIRECT_BINDING);
   }
 
-  public void maybeIndirectBinding (Compilation comp)
-  {
-      if (isLexical() && ! inExternalModule(comp))
-      setIndirectBinding(true);
-  }
+    public void maybeIndirectBinding(Compilation comp) {
+        if (isLexical() && ! inExternalModule(comp) && !getFlag(TYPE_SPECIFIED))
+            setIndirectBinding(true);
+    }
 
     public boolean inExternalModule(Compilation comp) {
         return context instanceof ModuleExp && context != comp.mainLambda;

@@ -1,3 +1,9 @@
+2014-07-06  Per Bothner  <per@bothner.com>
+
+	* Declaration.java (maybeIndirectBinding): Don't set indirect
+	if TYPE_SPECIFIED. Fixes Savannah bug #42689
+	'Bytecode verify error involving use of "location"'.
+
 2014-07-05  Per Bothner  <per@bothner.com>
 
 	* PrimProcedure.java (compileArgs): Handle splices if the method

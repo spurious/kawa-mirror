@@ -1,3 +1,9 @@
+2014-07-06  Per Bothner  <per@bothner.com>
+
+	* sva42689.scm: New test for Savannah bug #42689
+	'Bytecode verify error involving use of "location"'.
+	* Makefile.am: Update accordingly.
+
 2014-07-03  Per Bothner  <per@bothner.com>
 
 	* srfi-109-test.scm: Add some tests involving splicing.

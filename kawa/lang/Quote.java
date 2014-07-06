@@ -8,6 +8,7 @@ import gnu.bytecode.ClassType;
 import gnu.bytecode.Method;
 import gnu.kawa.lispexpr.LispLanguage;
 import gnu.kawa.functions.CompileNamedPart;
+import gnu.kawa.functions.MakeSplice;
 
 /**
  * The Syntax transformer that re-writes the "quote" "quasiquote" primitive.
@@ -358,8 +359,8 @@ public class Quote extends Syntax {
 	// For each element, the state is one of these four:
 	// 0: the expanded element is the same as the original
 	// 1: the expanded element is a constant
-	// 2: the expanded element is neither constant nor a slice
-	// 3: the element is sliced in
+	// 2: the expanded element is neither constant nor a splice
+	// 3: the element is spliced in
 	byte[] state = new byte[n];
 	byte max_state = 0;
 	for (int i = 0;  i < n; i++)
@@ -399,29 +400,17 @@ public class Quote extends Syntax {
 	else
 	  {
 	    Expression[] args = new Expression[n];
-	    for (int i = 0;  i < n;  i++)
-	      {
+            int firstSpliceArg = -1;
+	    for (int i = 0;  i < n;  i++) {
 		if (state[i] == 3)
-		  args[i] = (Expression) buffer[i];
-		else if (max_state < 3)
-		  args[i] = coerceExpression (buffer[i], tr);
-		else if (state[i] < 2)
-		  {
-		    Object[] arg1 = new Object[1];
-		    arg1[0] = buffer[i];
-		    args[i] = leaf(new ConstVector<Object>(arg1), tr);
-		  }
+                    args[i] = new ApplyExp(MakeSplice.quoteInstance,
+                                           (Expression) buffer[i]);
 		else
-		  {
-		    Expression[] arg1 = new Expression[1];
-		    arg1[0] = (Expression) buffer[i];
-		    args[i] = makeInvokeMakeVector(arg1);
-		  }
+		  args[i] = coerceExpression (buffer[i], tr);
 	      }
-	    if (max_state < 3)
-	      result = makeInvokeMakeVector(args);
-	    else
-	      result = new ApplyExp(vectorAppendMethod, args);
+            ApplyExp exp = makeInvokeMakeVector(args);
+            exp.firstSpliceArg = firstSpliceArg;
+            result = exp;
 	  }
       }
     else
@@ -497,9 +486,6 @@ public class Quote extends Syntax {
     return result;
   }
 
-  static final Method vectorAppendMethod
-  = ClassType.make("kawa.standard.vector_append")
-    .getDeclaredMethod("appendToConstVector", 1);
   static final ClassType quoteType = ClassType.make("kawa.lang.Quote");
   static final Method consXMethod = quoteType.getDeclaredMethod("consX$V", 1);
   static final Method appendMethod = quoteType.getDeclaredMethod("append$V", 1);

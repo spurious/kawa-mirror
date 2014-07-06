@@ -1,3 +1,8 @@
+2014-07-05  Per Bothner  <per@bothner.com>
+
+	* lang/Quote.java (expand): Re-do handling of quasiquoted vectors
+	with splicing - use new MakeSplice functionality.
+
 2014-07-03  Per Bothner  <per@bothner.com>
 
 	* standard/Scheme.java (initScheme): Define R7RS functions floor/,

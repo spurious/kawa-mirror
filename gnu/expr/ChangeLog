@@ -1,3 +1,14 @@
+2014-07-05  Per Bothner  <per@bothner.com>
+
+	* PrimProcedure.java (compileArgs): Handle splices if the method
+	takesVarArgs.  This optimization allows a direct method invocation.
+	* PrimProcedure.java: No longer implement Inlineable.
+	(compile): Change to allow splice when varargs.  Change return type.
+	* ApplyExp (inlineCompile): Special handling for PrimProcedure.
+
+	* PrimProcedure.java (explicitArrayAsVarArgsAllowed): New flag.
+	Used to enable compatibility kludge for varargs arrays.
+
 2014-07-02  Per Bothner  <per@bothner.com>
 
 	* Compilation.java (compileConstant): Update for 'character'

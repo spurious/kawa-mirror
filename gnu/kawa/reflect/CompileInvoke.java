@@ -309,9 +309,9 @@ public class CompileInvoke
                       {
                         PrimProcedure pproc = methods[j];
                         int pii = pi+(kind!='S'&&pproc.takesTarget()?1:0);
-                        // KLUDGE If varargs, then the last parameter is
-                        // special: If can be an array, or a single argument.
-                        if (last && pproc.takesVarArgs()
+                        // KLUDGE - see explicitArrayAsVarArgsAllowed
+                        if (PrimProcedure.explicitArrayAsVarArgsAllowed
+                            && last && pproc.takesVarArgs()
                             && pii == pproc.minArgs())
                           atype = null;
                         else

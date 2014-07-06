@@ -5,14 +5,16 @@ package gnu.expr;
 import gnu.bytecode.*;
 import gnu.mapping.*;
 import gnu.kawa.lispexpr.LangObjType;
+import gnu.kawa.reflect.CompileArrays;
 import gnu.lists.ConsumerWriter;
 import kawa.SourceMethodType;
 import java.io.Writer;
 import java.lang.reflect.Array;
+import gnu.kawa.functions.MakeSplice;
 
 /** A primitive Procedure implemented by a plain Java method. */
 
-public class PrimProcedure extends MethodProc implements Inlineable {
+public class PrimProcedure extends MethodProc {
     private Type retType;
 
     /** The types of the method parameters.
@@ -94,11 +96,26 @@ public class PrimProcedure extends MethodProc implements Inlineable {
     return method.getName().endsWith("$X");
   }
 
+    /** Support passing an explicit array to a varargs function.
+     * This is a kludge inherited from Java to support backwards
+     * compatibility after various methods were converte to take varargs.
+     * If Java5-style VARARS we allow both a variable-length argument list,
+     * or if the last argument already is an array we can use it as is.
+     * The tricky part is we sometimes have to distinguish these cases
+     * at run-time - see the logic for createVarargsArrayIfNeeded in
+     * compileArgs.
+     * FIXME This is needless and unreliable complexity.  We should by default
+     * create a varargs array - even if the actual argument is an array.
+     * People should now uses splices instead.
+     */
+    public static boolean explicitArrayAsVarArgsAllowed = true;
+
   public int isApplicable(Type[] argTypes)
   {
     int app = super.isApplicable(argTypes);
     int nargs = argTypes.length;
-    if (app == -1 && method != null
+    if (explicitArrayAsVarArgsAllowed
+        && app == -1 && method != null
         && (method.getModifiers() & Access.VARARGS) != 0
         && nargs > 0 && argTypes[nargs-1] instanceof ArrayType)
       {
@@ -482,7 +499,7 @@ public class PrimProcedure extends MethodProc implements Inlineable {
    *   pass a link to a closure environment, which was pushed by our caller.)
    *   If thisType==null, no special handling of args[0] or argTypes[0].
    */
-  private void compileArgs(Expression[] args, int startArg, Type thisType, Compilation comp)
+    private void compileArgs(ApplyExp exp, Expression[] args, int startArg, Type thisType, Compilation comp)
  {
     boolean variable = takesVarArgs();
     String name = getName();
@@ -495,14 +512,13 @@ public class PrimProcedure extends MethodProc implements Inlineable {
     int nargs = args.length - startArg;
     boolean is_static = thisType == null || skipArg != 0;
 
-    // If Java5-style VARARS we allow both a variable-length argument list,
-    // or if the last argument already is an array we can use it as is.
-    // The tricky part is we sometimes have to distinguish these cases
-    // at run-time, in which case we set createVarargsArrayIfNeeded.
-    // FIXME This is needless and unreliable complexity.  We should by default
-    // create a varargs array - even if the actual argument is an array.
+    // Do we need to check at runtime whether a final argument to a VARARGS
+    // is an array or need to be wrapped in an array?
+    // See comment at explicitArrayAsVarArgsAllowed.
     boolean createVarargsArrayIfNeeded = false;
-    if (variable && (method.getModifiers() & Access.VARARGS) != 0
+    if (explicitArrayAsVarArgsAllowed
+        && variable && (method.getModifiers() & Access.VARARGS) != 0
+        && exp.firstSpliceArg < 0
         && nargs > 0 && argTypes.length > 0
         && nargs == arg_count + (is_static ? 0 : 1))
       {
@@ -530,9 +546,32 @@ public class PrimProcedure extends MethodProc implements Inlineable {
 		gnu.kawa.functions.MakeList.compile(args, startArg+i, comp);
 		break;
 	      }
-            code.emitPushInt(args.length - startArg - fix_arg_count);
+            if (startArg+i+1== args.length
+                && exp.firstSpliceArg==startArg+i) {
+                // See if final argument is a splice of an array we can re-use.
+                Expression spliceArg = MakeSplice.argIfSplice(args[startArg+i]);
+                Type spliceType = spliceArg.getType();
+                if (spliceType instanceof ArrayType) {
+                    Type spliceElType = ((ArrayType) spliceType).getComponentType();
+                    Type argElType = ((ArrayType) arg_type).getComponentType();
+                    if (spliceElType == argElType
+                        || (argElType == Type.objectType
+                            && spliceElType instanceof ObjectType)
+                        || (argElType instanceof ClassType
+                            && spliceElType instanceof ClassType
+                            && spliceElType.isSubtype(argElType))) {
+                        spliceArg.compileWithPosition(comp, Target.pushObject);
+                        i = nargs;
+                        break;
+                    }
+                }
+            }
+                
             arg_type = ((ArrayType) arg_type).getComponentType();
-            code.emitNewArray(arg_type);
+            CompileArrays.createArray(arg_type, comp,
+                                      args, startArg+i, args.length);
+            i = nargs;
+            break;
           }
         if (i >= nargs)
           break;
@@ -553,7 +592,7 @@ public class PrimProcedure extends MethodProc implements Inlineable {
 	  source == null ? CheckedTarget.getInstance(argTypeForTarget, name, i+1)
 	  : CheckedTarget.getInstance(argTypeForTarget, source, i);
 	args[startArg+i].compileNotePosition(comp, target, args[startArg+i]);
-        if (createVarargsNow)
+        if (createVarargsNow) // Only if explicitArrayAsVarArgsAllowed
           {
             // Wrap final argument in array if not already an array:
             // Emit: (arg instanceof T[] ? (T[]) arg : new T[]{arg})
@@ -580,8 +619,15 @@ public class PrimProcedure extends MethodProc implements Inlineable {
       }
   }
 
-  public void compile (ApplyExp exp, Compilation comp, Target target)
-  {
+    public boolean compile(ApplyExp exp, Compilation comp, Target target) {
+        if (exp.firstKeywordArgIndex != 0)
+            return false;
+        // We can optimize splice arguments if they're in the "varargs"
+        // section of the argument list.
+        if (exp.firstSpliceArg >= 0
+            && (! takesVarArgs() || minArgs() > exp.firstSpliceArg))
+            return false;
+
     gnu.bytecode.CodeAttr code = comp.getCode();
     ClassType mclass = getDeclaringClass();
     Expression[] args = exp.getArgs();
@@ -624,7 +670,7 @@ public class PrimProcedure extends MethodProc implements Inlineable {
             comp.letEnter();
             LetExp let = comp.letDone(new ApplyExp(exp.func, xargs));
             let.compile(comp, target);
-            return;
+            return true;
           }
         code.emitNew(mclass);
         code.emitDup(mclass);
@@ -634,6 +680,7 @@ public class PrimProcedure extends MethodProc implements Inlineable {
       comp.error('e', arg_error);
 
     compile(getStaticFlag() ? null : mclass, exp, comp, target);
+    return true;
   }
 
   void compile (Type thisType, ApplyExp exp, Compilation comp, Target target)
@@ -668,7 +715,7 @@ public class PrimProcedure extends MethodProc implements Inlineable {
       }
     else if (takesTarget() && method.getStaticFlag())
       startArg = 1;
-    compileArgs(args, startArg, thisType, comp);
+    compileArgs(exp, args, startArg, thisType, comp);
 
     if (method == null)
       {

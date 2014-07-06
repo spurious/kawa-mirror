@@ -8,10 +8,18 @@ import java.lang.reflect.Array;
 public class ArrayMake extends ProcedureN {
     Type elementType;
 
+    public static final ArrayMake makeObjectArray =
+        new ArrayMake(Type.objectType);
+
     public ArrayMake(Type elementType) {
         this.elementType = elementType;
         setProperty(Procedure.compilerXKey,
                     "gnu.kawa.reflect.CompileArrays:compileMake");
+    }
+
+    public static ArrayMake getInstance(Type elementType) {
+        return elementType==Type.objectType ? makeObjectArray
+            : new ArrayMake(elementType);
     }
 
     public Object applyN(Object[] args) {

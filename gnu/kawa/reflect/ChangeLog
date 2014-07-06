@@ -1,5 +1,9 @@
 2014-07-05  Per Bothner  <per@bothner.com>
 
+	* ArrayMake.java (makeObjectArray): New constant.
+	(getInstance): New factory method.
+	* CompileInvoke.java (validateApplyInvoke): Use getInstance.
+
 	* CompileArrays.java (createArray): Optimize the case when there are
 	no splices.
 

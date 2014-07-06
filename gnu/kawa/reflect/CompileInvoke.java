@@ -153,7 +153,8 @@ public class CompileInvoke
         if (useArrayMake) {
             Expression[] xargs = new Expression[args.length-1];
             System.arraycopy(args, 1, xargs, 0, xargs.length);
-            ApplyExp xexp = new ApplyExp(new ArrayMake(elementType), xargs);
+            ApplyExp xexp 
+                = new ApplyExp(ArrayMake.getInstance(elementType), xargs);
             xexp.adjustSplice(exp, -1);
             xexp.setType(atype);
             return xexp;

@@ -788,7 +788,7 @@ public class ApplyExp extends Expression
     // private static final Class[] compilerMethodType =
     //     new Class[] { gnu.expr.ApplyExp.class,
     //                   gnu.expr.Compilation.class,
-    //                   gnu.expr.Target.class, };
+    //                   gnu.expr.Target.class,
     //                   gnu.mapping.Procedure.class };
     /* #endif */
 }

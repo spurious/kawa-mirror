@@ -1,3 +1,7 @@
+2014-07-07  Matthieu Vachon <matthieu.o.vachon@gmail.com>
+
+	* ApplyExp.java (compilerMethodType): Fix typo in non-invoke case.
+
 2014-07-06  Per Bothner  <per@bothner.com>
 
 	* LambdaExp.java (getMethod): Add separate count of splices.

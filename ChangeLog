@@ -1,3 +1,7 @@
+2014-07-07  Matthieu Vachon <matthieu.o.vachon@gmail.com>
+
+	* build.xml: Add some missing Scheme files.
+
 2014-07-02  Per Bothner  <per@bothner.com>
 
 	* classes-to-skip-for-runtime: Remove some new classes.

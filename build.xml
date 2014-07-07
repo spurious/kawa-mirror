@@ -522,6 +522,8 @@
         <file name="reflection.scm"/>
         <file name="syntax.scm"/>
         <file name="lists.scm"/>
+        <file name="ExceptionClasses.scm"/>
+        <file name="exceptions.scm"/>
         <file name="thread.scm"/>
         <file name="characters.scm"/>
         <file name="keywords.scm"/>
@@ -539,6 +541,7 @@
         <file name="system.scm"/>
         <file name="ExceptionClasses.scm"/>
         <file name="exceptions.scm"/>
+        <file name="kawa/expressions.scm"/>
         <file name="kawa/hashtable.scm"/>
         <file name="kawa/regex.scm"/>
         <file name="rnrs/hashtables.scm"/>
@@ -548,6 +551,7 @@
         <file name="rnrs/sorting.scm"/>
         <file name="rnrs/programs.scm"/>
         <file name="trace.scm"/>
+        <file name="compile_misc.scm"/>
       </filelist>
       <fileset dir="${src.dir}/kawa/lib">
         <include name="windows.scm" if="${with-swing}"/>

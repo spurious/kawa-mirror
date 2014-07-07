@@ -12,19 +12,19 @@ public class WrongArguments extends IllegalArgumentException {
 
   /** Returns an error message if the number of arguments in a call is invalid.
     * @param proc the Procedure being called
-    * @param argCount the number of arguments in the call
+    * @param argCount the number of non-splice arguments in the call
     * @return null, if the number of arguments is ok;
     *     otherwise a suitable error message
     */
-  public static String checkArgCount (Procedure proc, int argCount)
-  {
+  public static String checkArgCount(Procedure proc, int argCount,
+                                        boolean hasSplices) {
     int num = proc.numArgs();
     int min = num & 0xfff;
     int max = num >> 12;
     String pname = proc.getName();
     if (pname == null)
       pname = proc.getClass().getName();
-    return checkArgCount(pname, min, max, argCount);
+    return checkArgCount(pname, hasSplices?0:min, max, argCount);
   }
 
   public static String checkArgCount (String pname, int min, int max, int argCount)
@@ -72,7 +72,7 @@ public class WrongArguments extends IllegalArgumentException {
   {
     if (proc != null)
       {
-	String msg = checkArgCount(proc, number);
+	String msg = checkArgCount(proc, number, false);
 	if (msg != null)
 	  return msg;
       }

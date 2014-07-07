@@ -675,7 +675,10 @@ public class PrimProcedure extends MethodProc {
         code.emitNew(mclass);
         code.emitDup(mclass);
       }
-    String arg_error = WrongArguments.checkArgCount(this, args.length);
+    int spliceCount = exp.spliceCount();
+    String arg_error = WrongArguments.checkArgCount(this,
+                                                    args.length-spliceCount,
+                                                    spliceCount>0);
     if (arg_error != null)
       comp.error('e', arg_error);
 

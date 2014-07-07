@@ -276,6 +276,9 @@ public class ApplyExp extends Expression
       // No keyword or optional arguments.
       && func_lambda.opt_args == 0 && func_lambda.keywords == null;
 
+    int spliceCount = exp.spliceCount();
+    int nonSpliceCount = args_length - spliceCount;
+        
     if (func_lambda != null)
       {
 	if ((func_lambda.max_args >= 0 && args_length > func_lambda.max_args)
@@ -294,7 +297,7 @@ public class ApplyExp extends Expression
 	    && (conv <= Compilation.CALL_WITH_CONSUMER
 		|| (conv == Compilation.CALL_WITH_TAILCALLS
 		    && ! exp.isTailCall()))
-	    && (method = func_lambda.getMethod(args_length)) != null)
+	    && (method = func_lambda.getMethod(nonSpliceCount, spliceCount)) != null)
 	  {
 	    PrimProcedure pproc = new PrimProcedure(method, func_lambda);
 	    boolean is_static = method.getStaticFlag();
@@ -377,7 +380,7 @@ public class ApplyExp extends Expression
       }
     */
     if (func_lambda != null && func_lambda.getInlineOnly() && !tail_recurse
-	&& func_lambda.min_args == args_length)
+	&& func_lambda.min_args == nonSpliceCount)
       {
         pushArgs(func_lambda, exp.args, exp.args.length, null, comp);
         if (func_lambda.getFlag(LambdaExp.METHODS_COMPILED))

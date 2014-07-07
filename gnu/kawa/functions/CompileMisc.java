@@ -18,7 +18,7 @@ public class CompileMisc
     int nargs = exp.getArgCount();
     if (nargs != 0 && visitor != null)
       {
-	String message = WrongArguments.checkArgCount(proc, nargs);
+        String message = WrongArguments.checkArgCount(proc, nargs, false);
 	return visitor.noteError(message);
       }
     return ((ConstantFunction0) proc).constant;

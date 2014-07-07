@@ -27,3 +27,11 @@
 (define xoarr (object[] "<x: %s y: %s>" @oarr))
 (display (java.lang.String:format @xoarr)) (newline)
 ;; Output: <x: 5 y: 4>
+
+(define-private (fooz x y z)
+  (list z y x))
+(define (bar x)
+  (let ((v [4 x]))
+    (vector (fooz @v 6) 123)))
+(format #t "~w~%" (bar 10))
+;; Output: #((6 10 4) 123)

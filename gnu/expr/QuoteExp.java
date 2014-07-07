@@ -156,7 +156,9 @@ public class QuoteExp extends Expression
 				 + " which is a "+fval.getClass().getName()));
     Procedure proc = (Procedure) fval;
     int nargs = exp.getArgCount();
-    String msg = WrongArguments.checkArgCount(proc, nargs);
+    int spliceCount = exp.spliceCount();
+    String msg = WrongArguments.checkArgCount(proc, nargs-spliceCount,
+                                              spliceCount>0);
     if (msg != null)
       return visitor.noteError(msg);
     Expression inlined = visitor.maybeInline(exp, required, proc);

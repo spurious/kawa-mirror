@@ -1,5 +1,7 @@
 2014-07-06  Per Bothner  <per@bothner.com>
 
+	* splice1.scm: Add test for calling local function with splice.
+
 	* sva42689.scm: New test for Savannah bug #42689
 	'Bytecode verify error involving use of "location"'.
 	* Makefile.am: Update accordingly.

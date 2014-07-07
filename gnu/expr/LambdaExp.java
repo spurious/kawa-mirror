@@ -373,13 +373,15 @@ public class LambdaExp extends ScopeExp {
     Method[] primBodyMethods;
 
     /** Select the method used given an argument count. */
-    public final Method getMethod(int argCount) {
-        if (primMethods == null || (max_args >= 0 && argCount > max_args))
+    public final Method getMethod(int nonSpliceCount, int spliceCount) {
+        if (primMethods == null || (max_args >= 0 && nonSpliceCount > max_args))
             return null;
-        int index = argCount - min_args;
+        int index = nonSpliceCount - min_args;
         if (index < 0)
             return null; // Too few arguments.
         int length = primMethods.length;
+        if (spliceCount > 0)
+            return length == 1 ? primMethods[0] : null;
         return primMethods[index < length ? index : length - 1];
     }
 
@@ -1694,6 +1696,17 @@ public class LambdaExp extends ScopeExp {
     public Expression validateApply(ApplyExp exp, InlineCalls visitor,
                                     Type required, Declaration decl) {
         Expression[] args = exp.getArgs();
+        if (exp.firstSpliceArg >= 0) {
+            // We might be unable to inline this function. If we need to
+            // call it using apply, it needs to be readable.
+            // FIXME better to use pattern-matching:
+            // Given: (define (fun a b c d) ...)
+            // Translate: (fun x @y z) to:
+            // (let (([t1 t2 t3 t4] [x @y z])) (fun t1 t2 t3 t4])
+            setCanRead(true);
+            if (nameDecl != null)
+                nameDecl.setCanRead(true);
+        }
         if ((flags & ATTEMPT_INLINE) != 0) {
             Expression inlined = InlineCalls.inlineCall(this, args, true);
             if (inlined != null)
@@ -1701,8 +1714,12 @@ public class LambdaExp extends ScopeExp {
         }
         exp.visitArgs(visitor);
         int args_length = exp.args.length;
+        int spliceCount = exp.spliceCount();
+        int nonSpliceCount = args_length - spliceCount;
         String msg = WrongArguments.checkArgCount(getName(),
-                                                  min_args, max_args, args_length);
+                                                  spliceCount > 0 ? 0 : min_args,
+                                                  max_args,
+                                                  nonSpliceCount);
         if (msg != null)
             return visitor.noteError(msg);
         int conv = getCallConvention();
@@ -1712,7 +1729,7 @@ public class LambdaExp extends ScopeExp {
         if (comp.inlineOk(this) && isClassMethod()
             && (conv <= Compilation.CALL_WITH_CONSUMER
                 || (conv == Compilation.CALL_WITH_TAILCALLS))
-            && (method = getMethod(args_length)) != null) {
+            && (method = getMethod(nonSpliceCount, spliceCount)) != null) {
             // This is an optimization to expand a call to a method in the
             // same ClassExp.  The result is a call to a PrimProcedure instead.
             // This isn't just an optimization, since the re-write is
@@ -1753,6 +1770,7 @@ public class LambdaExp extends ScopeExp {
                 margs[0] = new ThisExp(d);
             }
             ApplyExp nexp = new ApplyExp(mproc, margs);
+            nexp.adjustSplice(exp, isStatic ? 0 : 1);
             return nexp.setLine(exp);
         }
         return exp;

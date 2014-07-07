@@ -1,5 +1,11 @@
 2014-07-06  Per Bothner  <per@bothner.com>
 
+	* LambdaExp.java (getMethod): Add separate count of splices.
+	(validateApply): Check for splices.
+	* PrimProcedure.java: Likewise.
+	* QuoteExp.java: Likewise.
+	* ApplyExp.java: Likewise.
+
 	* Declaration.java (maybeIndirectBinding): Don't set indirect
 	if TYPE_SPECIFIED. Fixes Savannah bug #42689
 	'Bytecode verify error involving use of "location"'.

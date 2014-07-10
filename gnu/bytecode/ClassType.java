@@ -616,16 +616,8 @@ public class ClassType extends ObjectType
     return field;
   }
 
-    public final Field addField(java.lang.reflect.Field field) {
-        Field fld = addField(field.getName(),
-                             Type.make(field.getType(), field.getGenericType()),
-                             field.getModifiers());
-        fld.rfield = field;
-        return fld;
-    }
-
   /** Use reflection to add all the declared fields of this class.
-   * Does not add private or package-private fields.
+   * Does not add private fields.
    * Does not check for duplicate (already-known) fields.
    * Is not thread-safe if another thread may access this ClassType. */
   public synchronized void addFields()
@@ -646,7 +638,13 @@ public class ClassType extends ObjectType
         java.lang.reflect.Field field = fields[i];
         if ("this$0".equals(field.getName()))
           flags |= HAS_OUTER_LINK;
-        addField(field);
+        int mods = field.getModifiers();
+        if ((mods & Access.PRIVATE) == 0) {
+            Field fld = addField(field.getName(),
+                                 null, // lazy type lookup
+                                 mods);
+            fld.rfield = field;
+        }
       }
     flags |= ADD_FIELDS_DONE;
   }

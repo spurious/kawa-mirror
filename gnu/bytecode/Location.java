@@ -7,7 +7,7 @@ package gnu.bytecode;
 
 public class Location {
   protected String name;
-  protected Type type;
+  private Type type;
   int name_index; /* Index in constant table, or 0 if un-assigned */
   int signature_index; /* Index in constant table, or 0 if un-assigned */
 
@@ -34,17 +34,16 @@ public class Location {
     this.name_index = name_index;
   }
 
-  public final Type getType()
-  {
-    return type;
-  }
+    public Type getType() {
+        return type;
+    }
 
   public final void setType(Type type)
   {
     this.type = type;
   }
 
-    public final String getSignature () { return type.getRawType().getSignature (); }
+    public final String getSignature () { return getType().getRawType().getSignature (); }
 
   public void setSignature (int signature_index, ConstantPool constants)
   {

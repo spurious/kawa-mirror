@@ -161,7 +161,7 @@ public class ClassTypeWriter extends PrintWriter
 	print(" Signature: ");
 	if (field.signature_index != 0)
 	  printOptionalIndex(field.signature_index);
-	printSignature(field.type);
+	printSignature(field.getType());
 	println();
 	printAttributes(field);
       }

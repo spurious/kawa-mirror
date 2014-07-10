@@ -1445,7 +1445,7 @@ public class CodeAttr extends Attribute implements AttrContainer
 
   public final void emitGetStatic(Field field)
   {
-    pushType(field.type);
+    pushType(field.getType());
     emitFieldop (field, 178);  // getstatic
   }
 
@@ -1455,7 +1455,7 @@ public class CodeAttr extends Attribute implements AttrContainer
   public final void emitGetField(Field field)
   {
     popType();
-    pushType(field.type);
+    pushType(field.getType());
     emitFieldop(field, 180);  // getfield
   }
 
@@ -1531,8 +1531,8 @@ public class CodeAttr extends Attribute implements AttrContainer
         for (int i = used == null ? 0 : used.length;  --i >= 0; )
           {
             Variable var = used[i];
-            if (var != null && var.type == t)
-              var.type = ctype;
+            if (var != null && var.getType() == t)
+                var.setType(ctype);
           }
         for (int i = local_types == null ? 0 : local_types.length;  --i >= 0; )
           if (local_types[i] == t)

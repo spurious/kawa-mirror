@@ -1,3 +1,18 @@
+2014-07-10  Per Bothner  <per@bothner.com>
+
+	Fix for Savannah bug #42713: "MalformedParameterizedTypeException
+	thrown when compiling".  Actually 2 fixes: (1) Make the call
+	getGenericType lazy (2) don't addField if field is private.
+	* Location.java (type): Make private.
+	(getType): Make non-final.
+	* CodeAttr.java: Update accordingly.
+	* ClassTypeWriter.java: Likewise.
+	* Field.java (getType): New override.  If we have a reflect-field
+	and type is null, call getGenericType.
+	* ClassType.java (addField(java.lang.reflect.Field)): Inline.
+	(addFields): Inline here. Leave type as null for now,
+	Also skip if private.
+
 2014-06-30  Per Bothner  <per@bothner.com>
 
 	* PrimType.java (convertToRaw): New method.

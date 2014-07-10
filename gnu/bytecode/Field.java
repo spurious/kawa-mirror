@@ -67,6 +67,18 @@ public class Field extends Location
         flags = modifiers;
     }
   
+    @Override
+    public Type getType() {
+        synchronized (this) {
+            Type t = super.getType();
+            if (t == null && rfield != null) {
+                t = Type.make(rfield.getType(), rfield.getGenericType());
+                super.setType(t);
+            }
+            return t;
+        }
+    }
+
     void write(DataOutputStream dstr, ClassType classfile)
         throws java.io.IOException {
         dstr.writeShort (flags);
@@ -78,15 +90,16 @@ public class Field extends Location
   
     void assign_constants(ClassType classfile) {
         ConstantPool constants = classfile.constants;
-        String signature = type.getSignature();
-        String genericSignature = getType().getGenericSignature();
+        Type t = getType();
+        String signature = t.getSignature();
+        String genericSignature = t.getGenericSignature();
         if (genericSignature != null && ! genericSignature.equals(signature)) {
             SignatureAttr attr = new SignatureAttr(genericSignature);
             attr.addToFrontOf(this);
         }
         if (name_index == 0 && name != null)
             name_index = constants.addUtf8(name).index;
-        if (signature_index == 0 && type != null)
+        if (signature_index == 0 && t != null)
             signature_index = constants.addUtf8(signature).index;
         Attribute.assignConstants(this, classfile);
     }
@@ -142,7 +155,7 @@ public class Field extends Location
         ConstantPool cpool = ctype.constants;
         if (cpool == null)
             ctype.constants = cpool = new ConstantPool();
-        char sig1 = type.getSignature().charAt(0);
+        char sig1 = getType().getSignature().charAt(0);
         CpoolEntry entry;
         switch (sig1) {
         case 'Z':

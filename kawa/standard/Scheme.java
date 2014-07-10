@@ -1091,33 +1091,24 @@ public class Scheme extends LispLanguage
         return types;
     }
 
-  public String formatType (Type type)
-  {
-    // FIXME synchronize
-    if (type instanceof LazyType)
-      {
-        LazyType ltype = (LazyType) type;
-        return formatType(ltype.getRawType())
-          +'['+formatType(ltype.getValueType())+']';
-      }
-    if (typeToStringMap == null)
-      {
-        typeToStringMap = new HashMap<Type,String>();
-        for (java.util.Map.Entry<String,Type> e : getTypeMap().entrySet())
-          {
-            String s = e.getKey();
-            Type t = e.getValue();
-            typeToStringMap.put(t, s);
-            Type it = t.getImplementationType();
-            if (it != t)
-              typeToStringMap.put(it, s);
-          }
-      }
-    String str = typeToStringMap.get(type);
-    if (str != null)
-      return str;
-    return super.formatType(type);
-  }
+    public String formatType(Type type) {
+        // FIXME synchronize
+        if (type instanceof LazyType) {
+            LazyType ltype = (LazyType) type;
+            return formatType(ltype.getRawType())
+                +'['+formatType(ltype.getValueType())+']';
+        }
+        if (typeToStringMap == null)  {
+            typeToStringMap = new HashMap<Type,String>();
+            // Invert the map returned by getTypeMap.
+            for (java.util.Map.Entry<String,Type> e : getTypeMap().entrySet())
+                typeToStringMap.put(e.getValue(), e.getKey());
+        }
+        String str = typeToStringMap.get(type);
+        if (str != null)
+            return str;
+        return super.formatType(type);
+    }
 
  /** Convert expression to a Type.
    * Allow "TYPE" or 'TYPE or <TYPE>.

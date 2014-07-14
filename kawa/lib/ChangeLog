@@ -1,3 +1,8 @@
+2014-07-13  Per Bothner  <per@bothner.com>
+
+	* kawa/expressions.scm: New R7RS-style module-name syntax.
+	* rnrs/unicode.scm: Likewise.
+
 2014-07-03  Per Bothner  <per@bothner.com>
 
 	* syntax.scm (%string-format-enclosed-format): Handle $splice$ in

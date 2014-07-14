@@ -1,4 +1,4 @@
-(module-name <kawa.lib.rnrs.unicode>)
+(module-name (rnrs unicode))
 (module-export char-upcase char-downcase char-titlecase char-foldcase
 	       char-alphabetic? char-numeric? char-whitespace?
 	       char-upper-case? char-lower-case? char-title-case?

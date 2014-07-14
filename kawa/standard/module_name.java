@@ -32,6 +32,26 @@ public class module_name extends Syntax {
                 err = "invalid quoted symbol for 'module-name'";
             else
                 name = (String) p.getCar();
+        } else if (arg instanceof Pair) {
+            StringBuilder sbuf = new StringBuilder(Compilation.classPrefixDefault);
+            boolean first = true;
+            for (;;) {
+                Pair parg = (Pair) arg;
+                if (! first)
+                    sbuf.append('.');
+                first = false;
+                Object car = parg.getCar();
+                if (car != null)
+                    sbuf.append(Compilation.mangleNameIfNeeded(car.toString()));
+                arg = parg.getCdr();
+                if (arg == LList.Empty)
+                    break;
+                if (car == null || ! (arg instanceof Pair)) {
+                    tr.error('e', "invalid list in module name");
+                    break;
+                }
+            }
+            name = sbuf.toString();
         } else if (arg instanceof FString || arg instanceof String)
             name = arg.toString();
         else if (arg instanceof Symbol) {

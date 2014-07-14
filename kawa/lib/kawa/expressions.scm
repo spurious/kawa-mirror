@@ -1,6 +1,6 @@
 ;; Experimental API for manipulating and validating expressions.
 
-(module-name kawa.lib.kawa.expressions)
+(module-name (kawa expressions))
 (require <kawa.lib.prim_syntax>)
 (require <kawa.lib.std_syntax>)
 

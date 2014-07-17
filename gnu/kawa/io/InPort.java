@@ -829,7 +829,7 @@ public class InPort extends Reader implements Printable
         if (c >= 0xD800 && c <= 0xDBFF) {
             int next = in.read();
             if (next >= 0xDC00 && next <= 0xDFFF)
-                c = ((c - 0xD800) << 10) + (c - 0xDC00) + 0x10000;
+                c = ((c - 0xD800) << 10) + (next - 0xDC00) + 0x10000;
             else
                 c = 0xFFFD; // Unicode replacement character.
         }

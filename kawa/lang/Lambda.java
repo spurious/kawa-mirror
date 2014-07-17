@@ -554,7 +554,9 @@ public class Lambda extends Syntax
         if (texp instanceof LangExp)
           {
             Pair typeSpecPair = (Pair) ((LangExp) texp).getLangValue(); 
-            tr.exp2Type(typeSpecPair, cur, null/*FIXME*/);
+            Type t = tr.exp2Type(typeSpecPair, cur, null/*FIXME*/);
+            if (t != null)
+                cur.setType(t);
           }
 	prev = cur;
 

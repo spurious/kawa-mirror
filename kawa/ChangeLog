@@ -1,3 +1,8 @@
+2014-07-17  Per Bothner  <per@bothner.com>
+
+	* lang/Lambda.java (rewriteBody): After evaluating a parameter's type,
+	update the Declaration's type.
+
 2014-07-13  Per Bothner  <per@bothner.com>
 
 	* standard/module_name.scm: Allow R6RS/R7RS-style library name as list.

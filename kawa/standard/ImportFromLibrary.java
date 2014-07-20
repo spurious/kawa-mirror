@@ -118,7 +118,7 @@ public class ImportFromLibrary extends Syntax
         else if (car instanceof String)
           {
             if (cdr instanceof Pair)
-              tr.error('e', "source specifier must be last elemnt in library reference");
+              tr.error('e', "source specifier must be last element in library reference");
             sourcePath = (String) car;
           }
         else

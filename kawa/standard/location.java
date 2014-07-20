@@ -53,10 +53,18 @@ public class location extends Syntax
 	Expression[] args = new Expression[aexp.getArgs().length + 1];
 	args[0] = aexp.getFunction();
 	System.arraycopy(aexp.getArgs(), 0, args, 1, args.length-1);
-	return Invoke.makeInvokeStatic(thisType, "makeProcLocation", args);
+        return new ApplyExp(getMakeProcLocProc(), args);
       }
     return tr.syntaxError("invalid argument to location");
   }
+
+    private static PrimProcedure makeProcLocProc;
+    public static synchronized PrimProcedure getMakeProcLocProc() {
+        if (makeProcLocProc == null) {
+            makeProcLocProc = new PrimProcedure(ClassType.make("kawa.standard.location").getDeclaredMethod("makeProcLocation$V", 2));
+        }
+        return makeProcLocProc;
+    }
 
   public static Location
   makeProcLocation$V (Procedure proc, Object[] args)

@@ -1,5 +1,10 @@
 2014-07-20  Per Bothner  <per@bothner.com>
 
+	* standard/location (getMakeProcLocProc):  New method.
+	(rewrite): Use it.
+
+2014-07-20  Per Bothner  <per@bothner.com>
+
 	* standard/ImportFromLibrary.java: Fix typo in error message.
 
 2014-07-17  Per Bothner  <per@bothner.com>

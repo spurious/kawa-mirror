@@ -1,3 +1,8 @@
+2014-07-20  Per Bothner  <per@bothner.com>
+
+	* annotations1.scm (authentication-identity): New test for using
+	alias of nested type as type name.
+
 2014-07-06  Per Bothner  <per@bothner.com>
 
 	* splice1.scm: Add test for calling local function with splice.

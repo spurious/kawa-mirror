@@ -38,3 +38,7 @@
      (@java.beans.ConstructorProperties value: #("abc" "def"))
      ::integer))
 |#
+
+;; A bonus test for using an alias to a sub-class.
+(define (authentication-identity x::AuthenticationType) ::AuthenticationType
+  x)

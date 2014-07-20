@@ -13,6 +13,7 @@ import gnu.kawa.io.InPort;
 import gnu.kawa.io.OutPort;
 import gnu.kawa.reflect.*;
 import java.io.*;
+import gnu.kawa.functions.GetNamedPart;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import gnu.kawa.lispexpr.ClassNamespace; // FIXME
@@ -939,6 +940,19 @@ public abstract class Language
 		    name = ((Named) loc).getName();
 		  }
 	      }
+            else if (exp instanceof ApplyExp) {
+                ApplyExp aexp = (ApplyExp) exp;
+                Expression afunc = aexp.getFunction();
+                Object func = afunc.valueIfConstant();
+                Expression[] args = aexp.getArgs();
+                int start = 0;
+                if (decl.isAlias()
+                    && func == kawa.standard.location.getMakeProcLocProc()) {
+                    afunc = args[0];
+                    start = 1;
+                }
+                return getTypeFor(afunc, args, start);
+            }
 	    else if (! decl.getFlag(Declaration.IS_UNKNOWN))
 	      return getTypeFor(exp, lenient);
 	  }
@@ -952,6 +966,10 @@ public abstract class Language
             && name.charAt(len-1) == '>')
           return getTypeFor(name.substring(1, len-1));
       }
+    else if (exp instanceof ApplyExp) {
+        ApplyExp aexp = (ApplyExp) exp;
+        return getTypeFor(aexp.getFunction(), aexp.getArgs(), 0);
+    }
     else if ((exp instanceof ClassExp && ! (exp instanceof ObjectExp))
              || exp instanceof ModuleExp)
       {
@@ -959,6 +977,37 @@ public abstract class Language
       }
     return null;
   }
+
+    private Type getTypeFor(Expression afunc, Expression[] args, int start) {
+        Object func = afunc.valueIfConstant();
+        try {
+            if (func == SlotGet.staticField
+                && args.length == 2+start) {
+                Object arg1 = args[start+0].valueIfConstant();
+                Object arg2 = args[start+1].valueIfConstant();
+                if (arg1 != null && arg2 != null) {
+                    Object fld = SlotGet.staticField.apply2(arg1, arg2);
+                    if (fld instanceof Type)
+                        return (Type) fld;
+                }
+            }
+            if (func == GetNamedPart.getNamedPart
+                && args.length == 2+start) {
+                Object arg1 = args[start+0].valueIfConstant();
+                Object arg2 = args[start+1].valueIfConstant();
+                if (arg2 instanceof Symbol) {
+                    Object comb = GetNamedPart.getNamedPart(arg1, (Symbol) arg2);
+                    if (comb instanceof Class)
+                        return Type.make((Class) comb);
+                    if (comb instanceof Type)
+                        return (Type) comb;
+                }
+            }
+        } catch (Exception ex) {
+            ;
+        }
+        return null;
+    }
 
   public static/* for now */ Type unionType (Type t1, Type t2)
   {

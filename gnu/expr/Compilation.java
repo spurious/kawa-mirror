@@ -2771,91 +2771,101 @@ public class Compilation implements SourceLocator
     return let;
   }
 
-  private void checkLoop()
-  {
-    if (((LambdaExp) current_scope).getName() != "%do%loop")
-      throw new Error("internal error - bad loop state");
-  }
+    private void checkLoop() {
+        if (((LambdaExp) current_scope).getName() != "%do%loop")
+            throw new Error("internal error - bad loop state");
+    }
 
-  /** Start a new loop.
-   * (We could make this implied by the first loopVaribale call ???) */
-  public void loopStart()
-  {
-    if (exprStack == null)
-      exprStack = new Stack<Expression>();
-    LambdaExp loopLambda = new LambdaExp();
-    LetExp let = new LetExp();
-    String fname = "%do%loop";
-    Declaration fdecl = let.addDeclaration(fname);
-    fdecl.setInitValue(loopLambda);
-    fdecl.noteValueFromLet(let);
-    loopLambda.setName(fname);
-    let.outer = current_scope;
-    loopLambda.outer = let;
-    current_scope = loopLambda;
-  }
+    /** Start a new loop.
+     * This provides the functionality of Scheme 'named let'. 
+     */
+    public LambdaExp loopStart() {
+        if (exprStack == null)
+            exprStack = new Stack<Expression>();
+        LambdaExp loopLambda = new LambdaExp();
+        LetExp let = new LetExp();
+        String fname = "%do%loop";
+        Declaration fdecl = let.addDeclaration(fname);
+        fdecl.setInitValue(loopLambda);
+        fdecl.noteValueFromLet(let);
+        loopLambda.setName(fname);
+        let.outer = current_scope;
+        loopLambda.outer = let;
+        current_scope = loopLambda;
+        return loopLambda;
+    }
 
-  public Declaration loopVariable(Object name, Type type, Expression init)
-  {
-    checkLoop();
-    LambdaExp loopLambda = (LambdaExp) current_scope;
-    Declaration decl = loopLambda.addDeclaration(name, type);
-    exprStack.push(init);
-    loopLambda.min_args++;
-    return decl;
-  }
+    /** Add a new loop variable, with initializer. */
+    public Declaration loopVariable(Object name, Type type, Expression init) {
+        checkLoop();
+        LambdaExp loopLambda = (LambdaExp) current_scope;
+        Declaration decl = loopLambda.addDeclaration(name, type);
+        exprStack.push(init);
+        loopLambda.min_args++;
+        return decl;
+    }
 
-  /** Done handling loop variables, and pushes them into the lexical scope.
-   * Ready to parse the loop condition. */ 
-  public void loopEnter ()
-  {
-    checkLoop();
-    LambdaExp loopLambda = (LambdaExp) current_scope;
-    int ninits = loopLambda.min_args;
-    loopLambda.max_args = ninits;
-    Expression[] inits = new Expression[ninits];
-    for (int i = ninits;  --i >= 0; )
-      inits[i] = (Expression) exprStack.pop();
-    LetExp let = (LetExp) loopLambda.outer;
-    Declaration fdecl = let.firstDecl();  // The decls for loopLambda.
-    let.setBody(new ApplyExp(new ReferenceExp(fdecl), inits));
-    lexical.push(loopLambda);
-  }
-  public void loopCond(Expression cond)
-  {
-    checkLoop();
-    exprStack.push(cond);
-  }
-  public void loopBody(Expression body)
-  {
-    LambdaExp loopLambda = (LambdaExp) current_scope;
-    loopLambda.body = body;
-  }
-  public Expression loopRepeat(Expression[] exps)
-  {
-    LambdaExp loopLambda = (LambdaExp) current_scope;
-    ScopeExp let = loopLambda.outer;
-    Declaration fdecl = let.firstDecl();  // The decls for loopLambda.
-    Expression cond = (Expression) exprStack.pop();
-    Expression recurse = new ApplyExp(new ReferenceExp(fdecl), exps);
-    loopLambda.body = new IfExp(cond,
-				new BeginExp(loopLambda.body, recurse),
-				QuoteExp.voidExp);
-    lexical.pop(loopLambda);
-    current_scope = let.outer;
-    return let;
-  }
+    /** Done handling loop variables, and pushes them into the lexical scope.
+     * Ready to parse the loop condition.
+     */ 
+    public void loopEnter() {
+        checkLoop();
+        LambdaExp loopLambda = (LambdaExp) current_scope;
+        int ninits = loopLambda.min_args;
+        loopLambda.max_args = ninits;
+        Expression[] inits = new Expression[ninits];
+        for (int i = ninits;  --i >= 0; )
+            inits[i] = (Expression) exprStack.pop();
+        LetExp let = (LetExp) loopLambda.outer;
+        Declaration fdecl = let.firstDecl();  // The decls for loopLambda.
+        let.setBody(new ApplyExp(new ReferenceExp(fdecl), inits));
+        lexical.push(loopLambda);
+    }
 
-  public Expression loopRepeat ()
-  {
-    return loopRepeat(Expression.noExpressions);
-  }
+    @Deprecated
+    public void loopCond(Expression cond) {
+        checkLoop();
+        exprStack.push(cond);
+    }
 
-  public Expression loopRepeat (Expression exp)
-  {
-    Expression[] args = { exp };
-    return loopRepeat(args);
-  }
+    @Deprecated
+    public void loopBody(Expression body) {
+        LambdaExp loopLambda = (LambdaExp) current_scope;
+        loopLambda.body = body;
+    }
+
+    /** Recurse to next iteration of specified loop. */
+    public Expression loopRepeat(LambdaExp loop, Expression... exps) {
+        ScopeExp let = loop.outer;
+        Declaration fdecl = let.firstDecl();  // The decls for loopLambda.
+        return new ApplyExp(new ReferenceExp(fdecl), exps);
+    }
+
+    /** Finish building a loop and return resulting expression. */
+    public Expression loopDone(Expression body) {
+        LambdaExp loopLambda = (LambdaExp) current_scope;
+        ScopeExp let = loopLambda.outer;
+        loopLambda.body = body;
+        lexical.pop(loopLambda);
+        current_scope = let.outer;
+        return let;
+    }
+
+    /** Combine loopRepeat and loopDone.
+     * Assume loopCond and loopBody have been called.
+     */
+    public Expression loopRepeatDone(Expression... exps) {
+        LambdaExp loopLambda = (LambdaExp) current_scope;
+        ScopeExp let = loopLambda.outer;
+        Expression cond = (Expression) exprStack.pop();
+        Expression recurse = loopRepeat(loopLambda, exps);
+        loopLambda.body = new IfExp(cond,
+                                    new BeginExp(loopLambda.body, recurse),
+                                    QuoteExp.voidExp);
+        lexical.pop(loopLambda);
+        current_scope = let.outer;
+        return let;
+    }
 
   public QuoteExp makeQuoteExp (Object value)
   {
@@ -2873,7 +2883,7 @@ public class Compilation implements SourceLocator
     Expression[] exps = new Expression[2];
     exps[0] = type;
     exps[1] = value;
-    QuoteExp c = new QuoteExp(Convert.getInstance());
+    QuoteExp c = new QuoteExp(Convert.cast);
     return new ApplyExp(c, exps);
   }
 

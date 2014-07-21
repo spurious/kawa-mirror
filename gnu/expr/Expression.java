@@ -276,7 +276,7 @@ public abstract class Expression extends Procedure0
     parser.loopEnter();
     parser.loopCond(parser.parse(cond));
     parser.loopBody(parser.parse(body));
-    return parser.loopRepeat();
+    return parser.loopRepeatDone();
   }
   
   /** Copies the current location. */

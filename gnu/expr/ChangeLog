@@ -1,3 +1,12 @@
+2014-07-21  Per Bothner  <per@bothner.com>
+
+	Tweak helper methods for constructing loop expressions.
+	* Compilation.java (loopBegin) Add return value.
+	(loopRepeat, loopDone): New methods.
+	(loopRepeatDone): Renamed from old loopDone.
+	(loopBody, loopCond): Deprecated.
+	* Expression.java (makeWhile): Update to use loopRepeatDone.
+
 2014-07-20  Per Bothner  <per@bothner.com>
 
 	* Language.java (getTypeFor): Improvements in extracting a type

@@ -1,3 +1,10 @@
+2014-07-21  Per Bothner  <per@bothner.com>
+
+	* CompileMisc.java (validateApplyConvert): If the conversion is
+	lenient, use a LenientExpectedType for the required type of the value.
+	(validateApplyCallCC, validateApplyWithExceptionHandler):
+	Use new maybeSetReturnType to also check for a LenientExpectedType.
+
 2014-07-03  Per Bothner  <per@bothner.com>
 
 	* DivideOp.java (floorQuotient): New static field.

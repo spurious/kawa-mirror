@@ -1908,6 +1908,13 @@ public class LambdaExp extends ScopeExp {
         }
     }
 
+    public static void maybeSetReturnType(LambdaExp lexp, Type type) {
+        if (lexp.returnType == null && type != null
+            && ! (type instanceof InlineCalls.LenientExpectedType)
+            && ! (type instanceof InlineCalls.ValueNeededType))
+            lexp.setCoercedReturnType(type);
+    }
+
     /** Modify LambdaExp so result is coerced to given type. */
     public final void setCoercedReturnValue(Expression type,
                                             Language language) {

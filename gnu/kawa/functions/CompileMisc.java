@@ -8,6 +8,7 @@ import gnu.kawa.lispexpr.LangObjType;
 import gnu.lists.LList;
 import kawa.standard.Scheme;
 import kawa.standard.SchemeCompilation;
+import static gnu.expr.InlineCalls.LenientExpectedType;
 
 public class CompileMisc
 {
@@ -38,15 +39,11 @@ public class CompileMisc
         if (type instanceof Type)
           {
             args[0] = new QuoteExp(type);
+            Type xtype = cproc.lenient ? LenientExpectedType.make(type)
+                : type;
             if (! args[1].getFlag(Expression.VALIDATED))
-                args[1] = ExpVisitor.visit(visitor, args[1], type);
-            if (cproc.lenient
-                && args[1].getType().getRawType().equals(type.getRawType())) {
-                // In lenient mode we allow matching raw types without
-                // further checking.
-            }
-            else
-                args[1] = visitor.checkType(args[1], type);
+                args[1] = ExpVisitor.visit(visitor, args[1], xtype);
+            args[1] = visitor.checkType(args[1], xtype);
             CompileReflect.checkKnownClass(type, comp);
             exp.setType(type);
             if (args[1].getType() == type)
@@ -525,10 +522,7 @@ public class CompileMisc
         Declaration contDecl = lexp.firstDecl();
         if (! contDecl.getFlag(Declaration.TYPE_SPECIFIED))
           contDecl.setType(typeContinuation);
-        if (lexp.returnType == null && required != null
-            && ! (required instanceof InlineCalls.ValueNeededType))
-          lexp.setCoercedReturnType(required);
-
+        LambdaExp.maybeSetReturnType(lexp, required);
         // FIXME (future): (after visiting lexp), do:
         // exp.setType(lexp.body.getType() UNION continuation-arguments);
       }
@@ -632,9 +626,7 @@ public class CompileMisc
         if (thunk instanceof LambdaExp) {
             LambdaExp lthunk = (LambdaExp) thunk;
             if (lthunk.min_args == 0 && lthunk.max_args == 0) {
-                if (lthunk.returnType == null && required != null
-                    && ! (required instanceof InlineCalls.ValueNeededType))
-                    lthunk.setCoercedReturnType(required);
+                LambdaExp.maybeSetReturnType(lthunk, required);
                 thunk = visitor.visit(lthunk, required);
                 args[1] = thunk;
 

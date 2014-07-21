@@ -1,5 +1,9 @@
 2014-07-21  Per Bothner  <per@bothner.com>
 
+	Handle "lenient conversions" using "lenient required types".
+	* InlineCalls.java (class LenientExpectedType): New class.
+	* LambdaExp.java (maybeSetReturnType): New static method.
+
 	Tweak helper methods for constructing loop expressions.
 	* Compilation.java (loopBegin) Add return value.
 	(loopRepeat, loopDone): New methods.

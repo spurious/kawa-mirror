@@ -951,6 +951,42 @@ public class InlineCalls extends ExpExpVisitor<Type> {
         return null;
     }
 
+    /** New helper Type class, used for "lenient" conversions. */
+    public static class LenientExpectedType extends Type {
+        Type base;
+        
+        public static LenientExpectedType make(Type type) {
+            return new LenientExpectedType(type);
+        }
+
+        LenientExpectedType(Type type) {
+            super(type);
+            base = type;
+        }
+
+        @Override
+        public int compare(Type other) {
+            return this == other ? 0 : -3;
+        }
+
+        @Override
+        public Object coerceFromObject (Object obj) {
+            return obj;
+        }
+
+        @Override
+        public int isCompatibleWithValue(Type valueType) {
+            if (base.getRawType().equals(base.getRawType()))
+                return 1;
+            return base.isCompatibleWithValue(valueType);
+        }
+
+        @Override
+        public String toString() {
+            return "LenientExpectedType["+base+']';
+        }
+    }
+
     public static class ProcedureInCallContext extends ObjectType {
         public static final ProcedureInCallContext INSTANCE = new ProcedureInCallContext();
 

@@ -1,3 +1,9 @@
+2014-07-22  Per Bothner  <per@bothner.com>
+
+	* kawa/string-cursors.scm: New file implementing the 'string-cursor'
+	API introduced in Chibi Scheme.
+	* Makefile.am: Update accordingly.
+
 2014-07-13  Per Bothner  <per@bothner.com>
 
 	* kawa/expressions.scm: New R7RS-style module-name syntax.

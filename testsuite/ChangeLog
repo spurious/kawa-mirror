@@ -1,5 +1,10 @@
 2014-07-22  Per Bothner  <per@bothner.com>
 
+	The SRFI-13 function string-append/shared is no longer
+	automatically imported.
+	* misc-test.scm: Move string-append/shared tests from here ...
+	* text-test.scm: ... to here.
+
 	* lib-test.scm: New test for string-cursor API.
 
 2014-07-20  Per Bothner  <per@bothner.com>

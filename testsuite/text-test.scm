@@ -83,4 +83,13 @@
 (import (srfi :13 strings))
 (test-equal 15 (string-contains "eek -- what a geek." "ee" 12 18))
 
+;;; Test SRFI-13 string-append/shared
+(let ((str "abc"))
+  (test-equal "" (string-append/shared))
+  (test-equal "" (string-append/shared ""))
+  (test-equal "abc" (string-append/shared str))
+  (set! str (string-append/shared str "123" "xy"))
+  (test-equal "abc123xy" (string-append/shared str))
+  (test-equal "abc123xy" str))
+
 (test-end)

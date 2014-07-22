@@ -7,7 +7,7 @@
                substring string->list list->string string-copy string-copy!
                string-fill! string-upcase! string-downcase!
                string-capitalize string-capitalize!
-               string-append string-append/shared)
+               string-append)
 
 (require <kawa.lib.prim_syntax>)
 (require <kawa.lib.std_syntax>)
@@ -129,16 +129,6 @@
   (let ((str :: <gnu.lists.FString> (make <gnu.lists.FString>)))
     (invoke str 'addAllStrings args 0)
     str))
-
-(define (string-append/shared #!rest (args :: <Object[]>)) :: <string>
-  (if (= 0 args:length)
-      (make <gnu.lists.FString>)
-      (let ((arg1 (args 0)))
-	(let ((fstr :: <gnu.lists.FString>
-		    (if (instance? arg1 <gnu.lists.FString>) arg1
-			(string-copy arg1))))
-	  (invoke fstr 'addAllStrings args 1)
-	  fstr))))
 
 (define (%string-compare-ci2 (str1 :: string) (str2 :: string)) ::int
   ;; The obvious doesn't handle German SS correctly.

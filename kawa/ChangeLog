@@ -1,3 +1,7 @@
+2014-07-22  Per Bothner  <per@bothner.com>
+
+	* standard/Scheme.java (initScheme) Remove string-append/shared.
+
 2014-07-20  Per Bothner  <per@bothner.com>
 
 	* standard/location (getMakeProcLocProc):  New method.

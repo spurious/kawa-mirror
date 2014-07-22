@@ -284,7 +284,7 @@ public class FString extends SimpleVector
   /* #endif */
 
   /** Append arguments to this FString.
-   * Used to implement Scheme's string-append and string-append/shared.
+   * Used to implement Scheme's string-append.
    * @param args an array of FString value
    * @param startIndex index of first string in <code>args</code> to use
    */

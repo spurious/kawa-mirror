@@ -416,7 +416,6 @@ public class Scheme extends LispLanguage
 
       defProcStFld("substring", "kawa.lib.strings");
       defProcStFld("string-append", "kawa.lib.strings");
-      defProcStFld("string-append/shared", "kawa.lib.strings");
       defProcStFld("string->list", "kawa.lib.strings");
       defProcStFld("list->string", "kawa.lib.strings");
       defProcStFld("string-copy", "kawa.lib.strings");

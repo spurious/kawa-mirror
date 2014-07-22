@@ -39,6 +39,10 @@ public class LangPrimType extends PrimType implements TypeValue {
        = new LangPrimType(Type.intType);
     static { characterOrEofType.setName("character-or-eof"); }
 
+    public static final LangPrimType stringCursorType
+       = new LangPrimType(Type.intType);
+    static { stringCursorType.setName("string-cursor"); }
+
     public LangPrimType(PrimType type) {
         super(type);
         implementationType = type;
@@ -238,6 +242,8 @@ public class LangPrimType extends PrimType implements TypeValue {
             return implementationType.compare(other);
         if (this == other)
             return 0;
+        if (this == stringCursorType)
+            return other == Type.objectType ? -1 : -3;
         if (this == charType) {
             if (other == characterType || other == characterOrEofType
                 || other == scmCharType)
@@ -253,6 +259,7 @@ public class LangPrimType extends PrimType implements TypeValue {
         }
         if (this == characterOrEofType) {
             if (other == characterType
+                || other == ClassType.make("gnu.lists.EofClass") // FIXME pre-alloate
                 || other == charType || other == scmCharType || sig2 == 'C')
                 return 1;
             return other == Type.objectType ? -1 : -3;
@@ -308,6 +315,7 @@ public class LangPrimType extends PrimType implements TypeValue {
     public String encodeType(Language language) {
         if (this == characterType) return "character";
         if (this == characterOrEofType) return "character-or-eof";
+        if (this == stringCursorType) return "string-cursor";
         return null;
     }
 }

@@ -1,3 +1,7 @@
+2014-07-22  Per Bothner  <per@bothner.com>
+
+	* build.xml (lib-scm-classes): Add string-cursors.scm.
+
 2014-07-07  Matthieu Vachon <matthieu.o.vachon@gmail.com>
 
 	* build.xml: Add some missing Scheme files.

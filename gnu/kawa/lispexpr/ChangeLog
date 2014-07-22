@@ -1,3 +1,8 @@
+2014-07-22  Per Bothner  <per@bothner.com>
+
+	* LangPrimType.java (stringCursorType): New 'string-cursor' type.
+	* LispLanguage.java (getTypeMap):  Add 'string-cursor'.
+
 2014-07-02  Per Bothner  <per@bothner.com>
 
 	* LangPrimType.java (characterType, characterOrEofType): New instances.

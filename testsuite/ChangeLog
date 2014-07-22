@@ -1,3 +1,7 @@
+2014-07-22  Per Bothner  <per@bothner.com>
+
+	* lib-test.scm: New test for string-cursor API.
+
 2014-07-20  Per Bothner  <per@bothner.com>
 
 	* annotations1.scm (authentication-identity): New test for using

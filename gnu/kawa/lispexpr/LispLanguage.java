@@ -254,6 +254,7 @@ public abstract class LispLanguage extends Language
             types.put("document", ClassType.make("gnu.kawa.xml.KDocument"));
             types.put("readtable",
                       ClassType.make("gnu.kawa.lispexpr.ReadTable"));
+            types.put("string-cursor", LangPrimType.stringCursorType);
         }
         return types;
     }

@@ -1,4 +1,6 @@
-(test-begin "libs" 255)
+;; -*- coding: utf-8 -*-
+
+(test-begin "libs" 256)
 
 (test-begin "vectors")
 (test-equal '(dah dah didah)
@@ -491,6 +493,21 @@
 (test-equal 1 (cons* 1))
 
 (test-end "rnrs-lists")
+
+(test-begin "strings")
+(import (kawa string-cursors))
+
+(define str1 "a😂b😼c")
+(define sc1e::string-cursor (string-cursor-end str1))
+(define str1lst '())
+(do ((sc::string-cursor (string-cursor-start str1)
+                        (string-cursor-next str1 sc)))
+    ((string-cursor>=? sc sc1e))
+  (set! str1lst (cons (as int (string-cursor-ref str1 sc)) str1lst)))
+(test-equal '(97 128514 98 128572 99) (reverse str1lst))
+;; FIXME more
+
+(test-end)
 
 (test-begin "char-sets" 89)
 

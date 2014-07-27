@@ -23,9 +23,10 @@
 ; Call static varargs method:
 (display (java.lang.String:format "<x: %s y: %s z: %s>" @oarr)) (newline)
 ;; Output: <x: 5 y: 4 z: 3>
+
 ;; Static varargs with non-matching splice:
 (define xoarr (object[] "<x: %s y: %s>" @oarr))
-(display (java.lang.String:format @xoarr)) (newline)
+(display (gnu.kawa.functions.Format:sprintfToString @xoarr)) (newline)
 ;; Output: <x: 5 y: 4>
 
 (define-private (fooz x y z)
@@ -35,3 +36,8 @@
     (vector (fooz @v 6) 123)))
 (format #t "~w~%" (bar 10))
 ;; Output: #((6 10 4) 123)
+
+(define (apply-mod x)
+  (gnu.math.IntNum:modulo @x))
+(format #t "mod: ~w~%" (apply-mod [12 5]))
+;; Output: mod: 2

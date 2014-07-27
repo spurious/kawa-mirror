@@ -1,3 +1,8 @@
+2014-07-27  Per Bothner  <per@bothner.com>
+
+	* GenericProc.java (isApplicable): Update to support splicing.
+	* PrimProcedure.java (isApplicable); Likewise.
+
 2014-07-21  Per Bothner  <per@bothner.com>
 
 	Handle "lenient conversions" using "lenient required types".

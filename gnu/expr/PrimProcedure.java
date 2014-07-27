@@ -106,16 +106,15 @@ public class PrimProcedure extends MethodProc {
      * compileArgs.
      * FIXME This is needless and unreliable complexity.  We should by default
      * create a varargs array - even if the actual argument is an array.
-     * People should now uses splices instead.
+     * People should now use splices instead.
      */
     public static boolean explicitArrayAsVarArgsAllowed = true;
 
-  public int isApplicable(Type[] argTypes)
-  {
-    int app = super.isApplicable(argTypes);
+    public int isApplicable(Type[] argTypes, Type restType) {
+        int app = super.isApplicable(argTypes, restType);
     int nargs = argTypes.length;
     if (explicitArrayAsVarArgsAllowed
-        && app == -1 && method != null
+        && app == -1 && method != null && restType == null
         && (method.getModifiers() & Access.VARARGS) != 0
         && nargs > 0 && argTypes[nargs-1] instanceof ArrayType)
       {
@@ -124,7 +123,7 @@ public class PrimProcedure extends MethodProc {
         Type[] tmp = new Type[nargs];
         System.arraycopy(argTypes, 0, tmp, 0, nargs-1);
         tmp[nargs-1] = ((ArrayType) argTypes[nargs-1]).getComponentType();
-        return super.isApplicable(tmp);
+        return super.isApplicable(tmp, null);
       }
     return app;
   }
@@ -965,7 +964,7 @@ public class PrimProcedure extends MethodProc {
 	pproc = null;
 	for (int i = gproc.count;  --i >= 0; )
 	  {
-	    int applic = methods[i].isApplicable(atypes);
+              int applic = methods[i].isApplicable(atypes, null/*FIXME*/);
 	    if (applic < 0)
 	      continue;
 	    if (pproc != null)
@@ -978,7 +977,7 @@ public class PrimProcedure extends MethodProc {
     if (pproc instanceof PrimProcedure)
       {
 	PrimProcedure prproc = (PrimProcedure) pproc;
-	if (prproc.isApplicable(atypes) >= 0)
+	if (prproc.isApplicable(atypes, null/*FIXME*/) >= 0)
 	  return prproc;
       }
     Class pclass = getProcedureClass(pproc);
@@ -1167,7 +1166,7 @@ public class PrimProcedure extends MethodProc {
 	      }
 	    PrimProcedure prproc = new PrimProcedure(meth, language);
 	    prproc.setName(name);
-	    int code = prproc.isApplicable(atypes);
+	    int code = prproc.isApplicable(atypes, null/*FIXME*/);
 	    if (code < 0 || code < bestCode)
 	      continue;
 	    if (code > bestCode)

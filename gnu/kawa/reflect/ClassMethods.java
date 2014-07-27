@@ -161,14 +161,14 @@ public class ClassMethods extends Procedure2
    *          + (number of possibly applicable methods.
    */
   public static long selectApplicable(PrimProcedure[] methods,
-                                      Type[] atypes)
+                                      Type[] atypes, Type restType)
   {
     int limit = methods.length;
     int numDefApplicable = 0;
     int numPosApplicable = 0;
     for (int i = 0;  i < limit;  )
       {
-        int code = methods[i].isApplicable(atypes);
+        int code = methods[i].isApplicable(atypes, restType);
         if (code < 0)
           { // Definitely not applicable.
             // swap(methods[limit-1], methods[i]):

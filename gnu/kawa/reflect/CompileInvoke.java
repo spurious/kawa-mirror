@@ -431,10 +431,19 @@ public class CompileInvoke {
         int dst = 0;
         if (objIndex >= 0)
             atypes[dst++] = ctype;
+        Type restType = null;
         for (int src = argsStartIndex; 
              src < args.length && dst < atypes.length; 
              src++, dst++) {
             Expression arg = args[src];
+            Expression spliceArg = MakeSplice.argIfSplice(arg);
+            if (spliceArg != null) {
+                restType = Type.objectType; // Could be smarter.  FIXME
+                Type[] xtypes = new Type[dst];
+                System.arraycopy(atypes, 0, xtypes, 0, dst);
+                atypes = xtypes;
+                break;
+            }
             Type atype = null;
             // Treat IntNum constant argument in int/long range as int/long.
             if (InlineCalls.checkIntValue(arg) != null)
@@ -445,7 +454,7 @@ public class CompileInvoke {
                 atype = arg.getType();
             atypes[dst] = atype;
         }
-        return ClassMethods.selectApplicable(methods, atypes);
+        return ClassMethods.selectApplicable(methods, atypes, restType);
     }
 
     public static synchronized PrimProcedure

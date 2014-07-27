@@ -1,3 +1,9 @@
+2014-07-27  Per Bothner  <per@bothner.com>
+
+	* ClassMethods.java (selectApplicable):  Add extra 'restType'
+	argument to handle splices.
+	* CompileInvoke.java (selectApplicable): Handle splices.
+
 2014-07-06  Per Bothner  <per@bothner.com>
 
 	* WrongArguments.java (checkArgCount): Take haSplicies argument.

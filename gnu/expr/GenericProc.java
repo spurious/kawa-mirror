@@ -122,13 +122,14 @@ public class GenericProc extends MethodProc
     throw new WrongType(this, WrongType.ARG_UNKNOWN, null);
   }
 
-  public int isApplicable(Type[] args)
+    @Override
+    public int isApplicable(Type[] args, Type restType)
   {
     int best = -1;
     for (int i = count;  --i >= 0; )
       {
         MethodProc method = methods[i];
-        int result = method.isApplicable(args);
+        int result = method.isApplicable(args, restType);
         if (result == 1)
           return 1;
         if (result == 0)
@@ -245,7 +246,7 @@ public class GenericProc extends MethodProc
     int bestIndex = -1;
     for (int i = 0;  i < count;  i++)
       {
-        int code = methods[i].isApplicable(atypes);
+          int code = methods[i].isApplicable(atypes, null);
         if (defCount == 0 && code >= 0)
           bestIndex = i;
         if (code > 0)

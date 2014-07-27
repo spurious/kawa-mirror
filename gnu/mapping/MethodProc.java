@@ -15,37 +15,45 @@ public abstract class MethodProc extends ProcedureN
    * Usually either an Type[] or a String encoding. */
   protected Object argTypes;
 
-  /** Test if method is applicable to an invocation with given arguments.
-   * Returns -1 if no; 1 if yes; 0 if need to check at run-time. */
-  public int isApplicable(Type[] argTypes)
-  {
-    int argCount = argTypes.length;
-    int num = numArgs();
-    if (argCount < (num & 0xFFF)
-	|| (num >= 0 && argCount > (num >> 12)))
-      return -1;
-    int result = 1;
-    for (int i = argCount;  --i >= 0; )
-      {
-        Type ptype = getParameterType(i);
-	boolean toStringTypeHack = ptype == Type.toStringType;
-	// Treat Type.toString as if it might need a narrowing cast, even
-	// though it always succeeds, so as to prefer methods that don't
-	// require the toString converstion.
-	if (toStringTypeHack)
-	    ptype = Type.javalangStringType;
-        int code = ptype.compare(argTypes[i]);
-        if (code == -3) {
-	  if (toStringTypeHack)
-	    result = 0;
-	  else
-	    return -1;
-	}
-        else if (code < 0)
-          result = 0;
-      }
-    return result;
-  }
+    /** Test if method is applicable to an invocation with given arguments.
+     * @param argTypes array of known "single" arguments.
+     * @param restType If null, the arguments are fully  specified by argTypes.
+     *   If non-null, there may be an unknown number of extra arguments
+     *   of the given restType.  This is used for splices, where we usually
+     *   don't know at compile-time how many argument values we have.
+     * @return -1 if no; 1 if yes; 0 if need to check at run-time.
+     */
+    public int isApplicable(Type[] argTypes, Type restType) {
+        int argCount = argTypes.length;
+        int num = numArgs();
+        int min = Procedure.minArgs(num);
+        int max = Procedure.maxArgs(num);
+        if ((argCount < min && restType == null)
+            || (num >= 0 && argCount > max))
+            return -1;
+        int result = 1;
+        for (int i = 0;  ; i++ )  {
+            if (i >= argCount && (restType == null || i >= min))
+                break;
+            Type ptype = getParameterType(i);
+            boolean toStringTypeHack = ptype == Type.toStringType;
+            // Treat Type.toString as if it might need a narrowing cast, even
+            // though it always succeeds, so as to prefer methods that don't
+            // require the toString converstion.
+            if (toStringTypeHack)
+                ptype = Type.javalangStringType;
+            int code = ptype.compare(i < argCount ? argTypes[i] : restType);
+            if (code == -3) {
+                if (toStringTypeHack)
+                    result = 0;
+                else
+                    return -1;
+            }
+            else if (code < 0)
+                result = 0;
+        }
+        return result;
+    }
 
   /** Return number of parameters, including optional and rest arguments. */
   public int numParameters()

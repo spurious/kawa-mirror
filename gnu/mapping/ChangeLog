@@ -1,3 +1,8 @@
+2014-07-27  Per Bothner  <per@bothner.com>
+
+	* MethodProc.java (isApplicable): Take an extra parameter
+	to handle splice argumemnt expressions.
+
 2014-07-06  Per Bothner  <per@bothner.com>
 
 	* WrongArguments.java (checkArgCount): Take haSplicies argument.

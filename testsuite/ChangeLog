@@ -1,3 +1,7 @@
+2014-07-27  Per Bothner  <per@bothner.com>
+
+	* splice1.scm: Add test for fixed regression.
+
 2014-07-22  Per Bothner  <per@bothner.com>
 
 	The SRFI-13 function string-append/shared is no longer

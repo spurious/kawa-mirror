@@ -1,3 +1,8 @@
+2014-07-27  Per Bothner  <per@bothner.com>
+
+	* LangObjType.java: Change to extend SpecialObjectType.
+	Some methods and fields moved to SpecialObjectType.
+
 2014-07-22  Per Bothner  <per@bothner.com>
 
 	* LangPrimType.java (stringCursorType): New 'string-cursor' type.

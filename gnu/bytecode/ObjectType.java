@@ -132,12 +132,6 @@ public class ObjectType extends Type
     return reflectClass;
   }
 
-  public Type getImplementationType()
-  {
-    return this == nullType ? objectType
-      : this == toStringType ? javalangStringType : this;
-  }
-
   public Type promote ()
   {
     return this == nullType ? objectType : this;
@@ -167,16 +161,10 @@ public class ObjectType extends Type
     return getMethods(filter, searchSupers, result);
   }
 
-  public int getMethods (Filter filter, int searchSupers,
-                         /* #ifdef JAVA5 */
-                         List<Method>
-                         /* #else */
-                         // Vector
-                         /* #endif */
-			 result)
-  {
-    return Type.objectType.getMethods(filter, searchSupers, result);
-  }
+    public int getMethods (Filter filter, int searchSupers,
+                           List<Method> result) {
+        return Type.objectType.getMethods(filter, searchSupers, result);
+    }
 
     public int compare(Type other) {
 	if (this == other)

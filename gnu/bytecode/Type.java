@@ -632,16 +632,6 @@ public abstract class Type
     public static final Type neverReturnsType
         = ClassType.make("gnu.bytecode.Type$NeverReturns");
 
-  /** The magic type of null. */
-  public static final ObjectType nullType = new ObjectType("(type of null)");
-
-  public static final ObjectType errorType = new ClassType("(error type)");
-
-  static public ClassType javalangStringType = ClassType.make("java.lang.String");
-  /* The String type. but coercion is handled by toString. */
-  public static final ClassType toStringType
-    = new ClassType("java.lang.String");
-
   public static final ClassType javalangObjectType
     = ClassType.make("java.lang.Object");
   public static final ClassType objectType = javalangObjectType;
@@ -675,12 +665,25 @@ public abstract class Type
 			      booleanType, Access.PUBLIC);
   public static final ClassType javalangClassType
     = ClassType.make("java.lang.Class");
+
+    /** The magic type of null. */
+    public static final ObjectType nullType
+    //= new ObjectType("(type of null)");
+    = new SpecialObjectType("(type of null)", objectType);
+    public static final ObjectType errorType = new ObjectType("(error type)");
+
+    static public ClassType javalangStringType = ClassType.make("java.lang.String");
+    /* The String type. but coercion is handled by toString. */
+    public static final ObjectType toStringType
+        = new SpecialObjectType("String", javalangStringType);
+    //= new ClassType("java.lang.String");
+
   /** @deprecated */
   public static final ClassType pointer_type = javalangObjectType;
   /** @deprecated */
   public static final ClassType string_type = javalangStringType;
   /** @deprecated */
-  public static final ClassType tostring_type = toStringType;
+  public static final ObjectType tostring_type = toStringType;
   /** @deprecated */
   public static final ClassType java_lang_Class_type = javalangClassType;
   /** @deprecated */

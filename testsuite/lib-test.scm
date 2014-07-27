@@ -200,7 +200,7 @@
       (expand '(let loop () (loop))))
 (test-equal '(let ((x #!undefined)) (set x 10))
       (expand '(define x 10)))
-(test-equal '(as <java.lang.String> (quote a))
+(test-equal '(as <String> (quote a))
       (expand '(as String 'a)))
 
 (test-equal '(lambda (a b c) #f)

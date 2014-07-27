@@ -1,5 +1,7 @@
 2014-07-27  Per Bothner  <per@bothner.com>
 
+	* lib-test.scm: Updated expected output for expand.
+
 	* splice1.scm: Add test for fixed regression.
 
 2014-07-22  Per Bothner  <per@bothner.com>

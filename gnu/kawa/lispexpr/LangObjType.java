@@ -19,7 +19,7 @@ import java.util.*;
  * but may have a custom (language-specific) coercion method,
  * constructor, and name. */
 
-public class LangObjType extends ObjectType implements TypeValue
+public class LangObjType extends SpecialObjectType implements TypeValue
 {
   final int typeCode;
   private static final int PATH_TYPE_CODE = 1;
@@ -162,15 +162,10 @@ public class LangObjType extends ObjectType implements TypeValue
     new LangObjType("promise", "gnu.mapping.Lazy",
                     PROMISE_TYPE_CODE);
 
-  LangObjType(String name, String implClass, int typeCode)
-  {
-    super(name);
-    this.implementationType = ClassType.make(implClass);
-    this.typeCode = typeCode;
-    this.setSignature(this.implementationType.getSignature());
-  }
-
-  ClassType implementationType;
+    LangObjType(String name, String implClass, int typeCode) {
+        super(name, ClassType.make(implClass));
+        this.typeCode = typeCode;
+    }
 
   public int compare(Type other)
   {
@@ -204,47 +199,6 @@ public class LangObjType extends ObjectType implements TypeValue
         break;
       }
     return getImplementationType().compare(other);
-  }
-
-  public Field getField(String name, int mask)
-  {
-    return implementationType.getField(name, mask);
-  }
-
-  public Method getMethod(String name, Type[] arg_types)
-  {
-    return implementationType.getMethod(name, arg_types);
-  }
-
-  public Method getDeclaredMethod(String name, int argCount)
-  {
-    return implementationType.getDeclaredMethod(name, argCount);
-  }
-
-  public int getMethods (Filter filter, int searchSupers,
-                         /* #ifdef JAVA5 */
-                         List<Method>
-                         /* #else */
-                         // Vector
-                         /* #endif */
-                         result)
-  {
-    return implementationType.getMethods(filter, searchSupers, result);
-  }
-
-  public java.lang.Class getReflectClass()
-  {
-    return implementationType.getReflectClass();
-  }
-
-  public Type getRealType()
-  {
-    return implementationType;
-  }
-
-  public Type getImplementationType()
-  {
-    return implementationType;
   }
 
   public void emitIsInstance(Variable incoming,

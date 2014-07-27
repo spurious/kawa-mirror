@@ -37,6 +37,7 @@ Scope.java \
 SignatureAttr.java \
 SourceDebugExtAttr.java \
 SourceFileAttr.java \
+SpecialObjectType.java \
 StackMapTableAttr.java \
 Type.java \
 UninitializedType.java \

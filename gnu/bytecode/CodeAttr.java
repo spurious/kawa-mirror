@@ -960,6 +960,14 @@ public class CodeAttr extends Attribute implements AttrContainer
     pushType(Type.javalangClassType);
   }
 
+    /** Push a MethodHandle, using an appropriate constant pool entry.
+     * This is only supported by JDK 1.6 and later.
+     */
+    public final void emitPushMethodHandle(Method method) {
+        emitPushConstant(getConstants().addMethodHandle(method));
+        pushType(Type.javalanginvokeMethodHandleType);
+    }
+
   public void emitPushNull ()
   {
     reserve(1);

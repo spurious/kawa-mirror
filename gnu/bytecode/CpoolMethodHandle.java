@@ -13,10 +13,29 @@ public class CpoolMethodHandle extends CpoolEntry {
     public CpoolMethodHandle() {
     } 
 
+    CpoolMethodHandle(ConstantPool cpool, int hash,
+                      int kind, CpoolRef reference) {
+        super (cpool, hash);
+        this.kind = kind;
+        this.reference = reference;
+    }
+
     public int getTag() { return ConstantPool.METHOD_HANDLE; }
 
+    final static int hashCode(int kind, CpoolRef reference) {
+        return kind ^ reference.hashCode();
+    }
+
+    public int hashCode() {
+        if (hash == 0)
+            hash = hashCode(kind, reference);
+        return hash;
+    }
+
     void write (DataOutputStream dstr) throws java.io.IOException {
-	throw new Error();
+        dstr.writeByte(ConstantPool.METHOD_HANDLE);
+        dstr.writeByte(kind);
+        dstr.writeShort(reference.index);
     }
 
     public void print (ClassTypeWriter dst, int verbosity) {

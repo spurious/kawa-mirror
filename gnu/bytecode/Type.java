@@ -666,6 +666,9 @@ public abstract class Type
   public static final ClassType javalangClassType
     = ClassType.make("java.lang.Class");
 
+    public static final ClassType javalanginvokeMethodHandleType
+        = ClassType.make("java.lang.invoke.MethodHandle");
+
     /** The magic type of null. */
     public static final ObjectType nullType
     //= new ObjectType("(type of null)");

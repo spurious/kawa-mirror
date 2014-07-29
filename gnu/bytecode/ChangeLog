@@ -1,3 +1,12 @@
+2014-07-29  Per Bothner  <per@bothner.com>
+
+	Add support for generating MethodHandle constant pool entries.
+	* CpoolMethodHandle.java: New constructor.
+	(hashCode, write): New methods.
+	* ConstantPool.java (addMethodHandle): New methdods.
+	* CodeAttr.java (emitPushMethodHandle): New method.
+	* Type.java (javalanginvokeMethodHandleType): New field.
+
 2014-07-27  Per Bothner  <per@bothner.com>
 
 	* SpecialObjectType.java: New class that extends ObjectType.

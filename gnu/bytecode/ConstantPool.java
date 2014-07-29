@@ -108,6 +108,39 @@ public class ConstantPool {
     return entry;
   }
 
+    public CpoolMethodHandle addMethodHandle(Method method) {
+        int kind;
+        if ((method.access_flags & Access.STATIC) != 0)
+            kind = 6; // REF_invokeStatic
+        else if (method.classfile.isInterface())
+            kind = 9; // REF_invokeInterface
+        else if ("<init>".equals(method.getName()))
+            kind = 8; // REF_newInvokeSpecial
+        else if ((method.access_flags & Access.PRIVATE) != 0)
+            kind = 7; // REF_invokeSpecial
+        else
+            kind = 5; // REF_invokeVirtual
+        return addMethodHandle(kind, addMethodRef(method));
+    }
+
+    public CpoolMethodHandle addMethodHandle(int kind, CpoolRef reference) {
+        int h = CpoolMethodHandle.hashCode(kind, reference);
+
+        // Check if we already have a matching CONSTANT_METHOD_HANDLE
+        if (hashTab == null)
+            rehash();
+        int index = (h & 0x7FFFFFFF) % hashTab.length;
+        for (CpoolEntry entry = hashTab[index]; entry != null;
+             entry = entry.next) {
+            if (h == entry.hash
+                && entry instanceof CpoolMethodHandle
+                && ((CpoolMethodHandle)entry).kind == kind
+                && ((CpoolMethodHandle)entry).reference == reference)
+                return (CpoolMethodHandle)entry;
+        }
+        return new CpoolMethodHandle(this, h, kind, reference);
+    }
+
   public CpoolClass addClass (CpoolUtf8 name)
   {
     int h = CpoolClass.hashCode(name);
@@ -152,7 +185,7 @@ public class ConstantPool {
   {
     int h = CpoolValue2.hashCode(val);
 
-    // Check if we already have a matching CONSTANT_Integer.
+    // Check if we already have a matching CONSTANT_Long
     if (hashTab == null)
       rehash();
     int index = (h & 0x7FFFFFFF) % hashTab.length;
@@ -232,7 +265,7 @@ public class ConstantPool {
   {
     int h = CpoolNameAndType.hashCode (name, type);
 
-    // Check if we already have a matching CONSTANT_Integer.
+    // Check if we already have a matching CONSTANT_NAME_AND_TYPE
     if (hashTab == null)
       rehash();
     int index = (h & 0x7FFFFFFF) % hashTab.length;
@@ -252,7 +285,7 @@ public class ConstantPool {
   {
     int h = CpoolRef.hashCode (clas, nameAndType);
 
-    // Check if we already have a matching CONSTANT_Integer.
+    // Check if we already have a matching CONSTANT_Ref
     if (hashTab == null)
       rehash();
     int index = (h & 0x7FFFFFFF) % hashTab.length;

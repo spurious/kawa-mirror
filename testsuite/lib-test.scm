@@ -1,6 +1,6 @@
 ;; -*- coding: utf-8 -*-
 
-(test-begin "libs" 256)
+(test-begin "libs" 257)
 
 (test-begin "vectors")
 (test-equal '(dah dah didah)
@@ -505,6 +505,12 @@
     ((string-cursor>=? sc sc1e))
   (set! str1lst (cons (as int (string-cursor-ref str1 sc)) str1lst)))
 (test-equal '(97 128514 98 128572 99) (reverse str1lst))
+
+(define str2lst '())
+(string-cursor-for-each
+ (lambda (x) (set! str2lst (cons (char->integer x) str2lst)))
+ str1 (as string-cursor 3))
+(test-equal '(98 128572 99) (reverse str2lst))
 ;; FIXME more
 
 (test-end)

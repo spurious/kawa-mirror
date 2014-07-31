@@ -4,7 +4,8 @@
                string-cursor-ref string-cursor-ref-or-eof substring-cursor
                string-cursor-next string-cursor-prev
                string-cursor<? string-cursor<=? string-cursor=?
-               string-cursor>? string-cursor>=? string-cursor)
+               string-cursor>? string-cursor>=? string-cursor
+               string-cursor-move string-cursor-for-each)
 
 (require <kawa.lib.prim_syntax>)
 (require <kawa.lib.std_syntax>)
@@ -51,6 +52,10 @@
   (as string-cursor
       (java.lang.Character:offsetByCodePoints str (as int cursor) -1)))
 
+(define (string-cursor-move str::string cursor::string-cursor delta::int) ::string-cursor
+  (as string-cursor
+      (java.lang.Character:offsetByCodePoints str (as int cursor) delta)))
+
 ;; take a substring from the given cursors
 (define (substring-cursor str::string cs1::string-cursor
                           #!optional (cs2::string-cursor (as string-cursor (str:length)))) ::string
@@ -75,3 +80,13 @@
 ;; cs1 is the same or after cs2
 (define (string-cursor>=? cs1::string-cursor cs2::string-cursor) ::boolean
   (>= (as int cs1) (as int cs2)))
+
+(define (string-cursor-for-each proc str::string
+                                #!optional
+                                (start::string-cursor (as string-cursor 0))
+                                (end::string-cursor (string-cursor-end str)))
+  ::void
+  (do ((cursor::string-cursor start
+                              (string-cursor-next str cursor)))
+      ((string-cursor>=? cursor end))
+    (proc (string-cursor-ref str cursor))))

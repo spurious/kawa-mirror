@@ -15,13 +15,36 @@
 (define (get-visitor) ::gnu.expr.InlineCalls
   (gnu.expr.InlineCalls:currentVisitor:get))
 
+(define (get-compilation) ::gnu.expr.Compilation
+  ((get-visitor):getCompilation))
+
 (define (visit-exp exp::gnu.expr.Expression
                    #!optional (required ::gnu.bytecode.Type #!null))
   (gnu.expr.ExpVisitor:visit (get-visitor) exp required))
 
+(define-syntax syntax-as-exp
+  (lambda (form)
+    (syntax-case form ()
+      ((_ expr)
+       (syntax->expression (syntax expr))))))
+
 (define (apply-exp func . args)
   (gnu.expr.ApplyExp (->exp func)
                      @(map ->exp args)))
+
+(define (begin-exp . args)
+  (gnu.expr.BeginExp @(map ->exp args)))
+
+(define (if-exp a b #!optional (c #!null))
+  (gnu.expr.IfExp (->exp a) (->exp b) (if (eq? c #!null) c (->exp c))))
+
+(define (set-exp (var::gnu.expr.Declaration) val)
+  (let ((se (gnu.expr.SetExp var (->exp val))))
+    (se:setContextDecl var)
+    (var:setCanWrite #t)
+    (se:setBinding var)
+    (var:noteValueFromSet se)
+    se))
 
 (define-syntax define-validate
   (syntax-rules ()

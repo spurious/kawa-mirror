@@ -1,3 +1,7 @@
+2014-07-31  Per Bothner  <per@bothner.com>
+
+	* kawa/expressions.scm: Some more utility functions and macros.
+
 2014-07-22  Per Bothner  <per@bothner.com>
 
 	* strings.scm (string-append/shared): Remove incorrect implementation

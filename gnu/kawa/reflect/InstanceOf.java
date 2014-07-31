@@ -45,7 +45,7 @@ public class InstanceOf extends Procedure2 implements Inlineable
           }
         catch (Exception ex)
           {
-            comp.error('w', "unknown type spec: "+type);
+            comp.error('w', "unknown type spec: "+type, typeArg);
           }
       }
     else 

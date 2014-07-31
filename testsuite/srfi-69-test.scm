@@ -57,7 +57,7 @@ use of this software.
 
 (define ht3string-ci= (make-hash-table string-ci=? string-ci-hash))
 
-(define fx=? =?)
+(define fx=? =)
 (define ht3fx= (make-hash-table fx=? values))
 
 (define ht4equal (alist->hash-table '()))

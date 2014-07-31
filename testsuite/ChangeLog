@@ -1,3 +1,8 @@
+2014-07-31  Per Bothner  <per@bothner.com>
+
+	* errors2.scm: Test new error on swapped instance? arguments.
+	* srfi-69-test.scm: Fix typo.
+
 2014-07-27  Per Bothner  <per@bothner.com>
 
 	* lib-test.scm: Updated expected output for expand.

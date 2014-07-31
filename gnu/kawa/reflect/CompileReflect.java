@@ -59,6 +59,7 @@ public class CompileReflect
   public static Expression validateApplyInstanceOf
   (ApplyExp exp, InlineCalls visitor, Type required, Procedure proc)
   {
+    Expression origTypeExp = exp.getArgCount() >= 2 ? exp.getArg(1) : null;
     exp.visitArgs(visitor);
     exp = inlineClassName(exp, 1, visitor);
     Expression[] args = exp.getArgs();
@@ -87,6 +88,10 @@ public class CompileReflect
                   }
               }
           }
+        Type texpType = texp.getType();
+        if (Compilation.typeType.isCompatibleWithValue(texpType) < 0
+            && Type.javalangClassType.isCompatibleWithValue(texpType) < 0)
+            visitor.getCompilation().error('w', "not a type or class expression", origTypeExp);
       }
     return exp;
   }

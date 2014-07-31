@@ -1,3 +1,7 @@
+2014-07-31  Per Bothner  <per@bothner.com>
+
+	* Expression.java (maybeSetLine): New method.
+
 2014-07-27  Per Bothner  <per@bothner.com>
 
 	* GenericProc.java (isApplicable): Update to support splicing.

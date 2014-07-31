@@ -54,5 +54,8 @@
               visitor::gnu.expr.InlineCalls
               required::gnu.bytecode.Type
               proc::gnu.mapping.Procedure) ::gnu.expr.Expression
-              (cond clauses ...
-                    (else (exp:visitArgs visitor) exp))))))
+              (let ((ex ::gnu.expr.Expression
+                        (cond clauses ... (else #!null))))
+                (if (eq? ex #!null) #!null
+                    (gnu.expr.ExpVisitor:visit visitor (ex:maybeSetLine exp)
+                                               required)))))))

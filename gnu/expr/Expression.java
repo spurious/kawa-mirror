@@ -292,6 +292,12 @@ public abstract class Expression extends Procedure0
     return this;
   }
 
+    public final Expression maybeSetLine(Expression old) {
+        if (position == 0 && old != null && old.position != 0)
+            setLocation(old);
+        return this;
+    }
+
   public final void setFile (String filename)
   {
     this.filename = filename;

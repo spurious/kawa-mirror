@@ -1,5 +1,9 @@
 2014-07-31  Per Bothner  <per@bothner.com>
 
+	* kawa/expressions.scm (define-validate): Automagically visit result,
+	and also set line position.
+	* compile-misc.scm: Remove redundant visit-exp calls.
+
 	* kawa/string-cursors.scm (string-cursor-move, string-cursor-for-each):
 	New functions.
 

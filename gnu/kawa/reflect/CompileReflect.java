@@ -78,7 +78,7 @@ public class CompileReflect
                 if (value instanceof QuoteExp)
                   return type.isInstance(((QuoteExp) value).getValue())
                     ? QuoteExp.trueExp : QuoteExp.falseExp;
-                if (! value.side_effects())
+                if (! value.side_effects() && type instanceof ClassType)
                   {
                     int comp = type.compare(value.getType());
                     if (comp == 1 || comp == 0)

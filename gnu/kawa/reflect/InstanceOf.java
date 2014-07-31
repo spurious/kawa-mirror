@@ -61,7 +61,7 @@ public class InstanceOf extends Procedure2 implements Inlineable
 	    return;
 	  }
 	else
-	  type.emitIsInstance(code);
+            type.getImplementationType().emitIsInstance(code);
 	comp.usedClass(type);
       }
     else

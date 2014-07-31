@@ -1,5 +1,7 @@
 2014-07-31  Per Bothner  <per@bothner.com>
 
+	* CompileReflect.java (inlineClassName): Update in-place.
+
 	* CompileReflect.java (validateApplyInstanceOf): Only constant-fold
 	if type is a plain ClassType.  This fixes Savannah bug #42722
 	"Explicit type declaration, later instance? check issues".

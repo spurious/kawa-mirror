@@ -45,12 +45,8 @@ public class CompileReflect
 	  return exp;
         if (checkKnownClass(type, comp) >= 0)
           {
-            Expression[] nargs = new Expression[args.length];
-            System.arraycopy(args, 0, nargs, 0, args.length);
-            nargs[carg] = new QuoteExp(type);
-            ApplyExp nexp = new ApplyExp(exp.getFunction(), nargs);
-            nexp.setLine(exp);
-            return nexp;
+            args[carg] = new QuoteExp(type);
+            return exp;
           }
       }
     return exp;

@@ -545,9 +545,12 @@ public abstract class Type
     code.emitInstanceof(this);
   }
 
-  /** Convert an object to a value of this Type.
-   * Throw a ClassCastException when this is not possible. */
-  public abstract Object coerceFromObject (Object obj);
+    /** Convert an object to a value of this Type.
+     * The result is actually of the implementation type, boxed as appropriate,
+     * so it is suitable for standard reflective operations.
+     * Throw a ClassCastException when this is not possible.
+     */
+    public abstract Object coerceFromObject (Object obj);
 
     /** Given a raw JVM value convert it to an object of this type.
      * I.e. the argument is an object of the type returned by

@@ -78,6 +78,7 @@ public class LangPrimType extends PrimType implements TypeValue {
         return super.boxedType();
     }
 
+    @Override
     public Object coerceFromObject(Object obj) {
         if (obj.getClass() == reflectClass)
             return obj;
@@ -85,12 +86,14 @@ public class LangPrimType extends PrimType implements TypeValue {
         switch (sig1) {
         case 'I':
             if (this == characterType || this == characterOrEofType) {
-                if (obj instanceof Character) {
-                    return Char.make(((Character) obj).charValue());
-                }
-                if (obj instanceof Char
-                    || (obj == Sequence.eofValue && this == characterOrEofType))
-                    return obj;
+                int ival;
+                if (obj instanceof Char)
+                    ival = ((Char) obj).intValue();
+                else if (obj == Sequence.eofValue && this == characterOrEofType)
+                    ival = -1;
+                else
+                    ival = ((Character) obj).charValue();
+                return Integer.valueOf(ival);
             }
             break;
         case 'Z':

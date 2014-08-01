@@ -87,6 +87,8 @@ public class LangPrimType extends PrimType implements TypeValue {
         case 'I':
             if (this == characterType || this == characterOrEofType) {
                 int ival;
+                if (obj instanceof Integer)
+                    return obj;
                 if (obj instanceof Char)
                     ival = ((Char) obj).intValue();
                 else if (obj == Sequence.eofValue && this == characterOrEofType)

@@ -62,6 +62,7 @@ public class SwitchState
     switch_label = new Label(code);
     cases_label = new Label(code);
     after_label = new Label(code);
+    defaultLabel = new Label(code);
     outerTry = code.try_stack;
 
     numCases = 0;
@@ -104,11 +105,11 @@ public class SwitchState
 
   public void addDefault(CodeAttr code)
   {
-    Label label = new Label(code);
-    label.setTypes(cases_label);
-    label.define(code);
-    if (defaultLabel!=null) throw new Error();
-    defaultLabel = label;
+    if (defaultLabel.defined()) throw new Error();
+    if (outerTry != code.try_stack)
+    	defaultLabel.setTypes(code);
+    defaultLabel.setTypes(cases_label);
+    defaultLabel.define(code);
   }
 
   /** Internal routine to add a new case.
@@ -209,8 +210,14 @@ public class SwitchState
 	code.emitThrow();
       }
     Label end_label = new Label(code);
+
+    // When numCases > 1 we are going to generate code
+    // that will be moved before the already generated 
+    // code of the case clauses. We need to set the 
+    // stack map to reflect the correct state.
+    code.setTypes((numCases <= 1) ? switch_label : cases_label);
+
     code.fixupChain(switch_label, end_label);
-    code.setTypes(switch_label);
     if (numCases <= 1)
       {
 	if (numCases == 1)
@@ -235,7 +242,6 @@ public class SwitchState
       }
     else if (2 * numCases >= maxValue - minValue)
       {
-        code.popType();
 	code.reserve(13 + 4 * (maxValue - minValue + 1));
 	code.fixupAdd(CodeAttr.FIXUP_SWITCH, null);
 	code.put1(170);  // tableswitch
@@ -253,7 +259,6 @@ public class SwitchState
       }
     else
       {
-        code.popType();
 	code.reserve(9 + 8 * numCases);
 	code.fixupAdd(CodeAttr.FIXUP_SWITCH, null);
 	code.put1(171);  // lookupswitch

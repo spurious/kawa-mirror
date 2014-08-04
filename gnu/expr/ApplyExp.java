@@ -257,18 +257,6 @@ public class ApplyExp extends Expression
         CodeAttr code = comp.getCode();
         Method method;
 
-        if (exp.firstSpliceArg >= 0) {
-            Expression[] args = exp.getArgs();
-            exp_func.compile(comp, Target.pushObject);
-            CompileArrays.createArray(Type.objectType, comp,
-                                      args, 0, args.length);
-            code.emitInvoke(Compilation.typeProcedure
-                            .getDeclaredMethod("applyN", 1));
-            target.compileFromStack(comp, Type.pointer_type);
-            return;
-        }
-
-
     // Check for tail-recursion.
     boolean tail_recurse
       = exp.isTailCall()
@@ -281,8 +269,8 @@ public class ApplyExp extends Expression
         
     if (func_lambda != null)
       {
-	if ((func_lambda.max_args >= 0 && args_length > func_lambda.max_args)
-	    || args_length < func_lambda.min_args)
+	if ((func_lambda.max_args >= 0 && nonSpliceCount > func_lambda.max_args)
+	    || (nonSpliceCount < func_lambda.min_args) && spliceCount == 0)
 	  // This is supposed to get caught by InlineCalls.
 	  throw new Error ("internal error - wrong number of parameters for "
 			   + func_lambda);
@@ -297,7 +285,10 @@ public class ApplyExp extends Expression
 	    && (conv <= Compilation.CALL_WITH_CONSUMER
 		|| (conv == Compilation.CALL_WITH_TAILCALLS
 		    && ! exp.isTailCall()))
-	    && (method = func_lambda.getMethod(nonSpliceCount, spliceCount)) != null)
+	    && (method = func_lambda.getMethod(nonSpliceCount, spliceCount)) != null
+            && (exp.firstSpliceArg < 0
+                || (PrimProcedure.takesVarArgs(method)
+                    && func_lambda.min_args <= exp.firstSpliceArg)))
 	  {
 	    PrimProcedure pproc = new PrimProcedure(method, func_lambda);
 	    boolean is_static = method.getStaticFlag();
@@ -413,7 +404,7 @@ public class ApplyExp extends Expression
 	ClassType typeContext = Compilation.typeCallContext;
 	exp_func.compile(comp, new StackTarget(Compilation.typeProcedure));
 	// evaluate args to frame-locals vars;  // may recurse!
-	if (args_length <= 4)
+	if (args_length <= 4 && exp.isSimple())
 	  {
 	    for (int i = 0; i < args_length; ++i)
 	      exp.args[i].compileWithPosition(comp, Target.pushObject);
@@ -424,7 +415,11 @@ public class ApplyExp extends Expression
 	  }
 	else
 	  {
-            compileToArray (exp.args, 0, comp);
+            if (exp.firstSpliceArg >= 0)
+                CompileArrays.createArray(Type.objectType, comp,
+                                          exp.args, 0, args_length);
+            else
+                compileToArray (exp.args, 0, comp);
 	    comp.loadCallContext();
 	    code.emitInvoke(Compilation.typeProcedure
 			    .getDeclaredMethod("checkN", 2));
@@ -446,6 +441,17 @@ public class ApplyExp extends Expression
 	  }
 	return;
       }
+
+        if (exp.firstSpliceArg >= 0) {
+            Expression[] args = exp.getArgs();
+            exp_func.compile(comp, Target.pushObject);
+            CompileArrays.createArray(Type.objectType, comp,
+                                      args, 0, args.length);
+            code.emitInvoke(Compilation.typeProcedure
+                            .getDeclaredMethod("applyN", 1));
+            target.compileFromStack(comp, Type.pointer_type);
+            return;
+        }
 
     if (!tail_recurse)
       exp_func.compile (comp, new StackTarget(Compilation.typeProcedure));

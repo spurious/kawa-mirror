@@ -73,18 +73,20 @@ public class PrimProcedure extends MethodProc {
     sideEffectFree = true;
   }
 
-  /** Return true iff the last parameter is a "rest" argument. */
-  public boolean takesVarArgs()
-  {
-    if (method != null)
-      {
-        if ((method.getModifiers() & Access.VARARGS) != 0)
-          return true;
-	String name = method.getName();
-	return name.endsWith("$V") || name.endsWith("$V$X");
-      }
-    return false;
-  }
+    /** Return true iff the last parameter is a "rest" argument. */
+    public boolean takesVarArgs() {
+        return takesVarArgs(method);
+    }
+
+    public static boolean takesVarArgs(Method method) {
+        if (method != null) {
+            if ((method.getModifiers() & Access.VARARGS) != 0)
+                return true;
+            String name = method.getName();
+            return name.endsWith("$V") || name.endsWith("$V$X");
+        }
+        return false;
+    }
 
   public boolean takesContext()
   {

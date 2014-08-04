@@ -1,3 +1,8 @@
+2014-08-04  Per Bothner  <per@bothner.com>
+
+	* ApplyExp.java (compile): Better handling of calls with splices.
+	* PrimProcedure.java (takesVarArgs): New static method.
+
 2014-07-31  Per Bothner  <per@bothner.com>
 
 	* Expression.java (maybeSetLine): New method.

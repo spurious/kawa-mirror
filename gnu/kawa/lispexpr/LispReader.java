@@ -1275,8 +1275,12 @@ public class LispReader extends Lexer
     reader.readToken(reader.read(), ReadTable.getCurrent());
     char[] tokenBuffer = reader.tokenBuffer;
     int length = reader.tokenBufferLength - startPos;
-    if (length == 1)
-      return Char.make(tokenBuffer[startPos]);
+    if (length == 1 || length == 2) {
+        ch = Character.codePointAt(tokenBuffer, startPos,
+                                   reader.tokenBufferLength);
+        if (ch > 0xFFFF || length == 1)
+            return Char.make(ch);
+    }
     String name = new String(tokenBuffer, startPos, length);
     ch = Char.nameToChar(name);
     if (ch >= 0)

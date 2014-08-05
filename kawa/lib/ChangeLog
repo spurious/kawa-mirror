@@ -1,3 +1,8 @@
+2014-08-05  Per Bothner  <per@bothner.com>
+
+	* strings.scm (string-length): Change to use sizeInCodePoints.
+	(string-ref): Change to scan for code-points.
+
 2014-08-04  Per Bothner  <per@bothner.com>
 
 	* strings.scm (string-map): New function.

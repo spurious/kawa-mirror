@@ -44,13 +44,15 @@
 	((>= i n) str)
 	(str:setCharAt i ((as gnu.text.Char (args i)):charValue))))) ;; FIXME
 
-(define (string-length str ::string) :: <int>
-  (invoke str 'length))
+(define (string-length str ::string) ::int
+  (gnu.lists.Strings:sizeInCodePoints str))
 
-(define (string-ref (string ::java.lang.CharSequence) (k ::int)) ::char
-  (invoke string 'charAt k))
+(define (string-ref (str ::java.lang.CharSequence) (k ::int)) ::character
+ (as character (java.lang.Character:codePointAt
+                str
+                (java.lang.Character:offsetByCodePoints str 0 k))))
 
-(define (string-set! string::abstract-string k::int char::char)
+(define (string-set! string::abstract-string k::int char::character)
   ::void
   (invoke string 'setCharAt k char))
 

@@ -8,6 +8,22 @@ import java.io.IOException;
 
 public class Strings
 {
+    public static int sizeInCodePoints(CharSequence str) {
+        int len = str.length();
+        int nsurr = 0;
+        for (int i = 0; i < len;  ) {
+            char ch = str.charAt(i++);
+            if (ch >= 0xD800 && ch <= 0xDBFF && i < len) {
+                int next = str.charAt(i);
+                if (next >= 0xDC00 && next <= 0xDFFF) {
+                    i++;
+                    nsurr++;
+                }
+            }
+        }
+        return len-nsurr;
+    }
+
   /** Change every character to be uppercase. */
   public static void makeUpperCase(CharSeq str)
   {

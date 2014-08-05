@@ -83,6 +83,9 @@
 (test-equal "\xE9;" (string-normalize-nfc "\x65;\x301;"))
 
 (define str1 "a😂b😼c")
+(test-equal 5 (string-length str1))
+(test-equal #\c (string-ref str1 4))
+(test-equal #\😼 (string-ref str1 3))
 (define str1lst '())
 (string-for-each (lambda (x)
                    (set! str1lst (cons (char->integer x) str1lst)))

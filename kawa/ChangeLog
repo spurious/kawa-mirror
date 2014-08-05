@@ -1,5 +1,7 @@
 2014-08-04  Per Bothner  <per@bothner.com>
 
+	* standard/Scheme.java (initScheme): Add string-map.
+
 	* standard/Scheme.java (initScheme): Update string-for-each location
 	and add srfi-13-string-for-each.
 

@@ -1,3 +1,7 @@
+2014-08-04  Per Bothner  <per@bothner.com>
+
+	* FString.java (alloc, appendCharacter): New methods.
+
 2014-05-21  Per Bothner  <per@bothner.com>
 
 	* TreeList.java (posToDataIndex): Fix thinko in gap handling.

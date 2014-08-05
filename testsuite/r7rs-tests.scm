@@ -1469,7 +1469,6 @@
       (set-cdr! (cddr ls1) ls1)
       (map * ls1 ls2)))
 
-(skip-if-kawa "string-map not implemented"
 (test "abdegh" (string-map char-foldcase "AbdEgH"))
 
 (test "IBM" (string-map
@@ -1482,7 +1481,6 @@
      (lambda (c k) (if (eqv? k #\u) (char-upcase c) (char-downcase c)))
      "studlycaps xxx"
      "ululululul"))
-)
 
 (test #(b e h) (vector-map cadr '#((a b) (d e) (g h))))
 

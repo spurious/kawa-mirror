@@ -10,14 +10,7 @@ import java.io.*;
  */
 
 public class FString extends SimpleVector
-  implements
-  /* #ifdef JAVA2 */
-  Comparable,
-  /* #endif */
-  /* #ifdef JAVA5 */
-  Appendable,
-  /* #endif */
-  CharSeq, Externalizable, Consumable
+  implements Comparable, Appendable, CharSeq, Externalizable, Consumable
 {
   public char[] data;
   protected static char[] empty = new char[0];
@@ -107,6 +100,13 @@ public class FString extends SimpleVector
         }
         this.data = data;
         this.size = length;
+    }
+
+    /** Create a empty string, but with a given initial buffer size. */
+    public static FString alloc(int sz) {
+        FString str = new FString(sz);
+        str.size = 0;
+        return str;
     }
 
   public int length() { return size; }
@@ -464,7 +464,22 @@ public class FString extends SimpleVector
     return this;
   }
 
-  /* #ifdef use:java.lang.CharSequence */
+    /** Append a Unicode code point. */
+    public FString appendCharacter(int c) {
+        int sz = size;
+        int delta = c >= 0x10000 ? 2 : 1;
+        if (sz + delta > data.length)
+            ensureBufferLength(sz+delta);
+        char[] d = data;
+        if (delta > 1) {
+            d[sz++] = (char) (((c - 0x10000) >> 10) + 0xD800);
+            c = (c & 0x3FF) + 0xDC00;
+        }
+        d[sz++] = (char) c;
+        size = sz;
+        return this;
+    }
+
   public FString append (CharSequence csq)
   {
     if (csq == null)
@@ -494,18 +509,7 @@ public class FString extends SimpleVector
     size = sz;
     return this;
   }
-  /* #else */
-  // public FString append (String str)
-  // {
-  //   int len = str.length();
-  //   ensureBufferLength(size+len);
-  //   str.getChars(0, len, data, size);
-  //   size += len;
-  //   return this;
-  // }
-  /* #endif */
 
-  /* #ifdef JAVA5 */
   public void writeTo(int start, int count, Appendable dest)
      throws java.io.IOException
   {
@@ -530,18 +534,6 @@ public class FString extends SimpleVector
   {
     writeTo(0, size, dest);
   }
-  /* #else */
-  // public void writeTo(int start, int count, java.io.Writer dest)
-  //   throws java.io.IOException
-  // {
-  //   dest.write(data, start, count);
-  // }
-
-  // public void writeTo(java.io.Writer dest) throws java.io.IOException
-  // {
-  //   dest.write(data, 0, size);
-  // }
-  /* #endif */
 
   /**
    * @serialData Write 'size' (using writeInt),

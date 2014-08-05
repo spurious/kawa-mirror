@@ -1,3 +1,8 @@
+2014-08-04  Per Bothner  <per@bothner.com>
+
+	* srfi13.scm (string-for-each): Replace by alias for
+	srfi-13-string-for-each.
+
 2014-07-02  Per Bothner  <per@bothner.com>
 
 	* srfi14.scm (char-set): Update since character is now primitive.

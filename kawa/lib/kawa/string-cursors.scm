@@ -63,22 +63,27 @@
 
 ;; cs1 is before cs2
 (define (string-cursor<? cs1::string-cursor cs2::string-cursor) ::boolean
+  validate-apply: "kawa.lib.compile_misc:stringCursorCompareValidateApply"
   (< (as int cs1) (as int cs2)))
 
 ;; cs1 is before or the same as cs2
 (define (string-cursor<=? cs1::string-cursor cs2::string-cursor) ::boolean
+  validate-apply: "kawa.lib.compile_misc:stringCursorCompareValidateApply"
   (<= (as int cs1) (as int cs2)))
 
 ;; cs1 is the same as cs2
 (define (string-cursor=? cs1::string-cursor cs2::string-cursor) ::boolean
+  validate-apply: "kawa.lib.compile_misc:stringCursorCompareValidateApply"
   (= (as int cs1) (as int cs2)))
 
 ;; cs1 is after cs2
 (define (string-cursor>? cs1::string-cursor cs2::string-cursor) ::boolean
+  validate-apply: "kawa.lib.compile_misc:stringCursorCompareValidateApply"
   (> (as int cs1) (as int cs2)))
 
 ;; cs1 is the same or after cs2
 (define (string-cursor>=? cs1::string-cursor cs2::string-cursor) ::boolean
+  validate-apply: "kawa.lib.compile_misc:stringCursorCompareValidateApply"
   (>= (as int cs1) (as int cs2)))
 
 (define (string-cursor-for-each proc str::string
@@ -86,6 +91,7 @@
                                 (start::string-cursor (as string-cursor 0))
                                 (end::string-cursor (string-cursor-end str)))
   ::void
+  validate-apply: "kawa.lib.compile_map:stringCursorForEachValidateApply"
   (do ((cursor::string-cursor start
                               (string-cursor-next str cursor)))
       ((string-cursor>=? cursor end))

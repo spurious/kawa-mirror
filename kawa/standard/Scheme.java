@@ -555,7 +555,8 @@ public class Scheme extends LispLanguage
 
       defProcStFld("vector-map", "kawa.lib.vectors");
       defProcStFld("vector-for-each", "kawa.lib.vectors");
-      defProcStFld("string-for-each", "gnu.kawa.slib.srfi13");
+      defProcStFld("srfi-13-string-for-each", "kawa.lib.strings");
+      defProcStFld("string-for-each", "kawa.lib.strings");
       defProcStFld("real-valued?", "kawa.lib.numbers");
       defProcStFld("rational-valued?", "kawa.lib.numbers");
       defProcStFld("integer-valued?", "kawa.lib.numbers");

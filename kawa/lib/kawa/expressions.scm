@@ -20,6 +20,7 @@
 
 (define (visit-exp exp::gnu.expr.Expression
                    #!optional (required ::gnu.bytecode.Type #!null))
+  ::gnu.expr.Expression
   (gnu.expr.ExpVisitor:visit (get-visitor) exp required))
 
 (define-syntax syntax-as-exp

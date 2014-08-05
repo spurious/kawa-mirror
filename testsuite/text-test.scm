@@ -1,3 +1,5 @@
+;; -*- coding: utf-8 -*-
+
 (test-begin "text")
 
 (test-equal #\space (integer->char 32))
@@ -79,6 +81,27 @@
 (test-equal "\xE9;" (string-normalize-nfc "\xE9;"))
 (test-equal "\x65;\x301;" (string-normalize-nfd "\x65;\x301;"))
 (test-equal "\xE9;" (string-normalize-nfc "\x65;\x301;"))
+
+(define str1 "a😂b😼c")
+(define str1lst '())
+(string-for-each (lambda (x)
+                   (set! str1lst (cons (char->integer x) str1lst)))
+                 str1)
+(test-equal '(97 128514 98 128572 99) (reverse str1lst))
+
+(define str2lst '())
+(string-for-each (lambda (x y)
+                   (set! str2lst (cons (char->integer x) str2lst))
+                   (set! str2lst (cons (char->integer y) str2lst)))
+                 str1 "ABC")
+(test-equal '(97 65 128514 66 98 67) (reverse str2lst))
+
+(define str3lst '())
+;; SRFI-13 extension
+(string-for-each (lambda (x)
+                   (set! str3lst (cons (char->integer x) str3lst)))
+                 str1 1 4)
+(test-equal '(128514 98 128572) (reverse str3lst))
 
 (import (srfi :13 strings))
 (test-equal 15 (string-contains "eek -- what a geek." "ee" 12 18))

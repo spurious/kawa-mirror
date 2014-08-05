@@ -1,3 +1,7 @@
+2014-08-04  Per Bothner  <per@bothner.com>
+
+	* build.xml (lib-scm-classes): Add compile_map.scm.
+
 2014-07-22  Per Bothner  <per@bothner.com>
 
 	* build.xml (lib-scm-classes): Add string-cursors.scm.

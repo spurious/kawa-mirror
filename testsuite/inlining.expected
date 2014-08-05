@@ -102,6 +102,12 @@ InliningTest.factorialInfer1(int)java.lang.Object: 25 bytes
 InliningTest.getFromVector1(gnu.lists.FVector,int)java.lang.Integer: 9 bytes
 InliningTest.getFromVector2(gnu.lists.FVector,int)java.lang.Integer: 9 bytes
 InliningTest.read1(gnu.kawa.io.InPort)int: 71 bytes
+InliningTest.stringForEach1(java.lang.CharSequence)void: 51 bytes
+InliningTest.stringForEach2(java.lang.CharSequence)void: 42 bytes
+InliningTest.stringForEach3(java.lang.CharSequence)void: 49 bytes
+InliningTest.stringForEach4(java.lang.CharSequence,int,int)void: 38 bytes
+InliningTest.stringForEach5(java.lang.CharSequence,int,int)void: 52 bytes
+InliningTest.stringForEach6(java.lang.CharSequence)void: 144 bytes
 InliningTest.topLevelRecurse1(gnu.lists.Pair)gnu.bytecode.Type$NeverReturns: 10 bytes
 InliningTest.topLevelRecurse2(java.lang.Object,java.lang.Object)gnu.bytecode.Type$NeverReturns: 7 bytes
 InliningTest.sum1(gnu.math.IntNum)java.lang.Object: 34 bytes

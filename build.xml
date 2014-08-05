@@ -553,6 +553,7 @@
         <file name="rnrs/programs.scm"/>
         <file name="trace.scm"/>
         <file name="compile_misc.scm"/>
+        <file name="compile_map.scm"/>
       </filelist>
       <fileset dir="${src.dir}/kawa/lib">
         <include name="windows.scm" if="${with-swing}"/>

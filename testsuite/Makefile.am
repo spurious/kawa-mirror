@@ -537,7 +537,7 @@ inlining.log: InliningTest.class cycle1.class cycle2.class \
 	factoriali1 factoriali2 factoriall1 plusLambda1 firstNegative \
 	inlineTwoCalls inlineTwoFunctions checkEven \
 	constantPropagation1 constantPropagation2 constantPropagation3 \
-	factorialInfer1 getFromVector1 getFromVector2 read1 \
+	factorialInfer1 getFromVector1 getFromVector2 read1 stringForEach \
 	topLevelRecurse1 topLevelRecurse2 sum1 sum2 numcomp eqv \
 	raise >inlining.log
 	$(LIST_CODE_SIZE) cycle1.class isIsEven >>inlining.log

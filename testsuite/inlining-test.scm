@@ -300,3 +300,24 @@
           ((char=? ch #\space) 2)
           ((and (char-ci>=? ch #\A) (char-ci<=? ch #\Z)) 3)
           (else 4))))
+
+(define (handle-char ch::character)::void
+  (format #t "{~w}" ch))
+(define (string-for-each1 str::string)::void
+  (string-for-each (lambda (x) (if (char>? x #\Space) (handle-char x))) str))
+(define (string-for-each2 str::string)::void
+  (string-for-each handle-char str))
+(import (kawa string-cursors))
+(define (string-for-each3 str::string)::void
+  (string-cursor-for-each (lambda (x) (if (char>? x #\Space) (handle-char x)))
+                          str))
+(define (string-for-each4 str::string
+                          start::string-cursor end::string-cursor)::void
+  (string-cursor-for-each handle-char str start end))
+(define (string-for-each5 str::string
+                          start::int end::int)::void
+  (srfi-13-string-for-each handle-char str start end))
+(define (string-for-each6 str::string)::void
+  (string-for-each
+   (lambda (x y z) (handle-char x) (handle-char y) (handle-char z))
+   str "BCDE" str))

@@ -60,3 +60,23 @@
                   (set! e (apply-exp invoke-static java.lang.Character 'toUpperCase e)))
               (exp:setArg i e)))
           (apply-exp num-op @exp:args)))))
+
+(define-validate stringCursorCompareValidateApply (exp required proc)
+  ((exp:isSimple 2 2)
+   (define name proc:name)
+   (define n exp:arg-count)
+   (define num-op
+     (cond ((name:equals "string-cursor=?") =)
+           ((name:equals "string-cursor<?") <)
+           ((name:equals "string-cursor>?") >)
+           ((name:equals "string-cursor<=?") <=)
+           ((name:equals "string-cursor>=?") >=)
+           (else #!null)))
+   (cond ((eq? num-op #!null)
+          #!null)
+         (else
+          (do ((i::int 0 (+ i 1)))
+              ((= i n))
+            (let ((e (apply-exp as int (exp:getArg i))))
+              (exp:setArg i e)))
+          (apply-exp num-op @exp:args)))))

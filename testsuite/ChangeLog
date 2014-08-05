@@ -1,3 +1,10 @@
+2014-08-04  Per Bothner  <per@bothner.com>
+
+	* text-test.scm: Add tests for string-for-each.
+	* inlining-test.scm: Likewise.
+	* Makefile.am: Update accordingly.
+	* inlining.expected: Likewise.
+
 2014-07-31  Per Bothner  <per@bothner.com>
 
 	* lib-test.scm: Add test for string-cursor-for-each.

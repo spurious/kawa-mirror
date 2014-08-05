@@ -1,6 +1,11 @@
+2014-08-04  Per Bothner  <per@bothner.com>
+
+	* standard/Scheme.java (initScheme): Update string-for-each location
+	and add srfi-13-string-for-each.
+
 2014-07-22  Per Bothner  <per@bothner.com>
 
-	* standard/Scheme.java (initScheme) Remove string-append/shared.
+	* standard/Scheme.java (initScheme): Remove string-append/shared.
 
 2014-07-20  Per Bothner  <per@bothner.com>
 

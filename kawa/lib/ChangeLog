@@ -1,3 +1,15 @@
+2014-08-04  Per Bothner  <per@bothner.com>
+
+	* strings.scm (string-for-each, srfi-13-string-for-each): New functions.
+	* compile_map.scm: New file. Optimize/inline string-for-each,
+	srfi-13-string-for-each, and string-cursor-for-each/
+	* Makefile.am: Update for new file.
+	* compile_misc.scm (stringCursorCompareValidateApply): Inline
+	string-cursor<? and similar functions.
+	* kawa/string-cursors.scm: Add validate-apply properties.
+
+	* kawa/expressions.scm (visit-exp): Specify return type.
+
 2014-07-31  Per Bothner  <per@bothner.com>
 
 	* kawa/expressions.scm (define-validate): Automagically visit result,

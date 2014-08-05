@@ -7,7 +7,7 @@
                substring string->list list->string string-copy string-copy!
                string-fill! string-upcase! string-downcase!
                string-capitalize string-capitalize!
-               string-append)
+               string-append string-for-each srfi-13-string-for-each)
 
 (require <kawa.lib.prim_syntax>)
 (require <kawa.lib.std_syntax>)
@@ -15,6 +15,7 @@
 (require <kawa.lib.lists>)
 (require <kawa.lib.characters>)
 (require <kawa.lib.compile_misc>)
+(import (kawa lib kawa string-cursors))
 
 (define-syntax define-compare
   (syntax-rules ()
@@ -172,3 +173,51 @@
   validate-apply: "kawa.lib.compile_misc:charCompareValidateApply")
 (define-compare char-ci>=? character >= %char-compare-ci
   validate-apply: "kawa.lib.compile_misc:charCompareValidateApply")
+
+;; Hook for backward compatibility with SRFI-13's string-for-each,
+;; which differs from the R7RS version.
+(define (srfi-13-string-for-each proc str::string #!optional
+                                 (start::int 0) (end::int -1))
+  ::void
+  validate-apply: "kawa.lib.compile_map:stringForEach1ValidateApply" 
+  (let* ((cstart ::string-cursor
+                 (string-cursor-move str
+                                     (as string-cursor 0)
+                                     start))
+         (cend ::string-cursor
+             (if (= end -1) (as string-cursor (str:length))
+                 (string-cursor-move str cstart (- end start)))))
+    (string-cursor-for-each proc str cstart cend)))
+  
+(define (string-for-each proc str1::string #!rest rst::object[])::void
+  validate-apply: "kawa.lib.compile_map:stringForEachValidateApply"
+  (define nrst rst:length)
+  (cond ((= nrst 0)
+         (string-cursor-for-each proc str1))
+        ((and (< nrst 3) (not (instance? (rst 0) string)))
+         (srfi-13-string-for-each proc str1 (rst 0)
+                           (if (= nrst 2) (rst 1) -1)))
+        (else
+         (define n::int (+ nrst 1))
+         (define cursors::int[] (int[] length: n))
+         (define ends::int[] (int[] length: n))
+         (define chs::gnu.text.Char[] (gnu.text.Char[] length: n))
+         (set! (cursors 0) (string-cursor-start str1))
+         (set! (ends 0) (string-cursor-end str1))
+         (do ((i ::int 1 (+ i 1))) ((>= i n))
+           (let ((str ::string (rst (- i 1))))
+             (set! (cursors i) (string-cursor-start str))
+             (set! (ends i) (string-cursor-end str))))
+         (let loop1 ()
+           (let loop2 ((i::int 0))
+             (cond ((= i n)
+                    (proc @chs)
+                    (loop1))
+                   (else
+                    (define curs-i (cursors i))
+                    (define end-i (ends i))
+                    (define str ::string (if (= i 0) str1 (rst (- i 1))))
+                    (cond ((string-cursor<? curs-i end-i)
+                           (set! (chs i) (string-cursor-ref str curs-i))
+                           (set! (cursors i) (string-cursor-next str curs-i))
+                           (loop2 (+ i 1)))))))))))

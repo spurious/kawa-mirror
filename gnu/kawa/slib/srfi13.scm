@@ -506,7 +506,9 @@
 	      ans))))))
 
 
-(define (string-for-each proc s . maybe-start+end)
+(define-alias string-for-each srfi-13-string-for-each)
+#|
+(define (string-for-each proc s . maybe-start+end) ;; FIXME
   (check-arg procedure? proc string-for-each)
   (let-string-start+end (start end) string-for-each s maybe-start+end
     (let lp ((i start))
@@ -519,6 +521,7 @@
   (let-string-start+end (start end) string-for-each-index s maybe-start+end
     (let lp ((i start))
       (if (< i end) (begin (proc i) (lp (+ i 1)))))))
+|#
 
 (define (string-every criterion s . maybe-start+end)
   (let-string-start+end (start end) string-every s maybe-start+end

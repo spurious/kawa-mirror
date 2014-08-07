@@ -26,14 +26,27 @@ public class FString extends SimpleVector
     data = new char[num];
   }
 
-  public FString (int num, char value)
-  {
-    char[] array = new char[num];
-    data = array;
-    size = num;
-    while (--num >= 0)
-      array[num] = value;
-  }
+    public FString(int num, int value) {
+        char c1, c2;
+        int len;
+        if (value >= 0x10000) {
+            c1 = (char) (((value - 0x10000) >> 10) + 0xD800);
+            c2 = (char) ((value & 0x3FF) + 0xDC00);
+            len = 2 * num;
+        } else {
+            c1 = (char) value;
+            c2 = 0;
+            len = num;
+        }
+        char[] array = new char[len];
+        data = array;
+        size = len;
+        for (int i = 0;  i < len;  ) {
+            array[i++] = c1;
+            if (c2 != 0)
+                array[i++] = c2;
+        }
+    }
 
   /** Create an FString from a char[].
    * Note that this contructor does *not* copy the argument. */
@@ -343,6 +356,33 @@ public class FString extends SimpleVector
       throw new StringIndexOutOfBoundsException(index);
     data[index] = ch;
   }
+
+    public void setCharacterAt(int index, int ch) {
+        if (index < 0 || index >= size)
+            throw new StringIndexOutOfBoundsException(index);
+        char old1 = data[index];
+        char old2;
+        boolean oldIsSupp = old1 >= 0xD800 && old1 <= 0xDBFF
+            && index+1 < size
+            && (old2 = data[index+1]) >= 0xDC00 && old2 <= 0xDFFF;
+        if (ch <= 0xFFFF) {
+            if (oldIsSupp) {
+                System.arraycopy(data, index+2, data, index+1, size-index-2);
+                size--;
+            }
+            data[index] = (char) ch;
+        } else {
+            char c1 = (char) (((ch - 0x10000) >> 10) + 0xD800);
+            char c2 = (char) ((ch & 0x3FF) + 0xDC00);
+            if (!oldIsSupp) {
+                ensureBufferLength(size+1);
+                System.arraycopy(data, index+1, data, index+2, size-index-1);
+                size++;
+            }
+            data[index] = c1;
+            data[index+1] = c2;
+        }
+    }
 
   public void setCharAtBuffer (int index, char ch)
   {

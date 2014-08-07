@@ -92,6 +92,24 @@
                  str1)
 (test-equal '(97 128514 98 128572 99) (reverse str1lst))
 
+(test-equal "😂b😼" (string-copy str1 1 4))
+;; Test various cominations of replacing characters that are 1-char
+;; or 2-char (i.e. surrogate pairs).
+(define strx2 (string-copy str1 0))
+(test-equal str1 strx2)
+(string-set! strx2 3 #\y)
+(test-equal "a😂byc" strx2)
+(string-set! strx2 2 #\x)
+(test-equal "a😂xyc" strx2)
+(string-set! strx2 4 #\😂)
+(test-equal "a😂xy😂" strx2)
+(string-set! strx2 1 #\😼)
+(test-equal "a😼xy😂" strx2)
+
+(define strx3 (make-string 3 #\😂))
+(test-equal 3 (string-length strx3))
+(test-equal #\😂 (string-ref strx3 2))
+
 (define str2lst '())
 (string-for-each (lambda (x y)
                    (set! str2lst (cons (char->integer x) str2lst))

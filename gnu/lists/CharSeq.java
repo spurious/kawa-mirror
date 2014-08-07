@@ -24,6 +24,7 @@ public interface CharSeq
   public void getChars (int srcBegin, int srcEnd, char[] dst, int dstBegin);
 
   public void setCharAt(int index, char ch);
+  public void setCharacterAt(int index, int ch);
 
   /** Set all the elements to a given character. */
   public void fill(char value);

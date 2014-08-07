@@ -39,6 +39,13 @@ implements CharSeq
     ((CharSeq) base).setCharAt(start + index, ch);
   }
 
+    public void setCharacterAt(int index, int ch) {
+        if (index < 0 || index >=size())
+            throw new IndexOutOfBoundsException();
+        int start = base.nextIndex(ipos0);
+        ((CharSeq) base).setCharacterAt(start + index, ch);
+    }
+
   /** Set all the elements to a given character. */
   public void fill(char value)
   {

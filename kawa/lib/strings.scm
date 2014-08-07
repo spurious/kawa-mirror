@@ -34,15 +34,16 @@
 (define (string? x) :: <boolean>
   (instance? x <string>))
 
-(define (make-string n ::int #!optional (ch #\Space)) :: <string>
-  (make <gnu.lists.FString> n ch))
+(define (make-string n ::int #!optional (ch ::character #\Space)) :: <string>
+  (make <gnu.lists.FString> n (as int ch)))
 
-(define ($make$string$ #!rest args ::Object[]) :: <string>
+(define ($make$string$ #!rest args ::object[]) :: <string>
   (let* ((n :: <int> args:length)
-	 (str (<gnu.lists.FString> n)))
+	 (str (gnu.lists.FString:alloc n)))
     (do ((i :: <int> 0 (+ i 1)))
 	((>= i n) str)
-	(str:setCharAt i ((as gnu.text.Char (args i)):charValue))))) ;; FIXME
+	(str:appendCharacter
+         ((as gnu.text.Char (args i)):intValue)))))
 
 (define (string-length str ::string) ::int
   (gnu.lists.Strings:sizeInCodePoints str))
@@ -52,9 +53,11 @@
                 str
                 (java.lang.Character:offsetByCodePoints str 0 k))))
 
-(define (string-set! string::abstract-string k::int char::character)
+(define (string-set! str::abstract-string k::int char::character)
   ::void
-  (invoke string 'setCharAt k char))
+  (invoke str 'setCharacterAt
+          (java.lang.Character:offsetByCodePoints str 0 k)
+          (as int char)))
 
 (define (%string-compare2 (str1 :: string) (str2 :: string)) ::int
   ((str1:toString):compareTo (str2:toString)))
@@ -91,9 +94,17 @@
 (define (string-copy (str ::java.lang.CharSequence)
                      #!optional
                      (start ::int 0)
-                     (end ::int (str:length)))
+                     (end ::int -1))
   ::gnu.lists.FString
-  (gnu.lists.FString str start (- end start)))
+  (let* ((istart (java.lang.Character:offsetByCodePoints str 0 start))
+         (iend (cond ((= end -1) (str:length))
+                     ((< end start)
+                      (primitive-throw (java.lang.StringIndexOutOfBoundsException)))
+                     (else
+                      ;(format #t "string-copy start:~w end:~w istart:~w~%"        start end istart)
+                      (java.lang.Character:offsetByCodePoints str istart
+                                                              (- end start))))))
+    (gnu.lists.FString str istart (- iend istart))))
 
 (define (string-copy! (to ::abstract-string)
                       (at ::int)

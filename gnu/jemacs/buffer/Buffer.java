@@ -89,7 +89,11 @@ public abstract class Buffer extends AbstractSequence implements CharSeq
     getStringContent().setCharAt(index, ch);
   }
 
-  /**
+    public void setCharacterAt(int index, int ch) {
+        getStringContent().setCharacterAt(index, ch);
+    }
+
+ /**
    * @see gnu.lists.CharSeq#fill(char)
    */
   public void fill(char value)

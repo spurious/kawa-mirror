@@ -138,6 +138,32 @@ public class CharBuffer extends StableVector
     string.setCharAt(index, value);
   }
 
+    public void setCharacterAt(int index, int ch) {
+        int sz = size();
+        if (index < 0 || index >= sz)
+            throw new StringIndexOutOfBoundsException(index);
+        char old1 = charAt(index);
+        char old2;
+        boolean oldIsSupp = old1 >= 0xD800 && old1 <= 0xDBFF
+            && index+1 < sz
+            && (old2 = charAt(index+1)) >= 0xDC00 && old2 <= 0xDFFF;
+        if (ch <= 0xFFFF) {
+            if (oldIsSupp)
+                delete(index+1, 1);
+            setCharAt(index, (char) ch);
+        } else {
+            char c1 = (char) (((ch - 0x10000) >> 10) + 0xD800);
+            char c2 = (char) ((ch & 0x3FF) + 0xDC00);
+            setCharAt(index, c1);
+            if (oldIsSupp) {
+                setCharAt(index+1, c2);
+            } else {
+                insert(index+1, new String(new char[] { c2 }), true);
+            }
+        }
+    }
+
+
   public String substring (int start, int end)
   {
     int sz = size();
@@ -194,12 +220,17 @@ public class CharBuffer extends StableVector
     releasePos(ipos);
   }
 
-  public void insert(int where, String str, boolean beforeMarkers/*ignored*/)
+  public void insert(int where, String str, boolean beforeMarkers)
   {
     int len = str.length();
     gapReserve(where, len);
     str.getChars(0, len, string.data, where);
     gapStart += len;
+    if (beforeMarkers) {
+        // Adjust markers at insertion point to be after inserted next.
+        int oldPos = (gapStart-len) << 1;
+        adjustPositions(oldPos, oldPos + 1, len << 1);
+    }
   }
 
   public void consume(int start, int count, Consumer dest)

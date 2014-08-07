@@ -1,3 +1,7 @@
+2014-08-06  Per Bothner  <per@bothner.com>
+
+	* Buffer.java (setCharacterAt): New method.
+
 2014-02-16  Per Bothner  <per@bothner.com>
 
 	* EWindow.java: Make sure Error is uncaught or re-thrown.

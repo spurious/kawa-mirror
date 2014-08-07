@@ -1,3 +1,8 @@
+2014-08-06  Per Bothner  <per@bothner.com>
+
+	* text-test.scm: Add tests for string-set! and string-copy for
+	string with non-BMP characters.
+
 2014-08-05  Per Bothner  <per@bothner.com>
 
 	* text-test.scm: Add tests for string-length and string-ref for

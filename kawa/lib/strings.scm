@@ -14,7 +14,6 @@
 (require <kawa.lib.syntax>)
 (require <kawa.lib.lists>)
 (require <kawa.lib.characters>)
-(require <kawa.lib.compile_misc>)
 (import (kawa lib kawa string-cursors))
 
 (define-syntax define-compare
@@ -30,6 +29,19 @@
                     (let ((next (strs i)))
                       (and (OP (COMP2 prev next) 0)
                            (loop (+ i 1) next)))))))))))
+
+(define-syntax with-start-end
+  (syntax-rules ()
+    ((_ str (start end) (cstart cend) . body)
+     (let* ((cstart (java.lang.Character:offsetByCodePoints str 0 start))
+            (cend (cond ((= end -1) (str:length))
+                        ((< end start)
+                         (primitive-throw
+                          (java.lang.StringIndexOutOfBoundsException)))
+                        (else
+                         (java.lang.Character:offsetByCodePoints
+                          str cstart (- end start))))))
+       . body))))
 
 (define (string? x) :: <boolean>
   (instance? x <string>))
@@ -73,14 +85,16 @@
   (make <gnu.lists.FString> str start (- end start)))
 
 (define (string->list (str ::string)
-                      #!optional (start ::int 0) (end ::int (str:length)))
+                      #!optional (start ::int 0) (end ::int -1))
   ::list
-  (let loop ((result ::list '())
-	     (i ::int end))
-    (set! i (- i 1))
-    (if (< i start)
-	result
-	(loop (make <pair> (string-ref str i) result) i))))
+  (with-start-end 
+   str (start end) (cstart cend)
+   (let loop ((result ::list '())
+              (i ::string-cursor (as string-cursor cend)))
+     (if (string-cursor<=? i start)
+         result
+         (let ((prev (string-cursor-prev str i)))
+           (loop (make <pair> (string-cursor-ref str prev) result) prev))))))
 
 (define (list->string (lst ::list)) ::string
   (let* ((len ::int (length lst))
@@ -96,15 +110,8 @@
                      (start ::int 0)
                      (end ::int -1))
   ::gnu.lists.FString
-  (let* ((istart (java.lang.Character:offsetByCodePoints str 0 start))
-         (iend (cond ((= end -1) (str:length))
-                     ((< end start)
-                      (primitive-throw (java.lang.StringIndexOutOfBoundsException)))
-                     (else
-                      ;(format #t "string-copy start:~w end:~w istart:~w~%"        start end istart)
-                      (java.lang.Character:offsetByCodePoints str istart
-                                                              (- end start))))))
-    (gnu.lists.FString str istart (- iend istart))))
+  (with-start-end str (start end) (istart iend)
+                  (gnu.lists.FString str istart (- iend istart))))
 
 (define (string-copy! (to ::abstract-string)
                       (at ::int)
@@ -115,12 +122,17 @@
   ::void
   (gnu.lists.Strings:copyInto from start end to at))
 
-(define (string-fill! str ::abstract-string ch ::char
+(define (string-fill! str ::abstract-string ch ::character
                       #!optional
                       (start ::int 0)
-                      (end ::int (str:length)))
+                      (end ::int (string-length str)))
   ::void
-  (str:fill start end ch))
+  (let ((width ::int (if (> (as int ch) #xffff) 2 1)))
+    (do ((to-do ::int (- end start) (- to-do 1))
+         (pos ::int (java.lang.Character:offsetByCodePoints str 0 start)
+              (+ pos width)))
+        ((<= to-do 0))
+      (str:setCharacterAt pos (as int ch)))))
 
 (define (string-upcase! str ::abstract-string) ::string
   (gnu.lists.Strings:makeUpperCase str)

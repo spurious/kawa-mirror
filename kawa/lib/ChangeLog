@@ -1,3 +1,8 @@
+2014-08-08  Per Bothner  <per@bothner.com>
+
+	* strings.scm (string->list, string-copy, string-fill!): Generalize
+	to strings with non-BMP characters.
+
 2014-08-06  Per Bothner  <per@bothner.com>
 
 	* strings.scm (make-string): Generalize to non-BMP characters.

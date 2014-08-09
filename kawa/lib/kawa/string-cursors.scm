@@ -13,7 +13,7 @@
 (import (rename (only (gnu kawa lispexpr LangPrimType) stringCursorType)
                 (stringCursorType string-cursor)))
 
-;; returns a cursor one past the last valid cursor
+;; returns a cursor for the start of the string
 (define (string-cursor-start str::string) ::string-cursor
   (as string-cursor 0))
 

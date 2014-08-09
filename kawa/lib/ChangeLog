@@ -2,6 +2,7 @@
 
 	* strings.scm (string->list, string-copy, string-fill!): Generalize
 	to strings with non-BMP characters.
+	(substring): Likewise.
 
 2014-08-06  Per Bothner  <per@bothner.com>
 

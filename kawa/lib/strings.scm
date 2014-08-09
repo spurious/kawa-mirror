@@ -82,7 +82,8 @@
 
 (define (substring (str <string>) (start <int>) (end <int>))
   :: <string>
-  (make <gnu.lists.FString> str start (- end start)))
+  (with-start-end str (start end) (istart iend)
+                  (gnu.lists.FString str istart (- iend istart))))
 
 (define (string->list (str ::string)
                       #!optional (start ::int 0) (end ::int -1))

@@ -119,9 +119,12 @@
                       (from ::java.lang.CharSequence)
                       #!optional
                       (start ::int 0)
-                      (end ::int (from:length)))
+                      (end ::int -1))
   ::void
-  (gnu.lists.Strings:copyInto from start end to at))
+  (with-start-end 
+   from (start end) (cstart cend)
+   (let ((cat (java.lang.Character:offsetByCodePoints to 0 at)))
+     (gnu.lists.Strings:copyInto from cstart cend to cat))))
 
 (define (string-fill! str ::abstract-string ch ::character
                       #!optional

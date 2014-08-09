@@ -158,7 +158,15 @@ public class CharBuffer extends StableVector
             if (oldIsSupp) {
                 setCharAt(index+1, c2);
             } else {
-                insert(index+1, new String(new char[] { c2 }), true);
+                // Optimization of:
+                // insert(index+1, new String(new char[] { c2 }), true);
+                gapReserve(index+1, 1);
+                string.setCharAt(index+1, c2);
+                gapStart += 1;
+                // Any position after old single-wide char are now in the
+                // middle of the new char pair.  Adjust to be after c2.
+                int oldPos = (gapStart-1)<<1;
+                adjustPositions(oldPos, oldPos + 1, 2);
             }
         }
     }

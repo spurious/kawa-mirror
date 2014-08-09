@@ -1,3 +1,7 @@
+2014-08-08  Per Bothner  <per@bothner.com>
+
+	* CharBuffer.java (setCharacterAt): Performance improvement.
+
 2014-08-06  Per Bothner  <per@bothner.com>
 
 	* CharSeq.java (setCharacterAt): New method.

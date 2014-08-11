@@ -1,3 +1,7 @@
+2014-08-11  Per Bothner  <per@bothner.com>
+
+	* text-test.scm: Use local variables rather than top-level variables.
+
 2014-08-06  Per Bothner  <per@bothner.com>
 
 	* text-test.scm: Add tests for string-set! and string-copy for

@@ -147,7 +147,7 @@ public class FString extends SimpleVector
     if (sz > data.length)
       {
         char[] d = new char[sz < 60 ? 120 : 2 * sz];
-        System.arraycopy(data, 0, d, 0, sz);
+        System.arraycopy(data, 0, d, 0, size);
         data = d;
       }
   }
@@ -546,7 +546,7 @@ public class FString extends SimpleVector
         for (int i = start; i < end;  i++)
           d[j++] = csq.charAt(i);;
       }
-    size = sz;
+    size = sz+len;
     return this;
   }
 

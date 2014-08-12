@@ -1,3 +1,8 @@
+2014-08-11  Per Bothner  <per@bothner.com>
+
+	* LangPrimType.java (emitCoerceFromObject): Optimize for char or
+	character if matching boxed type.
+
 2014-08-05  Per Bothner  <per@bothner.com>
 
 	* LispReader.java (readCharacter): Handle non-BMP characters.

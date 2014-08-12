@@ -141,6 +141,17 @@ public class LangPrimType extends PrimType implements TypeValue {
         char sig1 = getSignature().charAt(0);
         switch (sig1) {
         case 'I':
+            if (this == characterType || this == characterOrEofType) {
+                Type top = code.topType();
+                if (top == javalangCharacterType) {
+                    code.emitInvokeVirtual(javalangCharacterType.getDeclaredMethod("charValue", 0));
+                    return;
+                }
+                if (top == scmCharType) {
+                    code.emitInvokeVirtual(scmCharType.getDeclaredMethod("intValue", 0));
+                    return;
+                }
+            }
             String mname = this == characterType ? "castToCharacter"
                 : this == characterOrEofType ? "castToCharacterOrEof" : null;
             if (mname != null) {
@@ -152,6 +163,10 @@ public class LangPrimType extends PrimType implements TypeValue {
             Compilation.getCurrent().emitCoerceToBoolean();
             return;
         case 'C':
+            if (code.topType() == javalangCharacterType) {
+                code.emitInvokeVirtual(javalangCharacterType.getDeclaredMethod("charValue", 0));
+                return;
+            }
             Method charValueMethod = scmCharType.getDeclaredMethod("castToChar",1);
             code.emitInvokeStatic(charValueMethod);
             return;

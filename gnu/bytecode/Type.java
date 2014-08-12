@@ -640,6 +640,8 @@ public abstract class Type
   public static final ClassType objectType = javalangObjectType;
   public static final ClassType javalangBooleanType
     = ClassType.make("java.lang.Boolean");
+  public static final ClassType javalangCharacterType
+    = ClassType.make("java.lang.Character");
   public static final ClassType javalangThrowableType
     = ClassType.make("java.lang.Throwable");
   public static final ClassType javalangannotationAnnotationType

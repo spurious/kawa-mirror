@@ -2,7 +2,7 @@
 (require <kawa.lib.compile_misc>)
 
 (define (char? x)
-  (instance? x <character>))
+  (or (instance? x gnu.text.Char) (instance? x java.lang.Character)))
 
 (define (char->integer ch::character-or-eof) ::int
   validate-apply: "kawa.lib.compile_misc:charToIntegerValidateApply"

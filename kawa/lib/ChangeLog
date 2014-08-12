@@ -1,3 +1,7 @@
+2014-08-12  Per Bothner  <per@bothner.com>
+
+	* characters.scm (char?): Also check for java.lang.Character.
+
 2014-08-11  Per Bothner  <per@bothner.com>
 
 	* kawa/string-cursors.scm

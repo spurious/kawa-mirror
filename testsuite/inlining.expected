@@ -108,6 +108,14 @@ InliningTest.stringForEach3(java.lang.CharSequence)void: 49 bytes
 InliningTest.stringForEach4(java.lang.CharSequence,int,int)void: 38 bytes
 InliningTest.stringForEach5(java.lang.CharSequence,int,int)void: 52 bytes
 InliningTest.stringForEach6(java.lang.CharSequence)void: 144 bytes
+InliningTest.stringAppend1(gnu.lists.FString,char)gnu.lists.FString: 6 bytes
+InliningTest.stringAppend2(gnu.lists.FString,int)gnu.lists.FString: 6 bytes
+InliningTest.stringAppend3(gnu.lists.FString,gnu.lists.FString)gnu.lists.FString: 6 bytes
+InliningTest.stringAppend4(gnu.lists.FString,gnu.text.Char)gnu.lists.FString: 9 bytes
+InliningTest.stringAppend5(gnu.lists.FString,java.lang.Character)gnu.lists.FString: 9 bytes
+InliningTest.stringAppend6(gnu.lists.FString,java.lang.Object)gnu.lists.FString: 6 bytes
+InliningTest.stringAppend7(gnu.lists.FString,java.lang.Object,int)void: 13 bytes
+InliningTest.translateSpaceToNewline(java.lang.CharSequence)java.lang.CharSequence: 65 bytes
 InliningTest.topLevelRecurse1(gnu.lists.Pair)gnu.bytecode.Type$NeverReturns: 10 bytes
 InliningTest.topLevelRecurse2(java.lang.Object,java.lang.Object)gnu.bytecode.Type$NeverReturns: 7 bytes
 InliningTest.sum1(gnu.math.IntNum)java.lang.Object: 34 bytes

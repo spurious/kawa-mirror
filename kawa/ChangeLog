@@ -1,3 +1,7 @@
+2014-08-11  Per Bothner  <per@bothner.com>
+
+	* standard/Scheme.java (initScheme): Add string-append!.
+
 2014-08-04  Per Bothner  <per@bothner.com>
 
 	* standard/Scheme.java (initScheme): Add string-map.

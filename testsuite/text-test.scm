@@ -136,4 +136,15 @@
   (test-equal "abc123xy" (string-append/shared str))
   (test-equal "abc123xy" str))
 
+(define (translate-space-to-newline str::string)::string
+  (let ((result (make-string 0)))
+    (string-for-each
+     (lambda (ch)
+       (string-append! result
+                       (if (char=? ch #\Space) #\Newline ch)))
+     str)
+    result))
+(test-equal "ab\ncd\nx"
+            (translate-space-to-newline "ab cd x"))
+
 (test-end)

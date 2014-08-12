@@ -53,12 +53,12 @@
    (comp:letDone
     (apply-exp string-cursor-for-each
                (exp:getArg 0) decl1
-               (apply-exp (syntax-as-exp string-cursor-move) decl1
+               (apply-exp string-cursor-next decl1
                           (apply-exp as string-cursor 0)
                           decl2)
                (if (< exp:arg-count 4)
                    (apply-exp string-cursor-end decl1)
-                   (apply-exp (syntax-as-exp string-cursor-move) decl1
+                   (apply-exp string-cursor-next decl1
                               (apply-exp as string-cursor 0)
                               (exp:getArg 3)))))))
                    

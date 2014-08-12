@@ -1,11 +1,11 @@
 (module-name (kawa string-cursors))
 
 (module-export string-cursor-start string-cursor-end
-               string-cursor-ref string-cursor-ref-or-eof substring-cursor
+               string-cursor-ref substring-cursor
                string-cursor-next string-cursor-prev
                string-cursor<? string-cursor<=? string-cursor=?
                string-cursor>? string-cursor>=? string-cursor
-               string-cursor-move string-cursor-for-each)
+               string-cursor-for-each)
 
 (require <kawa.lib.prim_syntax>)
 (require <kawa.lib.std_syntax>)
@@ -25,6 +25,7 @@
 (define (string-cursor-ref str::string cursor::string-cursor) ::character
   (as character (java.lang.Character:codePointAt str (as int cursor))))
 
+#|
 (define (string-cursor-ref-or-eof str::string cursor::string-cursor) ::character-or-eof
   (let ((len (str:length))
         (cursor0 (as int cursor)))
@@ -41,20 +42,19 @@
                                  (- ch2 #xDC00)
                                  #x10000))
                           (as character-or-eof ch1))))))))))
+|#
 
 ;; increment to the next cursor
-(define (string-cursor-next str::string cursor::string-cursor) ::string-cursor
+(define (string-cursor-next str::string cursor::string-cursor
+                            #!optional (count ::int 1)) ::string-cursor
   (as string-cursor
-      (java.lang.Character:offsetByCodePoints str (as int cursor) 1)))
+      (java.lang.Character:offsetByCodePoints str (as int cursor) count)))
 
 ;; decrement to the previous cursor
-(define (string-cursor-prev str::string cursor::string-cursor) ::string-cursor
+(define (string-cursor-prev str::string cursor::string-cursor
+                            #!optional (count ::int 1)) ::string-cursor
   (as string-cursor
-      (java.lang.Character:offsetByCodePoints str (as int cursor) -1)))
-
-(define (string-cursor-move str::string cursor::string-cursor delta::int) ::string-cursor
-  (as string-cursor
-      (java.lang.Character:offsetByCodePoints str (as int cursor) delta)))
+      (java.lang.Character:offsetByCodePoints str (as int cursor) (- count))))
 
 ;; take a substring from the given cursors
 (define (substring-cursor str::string cs1::string-cursor

@@ -1,5 +1,7 @@
 2014-08-11  Per Bothner  <per@bothner.com>
 
+	* FString (append(Object)): New method.
+
 	* FString.java (ensureBufferLength, append): Fix logic errors.
 
 2014-08-08  Per Bothner  <per@bothner.com>

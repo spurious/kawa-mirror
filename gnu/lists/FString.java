@@ -550,6 +550,16 @@ public class FString extends SimpleVector
     return this;
   }
 
+    public FString append(Object obj) {
+        if (obj instanceof gnu.text.Char)
+            appendCharacter(((gnu.text.Char) obj).intValue());
+        else if (obj instanceof java.lang.Character)
+            appendCharacter(((java.lang.Character) obj).charValue());
+        else
+            append(obj.toString());
+        return this;
+    }
+
   public void writeTo(int start, int count, Appendable dest)
      throws java.io.IOException
   {

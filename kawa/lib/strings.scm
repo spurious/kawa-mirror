@@ -6,7 +6,8 @@
 	       string-ci=? string-ci<? string-ci>? string-ci<=? string-ci>=?
                substring string->list list->string string-copy string-copy!
                string-fill! string-upcase! string-downcase!
-               string-capitalize string-capitalize! string-append
+               string-capitalize string-capitalize!
+               string-append string-append!
                string-map string-for-each srfi-13-string-for-each)
 
 (require <kawa.lib.prim_syntax>)
@@ -46,7 +47,8 @@
 (define (string? x) :: <boolean>
   (instance? x <string>))
 
-(define (make-string n ::int #!optional (ch ::character #\Space)) :: <string>
+(define (make-string n ::int #!optional (ch ::character #\Space))
+  ::gnu.lists.FString
   (make <gnu.lists.FString> n (as int ch)))
 
 (define ($make$string$ #!rest args ::object[]) :: <string>
@@ -210,12 +212,12 @@
   ::void
   validate-apply: "kawa.lib.compile_map:stringForEach1ValidateApply" 
   (let* ((cstart ::string-cursor
-                 (string-cursor-move str
+                 (string-cursor-next str
                                      (as string-cursor 0)
                                      start))
          (cend ::string-cursor
              (if (= end -1) (as string-cursor (str:length))
-                 (string-cursor-move str cstart (- end start)))))
+                 (string-cursor-next str cstart (- end start)))))
     (string-cursor-for-each proc str cstart cend)))
   
 (define (string-for-each proc str1::string #!rest rst::object[])::void
@@ -280,3 +282,11 @@
                     (set! (cursors i) (string-cursor-next str curs-i))
                     (loop2 (+ i 1))))))))
   result)
+
+(define (string-append! str::gnu.lists.FString #!rest args :: object[]) ::void
+  validate-apply: "kawa.lib.compile_misc:stringAppendToValidateApply"
+  (let ((len args:length))
+    (do ((i ::int 0 (+ i 1)))
+      ((>= i len))
+      (str:append (args i)))))
+

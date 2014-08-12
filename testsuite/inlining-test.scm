@@ -321,3 +321,28 @@
   (string-for-each
    (lambda (x y z) (handle-char x) (handle-char y) (handle-char z))
    str "BCDE" str))
+
+(define (string-append1 (str::gnu.lists.FString) (ch::char))
+  (string-append! str ch))
+
+(define (string-append2 (str::gnu.lists.FString) (ch::character))
+  (string-append! str ch))
+(define (string-append3 (str::gnu.lists.FString) (ch::gnu.lists.FString))
+  (string-append! str ch))
+(define (string-append4 (str::gnu.lists.FString) (ch::gnu.text.Char))
+  (string-append! str ch))
+(define (string-append5 (str::gnu.lists.FString) (ch::java.lang.Character))
+  (string-append! str ch))
+(define (string-append6 (str::gnu.lists.FString) ch)
+  (string-append! str ch))
+(define (string-append7 (str::gnu.lists.FString) ch1 (ch2::character))
+  (string-append! str ch1 ch2))
+
+(define (translate-space-to-newline str::string)::string
+  (let ((result (make-string 0)))
+    (string-for-each
+     (lambda (ch)
+       (string-append! result
+                       (if (char=? ch #\Space) #\Newline ch)))
+     str)
+    result))

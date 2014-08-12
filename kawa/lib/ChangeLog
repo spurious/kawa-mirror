@@ -1,3 +1,17 @@
+2014-08-11  Per Bothner  <per@bothner.com>
+
+	* kawa/string-cursors.scm
+	(string-cursor-next, string-cursor-prev): Take optional count.
+	(string-cursor-move): Remove now-redundant function.
+	(string-cursor-ref-or-eof): Comment out unused function.
+	* strings.scm (make-string): Give more precide return type.
+	(string-append!): New function.
+	* compile_misc.scm (stringAppendToValidateApply): Inline string-append!.
+
+2014-08-09  Per Bothner  <per@bothner.com>
+
+	* strings.scm (string-copy!): Handle strings with non-BMP characters.
+
 2014-08-08  Per Bothner  <per@bothner.com>
 
 	* strings.scm (string->list, string-copy, string-fill!): Generalize

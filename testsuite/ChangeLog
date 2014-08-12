@@ -1,5 +1,10 @@
 2014-08-11  Per Bothner  <per@bothner.com>
 
+	* inlining-test.scm: Add tests for string-append!.
+	* inlining.expected: Update accordingly.
+	* Makefile.am: Likewise.
+	* text-test.scm (translate-space-to-newline): New test.
+
 	* text-test.scm: Use local variables rather than top-level variables.
 
 2014-08-06  Per Bothner  <per@bothner.com>

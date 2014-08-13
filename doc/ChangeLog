@@ -1,3 +1,11 @@
+2014-08-12  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (PerformanceNote): New macro.
+	* kawa.texi (Characters): Various tweaks, including defining
+	character litrerals.
+	(String): Various updates.
+	(String Cursor API): New subsection.
+
 2014-07-03  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Arithmetic operations): Document more R7RS functions.

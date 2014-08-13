@@ -67,6 +67,10 @@
 @var{\THING\}
 @end macro
 
+@macro PerformanceNote
+@emph{Performance note:}
+@end macro
+
 @ifinfo
 @macro vari{THING}
 @var{\THING\1}
@@ -2154,7 +2158,7 @@ Syntax'':
          | @stxref{compound-datum}
 
 @stxdef{lexeme-datum} @stxref{boolean} | @meta{number}
-         | @meta{character} | @stxref{string} | @stxref{symbol}
+         | @stxref{character} | @stxref{string} | @stxref{symbol}
 @stxdef{symbol} @stxref{identifier}
 @stxdef{compound-datum} @stxref{list} | @stxref{vector} | @stxref{uniform-vector} | @stxref{extended-string-literal} | @stxref{xml-literal}
 @stxdef{list} @stxlit{(}@stxref{datum}*@stxlit{)}
@@ -2269,7 +2273,7 @@ Thus @code{#x} and @code{#X} are the same.
 @item @stxlit{#:}@var{keyword}
 Guile-style keyword syntax (deprecated).
 @item @stxlit{#\\}
-Character literals.
+@ref{meta-character, Character literals, Character literals}.
 @item @stxlit{#!}
 @xref{Special named constants}.
 @item @stxlit{#`}@var{datum}
@@ -4336,7 +4340,7 @@ invocation of @var{thunk}.
 
 After printing, the second example then raises another exception.
 
-@emph{Performance note:} The @var{thunk} is inlined if it is a
+@PerformanceNote{} The @var{thunk} is inlined if it is a
 lambda expression.  However, the @var{handler} cannot be inlined
 even if it is a lambda expression, because it could be called by
 @code{raise-continuable}.  Using the @code{guard} form is
@@ -6330,15 +6334,17 @@ a library call is needed, but run-time type dispatch is avoided.
 @node Characters
 @section Characters
 
-@emph{Characters} are objects that represent Unicode scalar values.
+Characters are objects that represent human-readable characters
+such as letters and digits.  More precisely, a character
+represents a @uref{http://www.unicode.org/glossary/#unicode_scalar_value,
+Unicode scalar value}. Each character has an integer value
+in the range @code{0} to @code{#x10FFFF}
+(excluding the range @code{#xD800} to @code{#xDFFF}
+used for @uref{http://www.unicode.org/glossary/#surrogate_code_point, Surrogate Code Points}).
 
 @quotation
 @emph{Note:}
-Unicode defines a standard mapping between sequences of
-@dfn{Unicode scalar values}  (integers in the range @code{0} to @code{#x10FFFF},
-excluding the range @code{#xD800} to @code{#xDFFF}) in the latest
-version of the standard and human--readable ``characters''.
-More precisely, Unicode distinguishes
+Unicode distinguishes
 between glyphs, which are printed for humans to read, and characters,
 which are abstract entities that map to glyphs (sometimes in a way
 that’s sensitive to surrounding characters). Furthermore, different
@@ -6364,7 +6370,8 @@ characters.
 @end quotation
 
 @deffn Type character
-A Unicode scalar value (or a surrogate).
+A Unicode code point - normally a Unicode scalar value,
+but could be a surrogate.
 This is implemented using a 32-bit @code{int}.
 When an object is needed (i.e. the @dfn{boxed} representation),
 it is implemented an instance of @code{gnu.text.Char}.
@@ -6380,7 +6387,7 @@ When an object is needed, it is implemented an instance of
 @end deffn
 
 @deffn Type char
-A UTF-16 code point.  Same as Java primitivce @code{char} type.
+A UTF-16 code unit.  Same as Java primitive @code{char} type.
 Considered to be a sub-type of @code{character}.
 When an object is needed, it is implemented as an instance
 of @code{java.lang.Character}.  Note the unfortunate inconsistency
@@ -6388,8 +6395,54 @@ of @code{java.lang.Character}.  Note the unfortunate inconsistency
 vs @code{character} boxed as @code{Char}.
 @end deffn
 
+Characters are written using the notation
+@code{#\}@var{character} (which stands for the given @var{character};
+@code{#\x}@var{hex-scalar-value} (the character whose scalar value
+is the given hex integer);
+or @code{#\}@var{character-name} (a character with a given name):
+
+@c can't use @stxlit because of slash
+@display
+@stxdef{character} @code{@b{#\}}@var{any-character}
+        | @code{@b{#\}} @meta{character-name}
+        | @code{@b{#\x}} @stxref{hex-scalar-value}
+        | @code{@b{#\X}} @stxref{hex-scalar-value}
+@end display
+
+The following @meta{character-name} forms are recognized:
+@table @code
+@item @b{#\alarm}
+@code{#\x0007} - the alarm (bell) character
+@item @b{#\backspace}
+@code{#\x0008}
+@item @b{#\delete}
+@item @b{#\del}
+@item @b{#\rubout}
+@code{#\x007f} - the delete or rubout character
+@item @b{#\escape}
+@item @b{#\esc}
+@code{#\x001b}
+@item @b{#\newline}
+@itemx @b{#\linefeed}
+@code{#\x001a} - the linefeed character
+@item @b{#\null}
+@item @b{#\nul}
+@code{#\x0000} - the null character
+@item @b{#\page}
+@code{#\000c} - the formfeed character
+@item @b{#\return}
+@code{#\000d} - the carriage return character
+@item @b{#\space}
+@code{#\x0020} - the preferred way to write a space
+@item @b{#\tab}
+@code{#\x0009} - the tab character
+@item @b{#\vtab}
+@code{#\x000b} - the vertical tabulation character
+@end table
+
 @deffn Procedure {char?} @var{obj}
 Return @true{} if @var{obj} is a character, @false{} otherwise.
+(The @var{obj} can be any character, not just a 16-bit @code{char}.)
 @end deffn
 
 @deffn Procedure {char->integer} @var{char}
@@ -6408,7 +6461,7 @@ as an exact integer object.  For a Unicode scalar value @var{sv},
 (integer->char #\xD800)                @result{} throws ClassCastException
 @end example
 
-@emph{Performance note:} A call to @code{char->integer} is compiled as
+@PerformanceNote{} A call to @code{char->integer} is compiled as
 casting the argument to a @code{character}, and then re-interpreting
 that value as an @code{int}.
 A call to @code{integer->char} is compiled as
@@ -6431,7 +6484,7 @@ according to their Unicode scalar values.
 (char<? #\z #\Z)      @result{} #f
 @end example
 
-@emph{Performance note:}  This is compiled as if converting each
+@PerformanceNote{}  This is compiled as if converting each
 argument using @code{char->integer} (which requires no code)
 and the using the corresponing @code{int} comparison.
 @end deffn
@@ -6838,14 +6891,14 @@ Return @true{} if @var{obj} is a string, @false{} otherwise.
 
 @deffn Type string
 The type of string objects.
+The underlying type is the interface @code{java.lang.CharSequence}.
+Immultable strings are @code{java.lang.String},
+while mutable strings are @code{gnu.lists.FString}.
 @end deffn
 
 @deffn Constructor string @var{char} @dots{}
 Return a newly allocated string composed of the arguments.
 This is analogous to @var{list}.
-The underlying type is the interface @code{java.lang.CharSequence}.
-Immultable strings are @code{java.lang.String},
-while mutable strings are @code{gnu.lists.FString}.
 @end deffn
 
 @deffn Procedure make-string @var{k}
@@ -6858,18 +6911,21 @@ otherwise the contents of the @var{string} are unspecified.
 @deffn Procedure string-length @var{string}
 Return the number of characters in the given @var{string} as an exact
 integer object.
-@end deffn
 
+@PerformanceNote{} Calling @code{string-length} may take time propertial
+to the length of the @var{string},
+because of the need to scan for surrogate pairs.
+@end deffn
 
 @deffn Procedure string-ref @var{string} @var{k}
 @var{k} must be a valid index of @var{string}.  The @func{string-ref}
 procedure returns character @var{k} of @var{string} using zero--origin
 indexing.
 
-@c @quotation
-@c @emph{Note:} Implementors should make @func{string-ref} run in constant
-@c time.
-@c @end quotation
+@PerformanceNote{} Calling @code{string-ref} may take time propertial
+to @var{k} because of the need to check for surrogate pairs.
+An alternative is to use @code{string-cursor-ref}.
+If iterating through a string, use @code{string-for-each}.
 @end deffn
 
 @deffn Procedure string-set! string k char
@@ -6919,8 +6975,14 @@ so far as @func{equal?} is concerned.
 @end deffn
 
 @deffn Procedure string-for-each @var{proc} @vari{string} @varii{string} @dots{}
+@deffnx Procedure string-for-each @var{proc} @vari{string} [start [end]]
 The @var{string}s must all have the same length.  @var{proc} should
 accept as many arguments as there are @var{string}s.
+
+The @var{start}-@var{end} variant is provided for compatibility
+with the SRFI-13 version.  (In that case @var{start} and @var{end}
+count code Unicode scalar values (@code{character} values),
+not Java 16-bit @code{char} values.)
 
 The @func{string-for-each} procedure applies @var{proc} element--wise to
 the characters of the @var{string}s for its side effects, in order from
@@ -6938,6 +7000,46 @@ Analogous to @func{for-each}.
    v)
   @result{} (101 100 99 98 97)
 @end example
+
+@PerformanceNote{} The compiler generates efficient code
+for @code{string-for-each}.
+If @var{proc} is a lambda expression, it is inlined,
+@end deffn
+
+@deffn Procedure string-map @var{proc} @vari{string} @varii{string} @dots{}
+The @code{string-map} procedure applies @var{proc} element-wise to
+the elements of the strings and returns a string of the results, in order.
+It is an error if @var{proc} does not accept as many arguments as there
+are strings, or return other than a single character.
+If more than one string is given and not all strings have the same length,
+@code{string-map} terminates when the shortest string runs out.
+The dynamic order in
+which @var{proc} is applied to the elements of the strings is unspecified.
+@c If multiple returns occur from string-map, the
+@c values returned by earlier returns are not mutated.
+
+@example
+(string-map char-foldcase "AbdEgH")  @result{} "abdegh"
+@end example
+@example
+(string-map
+  (lambda (c) (integer->char (+ 1 (char->integer c))))
+  "HAL")
+        @result{} "IBM"
+@end example
+@example
+(string-map
+  (lambda (c k)
+    ((if (eqv? k #\u) char-upcase char-downcase) c))
+  "studlycaps xxx"
+  "ululululul")
+        @result{} "StUdLyCaPs"
+@end example
+
+@PerformanceNote{} The @code{string-map} procedure has not been
+optimized (mainly because it is not very useful):
+The characters are boxed, and the @var{proc} is not inlined even if
+a lambda expression.
 @end deffn
 
 @deffn Procedure string-copy @var{string} [@var{start} [@var{end}]]
@@ -7112,6 +7214,66 @@ the argument instead of a newly allocated string.
 (string-normalize-nfd "\x65;\x301;")    @result{} "\x65;\x301;"
 (string-normalize-nfc "\x65;\x301;")    @result{} "\xE9;"
 @end example
+@end deffn
+
+@subsection String Cursor API
+
+Indexing into a string (using for example @code{string-ref})
+is inefficient because of the possible presence of surrogate pairs.
+Hence given an index @var{i} access normally requires linearly
+scanning the string until we have seen @var{i} characters.
+
+The string-cursor API is defined in terms of abstract ``cursor values'',
+which point to a position in the string.  This avoids the linear scan.
+
+The API is non-standard, but is based on that in Chibi Scheme.
+
+@deffn Type string-cursor
+An abstract posistion (index) in a string.
+Implemented as a primitive @code{int} which counts the
+number of preceding code units (16-bit @code{char} values).
+@end deffn
+
+@deffn Procedure string-cursor-start str
+Returns a cursor for the start of the string.
+@end deffn
+
+@deffn Procedure string-cursor-end str
+Returns a cursor for the end of the string - one past the last valid character..
+@end deffn
+
+@deffn Procedure string-cursor-ref str cursor
+Return the @code{character} at the give @var{cursor}.
+@end deffn
+
+@deffn Procedure string-cursor-next string cursor [count]
+Return the cursor position @var{count} (default 1) character
+positions forwards.
+@end deffn
+
+@deffn Procedure string-cursor-prev string cursor [count]
+Return the cursor position @var{count} (default 1) character
+positions backwards.
+@end deffn
+
+@deffn Procedure substring-cursor string [start [end]]
+Create a substring of the section of @var{string}
+between the cursors @var{start} and @var{end}.
+@end deffn
+
+@deffn Procedure string-cursor<? cursor1 cursor2
+@deffnx Procedure string-cursor<=? cursor1 cursor2
+@deffnx Procedure string-cursor=? cursor1 cursor2
+@deffnx Procedure string-cursor>=? cursor1 cursor2
+@deffnx Procedure string-cursor>? cursor1 cursor2
+Is the position of @var{cursor1} respectively before,
+before or same, same, after, or after or same, as @var{cursor2}.
+@end deffn
+
+@c non-chibi
+@deffn Procedure string-cursor-for-each proc string [start [end]]
+Apply the procedure @var{proc} to each character position in
+@var{string} between the cursors @var{start} and @var{end}.
 @end deffn
 
 @node Unicode, Regular expressions, Strings, Characters and text

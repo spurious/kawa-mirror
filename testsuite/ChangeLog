@@ -2530,7 +2530,7 @@
 
 2002-10-27  Per Bothner  <per@bothner.com>
 
-	* misc-test.scm:  Change Österlund -> &Ouml;sterlund to avoid
+	* misc-test.scm:  Change Ã–sterlund -> &Ouml;sterlund to avoid
 	character encoding issues.
 
 2002-10-20  Per Bothner  <per@bothner.com>
@@ -2976,3 +2976,7 @@ Sun Dec 15 22:37:03 1996  Per Bothner  <bothner@deneb.cygnus.com>
 Fri Dec 13 17:04:54 1996  Per Bothner  <bothner@deneb.cygnus.com>
 
 	New directory - for test suites for Kawa.
+
+;; Local Variables:
+;; coding: utf-8-unix
+;; End:

@@ -1,3 +1,8 @@
+2014-08-13  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Strings): Various updates.
+	(String literals): New node.
+
 2014-08-12  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (PerformanceNote): New macro.

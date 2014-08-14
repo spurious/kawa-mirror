@@ -6540,29 +6540,479 @@ Other operations may take time proportional to the number of inversions.
 
 Strings are sequences of characters.  The @emph{length} of a string is
 the number of characters that it contains, as an exact non-negative integer.
-This number is fixed when
-the string is created.  The @emph{valid indices} of a string are the
+This number is usually fixed when the string is created,
+however, you can extend a mutable string with
+the (Kawa-specific) @code{string-append!} function.
+The @emph{valid indices} of a string are the
 exact non-negative integers less than the length of the string.
 The first character of a
 string has index 0, the second has index 1, and so on.
+
+Strings are @emph{implemented} as a sequence of 16-bit @code{char} values,
+even though they're semantically a sequence of 32-bit Unicode code points.
+A character whose value is greater than @code{#xffff}
+is represented using two surrogate characters.
+The implementation allows for natural interoperability with Java APIs.
+However it does make certain operations (indexing or counting based on
+character counts) difficult to implement efficiently.  Luckily one
+rarely needs to index or count based on character counts;
+alternatives are discussed below.
 
 Some of the procedures that operate on strings ignore the
 difference between upper and lower case. The names of
 the versions that ignore case end with “@code{-ci}” (for “case
 insensitive”).
 
+@deffn Type string
+The type of string objects.
+The underlying type is the interface @code{java.lang.CharSequence}.
+Immultable strings are @code{java.lang.String},
+while mutable strings are @code{gnu.lists.FString}.
+@end deffn
+
+@subsection Basic string procedures
+
+@deffn Procedure {string?} @var{obj}
+Return @true{} if @var{obj} is a string, @false{} otherwise.
+@end deffn
+
+@deffn Constructor string @var{char} @dots{}
+Return a newly allocated string composed of the arguments.
+This is analogous to @var{list}.
+@end deffn
+
+@deffn Procedure make-string @var{k}
+@deffnx Procedure make-string @var{k} @var{char}
+Return a newly allocated string of length @var{k}.  If @var{char} is
+given, then all elements of the string are initialized to @var{char},
+otherwise the contents of the @var{string} are unspecified.
+@end deffn
+
+@deffn Procedure string-length @var{string}
+Return the number of characters in the given @var{string} as an exact
+integer object.
+
+@PerformanceNote{} Calling @code{string-length} may take time propertial
+to the length of the @var{string},
+because of the need to scan for surrogate pairs.
+@end deffn
+
+@deffn Procedure string-ref @var{string} @var{k}
+@var{k} must be a valid index of @var{string}.  The @func{string-ref}
+procedure returns character @var{k} of @var{string} using zero--origin
+indexing.
+
+@PerformanceNote{} Calling @code{string-ref} may take time propertial
+to @var{k} because of the need to check for surrogate pairs.
+An alternative is to use @code{string-cursor-ref}.
+If iterating through a string, use @code{string-for-each}.
+@end deffn
+
+@deffn Procedure string-set! string k char
+This procedure stores @var{char} in element @var{k} of @var{string}.
+
+@example
+(define s1 (make-string 3 #\*))
+(define s2 "***")
+(string-set! s1 0 #\?) @result{} @emph{void}
+s1 @result{} "?**"
+(string-set! s2 0 #\?) @result{} @emph{error}
+(string-set! (symbol->string 'immutable) 0 #\?) @result{} @emph{error}
+@end example
+
+@PerformanceNote{} Calling @code{string-set!} may take time propertial
+to the length of the string:  First it must scan for the right position,
+like @code{string-ref} does. Then if the new character requires
+using a surrogate pair (and the old one doesn't) then we have to make rom
+in the string, possible re-allocating a new @code{char} array.
+Alternatively, if the old character requires using a surrogate pair
+(and the new one doesn't) then following characters need to be moved.
+
+The function @code{string-set!} is deprecated: It is inefficient,
+and it very seldom does the correct thing.  Instead, you can
+construct a string with @code{string-append!}.
+@end deffn
+
+@deffn Procedure substring @var{string} @var{start} @var{end}
+@var{string} must be a string, and @var{start} and @var{end} must be
+exact integer objects satisfying:
+
+@example
+0 <= @var{start} <= @var{end} <= (string-length @var{string})
+@end example
+
+The @func{substring} procedure returns a newly allocated string formed
+from the characters of @var{string} beginning with index @var{start}
+(inclusive) and ending with index @var{end} (exclusive).
+@end deffn
+
+
+@deffn Procedure string-append @var{string} @dots{}
+Return a newly allocated string whose characters form the concatenation
+of the given strings.
+@end deffn
+
+@deffn Procedure string-append! @var{string} @var{value} @dots{}
+The @var{string} must be a mutable string, such as one retuned
+by @code{make-string} or @code{string-copy}.
+The @code{string-append!} procedure extends @var{string}
+by appending each @var{value} (in order) to the end of @var{string}.
+
+@PerformanceNote{} The compiler converts a call with multiple @var{value}s
+to a multiple @code{string-append!} calls.
+If a @var{value} is known to be a @code{character}, then
+no boxing (object-allocation) is needed.
+
+The following example show to to efficiently process a string
+using @code{string-for-each} and incrementally ``building'' a result string
+using @code{string-append!}.
+
+@example
+(define (translate-space-to-newline str::string)::string
+  (let ((result (make-string 0)))
+    (string-for-each
+     (lambda (ch)
+       (string-append! result
+                       (if (char=? ch #\Space) #\Newline ch)))
+     str)
+    result))
+@end example
+@end deffn
+
+@deffn Procedure string->list @var{string} [@var{start} [@var{end}]]
+@deffnx Procedure list->string @var{list}
+It is an error if any element of @var{list} is not a character.
+
+The @func{string->list} procedure returns a newly allocated list of the
+characters of @var{string} between @var{start} and @var{end}.
+The @func{list->string} procedure returns a newly allocated string
+formed from the characters in @var{list}.
+In both procedures, order is preserved.
+The @func{string->list} and @func{list->string} procedures are inverses
+so far as @func{equal?} is concerned.
+@end deffn
+
+@deffn Procedure string-for-each @var{proc} @vari{string} @varii{string} @dots{}
+@deffnx Procedure string-for-each @var{proc} @vari{string} [start [end]]
+The @var{string}s must all have the same length.  @var{proc} should
+accept as many arguments as there are @var{string}s.
+
+The @var{start}-@var{end} variant is provided for compatibility
+with the SRFI-13 version.  (In that case @var{start} and @var{end}
+count code Unicode scalar values (@code{character} values),
+not Java 16-bit @code{char} values.)
+
+The @func{string-for-each} procedure applies @var{proc} element--wise to
+the characters of the @var{string}s for its side effects, in order from
+the first characters to the last.  @var{proc} is always called in the
+same dynamic environment as @func{string-for-each} itself.
+@c  The return values of @func{string-for-each} are unspecified.
+
+Analogous to @func{for-each}.
+
+@example
+(let ((v '()))
+  (string-for-each
+    (lambda (c) (set! v (cons (char->integer c) v)))
+    "abcde")
+   v)
+  @result{} (101 100 99 98 97)
+@end example
+
+@PerformanceNote{} The compiler generates efficient code
+for @code{string-for-each}.
+If @var{proc} is a lambda expression, it is inlined,
+@end deffn
+
+@deffn Procedure string-map @var{proc} @vari{string} @varii{string} @dots{}
+The @code{string-map} procedure applies @var{proc} element-wise to
+the elements of the strings and returns a string of the results, in order.
+It is an error if @var{proc} does not accept as many arguments as there
+are strings, or return other than a single character.
+If more than one string is given and not all strings have the same length,
+@code{string-map} terminates when the shortest string runs out.
+The dynamic order in
+which @var{proc} is applied to the elements of the strings is unspecified.
+@c If multiple returns occur from string-map, the
+@c values returned by earlier returns are not mutated.
+
+@example
+(string-map char-foldcase "AbdEgH")  @result{} "abdegh"
+@end example
+@example
+(string-map
+  (lambda (c) (integer->char (+ 1 (char->integer c))))
+  "HAL")
+        @result{} "IBM"
+@end example
+@example
+(string-map
+  (lambda (c k)
+    ((if (eqv? k #\u) char-upcase char-downcase) c))
+  "studlycaps xxx"
+  "ululululul")
+        @result{} "StUdLyCaPs"
+@end example
+
+@PerformanceNote{} The @code{string-map} procedure has not been
+optimized (mainly because it is not very useful):
+The characters are boxed, and the @var{proc} is not inlined even if
+a lambda expression.
+@end deffn
+
+@deffn Procedure string-copy @var{string} [@var{start} [@var{end}]]
+Returns a newly allocated copy of the the part of the given @var{string}
+between @var{start} and @var{end}.
+@end deffn
+
+@deffn Procedure string-copy!  @var{to}  @var{at}  @var{from} [@var{start} [@var{end}]]
+Copies the characters of the string @var{from} that are between
+@var{start} end @var{end} into the string @var{to},
+starting at index @var{at}.  The order in which characters are copied
+is unspecified, except that if the source and destination overlap,
+copying takes places as if the source is first copied into a
+temporary string and then into the destination.
+(This is achieved without allocating storage by making sure to copy in
+the correct direction in such circumstances.)
+@example
+(define a "12345")
+(define b (string-copy "abcde"))
+(string-copy! b 1 a 0 2)
+b  @result{}  "a12de"
+@end example
+
+@emph{Warning:} This function is deprecated.  It doesn't handle
+the case where source substring or the destination contains
+non-BMP character (those needing surrogates).
+@end deffn
+
+@deffn Procedure string-fill! @var{string} @var{fill} [@var{start} [@var{end}]]
+The @code{string-fill!} procedure stores @var{fill} in the elements
+of @var{string} between @var{start} and @var{end}.
+It is an error if @var{fill} is not a character or is forbidden in strings.
+@end deffn
+
+@subsection String Comparisons
+
+@deffn Procedure {string=?} @vari{string} @varii{string} @variii{string} @dots{}
+Return @true{} if the strings are the same length and contain the same
+characters in the same positions.  Otherwise, the @func{string=?}
+procedure returns @false{}.
+
+@example
+(string=? "Straße" "Strasse")    @result{} #f
+@end example
+@end deffn
+
+
+@deffn Procedure {string<?} @vari{string} @varii{string} @variii{string} @dots{}
+@deffnx Procedure {string>?} @vari{string} @varii{string} @variii{string} @dots{}
+@deffnx Procedure {string<=?} @vari{string} @varii{string} @variii{string} @dots{}
+@deffnx Procedure {string>=?} @vari{string} @varii{string} @variii{string} @dots{}
+These procedures return @code{#t} if their arguments are (respectively):
+monotonically increasing, monotonically decreasing,
+monotonically non-decreasing, or monotonically nonincreasing.
+These predicates are required to be transitive.
+
+These procedures are the lexicographic extensions to strings of the
+corresponding orderings on characters.  For example, @func{string<?} is
+the lexicographic ordering on strings induced by the ordering
+@func{char<?} on characters.  If two strings differ in length but are
+the same up to the length of the shorter string, the shorter string is
+considered to be lexicographically less than the longer string.
+
+@example
+(string<? "z" "ß")      @result{} #t
+(string<? "z" "zz")     @result{} #t
+(string<? "z" "Z")      @result{} #f
+@end example
+@end deffn
+
+@deffn Procedure string-ci=? @vari{string} @varii{string} @variii{string} @dots{}
+@deffnx Procedure string-ci<? @vari{string} @varii{string} @variii{string} @dots{}
+@deffnx Procedure string-ci>? @vari{string} @varii{string} @variii{string} @dots{}
+@deffnx Procedure string-ci<=? @vari{string} @varii{string} @variii{string} @dots{}
+@deffnx Procedure string-ci>=? @vari{string} @varii{string} @variii{string} @dots{}
+These procedures are similar to @func{string=?}, etc.,
+but behave as if they applied @code{string-foldcase} to their arguments
+before invokng the corresponding procedures without @code{-ci}.
+
+@example
+(string-ci<? "z" "Z")                   @result{} #f
+(string-ci=? "z" "Z")                   @result{} #t
+(string-ci=? "Straße" "Strasse")        @result{} #t
+(string-ci=? "Straße" "STRASSE")        @result{} #t
+(string-ci=? "ΧΑΟΣ" "χαοσ")             @result{} #t
+@end example
+@end deffn
+
+@subsection String Conversions
+
+@deffn Procedure string-upcase @var{string}
+@deffnx Procedure string-downcase @var{string}
+@deffnx Procedure string-titlecase @var{string}
+@deffnx Procedure string-foldcase @var{string}
+These procedures take a string argument and return a string result.
+They are defined in terms of Unicode's locale--independent case mappings
+from Unicode scalar--value sequences to scalar--value sequences.  In
+particular, the length of the result string can be different from the
+length of the input string.  When the specified result is equal in the
+sense of @func{string=?} to the argument, these procedures may return
+the argument instead of a newly allocated string.
+
+The @func{string-upcase} procedure converts a string to upper case;
+@func{string-downcase} converts a string to lower case.  The
+@func{string-foldcase} procedure converts the string to its case--folded
+counterpart, using the full case--folding mapping, but without the
+special mappings for Turkic languages.  The @func{string-titlecase}
+procedure converts the first cased character of each word, and downcases
+all other cased characters.
+
+@example
+(string-upcase "Hi")              @result{} "HI"
+(string-downcase "Hi")            @result{} "hi"
+(string-foldcase "Hi")            @result{} "hi"
+
+(string-upcase "Straße")          @result{} "STRASSE"
+(string-downcase "Straße")        @result{} "straße"
+(string-foldcase "Straße")        @result{} "strasse"
+(string-downcase "STRASSE")       @result{} "strasse"
+
+(string-downcase "Σ")             @result{} "σ"
+; Chi Alpha Omicron Sigma:
+(string-upcase "ΧΑΟΣ")            @result{} "ΧΑΟΣ"
+(string-downcase "ΧΑΟΣ")          @result{} "χαος"
+(string-downcase "ΧΑΟΣΣ")         @result{} "χαοσς"
+(string-downcase "ΧΑΟΣ Σ")        @result{} "χαος σ"
+(string-foldcase "ΧΑΟΣΣ")         @result{} "χαοσσ"
+(string-upcase "χαος")            @result{} "ΧΑΟΣ"
+(string-upcase "χαοσ")            @result{} "ΧΑΟΣ"
+
+(string-titlecase "kNock KNoCK")  @result{} "Knock Knock"
+(string-titlecase "who's there?") @result{} "Who's There?"
+(string-titlecase "r6rs")         @result{} "R6rs"
+(string-titlecase "R6RS")         @result{} "R6rs"
+@end example
+
 @quotation
-@emph{Kawa note:}
-Kawa's implementation of strings that contain
-surrogate characters does not quite follow the R6RS specification.
-Specifically indexing into such a string retrieves a surrogate
-rather than a Unicode scalar value.
-It is not clear what the best solution is - there is a tradeoff
-between performance, compatibility with R6RS, and
-interoperability with Java APIs.
+@emph{Note:} The case mappings needed for implementing these procedures
+can be extracted from @file{UnicodeData.txt}, @file{SpecialCasing.txt},
+@file{WordBreakProperty.txt} (the ``MidLetter'' property partly defines
+case--ignorable characters), and @file{CaseFolding.txt} from the Unicode
+Consortium.
+
+Since these procedures are locale--independent, they may not be
+appropriate for some locales.
 @end quotation
 
-@subsection String literals
+@quotation
+@emph{Note:} Word breaking, as needed for the correct casing of the
+upper case greek sigma and for @func{string-titlecase}, is specified in
+Unicode Standard Annex #29.
+@end quotation
+
+@quotation
+@emph{Kawa Note:}  The implementation of @func{string-titlecase}
+does not correctly handle the case where an initial character
+needs to be converted to multiple characters, such as
+``LATIN SMALL LIGATURE FL'' which should be converted to
+the two letters @code{"Fl"}.
+@end quotation
+@end deffn
+
+@deffn Procedure string-normalize-nfd @var{string}
+@deffnx Procedure string-normalize-nfkd @var{string}
+@deffnx Procedure string-normalize-nfc @var{string}
+@deffnx Procedure string-normalize-nfkc @var{string}
+These procedures take a string argument and return a string result,
+which is the input string normalized to Unicode normalization form D,
+KD, C, or KC, respectively.  When the specified result is equal in the
+sense of @func{string=?} to the argument, these procedures may return
+the argument instead of a newly allocated string.
+
+@example
+(string-normalize-nfd "\xE9;")          @result{} "\x65;\x301;"
+(string-normalize-nfc "\xE9;")          @result{} "\xE9;"
+(string-normalize-nfd "\x65;\x301;")    @result{} "\x65;\x301;"
+(string-normalize-nfc "\x65;\x301;")    @result{} "\xE9;"
+@end example
+@end deffn
+
+@subsection String Cursor API
+
+Indexing into a string (using for example @code{string-ref})
+is inefficient because of the possible presence of surrogate pairs.
+Hence given an index @var{i} access normally requires linearly
+scanning the string until we have seen @var{i} characters.
+
+The string-cursor API is defined in terms of abstract ``cursor values'',
+which point to a position in the string.  This avoids the linear scan.
+
+The API is non-standard, but is based on that in Chibi Scheme.
+
+@deffn Type string-cursor
+An abstract posistion (index) in a string.
+Implemented as a primitive @code{int} which counts the
+number of preceding code units (16-bit @code{char} values).
+@end deffn
+
+@deffn Procedure string-cursor-start str
+Returns a cursor for the start of the string.
+The result is always 0, cast to a @code{string-cursor}.
+@end deffn
+
+@deffn Procedure string-cursor-end str
+Returns a cursor for the end of the string - one past the last valid character.
+Implemented as @code{(as string-cursor (invoke @var{str} 'length))}.
+@end deffn
+
+@deffn Procedure string-cursor-ref str cursor
+Return the @code{character} at the @var{cursor}.
+@end deffn
+
+@deffn Procedure string-cursor-next string cursor [count]
+Return the cursor position @var{count} (default 1) character
+positions forwards beyond @var{cursor}.
+For each @var{count} this may add either 1 or 2
+(if pointing at a surrogate pair) to the @var{cursor}.
+@end deffn
+
+@deffn Procedure string-cursor-prev string cursor [count]
+Return the cursor position @var{count} (default 1) character
+positions backwards before @var{cursor}.
+@end deffn
+
+@deffn Procedure substring-cursor string [start [end]]
+Create a substring of the section of @var{string}
+between the cursors @var{start} and @var{end}.
+@end deffn
+
+@deffn Procedure string-cursor<? cursor1 cursor2
+@deffnx Procedure string-cursor<=? cursor1 cursor2
+@deffnx Procedure string-cursor=? cursor1 cursor2
+@deffnx Procedure string-cursor>=? cursor1 cursor2
+@deffnx Procedure string-cursor>? cursor1 cursor2
+Is the position of @var{cursor1} respectively before,
+before or same, same, after, or after or same, as @var{cursor2}.
+
+@PerformanceNote{} Implemented as the corresponding @code{int} comparison.
+@end deffn
+
+@c non-chibi
+@deffn Procedure string-cursor-for-each proc string [start [end]]
+Apply the procedure @var{proc} to each character position in
+@var{string} between the cursors @var{start} and @var{end}.
+@end deffn
+
+@node String literals
+@section String literals
+
+Kaw support two syntaxes of string literals:
+The traditional, portable, qdouble-quoted-delimited literals
+like @code{"this"};
+and extended SRFI-109 quasi-literals like @code{&@{this@}}.
+
+@subsection Simple string literals
 
 @display
 @stxdef{string} @stxlit{"}@arbno{@stxref{string-element}}@stxlit{"}
@@ -6883,400 +7333,7 @@ it is not repeated for each enclosed expression: it appears
 exactly once in the effective format string, whether
 there are zero, one, or many expressions.
 
-@subsection Basic string procedures
-
-@deffn Procedure {string?} @var{obj}
-Return @true{} if @var{obj} is a string, @false{} otherwise.
-@end deffn
-
-@deffn Type string
-The type of string objects.
-The underlying type is the interface @code{java.lang.CharSequence}.
-Immultable strings are @code{java.lang.String},
-while mutable strings are @code{gnu.lists.FString}.
-@end deffn
-
-@deffn Constructor string @var{char} @dots{}
-Return a newly allocated string composed of the arguments.
-This is analogous to @var{list}.
-@end deffn
-
-@deffn Procedure make-string @var{k}
-@deffnx Procedure make-string @var{k} @var{char}
-Return a newly allocated string of length @var{k}.  If @var{char} is
-given, then all elements of the string are initialized to @var{char},
-otherwise the contents of the @var{string} are unspecified.
-@end deffn
-
-@deffn Procedure string-length @var{string}
-Return the number of characters in the given @var{string} as an exact
-integer object.
-
-@PerformanceNote{} Calling @code{string-length} may take time propertial
-to the length of the @var{string},
-because of the need to scan for surrogate pairs.
-@end deffn
-
-@deffn Procedure string-ref @var{string} @var{k}
-@var{k} must be a valid index of @var{string}.  The @func{string-ref}
-procedure returns character @var{k} of @var{string} using zero--origin
-indexing.
-
-@PerformanceNote{} Calling @code{string-ref} may take time propertial
-to @var{k} because of the need to check for surrogate pairs.
-An alternative is to use @code{string-cursor-ref}.
-If iterating through a string, use @code{string-for-each}.
-@end deffn
-
-@deffn Procedure string-set! string k char
-This procedure stores @var{char} in element @var{k} of @var{string}.
-
-@example
-(define s1 (make-string 3 #\*))
-(define s2 "***")
-(string-set! s1 0 #\?) @result{} @emph{void}
-s1 @result{} "?**"
-(string-set! s2 0 #\?) @result{} @emph{error}
-(string-set! (symbol->string 'immutable) 0 #\?) @result{} @emph{error}
-@end example
-@end deffn
-
-
-@deffn Procedure substring @var{string} @var{start} @var{end}
-@var{string} must be a string, and @var{start} and @var{end} must be
-exact integer objects satisfying:
-
-@example
-0 <= @var{start} <= @var{end} <= (string-length @var{string})
-@end example
-
-The @func{substring} procedure returns a newly allocated string formed
-from the characters of @var{string} beginning with index @var{start}
-(inclusive) and ending with index @var{end} (exclusive).
-@end deffn
-
-
-@deffn Procedure string-append @var{string} @dots{}
-Return a newly allocated string whose characters form the concatenation
-of the given strings.
-@end deffn
-
-@deffn Procedure string->list @var{string} [@var{start} [@var{end}]]
-@deffnx Procedure list->string @var{list}
-It is an error if any element of @var{list} is not a character.
-
-The @func{string->list} procedure returns a newly allocated list of the
-characters of @var{string} between @var{start} and @var{end}.
-The @func{list->string} procedure returns a newly allocated string
-formed from the characters in @var{list}.
-In both procedures, order is preserved.
-The @func{string->list} and @func{list->string} procedures are inverses
-so far as @func{equal?} is concerned.
-@end deffn
-
-@deffn Procedure string-for-each @var{proc} @vari{string} @varii{string} @dots{}
-@deffnx Procedure string-for-each @var{proc} @vari{string} [start [end]]
-The @var{string}s must all have the same length.  @var{proc} should
-accept as many arguments as there are @var{string}s.
-
-The @var{start}-@var{end} variant is provided for compatibility
-with the SRFI-13 version.  (In that case @var{start} and @var{end}
-count code Unicode scalar values (@code{character} values),
-not Java 16-bit @code{char} values.)
-
-The @func{string-for-each} procedure applies @var{proc} element--wise to
-the characters of the @var{string}s for its side effects, in order from
-the first characters to the last.  @var{proc} is always called in the
-same dynamic environment as @func{string-for-each} itself.
-@c  The return values of @func{string-for-each} are unspecified.
-
-Analogous to @func{for-each}.
-
-@example
-(let ((v '()))
-  (string-for-each
-    (lambda (c) (set! v (cons (char->integer c) v)))
-    "abcde")
-   v)
-  @result{} (101 100 99 98 97)
-@end example
-
-@PerformanceNote{} The compiler generates efficient code
-for @code{string-for-each}.
-If @var{proc} is a lambda expression, it is inlined,
-@end deffn
-
-@deffn Procedure string-map @var{proc} @vari{string} @varii{string} @dots{}
-The @code{string-map} procedure applies @var{proc} element-wise to
-the elements of the strings and returns a string of the results, in order.
-It is an error if @var{proc} does not accept as many arguments as there
-are strings, or return other than a single character.
-If more than one string is given and not all strings have the same length,
-@code{string-map} terminates when the shortest string runs out.
-The dynamic order in
-which @var{proc} is applied to the elements of the strings is unspecified.
-@c If multiple returns occur from string-map, the
-@c values returned by earlier returns are not mutated.
-
-@example
-(string-map char-foldcase "AbdEgH")  @result{} "abdegh"
-@end example
-@example
-(string-map
-  (lambda (c) (integer->char (+ 1 (char->integer c))))
-  "HAL")
-        @result{} "IBM"
-@end example
-@example
-(string-map
-  (lambda (c k)
-    ((if (eqv? k #\u) char-upcase char-downcase) c))
-  "studlycaps xxx"
-  "ululululul")
-        @result{} "StUdLyCaPs"
-@end example
-
-@PerformanceNote{} The @code{string-map} procedure has not been
-optimized (mainly because it is not very useful):
-The characters are boxed, and the @var{proc} is not inlined even if
-a lambda expression.
-@end deffn
-
-@deffn Procedure string-copy @var{string} [@var{start} [@var{end}]]
-Returns a newly allocated copy of the the part of the given @var{string}
-between @var{start} and @var{end}.
-@end deffn
-
-@deffn Procedure string-copy!  @var{to}  @var{at}  @var{from} [@var{start} [@var{end}]]
-Copies the characters of the string @var{from} that are between
-@var{start} end @var{end} into the string @var{to},
-starting at index @var{at}.  The order in which characters are copied
-is unspecified, except that if the source and destination overlap,
-copying takes places as if the source is first copied into a
-temporary string and then into the destination.
-(This is achieved without allocating storage by making sure to copy in
-the correct direction in such circumstances.)
-@example
-(define a "12345")
-(define b (string-copy "abcde"))
-(string-copy! b 1 a 0 2)
-b  @result{}  "a12de"
-@end example
-@end deffn
-
-@deffn Procedure string-fill! @var{string} @var{fill} [@var{start} [@var{end}]]
-The @code{string-fill!} procedure stores @var{fill} in the elements
-of @var{string} between @var{start} and @var{end}.
-It is an error if @var{fill} is not a character or is forbidden in strings.
-@end deffn
-
-@subsection String Comparisons
-
-@deffn Procedure {string=?} @vari{string} @varii{string} @variii{string} @dots{}
-Return @true{} if the strings are the same length and contain the same
-characters in the same positions.  Otherwise, the @func{string=?}
-procedure returns @false{}.
-
-@example
-(string=? "Straße" "Strasse")    @result{} #f
-@end example
-@end deffn
-
-
-@deffn Procedure {string<?} @vari{string} @varii{string} @variii{string} @dots{}
-@deffnx Procedure {string>?} @vari{string} @varii{string} @variii{string} @dots{}
-@deffnx Procedure {string<=?} @vari{string} @varii{string} @variii{string} @dots{}
-@deffnx Procedure {string>=?} @vari{string} @varii{string} @variii{string} @dots{}
-These procedures return @code{#t} if their arguments are (respectively):
-monotonically increasing, monotonically decreasing,
-monotonically non-decreasing, or monotonically nonincreasing.
-These predicates are required to be transitive.
-
-These procedures are the lexicographic extensions to strings of the
-corresponding orderings on characters.  For example, @func{string<?} is
-the lexicographic ordering on strings induced by the ordering
-@func{char<?} on characters.  If two strings differ in length but are
-the same up to the length of the shorter string, the shorter string is
-considered to be lexicographically less than the longer string.
-
-@example
-(string<? "z" "ß")      @result{} #t
-(string<? "z" "zz")     @result{} #t
-(string<? "z" "Z")      @result{} #f
-@end example
-@end deffn
-
-@deffn Procedure string-ci=? @vari{string} @varii{string} @variii{string} @dots{}
-@deffnx Procedure string-ci<? @vari{string} @varii{string} @variii{string} @dots{}
-@deffnx Procedure string-ci>? @vari{string} @varii{string} @variii{string} @dots{}
-@deffnx Procedure string-ci<=? @vari{string} @varii{string} @variii{string} @dots{}
-@deffnx Procedure string-ci>=? @vari{string} @varii{string} @variii{string} @dots{}
-These procedures are similar to @func{string=?}, etc.,
-but behave as if they applied @code{string-foldcase} to their arguments
-before invokng the corresponding procedures without @code{-ci}.
-
-@example
-(string-ci<? "z" "Z")                   @result{} #f
-(string-ci=? "z" "Z")                   @result{} #t
-(string-ci=? "Straße" "Strasse")        @result{} #t
-(string-ci=? "Straße" "STRASSE")        @result{} #t
-(string-ci=? "ΧΑΟΣ" "χαοσ")             @result{} #t
-@end example
-@end deffn
-
-@subsection String Conversions
-
-@deffn Procedure string-upcase @var{string}
-@deffnx Procedure string-downcase @var{string}
-@deffnx Procedure string-titlecase @var{string}
-@deffnx Procedure string-foldcase @var{string}
-These procedures take a string argument and return a string result.
-They are defined in terms of Unicode's locale--independent case mappings
-from Unicode scalar--value sequences to scalar--value sequences.  In
-particular, the length of the result string can be different from the
-length of the input string.  When the specified result is equal in the
-sense of @func{string=?} to the argument, these procedures may return
-the argument instead of a newly allocated string.
-
-The @func{string-upcase} procedure converts a string to upper case;
-@func{string-downcase} converts a string to lower case.  The
-@func{string-foldcase} procedure converts the string to its case--folded
-counterpart, using the full case--folding mapping, but without the
-special mappings for Turkic languages.  The @func{string-titlecase}
-procedure converts the first cased character of each word, and downcases
-all other cased characters.
-
-@example
-(string-upcase "Hi")              @result{} "HI"
-(string-downcase "Hi")            @result{} "hi"
-(string-foldcase "Hi")            @result{} "hi"
-
-(string-upcase "Straße")          @result{} "STRASSE"
-(string-downcase "Straße")        @result{} "straße"
-(string-foldcase "Straße")        @result{} "strasse"
-(string-downcase "STRASSE")       @result{} "strasse"
-
-(string-downcase "Σ")             @result{} "σ"
-; Chi Alpha Omicron Sigma:
-(string-upcase "ΧΑΟΣ")            @result{} "ΧΑΟΣ"
-(string-downcase "ΧΑΟΣ")          @result{} "χαος"
-(string-downcase "ΧΑΟΣΣ")         @result{} "χαοσς"
-(string-downcase "ΧΑΟΣ Σ")        @result{} "χαος σ"
-(string-foldcase "ΧΑΟΣΣ")         @result{} "χαοσσ"
-(string-upcase "χαος")            @result{} "ΧΑΟΣ"
-(string-upcase "χαοσ")            @result{} "ΧΑΟΣ"
-
-(string-titlecase "kNock KNoCK")  @result{} "Knock Knock"
-(string-titlecase "who's there?") @result{} "Who's There?"
-(string-titlecase "r6rs")         @result{} "R6rs"
-(string-titlecase "R6RS")         @result{} "R6rs"
-@end example
-
-@quotation
-@emph{Note:} The case mappings needed for implementing these procedures
-can be extracted from @file{UnicodeData.txt}, @file{SpecialCasing.txt},
-@file{WordBreakProperty.txt} (the ``MidLetter'' property partly defines
-case--ignorable characters), and @file{CaseFolding.txt} from the Unicode
-Consortium.
-
-Since these procedures are locale--independent, they may not be
-appropriate for some locales.
-@end quotation
-
-@quotation
-@emph{Note:} Word breaking, as needed for the correct casing of the
-upper case greek sigma and for @func{string-titlecase}, is specified in
-Unicode Standard Annex #29.
-@end quotation
-
-@quotation
-@emph{Kawa Note:}  The implementation of @func{string-titlecase}
-does not correctly handle the case where an initial character
-needs to be converted to multiple characters, such as
-``LATIN SMALL LIGATURE FL'' which should be converted to
-the two letters @code{"Fl"}.
-@end quotation
-@end deffn
-
-@deffn Procedure string-normalize-nfd @var{string}
-@deffnx Procedure string-normalize-nfkd @var{string}
-@deffnx Procedure string-normalize-nfc @var{string}
-@deffnx Procedure string-normalize-nfkc @var{string}
-These procedures take a string argument and return a string result,
-which is the input string normalized to Unicode normalization form D,
-KD, C, or KC, respectively.  When the specified result is equal in the
-sense of @func{string=?} to the argument, these procedures may return
-the argument instead of a newly allocated string.
-
-@example
-(string-normalize-nfd "\xE9;")          @result{} "\x65;\x301;"
-(string-normalize-nfc "\xE9;")          @result{} "\xE9;"
-(string-normalize-nfd "\x65;\x301;")    @result{} "\x65;\x301;"
-(string-normalize-nfc "\x65;\x301;")    @result{} "\xE9;"
-@end example
-@end deffn
-
-@subsection String Cursor API
-
-Indexing into a string (using for example @code{string-ref})
-is inefficient because of the possible presence of surrogate pairs.
-Hence given an index @var{i} access normally requires linearly
-scanning the string until we have seen @var{i} characters.
-
-The string-cursor API is defined in terms of abstract ``cursor values'',
-which point to a position in the string.  This avoids the linear scan.
-
-The API is non-standard, but is based on that in Chibi Scheme.
-
-@deffn Type string-cursor
-An abstract posistion (index) in a string.
-Implemented as a primitive @code{int} which counts the
-number of preceding code units (16-bit @code{char} values).
-@end deffn
-
-@deffn Procedure string-cursor-start str
-Returns a cursor for the start of the string.
-@end deffn
-
-@deffn Procedure string-cursor-end str
-Returns a cursor for the end of the string - one past the last valid character..
-@end deffn
-
-@deffn Procedure string-cursor-ref str cursor
-Return the @code{character} at the give @var{cursor}.
-@end deffn
-
-@deffn Procedure string-cursor-next string cursor [count]
-Return the cursor position @var{count} (default 1) character
-positions forwards.
-@end deffn
-
-@deffn Procedure string-cursor-prev string cursor [count]
-Return the cursor position @var{count} (default 1) character
-positions backwards.
-@end deffn
-
-@deffn Procedure substring-cursor string [start [end]]
-Create a substring of the section of @var{string}
-between the cursors @var{start} and @var{end}.
-@end deffn
-
-@deffn Procedure string-cursor<? cursor1 cursor2
-@deffnx Procedure string-cursor<=? cursor1 cursor2
-@deffnx Procedure string-cursor=? cursor1 cursor2
-@deffnx Procedure string-cursor>=? cursor1 cursor2
-@deffnx Procedure string-cursor>? cursor1 cursor2
-Is the position of @var{cursor1} respectively before,
-before or same, same, after, or after or same, as @var{cursor2}.
-@end deffn
-
-@c non-chibi
-@deffn Procedure string-cursor-for-each proc string [start [end]]
-Apply the procedure @var{proc} to each character position in
-@var{string} between the cursors @var{start} and @var{end}.
-@end deffn
-
-@node Unicode, Regular expressions, Strings, Characters and text
+@node Unicode
 @section Unicode character classes and conversions
 
 @ignore

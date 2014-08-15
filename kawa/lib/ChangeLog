@@ -1,3 +1,12 @@
+2014-08-14  Per Bothner  <per@bothner.com>
+
+	* strings.scm (string-replace!): New function.
+	(string-copy!): Re-implement using string-replace!.  Note that
+	while string-copy! is defined to replace a substring with the same
+	number of character from the source, because of surrogates the
+	target and source segments may be different lengths, so we need
+	to use a general replace.  String-replace! does the job.
+
 2014-08-12  Per Bothner  <per@bothner.com>
 
 	* characters.scm (char?): Also check for java.lang.Character.

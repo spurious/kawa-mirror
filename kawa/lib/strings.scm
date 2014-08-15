@@ -7,7 +7,7 @@
                substring string->list list->string string-copy string-copy!
                string-fill! string-upcase! string-downcase!
                string-capitalize string-capitalize!
-               string-append string-append!
+               string-append string-append! string-replace!
                string-map string-for-each srfi-13-string-for-each)
 
 (require <kawa.lib.prim_syntax>)
@@ -116,17 +116,28 @@
   (with-start-end str (start end) (istart iend)
                   (gnu.lists.FString str istart (- iend istart))))
 
-(define (string-copy! (to ::abstract-string)
+(define (string-copy! (to ::gnu.lists.FString)
                       (at ::int)
                       (from ::java.lang.CharSequence)
                       #!optional
                       (start ::int 0)
-                      (end ::int -1))
+                      (end ::int (gnu.lists.Strings:sizeInCodePoints from)))
+  ::void
+  (string-replace! to at (+ at (- end start)) from start end))
+
+(define (string-replace! (dst ::gnu.lists.FString)
+                         (dstart ::int)
+                         (dend ::int)
+                         (src ::java.lang.CharSequence)
+                         #!optional
+                         (sstart ::int 0)
+                         (send ::int -1))
   ::void
   (with-start-end 
-   from (start end) (cstart cend)
-   (let ((cat (java.lang.Character:offsetByCodePoints to 0 at)))
-     (gnu.lists.Strings:copyInto from cstart cend to cat))))
+   src (sstart send) (csstart csend)
+   (with-start-end
+    dst (dstart dend) (cdstart cdend)
+    (dst:replace src csstart csend cdstart cdend))))
 
 (define (string-fill! str ::abstract-string ch ::character
                       #!optional

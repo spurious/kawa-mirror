@@ -1,3 +1,7 @@
+2014-08-14  Per Bothner  <per@bothner.com>
+
+	* text-test.scm: Add some tests of string-replace!.
+
 2014-08-11  Per Bothner  <per@bothner.com>
 
 	* inlining-test.scm: Add tests for string-append!.

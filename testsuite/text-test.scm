@@ -147,4 +147,15 @@
 (test-equal "ab\ncd\nx"
             (translate-space-to-newline "ab cd x"))
 
+(let ((str (make-string 3 #\😂)))
+  (test-equal 3 (string-length str))
+  (test-equal 6 (str:length))
+  (string-replace! str 1 2 "abc")
+  (test-equal "😂abc😂" str)
+  (string-replace! str 5 5 str 3)
+  (test-equal "😂abc😂c😂" str)
+  (string-replace! str 0 2 "ABC" 1 2)
+  (test-equal "Bbc😂c😂" str))
+
+
 (test-end)

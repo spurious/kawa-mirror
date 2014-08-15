@@ -384,6 +384,39 @@ public class FString extends SimpleVector
         }
     }
 
+    /** Replace a substring of this string with another.
+     * The two strings may have different lengths, so this
+     * generalizes insertion and deletion.
+     */
+    public void replace(CharSequence src, int srcStart, int srcEnd,
+                        int dstStart, int dstEnd) {
+        if (dstStart < 0 || dstStart > dstEnd || dstEnd > size
+            || srcStart < 0 || srcStart > srcEnd || srcEnd > src.length())
+            throw new StringIndexOutOfBoundsException();
+        int srcLength = srcEnd - srcStart;
+        int dstLength = dstEnd - dstStart;
+        int grow = srcLength - dstLength;
+        if (grow != 0) {
+            if (grow > 0)
+                ensureBufferLength(size + grow);
+            System.arraycopy(data, dstEnd, data, dstEnd+grow, size-dstEnd);
+            size += grow;
+        }
+        if (dstStart <= srcStart) {
+            int i = dstStart;
+            int j = srcStart;
+            for (; j < srcEnd; i++, j++) {
+                data[i] = src.charAt(j);
+            }
+        } else {
+            int i = dstEnd + grow;
+            int j = srcEnd;
+            while (--j >= srcStart) {
+                data[--i] = src.charAt(j);
+            }
+        }
+    }
+
   public void setCharAtBuffer (int index, char ch)
   {
     data[index] = ch;

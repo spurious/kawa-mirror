@@ -6327,6 +6327,7 @@ a library call is needed, but run-time type dispatch is avoided.
 * Characters::
 * Character sets::
 * Strings::
+* String literals::
 * Unicode::              Unicode character classes and conversions
 * Regular expressions::
 @end menu
@@ -6765,6 +6766,21 @@ Returns a newly allocated copy of the the part of the given @var{string}
 between @var{start} and @var{end}.
 @end deffn
 
+@deffn Procedure string-replace!  @var{dst} @var{dst-start} @var{dst-end} @var{src} [@var{src-start} [@var{src-end}]]
+Replaces the characters of string @var{dst} (between @var{dst-start} and @var{dst-end}) with the characters of @var{src} (between @var{src-start} and @var{src-end}).
+The number of characters from @var{src} may be different than the
+number replaced in @var{dst}, so the string may grow or contract.
+The special case where @var{dst-start} is equal to @var{dst-end} corresponds to
+insertion; the case where @var{src-start} is equal to @var{src-end}
+corresponds to deletion.
+The order in which characters are copied
+is unspecified, except that if the source and destination overlap,
+copying takes places as if the source is first copied into a
+temporary string and then into the destination.
+(This is achieved without allocating storage by making sure to copy in
+the correct direction in such circumstances.)
+@end deffn
+
 @deffn Procedure string-copy!  @var{to}  @var{at}  @var{from} [@var{start} [@var{end}]]
 Copies the characters of the string @var{from} that are between
 @var{start} end @var{end} into the string @var{to},
@@ -6774,16 +6790,18 @@ copying takes places as if the source is first copied into a
 temporary string and then into the destination.
 (This is achieved without allocating storage by making sure to copy in
 the correct direction in such circumstances.)
+
+This is equivalent to (and implemented as):
+@example
+(string-replace! to at (+ at (- end start)) from start end))
+@end example
+
 @example
 (define a "12345")
 (define b (string-copy "abcde"))
 (string-copy! b 1 a 0 2)
 b  @result{}  "a12de"
 @end example
-
-@emph{Warning:} This function is deprecated.  It doesn't handle
-the case where source substring or the destination contains
-non-BMP character (those needing surrogates).
 @end deffn
 
 @deffn Procedure string-fill! @var{string} @var{fill} [@var{start} [@var{end}]]
@@ -10259,7 +10277,7 @@ is signaled.
 @deffn Procedure read-char [port]
 Returns the next character available from the textual input
 @var{port}, updating the port to point to the following character.
-If no more characters are available, an end-of-file object is
+If no more characters are available, an end-of-file value is
 returned.
 
 The result type is @code{character-or-eof}.
@@ -10269,7 +10287,9 @@ The result type is @code{character-or-eof}.
 Returns the next character available from the textual input @var{port},
 but @emph{without} updating the port to point to the
 following character. If no more characters are available, an
-end-of-file object is returned.
+end-of-file value is returned.
+
+The result type is @code{character-or-eof}.
 
 @emph{Note:} The value returned by a call to @code{peek-char} is the same as
 the value that would have been returned by a call to @code{read-char}

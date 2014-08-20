@@ -240,9 +240,13 @@ public class SwitchState
             code.emitGoto(defaultLabel);
 	  }
       }
-    else if (2 * numCases >= maxValue - minValue)
+    else 
       {
-	code.reserve(13 + 4 * (maxValue - minValue + 1));
+       long rangeDim = (long)maxValue - (long)minValue;
+       if (2 * numCases >= rangeDim)
+      {
+       int size = (int) (13 + 4 * (rangeDim + 1));
+       code.reserve(size);
 	code.fixupAdd(CodeAttr.FIXUP_SWITCH, null);
 	code.put1(170);  // tableswitch
 	code.fixupAdd(CodeAttr.FIXUP_CASE, defaultLabel);
@@ -250,11 +254,13 @@ public class SwitchState
 	code.put4(minValue);
 	code.put4(maxValue);
 	int index = 0;
-	for (int i = minValue;  i <= maxValue;  i++)
+       // convoluted code in case maxValue==Integer.MAX_VALUE
+       for (int i = minValue; ; i++)
 	  {
 	    Label lab = values[index] == i ? labels[index++] : defaultLabel;
 	    code.fixupAdd(CodeAttr.FIXUP_CASE, lab);
 	    code.PC += 4;
+           if (i == maxValue) break;
 	  }
       }
     else
@@ -271,6 +277,7 @@ public class SwitchState
 	    code.fixupAdd(CodeAttr.FIXUP_CASE, labels[index]);
 	    code.PC += 4;
 	  }
+      }
       }
     code.fixupChain(end_label, cases_label);
     code.setUnreachable();

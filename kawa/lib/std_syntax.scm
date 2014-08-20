@@ -2,7 +2,7 @@
 
 ;;; Definitions for some standard syntax.
 
-(module-export cond case and or let let* do delay lazy
+(module-export cond and or let let* do delay lazy
                syntax->datum datum->syntax with-syntax
 	       syntax-object->datum datum->syntax-object ; deprecated
 	       begin-for-syntax define-for-syntax
@@ -44,49 +44,6 @@
 		 (if test
 		     (begin result1 result2 ...)
 		     (cond clause1 clause2 ...)))))
-
-;;; CASE
-
-(define-syntax case (syntax-rules ()
-				  ((case key clauses ...)
-				   (%let ((tmp key))
-				     (%case tmp clauses ...)))))
-
-(define-syntax %case (syntax-rules (else =>)
-				   ((%case key (else => expression))
-                                    (expression key))
-				   ((%case key (else expression ...))
-				    (begin expression ...))
-				   ((%case key (else expression ...) . junk)
-				    (%syntax-error
-				     "junk following else (in case)"))
-				   ((%case key
-					   ((datum ...) => expression))
-				    (if (%case-match key datum ...)
-					(expression key)))
-				   ((%case key
-					   ((datum ...) expression ...))
-				    (if (%case-match key datum ...)
-					(begin expression ...)))
-				   ((%case key
-					   ((datum ...) => expression)
-					   clause more ...)
-				    (if (%case-match key datum ...)
-					(expression key)
-					(%case key clause more ...)))
-				   ((%case key
-					   ((datum ...) expression ...)
-					   clause more ...)
-				    (if (%case-match key datum ...)
-					(begin expression ...)
-					(%case key clause more ...)))))
-					  
-(define-syntax %case-match (syntax-rules ()
-					 ((%case-match key datum)
-					  (eqv? key (quote datum)))
-					 ((%case-match key datum more ...)
-					  (or (eqv? key 'datum)
-					      (%case-match key more ...)))))
 
 (define-syntax %lang-boolean
   (syntax-rules ()

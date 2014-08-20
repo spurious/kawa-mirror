@@ -9,6 +9,7 @@ java_SCM_ALWAYS =\
   reflection.scm \
   syntax.scm \
   lists.scm \
+  case_syntax.scm \
   ExceptionClasses.scm \
   exceptions.scm \
   thread.scm \

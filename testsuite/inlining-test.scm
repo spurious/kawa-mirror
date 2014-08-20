@@ -346,3 +346,87 @@
                        (if (char=? ch #\Space) #\Newline ch)))
      str)
     result))
+
+(define (case01)
+  (let ((key 5))
+    (case key
+      ((1 2 3 4) '1to4)
+      ((5 6 7 8) '5to8))))
+
+(define (case02)
+  (let ((key (* 2 3)))
+    (case key
+      ((1 2 3 4) '1to4)
+      ((5 6 7 8) '5to8))))
+
+(define (case03)
+  (let ((key 'five))
+    (case key
+      ((one two three four) '1to4)
+      ((five six seven eight) '5to8))))
+
+(define (case04 key)
+  (case key
+    ((1 2 3 4) (+ 5 (* 2 3)))
+    ((5 6 7 8) (* 2 (+ 3 4)))
+    (else (+ (* 3 2) 6))))
+
+(define (case05 key::int)
+  (case key
+    ((1 2 3 4) (+ 5 (* 2 3)))
+    ((5 6 7 8) (* 2 (+ 3 4)))
+    (else (+ (* 3 2) 6))))
+
+(define (case06 key::long)
+  (case key
+    ((1 2 3 4) (+ 5 (* 2 3)))
+    ((5 6 7 8) (* 2 (+ 3 4)))
+    (else (+ (* 3 2) 6))))
+
+(define (case07 key)
+  (case key
+    ((1 2 3 4) 1)
+    ((5 6 7 8) 2)
+    (else 3)))
+
+(define (case08 key::int)
+  (case key
+    ((1 2 3 4) 1)
+    ((5 6 7 8) 2)
+    (else 3)))
+
+(define (case09 key::long)
+  (case key
+    ((1 2 3 4) 1)
+    ((5 6 7 8) 2)
+    (else 3)))
+
+(define (case10 key)
+  (case key
+    ((1 2 3 4) '1to4)
+    ((5 6 7 8) '5to8)
+    (else 3)))
+
+(define (case11 key::int)
+  (case key
+    ((1 2 3 4) '1to4)
+    ((5 6 7 8) '5to8)
+    (else 3)))
+
+(define (case12 key::long)
+  (case key
+    ((1 2 3 4) '1to4)
+    ((5 6 7 8) '5to8)
+    (else 3)))
+
+(define (case13 key::integer)
+   (case key
+     ((1 2 3 4) 1)
+     ((5 6 7 8) 2)
+     (else 3)))
+
+(define (case14 key::char)
+   (case key
+     ((#\a #\b #\c #\d) 1)
+     ((#\e #\f #\g #\h) 2)
+     (else 3)))

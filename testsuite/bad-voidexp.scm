@@ -71,16 +71,9 @@
 ;; Diagnostic: bad-voidexp.scm:69:9: warning - missing else where value is required
 ;; Output: compare 3 2: greater
 
-(let ((v (list (case (* 2 3)
-                 ((2 3 5 7) 'prime)
-                 ((1 4 6 8 9) 'composite)))))
-  (format #t "6 is ~s~%" (car v)))
-;; Diagnostic: bad-voidexp.scm:74:16: warning - missing else where value is required
-;; Output: 6 is composite
-
 ;; Savannah bug #27014 "AND vs. VOID"
 (begin
   (define (foo) (and (bar) (bar)))
   (define baz #f)
   (define (bar) (set! baz #f)))
-;; Diagnostic: bad-voidexp.scm:83:22: warning - void-valued expression where value is needed
+;; Diagnostic: bad-voidexp.scm:76:22: warning - void-valued expression where value is needed

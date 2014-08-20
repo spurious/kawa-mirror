@@ -1,3 +1,14 @@
+2014-08-13  Andrea Bernardini <andrebask@gmail.com>
+
+       Define rewriting rules for the new implementation of "case"
+       expressions.
+       * case_syntax.scm: New file. "case" syntax definition, CaseExps
+       construction.
+       * Makefile.am: Add case_syntax.scm.
+       * Makefile.in: Add case_syntax.scm.
+       * std_syntax.scm: Delete "case" macro, new implementation moved
+       in case_syntax.scm.
+
 2014-08-14  Per Bothner  <per@bothner.com>
 
 	* strings.scm (string-replace!): New function.
@@ -17,7 +28,7 @@
 	(string-cursor-next, string-cursor-prev): Take optional count.
 	(string-cursor-move): Remove now-redundant function.
 	(string-cursor-ref-or-eof): Comment out unused function.
-	* strings.scm (make-string): Give more precide return type.
+	* strings.scm (make-string): Give more precise return type.
 	(string-append!): New function.
 	* compile_misc.scm (stringAppendToValidateApply): Inline string-append!.
 
@@ -104,7 +115,7 @@
 	(u8): Inline readByte from kawa.standard.readchar.
 	* rnrs/unicode.scm: Update character/int conversions.
 	* strings.scm: Likewise.
-	Add validation hook for character comparions.
+	Add validation hook for character comparisons.
 	* compile_misc.scm: Implement various validation hooks.
 
 2014-07-01  Per Bothner  <per@bothner.com>
@@ -173,7 +184,7 @@
 
 	* rnrs/programs.scm (exit): Use ExitCalled utility class,
 	so that finally-handlers can be executed.
-	(mergency-exit): New method.
+	(emergency-exit): New method.
 
 2014-02-12  Per Bothner  <per@bothner.com>
 
@@ -574,7 +585,7 @@
 
 	* ports.scm (write, write-with-shared-structure): write was
 	modified slightly for SRFI-38, write-w-s-s is a new procedure that
-	calls the appropiate Java methods for shared structure printing.
+	calls the appropriate Java methods for shared structure printing.
 
 2011-06-14  Per Bothner  <per@bothner.com>
 
@@ -692,7 +703,7 @@
 2010-01-06  Per Bothner  <per@bothner.com>
 
 	* strings.scm:  Update some of the type specifiers to use the
-	new format, where separators before or after are uptional.
+	new format, where separators before or after are optional.
 	This is mainly for testing, but more will be changed later.
 
 2009-12-25  root  <per@bothner.com>
@@ -731,7 +742,7 @@
 2009-10-03  Per Bothner  <per@bothner.com>
 
 	* std_syntax.scm (do):  Re-write so we can handle type-specifiers
-	for mutliple variable clauses.
+	for multiple variable clauses.
 
 	* std_syntax.scm (do):  Re-order parts of 'do' to avoid a goto
 	in generated code.
@@ -813,7 +824,7 @@
 2009-06-02  Per Bothner  <per@bothner.com>
 
 	* rnrs/unicode.scm: New module, implements (rnrs unicode) library.
-	* Makefile.am: Update acordingly.
+	* Makefile.am: Update accordingly.
 	* characters.scm: Move some functions rnrs/unicode.scm.
 	* strings.scm: Likewise.
 
@@ -840,7 +851,7 @@
 2009-03-13  Per Bothner  <per@bothner.com>
 
 	* syntax.scm: Implement R6RS 'import' keyword.
-	* lists.scm, std_syntax.scm, syntax.scm: More some functons and macros
+	* lists.scm, std_syntax.scm, syntax.scm: More some functions and macros
 	around so import can make use of what it needs.
 
 	* srfi95.scm: New SRFI-95 (sorting and merging) implementation,
@@ -942,7 +953,7 @@
 2007-02-08  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (SCM_COMPILE_FLAGS): Add --warn-invoke-unknown-method
-	amd --warn-as-error compiles flags.
+	and --warn-as-error compiles flags.
 
 2007-02-05  Per Bothner  <per@bothner.com>
 
@@ -1285,7 +1296,7 @@
 2004-12-07  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (SCM_COMPILE_FLAGS): Add--warn-undefined-variable.
-	* misc.scm: Add some <boolean> return type specifers.
+	* misc.scm: Add some <boolean> return type specifiers.
 	(procedure?): Simplify since Location no longer extends Procedure.
 
 	* system.scm (command-parse): New function variable.
@@ -1366,12 +1377,12 @@
 
 2003-11-21  Per Bothner  <per@bothner.com>
 
-	* ports.scm (call-with-input-file):  New functiom.
+	* ports.scm (call-with-input-file):  New function.
 	(call-with-output-file):  Add type declaration.
 
 2003-11-21  Hoehle, Joerg-Cyril <Joerg-Cyril.Hoehle@t-systems.com>
 
-	* ports.scm (call-with-output-file):  New functiom.
+	* ports.scm (call-with-output-file):  New function.
 
 2003-11-09  Chris Dean  <Chris.Dean@sokitomi.com>
 
@@ -1383,7 +1394,7 @@
 
 2003-09-23  Per Bothner  <per@bothner.com>
 
-	* vectors.scm ((list->vector):  Don't hardwire in paramater type
+	* vectors.scm ((list->vector):  Don't hardwire in parameter type
 	using primitive-constructor - since that now depends on JAVA2.
 
 2003-08-20  Per Bothner  <per@bothner.com>
@@ -1455,7 +1466,7 @@
 
 2002-05-17  Per Bothner  <per@bothner.com>
 
-	* misc.scm (null-environment):  Should take a versio number, according
+	* misc.scm (null-environment):  Should take a version number, according
 	to R5RS.  Bug reported by Dr. M. Luedde <Mirko.Luedde@Computer.Org>.
 
 2002-03-21  Per Bothner  <per@bothner.com>
@@ -1555,7 +1566,7 @@ Weiqi Gao <weiqigao@networkusa.net>
 
 2000-10-12  Per Bothner  <per@bothner.com>
 
-	* numbers.scm:  Add (new-style) type specificiers.
+	* numbers.scm:  Add (new-style) type specifiers.
 	Replace some ((primitive-virtual-method ...)) by (invoke ...).
 	(floor, ceiling, truncate, round, arithmetic-shift):  New procedures.
 
@@ -1680,7 +1691,7 @@ Weiqi Gao <weiqigao@networkusa.net>
 
 	* ports.scm (transcript-on):  Use <String> as parameter type,
 	rather than <java.lang.String>, so we get the desired conversion.
-	* vectors.scm:  Extra whitespace for more discrimating line numbers.
+	* vectors.scm:  Extra whitespace for more discriminating line numbers.
 
 1999-09-05  Per Bothner  <per@bothner.com>
 
@@ -1921,7 +1932,7 @@ Sat Mar  8 11:18:51 1997  Per Bothner  <bothner@deneb.cygnus.com>
 Mon Feb  3 17:36:41 1997  Per Bothner  <bothner@kalessin.cygnus.com>
 
 	* characters.scm, vectors.scm:  New files.
-	* Makefile.am: Upadte.  Use new $KAWA.
+	* Makefile.am: Update.  Use new $KAWA.
 
 Mon Jan 20 16:45:20 1997  Per Bothner  <bothner@kalessin.cygnus.com>
 

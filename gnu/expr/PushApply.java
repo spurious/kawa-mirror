@@ -138,6 +138,47 @@ public class PushApply extends ExpVisitor<Expression,Void>
         }
     }
 
+    protected Expression visitCaseExp(CaseExp exp, Void ignored) {
+        Expression key = exp.key;
+        if (key instanceof LetExp && !(key instanceof FluidLetExp)) {
+            // [CASE-LET]
+            // Optimize (case (let (...) body) clause1 ...)
+            // to (let (...) (case body clause1 ...))
+            LetExp let = (LetExp) key;
+            Expression body = let.body;
+            let.body = exp;
+            exp.key = body;
+            return visit(let, ignored);
+        } else if (key instanceof BeginExp) {
+            // [CASE-BEGIN]
+            // Optimize (case (begin ... last) clause1 ...)
+            // to (begin ... (case last clause1 ...)).
+            BeginExp begin = (BeginExp) key;
+            Expression[] stmts = begin.exps;
+            int last_index = begin.exps.length - 1;
+            exp.key = stmts[last_index];
+            stmts[last_index] = exp;
+            return visit(begin, ignored);
+        } else {
+            exp.key = visit(exp.key, ignored);
+            forkPush();
+            if (exp.clauses.length > 0) {
+                exp.clauses[0].exp = visit(exp.clauses[0].exp, ignored);
+                for (int i = 1; i < exp.clauses.length; i++) {
+                    forkNext();
+                    exp.clauses[i].exp = visit(exp.clauses[i].exp, ignored);
+                }
+                if (exp.elseClause != null)
+                    forkNext();
+            }
+            if (exp.elseClause != null)
+                exp.elseClause.exp = visit(exp.elseClause.exp, ignored);
+            forkPop();
+            return exp;
+        }
+
+    }
+
     protected Expression visitTryExp (TryExp exp, Void ignored) {
         forkPush();
         exp.try_clause = visit(exp.try_clause, ignored);

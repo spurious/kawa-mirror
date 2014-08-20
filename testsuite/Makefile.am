@@ -50,7 +50,8 @@ check1:  check-num check-arr check-java-array check-lazy check-lib \
   check-knucleotide check-mandelbrot check-meteor check-nbody \
   check-nsieve check-pidigits check-regexdna check-revcomp \
   check-spectralnorm check-threadring
-check2:  check-scm check-r7rs check-misc check-mac check-obj check-polytype
+check2:  check-scm check-r7rs check-misc check-mac check-obj check-polytype \
+  check-case
 
 check-run-test-scripts:
 	CLASSPATH=$(top_builddir) $(JAVA) gnu.kawa.util.RunTestScript \
@@ -65,6 +66,9 @@ check-scm: testing.zip
 	  -e '(define this-file-name "$(srcdir)/test.scm")' \
 	  -e "(set! symbol-read-case 'D)" --no-warn-undefined-variable \
 	  -f $(srcdir)/test.scm -e '(test-report)'
+
+check-case: testing.zip
+	$(KAWATEST) -f "$(srcdir)/case-test.scm" -e '(test-report)'
 
 check-r7rs:
 	$(KAWA) --no-warn-void-used -f $(srcdir)/r7rs-tests.scm
@@ -529,6 +533,8 @@ InliningTest.class: $(srcdir)/inlining-test.scm
 
 LIST_CODE_SIZE = $(CPJAVA) gnu.bytecode.ListCodeSize
 
+CASES=$(foreach var,$(shell echo {01..14}), $(shell echo "case$(var)"))
+
 inlining.log: InliningTest.class cycle1.class cycle2.class \
   binarytrees.class fannkuch.class fannkuchredux.class fasta.class mandelbrot.class nbody.class pidigits.class regexdna.class revcomp1.class revcomp2.class spectralnorm.class Makefile
 	$(LIST_CODE_SIZE) InliningTest.class \
@@ -540,7 +546,7 @@ inlining.log: InliningTest.class cycle1.class cycle2.class \
 	factorialInfer1 getFromVector1 getFromVector2 read1 stringForEach \
 	stringAppend translateSpaceToNewline \
 	topLevelRecurse1 topLevelRecurse2 sum1 sum2 numcomp eqv \
-	raise >inlining.log
+	$(CASES) >inlining.log
 	$(LIST_CODE_SIZE) cycle1.class isIsEven >>inlining.log
 	$(LIST_CODE_SIZE) cycle2.class isIsOdd >>inlining.log
 	$(LIST_CODE_SIZE) binarytrees.class bottomUpTree test >>inlining.log
@@ -603,7 +609,7 @@ check-bridge:
 	$(KAWA) $(OPTIONS) "$(srcdir)/bridge.scm"
 
 CLEANFILES = tmp* *.log testing.zip revcomp-input.txt knucleotide-input.txt regexdna-input.txt *.class HelloCgiK HelloCgiS
-SCRIPTS_TO_RUN = uninit1.scm errors1.scm errors2.scm errors3.scm\
+SCRIPTS_TO_RUN = case-warnings.scm uninit1.scm errors1.scm errors2.scm errors3.scm\
   inner-1.scm lambda-in-class-1.scm reflect1.scm reflect2.scm \
   promise1.scm bad-keywords1.scm splice1.scm standards1.scm \
   anonymous-lambda-1.scm unreach1.scm unreach2.scm unreach3.scm \

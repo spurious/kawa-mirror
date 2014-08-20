@@ -68,7 +68,12 @@ public class ExpVisitor<R,D>
         return visitExpression(exp, d);
     }
 
-    protected void visitDeclarationType(Declaration decl) {
+    protected R visitCaseExp(CaseExp exp, D d) {
+        return visitExpression(exp, d);
+    }
+
+    protected void visitDeclarationType (Declaration decl)
+    {
         Expression texp1 = decl.typeExp;
         if (texp1 != null) {
             Expression texp2 = visitAndUpdate(texp1, null); // FIXME

@@ -1,4 +1,8 @@
-2014-08-14  Per Bothner  <per@bothner.com>
+2014-08-13  Andrea Bernardini <andrebask@gmail.com>
+
+       * standard/Scheme.java (initScheme): Add case.
+
+202014-08-14  Per Bothner  <per@bothner.com>
 
 	* standard/Scheme.java (initScheme): Add string-replace!.
 

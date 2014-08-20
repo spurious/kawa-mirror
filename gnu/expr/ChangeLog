@@ -1,3 +1,25 @@
+2014-08-13  Andrea Bernardini <andrebask@gmail.com>
+
+	Optimized implementation of "case" expressions, with a new class  
+	extending Expression, compiled using the existing SwitchState
+	interface.
+	* CaseExp.java: New file. New class representing "case" expressions, 
+	cases are now compiled using the tableswitch/lookupswitch
+	jvm instructions.
+	* ChainLambdas.java: Add visitCaseExp method, for unreachable
+	code detection in "case" expressions.
+	* ExpVisitor.java: Add visitCaseExp method.
+	* FindCapturedVars.java: Add visitCaseExp method, to bind 
+	ReferenceExps in "case" expressions.
+	* FindTailCalls.java: Add visitCaseExp method, to check for
+	tail-calls in "case" expressions.
+	* InlineCalls.java: Add visitCaseExp method, implements inlining 
+	and type checking for "case" expressions.
+	* Makefile.am: Add CaseExp.java class to java_sources.
+	* Makefile.in: Add CaseExp.java class to java_sources.
+	* PushApply.java: Add visitCaseExp method, optimizes case-let 
+	and case-begin occurrences. 
+
 2014-08-04  Per Bothner  <per@bothner.com>
 
 	* ApplyExp.java (compile): Better handling of calls with splices.

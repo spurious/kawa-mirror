@@ -297,6 +297,21 @@ public class FindCapturedVars extends ExpExpVisitor<Void>
     return super.visitLambdaExp(exp, ignored);
   }
 
+    protected Expression visitCaseExp(CaseExp exp, Void ignored) {
+
+        exp.key = visit(exp.key, ignored);
+        for (int i = 0; i < exp.clauses.length; i++) {
+            Expression e = exp.clauses[i].exp;
+            e = visit(e, ignored);
+        }
+
+        CaseExp.CaseClause ecl = exp.elseClause;
+        if (ecl != null)
+            ecl.exp = visit(ecl.exp, ignored);
+
+        return exp;
+    }
+
   public void capture(Declaration decl)
   {
     if (! (decl.getCanRead() || decl.getCanCall()))

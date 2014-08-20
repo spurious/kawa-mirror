@@ -68,3 +68,18 @@
  (ex java.lang.NullPointerException
      (format #t "nested-with-compile-options threw NullPointerException.~%")))
 ;; Output: nested-with-compile-options threw NullPointerException.
+ 
+(define loop (lambda () 
+               (let loop ((n 1))
+                 (loop (+ n 1)))))
+(define (e x)
+  (case x
+    ((1) (loop))
+    ((2 3 4 5) (loop))
+    ((#\a) (loop))))
+
+(try-catch (display (e 6)) 
+  (exc java.lang.ClassCastException (lambda () (#!void))))
+;; Diagnostic: unreach1.scm:81:12: warning - unreachable procedure call
+;; Diagnostic: unreach1.scm:81:21: note - this operand never finishes
+

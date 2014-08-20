@@ -39,6 +39,7 @@ java_sources = \
   FluidLetExp.java \
   GenericProc.java \
   IfExp.java \
+  CaseExp.java \
   IgnoreTarget.java \
   Initializer.java \
   Inlineable.java \

@@ -112,6 +112,36 @@ public class ChainLambdas extends ExpExpVisitor<ScopeExp> {
         return exp;
     }
 
+    protected Expression visitCaseExp(CaseExp exp, ScopeExp scope) {
+
+        Expression e = visit(exp.key, scope);
+        if (e.neverReturns()) {
+            for (int i = 0; i < exp.clauses.length; i++) {
+                maybeWarnUnreachable(exp.clauses[i].exp);
+            }
+            maybeWarnUnreachable(exp.elseClause.exp);
+            return e;
+        }
+
+        boolean neverReturns = true;
+        for (int i = 0; i < exp.clauses.length; i++) {
+            exp.clauses[i].exp = visit(exp.clauses[i].exp, scope);
+            if (!exp.clauses[i].exp.neverReturns()) {
+                neverReturns = false;
+            }
+        }
+        if (neverReturns && exp.elseClause != null) {
+            exp.elseClause.exp = visit(exp.elseClause.exp, scope);
+            if (!exp.elseClause.exp.neverReturns())
+                neverReturns = false;
+        }
+
+        if (neverReturns)
+            exp.type = Type.neverReturnsType;
+
+        return exp;
+    }
+
   protected Expression visitScopeExp (ScopeExp exp, ScopeExp scope)
   {
     exp.outer = scope; 

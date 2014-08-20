@@ -198,6 +198,18 @@ public class FindTailCalls extends ExpExpVisitor<Expression>
     return exp;
   }
 
+    protected Expression visitCaseExp(CaseExp exp, Expression returnContinuation) {
+        exp.key = exp.key.visit(this, exp.key);
+        for (int i = 0; i < exp.clauses.length; i++) {
+            exp.clauses[i].exp = exp.clauses[i].exp.visit(this,
+                    returnContinuation);
+        }
+        if (exp.elseClause != null)
+            exp.elseClause.exp = exp.elseClause.exp.visit(this,
+                    returnContinuation);
+        return exp;
+    }
+
   protected Expression visitLambdaExp (LambdaExp exp, Expression returnContinuation)
   {
     exp.clearCallList();

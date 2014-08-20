@@ -12,9 +12,15 @@ import gnu.math.DFloNum;
 import gnu.math.IntNum;
 import gnu.math.BitOps;
 import gnu.text.Char;
+
 import java.lang.reflect.InvocationTargetException;
+
 import gnu.kawa.functions.MakePromise;
 import gnu.kawa.lispexpr.LangPrimType;
+import gnu.lists.ConstVector;
+import gnu.lists.EmptyList;
+import gnu.lists.PairWithPosition;
+
 import java.util.List;
 import java.util.HashMap;
 import java.lang.reflect.Proxy;
@@ -452,6 +458,98 @@ public class InlineCalls extends ExpExpVisitor<Type> {
         int last = exp.length - 1;
         for (int i = 0;  i <= last;  i++) {
             exp.exps[i] = visit(exp.exps[i], i < last ? null : required);
+        }
+        return exp;
+    }
+
+    protected Expression visitCaseExp(CaseExp exp, Type required) {
+        Expression key = exp.key.visit(this, ValueNeededType.instance);
+        
+        // Inline the key when it is a ReferenceExp bound
+        // to a known value (a QuoteExp).
+        if (key instanceof ReferenceExp) {
+            Declaration decl = ((ReferenceExp) key).getBinding();
+            if (decl != null) {
+                Expression value = decl.getValue();
+                if (value instanceof QuoteExp
+                        && value != QuoteExp.undefined_exp)
+                    key = value;
+            }
+        }
+        exp.key = key;
+
+        // replaces a case containing only the default case
+        if (exp.clauses.length == 0) {
+            return new BeginExp(key, visit(exp.elseClause.exp, required));
+        }
+
+        // type checking for datums
+        Expression lastIncomp = null;
+        int incomps = 0;
+        for (int i = 0; i < exp.clauses.length; i++) {
+            for (int j = 0; j < exp.clauses[i].datums.length; j++) {
+                Expression dexp = exp.clauses[i].datums[j];
+                Object d = ((QuoteExp) dexp).getValue();
+                if (d instanceof ConstVector
+                        || (!(d instanceof EmptyList) && d instanceof PairWithPosition)) {
+                    comp.error('w', "List and vectors will never be matched in a case clause", dexp);
+                }
+                if (key.getType().isCompatibleWithValue(dexp.getType()) == -1){
+                    if (incomps < 2)
+                        comp.error('w', "datum type incompatible with the key", dexp);
+                    else if (incomps == 2)
+                        lastIncomp = dexp;
+                    incomps++;
+                }
+            }
+        }
+        // if more than 2 datums are incompatible we report a summary
+        if (incomps > 2)
+            comp.error('w', "there are " + (incomps - 2)
+                        + " more datums that are incompatible with the key", lastIncomp);
+
+        VarValueTracker.forkPush(this);
+        if (exitValue == null) {
+            exp.clauses[0].exp = visit(exp.clauses[0].exp, required);
+            for (int i = 1; i < exp.clauses.length; i++) {
+                if (exitValue == null) {
+                    valueTracker.forkNext();
+                    exp.clauses[i].exp = visit(exp.clauses[i].exp, required);
+                }
+            }
+        }
+        if (exitValue == null && exp.elseClause != null) {
+            valueTracker.forkNext();
+            exp.elseClause.exp = visit(exp.elseClause.exp, required);
+        }
+        VarValueTracker.forkPop(this);
+
+        boolean isKeyKnown = key instanceof QuoteExp;
+
+        Object keyValue = isKeyKnown ? ((QuoteExp) key).getValue() : null;
+
+        if (exp.elseClause == null && required instanceof ValueNeededType) {
+            boolean missing = !isKeyKnown || !exp.searchValue(keyValue);
+            if (missing) {
+                if (comp.warnVoidUsed())
+                    comp.error('w', "missing else where value is required", exp);
+            }
+
+            if (isKeyKnown && missing) {
+                return QuoteExp.voidObjectExp;
+            }
+        }
+
+        // When the key is know at compile time, search a matching
+        // datum and return the corresponding expression.
+        if (isKeyKnown) {
+            Expression e = exp.selectCase(keyValue);
+            return (e != null) ? e : QuoteExp.voidObjectExp;
+        }
+
+        if (key.getType().isVoid()) {
+            return new BeginExp(key,
+                    exp.selectCase(QuoteExp.voidExp.getValue()));
         }
         return exp;
     }

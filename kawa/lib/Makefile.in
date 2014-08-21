@@ -241,6 +241,7 @@ java_SCM_ALWAYS = \
   numbers.scm \
   strings.scm \
   parameters.scm \
+  parameterize.scm \
   ports.scm \
   files.scm \
   misc.scm \
@@ -262,8 +263,6 @@ EXTRA_DIST = $(java_SCM_ALWAYS) $(scm_WITH_SWING)
 @WITH_SWING_FALSE@java_SCM = $(java_SCM_ALWAYS)
 @WITH_SWING_TRUE@java_SCM = $(java_SCM_ALWAYS) $(scm_WITH_SWING)
 PACKAGE_FNAME = kawa-lib
-EXTRA_GCJ_COMPILED = scm-classes.stamp
-EXTRA_GCJ_INPUTS = *.class
 SCM_COMPILE_FLAGS = --warn-undefined-variable --warn-unknown-member --warn-as-error
 EXTRA_CLEAN = */*.class
 all: all-am
@@ -484,7 +483,7 @@ elisp-classes.stamp: $(java_ELISP)
 list-sources:
 	echo $(SOURCES)
 
-all: Makefile $(@GCJ_COMPILED_SELECTED@_CDEP) scm-classes.stamp $(@GCJ_COMPILED_SELECTED@)
+all: Makefile scm-classes.stamp
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

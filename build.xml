@@ -533,6 +533,7 @@
         <file name="numbers.scm"/>
         <file name="strings.scm"/>
         <file name="parameters.scm"/>
+        <file name="parameterize.scm"/>
         <file name="ports.scm"/>
         <file name="files.scm"/>
         <file name="misc.scm"/>

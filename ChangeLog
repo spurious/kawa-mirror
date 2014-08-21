@@ -1,5 +1,8 @@
 2014-08-21  Per Bothner  <per@bothner.com>
 
+	* build.xml (lib-scm-classes): Add parameterize.scm.
+	* classes-to-skip-for-runtime: Add some more classes.
+
 	* build.xml (android-classes): Add utils.scm.
 
 2014-08-20  Per Bothner  <per@bothner.com>

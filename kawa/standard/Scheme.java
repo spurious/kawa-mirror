@@ -773,7 +773,7 @@ public class Scheme extends LispLanguage
       defSntxStFld("constant-fold", "kawa.standard.constant_fold",
                    "constant_fold");
       defProcStFld("make-parameter", "kawa.lib.parameters");
-      defSntxStFld("parameterize", "kawa.lib.parameters");
+      defSntxStFld("parameterize", "kawa.lib.parameterize");
 
       defProcStFld("compile-file", "kawa.lib.system");
       defProcStFld("environment-bound?", "kawa.lib.misc");

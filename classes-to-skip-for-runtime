@@ -67,6 +67,8 @@ gnu/expr/SynchronizedExp.class
 gnu/expr/Target.class
 gnu/expr/ThisExp.class
 gnu/expr/TryExp.class
+gnu/kawa/android/defs.class
+gnu/kawa/android/ViewBuilder.class
 gnu/kawa/functions/CompilationHelpers.class
 gnu/kawa/functions/CompileArith.class
 gnu/kawa/functions/CompileMisc.*.class
@@ -120,6 +122,7 @@ kawa/lang/SyntaxTemplate.class
 kawa/lang/TemplateScope.class
 kawa/lang/VarListPat.class
 kawa/lib/misc_syntax.*.class
+kawa/lib/parameterize.*.class
 kawa/lib/prim_syntax.*.class
 kawa/lib/std_syntax.*.class
 kawa/lib/syntax.*.class

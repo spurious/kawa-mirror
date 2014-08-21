@@ -1,3 +1,10 @@
+2014-08-21  Per Bothner  <per@bothner.com>
+
+	* parameters.scm (parameterize): Move compile-type macro
+	to separate module - away from run-time code.
+	* parameterize.scm: New file.
+	* Makefile.am: Update accoringly.
+
 2014-08-20  Per Bothner  <per@bothner.com>
 
 	* misc.scm: Add dependency on case_syntax.

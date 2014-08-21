@@ -18,6 +18,7 @@ java_SCM_ALWAYS =\
   numbers.scm \
   strings.scm \
   parameters.scm \
+  parameterize.scm \
   ports.scm \
   files.scm \
   misc.scm \
@@ -47,12 +48,8 @@ endif
 list-sources:
 	echo $(SOURCES)
 
-all: Makefile $(@GCJ_COMPILED_SELECTED@_CDEP) scm-classes.stamp $(@GCJ_COMPILED_SELECTED@)
+all: Makefile scm-classes.stamp
 
 PACKAGE_FNAME = kawa-lib
-EXTRA_GCJ_COMPILED = scm-classes.stamp
-EXTRA_GCJ_INPUTS = *.class
 SCM_COMPILE_FLAGS = --warn-undefined-variable --warn-unknown-member --warn-as-error
 EXTRA_CLEAN = */*.class
-
-

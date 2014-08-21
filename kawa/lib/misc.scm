@@ -1,5 +1,6 @@
 (require <kawa.lib.prim_syntax>)
 (require <kawa.lib.std_syntax>)
+(require <kawa.lib.case_syntax>)
 (require <kawa.lib.syntax>)
 (require <kawa.lib.strings>)
 (require <kawa.lib.ports>)

@@ -1,3 +1,7 @@
+2014-08-20  Per Bothner  <per@bothner.com>
+
+	* misc.scm: Add dependency on case_syntax.
+
 2014-08-13  Andrea Bernardini <andrebask@gmail.com>
 
        Define rewriting rules for the new implementation of "case"

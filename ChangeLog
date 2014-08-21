@@ -1,5 +1,9 @@
 2014-08-20  Per Bothner  <per@bothner.com>
 
+	* build.xml: Fix support for enable.android, by adding android.path
+	to the build.path.
+	* build.properties (android.path): Set defaul value.
+
 	* build.xml (lib-scm-classes): Add case_syntax.scm.
 
 2014-08-04  Per Bothner  <per@bothner.com>

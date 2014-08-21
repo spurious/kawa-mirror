@@ -2,6 +2,8 @@
 <!-- A build file for use by Ant to build Kawa. -->
 <!-- Requires Ant 1.6.3 -->
 <project name="Kawa" default="default" basedir=".">
+  <property environment="env"/>
+
   <!-- Give the user a chance to override the defaults. -->
   <property file="build.properties"/>
 
@@ -724,15 +726,21 @@
   <target name="android-classes" 
           depends="build-settings, java-classes" 
           if="${enable-android}">
+    <fail message="android.path (value: ${android.path}) is not a file">
+      <condition>
+        <not><available file="${android.path}"/></not>
+      </condition>
+    </fail>
     <apply taskname="kawa" executable="java" 
            failonerror="true" parallel="true">
       <!-- I don't quite get why the Java classpath has to be tacked on here, but it does. -->
-      <arg value="-classpath"/> <arg path="${build.classes}:${java.class.path}"/>
+      <arg value="-classpath"/> <arg path="${android.path}:${build.classes}:${java.class.path}"/>
       <arg value="kawa.repl"/>
       <arg value="-d"/> <arg path="${build.classes}"/>
       <arg line="-P gnu.kawa.android. --module-static-run -C"/>
       <fileset dir="${src.dir}/gnu/kawa/android"> 
         <include name="defs.scm"/>
+        <include name="ViewBuilder.scm"/>
       </fileset>
     </apply>
   </target>

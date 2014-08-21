@@ -330,38 +330,16 @@ public class Compilation implements SourceLocator
     = ClassType.make("gnu.kawa.reflect.StaticFieldLocation");
   static public ClassType typeSymbol
     = ClassType.make("gnu.mapping.Symbol");
-  static public final Method getSymbolValueMethod
-    = typeLanguage.getDeclaredMethod("getSymbolValue", 1);
-  static public final Method getSymbolProcedureMethod
-    = typeLanguage.getDeclaredMethod("getSymbolProcedure", 1);
-  static public final Method getLocationMethod
-    = typeLocation.addMethod("get", Type.typeArray0,
-			    Type.objectType, Access.PUBLIC);
-  static public final Method getProcedureBindingMethod
-    = typeSymbol.addMethod("getProcedure", Type.typeArray0,
-			    typeProcedure, Access.PUBLIC);
   static public final Field trueConstant
     = scmBooleanType.getDeclaredField("TRUE"); 
   static public final Field falseConstant
     = scmBooleanType.getDeclaredField("FALSE");
 
-  static final Method setNameMethod
-    = typeProcedure.getDeclaredMethod("setName", 1);
   static Method makeListMethod;
   
   public static final Type[] int1Args = { Type.intType  };
   public static final Type[] string1Arg = { javaStringType };
   public static final Type[] sym1Arg = string1Arg;
-
-  static public final Method getLocation1EnvironmentMethod
-  = typeEnvironment.getDeclaredMethod("getLocation", 1);
-  static public final Method getLocation2EnvironmentMethod;
-  static {
-    Type[] args = { typeSymbol, Type.objectType    };
-    getLocation2EnvironmentMethod
-      = typeEnvironment.addMethod("getLocation", args,
-				  typeLocation, Access.PUBLIC|Access.FINAL);
-  }
 
   static {
     Type[] makeListArgs = { objArrayType, Type.intType  };

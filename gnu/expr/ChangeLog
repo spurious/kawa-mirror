@@ -1,24 +1,32 @@
+2014-08-21  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (getSymbolValueMethod, getSymbolProcedureMethod,
+	getProcedureBindingMethod, setNameMethod, getLocation1EnvironmentMethod,
+	getLocation2EnvironmentMethod): Remove unused fields.
+	(getLocationMethod): Moved to ...
+	* Declaration.java: ... here.
+
 2014-08-13  Andrea Bernardini <andrebask@gmail.com>
 
-	Optimized implementation of "case" expressions, with a new class  
+	Optimized implementation of "case" expressions, with a new class
 	extending Expression, compiled using the existing SwitchState
 	interface.
-	* CaseExp.java: New file. New class representing "case" expressions, 
+	* CaseExp.java: New file. New class representing "case" expressions,
 	cases are now compiled using the tableswitch/lookupswitch
 	jvm instructions.
 	* ChainLambdas.java: Add visitCaseExp method, for unreachable
 	code detection in "case" expressions.
 	* ExpVisitor.java: Add visitCaseExp method.
-	* FindCapturedVars.java: Add visitCaseExp method, to bind 
+	* FindCapturedVars.java: Add visitCaseExp method, to bind
 	ReferenceExps in "case" expressions.
 	* FindTailCalls.java: Add visitCaseExp method, to check for
 	tail-calls in "case" expressions.
-	* InlineCalls.java: Add visitCaseExp method, implements inlining 
+	* InlineCalls.java: Add visitCaseExp method, implements inlining
 	and type checking for "case" expressions.
 	* Makefile.am: Add CaseExp.java class to java_sources.
 	* Makefile.in: Add CaseExp.java class to java_sources.
-	* PushApply.java: Add visitCaseExp method, optimizes case-let 
-	and case-begin occurrences. 
+	* PushApply.java: Add visitCaseExp method, optimizes case-let
+	and case-begin occurrences.
 
 2014-08-04  Per Bothner  <per@bothner.com>
 

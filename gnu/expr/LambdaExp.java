@@ -736,6 +736,8 @@ public class LambdaExp extends ScopeExp {
             //       {
             // 	code.emitDup(ctype);
             // 	code.emitPushString(name);
+            //  Method setNameMethod =
+            //      Compilation.typeProcedure.getDeclaredMethod("setName", 1);
             // 	code.emitInvokeVirtual(comp.setNameMethod);
             //       }
             //     // Set numArgs field.

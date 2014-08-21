@@ -418,7 +418,7 @@ public class Declaration
                 int column = access.getColumnNumber();
                 Label startTry = new Label(code);
                 startTry.define(code);
-                code.emitInvokeVirtual(Compilation.getLocationMethod);
+                code.emitInvokeVirtual(getLocationMethod);
                 Label endTry = new Label(code);
                 endTry.define(code);
                 Label endLabel = new Label(code);
@@ -445,13 +445,17 @@ public class Declaration
                   code.endFragment(fragment_cookie);
               }
             else
-              code.emitInvokeVirtual(Compilation.getLocationMethod);
+              code.emitInvokeVirtual(getLocationMethod);
 
             rtype = Type.pointer_type;
           }
       }
     target.compileFromStack(comp, rtype);
   }
+
+    static final Method getLocationMethod
+        = Compilation.typeLocation.addMethod("get", Type.typeArray0,
+                                             Type.objectType, Access.PUBLIC);
 
   /* Compile code to store a value (which must already be on the
      stack) into this variable. */

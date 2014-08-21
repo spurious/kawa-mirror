@@ -1,3 +1,10 @@
+2014-08-21  Per Bothner  <per@bothner.com>
+
+	* defs.scm (current-activity): Separate out run-time variable
+	from compile-time definitions.
+	* utils.scm: New module.
+	* Makefile.am: Update accordingly.
+
 2012-11-19  Per Bothner  <per@bothner.com>
 
 	* defs.scm (current-activity): New parameter.

@@ -1,3 +1,8 @@
+(require <gnu.kawa.android.utils>)
+(export Button EditText ImageView LinearLayout ScrollView TextView View
+        current-activity activity
+        {gnu.kawa.reflect/ObjectBuilder}:android.view.View)
+
 ;; FIXME add more
 (define-alias Button android.widget.Button)
 (define-alias EditText android.widget.EditText)
@@ -7,9 +12,6 @@
 (define-alias ScrollView android.widget.ScrollView)
 (define-alias TextView android.widget.TextView)
 (define-alias View android.view.View)
-
-(define-constant current-activity
-  (make-parameter #!null #|android.app.Activity|#))
 
 (define (%process-activity form)
   (syntax-case form (on-create on-create-view)

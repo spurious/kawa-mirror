@@ -225,10 +225,9 @@ KAWA_COMPILER = $(JAVA) -classpath "$(CLASSPATH)" kawa.repl -d $(top_builddir) \
   -P `echo $(PACKAGE_FNAME)|sed -e s/-/./g`.
 
 java_sources = 
-java_SCM = defs.scm ViewBuilder.scm 
-GCJ_INPUTS = defs*.class ViewBuilder*.class
-EXTRA_GCJ_DEPS = scm-classes.stamp
+java_SCM = defs.scm utils.scm ViewBuilder.scm 
 PACKAGE_FNAME = gnu-kawa-android
+SCM_COMPILE_FLAGS = --warn-undefined-variable --warn-unknown-member --warn-as-error
 all: all-am
 
 .SUFFIXES:
@@ -443,7 +442,7 @@ elisp-classes.stamp: $(java_ELISP)
 	echo timestamp > elisp-classes.stamp
 	echo timestamp > $(TO_TOPDIR)/kawa-jar.stamp
 
-all: Makefile scm-classes.stamp $(@GCJ_COMPILED_SELECTED@)
+all: Makefile scm-classes.stamp
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

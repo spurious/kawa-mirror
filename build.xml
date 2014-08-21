@@ -739,6 +739,7 @@
       <arg value="-d"/> <arg path="${build.classes}"/>
       <arg line="-P gnu.kawa.android. --module-static-run -C"/>
       <fileset dir="${src.dir}/gnu/kawa/android"> 
+        <include name="utils.scm"/>
         <include name="defs.scm"/>
         <include name="ViewBuilder.scm"/>
       </fileset>

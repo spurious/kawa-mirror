@@ -1,15 +1,21 @@
+2014-08-21  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (CASES): Remove non-portable macro.
+	(inlining.log): Replace use of CASES.
+	* Makefile.am (EXTRA_DIST): Add case-test.scm.
+
 2014-08-13  Andrea Bernardini <andrebask@gmail.com>
 
        Tests for the new implementation of "case".
        * bad-voidexp.scm: Move one test to case-test.scm.
        * case-test.scm: New tests for "case" expressions.
-       * case-warnings.scm: New tests for warnings reported by "case" 
+       * case-warnings.scm: New tests for warnings reported by "case"
        expressions.
        * inlining.expected: Add output for case-warnings.scm output.
        * inlining-test.scm: Add tests for inlining of "case" expressions.
        * Makefile.am: Add new test files.
        * Makefile.in: Add new test files.
-       * unreach1.scm: Add a test that contains a non terminating 
+       * unreach1.scm: Add a test that contains a non terminating
        case expression.
 
  22014-08-14  Per Bothner  <per@bothner.com>

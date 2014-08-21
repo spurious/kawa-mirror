@@ -533,8 +533,6 @@ InliningTest.class: $(srcdir)/inlining-test.scm
 
 LIST_CODE_SIZE = $(CPJAVA) gnu.bytecode.ListCodeSize
 
-CASES=$(foreach var,$(shell echo {01..14}), $(shell echo "case$(var)"))
-
 inlining.log: InliningTest.class cycle1.class cycle2.class \
   binarytrees.class fannkuch.class fannkuchredux.class fasta.class mandelbrot.class nbody.class pidigits.class regexdna.class revcomp1.class revcomp2.class spectralnorm.class Makefile
 	$(LIST_CODE_SIZE) InliningTest.class \
@@ -545,8 +543,8 @@ inlining.log: InliningTest.class cycle1.class cycle2.class \
 	constantPropagation1 constantPropagation2 constantPropagation3 \
 	factorialInfer1 getFromVector1 getFromVector2 read1 stringForEach \
 	stringAppend translateSpaceToNewline \
-	topLevelRecurse1 topLevelRecurse2 sum1 sum2 numcomp eqv \
-	$(CASES) >inlining.log
+	topLevelRecurse1 topLevelRecurse2 sum1 sum2 numcomp eqv raise \
+	case >inlining.log
 	$(LIST_CODE_SIZE) cycle1.class isIsEven >>inlining.log
 	$(LIST_CODE_SIZE) cycle2.class isIsOdd >>inlining.log
 	$(LIST_CODE_SIZE) binarytrees.class bottomUpTree test >>inlining.log
@@ -623,7 +621,7 @@ SCRIPTS_TO_RUN = case-warnings.scm uninit1.scm errors1.scm errors2.scm errors3.s
   sva40077.scm sva40494.scm sva40649.scm sva40729.scm sva40814.scm \
   sva42377.scm sva42689.scm sva42722.scm
 EXTRA_DIST = testing.scm test-utils.scm \
-  test.scm num-test.scm mac-test.scm mac1.scm r7rs-tests.scm \
+  test.scm case-test.scm num-test.scm mac-test.scm mac1.scm r7rs-tests.scm \
   classes1.scm classes2.scm SimpleB.java obj-test.scm arr-test.scm \
   lib-test.scm srfi-38-test.scm srfi-64-test.scm srfi-69-test.scm \
   srfi-108-test.scm srfi-109-test.scm system-test.scm \

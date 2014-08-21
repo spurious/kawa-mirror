@@ -967,8 +967,6 @@ check-interpreted-cyclebr:
 InliningTest.class: $(srcdir)/inlining-test.scm
 	$(CPKAWA) -T InliningTest -C $(srcdir)/inlining-test.scm
 
-CASES=$(foreach var,$(shell echo {01..14}), $(shell echo "case$(var)"))
-
 inlining.log: InliningTest.class cycle1.class cycle2.class \
   binarytrees.class fannkuch.class fannkuchredux.class fasta.class mandelbrot.class nbody.class pidigits.class regexdna.class revcomp1.class revcomp2.class spectralnorm.class Makefile
 	$(LIST_CODE_SIZE) InliningTest.class \
@@ -980,7 +978,7 @@ inlining.log: InliningTest.class cycle1.class cycle2.class \
 	factorialInfer1 getFromVector1 getFromVector2 read1 stringForEach \
 	stringAppend translateSpaceToNewline \
 	topLevelRecurse1 topLevelRecurse2 sum1 sum2 numcomp eqv raise \
-	$(CASES) >inlining.log
+	case >inlining.log
 	$(LIST_CODE_SIZE) cycle1.class isIsEven >>inlining.log
 	$(LIST_CODE_SIZE) cycle2.class isIsOdd >>inlining.log
 	$(LIST_CODE_SIZE) binarytrees.class bottomUpTree test >>inlining.log

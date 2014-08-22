@@ -195,9 +195,8 @@ public class SwitchState
   {
     if (code.reachableHere())
        exitSwitch(code);
-    if (defaultLabel == null)
+    if (!defaultLabel.defined())
       {
-	defaultLabel = new Label(code);
 	defaultLabel.define(code);
 	ClassType ex = ClassType.make("java.lang.RuntimeException");
 	code.emitNew(ex);

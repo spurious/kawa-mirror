@@ -264,7 +264,7 @@ public class ClassType extends ObjectType
 
   /** Note that this class needs an other link ("this$0") field.
    * This is only allowed if !isExisting().
-   * Adjust any existing "<init>" methods to take the extra
+   * Adjust any existing {@code "<init>"} methods to take the extra
    * implicit parameter.
    * @param outer the outer class
    */

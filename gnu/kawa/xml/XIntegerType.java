@@ -117,7 +117,10 @@ public class XIntegerType extends XDataType
 
  public Object coerceFromObject (Object obj)
   {
-    return valueOf((IntNum) obj);
+    IntNum ival = IntNum.asIntNumOrNull(obj);
+    if (ival == null)
+      throw new ClassCastException("cannot cast "+obj+" to "+name);
+    return valueOf(ival);
   }
 
   public IntNum valueOf (IntNum value)

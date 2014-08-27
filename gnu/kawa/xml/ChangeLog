@@ -1,3 +1,8 @@
+2014-08-27  Per Bothner  <per@bothner.com>
+
+	* XIntegerType.java (coerceFromObject): First coerce asIntNumOrNull
+	before checking that it's in range.
+
 2014-06-30  Per Bothner  <per@bothner.com>
 
 	* NodeType.java (encodeType): New method.

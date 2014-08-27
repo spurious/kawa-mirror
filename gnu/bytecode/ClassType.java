@@ -1318,8 +1318,7 @@ public class ClassType extends ObjectType
   {
     if (other.isInterface())
       return implementsInterface(other);
-    if ((this == toStringType && other == javalangStringType)
-	|| (this == javalangStringType && other == toStringType))
+    if ((this == javalangStringType && other == toStringType))
       return true;
     if (other == Type.javalangObjectType)
       return true;
@@ -1347,10 +1346,6 @@ public class ClassType extends ObjectType
       return -1;
     if (cother.isSubclass(this))
       return 1;
-    if (this == toStringType)
-      return cother == Type.javalangObjectType ? -1 : 1;
-    if (cother == toStringType)
-      return this == Type.javalangObjectType ? 1 : -1;
     if (this.isInterface())
       return cother.isAnnotation() || cother.isFinal() ? -3
         : cother == Type.javalangObjectType ? -1 : -2;

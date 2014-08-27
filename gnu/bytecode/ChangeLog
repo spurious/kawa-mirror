@@ -1,3 +1,8 @@
+2014-08-27  Per Bothner  <per@bothner.com>
+
+	* ClassType.java (isSubclass, compare): Since toStringType is no
+	longer a ClassType, remove some dead code.
+
 2014-08-21  Per Bothner  <per@bothner.com>
 
 	* SwitchState.java (finish): Update, since defaultLabel is

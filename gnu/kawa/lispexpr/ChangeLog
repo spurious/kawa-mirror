@@ -1,3 +1,11 @@
+2014-08-27  Per Bothner  <per@bothner.com>
+
+	* LangObjType.java (isCompatibleWithValue): New override.
+
+	* LangObjType.java (emitCoerceFromObject): Support promiseType.
+
+	* LangPrimType.java (voidType): Just make an alias for Type.voidType.
+
 2014-08-11  Per Bothner  <per@bothner.com>
 
 	* LangPrimType.java (emitCoerceFromObject): Optimize for char or

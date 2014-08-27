@@ -27,8 +27,7 @@ public class LangPrimType extends PrimType implements TypeValue {
     public static final PrimType doubleType = Type.doubleType;
     public static final LangPrimType charType
         = new LangPrimType(Type.charType);
-    public static final LangPrimType voidType
-        = new LangPrimType(Type.voidType);
+    public static final PrimType voidType = Type.voidType;
 
     static final ClassType scmCharType = ClassType.make("gnu.text.Char");
 

@@ -167,6 +167,11 @@ public class LangObjType extends SpecialObjectType implements TypeValue
         this.typeCode = typeCode;
     }
 
+    @Override
+    public int isCompatibleWithValue(Type valueType) {
+        return getImplementationType().isCompatibleWithValue(valueType);
+    }
+
   public int compare(Type other)
   {
     if (other instanceof LazyType)
@@ -661,6 +666,7 @@ public class LangObjType extends SpecialObjectType implements TypeValue
       case STRING_TYPE_CODE:
       case LIST_TYPE_CODE:
       case REGEX_TYPE_CODE:
+      case PROMISE_TYPE_CODE:
         code.emitCheckcast(implementationType);
         break;
       default:

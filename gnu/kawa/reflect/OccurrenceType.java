@@ -167,7 +167,7 @@ public class OccurrenceType extends ObjectType
     return null;
   }
 
-  /** Return a conservative estimage on the min/max number of items of a type.
+  /** Return a conservative estimate on the min/max number of items of a type.
    * @return {@code maxCount << 12 | minCount & 0xFFF},
    * where a {@code maxCount} of -1 means unbounded.
    */

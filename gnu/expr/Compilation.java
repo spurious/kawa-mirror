@@ -562,7 +562,8 @@ public class Compilation implements SourceLocator
         int len = values.length;
         for (int i = 0;  i < len;  i++)
           {
-            compileConstant(values[i], target);
+            compileConstant(values[i],
+                            ((ConsumerTarget) target).getSingleTarget());
           } 
         return;
       }
@@ -591,6 +592,7 @@ public class Compilation implements SourceLocator
 		    Number num = (Number) value;
 		    switch (sig1)
 		      {
+                      case 'C':
 		      case 'I':
 			code.emitPushInt(num.intValue());
 			return;

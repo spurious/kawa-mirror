@@ -96,6 +96,19 @@ public class ArrayType extends ObjectType
         return 0;
     }
 
+    @Override
+    public int isCompatibleWithValue(Type valueType) {
+        if (valueType instanceof ArrayType) {
+            return getComponentType().isCompatibleWithValue
+                (((ArrayType) valueType).getComponentType());
+        }
+        if (valueType == nullType)
+            return 2;
+        if (valueType == objectType)
+            return 0;
+        return -1;
+    }
+
     public int compare(Type other) {
         if (other == nullType)
             return 1;

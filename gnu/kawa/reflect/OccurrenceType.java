@@ -36,6 +36,13 @@ public class OccurrenceType extends ObjectType
     if (minOccurs == 0 && maxOccurs < 0
         && (base == SingletonType.instance || base == Type.pointer_type))
       return Type.pointer_type;
+    if (base instanceof OccurrenceType) {
+        OccurrenceType occ = (OccurrenceType) base;
+        minOccurs *= occ.minOccurs;
+        maxOccurs = maxOccurs < 0 || occ.maxOccurs < 0 ? -1
+            : maxOccurs * occ.maxOccurs;
+        base = occ.base;
+    }
     return new OccurrenceType(base, minOccurs, maxOccurs);
   }
 

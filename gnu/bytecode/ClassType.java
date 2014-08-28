@@ -1332,6 +1332,23 @@ public class ClassType extends ObjectType
     return false;
   }
 
+    @Override
+    public int isCompatibleWithValue(Type valueType) {
+        if (this == objectType && valueType instanceof ObjectType)
+            return 2;
+        int comp = compare(valueType);
+        if (comp >= 0) {
+            if (valueType instanceof ClassType
+                || valueType instanceof ParameterizedType
+                || valueType instanceof TypeVariable)
+                return 2;
+            else
+                return 1;
+        } else
+            return comp == -3 ? -1 : 0;
+    }
+
+
   public int compare(Type other)
   {
     if (other == nullType)

@@ -1,3 +1,23 @@
+2014-08-28  Per Bothner  <per@bothner.com>
+
+	* StackTarget.java (compileFromStack0): Use Type#isCompatibleWithValue
+	with new return code to check if conversion is needed.
+	* ConsumerTarget.java (type): New field.
+	(<init>): Update accordingly.
+	(getSingleTarget): New method.
+	(makeContextTarget): Take result type.
+	(compileUsingConsumer): Use more precise typing.
+	(compileFromStack): First convert to target type.
+	(compileWrite): Convert as needed.
+	* InlineCalls.java (checkType): On type error involving PrimTypes,
+	coerced to boxing of required type, not expression type. The former
+	seems to do a better job of throwing a desired ClassCastException.
+	* Compilation.java (compileConstant): Fix target type for
+	compiling Values to ConsumerTarget.
+	(compileConstant): Allow pushing char as int to consumer.
+	* LambdaExp.java (compileBody): If compiling to a Consumer,
+	make sure we still convert/cast to return type.
+
 2014-08-21  Per Bothner  <per@bothner.com>
 
 	* Compilation.java (getSymbolValueMethod, getSymbolProcedureMethod,

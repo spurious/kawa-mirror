@@ -1,3 +1,7 @@
+2014-08-28  Per Bothner  <per@bothner.com>
+
+	* LangPrimType.java (isCompatibleWithValue): Add hack for charType.
+
 2014-08-27  Per Bothner  <per@bothner.com>
 
 	* LangObjType.java (isCompatibleWithValue): New override.

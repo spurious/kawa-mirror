@@ -43,6 +43,10 @@ public class TypeVariable extends ObjectType {
         return rawType;
     }
 
+    public void emitCoerceFromObject(CodeAttr code) {
+        rawType.emitCoerceFromObject(code);
+    }
+
     @Override
     public String getSignature () { return getRawType().getSignature(); }
 }

@@ -188,8 +188,11 @@ public class CompileMisc
   public static Expression validateApplyValuesMap
   (ApplyExp exp, InlineCalls visitor, Type required, Procedure proc)
   {
-    exp.visitArgs(visitor);
     LambdaExp lexp = ValuesMap.canInline(exp, (ValuesMap) proc);
+    // FIXME If required is an OccurrenceType, then we want to validate
+    // lexp.body with the same OccurrenceType.  This is tricky - best to
+    // do a tree rewrite here, instead of in ValuesMap#compile.
+    exp.visitArgs(visitor);
     if (lexp != null)
       {
 	lexp.setInlineOnly(true);
@@ -215,8 +218,9 @@ public class CompileMisc
             PrimProcedure.compileReachedUnexpected(code);
         } else if (type != null) {
             args[1].compile(comp, Target.pushValue(type));
-            if (code.reachableHere())
+            if (code.reachableHere() && ! type.isVoid()) {
                 target.compileFromStack(comp, type);
+            }
         } else {
             if (typeType == null) {
                 typeType = ClassType.make("gnu.bytecode.Type");

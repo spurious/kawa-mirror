@@ -95,7 +95,19 @@ public class CompileMisc
 	|| lexp2.max_args != 3)
       return exp;
 
-    exp.setType(args[0].getType());
+    Expression seq = args[0];
+    Type seqType = seq.getType();
+    if (seqType instanceof OccurrenceType) {
+        OccurrenceType occType = (OccurrenceType) seqType;
+        Type baseType = occType.getBase();
+        if (OccurrenceType.itemCountIsOne(baseType)) {
+            int min = occType.minOccurs();
+            if (min > 0)
+                occType =
+                    new OccurrenceType(baseType, min, occType.maxOccurs());
+            exp.setType(occType);
+        }
+    }
 
     Compilation comp = visitor.getCompilation();
 
@@ -122,12 +134,9 @@ public class CompileMisc
     lastArg.setCanRead(true);
 
     comp.letStart();
-    Expression seq = args[0];
-    Type seqType;
     Method sizeMethod;
     if (vproc.kind == 'P')
       {
-        seqType = seq.getType();
         sizeMethod = Compilation.typeValues.getDeclaredMethod("countValues", 1);
       }
     else
@@ -177,7 +186,7 @@ public class CompileMisc
       = new ApplyExp(ValuesMap.valuesMapWithPos,
 		     new Expression[] { lexp2,
 					new ReferenceExp(sequence) });
-    doMap.setType(dotArg.getType());
+    doMap.setType(OccurrenceType.getInstance(dotArg.getType(), 0, -1));
     lexp2.returnContinuation = doMap;
 
     Expression lastInit = new ApplyExp(sizeMethod,

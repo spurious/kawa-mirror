@@ -1,3 +1,8 @@
+2014-08-28  Per Bothner  <per@bothner.com>
+
+	* CompileMisc.java validateApplyValuesFilter): Fix two errors
+	in setting expression type.
+
 2014-07-02  Per Bothner  <per@bothner.com>
 
 	* CastAs.java: Update for changes to super-type.

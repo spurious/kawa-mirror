@@ -1,3 +1,11 @@
+2014-08-28  Per Bothner  <per@bothner.com>
+
+	* Type.java (isCompatibleWithValue): Change interpretation of return
+	value so 2 means no run-time conversion/check needed.
+	* ClassType.java (isCompatibleWithValue): New overload.
+	* ArrayType.java (isCompatibleWithValue): New overload.
+	* TypeVariable.java (isCompatibleWithValue): New overload.
+
 2014-08-27  Per Bothner  <per@bothner.com>
 
 	* ClassType.java (isSubclass, compare): Since toStringType is no

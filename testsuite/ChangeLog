@@ -1,3 +1,9 @@
+2014-08-28  Per Bothner  <per@bothner.com>
+
+	* convert1.scm: New tests for char->integer and integer->char.
+	* Makefile.am: Update accordingly.
+	* errors3.scm: Update exception message.
+
 2014-08-21  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (CASES): Remove non-portable macro.

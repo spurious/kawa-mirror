@@ -4,6 +4,7 @@
 package gnu.expr;
 import gnu.bytecode.*;
 import gnu.kawa.reflect.OccurrenceType;
+import gnu.kawa.reflect.SingletonType;
 import gnu.kawa.lispexpr.LangPrimType;
 
 /**
@@ -14,11 +15,35 @@ public class ConsumerTarget extends Target
 {
   Variable consumer;
   boolean isContextTarget;
+  Type type;
 
   public ConsumerTarget(Variable consumer)
   {
     this.consumer = consumer;
+    this.type = Type.objectType;
   }
+
+  public ConsumerTarget(Variable consumer, Type type)
+  {
+    this.consumer = consumer;
+    this.type = type;
+  }
+
+    private ConsumerTarget singleTarget;
+
+    /** Get equivalent target but which only accepts a single item. */
+    public ConsumerTarget getSingleTarget() {
+        if (singleTarget == null) {
+            Type base;
+            if (! (type instanceof OccurrenceType)
+                || ! (OccurrenceType.itemCountIsOne
+                      (base = ((OccurrenceType) type).getBase())))
+                base = SingletonType.getInstance();
+            singleTarget = new ConsumerTarget(consumer, base);
+            singleTarget.isContextTarget = this.isContextTarget;
+        }
+        return singleTarget;
+    }
 
   public Variable getConsumerVariable() { return consumer; }
 
@@ -26,7 +51,7 @@ public class ConsumerTarget extends Target
   public final boolean isContextTarget () { return isContextTarget; }
 
   /** Make a Target that uses the current CallContext's current Consumer. */
-  public static Target makeContextTarget (Compilation comp)
+  public static Target makeContextTarget (Compilation comp, Type type)
   {
     CodeAttr code = comp.getCode();
     comp.loadCallContext();
@@ -36,7 +61,7 @@ public class ConsumerTarget extends Target
     Variable result
       = scope.addVariable(code, Compilation.typeConsumer, "$result");
     code.emitStore(result);
-    ConsumerTarget target = new ConsumerTarget(result);
+    ConsumerTarget target = new ConsumerTarget(result, type);
     target.isContextTarget = true;
     return target;
   }
@@ -78,15 +103,14 @@ public class ConsumerTarget extends Target
 	code.emitInvokeStatic(makeMethod);
       }
     Variable consumer = scope.addVariable(code, ctype, null);
-    ConsumerTarget ctarget = new ConsumerTarget(consumer);
+    ConsumerTarget ctarget = new ConsumerTarget(consumer, exp.getType());
     code.emitStore(consumer);
     exp.compile(comp, ctarget);
     code.emitLoad(consumer);
     if (resultMethod != null)
       code.emitInvoke(resultMethod);
     code.popScope();
-    target.compileFromStack(comp, resultMethod == null ? ctype
-			    : resultMethod.getReturnType());
+    target.compileFromStack(comp, exp.getType());
   }
 
 
@@ -108,8 +132,13 @@ public class ConsumerTarget extends Target
     Method method = null;
     Type methodArg = null;
     boolean islong = false;
-    char sig;
-    // We don't want to push a character as an int (which is it's
+    char sig; 
+    Type ttype = getType();
+    if (! stackType.isVoid()) {
+        StackTarget.convert(comp, stackType, ttype);
+        stackType = ttype;
+    }
+    // We don't want to push a character as an int (which is its
     // implementation type) since it isn't an integer.  So we box it.
     if (stackType == LangPrimType.characterType
         || stackType == LangPrimType.characterOrEofType) {
@@ -169,7 +198,7 @@ public class ConsumerTarget extends Target
 	    method = (Compilation.typeValues
 		      .getDeclaredMethod("writeValues", 2));
 	    code.emitLoad(consumer);
-            if (consumerPushed == 0)
+            if (consumerPushed == 0) // ??? Seems wrong - Never used.
               code.emitSwap();
 	    code.emitInvokeStatic(method);
 	    return;
@@ -214,13 +243,13 @@ public class ConsumerTarget extends Target
       {
         // Optimization to avoid a 'swap'.
         comp.getCode().emitLoad(this.consumer);
-        Target starget = StackTarget.getInstance(stackType);
-        exp.compile(comp, starget);
-        compileFromStack(comp, stackType, 1);
+        Type ttype = this.type;
+        exp.compile(comp, StackTarget.getInstance(ttype));
+        compileFromStack(comp, ttype, 1);
         return true;
       }
     return false;
    }
 
-  public Type getType() { return Compilation.scmSequenceType; }
+  public Type getType() { return type; }
 }

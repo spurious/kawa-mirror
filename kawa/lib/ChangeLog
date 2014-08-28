@@ -1,3 +1,8 @@
+2014-08-28  Per Bothner  <per@bothner.com>
+
+	* compile_misc.scm (integerToCharValidateApply): Fix expansion
+	to better type-check/type-convert.
+
 2014-08-21  Per Bothner  <per@bothner.com>
 
 	* parameters.scm (parameterize): Move compile-type macro

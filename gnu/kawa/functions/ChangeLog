@@ -1,3 +1,7 @@
+2014-08-28  Per Bothner  <per@bothner.com>
+
+	* CompileMisc.java (compileConvert): Check for void type.
+
 2014-07-21  Per Bothner  <per@bothner.com>
 
 	* CompileMisc.java (validateApplyConvert): If the conversion is

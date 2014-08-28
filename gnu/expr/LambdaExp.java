@@ -1603,7 +1603,7 @@ public class LambdaExp extends ScopeExp {
             Variable var = getVarScope().lookup("$ctx");
             if (var != null && var.getType() == Compilation.typeCallContext)
                 comp.callContextVar = var;
-            target = ConsumerTarget.makeContextTarget(comp);
+            target = ConsumerTarget.makeContextTarget(comp, getReturnType());
         }
         else
             target = Target.pushValue(getReturnType());

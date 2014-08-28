@@ -24,9 +24,8 @@
 
 (define-validate integerToCharValidateApply (exp required proc)
   ((exp:isSimple 1 1)
-   (let ((e0 (visitor:visit (exp:getArg 0) int)))
-     (apply-exp as character
-                (apply-exp gnu.kawa.functions.Convert:cast int e0)))))
+   (apply-exp as character
+              (apply-exp gnu.kawa.functions.Convert:cast int (exp:getArg 0)))))
 
 (define-validate isEofValidateApply (exp required proc)
   ((exp:isSimple 1 1)

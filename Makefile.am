@@ -2,13 +2,15 @@
 
 FIXED_SUBDIRS = doc testsuite gnu/bytecode gnu/math gnu/lists gnu/text \
   gnu/mapping gnu/expr gnu \
-  kawa gnu/kawa/slib gnu/kawa/servlet gnu/commonlisp gnu/q2
+  kawa gnu/kawa/slib gnu/kawa/servlet \
+  gnu/commonlisp/lang gnu/commonlisp/lisp gnu/commonlisp/testsuite \
+  gnu/q2/lang gnu/q2/testsuite
 ANDROID_SUBDIRS = gnu/kawa/android
 BRL_SUBDIRS = gnu/brl gnu/kawa/brl
 JAVAFX_SUBDIRS = gnu/kawa/javafx
 JEMACS_SUBDIRS = gnu/jemacs/lang gnu/jemacs/buffer gnu/jemacs/lisp \
   gnu/jemacs/testsuite gnu/jemacs/swing gnu/jemacs/swt
-XQUERY_SUBDIRS = gnu/xquery gnu/kawa/xslt
+XQUERY_SUBDIRS = gnu/xquery/util gnu/xquery/lang gnu/xquery/testsuite
 
 SUBDIRS = $(FIXED_SUBDIRS)
 if ENABLE_JEMACS

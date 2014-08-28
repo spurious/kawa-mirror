@@ -84,6 +84,7 @@ DIST_COMMON = $(top_srcdir)/Make-rules $(srcdir)/Makefile.in \
 @ENABLE_XML_TRUE@am__append_3 = $(GNU_XML_JSOURCES) $(GNU_KAWA_XML_JSOURCES)
 @ENABLE_XML_TRUE@@WITH_SAX2_TRUE@am__append_4 = $(GNU_KAWA_SAX_JSOURCES)
 @ENABLE_ECHO2_TRUE@am__append_5 = $(GNU_KAWA_ECHO2_JSOURCES)
+@ENABLE_XQUERY_TRUE@am__append_6 = $(GNU_KAWA_XSLT_JSOURCES)
 subdir = gnu
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
@@ -505,6 +506,12 @@ GNU_KAWA_SAX_JSOURCES = \
   kawa/sax/ContentConsumer.java \
   kawa/sax/KawaXMLReader.java
 
+GNU_KAWA_XSLT_JSOURCES = \
+  kawa/xslt/ApplyTemplates.java \
+  kawa/xslt/TemplateTable.java \
+  kawa/xslt/XSLT.java \
+  kawa/xslt/XslTranslator.java
+
 
 # These Java sources are not built or used when using configure+make, only
 # when using Ant - but they still should go into the distribution tar file.
@@ -523,7 +530,8 @@ java_sources = $(GNU_KAWA_IO_JSOURCES) $(GNU_KAWA_UTIL_JSOURCES) \
 	$(GNU_KAWA_REFLECT_JSOURCES) $(GNU_KAWA_FUNCTIONS_JSOURCES) \
 	$(GNU_KAWA_LISPEXPR_JSOURCES) $(GNU_KAWA_MODELS_JSOURCES) \
 	$(GNU_ECMASCRIPT_JSOURCES) $(am__append_1) $(am__append_2) \
-	$(am__append_3) $(am__append_4) $(am__append_5)
+	$(am__append_3) $(am__append_4) $(am__append_5) \
+	$(am__append_6)
 all: all-am
 
 .SUFFIXES:

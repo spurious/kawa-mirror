@@ -278,6 +278,12 @@ GNU_KAWA_SAX_JSOURCES = \
   kawa/sax/ContentConsumer.java \
   kawa/sax/KawaXMLReader.java
 
+GNU_KAWA_XSLT_JSOURCES = \
+  kawa/xslt/ApplyTemplates.java \
+  kawa/xslt/TemplateTable.java \
+  kawa/xslt/XSLT.java \
+  kawa/xslt/XslTranslator.java
+
 # These Java sources are not built or used when using configure+make, only
 # when using Ant - but they still should go into the distribution tar file.
 GNU_KAWA_ANT_JSOURCES =\
@@ -314,6 +320,9 @@ endif
 endif
 if ENABLE_ECHO2
 java_sources += $(GNU_KAWA_ECHO2_JSOURCES)
+endif
+if ENABLE_XQUERY
+java_sources += $(GNU_KAWA_XSLT_JSOURCES)
 endif
 
 all:  Makefile java-classes.stamp

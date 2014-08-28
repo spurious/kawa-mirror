@@ -2953,7 +2953,7 @@ if test -z "$ENABLE_KAWA_FRONTEND_TRUE"; then :
 
 fi
 
-ac_config_files="$ac_config_files Makefile gnu/bytecode/Makefile gnu/math/Makefile gnu/lists/Makefile gnu/text/Makefile gnu/mapping/Makefile gnu/expr/Makefile gnu/Makefile bin/qexo gnu/kawa/servlet/Makefile gnu/kawa/xslt/Makefile gnu/brl/Makefile gnu/kawa/brl/Makefile gnu/kawa/slib/Makefile gnu/commonlisp/Makefile gnu/commonlisp/lang/Makefile gnu/commonlisp/lisp/Makefile gnu/commonlisp/testsuite/Makefile gnu/jemacs/lang/Makefile gnu/jemacs/buffer/Makefile gnu/jemacs/lisp/Makefile gnu/jemacs/testsuite/Makefile gnu/jemacs/swing/Makefile gnu/jemacs/swt/Makefile kawa/Makefile kawa/lib/Makefile gnu/q2/Makefile gnu/q2/lang/Makefile gnu/q2/testsuite/Makefile gnu/xquery/Makefile gnu/xquery/lang/Makefile gnu/xquery/util/Makefile gnu/xquery/testsuite/Makefile gnu/kawa/android/Makefile gnu/kawa/javafx/Makefile doc/Makefile testsuite/Makefile"
+ac_config_files="$ac_config_files Makefile gnu/bytecode/Makefile gnu/math/Makefile gnu/lists/Makefile gnu/text/Makefile gnu/mapping/Makefile gnu/expr/Makefile gnu/Makefile bin/qexo gnu/kawa/servlet/Makefile gnu/brl/Makefile gnu/kawa/brl/Makefile gnu/kawa/slib/Makefile gnu/commonlisp/lang/Makefile gnu/commonlisp/lisp/Makefile gnu/commonlisp/testsuite/Makefile gnu/jemacs/lang/Makefile gnu/jemacs/buffer/Makefile gnu/jemacs/lisp/Makefile gnu/jemacs/testsuite/Makefile gnu/jemacs/swing/Makefile gnu/jemacs/swt/Makefile kawa/Makefile kawa/lib/Makefile gnu/q2/lang/Makefile gnu/q2/testsuite/Makefile gnu/xquery/util/Makefile gnu/xquery/testsuite/Makefile gnu/kawa/android/Makefile gnu/kawa/javafx/Makefile doc/Makefile testsuite/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -3773,11 +3773,9 @@ do
     "gnu/Makefile") CONFIG_FILES="$CONFIG_FILES gnu/Makefile" ;;
     "bin/qexo") CONFIG_FILES="$CONFIG_FILES bin/qexo" ;;
     "gnu/kawa/servlet/Makefile") CONFIG_FILES="$CONFIG_FILES gnu/kawa/servlet/Makefile" ;;
-    "gnu/kawa/xslt/Makefile") CONFIG_FILES="$CONFIG_FILES gnu/kawa/xslt/Makefile" ;;
     "gnu/brl/Makefile") CONFIG_FILES="$CONFIG_FILES gnu/brl/Makefile" ;;
     "gnu/kawa/brl/Makefile") CONFIG_FILES="$CONFIG_FILES gnu/kawa/brl/Makefile" ;;
     "gnu/kawa/slib/Makefile") CONFIG_FILES="$CONFIG_FILES gnu/kawa/slib/Makefile" ;;
-    "gnu/commonlisp/Makefile") CONFIG_FILES="$CONFIG_FILES gnu/commonlisp/Makefile" ;;
     "gnu/commonlisp/lang/Makefile") CONFIG_FILES="$CONFIG_FILES gnu/commonlisp/lang/Makefile" ;;
     "gnu/commonlisp/lisp/Makefile") CONFIG_FILES="$CONFIG_FILES gnu/commonlisp/lisp/Makefile" ;;
     "gnu/commonlisp/testsuite/Makefile") CONFIG_FILES="$CONFIG_FILES gnu/commonlisp/testsuite/Makefile" ;;
@@ -3789,11 +3787,8 @@ do
     "gnu/jemacs/swt/Makefile") CONFIG_FILES="$CONFIG_FILES gnu/jemacs/swt/Makefile" ;;
     "kawa/Makefile") CONFIG_FILES="$CONFIG_FILES kawa/Makefile" ;;
     "kawa/lib/Makefile") CONFIG_FILES="$CONFIG_FILES kawa/lib/Makefile" ;;
-    "gnu/q2/Makefile") CONFIG_FILES="$CONFIG_FILES gnu/q2/Makefile" ;;
     "gnu/q2/lang/Makefile") CONFIG_FILES="$CONFIG_FILES gnu/q2/lang/Makefile" ;;
     "gnu/q2/testsuite/Makefile") CONFIG_FILES="$CONFIG_FILES gnu/q2/testsuite/Makefile" ;;
-    "gnu/xquery/Makefile") CONFIG_FILES="$CONFIG_FILES gnu/xquery/Makefile" ;;
-    "gnu/xquery/lang/Makefile") CONFIG_FILES="$CONFIG_FILES gnu/xquery/lang/Makefile" ;;
     "gnu/xquery/util/Makefile") CONFIG_FILES="$CONFIG_FILES gnu/xquery/util/Makefile" ;;
     "gnu/xquery/testsuite/Makefile") CONFIG_FILES="$CONFIG_FILES gnu/xquery/testsuite/Makefile" ;;
     "gnu/kawa/android/Makefile") CONFIG_FILES="$CONFIG_FILES gnu/kawa/android/Makefile" ;;

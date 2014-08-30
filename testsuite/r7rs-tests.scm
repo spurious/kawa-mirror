@@ -433,9 +433,6 @@
            (if y)
            y))))
 
-(cond-expand
- (kawa (begin))
- (else
 (define-syntax be-like-begin
   (syntax-rules ()
     ((be-like-begin name)
@@ -445,7 +442,6 @@
           (begin expr (... ...))))))))
 (be-like-begin sequence)
 (test 4 (sequence 1 2 3 4))
-))
 
 (test 'ok (let ((=> #f)) (cond (#t => 'ok))))
 

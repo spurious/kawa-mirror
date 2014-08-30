@@ -1,3 +1,7 @@
+2014-08-30  Per Bothner  <per@bothner.com>
+
+	* r7rs.scm: Enable test for (... ...) in syntax-rules.
+
 2014-08-28  Per Bothner  <per@bothner.com>
 
 	* convert1.scm: New tests for char->integer and integer->char.

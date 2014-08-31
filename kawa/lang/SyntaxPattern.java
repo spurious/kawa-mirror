@@ -27,7 +27,7 @@ public class SyntaxPattern extends Pattern implements Externalizable
   static final int MATCH_NIL = (1<<3)+MATCH_MISC;
 
   /** Matches a vector (FVector).
-   * Matches a vecetor v if the following list pattern (at pc+1)
+   * Matches a vector v if the following list pattern (at pc+1)
    * matches (vector->list v). */
   static final int MATCH_VECTOR = (2<<3)+MATCH_MISC;
 
@@ -651,7 +651,7 @@ public class SyntaxPattern extends Pattern implements Externalizable
     Declaration d1 = null, d2 = null;
     // Ending the look before we get to ModuleExp isn't really right,
     // but it's a hassle dealing the global Environment.
-    // FIXME when we re-do the library/globals imlementation.
+    // FIXME when we re-do the library/globals implementation.
     while (sc1 != null && ! (sc1 instanceof ModuleExp))
       {
 	d1 = sc1.lookup(id1);
@@ -691,14 +691,8 @@ public class SyntaxPattern extends Pattern implements Externalizable
 	Pair pair = (Pair) list;
 	tr.pushPositionOf(pair);
 	Object literal = pair.getCar();
-	Object wrapped;
-	if (literal instanceof SyntaxForm)
-	  {
-	    wrapped = literal;
-	    literal = ((SyntaxForm) literal).getDatum();
-	  }
-	else
-	  wrapped = literal; // FIXME
+	Object wrapped = SyntaxForms.fromDatumIfNeeded(literal, syntax);
+        literal = Translator.stripSyntax(literal);
 	if (! (literal instanceof Symbol))
           tr.error('e', "non-symbol '"+literal+"' in literals list");
 	literals[i] = wrapped;

@@ -136,15 +136,14 @@ public class SyntaxForms {
     return SyntaxForms.makeForm(datum, template.getScope());
   }
 
-  public static Object fromDatumIfNeeded (Object datum, SyntaxForm template)
-  {
-    if (datum == template.getDatum())
-      return template;
-    else if (datum instanceof SyntaxForm)
-      return (SyntaxForm) datum;
-    else
-      return SyntaxForms.fromDatum(datum, template);
-  }
+    public static Object fromDatumIfNeeded(Object datum, SyntaxForm template) {
+        if (datum instanceof SyntaxForm || template == null)
+            return datum;
+        else if (datum == template.getDatum())
+            return template;
+        else
+            return SyntaxForms.fromDatum(datum, template);
+    }
 
   public static Expression rewrite (Object x)
   {

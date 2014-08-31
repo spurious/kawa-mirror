@@ -1,3 +1,9 @@
+2014-08-31  Per Bothner  <per@bothner.com>
+
+	* lang/SyntaxForms.java (fromDatumIfNeeded): Handle null template.
+	* lang/SyntaxPattern.java (getLiteralsList): Simplify and make
+	more general by using fromDatumIfNeeded.
+
 2014-08-21  Per Bothner  <per@bothner.com>
 
 	* standard/Scheme.java (initScheme): 'parameterize' moved.

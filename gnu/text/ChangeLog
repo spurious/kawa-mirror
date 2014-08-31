@@ -1,3 +1,7 @@
+2014-08-31  Per Bothner  <per@bothner.com>
+
+	* Makefile.am: Merge in gnu/Makefile.am.
+
 2014-07-02  Per Bothner  <per@bothner.com>
 
 	* Char.java (castToCharacter, castToCharacterOrEof, isCharOrEof,

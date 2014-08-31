@@ -1,3 +1,7 @@
+2014-08-31  Per Bothner  <per@bothner.com>
+
+	* Makefile.am: Merge in gnu/Makefile.am.
+
 2014-08-28  Per Bothner  <per@bothner.com>
 
 	* StackTarget.java (compileFromStack0): Use Type#isCompatibleWithValue

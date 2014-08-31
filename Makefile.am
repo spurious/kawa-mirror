@@ -1,7 +1,7 @@
 # Process this with automake to create Makefile.in
 
-FIXED_SUBDIRS = doc testsuite gnu/bytecode gnu/math gnu/lists gnu/text \
-  gnu/mapping gnu/expr gnu \
+FIXED_SUBDIRS = doc testsuite gnu/bytecode gnu/math \
+  gnu \
   kawa gnu/kawa/slib gnu/kawa/servlet \
   gnu/commonlisp/lang gnu/commonlisp/lisp gnu/commonlisp/testsuite \
   gnu/q2/lang gnu/q2/testsuite

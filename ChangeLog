@@ -1,3 +1,9 @@
+2014-08-31  Per Bothner  <per@bothner.com>
+
+	* Makefile.am: Each Makefile from gnu/expr, gnu/mapping, gnu/lists
+	and gnu/text were merged into gnu/Makefile.
+	* configure.ac: Likewise.
+
 2014-08-28  Per Bothner  <per@bothner.com>
 
 	* Makefile.am: Remove Makefiles from intermediate directories

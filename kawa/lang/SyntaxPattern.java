@@ -113,11 +113,11 @@ public class SyntaxPattern extends Pattern implements Externalizable
   public SyntaxPattern (Object pattern,
 			Object[] literal_identifiers, Translator tr)
   {
-    this(new StringBuffer(), pattern,
+    this(new StringBuilder(), pattern,
 	 null, literal_identifiers, tr);
   }
 
-  SyntaxPattern (StringBuffer programbuf, Object pattern,
+  SyntaxPattern (StringBuilder programbuf, Object pattern,
 		 SyntaxForm syntax, Object[] literal_identifiers,
 		 Translator tr)
   {
@@ -243,7 +243,7 @@ public class SyntaxPattern extends Pattern implements Externalizable
   /**
    * @param context 'V' : vector elements; 'P' : car of Pair; '\0' : other.
    */
-  void translate (Object pattern, StringBuffer program,
+  void translate (Object pattern, StringBuilder program,
 		  Object[] literal_identifiers, int nesting,
 		  Vector literals, SyntaxForm syntax,
 		  char context,
@@ -406,14 +406,14 @@ public class SyntaxPattern extends Pattern implements Externalizable
       }
   }
 
-  private static void addInt (StringBuffer sbuf, int val)
+  private static void addInt (StringBuilder sbuf, int val)
   {
     if (val > 0xFFFF)
       addInt(sbuf, (val << 13) + MATCH_WIDE);
     sbuf.append((char) (val));
   }
 
-  private static int insertInt (int offset, StringBuffer sbuf, int val)
+  private static int insertInt (int offset, StringBuilder sbuf, int val)
   {
     if (val > 0xFFFF)
       offset += insertInt(offset, sbuf, (val << 13) + MATCH_WIDE);

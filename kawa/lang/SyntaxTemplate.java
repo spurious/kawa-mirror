@@ -166,7 +166,7 @@ public class SyntaxTemplate implements Externalizable
   {
     this.patternNesting = tr == null || tr.patternScope == null ? ""
       : tr.patternScope.patternNesting.toString();
-    StringBuffer program = new StringBuffer ();
+    StringBuilder program = new StringBuilder();
     java.util.Vector literals_vector = new java.util.Vector ();
     IdentityHashMap seen = new IdentityHashMap();
     convert_template(template, syntax,
@@ -207,7 +207,7 @@ public class SyntaxTemplate implements Externalizable
    */
   public int convert_template (Object form,
 			       SyntaxForm syntax,
-			       StringBuffer template_program,
+			       StringBuilder template_program,
 			       int nesting,
 			       java.util.Vector literals_vector,
 			       IdentityHashMap seen,

@@ -1,5 +1,9 @@
 2014-08-31  Per Bothner  <per@bothner.com>
 
+	* lang/SyntaxPattern.java: Use StringBuilder instead of StringBuffer.
+	* lang/SyntaxRules.java: Likewise.
+	* lang/SyntaxTemplate.java: Likewise.
+
 	* lang/SyntaxForms.java (fromDatumIfNeeded): Handle null template.
 	* lang/SyntaxPattern.java (getLiteralsList): Simplify and make
 	more general by using fromDatumIfNeeded.

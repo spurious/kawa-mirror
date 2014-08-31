@@ -112,7 +112,7 @@ public class SyntaxRules extends Procedure1 implements Printable, Externalizable
 		pattern = pattern_syntax.getDatum();
 	      }
 
-	    StringBuffer programbuf = new StringBuffer();
+	    StringBuilder programbuf = new StringBuilder();
 
 	    // In R5RS syntax-rules, the initial name is neither a
 	    // pattern variable or a literal identifier, so ignore it.
@@ -186,7 +186,7 @@ public class SyntaxRules extends Procedure1 implements Printable, Externalizable
   }
 
   /* DEBUGGING:
-  private void printElement (Object el, StringBuffer sb)
+  private void printElement (Object el, StringBuilder sb)
   {
     if (el instanceof Object[])
       {
@@ -227,7 +227,7 @@ public class SyntaxRules extends Procedure1 implements Printable, Externalizable
 	      {
 		/*
 		OutPort err = OutPort.errDefault();
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		sb.append("{Expand "+macro + " rule#" + i
 			  +" - matched variables: ");
 		for (int j = 0;  j < rule.pattern.varCount;  j++)

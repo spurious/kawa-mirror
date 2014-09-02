@@ -1,3 +1,9 @@
+2014-09-02  Per Bothner  <per@bothner.com>
+
+	* r7rs-tests.scm: Add tests for two r7rs extensions for ellipsis
+	in syntax-rules/syntax-case: (... TEMPLATE) as a generalization of
+	(... ...); specifying an alternate symbol in place of ... .
+
 2014-08-30  Per Bothner  <per@bothner.com>
 
 	* r7rs.scm: Enable test for (... ...) in syntax-rules.

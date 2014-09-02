@@ -95,7 +95,8 @@ public class syntax extends kawa.lang.Quote
 
   static Expression makeSyntax (Object form, Translator tr)
   {
-    SyntaxTemplate template = new SyntaxTemplate(form, null, tr);
+    SyntaxTemplate template = new SyntaxTemplate(form, null,
+                                                 SyntaxRule.dots3Symbol, tr);
     Expression matchArray = QuoteExp.nullExp;
     PatternScope patternScope = tr.patternScope;
     if (patternScope != null && patternScope.matchArray != null)

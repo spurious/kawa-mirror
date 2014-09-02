@@ -114,15 +114,15 @@ public class SyntaxPattern extends Pattern implements Externalizable
 			Object[] literal_identifiers, Translator tr)
   {
     this(new StringBuilder(), pattern,
-	 null, literal_identifiers, tr);
+	 null, SyntaxRule.dots3Symbol, literal_identifiers, tr);
   }
 
-  SyntaxPattern (StringBuilder programbuf, Object pattern,
-		 SyntaxForm syntax, Object[] literal_identifiers,
-		 Translator tr)
+  SyntaxPattern(StringBuilder programbuf, Object pattern, SyntaxForm syntax,
+                Object ellipsis, Object[] literal_identifiers,
+		Translator tr)
   {
     Vector literalsbuf = new Vector();
-    translate(pattern, programbuf,
+    translate(pattern, programbuf, ellipsis,
 	      literal_identifiers, 0, literalsbuf, null, '\0', tr);
     program = programbuf.toString();
     literals = new Object[literalsbuf.size()];
@@ -244,7 +244,7 @@ public class SyntaxPattern extends Pattern implements Externalizable
    * @param context 'V' : vector elements; 'P' : car of Pair; '\0' : other.
    */
   void translate (Object pattern, StringBuilder program,
-		  Object[] literal_identifiers, int nesting,
+		  Object ellipsis, Object[] literal_identifiers, int nesting,
 		  Vector literals, SyntaxForm syntax,
 		  char context,
 		  Translator tr)
@@ -274,22 +274,25 @@ public class SyntaxPattern extends Pattern implements Externalizable
 		    next = syntax.getDatum();
 		  }
 		boolean repeat = false;
-		if (next instanceof Pair
-		    && tr.matches(((Pair) next).getCar(), SyntaxRule.dots3))
-		  {
+                if (next instanceof Pair) {
+                    Pair nextPair = (Pair) next;
+                    Object nextCar = nextPair.getCar();
+                    if (literalIdentifierEq(nextCar, syntax == null ? null : syntax.getScope(), ellipsis, null)) {
 		    repeat = true;
-		    next = ((Pair) next).getCdr();
+		    next = nextPair.getCdr();
 		    while (next instanceof SyntaxForm)
 		      {
 			syntax = (SyntaxForm) next;
 			next = syntax.getDatum();
 		      }
 		  }
+                }
 
 		int subvar0 = patternNames.size();
 		if (context == 'P')
 		  context = '\0';
-		translate(pair.getCar(), program, literal_identifiers,
+		translate(pair.getCar(), program,
+                          ellipsis, literal_identifiers,
 			  repeat ? nesting + 1 : nesting,
 			  literals, car_syntax,
 			  context == 'V' ? '\0' : 'P', tr);
@@ -574,33 +577,14 @@ public class SyntaxPattern extends Pattern implements Externalizable
 	    continue;
 	  case MATCH_EQUALS:
 	    Object lit = literals[value];
-            Object id1, id2;
-            ScopeExp sc1, sc2;
             Translator tr = (Translator) Compilation.getCurrent();
-            if (lit instanceof SyntaxForm)
-              {
-                SyntaxForm sf = (SyntaxForm) lit;
-                id1 = sf.getDatum();
-                sc1 = sf.getScope();
-              }
-            else
-              {
-                id1 = lit;
-                Syntax curSyntax = tr.getCurrentSyntax();
-                sc1 = curSyntax instanceof Macro ? ((Macro) curSyntax).getCapturedScope() : null;
-              }
-            if (obj instanceof SyntaxForm)
-              {
-                SyntaxForm sf = (SyntaxForm) obj;
-                id2 = sf.getDatum();
-                sc2 = sf.getScope();
-              }
-            else
-              {
-                id2 = obj;
-                sc2 = syntax == null ? tr.currentScope() : syntax.getScope();
-              }
-            return literalIdentifierEq(id1, sc1, id2, sc2);
+            Syntax curSyntax = tr.getCurrentSyntax();
+            ScopeExp sc1 = curSyntax instanceof Macro
+                ? ((Macro) curSyntax).getCapturedScope()
+                : null;
+            ScopeExp sc2 = syntax == null ? tr.currentScope()
+                : syntax.getScope();
+            return literalIdentifierEq(lit, sc1, obj, sc2);
 	  case MATCH_ANY:
 	    if (syntax != null)
 	      obj = SyntaxForms.fromDatum(obj, syntax);
@@ -641,9 +625,18 @@ public class SyntaxPattern extends Pattern implements Externalizable
         return vars;
     }
 
-  public static boolean literalIdentifierEq (Object id1, ScopeExp sc1,
-					     Object id2, ScopeExp sc2)
-  {
+    public static boolean literalIdentifierEq(Object id1, ScopeExp sc1,
+                                              Object id2, ScopeExp sc2) {
+        if (id1 instanceof SyntaxForm) {
+            SyntaxForm form1 = (SyntaxForm) id1;
+            id1 = form1.getDatum();
+            sc1 = form1.getScope();
+        }
+        if (id2 instanceof SyntaxForm) {
+            SyntaxForm form2 = (SyntaxForm) id2;
+            id2 = form2.getDatum();
+            sc2 = form2.getScope();
+        }
     if (id1 != id2 && (id1 == null || id2 == null || ! id1.equals(id2)))
       return false;
     if (sc1 == sc2)

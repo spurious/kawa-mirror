@@ -25,9 +25,9 @@ public class SyntaxRule extends SyntaxTemplate implements Externalizable
   public SyntaxRule (SyntaxPattern pattern,
 		     Object template,
 		     SyntaxForm template_syntax,
-		     Translator tr)
+		     Object ellipsis, Translator tr)
   {
-    super(template, template_syntax, tr);
+    super(template, template_syntax, ellipsis, tr);
     this.pattern = pattern;
   }
 

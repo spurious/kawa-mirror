@@ -11,7 +11,7 @@ public class SyntaxRules extends Procedure1 implements Printable, Externalizable
 {
   /** The list of literal identifiers.
    * The 0'th element is name of the macro being defined;
-   * the rest are as specied in the syntax-rules form. */
+   * the rest are as specified in the syntax-rules form. */
   Object[] literal_identifiers;
 
   SyntaxRule[] rules;
@@ -32,8 +32,8 @@ public class SyntaxRules extends Procedure1 implements Printable, Externalizable
     this.maxVars = maxVars;
   }
 
-  public SyntaxRules (Object[] literal_identifiers, Object srules,
-		      Translator tr)
+  public SyntaxRules(Object ellipsis, Object[] literal_identifiers,
+                     Object srules, Translator tr)
   {
     this.literal_identifiers = literal_identifiers;
     int rules_count = Translator.listLength(srules);
@@ -133,10 +133,10 @@ public class SyntaxRules extends Procedure1 implements Printable, Externalizable
 		return;
 	      }
 	    SyntaxPattern spattern = new SyntaxPattern(programbuf, pattern,
-					     pattern_syntax, literal_identifiers, tr);
+					     pattern_syntax, ellipsis, literal_identifiers, tr);
 
-	    this.rules[i] = new SyntaxRule(spattern,
-					   template, template_syntax, tr);
+	    this.rules[i] = new SyntaxRule(spattern, template,
+                                           template_syntax, ellipsis, tr);
 
 	    PatternScope.pop(tr);
 	    tr.pop();
@@ -186,7 +186,7 @@ public class SyntaxRules extends Procedure1 implements Printable, Externalizable
   }
 
   /* DEBUGGING:
-  private void printElement (Object el, StringBuilder sb)
+  private void printElement (Object el, StringBuffer sb)
   {
     if (el instanceof Object[])
       {
@@ -227,7 +227,7 @@ public class SyntaxRules extends Procedure1 implements Printable, Externalizable
 	      {
 		/*
 		OutPort err = OutPort.errDefault();
-		StringBuilder sb = new StringBuilder();
+		StringBuffer sb = new StringBuffer();
 		sb.append("{Expand "+macro + " rule#" + i
 			  +" - matched variables: ");
 		for (int j = 0;  j < rule.pattern.varCount;  j++)

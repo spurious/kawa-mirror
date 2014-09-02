@@ -17,7 +17,7 @@ public class SyntaxTemplate implements Externalizable
    * The encoding is designed so that instructions are normally
    * in the range 1..127, which makes the <code>CONSTANT_Utf8</code> encoding
    * used in <code>.class</code> files compact.
-   * The folowing <code>BUILD_XXX</code> are the "opcode" of the encoding,
+   * The following <code>BUILD_XXX</code> are the "opcode" of the encoding,
    * stored in the low-order 3 bits of a <code>char</code>.
    */
   String template_program;
@@ -37,7 +37,7 @@ public class SyntaxTemplate implements Externalizable
    * The latter must evaluate to a list. */
   static final int BUILD_VECTOR = (5<<3)+BUILD_MISC;
 
-  /** Instruction to creat a <code>Pair</code> from sub-expressions.
+  /** Instruction to create a <code>Pair</code> from sub-expressions.
    * Instruction <code>BUILD_CONS+8*delta</code> is followed by a
    * sub-expression for the <code>car</code>
    * (whose length is <code>delta</code> chars),
@@ -78,8 +78,7 @@ public class SyntaxTemplate implements Externalizable
 
   Object[] literal_values;
 
-  static final String dots3 = "...";
-  static final SimpleSymbol dots3Symbol = Symbol.valueOf(dots3);
+  public static final SimpleSymbol dots3Symbol = Symbol.valueOf("...");
 
   /* DEBUGGING:
   void print_template_program (java.util.Vector patternNames,
@@ -162,7 +161,7 @@ public class SyntaxTemplate implements Externalizable
     this.max_nesting = max_nesting;
   }
 
-  public SyntaxTemplate (Object template, SyntaxForm syntax, Translator tr)
+  public SyntaxTemplate (Object template, SyntaxForm syntax, Object ellipsis, Translator tr)
   {
     this.patternNesting = tr == null || tr.patternScope == null ? ""
       : tr.patternScope.patternNesting.toString();
@@ -170,7 +169,7 @@ public class SyntaxTemplate implements Externalizable
     java.util.Vector literals_vector = new java.util.Vector ();
     IdentityHashMap seen = new IdentityHashMap();
     convert_template(template, syntax,
-		     program, 0, literals_vector, seen, false, tr);
+		     program, 0, literals_vector, seen, false, ellipsis, tr);
     this.template_program = program.toString();
     this.literal_values = new Object[literals_vector.size ()];
     literals_vector.copyInto (this.literal_values);
@@ -202,16 +201,17 @@ public class SyntaxTemplate implements Externalizable
    * @param tr  the current Translator
    * @return the index of a pattern variable (in <code>pattern_names</code>)
    *   that is nested at least as much as <code>nesting</code>;
-   *   if there is none such, -1 if there is any pattern variable or elipsis;
-   *   and -2 if the is no pattern variable or elipsis.
+   *   if there is none such, -1 if there is any pattern variable or ellipsis;
+   *   and -2 if the is no pattern variable or ellipsis.
    */
-  public int convert_template (Object form,
+  private int convert_template(Object form,
 			       SyntaxForm syntax,
 			       StringBuilder template_program,
 			       int nesting,
 			       java.util.Vector literals_vector,
 			       IdentityHashMap seen,
 			       boolean isVector,
+                               Object ellipsis,
 			       Translator tr)
   {
     if (form instanceof Pair || form instanceof FVector)
@@ -230,25 +230,26 @@ public class SyntaxTemplate implements Externalizable
 	form = syntax.getDatum();
       }
 
-  check_form:
     if (form instanceof Pair)
       {
 	Pair pair = (Pair) form;
 	int save_pc = template_program.length();
 	Object car = pair.getCar();
 
-        // Look for (... ...) and translate that to ...
-        if (tr.matches(car, dots3))
+        // Look for (... XXX) and translate that to XXX
+        if (SyntaxPattern.literalIdentifierEq(car,
+                                              syntax==null?null:syntax.getScope(), ellipsis, null))
           {
-            Object cdr = Translator.stripSyntax(pair.getCdr());
-            if (cdr instanceof Pair)
-              {
+            Object cdr = pair.getCdr();
+            if (cdr instanceof Pair) {
                 Pair cdr_pair = (Pair) cdr;
-                if (tr.matches(cdr_pair.getCar(), dots3) && cdr_pair.getCdr() == LList.Empty)
-                  {
-                    form = dots3Symbol;
-                    break check_form;
-                  }
+                if (cdr_pair.getCdr() == LList.Empty) {
+                    convert_template(cdr_pair.getCar(), syntax,
+                                     template_program, nesting,
+                                     literals_vector, seen,
+                                     false, null, tr);
+                    return -1;
+                }
               }
           }
 
@@ -262,7 +263,8 @@ public class SyntaxTemplate implements Externalizable
 	while (rest instanceof Pair)
 	  {
 	    Pair p = (Pair) rest;
-	    if (! tr.matches(p.getCar(), dots3))
+	    if (! SyntaxPattern.literalIdentifierEq(p.getCar(), null,
+                                                    ellipsis, null))
 	      break;
 	    num_dots3++;
 	    rest = p.getCdr();
@@ -270,7 +272,7 @@ public class SyntaxTemplate implements Externalizable
 	  }
 	int ret_car = convert_template(car, syntax, template_program,
 				       nesting + num_dots3,
-				       literals_vector, seen, false, tr);
+				       literals_vector, seen, false, ellipsis, tr);
         int ret_cdr = -2;
 	if (rest != LList.Empty)
 	  {
@@ -279,7 +281,7 @@ public class SyntaxTemplate implements Externalizable
 				       (char)((delta<<3)+BUILD_CONS));
 	    ret_cdr = convert_template (rest, syntax,
 					template_program, nesting,
-					literals_vector, seen, isVector, tr);
+					literals_vector, seen, isVector, ellipsis, tr);
 	  }
 	if (num_dots3 > 0)
 	  {
@@ -313,7 +315,7 @@ public class SyntaxTemplate implements Externalizable
 	template_program.append((char) BUILD_VECTOR);
 	return convert_template(LList.makeList((FVector) form), syntax,
 				template_program, nesting,
-				literals_vector, seen, true, tr);
+				literals_vector, seen, true, ellipsis, tr);
       }
     else if (form == LList.Empty)
       {
@@ -348,10 +350,10 @@ public class SyntaxTemplate implements Externalizable
 	literals_index = literals_vector.size ();
 	literals_vector.addElement(form);
       }
-    if (! (form instanceof SyntaxForm) && form != dots3Symbol)
+    if (! (form instanceof SyntaxForm) && form != ellipsis)
       template_program.append((char) (BUILD_SYNTAX));
     template_program.append((char) (BUILD_LITERAL + 8 * literals_index));
-    return  form == dots3Symbol ? -1 : -2;
+    return  form == ellipsis ? -1 : -2;
   }
 
   /** Similar to vec.indexOf(elem), but uses == (not equals) to compare. */
@@ -512,7 +514,7 @@ public class SyntaxTemplate implements Externalizable
     else if (ch == BUILD_SYNTAX)
       {
 	Object v = execute(pc+1, vars, nesting, indexes, tr, templateScope);
-	return v == LList.Empty ? v : SyntaxForms.makeForm(v, templateScope);
+	return SyntaxForms.makeForm(v, templateScope);
       }
     else if ((ch & 7) == BUILD_CONS)
       {

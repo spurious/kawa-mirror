@@ -1,3 +1,18 @@
+2014-09-02  Per Bothner  <per@bothner.com>
+
+	Add R7RS functionality for ellipsis in syntax-rules.
+	* standard/syntax_rules.java (rewriteForm): Check for alternative
+	symbol to use in place of '... .
+	* lang/SyntaxPattern.java (<init>, translate): Take ellipsis argument.
+	(literalIdentifierEq): Handle SyntaxForm as a convenience.
+	* lang/SyntaxRules.java (<init>): Take ellipsis argument.
+	* lang/SyntaxTemplate.java (dots3): Remove field.
+	(<init>, convert_template): Take ellipsis argument.
+	(convert_template): Generalize to user-specified ellipsis symbol.
+	Generalize handling of (... ...) to handle the r7rs extension (... XXX).
+	* lang/SyntaxRule.java: Update accordingly.
+	* standard/syntax.java: Update accordingly.
+
 2014-08-31  Per Bothner  <per@bothner.com>
 
 	* lang/SyntaxPattern.java: Use StringBuilder instead of StringBuffer.

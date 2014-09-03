@@ -433,6 +433,26 @@
            (if y)
            y))))
 
+;; Syntax pattern with ellipsis in middle of proper list.
+(define-syntax part-2
+  (syntax-rules ()
+    ((_ a b (m n) ... x y)
+     (vector (list a b) (list m ...) (list n ...) (list x y)))
+    ((_ . rest) 'error)))
+(test '#((10 43) (31 41 51) (32 42 52) (63 77))
+      (part-2 10 (+ 21 22) (31 32) (41 42) (51 52) (+ 61 2) 77))
+;; Syntax pattern with ellipsis in middle of improper list.
+(define-syntax part-2x
+  (syntax-rules ()
+    ((_ a b (m n) ... x y . rest)
+     (vector (list a b) (list m ...) (list n ...) (list x y)
+             (cons "rest:" rest)))
+    ((_ . rest) 'error)))
+(test '#((10 43) (31 41 51) (32 42 52) (63 77) ("rest:"))
+      (part-2x 10 (+ 21 22) (31 32) (41 42) (51 52) (+ 61 2) 77))
+(test '#((10 43) (31 41 51) (32 42 52) (63 77) ("rest:" . "tail"))
+      (part-2x 10 (+ 21 22) (31 32) (41 42) (51 52) (+ 61 2) 77 . "tail"))
+
 (define-syntax be-like-begin1
   (syntax-rules ()
     ((be-like-begin1 name)

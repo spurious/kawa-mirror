@@ -118,9 +118,6 @@ public class SyntaxRules extends Procedure1 implements Printable, Externalizable
 	    // pattern variable or a literal identifier, so ignore it.
 	    if (pattern instanceof Pair)
 	      {
-		// ?? FIXME
-		literal_identifiers[0] = ((Pair)pattern).getCar();
-
 		Pair p = (Pair) pattern;
 		programbuf.append((char) ((1 << 3) | SyntaxPattern.MATCH_PAIR));
 		programbuf.append((char) SyntaxPattern.MATCH_IGNORE);

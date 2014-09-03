@@ -463,6 +463,15 @@
 (be-like-begin3 sequence3)
 (test 5 (sequence3 2 3 4 5))
 
+(define-syntax count-to-2
+  (syntax-rules ()
+    ((_) 0)
+    ((_ _) 1)
+    ((_ _ _) 2)
+    ((_ . _) 'many)))
+(test '(2 0 many)
+      (list (count-to-2 a b) (count-to-2) (count-to-2 a b c d)))
+
 (test 'ok (let ((=> #f)) (cond (#t => 'ok))))
 
 (test-end)

@@ -1,5 +1,10 @@
 2014-09-02  Per Bothner  <per@bothner.com>
 
+	* lang/SyntaxPattern.java: Add support for underscore meaning
+	"match and ignore anything".
+	* lang/SyntaxRules.java (<init>): Don't set literal_identifiers[0] -
+	there is no need and it confuses things.
+
 	Add R7RS functionality for ellipsis in syntax-rules.
 	* standard/syntax_rules.java (rewriteForm): Check for alternative
 	symbol to use in place of '... .

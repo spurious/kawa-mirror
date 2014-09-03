@@ -20,6 +20,8 @@ public class SyntaxPattern extends Pattern implements Externalizable
    * following instruction. */
   String program;
 
+  public static final SimpleSymbol underscoreSymbol = Symbol.valueOf("_");
+
   /** This 3-bit "opcode" is used for shorter operand-less instructions. */
   static final int MATCH_MISC = 0;
 
@@ -31,7 +33,7 @@ public class SyntaxPattern extends Pattern implements Externalizable
    * matches (vector->list v). */
   static final int MATCH_VECTOR = (2<<3)+MATCH_MISC;
 
-  /** Match anything and ignoe it. */
+  /** Match anything and ignore it. */
   static final int MATCH_IGNORE = (3<<3)+MATCH_MISC;
 
   /** The instruction <code>8*i+MATCH_WIDE</code> is a prefix.
@@ -339,10 +341,10 @@ public class SyntaxPattern extends Pattern implements Externalizable
 	  }
 	else if (pattern instanceof Symbol)
 	  {
+            ScopeExp current = tr.currentScope();
+            ScopeExp scope1 = syntax == null ? current : syntax.getScope();
 	    for (int j = literal_identifiers.length;  --j >= 0; )
 	      {
-                ScopeExp current = tr.currentScope();
-                ScopeExp scope1 = syntax == null ? current : syntax.getScope();
                 ScopeExp scope2;
                 Object literal = literal_identifiers[j];
                 if (literal instanceof SyntaxForm)
@@ -369,6 +371,10 @@ public class SyntaxPattern extends Pattern implements Externalizable
 		    return;
 		  }
 	      }
+            if (literalIdentifierEq(pattern, scope1, underscoreSymbol, null)) {
+                program.append((char) MATCH_IGNORE);
+                return;
+            }
 	    if (patternNames.contains(pattern))
 	      tr.syntaxError("duplicated pattern variable " + pattern);
 	    int i = patternNames.size();
@@ -478,7 +484,7 @@ public class SyntaxPattern extends Pattern implements Externalizable
 	    else if (ch == MATCH_IGNORE)
 	      return true;
 	    else
-	      throw new Error("unknwon pattern opcode");
+	      throw new Error("unknown pattern opcode");
 	  case MATCH_NIL:
 	    return obj == LList.Empty;
 	  case MATCH_LENGTH:
@@ -673,8 +679,8 @@ public class SyntaxPattern extends Pattern implements Externalizable
 	tr.error('e', "missing or malformed literals list");
 	count = 0;
       }
-    Object[] literals = new Object[count + 1];
-    for (int i = 1;  i <= count;  i++)
+    Object[] literals = new Object[count];
+    for (int i = 0;  i < count;  i++)
       {
 	while (list instanceof SyntaxForm)
 	  {

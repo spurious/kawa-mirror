@@ -1,3 +1,13 @@
+2014-09-04  Per Bothner  <per@bothner.com>
+
+	* prim_syntax.scm (syntax-error): Rename to ...
+	(report-syntax-error): .. because r7rs syntax-error is incompatible.
+	* case_syntax.scm: Update.
+	* misc_syntax.scm: Update.
+	* syntax.scm: Update.
+	* std_syntax.scm (free-identifier=?, bound-identifier=?): Update
+	and add missing location argument.
+
 2014-08-28  Per Bothner  <per@bothner.com>
 
 	* compile_misc.scm (integerToCharValidateApply): Fix expansion

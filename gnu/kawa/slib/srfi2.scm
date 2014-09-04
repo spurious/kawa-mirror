@@ -9,7 +9,7 @@
     ((and-let* (var))
      (if (identifier? #`var)
 	 #`var
-	 (syntax-error #`var "expected a variable name")))
+	 (report-syntax-error #`var "expected a variable name")))
     ((and-let* ((var expr) . claws))
      #`(let ((var expr))
 	 (and var (and-let* claws))))
@@ -18,6 +18,6 @@
     ((and-let* (var . claws))
      (if (identifier? #`var)
 	 #`(and var (and-let* claws))
-	 (syntax-error #`var "expected a variable name")))
+	 (report-syntax-error #`var "expected a variable name")))
     ((and-let* ())
      #`#t)))

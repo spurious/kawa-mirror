@@ -249,12 +249,16 @@
 (define (free-identifier=? id1 id2) :: <boolean>
   (if (and (identifier? id1) (identifier? id2))
       (kawa.lang.SyntaxForms:identifierEquals id1 id2 #f)
-      (syntax-error "free-identifier-? - argument is not an identifier")))
+      (report-syntax-error
+       (if (identifier? id1) id2 id1)
+       "free-identifier-? - argument is not an identifier")))
 
 (define (bound-identifier=? id1 id2) :: <boolean>
   (if (and (identifier? id1) (identifier? id2))
       (kawa.lang.SyntaxForms:identifierEquals id1 id2 #t)
-      (syntax-error "bound-identifier-? - argument is not an identifier")))
+      (report-syntax-error
+       (if (identifier? id1) id2 id1)
+       "bound-identifier-? - argument is not an identifier")))
 
 (define (syntax-source form)
   (cond ((instance? form kawa.lang.SyntaxForm)

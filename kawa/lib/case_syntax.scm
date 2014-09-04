@@ -42,7 +42,7 @@
 ;; Creates a begin expression from the expressions included in a clause
 (define (case-clause->expression s-clause key)
   (if (or (null? s-clause) (null? (cdr s-clause)))
-      (syntax-error s-clause "too few expressions for a 'case' clause")
+      (report-syntax-error s-clause "too few expressions for a 'case' clause")
       (let* ((exp (cdr s-clause))
              (exp (if (eq? (car exp) '=>)
                       (list (append (cdr exp) (list key)))

@@ -1,3 +1,7 @@
+2014-09-04  Per Bothner  <per@bothner.com>
+
+	* MiscOps.scm (if): Update renamed syntax-error -> report-syntax-error.
+
 2013-11-10  Per Bothner  <per@bothner.com>
 
 	* defgroup.java: Update for new 'formStack' and scanDefinitions API.

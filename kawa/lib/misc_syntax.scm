@@ -13,7 +13,7 @@
          ;; The value doesn't matter.
          ::int 123))
     ((_ . rest)
-     (syntax-error form "provide requires a quoted feature-name"))))
+     (report-syntax-error form "provide requires a quoted feature-name"))))
 
 (define-syntax test-begin
   (syntax-rules ()

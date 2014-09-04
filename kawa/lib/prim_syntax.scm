@@ -63,7 +63,7 @@
     ((define-early-constant name value)
      (%define name 24 #!null value))))
 
-(%define syntax-error 2 #!null (id #!rest (msg :: <Object[]>))
+(%define report-syntax-error 2 #!null (id #!rest (msg :: <Object[]>))
   (invoke-static <kawa.standard.syntax_error> 'error id msg))
 
 (%define-syntax syntax->expression
@@ -90,10 +90,10 @@
 		    (syntax->expression (syntax then))
 		    (syntax->expression (syntax else))))
 		 ((_ e1 e2 e3 e4 . rest)
-		  (syntax-error (syntax e4)
+		  (report-syntax-error (syntax e4)
 				"too many expressions for 'if'"))
 		 ((_ . rest)
-		  (syntax-error (syntax rest)
+		  (report-syntax-error (syntax rest)
 				"too few expressions for 'if'")))))
 
 (define-rewrite-syntax try-catch
@@ -127,9 +127,9 @@
 			    (set! out-inits (make <pair> (syntax (set! name init)) out-inits))
 			    (process-binding (syntax rest))))
 			 (((name) . rest)
-			  (syntax-error b "missing initializion in letrec"))
+			  (report-syntax-error b "missing initializion in letrec"))
 			 (whatever
-			  (syntax-error b "invalid bindings syntax in letrec")))))
+			  (report-syntax-error b "invalid bindings syntax in letrec")))))
 	       (process-binding (syntax bindings))
 	       (set! out-bindings (gnu.lists.LList:reverseInPlace out-bindings))
 	       (set! out-inits (gnu.lists.LList:reverseInPlace out-inits))

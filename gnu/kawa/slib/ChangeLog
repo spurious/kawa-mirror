@@ -1,3 +1,8 @@
+2014-09-04  Per Bothner  <per@bothner.com>
+
+	* enums.scm: Update for syntax-error -> report-syntax-error renaming.
+	* srfi2.scm: Likewise.
+
 2014-08-04  Per Bothner  <per@bothner.com>
 
 	* srfi13.scm (string-for-each): Replace by alias for

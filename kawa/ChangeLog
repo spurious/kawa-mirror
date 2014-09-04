@@ -1,3 +1,8 @@
+2014-09-04  Per Bothner  <per@bothner.com>
+
+	* standard/Scheme.java (initScheme): Rename syntax-error to
+	report-syntax-error.
+
 2014-09-03  Per Bothner  <per@bothner.com>
 
 	* lang/SyntaxPattern.java: Instead using literal_identifiers[0]

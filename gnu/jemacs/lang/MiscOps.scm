@@ -34,7 +34,7 @@
 		    (syntax->expression (syntax then))
 		    (syntax-body->expression (syntax (begin else ...)))))
 		 ((_ . rest)
-		  (syntax-error (syntax rest)
+		  (report-syntax-error (syntax rest)
 				"too few expressions for 'if'")))))
 
 (define-syntax catch

@@ -35,8 +35,8 @@
      #`(define-enum "findkeywords" tname (keyword value k ...) e ...))
     ((_ "findkeywords" tname (k ...) e ...)
      #`(%define-enum tname (k ...) e ...))
-    ((_) (syntax-error form "no enum type name given"))
-    ((_ tname) (syntax-error form "no enum constants given"))
+    ((_) (report-syntax-error form "no enum type name given"))
+    ((_ tname) (report-syntax-error form "no enum constants given"))
     ((_ tname e ...)
      #`(define-enum "findkeywords" tname () e ...))))
 

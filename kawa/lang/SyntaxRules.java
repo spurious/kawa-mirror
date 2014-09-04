@@ -9,9 +9,7 @@ import java.io.*;
 
 public class SyntaxRules extends Procedure1 implements Printable, Externalizable 
 {
-  /** The list of literal identifiers.
-   * The 0'th element is name of the macro being defined;
-   * the rest are as specified in the syntax-rules form. */
+  /** The list of literal identifiers as specified in the syntax-rules form. */
   Object[] literal_identifiers;
 
   SyntaxRule[] rules;
@@ -25,16 +23,24 @@ public class SyntaxRules extends Procedure1 implements Printable, Externalizable
 
   /** The compiler generates calls to this constructor. */
   public SyntaxRules (Object[] literal_identifiers, SyntaxRule[] rules,
-		      int maxVars)
+		      int maxVars, Object name)
   {
     this.literal_identifiers = literal_identifiers;
     this.rules = rules;
     this.maxVars = maxVars;
+    if (name != null)
+        this.setSymbol(name);
   }
 
   public SyntaxRules(Object ellipsis, Object[] literal_identifiers,
                      Object srules, Translator tr)
   {
+    Macro curMacro = tr.currentMacroDefinition;
+    if (curMacro != null) {
+        Object curName = curMacro.getSymbol();
+        if (curName != null)
+            this.setSymbol(curName);
+    }
     this.literal_identifiers = literal_identifiers;
     int rules_count = Translator.listLength(srules);
     if (rules_count < 0)
@@ -243,7 +249,7 @@ public class SyntaxRules extends Procedure1 implements Printable, Externalizable
 	      {
 		/* DEBUGGING:
 		OutPort err = OutPort.errDefault();
-		err.print("Expanding ");  err.println(literal_identifiers[0]);
+		err.print("Expanding ");  err.println(getName());
 		rule.print_template_program(null, err);
 		err.flush();
 		*/
@@ -267,17 +273,17 @@ public class SyntaxRules extends Procedure1 implements Printable, Externalizable
       }
     /* DEBUGGING:
     System.err.println("no matching syntax-rule for "
-		       + literal_identifiers[0]);
+		       + getName());
     System.err.flush();
     */
     return tr.syntaxError ("no matching syntax-rule for "
-			   + literal_identifiers[0]);
+			   + getName());
   }
 
   public void print (Consumer out)
   {
     out.write("#<macro ");
-    ReportFormat.print(literal_identifiers[0], out);
+    ReportFormat.print(getName(), out);
     out.write('>');
   }
 
@@ -290,6 +296,7 @@ public class SyntaxRules extends Procedure1 implements Printable, Externalizable
     out.writeObject(literal_identifiers);
     out.writeObject(rules);
     out.writeInt(maxVars);
+    out.writeObject(getSymbol());
   }
 
   public void readExternal(ObjectInput in)
@@ -298,5 +305,8 @@ public class SyntaxRules extends Procedure1 implements Printable, Externalizable
     literal_identifiers = (Object[]) in.readObject();
     rules = (SyntaxRule[]) in.readObject();
     maxVars = in.readInt();
+    Object name = in.readObject();
+    if (name != null)
+        setSymbol(name);
   }
 }

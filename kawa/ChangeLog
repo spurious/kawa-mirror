@@ -1,3 +1,10 @@
+2014-09-03  Per Bothner  <per@bothner.com>
+
+	* lang/SyntaxPattern.java: Instead using literal_identifiers[0]
+	for a "name" for output, use getSymbol().  Set the symbol from the
+	currentMacroDefinition, rather than from the head of a syntax-pattern
+	- which is often "_" and thus useless anyway.
+
 2014-09-02  Per Bothner  <per@bothner.com>
 
 	* lang/SyntaxPattern.java: Add support for underscore meaning

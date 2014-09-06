@@ -312,15 +312,25 @@ public class SyntaxTemplate implements Externalizable {
         if (form instanceof Symbol)
             tr.noteAccess(form, tr.currentScope());
         form = SyntaxForms.makeWithTemplate(syntax, form); // Usually a no-op.
+        if (template_program.length() == 0
+            && form instanceof PairWithPosition) {
+            // If the top-level result is a PairWithPosition, that conflicts
+            // with setting the application-site line number in Macro#expand.
+            PairWithPosition pform = (PairWithPosition) form;
+            form = new Pair(pform.getCar(), pform.getCdr());
+        }
         int literals_index = indexOf(literals_vector, form);
         if (literals_index < 0) {
             literals_index = literals_vector.size ();
             literals_vector.addElement(form);
         }
-        if (! (form instanceof SyntaxForm) && form != ellipsis)
+        if (! (form instanceof SyntaxForm) && form != ellipsis
+            && ! (form instanceof CharSequence
+                  || form instanceof Number
+                  || form instanceof Boolean))
             template_program.append((char) (BUILD_SYNTAX));
         template_program.append((char) (BUILD_LITERAL + 8 * literals_index));
-        return  form == ellipsis ? -1 : -2;
+        return form == ellipsis ? -1 : -2;
     }
 
     /** Similar to vec.indexOf(elem), but uses == (not equals) to compare. */

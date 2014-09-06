@@ -1,5 +1,11 @@
 2014-09-05  Per Bothner  <per@bothner.com>
 
+	* lang/SyntaxTemplate.java (convert_template): Convert literal
+	PairWithPosition to plain Pair, to allow setting line number in
+	Macro.expand.
+	* lang/SyntaxTemplate.java (convert_template) Don't wrap constands
+	with a SyntaxForm.
+
 	* standard/syntax_error.java (rewrite): Tweak formatting to be
 	more take the Scheme error routine.
 

@@ -2,6 +2,8 @@ package kawa.standard;
 import kawa.lang.*;
 import gnu.lists.*;
 import gnu.expr.*;
+import gnu.kawa.functions.DisplayFormat;
+import gnu.kawa.io.CharArrayOutPort;
 
 /** Implements the Kawa extension "%syntax-error".
  * Prints out its arguments in an error message.
@@ -15,24 +17,26 @@ public class syntax_error extends Syntax
 
   public Expression rewrite (Object obj, Translator tr)
   {
-    StringBuffer buffer = new StringBuffer ();
+    CharArrayOutPort buf = new CharArrayOutPort();
     int words = 0;
+    DisplayFormat format = DisplayFormat.schemeDisplayFormat;
     while (obj instanceof Pair)
       {
 	Pair pair = (Pair) obj;
 	if (words > 0)
-	  buffer.append (' ');
-	buffer.append (pair.getCar());
+	  buf.append(' ');
+        format.format(Translator.stripSyntax(pair.getCar()), buf);
+        format = DisplayFormat.schemeWriteFormat;
 	obj = pair.getCdr();
 	words++;
       }
     if (obj != LList.Empty)
       {
 	if (words > 0)
-	  buffer.append (' ');
-	buffer.append (obj);
+	  buf.append(' ');
+	format.format(obj, buf);
       }
-    return tr.syntaxError (buffer.toString ());
+    return tr.syntaxError(buf.toString());
   }
 
   public static Expression error (Object form, Object[] message)

@@ -1,3 +1,8 @@
+2014-09-05  Per Bothner  <per@bothner.com>
+
+	* standard/syntax_error.java (rewrite): Tweak formatting to be
+	more take the Scheme error routine.
+
 2014-09-04  Per Bothner  <per@bothner.com>
 
 	* standard/Scheme.java (initScheme): Rename syntax-error to

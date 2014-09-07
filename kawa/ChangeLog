@@ -1,5 +1,7 @@
 2014-09-07  Per Bothner  <per@bothner.com>
 
+	* lang/Translator.java (pushPositionOf): Generalize to SourceLocator.
+
 	* standard/Scheme.java (initScheme): Renamed '5syntax-error'
 	to 'syntax-error', which is in r7rs.
 	* standard/syntax_error.java: updated.

@@ -1265,13 +1265,17 @@ public class Translator extends Compilation
   /** Note current line number position from a PairWithPosition.
    * Return an object to pass to popPositionOf.
    */
-  public Object pushPositionOf(Object pair)
+  public Object pushPositionOf(Object pos)
   {
-    if (pair instanceof SyntaxForm)
-      pair = ((SyntaxForm) pair).getDatum();
-    if (! (pair instanceof PairWithPosition))
+    if (pos instanceof SyntaxForm)
+      pos = ((SyntaxForm) pos).getDatum();
+    PairWithPosition pair;
+    if (pos instanceof PairWithPosition)
+        pair = (PairWithPosition) pos;
+    else if (pos instanceof SourceLocator)
+        pair = new PairWithPosition((SourceLocator) pos, null, null);
+    else
       return null;
-    PairWithPosition ppair = (PairWithPosition) pair;
     Object saved;
     if (positionPair == null
 	|| positionPair.getFileName() != getFileName()
@@ -1282,8 +1286,8 @@ public class Translator extends Compilation
       }
     else
       saved = positionPair;
-    setLine(pair);
-    positionPair = ppair;
+    setLine(pos);
+    positionPair = pair;
     return saved;
   }
 

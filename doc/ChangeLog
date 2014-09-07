@@ -1,3 +1,7 @@
+2014-09-07  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Macros): Updated and merged in documentation form r7rs.
+
 2014-08-14  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Strings): Document string-replace!.

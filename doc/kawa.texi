@@ -2799,7 +2799,7 @@ Kawa supports most of the @code{syntax-case} feature.
 Syntax definitions are valid wherever definitions are.
 They have the following form:
 
-@deffn Syntax define-syntax keyword transformer-spec
+@deffn Syntax define-syntax keyword @stxref{transformer-spec}
 The @var{keyword} is a identifier, and @var{transformer-spec}
 is a function that maps syntax forms to syntax forms,
 usually an instance of @code{syntax-rules}.
@@ -2908,6 +2908,188 @@ To access this function, you must first @code{(require 'syntax-utils)}.
 (expand '(cond ((> x y) 0) (else 1))) @result{} (if (> x y) 0 1)
 @end example
 @end deffn
+
+@subsection Pattern language
+
+A @meta{transformer-spec} is an expression that evaluates to a
+transformer procedure, which takes an input form and returns a
+resulting form.  You can do general macro-time compilation with such a
+procedure, commonly using @code{syntax-case} (which is documented
+in the R6RS library specification).
+However, when possible it is better to use the simpler
+pattern language of @code{syntax-rules}:
+
+@display
+@stxdef{transformer-spec}
+  @stxlit{(syntax-rules (} @arbno{@stxref{tr-literal}} @stxlit{)} @arbno{@stxref{syntax-rule}}@stxlit{)}
+  | @stxlit{(syntax-rules} @stxref{ellipsis} @stxlit{(} @arbno{@stxref{tr-literal}} @stxlit{)} @arbno{@stxref{syntax-rule}}@stxlit{)}
+  | @stxref{expression}
+@stxdef{syntax-rule} @stxlit{(}@stxref{list-pattern} @stxref{syntax-template}@stxlit{)}
+@stxdef{tr-literal} @stxref{identifier}
+@stxdef{ellipsis} @stxref{identifier}
+@end display
+
+An instance of @code{syntax-rules} produces a new
+macro transformer by specifying a sequence of hygienic
+rewrite rules. A use of a macro whose keyword is associated
+with a transformer specified by @code{syntax-rules} is matched
+against the patterns contained in the @meta{syntax-rule}s
+beginning with the leftmost syntax rule . When a match is
+found, the macro use is transcribed hygienically according
+to the template.
+The optional @meta{ellipsis} species a symbol used to indicate
+repetition; it defaults to @code{...} (3 periods).
+
+@display
+@stxdef{syntax-pattern}
+  @stxref{identifier} | @stxref{constant} | @stxref{list-pattern} | @stxref{vector-pattern}
+@stxdef{list-pattern} @stxlit{(} @arbno{@stxref{syntax-pattern}} @stxlit{)}
+  | @stxlit{(} @stxref{syntax-pattern} @arbno{@stxref{syntax-pattern}} @stxlit{.} @stxref{syntax-pattern} @stxlit{)}
+  | @stxlit{(} @arbno{@stxref{syntax-pattern}} @stxref{syntax-pattern} @stxref{ellipsis} @arbno{@stxref{syntax-pattern}} @stxlit{)}
+  | @stxlit{(} @arbno{@stxref{syntax-pattern}} @stxref{syntax-pattern} @stxref{ellipsis} @arbno{@stxref{syntax-pattern}} @stxlit{.} @stxref{syntax-pattern}@stxlit{)}
+@stxdef{vector-pattern} @stxlit{#(} @arbno{@stxref{syntax-pattern}} @stxlit{)}
+  | @stxlit{#(} @arbno{@stxref{syntax-pattern}} @stxref{syntax-pattern} @stxref{ellipsis} @arbno{@stxref{syntax-pattern}} @stxlit{)}
+@end display
+
+An identifier appearing within a pattern can be an underscore
+(@code{_}), a literal identifier listed in the list of @meta{tr-literal}s,
+or the @meta{ellipsis}. All other identifiers appearing within a
+pattern are pattern variables.
+
+The outer @var{syntax-list} of the pattern in a @meta{yntax-rule}
+must start with an identifier. It is not involved in the matching and
+is considered neither a pattern variable nor a literal identifier.
+
+Pattern variables match arbitrary input elements and are
+used to refer to elements of the input in the template.
+It is an error for the same pattern variable to appear more
+than once in a @meta{syntax-pattern}.
+
+Underscores also match arbitrary input elements but are
+not pattern variables and so cannot be used to refer to
+those elements. If an underscore appears in the literals
+list, then that takes precedence and underscores in the
+pattern match as literals. Multiple underscores can
+appear in a @meta{syntax-pattern}.
+
+Identifiers that appear in @code{(@arbno{@meta{tr-literal}})} are interpreted
+as literal identifiers to be matched against corresponding
+elements of the input. An element in the input matches a
+literal identifier if and only if it is an identifier and either
+both its occurrence in the macro expression and its occurrence
+in the macro definition have the same lexical binding,
+or the two identifiers are the same and both have no lexical
+binding.
+
+A subpattern followed by ellipsis can match zero or
+more elements of the input, unless ellipsis appears in the
+literals, in which case it is matched as a literal.
+
+More formally, an input expression @var{E} matches a pattern @var{P}
+if and only if:
+@itemize @bullet
+@item
+@var{P} is an underscore (@stxlit{_}); or
+@item
+@var{P} is a non-literal identifier; or
+@item
+@var{P} is a literal identifier and @var{E} is an identifier with the
+same binding; or
+@item
+@var{P} is a list @stxlit{(}@var{P@sub{1}} ... @var{P@sub{n}}@stxlit{)} and
+@var{E} is a list of @var{n} elements
+that match @var{P@sub{1}} through @var{P@sub{n}}, respectively; or
+@item
+@var{P} is an improper list
+@stxlit{(}@var{P@sub{1}} ... @var{P@sub{n}} @stxlit{.} @var{P@sub{n+1}}@stxlit{)} and
+@var{E} is a list or improper list of @var{n} or more elements that
+match @var{P@sub{1}} through @var{P@sub{n}}, respectively,
+and whose @var{n}th tail matches @var{P@sub{n+1}}; or
+@item
+@var{P} is of the form
+@stxlit{(}@var{P@sub{1}} ... @var{P@sub{k}} @var{P@sub{e}} @var{ellipsis} @var{P@sub{k+1}} ... @var{P@sub{k+l}}@stxlit{)} where @var{E} is a proper list of @var{n} elements,
+ the first @var{k} of which match @var{P@sub{1}} through @var{P@sub{k}},
+respectively, whose
+next @var{n-k-l} elements each match @var{P@sub{e}}, and whose remaining
+@var{l} elements match @var{P@sub{k+1}} through @var{P@sub{k+l}}; or
+@item
+@var{P} is of the form
+@stxlit{(}@var{P@sub{1}} ... @var{P@sub{k}} @var{P@sub{e}} @var{ellipsis} @var{P@sub{k+1}} ... @var{P@sub{k+l}} @stxlit{.} @var{P@sub{x}}@stxlit{)}
+where @var{E} is a list or improper list of @var{n} elements,
+the first @var{k} of which match @var{P@sub{1}} through @var{P@sub{k}},
+whose next @var{n-k-l} elements each match @var{P@sub{e}}, and whose
+remaining @var{l} elements match @var{P@sub{k+1}} through @var{P@sub{k+l}},
+and whose @var{n}th and final @code{cdr} matches @var{P@sub{x}}; or
+@item
+@var{P} is a vector of the form
+@stxlit{#(}@var{P@sub{1}} ... @var{P@sub{n}}@stxlit{)} and @var{E} is a
+vector of @var{n} elements that match @var{P@sub{1}} through @var{P@sub{n}}; or
+@item
+@var{P} is of the form
+@stxlit{#(}@var{P@sub{1}} ... @var{P@sub{k}} @var{P@sub{e}} @var{ellipsis} @var{P@sub{k+1}} ... @var{P@sub{k+l}}@stxlit{)}
+where @var{E} is a vector of @var{n} elements the first
+@var{k} of which match @var{P@sub{1}} through @var{P@sub{k}},
+whose next @var{n-k-l} elements each match @var{P@sub{e}},
+and whose remaining @var{l} elements match @var{P@sub{k+1}}
+through @var{P@sub{k+l}}; or
+@item
+@var{P} is a constant and E is equal to @var{P} in the sense of the
+@code{equal?} procedure.
+@end itemize
+
+It is an error to use a macro keyword, within the scope of
+its binding, in an expression that does not match any of
+the patterns.
+@display
+@stxdef{syntax-template} @stxref{identifier} | @stxref{constant}
+   | @stxlit{(}@arbno{@stxref{template-element}}@stxlit{)}
+   | @stxlit{(}@stxref{template-element} @arbno{@stxref{template-element}} @stxlit{.} @stxref{syntax-template} @stxlit{)}
+   | @stxlit{(} @stxref{ellipsis} @stxref{syntax-template}@stxlit{)}
+@stxdef{template-element} @stxref{syntax-template} [@stxref{ellipsis}]
+@end display
+
+When a macro use is transcribed according to the template
+of the matching @meta{syntax-rule}, pattern variables that occur
+in the template are replaced by the elements they match in
+the input. Pattern variables that occur in subpatterns followed
+by one or more instances of the identifier @meta{ellipsis} are
+allowed only in subtemplates that are followed by as many
+instances of @meta{ellipsis} . They are replaced in the output by
+all of the elements they match in the input, distributed as
+indicated. It is an error if the output cannot be built up
+as specified.
+
+Identifiers that appear in the template but are not pattern
+variables or the identifier @meta{ellipsis} are inserted into the output
+as literal identifiers. If a literal identifier is inserted as a
+free identifier then it refers to the binding of that identifier
+within whose scope the instance of @code{syntax-rules} appears.
+If a literal identifier is inserted as a bound identifier then
+it is in effect renamed to prevent inadvertent captures of
+free identifiers.
+
+A template of the
+form @stxlit{(}@meta{ellipsis} @meta{template}@stxlit{)} is
+identical to @meta{template} , except that @meta{ellipses}
+within the template have no special meaning.
+That is, any @meta{ellipses} contained within
+@meta{template} are treated as ordinary identifiers. In particular,
+the template @stxlit{(}@meta{ellipsis}  @meta{ellipsis}@stxlit{)}
+produces a single @meta{ellipsis}. This allows syntactic
+abstractions to expand into code containing ellipses.
+
+@example
+(define-syntax be-like-begin
+  (syntax-rules ()
+    ((be-like-begin name)
+     (define-syntax name
+       (syntax-rules ()
+         ((name expr (... ...))
+          (begin expr (... ...))))))))
+
+(be-like-begin sequence)
+(sequence 1 2 3 4) @result{} 4
+@end example
 
 @subsection Identifier predicates
 
@@ -3085,7 +3267,7 @@ since @code{else} is bound lexically and is therefore not the same
 @code{else} that appears in the definition of @func{case}.
 @end deffn
 
-@subsubsection Syntax-object and datum conversions
+@subsection Syntax-object and datum conversions
 
 @deffn Procedure {syntax->datum} @var{syntax-object}
 @deffnx {Deprecated procedure} {syntax-object->datum} @var{syntax-object}
@@ -3238,7 +3420,73 @@ where the original macro use appeared.
 @end example
 @end deffn
 
-@subsubsection Convenience forms
+@subsection Signaling errors in macro transformers
+
+@deffn Syntax syntax-error message @arbno{args}
+The @meta{message} and @meta{args} are treated similary as for
+the @code{error} procedure.  However, the error is reported
+when the @code{syntax-error} is expanded.
+This can be used as a @code{syntax-rules}
+template for a pattern that is an invalid use of the
+macro, which can provide more descriptive error messages.
+The @meta{message} should be a string literal, and the @var{args}
+arbitrary (non-evalualted) expressions providing additional information.
+
+@example
+(define-syntax simple-let
+  (syntax-rules ()
+    ((_ (head ... ((x . y) val) . tail)
+       body1 body2 ...)
+     (syntax-error "expected an identifier but got" (x . y)))
+    ((_ ((name val) ...) body1 body2 ...)
+     ((lambda (name ...) body1 body2 ...)
+      val ...))))
+@end example
+@end deffn
+
+@deffn Procedure report-syntax-error location message
+This is a procedure that can be called at macro-expansion time
+by a syntax transformer function.
+(In contrast @code{syntax-error} is a syntax form used in the
+expansion result.)
+The @var{message} is reported as a compile-time error message.
+The @var{location} is used for the source location (file name and
+line/column numbers): In general it can be a @code{SourceLocator} value;
+most commonly it is a syntax object for a sub-list of the input form
+that is erroneous.
+The value returned by @code{report-syntax-error} is an
+instance of @code{ErrorExp}, which supresses further compilation.
+
+@example
+(define-syntax if
+  (lambda (x)
+    (syntax-case x ()
+                 ((_ test then)
+                  (make-if-exp #'test #'then #!null))
+                 ((_ test then else)
+                  (make-if-exp #'test #'then #'else))
+                 ((_ e1 e2 e3 . rest)
+                  (report-syntax-error #'rest
+                   "too many expressions for 'if'"))
+                 ((_ . rest)
+                  (report-syntax-error #'rest
+                   "too few expressions for 'if'")))))
+@end example
+In the above example, one could use the source form @code{x} for the
+location, but using @code{#'rest} is more accurate.  Note that the following
+is incorrect, because @code{e1} might not be a pair, in which case
+we don't have location information for it (due to a Kawa limitation):
+@example
+    (syntax-case x ()
+                 ...
+                 ((_ e1)
+                  (report-syntax-error
+                   #'e1 ;; @i{poor location specifier}
+                   "too few expressions for 'if'")))))
+@end example
+@end deffn
+
+@subsection Convenience forms
 
 @deffn Syntax with-syntax ((@var{pattern} @stxref{expression}) @dots{}) @stxref{body}
 The @func{with-syntax} form is used to bind pattern variables, just as
@@ -16236,17 +16484,6 @@ It would be useful to extend the @code{import} form (and also the
 needed (as done in the @code{require} form when an explicit filename is given).
 In interactive mode, if the module is already loaded, check if it is updated
 - if not recompile and re-load it.
-
-@subsection Optimize switches (case)
-
-Implement @code{SwitchExp} as a new class extending @code{Expression},
-and compile it using the existing @code{gnu.bytecode.SwitchState}.
-Use it to optimize Scheme's @code{case} form.
-This might be better done without a new @code{Expression},
-but instead using a special @code{Procedure} with custom
-``validation'' and code-generation.
-
-(This is a fairly small starter project.)
 
 @anchor{task-parameterized-types}
 @subsection Parameterized types

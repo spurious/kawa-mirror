@@ -89,11 +89,11 @@
 		    (syntax->expression (syntax test))
 		    (syntax->expression (syntax then))
 		    (syntax->expression (syntax else))))
-		 ((_ e1 e2 e3 e4 . rest)
-		  (report-syntax-error (syntax e4)
+		 ((_ e1 e2 e3 . rest)
+		  (report-syntax-error #'rest
 				"too many expressions for 'if'"))
 		 ((_ . rest)
-		  (report-syntax-error (syntax rest)
+		  (report-syntax-error #'rest
 				"too few expressions for 'if'")))))
 
 (define-rewrite-syntax try-catch

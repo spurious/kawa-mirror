@@ -1,3 +1,8 @@
+2014-09-07  Per Bothner  <per@bothner.com>
+
+	* syntax.scm: Update for '%syntax-error' -> 'syntax-error' renaming.
+	* std_syntax.scm: Likewise.
+
 2014-09-04  Per Bothner  <per@bothner.com>
 
 	* prim_syntax.scm (syntax-error): Rename to ...

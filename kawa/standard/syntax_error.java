@@ -5,7 +5,7 @@ import gnu.expr.*;
 import gnu.kawa.functions.DisplayFormat;
 import gnu.kawa.io.CharArrayOutPort;
 
-/** Implements the Kawa extension "%syntax-error".
+/** Implements the "syntax-error" form.
  * Prints out its arguments in an error message.
  * @author	Per Bothner
  */
@@ -13,7 +13,7 @@ import gnu.kawa.io.CharArrayOutPort;
 public class syntax_error extends Syntax
 {
   public static final syntax_error syntax_error = new syntax_error();
-  static { syntax_error.setName("%syntax-error"); }
+  static { syntax_error.setName("syntax-error"); }
 
   public Expression rewrite (Object obj, Translator tr)
   {

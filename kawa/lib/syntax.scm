@@ -196,7 +196,7 @@
 
 (define-syntax cond-expand
   (syntax-rules (and or not else)
-    ((cond-expand) (%syntax-error "Unfulfilled cond-expand"))
+    ((cond-expand) (syntax-error "Unfulfilled cond-expand"))
     ((cond-expand (else body ...))
      (begin body ...))
     ((cond-expand ((and) body ...) more-clauses ...)

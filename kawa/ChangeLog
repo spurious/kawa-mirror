@@ -1,3 +1,9 @@
+2014-09-07  Per Bothner  <per@bothner.com>
+
+	* standard/Scheme.java (initScheme): Renamed '5syntax-error'
+	to 'syntax-error', which is in r7rs.
+	* standard/syntax_error.java: updated.
+
 2014-09-05  Per Bothner  <per@bothner.com>
 
 	* lang/SyntaxTemplate.java (convert_template): Convert literal

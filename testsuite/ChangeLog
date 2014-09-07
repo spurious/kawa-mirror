@@ -1,3 +1,8 @@
+2014-09-07  Per Bothner  <per@bothner.com>
+
+	* errors4.scm: New test from r7rs of 'syntax-error'.
+	* Makefile.am: Update accordingly.
+
 2014-09-03  Per Bothner  <per@bothner.com>
 
 	* r7rs-tests.scm: Tests for ellipsis in middle of syntax pattern list.

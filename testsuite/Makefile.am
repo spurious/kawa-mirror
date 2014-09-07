@@ -607,7 +607,8 @@ check-bridge:
 	$(KAWA) $(OPTIONS) "$(srcdir)/bridge.scm"
 
 CLEANFILES = tmp* *.log testing.zip revcomp-input.txt knucleotide-input.txt regexdna-input.txt *.class HelloCgiK HelloCgiS
-SCRIPTS_TO_RUN = case-warnings.scm uninit1.scm errors1.scm errors2.scm errors3.scm\
+SCRIPTS_TO_RUN = case-warnings.scm uninit1.scm \
+  errors1.scm errors2.scm errors3.scm errors4.scm \
   convert1.scm inner-1.scm lambda-in-class-1.scm reflect1.scm reflect2.scm \
   promise1.scm bad-keywords1.scm splice1.scm standards1.scm \
   anonymous-lambda-1.scm unreach1.scm unreach2.scm unreach3.scm \

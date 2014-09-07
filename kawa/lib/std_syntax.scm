@@ -19,7 +19,7 @@
 		 (begin result1 result2 ...))
 
 		((cond (else result1 result2 ...) clause1 ...)
-		 (%syntax-error "else clause must be last clause of cond"))
+		 (syntax-error "else clause must be last clause of cond"))
 
 		((cond (test => result))
 		 (%let ((temp test))
@@ -102,9 +102,9 @@
 		((%let-init (var type init))
 		 init)
 		((%let-init (var))
-		 (%syntax-error "let binding with no value"))
+		 (syntax-error "let binding with no value"))
 		((%let-init (var a b c))
-		 (%syntax-error
+		 (syntax-error
 		  "let binding must have syntax: (var [type] init)"))))
 
 (define-syntax let
@@ -132,10 +132,10 @@
      (%let (var-init)
 	   (let* bindings . body)))
     ((let* bindings . body)
-     (%syntax-error
+     (syntax-error
       "invalid bindings list in let*"))
     ((let* . body)
-     (%syntax-error
+     (syntax-error
       "missing bindings list in let*"))))
 
 ;;; DO
@@ -161,9 +161,9 @@
 		((%do-init (var type init))
 		 init)
 		((%do-init (var))
-		 (%syntax-error "do binding with no value"))
+		 (syntax-error "do binding with no value"))
 		((%do-init (var a b c))
-		 (%syntax-error
+		 (syntax-error
 		  "do binding must have syntax: (var [:: type] init [step])"))))
 
 (define-syntax %do-lambda1

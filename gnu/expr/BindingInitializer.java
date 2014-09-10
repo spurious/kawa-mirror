@@ -79,7 +79,7 @@ public class BindingInitializer extends Initializer
               code.emitPushNull();
             else
               comp.compileConstant(property, Target.pushObject);
-            code.emitInvokeStatic(typeThreadLocation.getDeclaredMethod("getInstance", 2));
+            code.emitInvokeStatic(typeDynamicLocation.getDeclaredMethod("getInstance", 2));
           }
 	else if (decl.isFluid())
           {
@@ -121,8 +121,10 @@ public class BindingInitializer extends Initializer
     messages.swapSourceLocator(saveLoc);
   }
 
-  static final ClassType typeThreadLocation =
-    ClassType.make("gnu.mapping.ThreadLocation");
+    static final ClassType typeThreadLocation =
+      ClassType.make("gnu.mapping.ThreadLocation");
+    static final ClassType typeDynamicLocation =
+      ClassType.make("gnu.mapping.DynamicLocation");
 
   public static Method makeLocationMethod (Object name)
   {

@@ -22,8 +22,6 @@ public class BuiltinEnvironment extends Environment
 
   public NamedLocation lookup (Symbol name, Object property, int hash)
   {
-    if (property == ThreadLocation.ANONYMOUS)
-      return null;
     Language lang = Language.getDefaultLanguage();
     return lang == null ? null : lang.lookupBuiltin(name, property, hash);
   }

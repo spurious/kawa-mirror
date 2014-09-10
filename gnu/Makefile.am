@@ -141,6 +141,7 @@ GNU_LISTS_JSOURCES = \
 GNU_MAPPING_JSOURCES = \
   mapping/CallContext.java \
   mapping/ConstrainedLocation.java \
+  mapping/DynamicLocation.java \
   mapping/Environment.java \
   mapping/EnvironmentKey.java \
   mapping/Future.java \

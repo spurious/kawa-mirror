@@ -1085,7 +1085,7 @@ public abstract class Language
         if (isAlias) {
             fdecl.setIndirectBinding(true);
             if (ftype instanceof ClassType
-                && ((ClassType) ftype).isSubclass("gnu.mapping.ThreadLocation"))
+                && ((ClassType) ftype).isSubclass("gnu.mapping.DynamicLocation"))
                 fdecl.setFlag(Declaration.IS_DYNAMIC);
         }
         else if (isFinal && ftype instanceof ClassType) {

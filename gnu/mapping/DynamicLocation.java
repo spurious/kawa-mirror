@@ -8,31 +8,19 @@ package gnu.mapping;
 
 public class DynamicLocation<T> extends NamedLocation<T> implements Named
 {
-    SharedLocation<T> global;
-
     private int hash;
 
     static SimpleEnvironment env;
 
-    public DynamicLocation (Symbol name, Object property, SharedLocation global)  {
+    public DynamicLocation (Symbol name, Object property)  {
         super(name, property);
         hash = name.hashCode() ^ System.identityHashCode(property);
-        this.global = global;
-    }
-
-    /** Set the default/global value. */
-    public void setGlobal(T value) {
-        synchronized (this) {
-            if (global == null)
-                global = new SharedLocation<T>(this.name, null, 0);
-            global.set(value);
-        }
     }
 
     /** Get the thread-specific Location for this Location. */
     public NamedLocation<T> getLocation() {
         Environment curenv = Environment.getCurrent();
-        NamedLocation<T> loc =  curenv.getLocation(name, property, hash, true);
+        NamedLocation<T> loc = curenv.getLocation(name, property, hash, true);
         return loc;
     }
 
@@ -82,9 +70,8 @@ public class DynamicLocation<T> extends NamedLocation<T> implements Named
             = (IndirectableLocation) env.getLocation(name, property);
         if (loc.base != null)
             return (DynamicLocation) loc.base;
-        DynamicLocation tloc = new DynamicLocation(name, property, null);
+        DynamicLocation tloc = new DynamicLocation(name, property);
         loc.base = tloc;
         return tloc;
     }
 }
-

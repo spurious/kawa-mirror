@@ -1,5 +1,8 @@
 2014-09-10  Per Bothner  <per@bothner.com>
 
+	* DynamicLocation.java (global): Remove field and uses of it.
+	(setGlobal): Remove method.
+
 	* ThreadLocation.java: Split into two classes: for "anonymous"
 	thread-locals use ThreadLocarion.  Otherwise use new class:
 	* DynamicLocation.java: New class for dynamic named variables.

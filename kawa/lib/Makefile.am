@@ -32,6 +32,7 @@ java_SCM_ALWAYS =\
   kawa/string-cursors.scm \
   kawa/hashtable.scm kawa/regex.scm rnrs/hashtables.scm rnrs/lists.scm \
   srfi95.scm rnrs/unicode.scm rnrs/sorting.scm rnrs/programs.scm \
+  scheme/complex.scm scheme/cxr.scm \
   compile_misc.scm compile_map.scm \
   trace.scm
 

@@ -1,3 +1,9 @@
+2014-09-13  Per Bothner  <per@bothner.com>
+
+	* scheme/cxr.scm: New file, implements r7rs library (scheme cxr).
+	* scheme/complex.scm: Likewise for r7rs library (scheme complex).
+	* Makefile.am: Update accordingly.
+
 2014-09-07  Per Bothner  <per@bothner.com>
 
 	* prim_syntax.scm (if): Tweak for more precise error message.

@@ -1,3 +1,12 @@
+2014-09-15  Helmut Eller  <eller.helmut@gmail.com>
+	    Per Bothner  <per@bothner.com>
+
+	* sva43131.scm: New test based on Savannah bug #43131
+	"Poor support for re-defining toplevel variables".
+	* test.scm: Move test, which now passes but only if --no-inline, to ...
+	* define3.scm: New file for moved test.
+	* Makefile.am: Update accordingly.
+
 2014-09-07  Per Bothner  <per@bothner.com>
 
 	* errors4.scm: New test from r7rs of 'syntax-error'.

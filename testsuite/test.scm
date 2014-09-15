@@ -29,7 +29,7 @@
 ;;; send corrections or additions to jaffer@ai.mit.edu or
 ;;; Aubrey Jaffer, 84 Pleasant St., Wakefield MA 01880, USA
 
-(TEST-INIT "scm-test" 621)(define errs '())
+(TEST-INIT "scm-test" 617)(define errs '())
 
 ;(define test
 ;  (lambda (expect fun . args)
@@ -226,21 +226,7 @@
 (test '(list 3 4) 'quasiquote (quasiquote (list (unquote (+ 1 2)) 4)))
 (test '`(list ,(+ 1 2) 4) 'quasiquote '(quasiquote (list (unquote (+ 1 2)) 4)))
 (SECTION 5 2 1)
-(define add3 (lambda (x) (+ x 3)))
-(test 6 'define (add3 3))
-(define first car)
-(test 1 'define (first '(1 2)))
-(define old-+ +)
-(set! fail-expected "+ is resolved at compile-time, not run-time")
-(begin (begin (begin)
-	      (begin (begin (begin) (define + (lambda (x y) (list y x)))
-			    (begin)))
-	      (begin))
-       (begin)
-       (begin (begin (begin) (test '(3 6) add3 6)
-		     (begin))))
-(set! + old-+)
-(test 9 add3 6)
+;; some tests moved to define3.scm because they only work if --no-inline
 (begin)
 (begin (begin))
 (begin (begin (begin (begin))))
@@ -1104,7 +1090,7 @@
 (SECTION 6 10 2)
 (test #\; peek-char this-file)
 (test #\; read-char this-file)
-(test '(TEST-INIT "scm-test" 621) read this-file)
+(test '(TEST-INIT "scm-test" 617) read this-file)
 (test #\( peek-char this-file)
 (test '(define errs '()) read this-file)
 (close-input-port this-file)

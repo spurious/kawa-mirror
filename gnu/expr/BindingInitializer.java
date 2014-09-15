@@ -96,8 +96,10 @@ public class BindingInitializer extends Initializer
           }
         else
           {
+            if (name instanceof String)
+              name = Namespace.EmptyNamespace.getSymbol(((String)name).intern());
             comp.compileConstant(name, Target.pushObject);
-            code.emitInvokeStatic(makeLocationMethod(name));
+            code.emitInvokeStatic(Compilation.typeLocation.getDeclaredMethod("define", 1));
           }
       }
     else

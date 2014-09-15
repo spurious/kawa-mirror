@@ -169,4 +169,22 @@ public abstract class Location<T>
     loc.value = UNBOUND;
     return loc;
   }
+
+    /** Implement top-level 'define' for Scheme in interactive mode.
+     * I.e. if there is no binding, create it;
+     * if the existing binding is non-constant, set its value;
+     * if it is constant, create a new binding initialized to the old value
+     * (though we actually change the binding to non-constant).
+     */
+    public static Location define(Symbol name) {
+        Environment env = Environment.getCurrent();
+        int hash = name.hashCode();
+        NamedLocation loc = env.getLocation(name, null, hash, true);
+        if (loc.isConstant()) {
+            Object value = loc.get(Location.UNBOUND);
+            loc.value = value;
+            loc.base = null;
+        }
+        return loc;
+    }
 }

@@ -1,3 +1,8 @@
+2014-09-15  Per Bothner  <per@bothner.com>
+
+	* Location.java (define): New static method, used top-level
+	'define' in Scheme interactive mode.
+
 2014-09-10  Per Bothner  <per@bothner.com>
 
 	* DynamicLocation.java (global): Remove field and uses of it.

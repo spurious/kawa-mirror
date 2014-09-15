@@ -10,6 +10,7 @@ public class ThreadLocation<T> extends NamedLocation<T> implements Named {
     static int counter;
     private static synchronized int nextCounter() { return ++counter; }
 
+    /** Used for a binding that was explicitly set to null. */
     static final Object NULL_PROXY = new Object();
 
     private ThreadLocal thLocal;

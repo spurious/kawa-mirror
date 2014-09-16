@@ -268,8 +268,10 @@ public class Shell
                   sawError = false;
 		if (comp == null) // ??? end-of-file
 		  break;
-		if (sawError)
-		  continue;
+		if (sawError) {
+                    comp.lexical.pop(comp.mainLambda);
+                    continue;
+                }
 
 		// Skip whitespace, in case (read-char) or similar is called:
 		int ch;

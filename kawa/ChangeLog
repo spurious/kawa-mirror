@@ -1,5 +1,8 @@
 2014-09-15  Per Bothner  <per@bothner.com>
 
+	* Shell.java (run): If parse or rewrite error, pop the new
+	ModuleExp to clear semi-processed declarations.
+
 	* lang/SyntaxPattern.java (printSyntaxPatternMatch):  New static flag.
 	(match): Maybe print log information.
 	* repl.java: Maybe set printSyntaxPatternMatch.

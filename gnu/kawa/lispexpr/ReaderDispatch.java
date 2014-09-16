@@ -98,7 +98,7 @@ public class ReaderDispatch extends ReadTableEntry
 	in.error('e', in.getName(),
                  in.getLineNumber() + 1, in.getColumnNumber(),
                  "invalid dispatch character '"+((char) ch)+'\'');
-	return Values.empty;
+	return Char.make('?');
       }
     return entry.read(in, ch, count, sharingIndex);
   }

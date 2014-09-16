@@ -1,3 +1,8 @@
+2014-09-14  Per Bothner  <per@bothner.com>
+
+	* ReaderDispatch.java (read): Return a non-empty value on an
+	invalid dispatch character - it seems less likely to cause confusion.
+
 2014-08-28  Per Bothner  <per@bothner.com>
 
 	* LangPrimType.java (isCompatibleWithValue): Add hack for charType.

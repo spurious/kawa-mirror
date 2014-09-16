@@ -1,5 +1,7 @@
 2014-09-15  Per Bothner  <per@bothner.com>
 
+	* std_syntax.scm (and, or): Use underscore in pattern top-level.
+
 	* syntax.scm (%string-format-enclosed-args): Add missing
 	literal $splice$.
 

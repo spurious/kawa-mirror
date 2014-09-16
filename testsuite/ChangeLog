@@ -1,3 +1,10 @@
+2014-09-16  Alex Shinn <alexshinn@gmail.com>
+	    Per Bothner  <per@bothner.com>
+
+	* numeric-tests.scm: New numeric tests imported fro Chibi-scheme.
+	* Makefile.am: Updated accordingly.
+	* num-test.scm: Rename name used for log file to avoid conflict.
+
 2014-09-16  Per Bothner  <per@bothner.com>
 
 	* r7rs-tests.scm: Add some string->number tests.

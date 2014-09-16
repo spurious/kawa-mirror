@@ -596,6 +596,7 @@ public class LispReader extends Lexer
    *   '\0' yields an inact or inexact depending on the form of the literal,
    *   while ' ' is like '\0' but does not allow more exactness specifiers.
    * @param radix the number base to use or 0 if unspecified
+   *   A negative radix is an overideable default.
    * @return the number if a valid number; null or a String-valued error
    *   message if if there was some error parsing the number.
    */
@@ -615,22 +616,22 @@ public class LispReader extends Lexer
 	switch (ch)
 	  {
 	  case 'b':  case 'B':
-	    if (radix != 0)
+	    if (radix > 0)
 	      return "duplicate radix specifier";
 	    radix = 2;
 	    break;
 	  case 'o':  case 'O':
-	    if (radix != 0)
+	    if (radix > 0)
 	      return "duplicate radix specifier";
 	    radix = 8;
 	    break;
 	  case 'd':  case 'D':
-	    if (radix != 0)
+	    if (radix > 0)
 	      return "duplicate radix specifier";
 	    radix = 10;
 	    break;
 	  case 'x':  case 'X':
-	    if (radix != 0)
+	    if (radix > 0)
 	      return "duplicate radix specifier";
 	    radix = 16;
 	    break;
@@ -659,7 +660,7 @@ public class LispReader extends Lexer
 	      }
 	    if (ch == 'R' || ch == 'r')
 	      {
-		if (radix != 0)
+		if (radix > 0)
 		  return "duplicate radix specifier";
 		if (value < 2 || value > 35)
 		  return "invalid radix specifier";
@@ -674,8 +675,12 @@ public class LispReader extends Lexer
       }
     if (exactness == '\0')
       exactness = ' ';
-    if (radix == 0)
+    if (radix < 0)
+        radix = -radix;
+    else if (radix == 0)
       {
+        radix = 10;
+        /*
 	for (int i = count;  ; )
 	  {
 	    if (--i < 0)
@@ -691,6 +696,7 @@ public class LispReader extends Lexer
 		break;
 	      }
 	  }
+        */
       }
 
     boolean negative = ch == '-';

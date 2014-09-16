@@ -896,6 +896,9 @@
 
 (test 100 (string->number "100"))
 (test 256 (string->number "100" 16))
+(test 100 (string->number "#d100" 16))
+(test 256 (string->number "#x100" 10))
+(test #f (string->number "#d#x100" 16))
 (test 100.0 (string->number "1e2"))
 
 (test-end)

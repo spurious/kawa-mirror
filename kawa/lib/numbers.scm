@@ -351,9 +351,9 @@
   (make <gnu.lists.FString>
     (gnu.kawa.functions.Arithmetic:toString arg radix)))
 
-(define (string->number (str :: <string>) #!optional (radix :: <int> 10))
+(define (string->number (str :: <string>) #!optional (radix ::int 10))
   ::object
-  (let ((result (gnu.kawa.lispexpr.LispReader:parseNumber str radix)))
+  (let ((result (gnu.kawa.lispexpr.LispReader:parseNumber str (- radix))))
     (if (instance? result <gnu.math.Numeric>) result #f)))
 
 (define (quantity->number (q :: <quantity>)) :: <complex>

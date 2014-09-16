@@ -1,3 +1,8 @@
+2014-09-16  Per Bothner  <per@bothner.com>
+
+	* numbers.scm (string->number): Pass the negative of the radix to
+	indicate the radix is only a default.
+
 2014-09-15  Per Bothner  <per@bothner.com>
 
 	* std_syntax.scm (and, or): Use underscore in pattern top-level.

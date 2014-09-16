@@ -1,3 +1,7 @@
+2014-09-16  Per Bothner  <per@bothner.com>
+
+	* r7rs-tests.scm: Add some string->number tests.
+
 2014-09-15  Per Bothner  <per@bothner.com>
 
 	* srfi-109-test.scm: Test for bug reported by Ito Kazumitsu.

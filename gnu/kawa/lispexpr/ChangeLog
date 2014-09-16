@@ -1,3 +1,8 @@
+2014-09-16  Per Bothner  <per@bothner.com>
+
+	* LispReader.java (parseNumber): Interpret a negative radix as
+	an overloadable default.  Needed for string->number.
+
 2014-09-14  Per Bothner  <per@bothner.com>
 
 	* ReaderDispatch.java (read): Return a non-empty value on an

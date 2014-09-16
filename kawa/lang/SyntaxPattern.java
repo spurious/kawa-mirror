@@ -20,6 +20,9 @@ public class SyntaxPattern extends Pattern implements Externalizable
    * following instruction. */
   String program;
 
+    /** A string (if non-null) of the form FILENAME:LINENUMBER. */
+    String fileLine;
+
   public static final SimpleSymbol underscoreSymbol = Symbol.valueOf("_");
 
   /** This 3-bit "opcode" is used for shorter operand-less instructions. */
@@ -86,8 +89,10 @@ public class SyntaxPattern extends Pattern implements Externalizable
 	OutPort err = OutPort.errDefault();
 	err.print("{match ");
 	DisplayFormat.schemeWriteFormat.writeObject(obj, err);
-	err.print(" in ");
-	err.print(((Translator) Compilation.getCurrent()).getCurrentSyntax());
+        if (fileLine != null) {
+            err.print(" in ");
+            err.print(fileLine);
+        }
 	if (r)
 	  {
 	    err.print(" -> vars: ");
@@ -105,11 +110,13 @@ public class SyntaxPattern extends Pattern implements Externalizable
     return r;
   }
 
-  public SyntaxPattern (String program, Object[] literals, int varCount)
+  public SyntaxPattern (String program, Object[] literals,
+                        int varCount, String fileLine)
   {
     this.program = program;
     this.literals = literals;
     this.varCount = varCount;
+    this.fileLine = fileLine;
   }
 
   public SyntaxPattern (Object pattern,
@@ -130,6 +137,12 @@ public class SyntaxPattern extends Pattern implements Externalizable
     literals = new Object[literalsbuf.size()];
     literalsbuf.copyInto(literals);
     varCount = tr.patternScope.pattern_names.size();
+    String filename = tr.getFileName();
+    int fileslash = filename.replace(File.separatorChar, '/').lastIndexOf('/');
+    fileLine = fileslash >= 0 ? filename.substring(fileslash+1) : filename;
+    int line = tr.getLineNumber();
+    if (line > 0)
+        fileLine = fileLine + ':' + line;
     /* DEBUGGING:
     System.err.print("{translated pattern");
     Macro macro = tr.currentMacroDefinition;
@@ -138,13 +151,12 @@ public class SyntaxPattern extends Pattern implements Externalizable
 	System.err.print(" for ");
 	System.err.print(macro);
       }
-    String file = tr.getFileName();
+    String file = filename;
     if (file != null)
       {
 	System.err.print(" file=");
 	System.err.print(file);
       }
-    int line = tr.getLineNumber();
     if (line > 0)
       {
 	System.err.print(" line=");
@@ -609,6 +621,7 @@ public class SyntaxPattern extends Pattern implements Externalizable
     out.writeObject(program);
     out.writeObject(literals);
     out.writeInt(varCount);
+    out.writeUTF(fileLine == null ? "" : fileLine);
   }
 
   public void readExternal(ObjectInput in)
@@ -617,6 +630,9 @@ public class SyntaxPattern extends Pattern implements Externalizable
     literals = (Object[]) in.readObject();
     program = (String)  in.readObject();
     varCount = in.readInt();
+    String fline = in.readUTF();
+    if (fline != null)
+        fileLine = fline;
   }
 
     /** The compiler calls this method to implement syntax-case. */
@@ -701,8 +717,13 @@ public class SyntaxPattern extends Pattern implements Externalizable
     return literals;
   }
 
-  public void print (Consumer out)
-  {
-    out.write("#<syntax-pattern>");
-  }
+    public String toString() {
+        StringBuilder sbuf = new StringBuilder("#<syntax-pattern");
+        if (fileLine != null) {
+            sbuf.append(' ');
+            sbuf.append(fileLine);
+        }
+        sbuf.append('>');
+        return sbuf.toString();
+    }
 }

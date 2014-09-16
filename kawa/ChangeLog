@@ -1,3 +1,12 @@
+2014-09-15  Per Bothner  <per@bothner.com>
+
+	* lang/SyntaxPattern.java (fileLine): New field.
+	(<init>): Set fileLine.
+	(writeExternal, readExternal): Write/set fileLine.
+	(match): Use fileLine.
+	(toString): New method.
+	* lang/Pattern.java (print): New default method.
+
 2014-09-07  Per Bothner  <per@bothner.com>
 
 	* lang/Translator.java (pushPositionOf): Generalize to SourceLocator.

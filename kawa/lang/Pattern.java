@@ -1,6 +1,7 @@
 package kawa.lang;
 import gnu.bytecode.*;
 import gnu.expr.Compilation;
+import gnu.lists.Consumer;
 import gnu.text.Printable;
 
 /**
@@ -37,4 +38,8 @@ abstract public class Pattern implements Printable
   { Type.pointer_type, Compilation.objArrayType, Type.intType  };
   static public final Method matchPatternMethod
   = typePattern.addMethod("match", matchArgs, Type.booleanType, Access.PUBLIC);
+
+    public void print(Consumer out) {
+        out.write(toString());
+    }
 }

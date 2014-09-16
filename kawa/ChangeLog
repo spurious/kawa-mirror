@@ -1,5 +1,9 @@
 2014-09-15  Per Bothner  <per@bothner.com>
 
+	* lang/SyntaxPattern.java (printSyntaxPatternMatch):  New static flag.
+	(match): Maybe print log information.
+	* repl.java: Maybe set printSyntaxPatternMatch.
+
 	* lang/SyntaxPattern.java (fileLine): New field.
 	(<init>): Set fileLine.
 	(writeExternal, readExternal): Write/set fileLine.

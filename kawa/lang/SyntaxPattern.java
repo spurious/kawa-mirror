@@ -81,33 +81,36 @@ public class SyntaxPattern extends Pattern implements Externalizable
 
   public int varCount() { return varCount; }
 
-  public boolean match (Object obj, Object[] vars, int start_vars)
-  {
-    boolean r = match(obj, vars, start_vars, 0, null);
-    if (false)  // DEBUGGING
-      {
-	OutPort err = OutPort.errDefault();
-	err.print("{match ");
-	DisplayFormat.schemeWriteFormat.writeObject(obj, err);
-        if (fileLine != null) {
-            err.print(" in ");
-            err.print(fileLine);
+    /** Control logging to standard error on successful pattern match. */
+    public static boolean printSyntaxPatternMatch;
+
+    public boolean match(Object obj, Object[] vars, int start_vars) {
+        boolean r = match(obj, vars, start_vars, 0, null);
+        if (printSyntaxPatternMatch && r) {
+            OutPort log = OutPort.errDefault();
+            log.startLogicalBlock("{syntax-pattern ", false, "}");
+            log.setIndentation(-14, false);
+            if (fileLine != null) {
+                log.print(fileLine);
+            }
+            log.writeSpaceLinear();
+            log.print("match ");
+            DisplayFormat.schemeWriteFormat.writeObject(obj, log);
+            if (r) {
+                log.print(" -> vars: ");
+                for (int i = start_vars;  i < vars.length;  i++) {
+                    log.writeSpaceLinear();
+                    log.print(i);
+                    log.print(" : ");
+                    DisplayFormat.schemeWriteFormat.writeObject(vars[i], log);
+                }
+            }
+            else
+                log.println(" -> failed");
+            log.endLogicalBlock("}");
+            log.println();
         }
-	if (r)
-	  {
-	    err.print(" -> vars: ");
-	    for (int i = start_vars;  i < vars.length;  i++)
-	      {
-		err.println();
-		err.print("  " + i +" : ");
-		DisplayFormat.schemeWriteFormat.writeObject(vars[i], err);
-	      }
-	    err.println('}');
-	  }
-	else
-	  err.println(" -> failed}");
-      }
-    return r;
+        return r;
   }
 
   public SyntaxPattern (String program, Object[] literals,

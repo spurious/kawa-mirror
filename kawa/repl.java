@@ -17,6 +17,7 @@ import gnu.kawa.io.OutPort;
 import gnu.kawa.io.Path;
 import gnu.kawa.io.WriterManager;
 import gnu.kawa.util.ExitCalled;
+import kawa.lang.SyntaxPattern;
 
 /** Start a "Read-Eval-Print-Loop" for the Kawa Scheme evaluator. */
 
@@ -608,6 +609,10 @@ public class repl extends Procedure0or1
 	else if (arg.equals("--debug-print-final-expr"))
 	  {
 	    Compilation.debugPrintFinalExpr = true;
+	  }
+	else if (arg.equals("--debug-syntax-pattern-match"))
+	  {
+	    SyntaxPattern.printSyntaxPatternMatch = true;
 	  }
 	else if (arg.equals("--debug-error-prints-stack-trace"))
 	  {

@@ -1,3 +1,8 @@
+2014-09-15  Per Bothner  <per@bothner.com>
+
+	* syntax.scm (%string-format-enclosed-args): Add missing
+	literal $splice$.
+
 2014-09-13  Per Bothner  <per@bothner.com>
 
 	* scheme/cxr.scm: New file, implements r7rs library (scheme cxr).

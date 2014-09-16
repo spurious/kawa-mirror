@@ -1,3 +1,7 @@
+2014-09-15  Per Bothner  <per@bothner.com>
+
+	* srfi-109-test.scm: Test for bug reported by Ito Kazumitsu.
+
 2014-09-15  Helmut Eller  <eller.helmut@gmail.com>
 	    Per Bothner  <per@bothner.com>
 

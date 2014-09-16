@@ -144,6 +144,10 @@ b}
          '($string$ "abc  def klm")
          "abc  def klm")
 
+(strtest &{<&[(string-length "a/b/c")]>}
+         '($string$ "<" $<<$ (string-length "a/b/c")  $>>$ ">")
+         "<5>")
+
 (strtest &{m&[3]&[4]n}
          '($string$ "m" $<<$ 3 $>>$ $<<$ 4 $>>$ "n")
          "m34n")

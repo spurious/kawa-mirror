@@ -318,7 +318,7 @@
                          
 ;; Collect format arguments, assuming we're inside $<<$ ... $>>$
 (define (%string-format-enclosed-args forms)
-  (syntax-case forms ($format$ $<<$ $>>$)
+  (syntax-case forms ($format$ $splice$ $<<$ $>>$)
     (() '())
     (($>>$ . rest)
      (%string-format-args #'rest))

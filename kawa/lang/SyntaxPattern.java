@@ -101,7 +101,7 @@ public class SyntaxPattern extends Pattern implements Externalizable
                 for (int i = start_vars;  i < vars.length;  i++) {
                     log.writeSpaceLinear();
                     log.print(i);
-                    log.print(" : ");
+                    log.print(": ");
                     DisplayFormat.schemeWriteFormat.writeObject(vars[i], log);
                 }
             }

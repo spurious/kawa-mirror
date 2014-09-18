@@ -376,6 +376,7 @@
 
 (define (read #!optional (port :: <input-port> (current-input-port)))
   (let ((lexer (gnu.kawa.lispexpr.LispReader:new port)))
+    (lexer:setReturnMutablePairs #t)
     (try-catch
      (let ((result (lexer:readObject)))
        (if (lexer:seenErrors)

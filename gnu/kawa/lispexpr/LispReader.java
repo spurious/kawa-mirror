@@ -28,6 +28,10 @@ public class LispReader extends Lexer
     super(port, messages);
   }
 
+    boolean returnMutablePairs;
+    /** Set whether returned pairs are mutable or not (the default). */
+    public void setReturnMutablePairs(boolean v) { returnMutablePairs = v; }
+
   GeneralHashTable<Integer,Object> sharedStructureTable;
 
     /** Bind value to index in sharingStructuretable.
@@ -506,10 +510,9 @@ public class LispReader extends Lexer
             if (ch == '[' && rtable.defaultBracketMode == -2) {
                 port.read();
                 Object lst = ReaderParens.readList(this, null, ch, 1, ']', -1);
-                value = PairWithPosition.make(value, lst,
-                                              port.getName(), line+1, column+1);
-                value = PairWithPosition.make(LispLanguage.bracket_apply_sym, value,
-                                              port.getName(), line+1, column+1);
+                value = makePair(value, lst, line, column);
+                value = makePair(LispLanguage.bracket_apply_sym, value,
+                                              line, column);
             } else if (ch == rtable.postfixLookupOperator) {
                 // A kludge to map PreOpWord to ($lookup$ Pre 'Word).
                 port.read();
@@ -529,8 +532,8 @@ public class LispReader extends Lexer
                 }
                 value = LList.list2(value,
                                     LList.list2(rtable.makeSymbol(LispLanguage.quote_str), rightOperand));
-                value = PairWithPosition.make(LispLanguage.lookup_sym, value,
-                                              port.getName(), line+1, column+1);
+                value = makePair(LispLanguage.lookup_sym, value,
+                                 line, column);
             }
             else
                 break;
@@ -1216,7 +1219,7 @@ public class LispReader extends Lexer
   protected Pair makePair (Object car, Object cdr, int line, int column)
   {
     String pname = port.getName();
-    if (pname != null && line >= 0)
+    if (! returnMutablePairs && pname != null && line >= 0)
       return PairWithPosition.make(car, cdr,
                                    pname, line + 1, column + 1);
     else

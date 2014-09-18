@@ -1,3 +1,7 @@
+2014-09-17  Per Bothner  <per@bothner.com>
+
+	* ports.scm (%write-shared%): Use new finishIDHash method.
+
 2014-09-16  Per Bothner  <per@bothner.com>
 
 	* numbers.scm (string->number): Pass the negative of the radix to

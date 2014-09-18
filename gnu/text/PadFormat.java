@@ -62,6 +62,8 @@ public class PadFormat extends ReportFormat
       }
     */
 
+      // FIXME: Should use a CharArrayOutPort instead of a StringBuffer;
+      // dst is already a CharArrayOutPort, re-use it.
     StringBuffer tbuf = new StringBuffer(200);
     if (fmt instanceof ReportFormat)
       start = ((ReportFormat)fmt).format(args, start, tbuf, fpos);

@@ -289,10 +289,7 @@
     (try-finally
      (fmt:format value out)
      (pretty-out:setSharing #f))
-    (pretty-out:clearIDHash)
-    (pretty-out:writeEndOfExpression)
-    (pretty-out:resolveBackReferences)
-    (pretty-out:flush)))
+    (pretty-out:finishIDHash)))
 
 (define (write
 	 value #!optional (out ::output-port (current-output-port))) ::void

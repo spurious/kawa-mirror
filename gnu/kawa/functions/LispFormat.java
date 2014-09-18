@@ -167,20 +167,17 @@ public class LispFormat extends CompoundFormat
             fmt = dfmt.resolve(null, 0);
 	    break;
 	  case 'A':  case 'S':  case 'W':
-	  case 'Y':  // SRFI-48 "yuppify" (pretty-print)
-	    // We don't distinguish between ~S and ~W.  FIXME.
-	    fmt = ObjectFormat.getInstance(ch != 'A');
-	    if (numParams > 0)
-	      {
-		minWidth = getParam(stack, speci);
-		int colInc = getParam(stack, speci+1);
-		int minPad = getParam(stack, speci+2);
-		padChar = getParam(stack, speci+3);
-		fmt = new LispObjectFormat((ReportFormat) fmt,
-					   minWidth, colInc, minPad,
-					   padChar, seenAt ? 0 : 100);
-	      }
-	    break;
+	  case 'Y': {// SRFI-48 "yuppify" (pretty-print)
+              // We don't distinguish between ~S and ~W.  FIXME.
+              minWidth = getParam(stack, speci);
+              int colInc = getParam(stack, speci+1);
+              int minPad = getParam(stack, speci+2);
+              padChar = getParam(stack, speci+3);
+              fmt = new LispObjectFormat(ObjectFormat.getInstance(ch != 'A'),
+                                         minWidth, colInc, minPad,
+                                         padChar, seenAt ? 0 : 100);
+              }
+              break;
 	  case 'C':
 	    charVal = numParams > 0 ? getParam(stack, speci)
 	      : PARAM_FROM_LIST;
@@ -754,9 +751,9 @@ class LispObjectFormat extends ReportFormat
   int minPad;
   int padChar;
   int where;
-  ReportFormat base;
+  ObjectFormat base;
 
-  public LispObjectFormat(ReportFormat base,
+  public LispObjectFormat(ObjectFormat base,
 			  int minWidth, int colInc, int minPad, int padChar,
 			  int where)
   {
@@ -779,6 +776,21 @@ class LispObjectFormat extends ReportFormat
     if (this.minPad == LispFormat.PARAM_FROM_LIST)  start++;
     char padChar = getParam(this.padChar, ' ', args, start);
     if (this.padChar == LispFormat.PARAM_FROM_LIST)  start++;
+    if (base.readable && dst instanceof OutPort
+        // PadFormat formats to a temporary StringBuffer (i.e. not a
+        // PrettyWriter) so we don't support sharing anyway.
+        // FIXME in ParFormat.
+        && minWidth == 0) {
+        PrettyWriter pdst = ((OutPort) dst).getPrettyWriter();
+        pdst.initialiseIDHash();
+        pdst.setSharing(true);
+        try {
+            return base.format(args, start, dst, fpos);
+        } finally {
+            pdst.setSharing(false);
+            pdst.finishIDHash();
+        }
+    }
     return gnu.text.PadFormat.format(base, args, start, dst,
 				     padChar, minWidth, colInc, minPad,
 				     where, fpos);

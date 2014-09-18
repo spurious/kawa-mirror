@@ -176,6 +176,13 @@ public class PrettyWriter extends java.io.Writer
     idhash.clear();
   }
   
+    public void finishIDHash() {
+        idhash.clear();
+        writeEndOfExpression();
+        resolveBackReferences();
+        flush();
+    }
+
   public int IDHashLookup(Object obj) {
     if (idhash == null) initialiseIDHash();
     return idhash.lookup(obj);

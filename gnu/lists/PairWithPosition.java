@@ -98,6 +98,15 @@ public class PairWithPosition extends ImmutablePair
     return pair;
   }
 
+    /** Should only be used when initializing a PairWithPosition instance. */
+    public void init(Object car, Object cdr,
+                     String filename, int position) {
+        this.car = car;
+        this.cdr = cdr;
+        this.filename = filename;
+        this.position = position;
+    }
+
   /**
    * @serialData Write the car followed by the cdr,
    *   followed by filename (as an Object, so it can be shared),
@@ -111,12 +120,12 @@ public class PairWithPosition extends ImmutablePair
     out.writeInt(position);
   }
 
-  public void readExternal(ObjectInput in)
-    throws IOException, ClassNotFoundException
-  {
-    car = in.readObject();
-    cdr = in.readObject();
-    filename = (String) in.readObject();
-    position = in.readInt();
-  }
+    public void readExternal(ObjectInput in)
+        throws IOException, ClassNotFoundException {
+        Object car = in.readObject();
+        Object cdr = in.readObject();
+        String filename = (String) in.readObject();
+        int position = in.readInt();
+        init(car, cdr, filename, position);
+    }
 }

@@ -1,4 +1,4 @@
-(test-init "Objects" 142)
+(test-init "Objects" 143)
 
 ;; Force procedure to be applied without being inlined:
 (define-syntax force-eval
@@ -184,6 +184,12 @@
 (require <module3>)
 
 (test 13 'Savannah-bug-40822 (macro2))
+
+(let* ((all0 (all-zeros))
+       (nlen (gnu.lists.LList:listLength all0 #t)))
+  (test "#0=(0 . #0#) len:-1" 'Savannah-bug-43233
+        (format #f "~w len:~d" all0 nlen)))
+
 
 (define-variable dvar3 4)
 (test '(2 3 13) 'dvar-test-1 dvar-test-1)

@@ -649,7 +649,9 @@ public class LitTable implements ObjectOutput
 	  }
 	if (useDefaultInit)
 	  {
-	    method = getMethod(type, "set", literal, false);
+	    method = getMethod(type, "init", literal, false);
+            if (method == null)
+                method = getMethod(type, "set", literal, false);
 	    // otherwise error;
 	  }
 	if (method == null && literal.argTypes.length > 0)

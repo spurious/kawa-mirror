@@ -1,3 +1,10 @@
+2014-09-17  Helmut Eller  <eller.helmut@gmail.com>
+	    Per Bothner  <per@bothner.com>
+
+	* module3.scm (all-zeros): Add test for Savannah bug #43233
+	"Dumping circular literals".
+	* obj-test.scm: Test all-zeros.
+
 2014-09-16  Alex Shinn <alexshinn@gmail.com>
 	    Per Bothner  <per@bothner.com>
 

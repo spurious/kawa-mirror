@@ -1,3 +1,8 @@
+2014-09-18  Alex Shinn <alexshinn@gmail.com>
+
+	* r7rs-tests.scm: Import a exact-integer-sqrt test from the Chibi
+	version. This forced a re-implementation of exact-integer-sqrt.
+
 2014-09-17  Helmut Eller  <eller.helmut@gmail.com>
 	    Per Bothner  <per@bothner.com>
 

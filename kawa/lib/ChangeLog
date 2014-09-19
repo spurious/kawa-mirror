@@ -1,5 +1,8 @@
 2014-09-18  Per Bothner  <per@bothner.com>
 
+	* numbers.scm (exact-integer-sqrt): Re-implement using a variant
+	of the "Babylonian method".
+
 	* ports.scm (read): Call setReturnMutablePairs so mutable pairs
 	get created, for better standards-compliance.
 

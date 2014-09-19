@@ -2,6 +2,10 @@
 (require <kawa.lib.std_syntax>)
 (require <kawa.lib.syntax>)
 (require <kawa.lib.misc>)
+(define-alias Double java.lang.Double)
+(define-alias IntNum gnu.math.IntNum)
+(define-alias Numeric gnu.math.Numeric)
+(define-alias RealNum gnu.math.RealNum)
 
 (define-private (java.lang.real? x) ::boolean
   (and (java.lang.Number? x)
@@ -378,41 +382,24 @@
 (define (duration duration) :: <gnu.math.Duration>
   (gnu.math.Duration:parseDuration duration))
 
-#| The algorithm of exact-integer-sqrt is from chibi-scheme,
-which has:
-Copyright (c) 2009-2012 Alex Shinn
-All rights reserved.
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions
-are met:
-1. Redistributions of source code must retain the above copyright
-   notice, this list of conditions and the following disclaimer.
-2. Redistributions in binary form must reproduce the above copyright
-   notice, this list of conditions and the following disclaimer in the
-   documentation and/or other materials provided with the distribution.
-3. The name of the author may not be used to endorse or promote products
-   derived from this software without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
-IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
-INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-|#
-
 (define (exact-integer-sqrt (i ::integer))
   (if (< i 0)
       (primitive-throw (java.lang.IllegalArgumentException
-                        (format #f "negative argument: ~A" i)))
-      (let ((res (sqrt i)))
-        (let lp ((res ::integer (inexact->exact (truncate res))))
-          (let ((rem ::integer (- i (* res res))))
-            (if (negative? rem)
-                (lp (quotient (+ res (quotient i res)) 2))
-                (values res rem)))))))
+                        (format #f "negative argument: ~A" i))))
+  (let* ((dval ::double (i:doubleValue))
+         (init ::integer ;; initial approximation
+               (if (Double:isInfinite dval) 
+                   (IntNum:shift 1 (i:intLength))
+                   (RealNum:toExactInt (java.lang.Math:sqrt dval)
+                                       Numeric:TRUNCATE))))
+    ;; "Babylonian method"
+    (let loop ((q ::integer init)) ;; q is current approximation
+      (let ((rem (- i (* q q))))
+        ;; Continue if rem<0 or (q+1)^2<=i
+        (if (or (< rem 0)
+                ;; Because rem=i-q^2, we can simplify (q+1)^2<=i
+                ;; to q^2+2*q+1<=q^2+rem or 2*q+1<=rem
+                (<= (IntNum:shift q 1) (- rem 1)))
+            ;; Next q is average of old q and i/q
+            (loop (IntNum:shift (+ q (IntNum:quotient i q)) -1))
+            (values q rem))))))

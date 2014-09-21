@@ -33,17 +33,18 @@ public class TemplateScope extends LetExp implements Externalizable
 
   public static TemplateScope make ()
   {
-    return make((Translator) Compilation.getCurrent());
+    return make((Translator) Compilation.getCurrent(), null);
   }
 
-    public static TemplateScope make (Translator tr) {
-        TemplateScope templateScope = new TemplateScope();
+    public static TemplateScope make (Translator tr, ScopeExp savedScope) {
+        TemplateScope templateScope = new TemplateScope(savedScope);
         if (tr != null) {
             templateScope.macroMark = tr.currentMacroMark;
             Syntax curSyntax = tr.getCurrentSyntax();
             if (curSyntax instanceof Macro) {
-                templateScope.outer = ((Macro) curSyntax).getCapturedScope();
                 templateScope.macroContext = tr.macroContext;
+                if (savedScope == null)
+                    templateScope.outer = ((Macro) curSyntax).getCapturedScope();
             }
             templateScope.syntax = curSyntax;
         }

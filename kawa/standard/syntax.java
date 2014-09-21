@@ -103,7 +103,8 @@ public class syntax extends kawa.lang.Quote
       matchArray = new ReferenceExp(patternScope.matchArray);
     Expression[] args = { new QuoteExp(template), matchArray, new ReferenceExp(tr.templateScopeDecl) };
     return new ApplyExp(ClassType.make("kawa.lang.SyntaxTemplate")
-			.getDeclaredMethod("execute", 2),
+			.getDeclaredMethod("execute",
+                                           new Type[]{null, typeTemplateScope}),
 			args);
   }
 }

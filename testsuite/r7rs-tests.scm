@@ -487,6 +487,7 @@
 (test '#((10 43) (31 41 51) (32 42 52) (63 77) ("rest:" . "tail"))
       (part-2x 10 (+ 21 22) (31 32) (41 42) (51 52) (+ 61 2) 77 . "tail"))
 
+;; underscore
 (define-syntax count-to-2
   (syntax-rules ()
     ((_) 0)
@@ -495,6 +496,27 @@
     ((_ . _) 'many)))
 (test '(2 0 many)
       (list (count-to-2 a b) (count-to-2) (count-to-2 a b c d)))
+
+(define-syntax count-to-2_
+  (syntax-rules (_)
+    ((_) 0)
+    ((_ _) 1)
+    ((_ _ _) 2)
+    ((x . y) 'fail)))
+(test '(2 0 fail fail)
+    (list (count-to-2_ _ _) (count-to-2_)
+          (count-to-2_ a b) (count-to-2_ a b c d)))
+
+(define-syntax jabberwocky
+  (syntax-rules ()
+    ((_ hatter)
+     (begin
+       (define march-hare 42)
+       (define-syntax hatter
+         (syntax-rules ()
+           ((_) march-hare)))))))
+(jabberwocky mad-hatter)
+(test 42 (mad-hatter))
 
 (test 'ok (let ((=> #f)) (cond (#t => 'ok))))
 

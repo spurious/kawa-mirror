@@ -1,3 +1,8 @@
+2014-09-21  Alex Shinn <alexshinn@gmail.com>
+
+	* r7rs-tests.scm: Merge two more tests from Chibi,
+	including a previously-failing one.
+
 2014-09-18  Alex Shinn <alexshinn@gmail.com>
 
 	* r7rs-tests.scm: Import a exact-integer-sqrt test from the Chibi

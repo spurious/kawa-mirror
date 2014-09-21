@@ -99,7 +99,7 @@ public class SyntaxForms {
         if (checkBound) {
             // Note that SRFI-72 specifies:
             // (bound-identifier=? (syntax x) (syntax x)) => #f
-            // but MzScheme/Rackets and Chez Scheme return #t.
+            // but MzScheme/Racket and Chez Scheme return #t.
             // SRFI-72 says: "Two identifiers will also be bound-identifier=?
             // if they were produced from existing bound-identifier=?
             // identifiers during a single evaluation of the same syntax or

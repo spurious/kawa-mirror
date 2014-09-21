@@ -21,6 +21,8 @@ public class SyntaxTemplate implements Externalizable {
      */
     String template_program;
 
+    ScopeExp savedScope;
+
     /** Template instructions that don't have an operand value. */
     static final int BUILD_MISC = 0;
 
@@ -136,7 +138,6 @@ public class SyntaxTemplate implements Externalizable {
     }
     END DEBUGGING */
 
-
     protected SyntaxTemplate() {
     }
 
@@ -152,6 +153,9 @@ public class SyntaxTemplate implements Externalizable {
                           Object ellipsis, Translator tr) {
         this.patternNesting = tr == null || tr.patternScope == null ? ""
             : tr.patternScope.patternNesting.toString();
+        savedScope = tr.currentScope();
+        if (savedScope instanceof PatternScope)
+            savedScope = savedScope.outer;
         StringBuilder program = new StringBuilder();
         java.util.Vector literals_vector = new java.util.Vector ();
         IdentityHashMap seen = new IdentityHashMap();
@@ -392,9 +396,8 @@ public class SyntaxTemplate implements Externalizable {
         return result;
     }
 
-    public Object execute(Object[] vars, Translator tr,
-                          TemplateScope templateScope) {
-        return execute(0, vars, 0, new int[max_nesting], tr, templateScope);
+    public Object execute(Object[] vars, Translator tr) {
+        return execute(0, vars, 0, new int[max_nesting], tr, TemplateScope.make(tr, savedScope));
     }
 
     Object get_var(int var_num, Object[] vars, int[] indexes) {
@@ -462,7 +465,7 @@ public class SyntaxTemplate implements Externalizable {
         for (int level=0;  level < nesting; level++)
             System.err.print ((level > 0 ? " " : "") + indexes[level]);
         System.err.println("]}");
-       /*/
+        */
         while ((ch & 7) == BUILD_WIDE)
             ch = ((ch - BUILD_WIDE) << 13) |	template_program.charAt(++pc);
         if (ch == BUILD_LIST1) {

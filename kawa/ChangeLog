@@ -1,3 +1,13 @@
+2014-09-20  Per Bothner  <per@bothner.com>
+
+	Remember current scope when we create a TemplateScope.  Just remembering
+	the macro scope may be insufficient for generated macros.
+	* lang/SyntaxTemplate.java (savedScope): New field.
+	(execute): Don't take TemplateScope parameter, instead calculate it.
+	* lang/SyntaxRules.java (<init>)update call to execute.
+	* lang/TemplateScope.java (make): Take savedScope parameter.
+	* standard/syntax.java: Update to disambiguate execute method.
+
 2014-09-15  Per Bothner  <per@bothner.com>
 
 	* Shell.java (run): If parse or rewrite error, pop the new

@@ -220,7 +220,7 @@ public class SyntaxRules extends Procedure1
                     err.flush();
                     */
                 }
-                Object expansion = rule.execute(vars, tr, TemplateScope.make(tr));
+                Object expansion = rule.execute(vars, tr);
 
                 if (false) { // DEBUGGING:
                     OutPort err = OutPort.errDefault();

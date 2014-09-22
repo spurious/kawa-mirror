@@ -461,4 +461,7 @@
 (test-assert (< 0 1/0))
 (test-assert (> 4.5 -1/0))
 
+(define (circle-area radius) (* java.lang.Math:PI (expt radius 2)))
+(test-approximate 28.27 (circle-area 3) 0.1)
+
 (test-end)

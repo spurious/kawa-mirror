@@ -104,7 +104,7 @@ public class Arithmetic
       case REALNUM_CODE:
         return typeRealNum;
       case NUMERIC_CODE:
-        return typeNumeric;
+        return LangObjType.numericType;
       default:
         return Type.pointer_type;
       }
@@ -118,7 +118,6 @@ public class Arithmetic
   static LangObjType typeRatNum = LangObjType.rationalType;
   static LangObjType typeRealNum = LangObjType.realType;
   static ClassType typeNumber = ClassType.make("java.lang.Number");
-  static ClassType typeNumeric = ClassType.make("gnu.math.Numeric");
   static LangObjType typeIntNum = LangObjType.integerType;
 
   public static int classifyType (Type type)
@@ -161,7 +160,7 @@ public class Arithmetic
       return BIGDECIMAL_CODE;
     else if (type.isSubtype(typeRealNum))
       return REALNUM_CODE;
-    else if (type.isSubtype(typeNumeric))
+    else if (type.isSubtype(LangObjType.numericType))
       return NUMERIC_CODE;
     else if (type instanceof LazyType)
       return classifyType(((LazyType) type).getValueType());

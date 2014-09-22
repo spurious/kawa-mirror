@@ -1,3 +1,8 @@
+2014-09-21  Alcides Flores Pineda <alcides.fp@gmail.com>
+	    Per Bothner  <per@bothner.com>
+
+	* num-test.scm: New test for mixing Kawa Numeric with Java double.
+
 2014-09-21  Alex Shinn <alexshinn@gmail.com>
 
 	* r7rs-tests.scm: Merge two more tests from Chibi,

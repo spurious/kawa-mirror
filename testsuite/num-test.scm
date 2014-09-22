@@ -1,4 +1,4 @@
-(test-begin "num" 1879)
+(test-begin "num" 1880)
 
 (test-equal 7 (+ 3 4))
 (test-equal 3 (+ 3))

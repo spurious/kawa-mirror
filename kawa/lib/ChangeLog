@@ -1,3 +1,7 @@
+2014-09-22  Per Bothner  <per@bothner.com>
+
+	* syntax.scm (define-values): New syntax.  Copied from R7RS
+
 2014-09-18  Per Bothner  <per@bothner.com>
 
 	* numbers.scm (exact-integer-sqrt): Re-implement using a variant

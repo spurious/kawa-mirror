@@ -1,3 +1,7 @@
+2014-09-22  Per Bothner  <per@bothner.com>
+
+	* standard/Scheme.java (initScheme): Define 'define-values'.
+
 2014-09-20  Per Bothner  <per@bothner.com>
 
 	Remember current scope when we create a TemplateScope.  Just remembering

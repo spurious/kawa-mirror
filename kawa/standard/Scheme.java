@@ -543,6 +543,7 @@ public class Scheme extends LispLanguage
 		   "callWithValues");
       defSntxStFld("let-values", "kawa.lib.syntax");
       defSntxStFld("let*-values", "kawa.lib.syntax");
+      defSntxStFld("define-values", "kawa.lib.syntax");
       defSntxStFld("case-lambda", "kawa.lib.syntax");
       defSntxStFld("receive", "kawa.lib.syntax");
       defProcStFld("eval", "kawa.lib.std_syntax");

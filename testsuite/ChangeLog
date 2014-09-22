@@ -1,3 +1,7 @@
+2014-09-22  Per Bothner  <per@bothner.com>
+
+	* r7rs-tests.scm: Enable tests for define-values.
+
 2014-09-21  Alcides Flores Pineda <alcides.fp@gmail.com>
 	    Per Bothner  <per@bothner.com>
 

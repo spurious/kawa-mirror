@@ -535,7 +535,6 @@
   (define bar (lambda (a b) (+ (* a b) a)))
   (foo (+ x 3))))
 
-(skip-if-kawa "define-values not implemented"
 (test 'ok
     (let ()
       (define-values () (values))
@@ -560,7 +559,6 @@
     (let ()
       (define-values (x y . z) (values 1 2 3 4))
       (+ x y (car z) (cadr z))))
-)
 
 (test '(2 1) (let ((x 1) (y 2))
   (define-syntax swap!

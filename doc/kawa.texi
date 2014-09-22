@@ -4820,6 +4820,24 @@ when passed some values, calls the @var{receiver} procedure
 with those values as arguments.
 @end deffn
 
+@deffn Syntax define-values @stxref{formals} @stxref{expression}
+It is an error if a variable appears more than once in the
+set of @meta{formals}.
+
+The @meta{expression} is evaluated, and the @meta{formals}
+are bound to the return values in the same way that the @meta{formals} in
+a @code{lambda} expression are matched to the arguments in a procedure call.
+
+@example
+(define-values (x y) (integer-sqrt 17))
+(list x y)    @result{} (4 1)
+(let ()
+  (define-values (x y) (values 1 2))
+  (+ x y))
+              @result{}  3
+@end example
+@end deffn
+
 @deffn Syntax let-values @stxlit{((}@stxref{formals} @stxref{expression}@stxlit{)} ...@stxlit{)} @stxref{body}
 Each @var{formals} should be a formal arguments list as for a @code{lambda}.
 
@@ -16304,7 +16322,7 @@ reference implementation.
 Simon Tatham wrote listsort.
 
 Aubrey Jaffer wrote much of SLIB, some of which has been
-imported into gnu.kawa.slib.
+imported into gnu.kawa.slib. He also wrote some tests we're using.
 
 @node Support
 @section Technical Support for Kawa

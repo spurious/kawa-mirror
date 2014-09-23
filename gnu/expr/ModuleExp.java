@@ -59,11 +59,12 @@ public class ModuleExp extends LambdaExp
     throws SyntaxException
   {
     ModuleExp mexp = comp.getModule();
+    ModuleInfo minfo = mexp.info;
     SourceMessages messages = comp.getMessages();
     try
       {
 
-        comp.minfo.loadByStages(Compilation.COMPILED);
+        minfo.loadByStages(Compilation.COMPILED);
 
 	if (messages.seenErrors())
 	  return null;
@@ -142,7 +143,6 @@ public class ModuleExp extends LambdaExp
               context.addClass(cclass);
           }
 
-        ModuleInfo minfo = comp.minfo;
         minfo.setModuleClass(clas);
         comp.cleanupAfterCompilation();
         int ndeps = minfo.numDependencies;
@@ -228,7 +228,6 @@ public class ModuleExp extends LambdaExp
     throws SyntaxException
   {
     ModuleExp mexp = comp.getModule();
-    mexp.info = comp.minfo;
     Environment orig_env = Environment.setSaveCurrent(env);
     Compilation orig_comp = Compilation.setSaveCurrent(comp);
     SourceMessages messages = comp.getMessages();
@@ -237,7 +236,7 @@ public class ModuleExp extends LambdaExp
     try
       {
         comp.process(Compilation.RESOLVED);
-        comp.minfo.loadByStages(Compilation.WALKED);
+        comp.getMinfo().loadByStages(Compilation.WALKED);
 
         if (msg != null ? messages.checkErrors(msg, 20) : messages.seenErrors())
           return null;
@@ -526,7 +525,7 @@ public class ModuleExp extends LambdaExp
     return decls;
   }
 
-  /** Return the class this module.
+  /** Return the class for this module.
    * If not set yet, sets it now, based on the source file name.
    */
   public ClassType classFor (Compilation comp)
@@ -536,10 +535,10 @@ public class ModuleExp extends LambdaExp
     String mname = getName();
     String className = getFileName();
     Path path = null;
-    if (comp.getModule() == this && comp.minfo != null
-        && comp.minfo.className != null)
+    if (comp.getModule() == this && info != null
+        && info.className != null)
       // If explicitly set, perhaps using command-line flags.
-      className = comp.minfo.className;
+      className = info.className;
     else
       {
         if (mname != null)

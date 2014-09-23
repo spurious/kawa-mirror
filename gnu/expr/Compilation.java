@@ -79,7 +79,6 @@ public class Compilation implements SourceLocator
   public static final int CLASS_WRITTEN = 16;
   public static final int ERROR_SEEN = 100;
 
-  public ModuleInfo minfo;
   public Lexer lexer;
 
   boolean pedantic;
@@ -988,7 +987,7 @@ public class Compilation implements SourceLocator
 	  new File(parent).mkdirs();
 	clas.writeToFile(out_name);
       }
-    minfo.cleanupAfterCompilation();
+    getMinfo().cleanupAfterCompilation();
   }
 
   public void cleanupAfterCompilation ()
@@ -996,6 +995,7 @@ public class Compilation implements SourceLocator
     for (int iClass = 0;  iClass < numClasses;  iClass++)
       classes[iClass].cleanupAfterCompilation();
     classes = null;
+    ModuleInfo minfo = getMinfo();
     minfo.className = mainClass.getName(); // In case it hasn't been set yet.
     minfo.setCompilation(null);
     // We don't clear minfo.exp itself, since it might be re-required.
@@ -1175,7 +1175,7 @@ public class Compilation implements SourceLocator
     if (curClass == mainClass
         // Optimization: No point in calling ModuleInfo.register if we aren't
         // compiling a named module.
-        && minfo != null && minfo.sourcePath != null
+        && getMinfo() != null && getMinfo().sourcePath != null
         && ! getModule().getFlag(ModuleExp.USE_DEFINED_CLASS))
       {
 	code.emitPushThis();
@@ -1944,9 +1944,9 @@ public class Compilation implements SourceLocator
 
         // Avoid writing class needlessly.
         if (! explicit && ! immediate
-            && minfo.checkCurrent(ModuleManager.getInstance(), System.currentTimeMillis()))
+            && getMinfo().checkCurrent(ModuleManager.getInstance(), System.currentTimeMillis()))
           {
-            minfo.cleanupAfterCompilation();
+            getMinfo().cleanupAfterCompilation();
             setState(CLASS_WRITTEN);
           }
 
@@ -2292,7 +2292,7 @@ public class Compilation implements SourceLocator
       }
 
     String uri;
-    if (minfo != null && (uri = minfo.getNamespaceUri()) != null)
+    if (getMinfo() != null && (uri = getMinfo().getNamespaceUri()) != null)
       {
         // Need to generate a ModuleSet for this class, so XQuery can find
         // this module and other modules in the same namespace.
@@ -3071,4 +3071,8 @@ public class Compilation implements SourceLocator
   {
     return "<compilation "+mainLambda+">";
   }
+
+    public ModuleInfo getMinfo() {
+        return mainLambda.info;
+    }
 }

@@ -283,9 +283,10 @@ public class require extends Syntax
         info.setClassName(comp.getModule().classFor(comp).getName());
       }
 
-    if (tr.minfo != null && tr.getState() < Compilation.BODY_PARSED)
+    ModuleInfo curinfo = tr.getMinfo();
+    if (curinfo != null && tr.getState() < Compilation.BODY_PARSED)
       {
-        tr.minfo.addDependency(info);
+        curinfo.addDependency(info);
 
         if (! info.loadEager(Compilation.COMPILED)
             && info.getState() < Compilation.RESOLVED)

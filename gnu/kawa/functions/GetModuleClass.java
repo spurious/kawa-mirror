@@ -92,7 +92,7 @@ public class GetModuleClass extends ProcedureN
         Expression value;
         if (comp.immediate)
           {
-            Path path = comp.minfo.getSourceAbsPath();
+            Path path = comp.getMinfo().getSourceAbsPath();
             if (path == null)
               path = Path.currentPath();
             if (! (path instanceof URLPath))

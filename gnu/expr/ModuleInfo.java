@@ -37,8 +37,8 @@ public class ModuleInfo
     this.comp = comp;
     if (comp == null)
         return;
-    comp.minfo = this;
     ModuleExp mod = comp.mainLambda;
+    mod.info = this;
     this.exp = mod;
     String fileName;
     if (mod != null && (fileName = mod.getFileName()) != null)

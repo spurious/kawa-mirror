@@ -1,3 +1,10 @@
+2014-09-23  Helmut Eller  <eller.helmut@gmail.com>
+	    Per Bothner  <per@bothner.com>
+
+	* sva42382.scm: New test for Savannah bug #42382
+	"Assigned but unused argument".
+	* Makefile.am: Update accordingly.
+
 2014-09-22  Per Bothner  <per@bothner.com>
 
 	* r7rs-tests.scm: Enable tests for define-values.

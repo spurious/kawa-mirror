@@ -289,7 +289,7 @@ public abstract class ScopeExp extends Expression
   {
     for (ScopeExp sc = this; sc != null; sc = sc.getOuter())
       {
-        if (sc ==  outer)
+        if (sc == outer)
           return true;
       }
     return false;

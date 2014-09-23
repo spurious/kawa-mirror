@@ -1212,9 +1212,6 @@ public class LambdaExp extends ScopeExp {
     void allocChildMethods(Compilation comp) {
         for (LambdaExp child = firstChild;  child != null;
              child = child.nextSibling) {
-            if (! child.isClassGenerated() && ! child.getInlineOnly()
-                && child.nameDecl != null && child.getFlag(Expression.VALIDATED))
-                child.allocMethod(this, comp);
             if (child instanceof ClassExp) {
                 ClassExp cl = (ClassExp) child;
                 if (cl.getNeedsClosureEnv())  {
@@ -1491,7 +1488,7 @@ public class LambdaExp extends ScopeExp {
             return;
         flags |= METHODS_COMPILED;
         if (primMethods == null)
-            return;
+            allocMethod(outerLambda(), comp);
         Method save_method = comp.method;
         LambdaExp save_lambda = comp.curLambda;
         comp.curLambda = this;

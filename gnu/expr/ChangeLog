@@ -1,5 +1,13 @@
 2014-09-23  Per Bothner  <per@bothner.com>
 
+	* LambdaExp.java (allocChildMethods): Don't call allocMethod on
+	child - instead do it lazily.  This avoids an inconsistency where
+	the Code attribute is created lazily, and fixes
+	Savannah bug #42382 "Assigned but unused argument".
+	(compileAsMethod): Call allocMethod if needed.
+
+2014-09-23  Per Bothner  <per@bothner.com>
+
 	* ScopeExp.java (outer): Make private.
 	(getOuter, setOuter): New accessor methods.
 

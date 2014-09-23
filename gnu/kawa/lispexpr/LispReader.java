@@ -1250,7 +1250,16 @@ public class LispReader extends Lexer
     throws java.io.IOException, SyntaxException
   {
     int startPos = reader.tokenBufferLength - previous;
-    reader.readToken(reader.read(), ReadTable.getCurrent());
+    ReadTable rtable = ReadTable.getCurrent();
+    for (;;) {
+        reader.readToken(reader.read(), rtable);
+        // '#' is a terminating-macro character so we have to add it "manually"
+        int ch = reader.peek();
+        if (ch != '#')
+            break;
+        reader.tokenBufferAppend(ch);
+        reader.skip();
+    }
     int endPos = reader.tokenBufferLength;
     if (startPos == endPos)
       {

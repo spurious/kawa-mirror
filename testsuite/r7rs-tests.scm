@@ -2210,10 +2210,8 @@
 (test-numeric-syntax "#o-10" -8 "-8")
 (test-numeric-syntax "#b-10" -2 "-2")
 ;; Combination of prefixes
-(skip-if-kawa "combination of prefixes broken"
 (test-numeric-syntax "#e#x10" 16 "16")
 (test-numeric-syntax "#i#x10" 16.0 "16.0" "16.")
-)
 ;; (Attempted) decimal notation with base prefixes
 (test-numeric-syntax "#d1." 1.0 "1.0" "1.")
 (test-numeric-syntax "#d.1" 0.1 "0.1" ".1" "100.0e-3")

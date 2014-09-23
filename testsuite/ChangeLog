@@ -1,3 +1,7 @@
+2014-09-23  Per Bothner  <per@bothner.com>
+
+	* r7rs-tests.scm: Enable "Combination of [numeric] prefixes" tests.
+
 2014-09-23  Helmut Eller  <eller.helmut@gmail.com>
 	    Per Bothner  <per@bothner.com>
 

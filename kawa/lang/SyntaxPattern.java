@@ -675,14 +675,14 @@ public class SyntaxPattern extends Pattern implements Externalizable
 	d1 = sc1.lookup(id1);
 	if (d1 != null)
 	  break;
-	sc1 = sc1.outer;
+	sc1 = sc1.getOuter();
       }
     while (sc2 != null && ! (sc2 instanceof ModuleExp))
       {
 	d2 = sc2.lookup(id2);
 	if (d2 != null)
 	  break;
-	sc2 = sc2.outer;
+	sc2 = sc2.getOuter();
       }
     return d1 == d2;
   }

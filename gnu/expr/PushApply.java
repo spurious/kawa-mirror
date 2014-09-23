@@ -206,7 +206,7 @@ public class PushApply extends ExpVisitor<Expression,Void>
         if (decl.context instanceof LetExp)
           {
             LambdaExp innerLambda = getCurrentLambda();
-            for (ScopeExp sc = innerLambda; sc != null; sc = sc.outer)
+            for (ScopeExp sc = innerLambda; sc != null; sc = sc.getOuter())
               {
                 if (sc == decl.context)
                   {

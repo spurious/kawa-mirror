@@ -590,9 +590,9 @@ public class object extends Syntax
     // If initMethod/clinitMethod were created by the "outer" (first) call
     // to rewriteInit, then we may need to fix up their outer chain.
     if (oexp.initMethod != null)
-      oexp.initMethod.outer = oexp;
+      oexp.initMethod.setOuter(oexp);
     if (oexp.clinitMethod != null)
-      oexp.clinitMethod.outer = oexp;
+      oexp.clinitMethod.setOuter(oexp);
     tr.pop(oexp);
   }
 

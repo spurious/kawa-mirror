@@ -410,7 +410,7 @@ public class LambdaExp extends ScopeExp {
     }
 
     public LambdaExp outerLambda() {
-        return outer == null ? null : outer.currentLambda ();
+        return getOuter() == null ? null : getOuter().currentLambda ();
     }
 
     public LambdaExp outerLambdaOrCaller() {
@@ -420,7 +420,7 @@ public class LambdaExp extends ScopeExp {
     /** Return the closest outer non-inlined LambdaExp. */
 
     public LambdaExp outerLambdaNotInline() {
-        for (ScopeExp exp = this; (exp = exp.outer) != null; ) {
+        for (ScopeExp exp = this; (exp = exp.getOuter()) != null; ) {
             if (exp instanceof LambdaExp) {
                 LambdaExp result = (LambdaExp) exp;
                 if (! result.getInlineOnly())
@@ -789,8 +789,8 @@ public class LambdaExp extends ScopeExp {
 
 
     public LambdaExp getOwningLambda() {
-        ScopeExp exp = outer;
-        for (;; exp = exp.outer) {
+        ScopeExp exp = getOuter();
+        for (;; exp = exp.getOuter()) {
             if (exp == null)
                 return null;
             if (exp instanceof ModuleExp
@@ -804,7 +804,7 @@ public class LambdaExp extends ScopeExp {
     void addMethodFor(Compilation comp, ObjectType closureEnvType) {
         ScopeExp sc = this;
         while (sc != null && ! (sc instanceof ClassExp))
-            sc = sc.outer;
+            sc = sc.getOuter();
         ClassType ctype;
         // If this is nested inside a Class, then create the method in that
         // class - in case it references a private field/method.
@@ -1743,8 +1743,8 @@ public class LambdaExp extends ScopeExp {
             // addMethodFor yet - since (except in the case of class methods)
             // that happens later, after FindCapturedVars.  Yuck.)
             boolean isStatic = nameDecl.isStatic();
-            if (! isStatic && outer instanceof ClassExp) {
-                ClassExp cl = (ClassExp) outer;
+            if (! isStatic && getOuter() instanceof ClassExp) {
+                ClassExp cl = (ClassExp) getOuter();
                 if (cl.isMakingClassPair()) {
                 }
             }
@@ -1757,7 +1757,7 @@ public class LambdaExp extends ScopeExp {
                 for (;;) {
                     if (curLambda == null)
                         return visitor.noteError("internal error: missing "+this);
-                    if (curLambda.outer == outer) // I.e. same class.
+                    if (curLambda.getOuter() == getOuter()) // I.e. same class.
                         break;
                     curLambda = curLambda.outerLambda();
                 }

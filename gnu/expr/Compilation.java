@@ -536,7 +536,7 @@ public class Compilation implements SourceLocator
      * methods getting too big.
      */
     static boolean avoidInline(LambdaExp proc) {
-        return proc.outer instanceof ModuleExp && proc.nameDecl != null;
+        return proc.getOuter() instanceof ModuleExp && proc.nameDecl != null;
     }
 
   public boolean isApplyFunction (Expression exp)
@@ -1190,7 +1190,7 @@ public class Compilation implements SourceLocator
 	LambdaExp save = curLambda;
 	curLambda = new LambdaExp();
 	curLambda.closureEnv = code.getArg(0);
-	curLambda.outer = save;
+	curLambda.setOuter(save);
         Initializer init;
 	while ((init = lexp.initChain) != null)
 	  {
@@ -2480,13 +2480,13 @@ public class Compilation implements SourceLocator
     ScopeExp sc = scope;
     while (scope_nesting > current_nesting)
       {
-	sc = sc.outer;
+	sc = sc.getOuter();
 	scope_nesting--;
       }
     while (sc != current_scope)
       {
 	pop(current_scope);
-	sc = sc.outer;
+        sc = sc.getOuter();
       }
     pushChain(scope, sc);
   }
@@ -2507,7 +2507,7 @@ public class Compilation implements SourceLocator
   {
     if (scope != limit)
       {
-	pushChain(scope.outer, limit);
+        pushChain(scope.getOuter(), limit);
         pushScope(scope);
         lexical.push(scope);
       }
@@ -2552,14 +2552,14 @@ public class Compilation implements SourceLocator
                 && scope instanceof LambdaExp
                 && ! (scope instanceof ModuleExp))))
       mustCompileHere();
-    scope.outer = current_scope;
+    scope.setOuter(current_scope);
     current_scope = scope;
   }
 
   public void pop (ScopeExp scope)
   {
     lexical.pop(scope);
-    current_scope = scope.outer;
+    current_scope = scope.getOuter();
   }
 
   public final void pop ()
@@ -2769,8 +2769,8 @@ public class Compilation implements SourceLocator
         fdecl.setInitValue(loopLambda);
         fdecl.noteValueFromLet(let);
         loopLambda.setName(fname);
-        let.outer = current_scope;
-        loopLambda.outer = let;
+        let.setOuter(current_scope);
+        loopLambda.setOuter(let);
         current_scope = loopLambda;
         return loopLambda;
     }
@@ -2796,7 +2796,7 @@ public class Compilation implements SourceLocator
         Expression[] inits = new Expression[ninits];
         for (int i = ninits;  --i >= 0; )
             inits[i] = (Expression) exprStack.pop();
-        LetExp let = (LetExp) loopLambda.outer;
+        LetExp let = (LetExp) loopLambda.getOuter();
         Declaration fdecl = let.firstDecl();  // The decls for loopLambda.
         let.setBody(new ApplyExp(new ReferenceExp(fdecl), inits));
         lexical.push(loopLambda);
@@ -2816,7 +2816,7 @@ public class Compilation implements SourceLocator
 
     /** Recurse to next iteration of specified loop. */
     public Expression loopRepeat(LambdaExp loop, Expression... exps) {
-        ScopeExp let = loop.outer;
+        ScopeExp let = loop.getOuter();
         Declaration fdecl = let.firstDecl();  // The decls for loopLambda.
         return new ApplyExp(new ReferenceExp(fdecl), exps);
     }
@@ -2824,10 +2824,10 @@ public class Compilation implements SourceLocator
     /** Finish building a loop and return resulting expression. */
     public Expression loopDone(Expression body) {
         LambdaExp loopLambda = (LambdaExp) current_scope;
-        ScopeExp let = loopLambda.outer;
+        ScopeExp let = loopLambda.getOuter();
         loopLambda.body = body;
         lexical.pop(loopLambda);
-        current_scope = let.outer;
+        current_scope = let.getOuter();
         return let;
     }
 
@@ -2836,14 +2836,14 @@ public class Compilation implements SourceLocator
      */
     public Expression loopRepeatDone(Expression... exps) {
         LambdaExp loopLambda = (LambdaExp) current_scope;
-        ScopeExp let = loopLambda.outer;
+        ScopeExp let = loopLambda.getOuter();
         Expression cond = (Expression) exprStack.pop();
         Expression recurse = loopRepeat(loopLambda, exps);
         loopLambda.body = new IfExp(cond,
                                     new BeginExp(loopLambda.body, recurse),
                                     QuoteExp.voidExp);
         lexical.pop(loopLambda);
-        current_scope = let.outer;
+        current_scope = let.getOuter();
         return let;
     }
 

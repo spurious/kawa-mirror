@@ -144,7 +144,7 @@ public class ChainLambdas extends ExpExpVisitor<ScopeExp> {
 
   protected Expression visitScopeExp (ScopeExp exp, ScopeExp scope)
   {
-    exp.outer = scope; 
+    exp.setOuter(scope); 
     exp.visitChildren(this, exp);
     exp.setIndexes();
     if (exp.mustCompile())
@@ -154,7 +154,7 @@ public class ChainLambdas extends ExpExpVisitor<ScopeExp> {
 
   protected Expression visitLetExp (LetExp exp, ScopeExp scope)
   {
-    exp.outer = scope;
+    exp.setOuter(scope);
     int count = 0;
     for (Declaration decl = exp.firstDecl(); decl != null; decl = decl.nextDecl())
       {
@@ -192,7 +192,7 @@ public class ChainLambdas extends ExpExpVisitor<ScopeExp> {
 	parent.firstChild = exp;
       }
 
-    exp.outer = scope;
+    exp.setOuter(scope);
     exp.firstChild = null;
     exp.visitChildrenOnly(this, exp);
     exp.visitProperties(this, exp);

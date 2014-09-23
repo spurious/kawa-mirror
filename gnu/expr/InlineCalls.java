@@ -744,7 +744,7 @@ public class InlineCalls extends ExpExpVisitor<Type> {
         if (exp.isClassMethod() && "*init*".equals(exp.getName())) {
             Expression bodyFirst = exp.getBodyFirstExpression();
             ClassType calledInit = exp.checkForInitCall(bodyFirst);
-            ClassExp cexp = (ClassExp) exp.outer;
+            ClassExp cexp = (ClassExp) exp.getOuter();
             ClassType superClass = cexp.instanceType.getSuperclass();
             if (calledInit != null) {
                 if (calledInit != cexp.instanceType && calledInit != superClass)

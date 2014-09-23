@@ -747,17 +747,17 @@ public class Translator extends Compilation
             dname = null;
             scope = null;
           }
-        for (;scope != null; scope = scope.outer)
+        for (;scope != null; scope = scope.getOuter())
           {
             if (scope instanceof LambdaExp
-                && scope.outer instanceof ClassExp // redundant? FIXME
+                && scope.getOuter() instanceof ClassExp // redundant? FIXME
                 && ((LambdaExp) scope).isClassMethod()
                 && mode != 'M')
               {
-                if (decl_nesting >= ScopeExp.nesting(scope.outer))
+                if (decl_nesting >= ScopeExp.nesting(scope.getOuter()))
                   break;
                 LambdaExp caller = (LambdaExp) scope;
-                ClassExp cexp = (ClassExp) scope.outer;
+                ClassExp cexp = (ClassExp) scope.getOuter();
                 ClassType ctype = (ClassType) cexp.getClassType();
                 // BUG: lookupMember doesn't work if ctype
                 // is a class that hasn't been compiled yet,
@@ -783,7 +783,7 @@ public class Translator extends Compilation
                 Expression part1;
                 // FIXME We're throwing away 'part', which is wasteful.
                 if (contextStatic)
-                  part1 = new ReferenceExp(((ClassExp) caller.outer).nameDecl);
+                  part1 = new ReferenceExp(((ClassExp) caller.getOuter()).nameDecl);
                 else
                   part1 = new ThisExp(caller.firstDecl());
                 return CompileNamedPart.makeExp(part1,
@@ -825,9 +825,9 @@ public class Translator extends Compilation
                   {
                     if (scope == null)
                       throw new Error("internal error: missing "+decl);
-                    if (scope.outer == decl.context) // I.e. same class.
+                    if (scope.getOuter() == decl.context) // I.e. same class.
                       break;
-                    scope = scope.outer;
+                    scope = scope.getOuter();
                   }
                 cdecl = scope.firstDecl();
               }
@@ -1650,7 +1650,7 @@ public class Translator extends Compilation
     int renamedAliasOldSize =
         renamedAliasStack == null ? 0 : renamedAliasStack.size();
     Pair first = formStack.last;
-    defs.outer = current_scope;
+    defs.setOuter(current_scope);
     current_scope = defs;
     try
       {

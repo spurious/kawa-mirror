@@ -319,7 +319,7 @@ public class ClassExp extends LambdaExp
             // if we're called from object.rewriteClassDef and there is some
             // funny macro expansion going on, in which case outer
             // might be a TemplateScope.
-            child.outer = this;
+            child.setOuter(this);
             if ((child != initMethod && child != clinitMethod
                  && child.nameDecl != null // only if error
                  && ! child.nameDecl.getFlag(Declaration.STATIC_SPECIFIED))
@@ -819,7 +819,7 @@ public class ClassExp extends LambdaExp
 
     public Declaration addMethod (LambdaExp lexp, Object mname) {
         Declaration mdecl = addDeclaration(mname, Compilation.typeProcedure);
-        lexp.outer = this;
+        lexp.setOuter(this);
         lexp.setClassMethod(true);
         mdecl.noteValue(lexp);
         mdecl.setFlag(Declaration.FIELD_OR_METHOD);

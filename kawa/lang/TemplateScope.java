@@ -28,7 +28,7 @@ public class TemplateScope extends LetExp implements Externalizable
 
   public TemplateScope (ScopeExp outer)
   {
-    this.outer = outer;
+    this.setOuter(outer);
   }
 
   public static TemplateScope make ()
@@ -44,7 +44,7 @@ public class TemplateScope extends LetExp implements Externalizable
             if (curSyntax instanceof Macro) {
                 templateScope.macroContext = tr.macroContext;
                 if (savedScope == null)
-                    templateScope.outer = ((Macro) curSyntax).getCapturedScope();
+                    templateScope.setOuter(((Macro) curSyntax).getCapturedScope());
             }
             templateScope.syntax = curSyntax;
         }
@@ -53,13 +53,13 @@ public class TemplateScope extends LetExp implements Externalizable
 
     public static TemplateScope make(ModuleExp module, String mname) {
         TemplateScope templateScope = new TemplateScope();
-        templateScope.outer = module;
+        templateScope.setOuter(module);
         return templateScope;
     }
 
     void init(Macro macro) {
-        outer = macro.getCapturedScope();
-        macroContext = outer.lookup(macro.getName());
+        setOuter(macro.getCapturedScope());
+        macroContext = getOuter().lookup(macro.getName());
         syntax = macro;
         macroMark = macro;
     }
@@ -71,7 +71,7 @@ public class TemplateScope extends LetExp implements Externalizable
     }
 
     void setOuter(String moduleClassName) {
-        outer = ModuleInfo.find(ClassType.make(moduleClassName)).getModuleExp();
+        setOuter(ModuleInfo.find(ClassType.make(moduleClassName)).getModuleExp());
     }
 
     public String toString() { return super.toString()+"(for "+syntax+")"; }
@@ -79,8 +79,8 @@ public class TemplateScope extends LetExp implements Externalizable
   public void writeExternal(ObjectOutput out) throws IOException
   {
       String moduleClassName = null;
-      if (outer instanceof ModuleExp) {
-          ClassType moduleClass = ((ModuleExp) outer).getClassType();
+      if (getOuter() instanceof ModuleExp) {
+          ClassType moduleClass = ((ModuleExp) getOuter()).getClassType();
           if (moduleClass != null)
               moduleClassName = moduleClass.getName();
       }

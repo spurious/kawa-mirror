@@ -1,3 +1,8 @@
+2014-09-23  Per Bothner  <per@bothner.com>
+
+	* ScopeExp.java (outer): Make private.
+	(getOuter, setOuter): New accessor methods.
+
 2014-09-17  Per Bothner  <per@bothner.com>
 
 	* LitTable.java (emit): If a cycle is seen, look for an "init"

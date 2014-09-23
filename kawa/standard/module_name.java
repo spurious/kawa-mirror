@@ -90,7 +90,7 @@ public class module_name extends Syntax {
             if (decl != null) {
                 decl.noteValue(tr.getModule());
                 decl.setFlag(Declaration.IS_CONSTANT|Declaration.PRIVATE_SPECIFIED);
-                if (module.outer == null)
+                if (module.getOuter() == null)
                     decl.setFlag(Declaration.STATIC_SPECIFIED);
                 decl.setPrivate(true);
                 decl.setType(Compilation.typeClass);

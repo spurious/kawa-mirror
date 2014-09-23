@@ -155,7 +155,7 @@ public class SyntaxTemplate implements Externalizable {
             : tr.patternScope.patternNesting.toString();
         savedScope = tr.currentScope();
         if (savedScope instanceof PatternScope)
-            savedScope = savedScope.outer;
+            savedScope = savedScope.getOuter();
         StringBuilder program = new StringBuilder();
         java.util.Vector literals_vector = new java.util.Vector ();
         IdentityHashMap seen = new IdentityHashMap();

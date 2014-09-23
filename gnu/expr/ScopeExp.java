@@ -114,13 +114,18 @@ public abstract class ScopeExp extends Expression
 
   public ScopeExp () { }
 
-  /** The statically enclosing binding contour. */
-  public ScopeExp outer;
+    /** The statically enclosing binding contour. */
+    private ScopeExp outer;
+
+    /** Return the statically enclosing binding contour. */
+    public ScopeExp getOuter() { return outer; }
+
+    public void setOuter(ScopeExp outer) { this.outer = outer; }
 
   public LambdaExp currentLambda ()
   {
     ScopeExp exp = this;
-    for (;; exp = exp.outer)
+    for (;; exp = exp.getOuter())
       {
 	if (exp == null)
 	  return null;
@@ -135,7 +140,7 @@ public abstract class ScopeExp extends Expression
     ScopeExp exp = this;
     for (;; )
       {
-        ScopeExp outer = exp.outer;
+        ScopeExp outer = exp.getOuter();
         if (outer == null || outer instanceof ModuleExp)
           return exp;
         exp = outer;
@@ -145,7 +150,7 @@ public abstract class ScopeExp extends Expression
   public ModuleExp currentModule ()
   {
     ScopeExp exp = this;
-    for (;; exp = exp.outer)
+    for (;; exp = exp.getOuter())
       {
 	if (exp == null)
 	  return null;
@@ -273,7 +278,7 @@ public abstract class ScopeExp extends Expression
     int n = 0;
     while (sc != null)
       {
-	sc = sc.outer;
+	sc = sc.getOuter();
 	n++;
       }
     return n;
@@ -282,7 +287,7 @@ public abstract class ScopeExp extends Expression
   /** True if given scope is nesed in this scope, perhaps indirectly. */
   public boolean nestedIn (ScopeExp outer)
   {
-    for (ScopeExp sc = this; sc != null; sc = sc.outer)
+    for (ScopeExp sc = this; sc != null; sc = sc.getOuter())
       {
         if (sc ==  outer)
           return true;

@@ -25,7 +25,7 @@ $(srcdir)/char-tables.iscm:
 scm-classes.stamp: $(srcdir)/char-tables.iscm
 
 # NOTE if this list is changed, also update build.xml.
-java_SCM = DefineRecordType.scm enums.scm readtable.scm \
+java_SCM = enums.scm readtable.scm \
   srfi1.scm srfi2.scm \
   conditions.scm srfi13.scm srfi14.scm srfi34.scm \
   srfi37.scm srfi60.scm srfi69.scm pregexp.scm \

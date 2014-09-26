@@ -18,6 +18,8 @@
 
 (module-export define-record-type)
 
+(require <kawa.lib.prim_syntax>)
+
 (define-syntax define-record-type
   (syntax-rules ()
     ((define-record-type type

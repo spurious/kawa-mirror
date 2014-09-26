@@ -766,7 +766,7 @@ public class Scheme extends LispLanguage
       defProcStFld("record-type-name", "kawa.lib.reflection");
       defProcStFld("record-type-field-names", "kawa.lib.reflection");
       defProcStFld("record?", "kawa.lib.reflection");
-      defSntxStFld("define-record-type", "gnu.kawa.slib.DefineRecordType");
+      defSntxStFld("define-record-type", "kawa.lib.DefineRecordType");
 
       defSntxStFld("when", "kawa.lib.syntax"); //-- (when cond exp ...)
       defSntxStFld("unless", "kawa.lib.syntax"); //-- (unless cond exp ...)
@@ -887,6 +887,7 @@ public class Scheme extends LispLanguage
 
       defAliasStFld("bytevector", "gnu.kawa.lispexpr.LangObjType",
                     "u8vectorType");
+      defProcStFld("bytevector?", "kawa.lib.bytevectors");
       defProcStFld("make-bytevector", "kawa.lib.bytevectors");
       defProcStFld("bytevector-length", "kawa.lib.bytevectors");
       defProcStFld("bytevector-u8-ref", "kawa.lib.bytevectors");

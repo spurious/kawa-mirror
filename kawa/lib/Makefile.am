@@ -10,6 +10,7 @@ java_SCM_ALWAYS =\
   syntax.scm \
   lists.scm \
   case_syntax.scm \
+  DefineRecordType.scm \
   ExceptionClasses.scm \
   exceptions.scm \
   thread.scm \

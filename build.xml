@@ -525,6 +525,7 @@
         <file name="syntax.scm"/>
         <file name="lists.scm"/>
         <file name="case_syntax.scm"/>
+        <file name="DefineRecordType.scm"/>
         <file name="ExceptionClasses.scm"/>
         <file name="exceptions.scm"/>
         <file name="thread.scm"/>
@@ -586,7 +587,6 @@
 	   prefix="gnu.kawa.slib." modulestatic="run"
 	   language="scheme">
       <filelist dir="${src.dir}/gnu/kawa/slib">
-        <file name="DefineRecordType.scm"/>
         <file name="enums.scm"/>
         <file name="readtable.scm"/>
         <file name="srfi1.scm"/>

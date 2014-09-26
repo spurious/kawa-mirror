@@ -2,6 +2,9 @@
 (require <kawa.lib.std_syntax>)
 (require <kawa.lib.syntax>)
 
+(define (bytevector? x) ::boolean
+  (instance? x bytevector))
+
 (define (make-bytevector (n ::int) #!optional (init ::int 0)) :: bytevector
   (make gnu.lists.U8Vector n init))
 

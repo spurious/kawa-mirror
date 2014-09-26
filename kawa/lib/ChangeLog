@@ -1,3 +1,9 @@
+2014-09-26  Per Bothner  <per@bothner.com>
+
+	* DefineRecordType.java: Moved from gnu/kawa/slib.
+	* Makefile.am: Update accordingly.
+	* bytevectors.scm (bytevector?): New function.
+
 2014-09-22  Per Bothner  <per@bothner.com>
 
 	* syntax.scm (define-values): New syntax.  Copied from R7RS

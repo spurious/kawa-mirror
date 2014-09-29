@@ -1,5 +1,16 @@
 2014-09-28  Per Bothner  <per@bothner.com>
 
+	* scheme/base.scm: New file for R7RS standard library.
+	* scheme/case-lambda.scm: Likewise.
+	* scheme/char.scm
+	* scheme/inexact.scm: Likewise.
+	* scheme/load.scm: Likewise.
+	* scheme/process-context.scm: Likewise.
+	* scheme/read.scm: Likewise.
+	* scheme/time.scm: Likewise.
+	* scheme/write.scm: Likewise.
+	* Makefile.am: Update accordingly.
+
 	* misc_syntax.scm (include, include-relative): Remove.
 	Now handled by kawa.standard.Include.
 

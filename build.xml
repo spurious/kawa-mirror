@@ -556,6 +556,16 @@
         <file name="rnrs/unicode.scm"/>
         <file name="rnrs/sorting.scm"/>
         <file name="rnrs/programs.scm"/>
+        <file name="scheme/base.scm"/>
+        <file name="scheme/case-lambda.scm"/>
+        <file name="scheme/char.scm"/>
+        <file name="scheme/complex.scm"/>
+        <file name="scheme/cxr.scm"/>
+        <file name="scheme/load.scm"/>
+        <file name="scheme/read.scm"/>
+        <file name="scheme/process-context.scm"/>
+        <file name="scheme/time.scm"/>
+        <file name="scheme/write.scm"/>
         <file name="trace.scm"/>
         <file name="compile_misc.scm"/>
         <file name="compile_map.scm"/>

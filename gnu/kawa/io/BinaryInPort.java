@@ -112,13 +112,13 @@ public class BinaryInPort extends InPort {
                     return count;
                 } else {
                     /* #ifdef JAVA7 */
-                    // setCharset(csetDefault != null ? csetDefault
-                    //            : StandardCharsets.UTF_8);
+                    setCharset(csetDefault != null ? csetDefault
+                               : StandardCharsets.UTF_8);
                     /* #else */
-                    if (csetDefault != null)
-                        setCharset(csetDefault);
-                    else
-                        setCharset("UTF-8");
+                    // if (csetDefault != null)
+                    //     setCharset(csetDefault);
+                    // else
+                    //     setCharset("UTF-8");
                     /* #endif */
                     break;
                 }

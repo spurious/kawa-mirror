@@ -425,4 +425,45 @@ implements javax.tools.FileObject
         }
         return contentType;
     }
+
+    /** Equivalent to the current value of {@code currentPath()}. */
+    public static final Object PATH_CURRENT = new String("<current>");
+
+    /** Resolve relative to the "current" or "parent" file. */
+    public static final Object PATH_RELATIVE = new String("<relative>");
+
+    /** Search for a readable file in a searchpath.
+     * @param searchPath each element is a string, a Path (or convertible
+     * to a Path using {@code Path.valueOf}) or the special values
+     *   {@code PATH_CURRENT} or {@code PATH_RELATIVE}.
+     * @param filename the name of the file to look for
+     * @param base the base path for a PATH_RELATIVE path
+     * @return ither null (if no match as found), or a 2-element array
+     *   {@code { inputStream, matchingPath }}.
+     */
+    public static Object[] search(Object[] searchPath, String filename,
+                                  String base) {
+        for (int i = 0;  i < searchPath.length;  i++) {
+            Object spath = searchPath[i];
+            if (spath == PATH_RELATIVE) {
+                String tpath = base;
+                if (tpath == null || tpath.startsWith("/dev/"))
+                    spath = PATH_CURRENT;
+                else
+                    spath = tpath;
+                }
+            Path path;
+            if (spath == PATH_CURRENT)
+                path = Path.currentPath();
+            else
+                path = Path.valueOf(spath); // May throw exception
+            try {
+                InputStream istrm = path.resolve(filename).openInputStream();
+                return new Object[] { istrm, path };
+            } catch (Exception ex) {
+                break;
+            }
+        }
+        return null;
+    }
 }

@@ -91,6 +91,7 @@ KAWA_STANDARD_JAVA_FILES = \
   standard/define_class.java \
   standard/thisRef.java \
   standard/IfFeature.java \
+  standard/Include.java \
   standard/ImportFromLibrary.java \
   standard/TracedProcedure.java
 

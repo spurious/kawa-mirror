@@ -1,3 +1,8 @@
+2014-09-28  Per Bothner  <per@bothner.com>
+
+	* misc_syntax.scm (include, include-relative): Remove.
+	Now handled by kawa.standard.Include.
+
 2014-09-26  Per Bothner  <per@bothner.com>
 
 	* DefineRecordType.java: Moved from gnu/kawa/slib.

@@ -8,8 +8,6 @@ import java.nio.charset.*;
 /** An InPort that wraps an InputStream.
  * Similar functionality as using an InputStreamReader, but provides hooks
  * to read at the byte level, possibly before setting the charset.
- * Optionally uses java.nio.charset directly, for extra flexibility
- * and a possible (but slight and unverified) performance improvement.
  */
 
 public class BinaryInPort extends InPort {
@@ -19,7 +17,9 @@ public class BinaryInPort extends InPort {
 
     Charset cset;
     CharsetDecoder decoder;
+    Charset csetDefault;
 
+    /** Return the character set used for text.  May be null if not set. */
     public Charset getCharset() { return cset; }
 
     public void setCharset(Charset cset) {
@@ -34,6 +34,12 @@ public class BinaryInPort extends InPort {
         else if (! cset.equals(this.cset))
             throw new RuntimeException("encoding "+name+" does not match previous "+this.cset);
     }
+
+    /** Set the charset to use if we don't find other information.
+     * Typically: if we don't see a byte-order-mark or a (language-dependent)
+     * encoding declaration.  Defaults to UTF-8.
+     */
+    public void setDefaultCharset(Charset cset) { csetDefault = cset; }
 
     private BinaryInPort(NBufferedInputStream bstrm, Path path) {
         super(bstrm, path);
@@ -105,7 +111,15 @@ public class BinaryInPort extends InPort {
                     bbuf.position(bpos);
                     return count;
                 } else {
-                    setCharset("UTF-8");
+                    /* #ifdef JAVA7 */
+                    // setCharset(csetDefault != null ? csetDefault
+                    //            : StandardCharsets.UTF_8);
+                    /* #else */
+                    if (csetDefault != null)
+                        setCharset(csetDefault);
+                    else
+                        setCharset("UTF-8");
+                    /* #endif */
                     break;
                 }
             }

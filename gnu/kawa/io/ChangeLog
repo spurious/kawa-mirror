@@ -1,3 +1,11 @@
+2014-09-28  Per Bothner  <per@bothner.com>
+
+	* BinaryInPort.java (defaultCset): New field.
+	(setDefaultCharset): New method.
+	(fill): Use defaultCset.
+	* Path.java (search): New method for searching using a searchpath.
+	(PATH_CURRENT, PATH_RELATIV): New constants.
+
 2014-09-17  Per Bothner  <per@bothner.com>
 
 	* PrettyWriter.java (finishIDHash): New convenience method.

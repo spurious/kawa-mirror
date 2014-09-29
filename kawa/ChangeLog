@@ -1,3 +1,10 @@
+2014-09-28  Per Bothner  <per@bothner.com>
+
+	* standard/Include.java: New Syntax class for handling 'include'.
+	* Makefile.am: Update accordingly.
+	* standard/Scheme.java (initScheme): Add 'include-ci' and update
+	'include' and 'include-relative'.
+
 2014-09-26  Per Bothner  <per@bothner.com>
 
 	* standard/Scheme.java (initScheme): 'define-record-type' was

@@ -716,8 +716,10 @@ public class Scheme extends LispLanguage
       defProcStFld("syntax-column", "kawa.lib.std_syntax");
       defSntxStFld("begin-for-syntax", "kawa.lib.std_syntax");
       defSntxStFld("define-for-syntax", "kawa.lib.std_syntax");
-      defSntxStFld("include", "kawa.lib.misc_syntax");
-      defSntxStFld("include-relative", "kawa.lib.misc_syntax");
+      defSntxStFld("include", "kawa.standard.Include", "include");
+      defSntxStFld("include-relative", "kawa.standard.Include",
+                   "includeRelative");
+      defSntxStFld("include-ci", "kawa.standard.Include", "includeCi");
 
       defProcStFld("file-exists?", "kawa.lib.files");
       defProcStFld("file-directory?", "kawa.lib.files");

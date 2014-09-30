@@ -1,3 +1,7 @@
+2014-09-30  Per Bothner  <per@bothner.com>
+
+	* syntax.scm: Add explicit module-export.
+
 2014-09-28  Per Bothner  <per@bothner.com>
 
 	* scheme/base.scm: New file for R7RS standard library.

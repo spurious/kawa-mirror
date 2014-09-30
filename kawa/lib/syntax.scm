@@ -1,3 +1,11 @@
+(module-export defmacro define-macro define-syntax-case
+               when unless try-finally synchronized
+               identifier-list? identifier-pair-list? import
+               let-values let*-values case-lambda define-values
+               cond-expand receive define-alias-parameter
+               $string$ $string-with-default-format$ $format$ $sprintf$
+               $string-with-delimiter-marks$ define-simple-constructor)
+
 (require <kawa.lib.prim_syntax>)
 (require <kawa.lib.std_syntax>)
 (require <kawa.lib.reflection>)

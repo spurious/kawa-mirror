@@ -1,3 +1,7 @@
+2014-09-30  Per Bothner  <per@bothner.com>
+
+	* standard/Scheme.java (initScheme): Remove '%cond-expand'.
+
 2014-09-28  Per Bothner  <per@bothner.com>
 
 	* standard/Include.java: New Syntax class for handling 'include'.

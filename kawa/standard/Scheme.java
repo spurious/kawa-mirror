@@ -904,7 +904,6 @@ public class Scheme extends LispLanguage
       defSntxStFld("cute", "gnu.kawa.slib.cut");
 
       defSntxStFld("cond-expand", "kawa.lib.syntax");
-      defSntxStFld("%cond-expand", "kawa.lib.syntax");
 
       defAliasStFld("*print-base*", "gnu.kawa.functions.DisplayFormat",
                     "outBase");

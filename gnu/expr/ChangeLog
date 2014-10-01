@@ -1,3 +1,9 @@
+2014-10-01  Per Bothner  <per@bothner.com>
+
+	* ApplyExp.java (getRawType, setType): Move up to ...
+	* Expression.java (getRawType, setType): ... here.
+	* QuoteExp.java (setType): Update to call super.
+
 2014-09-23  Per Bothner  <per@bothner.com>
 
 	* Compilation.java (info): Remove field, replace by ...

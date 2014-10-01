@@ -622,16 +622,6 @@ public class ApplyExp extends Expression
       code.emitStore(vars); // rest array
   }
 
-  public final gnu.bytecode.Type getTypeRaw()
-  {
-    return type;
-  }
-
-  public final void setType (gnu.bytecode.Type type)
-  {
-    this.type = type;
-  }
-
   public boolean side_effects ()
   {
     Object value = derefFunc(func).valueIfConstant();

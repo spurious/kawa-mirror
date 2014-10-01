@@ -37,11 +37,11 @@ public class QuoteExp extends Expression
       return Type.make(value.getClass());
   }
 
-  public void setType (Type type)
-  {
-    this.type = type;
-    setFlag(EXPLICITLY_TYPED);
-  }
+    @Override
+    public void setType(Type type) {
+        super.setType(type);
+        setFlag(EXPLICITLY_TYPED);
+    }
 
   public boolean isExplicitlyTyped ()
   {

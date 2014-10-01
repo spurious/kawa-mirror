@@ -377,6 +377,14 @@ public abstract class Expression extends Procedure0
     return Type.pointer_type;
   }
 
+    public final Type getTypeRaw() {
+        return type;
+    }
+
+    public void setType(Type type) {
+        this.type = type;
+    }
+
     /** True if the expression provably never returns.
      * Currently, this is very limited, not handling infinite recursion
      * (tail- or otherwise), but better analysis is planned.

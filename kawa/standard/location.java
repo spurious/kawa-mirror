@@ -5,7 +5,11 @@ import gnu.mapping.*;
 import gnu.mapping.Location;  // As opposed to gnu.bytecode.Location.
 import gnu.expr.*;
 import gnu.bytecode.*;
+import gnu.kawa.functions.GetNamedPart;
+import gnu.kawa.lispexpr.LispLanguage;
 import gnu.kawa.reflect.Invoke;
+import gnu.kawa.reflect.SlotGet;
+import gnu.kawa.reflect.StaticFieldLocation;
 
 /**
  * The Syntax transformer that re-writes the Kawa "location" primitive.
@@ -50,13 +54,70 @@ public class location extends Syntax
     if (arg instanceof ApplyExp)
       {
 	ApplyExp aexp = (ApplyExp) arg;
-	Expression[] args = new Expression[aexp.getArgs().length + 1];
-	args[0] = aexp.getFunction();
-	System.arraycopy(aexp.getArgs(), 0, args, 1, args.length-1);
+        Expression afunc = aexp.getFunction();
+        Expression[] aargs = aexp.getArgs();
+        int aalen = aargs.length;
+        Object aproc = afunc.valueIfConstant();
+        StaticFieldLocation sloc = null;
+
+        if (aproc == GetNamedPart.getNamedPart && aalen == 2) {
+            Expression exp = rewriteApply(aargs[0], aargs[1], tr);
+            if (exp != null)
+                return exp;
+        }
+        if (aproc == Scheme.applyToArgs && aalen == 3
+            && aargs[0].valueIfConstant() == SlotGet.staticField) {
+            Expression exp = rewriteApply(aargs[1], aargs[2], tr);
+            if (exp != null)
+                return exp;
+        }
+	Expression[] args = new Expression[aalen + 1];
+	args[0] = afunc;
+	System.arraycopy(aargs, 0, args, 1, aalen);
         return new ApplyExp(getMakeProcLocProc(), args);
       }
     return tr.syntaxError("invalid argument to location");
   }
+
+    /** Helper for handling special cases to take locations of ApplyExp.
+     * Specifically for static fields and static member classes.
+     */
+    static Expression rewriteApply(Expression classExp, Expression nameExp,
+                                   Compilation comp) {
+        ClassType caller = comp.curClass;
+        Object cls = classExp.valueIfConstant();
+        if (cls instanceof Class)
+            cls = Type.make((Class) cls);
+        Object nam = nameExp.valueIfConstant();
+        if (cls instanceof ClassType && nam instanceof SimpleSymbol) {
+            String name = nam.toString();
+            ClassType ctype = (ClassType) cls;
+            Member member = SlotGet.lookupMember(ctype, name, caller);
+            if (member.getStaticFlag()) {
+                if (member instanceof Field) {
+                    StaticFieldLocation sloc =
+                        new StaticFieldLocation(ctype, name);
+                    ReferenceExp rexp = new ReferenceExp(sloc.getDeclaration());
+                    rexp.setDontDereference(true);
+                    return rexp;
+                }
+                else if (member instanceof ClassType) {
+                    ClassType cltype = (ClassType) member;
+                    if (cltype.isExisting()) {
+                        try {
+                            Class clas = cltype.getReflectClass();
+                            if (clas != null)
+                                return new QuoteExp(clas);
+                        } catch (Exception ex) {
+                            // silenty ignored
+                        }
+                    }
+                }
+            }
+
+        }
+        return null;
+    }
 
     private static PrimProcedure makeProcLocProc;
     public static synchronized PrimProcedure getMakeProcLocProc() {

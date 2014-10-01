@@ -1,4 +1,5 @@
 package kawa.standard;
+import gnu.bytecode.Type;
 import gnu.expr.*;
 import gnu.lists.*;
 import gnu.mapping.*;
@@ -80,13 +81,13 @@ public class define_alias extends Syntax {
                     }
                     else
                         rarg.setDontDereference(true);
-                }
-                else if (arg instanceof QuoteExp) {
-                    decl.setIndirectBinding(false);
-                    decl.setFlag(Declaration.IS_CONSTANT);
                 } else {
-                    arg = location.rewrite(arg, tr);
-                    decl.setType(Compilation.typeLocation);
+                    if (! (arg instanceof QuoteExp))
+                        arg = location.rewrite(arg, tr);
+                    if (arg instanceof QuoteExp) {
+                        decl.setIndirectBinding(false);
+                        decl.setFlag(Declaration.IS_CONSTANT);
+                    }
                 }
                 decl.setFlag(Declaration.EARLY_INIT);
                 tr.mustCompileHere(); // For simplicity.

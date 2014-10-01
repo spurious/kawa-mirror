@@ -1,3 +1,12 @@
+2014-10-01  Per Bothner  <per@bothner.com>
+
+	* standard/location.java (rewriteApply): New helper method
+	for handling two special cases to take locations of ApplyExp.
+	Specifically for static fields and static member classes.
+	(rewrite): Use rewriteApply.
+	* standard/define_alias.java (rewriteForm): Minor tweak - note
+	that location.rewrite can now return a QuoteExp.
+
 2014-09-30  Per Bothner  <per@bothner.com>
 
 	* standard/Scheme.java (initScheme): Remove '%cond-expand'.

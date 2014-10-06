@@ -741,7 +741,8 @@ Provide better compatibility with the specified Scheme standards.
 For example @code{--r6rs} aims to disable Kawa extensions
 that conflict with R6RS.  It does not aim to disable all extensions,
 only incompatible extensions.
-So far these extensions disable the colon operator and keyword literals.
+So far these extensions disable the colon operator and keyword literals,
+as well as the use of initial @samp{@@} as a splicing operator.
 Selecting @code{--r5rs} makes symbols by default
 case-insensitive.
 @item --elisp
@@ -12142,6 +12143,11 @@ Note that it is an error if there is no definition for @var{identifier}
 (or @var{identifier}@sub{1})
 in the current module, or if it is defined using @code{define-private}.
 
+As a matter of style, @code{export} or @code{module-export} should
+appear after @code{module-name} but @emph{before} other commands
+(including @code{import} or @code{require}).
+(This is a requirement if there are any cycles.)
+
 @end deffn
 
 In this module, @code{fact} is public and @code{worker} is private:
@@ -12178,6 +12184,10 @@ flag is prepended to give the fully-qualified class name.
 Sets the name of the generated class, overriding the default.
 If there is no @samp{.} in the @var{name}, the package-prefix
 (specified by the @code{-P} Kawa command-line flag) is prepended.
+
+As a matter of style, @code{module-name} should be the first
+command in a file (after possible comments).  It must appear
+before a @code{require} or @code{import}, in case of cycles.
 @end deffn
 
 By default, the base class of the generated module class is unspecified;
@@ -12451,15 +12461,16 @@ which yields the implementing @var{classname}.
 @end deffn
 
 @deffn Syntax import @arbno{@stxref{import-set}}
-Similar functionality as @code{require}, but specified by R6RS.
+Similar functionality as @code{require}, but specified by R6RS/R7RS.
 @display
 @stxdef{import-set} @stxref{library-reference}
   | @stxlit{(library} @stxref{library-reference} @stxlit{)}
   | @stxlit{(only} @stxref{import-set} @arbno{@var{identifier}}@stxlit{)}
   | @stxlit{(except} @stxref{import-set} @arbno{@var{identifier}}@stxlit{)}
   | @stxlit{(prefix} @stxref{import-set} @var{identifier} @stxlit{)}
-  | @stxlit{(rename} @stxref{import-set} @arbno{@stxlit{(} @var{identifier1} @var{identifier2} @stxlit{)}}@stxlit{)}
-@stxdef{library-reference} @stxlit{(} @atleastone{@var{identifier}} @stxlit{)}
+  | @stxlit{(rename} @stxref{import-set} @arbno{@stxlit{(} @stxref{identifier}@sub{1} @stxref{identifier}@sub{2} @stxlit{)}}@stxlit{)}
+@stxdef{library-reference} @stxlit{(} @atleastone{@var{identifier}} [@stxref{sourcepath-string}]@stxlit{)}
+@stxdef{sourcepath-string} @stxref{string}
 @end display
 
 A @var{library-reference} is mapped to a class name by concatenating
@@ -12499,15 +12510,15 @@ another @meta{import-set}.
 A @code{rename} form:
 
 @example
-(rename (@var{identifier1} @var{identifier2}) @dots{})
+(rename (@var{identifier}@sub{1} @var{identifier}@sub{2}) @dots{})
 @end example
 @noindent
-removes the bindings for @code{@var{identifier1} @dots{}} to form an
+removes the bindings for @code{@var{identifier}@sub{1} @dots{}} to form an
 intermediate @meta{import-set}, then adds the bindings back for the
-corresponding @code{@var{identifier2} @dots{}} to form the final
-@meta{import-set}.  Each @var{identifier1} must be in the original
-@meta{import-set}, each @var{identifier2} must not be in the
-intermediate @meta{import-set}, and the @var{identifier2}s must be
+corresponding @code{@var{identifier}@sub{2} @dots{}} to form the final
+@meta{import-set}.  Each @var{identifier}@sub{1} must be in the original
+@meta{import-set}, each @var{identifier}@sub{2} must not be in the
+intermediate @meta{import-set}, and the @var{identifier}@sub{2}s must be
 distinct.
 @end itemize
 @end deffn
@@ -16163,7 +16174,8 @@ support and other contributions.
 
 @uref{http://google.com/,Google} through their
 @uref{http://code.google.com/soc/,Summer of Code} project
-sponsored Charles Turner's work Summer 2011.
+sponsored Charles Turner during Summer 2011 and 2012,
+and sponsored Andrea Bernardini Summer 2014.
 
 Thomas Kirk and AT&T provided financial support, and useful bug reports.
 
@@ -16203,6 +16215,8 @@ Anthony Green for Fedora packaging.
 
 Charles Turner for pretty-printer improvements,
 improvements in the Common Lips support, and other changes.
+
+Andrea Bernardini optimized the implementation of @code{case}.
 
 Julien Rousseau and Marius Kjeldahl contributed to Android support.
 

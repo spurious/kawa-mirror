@@ -1,3 +1,7 @@
+2014-10-06  Per Bothner  <per@bothner.com>
+
+	* kawa.texi: Various modest improvements.
+
 2014-09-22  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Multiple values): Document 'define-values'.

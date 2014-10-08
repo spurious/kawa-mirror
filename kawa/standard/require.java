@@ -273,34 +273,17 @@ public class require extends Syntax
         Field instanceField = null;
         Language language = tr.getLanguage();
         dofind.setLine(tr);
-        Pair formsStart = forms.lastPair();
 
         ModuleExp mod = info.setupModuleExp();
 
-        Vector declPairs = new Vector();
+        LinkedHashMap<Symbol,Declaration> dmap
+            = new LinkedHashMap<Symbol,Declaration>();
         for (Declaration fdecl = mod.firstDecl();
              fdecl != null;  fdecl = fdecl.nextDecl()) {
             if (fdecl.isPrivate())
                 continue;
 
             Symbol aname = (Symbol) fdecl.getSymbol();
-            if (renamer != null) {
-                Object mapped;
-                try {
-                    mapped = renamer.apply1(aname);
-                } catch (Error ex) {
-                    throw ex;
-                } catch (Throwable ex) {
-                    mapped = ex;
-                }
-                if (mapped == null)
-                    continue;
-                if (! (mapped instanceof Symbol)) {
-                    tr.error('e', "internal error - import name mapper returned non-symbol: "+mapped.getClass().getName());
-                    continue;
-                }
-                aname = (Symbol) mapped;
-            }
             boolean isStatic = fdecl.getFlag(Declaration.STATIC_SPECIFIED);
             if (! isStatic && decl == null) {
                 String iname = tname.replace('.', '$') + "$instance";
@@ -315,7 +298,6 @@ public class require extends Syntax
                 sexp.setLine(tr);
                 sexp.setDefining(true);
                 forms.push(sexp);
-                formsStart = forms.lastPair();
                 decl.setFlag(Declaration.EARLY_INIT);
                 // If Runnable, we need to set decl value in initializer,
                 // and later 'run' it, so it needs to be stored in a field.
@@ -334,6 +316,45 @@ public class require extends Syntax
                 }
             }
 
+            if (fdecl.field != null
+                && fdecl.field.getName().endsWith("$instance")) {
+                Declaration old = defs.lookup(aname, language, language.getNamespaceOf(fdecl));
+                if (old != null)
+                    continue;
+                Declaration adecl = defs.addDeclaration(aname);
+                adecl.setFlag(Declaration.IS_CONSTANT
+                              |Declaration.TYPE_SPECIFIED
+                              |Declaration.MODULE_REFERENCE);
+                adecl.setType(fdecl.getType());
+                ReferenceExp fref = new ReferenceExp(fdecl);
+                fref.setContextDecl(decl);
+                linkDecls(adecl, fdecl, fref, forms, tr);
+            } else
+                dmap.put(aname, fdecl);
+        }
+
+        for (Map.Entry<Symbol,Declaration> entry : dmap.entrySet()) {
+            Symbol aname = entry.getKey();
+            Declaration fdecl = entry.getValue();
+
+            if (renamer != null) {
+                Object mapped;
+                try {
+                    mapped = renamer.apply1(aname);
+                } catch (Error ex) {
+                    throw ex;
+                } catch (Throwable ex) {
+                    mapped = ex;
+                }
+                if (mapped == null)
+                    continue;
+                if (! (mapped instanceof Symbol)) {
+                    tr.error('e', "internal error - import name mapper returned non-symbol: "+mapped.getClass().getName());
+                    continue;
+                }
+                aname = (Symbol) mapped;
+            }
+
             // We create an alias in the current context that points
             // a dummy declaration in the exported module.  Normally,
             // followAliases will skip the alias, so we use the latter.
@@ -341,20 +362,9 @@ public class require extends Syntax
             // gets set), then we need a separate declaration.
             // (If EXTERNAL_ACCESS, the field gets PRIVATE_PREFIX.)
 
-            boolean isImportedInstance
-                = fdecl.field != null && fdecl.field.getName().endsWith("$instance");
-
             Declaration adecl;
             Declaration old = defs.lookup(aname, language, language.getNamespaceOf(fdecl));
-            if (isImportedInstance) {
-                if (old != null)
-                    continue;
-                adecl = defs.addDeclaration(aname);
-                adecl.setFlag(Declaration.IS_CONSTANT
-                              |Declaration.MODULE_REFERENCE);
-                adecl.setType(fdecl.getType());
-                adecl.setFlag(Declaration.TYPE_SPECIFIED);
-            } else if (old != null
+            if (old != null
                      && ! old.getFlag(Declaration.NOT_DEFINING)
                      && (Declaration.followAliases(old)
                          == Declaration.followAliases(fdecl)))
@@ -372,51 +382,13 @@ public class require extends Syntax
                 adecl.setAlias(true);
                 adecl.setIndirectBinding(true);
             }
-            adecl.setLocation(tr);
             ReferenceExp fref = new ReferenceExp(fdecl);
             fref.setContextDecl(decl);
-            if (! isImportedInstance) {
-                fref.setDontDereference(true);
-                if (! sharedModule)
-                    adecl.setPrivate(true);
-            } 
-            // Imported variables should be read-only.
-            adecl.setFlag(Declaration.IS_CONSTANT);
-            if (fdecl.getFlag(Declaration.IS_SYNTAX))
-                adecl.setFlag(Declaration.IS_SYNTAX);
-            if (fdecl.isProcedureDecl())
-                adecl.setProcedureDecl(true);
-            if (isStatic)
-                adecl.setFlag(Declaration.STATIC_SPECIFIED);
+            fref.setDontDereference(true);
+            if (! sharedModule)
+                adecl.setPrivate(true);
+            linkDecls(adecl, fdecl, fref, forms, tr);
 
-            SetExp sexp = new SetExp(adecl, fref);
-            adecl.setFlag(Declaration.EARLY_INIT);
-            sexp.setDefining(true);
-            if (isImportedInstance) {
-                // Make sure the "MODULE$instance" declarations are
-                // initialized first, since we may need then for
-                // imported declarations that are re-exported.  (The
-                // instance may be needed for FieldLocation values.)
-                forms.pushAfter(sexp, formsStart);
-                formsStart = forms.lastPair();
-            }
-            else
-                forms.push(sexp);
-
-            declPairs.add(adecl);
-            declPairs.add(fdecl);
-
-            adecl.noteValue(fref);
-            adecl.setFlag(Declaration.IS_IMPORTED);
-            tr.push(adecl);  // Add to translation env.
-        }
-
-        // This needs to be a second pass, because a Declaration might need to
-        // look for a context MOD$instance that is provided by a following field.
-        int ndecls = declPairs.size();
-        for (int i = 0;  i < ndecls;  i += 2) {
-            Declaration adecl = (Declaration) declPairs.elementAt(i);
-            Declaration fdecl = (Declaration) declPairs.elementAt(i+1);
             Expression fval = fdecl.getValue();
             if (fdecl.isIndirectBinding() && fval instanceof ReferenceExp) {
                 ReferenceExp aref = (ReferenceExp) adecl.getValue();
@@ -452,6 +424,28 @@ public class require extends Syntax
             forms.push(dofind);
         }
         return true;
+    }
+
+    static void linkDecls(Declaration adecl, Declaration fdecl,
+                          ReferenceExp fref, FormStack forms, Compilation tr) {
+        adecl.setLocation(tr);
+        // Imported variables should be read-only.
+        adecl.setFlag(Declaration.IS_CONSTANT);
+        if (fdecl.getFlag(Declaration.IS_SYNTAX))
+            adecl.setFlag(Declaration.IS_SYNTAX);
+        if (fdecl.isProcedureDecl())
+            adecl.setProcedureDecl(true);
+        if (fdecl.getFlag(Declaration.STATIC_SPECIFIED))
+            adecl.setFlag(Declaration.STATIC_SPECIFIED);
+
+        SetExp sexp = new SetExp(adecl, fref);
+        adecl.setFlag(Declaration.EARLY_INIT);
+        sexp.setDefining(true);
+        forms.push(sexp);
+        adecl.noteValue(fref);
+        adecl.setFlag(Declaration.IS_IMPORTED);
+        tr.push(adecl);  // Add to translation env.
+
     }
 
     public Expression rewriteForm(Pair form, Translator tr) {

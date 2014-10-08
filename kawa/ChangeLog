@@ -1,3 +1,10 @@
+2014-10-08  Per Bothner  <per@bothner.com>
+
+	* standard/require.java (importDefinitions): Re-organize the code.
+	Add a pre-pass over the exported module; this will (soon) allow
+	doing name-mapping over the names as a set.  It also allows us
+	to remove the post-processor loop to set context decls.
+
 2014-10-01  Per Bothner  <per@bothner.com>
 
 	* standard/location.java (rewriteApply): New helper method

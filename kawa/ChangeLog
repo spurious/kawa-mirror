@@ -1,3 +1,16 @@
+2014-10-09  Per Bothner  <per@bothner.com>
+
+	* standard/require.java (importDefinitions): For mapping imported
+	names, use a DeclSetMapper rather than a Procedure.  The latter
+	only re-maps a single binding at a time, which makes diagnosing
+	errors difficult.
+	(DeclSetMapper): New member interface.
+	* standard/ImportFromLibrary.java: Re-implement to handle the
+	entire import syntax (rather than handing renaming in Scheme).
+	We add better error-checking.  This fixes Savannah bug #43341
+	"Import should warn about non existing bindings".
+	* standard/Scheme.java (initDecls): Update for 'import'.
+
 2014-10-08  Per Bothner  <per@bothner.com>
 
 	* standard/require.java (importDefinitions): Re-organize the code.

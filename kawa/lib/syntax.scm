@@ -1,6 +1,5 @@
 (module-export defmacro define-macro define-syntax-case
                when unless try-finally synchronized
-               identifier-list? identifier-pair-list? import
                let-values let*-values case-lambda define-values
                cond-expand receive define-alias-parameter
                $string$ $string-with-default-format$ $format$ $sprintf$
@@ -54,76 +53,6 @@
          (syntax->expression (syntax object))
          (syntax-body->expression (syntax body)))))))
 
-(define (identifier-list? obj) ::boolean
-  (and (>= (kawa.lang.Translator:listLength obj) 0)
-       (let loop ((obj obj))
-	 (syntax-case obj ()
-	   ((x . y)
-	    (and (identifier? #'x) (loop #'y)))
-	   (() #t)
-	   (_ #f)))))
-
-(define (identifier-pair-list? obj) ::boolean
-  (and (>= (kawa.lang.Translator:listLength obj) 0)
-       (let loop ((obj obj))
-	 (syntax-case obj ()
-	   (((from to) . y)
-	    (and (identifier? #'from) (identifier? #'to) (loop #'y)))
-	   (() #t)
-	   (_ #f)))))
-
-(define (import-handle-only name list)
-  ;; FIXME handle if list element is a syntax object
-  (if (memq name list) name #!null))
-(define (import-handle-except name list)
-  ;; FIXME handle if list element is a syntax object
-  (if (memq name list) #!null name))
-(define (import-handle-prefix name prefix)
-  ;; FIXME handle if list element is a syntax object
-  (if (eq? name #!null) #!null
-      (let ((str (make java.lang.StringBuilder)))
-        (str:append (prefix:toString))
-        (str:append (name:toString))
-        (gnu.mapping.SimpleSymbol:valueOf (str:toString)))))
-(define (import-handle-rename name rename-pairs)
-  (if (pair? rename-pairs)
-      (if (eq? name (caar rename-pairs))
-	  (cadar rename-pairs)
-	  (import-handle-rename name (cdr rename-pairs)))
-      name))
-(define (import-mapper list)
-  (lambda (name)
-    (let loop ((l list) (n name))
-      (if (or (eq? n #!null) (null? l))
-	  n
-	  (loop (cdr l) ((caar l) n (cdar l)))))))
-
-(define-syntax import
-  (syntax-rules ()
-    ((import import-spec ...)
-     (begin (%import import-spec ()) ...))))
-
-(define-syntax-case %import (library only except prefix rename)
-  ((_ (rename import-set . pairs) mapper)
-   (if (identifier-pair-list? #'pairs)
-       #`(%import import-set #,(cons (cons import-handle-rename #`pairs) #`mapper))
-       (report-syntax-error (syntax rest) "invalid 'rename' clause in import")))
-  ((_ (only import-set . ids) mapper)
-   (if (identifier-list? #'ids)
-       #`(%import import-set #,(cons (cons import-handle-only #`ids) #`mapper))
-       (report-syntax-error (syntax ids) "invalid 'only' identifier list")))
-  ((_ (except import-set . ids) mapper)
-   (if (identifier-list? #'ids)
-       #`(%import import-set #,(cons (cons import-handle-except #`ids) #`mapper))
-       (report-syntax-error (syntax ids) "invalid 'except' identifier list")))
-  ((_ (prefix import-set pfix) mapper)
-   #`(%import import-set #,(cons (cons import-handle-prefix #`pfix) #`mapper)))
-  ((_ (prefix import-set . rest) mapper)
-   (report-syntax-error (syntax rest) "invalid prefix clause in import"))
-  ((_ (library libref) mapper)
-   #`(kawa.standard.ImportFromLibrary:instance libref #,(import-mapper (syntax-object->datum (syntax mapper)))))
-  ((_ libref mapper)
-   #`(kawa.standard.ImportFromLibrary:instance libref #,(import-mapper (syntax-object->datum (syntax mapper))))))
 
 ;; LET-VALUES implementation from SRFI-11, by Lars T Hansen.
 ;; http://srfi.schemers.org/srfi-11/srfi-11.html

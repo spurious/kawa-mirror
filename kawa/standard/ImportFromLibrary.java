@@ -81,26 +81,58 @@ public class ImportFromLibrary extends Syntax
     };
 
     @Override
-    public boolean scanForDefinitions(Pair st, ScopeExp defs, Translator tr) {
-        Procedure mapper = null;
-        Object args = st.getCdr();
-        if (! (args instanceof Pair))
-            return false; // Should never happen.
-        Pair pair = (Pair) args;
-        Object libref = pair.getCar();
-        if (LList.listLength(libref, false) <= 0) {
-            tr.error('e', "expected <library reference> which must be a list");
-            return false;
+    public void scanForm(Pair st, ScopeExp defs, Translator tr) {
+        Object obj = st.getCdr();
+        while (obj instanceof Pair) {
+            Pair pair = (Pair) obj;
+            Object save1 = tr.pushPositionOf(pair);
+            scanImportSet(pair.getCar(), defs, tr, null);
+            tr.popPositionOf(save1);
+            obj = pair.getCdr();
         }
-        Object rest = pair.getCdr();
-        if (rest instanceof Pair && ((Pair) rest).getCar() instanceof Procedure)
-            mapper = (Procedure) ((Pair) rest).getCar();
+        if (obj != LList.Empty) tr.error('e', "improper list");
+    }
+
+    void scanImportSet(Object imports, ScopeExp defs, Translator tr, require.DeclSetMapper mapper) {
+        int specLength = Translator.listLength(imports);
+        if (specLength <= 0) {
+            Object save1 = tr.pushPositionOf(imports);
+            tr.error('e', "import specifier is not a proper list");
+            tr.popPositionOf(save1);
+            return;
+        }
+        Pair pimport = (Pair) imports;
+        Object first = pimport.getCar();
+        Object rest = pimport.getCdr();
+        Pair cdrPair = specLength >= 2 ? (Pair) rest : null;
+        char kind = '\0';
+        if (first == onlySymbol)
+            kind = 'O';
+        else if (first == exceptSymbol)
+            kind = 'E';
+        else if (first == renameSymbol)
+            kind = 'R';
+        else if (first == prefixSymbol)
+            kind = 'P';
+        else if (first == librarySymbol && specLength == 2
+                 && cdrPair.getCar() instanceof Pair)
+            pimport = (Pair) cdrPair.getCar();
+        if (specLength >= 2 && kind != '\0'
+            // A keyword such as 'only must be followed by an <import set>.
+            && cdrPair.getCar() instanceof LList) {
+            ImportSetMapper nmapper
+                = new ImportSetMapper(kind, cdrPair.getCdr(), specLength-2);
+            nmapper.chain = mapper;
+            scanImportSet(cdrPair.getCar(), defs, tr, nmapper);
+            return;
+        }
 
         Object versionSpec = null;
         String sourcePath = null;
         StringBuffer sbuf = new StringBuffer();
+        Object libref = pimport;
         while (libref instanceof Pair) {
-            pair = (Pair) libref;
+            Pair pair = (Pair) libref;
             Object car = pair.getCar();
             Object cdr = pair.getCdr();
             if (car instanceof Pair) {
@@ -126,7 +158,7 @@ public class ImportFromLibrary extends Syntax
             minfo = require.lookupModuleFromSourcePath(sourcePath, defs);
             if (minfo == null) {
                 tr.error('e', "malformed URL: "+sourcePath);
-                return false;
+                return;
             }
         }
         String lname = sbuf.toString();
@@ -155,14 +187,14 @@ public class ImportFromLibrary extends Syntax
             }
             if (srfiNumber == null) {
                 tr.error('e', "SRFI library reference must have the form: (srfi :NNN [name])");
-                return false;
+                return;
             }
             int srfiIndex = SRFI97Map.length;
             for (;;) {
                 if (--srfiIndex < 0) {
                     tr.error('e', badNameBuffer != null ? badNameBuffer.toString()
                              : "unknown SRFI number '"+srfiNumber+"' in SRFI library reference");
-                    return false;
+                    return;
                 }
                 if (!SRFI97Map[srfiIndex][0].equals(srfiNumber))
                     continue;
@@ -182,7 +214,7 @@ public class ImportFromLibrary extends Syntax
                 }
 
                 if (srfiClass == BUILTIN)
-                    return true; // Nothing to do.
+                    return; // Nothing to do.
                 else if (srfiClass == MISSING) {
                     tr.error('e', "sorry - Kawa does not support SRFI "+srfiNumber+" ("+srfiNameExpected+')');
                 }
@@ -203,14 +235,127 @@ public class ImportFromLibrary extends Syntax
         }
         if (minfo == null) {
             tr.error('e', "unknown class "+lname);
-            return false;
+            return;
         }
         require.importDefinitions(null, minfo, mapper,
                                   tr.formStack, defs, tr);
-        return true;
     }
 
     public Expression rewriteForm(Pair form, Translator tr) {
         return null;
     }
+
+    static class ImportSetMapper implements require.DeclSetMapper {
+        char kind;
+        Object list;
+        int listLength;
+        require.DeclSetMapper chain;
+
+        public ImportSetMapper(char kind, Object list, int listLength) {
+            this.kind = kind;
+            this.list = list;
+            this.listLength = listLength;
+        }
+
+        public Map<Symbol, Declaration> map(Map<Symbol, Declaration> decls, Compilation comp) {
+            Translator tr = (Translator) comp;
+            Object lst = this.list;
+            Map<Symbol,Declaration> nmap = decls;
+
+            switch (kind) {
+            case 'E': // 'except; list has the form (name ...)
+            case 'O': // 'only; list has the form (name ...)
+                if (kind == 'O')
+                    nmap = new LinkedHashMap<Symbol,Declaration>();
+                while (lst instanceof Pair) {
+                    Pair pair = (Pair) lst;
+                    Object save1 = tr.pushPositionOf(pair);
+                    Object name = Translator.stripSyntax(pair.getCar());
+                    if (name instanceof Symbol) {
+                        Symbol sym = (Symbol) name;
+                        Declaration old = decls.get(sym);
+                        if (old == null)
+                            tr.error('e', "unknown symbol in import set: "+sym);
+                        else if (kind == 'E')
+                            nmap.remove(sym);
+                        else
+                            nmap.put(sym, old);
+                    }
+                    else
+                        tr.error('e', "non-symbol in name list");
+                    tr.popPositionOf(save1);
+                    lst = pair.getCdr();
+                }
+                break;
+
+            case 'R': // 'rename; list has the form: ((oldname newname) ...)
+                Symbol[] pendingSymbols = new Symbol[listLength];
+                Declaration[] pendingDecls = new Declaration[listLength];
+                int npending = 0;
+                while (lst instanceof Pair) {
+                    Pair pair = (Pair) lst;
+                    Object save1 = tr.pushPositionOf(pair);
+                    Object entry = pair.getCar();
+                    int entryLen = Translator.listLength(entry);
+                    if (entryLen == 2) {
+                        Pair p1 = (Pair) entry;
+                        Object oldname = p1.getCar();
+                        Object newname = ((Pair) p1.getCdr()).getCar();
+                        if (oldname instanceof Symbol
+                            && newname instanceof Symbol) {
+                            Symbol oldSymbol = (Symbol) oldname;
+                            Symbol newSymbol = (Symbol) newname;
+                            Declaration oldDecl = decls.remove(oldSymbol);
+                            if (oldDecl == null)
+                                tr.error('e', "missing binding "+oldSymbol);
+                            else {
+                                pendingSymbols[npending] = newSymbol;
+                                pendingDecls[npending] = oldDecl;
+                                npending++;
+                            }
+                        }
+                        else
+                            entryLen = -1;
+                    }
+                    if (entryLen != 2)
+                        tr.error('e', "entry is not a pair of names");
+                    tr.popPositionOf(save1);
+                    lst = pair.getCdr();
+                }
+                for (int i = 0;  i < npending;  i++) {
+                    Symbol newSymbol = pendingSymbols[i];
+                    Declaration decl = pendingDecls[i];
+                    if (decls.put(newSymbol, decl) != null)
+                        tr.error('e', "duplicate binding for "+newSymbol);
+                }
+                break;
+
+            case 'P':  // 'prefix; list has the form: (name-prefix)
+                nmap = new LinkedHashMap<Symbol,Declaration>();
+                if (listLength != 1
+                    || ! (((Pair) list).getCar() instanceof SimpleSymbol))
+                    tr.error('e', "bad syntax for prefix import specifier");
+                else {
+                    String prefix
+                        = ((SimpleSymbol) ((Pair) list).getCar()).getName();
+                    for (Map.Entry<Symbol,Declaration> entry : decls.entrySet()) {
+                        Symbol aname = entry.getKey();
+                        Declaration decl = entry.getValue();
+                        Symbol nname = Symbol.valueOf(prefix+aname);
+                        nmap.put(nname, decl);
+                    }
+                }
+                break;
+            }
+            if (chain != null)
+                nmap = chain.map(nmap, tr);
+            return nmap;
+        }
+    }
+
+    public static final SimpleSymbol exceptSymbol = Symbol.valueOf("except");
+    public static final SimpleSymbol librarySymbol = Symbol.valueOf("library");
+    public static final SimpleSymbol onlySymbol = Symbol.valueOf("only");
+    public static final SimpleSymbol prefixSymbol = Symbol.valueOf("prefix");
+    public static final SimpleSymbol renameSymbol = Symbol.valueOf("rename");
 }

@@ -1,3 +1,9 @@
+2014-10-09  Per Bothner  <per@bothner.com>
+
+	* syntax.scm: Remove import syntax and related bindings.
+	Instead, import is now implemented in Java code, to make
+	bootstrapping easier - and with better error checking.
+
 2014-09-30  Per Bothner  <per@bothner.com>
 
 	* syntax.scm: Add explicit module-export.

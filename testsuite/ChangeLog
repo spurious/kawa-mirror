@@ -1,3 +1,10 @@
+2014-10-09  Per Bothner  <per@bothner.com>
+	    Helmut Eller  <eller.helmut@gmail.com>
+
+	* errors5.scm: Add test for Savannah bug #43341 "Import should
+	warn about non existing bindings" and other 'import' errors.
+	* Makefile.am: Update accordingly.
+
 2014-09-23  Per Bothner  <per@bothner.com>
 
 	* r7rs-tests.scm: Enable "Combination of [numeric] prefixes" tests.

@@ -214,8 +214,8 @@ public class require extends Syntax
      *   or null if unknown.
      */
     public static boolean
-        importDefinitions(String className, ModuleInfo info, Procedure renamer,
-                           FormStack forms, 
+        importDefinitions(String className, ModuleInfo info,
+                           DeclSetMapper mapper, FormStack forms, 
                            ScopeExp defs, Compilation tr) {
         ModuleManager manager = ModuleManager.getInstance();
         long now;
@@ -276,7 +276,7 @@ public class require extends Syntax
 
         ModuleExp mod = info.setupModuleExp();
 
-        LinkedHashMap<Symbol,Declaration> dmap
+        Map<Symbol,Declaration> dmap
             = new LinkedHashMap<Symbol,Declaration>();
         for (Declaration fdecl = mod.firstDecl();
              fdecl != null;  fdecl = fdecl.nextDecl()) {
@@ -333,27 +333,12 @@ public class require extends Syntax
                 dmap.put(aname, fdecl);
         }
 
+        if (mapper != null)
+            dmap = mapper.map(dmap, tr);
+
         for (Map.Entry<Symbol,Declaration> entry : dmap.entrySet()) {
             Symbol aname = entry.getKey();
             Declaration fdecl = entry.getValue();
-
-            if (renamer != null) {
-                Object mapped;
-                try {
-                    mapped = renamer.apply1(aname);
-                } catch (Error ex) {
-                    throw ex;
-                } catch (Throwable ex) {
-                    mapped = ex;
-                }
-                if (mapped == null)
-                    continue;
-                if (! (mapped instanceof Symbol)) {
-                    tr.error('e', "internal error - import name mapper returned non-symbol: "+mapped.getClass().getName());
-                    continue;
-                }
-                aname = (Symbol) mapped;
-            }
 
             // We create an alias in the current context that points
             // a dummy declaration in the exported module.  Normally,
@@ -450,5 +435,9 @@ public class require extends Syntax
 
     public Expression rewriteForm(Pair form, Translator tr) {
         return null;
+    }
+
+    public static interface DeclSetMapper {
+        public Map<Symbol, Declaration> map(Map<Symbol, Declaration> decls, Compilation comp);
     }
 }

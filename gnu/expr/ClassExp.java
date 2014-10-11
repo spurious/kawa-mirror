@@ -19,6 +19,7 @@ public class ClassExp extends LambdaExp
     public static final int INTERFACE_SPECIFIED = 2 * LambdaExp.NEXT_AVAIL_FLAG;
     public static final int CLASS_SPECIFIED = 4 * LambdaExp.NEXT_AVAIL_FLAG;
     public static final int HAS_SUBCLASS = 8 * LambdaExp.NEXT_AVAIL_FLAG;
+    /** True if the resulting class(es) are *not* member/inner classes. */
     public static final int IS_PACKAGE_MEMBER = 16 * LambdaExp.NEXT_AVAIL_FLAG;
 
     /** True if there is at least one explicit "<init>" ("*init*"} method. */
@@ -230,6 +231,7 @@ public class ClassExp extends LambdaExp
         else {
             int start = 0;
             StringBuffer nbuf = new StringBuffer(100);
+            // Mangle characters in name, if needed - but don't mangle '.'.
             for (;;) {
                 int dot = name.indexOf('.', start);
                 if (dot < 0)
@@ -240,7 +242,9 @@ public class ClassExp extends LambdaExp
                 if (start < name.length())
                     nbuf.append('.');
             }
-            if (start == 0) {
+            // nbuf contains package prefix (mangled if needed, except for '.')
+            // start is the rest of name (after the package prefix)
+            if (start == 0) { // No '.' in name
                 setFlag(IS_PACKAGE_MEMBER);
                 String mainName = comp.mainClass == null ? null
                     : comp.mainClass.getName();
@@ -251,6 +255,7 @@ public class ClassExp extends LambdaExp
                     nbuf.append(comp.classPrefix);
             }
             else if (start == 1 && start < name.length()) {
+                // name has a single initial dot. Treat as member class.
                 nbuf.setLength(0);
                 nbuf.append(comp.mainClass.getName());
                 nbuf.append('$');

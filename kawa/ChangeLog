@@ -1,3 +1,7 @@
+2014-10-12  Per Bothner  <per@bothner.com>
+
+	* standard/Scheme.java (initScheme): Remove '%let' and '%define'.
+
 2014-10-09  Per Bothner  <per@bothner.com>
 
 	* standard/require.java (importDefinitions): For mapping imported

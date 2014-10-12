@@ -174,7 +174,6 @@ public class Scheme extends LispLanguage
 
       //-- Section 4.1  -- complete
       defSntxStFld(LispLanguage.quote_str, "kawa.lang.Quote", "plainQuote");
-      defSntxStFld("%define", "kawa.standard.define", "defineRaw");
       defSntxStFld("define", "kawa.lib.prim_syntax");
 
       defSntxStFld("if", "kawa.lib.prim_syntax");
@@ -185,7 +184,6 @@ public class Scheme extends LispLanguage
       defSntxStFld("case", "kawa.lib.case_syntax");
       defSntxStFld("and", "kawa.lib.std_syntax");
       defSntxStFld("or", "kawa.lib.std_syntax");
-      defSntxStFld("%let", "kawa.standard.let", "let");
       defSntxStFld("let", "kawa.lib.std_syntax");
       defSntxStFld("let*", "kawa.lib.std_syntax");
       defSntxStFld("letrec", "kawa.lib.prim_syntax");

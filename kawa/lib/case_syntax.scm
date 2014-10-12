@@ -51,7 +51,7 @@
 
 (define-syntax case (syntax-rules ()
     ((case key clauses ...)
-     (%let ((tmp key))
+     (let ((tmp key))
          (%case tmp clauses ...)))))
 
 (define-rewrite-syntax %case

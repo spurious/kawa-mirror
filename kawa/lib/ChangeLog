@@ -1,3 +1,11 @@
+2014-10-12  Per Bothner  <per@bothner.com>
+
+	* prim_syntax.scm: Add explicit imports instead of implicit
+	dependencies on dynamic environment.
+	* std_syntax.scm: Likewise.
+	* syntax.scm: Likewise.
+	* case_syntax.scm: Use plain 'let' rather than '%let'.
+
 2014-10-09  Per Bothner  <per@bothner.com>
 
 	* syntax.scm: Remove import syntax and related bindings.

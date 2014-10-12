@@ -1,5 +1,14 @@
 ;; Definitions for some primitives before we define anything else.
 
+(module-export
+ define-syntax define define-private define-constant define-early-constant
+ report-syntax-error syntax->expression syntax-body->expression
+ if try-catch letrec)
+
+(import (rename (only (kawa standard define) defineRaw) (defineRaw %define)))
+(import (rename (only (kawa standard let) let) (let %let)))
+(import (rename (only (kawa standard set_b) set) (set set!)))
+
 (%define-syntax define-syntax
   (syntax-rules ($lookup$)
     ((define-syntax (($lookup$ part1 'part2) . pattern) . forms)

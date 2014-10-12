@@ -10,6 +10,8 @@
 (require <kawa.lib.reflection>)
 (require <kawa.lib.lists>)
 
+(import (only (kawa standard begin) begin))
+
 (define-syntax defmacro
   (syntax-rules ()
 		((defmacro name pattern . forms)
@@ -352,6 +354,7 @@
       ((%symbol->construct sym)
        (string->symbol (string-append "$construct$:"
                                       (symbol->string sym))))))))
+
 (define-syntax define-simple-constructor
   (lambda (form)
     (syntax-case form ($construct$)

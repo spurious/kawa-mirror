@@ -10,6 +10,12 @@
 	       identifier? free-identifier=? bound-identifier=?
 	       syntax-source syntax-line syntax-column eval)
 
+(import (rename (only (kawa standard let) let) (let %let)))
+(import (rename (only (kawa standard define) defineRaw) (defineRaw %define)))
+(import (only (kawa standard SchemeCompilation) lambda))
+(import (only (kawa standard Scheme) not))
+(import (only (kawa standard begin) begin))
+
 ;;; COND
 
 (define-syntax cond

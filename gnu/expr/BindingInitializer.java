@@ -21,8 +21,9 @@ public class BindingInitializer extends Initializer
       }
     else
       {
-        init.next = comp.mainLambda.initChain; // FIXME why mainLambda?
-        comp.mainLambda.initChain = init;
+        ModuleExp mod = comp.getModule();
+        init.next = mod.initChain; // FIXME why mainLambda?
+        mod.initChain = init;
       }
   }
 

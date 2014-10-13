@@ -1,3 +1,11 @@
+2014-10-13  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (isPedantic, setPedantic): New methods
+	(pedantic): Make field private.
+	* Language.java: Use setPedantic.
+	* Compilation.java (addClass); Tweak to use getModule.
+	* BindingInitializer.java: Likewise.
+
 2014-10-01  Per Bothner  <per@bothner.com>
 
 	* ApplyExp.java (getRawType, setType): Move up to ...

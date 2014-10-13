@@ -81,8 +81,9 @@ public class Compilation implements SourceLocator
 
   public Lexer lexer;
 
-  boolean pedantic;
-  public boolean isPedantic() { return pedantic; }
+    private boolean pedantic;
+    public boolean isPedantic() { return pedantic; }
+    public void setPedantic(boolean value) { pedantic = value; }
 
   /** Used to access the "main" instance.
    * This is used for two different purposes, which may be confusing:
@@ -1080,11 +1081,12 @@ public class Compilation implements SourceLocator
 
   public void addClass (ClassType new_class)
   {
-    if (mainLambda.filename != null)
+    String fname = getModule().filename;
+    if (fname != null)
       {
 	if (emitSourceDebugExtAttr)
 	  new_class.setStratum(getLanguage().getName());
-	new_class.setSourceFile(mainLambda.filename);
+	new_class.setSourceFile(fname);
       }
     registerClass(new_class);
     new_class.setClassfileVersion(defaultClassFileVersion);

@@ -703,7 +703,7 @@ public abstract class Language
     boolean immediate = (options & PARSE_IMMEDIATE) != 0;
     Compilation tr = getCompilation(messages, lexical);
     if (requirePedantic)
-      tr.pedantic = true;
+      tr.setPedantic(true);
     if (! immediate)
       tr.mustCompile = true;
     tr.immediate = immediate;

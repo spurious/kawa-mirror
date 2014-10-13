@@ -1,3 +1,7 @@
+2014-10-13  Per Bothner  <per@bothner.com>
+
+	* LispLanguage.java: Use new setPedantic method.
+
 2014-09-23  Per Bothner  <per@bothner.com>
 
 	* LispReader.java (readNumberWithRadix): Check for and append '#'

@@ -1,5 +1,10 @@
 2014-10-13  Per Bothner  <per@bothner.com>
 
+	* Compilation.java (getGlobalEnvironment): New method.
+	(resolve): Use it.
+
+2014-10-13  Per Bothner  <per@bothner.com>
+
 	* Compilation.java (isPedantic, setPedantic): New methods
 	(pedantic): Make field private.
 	* Language.java: Use setPedantic.

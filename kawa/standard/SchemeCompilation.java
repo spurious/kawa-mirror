@@ -9,10 +9,15 @@ import kawa.lang.*;
 
 public class SchemeCompilation extends Translator
 {
-  public SchemeCompilation (Language language, SourceMessages messages, NameLookup lexical)
-  {
-    super(language, messages, lexical);
-  }
+    public SchemeCompilation(Language language, SourceMessages messages,
+                             NameLookup lexical, Environment env) {
+        super(language, messages, lexical, env);
+    }
+
+    public SchemeCompilation(Language language, SourceMessages messages,
+                             NameLookup lexical) {
+        super(language, messages, lexical);
+    }
 
   public static final Declaration applyFieldDecl =
     Declaration.getDeclarationFromStatic("kawa.standard.Scheme", "applyToArgs");

@@ -2941,9 +2941,11 @@ public class Compilation implements SourceLocator
     return forNameHelper;
   }
 
+    public Environment getGlobalEnvironment() { return Environment.getCurrent(); }
+
   public Object resolve(Object name, boolean function)
   {
-    Environment env = Environment.getCurrent();
+    Environment env = getGlobalEnvironment();
     Symbol symbol;
     if (name instanceof String)
       symbol = env.defaultNamespace().lookup((String) name);

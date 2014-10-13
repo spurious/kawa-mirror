@@ -87,13 +87,20 @@ public class Translator extends Compilation
 
   private static Expression errorExp = new ErrorExp ("unknown syntax error");
 
-  public Translator (Language language, SourceMessages messages, NameLookup lexical)
-  {
-    super(language, messages, lexical);
-    this.env = Environment.getCurrent();
-  }
+    public Translator(Language language, SourceMessages messages,
+                      NameLookup lexical, Environment env) {
+        super(language, messages, lexical);
+        this.env = env;
+    }
 
-  public final Environment getGlobalEnvironment() { return env; }
+    public Translator(Language language, SourceMessages messages,
+                      NameLookup lexical) {
+        super(language, messages, lexical);
+        this.env = Environment.getCurrent();
+    }
+
+    @Override
+    public final Environment getGlobalEnvironment() { return env; }
 
   public Expression parse (Object input)
   {
@@ -578,7 +585,7 @@ public class Translator extends Compilation
    * Returns Integer.MIN_VALUE for cyclic lists.
    * For impure lists returns the negative of one more than
    * the number of pairs before the "dot".
-   * Similar to LList.listLength, but descends into SyntaxForm. */
+   * Similar to LList.listLength, but handles SyntaxForm more efficiently. */
   public static int listLength(Object obj)
   {
     // Based on list-length implementation in

@@ -1,3 +1,10 @@
+2014-10-13  Per Bothner  <per@bothner.com>
+
+	* lang/Translator.java (getGlobalEnvironment): Is now an override.
+	(<init>): New constructor that takes argument for env field.
+	* standard/SchemeCompilation.java (<init>): New constructor
+	that takes argument for env field.
+
 2014-10-12  Per Bothner  <per@bothner.com>
 
 	* standard/Scheme.java (initScheme): Remove '%let' and '%define'.

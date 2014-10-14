@@ -1,5 +1,8 @@
 2014-10-14  Per Bothner  <per@bothner.com>
 
+	* standard/IfFeature.java (coreFeatures): Add a bunch of features,
+	oncluding r7rs and system properties.
+
 	* standard/Scheme.java (initScheme): Add bindings for 'make-promise'
 	and 'delay-force' (as a synonym for 'lazy').
 

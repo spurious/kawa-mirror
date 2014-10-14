@@ -1,5 +1,6 @@
 package kawa.standard;
 import kawa.lang.*;
+import kawa.Version;
 import gnu.expr.*;
 import gnu.lists.ImmutablePair;
 import gnu.lists.LList;
@@ -8,6 +9,8 @@ import gnu.mapping.Symbol;
 import gnu.mapping.SimpleSymbol;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.nio.ByteOrder;
 
 /** Implements the Scheme 'cond-expand' syntax.
  * Also provides various static methods relating to "features".
@@ -101,8 +104,14 @@ public class IfFeature extends Syntax {
 
     private static List<String> coreFeatures = new ArrayList<String>();
     static {
+        coreFeatures.add("kawa");
+        coreFeatures.add("kawa-"+Version.getVersion());
+
         coreFeatures.add("complex");
         coreFeatures.add("exact-complex");
+        coreFeatures.add("exact-closed");
+        coreFeatures.add("ieee-float");
+        coreFeatures.add("ratios");
         coreFeatures.add("full-unicode");
 
         String javaVersion = System.getProperty("java.version");
@@ -125,10 +134,57 @@ public class IfFeature extends Syntax {
             }
         }
 
-        coreFeatures.add("kawa");
-        coreFeatures.add("ratios");
+        if (ByteOrder.nativeOrder() == ByteOrder.BIG_ENDIAN)
+            coreFeatures.add("big-endian");
+        else
+            coreFeatures.add("little-endian");
 
-        // coreFeatures.add("r7rs"); // Later, when more is implemented
+        String osName =
+            System.getProperty("os.name").toLowerCase(Locale.ENGLISH);
+        if (osName.indexOf("linux") >= 0) {
+            coreFeatures.add("posix");
+            coreFeatures.add("unix");
+            coreFeatures.add("linux");
+            coreFeatures.add("gnu-linux");
+        }
+        else if (osName.indexOf("win") >= 0) {
+            coreFeatures.add("windows");
+        } else if (osName.indexOf("sunos") >= 0
+                   || osName.indexOf("solaris") >= 0) {
+            coreFeatures.add("posix");
+            coreFeatures.add("unix");
+            coreFeatures.add("solaris");
+        } else if (osName.indexOf("mac") >= 0
+                   || osName.indexOf("darwin") >= 0) {
+            coreFeatures.add("posix");
+            coreFeatures.add("unix");
+            coreFeatures.add("darwin");
+            coreFeatures.add("macos");
+        } else if (osName.indexOf("nix") >= 0
+                   || osName.indexOf("nux") >= 0
+                   || osName.indexOf("aix") > 0) {
+            coreFeatures.add("posix");
+            coreFeatures.add("unix");
+        }
+
+        String archName =
+            System.getProperty("os.arch").toLowerCase(Locale.ENGLISH);;
+        if (archName.indexOf("amd64") >= 0
+            || archName.indexOf("x86_64") >= 0) {
+            coreFeatures.add("i386");
+            coreFeatures.add("x86-64");
+        } else if (archName.indexOf("x86") >= 0
+                   || archName.indexOf("i386") >= 0) {
+            coreFeatures.add("i386");
+        } else if (archName.indexOf("ppc") >= 0
+                   || archName.indexOf("powerpc") >= 0) {
+            coreFeatures.add("ppc");
+        } else if (archName.indexOf("sparc") >= 0) {
+            coreFeatures.add("sparc");
+        }
+        coreFeatures.add("jvm");
+
+        coreFeatures.add("r7rs");
 
         coreFeatures.add("srfi-0"); // cond-expand
         // coreFeatures.add("srfi-1"); // lists - only if require used.

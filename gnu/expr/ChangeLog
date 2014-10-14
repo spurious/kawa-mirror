@@ -1,5 +1,11 @@
 2014-10-13  Per Bothner  <per@bothner.com>
 
+	Add support for r7rs 'define-library'.
+	* Compilation.java (process): Checked lexer is non-null before close.
+	Don't write sub-module class if it is empty.
+	* ModuleExp.java (HAS_SUB_MODULE): New flag.
+	* ModuleManager.java (createWithClassName): New factory method.
+
 	* Compilation.java (getGlobalEnvironment): New method.
 	(resolve): Use it.
 

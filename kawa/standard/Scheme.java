@@ -832,6 +832,8 @@ public class Scheme extends LispLanguage
       defProcStFld("keyword->string", "kawa.lib.keywords");
       defProcStFld("string->keyword", "kawa.lib.keywords");
       defSntxStFld("location", "kawa.standard.location", "location");
+      defSntxStFld("define-library", "kawa.standard.define_library",
+                   "define_library");
       defSntxStFld("define-alias", "kawa.standard.define_alias",
                    "define_alias");
       defSntxStFld("define-private-alias", "kawa.standard.define_alias",

@@ -96,6 +96,13 @@ public class ModuleManager
     modules[numModules++] = info;
   }
 
+    public ModuleInfo createWithClassName(String className) {
+        ModuleInfo info = new ModuleInfo();
+        info.setClassName(className);
+        add(info);
+        return info;
+    }
+
   public synchronized ModuleInfo searchWithClassName (String className)
   {
     for (int i = numModules;  --i >= 0; )

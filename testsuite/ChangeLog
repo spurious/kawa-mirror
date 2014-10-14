@@ -1,3 +1,10 @@
+2014-10-13  Per Bothner  <per@bothner.com>
+
+	* life-grid.scm: New test, taken from r7rs document.
+	* life-grid.expected: Corresponding expected output.
+	* lib-cycle.scm: New test for define-library - with cycle.
+	* Makefile.am: Upadte accordingly.
+
 2014-10-09  Per Bothner  <per@bothner.com>
 	    Helmut Eller  <eller.helmut@gmail.com>
 

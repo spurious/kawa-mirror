@@ -82,6 +82,8 @@ public abstract class LispLanguage extends Language
           }
         for (;;)
           {
+            if (reader == null)
+              break;
             Object sexp = reader.readCommand();
             if (sexp == Sequence.eofValue)
               {

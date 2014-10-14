@@ -33,25 +33,7 @@ public class module_name extends Syntax {
             else
                 name = (String) p.getCar();
         } else if (arg instanceof Pair) {
-            StringBuilder sbuf = new StringBuilder(Compilation.classPrefixDefault);
-            boolean first = true;
-            for (;;) {
-                Pair parg = (Pair) arg;
-                if (! first)
-                    sbuf.append('.');
-                first = false;
-                Object car = parg.getCar();
-                if (car != null)
-                    sbuf.append(Compilation.mangleNameIfNeeded(car.toString()));
-                arg = parg.getCdr();
-                if (arg == LList.Empty)
-                    break;
-                if (car == null || ! (arg instanceof Pair)) {
-                    tr.error('e', "invalid list in module name");
-                    break;
-                }
-            }
-            name = sbuf.toString();
+            name = listToModuleName(arg, tr);
         } else if (arg instanceof FString || arg instanceof String)
             name = arg.toString();
         else if (arg instanceof Symbol) {
@@ -82,7 +64,7 @@ public class module_name extends Syntax {
                 if (oldName == null)
                     tr.mainClass.setName(className);
                 else if (! oldName.equals(className))
-                    tr.syntaxError("duplicate module-name: old name: "+oldName);
+                    tr.syntaxError("inconsistent module-name - old name: "+oldName);
             }
             module.setType(tr.mainClass);
             module.setName(name);
@@ -97,5 +79,27 @@ public class module_name extends Syntax {
             }
             tr.mustCompileHere();
         }
+    }
+
+    public static String listToModuleName(Object list, Translator tr) {
+        StringBuilder sbuf = new StringBuilder(Compilation.classPrefixDefault);
+        boolean first = true;
+        for (;;) {
+            Pair parg = (Pair) list;
+            if (! first)
+                sbuf.append('.');
+            first = false;
+            Object car = parg.getCar();
+            if (car != null)
+                sbuf.append(Compilation.mangleNameIfNeeded(car.toString()));
+            list = parg.getCdr();
+            if (list == LList.Empty)
+                break;
+            if (car == null || ! (list instanceof Pair)) {
+                tr.error('e', "invalid list in module name");
+                break;
+            }
+        }
+        return sbuf.toString();
     }
 }

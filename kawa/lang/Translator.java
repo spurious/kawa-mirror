@@ -1316,6 +1316,11 @@ public class Translator extends Compilation
         popPositionOf(save);
     }
 
+    public void errorIfNonEmpty(Object form) {
+        if (form != LList.Empty)
+            error('e', "invalid improper (dotted) list");
+    }
+
   /** Set the line position of the argument to the current position. */
 
   public void setLineOf (Expression exp)
@@ -1505,7 +1510,6 @@ public class Translator extends Compilation
                 else
                   obj = namespaceResolve(part1, part2);
               }
-            
             if (obj instanceof Symbol && ! selfEvaluatingSymbol(obj))
               {
                 Expression func = rewrite(obj, 'M');
@@ -1525,7 +1529,8 @@ public class Translator extends Compilation
             // Recognize deferred begin created in scanBody for pendingForms.
             // A seemingly-cleaner (obj instanceof Syntax) causes problems
             // with some Syntax forms, such as define.
-            else if (obj == kawa.standard.begin.begin)
+            else if (obj == kawa.standard.begin.begin
+                     || obj == kawa.standard.define_library.define_library_scan)
               syntax = (Syntax) obj;
           }
         finally

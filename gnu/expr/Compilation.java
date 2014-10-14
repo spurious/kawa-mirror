@@ -1926,7 +1926,8 @@ public class Compilation implements SourceLocator
             setState(BODY_PARSED-1);
             language.parse(this, 0);
             mexp.classFor(this);
-            lexer.close();
+            if (lexer != null)
+                lexer.close();
             lexer = null;
             setState(messages.seenErrors() ? ERROR_SEEN : BODY_PARSED);
             if (pendingImports != null)
@@ -1993,8 +1994,10 @@ public class Compilation implements SourceLocator
             setState(messages.seenErrors() ? ERROR_SEEN : COMPILED);
           }
         if (wantedState >= CLASS_WRITTEN && getState() < CLASS_WRITTEN)
-          { 
-            outputClass(ModuleManager.getInstance().getCompilationDirectory());
+          {
+            if (! (mexp.getFlag(ModuleExp.HAS_SUB_MODULE)
+                   && mexp.body == QuoteExp.voidExp && mexp.firstDecl() == null))
+                outputClass(ModuleManager.getInstance().getCompilationDirectory());
             setState(CLASS_WRITTEN);
           }
       }

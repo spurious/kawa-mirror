@@ -39,6 +39,8 @@ public class ModuleExp extends LambdaExp
   /** Using explicit class (e.g. define-simple-class) for module class. */
   public static final int USE_DEFINED_CLASS = INTERACTIVE << 1;
 
+  public static final int HAS_SUB_MODULE = USE_DEFINED_CLASS << 1;
+
   public ModuleExp ()
   {
   }

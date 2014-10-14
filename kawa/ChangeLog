@@ -1,5 +1,15 @@
 2014-10-13  Per Bothner  <per@bothner.com>
 
+	Add support for r7rs 'define-library'.
+	* standard/define_library.java: New class, extends Syntax.
+	* Makefile.am: Update accordingly.
+	* standard/Scheme.java (initScheme): Bind 'define-library'.
+	* lang/Translator.java (errorIfNonEmpty): New convenience method.
+	(scanForm): Special handling of define_library#define_library_scan.
+	* standard/module_name.java (listToModuleName): New method.
+	(scanForm): Scan form.
+	* standard/export.java: Complain if used after a define-library form.
+
 	* lang/Translator.java (rewrite_apir): Tweak/simplify error message.
 
 	* lang/Translator.java (getGlobalEnvironment): Is now an override.

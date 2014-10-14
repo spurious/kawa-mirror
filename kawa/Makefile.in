@@ -343,6 +343,7 @@ KAWA_STANDARD_JAVA_FILES = \
   standard/load.java \
   standard/constant_fold.java \
   standard/define.java \
+  standard/define_library.java \
   standard/define_syntax.java \
   standard/syntax_rules.java \
   standard/let_syntax.java \

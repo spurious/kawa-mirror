@@ -16,12 +16,16 @@ public class export extends Syntax {
         Object list = st.getCdr();
         Object savePos = tr.pushPositionOf(st);
         try {
-            if (defs instanceof ModuleExp)
-                ((ModuleExp) defs).setFlag(ModuleExp.EXPORT_SPECIFIED);
-            else {
+            if (! (defs instanceof ModuleExp)) {
                 tr.error('e', "\'" + getName() + "\' not at module level");
-                return true;
+                return false;
             }
+            ModuleExp mexp = (ModuleExp) defs;
+            if (mexp.getFlag(ModuleExp.HAS_SUB_MODULE)) {
+                tr.error('e', "'export' used follow explicit modules");
+                return false;
+            }
+            mexp.setFlag(ModuleExp.EXPORT_SPECIFIED);
             SyntaxForm restSyntax = null;
             while (list != LList.Empty) {
                 tr.pushPositionOf(list);

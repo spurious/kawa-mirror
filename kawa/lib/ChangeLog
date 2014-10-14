@@ -1,3 +1,8 @@
+2014-10-14  Per Bothner  <per@bothner.com>
+
+	* syntax.scm (cond-expand): Remove - now implemented by IfFeature.
+	* scheme/base.scm: New need to import cond-expand from IfFeature.
+
 2014-10-12  Per Bothner  <per@bothner.com>
 
 	* prim_syntax.scm: Add explicit imports instead of implicit

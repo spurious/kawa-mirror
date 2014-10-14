@@ -43,6 +43,8 @@
 (import (rename (only (kawa standard call_with_values) callWithValues)
                 (callWithValues call-with-values)))
 (import (only (kawa standard expt) expt))
+(import (rename (only (kawa standard IfFeature) condExpand)
+                (condExpand cond-expand)))
 (import (rename (only (kawa standard Include) include includeCi)
                 (includeCi include-ci)))
 (import (rename (only (kawa standard let_syntax) let_syntax letrec_syntax)

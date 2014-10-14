@@ -104,8 +104,11 @@ public class define_library extends Syntax {
                     Object[] searchPath = Include.relativeFirst;
                     Object forms = Include.process(pclause.getCdr(), tr, null, false, searchPath);
                     scanModulePass(forms, defs, tr);
-                }
-                else if (syntax != null) {
+                } else if (clauseHead == condExpandSymbol) {
+                    Object forms = IfFeature.condExpand
+                        .evaluate(pclause.getCdr(), tr);
+                    scanModulePass(forms, defs, tr);
+                } else if (syntax != null) {
                     syntax.scanForm(pclause, defs, tr);
                 }
                 else {
@@ -124,6 +127,7 @@ public class define_library extends Syntax {
     }
 
     public static final SimpleSymbol beginSymbol = Symbol.valueOf("begin");
+    public static final SimpleSymbol condExpandSymbol = Symbol.valueOf("cond-expand");
     public static final SimpleSymbol exportSymbol = Symbol.valueOf("export");
     public static final SimpleSymbol importSymbol = Symbol.valueOf("import");
     public static final SimpleSymbol includeSymbol = Symbol.valueOf("include");

@@ -1,3 +1,14 @@
+2014-10-14  Per Bothner  <per@bothner.com>
+
+	* standard/IfFeature.java: Now extends syntax.  Re-write to
+	handle cond-expand here (rather than in Scheme code).
+	Now also implements the library clause.
+	* standard/Scheme.java (initScheme): Update 'cond-expand' binding.
+	* standard/define_library.java: Support cond-expand clause.
+	* standard/ImportFromLibrary.java (checkSrfi): New method.
+	(scanImportset): Use it.
+	(libraryExists): New method, for cond-expand 'library' test.
+
 2014-10-13  Per Bothner  <per@bothner.com>
 
 	Add support for r7rs 'define-library'.

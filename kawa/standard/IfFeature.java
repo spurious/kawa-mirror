@@ -3,25 +3,101 @@ import kawa.lang.*;
 import gnu.expr.*;
 import gnu.lists.ImmutablePair;
 import gnu.lists.LList;
+import gnu.lists.Pair;
 import gnu.mapping.Symbol;
 import gnu.mapping.SimpleSymbol;
 import java.util.ArrayList;
 import java.util.List;
 
-public class IfFeature
-{
-  public static boolean testFeature (Object form)
-  {
-    if (form instanceof SyntaxForm)
-      {
-	SyntaxForm sf = (SyntaxForm) form;
-	form = sf.getDatum();
-      }
-    form = ((Translator) Compilation.getCurrent()).namespaceResolve(form);
-    if (form instanceof String || form instanceof SimpleSymbol)
-      return hasFeature(form.toString());
-    return false;  // FIXME - return error
-  }
+/** Implements the Scheme 'cond-expand' syntax.
+ * Also provides various static methods relating to "features".
+ */
+
+public class IfFeature extends Syntax {
+
+    public static final IfFeature condExpand = new IfFeature();
+    static { condExpand.setName("cond-expand"); }
+
+    @Override
+    public void scanForm(Pair st, ScopeExp defs, Translator tr) {
+        Object forms = evaluate(st.getCdr(), tr);
+        tr.scanBody(forms, defs, false);
+    }
+
+    public Expression rewriteForm(Pair form, Translator tr) {
+        Object forms = evaluate(form.getCdr(), tr);
+        return tr.rewrite_body(forms);
+    }
+
+    public boolean evaluateConditionCar(Pair pair, Translator tr) {
+        Object save = tr.pushPositionOf(pair);
+        boolean r = evaluateCondition(pair.getCar(), tr);
+        tr.popPositionOf(save);
+        return r;
+    }
+
+    public boolean evaluateCondition(Object form, Translator tr) {
+        form = tr.namespaceResolve(Translator.stripSyntax(form));
+        if (form instanceof String || form instanceof SimpleSymbol)
+            return hasFeature(form.toString());
+        if (form instanceof Pair) {
+            Pair pair = (Pair) form;
+            Object keyword = Translator.stripSyntax(pair.getCar());
+            if (keyword == orSymbol || keyword == andSymbol) {
+                Object rest = pair.getCdr();
+                while (rest instanceof Pair) {
+                    pair = (Pair) rest;
+                    boolean val = evaluateConditionCar(pair, tr);
+                    if (val == (keyword == orSymbol))
+                        return val;
+                    rest = pair.getCdr();
+                }
+                tr.errorIfNonEmpty(rest);
+                return keyword == andSymbol;
+            }
+            if (keyword == notSymbol) {
+                Object rest = pair.getCdr();
+                if (rest instanceof Pair) {
+                    Pair pair2 = (Pair) rest;
+                    if (pair2.getCdr() == LList.Empty)
+                        return ! evaluateConditionCar(pair2, tr);
+                }
+                tr.errorWithPosition("'not' must be followed by a single condition", pair);
+                return false;
+            }
+            if (keyword == librarySymbol) {
+                Object rest = pair.getCdr();
+                if (rest instanceof Pair) {
+                    Pair pair2 = (Pair) rest;
+                    if (pair2.getCdr() == LList.Empty)
+                        return (ImportFromLibrary.instance
+                                .libraryExists(pair2.getCar(), tr)) != null;
+                }
+                tr.errorWithPosition("'library' must be followed by <library name>", pair);
+                return false;
+            }
+        }
+        tr.error('e', "unrecognized cond-expand expression");
+        return false;
+    }
+
+    public Object evaluate(Object clauses, Translator tr) {
+        while (clauses instanceof Pair) {
+            Pair pclauses = (Pair) clauses;
+            Object clause = pclauses.getCar();
+            clauses = pclauses.getCdr();
+            if (! (clause instanceof Pair))
+                tr.errorWithPosition("cond-expand clauses is not a list",
+                                     pclauses);
+            Pair pclause = (Pair) clause;
+            Object test = Translator.stripSyntax(pclause.getCar());
+            if ((test == elseSymbol && clauses == LList.Empty)
+                || evaluateConditionCar(pclause, tr))
+                return pclause.getCdr();
+        }
+        tr.errorIfNonEmpty(clauses);
+        return LList.Empty;
+    }
 
     private static List<String> coreFeatures = new ArrayList<String>();
     static {
@@ -140,4 +216,10 @@ public class IfFeature
   {
     return decl.getName().startsWith(PROVIDE_PREFIX);
   }
+
+    public static final SimpleSymbol andSymbol = Symbol.valueOf("and");
+    public static final SimpleSymbol elseSymbol = Symbol.valueOf("else");
+    public static final SimpleSymbol librarySymbol = Symbol.valueOf("library");
+    public static final SimpleSymbol notSymbol = Symbol.valueOf("not");
+    public static final SimpleSymbol orSymbol = Symbol.valueOf("or");
 }

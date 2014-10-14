@@ -1,9 +1,12 @@
 (define-library (evn)
   (import (scheme base) (odd))
-  (begin
-    (define (is-even? (x :: <int>)) :: <boolean>
-      (if (= x 0) #t (is-odd? (- x 1)))))
-  (export is-even?))  
+  (cond-expand ((library (java lang no-such))
+                (define d e f)))
+  (cond-expand ((library (scheme base))
+                (begin
+                  (define (is-even? (x :: <int>)) :: <boolean>
+                    (if (= x 0) #t (is-odd? (- x 1)))))
+                (export is-even?))))
 
 (define-library (odd)
   (import (scheme base) (evn))

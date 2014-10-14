@@ -1,3 +1,7 @@
+2014-10-14  Per Bothner  <per@bothner.com>
+
+	* lib-cycle.scm (evn): Add cond-expand clauses so we can test that.
+
 2014-10-13  Per Bothner  <per@bothner.com>
 
 	* life-grid.scm: New test, taken from r7rs document.

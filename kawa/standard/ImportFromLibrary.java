@@ -6,6 +6,7 @@ import kawa.lang.*;
 import gnu.expr.*;
 import gnu.lists.*;
 import gnu.mapping.*;
+import gnu.bytecode.ObjectType;
 import java.util.*;
 import kawa.lang.Translator.FormStack;
 
@@ -20,7 +21,7 @@ public class ImportFromLibrary extends Syntax
 
     public String[] classPrefixPath = { "", "kawa.lib." };
 
-    private static final String BUILTIN = "";
+    private static final String BUILTIN = "<builtin>";
     private static final String MISSING = null;
 
     static final String[][] SRFI97Map = {
@@ -93,6 +94,70 @@ public class ImportFromLibrary extends Syntax
         if (obj != LList.Empty) tr.error('e', "improper list");
     }
 
+    public static String checkSrfi(String lname, Translator tr) {
+        if (lname.startsWith("srfi.")) {
+            String demangled = Compilation.demangleName(lname.substring(5));
+            int dot = demangled.indexOf('.');
+            String srfiName;
+            StringBuilder badNameBuffer = null;
+
+            if (dot < 0) {
+                srfiName = null;
+                dot = demangled.length();
+            } else
+                srfiName = demangled.substring(dot+1);
+            String srfiNumber = null;
+            if (dot >= 2 || demangled.charAt(0) == ':') {
+                for (int i = 1;  ;  i++) {
+                    if (i == dot) {
+                        srfiNumber = demangled.substring(1, dot);
+                        break;
+                    }
+                    if (Character.digit(demangled.charAt(i), 10) < 0)
+                        break;
+                }
+            }
+            if (srfiNumber == null) {
+                tr.error('e', "SRFI library reference must have the form: (srfi :NNN [name])");
+                return lname;
+            }
+            int srfiIndex = SRFI97Map.length;
+            for (;;) {
+                if (--srfiIndex < 0) {
+                    tr.error('e', badNameBuffer != null ? badNameBuffer.toString()
+                             : "unknown SRFI number '"+srfiNumber+"' in SRFI library reference");
+                    return lname;
+                }
+                if (!SRFI97Map[srfiIndex][0].equals(srfiNumber))
+                    continue;
+                String srfiNameExpected = SRFI97Map[srfiIndex][1];
+                String srfiClass = SRFI97Map[srfiIndex][2];
+                if (srfiName != null && ! srfiName.equals(srfiNameExpected)) {
+                    if (badNameBuffer == null) {
+                        badNameBuffer = new StringBuilder("the name of SRFI ");
+                        badNameBuffer.append(srfiNumber);
+                        badNameBuffer.append(" should be '");
+                    }
+                    else
+                        badNameBuffer.append(" or '");
+                    badNameBuffer.append(srfiNameExpected);
+                    badNameBuffer.append('\'');
+                    continue;
+                }
+
+                if (srfiClass == BUILTIN)
+                    return BUILTIN; // Nothing to do.
+                else if (srfiClass == MISSING) {
+                    tr.error('e', "sorry - Kawa does not support SRFI "+srfiNumber+" ("+srfiNameExpected+')');
+                }
+                else
+                    lname = srfiClass;
+                break;
+            }
+        }
+        return lname;
+    }
+
     void scanImportSet(Object imports, ScopeExp defs, Translator tr, require.DeclSetMapper mapper) {
         int specLength = Translator.listLength(imports);
         if (specLength <= 0) {
@@ -162,67 +227,9 @@ public class ImportFromLibrary extends Syntax
             }
         }
         String lname = sbuf.toString();
-
-        if (lname.startsWith("srfi.")) {
-            String demangled = Compilation.demangleName(lname.substring(5));
-            int dot = demangled.indexOf('.');
-            String srfiName;
-            StringBuilder badNameBuffer = null;
-
-            if (dot < 0) {
-                srfiName = null;
-                dot = demangled.length();
-            } else
-                srfiName = demangled.substring(dot+1);
-            String srfiNumber = null;
-            if (dot >= 2 || demangled.charAt(0) == ':') {
-                for (int i = 1;  ;  i++) {
-                    if (i == dot) {
-                        srfiNumber = demangled.substring(1, dot);
-                        break;
-                    }
-                    if (Character.digit(demangled.charAt(i), 10) < 0)
-                        break;
-                }
-            }
-            if (srfiNumber == null) {
-                tr.error('e', "SRFI library reference must have the form: (srfi :NNN [name])");
-                return;
-            }
-            int srfiIndex = SRFI97Map.length;
-            for (;;) {
-                if (--srfiIndex < 0) {
-                    tr.error('e', badNameBuffer != null ? badNameBuffer.toString()
-                             : "unknown SRFI number '"+srfiNumber+"' in SRFI library reference");
-                    return;
-                }
-                if (!SRFI97Map[srfiIndex][0].equals(srfiNumber))
-                    continue;
-                String srfiNameExpected = SRFI97Map[srfiIndex][1];
-                String srfiClass = SRFI97Map[srfiIndex][2];
-                if (srfiName != null && ! srfiName.equals(srfiNameExpected)) {
-                    if (badNameBuffer == null) {
-                        badNameBuffer = new StringBuilder("the name of SRFI ");
-                        badNameBuffer.append(srfiNumber);
-                        badNameBuffer.append(" should be '");
-                    }
-                    else
-                        badNameBuffer.append(" or '");
-                    badNameBuffer.append(srfiNameExpected);
-                    badNameBuffer.append('\'');
-                    continue;
-                }
-
-                if (srfiClass == BUILTIN)
-                    return; // Nothing to do.
-                else if (srfiClass == MISSING) {
-                    tr.error('e', "sorry - Kawa does not support SRFI "+srfiNumber+" ("+srfiNameExpected+')');
-                }
-                else
-                    lname = srfiClass;
-                break;
-            }
-        }
+        lname = checkSrfi(lname, tr);
+        if (lname == BUILTIN)
+            return; // nothing to do
 
         int classPrefixPathLength = classPrefixPath.length;
         for (int i = 0;  i < classPrefixPathLength;  i++) {
@@ -351,6 +358,28 @@ public class ImportFromLibrary extends Syntax
                 nmap = chain.map(nmap, tr);
             return nmap;
         }
+    }
+
+    /** Check if library (in r7rs import syntax) exists.
+     * @return if library exists: class name of (existing) library class,
+     * or the special BUILTIN value; otherwise null.
+     */
+    public String libraryExists(Object list, Translator tr) {
+        String lname = module_name.listToModuleName(list, tr);
+        lname = checkSrfi(lname, tr);
+        if (lname == BUILTIN)
+            return lname;
+        int classPrefixPathLength = classPrefixPath.length;
+        for (int i = 0;  i < classPrefixPathLength;  i++) {
+            String className = classPrefixPath[i] + lname;
+            try {
+                ObjectType.getContextClass(className);
+                return className;
+            } catch (Exception ex) {
+                continue;
+            }
+        }
+        return null;
     }
 
     public static final SimpleSymbol exceptSymbol = Symbol.valueOf("except");

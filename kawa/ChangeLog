@@ -1,5 +1,7 @@
 2014-10-13  Per Bothner  <per@bothner.com>
 
+	* lang/Translator.java (rewrite_apir): Tweak/simplify error message.
+
 	* lang/Translator.java (getGlobalEnvironment): Is now an override.
 	(<init>): New constructor that takes argument for env field.
 	* standard/SchemeCompilation.java (<init>): New constructor

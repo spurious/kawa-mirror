@@ -413,10 +413,9 @@ public class Translator extends Compilation
     Object cdr = p.getCdr();
     int cdr_length = listLength(cdr);
 
-    if (cdr_length == -1)
-      return syntaxError("circular list is not allowed after "+p.getCar());
     if (cdr_length < 0)
-      return syntaxError("dotted list ["+cdr+"] is not allowed after "+p.getCar());
+      return syntaxError
+          ("improper list (circular or dotted) is not allowed here");
     Expression applyFunction =  useHelper ? applyFunction(func) : null;
 
     Stack vec = new Stack();

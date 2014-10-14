@@ -321,7 +321,6 @@
 
 (test 2 (head (tail (tail integers))))
 
-(skip-if-kawa "delay-force not implemented"
 (define (stream-filter p? s)
   (delay-force
    (if (null? (force s)) 
@@ -344,7 +343,6 @@
                       (force p)))))
   (test 6 (force p))
   (test 6 (begin (set! x 10) (force p))))
-)
 
 (define radix
   (make-parameter

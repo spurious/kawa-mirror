@@ -2,7 +2,7 @@
 
 ;;; Definitions for some standard syntax.
 
-(module-export cond and or let let* do delay lazy
+(module-export cond and or let let* do delay lazy delay-force
                syntax->datum datum->syntax with-syntax
 	       syntax-object->datum datum->syntax-object ; deprecated
 	       begin-for-syntax define-for-syntax
@@ -215,7 +215,13 @@
 
 (define-syntax (lazy form)
   (syntax-case form ()
-    ((lazy expression)
+    ((_ expression)
+     (gnu.expr.ApplyExp gnu.kawa.functions.MakePromise:makeLazy
+                        (syntax->expression #'(lambda () expression))))))
+
+(define-syntax (delay-force form)
+  (syntax-case form ()
+    ((_ expression)
      (gnu.expr.ApplyExp gnu.kawa.functions.MakePromise:makeLazy
                         (syntax->expression #'(lambda () expression))))))
 

@@ -105,6 +105,9 @@
    (thunk)
    (after)))
 
+(define (make-promise obj) ::gnu.mapping.Promise
+  (gnu.mapping.Promise:makeBoundPromise obj))
+
 (define (promise-set-value! promise::gnu.mapping.Promise value) ::void
   (promise:setValue value))
 

@@ -1,5 +1,8 @@
 2014-10-14  Per Bothner  <per@bothner.com>
 
+	* standard/Scheme.java (initScheme): Add bindings for 'make-promise'
+	and 'delay-force' (as a synonym for 'lazy').
+
 	* standard/IfFeature.java: Now extends syntax.  Re-write to
 	handle cond-expand here (rather than in Scheme code).
 	Now also implements the library clause.

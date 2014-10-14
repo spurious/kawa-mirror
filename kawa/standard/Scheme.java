@@ -192,6 +192,7 @@ public class Scheme extends LispLanguage
       defSntxStFld("begin", "kawa.standard.begin", "begin");
       defSntxStFld("do", "kawa.lib.std_syntax");
       defSntxStFld("lazy", "kawa.lib.std_syntax");
+      defSntxStFld("delay-force", "kawa.lib.std_syntax");
       defSntxStFld("delay", "kawa.lib.std_syntax");
       defSntxStFld("quasiquote", "kawa.lang.Quote", "quasiQuote");
 
@@ -451,6 +452,7 @@ public class Scheme extends LispLanguage
       defProcStFld("force", "kawa.lib.misc");
       defProcStFld("force*", "kawa.lib.misc");
       defProcStFld("eager", "kawa.lib.misc");
+      defProcStFld("make-promise!", "kawa.lib.misc");
       defProcStFld("promise-set-value!", "kawa.lib.misc");
       defProcStFld("promise-set-alias!", "kawa.lib.misc");
       defProcStFld("promise-set-exception!", "kawa.lib.misc");

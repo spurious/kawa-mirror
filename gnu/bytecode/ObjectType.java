@@ -85,15 +85,9 @@ public class ObjectType extends Type
   public static Class getContextClass (String cname)
     throws java.lang.ClassNotFoundException
   {
-    /* #ifdef JAVA2 */
-    /* Specifies optional 'initialize' argument. */
     return Class.forName(cname, false, getContextClassLoader());
-    /* #else */
-    // return Class.forName(cname);
-    /* #endif */
   }
 
-  /* #ifdef JAVA2 */
   public static ClassLoader getContextClassLoader ()
   {
     try
@@ -111,7 +105,6 @@ public class ObjectType extends Type
         /* #endif */
       }
   }
-  /* #endif */
 
   /** Get the java.lang.Class object for the representation type. */
   public Class getReflectClass()

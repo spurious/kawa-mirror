@@ -1,5 +1,5 @@
 qdnl Process this with autoconf to create configure
-AC_INIT([kawa],[1.14.1]) dnl Also update build.xml.
+AC_INIT([kawa],[1.90]) dnl Also update bin/configure.ac and build.xml.
 AC_CONFIG_SRCDIR([doc/kawa.texi])
 
 AM_MAINTAINER_MODE

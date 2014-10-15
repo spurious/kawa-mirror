@@ -2646,10 +2646,11 @@ the @func{let} expression in the above example is equivalent to
 @display
 @stxdef{cond-expand-clause} @stxlit{(}@var{feature-requirement} @var{command-or-definition}*@stxlit{)}
 @findex @i{fff-rec}
-@stxdef{feature-requirement} @var{feature-identifier}
-  | @stxlit{(and} @var{feature-requirement}*@stxlit{)}
-  | @stxlit{(or} @var{feature-requirement}*@stxlit{)}
-  | @stxlit{(not} @var{feature-requirement}@stxlit{)}
+@stxdef{feature-requirement} @stxref{feature-identifier}
+  | @stxlit{(and} @arbno{@stxref{feature-requirement}}@stxlit{)}
+  | @stxlit{(or} @arbno{@stxref{feature-requirement}}@stxlit{)}
+  | @stxlit{(not} @stxref{feature-requirement}@stxlit{)}
+  | @stxlit{(library} @stxref{library-name}@stxlit{)}
 @stxdef{feature-identifier} a symbol which is the name or alias of a SRFI
 @end display
 
@@ -2661,12 +2662,17 @@ whose feature requirement is currently satisfied; the @code{else}
 clause, if present, is selected if none of the previous clauses is
 selected.
 
-A feature requirement has an obvious interpretation as a logical
-formula, where the @var{feature-identifier} variables have meaning true if @c 
-the feature corresponding to the feature identifier, as specified in the
-SRFI registry, is in effect at the location of the @code{cond-expand} form, and
-false otherwise. A feature requirement is satisfied if its formula is
-true under this interpretation.
+The implementation has a set of
+feature identifiers which are ``present'', as well as a set
+of libraries which can be imported.
+The value of a
+@meta{feature-requirement} is determined by replacing each
+@meta{feature-identifier} by @code{#t} if it is present
+(and @code{#f} otherwise);
+replacing @code{(library @meta{library-name})}
+by @code{#t} if @meta{library-name} is importable (and @code{#f} otherwise);
+and then evaluating the resulting expression as a Scheme boolean expression
+under the normal interpretation of @code{and}, @code{or}, and @code{not}.
 
 Examples:
 @example
@@ -2697,8 +2703,11 @@ reported by @code{System} property @code{"java.version"}.
 
 You can use @code{class-exists:@var{ClassName}} to check
 if @code{@var{ClassName}} exists at compile-time.
+The identifier @code{class-exists:org.example.MyClass}
+is roughly equivalent to the test @code{(library (org example MyClass))}.
+(The latter has some special handling for @code{(srfi ...)} as well
+as builtin Kawa classes.)
 @end deffn
-
 
 @deffn Procedure features
 Returns a list of feature identifiers which @code{cond-expand}
@@ -4228,13 +4237,28 @@ resulting value.  The effect of @var{expression} returning multiple
 values is unspecified.
 @end deffn
 
-@deffn Syntax lazy @stxref{expression}
-The @code{lazy} construct is similar to delay, but it is expected
+@deffn Syntax delay-force @stxref{expression}
+@deffnx Syntax lazy @stxref{expression}
+The @code{delay-force} construct is similar to @code{delay}, but it is expected
 that its argument evaluates to a promise.
 (Kawa treats a non-promise value as if it were a forced promise.)
 The returned
 promise, when forced, will evaluate to whatever the original
 promise would have evaluated to if it had been forced.
+
+The expression @code{(delay-force @meta{expression})} is
+conceptually similar to @code{(delay (force @meta{expression}))}, with
+the difference that forcing the result of @code{delay-force} will
+in effect result in a tail call to @code{(force @meta{expression})}, while
+forcing the result of @code{(delay (force @meta{expression}))} might
+not. Thus iterative lazy algorithms that might result in a
+long series of chains of @code{delay} and @code{force} can be rewritten
+using delay-force to prevent consuming unbounded space
+during evaluation.
+
+Using @code{delay-force} or @code{lazy} is equivalent.
+The name @code{delay-force} is from R7RS; the name @code{lazy}
+is from the older SRFI-45.
 @end deffn
 
 @deffn Procedure eager obj
@@ -4242,10 +4266,9 @@ Returns a promise that when forced will return @var{obj}.
 It is similar to @code{delay}, but does not delay its argument;
 it is a procedure rather than syntax.
 
-As a Kawa optimization, if the @var{obj} is not a promise
-(does not implement @code{gnu.mapping.Lazy}), it is returned as-is.
-(This is because Kawa generally minimizes the difference
-bwteen a value and forced promise evaluating to the value.)
+The Kawa implementation just returns @var{obj} as-is.
+This is because Kawa treats as equivalent
+a value and forced promise evaluating to the value.
 @end deffn
 
 @deffn Procedure force promise
@@ -4454,6 +4477,16 @@ Associate @var{thunk} (a zero-argument procedure) with the @var{promise}.
 The first time the @var{promise} is forced will causes the
 @var{thunk} to be called, with the result (a value or an exception)
 saved for future calls.
+@end deffn
+
+@deffn Procedure make-promise obj
+The @code{make-promise} procedure returns a promise which,
+when forced, will return @var{obj}. It is similar to @code{delay}, but
+does not delay its argument: it is a procedure rather than
+syntax. If @var{obj} is already a promise, it is returned.
+
+Because of Kawa's implicit forcing, there is seldom a
+need to use @code{make-promise}, except for portability.
 @end deffn
 
 @subsection Lazy and eager types
@@ -12163,6 +12196,25 @@ Alternatively, you can write:
 (define (fact x) ...)
 @end example
 
+@subsection R7RS explicit library modules
+
+A R7RS @code{define-library} form is another way to create a module.
+The R7RS term @dfn{library} is roughly the same as a Kawa module.
+In Kawa, each source file is a @dfn{implicit module},
+which may contain zero or more explicit sub-modules (in
+the form of @code{define-library}) optionally followed by
+the definitions and expressions of the implicit (file-level) module.
+
+@deffn Syntax define-library @stxref{library-name} @arbno{@stxref{library-declaration}}
+@end deffn
+
+@display
+@stxdef{library-declaration}
+  ...
+@stxdef{library-name} @stxlit{(} @stxref{library-name-parts} @stxlit{)}
+@stxdef{library-name-parts} @atleastone{@var{identifier}}
+@end display
+
 @subsection How a module becomes a class
 
 If you want to just use a Scheme module as a module (i.e. @code{load}
@@ -12469,7 +12521,7 @@ Similar functionality as @code{require}, but specified by R6RS/R7RS.
   | @stxlit{(except} @stxref{import-set} @arbno{@var{identifier}}@stxlit{)}
   | @stxlit{(prefix} @stxref{import-set} @var{identifier} @stxlit{)}
   | @stxlit{(rename} @stxref{import-set} @arbno{@stxlit{(} @stxref{identifier}@sub{1} @stxref{identifier}@sub{2} @stxlit{)}}@stxlit{)}
-@stxdef{library-reference} @stxlit{(} @atleastone{@var{identifier}} [@stxref{sourcepath-string}]@stxlit{)}
+@stxdef{library-reference} @stxlit{(} @stxref{library-name-parts} [@stxref{sourcepath-string}]@stxlit{)}
 @stxdef{sourcepath-string} @stxref{string}
 @end display
 
@@ -16305,8 +16357,6 @@ Robert Yokota.
 
 Kawa includes Free Software originally written for other purposes,
 but incorporated into Kawa, perhaps with some porting.  A partial list:
-
-Marc Feeley wrote SRFI-0 (cond-expand macro).
 
 Dorai Sitaram wrote pregexp.
 

@@ -1,3 +1,8 @@
+2014-10-14  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Lazy evaluation): Document make-promise and delay-force.
+	(Syntax and conditional compilation):  Update cond-expand.
+
 2014-10-06  Per Bothner  <per@bothner.com>
 
 	* kawa.texi: Various modest improvements.

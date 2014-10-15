@@ -822,7 +822,7 @@ public class InPort extends Reader implements Printable
     }
 
     /** Reads a Unicode character (codepoint) by checking for surrogates.
-     * An invalid surrogate pair retruns 0xFFFD.
+     * End-of-file return -1; an invalid surrogate pair returns 0xFFFD.
      */
     public static int readCodePoint(Reader in) throws java.io.IOException {
         int c = in.read();

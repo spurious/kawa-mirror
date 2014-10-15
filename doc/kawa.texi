@@ -973,6 +973,9 @@ in a readable format to the standard output.
 Similar to the previous option, but prints out the @code{Expression} after
 various transformations and optimizations have been done, and just before
 code generation.
+@item --debug-syntax-pattern-match
+Prints logging importation to standard error when a @code{syntax-rules}
+or @code{syntax-case} pattern matches.
 @item --debug-error-prints-stack-trace
 Prints a stack trace with any error found during compilation.
 @item --debug-warning-prints-stack-trace
@@ -1627,7 +1630,7 @@ Kawa implements the following semi-standard SRFIs
 @uref{http://srfi.schemers.org/srfi-0/srfi-0.html, SRFI 0}: Feature-based conditional expansion construct,
 using @code{cond-expand} - @pxref{Syntax and conditional compilation}.
 @item
-@uref{http://srfi.schemers.org/srfi-1/srfi-1.html, SRFI 1}: List Library, if @code{(require 'list-lib)}.
+@uref{http://srfi.schemers.org/srfi-1/srfi-1.html, SRFI 1}: List Library, if @code{(require 'list-lib)} - @pxref{SRFI-1}.
 @item
 @uref{http://srfi.schemers.org/srfi-2/srfi-2.html, SRFI 2}: AND-LET*: an AND with local bindings, a guarded LET* special form.
 @item
@@ -1675,8 +1678,7 @@ The @code{read-with-shared-structure} is missing, but subsumed by @code{read}.
 @item
 @uref{http://srfi.schemers.org/srfi-45/srfi-45.html, SRFI 45}: Primitives for Expressing Iterative Lazy Algorithms - @pxref{Lazy evaluation}.
 @item
-@uref{http://srfi.schemers.org/srfi-60/srfi-60.html, SRFI 60}:
-Integers as Bits.
+@uref{http://srfi.schemers.org/srfi-60/srfi-60.html, SRFI 60}: Integers as Bits. - @pxref{Logical Number Operations}.
 @item
 @uref{http://srfi.schemers.org/srfi-62/srfi-62.html, SRFI 62}: S-expression comments.
 @item
@@ -1693,6 +1695,8 @@ Integers as Bits.
 @uref{http://srfi.schemers.org/srfi-97/srfi-97.html, SRFI 97}: Names for SRFI Libraries.
 @item
 @uref{http://srfi.schemers.org/srfi-98/srfi-98.html, SRFI 98}: An interface to access environment variables
+@item
+@uref{http://srfi.schemers.org/srfi-101/srfi-101.html, SRFI 101}: Purely Functional Random-Access Pairs and Lists - @pxref{SRFI-101}.
 @item
 @uref{http://srfi.schemers.org/srfi-107/,SRFI 107}: XML reader syntax - @pxref{XML literals}.
 @item
@@ -4069,7 +4073,7 @@ the given name and type, and evaluate @var{value}
 in the module's class initializer (if the definition
 is static) or constructor (if the definition is non-static),
 before other definitions and expressions.
-Othewise, the @var{value} is evaluated in the module body
+Otherwise, the @var{value} is evaluated in the module body
 where it appears.
 
 If the @var{value} is a compile-time constant,
@@ -8265,6 +8269,7 @@ Otherwise the initial contents of each element is unspecified.
 @end example
 @end deffn
 
+@anchor{SRFI-1}
 @subsection SRFI-1 list library
 
 The @uref{http://srfi.schemers.org/srfi-1/srfi-1.html, SRFI-1 List Library}
@@ -8281,6 +8286,17 @@ No new pairs are allocated, instead the pairs of @var{list} are re-used,
 with @code{cdr} cells of @var{list} reversed in place.  Note that if @var{list}
 was pair, it becomes the last pair of the reversed result.
 @end deffn
+
+@anchor{SRFI-101}
+@subsection SRFI-101 Purely Functional Random-Access Pairs and Lists
+
+@uref{http://srfi.schemers.org/srfi-101/srfi-101.html, SRFI-101}
+specifies immutable (read-only) lists with fast (logarithmic) indexing
+and functional
+update (i.e. return a modified list).
+These are implemented by a @code{RAPair} class
+which extends the generic @code{pair} type, which means that most
+code that expects a standard list will work on these lists as well.
 
 @node Vectors
 @section Vectors
@@ -10568,10 +10584,9 @@ characters are found that can begin an object, then an
 end-of-file object is returned. The port remains open, and
 further attempts to read will also return an end-of-file object.
 If an end of file is encountered after the beginning of
-an object’s external representation, but the external repre-
-sentation is incomplete and therefore not parsable, an error
-@c FIXME that satisfies @code{read-error?}
-is signaled.
+an object’s external representation, but the external representation
+is incomplete and therefore not parsable, an error
+that satisfies @code{read-error?} is signaled.
 @end deffn
 
 @deffn Procedure read-char [port]

@@ -2260,7 +2260,6 @@
 (test #t (exact? (jiffies-per-second)))
 
 (test #t (list? (features)))
-(test-expect-fail 1)
 (test #t (and (memq 'r7rs (features)) #t))
 
 (test #t (file-exists? "."))

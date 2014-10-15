@@ -1,5 +1,7 @@
 2014-10-14  Per Bothner  <per@bothner.com>
 
+	* r7rs-tests.scm: 'r7rs is now in the features list.
+
 	* r7rs-tests.scm: Enable test for delay-force.
 
 	* lib-cycle.scm (evn): Add cond-expand clauses so we can test that.

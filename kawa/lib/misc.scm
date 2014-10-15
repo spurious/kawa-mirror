@@ -105,8 +105,9 @@
    (thunk)
    (after)))
 
-(define (make-promise obj) ::gnu.mapping.Promise
-  (gnu.mapping.Promise:makeBoundPromise obj))
+(define (make-promise obj) ::gnu.mapping.Lazy
+  (if (gnu.mapping.Lazy? obj) obj
+      (gnu.mapping.Promise:makeBoundPromise obj)))
 
 (define (promise-set-value! promise::gnu.mapping.Promise value) ::void
   (promise:setValue value))
@@ -127,9 +128,7 @@
   (gnu.mapping.Promise:force arg))
 
 (define (eager value)
-  (if (gnu.mapping.Promise? value)
-      (gnu.mapping.Promise value: value)
-      value))
+  eager)
 
 (define (base-uri #!optional (node #!null))
   (let ((uri (if (eq? node #!null)

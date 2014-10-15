@@ -1,6 +1,10 @@
 2014-10-14  Per Bothner  <per@bothner.com>
 
+	* misc.scm (eager): Change to just return the argument.
+	(make-promise): Tweak return argument if already a promise.
+
 	* misc.scm (make-promise): New procedure.
+
 	* std_syntax.scm (delay-force): New syntax.
 
 	* syntax.scm (cond-expand): Remove - now implemented by IfFeature.

@@ -1805,14 +1805,13 @@
     (let ((f (eval '(lambda (f x) (f x x)) (null-environment 5))))
       (f + 10)))
 
-(skip-if-kawa "evironment not implemented"
 (test 1024 (eval '(expt 2 10) (environment '(scheme base))))
 (test 0.0 (eval '(sin 0) (environment '(scheme inexact))))
 (test 1024.0 (eval '(+ (expt 2 10) (sin 0))
                    (environment '(scheme base) '(scheme inexact))))
 
 
-)(test-end)
+(test-end)
 
 (test-begin "6.13 Input and output")
 

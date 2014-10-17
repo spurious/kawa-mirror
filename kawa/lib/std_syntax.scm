@@ -1,14 +1,13 @@
-(require <kawa.lib.prim_syntax>)
-
 ;;; Definitions for some standard syntax.
 
 (module-export cond and or let let* do delay lazy delay-force
                syntax->datum datum->syntax with-syntax
 	       syntax-object->datum datum->syntax-object ; deprecated
-	       begin-for-syntax define-for-syntax
 	       generate-temporaries define-procedure
 	       identifier? free-identifier=? bound-identifier=?
-	       syntax-source syntax-line syntax-column eval)
+	       syntax-source syntax-line syntax-column)
+
+(require <kawa.lib.prim_syntax>)
 
 (import (rename (only (kawa standard let) let) (let %let)))
 (import (rename (only (kawa standard define) defineRaw) (defineRaw %define)))
@@ -297,24 +296,6 @@
 	 (- ((as gnu.lists.PairWithPosition form):getColumnNumber) 0))
 	(else
 	 #f)))
-
-(with-compile-options
- full-tailcalls: #t
- (define (eval exp #!optional (env ::gnu.mapping.Environment (gnu.mapping.Environment:user)))
-   (kawa.lang.Eval:evalForm exp env)))
-
-(define-syntax begin-for-syntax
-  (lambda (form)
-    (syntax-case form ()
-      ((begin-for-syntax . body)
-       (eval (syntax-object->datum (gnu.lists.Pair 'begin (syntax body))))
-       (syntax #!void)))))
-
-(define-syntax define-for-syntax
-  (syntax-rules ()
-    ((define-for-syntax . rest)
-     (begin-for-syntax
-      (define . rest)))))
 
 ;;; The definition of include is based on that in the portable implementation
 ;;; of syntax-case psyntax.ss, whixh is again based on Chez Scheme.

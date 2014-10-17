@@ -452,6 +452,7 @@ public class Scheme extends LispLanguage
       defProcStFld("force", "kawa.lib.misc");
       defProcStFld("force*", "kawa.lib.misc");
       defProcStFld("eager", "kawa.lib.misc");
+      defProcStFld("promise?", "kawa.lib.misc");
       defProcStFld("make-promise!", "kawa.lib.misc");
       defProcStFld("promise-set-value!", "kawa.lib.misc");
       defProcStFld("promise-set-alias!", "kawa.lib.misc");
@@ -546,9 +547,10 @@ public class Scheme extends LispLanguage
       defSntxStFld("define-values", "kawa.lib.syntax");
       defSntxStFld("case-lambda", "kawa.lib.syntax");
       defSntxStFld("receive", "kawa.lib.syntax");
-      defProcStFld("eval", "kawa.lib.std_syntax");
+      defProcStFld("eval", "kawa.lib.scheme.eval");
       defProcStFld("repl", "kawa.standard.SchemeCompilation", "repl");
       defProcStFld("scheme-report-environment", "kawa.lib.misc");
+      defProcStFld("environment", "kawa.lib.scheme.eval");
       defProcStFld("null-environment", "kawa.lib.misc");
       defProcStFld("interaction-environment", "kawa.lib.misc");
       defProcStFld("dynamic-wind", "kawa.lib.misc");
@@ -714,8 +716,8 @@ public class Scheme extends LispLanguage
       defProcStFld("syntax-source", "kawa.lib.std_syntax");
       defProcStFld("syntax-line", "kawa.lib.std_syntax");
       defProcStFld("syntax-column", "kawa.lib.std_syntax");
-      defSntxStFld("begin-for-syntax", "kawa.lib.std_syntax");
-      defSntxStFld("define-for-syntax", "kawa.lib.std_syntax");
+      defSntxStFld("begin-for-syntax", "kawa.lib.syntax");
+      defSntxStFld("define-for-syntax", "kawa.lib.syntax");
       defSntxStFld("include", "kawa.standard.Include", "include");
       defSntxStFld("include-relative", "kawa.standard.Include",
                    "includeRelative");

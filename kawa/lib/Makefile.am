@@ -34,10 +34,11 @@ java_SCM_ALWAYS =\
   kawa/hashtable.scm kawa/regex.scm rnrs/hashtables.scm rnrs/lists.scm \
   srfi95.scm rnrs/unicode.scm rnrs/sorting.scm rnrs/programs.scm \
   scheme/base.scm scheme/case-lambda.scm scheme/char.scm \
-  scheme/complex.scm scheme/cxr.scm scheme/inexact.scm scheme/load.scm \
-  scheme/read.scm scheme/process-context.scm scheme/time.scm scheme/write.scm \
-  compile_misc.scm compile_map.scm \
-  trace.scm
+  scheme/complex.scm scheme/cxr.scm scheme/eval.scm scheme/file.scm \
+  scheme/inexact.scm scheme/lazy.scm scheme/load.scm \
+  scheme/process-context.scm scheme/read.scm scheme/repl.scm scheme/time.scm \
+  scheme/write.scm compile_misc.scm compile_map.scm trace.scm
+# TODO: scheme/r5rs.scm
 
 scm_WITH_SWING = windows.scm
 EXTRA_DIST = $(java_SCM_ALWAYS) $(scm_WITH_SWING)

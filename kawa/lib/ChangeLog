@@ -1,3 +1,19 @@
+2014-10-17  Per Bothner  <per@bothner.com>
+
+	* scheme/file.scm: Implement r7rs library (scheme file), using imports.
+	* scheme/lazy.scm: Likewise for (scheme lazy).
+	* scheme/repl.scm: Likewise for (scheme repl).
+	* scheme/eval.scmm: Implement r7rs library (scheme eval) directly.
+	(environment): New procedure.
+	(eval): Moved from std_syntax.scm.
+	* Makefile.am: Update accordingly.
+	* misc.scm (promise?): New explicit type predicate.
+	* std_syntax.scm (eval): Moved to scheme/eval.scm.
+	(begin-for-syntax, define-for-syntax): Moved to syntax.scm.
+	* syntax.scm (begin-for-syntax, define-for-syntax):
+	Moved from std_syntax.scm.
+	* lists.scm: Remove redundant module-static specifier.
+
 2014-10-14  Per Bothner  <per@bothner.com>
 
 	* misc.scm (eager): Change to just return the argument.

@@ -1,4 +1,5 @@
 (module-export defmacro define-macro define-syntax-case
+	       begin-for-syntax define-for-syntax
                when unless try-finally synchronized
                let-values let*-values case-lambda define-values
                receive define-alias-parameter
@@ -9,6 +10,7 @@
 (require <kawa.lib.std_syntax>)
 (require <kawa.lib.reflection>)
 (require <kawa.lib.lists>)
+(require <kawa.lib.scheme.eval>)
 
 (import (only (kawa standard begin) begin))
 
@@ -55,6 +57,19 @@
          (syntax->expression (syntax object))
          (syntax-body->expression (syntax body)))))))
 
+
+(define-syntax begin-for-syntax
+  (lambda (form)
+    (syntax-case form ()
+      ((begin-for-syntax . body)
+       (eval (syntax-object->datum (gnu.lists.Pair 'begin (syntax body))))
+       (syntax #!void)))))
+
+(define-syntax define-for-syntax
+  (syntax-rules ()
+    ((define-for-syntax . rest)
+     (begin-for-syntax
+      (define . rest)))))
 
 ;; LET-VALUES implementation from SRFI-11, by Lars T Hansen.
 ;; http://srfi.schemers.org/srfi-11/srfi-11.html

@@ -105,6 +105,9 @@
    (thunk)
    (after)))
 
+(define (promise? obj) ::boolean
+  (instance? obj gnu.mapping.Lazy))
+
 (define (make-promise obj) ::gnu.mapping.Lazy
   (if (gnu.mapping.Lazy? obj) obj
       (gnu.mapping.Promise:makeBoundPromise obj)))

@@ -1,3 +1,8 @@
+2014-10-17  Per Bothner  <per@bothner.com>
+
+	* standard/Scheme.java (initScheme): Added promise? and environment.
+	Updated some other bindings.
+
 2014-10-14  Per Bothner  <per@bothner.com>
 
 	* standard/IfFeature.java (coreFeatures): Add a bunch of features,

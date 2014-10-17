@@ -1,4 +1,3 @@
-(module-static #t)
 (module-export pair? cons null? set-car! set-cdr! car cdr
 	       caar cadr cdar cddr
 	       caaar caadr cadar caddr cdaar cdadr cddar cdddr

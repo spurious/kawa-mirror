@@ -141,6 +141,7 @@ public class IfFeature extends Syntax {
 
         String osName =
             System.getProperty("os.name").toLowerCase(Locale.ENGLISH);
+        // FIXME check for cygwin, bsd
         if (osName.indexOf("linux") >= 0) {
             coreFeatures.add("posix");
             coreFeatures.add("unix");
@@ -159,7 +160,11 @@ public class IfFeature extends Syntax {
             coreFeatures.add("posix");
             coreFeatures.add("unix");
             coreFeatures.add("darwin");
-            coreFeatures.add("macos");
+            coreFeatures.add("macosx");
+        } else if (osName.indexOf("bsd") >= 0) {
+            coreFeatures.add("bsd");
+            coreFeatures.add("posix");
+            coreFeatures.add("unix");
         } else if (osName.indexOf("nix") >= 0
                    || osName.indexOf("nux") >= 0
                    || osName.indexOf("aix") > 0) {
@@ -171,7 +176,6 @@ public class IfFeature extends Syntax {
             System.getProperty("os.arch").toLowerCase(Locale.ENGLISH);;
         if (archName.indexOf("amd64") >= 0
             || archName.indexOf("x86_64") >= 0) {
-            coreFeatures.add("i386");
             coreFeatures.add("x86-64");
         } else if (archName.indexOf("x86") >= 0
                    || archName.indexOf("i386") >= 0) {

@@ -1,5 +1,8 @@
 2014-10-22  Per Bothner  <per@bothner.com>
 
+	* standard/IfFeature.java (coreFeatures): Rename 'macos to 'macosx.
+	Add some bsd support.  Don't also define i386 if x86_64.
+
 	* standard/Scheme.java (initScheme): Added bindings for 'else 'unquote
 	'unquote-splicing '... '=> '_.
 

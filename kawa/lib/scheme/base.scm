@@ -66,11 +66,8 @@
 (import (rename (only (kawa standard vector_append) vectorAppend)
                 (vectorAppend vector-append)))
 
-#| Special unbound symbols:
 (export
-  ... => _ else unquote unquote-splicing)
-|#
-(export
+ ... => _ else unquote unquote-splicing
  * + - / < <= = > >=
  abs and append apply assoc assq assv
  begin binary-port? boolean=? boolean?

@@ -1,3 +1,10 @@
+2014-10-22  Per Bothner  <per@bothner.com>
+
+	* std_syntax.scm (else unquote unquote-splicing ... => _):
+	Provide bindings that report an error.
+	* schemebase.scm (else unquote unquote-splicing ... => _):
+	Export bindings, as required by R7RS.
+
 2014-10-17  Per Bothner  <per@bothner.com>
 
 	* scheme/file.scm: Implement r7rs library (scheme file), using imports.

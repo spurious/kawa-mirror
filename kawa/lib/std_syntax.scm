@@ -1,6 +1,7 @@
 ;;; Definitions for some standard syntax.
 
 (module-export cond and or let let* do delay lazy delay-force
+               else ... => _ else unquote unquote-splicing
                syntax->datum datum->syntax with-syntax
 	       syntax-object->datum datum->syntax-object ; deprecated
 	       generate-temporaries define-procedure
@@ -14,6 +15,36 @@
 (import (only (kawa standard SchemeCompilation) lambda))
 (import (only (kawa standard Scheme) not))
 (import (only (kawa standard begin) begin))
+
+(define-syntax =>
+  (syntax-rules ()
+    ((_ . rest)
+     (syntax-error "invalid use of '=>"))))
+
+(define-syntax ...
+  (syntax-rules ()
+    ((_ . rest)
+     (syntax-error "invalid use of '..."))))
+
+(define-syntax _
+  (syntax-rules ()
+    ((_ . rest)
+     (syntax-error "invalid use of '_"))))
+
+(define-syntax else
+  (syntax-rules ()
+    ((_ . rest)
+     (syntax-error "invalid use of 'else"))))
+
+(define-syntax unquote
+  (syntax-rules ()
+    ((_ . rest)
+     (syntax-error "invalid use of 'unquote"))))
+
+(define-syntax unquote-splicing
+  (syntax-rules ()
+    ((_ . rest)
+     (syntax-error "invalid use of 'unquote-splicing"))))
 
 ;;; COND
 

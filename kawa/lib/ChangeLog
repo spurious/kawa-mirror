@@ -1,3 +1,9 @@
+2014-10-24  Per Bothner  <per@bothner.com>
+
+	* numbers.scm (numerator, denominator): Extend to handle
+	inexacts, as required by r7rs.
+	* numbers.scm (integer?): Fix logic error.
+
 2014-10-22  Per Bothner  <per@bothner.com>
 
 	* std_syntax.scm (else unquote unquote-splicing ... => _):

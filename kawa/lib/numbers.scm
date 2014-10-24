@@ -5,7 +5,9 @@
 (define-alias Double java.lang.Double)
 (define-alias IntNum gnu.math.IntNum)
 (define-alias Numeric gnu.math.Numeric)
+(define-alias RatNum gnu.math.RatNum)
 (define-alias RealNum gnu.math.RealNum)
+(define-alias LangObjType gnu.kawa.lispexpr.LangObjType)
 
 (define-private (java.lang.real? x) ::boolean
   (and (java.lang.Number? x)
@@ -58,7 +60,9 @@
                    (begin
                      ((->java.math.BigDecimal x):toBigIntegerExact)
                      #t)
-                   (ex java.lang.ArithmeticException #f)))))))
+                   (ex java.lang.ArithmeticException #f)))
+                 (else
+                  #f)))))
 
 (define (exact-integer? x) :: <boolean>
   (or (instance? x <gnu.math.IntNum>)
@@ -186,11 +190,15 @@
 	      ((>= i n) result)
 	    (set! result (gnu.math.IntNum:lcm result (args i))))))))
 
-(define (numerator (x :: <rational>)) :: <integer>
-  (x:numerator))
+(define (numerator (x ::real)) ::real
+  (if (RatNum? x)
+      ((->RatNum x):numerator)
+      (inexact ((LangObjType:coerceRatNum (exact x)):numerator))))
 
-(define (denominator (x :: <rational>)) :: <integer>
-  (x:denominator))
+(define (denominator (x ::real)) ::real
+  (if (RatNum? x)
+      ((->RatNum x):denominator)
+      (inexact ((LangObjType:coerceRatNum (exact x)):denominator))))
 
 (define (floor (x :: real)) :: real
   (x:toInt gnu.math.Numeric:FLOOR))

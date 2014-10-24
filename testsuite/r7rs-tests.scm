@@ -826,13 +826,11 @@
 
 (test 3 (numerator (/ 6 4)))
 (test 2 (denominator (/ 6 4)))
-(skip-if-kawa "denominator not implemented for inexacts"
 (test 2.0 (denominator (inexact (/ 6 4))))
 (test 11.0 (numerator 5.5))
 (test 2.0 (denominator 5.5))
 (test 5.0 (numerator 5.0))
 (test 1.0 (denominator 5.0))
-)
 
 (test -5.0 (floor -4.3))
 (test -4.0 (ceiling -4.3))

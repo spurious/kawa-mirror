@@ -172,23 +172,39 @@
 	 (r (- x (* q y))))
     (values q r)))
 
-(define (gcd #!rest (args ::integer[])) :: integer
-  (let ((n args:length))
-    (if (= n 0)
-	0
-	(let ((result ::integer (args 0)))
-	  (do ((i ::int 1 (+ i 1)))
-	      ((>= i n) result)
-	    (set! result (gnu.math.IntNum:gcd result (args i))))))))
+(define (gcd #!rest (args ::real[])) ::real
+  (let ((n args:length)
+        (result-inexact ::boolean #f)
+        (result ::integer 0))
+    (do ((i ::int 0 (+ i 1)))
+        ((>= i n)
+         (if result-inexact (inexact result) result))
+      (let* ((val ::real (args i))
+             (cur-inexact (inexact? val))
+             (cur ::integer
+                  (if cur-inexact
+                      (begin (set! result-inexact #t)
+                             (exact val))
+                      val)))
+        (set! result (if (= i 0) cur
+                         (gnu.math.IntNum:gcd result cur)))))))
 
-(define (lcm #!rest (args ::integer[])) :: <integer>
-  (let ((n args:length))
-    (if (= n 0)
-	1
-	(let ((result ::integer (gnu.math.IntNum:abs (args 0))))
-	  (do ((i ::int 1 (+ i 1)))
-	      ((>= i n) result)
-	    (set! result (gnu.math.IntNum:lcm result (args i))))))))
+(define (lcm #!rest (args ::real[])) ::real
+  (let ((n args:length)
+        (result-inexact ::boolean #f)
+        (result ::integer 1))
+    (do ((i ::int 0 (+ i 1)))
+        ((>= i n)
+         (if result-inexact (inexact result) result))
+      (let* ((val ::real (args i))
+             (cur-inexact (inexact? val))
+             (cur ::integer
+                  (if cur-inexact
+                      (begin (set! result-inexact #t)
+                             (exact val))
+                      val)))
+        (set! result (if (= i 0) cur
+                         (gnu.math.IntNum:lcm result cur)))))))
 
 (define (numerator (x ::real)) ::real
   (if (RatNum? x)

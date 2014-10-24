@@ -1,5 +1,6 @@
 2014-10-24  Per Bothner  <per@bothner.com>
 
+	* r7rs-tests.scm: Enable test for inexact lcm.
 	* r7rs-tests.scm: Enable tests for inexact numerator and denominator.
 
 2014-10-17  Per Bothner  <per@bothner.com>

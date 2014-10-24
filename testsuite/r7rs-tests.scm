@@ -819,9 +819,7 @@
 (test 4 (gcd 32 -36))
 (test 0 (gcd))
 (test 288 (lcm 32 -36))
-(skip-if-kawa "lcm not implemented for inexacts"
 (test 288.0 (lcm 32.0 -36))
-)
 (test 1 (lcm))
 
 (test 3 (numerator (/ 6 4)))

@@ -1,3 +1,7 @@
+2014-10-24  Per Bothner  <per@bothner.com>
+
+	* ReaderParens.java (readList): Report error if no value after '.'.
+
 2014-10-13  Per Bothner  <per@bothner.com>
 
 	* LispLanguage.java (parse): Check if reader is null.

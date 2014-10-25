@@ -186,6 +186,8 @@ public final class ReaderParens extends ReadTableEntry
 	      lexer.setCdr(last, value);
 	    last = value;
 	  }
+        if (sawDot && ! sawDotCdr)
+          lexer.error("missing value after '.'");
 	return lexer.bindSharedObject(sharingIndex, list);
       }
     finally

@@ -9578,12 +9578,13 @@ Kawa uses the @code{identityHashCode} method of @code{java.lang.System}.
 @node Eval and Environments
 @chapter Eval and Environments
 
-@deffn Procedure eval expression [environment]
-@code{eval} evaluates @var{expression} in the environment indicated
-by @var{environment}.
-
-The default for @var{environment} is the result
-of @code{(interaction-environment)}.
+@deffn Procedure environment @arbno{list}
+This procedure returns a specifier for the environment that
+results by starting with an empty environment and then
+importing each @var{list}, considered as an @stxref{import-set}, into it.
+The bindings of the environment represented by the specifier
+are immutable, as is the environment itself.
+See the @code{eval} function for examples.
 @end deffn
 
 @deffn Procedure null-environment version
@@ -9638,7 +9639,28 @@ While a source file is @code{load}ed, the base URI is temporarily
 set to the URL of the document.
 @end deffn
 
-@deffn Procedure load path
+@deffn Procedure eval expression [environment]
+This procedure evaluates @var{expression} in the environment indicated
+by @var{environment}.
+The default for @var{environment} is the result
+of @code{(interaction-environment)}.
+
+@example
+(eval ’(* 7 3) (environment '(scheme base)))
+            @result{} 21
+
+(let ((f (eval '(lambda (f x) (f x x))
+               (null-environment 5))))
+  (f + 10))
+            @result{} 20
+
+(eval '(define foo 32) (environment '(scheme base)))
+            @result{} @i{error is signaled}
+@end example
+@end deffn
+
+@deffn Procedure load path [environment]
+@deffnx Procedure load-relative path [environment]
 The @var{path} can be an (absolute) URL or a filename
 of a source file, which is read and evaluated line-by-line.
 The @var{path} can also be a fully-qualified class name.
@@ -9649,14 +9671,13 @@ about the enclosing lexical environment, and the latter
 can't know about definitions introduced by @code{load}.
 For those reasons it is highly recommended that you use instead use
 @code{@ref{require, require}} or @code{@ref{include, include}}.
-@end deffn
 
-@deffn Procedure load-relative path
-Same as @code{load}, except that @var{path} is a
+Evaluation is done in the specified @var{environment},
+which defauls to result of @code{(interaction-environment)}.
+
+The @code{load-relative} procedure is like @code{load},
+except that @var{path} is a
 URI that is relative to the context's current base URI.
-Since @code{load-relative} is a run-time function it doesn't work well
-with Kawa's orientation towards compilation.
-It is highly recommended that you use instead use @ref{include-relative, include-relative}.
 @end deffn
 
 @menu
@@ -12242,7 +12263,7 @@ which lets you define classes and instances fairly conveniently.
 
 The default name of the module class is the main part of the
 filename of the Scheme source file (with directories and extensions
-sripped off).  That can be overridden by the @code{-T} Kawa
+stripped off).  That can be overridden by the @code{-T} Kawa
 command-line flag.  The package-prefix specified by the @code{-P}
 flag is prepended to give the fully-qualified class name.
 
@@ -12263,7 +12284,7 @@ However, you can override it with @code{module-extends}.
 
 @deffn Syntax module-extends class
 Specifies that the class generated from the immediately surrounding
-module should extend (be a sub-class of) the class @code{<@var{class}>}.
+module should extend (be a sub-class of) the class @code{@var{class}}.
 @end deffn
 
 @deffn Syntax module-implements interface ...
@@ -12281,11 +12302,11 @@ For each top-level exported definition the compiler creates a
 corresponding public field with a similar (mangled) name.
 By default, there is some indirection:  The value of the Scheme variable
 is not that of the field itself.  Instead, the field is a
-@code{gnu.mapping.Symbol} object, and the value Scheme variable is
-defined to be the value stored in the @code{Symbol}.
+@code{gnu.mapping.Location} object, and the value Scheme variable is
+defined to be the value stored in the @code{Location}.
 Howewer, if you specify an explicit type, then the field will
-have the specified type, instead of being a @code{Symbol}.
-The indirection using @code{Symbol} is also avoided if you use
+have the specified type, instead of being a @code{Location}.
+The indirection using @code{Location} is also avoided if you use
 @code{define-constant}.
 
 If the Scheme definition defines a procedure (which is not re-assigned

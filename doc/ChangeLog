@@ -1,3 +1,8 @@
+2014-10-27  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Eval and Environments): Various updates,
+	including documenting the r7rs environment function.
+
 2014-10-14  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Lazy evaluation): Document make-promise and delay-force.

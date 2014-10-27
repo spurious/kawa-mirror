@@ -459,7 +459,7 @@ public class Scheme extends LispLanguage
       defProcStFld("force*", "kawa.lib.misc");
       defProcStFld("eager", "kawa.lib.misc");
       defProcStFld("promise?", "kawa.lib.misc");
-      defProcStFld("make-promise!", "kawa.lib.misc");
+      defProcStFld("make-promise", "kawa.lib.misc");
       defProcStFld("promise-set-value!", "kawa.lib.misc");
       defProcStFld("promise-set-alias!", "kawa.lib.misc");
       defProcStFld("promise-set-exception!", "kawa.lib.misc");

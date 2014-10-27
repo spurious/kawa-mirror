@@ -59,6 +59,14 @@ public class BinaryInPort extends InPort {
         this(new NBufferedInputStream(buffer, length), path);
     }
 
+    /** Buffer must have room for a surrogate pair. */
+    @Override
+    public void setBuffer(char[] buffer) throws java.io.IOException {
+        super.setBuffer(buffer);
+        if (limit - pos + 2 < this.buffer.length)
+            throw new java.io.IOException("setBuffer - too short");
+    }
+
     /** Check if we're looking at a Byte Order Mark.
      * If set, set encoding, and set position to just after the mark.
      */
@@ -129,22 +137,23 @@ public class BinaryInPort extends InPort {
         }
         cbuf.limit(pos+len);
         cbuf.position(pos);
-        boolean eof = false;
         int count;
+
         for (;;) {
-            CoderResult cres = decoder.decode(bstrm.bbuf, cbuf, eof);
+            CoderResult cres = decoder.decode(bstrm.bbuf, cbuf, inEofSeen);
             count = cbuf.position() - pos;
-            if (count > 0 || ! cres.isUnderflow())
+            if (count > 0 || inEofSeen || ! cres.isUnderflow())
                 break;
             int rem = bstrm.bbuf.remaining();
             int n = bstrm.fillBytes();
             if (n < 0) {
-                eof = true;
-                break;
+                inEofSeen = true;
             }
         }
-        return count == 0 && eof ? -1 : count;
+        return count == 0 && inEofSeen ? -1 : count;
     }
+
+    private boolean inEofSeen;
 
     public int readByte() throws IOException {
         return bstrm.read();

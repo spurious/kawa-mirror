@@ -54,20 +54,19 @@ public class NBufferedInputStream extends InputStream {
         return count;
     }
 
-    // Assumes position() == limit().
     synchronized int fillBytes() throws java.io.IOException {
         if (base == null)
             return -1;
-        int pos = bbuf.position();
-        int avail = bbuf.capacity() - pos;
+        int wpos = bbuf.limit();
+        int avail = bbuf.capacity() - wpos;
         if (avail == 0) {
-            bbuf.clear();
-            bbuf.limit(0);
-            avail = bbuf.capacity();
-            pos = 0;
+            bbuf.compact();
+            bbuf.flip();
+            wpos = bbuf.limit();
+            avail = bbuf.capacity() - wpos;
         }
-        int n = base.read(barr, pos, avail);
-        bbuf.limit(pos + (n < 0 ? 0 : n));
+        int n = base.read(barr, wpos, avail);
+        bbuf.limit(wpos + (n < 0 ? 0 : n));
         return n;
     }
 

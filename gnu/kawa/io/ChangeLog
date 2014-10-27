@@ -1,3 +1,10 @@
+2014-10-27  Per Bothner  <per@bothner.com>
+
+	* NBufferedInputStream.java (fillBytes): Generalize to allow
+	pos to be less than limit, and thus needing to be saved.  Needed if
+	we fail to decode the first byte of a mutli-byte sequence.
+	* BinaryInPort.java (fill): Fix decode logic.
+
 2014-09-28  Per Bothner  <per@bothner.com>
 
 	* BinaryInPort.java (defaultCset): New field.

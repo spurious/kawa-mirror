@@ -215,7 +215,6 @@
 ;; By Jussi Piitulainen <jpiitula@ling.helsinki.fi>
 ;; and John Cowan <cowan@mercury.ccil.org>:
 ;; http://lists.scheme-reports.org/pipermail/scheme-reports/2013-December/003876.html
-
 (define (means ton)
   (letrec*
      ((mean
@@ -344,6 +343,17 @@
   (test 6 (force p))
   (test 6 (begin (set! x 10) (force p))))
 
+(test #t (promise? (delay (+ 2 2))))
+(test #t (promise? (make-promise (+ 2 2))))
+(test #t
+    (let ((x (delay (+ 2 2))))
+      (force x)
+      (promise? x)))
+(test #t
+    (let ((x (make-promise (+ 2 2))))
+      (force x)
+      (promise? x)))
+
 (define radix
   (make-parameter
    10
@@ -443,7 +453,7 @@
          ((name expr (... ...))
           (begin expr (... ...))))))))
 (be-like-begin1 sequence1)
-(test 4 (sequence1 1 2 3 4))
+(test 3 (sequence1 0 1 2 3))
 
 (define-syntax be-like-begin2
   (syntax-rules ()
@@ -698,6 +708,7 @@
 (test #f (<= 1 2 1))
 (test #t (>= 2 1 1))
 (test #f (>= 1 2 1))
+(test '(#t #f) (list (<= 1 1 2) (<= 2 1 3)))
 
 ;; From R7RS 6.2.6 Numerical operations:
 ;;
@@ -846,20 +857,20 @@
 (test 1/3 (rationalize (exact .3) 1/10))
 (test #i1/3 (rationalize .3 1/10))
 
-(test 1.0 (exp 0))
+(test 1.0 (inexact (exp 0))) ;; may return exact number
 (test 20.0855369231877 (exp 3))
 
-(test 0.0 (log 1))
+(test 0.0 (inexact (log 1))) ;; may return exact number
 (test 1.0 (log (exp 1)))
 (test 42.0 (log (exp 42)))
 (test 2.0 (log 100 10))
 (test 12.0 (log 4096 2))
 
-(test 0.0 (sin 0))
+(test 0.0 (inexact (sin 0))) ;; may return exact number
 (test 1.0 (sin 1.5707963267949))
-(test 1.0 (cos 0))
+(test 1.0 (inexact (cos 0))) ;; may return exact number
 (test -1.0 (cos 3.14159265358979))
-(test 0.0 (tan 0))
+(test 0.0 (inexact (tan 0))) ;; may return exact number
 (test 1.5574077246549 (tan 1))
 
 (test 0.0 (asin 0))
@@ -884,7 +895,7 @@
 
 (test 3.0 (inexact (sqrt 9)))
 (test 1.4142135623731 (sqrt 2))
-(test +1.0i (sqrt -1))
+(test 0.0+1.0i (inexact (sqrt -1)))
 
 (test '(2 0) (call-with-values (lambda () (exact-integer-sqrt 4)) list))
 (test '(2 1) (call-with-values (lambda () (exact-integer-sqrt 5)) list))
@@ -1191,6 +1202,11 @@
 
 (test "a-c" (let ((str (string #\a #\b #\c))) (string-set! str 1 #\-) str))
 
+(test (string #\a #\x1F700 #\c)
+    (let ((s (string #\a #\b #\c)))
+      (string-set! s 1 #\x1F700)
+      s))
+
 (test #t (string=? "" ""))
 (test #t (string=? "abc" "abc" "abc"))
 (test #f (string=? "" "abc"))
@@ -1279,9 +1295,11 @@
 (test "γλώσσα" (string-downcase "ΓΛΏΣΣΑ"))
 (test "γλώσσα" (string-foldcase "ΓΛΏΣΣΑ"))
 (test "ΜΈΛΟΣ" (string-upcase "μέλος"))
-(test "μέλος" (string-downcase "ΜΈΛΟΣ"))
+(test #t (and (member (string-downcase "ΜΈΛΟΣ") '("μέλος" "μέλοσ")) #t))
 (test "μέλοσ" (string-foldcase "ΜΈΛΟΣ"))
-(test "μέλος ενός" (string-downcase "ΜΈΛΟΣ ΕΝΌΣ"))
+(test #t (and (member (string-downcase "ΜΈΛΟΣ ΕΝΌΣ")
+                      '("μέλος ενός" "μέλοσ ενόσ"))
+              #t))
 
 (test "" (substring "" 0 0))
 (test "" (substring "a" 0 0))
@@ -1802,10 +1820,11 @@
       (f + 10)))
 
 (test 1024 (eval '(expt 2 10) (environment '(scheme base))))
-(test 0.0 (eval '(sin 0) (environment '(scheme inexact))))
-(test 1024.0 (eval '(+ (expt 2 10) (sin 0))
+;; (sin 0) may return exact number
+(test 0.0 (inexact (eval '(sin 0) (environment '(scheme inexact)))))
+;; ditto
+(test 1024.0 (eval '(+ (expt 2 10) (inexact (sin 0)))
                    (environment '(scheme base) '(scheme inexact))))
-
 
 (test-end)
 
@@ -1856,6 +1875,19 @@
 (test #t (eof-object? (read-string 3 (open-input-string ""))))
 (test "abc" (read-string 3 (open-input-string "abcd")))
 (test "abc" (read-string 3 (open-input-string "abc\ndef\n")))
+
+(let ((in (open-input-string (string #\x10F700 #\x10F701 #\x10F702))))
+  (let* ((c1 (read-char in))
+         (c2 (read-char in))
+         (c3 (read-char in)))
+    (test #\x10F700 c1)
+    (test #\x10F701 c2)
+    (test #\x10F702 c3)))
+
+(test (string #\x10F700)
+    (let ((out (open-output-string)))
+      (write-char #\x10F700 out)
+      (get-output-string out)))
 
 (test "abc"
     (let ((out (open-output-string)))
@@ -2034,6 +2066,11 @@
 (test 'def (read (open-input-string "#| abc |# def")))
 (test 'ghi (read (open-input-string "#| abc #| def |# |# ghi")))
 (test 'ghi (read (open-input-string "#; ; abc\n def ghi")))
+(test '(abs -16) (read (open-input-string "(#;sqrt abs -16)")))
+(test '(a d) (read (open-input-string "(a #; #;b c d)")))
+(test '(a e) (read (open-input-string "(a #;(b #;c d) e)")))
+(test '(a . c) (read (open-input-string "(a . #;b c)")))
+(test '(a . b) (read (open-input-string "(a . b #;c)")))
 
 (test #\a (read (open-input-string "#\\a")))
 (test #\space (read (open-input-string "#\\space")))

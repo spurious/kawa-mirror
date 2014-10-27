@@ -1,3 +1,7 @@
+2014-10-27  Per Bothner  <per@bothner.com>
+
+	* r7rs-tests.scm: Merge in more tests from Chibi upstream.
+
 2014-10-26  Per Bothner  <per@bothner.com>
 
 	* r7rs-tests.scm: Fix string-foldcase of sigma.

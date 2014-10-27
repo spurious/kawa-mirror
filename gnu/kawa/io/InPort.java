@@ -10,7 +10,7 @@ import gnu.lists.Consumer;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 
-/** A LineNumberReader with some extra features:
+/** A Reader that tracks line numbers and has some extra features.
   *
   * You can seek backwards to the start of the line preceding the
   * current position (or the mark, if that has been set).

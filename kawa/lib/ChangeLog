@@ -1,3 +1,7 @@
+2014-10-27  Per Bothner  <per@bothner.com>
+
+	* scheme/eval.scm (environment): Generate a "name" for the result.
+
 2014-10-24  Per Bothner  <per@bothner.com>
 
 	* numbers.scm (numerator, denominator): Extend to handle

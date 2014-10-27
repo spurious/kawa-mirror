@@ -1,3 +1,8 @@
+2014-10-26  Per Bothner  <per@bothner.com>
+
+	* r7rs-tests.scm: Fix string-foldcase of sigma.
+	* text-test.scm: Likewise.
+
 2014-10-24  Per Bothner  <per@bothner.com>
 
 	* r7rs-tests.scm: Enable test for inexact lcm.

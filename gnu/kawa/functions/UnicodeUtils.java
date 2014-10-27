@@ -79,13 +79,9 @@ public class UnicodeUtils
                 chl = ch;
             else if (ch == 0xDF || ch == 0x130) // Special handling needed
                 chl = -2; // Handled below
-            else if (ch == 0x3A3 || ch == 0x3C3 || ch == 0x3C2) { // greek sigma
-                if (i+1 == len || ! Character.isLetter(str.charAt(i+1)))
-                    chl = 0x03C2; // greek small letter final sigma
-                else
-                    chl = 0x03C3; // greek small letter sigma
-
-            } else
+            else if (ch == 0x3C2) // greek final sigma
+                chl = 0x03C3;
+            else
                 chl = Character.toLowerCase(Character.toUpperCase(ch));
             if (ch != chl || sbuf != null) {
                 if (sbuf == null) {

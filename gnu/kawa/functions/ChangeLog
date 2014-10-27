@@ -1,3 +1,8 @@
+2014-10-26  Per Bothner  <per@bothner.com>
+
+	* UnicodeUtils.java (foldCase): Greek sigma should fold to regular
+	non-final lower-case sigma, even at the end of a word.
+
 2014-09-21  Per Bothner  <per@bothner.com>
 
 	* Arithmetic.java (typeNumeric): Remove field.   Instead use

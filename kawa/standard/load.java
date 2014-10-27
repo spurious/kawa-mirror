@@ -9,7 +9,7 @@ import gnu.lists.*;
 import gnu.text.*;
 import kawa.Shell;
 
-public class load extends Procedure1 {
+public class load extends Procedure1or2 {
   boolean relative;
 
   public load (String name, boolean relative)

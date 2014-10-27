@@ -251,6 +251,7 @@ public class Shell
       {
         // Nothing - we'll just lose some minor functionality.
       }
+    Environment saveEnv = Environment.setSaveCurrent(env);
     try
       {
 	for (;;)
@@ -308,6 +309,7 @@ public class Shell
       }
     finally
       {
+        Environment.restoreCurrent(saveEnv);
 	if (out != null)
 	  ctx.consumer = saveConsumer;
         Language.restoreCurrent(saveLanguage);

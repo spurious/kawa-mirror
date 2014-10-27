@@ -1,3 +1,8 @@
+2014-10-27  Per Bothner  <per@bothner.com>
+
+	* standard/load.java: Fix super-class to be Procedure1or2.
+	* Shell.java (runFile): Set and restore current environment.
+
 2014-10-24  Per Bothner  <per@bothner.com>
 
 	* standard/Scheme.java (initScheme): Fix typo 'make-promise!' ->

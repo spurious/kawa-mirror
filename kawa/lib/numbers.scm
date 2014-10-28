@@ -376,11 +376,17 @@
 
 (define (number->string (arg :: <java.lang.Number>)
 			#!optional (radix :: <int> 10)) ::string
+  (if (or (< radix 2) (> radix 36))
+      (primitive-throw (java.lang.IllegalArgumentException
+                        (format #f "invalid radix ~d" radix))))
   (make <gnu.lists.FString>
     (gnu.kawa.functions.Arithmetic:toString arg radix)))
 
 (define (string->number (str :: <string>) #!optional (radix ::int 10))
   ::object
+  (if (or (< radix 2) (> radix 36))
+      (primitive-throw (java.lang.IllegalArgumentException
+                        (format #f "invalid radix ~d" radix))))
   (let ((result (gnu.kawa.lispexpr.LispReader:parseNumber str (- radix))))
     (if (instance? result <gnu.math.Numeric>) result #f)))
 

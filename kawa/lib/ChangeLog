@@ -1,5 +1,8 @@
 2014-10-28  Per Bothner  <per@bothner.com>
 
+	* numbers.scm (number->string, string->number):
+	Check that radix is in range.
+
 	* scheme/r5rs.scm: Implemented r7rs (scheme r5rs) library.
 	* Makefile.am: Update accordingly.
 

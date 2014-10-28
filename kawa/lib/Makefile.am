@@ -37,8 +37,8 @@ java_SCM_ALWAYS =\
   scheme/complex.scm scheme/cxr.scm scheme/eval.scm scheme/file.scm \
   scheme/inexact.scm scheme/lazy.scm scheme/load.scm \
   scheme/process-context.scm scheme/read.scm scheme/repl.scm scheme/time.scm \
-  scheme/write.scm compile_misc.scm compile_map.scm trace.scm
-# TODO: scheme/r5rs.scm
+  scheme/write.scm scheme/r5rs.scm \
+  compile_misc.scm compile_map.scm trace.scm
 
 scm_WITH_SWING = windows.scm
 EXTRA_DIST = $(java_SCM_ALWAYS) $(scm_WITH_SWING)

@@ -561,9 +561,16 @@
         <file name="scheme/char.scm"/>
         <file name="scheme/complex.scm"/>
         <file name="scheme/cxr.scm"/>
+        <file name="scheme/eval.scm"/>
+        <file name="scheme/file.scm"/>
+        <file name="scheme/inexact.scm"/>
+        <file name="scheme/lazy.scm"/>
         <file name="scheme/load.scm"/>
-        <file name="scheme/read.scm"/>
         <file name="scheme/process-context.scm"/>
+        <file name="scheme/r5rs.scm"/>
+        <file name="scheme/read.scm"/>
+        <file name="scheme/repl.scm"/>
+        <file name="scheme/r5rs.scm"/>
         <file name="scheme/time.scm"/>
         <file name="scheme/write.scm"/>
         <file name="trace.scm"/>

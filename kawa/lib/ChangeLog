@@ -1,3 +1,8 @@
+2014-10-28  Per Bothner  <per@bothner.com>
+
+	* scheme/r5rs.scm: Implemented r7rs (scheme r5rs) library.
+	* Makefile.am: Update accordingly.
+
 2014-10-27  Per Bothner  <per@bothner.com>
 
 	* scheme/eval.scm (environment): Generate a "name" for the result.

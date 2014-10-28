@@ -1708,9 +1708,7 @@ The @code{read-with-shared-structure} is missing, but subsumed by @code{read}.
 @node Compatibility
 @section Compatibility with standards
 
-@emph{This will be re-written to compare with R7RS.}
-
-Kawa implements all the required and optional features of R5RS,
+Kawa implements all the required and optional features of R7RS,
 with the following exceptions.
 
 The entire "numeric tower" is implemented.
@@ -1741,6 +1739,9 @@ This includes must ``obvious'' cases of calls to the
 current function named using @code{define} or @code{letrec},
 and many cases of mutual tail-recursion (including
 state-machines using @code{letrec}).
+
+The @code{equal?} predicate does not handle infinite (self-referential)
+data structures.  (Checking for cycles is difficult to implement efficiently.)
 
 By default, symbols are case sensitive.
 
@@ -2409,6 +2410,11 @@ themselves; they need not be quoted.
 "abc"           @result{}  "abc"
 @end example
 @c #vu8(2 24 123)  @result{} #vu8(2 24 123)
+
+Note that @ref{Keywords,keywords} need to be quoted,
+unlike some other Lisp/Scheme dialect, including Common Lisp,
+and earlier versions of Kawa.  (Kawa currently evaluates a non-quoted
+keyword as itself, but that will change.)
 
 @anchor{variable-reference}
 @subsection Variable references
@@ -5645,6 +5651,7 @@ and Java number types as appropriate.
 
 @menu
 * Arithmetic operations::
+* Numerical input and output::
 * Quantities::
 * Logical Number Operations::
 * Performance of numeric operations::
@@ -5987,13 +5994,13 @@ Returns the absolute value of its argument.
 @deffnx Procedure lcm @vari{n} @dots{}
 These procedures return the greatest common divisor or least common
 multiple of their arguments.  The result is always non--negative.
-(R6RS allows inexact integer arguments; Kawa does not.)
+The arguments must be integers; if an argument is inexact, so is the result.
 
 @example
 (gcd 32 -36)                     @result{}  4
 (gcd)                            @result{}  0
 (lcm 32 -36)                     @result{}  288
-(lcm 32.0 -36)                   @result{}  288.0
+(lcm 32.0 -36)                   @result{}  288.0 ; inexact
 (lcm)                            @result{}  1
 @end example
 @end deffn
@@ -6004,12 +6011,12 @@ These procedures return the numerator or denominator of their argument;
 the result is computed as if the argument was represented as a fraction
 in lowest terms.  The denominator is always positive.  The denominator
 of @code{0} is defined to be @code{1}.
-(R6RS allows inexact integer arguments; Kawa does not.)
+The arguments must be integers; if an argument is inexact, so is the result.
 
 @example
 (numerator   (/ 6 4))            @result{}  3
 (denominator (/ 6 4))            @result{}  2
-@c (denominator (inexact (/ 6 4)))        @result{}  2.0
+(denominator (inexact (/ 6 4)))        @result{}  2.0
 @end example
 @end deffn
 
@@ -6175,6 +6182,72 @@ integer objects @emph{s} and @emph{r} where @code{@var{k} = s^2 + r} and
 (exact-integer-sqrt 5)  @result{} 2 1 ; two return values
 @end example
 @end deffn
+
+@node Numerical input and output
+@section Numerical input and output
+
+@deffn Procedure number->string z [radix]
+
+The procedure @code{number->string} takes a number and a
+radix and returns as a string an external representation
+of the given number in the given radix such that
+@example
+(let ((number number)
+      (radix radix))
+  (eqv? number
+        (string->number (number->string number radix)
+                        radix)))
+@end example
+is true. It is an error if no possible result makes this expression true.
+
+If present, @var{radix} must be an exact integer
+in the range 2 to 36, inclusive.
+If omitted, @var{radix} defaults to 10.
+
+If @var{z} is inexact, the @var{radix} is 10, and the above expression
+can be satisfied by a result that contains a decimal point,
+then the result contains a decimal point and is expressed
+using the minimum number of digits (exclusive of exponent
+and trailing zeroes) needed to make the above expression;
+otherwise the format of the result is unspecified.
+
+The result returned by @code{number->string} never contains an
+explicit radix prefix.
+
+@emph{Note:}
+The error case can occur only when @var{z} is not a complex
+number or is a complex number with a non-rational real or
+imaginary part.
+
+@emph{Rationale:} If @var{z} is an inexact number and the @var{radix} is 10,
+then the above expression is normally satisfied by a result containing
+a decimal point. The unspecified case allows for infinities, NaNs,
+and unusual representations.
+
+@end deffn
+
+@deffn Procedure string->number string [radix]
+Returns a number of the maximally precise representation
+expressed by the given @var{string}. It is an error if @var{radix} is not
+an exact integer in the range 2 to 26, inclusive.
+
+If supplied, @var{radix} is a default radix that will be overridden
+ if an explicit radix prefix is present in string (e.g.
+@code{"#o177"}). If @var{radix} is not supplied, then the default @var{radix}
+is 10. If @var{string} is not a syntactically valid notation for a
+number, or would result in a number that the implementation cannot represent,
+then @code{string->number} returns @code{#f}.
+An error is never signaled due to the content of @var{string}.
+
+@example
+(string->number "100")      @result{}  100
+(string->number "100" 16)   @result{}  256
+(string->number "1e2")      @result{}  100.0
+(string->number "#x100" 10) @result{}  256
+@end example
+
+@end deffn
+
 
 @node Quantities
 @section Quantities and Units

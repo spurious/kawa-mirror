@@ -1,3 +1,8 @@
+2014-10-28  Per Bothner  <per@bothner.com>
+
+	* kawa.texi: Various minor updates.
+	(Numerical input and output): New section.
+
 2014-10-27  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Eval and Environments): Various updates,

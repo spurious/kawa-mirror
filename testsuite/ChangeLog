@@ -1,5 +1,7 @@
 2014-10-27  Per Bothner  <per@bothner.com>
 
+	* Makefile.am (check-scm): Pass in --r5rs to disable colon processing.
+
 	* r7rs-tests.scm: Merge in more tests from Chibi upstream.
 
 2014-10-26  Per Bothner  <per@bothner.com>

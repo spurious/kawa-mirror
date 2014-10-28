@@ -1,3 +1,7 @@
+2014-10-27  Per Bothner  <per@bothner.com>
+
+	* LispReader.java (readAndHandleToken): Complain if token is ".".
+
 2014-10-24  Per Bothner  <per@bothner.com>
 
 	* ReaderParens.java (readList): Report error if no value after '.'.

@@ -313,8 +313,11 @@ public class LispReader extends Lexer
 	String str = new String(tokenBuffer, startPos, len - 1);
 	result = Keyword.make(str.intern());
       }
-    else
+    else {
+      if (len == 1 && tokenBuffer[startPos] == '.' && !seenEscapes)
+          error("invalid use of '.' token");
       result = rtable.makeSymbol(new String(tokenBuffer, startPos, len));
+    }
     tokenBufferLength = startPos;
     return result;
   }

@@ -62,7 +62,7 @@ testing.zip: $(srcdir)/testing.scm
 
 check-scm: testing.zip
 	rm -rf tmp?
-	$(KAWATEST) \
+	$(KAWA) --r5rs -e '(load "testing.zip")' $(OPTIONS) \
 	  -e '(define this-file-name "$(srcdir)/test.scm")' \
 	  -e "(set! symbol-read-case 'D)" --no-warn-undefined-variable \
 	  -f $(srcdir)/test.scm -e '(test-report)'

@@ -1,3 +1,5 @@
+A GRAB-BAG OF IDEAS AND THINGS TO DO, SOME QUITE OLD
+
 Optimize splicing of methods calls.
 Remove createVarargsArrayIfNeeded logic from PrimProcedure.
 
@@ -8,9 +10,7 @@ Use Parboiled as parser library?  https://github.com/sirthias/parboiled/wiki
 
 Before Kawa 1.12:
 - Jemacs type ctrl-C --> TooLongAction
-- Make Values constructors be private, so we can make Values be abstract.
 - Go through Savannah bugs.
-- Manual: should rename @node Extensions
 - Evaluate reported JEmacs bugs.
 - Go through remaining "news" entries and update manual.
 - go through Evaluating-Scheme-expressions-from-Java.
@@ -37,7 +37,6 @@ OPTIMIZATIONS
   - in fluid-let call getLocation before calling setWithSave so we don't
   have to call it again in setRestore.
   - In local references inside a fluid-let use the location from above.
-* case/switch
 * Optimize (make T) where T is a known non-simple class.
   This should not need to use reflection.
 * optimize zero? etc
@@ -79,7 +78,6 @@ It should be the same as the ctx.consumer.
 * Handle defmacro definition and use in same source file.
 * load.loadSource if (true) should be if (false).
 * Implement Scheme API for serialization.
-* Tail-calls in top-level functions should loop.
 * Document in internals.html how ModuleMethod/ModuleBody works.
 
 Optimize to avoid creating frame classes:
@@ -127,10 +125,6 @@ BindingInitializer.emit: global Environment should be cached
 
 TO BE DONE FOR 2.0:
 
-Move more of kawa.lang.* to gnu.kawa.reflect and gnu.kawa.*.
-
-Calls to setter (as in (set! (...)) should be inlined.
-
 'object': being able to pass constructor arguments. eg., to simulate:
    new javax.swing.JDialog(myFrame) {  public void foo() {} };
 Perhaps:  (object ((<javax.swing.JDialog> myFrame)) ...)
@@ -158,16 +152,9 @@ exact->inexact only implemented for RealNums, not other Complex.
 
 Fix scheme-window so #!eof closes window.
 
-Implement source-filename source-line source-column macros.
-
-All function calls in kawa.lib that call standard or library functions
-should be resolved statically (inlined or direct methods calls).
-
 Combine primitive field with record facility and define-class.
 
 Provide getopt-long (Guile, check scsh).
-
-Implement SwitchExp;  use it for Scheme case.
 
 Implement full call-cc by re-writing.
 This would be slower, so should be optional, probably not the default.
@@ -215,8 +202,6 @@ Make closure representation consistent with inner classes wrt
 use of Attributes (for possible improved debugging).
 
 Optionally issue a warning if a symbol is rebound.
-
-Make kawa.repl -f FILE (or something) work for compiled FILEs.
 
 Inline calls to simple methods, especially builtins.
 Ties in with module specifications (to determine which bindings are builtin).

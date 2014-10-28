@@ -1,5 +1,7 @@
 2014-10-28  Per Bothner  <per@bothner.com>
 
+	* ports.scm (write-char): Generalize to Appendable.
+
 	* numbers.scm (number->string, string->number):
 	Check that radix is in range.
 

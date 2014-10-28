@@ -96,10 +96,10 @@
                                           (gnu.kawa.io.Path:valueOf new-value))))))
 	 
 (define (write-char (ch ::character) #!optional
-		    (port :: <output-port>
+		    (port ::java.lang.Appendable
 			  (invoke-static  <output-port> 'outDefault)))
   :: <void>
-  (gnu.text.Char:print (char->integer ch) port))
+  (gnu.text.Char:append (as int ch) port))
 
 (define (write-string (str ::string)
                       #!optional

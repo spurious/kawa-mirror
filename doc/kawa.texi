@@ -10133,6 +10133,16 @@ and a @code{filepath} value is returned otherwise.
 True if @var{arg} is a @code{path} - i.e. an instance of a @code{gnu.kawa.io.Path}.
 @end deffn
 
+@deffn Procedure current-path [new-value]
+With no arguments, returns the default directory of the current thread.
+With a @var{new-value} argument, sets the default directory.
+The initial value is that of the @code{user.dir} property
+as returned by @code{(java.lang.System:getProperty "user.dir")}.
+
+Since @code{current-path} is a @ref{Parameter objects,parameter object}, you can
+locally change the value using @ref{parameterize-syntax,@code{parameterize}}.
+@end deffn
+
 @deffn Type filepath
 The name of a local file.
 Represented using the Java class @code{gnu.kawa.io.FilePath},
@@ -10508,7 +10518,35 @@ error port (an output port), respectively.
 - the @dfn{standard error} in Unix and C terminology.)
 These procedures are @ref{Parameter objects,parameter objects},
 which can be overridden with @ref{parameterize-syntax,@code{parameterize}}.
-The initial bindings for these are implementation-defined textual ports.
+
+The initial bindings for @code{(current-output-port)} and
+@code{(current-error-port)} are hybrid textual/binary
+ports that wrap the values of the corresponding @code{java.lang.System} fields
+@code{out}, and @code{err}.  The latter, in turn are bound
+to the standard output and error streams of the JVM process.
+This means you can write binary data to standard output
+using @code{write-bytevector} and @code{write-u8}.
+
+The initial value @code{(current-input-port)} similarly is a textual port
+that wraps the @code{java.lang.System} field @code{in}, which is bound
+to the standard input stream of the JVM process.
+It is a @emph{hybrid} textual/binary port only if there
+is no console (as determined by @code{(java.lang.System:console)}
+returning @code{#!null}) - i.e. if standard input is not a tty.
+
+Here is an example that copies standard input to standard output:
+@example
+(let* ((in (current-input-port))
+       (out (current-output-port))
+       (blen ::int 2048)
+       (buf (make-bytevector blen)))
+  (let loop ()
+    (define n (read-bytevector! buf in))
+    (cond ((not (eof-object? n))
+           (write-bytevector buf out 0 n)
+           (loop)))))
+@end example
+
 @end deffn
 
 @deffn Procedure with-input-from-file path thunk
@@ -10798,7 +10836,7 @@ bytevector. If no bytes are available before the end of file,
 an end-of-file object is returned.
 @end deffn
 
-@deffn Procedure read-bytevector! bytevector [start [end [port]]]
+@deffn Procedure read-bytevector! bytevector [port [start [end]]]
 Reads the next @var{end} − @var{start} bytes, or as many as are
 available before the end of file, from the binary input @var{port}
 into @var{bytevector} in left-to-right order beginning at the @var{start}

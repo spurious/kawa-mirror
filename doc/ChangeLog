@@ -1,3 +1,8 @@
+2014-10-29  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Ports): Fix thinko for read-bytevector!.
+	Note that default ports may be hybrid textual/binary.
+
 2014-10-28  Per Bothner  <per@bothner.com>
 
 	* kawa.texi: Various minor updates.

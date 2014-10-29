@@ -643,7 +643,7 @@ public class repl extends Procedure0or1
 	    Compilation.inlineOk = false;
 	  }
         else if (arg.equals("--no-console"))
-          noConsole = true;
+          InPort.noConsole = true;
 	else if (arg.equals("--inline"))
 	  {
 	    Compilation.inlineOk = true;
@@ -885,7 +885,7 @@ public class repl extends Procedure0or1
 	    getLanguage();
 	    setArgs (args, iArg);
 	    checkInitFile();
-            if (shouldUseGuiConsole())
+            if (! InPort.haveConsole())
               startGuiConsole();
             else
               {
@@ -906,25 +906,6 @@ public class repl extends Procedure0or1
 	ModuleBody.exitDecrement();
         ExitCalled.pop();
       }
-  }
-
-  public static boolean noConsole;
-
-  public static boolean shouldUseGuiConsole ()
-  {
-    if (noConsole)
-      return true;
-    try
-      {
-        if ((Class.forName("java.lang.System")
-             .getMethod("console", new Class[0])
-             .invoke(new Object[0])) == null)
-          return true;
-      }
-    catch (Exception ex)
-      {
-      }
-    return false;
   }
 
   private static void startGuiConsole ()

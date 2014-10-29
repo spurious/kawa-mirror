@@ -1,3 +1,10 @@
+2014-10-29  Per Bothner  <per@bothner.com>
+
+	* InPort.java (systemInPort): Initialize to a BinaryInPort if
+	we have no console.
+	(noConsole): Static field moved from repl.java.
+	(haveConsole): New method.
+
 2014-10-27  Per Bothner  <per@bothner.com>
 
 	* NBufferedInputStream.java (fillBytes): Generalize to allow

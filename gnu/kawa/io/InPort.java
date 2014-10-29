@@ -31,10 +31,28 @@ import java.nio.charset.CharsetDecoder;
 
 public class InPort extends Reader implements Printable
 {
-  public static final String systemInFilename = "/dev/stdin";
-  private static InPort systemInPort
-  = new TtyInPort (System.in, Path.valueOf(systemInFilename),
-                   OutPort.outInitial);
+    public static boolean noConsole;
+
+    public static boolean haveConsole() {
+        if (noConsole)
+            return false;
+        /* #ifdef JAVA6 */
+        return System.console() != null;
+        /* #else */
+        // return true;
+        /* #endif */
+    }
+
+    public static final String systemInFilename = "/dev/stdin";
+    private static InPort systemInPort;
+    static {
+        Path systemInPath = Path.valueOf(systemInFilename);
+        if (haveConsole())
+            systemInPort = new TtyInPort(System.in, systemInPath,
+                                         OutPort.outInitial);
+        else
+            systemInPort = new BinaryInPort(System.in, systemInPath);
+    }
   public static final ThreadLocation inLocation
     = new ThreadLocation("in-default");
   static { inLocation.setGlobal(systemInPort); }

@@ -1,3 +1,8 @@
+2014-10-29  Per Bothner  <per@bothner.com>
+
+	* repl.java (noConsole): Move field to InPort.java.
+	(shouldUseGuiConsole): Remove method - use InPort.haveConsole instead.
+
 2014-10-27  Per Bothner  <per@bothner.com>
 
 	* standard/load.java: Fix super-class to be Procedure1or2.

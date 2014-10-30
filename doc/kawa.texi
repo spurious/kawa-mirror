@@ -1148,7 +1148,7 @@ This is a less verbose mechanism, but it requires an
 absolute path to @code{kawa}, due to shell limitations.
 
 @example
-#!/usr/bin/bin/kawa \
+#!/usr/bin/kawa \
   --scheme --full-tailcalls
 (format #t "The command-line is:~@{ ~w~@}.~%" (command-line))
 @end example

@@ -1,5 +1,7 @@
 2014-10-29  Per Bothner  <per@bothner.com>
 
+	* kawa.texi (Scripts): Fix example problem.
+
 	* kawa.texi (Ports): Fix thinko for read-bytevector!.
 	Note that default ports may be hybrid textual/binary.
 

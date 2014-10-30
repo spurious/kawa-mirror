@@ -1,3 +1,8 @@
+2014-10-30  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Features): Move earlier.
+	(FAQs): Move before Framework.
+
 2014-10-29  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Scripts): Fix example problem.

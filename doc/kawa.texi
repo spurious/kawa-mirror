@@ -168,9 +168,9 @@ Various people and orgnizations @ref{Acknowledgements,have contributed to Kawa}.
 This package has nothing to do with the defunct Kawa commercial Java IDE.
 
 @menu
+* Features::
 * Installation::         Building and installing Kawa
 * Running::              Invoking, Running, and Using Kawa
-* Features::
 * Syntax::
 * Program structure::
 * Multiple values::
@@ -186,14 +186,215 @@ This package has nothing to do with the defunct Kawa commercial Java IDE.
 * Objects Classes and Modules::
 * XML tools::            XML, HTML, and the web
 * Miscellaneous::
-* Framework::            The Kawa language framework
 * FAQs::                 Frequently Asked Questions
+* Framework::            The Kawa language framework
 * Community::
 * License::
 * Overall Index::	 Index of functions, macros, concepts, and more.
 @end menu
 
-@node Installation, Running, Top, Top
+@node Features
+@chapter Features
+
+Kawa is a mostly-compatible implementatation of 
+the Scheme programming language,
+which has history going back to 1975, is standardized,
+has been the base for much programming language research,
+and has dozens of implementations.
+
+Kawa runs on top of the Java platform.  The implementation
+is written in Java and Kawa itself, without native code.
+Scheme programs have full and convenient
+access to the huge set of Java libraries.
+
+Kawa programs @uref{http://per.bothner.com/blog/2010/Kawa-in-shootout/, are fast}.
+A sophisticated compiler, type inference, and optional type declarations
+means you can write programs that run roughly as fast as Java programs,
+and much faster than other ``scripting languages''.
+
+Kawa uses Unicode internally, and uses the Java facilities to convert
+files using other character encodings.
+
+Kawa provides the usual read-eval-print loop, as well as batch modes.
+
+Kawa provides a framework for implementing other programming languages,
+and comes with incomplete support for CommonLisp, Emacs Lisp, and
+EcmaScript, and the
+draft @uref{http://www.gnu.org/software/qexo/,XML Query language}.
+
+Kawa has builtin pretty-printer support, and fancy formatting.
+
+Kawa supports class-definition facilities, and separately-compiled modules.
+
+Kawa can be @ref{Evaluating Scheme expressions from Java,
+embedded as a scripting language in Java programs}.
+
+Kawa has convenient syntax for
+@ref{Allocating objects,allocating and initializing objects}.
+
+Kawa has some special handling to ease
+@ref{Building JavaFX applications,JavaFX programming}.
+
+You can @ref{Building for Android,run Kawa programs on Android},
+and there is special handing to make @ref{Android view construction,constructuing View objects} easier.
+
+Kawa makes it easy to write
+@ref{Server-side scripts,web page scripts} running
+running on @ref{Self-configuring page scripts,self-configuring web servers}
+and optionally using @ref{XML literals}.
+
+Kawa implements the full numeric tower, including infinite-precision
+rational numbers and complex numbers.  It also supports @ref{Quantities}
+with units, such as @code{3cm}.
+
+Kawa supports @ref{Lazy evaluation}, with convenient implicit forcing.
+
+You can optionally declare the types of variables.
+
+You can conveniently access Java objects, methods, fields, and classes.
+
+@menu
+* Implemented SRFIs::
+* Compatibility::        Compatibility with standards
+@end menu
+
+@node Implemented SRFIs
+@section Implemented SRFIs
+
+Kawa implements the following semi-standard SRFIs
+(@uref{http://srfi.schemers.org/,Scheme Request for Implementation}):
+@itemize
+@item
+@uref{http://srfi.schemers.org/srfi-0/srfi-0.html, SRFI 0}: Feature-based conditional expansion construct,
+using @code{cond-expand} - @pxref{Syntax and conditional compilation}.
+@item
+@uref{http://srfi.schemers.org/srfi-1/srfi-1.html, SRFI 1}: List Library, if @code{(require 'list-lib)} - @pxref{SRFI-1}.
+@item
+@uref{http://srfi.schemers.org/srfi-2/srfi-2.html, SRFI 2}: AND-LET*: an AND with local bindings, a guarded LET* special form.
+@item
+@uref{http://srfi.schemers.org/srfi-4/srfi-4.html, SRFI 4}: Homogeneous numeric vector datatypes - @pxref{Uniform vectors}.
+@item
+@uref{http://srfi.schemers.org/srfi-6/srfi-6.html, SRFI 6}: Basic String Ports - @pxref{Ports}.
+@item
+@uref{http://srfi.schemers.org/srfi-8/srfi-8.html, SRFI 8}: @code{receive}: Binding to multiple values - @pxref{Multiple values}.
+@item
+@uref{http://srfi.schemers.org/srfi-9/srfi-9.html, SRFI 9}: Defining Record Types, using @code{define-record-type}
+- @pxref{Record types}.
+@item
+@uref{http://srfi.schemers.org/srfi-11/srfi-11.html, SRFI 11}: Syntax for receiving multiple values,
+using @code{let-values} and @code{let*-value} - @pxref{Multiple values}.
+@item
+@uref{http://srfi.schemers.org/srfi-13/srfi-13.html, SRFI 13}: String Library.
+Needs some polishing.
+@item
+@uref{http://srfi.schemers.org/srfi-14/srfi-14.html, SRFI 14}: Character-set Library - @pxref{Character sets}.
+@item
+@uref{http://srfi.schemers.org/srfi-16/srfi-16.html, SRFI 16}: Syntax for procedures of variable arity,
+using @uref{http://srfi.schemers.org/srfi-16/srfi-16.html, @code{case-lambda}}.
+@item
+@uref{http://srfi.schemers.org/srfi-17/srfi-17.html, SRFI 17}: Generalized @code{set!} - @pxref{Locations}.
+@item
+@uref{http://srfi.schemers.org/srfi-23/srfi-23.html, SRFI 23}: Error reporting mechanism, using @code{error} - @pxref{Exceptions}.
+@item
+@uref{http://srfi.schemers.org/srfi-25/srfi-25.html, SRFI 25}: Multi-dimensional Array Primitives - @pxref{Arrays}.
+@item
+@uref{http://srfi.schemers.org/srfi-26/srfi-26.html, SRFI 26}: Notation for Specializing Parameters without Currying - @pxref{Procedures}. 
+@item
+@uref{http://srfi.schemers.org/srfi-28/srfi-28.html, SRFI 28}: Basic Format Strings - @pxref{Format}.
+@item
+@uref{http://srfi.schemers.org/srfi-30/srfi-30.html, SRFI 30}: Nested Multi-line Comments.
+@item
+@uref{http://srfi.schemers.org/srfi-37/srfi-37.html, SRFI 37}: @uref{http://srfi.schemers.org/srfi-37/srfi-37.html,@code{args-fold} - a program argument processor}, if @code{(require 'args-fold)}.
+@item
+@uref{http://srfi.schemers.org/srfi-38/srfi-38.html, SRFI 38}: External Representation for Data With Shared Structure.
+The @code{read-with-shared-structure} is missing, but subsumed by @code{read}.
+@item
+@uref{http://srfi.schemers.org/srfi-39/srfi-39.html, SRFI 39}:
+@xref{Parameter objects}.
+@item
+@uref{http://srfi.schemers.org/srfi-41/srfi-41.html, SRFI 41}: Streams - @pxref{Streams}.
+@item
+@uref{http://srfi.schemers.org/srfi-45/srfi-45.html, SRFI 45}: Primitives for Expressing Iterative Lazy Algorithms - @pxref{Lazy evaluation}.
+@item
+@uref{http://srfi.schemers.org/srfi-60/srfi-60.html, SRFI 60}: Integers as Bits. - @pxref{Logical Number Operations}.
+@item
+@uref{http://srfi.schemers.org/srfi-62/srfi-62.html, SRFI 62}: S-expression comments.
+@item
+@uref{http://srfi.schemers.org/srfi-64/srfi-64.html, SRFI 64}: A Scheme API for test suites.
+@item
+@uref{http://srfi.schemers.org/srfi-69/srfi-69.html, SRFI 69}: Basic hash tables - @pxref{Hash tables}.
+@item
+@uref{http://srfi.schemers.org/srfi-87/srfi-87.html, SRFI 87}: @code{=>} in @code{case} clauses.
+@item
+@uref{http://srfi.schemers.org/srfi-88/srfi-88.html, SRFI 88}: Keyword objects - @pxref{Keywords}.
+@item
+@uref{http://srfi.schemers.org/srfi-95/srfi-95.html, SRFI 95}: Sorting and Merging.
+@item
+@uref{http://srfi.schemers.org/srfi-97/srfi-97.html, SRFI 97}: Names for SRFI Libraries.
+@item
+@uref{http://srfi.schemers.org/srfi-98/srfi-98.html, SRFI 98}: An interface to access environment variables
+@item
+@uref{http://srfi.schemers.org/srfi-101/srfi-101.html, SRFI 101}: Purely Functional Random-Access Pairs and Lists - @pxref{SRFI-101}.
+@item
+@uref{http://srfi.schemers.org/srfi-107/,SRFI 107}: XML reader syntax - @pxref{XML literals}.
+@item
+@uref{http://srfi.schemers.org/srfi-108/,SRFI 108}: Named quasi-literal constructors - @pxref{Named quasi-literals}.
+@item
+@uref{http://srfi.schemers.org/srfi-109/srfi-109.html, SRFI-109}: Extended string quasi-literals - @pxref{string quasi-literals}.
+@end itemize
+
+@node Compatibility
+@section Compatibility with standards
+
+Kawa implements all the required and optional features of R7RS,
+with the following exceptions.
+
+The entire "numeric tower" is implemented.
+However, some transcendental function only work on reals.
+Integral function do not necessarily work on
+inexact (floating-point) integers.
+(The whole idea of "inexact integer" in R5RS seems rather pointless ...)
+
+Also, @code{call-with-current-continuation} is only "upwards" (?).
+I.e. once a continuation has been exited, it cannot be invoked.
+These restricted continuations can be used to implement catch/throw
+(such as the examples in R4RS), but not co-routines or backtracking.
+
+Kawa now does general tail-call elimination, but only if
+you use the flag @code{--full-tail-calls}.  (Currently, the
+@code{eval} function itself is not fully tail-recursive, in violation
+of R5RS.)   The @code{--full-tail-calls} flag is not on by default,
+partly because it is noticably slower (though I have not measured how
+much), and partly I think it is more useful for Kawa to be compilatible
+with standard Java calling conventions and tools.
+Code compiled with @code{--full-tail-calls} can call code
+ compiled without it and vice versa.
+
+Even without @code{--full-tail-calls}, if the
+compiler can prove that the procedure being called is the current
+function, then the tail call will be replaced by a jump.
+This includes must ``obvious'' cases of calls to the
+current function named using @code{define} or @code{letrec},
+and many cases of mutual tail-recursion (including
+state-machines using @code{letrec}).
+
+The @code{equal?} predicate does not handle infinite (self-referential)
+data structures.  (Checking for cycles is difficult to implement efficiently.)
+
+By default, symbols are case sensitive.
+
+Kawa implements most of the features of the expression language of DSSSL,
+the Scheme-derived ISO-standard Document Style Semantics and Specification
+Language for SGML.  Of the core expression language, the only features
+missing are character properties, @code{external-procedure},
+the time-relationed procedures, and character name escapes in
+string literals.
+From the full expression language, Kawa additionally is missing
+@code{format-number}, @code{format-number-list}, and language objects.
+Quantities, keyword values, and the expanded @code{lambda} form
+(with optional and keyword parameters) are supported.
+
+@node Installation
 @chapter Getting and installing Kawa
 
 @menu
@@ -591,7 +792,7 @@ path issues with running the testsuite.)
 
 @uref{http://www.mingw.org/,MinGW} may also work but has not been tested.
 
-@node Running, Features, Installation, Top
+@node Running
 @chapter How to start up and run Kawa
 
 The easiest way to start up Kawa is to run the @samp{kawa} program.
@@ -1554,207 +1755,6 @@ the resulting executable program.  The @code{-lkawa} option tells
 the linker it should link with the kawa shared library, and
 the @code{-L$PREFIX/bin} option tells the linker where it can
 find that library.
-
-@node Features, Syntax, Running, Top
-@chapter Features
-
-Kawa is a mostly-compatible implementatation of 
-the Scheme programming language,
-which has history going back to 1975, is standardized,
-has been the base for much programming language research,
-and has dozens of implementations.
-
-Kawa runs on top of the Java platform.  The implementation
-is written in Java and Kawa itself, without native code.
-Scheme programs have full and convenient
-access to the huge set of Java libraries.
-
-Kawa programs @uref{http://per.bothner.com/blog/2010/Kawa-in-shootout/, are fast}.
-A sophisticated compiler, type inference, and optional type declarations
-means you can write programs that run roughly as fast as Java programs,
-and much faster than other ``scripting languages''.
-
-Kawa uses Unicode internally, and uses the Java facilities to convert
-files using other character encodings.
-
-Kawa provides the usual read-eval-print loop, as well as batch modes.
-
-Kawa provides a framework for implementing other programming languages,
-and comes with incomplete support for CommonLisp, Emacs Lisp, and
-EcmaScript, and the
-draft @uref{http://www.gnu.org/software/qexo/,XML Query language}.
-
-Kawa has builtin pretty-printer support, and fancy formatting.
-
-Kawa supports class-definition facilities, and separately-compiled modules.
-
-Kawa can be @ref{Evaluating Scheme expressions from Java,
-embedded as a scripting language in Java programs}.
-
-Kawa has convenient syntax for
-@ref{Allocating objects,allocating and initializing objects}.
-
-Kawa has some special handling to ease
-@ref{Building JavaFX applications,JavaFX programming}.
-
-You can @ref{Building for Android,run Kawa programs on Android},
-and there is special handing to make @ref{Android view construction,constructuing View objects} easier.
-
-Kawa makes it easy to write
-@ref{Server-side scripts,web page scripts} running
-running on @ref{Self-configuring page scripts,self-configuring web servers}
-and optionally using @ref{XML literals}.
-
-Kawa implements the full numeric tower, including infinite-precision
-rational numbers and complex numbers.  It also supports @ref{Quantities}
-with units, such as @code{3cm}.
-
-Kawa supports @ref{Lazy evaluation}, with convenient implicit forcing.
-
-You can optionally declare the types of variables.
-
-You can conveniently access Java objects, methods, fields, and classes.
-
-@menu
-* Implemented SRFIs::
-* Compatibility::        Compatibility with standards
-@end menu
-
-@node Implemented SRFIs
-@section Implemented SRFIs
-
-Kawa implements the following semi-standard SRFIs
-(@uref{http://srfi.schemers.org/,Scheme Request for Implementation}):
-@itemize
-@item
-@uref{http://srfi.schemers.org/srfi-0/srfi-0.html, SRFI 0}: Feature-based conditional expansion construct,
-using @code{cond-expand} - @pxref{Syntax and conditional compilation}.
-@item
-@uref{http://srfi.schemers.org/srfi-1/srfi-1.html, SRFI 1}: List Library, if @code{(require 'list-lib)} - @pxref{SRFI-1}.
-@item
-@uref{http://srfi.schemers.org/srfi-2/srfi-2.html, SRFI 2}: AND-LET*: an AND with local bindings, a guarded LET* special form.
-@item
-@uref{http://srfi.schemers.org/srfi-4/srfi-4.html, SRFI 4}: Homogeneous numeric vector datatypes - @pxref{Uniform vectors}.
-@item
-@uref{http://srfi.schemers.org/srfi-6/srfi-6.html, SRFI 6}: Basic String Ports - @pxref{Ports}.
-@item
-@uref{http://srfi.schemers.org/srfi-8/srfi-8.html, SRFI 8}: @code{receive}: Binding to multiple values - @pxref{Multiple values}.
-@item
-@uref{http://srfi.schemers.org/srfi-9/srfi-9.html, SRFI 9}: Defining Record Types, using @code{define-record-type}
-- @pxref{Record types}.
-@item
-@uref{http://srfi.schemers.org/srfi-11/srfi-11.html, SRFI 11}: Syntax for receiving multiple values,
-using @code{let-values} and @code{let*-value} - @pxref{Multiple values}.
-@item
-@uref{http://srfi.schemers.org/srfi-13/srfi-13.html, SRFI 13}: String Library.
-Needs some polishing.
-@item
-@uref{http://srfi.schemers.org/srfi-14/srfi-14.html, SRFI 14}: Character-set Library - @pxref{Character sets}.
-@item
-@uref{http://srfi.schemers.org/srfi-16/srfi-16.html, SRFI 16}: Syntax for procedures of variable arity,
-using @uref{http://srfi.schemers.org/srfi-16/srfi-16.html, @code{case-lambda}}.
-@item
-@uref{http://srfi.schemers.org/srfi-17/srfi-17.html, SRFI 17}: Generalized @code{set!} - @pxref{Locations}.
-@item
-@uref{http://srfi.schemers.org/srfi-23/srfi-23.html, SRFI 23}: Error reporting mechanism, using @code{error} - @pxref{Exceptions}.
-@item
-@uref{http://srfi.schemers.org/srfi-25/srfi-25.html, SRFI 25}: Multi-dimensional Array Primitives - @pxref{Arrays}.
-@item
-@uref{http://srfi.schemers.org/srfi-26/srfi-26.html, SRFI 26}: Notation for Specializing Parameters without Currying - @pxref{Procedures}. 
-@item
-@uref{http://srfi.schemers.org/srfi-28/srfi-28.html, SRFI 28}: Basic Format Strings - @pxref{Format}.
-@item
-@uref{http://srfi.schemers.org/srfi-30/srfi-30.html, SRFI 30}: Nested Multi-line Comments.
-@item
-@uref{http://srfi.schemers.org/srfi-37/srfi-37.html, SRFI 37}: @uref{http://srfi.schemers.org/srfi-37/srfi-37.html,@code{args-fold} - a program argument processor}, if @code{(require 'args-fold)}.
-@item
-@uref{http://srfi.schemers.org/srfi-38/srfi-38.html, SRFI 38}: External Representation for Data With Shared Structure.
-The @code{read-with-shared-structure} is missing, but subsumed by @code{read}.
-@item
-@uref{http://srfi.schemers.org/srfi-39/srfi-39.html, SRFI 39}:
-@xref{Parameter objects}.
-@item
-@uref{http://srfi.schemers.org/srfi-41/srfi-41.html, SRFI 41}: Streams - @pxref{Streams}.
-@item
-@uref{http://srfi.schemers.org/srfi-45/srfi-45.html, SRFI 45}: Primitives for Expressing Iterative Lazy Algorithms - @pxref{Lazy evaluation}.
-@item
-@uref{http://srfi.schemers.org/srfi-60/srfi-60.html, SRFI 60}: Integers as Bits. - @pxref{Logical Number Operations}.
-@item
-@uref{http://srfi.schemers.org/srfi-62/srfi-62.html, SRFI 62}: S-expression comments.
-@item
-@uref{http://srfi.schemers.org/srfi-64/srfi-64.html, SRFI 64}: A Scheme API for test suites.
-@item
-@uref{http://srfi.schemers.org/srfi-69/srfi-69.html, SRFI 69}: Basic hash tables - @pxref{Hash tables}.
-@item
-@uref{http://srfi.schemers.org/srfi-87/srfi-87.html, SRFI 87}: @code{=>} in @code{case} clauses.
-@item
-@uref{http://srfi.schemers.org/srfi-88/srfi-88.html, SRFI 88}: Keyword objects - @pxref{Keywords}.
-@item
-@uref{http://srfi.schemers.org/srfi-95/srfi-95.html, SRFI 95}: Sorting and Merging.
-@item
-@uref{http://srfi.schemers.org/srfi-97/srfi-97.html, SRFI 97}: Names for SRFI Libraries.
-@item
-@uref{http://srfi.schemers.org/srfi-98/srfi-98.html, SRFI 98}: An interface to access environment variables
-@item
-@uref{http://srfi.schemers.org/srfi-101/srfi-101.html, SRFI 101}: Purely Functional Random-Access Pairs and Lists - @pxref{SRFI-101}.
-@item
-@uref{http://srfi.schemers.org/srfi-107/,SRFI 107}: XML reader syntax - @pxref{XML literals}.
-@item
-@uref{http://srfi.schemers.org/srfi-108/,SRFI 108}: Named quasi-literal constructors - @pxref{Named quasi-literals}.
-@item
-@uref{http://srfi.schemers.org/srfi-109/srfi-109.html, SRFI-109}: Extended string quasi-literals - @pxref{string quasi-literals}.
-@end itemize
-
-@node Compatibility
-@section Compatibility with standards
-
-Kawa implements all the required and optional features of R7RS,
-with the following exceptions.
-
-The entire "numeric tower" is implemented.
-However, some transcendental function only work on reals.
-Integral function do not necessarily work on
-inexact (floating-point) integers.
-(The whole idea of "inexact integer" in R5RS seems rather pointless ...)
-
-Also, @code{call-with-current-continuation} is only "upwards" (?).
-I.e. once a continuation has been exited, it cannot be invoked.
-These restricted continuations can be used to implement catch/throw
-(such as the examples in R4RS), but not co-routines or backtracking.
-
-Kawa now does general tail-call elimination, but only if
-you use the flag @code{--full-tail-calls}.  (Currently, the
-@code{eval} function itself is not fully tail-recursive, in violation
-of R5RS.)   The @code{--full-tail-calls} flag is not on by default,
-partly because it is noticably slower (though I have not measured how
-much), and partly I think it is more useful for Kawa to be compilatible
-with standard Java calling conventions and tools.
-Code compiled with @code{--full-tail-calls} can call code
- compiled without it and vice versa.
-
-Even without @code{--full-tail-calls}, if the
-compiler can prove that the procedure being called is the current
-function, then the tail call will be replaced by a jump.
-This includes must ``obvious'' cases of calls to the
-current function named using @code{define} or @code{letrec},
-and many cases of mutual tail-recursion (including
-state-machines using @code{letrec}).
-
-The @code{equal?} predicate does not handle infinite (self-referential)
-data structures.  (Checking for cycles is difficult to implement efficiently.)
-
-By default, symbols are case sensitive.
-
-Kawa implements most of the features of the expression language of DSSSL,
-the Scheme-derived ISO-standard Document Style Semantics and Specification
-Language for SGML.  Of the core expression language, the only features
-missing are character properties, @code{external-procedure},
-the time-relationed procedures, and character name escapes in
-string literals.
-From the full expression language, Kawa additionally is missing
-@code{format-number}, @code{format-number-list}, and language objects.
-Quantities, keyword values, and the expanded @code{lambda} form
-(with optional and keyword parameters) are supported.
 
 @node Syntax
 @chapter Syntax
@@ -16192,34 +16192,6 @@ Applying the procedure returns the length of the array.
 (Alternatively, you can use @code{(field @var{array} 'length)}.)
 @end deffn
 
-@node Framework
-@chapter The Kawa language framework
-
-Kawa is a framework written in Java for implementing
-high-level and dynamic languages, compiling them into Java bytecodes.
-
-The Kawa distributions includes of other programming languages
-besides Scheme,
-including @uref{../qexo/index.html, XQuery (Qexo)}
-and @uref{http://JEmacs.sourceforge.net/,Emacs Lisp (JEmacs)}.
-
-For a technical overview of Kawa, see these
-@uref{http://www.gnu.org/software/kawa/internals/index.html}.
-Javadoc generated @uref{http://www.gnu.org/software/kawa/api/,documentation of the Kawa classes} is also available.
-The packages
-@uref{http://www.gnu.org/software/kawa/api/gnu/bytecode/package-summary.html,@code{gnu.bytecode}},
-@uref{http://www.gnu.org/software/kawa/api/gnu/math/package-summary.html,@code{gnu.math}},
-@uref{http://www.gnu.org/software/kawa/api/gnu/lists/package-summary.html,@code{gnu.lists}},
-@uref{http://www.gnu.org/software/kawa/api/gnu/xml/package-summary.html,@code{gnu.xml}},
-@uref{http://www.gnu.org/software/kawa/api/gnu/expr/package-summary.html,@code{gnu.expr}},
-@uref{http://www.gnu.org/software/kawa/api/gnu/mapping/package-summary.html,@code{gnu.mapping}},
-and
-@uref{http://www.gnu.org/software/kawa/api/gnu/text/package-summary.html,@code{gnu.text}},
-are used by Kawa, and distributed with it, but may be independently useful.
-
-This @uref{gnu.bytecode/compiling-regexps.html,article} explains how to
-use @code{gnu.bytecode} to compile regular expressions to bytecode.
-
 @node FAQs
 @chapter Frequently Asked Questions
 
@@ -16299,6 +16271,34 @@ find it confusing/annoying if shell output used quotes.
 
 This "repl-as-pad" model doesn't work as well if the repl
 uses @code{write} rather than @code{display}. 
+
+@node Framework
+@chapter The Kawa language framework
+
+Kawa is a framework written in Java for implementing
+high-level and dynamic languages, compiling them into Java bytecodes.
+
+The Kawa distributions includes of other programming languages
+besides Scheme,
+including @uref{../qexo/index.html, XQuery (Qexo)}
+and @uref{http://JEmacs.sourceforge.net/,Emacs Lisp (JEmacs)}.
+
+For a technical overview of Kawa, see these
+@uref{http://www.gnu.org/software/kawa/internals/index.html}.
+Javadoc generated @uref{http://www.gnu.org/software/kawa/api/,documentation of the Kawa classes} is also available.
+The packages
+@uref{http://www.gnu.org/software/kawa/api/gnu/bytecode/package-summary.html,@code{gnu.bytecode}},
+@uref{http://www.gnu.org/software/kawa/api/gnu/math/package-summary.html,@code{gnu.math}},
+@uref{http://www.gnu.org/software/kawa/api/gnu/lists/package-summary.html,@code{gnu.lists}},
+@uref{http://www.gnu.org/software/kawa/api/gnu/xml/package-summary.html,@code{gnu.xml}},
+@uref{http://www.gnu.org/software/kawa/api/gnu/expr/package-summary.html,@code{gnu.expr}},
+@uref{http://www.gnu.org/software/kawa/api/gnu/mapping/package-summary.html,@code{gnu.mapping}},
+and
+@uref{http://www.gnu.org/software/kawa/api/gnu/text/package-summary.html,@code{gnu.text}},
+are used by Kawa, and distributed with it, but may be independently useful.
+
+This @uref{gnu.bytecode/compiling-regexps.html,article} explains how to
+use @code{gnu.bytecode} to compile regular expressions to bytecode.
 
 @node Community
 @chapter The Kawa Community

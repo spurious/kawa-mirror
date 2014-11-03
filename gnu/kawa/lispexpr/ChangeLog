@@ -1,3 +1,8 @@
+2014-11-03  Per Bothner  <per@bothner.com>
+
+	* BracketApply.java (rewrite): Generalize handling of ParameterizedType
+	to LangObjType and other language-specific types.
+
 2014-10-27  Per Bothner  <per@bothner.com>
 
 	* LispReader.java (readAndHandleToken): Complain if token is ".".

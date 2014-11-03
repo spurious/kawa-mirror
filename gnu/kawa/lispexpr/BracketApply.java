@@ -34,9 +34,15 @@ public class BracketApply extends Syntax
         if (val1 instanceof Type)
           return new QuoteExp(LazyType.getInstance(LazyType.lazyType, (Type) val1));
       }
-
-    if (length > 0 && val instanceof Class) {
-	Class clas = (Class) val;
+    Class clas;
+    if (val instanceof Class)
+        clas = (Class) val;
+    else if (val instanceof ObjectType) {
+        Type rtype = ((ObjectType) val).getRawType();
+        clas = rtype.getReflectClass();
+    } else
+        clas = null;
+    if (length > 0 && clas != null) {
 	java.lang.reflect.TypeVariable[] vars = clas.getTypeParameters();
 	if (vars.length != length)
 	    return tr.syntaxError("expected "+vars.length+" parameters for type "+val);

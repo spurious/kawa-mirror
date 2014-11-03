@@ -27,7 +27,7 @@ public class CpoolInvokeDynamic extends CpoolEntry {
 	    //if (verbosity == 2)
 	    //dst.printOptionalIndex(str);
 	}
-	dst.print(" bootstrap_method: #");
+	dst.print("bootstrap_method: #");
 	dst.print(bootstrapMethodIndex);
 	dst.print(' ');
 	nameAndType.print(dst, 0);

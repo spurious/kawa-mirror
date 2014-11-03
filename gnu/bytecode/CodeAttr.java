@@ -3248,6 +3248,13 @@ public class CodeAttr extends Attribute implements AttrContainer
 		    dst.print(args + " args)");
 		    dst.printConstantOperand(index);
 		  }
+		else if (op == 186) // invokedynamic
+		  {
+		    dst.print("invokedynamic");
+		    int index = readUnsignedShort(i);
+		    i += 4;
+		    dst.printConstantOperand(index);
+		  }
 		else if (op < 196)
 		  {
 		    print("186;new;newarray;anewarray;arraylength;athrow;checkcast;instanceof;monitorenter;monitorexit;", op-186, dst);

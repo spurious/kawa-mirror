@@ -886,6 +886,12 @@ public class Compilation implements SourceLocator
     for (int i = 0;  i < len;  i++)
       {
 	char ch = name.charAt(i);
+        if (i == 0 && ch == '$' && len >= 3 && name.charAt(1) == 'N')
+          {
+            i = 1;
+            mangled = true;
+            continue;
+          }
 	if (downCaseNext && ! reversible)
 	  {
 	    ch = Character.toLowerCase(ch);

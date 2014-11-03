@@ -1,3 +1,7 @@
+2014-11-02  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (demangleName): Demangle initial '$N'.
+
 2014-10-13  Per Bothner  <per@bothner.com>
 
 	Add support for r7rs 'define-library'.

@@ -107,10 +107,11 @@ public class ImportFromLibrary extends Syntax
             } else
                 srfiName = demangled.substring(dot+1);
             String srfiNumber = null;
-            if (dot >= 2 || demangled.charAt(0) == ':') {
-                for (int i = 1;  ;  i++) {
+            if (dot > 0) {
+                int numStart = demangled.charAt(0) == ':' ? 1 : 0;
+                for (int i = numStart;  ;  i++) {
                     if (i == dot) {
-                        srfiNumber = demangled.substring(1, dot);
+                        srfiNumber = demangled.substring(numStart, dot);
                         break;
                     }
                     if (Character.digit(demangled.charAt(i), 10) < 0)
@@ -118,7 +119,7 @@ public class ImportFromLibrary extends Syntax
                 }
             }
             if (srfiNumber == null) {
-                tr.error('e', "SRFI library reference must have the form: (srfi :NNN [name])");
+                tr.error('e', "SRFI library reference must have the form: (srfi NNN [name]) or (srfi :NNN [name])");
                 return lname;
             }
             int srfiIndex = SRFI97Map.length;

@@ -9,7 +9,6 @@ import gnu.kawa.util.WeakIdentityHashMap;
 public abstract class AbstractScriptEngineFactory implements ScriptEngineFactory
 {
   Language language;
-  private List<String> extensions;
   protected List<String> names;
   private static List<String> noMimeTypes;
 
@@ -57,36 +56,9 @@ public abstract class AbstractScriptEngineFactory implements ScriptEngineFactory
     return language.getName();
   }
 
-  public List<String> getExtensions ()
-  {
-    if (extensions == null)
-      {
-        ArrayList<String> exts = new ArrayList<String>(1);
-        String[][] langs = Language.getLanguages();
-        for (int i = 0; i < langs.length;  i++)
-          {
-            String[] lang = langs[i];
-            if (lang == null)
-              continue;
-            int n = lang.length - 1;
-            String langClass = lang[n];
-            if (! language.getClass().getName().equals(langClass))
-              continue;
-            for (int j = 1; j < n;  j++)
-              {
-                String ext = lang[j];
-                if (ext != null && ext.charAt(0) == '.')
-                  {
-                    ext = ext.substring(1);
-                    if (! exts.contains(ext))
-                      exts.add(ext);
-                  }
-              }
-          }
-        extensions = Collections.unmodifiableList(exts);
-      }
-    return extensions;
-  }
+    public List<String> getExtensions() {
+        return language.getExtensions();
+    }
 
   public List<String> getMimeTypes ()
   {

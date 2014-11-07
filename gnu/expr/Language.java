@@ -12,11 +12,12 @@ import gnu.kawa.io.CharArrayInPort;
 import gnu.kawa.io.InPort;
 import gnu.kawa.io.OutPort;
 import gnu.kawa.reflect.*;
-import java.io.*;
 import gnu.kawa.functions.GetNamedPart;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import gnu.kawa.lispexpr.ClassNamespace; // FIXME
+import java.io.*;
+import java.util.*;
 import kawa.SourceType;
 
 /**
@@ -487,6 +488,35 @@ public abstract class Language
       name = name.substring(dot+1);
     return name;
   }
+
+    private List<String> extensions;
+
+    public List<String> getExtensions() {
+        if (extensions == null) {
+            ArrayList<String> exts = new ArrayList<String>(1);
+            String thisClassName = this.getClass().getName();
+            String[][] langs = Language.getLanguages();
+            for (int i = 0; i < langs.length;  i++) {
+                String[] lang = langs[i];
+                if (lang == null)
+                    continue;
+                int n = lang.length - 1;
+                String langClass = lang[n];
+                if (! thisClassName.equals(langClass))
+                    continue;
+                for (int j = 1; j < n;  j++) {
+                    String ext = lang[j];
+                    if (ext != null && ext.charAt(0) == '.') {
+                        ext = ext.substring(1);
+                        if (! exts.contains(ext))
+                            exts.add(ext);
+                    }
+                }
+            }
+            extensions = Collections.unmodifiableList(exts);
+        }
+        return extensions;
+    }
 
   public static String mangleNameIfNeeded (String name)
   {

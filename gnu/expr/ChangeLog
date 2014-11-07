@@ -1,3 +1,7 @@
+2014-11-06  Andrea Bernardini <andrebask@gmail.com>
+
+	* CaseExp.java (print): Fix to avoid a ClassCastException.
+
 2014-11-06  Per Bothner  <per@bothner.com>
 
 	* Language.java (getExtensions): New method, with logic moved

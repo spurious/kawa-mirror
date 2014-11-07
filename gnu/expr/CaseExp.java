@@ -123,14 +123,14 @@ public class CaseExp extends Expression {
         key.print(out);
         for (int i = 0; i < clauses.length; i++) {
             out.writeSpaceLinear();
-            QuoteExp[] datums = (QuoteExp[]) clauses[i].datums;
+            Expression[] datums = clauses[i].datums;
             Expression exp = clauses[i].exp;
             out.startLogicalBlock("(", false, ")");
             out.startLogicalBlock("(", false, ")");
             for (int j = 0; j < datums.length; j++) {
                 if (j > 0)
                     out.print(' ');
-                out.print(datums[j].getValue());
+                out.print(((QuoteExp) datums[j]).getValue());
             }
             out.endLogicalBlock(")");
             out.writeSpaceLinear();

@@ -1,3 +1,8 @@
+2014-11-10  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Paths): Note use of current-path as setter,
+	(Resources): Move to end of containing chapter.
+
 2014-10-30  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Features): Move earlier.

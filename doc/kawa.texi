@@ -10026,9 +10026,9 @@ A powerful pretty-printer.
 * Named output formats::
 * Paths:: Paths - file name, URLs, and URIs
 * Files:: File System Interface
-* Resources::
 * Ports::
 * Format:: Formatted Output (Common-Lisp-style)
+* Resources::
 @end menu
 
 @node Named output formats, Paths, , Input-Output
@@ -10094,7 +10094,7 @@ to infer an appropriate @code{Content-type} depending on the following value.
 Top-level values are ignored, instead of printed.
 @end table
 
-@node Paths, Resources, Named output formats, Input-Output
+@node Paths
 @section Paths - file name, URLs, and URIs
 
 A @dfn{Path} is the name of a file or some other @dfn{resource}.
@@ -10134,10 +10134,23 @@ True if @var{arg} is a @code{path} - i.e. an instance of a @code{gnu.kawa.io.Pat
 @end deffn
 
 @deffn Procedure current-path [new-value]
-With no arguments, returns the default directory of the current thread.
-With a @var{new-value} argument, sets the default directory.
+With no arguments, returns the default directory of the current thread
+as a @code{path}.
+This is used as the base directory for relative pathnames.
 The initial value is that of the @code{user.dir} property
 as returned by @code{(java.lang.System:getProperty "user.dir")}.
+
+If a @var{new-value} argument is given, sets the default directory:
+@example
+(current-path "/opt/myApp/")
+@end example
+A string value is automatically converted to a @code{path},
+normally a @code{filepath}. 
+
+Alternatively, you can change the default using a setter:
+@example
+(set! (current-path) "/opt/myApp/")
+@end example
 
 Since @code{current-path} is a @ref{Parameter objects,parameter object}, you can
 locally change the value using @ref{parameterize-syntax,@code{parameterize}}.
@@ -10313,44 +10326,7 @@ Otherwise resolves it against a base URI @var{base},
 which is normally (though not always) absolute.
 @end deffn
 
-@node Resources, Files, Paths, Input-Output
-@section Resources
-
-A resource is a file or other fixed data that an application may access.
-Resources are part of the application and are shipped with it, but are
-stored in external files.  Examples are images, sounds,
-and translation (localization) of messages.
-In the Java world a resource is commonly bundled in the same jar file
-as the application itself.
-
-@deffn Syntax resource-url resource-name
-Returns a @code{URLPath} you can use as a @code{URL}, or
-you can pass to it @code{open-input-file} to read the resource data.
-The @var{resource-name} is a string which is passed to the
-@code{ClassLoader} of the containing module.
-If the module class is in a jar file, things will magically
-work if the resource is in the same jar file, and @var{resource-name}
-is a filename relative to the module class in the jar.
-If the module is immediately evaluated, the @var{resource-name} is resolved
-against the location of the module source file.
-@end deffn
-
-@deffn Syntax module-uri
-Evaluates to a special URI that can be used to access resources
-relative to the class of the containing module.
-The URI has the form @code{"class-resource://@var{CurrentClass}/"}
-in compiled code, to allow moving the classes/jars.
-The current @code{ClassLoader} is associated with the URI, so accessing
-resources using the URI will use that @code{ClassLoader}.
-Therefore you should not create a @code{"class-resource:"} URI
-except by using this function or @code{resolve-uri},
-since that might try to use the wrong @code{ClassLoader}.
-
-The macro @code{resource-url} works by using @code{module-uri}
-and resolving that to a normal @code{URL}.
-@end deffn
-
-@node Files, Ports, Resources, Input-Output
+@node Files
 @section File System Interface
 
 @deffn Procedure file-exists? filename
@@ -11458,6 +11434,43 @@ be processed by @code{read}.
 may also print number strings, i.e. passing a number as a string and
 format it accordingly.
 @end table
+
+@node Resources
+@section Resources
+
+A resource is a file or other fixed data that an application may access.
+Resources are part of the application and are shipped with it, but are
+stored in external files.  Examples are images, sounds,
+and translation (localization) of messages.
+In the Java world a resource is commonly bundled in the same jar file
+as the application itself.
+
+@deffn Syntax resource-url resource-name
+Returns a @code{URLPath} you can use as a @code{URL}, or
+you can pass to it @code{open-input-file} to read the resource data.
+The @var{resource-name} is a string which is passed to the
+@code{ClassLoader} of the containing module.
+If the module class is in a jar file, things will magically
+work if the resource is in the same jar file, and @var{resource-name}
+is a filename relative to the module class in the jar.
+If the module is immediately evaluated, the @var{resource-name} is resolved
+against the location of the module source file.
+@end deffn
+
+@deffn Syntax module-uri
+Evaluates to a special URI that can be used to access resources
+relative to the class of the containing module.
+The URI has the form @code{"class-resource://@var{CurrentClass}/"}
+in compiled code, to allow moving the classes/jars.
+The current @code{ClassLoader} is associated with the URI, so accessing
+resources using the URI will use that @code{ClassLoader}.
+Therefore you should not create a @code{"class-resource:"} URI
+except by using this function or @code{resolve-uri},
+since that might try to use the wrong @code{ClassLoader}.
+
+The macro @code{resource-url} works by using @code{module-uri}
+and resolving that to a normal @code{URL}.
+@end deffn
 
 @node Types, Objects Classes and Modules, Input-Output, Top
 @chapter Types

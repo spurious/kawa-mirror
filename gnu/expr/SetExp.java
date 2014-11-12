@@ -174,7 +174,8 @@ public class SetExp extends AccessExp
         && decl.context instanceof ModuleExp
 	&& isDefining() && ! decl.ignorable())
       {
-        if (decl.shouldEarlyInit() && ! decl.field.hasConstantValueAttr()) 
+        if (decl.shouldEarlyInit()
+            && decl.field != null && ! decl.field.hasConstantValueAttr()) 
           BindingInitializer.create(decl, new_value, comp);
         if (needValue)
           {

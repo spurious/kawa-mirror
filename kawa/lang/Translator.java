@@ -687,560 +687,482 @@ public class Translator extends Compilation
         return name;
     }
 
-  /**
-   * Re-write a Scheme expression in S-expression format into internal form.
-   */
-  public Expression rewrite (Object exp)
-  {
-    return rewrite(exp, 'N');
-  }
+    /**
+     * Re-write a Scheme expression in S-expression format into internal form.
+     */
+    public Expression rewrite(Object exp) {
+        return rewrite(exp, 'N');
+    }
 
-  /**
-   * Re-write a Scheme expression in S-expression format into internal form.
-   */
-  public Expression rewrite (Object exp, boolean function)
-  {
-    return rewrite(exp, function ? 'F' : 'N');
-  }
+    /**
+     * Re-write a Scheme expression in S-expression format into internal form.
+     */
+    public Expression rewrite(Object exp, boolean function) {
+        return rewrite(exp, function ? 'F' : 'N');
+    }
 
-  /** Re-write a Scheme expression in S-expression format into internal form.
-   * @param mode either 'N' (normal), 'F' (function application context),
-   *  or 'M' (macro-checking).
-   */
-  public Expression rewrite (Object exp, char mode)
-  {
-    if (exp instanceof SyntaxForm)
-      {
-	SyntaxForm sf = (SyntaxForm) exp;
-	ScopeExp save_scope = setPushCurrentScope(sf.getScope());
-	try
-	  {
-	    Expression s = rewrite(sf.getDatum(), mode);
-	    return s;
-	  }
-	finally
-	  {
-	    setPopCurrentScope(save_scope);
-	  }
-      }
-    boolean function = mode != 'N';
-    if (exp instanceof PairWithPosition)
-      return rewrite_with_position (exp, function, (PairWithPosition) exp);
-    else if (exp instanceof Pair)
-      return rewrite_pair((Pair) exp, function);
-    else if (exp instanceof Symbol && ! selfEvaluatingSymbol(exp))
-      {
-          Symbol s = (Symbol) exp;
-          if (s.hasUnknownNamespace()) {
-              String loc = s.getLocalPart();
-              return rewrite_lookup(rewrite(Symbol.valueOf(s.getPrefix()), false),
-                                    QuoteExp.getInstance(Symbol.valueOf(s.getLocalPart())),
-                                    function);
-          }
-	Declaration decl = lexical.lookup(exp, function);
-        Declaration cdecl = null;
+    /** Re-write a Scheme expression in S-expression format into internal form.
+     * @param mode either 'N' (normal), 'F' (function application context),
+     *  or 'M' (macro-checking).
+     */
+    public Expression rewrite(Object exp, char mode) {
+        if (exp instanceof SyntaxForm) {
+            SyntaxForm sf = (SyntaxForm) exp;
+            ScopeExp save_scope = setPushCurrentScope(sf.getScope());
+            try {
+                Expression s = rewrite(sf.getDatum(), mode);
+                return s;
+            } finally {
+                setPopCurrentScope(save_scope);
+            }
+        }
+        boolean function = mode != 'N';
+        if (exp instanceof PairWithPosition)
+            return rewrite_with_position (exp, function, (PairWithPosition) exp);
+        else if (exp instanceof Pair)
+            return rewrite_pair((Pair) exp, function);
+        else if (exp instanceof Symbol && ! selfEvaluatingSymbol(exp)) {
+            Symbol s = (Symbol) exp;
+            if (s.hasUnknownNamespace()) {
+                String loc = s.getLocalPart();
+                return rewrite_lookup(rewrite(Symbol.valueOf(s.getPrefix()), false),
+                                      QuoteExp.getInstance(Symbol.valueOf(s.getLocalPart())),
+                                      function);
+            }
+            Declaration decl = lexical.lookup(exp, function);
+            Declaration cdecl = null;
 
-        // If we're nested inside a class (in a ClassExp) then the field
-        // and methods names of this class and super-classes/interfaces
-        // need to be searched.
-        ScopeExp scope = current_scope;
-        int decl_nesting = decl == null ? -1 : ScopeExp.nesting(decl.context);
-        String dname;
-        if (exp instanceof SimpleSymbol)
-          dname = exp.toString();
-        else
-          {
-            dname = null;
-            scope = null;
-          }
-        for (;scope != null; scope = scope.getOuter())
-          {
-            if (scope instanceof LambdaExp
-                && scope.getOuter() instanceof ClassExp // redundant? FIXME
-                && ((LambdaExp) scope).isClassMethod()
-                && mode != 'M')
-              {
-                if (decl_nesting >= ScopeExp.nesting(scope.getOuter()))
-                  break;
-                LambdaExp caller = (LambdaExp) scope;
-                ClassExp cexp = (ClassExp) scope.getOuter();
-                ClassType ctype = (ClassType) cexp.getClassType();
-                // BUG: lookupMember doesn't work if ctype
-                // is a class that hasn't been compiled yet,
-                // such that ClassExp#declareParts hasn't been called.
-                Member part = SlotGet.lookupMember(ctype, dname, ctype);
-                boolean contextStatic
-                  = (caller == cexp.clinitMethod
-                     || (caller != cexp.initMethod 
-                         && caller.nameDecl.isStatic()));
-                if (part == null)
-                  {
-                    PrimProcedure[] methods
-                      = ClassMethods.getMethods(ctype, dname,
-                                                contextStatic ? 'S' : 'V',
-                                                ctype, language);
-                    if (methods.length == 0)
-                      continue;
-                  }
-                else if (decl != null && ! dname.equals(part.getName()))
-                  {
-                    continue;
-                  }
-                Expression part1;
-                // FIXME We're throwing away 'part', which is wasteful.
-                if (contextStatic)
-                  part1 = new ReferenceExp(((ClassExp) caller.getOuter()).nameDecl);
-                else
-                  part1 = new ThisExp(caller.firstDecl());
-                return CompileNamedPart.makeExp(part1,
-                                            QuoteExp.getInstance(dname));
-              }
-          }
-
-	Object nameToLookup;
-	if (decl != null)
-	  {
-	    nameToLookup = decl.getSymbol();
-	    exp = null;
-	    ReferenceExp rexp = getOriginalRef(decl);
-	    if (rexp != null)
-	      {
-		decl = rexp.getBinding();
-		if (decl == null)
-		  {
-		    exp = rexp.getSymbol();
-		    nameToLookup = exp;
-		  }
-	      }
-	  }
-	else
-	  {
-	    nameToLookup = exp;
-	  }
-	Symbol symbol = (Symbol) exp;
-	boolean separate = getLanguage().hasSeparateFunctionNamespace();
-        if (decl != null)
-          {
-            if (current_scope instanceof TemplateScope && decl.needsContext())
-              cdecl = ((TemplateScope) current_scope).macroContext;
-            else if (decl.getFlag(Declaration.FIELD_OR_METHOD)
-                     && ! decl.isStatic())
-              {
-                scope = currentScope();
-                for (;;)
-                  {
-                    if (scope == null)
-                      throw new Error("internal error: missing "+decl);
-                    if (scope.getOuter() == decl.context) // I.e. same class.
-                      break;
-                    scope = scope.getOuter();
-                  }
-                cdecl = scope.firstDecl();
-              }
-          }
-        else
-          {
-	    Location loc
-	      = env.lookup(symbol,
-			   function && separate ? EnvironmentKey.FUNCTION
-			   : null);
-	    if (loc != null)
-	      loc = loc.getBase();
-            if (loc instanceof FieldLocation)
-              {
-                FieldLocation floc = (FieldLocation) loc;
-                try
-                  {
-                    decl = floc.getDeclaration();
-                    if (! inlineOk(null)
-                        // A kludge - we get a bunch of testsuite failures
-                        // if we don't inline $lookup$.  FIXME.
-                        && (decl != getNamedPartDecl
-                            // Another kludge to support "object" as a
-                            // type specifier.
-                            && ! isObjectSyntax(floc.getDeclaringClass(),
-                                                floc.getMemberName())))
-                      decl = null;
-                    else if (immediate)
-                      {
-                        if (! decl.isStatic())
-                          {
-                            cdecl = new Declaration("(module-instance)");
-                            cdecl.setValue(new QuoteExp(floc.getInstance()));
-                          }
-                      }
-                    else if (decl.isStatic())
-                      {
-                        // If the class has been loaded through ZipLoader
-                        // or ArrayClassLoader then it might not be visible
-                        // if loaded through some other ClassLoader.
-                        Class fclass = floc.getRClass();
-                        ClassLoader floader;
-                        if (fclass == null
-                            || ((floader = fclass.getClassLoader())
-                                instanceof ZipLoader)
-                            || floader instanceof ArrayClassLoader)
-                          decl = null;
-                      }
+            // If we're nested inside a class (in a ClassExp) then the field
+            // and methods names of this class and super-classes/interfaces
+            // need to be searched.
+            ScopeExp scope = current_scope;
+            int decl_nesting = decl == null ? -1 : ScopeExp.nesting(decl.context);
+            String dname;
+            if (exp instanceof SimpleSymbol)
+                dname = exp.toString();
+            else {
+                dname = null;
+                scope = null;
+            }
+            for (;scope != null; scope = scope.getOuter()) {
+                if (scope instanceof LambdaExp
+                    && scope.getOuter() instanceof ClassExp // redundant? FIXME
+                    && ((LambdaExp) scope).isClassMethod()
+                    && mode != 'M') {
+                    if (decl_nesting >= ScopeExp.nesting(scope.getOuter()))
+                        break;
+                    LambdaExp caller = (LambdaExp) scope;
+                    ClassExp cexp = (ClassExp) scope.getOuter();
+                    ClassType ctype = (ClassType) cexp.getClassType();
+                    // BUG: lookupMember doesn't work if ctype
+                    // is a class that hasn't been compiled yet,
+                    // such that ClassExp#declareParts hasn't been called.
+                    Member part = SlotGet.lookupMember(ctype, dname, ctype);
+                    boolean contextStatic
+                        = (caller == cexp.clinitMethod
+                           || (caller != cexp.initMethod 
+                               && caller.nameDecl.isStatic()));
+                    if (part == null) {
+                        PrimProcedure[] methods
+                            = ClassMethods.getMethods(ctype, dname,
+                                                      contextStatic ? 'S' : 'V',
+                                                      ctype, language);
+                        if (methods.length == 0)
+                            continue;
+                    } else if (decl != null && ! dname.equals(part.getName())) {
+                        continue;
+                    }
+                    Expression part1;
+                    // FIXME We're throwing away 'part', which is wasteful.
+                    if (contextStatic)
+                        part1 = new ReferenceExp(((ClassExp) caller.getOuter()).nameDecl);
                     else
-                      decl = null;
-                  }
-                catch (Exception ex)
-                  {
-                    error('e',
-                          "exception loading '" + exp
-                          + "' - " + ex.getMessage());
-                    decl = null;
-                  }
-              }
-            else if (mode != 'M' && (loc == null || ! loc.isBound()))
-              {
-                Expression e = checkDefaultBinding(symbol, this);
-                if (e != null)
-                  return e;
-              }
-	    /*
-            else if (Compilation.inlineOk && function)
-              {
-		// Questionable.  fail with new set_b implementation,
-		// which just call rewrite_car on the lhs,
-		// if we don't require function to be true.  FIXME.
-                decl = Declaration.getDeclaration(proc);
-              }
-            */
-          }
-	if (decl != null)
-          {
-            // A special kludge to deal with the overloading between the
-            // object macro and object as being equivalent to java.lang.Object.
-            // A cleaner solution would be to use an identifier macro.
-            Field dfield = decl.field;
-            if (! function && dfield != null
-                && isObjectSyntax(dfield.getDeclaringClass(),
-                                  dfield.getName()))
-              return QuoteExp.getInstance(Object.class);
+                        part1 = new ThisExp(caller.firstDecl());
+                    return CompileNamedPart.makeExp(part1,
+                                                    QuoteExp.getInstance(dname));
+                }
+            }
 
-            if (decl.getContext() instanceof PatternScope)
-              return syntaxError("reference to pattern variable "+decl.getName()+" outside syntax template");
-          }
+            Object nameToLookup;
+            if (decl != null) {
+                nameToLookup = decl.getSymbol();
+                exp = null;
+                ReferenceExp rexp = getOriginalRef(decl);
+                if (rexp != null) {
+                    decl = rexp.getBinding();
+                    if (decl == null) {
+                        exp = rexp.getSymbol();
+                        nameToLookup = exp;
+                    }
+                }
+            } else {
+                nameToLookup = exp;
+            }
+            Symbol symbol = (Symbol) exp;
+            boolean separate = getLanguage().hasSeparateFunctionNamespace();
+            if (decl != null) {
+                if (current_scope instanceof TemplateScope && decl.needsContext())
+                    cdecl = ((TemplateScope) current_scope).macroContext;
+                else if (decl.getFlag(Declaration.FIELD_OR_METHOD)
+                         && ! decl.isStatic()) {
+                    scope = currentScope();
+                    for (;;) {
+                        if (scope == null)
+                            throw new Error("internal error: missing "+decl);
+                        if (scope.getOuter() == decl.context) // I.e. same class.
+                            break;
+                        scope = scope.getOuter();
+                    }
+                    cdecl = scope.firstDecl();
+                }
+            } else {
+                Location loc
+                    = env.lookup(symbol,
+                                 function && separate ? EnvironmentKey.FUNCTION
+                                 : null);
+                if (loc != null)
+                    loc = loc.getBase();
+                if (loc instanceof FieldLocation) {
+                    FieldLocation floc = (FieldLocation) loc;
+                    try {
+                        decl = floc.getDeclaration();
+                        if (! inlineOk(null)
+                            // A kludge - we get a bunch of testsuite failures
+                            // if we don't inline $lookup$.  FIXME.
+                            && (decl != getNamedPartDecl
+                                // Another kludge to support "object" as a
+                                // type specifier.
+                                && ! isObjectSyntax(floc.getDeclaringClass(),
+                                                    floc.getMemberName())))
+                            decl = null;
+                        else if (immediate) {
+                            if (! decl.isStatic()) {
+                                cdecl = new Declaration("(module-instance)");
+                                cdecl.setValue(new QuoteExp(floc.getInstance()));
+                            }
+                        } else if (decl.isStatic()) {
+                            // If the class has been loaded through ZipLoader
+                            // or ArrayClassLoader then it might not be visible
+                            // if loaded through some other ClassLoader.
+                            Class fclass = floc.getRClass();
+                            ClassLoader floader;
+                            if (fclass == null
+                                || ((floader = fclass.getClassLoader())
+                                    instanceof ZipLoader)
+                                || floader instanceof ArrayClassLoader)
+                                decl = null;
+                        } else
+                            decl = null;
+                    } catch (Exception ex) {
+                        error('e',
+                              "exception loading '" + exp
+                              + "' - " + ex.getMessage());
+                        decl = null;
+                    }
+                }
+                else if (mode != 'M' && (loc == null || ! loc.isBound()))
+                {
+                    Expression e = checkDefaultBinding(symbol, this);
+                    if (e != null)
+                        return e;
+                }
+                /*
+                else if (Compilation.inlineOk && function) {
+                    // Questionable.  fail with new set_b implementation,
+                    // which just call rewrite_car on the lhs,
+                    // if we don't require function to be true.  FIXME.
+                    decl = Declaration.getDeclaration(proc);
+                }
+                */
+            }
+            if (decl != null) {
+                // A special kludge to deal with the overloading between the
+                // object macro and object as being equivalent to java.lang.Object.
+                // A cleaner solution would be to use an identifier macro.
+                Field dfield = decl.field;
+                if (! function && dfield != null
+                    && isObjectSyntax(dfield.getDeclaringClass(),
+                                      dfield.getName()))
+                    return QuoteExp.getInstance(Object.class);
 
-	ReferenceExp rexp = new ReferenceExp (nameToLookup, decl);
-        rexp.setContextDecl(cdecl);
-        rexp.setLine(this);
-	if (function && separate)
-	  rexp.setFlag(ReferenceExp.PREFER_BINDING2);
-	return rexp;
-      }
-    else if (exp instanceof LangExp)
-      return rewrite(((LangExp) exp).getLangValue(), function);
-    else if (exp instanceof Expression)
-      return (Expression) exp;
-    else if (exp == Special.abstractSpecial)
-      return QuoteExp.abstractExp;
-    else if (exp == Special.nativeSpecial)
-      return QuoteExp.nativeExp;
-    else
-      {
-        if (exp instanceof Keyword && ! keywordsAreSelfEvaluating())
-          error('w', "keyword should be quoted if not in argument position");
+                if (decl.getContext() instanceof PatternScope)
+                    return syntaxError("reference to pattern variable "+decl.getName()+" outside syntax template");
+            }
 
-        return QuoteExp.getInstance(Quote.quote(exp, this), this);
-      }
-  }
+            ReferenceExp rexp = new ReferenceExp (nameToLookup, decl);
+            rexp.setContextDecl(cdecl);
+            rexp.setLine(this);
+            if (function && separate)
+                rexp.setFlag(ReferenceExp.PREFER_BINDING2);
+            return rexp;
+        } else if (exp instanceof LangExp)
+            return rewrite(((LangExp) exp).getLangValue(), function);
+        else if (exp instanceof Expression)
+            return (Expression) exp;
+        else if (exp == Special.abstractSpecial)
+            return QuoteExp.abstractExp;
+        else if (exp == Special.nativeSpecial)
+            return QuoteExp.nativeExp;
+        else {
+            if (exp instanceof Keyword && ! keywordsAreSelfEvaluating())
+                error('w', "keyword should be quoted if not in argument position");
 
-  /** 
-   * If a symbol is lexically unbound, look for a default binding.
-   * The default implementation does the following:
-   * 
-   * If the symbol is the name of an existing Java class, return that class.
-   * Handles both with and without (semi-deprecated) angle-brackets:
-   *   {@code <java.lang.Integer>} and {@code java.lang.Integer}.
-   * Also handles arrays, such as {@code java.lang.String[]}.
-   *
-   * If the symbol starts with {@code '@'} parse as an annotation class.
-   *
-   * Recognizes quanties with units, such as {@code 2m} and {@code 3m/s^2}.
-   *
-   * Handles the xml and unit namespaces.
-   *
-   * @return null if no binding, otherwise an Expression.
-   * 
-   * FIXME: This method should be refactored. The quantities parsing should
-   *        be moved to its own method at least.
-   */
-  public Expression checkDefaultBinding (Symbol symbol, Translator tr)
-  {
-    Namespace namespace = symbol.getNamespace();
-    String local = symbol.getLocalPart();
-    String name = symbol.toString();
-    int len = name.length();
-
-    if (namespace instanceof XmlNamespace)
-      return makeQuoteExp(((XmlNamespace) namespace).get(local));
-    String namespaceName = namespace.getName();
-    if (namespaceName == LispLanguage.unitNamespace.getName())
-    {
-      Object val = Unit.lookup(local);
-      if (val != null)
-        return makeQuoteExp(val);
+            return QuoteExp.getInstance(Quote.quote(exp, this), this);
+        }
     }
-    if (namespaceName == LispLanguage.entityNamespace.getName())
-    {
-      Object val = lookupStandardEntity(local);
-      if (val != null)
-        return makeQuoteExp(val);
-      tr.error('e', "unknown entity name "+local);
-    }
 
-    char ch0 = name.charAt(0);
+    /** 
+     * If a symbol is lexically unbound, look for a default binding.
+     * The default implementation does the following:
+     * 
+     * If the symbol is the name of an existing Java class, return that class.
+     * Handles both with and without (semi-deprecated) angle-brackets:
+     *   {@code <java.lang.Integer>} and {@code java.lang.Integer}.
+     * Also handles arrays, such as {@code java.lang.String[]}.
+     *
+     * If the symbol starts with {@code '@'} parse as an annotation class.
+     *
+     * Recognizes quanties with units, such as {@code 2m} and {@code 3m/s^2}.
+     *
+     * Handles the xml and unit namespaces.
+     *
+     * @return null if no binding, otherwise an Expression.
+     * 
+     * FIXME: This method should be refactored. The quantities parsing should
+     *        be moved to its own method at least.
+     */
+    public Expression checkDefaultBinding(Symbol symbol, Translator tr) {
+        Namespace namespace = symbol.getNamespace();
+        String local = symbol.getLocalPart();
+        String name = symbol.toString();
+        int len = name.length();
 
-    if (ch0 == '@') // Deprecated - reader now returns ($splice$ ATYPE).
-    {
-      String rest = name.substring(1);
-      Expression classRef = tr.rewrite(Symbol.valueOf(rest));
-      return MakeAnnotation.makeAnnotationMaker(classRef);
-    }
+        if (namespace instanceof XmlNamespace)
+            return makeQuoteExp(((XmlNamespace) namespace).get(local));
+        String namespaceName = namespace.getName();
+        if (namespaceName == LispLanguage.unitNamespace.getName()) {
+            Object val = Unit.lookup(local);
+            if (val != null)
+                return makeQuoteExp(val);
+        }
+        if (namespaceName == LispLanguage.entityNamespace.getName()) {
+            Object val = lookupStandardEntity(local);
+            if (val != null)
+                return makeQuoteExp(val);
+            tr.error('e', "unknown entity name "+local);
+        }
 
-    // Look for quantities.
-    if (ch0 == '-' || ch0 == '+' || Character.digit(ch0, 10) >= 0)
-    {
-      // 1: initial + or -1 seen.
-      // 2: digits seen
-      // 3: '.' seen
-      // 4: fraction seen
-      // 5: [eE][=+]?[0-9]+ seen
-      int state = 0;
-      int i = 0;
+        char ch0 = name.charAt(0);
+
+        if (ch0 == '@') { // Deprecated - reader now returns ($splice$ ATYPE).
+            String rest = name.substring(1);
+            Expression classRef = tr.rewrite(Symbol.valueOf(rest));
+            return MakeAnnotation.makeAnnotationMaker(classRef);
+        }
+
+        // Look for quantities.
+        if (ch0 == '-' || ch0 == '+' || Character.digit(ch0, 10) >= 0) {
+            // 1: initial + or -1 seen.
+            // 2: digits seen
+            // 3: '.' seen
+            // 4: fraction seen
+            // 5: [eE][=+]?[0-9]+ seen
+            int state = 0;
+            int i = 0;
       
-      for (; i < len; i++)
-      {
-        char ch = name.charAt(i);
-        if (Character.digit(ch, 10) >= 0)
-          state = state < 3 ? 2 : state < 5 ? 4 : 5;
-        else if ((ch == '+' || ch == '-') && state == 0)
-          state = 1;
-        else if (ch == '.' && state < 3)
-          state = 3;
-        else if ((ch == 'e' || ch == 'E') && (state == 2 || state == 4)
-            && i + 1 < len)
-        {
-          int j = i + 1;
-          char next = name.charAt(j);
-          if ((next == '-' || next == '+') && ++j < len)
-            next = name.charAt(j);
-          if (Character.digit(next, 10) < 0)
-            break;
-          state = 5;
-          i = j + 1;
-        }
-        else
-          break;
-      }
-      tryQuantity:
-      if (i < len && state > 1)
-      {
-        DFloNum num = new DFloNum(name.substring(0, i));
-        boolean div = false;
-        Vector vec = new Vector();
-        for (; i < len;)
-        {
-          char ch = name.charAt(i++);
-          if (ch == '*')
-          {
-            if (i == len)
-              break tryQuantity;
-            ch = name.charAt(i++);
-          }
-          else if (ch == '/')
-          {
-            if (i == len || div)
-              break tryQuantity;
-            div = true;
-            ch = name.charAt(i++);
-          }
-          int unitStart = i - 1;
-          int unitEnd;
-          for (;;)
-          {
-            if (!Character.isLetter(ch))
-            {
-              unitEnd = i - 1;
-              if (unitEnd == unitStart)
-                break tryQuantity;
-              break;
+            for (; i < len; i++) {
+                char ch = name.charAt(i);
+                if (Character.digit(ch, 10) >= 0)
+                    state = state < 3 ? 2 : state < 5 ? 4 : 5;
+                else if ((ch == '+' || ch == '-') && state == 0)
+                    state = 1;
+                else if (ch == '.' && state < 3)
+                    state = 3;
+                else if ((ch == 'e' || ch == 'E') && (state == 2 || state == 4)
+                         && i + 1 < len) {
+                    int j = i + 1;
+                    char next = name.charAt(j);
+                    if ((next == '-' || next == '+') && ++j < len)
+                        next = name.charAt(j);
+                    if (Character.digit(next, 10) < 0)
+                        break;
+                    state = 5;
+                    i = j + 1;
+                }
+                else
+                    break;
             }
-            if (i == len)
-            {
-              unitEnd = i;
-              ch = '1';
-              break;
+            tryQuantity:
+            if (i < len && state > 1) {
+                DFloNum num = new DFloNum(name.substring(0, i));
+                boolean div = false;
+                Vector vec = new Vector();
+                for (; i < len;) {
+                    char ch = name.charAt(i++);
+                    if (ch == '*') {
+                        if (i == len)
+                            break tryQuantity;
+                        ch = name.charAt(i++);
+                    } else if (ch == '/') {
+                        if (i == len || div)
+                            break tryQuantity;
+                        div = true;
+                        ch = name.charAt(i++);
+                    }
+                    int unitStart = i - 1;
+                    int unitEnd;
+                    for (;;) {
+                        if (!Character.isLetter(ch)) {
+                            unitEnd = i - 1;
+                            if (unitEnd == unitStart)
+                                break tryQuantity;
+                            break;
+                        }
+                        if (i == len) {
+                            unitEnd = i;
+                            ch = '1';
+                            break;
+                        }
+                        ch = name.charAt(i++);
+                    }
+                    vec.addElement(name.substring(unitStart, unitEnd));
+                    boolean expRequired = false;
+                    if (ch == '^') {
+                        expRequired = true;
+                        if (i == len)
+                            break tryQuantity;
+                        ch = name.charAt(i++);
+                    }
+                    boolean neg = div;
+                    if (ch == '+') {
+                        expRequired = true;
+                        if (i == len)
+                            break tryQuantity;
+                        ch = name.charAt(i++);
+                    } else if (ch == '-') {
+                        expRequired = true;
+                        if (i == len)
+                            break tryQuantity;
+                        ch = name.charAt(i++);
+                        neg = !neg;
+                    }
+                    int nexp = 0;
+                    int exp = 0;
+                    for (;;) {
+                        int dig = Character.digit(ch, 10);
+                        if (dig <= 0) {
+                            i--;
+                            break;
+                        }
+                        exp = 10 * exp + dig;
+                        nexp++;
+                        if (i == len)
+                            break;
+                        ch = name.charAt(i++);
+                    }
+                    if (nexp == 0) {
+                        exp = 1;
+                        if (expRequired)
+                            break tryQuantity;
+                    }
+                    if (neg)
+                        exp = -exp;
+                    vec.addElement(IntNum.make(exp));
+                }
+                if (i == len) {
+                    int nunits = vec.size() >> 1;
+                    Expression[] units = new Expression[nunits];
+                    for (i = 0; i < nunits; i++) {
+                        String uname = (String) vec.elementAt(2 * i);
+                        Symbol usym = LispLanguage.unitNamespace.getSymbol(uname.intern());
+                        Expression uref = tr.rewrite(usym);
+                        IntNum uexp = (IntNum) vec.elementAt(2 * i + 1);
+                        if (uexp.longValue() != 1)
+                            uref = new ApplyExp(expt.expt,
+                                                new Expression[] {
+                                    uref, makeQuoteExp(uexp)
+                                });
+                        units[i] = uref;
+                    }
+                    Expression unit;
+                    if (nunits == 1)
+                        unit = units[0];
+                    else
+                        unit = new ApplyExp(MultiplyOp.$St, units);
+                    return new ApplyExp(MultiplyOp.$St,
+                                        new Expression[] {
+                            makeQuoteExp(num),
+                            unit
+                        });
+                }
             }
-            ch = name.charAt(i++);
-          }
-          vec.addElement(name.substring(unitStart, unitEnd));
-          boolean expRequired = false;
-          if (ch == '^')
-          {
-            expRequired = true;
-            if (i == len)
-              break tryQuantity;
-            ch = name.charAt(i++);
-          }
-          boolean neg = div;
-          if (ch == '+')
-          {
-            expRequired = true;
-            if (i == len)
-              break tryQuantity;
-            ch = name.charAt(i++);
-          }
-          else if (ch == '-')
-          {
-            expRequired = true;
-            if (i == len)
-              break tryQuantity;
-            ch = name.charAt(i++);
-            neg = !neg;
-          }
-          int nexp = 0;
-          int exp = 0;
-          for (;;)
-          {
-            int dig = Character.digit(ch, 10);
-            if (dig <= 0)
-            {
-              i--;
-              break;
-            }
-            exp = 10 * exp + dig;
-            nexp++;
-            if (i == len)
-              break;
-            ch = name.charAt(i++);
-          }
-          if (nexp == 0)
-          {
-            exp = 1;
-            if (expRequired)
-              break tryQuantity;
-          }
-          if (neg)
-            exp = -exp;
-          vec.addElement(IntNum.make(exp));
         }
-        if (i == len)
-        {
-          int nunits = vec.size() >> 1;
-          Expression[] units = new Expression[nunits];
-          for (i = 0; i < nunits; i++)
-          {
-            String uname = (String) vec.elementAt(2 * i);
-            Symbol usym = LispLanguage.unitNamespace.getSymbol(uname.intern());
-            Expression uref = tr.rewrite(usym);
-            IntNum uexp = (IntNum) vec.elementAt(2 * i + 1);
-            if (uexp.longValue() != 1)
-              uref = new ApplyExp(expt.expt,
-                  new Expression[]
-                  {
-                    uref, makeQuoteExp(uexp)
-                  });
-            units[i] = uref;
-          }
-          Expression unit;
-          if (nunits == 1)
-            unit = units[0];
-          else
-            unit = new ApplyExp(MultiplyOp.$St, units);
-          return new ApplyExp(MultiplyOp.$St,
-              new Expression[]
-              {
-                makeQuoteExp(num),
-                unit
-              });
-        }
-      }
-    }
 
-    boolean sawAngle;
-    if (len > 2 && ch0 == '<' && name.charAt(len - 1) == '>')
-    {
-      name = name.substring(1, len - 1);
-      len -= 2;
-      sawAngle = true;
-    }
-    else
-      sawAngle = false;
-    int rank = 0;
-    while (len > 2 && name.charAt(len - 2) == '[' && name.charAt(len - 1) == ']')
-    {
-      len -= 2;
-      rank++;
-    }
-    //(future) String cname = (namespace == LispPackage.ClassNamespace) ? local : name;
-    String cname = name;
-    if (rank != 0)
-      cname = name.substring(0, len);
-    try
-    {
-      Class clas;
-      Type type = getLanguage().getNamedType(cname);
-      if (rank > 0 && (!sawAngle || type == null))
-      {
-        Symbol tsymbol = namespace.getSymbol(cname.intern());
-        Expression texp = tr.rewrite(tsymbol, false);
-        texp = InlineCalls.inlineCalls(texp, tr);
-        if (!(texp instanceof ErrorExp))
-          type = tr.getLanguage().getTypeFor(texp);
-      }
-      if (type != null)
-      {
-        // Somewhat inconsistent: Types named by getNamedType are Type,
-        // while standard type/classes are Class.  FIXME.
-        while (--rank >= 0)
-        {
-          type = gnu.bytecode.ArrayType.make(type);
+        boolean sawAngle;
+        if (len > 2 && ch0 == '<' && name.charAt(len - 1) == '>') {
+            name = name.substring(1, len - 1);
+            len -= 2;
+            sawAngle = true;
+        } else
+            sawAngle = false;
+        int rank = 0;
+        while (len > 2 && name.charAt(len - 2) == '['
+               && name.charAt(len - 1) == ']') {
+            len -= 2;
+            rank++;
         }
-        return makeQuoteExp(type);
-      }
-      else
-      {
-        type = Type.lookupType(cname);
-        if (type instanceof gnu.bytecode.PrimType)
-          clas = type.getReflectClass();
-        else
-        {
-          if (cname.indexOf('.') < 0)
-            cname = (tr.classPrefix
-                + Compilation.mangleNameIfNeeded(cname));
-          clas = ClassType.getContextClass(cname);
+        //(future) String cname = (namespace == LispPackage.ClassNamespace) ? local : name;
+        String cname = name;
+        if (rank != 0)
+            cname = name.substring(0, len);
+        try {
+            Class clas;
+            Type type = getLanguage().getNamedType(cname);
+            if (rank > 0 && (!sawAngle || type == null)) {
+                Symbol tsymbol = namespace.getSymbol(cname.intern());
+                Expression texp = tr.rewrite(tsymbol, false);
+                texp = InlineCalls.inlineCalls(texp, tr);
+                if (!(texp instanceof ErrorExp))
+                    type = tr.getLanguage().getTypeFor(texp);
+            }
+            if (type != null) {
+                // Somewhat inconsistent: Types named by getNamedType are Type,
+                // while standard type/classes are Class.  FIXME.
+                while (--rank >= 0) {
+                    type = gnu.bytecode.ArrayType.make(type);
+                }
+                return makeQuoteExp(type);
+            } else {
+                type = Type.lookupType(cname);
+                if (type instanceof gnu.bytecode.PrimType)
+                    clas = type.getReflectClass();
+                else {
+                    if (cname.indexOf('.') < 0)
+                        cname = (tr.classPrefix
+                                 + Compilation.mangleNameIfNeeded(cname));
+                    clas = ClassType.getContextClass(cname);
+                }
+            }
+            if (clas != null) {
+                if (rank > 0) {
+                    type = Type.make(clas);
+                    while (--rank >= 0) {
+                        type = gnu.bytecode.ArrayType.make(type);
+                    }
+                    clas = type.getReflectClass();
+                }
+                return makeQuoteExp(clas);
+            }
+        } catch (ClassNotFoundException ex) {
+            Package pack = gnu.bytecode.ArrayClassLoader.getContextPackage(name);
+            if (pack != null)
+                return makeQuoteExp(pack);
+        } catch (NoClassDefFoundError ex) {
+            tr.error('w', "error loading class " + cname + " - " + ex.getMessage() + " not found");
+        } catch (Exception ex) {
         }
-      }
-      if (clas != null)
-      {
-        if (rank > 0)
-        {
-          type = Type.make(clas);
-          while (--rank >= 0)
-          {
-            type = gnu.bytecode.ArrayType.make(type);
-          }
-          clas = type.getReflectClass();
-        }
-        return makeQuoteExp(clas);
-      }
-    } catch (ClassNotFoundException ex)
-    {
-      Package pack = gnu.bytecode.ArrayClassLoader.getContextPackage(name);
-      if (pack != null)
-        return makeQuoteExp(pack);
-    } catch (NoClassDefFoundError ex)
-    {
-      tr.error('w', "error loading class " + cname + " - " + ex.getMessage() + " not found");
-    } catch (Exception ex)
-    {
+        return null;
     }
-    return null;
-  }
 
     static Map<String,String> standardEntities;
     public static synchronized String lookupStandardEntity(String key) {

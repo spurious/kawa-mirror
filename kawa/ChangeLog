@@ -1,3 +1,10 @@
+2014-11-12  Per Bothner  <per@bothner.com>
+
+	* standard/module_name.java (scanForm): Never declare a variable
+	named with the module name - the latter is in a different namespace.
+	* lang/Translator.java (checkDefaultBinding): Also check in
+	ModuleManager for class being currently compiled.
+
 2014-11-02  Per Bothner  <per@bothner.com>
 
 	* standard/ImportFromLibrary.java (checkSrfi): Allow r7rs

@@ -1116,7 +1116,6 @@ public class Translator extends Compilation
         if (rank != 0)
             cname = name.substring(0, len);
         try {
-            Class clas;
             Type type = getLanguage().getNamedType(cname);
             if (rank > 0 && (!sawAngle || type == null)) {
                 Symbol tsymbol = namespace.getSymbol(cname.intern());
@@ -1132,16 +1131,30 @@ public class Translator extends Compilation
                     type = gnu.bytecode.ArrayType.make(type);
                 }
                 return makeQuoteExp(type);
-            } else {
-                type = Type.lookupType(cname);
-                if (type instanceof gnu.bytecode.PrimType)
-                    clas = type.getReflectClass();
-                else {
-                    if (cname.indexOf('.') < 0)
-                        cname = (tr.classPrefix
-                                 + Compilation.mangleNameIfNeeded(cname));
-                    clas = ClassType.getContextClass(cname);
+            }
+            Class clas;
+            type = Type.lookupType(cname);
+            if (type instanceof gnu.bytecode.PrimType)
+                clas = type.getReflectClass();
+            else {
+                if (cname.indexOf('.') < 0)
+                    cname = (tr.classPrefix
+                             + Compilation.mangleNameIfNeeded(cname));
+                if (rank == 0) {
+                    ModuleManager mmanager = ModuleManager.getInstance();
+                    ModuleInfo typeInfo = mmanager.searchWithClassName(cname);
+                    if (typeInfo != null) {
+                        Compilation tcomp = typeInfo.getCompilation();
+                        if (tcomp != null && tcomp.mainClass != null) {
+                            QuoteExp qexp = new QuoteExp(tcomp.mainClass,
+                                                         Type.javalangClassType);
+                            qexp.setLocation(this);
+                            return qexp;
+                        }
+                    }
                 }
+
+                clas = ClassType.getContextClass(cname);
             }
             if (clas != null) {
                 if (rank > 0) {

@@ -23,7 +23,6 @@ public class module_name extends Syntax {
         String name = null;
         Pair p;
         String err = null;
-        Declaration decl = null;
         if (arg instanceof Pair && (p = (Pair) arg).getCar() == "quote") {
             arg = p.getCdr();
             if (! (arg instanceof Pair)
@@ -44,7 +43,6 @@ public class module_name extends Syntax {
                 && name.charAt(len-1) == '>') {
                 name = name.substring(1, len-1);
             }
-            decl = tr.define(arg, nameSyntax, defs);
         } else
             err = "un-implemented expression in module-name";
         if (err != null)
@@ -69,14 +67,6 @@ public class module_name extends Syntax {
             module.setType(tr.mainClass);
             module.setName(name);
 
-            if (decl != null) {
-                decl.noteValue(tr.getModule());
-                decl.setFlag(Declaration.IS_CONSTANT|Declaration.PRIVATE_SPECIFIED);
-                if (module.getOuter() == null)
-                    decl.setFlag(Declaration.STATIC_SPECIFIED);
-                decl.setPrivate(true);
-                decl.setType(Compilation.typeClass);
-            }
             tr.mustCompileHere();
         }
     }

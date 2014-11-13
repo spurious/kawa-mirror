@@ -1,3 +1,9 @@
+2014-11-12  Jamison Hope  <jrh@theptrgroup.com>
+
+	* IntNum.java (compare): Cast argument to Numeric instead of
+	RealNum if using compareReversed.
+	This fixes (= an-IntNum a-Complex).
+
 2014-02-20  Jamison Hope  <jrh@theptrgroup.com>
 
 	* RealNum.java (angle): The angle of a negative real is pi.

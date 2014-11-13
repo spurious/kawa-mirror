@@ -256,7 +256,7 @@ public class IntNum extends RatNum implements Externalizable
   {
     if (obj instanceof IntNum)
       return compare (this, (IntNum) obj);
-    return ((RealNum)obj).compareReversed (this);
+    return ((Numeric)obj).compareReversed (this);
   }
 
   public final boolean isOdd ()

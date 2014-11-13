@@ -1,3 +1,7 @@
+2014-11-13  Per Bothner  <per@bothner.com>
+
+	* lib-test.scm (test-ev-req): Tweak to use expanded string literals.
+
 2014-10-28  Per Bothner  <per@bothner.com>
 
 	* r7rs-tests.scm: More merging with Chibi upstream.

@@ -131,22 +131,6 @@
 	    (symbol-parts (element-name #<abc xmlns="URI"/>)))
 
 ;; Contributed by Helmut Eller.
-(define version-1
- '((module-export foo)
-   (module-static #t)
-   (module-compile-options
-    warn-invoke-unknown-method: #t
-    warn-undefined-variable: #t)
-   (define (foo) (bar))
-   (define (bar) "version 1")))
-(define version-2
- '((module-export foo)
-   (module-static #t)
-   (module-compile-options
-    warn-invoke-unknown-method: #t
-    warn-undefined-variable: #t)
-   (define (foo) (bar))
-   (define (bar) "version 2")))
 (define (test-ev-req)
   (let* ((file (java.io.File:createTempFile "foo" ".scm"))
 	 (filename (file:getAbsolutePath))
@@ -156,21 +140,31 @@
 	 (wait (lambda () (let* ((date (file:lastModified)))
 			    (let loop ()
 			      (when (< (- (now) date) (* 2 cache-time))
-				(sleep 0.5))))))
-	 (write-forms (lambda (forms)
+                                    (sleep 0.5))))))
+         (make-form (lambda (bar-body)
+                      &{
+                        &|(module-export foo)
+                        &|(module-static #t)
+                        &|(module-compile-options
+                        &|  warn-invoke-unknown-method: #t
+                        &|  warn-undefined-variable: #t)
+                        &|(define (foo) (bar))
+                        &|(define (bar) &[bar-body])
+                       }))
+         (write-forms (lambda (bar-body)
 			(wait)
 			(call-with-output-file filename
 			  (lambda (stream)
-			    (format stream "~{~s~%~}" forms)))
+                            (write-string (make-form bar-body) stream)))
 			(wait))))
     (try-finally
      (begin
-       (write-forms version-1)
+       (write-forms &{"version 1"})
        (eval `(begin (require ,filename)
 		     (define foo-1 foo)
 		   (define result-1 (foo-1)))
 	     (interaction-environment))
-       (write-forms version-2)
+       (write-forms &{"version 2"})
        (eval `(begin (require ,filename)
 		     (define result-2 (foo-1))
 		     (list result-1 result-2))

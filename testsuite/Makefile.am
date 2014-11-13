@@ -623,6 +623,7 @@ SCRIPTS_TO_RUN = case-warnings.scm uninit1.scm \
   srfi-45-test1.scm srfi-45-test2.scm bad-srfi-109.scm \
   define1.scm define2.scm define3.scm mac-obj.scm overload1.scm symbol1.scm \
   command1.scm command2.scm command3.scm exit1.scm exit2.scm lib-cycle.scm \
+  lib-square.scm lib-squaref.scm \
   sva34005.scm sva35362.scm sva36039.scm sva36413.scm sva36556.scm \
   sva36853.scm sva36863.scm sva36917.scm sva37684.scm sva38026.scm \
   sva39060.scm sva39150.scm sva39945.scm sva39940.scm sva39947.scm \

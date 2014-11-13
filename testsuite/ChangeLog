@@ -1,4 +1,9 @@
-2014-11-13  Per Bothner  <per@bothner.com>
+2014-11-13  Jeff Gonis <jeff.gonis@gmail.com>
+	    Per Bothner  <per@bothner.com>
+
+	* lib-square.scm: New test for define-library with name conflict.
+	* lib-squaref.scm: Likewise in line-at-at-time mode.
+	* Makefile.am: Update accordingly.
 
 	* lib-test.scm (test-ev-req): Tweak to use expanded string literals.
 

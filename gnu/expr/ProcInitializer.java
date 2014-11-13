@@ -40,8 +40,13 @@ public class ProcInitializer extends Initializer
           : Symbol.make("", pname.toString().intern());
         Object property = comp.getLanguage().getEnvPropertyFor(proc.nameDecl);
         Object old = env.get(sym, property, null);
-        if (old instanceof ModuleMethod)
-          oldproc = (ModuleMethod) old;
+        if (old instanceof ModuleMethod) {
+                String moduleName =
+                    ((ModuleMethod) old).module.getClass().getName();
+                if (moduleName.startsWith(ModuleManager.interactiveClassPrefix)
+                    || moduleName.equals(comp.moduleClass.getName()))
+                    oldproc = (ModuleMethod) old;
+            }
       }
     CodeAttr code = comp.getCode();
     ClassType procClass = proc.usingCallContext()

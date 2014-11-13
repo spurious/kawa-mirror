@@ -38,7 +38,7 @@ public class ModuleManager
 
     int evalCounter;
 
-    public String interactiveClassPrefix = "atInteractiveLevel$";
+    public static final String interactiveClassPrefix = "atInteractiveLevel$";
     public String evalClassPrefix = "atEvalLevel$";
 
     /** Used to generate unique class names for interactive REPLs and loads.

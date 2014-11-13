@@ -1,3 +1,11 @@
+2014-11-13  Per Bothner  <per@bothner.com>
+
+	* ProcInitializer.java (emitLoadModuleMethod): Be less agressive
+	about update-in-place of old ModuleMethod, since this could lead
+	to modifying standard procedures in kawa/lib.  Now only do so
+	if the old module is interactive or has the same class name.
+	* ModuleManager.java (interactiveClassPrefix): Make public.
+
 2014-11-12  Per Bothner  <per@bothner.com>
 
 	* SetExp.java (compile): Check that decl.field is non-null.

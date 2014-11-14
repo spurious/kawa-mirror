@@ -67,6 +67,8 @@ public class ModuleInfo
    * This is an absolute URI, absolute filename,
    * or filename relative to current working directory.
    * Null if source not known; in that case className must be non-null.
+   * Avoid using, since "relative to current working directory"
+   * is unreliable if the working directory can change.
    */
   public String sourcePath;
   Path sourceAbsPath;

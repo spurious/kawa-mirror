@@ -1,4 +1,4 @@
-(test-begin "num" 1880)
+(test-begin "num" 1881)
 
 (test-equal 7 (+ 3 4))
 (test-equal 3 (+ 3))
@@ -463,5 +463,7 @@
 
 (define (circle-area radius) (* java.lang.Math:PI (expt radius 2)))
 (test-approximate 28.27 (circle-area 3) 0.1)
+
+(test-assert (not (gnu.math.Complex:equals 3+4i 3+5i)))
 
 (test-end)

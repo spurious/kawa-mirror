@@ -1,3 +1,8 @@
+2014-11-13  Per Bothner  <per@bothner.com>
+
+	* num-test.scm: Add test for Complex:equals bug
+	reported by Jamison Hope.
+
 2014-11-13  Jeff Gonis <jeff.gonis@gmail.com>
 	    Per Bothner  <per@bothner.com>
 

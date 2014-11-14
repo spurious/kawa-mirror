@@ -122,7 +122,7 @@ public abstract class Complex extends Quantity
   public static boolean equals (Complex x, Complex y)
   {
     return x.re().equals(y.re())
-      && x.im().equals(x.im());
+      && x.im().equals(y.im());
   }
 
   public boolean equals (Object obj)

@@ -3,6 +3,7 @@
 	* IntNum.java (compare): Cast argument to Numeric instead of
 	RealNum if using compareReversed.
 	This fixes (= an-IntNum a-Complex).
+	* Complex.java (equals): Fix bug in imaginary part check.
 
 2014-02-20  Jamison Hope  <jrh@theptrgroup.com>
 

@@ -5,7 +5,10 @@ package kawa.standard;
 import kawa.lang.*;
 import gnu.expr.*;
 import gnu.lists.*;
+import gnu.kawa.io.FilePath;
+import gnu.kawa.io.Path;
 import gnu.mapping.*;
+import java.io.File;
 import gnu.bytecode.ObjectType;
 import java.util.*;
 import kawa.lang.Translator.FormStack;
@@ -19,7 +22,7 @@ public class ImportFromLibrary extends Syntax
 {
     public static final ImportFromLibrary instance = new ImportFromLibrary();
 
-    public String[] classPrefixPath = { "", "kawa.lib." };
+    public static String[] classPrefixPath = { "", "kawa.lib." };
 
     private static final String BUILTIN = "<builtin>";
     private static final String MISSING = null;
@@ -125,8 +128,6 @@ public class ImportFromLibrary extends Syntax
             int srfiIndex = SRFI97Map.length;
             for (;;) {
                 if (--srfiIndex < 0) {
-                    tr.error('e', badNameBuffer != null ? badNameBuffer.toString()
-                             : "unknown SRFI number '"+srfiNumber+"' in SRFI library reference");
                     return lname;
                 }
                 if (!SRFI97Map[srfiIndex][0].equals(srfiNumber))
@@ -148,10 +149,7 @@ public class ImportFromLibrary extends Syntax
 
                 if (srfiClass == BUILTIN)
                     return BUILTIN; // Nothing to do.
-                else if (srfiClass == MISSING) {
-                    tr.error('e', "sorry - Kawa does not support SRFI "+srfiNumber+" ("+srfiNameExpected+')');
-                }
-                else
+                else if (srfiClass != MISSING)
                     lname = srfiClass;
                 break;
             }
@@ -193,9 +191,17 @@ public class ImportFromLibrary extends Syntax
             return;
         }
 
+        ModuleInfo curinfo = tr.getMinfo();
+        Path currentSource = curinfo.getSourceAbsPath();
+        // If non-null, an exlicitly specified source file name.
+        String explicitSource = null;
+        // Source name inferred from library name, with '/' as separator.
+        // Does not include a file extension.
+        String implicitSource;
+
         Object versionSpec = null;
-        String sourcePath = null;
-        StringBuffer sbuf = new StringBuffer();
+        StringBuilder cbuf = new StringBuilder(); // for class name
+        StringBuilder sbuf = new StringBuilder(); // for source file name
         Object libref = pimport;
         while (libref instanceof Pair) {
             Pair pair = (Pair) libref;
@@ -206,47 +212,172 @@ public class ImportFromLibrary extends Syntax
                     tr.error('e', "duplicate version reference - was "+versionSpec);
                 }
                 versionSpec = car;
-                System.err.println("import version "+car);
             } else if (car instanceof String) {
                 if (cdr instanceof Pair)
                     tr.error('e', "source specifier must be last element in library reference");
-                sourcePath = (String) car;
+                explicitSource = (String) car;
             } else {
+                if (cbuf.length() > 0)
+                    cbuf.append('.');
                 if (sbuf.length() > 0)
-                    sbuf.append('.');
-                sbuf.append(Compilation.mangleNameIfNeeded(car.toString()));
+                    sbuf.append('/');
+                String part = car.toString();
+                cbuf.append(Compilation.mangleNameIfNeeded(part));
+                sbuf.append(part);
             }
             libref = cdr;
         }
+        implicitSource = sbuf.toString();
 
         ModuleInfo minfo = null;
-        if (sourcePath != null) {
-            minfo = require.lookupModuleFromSourcePath(sourcePath, defs);
-            if (minfo == null) {
-                tr.error('e', "malformed URL: "+sourcePath);
-                return;
-            }
+
+        String currentExtension = currentSource == null ? null
+            : currentSource.getExtension();
+        if (currentExtension == null) {
+            List<String> langExtensions = tr.getLanguage().getExtensions();
+            if (! langExtensions.isEmpty())
+                currentExtension = langExtensions.get(0);
         }
-        String lname = sbuf.toString();
+        String lname = cbuf.toString();
         lname = checkSrfi(lname, tr);
         if (lname == BUILTIN)
             return; // nothing to do
 
-        int classPrefixPathLength = classPrefixPath.length;
-        for (int i = 0;  i < classPrefixPathLength;  i++) {
-            String tname = classPrefixPath[i] + lname;
-            try {
-                minfo = ModuleManager.getInstance().findWithClassName(tname);
-            } catch (Exception ex) {
-                continue;
+        boolean hasDot;
+        boolean isAbsolute;
+        if (explicitSource != null) {
+            hasDot = explicitSource.indexOf("./") >= 0;
+            isAbsolute = Path.valueOf(explicitSource).isAbsolute();
+        } else {
+            hasDot = false;
+            isAbsolute = false;
+        }
+
+        String currentClassName = curinfo.getClassName();
+
+        // Is the current module a file - as opposed to (say) a tty?
+        boolean currentIsFile = currentSource instanceof FilePath
+            && ((FilePath) currentSource).toFileRaw().isFile();
+        Path currentRoot = currentIsFile ? currentSource.getDirectory()
+            : Path.currentPath();
+        if (currentIsFile
+            && ! (explicitSource != null && (hasDot || isAbsolute))) {
+            int currentDots = 0;
+            String prefix = currentClassName != null ? currentClassName
+                : tr.classPrefix != null ? tr.classPrefix : "";
+            for (int i = prefix.length(); --i >= 0; )
+                if (prefix.charAt(i) == '.')
+                    currentDots++;
+            if (currentDots > 0) {
+                StringBuilder ups = new StringBuilder("..");
+                for (int i = currentDots; -- i > 0; )
+                    ups.append("/..");
+                currentRoot = currentRoot.resolve(ups.toString());
             }
         }
-        if (minfo == null) {
-            tr.error('e', "unknown class "+lname);
-            return;
+
+        ModuleManager mmanager = ModuleManager.getInstance();
+        List<CharSequence> srcSearchPath;
+        if (isAbsolute || hasDot) {
+            srcSearchPath = new ArrayList<CharSequence>();
+            srcSearchPath.add(currentRoot.toString());
         }
-        require.importDefinitions(null, minfo, mapper,
-                                  tr.formStack, defs, tr);
+        else
+            srcSearchPath = getImportSearchPath();
+        String pathStr = null;
+        for (CharSequence searchElement : srcSearchPath) {
+            if (isAbsolute)
+                pathStr = explicitSource;
+            else {
+                String pathElement = searchElement.toString();
+                int selectorEnd;
+                int star;
+                int prefixLength = 0;
+                StringBuilder pbuf = new StringBuilder();
+                if (pathElement.length() >= 3
+                    && pathElement.charAt(0) == '<'
+                    && (selectorEnd = pathElement.indexOf('>')+1) > 0) {
+                    StringBuilder prefixBuf = new StringBuilder();
+                    boolean slashNeeded = false;
+                    for (int i = 1; i < selectorEnd-1; i++) {
+                        char ch = pathElement.charAt(i);
+                        if (ch == ' ') {
+                            if (prefixBuf.length() > 0)
+                                slashNeeded = true;
+                        } else {
+                            if (slashNeeded)
+                                prefixBuf.append('/');
+                            prefixBuf.append(ch);
+                            prefixLength += slashNeeded ? 2 : 1;
+                            slashNeeded = false;
+                        }
+                    }
+                    if (! implicitSource.startsWith(prefixBuf.toString()))
+                        continue;
+                    if (implicitSource.length() != prefixLength) {
+                        if (implicitSource.charAt(prefixLength) != '/')
+                            continue;
+                        prefixLength++;
+                    }
+                    star = pathElement.indexOf('*', selectorEnd);
+                    if (star < 0) {
+                         pathElement = pathElement.substring(selectorEnd);
+                    }
+                } else { // No "<...>..." selector
+                    star = pathElement.indexOf('*');
+                    selectorEnd = 0;
+                }
+
+                if (star >= 0) {
+                    pbuf.append(pathElement.substring(selectorEnd, star));
+                    pbuf.append(implicitSource.substring(prefixLength));
+                    pbuf.append(pathElement.substring(star+1));
+                } else {
+                    pbuf.append(pathElement);
+                    pbuf.append('/');
+                    if (explicitSource != null)
+                        pbuf.append(explicitSource);
+                    else {
+                        pbuf.append(implicitSource);
+                        if (currentExtension != null) {
+                            pbuf.append('.');
+                            pbuf.append(currentExtension);
+                        }
+                    }
+                }
+                pathStr = pbuf.toString();
+            }
+            Path path = currentRoot.resolve(pathStr);
+            // Might be more efficient to first check the ModuleManager,
+            // before asking the file-system.  FIXME
+            long lastModifiedTime = path.getLastModified();
+            if (lastModifiedTime != 0) {
+                minfo = mmanager.findWithSourcePath(path, pathStr);
+                // Should save lastModifiedTime in minfo FIXME
+                break;
+            }
+        }
+
+        if (minfo == null) {
+            int classPrefixPathLength = classPrefixPath.length;
+            for (int i = 0;  i < classPrefixPathLength;  i++) {
+                String tname = classPrefixPath[i] + lname;
+                try {
+                    Class clas = ObjectType.getContextClass(tname);
+                    minfo = mmanager.findWithClass(clas);
+                    break;
+                } catch (Exception ex) {
+                }
+                minfo = mmanager.searchWithClassName(tname);
+                if (minfo != null)
+                    break;
+            }
+        }
+        if (minfo == null)
+            tr.error('e', "unknown library "+implicitSource.replace('/', ' '));
+        else
+            require.importDefinitions(lname, minfo, mapper,
+                                      tr.formStack, defs, tr);
     }
 
     public Expression rewriteForm(Pair form, Translator tr) {
@@ -381,6 +512,35 @@ public class ImportFromLibrary extends Syntax
             }
         }
         return null;
+    }
+
+    static final List<CharSequence> dotSearchPath;
+    static {
+        List<CharSequence> lst = new ArrayList<CharSequence>();
+        lst.add(".");
+        dotSearchPath = lst;
+    }
+
+    static ThreadLocal<List<CharSequence>> searchPath
+        = new InheritableThreadLocal<List<CharSequence>>();
+    public static List<CharSequence> getImportSearchPath() {
+        List<CharSequence> path = searchPath.get();
+        if (path != null)
+            return path;
+        String pstr = System.getProperty("kawa.import.path");
+        if (pstr != null) {
+            StringTokenizer tokenizer =
+                new StringTokenizer(pstr, File.pathSeparator);
+            path = new ArrayList<CharSequence>();
+            while (tokenizer.hasMoreTokens()) {
+                String str = tokenizer.nextToken().trim();
+                if (str.length() > 0)
+                    path.add(str);
+            }
+            searchPath.set(path);
+            return path;
+        }
+        return dotSearchPath;
     }
 
     public static final SimpleSymbol exceptSymbol = Symbol.valueOf("except");

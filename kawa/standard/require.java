@@ -214,9 +214,9 @@ public class require extends Syntax
      *   or null if unknown.
      */
     public static boolean
-        importDefinitions(String className, ModuleInfo info,
-                           DeclSetMapper mapper, FormStack forms, 
-                           ScopeExp defs, Compilation tr) {
+    importDefinitions(String className, ModuleInfo info,
+                      DeclSetMapper mapper, FormStack forms, 
+                      ScopeExp defs, Compilation tr) {
         ModuleManager manager = ModuleManager.getInstance();
         long now;
         if ((info.getState() & 1) == 0
@@ -245,7 +245,23 @@ public class require extends Syntax
                 // otherwise ignore it - it's already been recorded in messages.
                 return false;
             }
-            info.setClassName(comp.getModule().classFor(comp).getName());
+            String compiledClassName = comp.getModule().classFor(comp).getName();
+            info.setClassName(compiledClassName);
+            if (className != null) {
+                String[] classPrefixPath = ImportFromLibrary.classPrefixPath;
+                int classPrefixPathLength = classPrefixPath.length;
+                for (int i = 0;  ;  i++) {
+                    if (i == classPrefixPathLength) {
+                        tr.error('e', ("file '"+info.getSourceAbsPath()
+                                       +"' defines class '"+compiledClassName
+                                       +"' but need '"+className+"'"));
+                        break;
+                    }
+                    String tname = classPrefixPath[i] + className;
+                    if (tname.equals(compiledClassName))
+                        break;
+                }
+            }
         }
 
         ModuleInfo curinfo = tr.getMinfo();

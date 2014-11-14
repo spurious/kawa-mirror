@@ -1,3 +1,13 @@
+2014-11-14  Per Bothner  <per@bothner.com>
+
+	* standard/ImportFromLibrary.java (scanImportSet): Major changes to
+	support searching for a source file containing the library.
+	(checkSrfi): No error if unknown or unimplemented srfi.
+	Instead see if we can find it through regular search.
+	(getImportSearchPath): New method.
+	* standard/require.java (importDefinitions): Error if source file
+	defines a class different from what import/require asked for.
+
 2014-11-12  Per Bothner  <per@bothner.com>
 
 	* standard/module_name.java (scanForm): Never declare a variable

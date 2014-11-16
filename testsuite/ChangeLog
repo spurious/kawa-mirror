@@ -1,3 +1,11 @@
+2014-11-16  Per Bothner  <per@bothner.com>
+
+	* aux-libs.scm: New file, defined two libraries.
+	* lib-impsrc1.scm: New test of import-from-source of aux-libs.scm
+	* lib-impsrc2.scm: new test of bad import.
+	* lib-dup.scm: New test of file with duplicate libraries.
+	* Makefile.am: Update accordingly.
+
 2014-11-13  Per Bothner  <per@bothner.com>
 
 	* num-test.scm: Add test for Complex:equals bug

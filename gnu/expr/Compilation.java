@@ -115,6 +115,8 @@ public class Compilation implements SourceLocator
     pendingImports.push(forms.lastPair());
   }
 
+    public Map<String,ModuleInfo> subModuleMap;
+
     /* Write out implicitly-compiled classes.
      * Compare javac's -implicit:class flag.  Current not set.
      */

@@ -7,6 +7,8 @@ import gnu.mapping.SimpleSymbol;
 import gnu.mapping.Symbol;
 import gnu.text.SourceMessages;
 import kawa.lang.*;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /** Implements the R7RS 'define-library' form. */
 
@@ -79,6 +81,16 @@ public class define_library extends Syntax {
         mcomp.setState(Compilation.PROLOG_PARSED);
         mcomp.pendingForm = tr.makePair(pair2,
                                         define_library_scan, pair2.getCdr());
+        SchemeCompilation curcomp = (SchemeCompilation) tr;
+        Map<String,ModuleInfo> subModuleMap = curcomp.subModuleMap;
+        if (subModuleMap == null) {
+            subModuleMap = new LinkedHashMap<String,ModuleInfo>();
+            curcomp.subModuleMap = subModuleMap;
+        }
+        ModuleInfo oldinfo = subModuleMap.get(name);
+        if (oldinfo != null)
+            tr.error('e', "duplicate library name "+name);
+        subModuleMap.put(name, info);
     }
 
     void scanModulePass(Object form, ScopeExp defs, Translator tr) {

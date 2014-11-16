@@ -1,5 +1,10 @@
 2014-11-16  Per Bothner  <per@bothner.com>
 
+	* standard/define_library.java (createModulePass): Update subModuleMap.
+	Check for duplicate library name.requi
+	* standard/require.java (importDefinitions): Check if imported
+	source file actually defines the required module.
+
 	* standard/ImportFromLibrary.java (scanImporSet): Tweak error message.
 
 2014-11-14  Per Bothner  <per@bothner.com>

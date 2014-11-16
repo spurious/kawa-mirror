@@ -1,3 +1,7 @@
+2014-11-16  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (subModuleMap): New field.
+
 2014-11-13  Per Bothner  <per@bothner.com>
 
 	* ProcInitializer.java (emitLoadModuleMethod): Be less agressive

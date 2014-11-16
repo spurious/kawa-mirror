@@ -228,7 +228,6 @@ public class require extends Syntax
             try {
                 InPort fstream = InPort.openFile(info.getSourceAbsPath());
                 info.clearClass();
-                info.setClassName(className);
                 int options = Language.PARSE_PROLOG;
                 if (tr.immediate)
                     options |= Language.PARSE_IMMEDIATE;
@@ -246,21 +245,32 @@ public class require extends Syntax
                 return false;
             }
             String compiledClassName = comp.getModule().classFor(comp).getName();
-            info.setClassName(compiledClassName);
+ 
             if (className != null) {
-                String[] classPrefixPath = ImportFromLibrary.classPrefixPath;
-                int classPrefixPathLength = classPrefixPath.length;
-                for (int i = 0;  ;  i++) {
-                    if (i == classPrefixPathLength) {
-                        tr.error('e', ("file '"+info.getSourceAbsPath()
-                                       +"' defines class '"+compiledClassName
-                                       +"' but need '"+className+"'"));
-                        break;
+                Map<String,ModuleInfo> subModuleMap = comp.subModuleMap;
+                ModuleInfo modinfo;
+                if (subModuleMap != null) {
+                    modinfo = subModuleMap.get(className);
+                } else
+                    modinfo = null;
+                if (modinfo == null) {
+                    String[] classPrefixPath
+                        = ImportFromLibrary.classPrefixPath;
+                    int classPrefixPathLength = classPrefixPath.length;
+                    for (int i = 0;  i < classPrefixPathLength;  i++) {
+                        String tname = classPrefixPath[i] + className;
+                        if (tname.equals(compiledClassName)) {
+                            modinfo = info;
+                            break;
+                        }
                     }
-                    String tname = classPrefixPath[i] + className;
-                    if (tname.equals(compiledClassName))
-                        break;
                 }
+                if (modinfo == null)
+                    tr.error('e', ("file '"+info.getSourceAbsPath()
+                                   +"' does not declare library '"
+                                   +className+"'"));
+                else
+                    info = modinfo;
             }
         }
 

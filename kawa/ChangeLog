@@ -1,3 +1,7 @@
+2014-11-16  Per Bothner  <per@bothner.com>
+
+	* standard/ImportFromLibrary.java (scanImporSet): Tweak error message.
+
 2014-11-14  Per Bothner  <per@bothner.com>
 
 	* standard/ImportFromLibrary.java (scanImportSet): Major changes to

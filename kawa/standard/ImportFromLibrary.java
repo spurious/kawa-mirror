@@ -374,7 +374,7 @@ public class ImportFromLibrary extends Syntax
             }
         }
         if (minfo == null)
-            tr.error('e', "unknown library "+implicitSource.replace('/', ' '));
+            tr.error('e', "unknown library ("+implicitSource.replace('/', ' ')+")");
         else
             require.importDefinitions(lname, minfo, mapper,
                                       tr.formStack, defs, tr);

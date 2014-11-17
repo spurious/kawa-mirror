@@ -2661,7 +2661,7 @@ public class Compilation implements SourceLocator
   }
 
   public void error(char severity, String message,
-                    String code, Declaration decl)
+                    String code, SourceLocator decl)
   {
     if (severity == 'w' && warnAsError())
       severity = 'e';

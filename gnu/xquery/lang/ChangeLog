@@ -1,3 +1,7 @@
+2014-11-16  Per Bothner  <per@bothner.com>
+
+	* XQParser.java (parse): Test for duplicate import.
+
 2014-07-02  Per Bothner  <per@bothner.com>
 
 	* XQParser.java (treatAs): Update for new Convert handling.

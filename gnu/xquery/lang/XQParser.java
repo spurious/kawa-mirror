@@ -6,6 +6,8 @@ import gnu.kawa.lispexpr.*;
 import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.math.IntNum;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.Vector;
 import java.util.Stack;
 import gnu.kawa.xml.*;
@@ -25,6 +27,7 @@ import gnu.lists.FString;
 import gnu.lists.LList;
 import gnu.text.Lexer;
 import gnu.text.SourceError;
+import gnu.text.SourceLocator;
 import gnu.text.SourceMessages;
 import gnu.text.SyntaxException;
 import gnu.xquery.util.NamedCollator;
@@ -49,6 +52,8 @@ public class XQParser extends Lexer
   boolean seenDeclaration;
 
   String libraryModuleNamespace;
+
+    Map<String,SourceLocator> seenImports;
 
   /** Value of getLineNumber() at start of current token.
    * Sometimes set otherwise, to report errors. */
@@ -3957,6 +3962,19 @@ public class XQParser extends Lexer
 	getRawToken();
         // Make sure we have a ModuleInfo before we call importDefinitions.
         ModuleManager.getInstance().find(comp);
+
+        if (seenImports == null)
+            seenImports = new HashMap<String, SourceLocator>();
+        SourceLocator oldImport = seenImports.get(uri);
+        Declaration loc = new Declaration(uri);
+        maybeSetLine(loc, startLine, startColumn);
+        if (oldImport != null) {
+            comp.error('e', "duplicate import of '"+uri+"'",
+                       "XQST0047", loc);
+            comp.error('e', "(this is the previous import)", null, oldImport);
+            return QuoteExp.voidExp;
+        }
+        seenImports.put(uri, loc);
 
         String at;
  	ModuleExp module = comp.getModule();

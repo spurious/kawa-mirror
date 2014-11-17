@@ -1,5 +1,8 @@
 2014-11-16  Per Bothner  <per@bothner.com>
 
+	* standard/require.java (importDefinitions): Handle context
+	references lazily - i.e. only if needed.
+
 	* standard/define_library.java (createModulePass): Update subModuleMap.
 	Check for duplicate library name.requi
 	* standard/require.java (importDefinitions): Check if imported

@@ -304,34 +304,12 @@ public class require extends Syntax
 
         Map<Symbol,Declaration> dmap
             = new LinkedHashMap<Symbol,Declaration>();
+        Map<String,Declaration> moduleReferences = null;
+       
         for (Declaration fdecl = mod.firstDecl();
              fdecl != null;  fdecl = fdecl.nextDecl()) {
             if (fdecl.isPrivate())
                 continue;
-
-            Symbol aname = (Symbol) fdecl.getSymbol();
-            boolean isStatic = fdecl.getFlag(Declaration.STATIC_SPECIFIED);
-            if (! isStatic && decl == null) {
-                String iname = tname.replace('.', '$') + "$instance";
-                decl = new Declaration(SimpleSymbol.valueOf(iname), type);
-                decl.setPrivate(true);
-                decl.setFlag(Declaration.IS_CONSTANT
-                             |Declaration.MODULE_REFERENCE);
-                defs.addDeclaration(decl);
-
-                decl.noteValue(dofind);
-                SetExp sexp = new SetExp(decl, dofind);
-                sexp.setLine(tr);
-                sexp.setDefining(true);
-                forms.push(sexp);
-                decl.setFlag(Declaration.EARLY_INIT);
-                // If Runnable, we need to set decl value in initializer,
-                // and later 'run' it, so it needs to be stored in a field.
-                if (isRunnable)
-                    decl.setSimple(false);
-
-                decl.setFlag(Declaration.TYPE_SPECIFIED);
-            }
 
             if (fdecl.field != null) {
                 String fname = fdecl.field.getName();
@@ -344,19 +322,11 @@ public class require extends Syntax
 
             if (fdecl.field != null
                 && fdecl.field.getName().endsWith("$instance")) {
-                Declaration old = defs.lookup(aname, language, language.getNamespaceOf(fdecl));
-                if (old != null)
-                    continue;
-                Declaration adecl = defs.addDeclaration(aname);
-                adecl.setFlag(Declaration.IS_CONSTANT
-                              |Declaration.TYPE_SPECIFIED
-                              |Declaration.MODULE_REFERENCE);
-                adecl.setType(fdecl.getType());
-                ReferenceExp fref = new ReferenceExp(fdecl);
-                fref.setContextDecl(decl);
-                linkDecls(adecl, fdecl, fref, forms, tr);
+                if (moduleReferences == null)
+                    moduleReferences = new HashMap<String,Declaration>();
+                moduleReferences.put(fdecl.field.getName(), fdecl);
             } else
-                dmap.put(aname, fdecl);
+                dmap.put((Symbol) fdecl.getSymbol(), fdecl);
         }
 
         if (mapper != null)
@@ -380,19 +350,42 @@ public class require extends Syntax
                      && (Declaration.followAliases(old)
                          == Declaration.followAliases(fdecl)))
                 continue;
-            else {
-                if (old != null
-                    && (old.getFlag(Declaration.NOT_DEFINING | Declaration.IS_UNKNOWN))) {
-                    old.setFlag(false, Declaration.NOT_DEFINING|Declaration.IS_UNKNOWN);
-                    adecl = old;
-                } else {
-                    adecl = defs.addDeclaration(aname);
-                    if (old != null)
-                        ScopeExp.duplicateDeclarationError(old, adecl, tr);
-                }
-                adecl.setAlias(true);
-                adecl.setIndirectBinding(true);
+
+            if (decl == null && ! fdecl.getFlag(Declaration.STATIC_SPECIFIED)) {
+                String iname = tname.replace('.', '$') + "$instance";
+                decl = new Declaration(SimpleSymbol.valueOf(iname), type);
+                decl.setPrivate(true);
+                decl.setFlag(Declaration.IS_CONSTANT
+                             |Declaration.MODULE_REFERENCE);
+                defs.addDeclaration(decl);
+
+                decl.noteValue(dofind);
+                SetExp sexp = new SetExp(decl, dofind);
+                sexp.setLine(tr);
+                sexp.setDefining(true);
+                forms.push(sexp);
+                decl.setFlag(Declaration.EARLY_INIT);
+                // If Runnable, we need to set decl value in initializer,
+                // and later 'run' it, so it needs to be stored in a field.
+                if (isRunnable)
+                    decl.setSimple(false);
+
+                decl.setFlag(Declaration.TYPE_SPECIFIED);
             }
+
+            if (old != null
+                && (old.getFlag(Declaration.NOT_DEFINING | Declaration.IS_UNKNOWN))) {
+                old.setFlag(false, Declaration.NOT_DEFINING|Declaration.IS_UNKNOWN);
+                adecl = old;
+            } else {
+                adecl = defs.addDeclaration(aname);
+                if (old != null)
+                    ScopeExp.duplicateDeclarationError(old, adecl, tr);
+            }
+
+            adecl.setAlias(true);
+            adecl.setIndirectBinding(true);
+
             ReferenceExp fref = new ReferenceExp(fdecl);
             fref.setContextDecl(decl);
             fref.setDontDereference(true);
@@ -406,12 +399,24 @@ public class require extends Syntax
                 Declaration xdecl = ((ReferenceExp) fval).getBinding();
                 aref.setBinding(xdecl);
                 // xdecl can be null on an error.
-                if (xdecl != null && xdecl.needsContext())
-                {
+                if (xdecl != null && xdecl.needsContext()) {
                     String iname
                         = (xdecl.field.getDeclaringClass().getName().replace('.', '$')
                            + "$instance");
-                    Declaration cdecl = defs.lookup(SimpleSymbol.valueOf(iname));
+                    Declaration cdecl = moduleReferences == null ? null
+                        : moduleReferences.get(iname);
+                    if (cdecl != null && cdecl.context != defs) {
+                        Declaration acdecl = defs.addDeclaration(SimpleSymbol.valueOf(iname));
+                        moduleReferences.put(iname, acdecl);
+                        acdecl.setFlag(Declaration.IS_CONSTANT
+                                      |Declaration.TYPE_SPECIFIED
+                                      |Declaration.MODULE_REFERENCE);
+                        acdecl.setType(cdecl.getType());
+                        ReferenceExp cref = new ReferenceExp(cdecl);
+                        cref.setContextDecl(decl);
+                        linkDecls(acdecl, cdecl, cref, forms, tr);
+                        cdecl = acdecl;
+                    }
                     cdecl.setFlag(Declaration.EXPORT_SPECIFIED);
                     aref.setContextDecl(cdecl);
                 }
@@ -456,7 +461,6 @@ public class require extends Syntax
         adecl.noteValue(fref);
         adecl.setFlag(Declaration.IS_IMPORTED);
         tr.push(adecl);  // Add to translation env.
-
     }
 
     public Expression rewriteForm(Pair form, Translator tr) {

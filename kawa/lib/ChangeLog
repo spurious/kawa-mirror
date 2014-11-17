@@ -1,3 +1,22 @@
+2014-11-17  Jamison Hope  <jrh@theptrgroup.com>
+
+	* kawa/quaternions.scm: Implement quaternion library.
+	* Makefile.am: Update accordingly.
+	* numbers.scm (quaternion): New type alias used and exported by
+	the (kawa quaternions) module.
+	(quaternion?): New predicate exported by (kawa quaternions).
+	(real-valued?, rational-valued? integer-valued?, finite?
+	infinite?, nan?, exp, log): Update to support quaternions.
+	(sin, cos, tan, asin, acos, atan): Update to support complex and
+	quaternion arguments/return values (e.g. (asin 2)).
+	(make-rectangular, make-polar): Add four-argument methods to
+	construct quaternions.
+	(real-part, imag-part): Update to support quaternions.
+	(jmag-part, kmag-part, unit-vector): New functions exported by
+	the (kawa quaternions) module.
+	(angle): Update to support quaternions.
+	(quantity->number): Update return type to quaternion.
+
 2014-10-28  Per Bothner  <per@bothner.com>
 
 	* ports.scm (write-char): Generalize to Appendable.

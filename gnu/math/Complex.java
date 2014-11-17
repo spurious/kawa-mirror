@@ -3,9 +3,43 @@
 
 package gnu.math;
 
-public abstract class Complex extends Quantity
+public abstract class Complex extends Quaternion
 {
-  public Complex number() { return this; }
+    @Override public final RealNum jm() { return IntNum.zero(); }
+    @Override public final RealNum km() { return IntNum.zero(); }
+
+    @Override public final Complex complexPart() { return this; }
+
+    @Override public Quaternion vectorPart() {
+        return Complex.make(IntNum.zero(), im());
+    }
+
+    @Override public Quaternion unitVector() {
+        int imSign = im().sign();
+
+        switch (imSign) {
+        case 1:
+            return Complex.imOne();
+        case 0:
+            return IntNum.zero();
+        case -1:
+            return Complex.imMinusOne();
+        case -2: default:
+            return Complex.make(0, Double.NaN);
+        }
+    }
+
+    @Override public Quaternion unitQuaternion() {
+        if (im().isZero())
+            return re().unitQuaternion();
+        if (re().isZero())
+            return Complex.make(IntNum.zero(), (RealNum)im().unitQuaternion());
+        return DComplex.unitQuaternion(doubleRealValue(), doubleImagValue());
+    }
+
+    @Override public Quaternion conjugate() {
+        return Complex.make(re(), im().rneg());
+    }
 
   public boolean isExact ()
   {
@@ -60,11 +94,6 @@ public abstract class Complex extends Quantity
     return imMinusOne;
   }
 
-  public double doubleValue () { return re().doubleValue (); }
-  public double doubleImagValue () { return im().doubleValue (); }
-  public final double doubleRealValue () { return doubleValue (); }
-  public long longValue () { return re().longValue(); }
-
   public static Complex make (RealNum re, RealNum im)
   {
     if (im.isZero() && im.isExact())
@@ -118,6 +147,9 @@ public abstract class Complex extends Quantity
   {
     return new DFloNum(Math.atan2(doubleImagValue(), doubleRealValue()));
   }
+
+    @Override public final RealNum colatitude() { return IntNum.zero(); }
+    @Override public final RealNum longitude() { return IntNum.zero(); }
 
   public static boolean equals (Complex x, Complex y)
   {
@@ -279,4 +311,16 @@ public abstract class Complex extends Quantity
   {
     return DComplex.sqrt(doubleRealValue(), doubleImagValue());
   }
+
+    @Override public Complex sin() {
+        return DComplex.sin(doubleRealValue(), doubleImagValue());
+    }
+
+    @Override public Complex cos() {
+        return DComplex.cos(doubleRealValue(), doubleImagValue());
+    }
+
+    @Override public Complex tan() {
+        return DComplex.tan(doubleRealValue(), doubleImagValue());
+    }
 }

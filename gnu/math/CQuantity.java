@@ -4,47 +4,48 @@
 package gnu.math;
 import java.io.*;
 
-/** General Cartesian Complex quantity. */
+/** General Cartesian Quaternion quantity. */
 
-public class CQuantity extends Quantity implements Externalizable
-{
-  Complex num;
-  Unit unt;
+public class CQuantity extends Quantity implements Externalizable {
+    Quaternion num;
+    Unit unt;
 
-  public CQuantity (Complex num, Unit unit)
-  {
-    this.num = num;
-    this.unt = unit;
-  }
+    public CQuantity (Quaternion num, Unit unit) {
+        this.num = num;
+        this.unt = unit;
+    }
 
-  public CQuantity (RealNum real, RealNum imag, Unit unit)
-  {
-    this.num = new CComplex (real, imag);
-    this.unt = unit;
-  }
+    public CQuantity (RealNum real, RealNum imag, Unit unit) {
+        this.num = new CComplex (real, imag);
+        this.unt = unit;
+    }
 
-  public Complex number() { return num; }
-  public Unit unit() { return unt; }
+    public CQuantity (RealNum real, RealNum imag, RealNum jmag,
+                      RealNum kmag, Unit unit) {
+        this.num = new CQuaternion(real, imag, jmag, kmag);
+        this.unt = unit;
+    }
 
-  public boolean isExact () { return num.isExact(); }
+    public Quaternion number() { return num; }
+    public Unit unit() { return unt; }
 
-  public boolean isZero () { return num.isZero(); }
+    public boolean isExact () { return num.isExact(); }
 
-  /**
-   * @serialData Write the complex value (using writeObject) followed
-   *   by the Unit (also using writeUnit).
-   */
+    public boolean isZero () { return num.isZero(); }
 
-  public void writeExternal(ObjectOutput out) throws IOException
-  {
-    out.writeObject(num);
-    out.writeObject(unt);
-  }
+    /**
+     * @serialData Write the complex value (using writeObject) followed
+     *   by the Unit (also using writeUnit).
+     */
 
-  public void readExternal(ObjectInput in)
-    throws IOException, ClassNotFoundException
-  {
-    num = (Complex) in.readObject();
-    unt = (Unit) in.readObject();
-  }
+    public void writeExternal(ObjectOutput out) throws IOException {
+        out.writeObject(num);
+        out.writeObject(unt);
+    }
+
+    public void readExternal(ObjectInput in)
+        throws IOException, ClassNotFoundException {
+        num = (Quaternion) in.readObject();
+        unt = (Unit) in.readObject();
+    }
 }

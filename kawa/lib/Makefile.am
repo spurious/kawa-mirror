@@ -31,6 +31,7 @@ java_SCM_ALWAYS =\
   system.scm \
   kawa/expressions.scm \
   kawa/string-cursors.scm \
+  kawa/quaternions.scm \
   kawa/hashtable.scm kawa/regex.scm rnrs/hashtables.scm rnrs/lists.scm \
   srfi95.scm rnrs/unicode.scm rnrs/sorting.scm rnrs/programs.scm \
   scheme/base.scm scheme/case-lambda.scm scheme/char.scm \

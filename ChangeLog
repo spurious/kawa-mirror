@@ -1,3 +1,7 @@
+2014-11-17  Jamison Hope  <jrh@theptrgroup.com>
+
+	* build.xml (lib-scm-classes): Add quaternions.scm.
+
 2014-10-28  Per Bothner  <per@bothner.com>
 
 	* build.xml (lib-scm-classes): Add remaining R7RS standard libraries.

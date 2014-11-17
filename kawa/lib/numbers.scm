@@ -8,6 +8,7 @@
 (define-alias RatNum gnu.math.RatNum)
 (define-alias RealNum gnu.math.RealNum)
 (define-alias LangObjType gnu.kawa.lispexpr.LangObjType)
+(define-alias quaternion gnu.math.Quaternion)
 
 (define-private (java.lang.real? x) ::boolean
   (and (java.lang.Number? x)
@@ -22,6 +23,9 @@
 (define (number? x) ::boolean (java.lang.Number? x))
 (define (quantity? x) ::boolean
   (or (instance? x <quantity>)
+      (java.lang.real? x)))
+(define (quaternion? x) ::boolean
+  (or (instance? x quaternion)
       (java.lang.real? x)))
 (define (complex? x) ::boolean
   (or (instance? x <complex>)
@@ -74,11 +78,23 @@
 	       (instance? x <java.math.BigInteger>)))))
 
 (define (real-valued? x) ::boolean
-  (and (complex? x) (zero? (imag-part x)) (real? (real-part x))))
+  (and (quaternion? x)
+       (zero? (imag-part x))
+       (zero? (jmag-part x))
+       (zero? (kmag-part x))
+       (real? (real-part x))))
 (define (rational-valued? x) ::boolean
-  (and (complex? x) (zero? (imag-part x)) (rational? (real-part x))))
+  (and (quaternion? x)
+       (zero? (imag-part x))
+       (zero? (jmag-part x))
+       (zero? (kmag-part x))
+       (rational? (real-part x))))
 (define (integer-valued? x) ::boolean
-  (and (complex? x) (zero? (imag-part x)) (integer? (real-part x))))
+  (and (quaternion? x)
+       (zero? (imag-part x))
+       (zero? (jmag-part x))
+       (zero? (kmag-part x))
+       (integer? (real-part x))))
 
 (define (exact? x) :: boolean 
   (and (java.lang.Number? x)
@@ -105,25 +121,27 @@
   (invoke x 'isNegative))
 
 (define (finite? (z ::java.lang.Number)) ::boolean
-  (if (gnu.math.Complex? z)
-      (> ((->gnu.math.Complex z):classifyFinite) 0)
+  (if (gnu.math.Quaternion? z)
+      (> ((->gnu.math.Quaternion z):classifyFinite) 0)
       (and (java.lang.real? z)
            (let ((d (z:doubleValue)))
              (and (not (java.lang.Double:isInfinite d))
                   (not (java.lang.Double:isNaN d)))))))
 
 (define (infinite? (z ::java.lang.Number)) ::boolean
-  (if (gnu.math.Complex? z)
-      (let ((zc ::gnu.math.Complex z))
+  (if (gnu.math.Quaternion? z)
+      (let ((zc ::gnu.math.Quaternion z))
         (or (= ((zc:re):classifyFinite) 0)
-            (= ((zc:im):classifyFinite) 0)))
+            (= ((zc:im):classifyFinite) 0)
+            (= ((zc:jm):classifyFinite) 0)
+            (= ((zc:km):classifyFinite) 0)))
       (and (java.lang.real? z)
            (let ((d (z:doubleValue)))
              (java.lang.Double:isInfinite d)))))
 
 (define (nan? (z ::java.lang.Number)) ::boolean
-  (if (gnu.math.Complex? z)
-      (< ((->gnu.math.Complex z):classifyFinite) 0)
+  (if (gnu.math.Quaternion? z)
+      (< ((->gnu.math.Quaternion z):classifyFinite) 0)
       (and (java.lang.real? z)
            (let ((d (z:doubleValue)))
              (java.lang.Double:isNaN d)))))
@@ -233,36 +251,90 @@
    (as <real> (invoke x 'sub y))
    (as <real> (invoke x 'add y))))
 
-(define (exp (x :: <complex>)) :: <complex>
-  (invoke x 'exp))
+(define (exp (x ::java.lang.Number)) ::java.lang.Number
+  (cond ((java.lang.real? x) (java.lang.Math:exp x))
+        ((gnu.math.Quaternion? x) ((->gnu.math.Quaternion x):exp))
+        (else (primitive-throw (java.lang.IllegalArgumentException)))))
 
 (define-procedure log
-  (lambda ((x ::complex) (base ::complex))  ::complex
-          (/ (invoke x 'log) (invoke base 'log)))
-  (lambda ((x ::complex))  ::complex
-          (invoke x 'log)))
+  (lambda ((x ::java.lang.Number) (base ::java.lang.Number))
+    ::java.lang.Number
+    (cond ((and (gnu.math.RealNum? x) (gnu.math.RealNum? base))
+           (/ (log x) (log base)))
+          ((and (or (java.lang.real? x) (gnu.math.RealNum? x))
+                (or (java.lang.real? base) (gnu.math.RealNum? base)))
+           (/ (java.lang.Math:log x) (java.lang.Math:log base)))
+          (else (/ (log x) (log base)))))
+  (lambda (x ::java.lang.Number)
+    ::java.lang.Number
+    (cond ((java.lang.real? x) (java.lang.Math:log x))
+          ((gnu.math.Quaternion? x)
+           ((->gnu.math.Quaternion x):log)))))
 
-;;; These are only implemented for <real> arguments.
-(define (sin (x :: <double>)) :: <double>
-  (invoke-static <java.lang.Math> 'sin x))
+(define-procedure sin
+  (lambda (q ::quaternion) ::quaternion
+          (invoke q 'sin))
+  (lambda (x ::double) ::double
+          (invoke-static <java.lang.Math> 'sin x)))
 
-(define (cos (x :: <double>)) :: <double>
-  (invoke-static <java.lang.Math> 'cos x))
+(define-procedure cos
+  (lambda (q ::quaternion) ::quaternion
+          (invoke q 'cos))
+  (lambda (x ::double) ::double
+          (invoke-static <java.lang.Math> 'cos x)))
 
-(define (tan (x :: <double>)) :: <double>
-  (invoke-static <java.lang.Math> 'tan x))
+(define-procedure tan
+  (lambda (q ::quaternion) ::quaternion
+          (invoke q 'tan))
+  (lambda (x ::double) ::double
+          (invoke-static <java.lang.Math> 'tan x)))
 
-(define (asin (x :: <double>)) :: <double>
-  (invoke-static <java.lang.Math> 'asin x))
+(define (asin (x ::java.lang.Number)) ::java.lang.Number
+  (cond ((java.lang.real? x)
+         (java.lang.Math:asin x))
+        ((and (real-valued? x) (<= -1 x 1))
+         (gnu.math.DFloNum (java.lang.Math:asin (x:doubleValue))))
+        (else
+         (let* ((q ::gnu.math.Quaternion
+                   (gnu.kawa.functions.Arithmetic:asNumeric x))
+                (u (unit-vector q))
+                (v (if (= 0 u) +i u)))
+           (- (* v (log (+ (* v q) (sqrt (- 1 (* q q)))))))))))
 
-(define (acos (x :: <double>)) :: <double>
-  (invoke-static <java.lang.Math> 'acos x))
+(define (acos (x ::java.lang.Number)) ::java.lang.Number
+  (cond ((java.lang.real? x)
+         (java.lang.Math:acos x))
+        ((and (real-valued? x) (<= -1 x 1))
+         (gnu.math.DFloNum (java.lang.Math:acos (x:doubleValue))))
+        (else
+         (let* ((q ::gnu.math.Quaternion
+                   (gnu.kawa.functions.Arithmetic:asNumeric x))
+                (u (unit-vector q))
+                (v (if (= 0 u) +i u)))
+           (- (* v (log (+ q (sqrt (- (* q q) 1))))))))))
 
 (define-procedure atan
-  (lambda ((y :: <double>) (x :: <double>)) :: <double>
-	  (java.lang.Math:atan2 y x))
-  (lambda ((x :: <double>)) :: <double>
-	  (java.lang.Math:atan x)))
+  (lambda ((y ::java.lang.Number) (x ::java.lang.Number))
+    ::java.lang.Number
+    (cond ((and (gnu.math.RealNum? y) (gnu.math.RealNum? x))
+           (gnu.math.DFloNum (java.lang.Math:atan2 (y:doubleValue)
+                                                   (x:doubleValue))))
+          ((and (or (java.lang.real? y) (gnu.math.RealNum? y))
+                (or (java.lang.real? x) (gnu.math.RealNum? x)))
+           (java.lang.Math:atan2 (y:doubleValue) (x:doubleValue)))
+          (else
+           (primitive-throw (java.lang.IllegalArgumentException)))))
+  (lambda (x ::java.lang.Number)
+    ::java.lang.Number
+    (cond ((gnu.math.RealNum? x)
+           (gnu.math.DFloNum (java.lang.Math:atan (x:doubleValue))))
+          ((java.lang.real? x)
+           (java.lang.Math:atan (x:doubleValue)))
+          (else
+           (let* ((q ::gnu.math.Quaternion x)
+                  (u (unit-vector q))
+                  (v (if (= 0 u) +i u)))
+             (* 1/2 v (log (* (+ v q) (/ (- v q))))))))))
 
 (define-procedure sqrt
 #|
@@ -278,28 +350,49 @@
 (define (square x::quantity) ::quantity
   (* x x))
 
-(define (make-rectangular (x :: <real>) (y :: <real>)) :: <complex>
-  (invoke-static <complex> 'make x y))
+(define-procedure make-rectangular
+  (lambda (x::real y::real) ::complex
+          (invoke-static <complex> 'make x y))
+  (lambda (w::real x::real y::real z::real) ::quaternion
+          (quaternion:make w x y z)))
 
-(define (make-polar (x :: <double>) (y :: <double>)) :: <gnu.math.DComplex>
-  (invoke-static <complex> 'polar x y))
+(define-procedure make-polar
+  (lambda (x::double y::double) ::complex
+          (invoke-static <complex> 'polar x y))
+  (lambda (r::double t::double u::double v::double) ::quaternion
+          (quaternion:polar r t u v)))
 
 (define (real-part (x ::java.lang.Number)) ::java.lang.Number
-  (if (gnu.math.Complex? x)
-      ((->gnu.math.Complex x):re)
+  (if (gnu.math.Quaternion? x)
+      ((->gnu.math.Quaternion x):re)
       x))
 
 (define (imag-part (x ::java.lang.Number)) ::java.lang.Number
-  (if (gnu.math.Complex? x)
-      ((->gnu.math.Complex x):im)
+  (if (gnu.math.Quaternion? x)
+      ((->gnu.math.Quaternion x):im)
       (gnu.math.IntNum:zero)))
+
+(define (jmag-part x::java.lang.Number) ::java.lang.Number
+  (if (gnu.math.Quaternion? x)
+      ((->gnu.math.Quaternion x):jm)
+      (gnu.math.IntNum:zero)))
+
+(define (kmag-part x::java.lang.Number) ::java.lang.Number
+  (if (gnu.math.Quaternion? x)
+      ((->gnu.math.Quaternion x):km)
+      (gnu.math.IntNum:zero)))
+
+(define (unit-vector x::java.lang.Number) ::quaternion
+  (if (gnu.math.Quaternion? x)
+      ((->gnu.math.Quaternion x):unitVector)
+      0))
 
 (define (magnitude (x :: java.lang.Number)) :: java.lang.Number
   (abs x))
 
 (define (angle (x ::java.lang.Number)):: <real>
-  (if (gnu.math.Complex? x)
-      ((->gnu.math.Complex x):angle)
+  (if (gnu.math.Quaternion? x)
+      ((->gnu.math.Quaternion x):angle)
       (if (< (x:doubleValue) 0) java.lang.Math:PI 0)))
 
 (define (inexact (num :: java.lang.Number)) :: java.lang.Number
@@ -390,12 +483,12 @@
   (let ((result (gnu.kawa.lispexpr.LispReader:parseNumber str (- radix))))
     (if (instance? result <gnu.math.Numeric>) result #f)))
 
-(define (quantity->number (q :: <quantity>)) :: <complex>
+(define (quantity->number (q :: <quantity>)) ::quaternion
   (let ((u (q:unit))
 	(factor (q:doubleValue)))
     (if (= factor 1.0)
 	(q:number)
-	(<complex>:make (q:reValue) (q:imValue)))))
+	(quaternion:make (q:reValue) (q:imValue) (q:jmValue) (q:kmValue)))))
 
 (define (quantity->unit (q :: <quantity>)) :: <gnu.math.Unit>
   (q:unit))

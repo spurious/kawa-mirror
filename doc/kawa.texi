@@ -5652,6 +5652,7 @@ and Java number types as appropriate.
 @menu
 * Arithmetic operations::
 * Numerical input and output::
+* Quaternions::
 * Quantities::
 * Logical Number Operations::
 * Performance of numeric operations::
@@ -6249,6 +6250,237 @@ An error is never signaled due to the content of @var{string}.
 @end deffn
 
 
+@node Quaternions
+@section Quaternions
+
+Kawa extends the Scheme numeric tower to include
+@uref{http://en.wikipedia.org/wiki/Quaternion,quaternions} as a proper
+superset of the complex numbers.  Quaternions provide a convenient
+notation to represent
+@uref{http://en.wikipedia.org/wiki/Quaternions_and_spatial_rotation,rotations in three-dimensional space},
+and are therefore commonly found in applications such as computer
+graphics, robotics, and spacecraft engineering.  The Kawa quaternion API
+is modeled after
+@uref{http://www.ccs.neu.edu/home/dorai/squat/squat.html,this} with some
+additions.
+
+A quaternion is a number that can be expressed in the form
+@samp{w+xi+yj+zk}, where @code{w}, @code{x}, @code{y}, and @code{z} are
+real, and @code{i}, @code{j}, and @code{k} are imaginary units
+satisfying @math{i^2 = j^2 = k^2 = ijk = -1}.  The magnitude of a
+quaternion is defined to be its Euclidean norm when viewed as a point in
+@math{R^4}.
+
+The real--part of a quaternion is also called its @samp{scalar}, while
+the i--part, j--part, and k--part taken together are also called its
+@samp{vector}.  A quaternion with zero j--part and k--part is an
+ordinary complex number. (If the i--part is also zero, then it is a
+real).  A quaternion with zero real--part is called a
+@samp{vector quaternion}.
+
+The reader syntax for number literals has been extended to support both
+rectangular and polar (hyperspherical) notation for quaternions.  The
+rectangular notation is as above, i.e. @code{w+xi+yj+zk}.  The polar
+notation takes the form @code{r@@t%u&v}, where @code{r} is the
+magnitude, @code{t} is the first angle, and @code{u} and @code{v} are
+two other angles called the ``colatitude'' and ``longitude''.
+
+The rectangular coordinates and polar coordinates are related by the
+equations:
+@example
+@var{w} = @var{r} * cos @var{t}
+@var{x} = @var{r} * sin @var{t} * cos @var{u}
+@var{y} = @var{r} * sin @var{t} * sin @var{u} * cos @var{v}
+@var{z} = @var{r} * sin @var{t} * sin @var{u} * cos @var{v}
+@end example
+With either notation, zero elements may be omitted.
+
+@deffn Procedure make-rectangular @var{w} @var{x}
+@deffnx Procedure make-rectangular @var{w} @var{x} @var{y} @var{z}
+These procedures construct quaternions from Cartesian coordinates.
+@end deffn
+
+@deffn Procedure make-polar @var{r} @var{t}
+@deffnx Procedure make-polar @var{r} @var{t} @var{u} @var{v}
+These procedures construct quaternions from polar coordinates.
+@end deffn
+
+@deffn Procedure + @var{q} @dots{}
+@deffnx Procedure - @var{q} @dots{}
+@deffnx Procedure * @var{q} @dots{}
+@deffnx Procedure / @var{q}
+@deffnx Procedure / @vari{q} @varii{q} @variii{q} @dots{}
+@deffnx Procedure expt @vari{q} @varii{q}
+@deffnx Procedure exp @var{q}
+@deffnx Procedure log @var{q}
+@deffnx Procedure sqrt @var{q}
+@deffnx Procedure sin @var{q}
+@deffnx Procedure cos @var{q}
+@deffnx Procedure tan @var{q}
+@deffnx Procedure asin @var{q}
+@deffnx Procedure acos @var{q}
+@deffnx Procedure atan @var{q}
+All of the arithmetic and transcendental functions defined for complex
+arguments have been extended to support quaternions.
+
+Quaternion multiplication is not commutative, so there are two possible
+interpretations of @code{(/ q1 q2)} which would yield different results:
+either @code{(* q1 (/ q2))}, or @code{(* (/ q2) q1)}.  Division in this
+implementation has been defined such that @code{(/ q1 q2 ...)} is
+equivalent to @code{(* q1 (/ q2) ...)}, but it is recommended to
+use reciprocals (unary @code{/}) and multiplication.
+@end deffn
+
+@deffn Procedure real-part @var{q}
+Return the real--part of @var{q}.
+
+@example
+(real-part 0)          @result{}  0
+(real-part -i)         @result{}  0
+(real-part 1+2i-3j+4k) @result{}  1
+@end example
+@end deffn
+
+@deffn Procedure imag-part @var{q}
+Return the i--part of @var{q}.
+
+@example
+(imag-part 0)          @result{}  0
+(imag-part -i)         @result{}  -1
+(imag-part 1+2i-3j+4k) @result{}  2
+@end example
+@end deffn
+
+@deffn Procedure magnitude @var{q}
+Return the Euclidean norm of @var{q}.  If @var{q} is @code{a+bi+cj+dk},
+then @code{(magnitude q)} is
+@code{(sqrt (apply + (map square (list a b c d))))}
+@end deffn
+
+@deffn Procedure angle @var{q}
+Return the angle of @var{q}.
+@end deffn
+
+@subsection The @code{(kawa quaternions)} module
+
+The following additional functionality is made available by doing one
+of:
+@example
+(require 'quaternions) ;; or
+(import (kawa quaternions))
+@end example
+
+@deffn Alias quaternion
+An alias for @code{gnu.math.Quaternion}, useful for type declarations.
+@end deffn
+@deffn Procedure {quaternion?} @var{x}
+Return @true{} if @var{x} is a quaternion, i.e. an ordinary number, and
+@false{} otherwise.
+
+@example
+(quaternion? 0)          @result{}  #t
+(quaternion? -i)         @result{}  #t
+(quaternion? 1+2i-3j+4k) @result{}  #t
+(quaternion? 10.0m)      @result{}  #f
+(quaternion? "x")        @result{}  #f
+@end example
+@end deffn
+
+@deffn Procedure jmag-part @var{q}
+Return the j--part of @var{q}.
+
+@example
+(jmag-part 0)          @result{}  0
+(jmag-part -i)         @result{}  0
+(jmag-part 1+2i-3j+4k) @result{}  -3
+@end example
+@end deffn
+@deffn Procedure kmag-part @var{q}
+
+@example
+(kmag-part 0)          @result{}  0
+(kmag-part -i)         @result{}  0
+(kmag-part 1+2i-3j+4k) @result{}  4
+@end example
+@end deffn
+
+@deffn Procedure complex-part @var{q}
+Return the projection of @var{q} into the complex plane:
+@code{(+ (real-part q) (* +i (imag-part q)))}
+
+@example
+(complex-part 0)          @result{}  0
+(complex-part -i)         @result{}  -1i
+(complex-part 1+2i-3j+4k) @result{}  1+2i
+@end example
+@end deffn
+@deffn Procedure vector-part @var{q}
+Return the vector--part of @var{q}.
+
+@example
+(vector-part 0)          @result{}  0
+(vector-part -i)         @result{}  -1i
+(vector-part 1+2i-3j+4k) @result{}  +2i-3j+4k
+@end example
+@end deffn
+
+@deffn Procedure unit-quaternion @var{q}
+Return a quaternion of unit magnitude with the same direction as
+@var{q}.  If @var{q} is zero, return zero.  This is like a 4D version of
+a signum function.
+
+@example
+(unit-quaternion 0)          @result{}  0
+(unit-quaternion -i)         @result{}  -1i
+(unit-quaternion 1+2i-3j+4k) @result{}  0.18257418583505536+0.3651483716701107i-0.5477225575051661j+0.7302967433402214k
+@end example
+@end deffn
+
+@deffn Procedure unit-vector @var{q}
+Return the vector--part of @var{q}, scaled to have magnitude 1.  If the
+vector--part is zero, then return zero.
+
+@example
+(unit-vector 0)          @result{}  0
+(unit-vector -i)         @result{}  -1i
+(unit-vector 1+2i-3j+4k) @result{}  +0.3713906763541037i-0.5570860145311556j+0.7427813527082074k
+@end example
+@end deffn
+
+@deffn Procedure colatitude @var{q}
+Return the colatitude of @var{q}.
+@end deffn
+
+@deffn Procedure longitude @var{q}
+Return the longitude of @var{q}.
+@end deffn
+
+@deffn Procedure dot-product @vari{q} @varii{q}
+For two vector quaternions @vari{q} = @code{ai+bj+ck} and @varii{q} =
+@code{di+ej+fk}, return @code{ad + be + cf}.  This is equal to the
+@math{R^3} dot product for vectors @math{(a,b,c)} and @math{(d,e,f)},
+and is also equal to @code{(- (real-part (* q1 q2)))}.  It is an error
+if either @vari{q} or @varii{q} has a non-zero real--part.
+@end deffn
+
+@deffn Procedure cross-product @vari{q} @varii{q}
+For two vector quaternions @vari{q} = @code{ai+bj+ck} and @varii{q} =
+@code{di+ej+fk}, return the @math{R^3} cross product for vectors
+@math{(a,b,c)} and @math{(d,e,f)}, which is equal to
+@code{(vector-part (* q1 q2))}.  It is an error
+if either @vari{q} or @varii{q} has a non-zero real--part.
+@end deffn
+
+@deffn Procedure conjugate @var{q}
+Return @code{(+ (real-part q) (* -1 (vector-part q)))}.
+
+@example
+(conjugate 0)          @result{}  0
+(conjugate -i)         @result{}  +1i
+(conjugate 1+2i-3j+4k) @result{}  1-2i+3j-4k
+@end example
+@end deffn
+
 @node Quantities
 @section Quantities and Units
 
@@ -6283,6 +6515,9 @@ Currently, there are no quantities that re not numbers.
 To distinguish a plain unit-less number from a quantity,
 you can use @code{complex?}.
 @end deffn
+@c FIXME Using @code{complex?} as the test would erroneously classify
+@c @code{1+j} as non-plain.  The right test would be @code{quaternion?},
+@c though that requires importing the (kawa quaternions) module.
 
 @deffn Procedure quantity->number q
 Returns the pure number part of the quantity @var{q}, relative to
@@ -16401,7 +16636,8 @@ Daniel Bonniot for multiple small improvements
 to gnu.bytecode and gnu.expr.
 
 Jamison Hope for multiple contributions,
-including the SRFI-14 implementation, and Google Summer of Code mentoring.
+including quaternion support, the SRFI-14 implementation, and Google
+Summer of Code mentoring.
 
 Jim White for Ant support and other improvements.
 
@@ -16887,13 +17123,6 @@ more efficient, and more customizable are also desirable.
 for integrating server-side and client-side programming using
 a Scheme dialect.  These ideas seem like they would port
 quite well to Kawa.
-
-@subsection Quaternions
-Add @uref{http://en.wikipedia.org/wiki/Quaternion,quaternions}
-to the numerical tower, such that @code{Complex} extends a new abstract class
-@code{Quaternion} extends @code{Quantity}.
-These are useful for 3D rotations.
-A reasonable design is @uref{http://www.ccs.neu.edu/home/dorai/squat/squat.html,here}.
 
 @subsection String localization
 Support localization by extending the

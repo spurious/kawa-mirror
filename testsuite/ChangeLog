@@ -1,3 +1,8 @@
+2014-11-17  Jamison Hope  <jrh@theptrgroup.com>
+
+	* quaternion-test.scm: New file with test cases for quaternions.
+	* Makefile.am: Update accordingly.
+
 2014-11-16  Per Bothner  <per@bothner.com>
 
 	* aux-libs.scm: New file, defined two libraries.

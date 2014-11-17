@@ -576,6 +576,8 @@ public class LispReader extends Lexer
 
   static final int SCM_COMPLEX = 1;
   public static final int SCM_NUMBERS = SCM_COMPLEX;
+  public static final int SCM_ANGLE = SCM_NUMBERS << 1;
+  public static final int SCM_COLATITUDE = SCM_ANGLE << 1;
 
   public static Object parseNumber
   /* #ifdef use:java.lang.CharSequence */
@@ -716,16 +718,77 @@ public class LispReader extends Lexer
       }
 
     // Special case for '+i' and '-i'.
-    if ((ch == 'i' || ch == 'I') && pos == end && start == pos - 2
-	&& (flags & SCM_COMPLEX) != 0)
-      {
-	char sign = buffer[start];
-	if (sign != '+' && sign != '-')
-	  return "no digits";
-	if (exactness == 'i' || exactness == 'I')
-	  return new DComplex(0, negative ? -1 : 1);
-	return negative ? Complex.imMinusOne() : Complex.imOne();
-      }
+    if ((ch == 'i' || ch == 'I') &&
+        (pos == end || buffer[pos] == '+' || buffer[pos] == '-') &&
+        start == pos - 2 && (flags & SCM_COMPLEX) != 0) {
+        char sign = buffer[start];
+        if (sign != '+' && sign != '-')
+            return "no digits";
+        if (pos < end) {
+            Object jmag = parseNumber(buffer, pos, end-pos, exactness,
+                                      10, flags);
+            if (jmag instanceof String)
+                return jmag;
+            if (! (jmag instanceof Quaternion))
+                return "invalid numeric constant ("+jmag+")";
+            Quaternion qjmag = (Quaternion) jmag;
+            RealNum re = qjmag.re();
+            RealNum im = qjmag.im();
+            if (!(re.isZero() && im.isZero()))
+                return "invalid numeric constant";
+            if (exactness == 'i' || exactness == 'I')
+                return Quaternion.make(0, negative ? -1 : 1,
+                                       qjmag.doubleJmagValue(),
+                                       qjmag.doubleKmagValue());
+            return Quaternion.make(IntNum.zero(), negative ?
+                                   IntNum.minusOne() : IntNum.one(),
+                                   qjmag.jm(), qjmag.km());
+        }
+        if (exactness == 'i' || exactness == 'I')
+            return new DComplex(0, negative ? -1 : 1);
+        return negative ? Complex.imMinusOne() : Complex.imOne();
+    }
+    // Special case for '+j' and '-j'.
+    if ((ch == 'j' || ch == 'J') &&
+        (pos == end || buffer[pos] == '+' || buffer[pos] == '-') &&
+        start == pos - 2 && (flags & SCM_COMPLEX) != 0) {
+        char sign = buffer[start];
+        if (sign != '+' && sign != '-')
+            return "no digits";
+        if (pos < end) {
+            Object kmag = parseNumber(buffer, pos, end-pos, exactness,
+                                      10, flags);
+            if (kmag instanceof String)
+                return kmag;
+            if (! (kmag instanceof Quaternion))
+                return "invalid numeric constant ("+kmag+")";
+            Quaternion qkmag = (Quaternion) kmag;
+            RealNum re = qkmag.re();
+            RealNum im = qkmag.im();
+            RealNum jm = qkmag.jm();
+            if (!(re.isZero() && im.isZero() && jm.isZero()))
+                return "invalid numeric constant";
+            if (exactness == 'i' || exactness == 'I')
+                return Quaternion.make(0, 0, negative ? -1 : 1,
+                                       qkmag.doubleKmagValue());
+            return Quaternion.make(IntNum.zero(), IntNum.zero(),
+                                   negative ? IntNum.minusOne() : IntNum.one(),
+                                   qkmag.km());
+        }
+        if (exactness == 'i' || exactness == 'I')
+            return new DQuaternion(0, 0, 0, negative ? -1 : 1);
+        return negative ? Quaternion.jmMinusOne() : Quaternion.jmOne();
+    }
+    // Special case for '+k' and '-k'.
+    if ((ch == 'k' || ch == 'K') && pos == end && start == pos - 2
+	&& (flags & SCM_COMPLEX) != 0) {
+        char sign = buffer[start];
+        if (sign != '+' && sign != '-')
+            return "no digits";
+        if (exactness == 'i' || exactness == 'I')
+            return new DQuaternion(0, 0, 0, negative ? -1 : 1);
+        return negative ? Quaternion.kmMinusOne() : Quaternion.kmOne();
+    }
 
     int realStart = pos - 1;
     boolean hash_seen = false;
@@ -935,11 +998,20 @@ public class LispReader extends Lexer
 	if (ch == '@')
 	  { /* polar notation */
 	    Object angle = parseNumber(buffer, pos, end - pos,
-				       exactness, 10, flags);
+				       exactness, 10, flags|SCM_ANGLE);
 	    if (angle instanceof String)
 	      return angle;
-	    if (! (angle instanceof RealNum))
+	    if (! (angle instanceof RealNum) && ! (angle instanceof RealNum[]))
 	      return "invalid complex polar constant";
+            if (angle instanceof RealNum[]) {
+                RealNum[] polars = (RealNum[]) angle;
+                if (number.isZero() &&
+                    (!polars[0].isExact() || !polars[1].isExact() ||
+                     !polars[2].isExact()))
+                    return new DFloNum(0.0);
+                return Quaternion.polar(number, polars[0], polars[1],
+                                        polars[2]);
+            }
 	    RealNum rangle = (RealNum) angle;
 	    /* r4rs requires 0@1.0 to be inexact zero, even if (make-polar
 	     * 0 1.0) is exact zero, so check for this case.  */
@@ -948,6 +1020,67 @@ public class LispReader extends Lexer
 
 	    return Complex.polar (number, rangle);
 	  }
+        if (ch == '%') {
+            /* extended polar notation */
+            Object colatitude = parseNumber(buffer, pos, end - pos,
+                                            exactness, 10,
+                                            flags|SCM_COLATITUDE);
+            if (colatitude instanceof String)
+                return colatitude;
+            if (!(colatitude instanceof RealNum) &&
+                !(colatitude instanceof RealNum[]))
+                return "invalid quaternion polar constant";
+            if ((flags & SCM_ANGLE) == 0) {
+                // number%colatitude or number%colatitude&longitude
+                RealNum rangle = IntNum.zero();
+                RealNum rcolatitude, rlongitude;
+                if (colatitude instanceof RealNum) {
+                    rcolatitude = (RealNum) colatitude;
+                    rlongitude = IntNum.zero();
+                } else {
+                    RealNum[] polars = (RealNum[]) colatitude;
+                    rcolatitude = polars[1];
+                    rlongitude = polars[2];
+                }
+                /* r4rs requires 0@1.0 to be inexact zero, even if
+                   (make-polar 0 1.0) is exact zero, so check for this
+                   case.  */
+                if (number.isZero() &&
+                    (!rcolatitude.isExact() || !rlongitude.isExact()))
+                    return new DFloNum(0.0);
+                return Quaternion.polar(number, rangle, rcolatitude,
+                                        rlongitude);
+            }
+            if (colatitude instanceof RealNum[]) {
+                RealNum[] polars = (RealNum[]) colatitude;
+                polars[0] = number;
+                return polars;
+            }
+            return new RealNum[] { number, (RealNum)colatitude, IntNum.zero() };
+        }
+        if (ch == '&') {
+            /* extended polar notation */
+            Object longitude = parseNumber(buffer, pos, end - pos,
+                                           exactness, 10, flags);
+            if (longitude instanceof String)
+                return longitude;
+            if (! (longitude instanceof RealNum))
+                return "invalid quaternion polar constant";
+            RealNum rlongitude = (RealNum) longitude;
+            if ((flags & (SCM_ANGLE|SCM_COLATITUDE)) == 0) {
+                // number&longitude
+                /* r4rs requires 0@1.0 to be inexact zero, even if
+                   (make-polar 0 1.0) is exact zero, so check for this
+                   case.  */
+                if (number.isZero() && !rlongitude.isExact())
+                    return new DFloNum(0.0);
+                return Quaternion.polar(number, IntNum.zero(),
+                                        IntNum.zero(), rlongitude);
+            }
+            if ((flags & SCM_COLATITUDE) != 0)
+                return new RealNum[] { IntNum.zero(), number, rlongitude };
+            return new RealNum[] { number, IntNum.zero(), rlongitude };
+        }
 
 	if (ch == '-' || ch == '+')
 	  {
@@ -956,13 +1089,13 @@ public class LispReader extends Lexer
 				      exactness, 10, flags);
 	    if (imag instanceof String)
 	      return imag;
-	    if (! (imag instanceof Complex))
+	    if (! (imag instanceof Quaternion))
 	      return "invalid numeric constant ("+imag+")";
-	    Complex cimag = (Complex) imag;
+	    Quaternion cimag = (Quaternion) imag;
 	    RealNum re = cimag.re();
 	    if (! re.isZero())
 	      return "invalid numeric constant";
-	    return Complex.make(number, cimag.im());
+	    return Quaternion.make(number, cimag.im(), cimag.jm(), cimag.km());
 	  }
 
 	int lcount = 0;
@@ -979,18 +1112,54 @@ public class LispReader extends Lexer
 	    ch = buffer[pos++];
 	  }
 
-	if (lcount == 1)
-	  {
-	    char prev = buffer[pos-1];
-	    if (prev == 'i' || prev == 'I')
-	      {
-		if (pos < end)
-		  return "junk after imaginary suffix 'i'";
-		return Complex.make(IntNum.zero (), number);
-	      }
-	  }
+	if (lcount == 1) {
+            char prev = buffer[pos-1];
+            if (prev == 'i' || prev == 'I') {
+                if (pos < end) {
+                    Object jmag = parseNumber(buffer, pos, end-pos,
+                                              exactness, 10, flags);
+                    if (jmag instanceof String)
+                        return jmag;
+                    if (! (jmag instanceof Quaternion))
+                        return "invalid numeric constant ("+jmag+")";
+                    Quaternion qjmag = (Quaternion) jmag;
+                    RealNum re = qjmag.re();
+                    RealNum im = qjmag.im();
+                    if (!(re.isZero() && im.isZero()))
+                        return "invalid numeric constant";
+                    return Quaternion.make(IntNum.zero(), number,
+                                           qjmag.jm(), qjmag.km());
+                }
+                return Complex.make(IntNum.zero(), number);
+            }
+            if (prev == 'j' || prev == 'J') {
+                if (pos < end) {
+                    Object kmag = parseNumber(buffer, pos, end-pos,
+                                              exactness, 10, flags);
+                    if (kmag instanceof String)
+                        return kmag;
+                    if (! (kmag instanceof Quaternion))
+                        return "invalid numeric constant ("+kmag+")";
+                    Quaternion qkmag = (Quaternion) kmag;
+                    RealNum re = qkmag.re();
+                    RealNum im = qkmag.im();
+                    RealNum jm = qkmag.jm();
+                    if (!(re.isZero() && im.isZero() && jm.isZero()))
+                        return "invalid numeric constant";
+                    return Quaternion.make(IntNum.zero(), IntNum.zero(),
+                                           number, qkmag.km());
+                }
+                return Quaternion.make(IntNum.zero(), IntNum.zero(),
+                                       number, IntNum.zero());
+            }
+            if (prev == 'k' || prev == 'K') {
+                if (pos < end)
+                    return "junk after imaginary suffix 'k'";
+                return Quaternion.make(IntNum.zero (), IntNum.zero(),
+                                       IntNum.zero(), number);
+            }
+        }
         return "excess junk after number";
-	
       }
     else if (number instanceof DFloNum && exp_char > 0 && exp_char != 'e')
       {

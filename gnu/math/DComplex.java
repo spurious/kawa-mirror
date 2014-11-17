@@ -228,6 +228,39 @@ public class DComplex extends Complex implements Externalizable
     return new DComplex (nr, ni);
   }
 
+    public static Complex sin(double x_re, double x_im) {
+        if (x_im == 0.0)
+            return new DFloNum(Math.sin(x_re));
+        return Complex.make(Math.sin(x_re)*Math.cosh(x_im),
+                            Math.cos(x_re)*Math.sinh(x_im));
+    }
+
+    public static Complex cos(double x_re, double x_im) {
+        if (x_im == 0.0)
+            return new DFloNum(Math.cos(x_re));
+        return Complex.make(Math.cos(x_re)*Math.cosh(x_im),
+                            -Math.sin(x_re)*Math.sinh(x_im));
+    }
+
+    public static Complex tan(double x_re, double x_im) {
+        if (x_im == 0.0)
+            return new DFloNum(Math.tan(x_re));
+
+        double sin_re = Math.sin(x_re);
+        double cos_re = Math.cos(x_re);
+        double sinh_im = Math.sinh(x_im);
+        double cosh_im = Math.cosh(x_im);
+        // tan = sin/cos
+        return DComplex.div(sin_re*cosh_im, cos_re*sinh_im,
+                            cos_re*cosh_im, -sin_re*sinh_im);
+    }
+
+    public static Complex unitQuaternion(double x_re, double x_im) {
+        double r = Math.hypot(x_re, x_im);
+        if (r == 0.0) return IntNum.zero();
+        return Complex.make(x_re/r, x_im/r);
+    }
+
   // Transcribed from:
   // http://netlib.bell-labs.com/netlib/fdlibm/e_hypot.c.Z
   /*

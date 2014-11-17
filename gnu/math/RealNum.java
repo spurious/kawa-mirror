@@ -16,6 +16,18 @@ public abstract class RealNum extends Complex
     return isNegative() ? DFloNum.make(Math.PI) :IntNum.zero();
   }
 
+    @Override public final Quaternion vectorPart() { return IntNum.zero(); }
+    @Override public final Quaternion unitVector() { return IntNum.zero(); }
+    @Override public final Quaternion unitQuaternion() {
+        switch (sign()) {
+            case  1: return IntNum.one();
+            case  0: return IntNum.zero();
+            case -1: return IntNum.minusOne();
+            case -2: default: return this;     // NaN
+        }
+    }
+    @Override public final Quaternion conjugate() { return this; }
+
     public static boolean isReal(Object value) {
         return (value instanceof Number
                 && (value instanceof RealNum || ! (value instanceof Numeric)));
@@ -184,7 +196,15 @@ public abstract class RealNum extends Complex
     return new DFloNum(Math.log(x));
   }
 
-  public final Complex sin() { return new DFloNum(Math.sin(doubleValue())); }
+    @Override public final RealNum sin() {
+        return new DFloNum(Math.sin(doubleValue()));
+    }
+    @Override public final RealNum cos() {
+        return new DFloNum(Math.cos(doubleValue()));
+    }
+    @Override public final RealNum tan() {
+        return new DFloNum(Math.tan(doubleValue()));
+    }
 
   public final Complex sqrt ()
   {

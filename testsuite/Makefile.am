@@ -76,6 +76,7 @@ check-r7rs:
 check-num:
 	$(KAWA) $(OPTIONS) "$(srcdir)/num-test.scm"
 	$(KAWA) $(OPTIONS) "$(srcdir)/numeric-tests.scm"
+	$(KAWA) $(OPTIONS) "$(srcdir)/quaternion-test.scm"
 
 check-arr:
 	$(KAWA) $(OPTIONS) "$(srcdir)/arr-test.scm"
@@ -632,7 +633,7 @@ SCRIPTS_TO_RUN = case-warnings.scm uninit1.scm \
 # Files needed for SCRIPTS_TO_RUN
 AUX_FOR_SCRIPTS_TO_RUN = aux-libs.scm
 EXTRA_DIST = testing.scm test-utils.scm \
-  test.scm case-test.scm num-test.scm numeric-tests.scm \
+  test.scm case-test.scm num-test.scm numeric-tests.scm quaternion-tests.scm \
   mac-test.scm mac1.scm r7rs-tests.scm \
   classes1.scm classes2.scm SimpleB.java obj-test.scm arr-test.scm \
   lib-test.scm srfi-38-test.scm srfi-64-test.scm srfi-69-test.scm \

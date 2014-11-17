@@ -1,3 +1,23 @@
+2014-11-17  Jamison Hope  <jrh@theptrgroup.com>
+
+	Implemented quaternions.
+	* Quaternion.java, CQuaternion.java, DQuaternion.java: New files.
+	* Makefile.am: Update accordingly.
+	* Quantity.java: Change number() type to Quaternion, add accessors
+	for "j" and "k" parts.
+	* CQuantity.java (<init>, number, readExternal): Update
+	accordingly.
+	* DQuantity.java (number): Likewise.
+	* Complex.java: Change superclass from Quantity to Quaternion.
+	(complexPart, vectorPart, unitVector, unitQuaternion, conjugate,
+	colatitude, longitude, sin, cos, tan): New methods.
+	(doubleValue, doubleImagValue, doubleRealValue, longValue): Move
+	to Quaternion.java.
+	* DComplex.java (sin, cos, tan, unitQuaternion): New methods.
+	* RealNum.java (vectorPart, unitVector, unitQuaternion, cos, tan):
+	New methods.
+	(sin): Change return type from Complex to RealNum.
+
 2014-11-12  Jamison Hope  <jrh@theptrgroup.com>
 
 	* IntNum.java (compare): Cast argument to Numeric instead of

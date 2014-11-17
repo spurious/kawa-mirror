@@ -1,3 +1,8 @@
+2014-11-17  Jamison Hope  <jrh@theptrgroup>
+
+	* kawa.texi (Quaternions): New section.
+	(Ideas and tasks): Remove subsection Quaternions.
+
 2014-11-10  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Paths): Note use of current-path as setter,

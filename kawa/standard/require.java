@@ -111,6 +111,7 @@ public class require extends Syntax
         map("android-defs", "gnu.kawa.android.defs");
         map("javafx-defs", "gnu.kawa.javafx.defs");
         map("syntax-utils", SLIB_PREFIX + "syntaxutils");
+        map("quaternions", "kawa.lib.kawa.quaternions");
     }
 
     public static String mapFeature(String featureName) {

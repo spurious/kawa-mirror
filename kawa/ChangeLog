@@ -1,3 +1,9 @@
+2014-11-17  Jamison Hope  <jrh@theptrgroup.com>
+
+	* standard/expt.java (expt): Coerce arguments to Numeric and
+	support Quaternions.
+	* standard/require.java (featureMap): Add 'quaternions.
+
 2014-11-16  Per Bothner  <per@bothner.com>
 
 	* standard/require.java (importDefinitions): Handle context

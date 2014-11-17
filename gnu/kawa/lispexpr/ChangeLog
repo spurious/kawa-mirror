@@ -1,3 +1,8 @@
+2014-11-17  Jamison Hope  <jrh@theptrgroup.com>
+
+	* LispReader.java (parseNumber): Add support for quaternion
+	literals.
+
 2014-11-03  Per Bothner  <per@bothner.com>
 
 	* BracketApply.java (rewrite): Generalize handling of ParameterizedType

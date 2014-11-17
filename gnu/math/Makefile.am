@@ -5,6 +5,7 @@ include $(top_srcdir)/Make-rules
 java_sources = \
   Numeric.java \
   Quantity.java DQuantity.java CQuantity.java \
+  Quaternion.java CQuaternion.java DQuaternion.java \
   Complex.java CComplex.java DComplex.java \
   NamedUnit.java BaseUnit.java Unit.java MulUnit.java Dimensions.java \
   RealNum.java DFloNum.java \

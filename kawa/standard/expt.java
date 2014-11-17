@@ -19,13 +19,14 @@ public class expt extends Procedure2
     return IntNum.power(x, y);
   }
 
-  public static Numeric expt (Object arg1, Object arg2)
-  {
-    arg1 = Promise.force(arg1);
-    arg2 = Promise.force(arg2);
-    if (arg2 instanceof IntNum)
-      return Arithmetic.asNumeric(arg1).power((IntNum) arg2);
-    return Complex.power ((Complex) arg1, (Complex) arg2);
+  public static Numeric expt (Object arg1, Object arg2) {
+      Numeric narg1 = Arithmetic.asNumeric(arg1);
+      Numeric narg2 = Arithmetic.asNumeric(arg2);
+      if (narg2 instanceof IntNum)
+          return narg1.power((IntNum) narg2);
+      if ((narg1 instanceof Complex) && (narg2 instanceof Complex))
+          return Complex.power ((Complex) narg1, (Complex) narg2);
+      return Quaternion.power((Quaternion) narg1, (Quaternion) narg2);
   }
 
   public Object apply2 (Object arg1, Object arg2)

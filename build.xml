@@ -548,6 +548,7 @@
         <file name="exceptions.scm"/>
         <file name="kawa/expressions.scm"/>
         <file name="kawa/string-cursors.scm"/>
+        <file name="kawa/quaternions.scm"/>
         <file name="kawa/hashtable.scm"/>
         <file name="kawa/regex.scm"/>
         <file name="rnrs/hashtables.scm"/>

@@ -169,6 +169,7 @@ This package has nothing to do with the defunct Kawa commercial Java IDE.
 
 @menu
 * Features::
+* Community::
 * Installation::         Building and installing Kawa
 * Running::              Invoking, Running, and Using Kawa
 * Syntax::
@@ -188,7 +189,6 @@ This package has nothing to do with the defunct Kawa commercial Java IDE.
 * Miscellaneous::
 * FAQs::                 Frequently Asked Questions
 * Framework::            The Kawa language framework
-* Community::
 * License::
 * Overall Index::	 Index of functions, macros, concepts, and more.
 @end menu
@@ -393,6 +393,638 @@ From the full expression language, Kawa additionally is missing
 @code{format-number}, @code{format-number-list}, and language objects.
 Quantities, keyword values, and the expanded @code{lambda} form
 (with optional and keyword parameters) are supported.
+
+@node Community
+@chapter The Kawa Community
+
+@menu
+* Reporting bugs::       Where to report bugs
+* Mailing lists::        Where to discuss changes, etc
+* Acknowledgements::     Acknowledgements and thanks
+* Support::              Technical support for Kawa
+* Projects::             Projects using Kawa
+* Ideas and tasks::      Ideas and tasks for contributing to Kawa
+@end menu
+
+@node Reporting bugs
+@section Reporting bugs
+
+To report a bug or feature request for Kawa (including Qexo or JEmacs), it is
+best to use the
+@uref{http://savannah.gnu.org/bugs/?func=additem&group=kawa,bug-submission page}.
+You can browse and comment on existing bug reports
+using the @uref{http://savannah.gnu.org/bugs/?group=kawa, Kawa Bugzilla page}.
+
+When a bug report is created or modified, mail is automatically sent to the
+@email{bug-kawa@@gnu.org} list.  You can subscribe, unsubscribe, or browse
+the archives through the
+@uref{http://mail.gnu.org/mailman/listinfo/bug-kawa,
+@code{bug-kawa} web interface}.
+
+@node Mailing lists
+@section General Kawa email and discussion
+
+The general Kawa email list is @email{kawa@@sourceware.org}.
+This mailing list is used for announcements, questions, patches,
+and general discussion relating to Kawa.  If you wish to subscribe,
+send a blank message request to @email{kawa-subscribe@@sourceware.org}.
+To unsubscribe, send a blank message to
+@email{kawa-unsubscribe@@sourceware.org}.
+(If your mail is forwarded and you're not sure which email address you're
+subscribed as send mail to the address following @code{mailto:} in the
+@code{List-Unsubscribe} line in the headers of the messages you get from
+the list.)
+
+You can browse the @uref{http://sourceware.org/ml/kawa/,
+archive of past messages}.
+
+There are separate mailing lists for
+@uref{http://mail.gnu.org/mailman/listinfo/qexo-general, Qexo}
+and @uref{http://lists.sourceforge.net/mailman/listinfo/jemacs-info,JEmacs}.
+
+@node Acknowledgements
+@section Acknowledgements and thanks
+
+The author and project leader of Kawa is
+@uref{http://per.bothner.com/,Per Bothner}
+@email{per@@bothner.com}.
+
+Kawa is a re-write of Kawa 0.2, which was a Scheme interpreter written by
+R. Alexander Milowski @email{alex@@milowski.com}.
+
+Thanks to Cygnus Solutions (now part of Red Hat) for sponsoring
+the initial development of Kawa, and then transferring
+their ownership interest to Per.
+
+@subsubheading Financial support
+
+Ean Schuessler and @uref{http://www.brainfood.com/,Brainfood}
+provided financial support and encouragement.
+
+Thanks to Chris Dean, Dean Ferreyra, and others
+at @uref{http://www.mercedsystems.com/,Merced Systems} for financial
+support and other contributions.
+
+@uref{http://google.com/,Google} through their
+@uref{http://code.google.com/soc/,Summer of Code} project
+sponsored Charles Turner during Summer 2011 and 2012,
+and sponsored Andrea Bernardini Summer 2014.
+
+Thomas Kirk and AT&T provided financial support, and useful bug reports.
+
+@subsubheading Various contributions
+
+@uref{http://jcubic.pl/,Jakub Jankiewicz} contributed the Kawa logo.
+
+Helmut Eller provided SLIME support, syntaxutils.scm, and many bug reports.
+
+Daniel Bonniot for multiple small improvements
+to gnu.bytecode and gnu.expr.
+
+Jamison Hope for multiple contributions,
+including quaternion support, the SRFI-14 implementation, and Google
+Summer of Code mentoring.
+
+Jim White for Ant support and other improvements.
+
+Bruce R. Lewis implemented @ref{KRL,,KRL} and made other contributions.
+
+Geoff Berry: Handle Exceptions attribute.  Other improvements.
+
+Shad Gregory improved JEmacs.
+
+Al Petrofsky improved gnu.math printing and added some IntNum methods.
+
+Marco Vezzoli:  SRFI-1 tailoring for Kawa.
+
+Albert Ting - old GuiConsole code.
+
+Christian Surlykke ported JEmacs to use SWT.
+
+Geoff Berry for various gnu.bytecode improvements.
+
+Ivelin Ivanov and Tom Reilly for servlet support.
+
+Anthony Green for Fedora packaging.
+
+Charles Turner for pretty-printer improvements,
+improvements in the Common Lips support, and other changes.
+
+Andrea Bernardini optimized the implementation of @code{case}.
+
+Julien Rousseau and Marius Kjeldahl contributed to Android support.
+
+@subsubheading Small fixes and improvements
+
+Patrick Barta;
+Joseph Bowbeer;
+Dominique Boucher;
+Alexander Bunkenburg;
+Harold Carr;
+Emmanuel Castro;
+Álvaro Castro-Castilla;
+Heather Downs;
+Francisco Vides Fernández;
+Nic Ferrier;
+Oliver Flasch;
+Weiqi Gao;
+Luke Gorrie;
+Mario Domenech Goulart;
+Zvi Har'E;
+Jeff Haynes;
+Ethan Herdrick;
+Joerg-Cyril Hoehle;
+Elliott Hughes;
+Mike Kenne;
+Brian Jones;
+Gerardo Jorvilleur;
+Simon Josefsson (JEmacs menu);
+Thomas Kirk;
+Jay Krell;
+Edouard Parmelan;
+Walter C. Pelissero;
+Rafael Jesus Alcantara Perez;
+Lynn Quam;
+Marcus Otto;
+Terje Pedersen (some XQuery functions);
+Matthias Radestock;
+Ola Rinta-Koski;
+Andreas Schlapbach;
+Robert D. Skeels;
+Benny Tsai;
+Vladimir Tsichevski;
+Matthieu Vachon;
+Phil Walker;
+Knut Wannheden;
+Chris Wegrzyn.
+
+@subsubheading Bug reports and test cases
+
+Khairul Azhar;
+Bob Bane;
+Hans Boehm;
+Brian D. Carlstrom;
+Luis Casillas;
+Ken Dickey (format tests);
+Helge Dietert;
+Allan Erskine;
+Marc Feeley (polytype.scm);
+Margus Freudenthal;
+Weiqi Gao;
+Andrea Girotto;
+Norman Hard;
+Gerardo Horvilleur;
+Yaroslav Kavenchuk;
+Felix S Klock II;
+Francois Leygues;
+Mirko Luedde;
+Leonardo Valeri Manera;
+Kjetil S. Matheussen;
+Alex Mitchell;
+Alex Moiseenko
+Edouard Parmelan;
+Walter C. Pelissero;
+Stephen L. Peters;
+François Pinard;
+Bill Robinson;
+Dan Stanger (Eaton Vance);
+Hallvard Traetteberg;
+Taylor Venable;
+Alessandro Vernet;
+Tony White
+John Whittaker;
+Robert Yokota.
+
+@subsubheading Code ported from other packages
+
+Kawa includes Free Software originally written for other purposes,
+but incorporated into Kawa, perhaps with some porting.  A partial list:
+
+Dorai Sitaram wrote pregexp.
+
+The @code{rationalize} algorithm is by Alan Bawden and Marc Feeley.
+
+Lars T Hansen wrote SRFI-11 (let-values, let*-values macros).
+
+Olin Shivers wrote the SRFI-1 list-processing library,
+and the SRFI-13 reference impementation.
+
+John David Stone wrote SRFI-8 (receive macro)
+
+Jussi Piitulainen wrote the SRFI-25 specification and tests.
+
+Richard Kelsey and Michael Sperber wrote SRFI-34.
+
+Anthony Carrico wrote the SRFI-37 reference implementation.
+
+Panu Kalliokoski wrote the SRFI-69 reference implementation.
+
+Donovan Kolbly wrote the srfi-64 ``meta'' testsuite.
+Alex Shinn improved SRFI-64 portability.
+
+Philip L. Bewig wrote the SRFI-41 (streams) specification and
+reference implementation.
+
+Simon Tatham wrote listsort.
+
+Aubrey Jaffer wrote much of SLIB, some of which has been
+imported into gnu.kawa.slib. He also wrote some tests we're using.
+
+@node Support
+@section Technical Support for Kawa
+
+If you have a project that depends on Kawa or one of its component
+packages, you might do well get get paid priority support from
+Kawa's author.
+
+The base price is $2400 for one year.  This entitles you to basic
+support by email or phone.  Per @email{per@@bothner.com} will answer techical
+questions about Kawa or its implementation, investigate bug reports, and
+suggest work-arounds.  I may (at my discretion) provide fixes and
+enhancements (patches) for simple problems.  Reponse for support
+requests received using the day (California time) will normally be
+within a few hours.
+
+All support requests must come through a single designated contact
+person.  If Kawa is important to your business, you probably
+want at least two contact people, doubling the price.
+
+If the support contract is cancelled (by either party), remaining
+time will be prorated and refunded.
+
+Per is also available for development projects.
+
+@node Projects
+@section Projects using Kawa
+
+Google's @uref{http://appinventor.googlelabs.com/,App Inventor for Android}
+uses Kawa to translate its visual blocks language.
+
+@uref{http://www.mercedsystems.com/, Merced Systems@comma{} Inc.} uses Kawa
+extensively in their contact center performance management product
+Merced Peformance Suite.  Kawa Scheme is used for all development
+and has allowed Merced to realize the large productivity gains
+that come with using Scheme while still maintaining tight
+integration with a large number of Java libraries.
+
+JEmacs is included in the Kawa distribution.  It is a project to
+re-implement Emacs, allowing a mix of Java. Scheme, and Emacs Lisp.
+It has its own @uref{http://jemacs.sourceforge.net/,home-page}.
+
+BRL ("the Beautiful Report Language") is a database-oriented language
+to embed in HTML and other markup.
+@uref{http://brl.sourceforge.net/, BRL} allows you to embed Scheme in
+a an HTML file on a web server.
+
+The @uref{http://schemeway.sourceforge.net,SchemeWay Project} is a set of
+@uref{http://www.eclipse.org,Eclipse} plug-ins for professional Scheme
+programming. The first plugin released, SchemeScript, is a fully-featured
+Scheme
+editor customizable in Scheme. It embeds the Kawa Scheme system and has
+many features that ease Kawa Scheme programming (like code completion on
+variable names, 
+class and method names, namespaces, etc).
+
+@uref{http://www.nuecho.com,Nü Echo} develops high-performance speech
+enabled applications. Nü Echo uses Kawa for the development of innovative
+speech application development tools, like a complete 
+@uref{http://www.nuecho.com/en/services/grammar.shtml,grammar IDE} and a 
+S-expression based language and development environment for the
+specification of 
+highly reusable @uref{http://www.nuecho.com/en/services/dcl.shtml,dialog
+components}. 
+
+The Health Media Research Laboratory, part of the Comprehensive Cancer
+Center at the University of Michigan, is using Kawa as an integral part of
+its core tailoring technologies. Java programs using Kawa libraries are used
+to administer customized web-based surveys, generate tailored feedback,
+validate data, and "characterize," or transform, data. Kawa code is embedded
+directly in XML-formatted surveys and data dictionaries. Performance and
+ease of implementation has far exceeded expectations. For more information
+contact Paul R. Potts, Technical Director, Health Media Research Lab,
+@code{<potts@@umich.edu>}.
+
+Mike Dillon (@code{mdillon@@gjt.org})
+did the preliminary work of creating a
+Kawa plugin for jEdit. It is called SchemeShell and provides a REPL inside
+of the jEdit console for executing expressions in Kawa (much as the BeanShell
+plugin does with the BeanShell scripting language).
+It is currently available only via CVS from:
+@example
+CVSROOT=:pserver:anonymous@@cvs.jedit.sourceforge.net:/cvsroot/jedit
+MODULE=plugins/SchemeShell
+@end example
+
+STMicroelectronics (@code{marco.vezzoli@@st.com})
+uses Kawa in a prototypal
+intranet 3tier information retrival system as a communication protocol
+between server and clients and to do server agents programming.
+
+The Nice Programming Language is a new open source language with a
+Java-like syntax. It features multiple dispatch, parametric types,
+higher-order functions, tuples, optional parameters, safe static typing
+of @code{null}, ..., and the new concept of "abstract interfaces".
+The Nice compiler (@code{nicec}) uses Kawa's @code{gnu.expr}
+and @code{gnu.bytecode}
+packages to generate Java bytecode.
+You can find more about Nice at @uref{http://nice.sourceforge.net}.
+For more information feel free to contact
+Daniel Bonniot @email{bonniot@@users.sf.net}).
+
+@node Ideas and tasks
+@section Ideas and tasks for contributing to Kawa
+
+Kawa (like other Free Software projects) has no lack of tasks and projects
+to work on.  Here are some ideas.
+
+@subsection Compiler should use class-file reading instead of reflection
+The Kawa compiler currently uses reflection to determine properties
+(such as exported function definitions) from referenced classes.
+It would be better to read class files.
+This should not be too difficult, since the @code{gnu.bytecode} library
+abstracts over class information read by reflection or class reading.
+
+@subsection Mutually dependent Java and Scheme modules
+
+We'd like a command for compiling compile a list of Java and Scheme
+source files thar may have mutual dependencies.  A good way
+to do this is to hook into @code{javac}, which is quite extensible
+and pluggable.
+
+One could do something like:
+@enumerate
+@item
+Read the "header" of each Kawa source file, to determine the
+name of the generated main class.
+@item
+Enter these class names into the javac tables as ``uncompleted''
+classes.
+@item
+Start compiling the Java files.  When this requires the members
+of the of the Kawa classes, switch to the Kawa files.  From javac,
+treat these as pre-compiled .class files.  I.e. we treat the Kawa
+compiler as a black box that produces Symbols in the same way as
+reading class files.  At this point we should only need to the
+initial ``scan'' phase on Kawa.
+@item
+If necessary, finish compiling remaining Kawa files.
+@end enumerate
+
+This approach may not immediately provide as robust mixed-language
+support as ideal, but it is more amenable to incremental improvement
+that a standalone stub-generator.
+
+This project is good if you know or want to learn how @code{javac} works.
+
+@subsection Make use of Java-7 MethodHandles
+Java 7 supports MethodHandles which are meant to provide better
+performance (ultimately) for dynamic languages.
+See @uref{http://jcp.org/en/jsr/detail?id=292,JSR 292}
+and the @uref{http://openjdk.java.net/projects/mlvm/,Da Vinci Machine Project}. 
+MethodHandles will be used to compile lambdas in Java 8.
+Kawa can already be compiled to use Methodhandles, but only in
+one unimportant way.  There much more to be done.  For example we
+can start by optimizing arithmetic when the types are unknown
+at compile-time.  They could make implementing
+generic functions (multimethods) more efficient.
+At some point we want to compile lambdas in the same way
+as the Java 8 preview does. This can potenitally
+be more efficient than Kawa's current mechanism.
+
+@subsection R6RS and R7RS libraries and syntax
+Kawa supports most of the functionality of R6RS and R7RS.
+However, various R6R7 or (more importantly) R7RS features
+are missing, and should be added.
+For example, both R6RS or R7RS library definition syntax are unimplemented.
+In a related matter, Kawa supports most of the functionality of
+@code{syntax-case}, but some pieces are missing, and no
+doubt some of it is incorrect.  Adding the missing pieces
+and testing for correctness of corner cases is needed.
+@uref{http://lists.r6rs.org/pipermail/r6rs-discuss/2007-October/003387.html,Andre van Tonder's R6RS expander} may be helpful.
+
+It would be useful to extend the @code{import} form (and also the
+@code{require} form when no explicit filename is given) to search a
+``source path'' for a matching source file, automatically compiling it as
+needed (as done in the @code{require} form when an explicit filename is given).
+In interactive mode, if the module is already loaded, check if it is updated
+- if not recompile and re-load it.
+
+@anchor{task-parameterized-types}
+@subsection Parameterized types
+Kawa has some limited support for parameterized types, but
+it's not used much.  Improve type inferencing.
+Support definition of parameterized classes.
+Better used of parameterized types for sequence class.
+Support wildcards.  
+(It might be better to have wild-carding be associated with
+declarations, as in Scala, rather than uses.)
+
+@subsection Function types
+Kawa doesn't have true function types: Parameter and result types
+are only handled for ``known'' functions.  Adding first-class
+function types would be a major task, possibly depending on
+improvements in @ref{task-parameterized-types,Parameterized types}.
+
+@subsection Full continuations
+Add support for full continuations, which is the major
+feature missing for Kawa to qualify as a ``true Scheme''.
+One way to implement continuations is to add a add that converts
+the abstract syntax tree to continuation-pass-style, and then
+exhand the existing full-tail-call support to manage a stack.
+There are other ways to solve the problem.
+This may benefit from @ref{task-faster-tailcalls,Faster tailcalls}.
+
+@subsection Faster tailcalls
+@anchor{task-faster-tailcalls}
+Make @code{--full-tailcalls} run faster.
+This may depend on (or incorporate)
+@ref{task-TreeList-optimization,TreeList-optimization}. 
+
+@anchor{task-TreeList-optimization}
+@subsection TreeList-optimization
+The @uref{http://www.gnu.org/software/kawa/api/gnu/lists/TreeList.html,TreeList} class is a data structure for ``flattened'' trees.  It is used for
+XML-style nodes, for multiple values, and for the full-tail-call API.
+The basic concept is fine, but it could do with some re-thinking
+to make make random-access indexing fast.  Also, support for updating
+is insufficient.  (This needs someone into designing and hacking on
+low-level data-structures, along with lots of profiling and testing.)
+
+@subsection Asynchronous evaluation
+
+C# recently added @code{asynch} and @code{await} keywords
+for @uref{http://msdn.microsoft.com/en-us/vstudio/gg316360,asynchronous programming}.  Kawa's recently improved support for lazy programming
+seems like a good framework for equivalent functionality:
+Instead of an @code{asynch} method that returns a @code{Task<T>}
+the Kawa programmer would write a function that returns a @code{lazy[T]}.
+This involves some design work, and modifying the compiler to
+rewrite the function body as needed.
+
+This is related to full continuations, as the re-writing is similar.
+
+@anchor{task-REPL-improvements}
+@subsection REPL console and other REPL improvement
+Improvements to the read-eval-print console.
+In addition to a traditional Swing console,
+it would be useful to support using a web browser as a a remote terminal,
+possibly using web-sockets.
+(This allows ``printing'' HTML-expressions, which can be a useful way
+to learn and experiment with web technologies.)
+See @uref{http://per.bothner.com/blog/2007/ReplPane/, here} for an article
+on the existing Swing REPL, along with some to-do items.
+Being able to hide and show different parts of the output might be nice.
+Being able to link from error messages to source might be nice.
+Better handling of redefinitions is discussed 
+@uref{http://per.bothner.com/blog/2009/REPL-for-JavaFX/, here in the context of JavaXF Script}; this is a general REPL issue, mostly independent of the GUI for it.
+
+An interesting possibility is to use the @uref{http://ipython.org/,IPython}
+framework.  There are existing ports for Scala: either
+@uref{https://github.com/mattpap/IScala,IScala}
+or @uref{https://github.com/Bridgewater/scala-notebook, Scala Notebook}.
+
+@subsection XQuery-1.1-functionality
+It would be nice to update the XQuery (Qexo) support
+to @uref{http://www.w3.org/TR/xquery-30/,XQuery 1.1}.
+
+@subsection XQuery-updates
+It would be nice to support @uref{http://www.w3.org/TR/xquery-update-10/, XQuery updates}.  This depends on @ref{task-TreeList-optimization,TreeList-optimization}. 
+
+@anchor{task-common-lisp}
+@subsection Common Lisp support
+Kawa supports a small subset of the Common Lisp language, but it supports
+a much larger subset of core Common Lisp concepts and data structure, some
+designed with Common Lisp functionality in mind.  Examples include
+packages, arrays, expanded function declarations, type specifications,
+and format.  A lot could be done to improve the Common Lisp support
+with modest effort.  Some Common Lisp features could also be useful
+for Scheme: Documentation strings (or markup) as Java annotations,
+better MOP-like introspection, and generic methods a la defmethod
+(i.e. with multiple definition statements, possibly in separate files,
+as opposed to the current make-procedure) all come to mind.
+Being able to run some existing Common Lisp code bases with
+at most modest changes should be the goal.
+One such package to start with might be a
+@uref{http://aperiodic.net/phil/archives/Geekery/notes-on-lisp-testing-frameworks.html,existing test framework}, perhaps
+@uref{http://common-lisp.net/project/bese/FiveAM.html, FivaAM}.
+Full Common Lisp compatibility is nice, but let's walk before we can run.
+
+@subsection JEmacs improvements
+A lot of work is needed to make
+@uref{http://jemacs.sourceforge.net/,JEmacs} useful.
+One could try to import a useful package and see what works and what fails.
+Or one may look at basic editing primitives.
+Enhancements may be needed to core Emacs Lisp language primitives
+(enhancing @ref{task-common-lisp, Common Lisp support} may help),
+or to the display engine.
+
+Emacs now supports @uref{http://www.gnu.org/software/emacs/manual/html_node/elisp/Lexical-Binding.html,lexical bindings} - we should do the same.
+
+@subsection Improved IDE integration
+There is some Kawa support for Eclipse (Schemeway), and possibly
+other IDEs (NetBeans, IntelliJ).  But many improvements are
+desirable.
+@ref{task-REPL-improvements, REPL improvements} may be a component of this.
+
+@subsubsection Plugin for NetBeans IDE
+
+Kawa-Scheme support for the NetBeans IDE would be useful.
+One could perhaps build on the Clojure plugin.
+
+@subsubsection Plugin for Eclipse IDE
+
+Kawa-Scheme support for the Eclipse IDE would be useful.
+Probably makes sense to
+enhance @uref{http://sourceforge.net/projects/schemeway/,SchemeWay}.
+It may also make sense to build on
+the @uref{http://www.eclipse.org/dltk/,Dynamic Languages Toolkit},
+possibly making use of @uref{http://schemeide.sourceforge.net/,Schemeide},
+though DLTk seems more oriented towards interpreted non-JVM-based languages.
+
+@subsubsection Improve Emacs integration
+
+@uref{http://en.wikipedia.org/wiki/SLIME, SLIME} is an Emacs mode
+that provides IDE-like functionality.  It supports Kawa.
+
+@uref{http://jdee.sourceforge.net/,JDEE} is a Java development environment,
+so might have better hooks to the JVM and Java debugging architecture.
+
+@uref{http://cedet.sourceforge.net/,CEDET} is a more general
+framework of development tools.
+
+@subsubsection Implement @code{javax.tools} and code-range support in Kawa compiler
+
+Kawa currently records the line and column position of syntactic elements.
+For an IDE it is desirable to have both start and end position of an element,
+for example so it can put a squiggly line under an erroneous form.
+
+@subsection Output formatting and pretty printing
+It would be nice to integrate the pretty-printer with the REPL,
+so that window re-sizing re-breaks the output lines.
+It would be nice to enhance the pretty-printer to handle
+variable-width fonts and other ``rich'' text.
+Figuring out how to make the output formatter more flexible,
+more efficient, and more customizable are also desirable.
+
+@subsection Hop-style web programming
+@uref{http://hop.inria.fr/,Hop} is an interesting design
+for integrating server-side and client-side programming using
+a Scheme dialect.  These ideas seem like they would port
+quite well to Kawa.
+
+@subsection String localization
+Support localization by extending the
+@uref{http://srfi.schemers.org/srfi-109/srfi-109.html,SRFI_109}
+syntax, in the manner of (and compatible with)
+@uref{http://www.gnu.org/software/gettext/,GNU gettext}.
+I.e. optionally specify a localization key (to use as an index
+in the translation database); if there is no key specified,
+default to using the literal parts of the string.
+
+@subsection Data binding
+Implement a ``bind'' mechanism similar to that
+of @uref{http://docs.oracle.com/javafx/1.3/tutorials/core/dataBinding/,JavaFX Script}.
+The idea is when you initialize a variable or field,
+instead of initializing it to a fixed value, you bind it to
+an expression depending on other variables.
+We install ``listeners'' on those variables, so when those variables
+change, we update the bound variable.
+This feature is useful in many application, but the initial
+focus could be GUI programming and perhaps web programming.
+@c Note in general the result is a ``text'', which is a generalization
+@c of a string: A text is a sequence of characters *or* other values.
+@c If an embedded expression evaluates to a non-string, it is @emph{not}
+@c automatically converted to a string.  Conversion to a string
+@c is done on demand, for example on printing.
+@c (This is similar to values in the XML data model.)
+
+@subsection Better dynamic reload
+
+Kawa does a lot of optimizations and inlining.  This conflicts
+with being able to ``reload'' a module into an already-running
+interactive environment.
+
+We could add an option to load a module in ``reloadable'' mode.
+Kawa already patches an old function object (a @code{ModuleMethod})
+so existing references to the function get automatically updated.
+However, there are problems if the ``signature'' of the function
+changes - for example if the return type (declared or inferred)
+becomes more general.  In those cases the best thing is to
+re-compile any code that depends on the modified function.
+
+Reloading a module that defines a class is even trickier,
+at least if there are existing instances that should
+work as the updated class.  We can handle the special case
+where only method bodies change: In reloadable mode, each
+method body is compiled to a separate function, the
+actual body indirects to the function.  We must also
+recognize that we compiling a new version of the same
+class, which requires a textual comparison between the
+old and new versions, or a structural comparison
+between the old class and the new code.
+
+When it comes to top-level variables, an issue is when
+to re-evaluate the initializing expression.  It is reasonable
+to do so if and only if the expression is modified, which
+again requires a textual comparison.
 
 @node Installation
 @chapter Getting and installing Kawa
@@ -16547,638 +17179,6 @@ are used by Kawa, and distributed with it, but may be independently useful.
 
 This @uref{gnu.bytecode/compiling-regexps.html,article} explains how to
 use @code{gnu.bytecode} to compile regular expressions to bytecode.
-
-@node Community
-@chapter The Kawa Community
-
-@menu
-* Reporting bugs::       Where to report bugs
-* Mailing lists::        Where to discuss changes, etc
-* Acknowledgements::     Acknowledgements and thanks
-* Support::              Technical support for Kawa
-* Projects::             Projects using Kawa
-* Ideas and tasks::      Ideas and tasks for contributing to Kawa
-@end menu
-
-@node Reporting bugs
-@section Reporting bugs
-
-To report a bug or feature request for Kawa (including Qexo or JEmacs), it is
-best to use the
-@uref{http://savannah.gnu.org/bugs/?func=additem&group=kawa,bug-submission page}.
-You can browse and comment on existing bug reports
-using the @uref{http://savannah.gnu.org/bugs/?group=kawa, Kawa Bugzilla page}.
-
-When a bug report is created or modified, mail is automatically sent to the
-@email{bug-kawa@@gnu.org} list.  You can subscribe, unsubscribe, or browse
-the archives through the
-@uref{http://mail.gnu.org/mailman/listinfo/bug-kawa,
-@code{bug-kawa} web interface}.
-
-@node Mailing lists
-@section General Kawa email and discussion
-
-The general Kawa email list is @email{kawa@@sourceware.org}.
-This mailing list is used for announcements, questions, patches,
-and general discussion relating to Kawa.  If you wish to subscribe,
-send a blank message request to @email{kawa-subscribe@@sourceware.org}.
-To unsubscribe, send a blank message to
-@email{kawa-unsubscribe@@sourceware.org}.
-(If your mail is forwarded and you're not sure which email address you're
-subscribed as send mail to the address following @code{mailto:} in the
-@code{List-Unsubscribe} line in the headers of the messages you get from
-the list.)
-
-You can browse the @uref{http://sourceware.org/ml/kawa/,
-archive of past messages}.
-
-There are separate mailing lists for
-@uref{http://mail.gnu.org/mailman/listinfo/qexo-general, Qexo}
-and @uref{http://lists.sourceforge.net/mailman/listinfo/jemacs-info,JEmacs}.
-
-@node Acknowledgements
-@section Acknowledgements and thanks
-
-The author and project leader of Kawa is
-@uref{http://per.bothner.com/,Per Bothner}
-@email{per@@bothner.com}.
-
-Kawa is a re-write of Kawa 0.2, which was a Scheme interpreter written by
-R. Alexander Milowski @email{alex@@milowski.com}.
-
-Thanks to Cygnus Solutions (now part of Red Hat) for sponsoring
-the initial development of Kawa, and then transferring
-their ownership interest to Per.
-
-@subsubheading Financial support
-
-Ean Schuessler and @uref{http://www.brainfood.com/,Brainfood}
-provided financial support and encouragement.
-
-Thanks to Chris Dean, Dean Ferreyra, and others
-at @uref{http://www.mercedsystems.com/,Merced Systems} for financial
-support and other contributions.
-
-@uref{http://google.com/,Google} through their
-@uref{http://code.google.com/soc/,Summer of Code} project
-sponsored Charles Turner during Summer 2011 and 2012,
-and sponsored Andrea Bernardini Summer 2014.
-
-Thomas Kirk and AT&T provided financial support, and useful bug reports.
-
-@subsubheading Various contributions
-
-@uref{http://jcubic.pl/,Jakub Jankiewicz} contributed the Kawa logo.
-
-Helmut Eller provided SLIME support, syntaxutils.scm, and many bug reports.
-
-Daniel Bonniot for multiple small improvements
-to gnu.bytecode and gnu.expr.
-
-Jamison Hope for multiple contributions,
-including quaternion support, the SRFI-14 implementation, and Google
-Summer of Code mentoring.
-
-Jim White for Ant support and other improvements.
-
-Bruce R. Lewis implemented @ref{KRL,,KRL} and made other contributions.
-
-Geoff Berry: Handle Exceptions attribute.  Other improvements.
-
-Shad Gregory improved JEmacs.
-
-Al Petrofsky improved gnu.math printing and added some IntNum methods.
-
-Marco Vezzoli:  SRFI-1 tailoring for Kawa.
-
-Albert Ting - old GuiConsole code.
-
-Christian Surlykke ported JEmacs to use SWT.
-
-Geoff Berry for various gnu.bytecode improvements.
-
-Ivelin Ivanov and Tom Reilly for servlet support.
-
-Anthony Green for Fedora packaging.
-
-Charles Turner for pretty-printer improvements,
-improvements in the Common Lips support, and other changes.
-
-Andrea Bernardini optimized the implementation of @code{case}.
-
-Julien Rousseau and Marius Kjeldahl contributed to Android support.
-
-@subsubheading Small fixes and improvements
-
-Patrick Barta;
-Joseph Bowbeer;
-Dominique Boucher;
-Alexander Bunkenburg;
-Harold Carr;
-Emmanuel Castro;
-Álvaro Castro-Castilla;
-Heather Downs;
-Francisco Vides Fernández;
-Nic Ferrier;
-Oliver Flasch;
-Weiqi Gao;
-Luke Gorrie;
-Mario Domenech Goulart;
-Zvi Har'E;
-Jeff Haynes;
-Ethan Herdrick;
-Joerg-Cyril Hoehle;
-Elliott Hughes;
-Mike Kenne;
-Brian Jones;
-Gerardo Jorvilleur;
-Simon Josefsson (JEmacs menu);
-Thomas Kirk;
-Jay Krell;
-Edouard Parmelan;
-Walter C. Pelissero;
-Rafael Jesus Alcantara Perez;
-Lynn Quam;
-Marcus Otto;
-Terje Pedersen (some XQuery functions);
-Matthias Radestock;
-Ola Rinta-Koski;
-Andreas Schlapbach;
-Robert D. Skeels;
-Benny Tsai;
-Vladimir Tsichevski;
-Matthieu Vachon;
-Phil Walker;
-Knut Wannheden;
-Chris Wegrzyn.
-
-@subsubheading Bug reports and test cases
-
-Khairul Azhar;
-Bob Bane;
-Hans Boehm;
-Brian D. Carlstrom;
-Luis Casillas;
-Ken Dickey (format tests);
-Helge Dietert;
-Allan Erskine;
-Marc Feeley (polytype.scm);
-Margus Freudenthal;
-Weiqi Gao;
-Andrea Girotto;
-Norman Hard;
-Gerardo Horvilleur;
-Yaroslav Kavenchuk;
-Felix S Klock II;
-Francois Leygues;
-Mirko Luedde;
-Leonardo Valeri Manera;
-Kjetil S. Matheussen;
-Alex Mitchell;
-Alex Moiseenko
-Edouard Parmelan;
-Walter C. Pelissero;
-Stephen L. Peters;
-François Pinard;
-Bill Robinson;
-Dan Stanger (Eaton Vance);
-Hallvard Traetteberg;
-Taylor Venable;
-Alessandro Vernet;
-Tony White
-John Whittaker;
-Robert Yokota.
-
-@subsubheading Code ported from other packages
-
-Kawa includes Free Software originally written for other purposes,
-but incorporated into Kawa, perhaps with some porting.  A partial list:
-
-Dorai Sitaram wrote pregexp.
-
-The @code{rationalize} algorithm is by Alan Bawden and Marc Feeley.
-
-Lars T Hansen wrote SRFI-11 (let-values, let*-values macros).
-
-Olin Shivers wrote the SRFI-1 list-processing library,
-and the SRFI-13 reference impementation.
-
-John David Stone wrote SRFI-8 (receive macro)
-
-Jussi Piitulainen wrote the SRFI-25 specification and tests.
-
-Richard Kelsey and Michael Sperber wrote SRFI-34.
-
-Anthony Carrico wrote the SRFI-37 reference implementation.
-
-Panu Kalliokoski wrote the SRFI-69 reference implementation.
-
-Donovan Kolbly wrote the srfi-64 ``meta'' testsuite.
-Alex Shinn improved SRFI-64 portability.
-
-Philip L. Bewig wrote the SRFI-41 (streams) specification and
-reference implementation.
-
-Simon Tatham wrote listsort.
-
-Aubrey Jaffer wrote much of SLIB, some of which has been
-imported into gnu.kawa.slib. He also wrote some tests we're using.
-
-@node Support
-@section Technical Support for Kawa
-
-If you have a project that depends on Kawa or one of its component
-packages, you might do well get get paid priority support from
-Kawa's author.
-
-The base price is $2400 for one year.  This entitles you to basic
-support by email or phone.  Per @email{per@@bothner.com} will answer techical
-questions about Kawa or its implementation, investigate bug reports, and
-suggest work-arounds.  I may (at my discretion) provide fixes and
-enhancements (patches) for simple problems.  Reponse for support
-requests received using the day (California time) will normally be
-within a few hours.
-
-All support requests must come through a single designated contact
-person.  If Kawa is important to your business, you probably
-want at least two contact people, doubling the price.
-
-If the support contract is cancelled (by either party), remaining
-time will be prorated and refunded.
-
-Per is also available for development projects.
-
-@node Projects
-@section Projects using Kawa
-
-Google's @uref{http://appinventor.googlelabs.com/,App Inventor for Android}
-uses Kawa to translate its visual blocks language.
-
-@uref{http://www.mercedsystems.com/, Merced Systems@comma{} Inc.} uses Kawa
-extensively in their contact center performance management product
-Merced Peformance Suite.  Kawa Scheme is used for all development
-and has allowed Merced to realize the large productivity gains
-that come with using Scheme while still maintaining tight
-integration with a large number of Java libraries.
-
-JEmacs is included in the Kawa distribution.  It is a project to
-re-implement Emacs, allowing a mix of Java. Scheme, and Emacs Lisp.
-It has its own @uref{http://jemacs.sourceforge.net/,home-page}.
-
-BRL ("the Beautiful Report Language") is a database-oriented language
-to embed in HTML and other markup.
-@uref{http://brl.sourceforge.net/, BRL} allows you to embed Scheme in
-a an HTML file on a web server.
-
-The @uref{http://schemeway.sourceforge.net,SchemeWay Project} is a set of
-@uref{http://www.eclipse.org,Eclipse} plug-ins for professional Scheme
-programming. The first plugin released, SchemeScript, is a fully-featured
-Scheme
-editor customizable in Scheme. It embeds the Kawa Scheme system and has
-many features that ease Kawa Scheme programming (like code completion on
-variable names, 
-class and method names, namespaces, etc).
-
-@uref{http://www.nuecho.com,Nü Echo} develops high-performance speech
-enabled applications. Nü Echo uses Kawa for the development of innovative
-speech application development tools, like a complete 
-@uref{http://www.nuecho.com/en/services/grammar.shtml,grammar IDE} and a 
-S-expression based language and development environment for the
-specification of 
-highly reusable @uref{http://www.nuecho.com/en/services/dcl.shtml,dialog
-components}. 
-
-The Health Media Research Laboratory, part of the Comprehensive Cancer
-Center at the University of Michigan, is using Kawa as an integral part of
-its core tailoring technologies. Java programs using Kawa libraries are used
-to administer customized web-based surveys, generate tailored feedback,
-validate data, and "characterize," or transform, data. Kawa code is embedded
-directly in XML-formatted surveys and data dictionaries. Performance and
-ease of implementation has far exceeded expectations. For more information
-contact Paul R. Potts, Technical Director, Health Media Research Lab,
-@code{<potts@@umich.edu>}.
-
-Mike Dillon (@code{mdillon@@gjt.org})
-did the preliminary work of creating a
-Kawa plugin for jEdit. It is called SchemeShell and provides a REPL inside
-of the jEdit console for executing expressions in Kawa (much as the BeanShell
-plugin does with the BeanShell scripting language).
-It is currently available only via CVS from:
-@example
-CVSROOT=:pserver:anonymous@@cvs.jedit.sourceforge.net:/cvsroot/jedit
-MODULE=plugins/SchemeShell
-@end example
-
-STMicroelectronics (@code{marco.vezzoli@@st.com})
-uses Kawa in a prototypal
-intranet 3tier information retrival system as a communication protocol
-between server and clients and to do server agents programming.
-
-The Nice Programming Language is a new open source language with a
-Java-like syntax. It features multiple dispatch, parametric types,
-higher-order functions, tuples, optional parameters, safe static typing
-of @code{null}, ..., and the new concept of "abstract interfaces".
-The Nice compiler (@code{nicec}) uses Kawa's @code{gnu.expr}
-and @code{gnu.bytecode}
-packages to generate Java bytecode.
-You can find more about Nice at @uref{http://nice.sourceforge.net}.
-For more information feel free to contact
-Daniel Bonniot @email{bonniot@@users.sf.net}).
-
-@node Ideas and tasks
-@section Ideas and tasks for contributing to Kawa
-
-Kawa (like other Free Software projects) has no lack of tasks and projects
-to work on.  Here are some ideas.
-
-@subsection Compiler should use class-file reading instead of reflection
-The Kawa compiler currently uses reflection to determine properties
-(such as exported function definitions) from referenced classes.
-It would be better to read class files.
-This should not be too difficult, since the @code{gnu.bytecode} library
-abstracts over class information read by reflection or class reading.
-
-@subsection Mutually dependent Java and Scheme modules
-
-We'd like a command for compiling compile a list of Java and Scheme
-source files thar may have mutual dependencies.  A good way
-to do this is to hook into @code{javac}, which is quite extensible
-and pluggable.
-
-One could do something like:
-@enumerate
-@item
-Read the "header" of each Kawa source file, to determine the
-name of the generated main class.
-@item
-Enter these class names into the javac tables as ``uncompleted''
-classes.
-@item
-Start compiling the Java files.  When this requires the members
-of the of the Kawa classes, switch to the Kawa files.  From javac,
-treat these as pre-compiled .class files.  I.e. we treat the Kawa
-compiler as a black box that produces Symbols in the same way as
-reading class files.  At this point we should only need to the
-initial ``scan'' phase on Kawa.
-@item
-If necessary, finish compiling remaining Kawa files.
-@end enumerate
-
-This approach may not immediately provide as robust mixed-language
-support as ideal, but it is more amenable to incremental improvement
-that a standalone stub-generator.
-
-This project is good if you know or want to learn how @code{javac} works.
-
-@subsection Make use of Java-7 MethodHandles
-Java 7 supports MethodHandles which are meant to provide better
-performance (ultimately) for dynamic languages.
-See @uref{http://jcp.org/en/jsr/detail?id=292,JSR 292}
-and the @uref{http://openjdk.java.net/projects/mlvm/,Da Vinci Machine Project}. 
-MethodHandles will be used to compile lambdas in Java 8.
-Kawa can already be compiled to use Methodhandles, but only in
-one unimportant way.  There much more to be done.  For example we
-can start by optimizing arithmetic when the types are unknown
-at compile-time.  They could make implementing
-generic functions (multimethods) more efficient.
-At some point we want to compile lambdas in the same way
-as the Java 8 preview does. This can potenitally
-be more efficient than Kawa's current mechanism.
-
-@subsection R6RS and R7RS libraries and syntax
-Kawa supports most of the functionality of R6RS and R7RS.
-However, various R6R7 or (more importantly) R7RS features
-are missing, and should be added.
-For example, both R6RS or R7RS library definition syntax are unimplemented.
-In a related matter, Kawa supports most of the functionality of
-@code{syntax-case}, but some pieces are missing, and no
-doubt some of it is incorrect.  Adding the missing pieces
-and testing for correctness of corner cases is needed.
-@uref{http://lists.r6rs.org/pipermail/r6rs-discuss/2007-October/003387.html,Andre van Tonder's R6RS expander} may be helpful.
-
-It would be useful to extend the @code{import} form (and also the
-@code{require} form when no explicit filename is given) to search a
-``source path'' for a matching source file, automatically compiling it as
-needed (as done in the @code{require} form when an explicit filename is given).
-In interactive mode, if the module is already loaded, check if it is updated
-- if not recompile and re-load it.
-
-@anchor{task-parameterized-types}
-@subsection Parameterized types
-Kawa has some limited support for parameterized types, but
-it's not used much.  Improve type inferencing.
-Support definition of parameterized classes.
-Better used of parameterized types for sequence class.
-Support wildcards.  
-(It might be better to have wild-carding be associated with
-declarations, as in Scala, rather than uses.)
-
-@subsection Function types
-Kawa doesn't have true function types: Parameter and result types
-are only handled for ``known'' functions.  Adding first-class
-function types would be a major task, possibly depending on
-improvements in @ref{task-parameterized-types,Parameterized types}.
-
-@subsection Full continuations
-Add support for full continuations, which is the major
-feature missing for Kawa to qualify as a ``true Scheme''.
-One way to implement continuations is to add a add that converts
-the abstract syntax tree to continuation-pass-style, and then
-exhand the existing full-tail-call support to manage a stack.
-There are other ways to solve the problem.
-This may benefit from @ref{task-faster-tailcalls,Faster tailcalls}.
-
-@subsection Faster tailcalls
-@anchor{task-faster-tailcalls}
-Make @code{--full-tailcalls} run faster.
-This may depend on (or incorporate)
-@ref{task-TreeList-optimization,TreeList-optimization}. 
-
-@anchor{task-TreeList-optimization}
-@subsection TreeList-optimization
-The @uref{http://www.gnu.org/software/kawa/api/gnu/lists/TreeList.html,TreeList} class is a data structure for ``flattened'' trees.  It is used for
-XML-style nodes, for multiple values, and for the full-tail-call API.
-The basic concept is fine, but it could do with some re-thinking
-to make make random-access indexing fast.  Also, support for updating
-is insufficient.  (This needs someone into designing and hacking on
-low-level data-structures, along with lots of profiling and testing.)
-
-@subsection Asynchronous evaluation
-
-C# recently added @code{asynch} and @code{await} keywords
-for @uref{http://msdn.microsoft.com/en-us/vstudio/gg316360,asynchronous programming}.  Kawa's recently improved support for lazy programming
-seems like a good framework for equivalent functionality:
-Instead of an @code{asynch} method that returns a @code{Task<T>}
-the Kawa programmer would write a function that returns a @code{lazy[T]}.
-This involves some design work, and modifying the compiler to
-rewrite the function body as needed.
-
-This is related to full continuations, as the re-writing is similar.
-
-@anchor{task-REPL-improvements}
-@subsection REPL console and other REPL improvement
-Improvements to the read-eval-print console.
-In addition to a traditional Swing console,
-it would be useful to support using a web browser as a a remote terminal,
-possibly using web-sockets.
-(This allows ``printing'' HTML-expressions, which can be a useful way
-to learn and experiment with web technologies.)
-See @uref{http://per.bothner.com/blog/2007/ReplPane/, here} for an article
-on the existing Swing REPL, along with some to-do items.
-Being able to hide and show different parts of the output might be nice.
-Being able to link from error messages to source might be nice.
-Better handling of redefinitions is discussed 
-@uref{http://per.bothner.com/blog/2009/REPL-for-JavaFX/, here in the context of JavaXF Script}; this is a general REPL issue, mostly independent of the GUI for it.
-
-An interesting possibility is to use the @uref{http://ipython.org/,IPython}
-framework.  There are existing ports for Scala: either
-@uref{https://github.com/mattpap/IScala,IScala}
-or @uref{https://github.com/Bridgewater/scala-notebook, Scala Notebook}.
-
-@subsection XQuery-1.1-functionality
-It would be nice to update the XQuery (Qexo) support
-to @uref{http://www.w3.org/TR/xquery-30/,XQuery 1.1}.
-
-@subsection XQuery-updates
-It would be nice to support @uref{http://www.w3.org/TR/xquery-update-10/, XQuery updates}.  This depends on @ref{task-TreeList-optimization,TreeList-optimization}. 
-
-@anchor{task-common-lisp}
-@subsection Common Lisp support
-Kawa supports a small subset of the Common Lisp language, but it supports
-a much larger subset of core Common Lisp concepts and data structure, some
-designed with Common Lisp functionality in mind.  Examples include
-packages, arrays, expanded function declarations, type specifications,
-and format.  A lot could be done to improve the Common Lisp support
-with modest effort.  Some Common Lisp features could also be useful
-for Scheme: Documentation strings (or markup) as Java annotations,
-better MOP-like introspection, and generic methods a la defmethod
-(i.e. with multiple definition statements, possibly in separate files,
-as opposed to the current make-procedure) all come to mind.
-Being able to run some existing Common Lisp code bases with
-at most modest changes should be the goal.
-One such package to start with might be a
-@uref{http://aperiodic.net/phil/archives/Geekery/notes-on-lisp-testing-frameworks.html,existing test framework}, perhaps
-@uref{http://common-lisp.net/project/bese/FiveAM.html, FivaAM}.
-Full Common Lisp compatibility is nice, but let's walk before we can run.
-
-@subsection JEmacs improvements
-A lot of work is needed to make
-@uref{http://jemacs.sourceforge.net/,JEmacs} useful.
-One could try to import a useful package and see what works and what fails.
-Or one may look at basic editing primitives.
-Enhancements may be needed to core Emacs Lisp language primitives
-(enhancing @ref{task-common-lisp, Common Lisp support} may help),
-or to the display engine.
-
-Emacs now supports @uref{http://www.gnu.org/software/emacs/manual/html_node/elisp/Lexical-Binding.html,lexical bindings} - we should do the same.
-
-@subsection Improved IDE integration
-There is some Kawa support for Eclipse (Schemeway), and possibly
-other IDEs (NetBeans, IntelliJ).  But many improvements are
-desirable.
-@ref{task-REPL-improvements, REPL improvements} may be a component of this.
-
-@subsubsection Plugin for NetBeans IDE
-
-Kawa-Scheme support for the NetBeans IDE would be useful.
-One could perhaps build on the Clojure plugin.
-
-@subsubsection Plugin for Eclipse IDE
-
-Kawa-Scheme support for the Eclipse IDE would be useful.
-Probably makes sense to
-enhance @uref{http://sourceforge.net/projects/schemeway/,SchemeWay}.
-It may also make sense to build on
-the @uref{http://www.eclipse.org/dltk/,Dynamic Languages Toolkit},
-possibly making use of @uref{http://schemeide.sourceforge.net/,Schemeide},
-though DLTk seems more oriented towards interpreted non-JVM-based languages.
-
-@subsubsection Improve Emacs integration
-
-@uref{http://en.wikipedia.org/wiki/SLIME, SLIME} is an Emacs mode
-that provides IDE-like functionality.  It supports Kawa.
-
-@uref{http://jdee.sourceforge.net/,JDEE} is a Java development environment,
-so might have better hooks to the JVM and Java debugging architecture.
-
-@uref{http://cedet.sourceforge.net/,CEDET} is a more general
-framework of development tools.
-
-@subsubsection Implement @code{javax.tools} and code-range support in Kawa compiler
-
-Kawa currently records the line and column position of syntactic elements.
-For an IDE it is desirable to have both start and end position of an element,
-for example so it can put a squiggly line under an erroneous form.
-
-@subsection Output formatting and pretty printing
-It would be nice to integrate the pretty-printer with the REPL,
-so that window re-sizing re-breaks the output lines.
-It would be nice to enhance the pretty-printer to handle
-variable-width fonts and other ``rich'' text.
-Figuring out how to make the output formatter more flexible,
-more efficient, and more customizable are also desirable.
-
-@subsection Hop-style web programming
-@uref{http://hop.inria.fr/,Hop} is an interesting design
-for integrating server-side and client-side programming using
-a Scheme dialect.  These ideas seem like they would port
-quite well to Kawa.
-
-@subsection String localization
-Support localization by extending the
-@uref{http://srfi.schemers.org/srfi-109/srfi-109.html,SRFI_109}
-syntax, in the manner of (and compatible with)
-@uref{http://www.gnu.org/software/gettext/,GNU gettext}.
-I.e. optionally specify a localization key (to use as an index
-in the translation database); if there is no key specified,
-default to using the literal parts of the string.
-
-@subsection Data binding
-Implement a ``bind'' mechanism similar to that
-of @uref{http://docs.oracle.com/javafx/1.3/tutorials/core/dataBinding/,JavaFX Script}.
-The idea is when you initialize a variable or field,
-instead of initializing it to a fixed value, you bind it to
-an expression depending on other variables.
-We install ``listeners'' on those variables, so when those variables
-change, we update the bound variable.
-This feature is useful in many application, but the initial
-focus could be GUI programming and perhaps web programming.
-@c Note in general the result is a ``text'', which is a generalization
-@c of a string: A text is a sequence of characters *or* other values.
-@c If an embedded expression evaluates to a non-string, it is @emph{not}
-@c automatically converted to a string.  Conversion to a string
-@c is done on demand, for example on printing.
-@c (This is similar to values in the XML data model.)
-
-@subsection Better dynamic reload
-
-Kawa does a lot of optimizations and inlining.  This conflicts
-with being able to ``reload'' a module into an already-running
-interactive environment.
-
-We could add an option to load a module in ``reloadable'' mode.
-Kawa already patches an old function object (a @code{ModuleMethod})
-so existing references to the function get automatically updated.
-However, there are problems if the ``signature'' of the function
-changes - for example if the return type (declared or inferred)
-becomes more general.  In those cases the best thing is to
-re-compile any code that depends on the modified function.
-
-Reloading a module that defines a class is even trickier,
-at least if there are existing instances that should
-work as the updated class.  We can handle the special case
-where only method bodies change: In reloadable mode, each
-method body is compiled to a separate function, the
-actual body indirects to the function.  We must also
-recognize that we compiling a new version of the same
-class, which requires a textual comparison between the
-old and new versions, or a structural comparison
-between the old class and the new code.
-
-When it comes to top-level variables, an issue is when
-to re-evaluate the initializing expression.  It is reasonable
-to do so if and only if the expression is modified, which
-again requires a textual comparison.
 
 @node License
 @chapter License

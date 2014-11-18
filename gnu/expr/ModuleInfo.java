@@ -141,6 +141,8 @@ public class ModuleInfo
     className = name;
   }
 
+    public ModuleExp getModuleExpRaw() { return exp; }
+
   public synchronized ModuleExp getModuleExp ()
   {
     ModuleExp m = exp;

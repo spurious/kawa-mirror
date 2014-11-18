@@ -135,7 +135,18 @@ public abstract class LispLanguage extends Language
   public void resolve (Compilation comp)
   {
     Translator tr = (Translator) comp;
-    tr.resolveModule(tr.getModule());
+    ModuleExp mexp = tr.getModule();
+    tr.resolveModule(mexp);
+    if (tr.subModuleMap != null) {
+        String mainName = tr.mainClass.getName();
+        ModuleInfo subinfo = tr.subModuleMap.get(mainName);
+        if (subinfo != null
+            && ! (mexp.body == QuoteExp.voidExp && mexp.firstDecl() == null)) {
+            ModuleExp submodule = subinfo.getModuleExpRaw();
+            tr.error('e', "module has both statements and a submodule with the same name: "+tr.mainClass.getName(),
+                     submodule != null ? submodule : mexp);
+        }
+    }
   }
 
   public Declaration declFromField (ModuleExp mod, Object fvalue, Field fld)

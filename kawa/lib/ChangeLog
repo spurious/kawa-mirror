@@ -16,6 +16,7 @@
 	the (kawa quaternions) module.
 	(angle): Update to support quaternions.
 	(quantity->number): Update return type to quaternion.
+	* numbers.scm (sqrt): Generalize to java.lang.Number.
 
 2014-10-28  Per Bothner  <per@bothner.com>
 

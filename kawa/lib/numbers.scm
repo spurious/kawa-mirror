@@ -336,16 +336,13 @@
                   (v (if (= 0 u) +i u)))
              (* 1/2 v (log (* (+ v q) (/ (- v q))))))))))
 
-(define-procedure sqrt
-#|
-  ;; Only when the "required type" is real:
-  (lambda ((x :: <double>)) :: <double>
-	  (java.lang.Math:sqrt x))
-|#
-  (lambda ((num :: <quantity>)) :: <quantity>
-	  (gnu.math.Quantity:make
-	   (invoke (invoke num 'number) 'sqrt)
-	   (invoke (invoke num 'unit) 'sqrt))))
+(define (sqrt x::java.lang.Number) ::java.lang.Number
+  (cond ((java.lang.real? x)
+         (java.lang.Math:sqrt x))
+        ((gnu.math.Quantity? x)
+         (let ((num ::quantity x))
+           (gnu.math.Quantity:make ((num:number):sqrt)
+                                   ((num:unit):sqrt))))))
 
 (define (square x::quantity) ::quantity
   (* x x))

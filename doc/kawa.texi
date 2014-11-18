@@ -3162,6 +3162,27 @@ then the named part is modified as appropriate.
 Some of these are depecated;
 more compact and readable forms are usually preferred.
 
+@subsubsection Invoking methods
+
+@display
+@stxlit{(}@var{instance}@stxlit{:}@stxref{method-name} @var{arg} ...@stxlit{)}
+@stxlit{(}@var{class}@stxlit{:}@stxref{method-name} @var{instance} @var{arg} ...@stxlit{)}
+@stxlit{(}@var{class}@stxlit{:}@stxref{method-name} @var{arg} ...@stxlit{)}
+@stxlit{(*:}@stxref{method-name} @var{instance} @var{arg} ...@stxlit{)}
+@end display
+
+For details @pxref{Method operations}.
+
+@subsubsection Accessing fields
+
+@display
+@var{class}@stxlit{:}@stxref{field-name}
+@var{instance}@stxlit{:}@stxref{field-name}
+@stxlit{(}@var{prefix}@stxlit{:.}@stxref{field-name} @var{instance}@stxlit{)}
+@end display
+
+For details @pxref{Field operations}.
+
 @subsubsection Type literal
 
 @display
@@ -3206,30 +3227,10 @@ Deprecated; usually you can just write:
 @stxlit{(}@stxref{type} @var{arg} ...@stxlit{)}
 @end display
 
-@subsubsection Invoking methods
-
-@display
-@stxlit{(}@var{instance}@stxlit{:}@stxref{method-name} @var{arg} ...@stxlit{)}
-@stxlit{(}@var{class}@stxlit{:}@stxref{method-name} @var{instance} @var{arg} ...@stxlit{)}
-@stxlit{(}@var{class}@stxlit{:}@stxref{method-name} @var{arg} ...@stxlit{)}
-@stxlit{(*:}@stxref{method-name} @var{instance} @var{arg} ...@stxlit{)}
-@end display
-
-For details @pxref{Method operations}.
-
-@subsubsection Accessing fields
-
-@display
-@var{class}@stxlit{:}@stxref{field-name}
-@var{instance}@stxlit{:}@stxref{field-name}
-@stxlit{(}@var{prefix}@stxlit{:.}@stxref{field-name} @var{instance}@stxlit{)}
-@end display
-
-For details @pxref{Field operations}.
-
 @subsubsection Getting array length
 
 @display
+@stxref{expression}@stxlit{:length}
 @stxlit{(}@stxref{expression}@stxlit{:.length)}
 @end display
 
@@ -16679,6 +16680,11 @@ The first @code{import} form imports various useful definitions
 from the Kawa Android library.  Using these is not required for
 writing a Kawa application, but makes it more convenient.
 
+The names @code{LinearLayout}, @code{TextView}, and @code{Button}
+are just aliases for standard Android @code{View} sub-classes.
+A few are prefined by @code{(require 'android-defs)}, or you
+can define them yourself using @code{define-alias}.
+
 An Android application consists of one or more @dfn{activities},
 each of which is an instance of the @code{android.app.Activity} class.
 You can use the @code{activity} macro to define your @code{Activity} class.
@@ -16693,10 +16699,16 @@ The body of the @code{on-create-view} is evaluated.
 The result should be a @code{View} expression,
 which is passed to @code{setContentView}.
 
-The names @code{LinearLayout}, @code{TextView}, and @code{Button}
-are just aliases for standard Android @code{View} sub-classes.
-A few are prefined by @code{(require 'android-defs)}, or you
-can define them yourself using @code{define-alias}.
+@deffn Procedure current-activity [new-value]
+With no arguments, returns the current @code{Activity}.
+If a @var{new-value} argument is given, sets the current activity.
+It is set automatically by the @code{on-create} and @code{on-create-view}
+methods of the @code{activity} macro.
+
+Since @code{current-activity} is a @ref{Parameter objects,parameter object},
+you can
+locally change the value using @ref{parameterize-syntax,@code{parameterize}}.
+@end deffn
 
 @subsection View object allocation
 

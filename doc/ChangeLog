@@ -1,5 +1,7 @@
 2014-11-17  Per Bothner  <per@bothner.com>
 
+	* kawa.texi (Android view construction): Document (current-activity).
+	(Colon notation): Move around some.
 	* kawa.texi (Community): Move earlier in the file.
 
 2014-11-17  Jamison Hope  <jrh@theptrgroup>

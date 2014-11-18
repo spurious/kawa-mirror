@@ -1,3 +1,8 @@
+2014-11-17  Per Bothner  <per@bothner.com>
+
+	* r7rs-tests.scm: Downcasing capital dotted I is no longer expected
+	to fail on Java 8, following an update of the latter.
+
 2014-11-17  Jamison Hope  <jrh@theptrgroup.com>
 
 	* quaternion-test.scm: New file with test cases for quaternions.

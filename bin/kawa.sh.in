@@ -16,10 +16,8 @@ test -t 0 || no_console="--no-console"
 @ENABLE_KAWA_FRONTEND_TRUE@  export LD_LIBRARY_PATH
 @ENABLE_KAWA_FRONTEND_TRUE@  exec $thisdir/kawa "$@"
 
-if test -f $thisdir/../kawa-@VERSION@.jar
-then KAWALIB=${KAWALIB-"`@CYGPATH_W@ "$thisdir/../kawa-@VERSION@.jar"`"}
-else KAWALIB=${KAWALIB-@datadir@/java/@KAWAJAR@};
-fi
+# The next line is munged during installation:
+KAWALIB=${KAWALIB-"`@CYGPATH_W@ "$thisdir/../kawa-@VERSION@.jar"`"}
 CLASSPATH="${KAWALIB}@CLASSPATH_SEPARATOR@@conf_classpath@${CLASSPATH}"
 export CLASSPATH
 

@@ -456,9 +456,6 @@
         <filter token="CYGPATH_W" value="echo"/>
         <filter token="conf_classpath" value=""/>
       </filterset>
-      <filterset begintoken="@datadir@" endtoken="java/">
-        <filter token="/" value="${dist.dir}/"/>
-      </filterset>
     </copy>
     <chmod file="bin/kawa.sh" perm="+x"/>
   </target>

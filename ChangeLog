@@ -1,5 +1,11 @@
 2014-11-19  Per Bothner  <per@bothner.com>
 
+	* bin/kawa.sh.in: Simplify so kawa.sh only works for in-place running.
+	* Makefile.am (install-binSCRIPTS): Use sed to munge KAWALIB in kawa.sh.
+	* build.xml (kawa.sh): Simplify.
+
+2014-11-19  Per Bothner  <per@bothner.com>
+
 	* build.xml (kawa.sh): Build bin/kawa.sh from bin/kawa.sh.in.
 
 2014-11-18  Per Bothner  <per@bothner.com>

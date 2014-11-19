@@ -43,6 +43,8 @@ DIST_SUBDIRS = $(FIXED_SUBDIRS) \
 
 javadir=$(datadir)/java
 
+SED = sed
+CHMOD = chmod
 JAR = jar
 FIND = @FIND@
 KAWAJAR = kawa-@VERSION@.jar
@@ -132,8 +134,8 @@ EXTRA_DIST = debian/control debian/rules debian/changelog debian/dirs \
   bin/kawa.sh.in bin/qexo.in
 
 MOSTLYCLEANFILES = tmp* *.o bin/*.o *.stamp classes.list classes-rt.list
-CLEANFILES = *.jar bin/qexo bin/kawa.sh kawa/Version.java bin/kawa.bat $(META_ScriptEngineFactory)
-DISTCLEANFILES = selected-java-source
+CLEANFILES = *.jar bin/qexo kawa/Version.java bin/kawa.bat $(META_ScriptEngineFactory)
+DISTCLEANFILES = selected-java-source bin/kawa.sh
 MAINTAINERCLEANFILES = $(srcdir)/patch-source-list
 
 HTML_HOME = $$HOME/public_html
@@ -192,7 +194,10 @@ install-binSCRIPTS: $(bin_SCRIPTS)
 	test -z "$(bindir)" || $(mkdir_p) "$(DESTDIR)$(bindir)"
 	$(INSTALL_SCRIPT) bin/qexo $(DESTDIR)$(bindir)/qexo
 if ! ENABLE_KAWA_FRONTEND
-	$(INSTALL_SCRIPT) bin/kawa.sh $(DESTDIR)$(bindir)/kawa
+	$(SED) -e '/KAWALIB=/s|KAWALIB-\(.*\)}|KAWALIB-$(KAWALIB)}|' \
+	  <bin/kawa.sh >tmp-kawa.sh
+	$(CHMOD) +x tmp-kawa.sh
+	$(INSTALL_SCRIPT) tmp-kawa.sh $(DESTDIR)$(bindir)/kawa
 endif
 
 install-data-am:  install-jar

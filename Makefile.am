@@ -129,7 +129,7 @@ EXTRA_DIST = debian/control debian/rules debian/changelog debian/dirs \
   kawa/Version.java jar-manifest Make-rules classes-to-skip-for-runtime \
   bin/configure.ac bin/configure bin/Makefile.am bin/Makefile.in \
   bin/ChangeLog bin/kawa.bat.in bin/kawa.c bin/kawapath.c bin/cgi-servlet.c \
-  bin/qexo.in
+  bin/kawa.sh.in bin/qexo.in
 
 MOSTLYCLEANFILES = tmp* *.o bin/*.o *.stamp classes.list classes-rt.list
 CLEANFILES = *.jar bin/qexo bin/kawa.sh kawa/Version.java bin/kawa.bat $(META_ScriptEngineFactory)
@@ -344,28 +344,6 @@ KAWASCRIPTS_KAWA = bin/kawa.sh
 endif
 noinst_SCRIPTS = bin/kawa.sh
 bin_SCRIPTS = bin/qexo $(KAWASCRIPTS_KAWA)
-
-bin/kawa.sh:
-	echo '#!/bin/sh' >tmp-kawa.sh
-	echo 'thisfile=`which $$0`' >>tmp-kawa.sh
-	echo 'thisdir=`dirname $$thisfile`' >>tmp-kawa.sh
-if ENABLE_KAWA_FRONTEND
-# In this case kawa.sh is only used for pre-install testing.
-# We don't need to set KAWALIB, since kawapath.c looks for it in "..".
-	echo 'LD_LIBRARY_PATH=$$LD_LIBRARY_PATH:$$thisdir' >>tmp-kawa.sh
-	echo 'export LD_LIBRARY_PATH' >>tmp-kawa.sh
-	echo 'exec $$thisdir/kawa "$$@"' >>tmp-kawa.sh
-else
-	echo 'if test -f $$thisdir/../$(KAWAJAR)' >>tmp-kawa.sh
-	echo 'then KAWALIB=$${KAWALIB-"`$(CYGPATH_W) "$$thisdir/../$(KAWAJAR)"`"}' >>tmp-kawa.sh
-	echo 'else KAWALIB=$${KAWALIB-$(KAWALIB)}; fi' >>tmp-kawa.sh
-	echo 'CLASSPATH="$${KAWALIB}$(CLASSPATH_SEPARATOR)$(conf_classpath)$${CLASSPATH-$(CLASSPATH)}"' >>tmp-kawa.sh
-	echo 'export CLASSPATH' >>tmp-kawa.sh
-	if JAVA=`which $(JAVA)`; then true; else JAVA=$(JAVA); fi; \
-	  echo 'exec $${JAVA-"'$${JAVA}'"} kawa.repl "$$@"' >>tmp-kawa.sh
-endif
-	chmod +x tmp-kawa.sh
-	mv tmp-kawa.sh bin/kawa.sh
 
 bin/kawa.bat: $(srcdir)/bin/kawa.bat.in
 	sed -e 's|%DEFAULT_KAWA_VERSION%|$(VERSION)|' \

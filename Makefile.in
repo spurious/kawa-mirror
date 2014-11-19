@@ -90,8 +90,8 @@ subdir = .
 DIST_COMMON = INSTALL NEWS README AUTHORS ChangeLog \
 	$(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(top_srcdir)/configure $(am__configure_deps) mkinstalldirs \
-	$(top_srcdir)/bin/qexo.in COPYING TODO config.guess config.sub \
-	depcomp install-sh missing
+	$(top_srcdir)/bin/kawa.sh.in $(top_srcdir)/bin/qexo.in COPYING \
+	TODO config.guess config.sub depcomp install-sh missing
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
@@ -99,7 +99,7 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno config.status.lineno
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
-CONFIG_CLEAN_FILES = bin/qexo
+CONFIG_CLEAN_FILES = bin/kawa.sh bin/qexo
 CONFIG_CLEAN_VPATH_FILES =
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
@@ -364,7 +364,7 @@ EXTRA_DIST = debian/control debian/rules debian/changelog debian/dirs \
   kawa/Version.java jar-manifest Make-rules classes-to-skip-for-runtime \
   bin/configure.ac bin/configure bin/Makefile.am bin/Makefile.in \
   bin/ChangeLog bin/kawa.bat.in bin/kawa.c bin/kawapath.c bin/cgi-servlet.c \
-  bin/qexo.in
+  bin/kawa.sh.in bin/qexo.in
 
 MOSTLYCLEANFILES = tmp* *.o bin/*.o *.stamp classes.list classes-rt.list
 CLEANFILES = *.jar bin/qexo bin/kawa.sh kawa/Version.java bin/kawa.bat $(META_ScriptEngineFactory)
@@ -435,6 +435,8 @@ $(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
 $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
 	$(am__cd) $(srcdir) && $(ACLOCAL) $(ACLOCAL_AMFLAGS)
 $(am__aclocal_m4_deps):
+bin/kawa.sh: $(top_builddir)/config.status $(top_srcdir)/bin/kawa.sh.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
 bin/qexo: $(top_builddir)/config.status $(top_srcdir)/bin/qexo.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 
@@ -1095,25 +1097,6 @@ set-selected-java-source:
 	   test "$(JAVA_SOURCE)" != "`cat selected-java-source`"; \
 	   then echo "$(JAVA_SOURCE)" >selected-java-source; \
 	fi
-
-bin/kawa.sh:
-	echo '#!/bin/sh' >tmp-kawa.sh
-	echo 'thisfile=`which $$0`' >>tmp-kawa.sh
-	echo 'thisdir=`dirname $$thisfile`' >>tmp-kawa.sh
-# In this case kawa.sh is only used for pre-install testing.
-# We don't need to set KAWALIB, since kawapath.c looks for it in "..".
-@ENABLE_KAWA_FRONTEND_TRUE@	echo 'LD_LIBRARY_PATH=$$LD_LIBRARY_PATH:$$thisdir' >>tmp-kawa.sh
-@ENABLE_KAWA_FRONTEND_TRUE@	echo 'export LD_LIBRARY_PATH' >>tmp-kawa.sh
-@ENABLE_KAWA_FRONTEND_TRUE@	echo 'exec $$thisdir/kawa "$$@"' >>tmp-kawa.sh
-@ENABLE_KAWA_FRONTEND_FALSE@	echo 'if test -f $$thisdir/../$(KAWAJAR)' >>tmp-kawa.sh
-@ENABLE_KAWA_FRONTEND_FALSE@	echo 'then KAWALIB=$${KAWALIB-"`$(CYGPATH_W) "$$thisdir/../$(KAWAJAR)"`"}' >>tmp-kawa.sh
-@ENABLE_KAWA_FRONTEND_FALSE@	echo 'else KAWALIB=$${KAWALIB-$(KAWALIB)}; fi' >>tmp-kawa.sh
-@ENABLE_KAWA_FRONTEND_FALSE@	echo 'CLASSPATH="$${KAWALIB}$(CLASSPATH_SEPARATOR)$(conf_classpath)$${CLASSPATH-$(CLASSPATH)}"' >>tmp-kawa.sh
-@ENABLE_KAWA_FRONTEND_FALSE@	echo 'export CLASSPATH' >>tmp-kawa.sh
-@ENABLE_KAWA_FRONTEND_FALSE@	if JAVA=`which $(JAVA)`; then true; else JAVA=$(JAVA); fi; \
-@ENABLE_KAWA_FRONTEND_FALSE@	  echo 'exec $${JAVA-"'$${JAVA}'"} kawa.repl "$$@"' >>tmp-kawa.sh
-	chmod +x tmp-kawa.sh
-	mv tmp-kawa.sh bin/kawa.sh
 
 bin/kawa.bat: $(srcdir)/bin/kawa.bat.in
 	sed -e 's|%DEFAULT_KAWA_VERSION%|$(VERSION)|' \

@@ -1,3 +1,7 @@
+2014-11-18  Per Bothner  <per@bothner.com>
+
+	* kawa.sh.in: New file - template for kawa.sh.
+
 2014-10-14  Per Bothner  <per@bothner.com>
 
 	* configure.in (AC_INIT): Set version to 1.90.

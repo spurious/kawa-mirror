@@ -1,0 +1,18 @@
+#!/bin/sh
+thisfile=`which $0`
+thisdir=`dirname $thisfile`
+
+# If configured with --enable-kawa-frontend then kawa.sh is
+# only used for pre-install testing.  In that case
+# we don't need to set KAWALIB, since kawapath.c looks for it in "..".
+@ENABLE_KAWA_FRONTEND_TRUE@  LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$thisdir
+@ENABLE_KAWA_FRONTEND_TRUE@  export LD_LIBRARY_PATH
+@ENABLE_KAWA_FRONTEND_TRUE@  exec $thisdir/kawa "$@"
+
+if test -f $thisdir/../kawa-@VERSION@.jar
+then KAWALIB=${KAWALIB-"`@CYGPATH_W@ "$thisdir/../kawa-@VERSION@.jar"`"}
+else KAWALIB=${KAWALIB-@datadir@/java/@KAWAJAR@};
+fi
+CLASSPATH="${KAWALIB}@CLASSPATH_SEPARATOR@@conf_classpath@${CLASSPATH}"
+export CLASSPATH
+exec ${JAVA-"@JAVA@"} kawa.repl "$@"

@@ -56,7 +56,7 @@
   -->
   <property name="preprocess.overwrite" value="false"/>
 
-  <target name="all" depends="select-java-auto, classes, jar, kawa.bat"/>
+  <target name="all" depends="select-java-auto, classes, jar, kawa.sh, kawa.bat"/>
 
   <target name="default" depends="all"/>
 
@@ -179,6 +179,10 @@
     </condition>
 
     <condition property="isWindows">
+      <os family="windows" />
+    </condition>
+
+    <condition property="classpath.separator" value=";" else=":">
       <os family="windows" />
     </condition>
   
@@ -440,6 +444,23 @@
       </filterset>
     </xcopy>
 
+  </target>
+
+  <target name="kawa.sh">
+    <copy file="${src.dir}/bin/kawa.sh.in" tofile="bin/kawa.sh">
+      <filterset>
+        <filter token="ENABLE_KAWA_FRONTEND_TRUE" value="#"/>
+        <filter token="VERSION" value="${version}"/>
+        <filter token="CLASSPATH_SEPARATOR" value="${classpath.separator}"/>
+        <filter token="KAWAJAR" value="kawa-${version}.jar"/>
+        <filter token="CYGPATH_W" value="echo"/>
+        <filter token="conf_classpath" value=""/>
+      </filterset>
+      <filterset begintoken="@datadir@" endtoken="java/">
+        <filter token="/" value="${dist.dir}/"/>
+      </filterset>
+    </copy>
+    <chmod file="bin/kawa.sh" perm="+x"/>
   </target>
   
   <patternset id="with-sax2-false">

@@ -633,7 +633,7 @@ SCRIPTS_TO_RUN = case-warnings.scm uninit1.scm \
 # Files needed for SCRIPTS_TO_RUN
 AUX_FOR_SCRIPTS_TO_RUN = aux-libs.scm
 EXTRA_DIST = testing.scm test-utils.scm \
-  test.scm case-test.scm num-test.scm numeric-tests.scm quaternion-tests.scm \
+  test.scm case-test.scm num-test.scm numeric-tests.scm quaternion-test.scm \
   mac-test.scm mac1.scm r7rs-tests.scm \
   classes1.scm classes2.scm SimpleB.java obj-test.scm arr-test.scm \
   lib-test.scm srfi-38-test.scm srfi-64-test.scm srfi-69-test.scm \

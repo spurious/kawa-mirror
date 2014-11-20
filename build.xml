@@ -454,6 +454,7 @@
         <filter token="CLASSPATH_SEPARATOR" value="${classpath.separator}"/>
         <filter token="KAWAJAR" value="kawa-${version}.jar"/>
         <filter token="CYGPATH_W" value="echo"/>
+        <filter token="SHELL" value="/bin/sh"/>
         <filter token="conf_classpath" value=""/>
       </filterset>
     </copy>

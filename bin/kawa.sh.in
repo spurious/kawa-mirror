@@ -1,4 +1,4 @@
-#!/bin/sh
+#!@SHELL@
 thisfile=`which $0`
 thisdir=`dirname $thisfile`
 if [ "$#" -eq 0 ]

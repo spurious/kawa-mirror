@@ -1,5 +1,8 @@
 2014-11-19  Per Bothner  <per@bothner.com>
 
+	* bin/kawa.sh.in: Use SHELL autoconf variable.
+	* build.xml (kawa.sh): Substitute SHELL.
+
 	* bin/kawa.sh.in: Simplify so kawa.sh only works for in-place running.
 	* Makefile.am (install-binSCRIPTS): Use sed to munge KAWALIB in kawa.sh.
 	* build.xml (kawa.sh): Simplify.

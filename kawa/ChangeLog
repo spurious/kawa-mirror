@@ -1,3 +1,8 @@
+2014-11-19  Per Bothner  <per@bothner.com>
+
+	* standard/ImportFromLibrary.java (scanImportSet): If asking for a
+	SRFI, we normally don't want to match a source file.
+
 2014-11-17  Jamison Hope  <jrh@theptrgroup.com>
 
 	* standard/expt.java (expt): Coerce arguments to Numeric and

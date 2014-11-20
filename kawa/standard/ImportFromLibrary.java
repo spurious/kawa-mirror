@@ -238,10 +238,11 @@ public class ImportFromLibrary extends Syntax
             if (! langExtensions.isEmpty())
                 currentExtension = langExtensions.get(0);
         }
-        String lname = cbuf.toString();
-        lname = checkSrfi(lname, tr);
+        String lname0 = cbuf.toString();
+        String lname = checkSrfi(lname0, tr);
         if (lname == BUILTIN)
             return; // nothing to do
+        boolean foundSrfi = lname != lname0;
 
         boolean hasDot;
         boolean isAbsolute;
@@ -326,6 +327,8 @@ public class ImportFromLibrary extends Syntax
                 } else { // No "<...>..." selector
                     star = pathElement.indexOf('*');
                     selectorEnd = 0;
+                    if (foundSrfi && explicitSource == null)
+                        continue;
                 }
 
                 if (star >= 0) {
@@ -354,6 +357,8 @@ public class ImportFromLibrary extends Syntax
             if (lastModifiedTime != 0) {
                 minfo = mmanager.findWithSourcePath(path, pathStr);
                 // Should save lastModifiedTime in minfo FIXME
+                if (foundSrfi)
+                    lname = lname0;
                 break;
             }
         }

@@ -1,3 +1,8 @@
+2014-11-20  Per Bothner  <per@bothner.com>
+
+	* standard/location.java (rewriteApply): If creating a
+	StaticFieldLocation, make sure to mangle the field name if needed.
+
 2014-11-19  Per Bothner  <per@bothner.com>
 
 	* standard/ImportFromLibrary.java (checkSrfi): Fix checking

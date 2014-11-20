@@ -96,7 +96,7 @@ public class location extends Syntax
             if (member.getStaticFlag()) {
                 if (member instanceof Field) {
                     StaticFieldLocation sloc =
-                        new StaticFieldLocation(ctype, name);
+                        new StaticFieldLocation(ctype, Compilation.mangleNameIfNeeded(name));
                     ReferenceExp rexp = new ReferenceExp(sloc.getDeclaration());
                     rexp.setDontDereference(true);
                     return rexp;

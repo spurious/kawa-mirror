@@ -1,5 +1,12 @@
 2014-11-19  Per Bothner  <per@bothner.com>
 
+	* bin/kawa.sh.in: Use KAWA_SHELL instead of SHELL variable.
+	* configure.ac: Determine and export KAWA_SHELL.
+	* build.xml (kawa.shell): New property.
+	(kawa.sh): Substitute KAWA_SHELL based on kawa.shell property.
+
+2014-11-19  Per Bothner  <per@bothner.com>
+
 	* bin/kawa.sh.in: Use SHELL autoconf variable.
 	* build.xml (kawa.sh): Substitute SHELL.
 

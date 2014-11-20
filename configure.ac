@@ -235,7 +235,14 @@ AC_SUBST(PACKAGE)
 AC_SUBST(VERSION)
 AC_SUBST(JEMACS_VERSION)
 AC_SUBST(BYTECODE_VERSION)
-AC_SUBST(SHELL)
+
+if test -z "$KAWA_SHELL"; then
+  if test -f /bin/bash; then KAWA_SHELL=/bin/bash
+  elif test -f /bin/ksh; then KAWA_SHELL=/bin/ksh
+  else KAWA_SHELL=${CONFIG_SHELL-/bin/sh}
+  fi
+fi
+AC_SUBST(KAWA_SHELL)
 
 Make_rules="$srcdir/Make-rules"
 AC_SUBST_FILE(Make_rules)

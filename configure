@@ -586,6 +586,7 @@ enable_option_checking=no
 ac_subst_vars='LTLIBOBJS
 LIBOBJS
 subdirs
+KAWA_SHELL
 BYTECODE_VERSION
 JEMACS_VERSION
 TOP_BUILDDIR
@@ -2980,6 +2981,13 @@ XQTS_PATH=${with_XQTS:-XQTS}
 
 
 
+
+if test -z "$KAWA_SHELL"; then
+  if test -f /bin/bash; then KAWA_SHELL=/bin/bash
+  elif test -f /bin/ksh; then KAWA_SHELL=/bin/ksh
+  else KAWA_SHELL=${CONFIG_SHELL-/bin/sh}
+  fi
+fi
 
 
 Make_rules="$srcdir/Make-rules"

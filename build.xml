@@ -49,6 +49,10 @@
   
   <property name="dist.kawa.jar"    value="${dist.dir}/kawa-${version}.jar"/>
 
+  <condition property="kawa.shell" value="/bin/bash" else="/bin/sh">
+    <available file="/bin/bash"/>
+  </condition>
+
   <!-- 
      Set preprocess.overwrite true to force preprocessing.
      Eventually this will be dependency checked.
@@ -454,7 +458,7 @@
         <filter token="CLASSPATH_SEPARATOR" value="${classpath.separator}"/>
         <filter token="KAWAJAR" value="kawa-${version}.jar"/>
         <filter token="CYGPATH_W" value="echo"/>
-        <filter token="SHELL" value="/bin/sh"/>
+        <filter token="KAWA_SHELL" value="${kawa.shell}"/>
         <filter token="conf_classpath" value=""/>
       </filterset>
     </copy>

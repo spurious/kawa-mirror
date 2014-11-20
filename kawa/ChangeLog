@@ -1,5 +1,8 @@
 2014-11-19  Per Bothner  <per@bothner.com>
 
+	* standard/ImportFromLibrary.java (checkSrfi): Fix checking
+	of optional name component.
+
 	* standard/ImportFromLibrary.java (scanImportSet): If asking for a
 	SRFI, we normally don't want to match a source file.
 

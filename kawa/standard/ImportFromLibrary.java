@@ -128,30 +128,29 @@ public class ImportFromLibrary extends Syntax
             int srfiIndex = SRFI97Map.length;
             for (;;) {
                 if (--srfiIndex < 0) {
-                    return lname;
+                    break;
                 }
                 if (!SRFI97Map[srfiIndex][0].equals(srfiNumber))
                     continue;
                 String srfiNameExpected = SRFI97Map[srfiIndex][1];
                 String srfiClass = SRFI97Map[srfiIndex][2];
-                if (srfiName != null && ! srfiName.equals(srfiNameExpected)) {
-                    if (badNameBuffer == null) {
-                        badNameBuffer = new StringBuilder("the name of SRFI ");
-                        badNameBuffer.append(srfiNumber);
-                        badNameBuffer.append(" should be '");
-                    }
-                    else
-                        badNameBuffer.append(" or '");
-                    badNameBuffer.append(srfiNameExpected);
-                    badNameBuffer.append('\'');
-                    continue;
-                }
 
-                if (srfiClass == BUILTIN)
-                    return BUILTIN; // Nothing to do.
-                else if (srfiClass != MISSING)
-                    lname = srfiClass;
-                break;
+                if (srfiName == null || srfiName.equals(srfiNameExpected))
+                    return srfiClass != MISSING ? srfiClass : lname;
+
+                if (badNameBuffer == null) {
+                    badNameBuffer = new StringBuilder("the name of SRFI ");
+                    badNameBuffer.append(srfiNumber);
+                    badNameBuffer.append(" should be '");
+                }
+                else
+                    badNameBuffer.append(" or '");
+                badNameBuffer.append(srfiNameExpected);
+                badNameBuffer.append('\'');
+            }
+            if (badNameBuffer != null) {
+                tr.error('e', badNameBuffer.toString());
+                return BUILTIN;
             }
         }
         return lname;

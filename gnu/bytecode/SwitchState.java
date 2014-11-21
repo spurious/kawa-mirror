@@ -259,6 +259,7 @@ public class SwitchState {
         }
         code.fixupChain(end_label, cases_label);
         code.setUnreachable();
-        after_label.define(code);
+        if (after_label.localTypes != null)
+            after_label.define(code);
     }
 }

@@ -1,3 +1,7 @@
+2014-11-20  Per Bothner  <per@bothner.com>
+
+	* Language.java (languages): Add ".sld" extension for Scheme.
+
 2014-11-17  Per Bothner  <per@bothner.com>
 
 	* ModuleInfo.java (getModuleExpRaw): New method.

@@ -68,7 +68,7 @@ public abstract class Language
 
   static String[][] languages =
   {
-    { "scheme", ".scm", ".sc", "kawa.standard.Scheme" },
+    { "scheme", ".scm", ".sc", ".sld", "kawa.standard.Scheme" },
     { "r5rs", ".scm", "kawa.standard.Scheme" },
     { "r6rs", ".scm", "kawa.standard.Scheme" },
     { "r7rs", ".scm", "kawa.standard.Scheme" },

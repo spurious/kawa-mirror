@@ -1,3 +1,7 @@
+2014-11-22  Per Bothner  <per@bothner.com>
+
+	* system-test.scm: Add test using shell and quotes.
+
 2014-11-18  Per Bothner  <per@bothner.com>
 
 	* system-test.scm: Use kawa.sh, in case we were built without

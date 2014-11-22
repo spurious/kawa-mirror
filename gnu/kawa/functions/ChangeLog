@@ -1,3 +1,8 @@
+2014-11-22  Per Bothner  <per@bothner.com>
+
+	* RunProcess.java (tokenize): Avoid emitting an extra '\'' in one place.
+	Also cleanup structure.
+
 2014-10-26  Per Bothner  <per@bothner.com>
 
 	* UnicodeUtils.java (foldCase): Greek sigma should fold to regular

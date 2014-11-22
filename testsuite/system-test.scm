@@ -32,8 +32,11 @@
   (test-str-equal "|x|yzabc|x|yz|def x yzghi|\n"
                   &sh{&[split-with-kawa] &[v1]abc &[v1] "def&[v1]ghi"}))
 
-(let ((v2 ["a b" "c\"d"]))
-  (test-str-equal "|cmd|a b|c\"d|\n" &`{&[split-with-kawa] cmd &[v2]}))
+(let ((v2 ["a'b" "c\"d"]))
+  (test-str-equal "|cmd|a'b|c\"d|\n" &`{&[split-with-kawa] cmd &[v2]}))
+
+(let ((v2 ["a'b" "c\"d"]))
+  (test-str-equal "|cmd|a'b|c\"d|\n" &sh{&[split-with-kawa] cmd &[v2]}))
 
 (let ((v2 ["a b" "c\"d"]))
   (test-str-equal "|cmd|a b c\"d|\n" &`{&[split-with-kawa] cmd  "&[v2]"}))

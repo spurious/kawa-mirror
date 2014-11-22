@@ -461,42 +461,43 @@ public class RunProcess extends MethodProc {
                     }
                 }
             }
-            if (useShell && inSubstitution > 0) {
-                // May need to quote special characters
-                if (state == '"') {
-                    if (ch == '$' || ch == '\\')
-                        sbuf.append('\\');
-                } else if (ch == '\'') {
-                    if (state == -1)
-                        sbuf.append("\\'");
-                    else
-                        sbuf.append("'\\''");
-                } else if (state <= 1 && inGroup == 0
-                         && (ch == ' ' || ch == '\t'
-                             || ch == '\n' || ch == '\r')) {
-                    if (state == 1)
+            if (useShell) {
+                if (inSubstitution > 0) {
+                    // May need to quote special characters
+                    if (state == '"') {
+                        if (ch == '$' || ch == '\\')
+                            sbuf.append('\\');
+                    } else if (ch == '\'') {
+                        if (state == -1)
+                            sbuf.append("\\'");
+                        else // state is ' or state is 1
+                            sbuf.append("'\\'"); // Another '"' added below
+                    } else if (state <= 1 && inGroup == 0
+                               && (ch == ' ' || ch == '\t'
+                                   || ch == '\n' || ch == '\r')) {
+                        if (state == 1)
+                            sbuf.append('\'');
+                        state = -1;
+                    } else if (state == -1) {
                         sbuf.append('\'');
-                    state = -1;
-                    sbuf.append(ch);
-                } else if (state == -1) {
-                    sbuf.append('\'');
-                    state = 1;
+                        state = 1;
+                    }
+                }
+                else {
+                    if (ch == '\\' && state != '\'' && i+1 < len) {
+                        sbuf.append(ch);
+                        i++;
+                        ch = str.charAt(i);
+                    } else if (state < 0) {
+                        if (ch == '\"' || ch == '\'')
+                            state = ch;
+                    }
+                    else if (ch == state) {
+                        state = -1;
+                    }
                 }
             }
-            if (useShell && inSubstitution == 0) {
-                if (ch == '\\' && state != '\'' && i+1 < len) {
-                    sbuf.append(ch);
-                    i++;
-                    ch = str.charAt(i);
-                } else if (state < 0) {
-                    if (ch == '\"' || ch == '\'')
-                        state = ch;
-                }
-                else if (ch == state) {
-                    state = -1;
-                }
-            }
-            if (! useShell) {
+            else { // !useShell
                 if (state <= 0 && inGroup == 0
                     && (ch == ' ' || ch == '\t'
                         || ch == '\n' || ch == '\r')) {

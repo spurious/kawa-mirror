@@ -525,7 +525,7 @@ public class ImportFromLibrary extends Syntax
         dotSearchPath = lst;
     }
 
-    static ThreadLocal<List<CharSequence>> searchPath
+    public static final ThreadLocal<List<CharSequence>> searchPath
         = new InheritableThreadLocal<List<CharSequence>>();
     public static List<CharSequence> getImportSearchPath() {
         List<CharSequence> path = searchPath.get();

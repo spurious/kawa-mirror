@@ -1,3 +1,11 @@
+2014-11-22  Per Bothner  <per@bothner.com>
+
+	* kawa.texi: Comment out or update mentions of GCJ.
+
+2014-11-22  Alex Mitchell <lexaay@gmail.com>
+
+	* kawa.texi (Projects): Mention HypeDyn.
+
 2014-11-17  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Android view construction): Document (current-activity).

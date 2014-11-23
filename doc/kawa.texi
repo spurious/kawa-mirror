@@ -660,6 +660,15 @@ Per is also available for development projects.
 Google's @uref{http://appinventor.googlelabs.com/,App Inventor for Android}
 uses Kawa to translate its visual blocks language.
 
+The @uref{http://www.narrativeandplay.org/hypedyn/,HypeDyn} hypertext
+fiction authoring tool is written in Kawa. HypeDyn (pronounced "hyped
+in") is a procedural hypertext fiction authoring tool for people who
+want to create text-based interactive stories that adapt to reader
+choice. HypeDyn is free to download and open source, and runs on
+Linux, MacOS and Windows. This is a research project carried out at
+the Department of Communications and New Media, National University of
+Singapore.
+
 @uref{http://www.mercedsystems.com/, Merced Systems@comma{} Inc.} uses Kawa
 extensively in their contact center performance management product
 Merced Peformance Suite.  Kawa Scheme is used for all development
@@ -1104,11 +1113,11 @@ The program @code{java} is the Java interpreter.
 The program @code{javac} is the Java compiler,
 and is needed if you want to compile the source release yourself.
 Both programs must be in your @code{PATH}.
-If you have the JDK in directory @code{$JDK},
+If you have the JDK in directory @code{$JAVA_HOME},
 and you are using a Bourne-shell compatible shell
 (/bin/sh, ksh, bash, and some others) you can set @code{PATH} thus:
 @example
-PATH=$JDK/bin:$PATH
+PATH=$JAVA_HOME/bin:$PATH
 export PATH
 @end example
 
@@ -1365,7 +1374,11 @@ targets as appropriate.  Alternatively you can add @code{ant.jar} to the
 directory in Kawa's source directory (the one containing the @code{build.xml}
 file).
 
+@ignore
 @subsection Compiling Kawa to native code with GCJ
+
+@emph{Using GCJ is no longer supported.  This section is for historial
+reference, or if someone enhances GCJ enough to support Kawa.}
 
 The GNU Compiler for the Java(tm) Programming Language
 (@uref{http://gcc.gnu.org/java/,GCJ}) is part of the
@@ -1405,6 +1418,7 @@ make install
 Alternatively, you can use configure option
 @code{--with-gcj-dbtool}.  This allows gcj to automatically
 find the kawa shared libraries from the @code{.jar} file.
+@end ignore
 
 @subsection Building Kawa under MS-Windows
 
@@ -1463,7 +1477,7 @@ result (if there is a non-"void" result).
 * Scripts::      Running Command Scripts
 * New-Window::   Running a Command Interpreter in a new Window
 * Exiting::      Exiting Kawa
-* Compiling::    Compiling to byte-code or an executable
+* Compiling::    Compiling to byte-code
 @end menu
 
 @node Options, Scripts, Running, Running
@@ -2039,10 +2053,12 @@ running a @code{jar} file:
 exec java -cp /path/to/kawa -Dkawa.command.name="$0" foo.jar "$@@"
 @end example
 
+@ignore
 (It is in principle possible to compile a Kawa application to
 ``a native executable'', for example using @code{gcj}.
 However, this is no longer supported, as gcj is no longer
 being actively developed.)
+@end ignore
 
 @node New-Window, Exiting, Scripts, Running
 @section Running a Command Interpreter in a new Window
@@ -2076,7 +2092,7 @@ To exit the entire Kawa session, call the
 @code{exit} procedure (with 0 or 1 integer arguments).
 
 @node Compiling, , , Running
-@section Compiling to byte-code or an executable
+@section Compiling to byte-code
 
 All Scheme functions and source files are invisibly compiled
 into internal Java byte-codes.
@@ -2108,8 +2124,6 @@ The Java "verifier" does not need to get run, which makes
 loading a little faster.
 The compiled class files do have to be installed somewhere
 in the @code{CLASSPATH}.
-
-You can also compile your Scheme program to native code using GCJ.
 
 @menu
 * Files compilation::           Compiling to a set of .class files
@@ -2361,9 +2375,11 @@ Consider some alternative to applets, such as
 @node Compiling to executable, , Applet compilation, Compiling
 @subsection Compiling to a native executable
 
-@emph{Using GCJ with Kawa is no longer supported,
-as GCJ is no longer being actively maintained.}
+In the past it was possible to compile a Scheme program to native code using GCJ.
+However, using GCJ with Kawa is no longer supported,
+as GCJ is no longer being actively maintained.
 
+@ignore
 You can compile your Scheme program to native code using GCJ,
 as long as you have built Kawa using GCJ.
 
@@ -2387,6 +2403,7 @@ the resulting executable program.  The @code{-lkawa} option tells
 the linker it should link with the kawa shared library, and
 the @code{-L$PREFIX/bin} option tells the linker where it can
 find that library.
+@end ignore
 
 @node Syntax
 @chapter Syntax

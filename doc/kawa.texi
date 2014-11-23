@@ -133,14 +133,21 @@ END-INFO-DIR-ENTRY
 @c and includes a full implementation of XQuery and the beginnings of
 @c implementations of Common Lisp and Emacs Lisp (JEmacs).
 
-Kawa is a programming language for the Java platform.
-It is an implementation of @uref{http://www.schemers.org/,Scheme}, which,
-is in the Lisp family of programming languages.
-Kawa has many @ref{Features,useful features},
-including convenient integration with Java.
-It can be used as a ``scripting language'', but includes a compiler
-and all the benefits of a ``real'' programming language, including
-optional static typing, so Kawa programs can be as efficient as Java.
+Kawa is a general-purpose programming language that runs on the Java platform.
+It aims to combine:
+@itemize
+@item
+the benefits of dynamic scripting languages
+(non-verbose code with less boiler-plate, fast and easy start-up,
+a @uref{http://en.wikipedia.org/wiki/Read-eval-print_loop,REPL},
+no required compilation step); with
+@item
+the benefits of traditional compiled languages (fast execution, static error detection,
+modularity, zero-overhead Java platform integration).
+@end itemize
+It is an extension of the long-established @uref{http://www.schemers.org/,Scheme}
+language, which is in the Lisp family of programming languages.
+Kawa has many @ref{Features,useful features}.
 
 Kawa is also a useful @ref{Framework,framework} for implementing
 other programming languages on the Java platform.
@@ -196,62 +203,70 @@ This package has nothing to do with the defunct Kawa commercial Java IDE.
 @node Features
 @chapter Features
 
-Kawa is a mostly-compatible implementatation of 
-the Scheme programming language,
-which has history going back to 1975, is standardized,
-has been the base for much programming language research,
-and has dozens of implementations.
+Runs on the Java platform, with no native code needed.
 
-Kawa runs on top of the Java platform.  The implementation
-is written in Java and Kawa itself, without native code.
-Scheme programs have full and convenient
-access to the huge set of Java libraries.
+Extends the @uref{http://en.wikipedia.org/wiki/Scheme_%28programming_language%29,Scheme language}, following the @uref{http://r7rs.org/,R7RS} specification from 2013.
+Scheme has many implementations, and is much used in research and teaching.
 
-Kawa programs @uref{http://per.bothner.com/blog/2010/Kawa-in-shootout/, are fast}.
-A sophisticated compiler, type inference, and optional type declarations
-means you can write programs that run roughly as fast as Java programs,
+Programs @uref{http://per.bothner.com/blog/2010/Kawa-in-shootout/, run fast}
+- roughly as fast as Java programs,
 and much faster than other ``scripting languages''.
+This is due to a sophisticated compiler,
+compile-time transformations, type inference, and optional type declarations.
 
-Kawa uses Unicode internally, and uses the Java facilities to convert
-files using other character encodings.
+Full convenient and efficient access to the huge set of Java libraries
+means you can access objects, methods, fields, and classes without run-time overhead.
+
+Start-up times are fast.  You don't have to wait for a lot of
+initialization.  Even if you start with source code, the parser
+and compiler are fast.
+
+@ref{Scripts} are simple Kawa source files
+that can run as an application or command.  These are simple to write,
+start start, and run efficiently, since they're automatically
+compiled before execution.
+
+Alternatively, you can embed Kawa as a @ref{Evaluating Scheme expressions from Java,
+scripting language for Java applications}
+
+Deployment is easy and flexible.  You just need the Kawa jar file.
+
+@ref{Macros} and @ref{Named quasi-literals,custom named literals} make it easy
+to extend the syntax, and implement Domain-Specific Languages.
 
 Kawa provides the usual read-eval-print loop, as well as batch modes.
-
-Kawa provides a framework for implementing other programming languages,
-and comes with incomplete support for CommonLisp, Emacs Lisp, and
-EcmaScript, and the
-draft @uref{http://www.gnu.org/software/qexo/,XML Query language}.
 
 Kawa has builtin pretty-printer support, and fancy formatting.
 
 Kawa supports class-definition facilities, and separately-compiled modules.
 
-Kawa can be @ref{Evaluating Scheme expressions from Java,
-embedded as a scripting language in Java programs}.
+You can @ref{Allocating objects,allocate and initialize objects}
+with a compact ``builder'' syntax.  It works out-of-the-box
+(with no run-time overhead) on many classes and APIs,
+but can be customized if need be.
 
-Kawa has convenient syntax for
-@ref{Allocating objects,allocating and initializing objects}.
-
-Kawa has some special handling to ease
-@ref{Building JavaFX applications,JavaFX programming}.
+@ref{Building JavaFX applications,JavaFX programming} is simpler.
 
 You can @ref{Building for Android,run Kawa programs on Android},
-and there is special handing to make @ref{Android view construction,constructuing View objects} easier.
+and there is special handing to make @ref{Android view construction,constructing View objects} easier.
 
-Kawa makes it easy to write
-@ref{Server-side scripts,web page scripts} running
-running on @ref{Self-configuring page scripts,self-configuring web servers}
-and optionally using @ref{XML literals}.
+A flexible mechanism supports new @ref{Named quasi-literals, user-defined literal types}.
+
+@ref{Server-side scripts,Web page scripts} are easy to write and install
+with @ref{Self-configuring page scripts,self-configuring web servers}
+and optionally using @ref{Servlets,servlets} and @ref{XML literals}.
 
 Kawa implements the full numeric tower, including infinite-precision
 rational numbers and complex numbers.  It also supports @ref{Quantities}
 with units, such as @code{3cm}.
 
-Kawa supports @ref{Lazy evaluation}, with convenient implicit forcing.
+A @ref{Lazy evaluation,lazy value} wraps an expression which is evaluated
+only when it is needed.
 
-You can optionally declare the types of variables.
-
-You can conveniently access Java objects, methods, fields, and classes.
+Kawa provides a @ref{Framework,framework} for implementing other programming languages,
+and comes with incomplete support for CommonLisp, Emacs Lisp, and
+EcmaScript, and
+@uref{http://www.gnu.org/software/qexo/,XQuery}.
 
 @menu
 * Implemented SRFIs::
@@ -280,6 +295,11 @@ using @code{cond-expand} - @pxref{Syntax and conditional compilation}.
 @item
 @uref{http://srfi.schemers.org/srfi-9/srfi-9.html, SRFI 9}: Defining Record Types, using @code{define-record-type}
 - @pxref{Record types}.
+@item
+@uref{http://srfi.schemers.org/srfi-10/srfi-10.html, SRFI 10}: @code{#,} external form for special named types.
+This is deprecated for various reasons, including that it conflicts
+with syntax-case @code{unsyntax}.
+Better to use srfi-108 @ref{Named quasi-literals}.
 @item
 @uref{http://srfi.schemers.org/srfi-11/srfi-11.html, SRFI 11}: Syntax for receiving multiple values,
 using @code{let-values} and @code{let*-value} - @pxref{Multiple values}.
@@ -1437,6 +1457,8 @@ path separators.  (At the time of writing there were still some
 path issues with running the testsuite.)
 
 @uref{http://www.mingw.org/,MinGW} may also work but has not been tested.
+
+@part Reference Documentation
 
 @node Running
 @chapter How to start up and run Kawa

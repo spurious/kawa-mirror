@@ -1,3 +1,9 @@
+2014-11-23  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Top, Features): Various changes.
+	(Reference Document): Create a new @part to help web-site organization.
+	(Implemented SRFIs):  Note that srfo-10 is deprecated.
+
 2014-11-22  Per Bothner  <per@bothner.com>
 
 	* kawa.texi: Comment out or update mentions of GCJ.

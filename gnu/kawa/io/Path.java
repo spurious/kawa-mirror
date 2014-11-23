@@ -438,7 +438,7 @@ implements javax.tools.FileObject
      *   {@code PATH_CURRENT} or {@code PATH_RELATIVE}.
      * @param filename the name of the file to look for
      * @param base the base path for a PATH_RELATIVE path
-     * @return ither null (if no match as found), or a 2-element array
+     * @return either null (if no match as found), or a 2-element array
      *   {@code { inputStream, matchingPath }}.
      */
     public static Object[] search(Object[] searchPath, String filename,
@@ -461,7 +461,6 @@ implements javax.tools.FileObject
                 InputStream istrm = path.resolve(filename).openInputStream();
                 return new Object[] { istrm, path };
             } catch (Exception ex) {
-                break;
             }
         }
         return null;

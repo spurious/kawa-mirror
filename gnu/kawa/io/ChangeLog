@@ -1,3 +1,7 @@
+2014-11-23  Per Bothner  <per@bothner.com>
+
+	* Path.java (search): Fix logic error.
+
 2014-10-29  Per Bothner  <per@bothner.com>
 
 	* InPort.java (systemInPort): Initialize to a BinaryInPort if

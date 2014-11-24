@@ -1,5 +1,8 @@
 2014-11-23  Per Bothner  <per@bothner.com>
 
+	* DefineRecordType.scm (define-record-type): Add imports of definitions
+	used in expanded macro.
+
 	* prim_syntax.scm (%define-syntax): Define using an import.
 
 2014-11-17  Jamison Hope  <jrh@theptrgroup.com>

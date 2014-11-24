@@ -19,6 +19,15 @@
 (module-export define-record-type)
 
 (require <kawa.lib.prim_syntax>)
+(require <kawa.lib.std_syntax>)
+(import (only (kawa standard begin) begin))
+(import (rename (only (kawa standard define_class) define_class)
+                (define_class define-class)))
+(import (rename (only (kawa standard Scheme) instanceOf) (instanceOf instance?)))
+(import (rename (only (gnu kawa reflect SlotGet) slotRef) (slotRef slot-ref)))
+(import (rename (only (gnu kawa reflect SlotSet) set-field!) (set-field! slot-set!)))
+(import (only (gnu kawa reflect Invoke) make))
+(import (rename (only (kawa lang Quote) plainQuote) (plainQuote quote)))
 
 (define-syntax define-record-type
   (syntax-rules ()

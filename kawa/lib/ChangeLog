@@ -1,3 +1,7 @@
+2014-11-23  Per Bothner  <per@bothner.com>
+
+	* prim_syntax.scm (%define-syntax): Define using an import.
+
 2014-11-17  Jamison Hope  <jrh@theptrgroup.com>
 
 	* kawa/quaternions.scm: Implement quaternion library.

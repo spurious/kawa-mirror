@@ -6,6 +6,8 @@
  if try-catch letrec)
 
 (import (rename (only (kawa standard define) defineRaw) (defineRaw %define)))
+(import (rename (only (kawa standard define_syntax) define_syntax)
+                (define_syntax %define-syntax)))
 (import (rename (only (kawa standard let) let) (let %let)))
 (import (rename (only (kawa standard set_b) set) (set set!)))
 

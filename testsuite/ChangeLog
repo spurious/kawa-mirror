@@ -1,3 +1,11 @@
+2014-11-24  Seth Alves <alves@hungry.com>
+	    Per Bothner  <per@bothner.com>
+
+	* lib-colon1.scm: New test for named is colon in library.
+	* lib-export.scm: new test for exporting define-syntax and
+	define-record-type from a library.
+	* Makefile.am (SCRIPTS_TO_RUN): Update accordindgly.
+
 2014-11-22  Per Bothner  <per@bothner.com>
 
 	* system-test.scm: Add test using shell and quotes.

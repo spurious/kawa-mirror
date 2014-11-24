@@ -132,6 +132,24 @@ public class Translator extends Compilation
       return rewrite (car, function);
   }
 
+    /** Similar to rewrite_car.
+     * However, we check for (quasiquote exp) specially, and handle that
+     * directly.  This is in case quasiquote isn't in scope.
+     */
+    public final Expression rewrite_car_for_lookup(Pair pair) {
+        Object car = pair.getCar();
+        if (car instanceof Pair) {
+            Pair pcar = (Pair) car;
+            if (pcar.getCar() == LispLanguage.quasiquote_sym) {
+                Object pos = pushPositionOf(pair);
+                Expression ret = Quote.quasiQuote.rewrite(pcar.getCdr(), this);
+                popPositionOf(pos);
+                return ret;
+            }
+        }
+        return rewrite_car(pair, false);
+    }
+
   Syntax currentSyntax;
   public Syntax getCurrentSyntax() { return currentSyntax; }
 
@@ -665,7 +683,7 @@ public class Translator extends Compilation
             && p.getCdr() instanceof Pair
             && (p = (Pair) p.getCdr()).getCdr() instanceof Pair) {
             prefix = p.getCar();
-            part2 = rewrite(((Pair) p.getCdr()).getCar());
+            part2 = rewrite_car_for_lookup((Pair) p.getCdr());
         }
         else if (name instanceof Symbol) {
             Symbol s = (Symbol) name;
@@ -1426,7 +1444,7 @@ public class Translator extends Compilation
                 && (p = (Pair) p.getCdr()).getCdr() instanceof Pair)
               {
                 Expression part1 = rewrite(p.getCar());
-                Expression part2 = rewrite(((Pair) p.getCdr()).getCar());
+                Expression part2 = rewrite_car_for_lookup((Pair) p.getCdr());
                 Object value1 = part1.valueIfConstant();
                 Object value2 = part2.valueIfConstant();
                 if (value1 instanceof Class && value2 instanceof Symbol)

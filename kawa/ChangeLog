@@ -1,3 +1,13 @@
+2014-11-24  Per Bothner  <per@bothner.com>
+
+	Resolve colon names even if quasiquote isn't in scope.
+	* standard/export.java (scanForDefinitions): Call namespaceResolve
+	as needed.
+	* lang/Translator.java (rewrite_car_for_lookup): New method.
+	(namespaceResolve, scanForm): Use rewrite_car_for_lookup.
+	* lang/Quote.java (expand_pair): Likewise.
+	* standard/export.java (export): Fix setting name.
+
 2014-11-23  Per Bothner  <per@bothner.com>
 
 	* standard/Scheme.java (initScheme): Remove '%define-syntax'.

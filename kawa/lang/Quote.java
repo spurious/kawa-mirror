@@ -119,7 +119,7 @@ public class Quote extends Syntax {
                 && (p2 = (Pair) p1.getCdr()) instanceof Pair
                 && p2.getCdr() == LList.Empty) {
                 Expression part1 = tr.rewrite_car(p1, false);
-                Expression part2 = tr.rewrite_car(p2, false);
+                Expression part2 = tr.rewrite_car_for_lookup(p2);
                 Namespace ns = tr.namespaceResolvePrefix(part1);
                 Symbol sym = tr.namespaceResolve(ns, part2);
                 if (sym != null)

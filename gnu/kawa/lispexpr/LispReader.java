@@ -534,7 +534,7 @@ public class LispReader extends Lexer
                     rightOperand = readValues(ch, rtable.lookup(ch), rtable, -1);
                 }
                 value = LList.list2(value,
-                                    LList.list2(rtable.makeSymbol(LispLanguage.quote_str), rightOperand));
+                                    LList.list2(LispLanguage.quasiquote_sym, rightOperand));
                 value = makePair(LispLanguage.lookup_sym, value,
                                  line, column);
             }

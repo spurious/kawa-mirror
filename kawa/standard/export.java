@@ -9,7 +9,7 @@ public class export extends Syntax {
     static { module_export.setName("module-export"); }
 
     public static final export export = new export();
-    static { module_export.setName("export"); }
+    static { export.setName("export"); }
 
     @Override
     public boolean scanForDefinitions (Pair st, ScopeExp defs, Translator tr) {
@@ -48,6 +48,7 @@ public class export extends Syntax {
                             symbol = str.substring(10).intern();
                         }
                     }
+                    symbol = tr.namespaceResolve(symbol);
                     if (symbol instanceof Pair) {
                         // Match (rename name1 name2)
                         Pair psym = (Pair) symbol;
@@ -58,8 +59,8 @@ public class export extends Syntax {
                                  .getCdr()) instanceof Pair)) {
                             Pair psymcddr = (Pair) symcddr;
                             Object symcdddr = psymcddr.getCdr();
-                            Object name1 = psymcdr.getCar(); // local name
-                            Object name2 = psymcddr.getCar(); // renamed
+                            Object name1 = tr.namespaceResolve(psymcdr.getCar());
+                            Object name2 = tr.namespaceResolve(psymcddr.getCar());
                             if (symcdddr == LList.Empty
                                 && name1 instanceof Symbol
                                 && name2 instanceof Symbol) {

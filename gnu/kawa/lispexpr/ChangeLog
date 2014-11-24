@@ -1,3 +1,9 @@
+2014-11-24  Per Bothner  <per@bothner.com>
+
+	* LispLanguage.java (quasiquote_sym): New constant.
+	* LispReader.java (handlePostfix): Use quasiquote rather than quote
+	for colon notation.
+
 2014-11-17  Per Bothner  <per@bothner.com>
 
 	* LispLanguage.java (resolve): Error if module has both statements

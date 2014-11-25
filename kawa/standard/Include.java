@@ -8,19 +8,13 @@ import gnu.text.*;
 import kawa.lang.*;
 import java.io.*;
 import java.nio.charset.*;
+import java.util.*;
 
 /** Syntax class for source-file inclusion. */
 
 public class Include extends Syntax {
     boolean ignoreCase;
     boolean relative;
-
-    public static final Object[] currentFirst = {
-        Path.PATH_CURRENT, Path.PATH_RELATIVE
-    };
-    public static final Object[] relativeFirst = {
-        Path.PATH_RELATIVE, Path.PATH_CURRENT
-    };
 
     public static final Include include =
         new Include("include", false, false);
@@ -37,18 +31,16 @@ public class Include extends Syntax {
 
     @Override
     public void scanForm(Pair st, ScopeExp defs, Translator tr) {
-        Object[] searchPath = relative ? relativeFirst : currentFirst;
-        process(st.getCdr(), tr, defs, ignoreCase, searchPath);
+        process(st.getCdr(), tr, defs, ignoreCase);
     }
 
     @Override
     public Expression rewrite(Object obj, Translator tr) {
-        Object[] searchPath = relative ? relativeFirst : currentFirst;
-        return tr.rewrite_body(process(obj, tr, null, ignoreCase, searchPath));
+        return tr.rewrite_body(process(obj, tr, null, ignoreCase));
     }
 
-    public static LList process(Object rest, Translator tr, ScopeExp defs,
-                                boolean ignoreCase, Object[] searchPath) {
+    public LList process(Object rest, Translator tr, ScopeExp defs,
+                         boolean ignoreCase) {
         LList result = LList.Empty;
         Pair lastPair = null;
         while (rest instanceof Pair) {
@@ -59,20 +51,47 @@ public class Include extends Syntax {
                 tr.error('e', "include parameters must be strings");
             }
             String fname = paircar.toString();
-            Object[] found = Path.search(searchPath, fname, tr.getFileName());
-            if (found == null) {
-                tr.error('e', "cannot open file \""+fname+"\"");
-                return result;
-            } 
-            InputStream istrm = (InputStream) found[0];
-            Path path = (Path) found[1];
+            Path path;
             BinaryInPort inp;
-            try {
-                inp = BinaryInPort.openHeuristicFile(istrm, path);
-            } catch (Exception ex) {
-                tr.error('e', "error reading file \""+path+"\": "+ex.getMessage());
-                return result;
+            Iterator<CharSequence> searchIterator =
+                getIncludeSearchPath().iterator();
+            CharSequence searchElement = relative ? "|" : null;
+            for (;; searchElement = null) {
+                if (searchElement == null) {
+                    if (! searchIterator.hasNext()) {
+                        tr.error('e', "cannot open file \""+fname+"\"");
+                        return result;
+                    }
+                    searchElement = searchIterator.next();
+                }
+                Path pathElement;
+                if (searchElement.length() > 0 && searchElement.charAt(0) == '|') {
+                    pathElement = tr.getMinfo().getSourceAbsPath();
+                    boolean currentIsFile = pathElement instanceof FilePath
+                        && ((FilePath) pathElement).toFileRaw().isFile();
+                    if (! currentIsFile)
+                        pathElement = Path.currentPath();
+                    if (searchElement.length() > 1)
+                        pathElement = pathElement.resolve(searchElement.toString()
+                                                          .substring(1));
+                }
+                else
+                    pathElement = Path.valueOf(searchElement);
+                try {
+                    path = pathElement.resolve(fname);
+                    InputStream istrm = path.openInputStream();
+                    try {
+                        inp = BinaryInPort.openHeuristicFile(istrm, path);
+                    } catch (Exception ex) {
+                        tr.error('e', ("error reading file \""+path
+                                       +"\": "+ex.getMessage()));
+                        return result;
+                    }
+                    break;
+                } catch (Exception ex) {
+                }
             }
+            
             tr.popPositionOf(savePos1);
             LispReader reader = new LispReader(inp, tr.getMessages());
             if (ignoreCase)
@@ -122,4 +141,35 @@ public class Include extends Syntax {
             tr.error('e', "improper list");
         return result;
     }
+
+    public static final ThreadLocal<List<CharSequence>> searchPath
+        = new InheritableThreadLocal<List<CharSequence>>();
+    public static List<CharSequence> getIncludeSearchPath() {
+        return getSearchPath(searchPath, "kawa.include.path", ".:|");
+    }
+   
+    public static List<CharSequence> getSearchPath(ThreadLocal<List<CharSequence>> var,
+                                                   String propertyName,
+                                                   String defaultPath) {
+        List<CharSequence> path = var.get();
+        if (path != null)
+            return path;
+        String pstr = System.getProperty(propertyName);
+        if (pstr == null) {
+            if (defaultPath == null)
+                return null;
+            pstr = defaultPath;
+        }
+        StringTokenizer tokenizer =
+            new StringTokenizer(pstr, File.pathSeparator);
+        path = new ArrayList<CharSequence>();
+        while (tokenizer.hasMoreTokens()) {
+            String str = tokenizer.nextToken().trim();
+            if (str.length() > 0)
+                path.add(str);
+        }
+        var.set(path);
+        return path;
+    }
+    
 }

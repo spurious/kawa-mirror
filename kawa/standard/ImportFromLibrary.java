@@ -518,33 +518,11 @@ public class ImportFromLibrary extends Syntax
         return null;
     }
 
-    static final List<CharSequence> dotSearchPath;
-    static {
-        List<CharSequence> lst = new ArrayList<CharSequence>();
-        lst.add(".");
-        dotSearchPath = lst;
-    }
-
     public static final ThreadLocal<List<CharSequence>> searchPath
         = new InheritableThreadLocal<List<CharSequence>>();
+
     public static List<CharSequence> getImportSearchPath() {
-        List<CharSequence> path = searchPath.get();
-        if (path != null)
-            return path;
-        String pstr = System.getProperty("kawa.import.path");
-        if (pstr != null) {
-            StringTokenizer tokenizer =
-                new StringTokenizer(pstr, File.pathSeparator);
-            path = new ArrayList<CharSequence>();
-            while (tokenizer.hasMoreTokens()) {
-                String str = tokenizer.nextToken().trim();
-                if (str.length() > 0)
-                    path.add(str);
-            }
-            searchPath.set(path);
-            return path;
-        }
-        return dotSearchPath;
+        return Include.getSearchPath(searchPath, "kawa.import.path", ".");
     }
 
     public static final SimpleSymbol exceptSymbol = Symbol.valueOf("except");

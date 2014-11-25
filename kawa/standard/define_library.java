@@ -113,8 +113,8 @@ public class define_library extends Syntax {
                 else if (clauseHead == importSymbol)
                     syntax = ImportFromLibrary.instance;
                 if (clauseHead == includeLibraryDeclarationsSymbol) {
-                    Object[] searchPath = Include.relativeFirst;
-                    Object forms = Include.process(pclause.getCdr(), tr, null, false, searchPath);
+                    Object forms = Include.includeRelative
+                        .process(pclause.getCdr(), tr, null, false);
                     scanModulePass(forms, defs, tr);
                 } else if (clauseHead == condExpandSymbol) {
                     Object forms = IfFeature.condExpand

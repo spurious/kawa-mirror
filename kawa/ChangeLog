@@ -1,5 +1,12 @@
 2014-11-24  Per Bothner  <per@bothner.com>
 
+	* standard/Include.java: Re-implement to use a settable search path.
+	(process): Re-do search algorithm.
+	(getIncludeSearchPath, getSearchPath): New methods.
+	* standard/ImportFromLibrary.java (getImportSearchPath): Rewrite
+	to use Include.getSearchPath.
+	* standard/define_library.java: Update accordingly.
+
 	* standard/ImportFromLibrary.java (SRFI97Map): Map srfi-26 to
 	an actual classname, rather than BUILTIN.  Needed if environment
 	is restricted, as in r7rs libraries.

@@ -44,7 +44,7 @@ public class ImportFromLibrary extends Syntax
         { "21", "real-time-multithreading", MISSING },
         { "23", "error", BUILTIN },
         { "25", "multi-dimensional-arrays", BUILTIN },
-        { "26", "cut", BUILTIN },
+        { "26", "cut", "gnu.kawa.slib.cut" },
         { "27", "random-bits", MISSING },
         { "28", "basic-format-strings", BUILTIN },
         { "29", "localization", MISSING },

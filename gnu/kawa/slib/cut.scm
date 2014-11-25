@@ -50,6 +50,8 @@
 
 (module-export cut cute)  ;; Added by Per Bothner, for Kawa.
 
+(import (scheme base))
+
 (define-syntax srfi-26-internal-cut
   (syntax-rules (<> <...>)
 

@@ -1,5 +1,9 @@
 2014-11-24  Per Bothner  <per@bothner.com>
 
+	* standard/ImportFromLibrary.java (SRFI97Map): Map srfi-26 to
+	an actual classname, rather than BUILTIN.  Needed if environment
+	is restricted, as in r7rs libraries.
+
 	Resolve colon names even if quasiquote isn't in scope.
 	* standard/export.java (scanForDefinitions): Call namespaceResolve
 	as needed.

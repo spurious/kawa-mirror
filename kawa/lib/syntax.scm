@@ -13,6 +13,9 @@
 (require <kawa.lib.scheme.eval>)
 
 (import (only (kawa standard begin) begin))
+(import (only (kawa standard SchemeCompilation) lambda))
+(import (rename (only (kawa standard call_with_values) callWithValues)
+                (callWithValues call-with-values)))
 
 (define-syntax defmacro
   (syntax-rules ()

@@ -1,3 +1,7 @@
+2014-11-24  Per Bothner  <per@bothner.com>
+
+	* syntax.scm: Import lambda and call-with-values - used by let-values.
+
 2014-11-23  Per Bothner  <per@bothner.com>
 
 	* DefineRecordType.scm (define-record-type): Add imports of definitions

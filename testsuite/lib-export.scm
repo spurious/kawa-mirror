@@ -1,5 +1,6 @@
 (define-library (test export)
-  (export fifty-five make-foo foo? foo-x set-foo-x! foo-y)
+  (export fifty-five list-4-values
+          make-foo foo? foo-x set-foo-x! foo-y)
   (import (scheme base))
   (begin
 
@@ -13,6 +14,11 @@
       (x foo-x set-foo-x!)
       (y foo-y))
 
+    (define (list-4-values)
+      (let-values (((a b c d)
+                    (values 0 1 2 3)))
+
+        (list a b c d)))
     ))
 
 (import (scheme base)
@@ -28,3 +34,6 @@
   (display (foo-x bar))
   (newline))
 ;; Output: 5
+
+(write (list-4-values)) (newline)
+;; Output: (0 1 2 3)

@@ -2,8 +2,8 @@
 	    Per Bothner  <per@bothner.com>
 
 	* lib-colon1.scm: New test for named is colon in library.
-	* lib-export.scm: new test for exporting define-syntax and
-	define-record-type from a library.
+	* lib-export.scm: New test for exporting define-syntax,
+	define-record-type, and let-values from a library.
 	* Makefile.am (SCRIPTS_TO_RUN): Update accordindgly.
 
 2014-11-22  Per Bothner  <per@bothner.com>

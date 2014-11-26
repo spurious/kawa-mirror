@@ -10933,6 +10933,7 @@ A powerful pretty-printer.
 * Named output formats::
 * Paths:: Paths - file name, URLs, and URIs
 * Files:: File System Interface
+* Reading and writing whole files::
 * Ports::
 * Format:: Formatted Output (Common-Lisp-style)
 * Resources::
@@ -11296,7 +11297,117 @@ The current implementation is @emph{not} safe from race conditions;
 this will be fixed in a future release (using Java2 features).
 @end deffn
 
-@node Ports, Format, Files, Input-Output
+@node Reading and writing whole files
+@section Reading and writing whole files
+
+The following procedures and syntax allow you to read and write
+the entire contents of a file, without iterating using a port.
+
+@subsection Reading a file
+
+For reading the contents of a file in a single operation,
+you can use the following syntax:
+
+@display
+@stxlit{&<@lbracechar{}}@stxref{named-literal-part}+@stxlit{@rbracechar{}}
+@end display
+
+This is equivalent to using the @code{path-data} function (defined below):
+@display
+@stxlit{(path-data} @stxlit{&@lbracechar{}}@stxref{named-literal-part}+@stxlit{@rbracechar{})}
+@end display
+
+For example:
+@example
+(define dir "/home/me/")
+(define help-message &<@lbracechar{}&[dir]HELP@rbracechar{})
+@end example
+This binds @code{help-message} to the contents of the file
+named @code{HELP} in the @code{dir} directory.
+
+@subsection Blobs
+
+The contents of a file is in general a sequence of uninterpreted bytes.
+Often these bytes represent text in a locale-dependent encoding,
+but we don't always know this. Sometimes they're images, or videos,
+or word-processor documents.  A filename extension or a ``magic number''
+in the file can give you hints, but not certainty as to the type of the data.
+
+A @dfn{@uref{http://en.wikipedia.org/wiki/Binary_large_object,blob}}
+is a raw uninterpreted sequence of bytes. It is a @code{bytevector}
+that can be automatically converted to other types as needed,
+specifically to a string or a bytevector.
+
+The @code{&<@lbracechar{}..@rbracechar{}} returns a blob.  For example,
+assume the file @code{README} contains (bytes representing)
+the text @code{"Check doc directory.\n"}.  Then:
+@example
+#|kawa:1|# (define readme &<@lbracechar{}README@rbracechar{}))
+|kawa:2|# readme:class
+class gnu.lists.Blob
+#|kawa:3|# (write (->string readme))
+"Check doc directory.\n"
+#|kawa:4|# (write (->bytevector readme))
+#u8(67 104 101 99 107 32 100 111 99 32 100 105 114 101 99 116 111 114 121 46 10)
+#|kawa:5|# (->bytevector readme):class
+class gnu.lists.U8Vector
+@end example
+
+@subsection Writing to a file
+
+The @code{&<@lbracechar{}..@rbracechar{}} syntax can be used with @code{set!}
+to replace the contents of a file:
+@example
+(set! &<@lbracechar{}README@rbracechar{} "Check example.com\n")
+@end example
+
+The new contents must be blob-compatible - i.e. a bytevector or a string.
+
+If you dislike using @code{<} as an output operator, you can instead using the @code{&>@lbracechar{}..@rbracechar{}} operation, which evaluates to function whose single argument is the new value:
+@example
+(&>@lbracechar{}README@rbracechar{} "Check example.com\n")
+@end example
+In general:
+@example
+@stxlit{&>@lbracechar{}}@stxref{named-literal-part}+@stxlit{@rbracechar{}}
+@end example
+is equivalent to:
+@example
+(lambda (new-contents)
+  (set! @stxlit{&<@lbracechar{}}@stxref{named-literal-part}+@stxlit{@rbracechar{}} new-contents))
+@end example
+
+You can use @code{&>>} to append more data to a file:
+
+@example
+(&>>@lbracechar{}README@rbracechar{} "or check example2.com\n")
+@end example
+
+@subsection Functions
+
+@deffn Procedure path-data path
+Reads the contents of the file specified by @var{path},
+where @var{path} can be a @ref{Paths,path} object, or anything that can
+be converted to a @code{Path}, including a filename string or a URL. 
+returning the result as a blob.
+The result is a @emph{blob}, which is a kind of bytevector than can be
+auto-converted to a string or bytevecor as required.
+
+The function @code{path-data} has a setter, which replaces the contents
+with new contents:
+@example
+(set! &<@lbracechar{}file-name@rbracechar{} new-contents)
+@end example
+@end deffn
+
+@deffn Procedure path-bytes path
+Reads the contents of the file specified by @var{path}, as
+with the @code{path-data} function, but the result is a plain bytevector,
+rather than a blob.  This functtion also has a setter, which you
+can use to replace the file-contents by new bytevector-valued data.
+@end deffn
+
+@node Ports
 @section Ports
 
 Ports represent input and output devices.

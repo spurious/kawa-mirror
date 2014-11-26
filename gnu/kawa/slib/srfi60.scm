@@ -30,6 +30,8 @@
 ;;; logxor/bitwise-xor, lognot/bitwise-not, bitwise-if, logtest,
 ;;; logcount, integer-length, and ash/arithmetic-shift.
 
+(define-alias arithmetic-shift gnu.kawa.functions.BitwiseOp:ashift)
+
 ;;; These procedures alias functionality provided by built-ins with
 ;;; differing names:
 

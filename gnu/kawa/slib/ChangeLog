@@ -1,3 +1,7 @@
+2014-11-26  Per Bothner  <per@bothner.com>
+
+	* srfi60.scm: Add define-alias for arithmetic-shift.
+
 2014-11-24  Per Bothner  <per@bothner.com>
 
 	* cut.scm: Import (scheme base) to avoid dangling references.

@@ -2,6 +2,7 @@
 	     Per Bothner  <per@bothner.com>
 
 	* lib-export.scm: New test for 'guard'.
+	* lib-colon2.scm: New test for names with colons.
 
 2014-11-24  Seth Alves <alves@hungry.com>
 	    Per Bothner  <per@bothner.com>

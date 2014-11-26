@@ -25,11 +25,11 @@ export CLASSPATH
 # non-Posix and non-portable) if there is a -D or -J option.
 case "$1" in
     -D* | -J*)
-        jvm_args=()
+        i=0
         for arg in "$@"; do
             case "$arg" in
                 -D* | -J*)
-                    jvm_args+="$arg"
+                    jvm_args[i++]="$arg"
                     shift
                 ;;
                 *) break

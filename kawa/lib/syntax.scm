@@ -11,11 +11,7 @@
 (require <kawa.lib.reflection>)
 (require <kawa.lib.lists>)
 (require <kawa.lib.scheme.eval>)
-
-(import (only (kawa standard begin) begin))
-(import (only (kawa standard SchemeCompilation) lambda))
-(import (rename (only (kawa standard call_with_values) callWithValues)
-                (callWithValues call-with-values)))
+(require <kawa.lib.prim_imports>)
 
 (define-syntax defmacro
   (syntax-rules ()

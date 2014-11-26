@@ -1,3 +1,8 @@
+2014-11-26  Per Bothner  <per@bothner.com>
+
+	* lang/Translator.java (rewrite): Provide default binding to $lookup$.
+	* standard/Scheme.java (initScheme): Don't need to bind $lookup$.
+
 2014-11-24  Per Bothner  <per@bothner.com>
 
 	* standard/Include.java: Re-implement to use a settable search path.

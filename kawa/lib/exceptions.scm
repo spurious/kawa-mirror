@@ -1,4 +1,10 @@
 (require <kawa.lib.ExceptionClasses>)
+(require <kawa.lib.std_syntax>)
+(require <kawa.lib.syntax>)
+(require <kawa.lib.prim_syntax>)
+(require kawa.lib.prim_imports)
+;(import (rename (only (gnu kawa lispexpr LispLanguage) getNamedPartLocation)
+;                (getNamedPartLocation $lookup$)))
 
 (define-procedure with-exception-handler
   validate-apply:  "gnu.kawa.functions.CompileMisc:validateApplyWithExceptionHandler"
@@ -101,7 +107,7 @@
 ;;; The one-argument case is a standard DSSSL procedure.
 ;;; The multi-argument extension matches Guile.
 (define (error #!rest args::Object[])  ::never-returns
-  (primitive-throw (kawa.lang.NamedException:makeError args)))
+  (primitive-throw (kawa.lang.NamedException:makeError @args)))
 
 (define (catch key (thunk :: <procedure>) (handler :: <procedure>))
   (try-catch (thunk)

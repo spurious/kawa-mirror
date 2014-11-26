@@ -1,5 +1,5 @@
 (define-library (test export)
-  (export fifty-five list-4-values
+  (export fifty-five list-4-values test-guard
           make-foo foo? foo-x set-foo-x! foo-y)
   (import (scheme base))
   (begin
@@ -19,6 +19,11 @@
                     (values 0 1 2 3)))
 
         (list a b c d)))
+
+    (define (test-guard)
+      (guard
+       (exn (#t #t))
+       'g-5))
     ))
 
 (import (scheme base)
@@ -37,3 +42,6 @@
 
 (write (list-4-values)) (newline)
 ;; Output: (0 1 2 3)
+
+(display (test-guard)) (newline)
+;; Output: g-5

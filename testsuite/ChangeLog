@@ -1,3 +1,8 @@
+2014-11-26   Seth Alves <alves@hungry.com>
+	     Per Bothner  <per@bothner.com>
+
+	* lib-export.scm: New test for 'guard'.
+
 2014-11-24  Seth Alves <alves@hungry.com>
 	    Per Bothner  <per@bothner.com>
 

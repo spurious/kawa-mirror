@@ -907,6 +907,9 @@ public class Translator extends Compilation
                     return syntaxError("reference to pattern variable "+decl.getName()+" outside syntax template");
             }
 
+            if (decl == null && function
+                && nameToLookup==LispLanguage.lookup_sym)
+                decl = getNamedPartDecl;
             ReferenceExp rexp = new ReferenceExp (nameToLookup, decl);
             rexp.setContextDecl(cdecl);
             rexp.setLine(this);

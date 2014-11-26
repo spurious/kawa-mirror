@@ -152,8 +152,6 @@ public class Scheme extends LispLanguage
   {
       environ = nullEnvironment;
 
-      environ.addLocation(LispLanguage.lookup_sym, null, getNamedPartLocation);
-
       defSntxStFld("lambda", "kawa.standard.SchemeCompilation", "lambda");
       defSntxStFld("$bracket-apply$", "gnu.kawa.lispexpr.BracketApply", "instance");
       defSntxStFld("$string$", "kawa.lib.syntax");

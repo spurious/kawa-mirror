@@ -1,3 +1,13 @@
+2014-11-26  Per Bothner  <per@bothner.com>
+
+	* prim_imports.scm: New helper file with imports from Java classes.
+	* Makefile.am: Update accordingly.
+	* scheme/base.scm: Use prim_imports.scm.
+	* scheme/r5rs.scm: Likewise.
+	* syntax.scm: Likewise.
+	* exceptions.scm: Add imports for named references in macros.
+	* exceptions.scm (error): Use splice notation - emits better code.
+
 2014-11-24  Per Bothner  <per@bothner.com>
 
 	* syntax.scm: Import lambda and call-with-values - used by let-values.

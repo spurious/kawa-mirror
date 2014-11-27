@@ -31,6 +31,19 @@
 ;;; logcount, integer-length, and ash/arithmetic-shift.
 
 (define-alias arithmetic-shift gnu.kawa.functions.BitwiseOp:ashift)
+(define-alias ash gnu.kawa.functions.BitwiseOp:ashift)
+(define-alias bitwise-and gnu.kawa.functions.BitwiseOp:and)
+(define-alias logand gnu.kawa.functions.BitwiseOp:and)
+(define-alias bitwise-ior gnu.kawa.functions.BitwiseOp:ior)
+(define-alias logior gnu.kawa.functions.BitwiseOp:ior)
+(define-alias bitwise-not gnu.kawa.functions.BitwiseOp:not)
+(define-alias lognot gnu.kawa.functions.BitwiseOp:not)
+(define-alias bitwise-xor gnu.kawa.functions.BitwiseOp:xor)
+(define-alias logxor gnu.kawa.functions.BitwiseOp:xor)
+(define-alias integer-length kawa.lib.numbers:bitwise-length)
+(define-alias bitwise-if kawa.lib.numbers:bitwise-if)
+(define-alias logtest kawa.lib.numbers:logtest)
+(define-alias logcount kawa.lib.numbers:logcount)
 
 ;;; These procedures alias functionality provided by built-ins with
 ;;; differing names:

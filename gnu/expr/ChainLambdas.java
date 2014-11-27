@@ -130,7 +130,7 @@ public class ChainLambdas extends ExpExpVisitor<ScopeExp> {
                 neverReturns = false;
             }
         }
-        if (neverReturns && exp.elseClause != null) {
+        if (exp.elseClause != null) {
             exp.elseClause.exp = visit(exp.elseClause.exp, scope);
             if (!exp.elseClause.exp.neverReturns())
                 neverReturns = false;

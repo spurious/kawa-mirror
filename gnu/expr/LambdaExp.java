@@ -1196,6 +1196,13 @@ public class LambdaExp extends ScopeExp {
 
     void allocMethod(LambdaExp outer, Compilation comp) {
         ObjectType closureEnvType;
+        if (currentModule().info != null) {
+            int state = currentModule().info.getState();
+            if (state>=Compilation.COMPILED && state != Compilation.ERROR_SEEN)
+                comp.error('f', "internal error - allocate method for "+this
+                           +" in module "+currentModule()
+                           +" that has already been compiled");
+        }
         if (! getNeedsClosureEnv())
             closureEnvType = null;
         else if (outer instanceof ClassExp || outer instanceof ModuleExp)

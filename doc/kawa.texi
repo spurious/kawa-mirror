@@ -580,6 +580,7 @@ Chris Wegrzyn.
 
 @subsubheading Bug reports and test cases
 
+Seth Alves;
 Khairul Azhar;
 Bob Bane;
 Hans Boehm;
@@ -677,7 +678,8 @@ Per is also available for development projects.
 @node Projects
 @section Projects using Kawa
 
-Google's @uref{http://appinventor.googlelabs.com/,App Inventor for Android}
+@uref{http://appinventor.mit.edu/,MIT App Inventor}
+for Android (formerly Google App Inventor)
 uses Kawa to translate its visual blocks language.
 
 The @uref{http://www.narrativeandplay.org/hypedyn/,HypeDyn} hypertext
@@ -688,6 +690,11 @@ choice. HypeDyn is free to download and open source, and runs on
 Linux, MacOS and Windows. This is a research project carried out at
 the Department of Communications and New Media, National University of
 Singapore.
+
+@uref{http://www.nuecho.com,Nü Echo} develops high-performance speech
+enabled applications. Nü Echo uses Kawa for the development of innovative
+speech application development tools, like a complete 
+@uref{http://www.nuecho.com/en/services/grammar.shtml,grammar IDE}.
 
 @uref{http://www.mercedsystems.com/, Merced Systems@comma{} Inc.} uses Kawa
 extensively in their contact center performance management product
@@ -713,15 +720,6 @@ editor customizable in Scheme. It embeds the Kawa Scheme system and has
 many features that ease Kawa Scheme programming (like code completion on
 variable names, 
 class and method names, namespaces, etc).
-
-@uref{http://www.nuecho.com,Nü Echo} develops high-performance speech
-enabled applications. Nü Echo uses Kawa for the development of innovative
-speech application development tools, like a complete 
-@uref{http://www.nuecho.com/en/services/grammar.shtml,grammar IDE} and a 
-S-expression based language and development environment for the
-specification of 
-highly reusable @uref{http://www.nuecho.com/en/services/dcl.shtml,dialog
-components}. 
 
 The Health Media Research Laboratory, part of the Comprehensive Cancer
 Center at the University of Michigan, is using Kawa as an integral part of
@@ -749,6 +747,7 @@ uses Kawa in a prototypal
 intranet 3tier information retrival system as a communication protocol
 between server and clients and to do server agents programming.
 
+@ignore
 The Nice Programming Language is a new open source language with a
 Java-like syntax. It features multiple dispatch, parametric types,
 higher-order functions, tuples, optional parameters, safe static typing
@@ -759,6 +758,7 @@ packages to generate Java bytecode.
 You can find more about Nice at @uref{http://nice.sourceforge.net}.
 For more information feel free to contact
 Daniel Bonniot @email{bonniot@@users.sf.net}).
+@end ignore
 
 @node Ideas and tasks
 @section Ideas and tasks for contributing to Kawa
@@ -13293,6 +13293,9 @@ runtime construction of annotation values.)
 @node Module classes
 @section Modules and how they are compiled to classes
 
+Modules provide a way to organize Scheme into
+reusable parts with explicitly defined interfaces to the rest
+of the program.
 A @dfn{module} is a set of definitions that the module @dfn{exports},
 as well as some @dfn{actions} (expressions evaluated for their side effect).
 The top-level forms in a Scheme source file compile a module;
@@ -13330,6 +13333,7 @@ There can be more than one @code{module-export}, and they can be
 anywhere in the Scheme file.  The recommended style has
 a single @code{module-export} near the beginning of the file.
 
+@anchor{meta-export-declaration}
 @deffn Syntax module-export @arbno{@stxref{export-spec}}
 @deffnx Syntax export @arbno{@stxref{export-spec}}
 The forms @code{export} and @code{module-export} are equivalent.
@@ -13385,12 +13389,33 @@ the definitions and expressions of the implicit (file-level) module.
 
 @deffn Syntax define-library @stxref{library-name} @arbno{@stxref{library-declaration}}
 @end deffn
+@display
+@stxdef{library-name} @stxlit{(} @stxref{library-name-parts} @stxlit{)}
+@stxdef{library-name-parts} @atleastone{@var{identifier}}
+@end display
+
+A @meta{library-name} is a list whose members are identifiers and
+exact non-negative integers. It is used to identify the library
+uniquely when importing from other programs or
+libraries. Libraries whose first identifier is @code{scheme} are
+reserved for use by the R7RS report and future versions of that
+report. Libraries whose first identifier is @code{srfi} are reserved
+for libraries implementing @uref{http://srfi.schemer.org/,Scheme Requests for Implementation}.
+It is inadvisable, but not an error, for identifiers
+in library names to contain any of the characters @code{|} @code{\} @code{?}
+@code{*} @code{<} @code{"} @code{:} @code{>} @code{+} @code{[} @code{]}
+@code{/} @code {.} or control characters after escapes are
+expanded.
+
+See @ref{module-name} for how a @meta{library-name} is
+mapped to a class name.
 
 @display
 @stxdef{library-declaration}
-  ...
-@stxdef{library-name} @stxlit{(} @stxref{library-name-parts} @stxlit{)}
-@stxdef{library-name-parts} @atleastone{@var{identifier}}
+  @stxref{export-declaration}
+  | @stxref{import-declaration}
+  | @stxlit{(begin} @arbno{@stxref{statement}} @stxlit{)}
+  | ...
 @end display
 
 @subsection How a module becomes a class
@@ -13409,11 +13434,21 @@ stripped off).  That can be overridden by the @code{-T} Kawa
 command-line flag.  The package-prefix specified by the @code{-P}
 flag is prepended to give the fully-qualified class name.
 
+@anchor{module-name}
 @deffn Syntax module-name name
 @deffnx Syntax module-name <name>
+@deffnx Syntax module-name @stxref{library-name}
 Sets the name of the generated class, overriding the default.
 If there is no @samp{.} in the @var{name}, the package-prefix
 (specified by the @code{-P} Kawa command-line flag) is prepended.
+
+If the form @meta{library-name} is used,
+then the class name is the result of taking
+each @meta{identifier} in the @meta{library-name-parts},
+@ref{Mangling,mangling} if needed, and concatenating them
+separated by periods.
+For example @code{(org example doc-utils)} becomes
+@code{org.example.doc$Mnutils}.
 
 As a matter of style, @code{module-name} should be the first
 command in a file (after possible comments).  It must appear
@@ -13690,6 +13725,7 @@ If a @code{'@var{featurename}} is specified then the
 which yields the implementing @var{classname}.
 @end deffn
 
+@anchor{meta-import-declaration}
 @deffn Syntax import @arbno{@stxref{import-set}}
 Similar functionality as @code{require}, but specified by R6RS/R7RS.
 @display
@@ -14706,9 +14742,13 @@ is by default case-sensitive, but we recommend that you
 avoid using upper-case letters as a general rule.
 
 The Java language and the Java virtual machine uses names for
-classes, variables, fields and methods.  These names can
-contain upper- and lower-case letters, digits, and the special
-symbols @samp{_} and @samp{$}.
+classes, variables, fields and methods.
+Names in the Java language can contain upper- and lower-case letters,
+digits, and the special symbols @samp{_} and @samp{$}.
+The Java virtual machine allows most characters, but still
+has some limitations.  Kawa limits characters in generated names to those
+allowed by Java language (rather than those allowed by the
+virtual machine), for simplify and Java interoperatbility.
 
 Given a name in a Scheme program,
 Kawa needs to map that name into a valid Java name.  A typical

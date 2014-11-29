@@ -1,3 +1,8 @@
+2014-11-29  Per Bothner  <per@bothner.com>
+
+	* kawa.texi: Various updates.
+	(Module classes): Flesh out define-libray and module-name.
+
 2014-11-26  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Reading and writing whole files): New section.

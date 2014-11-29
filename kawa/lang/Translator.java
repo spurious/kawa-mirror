@@ -682,7 +682,9 @@ public class Translator extends Compilation
             && safeCar(p = (Pair) name) == LispLanguage.lookup_sym
             && p.getCdr() instanceof Pair
             && (p = (Pair) p.getCdr()).getCdr() instanceof Pair) {
-            prefix = p.getCar();
+            prefix = namespaceResolve(p.getCar());
+            if (! (stripSyntax(prefix) instanceof Symbol))
+                return name;
             part2 = rewrite_car_for_lookup((Pair) p.getCdr());
         }
         else if (name instanceof Symbol) {

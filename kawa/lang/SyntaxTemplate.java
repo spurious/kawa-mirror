@@ -313,8 +313,9 @@ public class SyntaxTemplate implements Externalizable {
             }
             // else treated quoted symbol as literal:
         }
-        if (form instanceof Symbol)
-            tr.noteAccess(form, tr.currentScope());
+        Object xform = tr.namespaceResolve(form);
+        if (xform instanceof Symbol)
+            tr.noteAccess(xform, tr.currentScope());
         form = SyntaxForms.makeWithTemplate(syntax, form); // Usually a no-op.
         if (template_program.length() == 0
             && form instanceof PairWithPosition) {

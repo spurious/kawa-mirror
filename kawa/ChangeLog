@@ -1,3 +1,12 @@
+2014-11-28  Per Bothner  <per@bothner.com>
+
+	* lang/SyntaxTemplate.java (convert_template): Before checking for a
+	symbol and calling noteAccess, do namespaceResolve to handle
+	symbols containing colons.
+	* lang/Translator.java (namespaceResolve): Call namespaceResolve
+	on prefix, in case there are multiplecolons.  If the result is not a
+	symbol, don't continue.
+
 2014-11-26  Per Bothner  <per@bothner.com>
 
 	* lang/Translator.java (rewrite): Provide default binding to $lookup$.

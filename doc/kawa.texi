@@ -4909,10 +4909,10 @@ support for safe multi-threaded programming.
 @subsection Delayed evaluation
 
 @deffn Syntax delay @stxref{expression}
-The @func{delay} construct is used together with the procedure
-@func{force} to implement @emph{lazy evaluation} or @emph{call by need}.
+The @code{delay} construct is used together with the procedure
+@code{force} to implement @emph{lazy evaluation} or @emph{call by need}.
 
-@code{(delay @var{expression})} returns an object called a
+The result of @code{(delay @var{expression})} is a
 @emph{promise} which at some point in the future may be asked (by the
 @func{force} procedure) to evaluate @var{expression}, and deliver the
 resulting value.  The effect of @var{expression} returning multiple
@@ -11325,6 +11325,7 @@ For example:
 This binds @code{help-message} to the contents of the file
 named @code{HELP} in the @code{dir} directory.
 
+@anchor{Blobs}
 @subsection Blobs
 
 The contents of a file is in general a sequence of uninterpreted bytes.
@@ -17039,6 +17040,495 @@ It is an error to mutate any of the strings or the alist itself.
 @node Processes
 @section Processes
 
+A @dfn{process} is a native (operating-system-level) application or
+program that runs separately from the current virtual machine.
+
+Many programming languages have facilities to allow access to system
+processes (commands).  (For example Java has @code{java.lang.Process}
+and @code{java.lang.ProcessBuilder}.)
+These facilities let you send data to the standard input, extract the
+resulting output, look at the return code, and sometimes even pipe
+commands together.   However, this is rarely as easy as it is using
+the old Bourne shell; for example command substitution is awkward.
+Kawa's solution is based on these two ideas:
+@itemize
+@item
+A ``process expression'' (typically a function call) evaluates to a
+@code{LProcess} value, which provides access to a Unix-style
+(or Windows) process.
+@item
+In a context requiring a string (or a bytevector), an @code{LProcess} is
+automatically converted to a string (or bytevector)
+comprising the standard output from the process.
+@end itemize
+
+@subsection Creating a process
+
+The most flexible way to start a process is with either the
+@code{run-process} procedure or
+the @code{&`@lbracechar{}@meta{command}@rbracechar{}} syntax
+for @ref{process literals}.
+
+@deffn Procedure run-process @arbno{@stxref{process-keyword-argument}} @meta{command}
+Creates a process object, specifically a @code{gnu.kawa.functions.LProcess}
+object.
+A @var{process-keyword-argument} can be used to set various options,
+as discussed below.
+
+The @var{command} is the process command-line (name and arguments).
+It can be an array of strings, in which case those are used as the
+command arguments directly:
+@example
+(run-process ["ls" "-l"])
+@end example
+The @var{command} can also be a single string, which is split (tokenized)
+into command arguments separated by whitespace.
+Quotation groups words together just like traditional shells:
+@example
+(run-process "cmd a\"b 'c\"d k'l m\"n'o")
+   @result{} (run-process ["cmd"   "ab 'cd"   "k'l m\"no"])
+@end example
+
+The syntax shorthand @code{&`@lbracechar{}@meta{command}@rbracechar{}}
+or @code{&sh@lbracechar{}@meta{command}@rbracechar{}} (discussed below)
+is usually more convenient.
+@end deffn
+
+@display
+@stxdef{process-keyword-argument}
+    @stxref{process-redirect-argument}
+  | @stxref{process-environment-argument}
+  | @stxref{process-misc-argument}
+@end display
+
+We discuss @stxref{process-redirect-argument} and
+@stxref{process-environment-argument} later.
+@anchor{meta-process-misc-argument}
+The @var{process-misc-argument} options are just the following:
+@table @asis
+@item @stxlit{shell:} @var{shell}
+Currently, @var{shell} must be one of @code{#f} (which is ignored)
+or @code{#t}.  The latter means to use an external shell to tokenize
+the @var{command}.
+I.e. the following are equivalent:
+@example
+(run-process shell: #t "@var{command}")
+(run-process ["/bin/sh" "-c" "@var{command}"])
+@end example
+@item @stxlit{directory:} @var{dir}
+Change the working directory of the new process to @var{dir}.
+@end table
+
+@anchor{process literals}
+@subsection Process literals
+
+A simple @dfn{process literal} is a kind of
+@ref{Named quasi-literals,named literal} that uses the backtick character
+(@code{`}) as the @stxref{cname}.
+For example:
+@example
+&`@lbracechar{}date --utc@rbracechar{}
+@end example
+This is equivalent to:
+@example
+(run-process "date --utc")
+@end example
+
+In general the following are
+roughly equivalent (using @ref{string quasi-literals}):
+@example
+&`[@var{args}...]@lbracechar{}@var{command}@rbracechar{}
+(run-process @var{args}... &@lbracechar{}@var{command}@rbracechar{})
+@end example
+The reason for the ``roughly'' is if @var{command} contains
+escaped sub-expressions; in that case @code{&`} may process
+the resulting values differently from plain string-substitution,
+as discussed below.
+
+If you use @code{&sh} instead of @code{&`} then a shell is used:
+@example
+&sh@lbracechar{}rm *.class@rbracechar{}
+@end example
+which is equivalent to:
+@example
+&`@lbracechar{}/bin/sh -c "rm *.class"@rbracechar{}
+@end example
+
+In general, the following are equivalent:
+@example
+&sh[@var{args}...]@lbracechar{}@var{command}@rbracechar{}
+&`[shell: #t @var{args}...]@lbracechar{}@var{command}@rbracechar{}
+@end example
+
+@subsection Process values and process output
+
+The value returned from a call to @code{run-process} or a process literal
+is an instance of @code{gnu.kawa.functions.LProcess}.
+This class extends @code{java.lang.Process}, so you can treat it as
+any other @code{Process} object.
+@example
+#|kawa:1|# (define p1 &`@lbracechar{}date --utc@rbracechar{})
+#|kawa:2|# (p1:toString)
+gnu.kawa.functions.LProcess@@377dca04
+#|kawa:3|# (write p1)
+gnu.kawa.functions.LProcess@@377dca04
+@end example
+
+What makes an @code{LProcess} interesting is that it is also
+a @ref{Blobs,blob}, which is automatically
+converted to a string (or bytevector) in a context that requires it.
+The contents of the blob comes from the standard output of the process.
+The blob is evaluated @ref{Lazy evaluation,lazily},
+so data it is only collected when requested.
+
+@example
+#|kawa:4|# (define s1 ::string p1)
+#|kawa:5|# (write s1)
+"Wed Jan  1 01:18:21 UTC 2014\n"
+#|kawa:6|# (define b1 ::bytevector p1)
+(write b1)
+#u8(87 101 100 32 74 97 110 ... 52 10)
+@end example
+
+The @code{display} procedure prints it in ``human'' form, as a string:
+@example
+#|kawa:7|# (display p1)
+Wed Jan  1 01:18:21 UTC 2014
+@end example
+This is also the default REPL formatting:
+@example
+#|kawa:8|# &`@lbracechar{}date --utc@rbracechar{}
+Wed Jan  1 01:18:22 UTC 2014
+@end example
+
+When you type a command to a shell, its output goes to the console,
+Similarly, in a REPL the output from the process
+is copied to the console output - which can sometimes by optimized
+by letting the process inherit its standard output from the Kawa process.
+
+@subsection Substitution and tokenization
+
+To substitute the variable or the result of an expression
+in the command line use the usual syntax for quasi literals:
+@example
+(define filename (make-temporary-file))
+&sh@lbracechar{}run-experiment >&[filename]@rbracechar{}
+@end example
+
+Since a process is convertible a string, we need no special
+syntax for command substitution:
+@example
+`@lbracechar{}echo The directory is: &[&`@lbracechar{}pwd@rbracechar{}]@rbracechar{}
+@end example
+or equivalently:
+@example
+`@lbracechar{}echo The directory is: &`@lbracechar{}pwd@rbracechar{}@rbracechar{}
+@end example
+
+@anchor{substitution-tokenization}
+Things gets more interesting when considering the interaction between
+substitution and tokenization. This is not simple string
+interpolation. For example, if an interpolated value contains a quote
+character, we want to treat it as a literal quote, rather than a token
+delimiter. This matches the behavior of traditional shells. There are
+multiple cases, depending on whether the interpolation result is a
+string or a vector/list, and depending on whether the interpolation is
+inside quotes.
+
+@itemize
+@item
+If the value is a string, and we're not inside quotes, then all
+non-whitespace characters (including quotes) are literal, but
+whitespace still separates tokens:
+@example
+(define v1 "a b'c ")
+&`@lbracechar{}cmd x y&[v1]z@rbracechar{}   @result{}  (run-process ["cmd" "x" "ya" "b'c" "z"])
+@end example
+@item
+If the value is a string, and we are inside single quotes,
+all characters (including whitespace) are literal.
+@example
+&`@lbracechar{}cmd 'x y&[v1]z'@rbracechar{}   @result{}  (run-process ["cmd" "x ya b'c z"])
+@end example
+Double quotes work the same except that newline is an argument
+separator. This is useful when you have one filename per line, and the
+filenames may contain spaces, as in the output from @code{find}:
+@example
+&`@lbracechar{}ls -l "&`@lbracechar{}find . -name '*.pdf'@rbracechar{}"@rbracechar{}
+@end example
+This solves a problem that is quite painful with traditional shells.
+@item
+If the value is a vector or list (of strings), and we're not inside
+quotes, then each element of the array becomes its own argument, as-is:
+@example
+(define v2 ["a b" "c\"d"])
+&`@lbracechar{}cmd &[v2]@rbracechar{}  @result{}  (run-process ["cmd" "a b" "c\"d"])
+@end example
+However, if the enclosed expression is adjacent to non-space non-quote
+characters, those are prepended to the first element, or appended to
+the last element, respectively.
+@example
+&`@lbracechar{}cmd x&[v2]y@rbracechar{}   @result{}  (run-process ["cmd" "xa b" "c\"dy"])
+&`@lbracechar{}cmd x&[[]]y@rbracechar{}   @result{}  (run-process ["cmd" "xy"])
+@end example
+This behavior is similar to how shells handle @code{"$@@"}
+(or @code{"$@lbracechar{}name[@@]@rbracechar{}"} for general arrays), though in Kawa you would
+leave off the quotes.
+
+Note the equivalence:
+@example
+&`@lbracechar{}&[array]@rbracechar{}   @result{}  (run-process array)
+@end example
+@item
+If the value is a vector or list (of strings), and we @emph{are}
+inside quotes, it is equivalent to interpolating a single string
+resulting from concatenating the elements separated by a space:
+@example
+&`@lbracechar{}cmd "&[v2]"@rbracechar{}
+ @result{}  (run-process ["cmd" "a b c\"d"])
+@end example
+This behavior is similar to how shells handle @code{"$*"} (or
+@code{"$@lbracechar{}name[*]@rbracechar{}"} for general arrays).
+@item
+If the value is the result of a call to @code{unescaped-data} then it
+is parsed as if it were literal. For example a quote in the unescaped
+data may match a quote in the literal:
+@example
+(define vu (unescaped-data "b ' c d '"))
+&`@lbracechar{}cmd 'a &[vu]z'@rbracechar{}   @result{}  (run-process ["cmd" "a b " "c" "d" "z"])
+@end example
+@item
+If we're using a shell to tokenize the command, then we add quotes or
+backslashes as needed so that the shell will tokenize as described
+above:
+@example
+(define authors ["O'Conner" "de Beauvoir"])
+&sh@lbracechar{}list-books &[authors]@rbracechar{}
+@end example
+The command passed to the shell is:
+@example
+list-books 'O'\''Conner' 'de Beauvoir
+@end example
+Having quoting be handled by the @code{$construct$:sh}
+implementation automatically eliminates common code injection problems.
+@end itemize
+
+Smart tokenization only happens when using the quasi-literal forms such
+as @code{&`@lbracechar{}command@rbracechar{}}.
+You can of course use string templates with @code{run-process}:
+@example
+(run-process &@lbracechar{}echo The directory is: &`@lbracechar{}pwd@rbracechar{}@rbracechar{})
+@end example
+However, in that case there is no smart tokenization: The template is
+evaluated to a string, and then the resulting string is tokenized,
+with no knowledge of where expressions were substituted.
+
+@subsection Input/output redirection
+
+You can use various keyword arguments to specify standard input, output,
+and error streams. For example to lower-case the text in @code{in.txt},
+writing the result to @code{out.txt}, you can do:
+@example
+&`[in-from: "in.txt" out-to: "out.txt"]@lbracechar{}tr A-Z a-z@rbracechar{}
+@end example
+or:
+@example
+(run-process in-from: "in.txt" out-to: "out.txt" "tr A-Z a-z")
+@end example
+
+@anchor{meta-process-redirect-argument}
+A @var{process-redirect-argument} can be one of the following:
+
+@table @asis
+@item @stxlit{in:} @var{value}
+The @var{value} is evaluated, converted to a string (as if
+using @code{display}), and copied to the input file of the process.
+The following are equivalent:
+@example
+&`[in: "text\n"]@lbracechar{}command@rbracechar{}
+&`[in: &`@lbracechar{}echo "text"@rbracechar{}]@lbracechar{}command@rbracechar{}
+@end example
+You can pipe the output from @code{command1} to the input
+of @code{command2} as follows:
+@example
+&`[in: &`@lbracechar{}command1@rbracechar{}]@lbracechar{}command2@rbracechar{}
+@end example
+@item @stxlit{in-from:} @var{path}
+The process reads its input from the specified @var{path}, which
+can be any value coercible to a @code{filepath}.
+@item @stxlit{out-to:} @var{path}
+    The process writes its output to the specified @var{path}. 
+@item @stxlit{err-to:} @var{path}
+    Similarly for the error stream. 
+@item @stxlit{out-append-to:} @var{path}
+@item @stxlit{err-append-to:} @var{path}
+    Similar to @code{out-to} and @code{err-to}, but append to the file
+    specified by @var{path}, instead of replacing it.
+@item @stxlit{in-from: 'pipe}
+@item @stxlit{out-to: 'pipe}
+@item @stxlit{err-to: 'pipe}
+Does not set up redirection. Instead, the specified stream is available
+using the methods @code{getOutputStream}, @code{getInputStream},
+or @code{getErrorStream}, respectively, on the resulting @code{Process} object,
+just like Java's @code{ProcessBuilder.Redirect.PIPE}.
+@item @stxlit{in-from: 'inherit}
+@item @stxlit{out-to: 'inherit}
+@item @stxlit{err-to: 'inherit}
+Inherits the standard input, output, or error stream from the
+current JVM process. 
+@item @stxlit{out-to:} @var{port}
+@item @stxlit{err-to:} @var{port}
+Redirects the standard output or error of the process to
+the specified @var{port}.
+@item @stxlit{out-to: 'current}
+@item @stxlit{err-to: 'current}
+Same as @code{out-to: (current-output-port)},
+or @code{err-to: (current-error-port)}, respectively. 
+@item @stxlit{in-from:} @var{port}
+@item @stxlit{in-from: 'current}
+Re-directs standard input to read from the @var{port}
+(or @code{(current-input-port)}). It is unspecified how much is read from
+the @var{port}. (The implementation is to use a thread that reads from the
+port, and sends it to the process, so it might read to the end of the port,
+even if the process doesn't read it all.) 
+@item @stxlit{err-to: 'out}
+Redirect the standard error of the process to be merged with the
+standard output. 
+@end table
+
+The default for the error stream (if neither @code{err-to} or
+@code{err-append-to} is specified) is equivalent to @code{err-to: 'current}.
+
+@emph{Note:} Writing to a port is implemented by copying the output or error
+stream of the process. This is done in a thread, which means we don't have
+any guarantees when the copying is finished. (In the future we might
+change @code{process-exit-wait} (discussed later) wait for not only the
+process to finish, but also for these helper threads to finish.)
+
+A @uref{https://en.wikipedia.org/wiki/Here_document,here document} is
+a form a literal string, typically multi-line, and commonly used in
+shells for the standard input of a process.  You can use string literals or
+@ref{string quasi-literals} for this.
+For example, this passes the string @code{"line1\nline2\nline3\n"} to
+the standard input of @code{command}:
+@example
+(run-process [in: &@lbracechar{}
+    &|line1
+    &|line2
+    &|line3
+    @rbracechar{}] "command")
+@end example
+
+Note the use of @code{&|} to mark the end of ignored indentation.
+
+@subsection Pipe-lines
+
+Piping the output of one process as the input of another
+is in princple easy - just use the @code{in:}
+process argument.  However, writing a multi-stage pipe-line quickly gets ugly:
+@example
+&`[in: &`[in: "My text\n"]@lbracechar{}tr a-z A-Z@rbracechar{}]@lbracechar{}wc@rbracechar{}
+@end example
+The convenience macro @code{pipe-process} makes this much nicer:
+@example
+(pipe-process
+  "My text\n"
+  &`@lbracechar{}tr a-z A-Z@rbracechar{}
+  &`@lbracechar{}wc@rbracechar{})
+@end example
+
+@deffn Syntax pipe-process input @arbno{process}
+All of the @var{process} expressions must be @code{run-process} forms,
+or equivalent @code{&`@lbracechar{}command@rbracechar{}} forms.
+The result of evaluating @var{input} becomes the input to the first
+@var{process}; the output from the first @var{process} becomes
+the input to the second @var{process}, and so on.  The result of
+whole @code{pipe-process} expression is that of the last @var{process}.
+
+Copying the output of one process to the input of the next is
+optimized: it uses a copying loop in a separate thread. Thus you can
+safely pipe long-running processes that produce huge output. This
+isn't quite as efficient as using an operating system pipe, but is
+portable and works pretty well.
+@end deffn
+
+@subsection Setting the process environment
+
+@anchor{meta-process-environment-argument}
+By default the new process inherits the system environment of the current
+(JVM) process as returned by @code{System.getenv()}, but you can override it.
+A @var{process-environment-argument} can be one of the following:
+
+@table @asis
+@item @stxlit{env-}@var{name}@stxlit{:} @var{value}
+In the process environment, set the @code{"@var{name}"} to the
+specified @var{value}. For example:
+@example
+&`[env-CLASSPATH: ".:classes"]@lbracechar{}java MyClass@rbracechar{}
+@end example
+@item @var{NAME}@stxlit{:} @var{value}
+Same as using the @code{env-@var{NAME}} option above, but only if the
+@code{@var{NAME}} is uppercase (i.e. if uppercasing @code{@var{NAME}} yields
+the same string). For example the previous example could be written:
+@example
+&`[CLASSPATH: ".:classes"]@lbracechar{}java MyClass@rbracechar{}
+@end example
+@item @stxlit{environment:} @var{env}
+The @var{env} is evaluated and must yield a @code{HashMap}.
+This map is used as the system environment of the process. 
+@end table
+
+@subsection Waiting for process exit
+
+When a process finishes, it returns an integer exit code.
+The code is traditionally 0 on successful completion,
+while a non-zero code indicates some kind of failure or error.
+
+@deffn Procedure process-exit-wait process
+The @var{process} expression must evaluate to a process
+(any @code{java.lang.Process} object).
+This procedure waits for the process to finish, and then returns the
+exit code as an @code{int}.
+@example
+(process-exit-wait (run-process "echo foo")) @result{} 0
+@end example
+@end deffn
+
+@deffn Procedure process-exit-ok? process
+Calls @code{process-exit-wait}, and then returns @code{#false}
+if the process exited it 0, and returns @code{#true} otherwise.
+
+This is useful for emulating the way traditional shell do
+logic control flow operations based on the exit code.
+For example in @code{sh} you might write:
+@example
+if grep Version Makefile >/dev/null
+then echo found Version
+else echo no Version
+fi
+@end example
+
+The equivalent in Kawa:
+
+@example
+(if (process-exit-ok? &`@lbracechar{}grep Version Makefile@rbracechar{})
+  &`@lbracechar{}echo found@rbracechar{}
+  &`@lbracechar{}echo not found@rbracechar{})
+@end example
+
+Strictly speaking these are not quite the same, since the Kawa
+version silently throws away the output from @code{grep}
+(because no-one has asked for it). To match the output from the @code{sh},
+you can use @code{out-to: 'inherit}:
+@example
+(if (process-exit-ok? &`[out-to: 'inherit]@lbracechar{}grep Version Makefile@rbracechar{})
+  &`@lbracechar{}echo found@rbracechar{}
+  &`@lbracechar{}echo not found@rbracechar{})
+@end example
+@end deffn
+
+@subsection Exiting the current process
+
 @deffn Procedure exit [code]
 Exits the Kawa interpreter, and ends the Java session.
 Returns the value of @var{code} to the operating system:
@@ -17067,6 +17557,8 @@ Unlike @code{exit}, neither finally-handlers nor
 shutdown hooks are executed.
 @end deffn
 
+@subsection Deprecated functions
+
 @deffn Procedure make-process command envp
 Creates a @code{<java.lang.Process>} object, using the specified
 @var{command} and @var{envp}.
@@ -17078,6 +17570,11 @@ or a Scheme string.  In the latter case, the command is converted
 using @code{command-parse}.
 The @var{envp} is process environment;  it should be either
 a Java array of Java strings, or the special @code{#!null} value.
+
+Except for the representation of @var{envp}, this is similar to:
+@example
+(run-process environment: @var{envp} @var{command})
+@end example
 @end deffn
 
 @deffn Procedure system command
@@ -17085,6 +17582,11 @@ Runs the specified @var{command}, and waits for it to finish.
 Returns the return code from the command.  The return code is an integer,
 where 0 conventionally means successful completion.
 The @var{command} can be any of the types handled by @code{make-process}.
+
+Equivalent to:
+@example
+(process-exit-wait (make-process @var{command} #!null))
+@end example
 @end deffn
 
 @defvar command-parse

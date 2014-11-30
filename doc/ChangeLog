@@ -1,5 +1,7 @@
 2014-11-29  Per Bothner  <per@bothner.com>
 
+	* kawa.texi (Processes): Major additions.
+
 	* kawa.texi: Various updates.
 	(Module classes): Flesh out define-libray and module-name.
 

@@ -1,3 +1,8 @@
+2014-11-30  Per Bothner  <per@bothner.com>
+
+	* standard/ImportFromLibrary.java (scanImportSet): Search for a
+	known class in the ModuleManager before looking for source file.
+
 2014-11-28  Per Bothner  <per@bothner.com>
 
 	* lang/SyntaxTemplate.java (convert_template): Before checking for a

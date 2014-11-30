@@ -228,7 +228,21 @@ public class ImportFromLibrary extends Syntax
         }
         implicitSource = sbuf.toString();
 
+        ModuleManager mmanager = ModuleManager.getInstance();
         ModuleInfo minfo = null;
+        String lname0 = cbuf.toString();
+        String lname = checkSrfi(lname0, tr);
+        if (lname == BUILTIN)
+            return; // nothing to do
+        boolean foundSrfi = lname != lname0;
+
+        int classPrefixPathLength = classPrefixPath.length;
+        for (int i = 0;  i < classPrefixPathLength;  i++) {
+            String tname = classPrefixPath[i] + lname;
+            minfo = mmanager.searchWithClassName(tname);
+            if (minfo != null)
+                break;
+        }
 
         String currentExtension = currentSource == null ? null
             : currentSource.getExtension();
@@ -237,11 +251,6 @@ public class ImportFromLibrary extends Syntax
             if (! langExtensions.isEmpty())
                 currentExtension = langExtensions.get(0);
         }
-        String lname0 = cbuf.toString();
-        String lname = checkSrfi(lname0, tr);
-        if (lname == BUILTIN)
-            return; // nothing to do
-        boolean foundSrfi = lname != lname0;
 
         boolean hasDot;
         boolean isAbsolute;
@@ -276,11 +285,12 @@ public class ImportFromLibrary extends Syntax
             }
         }
 
-        ModuleManager mmanager = ModuleManager.getInstance();
         List<CharSequence> srcSearchPath;
-        if (isAbsolute || hasDot) {
+        boolean skipSourceSearch = minfo != null && explicitSource == null;
+        if (isAbsolute || hasDot || skipSourceSearch) {
             srcSearchPath = new ArrayList<CharSequence>();
-            srcSearchPath.add(currentRoot.toString());
+            if (! skipSourceSearch)
+                srcSearchPath.add(currentRoot.toString());
         }
         else
             srcSearchPath = getImportSearchPath();
@@ -354,7 +364,18 @@ public class ImportFromLibrary extends Syntax
             // before asking the file-system.  FIXME
             long lastModifiedTime = path.getLastModified();
             if (lastModifiedTime != 0) {
-                minfo = mmanager.findWithSourcePath(path, pathStr);
+                if (minfo != null) {
+                    String pstring = path.getCanonical().toString();
+                    Path infoPath = minfo.getSourceAbsPath();
+                    if (infoPath == null
+                        || ! (pstring.equals(infoPath.toString()))) {
+                        tr.error('w', "ignoring source file at "+pstring
+                                 +" - instead using class "+minfo.getClassName()
+                                 +(infoPath==null?""
+                                   :(" from "+infoPath.toString())));
+                    }
+                } else
+                    minfo = mmanager.findWithSourcePath(path, pathStr);
                 // Should save lastModifiedTime in minfo FIXME
                 if (foundSrfi)
                     lname = lname0;
@@ -363,7 +384,6 @@ public class ImportFromLibrary extends Syntax
         }
 
         if (minfo == null) {
-            int classPrefixPathLength = classPrefixPath.length;
             for (int i = 0;  i < classPrefixPathLength;  i++) {
                 String tname = classPrefixPath[i] + lname;
                 try {
@@ -372,9 +392,6 @@ public class ImportFromLibrary extends Syntax
                     break;
                 } catch (Exception ex) {
                 }
-                minfo = mmanager.searchWithClassName(tname);
-                if (minfo != null)
-                    break;
             }
         }
         if (minfo == null)

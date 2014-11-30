@@ -2,6 +2,7 @@
 
 	* standard/ImportFromLibrary.java (scanImportSet): Search for a
 	known class in the ModuleManager before looking for source file.
+	Don't use the canonical of teh current file.
 
 2014-11-28  Per Bothner  <per@bothner.com>
 

@@ -191,7 +191,6 @@ public class ImportFromLibrary extends Syntax
         }
 
         ModuleInfo curinfo = tr.getMinfo();
-        Path currentSource = curinfo.getSourceAbsPath();
         // If non-null, an exlicitly specified source file name.
         String explicitSource = null;
         // Source name inferred from library name, with '/' as separator.
@@ -244,6 +243,9 @@ public class ImportFromLibrary extends Syntax
                 break;
         }
 
+        String currentFileName = tr.getFileName();
+        Path currentSource = currentFileName == null ? null
+            : Path.valueOf(currentFileName).getAbsolute();
         String currentExtension = currentSource == null ? null
             : currentSource.getExtension();
         if (currentExtension == null) {

@@ -1,3 +1,7 @@
+2014-12-01  Per Bothner  <per@bothner.com>
+
+	* build.xml (lib-scm-classes): Fix and update filelist.
+
 2014-11-19  Per Bothner  <per@bothner.com>
 
 	* bin/kawa.sh.in: Use KAWA_SHELL instead of SHELL variable.

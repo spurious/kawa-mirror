@@ -542,6 +542,7 @@
 	   prefix="kawa.lib." modulestatic="run" language="scheme">
       <arg line="--warn-undefined-variable --warn-unknown-member --warn-as-error"/>
       <filelist dir="${src.dir}/kawa/lib">
+        <file name="prim_imports.scm"/>
         <file name="prim_syntax.scm"/>
         <file name="std_syntax.scm"/>
         <file name="reflection.scm"/>
@@ -567,8 +568,6 @@
         <file name="bytevectors.scm"/>
         <file name="arrays.scm"/>
         <file name="system.scm"/>
-        <file name="ExceptionClasses.scm"/>
-        <file name="exceptions.scm"/>
         <file name="kawa/expressions.scm"/>
         <file name="kawa/string-cursors.scm"/>
         <file name="kawa/quaternions.scm"/>
@@ -591,15 +590,14 @@
         <file name="scheme/lazy.scm"/>
         <file name="scheme/load.scm"/>
         <file name="scheme/process-context.scm"/>
-        <file name="scheme/r5rs.scm"/>
         <file name="scheme/read.scm"/>
         <file name="scheme/repl.scm"/>
-        <file name="scheme/r5rs.scm"/>
         <file name="scheme/time.scm"/>
         <file name="scheme/write.scm"/>
-        <file name="trace.scm"/>
+        <file name="scheme/r5rs.scm"/>
         <file name="compile_misc.scm"/>
         <file name="compile_map.scm"/>
+        <file name="trace.scm"/>
       </filelist>
       <fileset dir="${src.dir}/kawa/lib">
         <include name="windows.scm" if="${with-swing}"/>

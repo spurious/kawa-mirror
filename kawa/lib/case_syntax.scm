@@ -7,9 +7,6 @@
 (define-namespace <Expression> <gnu.expr.Expression>)
 (define-namespace <QuoteExp> <gnu.expr.QuoteExp>)
 
-(define tr (as <kawa.lang.Translator> 
-               (<gnu.expr.Compilation>:getCurrent)))
-
 ;; Needed when the case is inside a macro
 (define (syntax-form->datum obj)
   (if (kawa.lang.SyntaxForm? obj)
@@ -19,7 +16,8 @@
 ;; Converts a list of datums to a list of QuoteExp
 (define (clause-datums->exps datums)
   (if (null? datums) ()
-      (let ((datum (tr:rewrite_car datums #f)))
+      (let* ((tr ::kawa.lang.Translator (gnu.expr.Compilation:getCurrent))
+             (datum (tr:rewrite_car datums #f)))
         (cons 
          (<QuoteExp>:getInstance 
           (syntax-form->datum (car datums)) 

@@ -1,5 +1,9 @@
 2014-12-01  Per Bothner  <per@bothner.com>
 
+	* configure.in (AC_INIT): Set version to 2.0.
+	* bin/configure.in (AC_INIT): Likewise.
+	* build.xml (version.release): Likewise.
+
 	* build.xml (lib-scm-classes): Fix and update filelist.
 
 2014-11-19  Per Bothner  <per@bothner.com>

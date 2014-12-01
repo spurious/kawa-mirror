@@ -146,8 +146,27 @@ public class ModuleInfo {
     /** If module has LAZY_DECLARATIONS, fix that. */
     public synchronized ModuleExp setupModuleExp() {
         ModuleExp mod = getModuleExp();
-        if ((mod.flags & ModuleExp.LAZY_DECLARATIONS) == 0)
+        if ((mod.flags & ModuleExp.LAZY_DECLARATIONS) == 0) {
+            if (moduleClass != null) {
+                for (Declaration decl = mod.firstDecl();
+                     decl != null;  decl = decl.nextDecl()) {
+                    Field fld = decl.field;
+                    if (fld == null
+                        || decl.isIndirectBinding()
+                        || (fld.getFlags() & Access.STATIC) == 0
+                        || decl.getValueRaw() instanceof QuoteExp)
+                        continue;
+                    try {
+                        Object fvalue = moduleClass
+                            .getField(fld.getName()).get(null);
+                        decl.setValue(new QuoteExp(fvalue));
+                    } catch (Exception ex) {
+                        continue;
+                    }
+                }
+            }
             return mod;
+        }
         mod.setFlag(false, ModuleExp.LAZY_DECLARATIONS);
         ClassType type;
         Class rclass;

@@ -1,3 +1,8 @@
+2014-12-01  Per Bothner  <per@bothner.com>
+
+	* ModuleInfo.java (setupModuleExp): If we have a class, set value
+	of decls that have static fields to the field value.
+
 2014-11-28  Per Bothner  <per@bothner.com>
 
 	* LambdaExp.java (allocMethod): Add a sanity check.

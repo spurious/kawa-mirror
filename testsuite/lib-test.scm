@@ -1,6 +1,6 @@
 ;; -*- coding: utf-8 -*-
 
-(test-begin "libs" 257)
+(test-begin "libs" 259)
 
 (test-begin "vectors")
 (test-equal '(dah dah didah)
@@ -509,7 +509,7 @@
 
 (test-end)
 
-(test-begin "char-sets" 89)
+(test-begin "char-sets" 91)
 
 (import (srfi :14 char-sets))
 (import (rnrs sorting))
@@ -526,6 +526,8 @@
 (test-equal #t (char-set<= char-set:empty char-set:full))
 (test-equal #t (char-set<= char-set:empty char-set:lower-case
                            char-set:full))
+(test-equal #t (char-set<= (char-set #\u) (char-set #\u)))
+(test-equal #t (char-set<= (char-set #\u) (char-set #\u #\a)))
 ; char-set-hash
 (test-equal #t (= (char-set-hash char-set:empty)
                   (char-set-hash (char-set))))

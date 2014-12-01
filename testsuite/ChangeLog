@@ -1,3 +1,8 @@
+2014-12-01  Jamison Hope  <jrh@theptrgroup.com>
+
+	* lib-test.scm: Add test for char-set<= bug reported by Seth
+	Alves.
+
 2014-11-26   Seth Alves <alves@hungry.com>
 	     Per Bothner  <per@bothner.com>
 

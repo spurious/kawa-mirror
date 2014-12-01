@@ -483,6 +483,9 @@ other character set is guaranteed not to be altered."
            ((= (inversion-list (- ai 1))
                (cs:inversion-list (- bi 1)))
             (loop (- ai 2) (- bi 2)))
+           ((> (inversion-list ai)
+               (cs:inversion-list (- bi 1)))
+            (loop ai (- bi 2)))
            (else #f))))
 
   ((contains? (char ::character)) ::boolean

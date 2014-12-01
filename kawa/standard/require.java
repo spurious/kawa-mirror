@@ -161,25 +161,22 @@ public class require extends Syntax
             }
             return importDefinitions(null, info, null, tr.formStack, defs, tr);
         } else if (name instanceof Symbol && ! tr.selfEvaluatingSymbol(name)) {
-            type = tr.getLanguage().getTypeFor(tr.rewrite(name, false));
-            String cname = null;
-            if (type instanceof ClassType)
-                cname = type.getName();
-            else if (type == null && name instanceof SimpleSymbol)
-                cname = ((SimpleSymbol) name).getName();
-            if (cname != null && args.getCdr() instanceof Pair) {
+            String requestedClass = name.toString();
+            int nlen = requestedClass.length();
+            if (nlen > 2 && requestedClass.charAt(0) == '<'
+                && requestedClass.charAt(nlen-1) == '>')
+                requestedClass = requestedClass.substring(1, nlen-1);
+            String implicitSource = requestedClass.replace('.', '/');
+            String explicitSource = null;
+            if (args.getCdr() instanceof Pair) {
                 Object sname = ((Pair) args.getCdr()).getCar();
                 if (sname instanceof CharSequence) {
-                    String sourceName = sname.toString();
-                    ModuleInfo info = lookupModuleFromSourcePath(sourceName, defs);
-                    if (info == null) {
-                        tr.error('e', "malformed URL: "+sourceName);
-                        return false;
-                    }
-                    return importDefinitions(cname, info, null,
-                                             tr.formStack, defs, tr);
-                }
+                    explicitSource = sname.toString();
+                } // else ERROR
             }
+            ImportFromLibrary.handleImport(implicitSource, explicitSource, requestedClass, defs, tr, null);
+            return true;
+
         }
         if (! (type instanceof ClassType)) {
             if (type != null)
@@ -406,7 +403,8 @@ public class require extends Syntax
                            + "$instance");
                     Declaration cdecl = moduleReferences == null ? null
                         : moduleReferences.get(iname);
-                    if (cdecl != null && cdecl.context != defs) {
+                    if (cdecl != null) {
+                        if (cdecl.context != defs) {
                         Declaration acdecl = defs.addDeclaration(SimpleSymbol.valueOf(iname));
                         moduleReferences.put(iname, acdecl);
                         acdecl.setFlag(Declaration.IS_CONSTANT
@@ -420,6 +418,7 @@ public class require extends Syntax
                     }
                     cdecl.setFlag(Declaration.EXPORT_SPECIFIED);
                     aref.setContextDecl(cdecl);
+                    }
                 }
             }
         }

@@ -190,13 +190,7 @@ public class ImportFromLibrary extends Syntax
             return;
         }
 
-        ModuleInfo curinfo = tr.getMinfo();
-        // If non-null, an exlicitly specified source file name.
         String explicitSource = null;
-        // Source name inferred from library name, with '/' as separator.
-        // Does not include a file extension.
-        String implicitSource;
-
         Object versionSpec = null;
         StringBuilder cbuf = new StringBuilder(); // for class name
         StringBuilder sbuf = new StringBuilder(); // for source file name
@@ -225,22 +219,38 @@ public class ImportFromLibrary extends Syntax
             }
             libref = cdr;
         }
-        implicitSource = sbuf.toString();
+        handleImport(sbuf.toString(), explicitSource,
+                     cbuf.toString(),
+                     defs, tr, mapper);
+    }
+
+    /** Do the actual work of importing a module.
+     * @param implicitSource Source name inferred from library name,
+     *   with '/' as separator. Does not include a file extension.
+     * @param explicitSource If non-null, an exlicitly specified
+     *   source file name.
+     */
+    public static void handleImport(String implicitSource, String explicitSource, String requestedClass, ScopeExp defs, Translator tr, require.DeclSetMapper mapper) {
 
         ModuleManager mmanager = ModuleManager.getInstance();
         ModuleInfo minfo = null;
-        String lname0 = cbuf.toString();
-        String lname = checkSrfi(lname0, tr);
+        String lname = checkSrfi(requestedClass, tr);
         if (lname == BUILTIN)
             return; // nothing to do
-        boolean foundSrfi = lname != lname0;
+        boolean foundSrfi = lname != requestedClass;
 
         int classPrefixPathLength = classPrefixPath.length;
+        Class existingClass = null;
         for (int i = 0;  i < classPrefixPathLength;  i++) {
             String tname = classPrefixPath[i] + lname;
             minfo = mmanager.searchWithClassName(tname);
             if (minfo != null)
                 break;
+            try {
+                existingClass = ObjectType.getContextClass(tname);
+                break;
+            } catch (Exception ex) {
+            }
         }
 
         String currentFileName = tr.getFileName();
@@ -264,6 +274,7 @@ public class ImportFromLibrary extends Syntax
             isAbsolute = false;
         }
 
+        ModuleInfo curinfo = tr.getMinfo();
         String currentClassName = curinfo.getClassName();
 
         // Is the current module a file - as opposed to (say) a tty?
@@ -380,21 +391,16 @@ public class ImportFromLibrary extends Syntax
                     minfo = mmanager.findWithSourcePath(path, pathStr);
                 // Should save lastModifiedTime in minfo FIXME
                 if (foundSrfi)
-                    lname = lname0;
+                    lname = requestedClass;
                 break;
             }
         }
 
-        if (minfo == null) {
-            for (int i = 0;  i < classPrefixPathLength;  i++) {
-                String tname = classPrefixPath[i] + lname;
-                try {
-                    Class clas = ObjectType.getContextClass(tname);
-                    minfo = mmanager.findWithClass(clas);
-                    break;
-                } catch (Exception ex) {
-                }
-            }
+        if (existingClass != null) {
+            if (minfo == null)
+                minfo = mmanager.findWithClass(existingClass);
+            else
+                minfo.setModuleClass(existingClass);
         }
         if (minfo == null)
             tr.error('e', "unknown library ("+implicitSource.replace('/', ' ')+")");

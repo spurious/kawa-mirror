@@ -1,8 +1,18 @@
+2014-12-01  Per Bothner  <per@bothner.com>
+
+	Share more code between import and require.
+	Specifically, have require share import's source path search handling.
+	* standard/ImportFromLibrary.java (scanImportSet): Split up/refactor.
+	(handleImport): New method.
+	Do check for an existing class regardless.
+	* standard/require.java (scanForDefinitions): Call handleImport,
+	rather than calling importDefinitions directly.
+
 2014-11-30  Per Bothner  <per@bothner.com>
 
 	* standard/ImportFromLibrary.java (scanImportSet): Search for a
 	known class in the ModuleManager before looking for source file.
-	Don't use the canonical of teh current file.
+	Don't use the canonical path of the current file.
 
 2014-11-28  Per Bothner  <per@bothner.com>
 

@@ -21,7 +21,7 @@
 @end macro
 
 @macro func{NAME}
-@code{@sc{\NAME\}}
+@code{\NAME\}
 @end macro
 
 @macro stxdef{NAME}
@@ -250,7 +250,7 @@ but can be customized if need be.
 You can @ref{Building for Android,run Kawa programs on Android},
 and there is special handing to make @ref{Android view construction,constructing View objects} easier.
 
-A flexible mechanism supports new @ref{Named quasi-literals, user-defined literal types}.
+Flexible shell-like functionality, including @ref{process literals}.
 
 @ref{Server-side scripts,Web page scripts} are easy to write and install
 with @ref{Self-configuring page scripts,self-configuring web servers}
@@ -3275,7 +3275,68 @@ Deprecated; usually you can just write:
 
 
 @node Bodies
-@section Bodies
+@section Programs and Bodies
+
+@subheading Program units
+
+A @meta{program-unit} consists of a sequence of definitions and expressions.
+
+@display
+@stxdef{program-unit} @atleastone{@stxref{library-definition}} [@stxref{statements}]
+  | @stxref{statements}
+@stxdef{statements} @atleastone{@stxref{statement}}
+@stxdef{statement} @var{definition} | @stxref{expression} | @stxlit{(begin} @arbno{@stxref{statement}} @stxlit{)}
+@end display
+
+Typically a @meta{program-unit} corresponds to a single source file
+(i.e.a named file in the file system).  Evaluating a @meta{program-unit}
+first requires the Kawa processor to analyze
+the whole @meta{program-unit} to determine which names are defined by the
+definitions, and then evaluates each @meta{statement} in order in the context
+of the defined names.  The value of an @meta{expression} is normally
+discared, but may be printed out instead, depending on the evaluating context.
+
+The read-eval-print-loop (REPL) reads one or more lines until it gets
+a valid @meta{program-unit}, and evaluates it as above, except that the
+values of expression are printed to the console (as if using the
+@code{display} function).  Then the REPL reads and evaluates
+another @meta{program-unit}, and so on. A definition in an earlier
+@meta{program-unit} is remembered and is visible in a later @meta{program-unit}
+unles it is overridden.
+
+@subheading Libraries
+
+A @meta{program-unit} may contain @meta{library-definitions}.
+In addition, any @meta{statements} in @meta{program-unit} comprise
+an @dfn{implicit library}, in that it can be given a name, and referenced
+from other libraries.
+Certain names defined in the @meta{program-unit} an be exported,
+and then they can be imported by other libraries
+For more information @pxref{Module classes}.
+
+It is recommended but not required that:
+@itemize
+@item
+There should be at most one @meta{library-definition} in a @meta{program-unit}.
+@item
+The @meta{library-name} of the @meta{library-definition} should
+match the name of the source file.  For example:
+@example
+(define-library (foo bar) ...)
+@end example
+should be in a file named @code{foo/bar.scm}.
+@item
+If there is a @meta{library-definition} there should
+should be no extra @meta{statements} - i.e no implicit library definition.
+(It is disallowed to @code{export} any definitions from the
+implicit library if there are also a  @meta{library-definition}.)
+@end itemize
+Following these recommendations makes it easier to locate
+and organize libraries.
+However, having multiple libraries in a single @meta{program-unit}
+is occasionally useful for source distribution and for testing.
+
+@subheading Bodies
 
 The @meta{body} of a @func{lambda}, @func{let}, @func{let*},
 @func{let-values}, @func{let*-values}, @func{letrec}, or @func{letrec*}
@@ -3283,10 +3344,9 @@ expression, or that of a definition with a body consists of zero or more
 definitions or expressions followed by a final expression.
 (Standard Scheme requires that all definitions precede all expressions.)
 
-@example
-@stxdef{body} @stxref{statement} ... @stxref{expression}
-@stxdef{statement} @var{definition} | @stxref{expression}
-@end example
+@display
+@stxdef{body} @arbno{@stxref{statement}}
+@end display
 
 Each identifier defined by a definition is local to the @meta{body}.
 That is, the identifier is bound, and the region of the binding is the
@@ -12751,6 +12811,7 @@ The Kawa module system is based on the features of the Java class system.
 * Enumerations::          Enumeration types
 * Annotations::
 * Module classes::        Modules and how they are compiled to classes
+* Importing::             Importing from a library
 * Record types::          Defining Record Types
 * Dynamic records::       Creating New Record Types On-the-fly
 * Method operations::     Calling Java methods from Scheme
@@ -13388,6 +13449,8 @@ which may contain zero or more explicit sub-modules (in
 the form of @code{define-library}) optionally followed by
 the definitions and expressions of the implicit (file-level) module.
 
+@anchor{meta-library-definition}
+@findex @i{library-definition}
 @deffn Syntax define-library @stxref{library-name} @arbno{@stxref{library-declaration}}
 @end deffn
 @display
@@ -13685,50 +13748,20 @@ to a particular body via the @code{with-compile-options} syntax.
 @end example
 @end deffn
 
-@subsection Requiring (importing) a module
+@node Importing
+@section Importing from a library
+
 @anchor{require}
-You can import a module into the current namespace with @code{require}.
-
-@deffn Syntax require @stxlit{'}featureName
-@deffnx Syntax require classname [@stxlit{"}sourcepath@stxlit{"}]
-@deffnx Syntax require @stxlit{"}sourcepath@stxlit{"}
-Search for a matching module (class), and add the names
-exported by that module to the current set of visible names.
-Normally, the module is specified using @var{classname}.
-The module can be static module (all public fields must be static),
-or an instance module (it has a public default constructor).
-
-If the module is a instance module and if no module instance for that class
-has been registered in the current environment, then a new instance
-is created and registered (using a "magic" identifier).
-If the module class either inherits from @code{gnu.expr.ModuleBody}
-or implements @code{java.lang.Runnable} then the corresponding @code{run}
-method is executed.  (This is done @emph{after} the instance is
-registered so that cycles can be handled.)  These actions (creating,
-registering, and running the module instance) are done both at compile
-time and at run time, if necessary.
-
-All the public fields of the module class are then incorporated
-in the current set of local visible names in the current module.
-(This is for both instance and static modules.)
-This is done at compile time - no new bindings are created at run-time
-(except for the magic binding used to register the module instance),
-and the imported bindings are private to the current module.
-References to the imported bindings will be compiled as field
-references, using the module instance (except for static fields).
-
-If a @code{@stxlit{"}@var{sourcepath}@stxlit{"}} is specified then
-that is used to locate the source file for the module, and if necessary,
-compile it.
-
-If a @code{'@var{featurename}} is specified then the
-@var{featurename} is looked up (at compile time) in the "feature table"
-which yields the implementing @var{classname}.
-@end deffn
+You can import a module into the current namespace with @code{import} or @code{require}.  This adds the exported bindings (or a subset of them) to the
+current lexical scope.  It follows that these bindings (which are said
+to be imported) are determined at compile-time.
 
 @anchor{meta-import-declaration}
 @deffn Syntax import @arbno{@stxref{import-set}}
-Similar functionality as @code{require}, but specified by R6RS/R7RS.
+An @code{import} declaration provides a way to import identifiers
+exported by a library (module). Each @meta{import-set} names a set of
+bindings from a library and possibly specifies local names
+for the imported bindings.
 @display
 @stxdef{import-set} @stxref{library-reference}
   | @stxlit{(library} @stxref{library-reference} @stxlit{)}
@@ -13736,8 +13769,8 @@ Similar functionality as @code{require}, but specified by R6RS/R7RS.
   | @stxlit{(except} @stxref{import-set} @arbno{@var{identifier}}@stxlit{)}
   | @stxlit{(prefix} @stxref{import-set} @var{identifier} @stxlit{)}
   | @stxlit{(rename} @stxref{import-set} @arbno{@stxlit{(} @stxref{identifier}@sub{1} @stxref{identifier}@sub{2} @stxlit{)}}@stxlit{)}
-@stxdef{library-reference} @stxlit{(} @stxref{library-name-parts} [@stxref{sourcepath-string}]@stxlit{)}
-@stxdef{sourcepath-string} @stxref{string}
+@stxdef{library-reference} @stxlit{(} @stxref{library-name-parts} [@stxref{explicit-source-name}]@stxlit{)}
+@stxdef{explicit-source-name} @stxref{string}
 @end display
 
 A @var{library-reference} is mapped to a class name by concatenating
@@ -13790,6 +13823,25 @@ distinct.
 @end itemize
 @end deffn
 
+@deffn Syntax require @stxlit{'}featureName
+@deffnx Syntax require classname [@stxref{explicit-source-name}]
+@deffnx Syntax require @stxref{explicit-source-name}]
+Search for a matching module (class), and add the names
+exported by that module to the current set of visible names.
+Normally, the module is specified using @var{classname}.
+
+The form @code{require} has similar functionality as @code{import},
+but with a different syntax, and without options like @code{rename}.
+
+If a @code{@stxlit{"}@var{sourcepath}@stxlit{"}} is specified then
+that is used to locate the source file for the module, and if necessary,
+compile it.
+
+If a @code{'@var{featurename}} is specified then the
+@var{featurename} is looked up (at compile time) in the "feature table"
+which yields the implementing @var{classname}.
+@end deffn
+
 @deffn Syntax provide @stxlit{'}featurename
 Declare that @code{'@var{featurename}} is available.
 A following @code{cond-expand} in this scope will match @var{featurename}.
@@ -13806,7 +13858,131 @@ static binding.
 For some examples, you may want to look in the @code{gnu/kawa/slib}
 directory.
 
-@node Record types, Dynamic records, Module classes, Objects Classes and Modules
+@subsection Searching for modules
+
+When Kawa sees a @code{import} or @code{require} it searches for
+either a matching source file or a previously-compiled class with a
+matching name.
+
+For @code{import} we generate a classname by converting it in the same
+way @code{module-name} does:  taking each identifier in the
+@meta{library-name-parts}, mangling if needed, and concatenating the parts
+separated by periods.
+
+If there is a matching module in any @meta{program-unit} that is
+in the process of being compiled, we use that.  This may be
+a file requested to be compiled with the @code{-C} command-line switch,
+or an extra @meta{library-definition} in a file already parsed.
+Kawa will attempt to finish compiling the module and load the class,
+but if there are circular dependencies it will use the uncompiled definitions.
+
+Next Kawa looks for a matching class in the context classpath.
+(There is special handling if the library-name starts with @code{srfi},
+and certain builtin classes will have @code{kawa.lib.} prepended.)
+
+Kawa also searches for a matching source file, described below.
+It uses the implicit source name (formed by concatenating the
+library-name parts, separated by @code{"/"}), as well as
+any @meta{explicit-source-name}.  The source file is parsed as
+a @stxref{program-unit}.  It is an error the @meta{program-unit}
+does not declare a library (explicit or implicit) with the
+matching name.
+
+If Kawa finds both a matching source file and a class, it will pick one
+based on which is newer.
+
+@subsection Searching for source files
+
+The Java property @code{kawa.import.path} controls how @code{import}
+and @code{require} search for a suitable source file.  Example usage:
+@example
+$ kawa -Dkawa.import.path=".:<foo fo>/opt/fo-libs/*.scm:/usr/local/kawa"
+@end example
+
+The value of the @code{kawa.import.path} property is a list of
+path elements, separated by @code{":"}.
+Each path element is combined with either the explicit source name
+or the implicit source name to produce a filename.
+If a matching file exists, then we have found a source file.
+
+If a path element contains a @code{"*"} then the @code{"*"}
+is replaced by the implicit source name (without an extension).
+(Any explicit source name is ignored in this case.)
+For example, for @code{(import (foo bar))} or @code{(require foo.bar)}
+the implicit source name is @code{"foo/bar"}.  If the path element is
+@code{"/opt/kawa/*.sc"} then the resulting filename is @code{"/opt/kawa/foo/bar.sc"}.
+
+If there is no @code{"*"} in the path element, and there is an
+explicit source, then it is appended to the path element
+(or replaces the path element if the explicit source is absolute).
+Otherwise we use the implicit source, followed by the default file extension.
+(The default file extension is that of the current source if that is a
+named file; otherwise the default for the current language, which
+is @code{".scm"}  for Scheme.)
+
+A path element that starts with a selector of the
+form @code{"<@stxref{library-name-parts}>"} is only applicable if a prefix
+of the requested module name matches the @meta{library-name-parts}.  If there
+is @code{"*"} in the path element, that is replaced by the corresponding rest
+of the implicit source name. For example if importing @code{(fee fo foo fum})
+and the path element is @code{"<fee fo>/opt/fo-libs/*.scm"} then the
+resulting filename is @code{"/opt/fo-libs/foo/fum.scm"}.
+If there is a selector but no @code{"*"}, then the rest of the path element
+following the selector is combined with the explicit or implicit source
+as if there were no selector (assuming of course that the selector matches).
+
+If the resulting filename is relative, then it is resolved
+relative to the @dfn{current root}.  For example the source to
+a library with the name @code{(x y)} that compiles to
+a class @code{x.y} might be a  file named @code{/a/b/x/y.scm}.
+Then the current root would be @code{/a/b/}
+- that is the directory that results from removing the library name
+suffix from the file name.
+
+More generally: assume the current module has @math{N} name components.
+For example the name @code{(x y)}
+(with the class name @code{x.y}) has 2 components.
+The current root is what you get when you take the current file name
+(say @code{"/a/b/c/d.scm"}), and remove everything after
+the @math{N}'th slash (@code{"/"}) from the end (say @code{"c/d.scm"};
+what remains (e.g. @code{"/a/b/"} is the current root.
+(If the current input source is not a named file,
+use the value of @code{(current-path)} with a @code{"/"} appended.)
+
+The default search path is @code{"."} - i.e. just search relative
+to the current root.
+
+@subsection Importing from a plain class
+
+Note you can import from many classes, even if they weren't
+compiled from a library-definition.  The set of @code{public} fields
+in a class are considered as the set of exported definitions,
+with the names demangled as needed.
+
+The module can be static module (all public fields must be static),
+or an instance module (it has a public default constructor).
+
+If an imported definition is a non-static field and if no module
+instance for that class
+has been registered in the current environment, then a new instance
+is created and registered (using a "magic" identifier).
+If the module class either inherits from @code{gnu.expr.ModuleBody}
+or implements @code{java.lang.Runnable} then the corresponding @code{run}
+method is executed.  (This is done @emph{after} the instance is
+registered so that cycles can be handled.)  These actions (creating,
+registering, and running the module instance) are done both at compile
+time and at run time, if necessary.
+
+All the imported fields of the module class are then incorporated
+in the current set of local visible names in the current module.
+(This is for both instance and static modules.)
+This is done at compile time - no new bindings are created at run-time
+(except for the magic binding used to register the module instance),
+and the imported bindings are private to the current module.
+References to the imported bindings will be compiled as field
+references, using the module instance (except for static fields).
+
+@node Record types
 @section Record types
 
 The @code{define-record-type} form can be used for creating new data
@@ -16609,7 +16785,7 @@ and
 JDK 8 ships with JavaFX, and it is in the default @code{CLASSPATH}.
 JDK 7 update 9 or later does have JavaFX included, but it is a separate
 @code{jfxrt.jar} which not in the default @code{CLASSPATH}.
-Thus have have to eplicitly add @code{jfxrt.jar}.
+Thus you have to explicitly add @code{jfxrt.jar}.
 To run the previous @code{HelloButton1.scm} you can do:
 @example
 java -cp $JAVA_HOME/lib/jfxrt.jar:$KAWA_HOME/kawa.jar HelloButton1.scm

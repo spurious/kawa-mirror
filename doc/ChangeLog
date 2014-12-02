@@ -1,3 +1,7 @@
+2014-12-02  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Importing): New section.
+
 2014-11-29  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Processes): Major additions.

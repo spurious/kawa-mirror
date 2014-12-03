@@ -1,3 +1,7 @@
+2014-12-02  Per Bothner  <per@bothner.com>
+
+	* standard/Include.java: Change search path default.
+
 2014-12-01  Per Bothner  <per@bothner.com>
 
 	Share more code between import and require.

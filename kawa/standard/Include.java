@@ -145,7 +145,7 @@ public class Include extends Syntax {
     public static final ThreadLocal<List<CharSequence>> searchPath
         = new InheritableThreadLocal<List<CharSequence>>();
     public static List<CharSequence> getIncludeSearchPath() {
-        return getSearchPath(searchPath, "kawa.include.path", ".:|");
+        return getSearchPath(searchPath, "kawa.include.path", "|:.");
     }
    
     public static List<CharSequence> getSearchPath(ThreadLocal<List<CharSequence>> var,

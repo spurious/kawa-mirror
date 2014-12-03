@@ -1,9 +1,13 @@
 2014-12-02  Per Bothner  <per@bothner.com>
 
-	* kawa.texi (@sub and @sup): When generating DocBook - which is used
-	for the online version of Kawa documentation - use the builtin versions
-	of @sup and @sub, which are only in the development version of texinfo.
-	(Quaternions): Use @sup.
+	* kawa.texi (@sub): When generating DocBook - which is used for the
+	online version of Kawa documentation - use the builtin version of @sub
+	which is only in the development version of texinfo.
+	(@xsup, @msup): Likewise, but instead of defining @sup use @xsup
+	and @msup to work around a conflicting \sup macro in older versions
+	of texinfo.tex.
+	(Quaternions): Use @msup.
+	(module classes): More on define-library.
 
 	* kawa.texi (Importing): New section.
 

@@ -490,33 +490,33 @@ public class ClassExp extends LambdaExp
                 if ("*init*".equals(child.getName())) {
                     code = comp.getCode();
 
-                if (staticLinkField != null) {
-                    code.emitPushThis();
-                    code.emitLoad(code.getCurrentScope().getVariable(1));
-                    code.emitPutField(staticLinkField);
-                }
+                    if (staticLinkField != null) {
+                        code.emitPushThis();
+                        code.emitLoad(code.getCurrentScope().getVariable(1));
+                        code.emitPutField(staticLinkField);
+                    }
 
-                // Extract "first" expression to see if it is special.
-                Expression bodyFirst = child.getBodyFirstExpression();
-                // See if bodyFirst is a this(...) or super(...) call.
-                ClassType calledInit = checkForInitCall(bodyFirst);
-                ClassType superClass = instanceType.getSuperclass();
-                if (calledInit != null) {
-                    bodyFirst.compileWithPosition(comp, Target.Ignore);
-                } else if (superClass != null) {
-                    // Call default super constructor if there isn't an explicit
-                    // call to a super constructor.
-                    invokeDefaultSuperConstructor(superClass, comp, this);
-                }
-                child.enterFunction(comp);
-                if (calledInit != instanceType)
-                    comp.callInitMethods(getCompiledClassType(comp),
-                                         new ArrayList<ClassType>(10));
-                if (calledInit != null)
-                    // Skip bodyFirst since we already compiled it.
-                    Expression.compileButFirst(child.body, comp);
-                else
-                    child.compileBody(comp);
+                    // Extract "first" expression to see if it is special.
+                    Expression bodyFirst = child.getBodyFirstExpression();
+                    // See if bodyFirst is a this(...) or super(...) call.
+                    ClassType calledInit = checkForInitCall(bodyFirst);
+                    ClassType superClass = instanceType.getSuperclass();
+                    if (calledInit != null) {
+                        bodyFirst.compileWithPosition(comp, Target.Ignore);
+                    } else if (superClass != null) {
+                        // Call default super constructor if there isn't
+                        // an explicit call to a super constructor.
+                        invokeDefaultSuperConstructor(superClass, comp, this);
+                    }
+                    child.enterFunction(comp);
+                    if (calledInit != instanceType)
+                        comp.callInitMethods(getCompiledClassType(comp),
+                                             new ArrayList<ClassType>(10));
+                    if (calledInit != null)
+                        // Skip bodyFirst since we already compiled it.
+                        Expression.compileButFirst(child.body, comp);
+                    else
+                        child.compileBody(comp);
                 } else {
                     child.enterFunction(comp);
                     child.compileBody(comp);
@@ -573,10 +573,10 @@ public class ClassExp extends LambdaExp
                 ArrayList<Method> vec = new ArrayList<Method>();
                 getImplMethods(compiledType, mname, ptypes, vec);
                 if (vec.size() == 0
-                        && mname.length() > 3
-                        && mname.charAt(2) == 't'
-                        && mname.charAt(1) == 'e'
-                        && ((ch = mname.charAt(0)) == 'g' || ch == 's')) {
+                    && mname.length() > 3
+                    && mname.charAt(2) == 't'
+                    && mname.charAt(1) == 'e'
+                    && ((ch = mname.charAt(0)) == 'g' || ch == 's')) {
                     // a "set" or "get" method is treated as a slot accessor.
                     Type ftype;
                     if (ch == 's' && rtype.isVoid() && ptypes.length == 1)

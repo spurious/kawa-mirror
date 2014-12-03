@@ -1,3 +1,8 @@
+2014-12-03  Per Bothner  <per@bothner.com>
+
+	* lang/SyntaxTemplate.java (convert_template): Check for cycles
+	could also trigger on harmless sharing.  Fix that.
+
 2014-12-02  Per Bothner  <per@bothner.com>
 
 	* standard/Include.java: Change search path default.

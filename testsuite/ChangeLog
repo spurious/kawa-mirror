@@ -1,3 +1,7 @@
+2014-12-03  Seth Alves <alves@hungry.com>
+
+	* macros1.scm: New test.
+
 2014-12-01  Jamison Hope  <jrh@theptrgroup.com>
 
 	* lib-test.scm: Add test for char-set<= bug reported by Seth

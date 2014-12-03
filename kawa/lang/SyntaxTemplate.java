@@ -202,14 +202,35 @@ public class SyntaxTemplate implements Externalizable {
                                  boolean isVector,
                                  Object ellipsis,
                                  Translator tr) {
+        Object unseeNeeded = null;
         if (form instanceof Pair || form instanceof FVector) {
             if (seen.containsKey(form)) {
-                /* FIXME cycles are OK if data are literal. */
-                tr.syntaxError("self-referential (cyclic) syntax template");
+                // FIXME cycles are OK if data are literal.
+                // Cycles in non-literal data could probably also be
+                // made to work with appropriate BUILD opcodes.
+                // However, that seems more trouble than it's worth.
+                tr.syntaxError("self-referential (cyclic) syntax template - "+form);
                 return -2;
             }
             seen.put(form, form);
+            unseeNeeded = form;
         }
+        int r = xconvert_template(form, syntax, template_program, nesting,
+                                  literals_vector, seen,
+                                  isVector, ellipsis, tr);
+        if (unseeNeeded != null)
+            seen.remove(unseeNeeded);
+        return r;
+    }
+    private int xconvert_template(Object form,
+                                 SyntaxForm syntax,
+                                 StringBuilder template_program,
+                                 int nesting,
+                                 java.util.Vector literals_vector,
+                                 IdentityHashMap seen,
+                                 boolean isVector,
+                                 Object ellipsis,
+                                 Translator tr) {
         while (form instanceof SyntaxForm) {
             syntax = (SyntaxForm) form;
             form = syntax.getDatum();

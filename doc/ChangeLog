@@ -1,5 +1,8 @@
 2014-12-02  Per Bothner  <per@bothner.com>
 
+	* kawa.texi (Tutorial): New chapter merged from tutorial.xml.
+	* tutorial.xml: Remove.
+
 	* kawa.texi (Bodies): Add note about encoding specifiers.
 
 	* kawa.texi (@sub): When generating DocBook - which is used for the

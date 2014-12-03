@@ -198,6 +198,7 @@ This package has nothing to do with the defunct Kawa commercial Java IDE.
 * Features::
 * Community::
 * Installation::         Building and installing Kawa
+* Tutorial::             Kawa Scheme Tutorial
 * Running::              Invoking, Running, and Using Kawa
 * Syntax::
 * Program structure::
@@ -1477,6 +1478,371 @@ path separators.  (At the time of writing there were still some
 path issues with running the testsuite.)
 
 @uref{http://www.mingw.org/,MinGW} may also work but has not been tested.
+
+@node Tutorial
+@chapter Kawa Scheme Tutorial
+
+@emph{This is obviously incomplete, but it may be useful,
+especially if you're starting with Kawa from scratch.}
+If you're new to Scheme you might also check out one of these tutorials:
+Takafumi Shido's
+@uref{http://www.shido.info/lisp/idx_scm_e.html,Yet Another Scheme Tutorial};
+@c dead link Greg Badross @uref{http://www.cs.washington.edu/education/courses/341/99suq/lectures/scheme/,lecture notes};
+Dorai Sitaram's @uref{http://www.ccs.neu.edu/home/dorai/t-y-scheme/t-y-scheme-Z-H-1.html,Teach Yourself Scheme in Fixnum Days}; or
+Paul Wilson's @uref{ftp://ftp.cs.utexas.edu/pub/garbage/cs345/schintro-v14/schintro_toc.html,An Introduction to Scheme and its Implementation}.
+
+@menu
+* Tutorial - Introduction::      Introduction
+* Tutorial - Booleans::          Booleans
+* Tutorial - Numbers::           Numbers
+* Tutorial - Functions::         Functions
+* Tutorial - Variables::         Variables
+* Tutorial - Sequences::         Lists and sequences
+* Tutorial - Types::             Types and declarations
+* Tutorial - Classes::           Classes
+
+@end menu
+
+@node Tutorial - Introduction
+@section Introduction
+You've heard about all the hot scripting languages
+-- you might even be tired of hearing about them.
+But Kawa offers you something different than the
+scripting-language @i{du-jour} can.
+You may be interested in one that runs on the Java virtual machine,
+either because you have to interact with other Java tools,
+or because you like having access to all the Java packages out there.
+Or maybe you don't care about Java, but you care about performance.
+If so, let me tell you about Kawa, which is actually one of the
+very oldest language implementations running on the Java Virtual Machine,
+dating back to 1996.
+
+The Kawa language is a dialect/implementation of the Scheme language.
+(The Kawa project also supports other languages, including
+@uref{http://www.w3.org/XML/Query,XQuery}
+and @uref{http://jemacs.sourceforge.net,Emacs Lisp},
+as well as tools for implementing mew programming languages,
+but we won't cover that in this tutorial.)
+
+@uref{http://www.schemers.org/,Scheme}
+is an established language with many
+@uref{http://community.schemewiki.org/?scheme-faq-standards#implementations,implementations},
+a @uref{http://www.schemers.org/Documents/Standards/,standard} specification
+(the traditional @uref{http://www.schemers.org/Documents/Standards/R5RS/,R5RS},
+@uref{http://www.r6rs.org/,R6RS} which was ratified in 2007,
+and @uref{http://www.r7rs.org/,R7RS} which was ratified in 2013),
+and is used by universities for both teaching and research.
+Scheme also has a reputation for being difficult to learn,
+with a weird parenthesis-heavy syntax,
+and hard-to-understand concepts like @uref{http://en.wikipedia.org/wiki/Continuation,continuations}.
+Luckily, you don't need to understand continuations!
+(Kawa doesn't fully implement them anyway.)
+
+The following assumes that Kawa is already installed on your computer;
+if not see these @ref{Installation,installation instructions}.
+Running the @code{kawa} command in interactive mode
+is a good way start learning Kawa:
+@example
+$ kawa
+#|kawa:1|# 
+@end example
+If you don't have @code{kawa} but you have a
+Kawa ``jar'' and you have Java installed you can instead do:
+
+@example
+$ java -jar kawa-@var{version-number}.jar
+#|kawa:1|# 
+@end example
+
+The prompt string has the form of a Scheme comment,
+to make it easier to cut-and-paste.
+Kawa is expecting you type type in an expression or command,
+which it will evaluate and print out the result.
+For example a quoted string is a simple expression that evaluates to a
+string value, which will print as itself, before printing the next prompt:
+
+@example
+#|kawa:1|# "Hello, world!"
+Hello, world!
+#|kawa:2|# 
+@end example
+@c Thus the Kawa equivalent of the traditional
+@c @uref{http://en.wikipedia.org/wiki/Hello_world,``hello world''} is trivial.
+
+The most noticable difference from most other programming languages
+is that Scheme uses ``prefix'' notation for function calls.
+For example Kawa has a function @code{max} which returns the
+largest value of the arguments.
+Instead of @code{max(5, 7, 3)}
+you write @code{(max 5 7 3)}:
+
+@example
+(max 5 7 3) @result{} 7
+@end example
+
+(We use the @code{@result{}} symbol above to indicate that
+the expression @code{(max 5 7 3)} evaluates to the
+value @code{7}.)
+
+The prefix notation may feel a bit weird, but you quickly
+get used to it, and it has some advantages.
+One is consistency: What are special infix operators in most languages
+in most languages are just regular functions in Scheme.
+For example addition is just a regular ordinary function call,
+and @code{+} is just a regular function name:
+@example
+(+ 2.5 1.2) @result{} 3.7
+@end example
+
+The same prefix notation is used for special operations like assignments:
+@example
+#|kawa:1|# (set! sqrt-of-2 (sqrt 2))
+#|kawa:2|# sqrt-of-2
+1.4142135623730951
+@end example
+
+@node Tutorial - Booleans
+@section Booleans
+
+Scheme uses the syntax @code{#t}> and @code{#f}
+for Boolean true and false value.  For example the
+``less-than'' function is named @code{<}.
+Its result is true if the first argument is less than the second (or if
+there are more than two arguments: that they are in increasing order):
+@example
+(< 3 4) @result{} #t
+(< -3 -4) @result{} #f
+(< 2 3 5 7 11)) @result{} #t
+@end example
+
+The @code{if} special form takes two or three sub-expressions:
+It evaluates the first expression.
+If that is true it evaluates the second expression;
+otherwise it evaluates the third expression, if provided:
+@example
+(if (< 3 4) (+ 5 5) (+ 5 6)) @result{} 10
+@end example
+
+We call @code{if} a special form rather than a function,
+because for a function all the arguments are evaluated before the
+function is called, but in a special form that is not neceassarily the case.
+
+In addition to @code{#t} any value except @code{#f}
+counts as ``true'' when evaluating the first expression of an @code{if}:
+
+@example
+(if 0 (+ 5 5) (+ 5 6)) @result{} 11
+@end example
+
+You can use @code{and}, @code{or},
+and not @code{and} to create complex boolean expressions.
+Of these @code{and} and @code{or}
+are special forms that only evaluate as many of the sub-expressions as needed.
+@example
+(if (not (and (>= i 0) (<= i 9)))
+    (display "error"))
+@end example
+
+You can use @code{cond} form as an alternative to
+@code{if}:
+@example
+(cond ((< 3 3) 'greater)
+      ((> 3 3) 'less)
+      (else ’equal))       @result{} equal
+@end example
+
+@node Tutorial - Numbers
+@section Numbers
+
+@subheading Exact integers and fractions
+
+Kawa has the usual syntax for decimal integers.
+Addition, subtraction, and mutliplication
+are written using the usual @code{+},
+@code{-}, and  @code{*},
+but these are all prefix functions that take a variable number of arguments:
+
+@example
+(+ 1 2 3) @result{} 6
+(- 10 3 4) @result{} (- (- 10 3) 4)  @result{} 3
+(* 2 -6)  @result{} -12
+@end example
+
+Kawa has arbitrary-precision integers.
+
+Let us implement the @uref{http://en.wikipedia.org/wiki/Factorial,factorial} function.
+Type in the following (we'll look at the syntax shortly):
+@example
+#|kawa:1|# (define (factorial x)
+#|(---:2|#   (if (< x 1) 1
+#|(---:3|#     (* x (factorial (- x 1)))))
+@end example
+
+(The prompt changes to indicate a continuation line.)
+This binds the name @code{factorial}
+to new function, with formal parameter @code{x}.
+This new function is immediately compiled to Java bytecodes,
+and later a JIT compiler may compile it to native code.
+
+A few tests:
+@example
+#|kawa:4|# (list (factorial 3) (factorial 4))
+(6 24)
+#|kawa:5|# (factorial 30)
+265252859812191058636308480000000
+@end example
+
+@subheading Floating-point real numbers
+
+@subheading Complex numbers
+
+@subheading Units and dimensions
+
+@node Tutorial - Functions
+@section Functions
+
+To declare a new function use @code{define},
+which has the following form:
+@example
+(define (@var{function-name} @var{parameter-names}) @var{body})
+@end example
+
+This creates a new function named @var{function-name},
+which takes @var{parameter-names} as parameters.
+When the function is called, the  @var{parameter-names}
+are initialized with the actual arguments. Then @var{body}
+is evaluated, and that becomes the result of the call.
+
+For example in the @code{factorial} function we looked at recently,
+the @var{function-name} is @code{factorial},
+and the @var{parameter-names} is @code{x}:
+
+@example
+(define (factorial x)
+  (if (< x 1) 1
+  (* x (factorial (- x 1)))))
+@end example
+
+@subheading Anonymous functions
+
+@c If you just evaluate a function nameA function is an actual variable you can evaluate xxx
+A @dfn{lambda expression} has the following form:
+@example
+(lambda (@var{parameter-names}) @var{body})
+@end example
+
+@subheading Optional and rest parameters
+You can declare a function that takes optional argument,
+or variable number of arguments.
+You can also use keyword parameters.
+@ref{Extended formals,Read more here.}
+
+@node Tutorial - Variables
+@section Variables
+
+You can declare a variable using a @code{define} form.
+This takes a variable name, and an expression.  It declares a new
+variable with the given name, and assigned the value of the
+expression to the variable.
+@example
+#|kawa:1|# (define binary-kilo 1024)
+#|kawa:2|# (define binary-mega (* binary-kilo binary-kilo))
+#|kawa:3|# binary-mega
+1048576
+@end example
+A @code{define} typed into the command-line
+defines a top-level variable.
+
+You can also declare local variables.  TODO.
+
+
+@node Tutorial - Sequences
+@section Lists and sequences
+
+A @dfn{list} is a sequence of values,
+which is implemented as a chain of linked @dfn{pairs}.
+You can create a constant list by quoting a parenthesized list:
+@example
+'(3 4 (10 20 30) "a string")
+@end example
+A @dfn{vector} is a sequence is whose elements are
+indexed by integers.
+A vector uses less space than a list of the same length,
+and is generally more efficient than a list.
+Lists and vectors are examples of @dfn{sequences},
+as are strings, and some other data types.  Sequences have certain common
+operations ...
+
+@node Tutorial - Types
+@section Types and declarations
+
+A @dfn{type} is a named value for a set
+of objects with related properties.
+For example @code{vector} is the type for standard Scheme vectors.
+You can use a type to specify that a variable can only have
+values of the specified types:
+
+@example
+#|kawa:5|# (define v ::vector #(3 4 5))
+#|kawa:6|# v
+#(3 4 5)
+#|kawa:7|# (set! v 12)
+/dev/stdin:7:1: warning - cannot convert literal (of type gnu.math.IntNum) to vector
+Value (12) for variable 'v' has wrong type (gnu.math.IntNum) (gnu.math.IntNum cannot be cast to gnu.lists.FVector)
+	at atInteractiveLevel$7.run(stdin:7)
+	at gnu.expr.ModuleExp.evalModule(ModuleExp.java:302)
+	at kawa.Shell.run(Shell.java:275)
+	at kawa.Shell.run(Shell.java:186)
+	at kawa.Shell.run(Shell.java:167)
+	at kawa.repl.main(repl.java:870)
+Caused by: java.lang.ClassCastException: gnu.math.IntNum cannot be cast to gnu.lists.FVector
+	... 6 more
+@end example
+
+Using a type specification catches errors, and matches your programs
+more readable.  It also can allow the Kawa compiler to generate code
+that runs faster.
+
+You can use a type to check that a value is an instance of the type,
+using either the @code{instance?} function:
+
+@example
+(instance? #(3 4 5) vector) @result{} #t
+(instance? '(3 4 5) vector) @result{} #f
+@end example
+
+As a convenience, you can use a type-name followed by a ``@code{?}'':
+@example
+(@var{type}? @var{val}) == (instance? @var{val} @var{type})
+@end example
+
+You can ``call'' a type as if it were a function.
+That constructs a new instance of the type.
+@example
+((EXAMPLE NEEDED))
+@end example
+
+A fully-qualified Java class is a type name.
+So are the names of Java primitive types.
+So are Java array types. ((EXAMPLES NEEDED))
+
+A type is true run-time value:
+
+@example
+(define mytypes (list vector list string))
+(instance? #(3 4 5) (car mytypes) @result{} #t
+@end example
+
+The @code{define-alias} form is useful for defining shorter names
+for types, like a generalization of Java's @code{import} statement:
+
+@example
+(define-alias jframe javax.swing.JFrame)
+@end example
+
+@node Tutorial - Classes
+@section Classes
+
 
 @part Reference Documentation
 
@@ -15717,7 +16083,7 @@ and the ending @var{QName} must match exactly:
 
 As a convenience, you can leave out the ending tag(s):
 @example
-<para>This is a paragraph in <emphasis>DocBook</> syntax.</>
+This is a paragraph in <emphasis>DocBook</> syntax.</>
 @end example
 
 You can use an expression to compute the element tag at runtime -

@@ -1,6 +1,13 @@
 2014-12-02  Per Bothner  <per@bothner.com>
 
+	* kawa.texi (@sub and @sup): When generating DocBook - which is used
+	for the online version of Kawa documentation - use the builtin versions
+	of @sup and @sub, which are only in the development version of texinfo.
+	(Quaternions): Use @sup.
+
 	* kawa.texi (Importing): New section.
+
+	* kawa.texi (Syntax and conditional compilation): Update for 'include'.
 
 2014-11-29  Per Bothner  <per@bothner.com>
 

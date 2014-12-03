@@ -59,9 +59,16 @@
 \THING\@math{^+}
 @end macro
 
+@c A kludge - the development version of texinfo supports @sup and @sub.
+@c When using DocBook (used for the online manual) we require this version.
+@ifnotdocbook
 @macro sub{THING}
 @math{_\THING\}
 @end macro
+@macro sup{THING}
+@math{^\THING\}
+@end macro
+@end ifnotdocbook
 
 @macro meta{THING}
 @var{\THING\}
@@ -7023,9 +7030,9 @@ additions.
 A quaternion is a number that can be expressed in the form
 @samp{w+xi+yj+zk}, where @code{w}, @code{x}, @code{y}, and @code{z} are
 real, and @code{i}, @code{j}, and @code{k} are imaginary units
-satisfying @math{i^2 = j^2 = k^2 = ijk = -1}.  The magnitude of a
+satisfying @math{i@sup{2} = j@sup{2} = k@sup{2} = ijk = -1}.  The magnitude of a
 quaternion is defined to be its Euclidean norm when viewed as a point in
-@math{R^4}.
+@math{R@sup{4}}.
 
 The real--part of a quaternion is also called its @samp{scalar}, while
 the i--part, j--part, and k--part taken together are also called its

@@ -1,5 +1,7 @@
 2014-12-02  Per Bothner  <per@bothner.com>
 
+	* kawa.texi (Bodies): Add note about encoding specifiers.
+
 	* kawa.texi (@sub): When generating DocBook - which is used for the
 	online version of Kawa documentation - use the builtin version of @sub
 	which is only in the development version of texinfo.

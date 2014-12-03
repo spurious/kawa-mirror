@@ -3297,6 +3297,7 @@ Deprecated; usually you can just write:
 @node Bodies
 @section Programs and Bodies
 
+@anchor{program units}
 @subheading Program units
 
 A @meta{program-unit} consists of a sequence of definitions and expressions.
@@ -3323,6 +3324,24 @@ values of expression are printed to the console (as if using the
 another @meta{program-unit}, and so on. A definition in an earlier
 @meta{program-unit} is remembered and is visible in a later @meta{program-unit}
 unles it is overridden.
+
+@cindex encoding specifier
+@cindex coding specifier
+A comment in the first 2 lines of a source file may contain an encoding
+specification.  This can be used to tell the reader what kind of character
+set encoding is used for the file.  This only works for a character
+encoding that is compatible with ASCII (in the sense that if the
+high-order bit is clear then it's an ASCII character),
+and that are no non-ASCI characters in the lines upto and including
+the encoding specification.
+A basic example is:
+@example
+;; -*- coding: utf-8 -*-
+@end example
+In general any string that matches the following regular expression works:
+@example
+coding[:=]\s*([-a-zA-Z0-9]+)
+@end example
 
 @subheading Libraries
 
@@ -4505,6 +4524,9 @@ or to read motivation and details, see the
 @c FIXME May rename: Control structure
 @node Program structure
 @chapter Program structure
+
+See @ref{program units} for some notes on
+structure of an entire source file.
 
 @menu
 * Boolean values::

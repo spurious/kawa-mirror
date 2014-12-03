@@ -2763,7 +2763,6 @@ The following directives give explicit control over case folding.
 
 @deffn Syntax #!fold-case
 @deffnx Syntax #!no-fold-case
-@end deffn
 
 These directives may appear anywhere comments are permitted and are
 treated as comments, except that they affect the reading of subsequent
@@ -2772,6 +2771,7 @@ procedure to case-fold (as if by @code{string-foldcase}) each
 identifier and character name subsequently read from the same
 port. The @code{#!no-fold-case} directive causes the @code{read}
 procedure to return to the default, non-folding behavior.
+@end deffn
 
 Note that colon @code{:} is treated specially for
 @ref{Colon notation, colon notation} in Kawa Scheme,
@@ -3384,7 +3384,9 @@ the @func{let} expression in the above example is equivalent to
 @node Syntax and conditional compilation
 @section Syntax and conditional compilation
 
-@deffn Syntax cond-expand cond-expand-clause* [@stxlit{(else} command-or-definition*@stxlit{)}]
+@subheading Feature testing
+
+@deffn Syntax cond-expand @arbno{@stxref{cond-expand-clause}} [@stxlit{(else} command-or-definition*@stxlit{)}]
 @display
 @stxdef{cond-expand-clause} @stxlit{(}@var{feature-requirement} @var{command-or-definition}*@stxlit{)}
 @findex @i{fff-rec}
@@ -3467,17 +3469,39 @@ Here is example of what @code{features} might return:
 @end example
 @end deffn
 
-@anchor{include}
-@deffn Syntax include path
-Read the contents of the file at @var{path} as a sequence of forms,
-and treat the result as if the resulting forms were the forms
-of a @code{begin}.
-@end deffn
+@subheading File inclusion
 
+@anchor{include}
 @anchor{include-relative}
-@deffn Syntax include-relative path
-Same as @code{include}, except that the @var{path} is relative to the
-path of the source-file containing the @code{include-file}.
+@deffn Syntax include @atleastone{path}
+@deffnx Syntax include-relative @atleastone{path}
+@deffnx Syntax include-ci @atleastone{path}
+These take one or more path names expressed as string literals,
+find corresponding files, read the contents of the files in the specified order
+as if by repeated applications of @code{read}, and effectively
+replace the @code{include} with a @code{begin} form
+containing what was read from the files.
+
+You can control the search path used for @code{include}
+by setting the @code{kawa.include.path} property.  For example:
+@example
+$ kawa -Dkawa.include.path="|:/opt/kawa-includes"
+@end example
+The special @code{"|"} path element means to search
+relative to the directory containing the including source file.
+The default search path is @code{"|:."} which means to first
+search the directory containing the including source file,
+and then search the directory specified by @code{(current-path)}.
+
+The search path for @code{include-relative} prepends @code{"|"}
+before the search path used by @code{include}, so it always
+searches first the directory containing the including source file.
+Note that if the default search path is used then @code{include}
+and @code{include-relative} are equivalent; there is only a difference
+if the @code{kawa.include.path} property changes the default.
+
+Using @code{include-ci} is like @code{include}, except that it reads each
+file as if it began with the @code{#!fold-case} directive.
 @end deffn
 
 @node Macros
@@ -13480,7 +13504,20 @@ mapped to a class name.
   | @stxref{import-declaration}
   | @stxlit{(begin} @arbno{@stxref{statement}} @stxlit{)}
   | ...
+  | @stxlit{(include-library-declarations} @atleastone{@meta{filename}}@stxlit{)}
+  | @stxlit{(cond-expand} @arbno{@stxref{cond-expand-clause}} [@stxlit{(else} command-or-definition*@stxlit{)}]@stxlit{)}
 @end display
+
+The @code{include-library-declarations} declaration is similar
+to @code{include} except that the contents of the file are
+spliced directly into the current library definition. This
+can be used, for example, to share the same @code{export} declaration
+among multiple libraries as a simple form of library interface.
+
+The @code{cond-expand} declaration has the same syntax and semantics
+as the @code{cond-expand} expression type, except that
+it expands to spliced-in library declarations rather than
+expressions enclosed in @code{begin}.
 
 @subsection How a module becomes a class
 

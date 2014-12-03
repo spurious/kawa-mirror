@@ -69,11 +69,12 @@ public class ClassType extends ObjectType
   /** The super (base) class of the current class.
    * X.superClass == null means the superClass has not been specified,
    * and defaults to java.lang.Object. */
-  ClassType superClass;
+  private ClassType superClass;
   /** The constant pool index of the superClass, or -1 if unassigned. */
   int superClassIndex = -1;
 
   ClassType[] interfaces;
+  private ClassType[] allInterfaces;
   int[] interfaceIndexes;
   int access_flags;
 
@@ -458,6 +459,39 @@ public class ClassType extends ObjectType
       }
     return interfaces;
   }
+
+    /** Get all the interfaces this class implements.
+     * Includes those inherited from its superclass/superinterfaces.
+     */
+    public synchronized ClassType[] getAllInterfaces() {
+        if (allInterfaces == null) {
+            LinkedHashMap<String,ClassType> map =
+                new LinkedHashMap<String,ClassType>();
+            for (ClassType t = this; t != null; t = t.getSuperclass()) {
+                if (! t.addInterfaces(map))
+                    return null;
+            }
+            ClassType[] allInts = new ClassType[map.size()];
+            int i = 0;
+            for (ClassType intf : map.values()) {
+                allInts[i++] = intf;
+            }
+            allInterfaces = allInts;
+        }
+        return allInterfaces;
+    }
+
+    private boolean addInterfaces(LinkedHashMap<String,ClassType> map) {
+        ClassType[] intfs = getInterfaces();
+        if (intfs == null)
+            return false;
+        for (ClassType intf : intfs) {
+            if (map.put(intf.getName(), intf) == null
+                && ! intf.addInterfaces(map))
+                return false;
+        }
+        return true;
+    }
 
   public void setInterfaces (ClassType[] interfaces)
   { this.interfaces = interfaces; }
@@ -872,7 +906,7 @@ public class ClassType extends ObjectType
 
       if (searchSupers > 1)
 	{
-	  ClassType[] interfaces = ctype.getInterfaces();
+	  ClassType[] interfaces = ctype.getAllInterfaces();
 	  if (interfaces != null)
 	    {
 	      for (int i = 0;  i < interfaces.length;  i++)
@@ -973,42 +1007,26 @@ public class ClassType extends ObjectType
     return getDeclaredMethod(name, true, argCount);
   }
 
-  /** Looks for a method matching the name and types.
-   * Note looks for an exact match, unless a type is null,
-   * not necessarily the best match.
-   */
-  public synchronized Method getMethod(String name, Type[] arg_types)
-  {
-    ClassType cl = this;
-    for (;;)
-      {
-        Method method = cl.getDeclaredMethod(name, arg_types);
-	if (method != null)
-          return method;
-        cl = cl.getSuperclass();
-        if (cl == null)
-          break;
-      }
-    cl = this;
-    for (;;)
-      {
-        ClassType[] interfaces = cl.getInterfaces();
-        if (interfaces != null)
-          {
-            for (int i = 0;  i < interfaces.length;  i++)
-              {
-                Method method
-                  = interfaces[i].getDeclaredMethod(name, arg_types);
-                if (method != null)
-                  return method;
-              }
-          }
-        cl = cl.getSuperclass();
-        if (cl == null)
-          break;
-      }
-    return null;
-  }
+    /** Looks for a method matching the name and types.
+     * Note looks for an exact match, unless a type is null,
+     * not necessarily the best match.
+     */
+    public synchronized Method getMethod(String name, Type[] arg_types) {
+        for (ClassType cl = this; cl != null; cl = cl.getSuperclass()) {
+            Method m = cl.getDeclaredMethod(name, arg_types);
+            if (m != null)
+                return m;
+        }
+        ClassType[] interfaces = getAllInterfaces();
+        if (interfaces != null) {
+            for (int i = 0;  i < interfaces.length;  i++) {
+                Method m = interfaces[i].getDeclaredMethod(name, arg_types);
+                if (m != null)
+                    return m;
+            }
+        }
+        return null;
+    }
 
   public Method getDefaultConstructor ()
   {

@@ -314,7 +314,7 @@ public class FindCapturedVars extends ExpExpVisitor<Void>
 
   public void capture(Declaration decl)
   {
-    if (! (decl.getCanRead() || decl.getCanCall()))
+    if (! decl.getCanReadOrCall())
       return;
     if (decl.field != null && decl.field.getStaticFlag())
       return;
@@ -405,7 +405,7 @@ public class FindCapturedVars extends ExpExpVisitor<Void>
 	decl.base.setCanRead(true);
 	capture(decl.base);
       }
-    else if (decl.getCanRead() || decl.getCanCall() || declValue == null)
+    else if (decl.getCanReadOrCall() || declValue == null)
       {
 	if (! decl.isStatic())
 	  {
@@ -416,7 +416,7 @@ public class FindCapturedVars extends ExpExpVisitor<Void>
 	    for (LambdaExp outer = parent;  outer != declLambda && outer != null; )
 	      {
 		heapLambda = outer;
-		if (! decl.getCanRead() && declValue == outer)
+		if (! decl.getCanReadOrCall() && declValue == outer)
 		  break;
 		Declaration heapDecl = heapLambda.nameDecl;
 		if (heapDecl != null

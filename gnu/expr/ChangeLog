@@ -1,3 +1,9 @@
+2014-12-07  Per Bothner  <per@bothner.com>
+
+	* Declaration.java (getCanReadOrCall): New method.
+	* FindCapturedVars.java (capture): Use getCanReadOrCall as appropriate.
+	In one case fix a bug - we should also check CAN_CALL.
+
 2014-12-01  Per Bothner  <per@bothner.com>
 
 	* ModuleInfo.java (setupModuleExp): If we have a class, set value

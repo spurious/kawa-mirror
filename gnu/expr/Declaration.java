@@ -714,6 +714,10 @@ public class Declaration
       base.setCanRead();
   }
 
+    public final boolean getCanReadOrCall() {
+        return (flags & (CAN_READ|CAN_CALL)) != 0;
+    }
+
   public final boolean getCanCall() { return (flags & CAN_CALL) != 0; }
   public final void setCanCall(boolean called) { setFlag(called, CAN_CALL); }
   public final void setCanCall()

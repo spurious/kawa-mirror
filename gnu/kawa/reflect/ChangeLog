@@ -1,5 +1,7 @@
 2014-12-08  Per Bothner  <per@bothner.com>
 
+	* TypeSwitch.java (compile): Force Lazy value if appropriate.
+
 	* TypeSwitch.java (compile): Re-do logic in preparation for patterns.
 
 2014-08-28  Per Bothner  <per@bothner.com>

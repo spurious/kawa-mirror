@@ -72,6 +72,13 @@ public class TypeSwitch extends MethodProc implements Inlineable {
                         numConditionsThisLambda++;
                     }
                     Variable incoming = selector;
+                    if (LazyType.maybeLazy(valType)
+                        && ! LazyType.maybeLazy(type)) {
+                        code.emitLoad(incoming);
+                        valType = StackTarget.forceLazy(comp, valType, type);
+                        incoming = param.getContext().getVarScope().addVariable(code, valType.getImplementationType(), null);
+                        code.emitStore(incoming);
+                    }
                     boolean storeNeeded = param.getCanRead();
                     if (isConditional) {
                         if (type instanceof TypeValue) {

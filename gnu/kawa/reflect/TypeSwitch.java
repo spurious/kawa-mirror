@@ -9,7 +9,7 @@ import gnu.mapping.*;
 /** Implement 'typeswitch' (as in XQuery) or 'typecase'.
  * Usage: (typeswitch SELECTOR CASE-LAMBDA ... DEFAULT-LAMBDA)
  * Each CASE-LAMBDA is a 1-argument MethodProc, while DEFAULT-LAMBDA
- * is a 0-argument Procedure.  Calls the first CASE-LAMBDA such that
+ * is a 1-argument Procedure.  Calls the first CASE-LAMBDA such that
  * SELECTOR is a valid argument; if there is none, calls DEFAULT-LAMBDA.
  * In the current implementation, all of CASE-LAMBDA and DEFAULT-LAMBDA
  * must be LambdaExps, and the call must be inlined.
@@ -49,42 +49,62 @@ public class TypeSwitch extends MethodProc implements Inlineable {
         Variable selector = code.addLocal(Type.pointer_type);
         args[0].compile(comp, Target.pushObject);
         code.emitStore(selector);
+        int numCondClauses = 0;
 
         for (int i = 1;  i < args.length;  ) {
-            if (i > 1)
-                code.emitElse();
-
             Expression arg = args[i++];
 
             if (arg instanceof LambdaExp) {
                 LambdaExp lambda = (LambdaExp) arg;
-                Declaration param = lambda.firstDecl();
-                Type type = param.getType();
-                if (! param.getCanRead())
-                    param = null;
-                else
-                    param.allocateVariable(code);
-
-                if (type instanceof TypeValue)
-                    ((TypeValue) type).emitTestIf(selector, param, comp);
-                else {
-                    if (i < args.length) {
-                        code.emitLoad(selector);
-                        type.emitIsInstance(code);
-                        code.emitIfIntNotZero();
+                int numConditionsThisLambda = 0;
+                for (Declaration param = lambda.firstDecl();
+                     param != null;  param = param.nextDecl()) {
+                    Type type = param.getType();
+                    Type valType = args[0].getType();
+                    // Rather simplistic ...
+                    boolean isConditional = type != Type.objectType
+                        && type != valType;
+                    if (param.getCanRead() || isConditional)
+                        param.allocateVariable(code);
+                    if (isConditional) {
+                        if (numConditionsThisLambda > 0)
+                            code.emitAndThen();
+                        numConditionsThisLambda++;
                     }
-                    if (param != null) {
-                        code.emitLoad(selector);
+                    Variable incoming = selector;
+                    boolean storeNeeded = param.getCanRead();
+                    if (isConditional) {
+                        if (type instanceof TypeValue) {
+                            ((TypeValue) type).emitTestIf(incoming, param, comp);
+                            storeNeeded = false;
+                        }
+                        else {
+                            code.emitLoad(incoming);
+                            type.emitIsInstance(code);
+                            code.emitIfIntNotZero();
+                        }
+                    }
+                    if (storeNeeded) {
+                        code.emitLoad(incoming);
+                        if (isConditional)
+                            type.emitCoerceFromObject(code);
                         param.compileStore(comp);
                     }
                 }
                 lambda.allocChildClasses(comp);
                 lambda.body.compileWithPosition(comp, target);
+                if (numConditionsThisLambda == 0)
+                    break;
+                else if (i < args.length) {
+                    numCondClauses++;
+                    code.emitElse();
+                }
+
             } else {
                 throw new Error("not implemented: typeswitch arg not LambdaExp");
             }
         }
-        for (int i = args.length - 2; --i >= 0; )
+        while (--numCondClauses >= 0)
             code.emitFi();
     
         code.popScope();

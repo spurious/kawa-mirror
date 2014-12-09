@@ -1740,7 +1740,6 @@ public class CodeAttr extends Attribute implements AttrContainer
       throw new Error ("non-int type to emitIfCompare1");
     reserve(3);
     emitTransfer (new_if.end_label, opcode);
-    new_if.start_stack_size = SP;
   }
 
   /** Compile start of conditional:  <tt>if (x != 0) ...</tt>.
@@ -1773,7 +1772,6 @@ public class CodeAttr extends Attribute implements AttrContainer
       throw new Error ("non-ref type to emitIfRefCompare1");
     reserve(3);
     emitTransfer (new_if.end_label, opcode);
-    new_if.start_stack_size = SP;
   }  
   
   /** Compile start of conditional:  if (x != null) */
@@ -1797,7 +1795,6 @@ public class CodeAttr extends Attribute implements AttrContainer
     popType();
     reserve(3);
     emitTransfer(new_if.end_label, opcode);
-    new_if.start_stack_size = SP;
   }
 
   /* Compile start of a conditional:  if (x < y) ... */
@@ -1812,7 +1809,6 @@ public class CodeAttr extends Attribute implements AttrContainer
   {
     IfState new_if = pushIfState();
     emitGotoIfEq(new_if.end_label);
-    new_if.start_stack_size = SP;
   }
 
   /** Compile start of a conditional:  if (x == y) ...
@@ -1821,7 +1817,6 @@ public class CodeAttr extends Attribute implements AttrContainer
   {
     IfState new_if = pushIfState();
     emitGotoIfNE(new_if.end_label);
-    new_if.start_stack_size = SP;
   }
 
   /** Compile start of a conditional:  if (x < y) ...
@@ -1830,7 +1825,6 @@ public class CodeAttr extends Attribute implements AttrContainer
   {
     IfState new_if = pushIfState();
     emitGotoIfGe(new_if.end_label);
-    new_if.start_stack_size = SP;
   }
 
   /** Compile start of a conditional:  if (x >= y) ...
@@ -1839,7 +1833,6 @@ public class CodeAttr extends Attribute implements AttrContainer
   {
     IfState new_if = pushIfState();
     emitGotoIfLt(new_if.end_label);
-    new_if.start_stack_size = SP;
   }
 
   /** Compile start of a conditional:  if (x > y) ...
@@ -1848,7 +1841,6 @@ public class CodeAttr extends Attribute implements AttrContainer
   {
     IfState new_if = pushIfState();
     emitGotoIfLe(new_if.end_label);
-    new_if.start_stack_size = SP;
   }
 
   /** Compile start of a conditional:  if (x <= y) ...
@@ -1857,7 +1849,6 @@ public class CodeAttr extends Attribute implements AttrContainer
   {
     IfState new_if = pushIfState();
     emitGotoIfGt(new_if.end_label);
-    new_if.start_stack_size = SP;
   }
 
   /** Emit a 'ret' instruction.
@@ -1882,7 +1873,6 @@ public class CodeAttr extends Attribute implements AttrContainer
 
   public final void emitThen()
   {
-    if_stack.start_stack_size = SP;
   }
 
   public final void emitIfThen ()
@@ -1898,23 +1888,10 @@ public class CodeAttr extends Attribute implements AttrContainer
       {
         Label end_label = new Label (this);
         if_stack.end_label = end_label;
-	int growth = SP-if_stack.start_stack_size;
-	if_stack.stack_growth = growth;
-	if (growth > 0)
-	  {
-	    if_stack.then_stacked_types = new Type[growth];
-	    System.arraycopy (stack_types, if_stack.start_stack_size,
-			      if_stack.then_stacked_types, 0, growth);
-	  }
-	else
-	  if_stack.then_stacked_types = new Type[0];  // ???
 	emitGoto (end_label);
       }
     else
       if_stack.end_label = null;
-    while (SP > if_stack.start_stack_size)
-      popType();
-    SP = if_stack.start_stack_size;
     if (else_label != null)
       else_label.define (this);
     if_stack.doing_else = true;    
@@ -1923,31 +1900,6 @@ public class CodeAttr extends Attribute implements AttrContainer
   /** Compile end of conditional. */
   public final void emitFi ()
   {
-    if (! if_stack.doing_else)
-      { // There was no 'else' clause.
-	if (reachableHere ()
-	    && SP != if_stack.start_stack_size)
-	  throw new Error("at PC "+PC+" then clause grows stack with no else clause");
-      }
-    else if (if_stack.then_stacked_types != null)
-      {
-	int then_clause_stack_size
-	  = if_stack.start_stack_size + if_stack.stack_growth;
-	if (! reachableHere ())
-	  {
-	    if (if_stack.stack_growth > 0)
-	      System.arraycopy (if_stack.then_stacked_types, 0,
-				stack_types, if_stack.start_stack_size,
-				if_stack.stack_growth);
-	    SP = then_clause_stack_size;
-	  }
-	else if (SP != then_clause_stack_size)
-	  throw new Error("at PC "+PC+": SP at end of 'then' was " +
-			  then_clause_stack_size
-			  + " while SP at end of 'else' was " + SP);
-        setReachable(true);
-      }
-
     if (if_stack.end_label != null)
       if_stack.end_label.define (this);
     // Pop the if_stack.

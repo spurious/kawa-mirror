@@ -18,16 +18,6 @@ public class IfState {
    * otherwise, it is the end of the "then" clause. */
   Label end_label;
 
-  /** The stack size before the "then" clause. */
-  int start_stack_size;
-
-  /** The change in the stack size caused by the then-clause.
-   * Same as then_stacked_types.length, if stack_growth >= 0. */
-  int stack_growth;
-
-  /** The types that were pushed by the then-clause. */
-  Type[] then_stacked_types;
-
   boolean andThenSet;
 
   public IfState (CodeAttr code)
@@ -40,7 +30,6 @@ public class IfState {
     previous = code.if_stack;
     code.if_stack = this;
     end_label = endLabel;
-    start_stack_size = code.SP;
   }
 }
 

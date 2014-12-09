@@ -1,3 +1,11 @@
+2014-12-08  Per Bothner  <per@bothner.com>
+
+	* IfState.java (start_stack_size, stack_growth, then_stacked_types):
+	Remove fields.  This old logic was redundant, since using a Label
+	handles type merging just as well.  Actually better, since the old
+	code had problem setting start_stack_size correctly in some cases.
+	* CodeAttr.java: Update and simplify accordingly.
+
 2014-12-02  Per Bothner  <per@bothner.com>
 
 	* ClassType.java (getAllInterfaces): New method.

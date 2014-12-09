@@ -1,3 +1,11 @@
+2014-12-08  Per Bothner  <per@bothner.com>
+
+	* BlockExp.java (runFinallyBlocks): New field.
+	(setRunFinallyBlocks): Set field.
+	(compile): Use field.
+	* FindTailCalls.java (visitExitExp): New method.
+	Use returnContinuation prevously passed in the BlockExp.
+
 2014-12-07  Per Bothner  <per@bothner.com>
 
 	* Declaration.java (getCanReadOrCall): New method.

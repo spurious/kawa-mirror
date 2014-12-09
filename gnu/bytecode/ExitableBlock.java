@@ -121,6 +121,8 @@ public class ExitableBlock
   /** Exit this surrounding block, executing finally blocks as needed. */
   void exit (TryState activeTry)
   {
+    if (! code.reachableHere())
+      return;
     popStack(code);
     if (activeTry == initialTryState)
       code.emitGoto(endLabel);

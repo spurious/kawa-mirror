@@ -1,5 +1,7 @@
 2014-12-08  Per Bothner  <per@bothner.com>
 
+	* ExitableBlock.java (exit): Do nothing  if not reachableHere.
+
 	* IfState.java (start_stack_size, stack_growth, then_stacked_types):
 	Remove fields.  This old logic was redundant, since using a Label
 	handles type merging just as well.  Actually better, since the old

@@ -20,6 +20,8 @@ public class BlockExp extends Expression
   /** If non-null, evaluate this, but only if non-normal exit. */
   Expression exitBody;
 
+    boolean runFinallyBlocks = true;
+
   public void setBody(Expression body)
   {
     this.body = body;
@@ -30,6 +32,10 @@ public class BlockExp extends Expression
     this.body = body;
     this.exitBody = exitBody;
   }
+
+    public void setRunFinallyBlocks(boolean value) {
+        this.runFinallyBlocks = value;
+    }
 
   public void setLabel (Declaration label)
   {
@@ -67,8 +73,7 @@ public class BlockExp extends Expression
     Type rtype = (exitBody == null && target instanceof StackTarget
                   ? target.getType()
                   : null);
-    // FIXME - be more clever than "true"
-    ExitableBlock bl = code.startExitableBlock(rtype, true);
+    ExitableBlock bl = code.startExitableBlock(rtype, runFinallyBlocks);
     exitableBlock = bl;
     this.exitTarget = exitBody == null ? target : Target.Ignore;
     body.compileWithPosition(comp, target);

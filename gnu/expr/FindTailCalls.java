@@ -1,5 +1,6 @@
 package gnu.expr;
 import gnu.bytecode.Type;
+import java.util.HashMap;
 
 /** A visitor that checks for tails-calls; also notes read/write/call accesses.
  *
@@ -24,6 +25,8 @@ public class FindTailCalls extends ExpExpVisitor<Expression>
     visitor.setContext(comp);
     visitor.visit(exp, exp);
   }
+
+    public HashMap<Expression,Expression> savedReturnContinuations;
 
   protected Expression visitExpression (Expression exp, Expression returnContinuation)
   {
@@ -120,13 +123,23 @@ public class FindTailCalls extends ExpExpVisitor<Expression>
     return exp;
   }
 
-  protected Expression visitBlockExp (BlockExp exp, Expression returnContinuation)
-  {
-    exp.body = exp.body.visit(this, returnContinuation);
-    if (exp.exitBody != null)
-      exp.exitBody = exp.exitBody.visit(this, exp.exitBody);
-    return exp;
-  }
+    protected Expression visitBlockExp(BlockExp exp, Expression returnContinuation) {
+        if (savedReturnContinuations == null)
+            savedReturnContinuations = new HashMap();
+        savedReturnContinuations.put(exp, returnContinuation);
+        exp.body = exp.body.visit(this, returnContinuation);
+        if (exp.exitBody != null)
+            exp.exitBody = exp.exitBody.visit(this, returnContinuation);
+        return exp;
+    }
+    protected Expression visitExitExp(ExitExp exp, Expression returnContinuation) {
+        BlockExp bl = exp.block;
+        Expression res = exp.result;
+        Expression retCont = bl.exitBody != null ? exp
+            : savedReturnContinuations.get(bl);
+        exp.result = res.visit(this, retCont);
+        return exp;
+    }
 
   protected Expression visitBeginExp (BeginExp exp, Expression returnContinuation)
   {

@@ -87,25 +87,56 @@
     ((syntax-body->expression x)
      (kawa.lang.SyntaxForms:rewriteBody x))))
 
+(define-syntax %if-and-x
+ (lambda (x)
+   (syntax-case x (? :: and)
+    ((_ k then)
+     (gnu.expr.ExitExp (syntax->expression #'then) #'k))
+    ((_ k then test1 . rest)
+     #`(if test1
+         (%if-and-x k then . rest))))))
+
 (define-rewrite-syntax if
   (lambda (x)
-    (syntax-case x ()
-		 ((_ test then)
-		  (make <gnu.expr.IfExp>
-		    (syntax->expression (syntax test))
-		    (syntax->expression (syntax then))
-		    #!null))
-		 ((_ test then else)
-		  (make <gnu.expr.IfExp>
-		    (syntax->expression (syntax test))
-		    (syntax->expression (syntax then))
-		    (syntax->expression (syntax else))))
-		 ((_ e1 e2 e3 . rest)
-		  (report-syntax-error #'rest
-				"too many expressions for 'if'"))
-		 ((_ . rest)
-		  (report-syntax-error #'rest
-				"too few expressions for 'if'")))))
+    (syntax-case x (? :: and)
+      ((_ (and . tests) then else)
+       (%let ((bl (gnu.expr.BlockExp)))
+             (bl:setRunFinallyBlocks #f)
+             (bl:setBody
+              (syntax->expression #`(begin
+                    (%if-and-x #,bl then . tests)
+                    else)))
+             bl))
+      ((_ (? . rest) then)
+       #'(if (? . rest) then #!void))
+      ((_ (and . rest) then)
+       #'(if (and . rest) then #!void))
+      ((_ (? pattern :: type init) then else)
+       #`(#,gnu.kawa.reflect.TypeSwitch:typeSwitch
+          init
+          (lambda ((pattern :: type)) then)
+          (lambda (unused) else)))
+      ((_ (? pattern init) then else)
+       #`(#,gnu.kawa.reflect.TypeSwitch:typeSwitch
+          init
+          (lambda ((pattern)) then)
+          (lambda (unused) else)))
+      ((_ test then)
+       (make <gnu.expr.IfExp>
+         (syntax->expression (syntax test))
+         (syntax->expression (syntax then))
+         #!null))
+      ((_ test then else)
+       (make <gnu.expr.IfExp>
+         (syntax->expression (syntax test))
+         (syntax->expression (syntax then))
+         (syntax->expression (syntax else))))
+      ((_ e1 e2 e3 . rest)
+       (report-syntax-error #'rest
+                            "too many expressions for 'if'"))
+      ((_ . rest)
+       (report-syntax-error #'rest
+                            "too few expressions for 'if'")))))
 
 (define-rewrite-syntax try-catch
   (lambda (x)

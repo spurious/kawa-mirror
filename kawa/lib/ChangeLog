@@ -1,3 +1,12 @@
+2014-12-08  Per Bothner  <per@bothner.com>
+
+	Implement the '?' operator.
+	* prim_syntax.scm (if): Re-implement to support '?'.
+	* std_syntax.scm (and): Likewise.
+	* std_syntax.scm (?): Error if used standalone.
+	* compile_misc.scm: Use '?' operator.
+	* lists.scm: Likewise.
+
 2014-12-01  Per Bothner  <per@bothner.com>
 
 	* case_syntax.scm (clause-datums->exps): Add tr local variable.

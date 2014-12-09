@@ -1,7 +1,7 @@
 ;;; Definitions for some standard syntax.
 
 (module-export cond and or let let* do delay lazy delay-force
-               else ... => _ else unquote unquote-splicing
+               else ... ? => _ else unquote unquote-splicing
                syntax->datum datum->syntax with-syntax
 	       syntax-object->datum datum->syntax-object ; deprecated
 	       generate-temporaries define-procedure
@@ -15,6 +15,11 @@
 (import (only (kawa standard SchemeCompilation) lambda))
 (import (only (kawa standard Scheme) not))
 (import (only (kawa standard begin) begin))
+
+(define-syntax ?
+  (syntax-rules ()
+    ((_ . rest)
+     (syntax-error "'?' is only allowed in a conditional e.g. 'if' or 'and'"))))
 
 (define-syntax =>
   (syntax-rules ()
@@ -96,8 +101,7 @@
 	       ((_) (%lang-boolean #t))
 	       ((_ test) (syntax test))
 	       ((_ test1 . test2)
-		#`(%let ((x test1))
-			  (if x (and . test2) x)))))
+		(syntax (if test1 (and . test2) #f)))))
 ;;; OR
 
 (define-syntax (or f)

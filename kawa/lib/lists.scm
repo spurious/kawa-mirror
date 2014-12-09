@@ -136,25 +136,22 @@
 
 (define (memq x list)
   (let lp ((lst list))
-    (and (instance? lst <pair>)
-	 (let ((p :: pair lst))
-	   (if (eq? x p:car) lst
-	       (lp p:cdr))))))
+    (and (? p::pair lst)
+         (if (eq? x p:car) lst
+             (lp p:cdr)))))
 
 (define (memv x list)
   (let lp ((lst list))
-    (and (instance? lst <pair>)
-	 (let ((p :: pair lst))
-	   (if (eqv? x p:car) lst
-	       (lp p:cdr))))))
+    (and (? p::pair lst)
+         (if (eqv? x p:car) lst
+             (lp p:cdr)))))
 
 ;;;  The optional test argument is an srfi-1 extension.
 (define (member x list #!optional (test :: <procedure> equal?))
   (let lp ((lst list))
-    (and (instance? lst <pair>)
-	 (let ((p :: pair lst))
-	   (if (test x p:car) lst
-	       (lp p:cdr))))))
+    (and (? p::pair lst)
+         (if (test x p:car) lst
+             (lp p:cdr)))))
 
 (define (assq x list)
   (let lp ((list list))

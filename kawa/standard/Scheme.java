@@ -181,6 +181,7 @@ public class Scheme extends LispLanguage
       defSntxStFld("cond", "kawa.lib.std_syntax");
       defSntxStFld("...", "kawa.lib.std_syntax");
       defSntxStFld("_", "kawa.lib.std_syntax");
+      defSntxStFld("?", "kawa.lib.std_syntax");
       defSntxStFld("=>", "kawa.lib.std_syntax");
       defSntxStFld("else", "kawa.lib.std_syntax");
       defSntxStFld("unquote", "kawa.lib.std_syntax");

@@ -101,7 +101,7 @@ InliningTest.constantPropagation3()int: 6 bytes
 InliningTest.factorialInfer1(int)java.lang.Object: 25 bytes
 InliningTest.getFromVector1(gnu.lists.FVector,int)java.lang.Integer: 9 bytes
 InliningTest.getFromVector2(gnu.lists.FVector,int)java.lang.Integer: 9 bytes
-InliningTest.read1(gnu.kawa.io.InPort)int: 71 bytes
+InliningTest.read1(gnu.kawa.io.InPort)int: 57 bytes
 InliningTest.stringForEach1(java.lang.CharSequence)void: 51 bytes
 InliningTest.stringForEach2(java.lang.CharSequence)void: 42 bytes
 InliningTest.stringForEach3(java.lang.CharSequence)void: 49 bytes
@@ -167,7 +167,7 @@ nbody.energy(nbody$Body[])double: 181 bytes
 nbody.jupiter()nbody$Body: 57 bytes
 nbody$Body.offsetMomentum(double,double,double)void: 32 bytes
 regexdna.regexdna(java.io.InputStream)void: 329 bytes
-revcomp1.revcomp(java.io.InputStream)void: 371 bytes
+revcomp1.revcomp(java.io.InputStream)void: 365 bytes
 revcomp2.run(gnu.mapping.CallContext)void: 200 bytes
 revcomp2$RevByteArray.reverseAndPrint()void: 129 bytes
 spectralnorm.Approximate(int)double: 110 bytes

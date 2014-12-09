@@ -1,3 +1,8 @@
+2014-12-08  Per Bothner  <per@bothner.com>
+
+	* inlining.expected: Update for new and improved implementation
+	of '(if (and ...) ...)'.
+
 2014-12-03  Seth Alves <alves@hungry.com>
 
 	* macros1.scm: New test.

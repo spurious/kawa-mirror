@@ -1,3 +1,9 @@
+2014-12-09  Per Bothner  <per@bothner.com>
+
+	* LangPrimType.java (emitTestIf): Fix handling of boolean,
+	character, character-or-eof, and char types.
+	(emitIsInstance): Remove special handling for booleans.
+
 2014-11-24  Per Bothner  <per@bothner.com>
 
 	* LispLanguage.java (quasiquote_sym): New constant.

@@ -67,6 +67,18 @@ public class Char implements Comparable, Externalizable {
             || obj == Sequence.eofValue;
     }
 
+    /** Return character value of argument; otherwise return -2.
+     * Uses same conversion as {@code castToCharacterOrEof}. */
+    public static int checkCharOrEof(Object obj) {
+        if (obj instanceof Char)
+            return ((Char) obj).intValue();
+        if (obj instanceof Character)
+            return ((Character) obj).charValue();
+        if (obj == Sequence.eofValue)
+            return -1;
+        return -2;
+    }
+
     public static void print(int i, Appendable out) {
         try {
             append(i, out);

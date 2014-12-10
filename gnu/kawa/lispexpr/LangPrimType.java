@@ -124,10 +124,6 @@ public class LangPrimType extends PrimType implements TypeValue {
                 return;
             }
             break;
-        case 'Z':
-            code.emitPop(1);
-            code.emitPushInt(1);
-            return;
         case 'C':
             ClassType scmCharType = ClassType.make("gnu.text.Char");
             code.emitInvokeStatic(scmCharType.getDeclaredMethod("isChar",1));
@@ -310,14 +306,42 @@ public class LangPrimType extends PrimType implements TypeValue {
     public void emitTestIf(Variable incoming, Declaration decl,
                            Compilation comp) {
         CodeAttr code = comp.getCode();
+        char sig1 = getSignature().charAt(0);
         if (incoming != null)
             code.emitLoad(incoming);
+        switch (sig1) {
+        case 'Z':
+            Type.javalangBooleanType.emitIsInstance(code);
+            code.emitIfIntNotZero();
+            if (decl != null) {
+                code.emitLoad(incoming);
+                super.emitCoerceFromObject(code);
+                decl.compileStore(comp);
+            }
+            return;
+        }
+        if (this == characterType || this == characterOrEofType
+            || this == charType) {
+            code.emitInvokeStatic(scmCharType
+                                  .getDeclaredMethod("checkCharOrEof", 1));
+        }
         if (decl != null) {
             code.emitDup();
             decl.compileStore(comp);
         }
-        emitIsInstance(code);
-        code.emitIfIntNotZero();
+        if (this == characterType) {
+            code.emitIfIntGEqZero();
+        } else if (this == charType) {
+            code.emitPushInt(16);
+            code.emitUshr();
+            code.emitIfIntEqZero();
+        } else if (this == characterOrEofType) {
+            code.emitPushInt(-1);
+            code.emitIfIntGEq();
+        } else {
+            emitIsInstance(code);
+            code.emitIfIntNotZero();
+        }
     }
 
     public Expression convertValue(Expression value) {

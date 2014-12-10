@@ -1762,6 +1762,12 @@ public class CodeAttr extends Attribute implements AttrContainer
     emitIfCompare1(157); // ifgt
   }
 
+  /** Compile start of conditional:  {@code if (x >= 0)}. */
+  public final void emitIfIntGEqZero()
+  {
+    emitIfCompare1(155); // iflt
+  }
+
   /** Compile start of a conditional:  <tt>if (!(x opcode null)) ...</tt>.
    * The value of <tt>x</tt> must already have been pushed and must be of
    * reference type. */
@@ -1797,10 +1803,16 @@ public class CodeAttr extends Attribute implements AttrContainer
     emitTransfer(new_if.end_label, opcode);
   }
 
-  /* Compile start of a conditional:  if (x < y) ... */
+  /* Compile start of a conditional:  {@code if (x < y) ...} */
   public final void emitIfIntLt()
   {
     emitIfIntCompare(162);  // if_icmpge
+  }
+
+  /* Compile start of a conditional:  {@code if (x >= y) ...} */
+  public final void emitIfIntGEq()
+  {
+    emitIfIntCompare(161);  // if_icmplt
   }
 
   /** Compile start of a conditional:  if (x != y) ...

@@ -1,3 +1,7 @@
+2014-12-09  Per Bothner  <per@bothner.com>
+
+	* CodeAttr.java (emitIfIntGEqZero, emitIfIntGEq): New methods.
+
 2014-12-08  Per Bothner  <per@bothner.com>
 
 	* ExitableBlock.java (exit): Do nothing  if not reachableHere.

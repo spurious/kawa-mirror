@@ -1,3 +1,9 @@
+2014-12-09  Jamison Hope  <jrh@theptrgroup.com>
+	    Per Bothner  <per@bothner.com>
+
+	* match1.scm: New files with tests for conditional binding.
+	* Makefile.am: Update accordingly.
+
 2014-12-08  Per Bothner  <per@bothner.com>
 
 	* inlining.expected: Update for new and improved implementation

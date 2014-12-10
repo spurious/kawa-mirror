@@ -1,3 +1,7 @@
+2014-12-09  Per Bothner  <per@bothner.com>
+
+	* TypeSwitch.java (compile): Special case for toStringType.
+
 2014-12-08  Per Bothner  <per@bothner.com>
 
 	* TypeSwitch.java (compile): Force Lazy value if appropriate.

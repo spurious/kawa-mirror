@@ -63,6 +63,7 @@ public class TypeSwitch extends MethodProc implements Inlineable {
                     Type valType = args[0].getType();
                     // Rather simplistic ...
                     boolean isConditional = type != Type.objectType
+                        && type != Type.toStringType
                         && type != valType;
                     if (param.getCanRead() || isConditional)
                         param.allocateVariable(code);

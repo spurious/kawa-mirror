@@ -3334,7 +3334,7 @@ Thus @code{#x} and @code{#X} are the same.
 
 @table @asis
 @item @stxlit{#:}@var{keyword}
-Guile-style keyword syntax (deprecated).
+Guile-style @ref{Keywords,keyword} syntax.
 @item @stxlit{#\\}
 @ref{meta-character, Character literals, Character literals}.
 @item @stxlit{#!}
@@ -6483,11 +6483,29 @@ with a keyword argument.  (This change is a work-in-progress.)
 
 @display
 @stxdef{keyword} @stxref{identifier}@stxlit{:}
+  | @stxlit{#:}@stxref{identifier}
 @end display
 
+The two syntaxes have the same meaning: The former is nicer-looking;
+the latter is more portable (and required if you use the
+@code{--r7rs} command-line flag).
+
+@quotation
+@emph{Details:}
+In r7rs and other Scheme standards the colon character
+does not have any special meaning, so @code{foo:} or @code{foo:bar}
+are just regular identifiers.  Therefore some other Scheme variants
+that have keywords (including Guile and Racket) use the @code{#:} syntax.
+Kawa has some hacks so that @emph{most}
+standard Scheme programs that have colons in identifiers will work.
+However, for best compatibility, use the @code{--r7rs} command-line flag
+(which turns colon into a regular character in a symbol), and the
+@code{#:} syntax.
+@end quotation
+
 A keyword is a single token; therefore no whitespace is allowed between
-the @var{identifier} and the colon (which is not considered part
-of the name of the keyword).
+the @var{identifier} and the colon or after the @code{#:};
+these characters are not considered part of the name of the keyword.
 
 @deffn Procedure keyword? obj
 Return @code{#t} if @var{obj} is a keyword, and otherwise returns @code{#f}.

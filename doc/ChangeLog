@@ -1,3 +1,7 @@
+2014-12-11  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Keywords): Add notes on Guile-style syntax.
+
 2014-12-02  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Tutorial): New chapter merged from tutorial.xml.

@@ -362,7 +362,6 @@ KAWA_STANDARD_JAVA_FILES = \
   standard/syntax_error.java \
   standard/let.java \
   standard/begin.java \
-  standard/call_with_values.java \
   standard/sleep.java \
   standard/try_catch.java \
   standard/make.java \

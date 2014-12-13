@@ -287,6 +287,7 @@ GNU_KAWA_FUNCTIONS_JSOURCES = \
   kawa/functions/AppendValues.java \
   kawa/functions/Apply.java \
   kawa/functions/ApplyToArgs.java \
+  kawa/functions/ApplyWithValues.java \
   kawa/functions/Arithmetic.java \
   kawa/functions/ArithOp.java \
   kawa/functions/Arrays.java \
@@ -294,11 +295,13 @@ GNU_KAWA_FUNCTIONS_JSOURCES = \
   kawa/functions/ArraySet.java \
   kawa/functions/BitwiseOp.java \
   kawa/functions/CallCC.java \
+  kawa/functions/CallWithValues.java \
   kawa/functions/CompilationHelpers.java \
   kawa/functions/CompileArith.java \
   kawa/functions/CompileNamedPart.java \
   kawa/functions/CompileMisc.java \
   kawa/functions/CompileProcess.java \
+  kawa/functions/CompileValues.java \
   kawa/functions/ConstantFunction0.java \
   kawa/functions/Convert.java \
   kawa/functions/CurryExp.java \

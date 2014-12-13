@@ -545,7 +545,7 @@ public class Scheme extends LispLanguage
       environ = r5Environment;
 
       defProcStFld("values", "kawa.lib.misc");
-      defProcStFld("call-with-values", "kawa.standard.call_with_values",
+      defProcStFld("call-with-values", "gnu.kawa.functions.CallWithValues",
 		   "callWithValues");
       defSntxStFld("let-values", "kawa.lib.syntax");
       defSntxStFld("let*-values", "kawa.lib.syntax");

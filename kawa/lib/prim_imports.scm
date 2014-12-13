@@ -30,7 +30,7 @@
 ;(import (rename (only (kawa lib prim_syntax) letrec) (letrec letrec*)))
 (import (only (kawa standard append) append))
 (import (only (kawa standard begin) begin))
-(import (rename (only (kawa standard call_with_values) callWithValues)
+(import (rename (only (gnu kawa functions CallWithValues) callWithValues)
                 (callWithValues call-with-values)))
 (import (only (kawa standard expt) expt))
 (import (rename (only (kawa standard IfFeature) condExpand)

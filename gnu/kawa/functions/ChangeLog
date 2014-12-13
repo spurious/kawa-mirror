@@ -1,3 +1,10 @@
+2014-12-12  Per Bothner  <per@bothner.com>
+
+	* CallWithValues.java: Moved from kawa/standard/call_with_values.java.
+	* ApplyWithValues.java: New Procedure.
+	* CompileValues.java: New class.
+	(validateCallWithValues): New method.
+
 2014-11-22  Per Bothner  <per@bothner.com>
 
 	* RunProcess.java (tokenize): Avoid emitting an extra '\'' in one place.

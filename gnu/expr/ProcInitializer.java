@@ -68,10 +68,11 @@ public class ProcInitializer extends Initializer
       : comp.getModule();
     if (owning instanceof ClassExp && owning.staticLinkField != null)
       code.emitLoad(code.getCurrentScope().getVariable(1));
-    else if (! (owning instanceof ModuleExp)
-	|| (comp.moduleClass == comp.mainClass
-	    && ! comp.method.getStaticFlag()))
-      code.emitPushThis();
+    else if (! (owning instanceof ModuleExp))
+        owning.loadHeapFrame(comp);
+    else if (comp.moduleClass == comp.mainClass
+             && ! comp.method.getStaticFlag())
+        code.emitPushThis();
     else
       {
         if (comp.moduleInstanceVar == null || comp.moduleInstanceVar.dead())

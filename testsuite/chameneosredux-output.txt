@@ -9,21 +9,21 @@ yellow + red -> blue
 yellow + yellow -> yellow
 
  blue red yellow
-400 zero
-400 zero
-400 zero
+NNN zero
+NNN zero
+NNN zero
  one two zero zero
 
  blue red yellow red yellow blue red yellow red blue
-120 zero
-120 zero
-120 zero
-120 zero
-120 zero
-120 zero
-120 zero
-120 zero
-120 zero
-120 zero
+NNN zero
+NNN zero
+NNN zero
+NNN zero
+NNN zero
+NNN zero
+NNN zero
+NNN zero
+NNN zero
+NNN zero
  one two zero zero
 

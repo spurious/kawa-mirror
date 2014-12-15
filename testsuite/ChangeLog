@@ -1,3 +1,9 @@
+2014-12-15  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (check-chameneosredux): Tweak to remove need for
+	ndiff program.
+	(chameneosredux-output.txt): Update accordingly.
+
 2014-12-09  Jamison Hope  <jrh@theptrgroup.com>
 	    Per Bothner  <per@bothner.com>
 

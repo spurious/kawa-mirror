@@ -6,8 +6,6 @@ KAWA = ../bin/kawa.sh
 CPJAVA = CLASSPATH="..$(CLASSPATH_SEPARATOR)@conf_classpath@.$(CLASSPATH_SEPARATOR)$$CLASSPATH" $(JAVA)
 CPKAWA = CLASSPATH="@conf_classpath@.$(CLASSPATH_SEPARATOR)$$CLASSPATH" $(KAWA)
 KAWATEST = CLASSPATH=".$(CLASSPATH_SEPARATOR)$$CLASSPATH" $(KAWA) -e '(load "testing.zip")' $(OPTIONS)
-# Used to test chameneosredux
-NDIFF = ndiff
 DIFF = diff --strip-trailing-cr
 
 if ENABLE_SERVLET
@@ -237,8 +235,9 @@ chameneosredux.class: $(srcdir)/chameneosredux.scm
 
 check-chameneosredux: chameneosredux.class
 	CLASSPATH="$(KAWARTLIB)$(CLASSPATH_SEPARATOR)@conf_classpath@.$(CLASSPATH_SEPARATOR)$$CLASSPATH" \
-	$(KAWA) chameneosredux 600 >chameneosredux600.log
-	@if $(NDIFF) -fields 2-10 $(srcdir)/chameneosredux-output.txt chameneosredux600.log; \
+	$(KAWA) chameneosredux 600 | \
+	  sed -e 's|^[1-9][0-9]* |NNN |' >chameneosredux600.log
+	@if $(DIFF) $(srcdir)/chameneosredux-output.txt chameneosredux600.log; \
 	  then echo '# chameneosredux test passes'; \
 	  else echo FAIL chameneosredux test; fi
 

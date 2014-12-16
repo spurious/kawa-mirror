@@ -70,26 +70,23 @@ public class Literal
     }
 
     public Literal(Object value, String name, LitTable litTable) {
-        this.value = value;
+        this(value, Type.make(value.getClass()));
         litTable.literalTable.put (value, this);
-        this.type = Type.make(value.getClass());
         assign(name, litTable);
     }
 
     /** Create a new Literal, for a value available from a static field.
      * The field must be static and already exist. */
     public Literal(Object value, Field field, LitTable litTable) {
-        this.value = value;
+        this(value, field.getType());
         litTable.literalTable.put(value, this);
         this.field = field;
-        this.type = field.getType();
         flags = WRITTEN|EMITTED;
     }
 
     public Literal(Object value, Type type, LitTable litTable) {
-        this.value = value;
+        this(value, type);
         litTable.literalTable.put (value, this);
-        this.type = type;
     }
 
     Literal(Object value, Type type) {

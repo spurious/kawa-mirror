@@ -1,3 +1,7 @@
+2014-12-15  Per Bothner  <per@bothner.com>
+
+	* Literal.java (Literal): Re-factor so constructors call each other.
+
 2014-12-12  Per Bothner  <per@bothner.com>
 
 	* ProcInitializer.java (emitLoadModuleMethod): Sometimes need

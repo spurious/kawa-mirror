@@ -21,7 +21,7 @@
 (define (visit-exp exp::gnu.expr.Expression
                    #!optional (required ::gnu.bytecode.Type #!null))
   ::gnu.expr.Expression
-  (gnu.expr.ExpVisitor:visit (get-visitor) exp required))
+  ((get-visitor):visit exp required))
 
 (define-syntax syntax-as-exp
   (lambda (form)
@@ -29,7 +29,7 @@
       ((_ expr)
        (syntax->expression (syntax expr))))))
 
-(define (apply-exp func . args)
+(define (apply-exp func . args) ::gnu.expr.ApplyExp
   (gnu.expr.ApplyExp (->exp func)
                      @(map ->exp args)))
 
@@ -57,6 +57,10 @@
               proc::gnu.mapping.Procedure) ::gnu.expr.Expression
               (let ((ex ::gnu.expr.Expression
                         (cond clauses ... (else #!null))))
-                (if (eq? ex #!null) #!null
-                    (gnu.expr.ExpVisitor:visit visitor (ex:maybeSetLine exp)
-                                               required)))))))
+                (cond ((eq? ex #!null)
+                       #!null)
+                      ((eq? ex exp)
+                       (exp:visitArgs visitor)
+                       exp)
+                      (else
+                       (visitor:visit (ex:maybeSetLine exp) required))))))))

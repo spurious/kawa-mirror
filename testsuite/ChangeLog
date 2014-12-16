@@ -1,4 +1,9 @@
-2014-12-15  Per Bothner  <per@bothner.com>
+2014-12-15  Victor van den Elzen
+	    Per Bothner  <per@bothner.com>
+
+	* overload2.scm: Test contributed for (unrelated)
+	Savannah bug #36973: "poor overload resolution when boxing numerics".
+	* Makefile.am: Update accordingly.
 
 	* Makefile.am (check-chameneosredux): Tweak to remove need for
 	ndiff program.

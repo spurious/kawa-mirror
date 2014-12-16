@@ -54,7 +54,7 @@ public class SpecialObjectType extends ObjectType {
     @Override
     public int compare(Type other) {
         if (this == toStringType) {
-            return other == Type.javalangStringType ? 0
+            return other == this || other == Type.javalangStringType ? 0
                 : other == Type.javalangObjectType ? -1 : 1;
         }
         return super.compare(other);

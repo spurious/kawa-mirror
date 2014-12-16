@@ -1,3 +1,8 @@
+2014-12-15  Victor van den Elzen
+
+	* SpecialObjectType.java (compare): Check for comparing
+	toStringType to itself.
+
 2014-12-09  Per Bothner  <per@bothner.com>
 
 	* CodeAttr.java (emitIfIntGEqZero, emitIfIntGEq): New methods.

@@ -1,5 +1,7 @@
 2014-12-16  Per Bothner  <per@bothner.com>
 
+	* std_syntax.scm (?): Add a more precise error message.
+
 	* characters.scm (char->integer): Change argument type to character.
 	* compile_misc.scm (charToIntegerValidateApply): Change to match.
 

@@ -18,6 +18,8 @@
 
 (define-syntax ?
   (syntax-rules ()
+    ((_ id :: type)
+     (syntax-error "missing init expression for '?'"))
     ((_ . rest)
      (syntax-error "'?' is only allowed in a conditional e.g. 'if' or 'and'"))))
 

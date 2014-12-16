@@ -117,7 +117,20 @@ public class ProcInitializer extends Initializer
 	      {
 		Object val = proc.properties[i+1];
 		code.emitDup(1);
-		comp.compileConstant(key);
+                Field pfld = null;
+                if (key == Procedure.validateApplyKey)
+                    pfld = Compilation.typeProcedure
+                        .getDeclaredField("validateApplyKey");
+                else if (key == Procedure.validateXApplyKey)
+                    pfld = Compilation.typeProcedure
+                        .getDeclaredField("validateXApplyKey");
+                else if (key == Procedure.compilerXKey)
+                    pfld = Compilation.typeProcedure
+                        .getDeclaredField("compilerXKey");
+                if (pfld != null)
+                    code.emitGetStatic(pfld);
+                else
+                    comp.compileConstant(key);
                 Target target = Target.pushObject;
                 if (val instanceof Expression)
                   ((Expression) val).compile(comp, target);

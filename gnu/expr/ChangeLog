@@ -1,5 +1,8 @@
 2014-12-16  Per Bothner  <per@bothner.com>
 
+	* ProcInitializer.java (emitLoadModuleMethod): For standard procedure
+	property names, load from the corresponding pre-existing field.
+
 	* InlineCalls.java (checkCast): On error, add an explicit coercion
 	to void casading error messages.
 

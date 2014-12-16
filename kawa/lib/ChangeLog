@@ -1,3 +1,8 @@
+2014-12-16  Per Bothner  <per@bothner.com>
+
+	* characters.scm (char->integer): Change argument type to character.
+	* compile_misc.scm (charToIntegerValidateApply): Change to match.
+
 2014-12-12  Per Bothner  <per@bothner.com>
 
 	* prim_imports.scm: Update call-with-values import.

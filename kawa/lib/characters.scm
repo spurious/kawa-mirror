@@ -4,7 +4,7 @@
 (define (char? x)
   (or (instance? x gnu.text.Char) (instance? x java.lang.Character)))
 
-(define (char->integer ch::character-or-eof) ::int
+(define (char->integer ch::character) ::int
   validate-apply: "kawa.lib.compile_misc:charToIntegerValidateApply"
   (as int ch))
 

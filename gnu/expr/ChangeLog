@@ -1,3 +1,8 @@
+2014-12-16  Per Bothner  <per@bothner.com>
+
+	* InlineCalls.java (checkCast): On error, add an explicit coercion
+	to void casading error messages.
+
 2014-12-15  Per Bothner  <per@bothner.com>
 
 	* Literal.java (Literal): Re-factor so constructors call each other.

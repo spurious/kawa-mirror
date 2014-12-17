@@ -1,5 +1,7 @@
 2014-12-16  Per Bothner  <per@bothner.com>
 
+	* lang/Translator.java (applyFunction) Moved to Compilation.
+
 	* standard/Scheme.java (formatType): Handle MultValuesType.
 
 2014-12-12  Per Bothner  <per@bothner.com>

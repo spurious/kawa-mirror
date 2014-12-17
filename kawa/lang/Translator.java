@@ -520,12 +520,6 @@ public class Translator extends Compilation
         return CompileNamedPart.makeExp(part1, part2);
     }
 
-    /** A language-dependent "apply" function for generic application.
-     */
-    public Expression applyFunction(Expression func) {
-        return null;
-    }
-
   public Namespace namespaceResolvePrefix (Expression context)
   {
     if (context instanceof ReferenceExp)

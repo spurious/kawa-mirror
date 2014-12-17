@@ -2860,6 +2860,12 @@ public class Compilation implements SourceLocator
         return let;
     }
 
+    /** A language-dependent "apply" function for generic application.
+     */
+    public Expression applyFunction(Expression func) {
+        return null;
+    }
+
   public QuoteExp makeQuoteExp (Object value)
   {
     return QuoteExp.getInstance(value, this);

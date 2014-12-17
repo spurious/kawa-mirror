@@ -1,5 +1,7 @@
 2014-12-16  Per Bothner  <per@bothner.com>
 
+	* Compilation.java (applyFunction) Moved from Translator.
+
 	* ProcInitializer.java (emitLoadModuleMethod): For standard procedure
 	property names, load from the corresponding pre-existing field.
 

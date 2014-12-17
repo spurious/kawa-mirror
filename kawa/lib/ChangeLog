@@ -1,5 +1,9 @@
 2014-12-16  Per Bothner  <per@bothner.com>
 
+	Better type-checking of 'values'.
+	* misc.scm (values): Add validate-aply and compile-apply properties,
+	* compile_misc.scm (valuesValidateApply, valuesCompile): New methods.
+
 	* kawa/expression.scm (define-validate): Minor improvements.
 	(visit-exp): Call InlineCalls#visit to gets its type-checking.
 

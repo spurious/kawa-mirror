@@ -1,6 +1,8 @@
 (require <kawa.lib.characters>)
 (require <kawa.lib.strings>)
 (require <kawa.lib.kawa.expressions>)
+(define-alias MultValuesType gnu.kawa.reflect.MultValuesType)
+(define-alias OccurrenceType gnu.kawa.reflect.OccurrenceType)
 
 (define-validate pipeProcessValidateApply (exp required proc)
   ((= exp:arg-count 2)
@@ -111,3 +113,37 @@
             (loop (+ i 1)
                   (cons (apply-exp string-append! seqDecl (exp:getArg i))
                         stmts))))))))
+
+(define-validate valuesValidateApply (exp required proc)
+  ((exp:isSimple 1 1)
+   (visit-exp (exp:getArg 0) required))
+  ((exp:isSimple)
+   (let* ((args exp:args)
+          (arg-count args:length)
+          (arg-count-ok
+           (= (OccurrenceType:compatibleWithCount required arg-count) 0))
+          (rmult ::MultValuesType
+                 (if (and arg-count-ok (MultValuesType? required))
+                     required
+                     #!null))
+          (rtypes (gnu.bytecode.Type[] length: arg-count)))
+     (do ((i ::int 0 (+ i 1)))
+         ((= i arg-count))
+       (let ((e (visit-exp (args i)
+                           (if (eq? rmult #!null) #!null
+                               (rmult:getValueType i)))))
+         (set! (rtypes i) (e:getType))
+         (set! (args i) e)))
+     (exp:setType (MultValuesType:create rtypes))
+     exp)))
+
+(define (valuesCompile exp::gnu.expr.ApplyExp comp::gnu.expr.Compilation
+                       target::gnu.expr.Target proc::gnu.mapping.Procedure)
+  ::boolean
+  (define pproc (gnu.expr.PrimProcedure
+                 (invoke gnu.expr.Compilation:typeValues 'getDeclaredMethod "makeFromArray" 1)))
+  (pproc:setReturnType exp:type)
+  (define ae::gnu.expr.ApplyExp (apply-exp pproc @exp:args))
+  (ae:compile comp target)
+  #t)
+

@@ -61,8 +61,9 @@
   (or (instance? x <function>) (instance? x gnu.kawa.lispexpr.LangObjType)))
 
 (define (values #!rest (args :: <Object[]>))
+  validate-apply: "kawa.lib.compile_misc:valuesValidateApply"
+  compile-apply: "kawa.lib.compile_misc:valuesCompile"
   (invoke-static <gnu.mapping.Values> 'make args))
-
 
 (define (environment-bound? (env :: <gnu.mapping.Environment>) sym)
   :: <boolean>

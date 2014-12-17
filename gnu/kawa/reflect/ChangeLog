@@ -1,3 +1,10 @@
+2014-12-16  Per Bothner  <per@bothner.com>
+
+	* OccurrenceType.java: No longer extends ObjectType, just Type.
+	(compare): Check item counts for compatibility.
+	(compatibleWithCount, itemCountMin, itemCountMax): New static methods.
+	* MultValuesType.java: New class, extends OccurrenceType.
+
 2014-12-09  Per Bothner  <per@bothner.com>
 
 	* TypeSwitch.java (compile): Special case for toStringType.

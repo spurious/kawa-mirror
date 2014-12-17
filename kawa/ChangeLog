@@ -1,3 +1,7 @@
+2014-12-16  Per Bothner  <per@bothner.com>
+
+	* standard/Scheme.java (formatType): Handle MultValuesType.
+
 2014-12-12  Per Bothner  <per@bothner.com>
 
 	* standard/call_with_values.java: Moved to

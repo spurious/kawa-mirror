@@ -12,6 +12,7 @@ import gnu.kawa.functions.*;
 import gnu.kawa.io.CharArrayInPort;
 import gnu.kawa.io.InPort;
 import gnu.kawa.reflect.LazyType;
+import gnu.kawa.reflect.MultValuesType;
 import gnu.kawa.servlet.HttpRequestContext;
 
 public class Scheme extends LispLanguage
@@ -1110,6 +1111,20 @@ public class Scheme extends LispLanguage
             LazyType ltype = (LazyType) type;
             return formatType(ltype.getRawType())
                 +'['+formatType(ltype.getValueType())+']';
+        }
+        if (type instanceof MultValuesType) {
+            MultValuesType mtype = (MultValuesType) type;
+            StringBuilder sbuf = new StringBuilder();
+            sbuf.append("values[");
+            int n = mtype.getValueCount();
+            for (int i = 0; i < n; i++) {
+                if (i > 0)
+                    sbuf.append(' ');
+                Type etype = mtype.getValueType(i);
+                sbuf.append(etype == null ? "unspecified" : formatType(etype));
+            }
+            sbuf.append(']');
+            return sbuf.toString();
         }
         if (typeToStringMap == null)  {
             typeToStringMap = new HashMap<Type,String>();

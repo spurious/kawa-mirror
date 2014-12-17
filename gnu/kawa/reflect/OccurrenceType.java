@@ -11,7 +11,7 @@ import gnu.expr.*;
 
 /** A type that matches some number of repetitions of a basetype. */
 
-public class OccurrenceType extends ObjectType
+public class OccurrenceType extends Type
   implements Externalizable, TypeValue
 {
   Type base;
@@ -24,6 +24,8 @@ public class OccurrenceType extends ObjectType
 
   public OccurrenceType (Type base, int minOccurs, int maxOccurs)
   {
+    super(Type.objectType);
+    setName(null);
     this.base = base;
     this.minOccurs = minOccurs;
     this.maxOccurs = maxOccurs;
@@ -65,6 +67,16 @@ public class OccurrenceType extends ObjectType
             && maxOccurs == occOther.maxOccurs)
           return base.compare(occOther.getBase());
       }
+    int numThis = itemCountRange(this);
+    int numOther = itemCountRange(other);
+    int minThis = numThis & 0xFFF;
+    int minOther = numOther & 0xFFF;
+    int maxThis = numThis >> 12;
+    int maxOther = numOther >> 12;
+    if ((minThis > maxOther && maxOther >= 0)
+        || (minOther > maxThis && maxThis >= 0)) {
+        return -3;
+    }
     /*
     Type primeThis = itemPrimeType(getBase());
     Type primeOther = itemPrimeType(other);
@@ -249,12 +261,29 @@ public class OccurrenceType extends ObjectType
     return (itemCountRange(type) >> 13) == 0;
   }
 
+    public static int itemCountMin(Type type) {
+        return itemCountRange(type) & 0xFFF;
+    }
+
+    public static int itemCountMax(Type type) {
+        return itemCountRange(type) >> 12;
+    }
+
   public static boolean itemCountIsOne (Type type)
   {
     return itemCountRange(type) == 0x1001;
   }
 
-  /** QUery formal semantics "prime type"
+    public static int compatibleWithCount(Type type, int count) {
+        int num = itemCountRange(type);
+        int min = num & 0xFFF;
+        int max = num >> 12;
+        return count < min ? -1
+            : max >= 0 && count > max ? 1
+            : 0;
+    }
+
+  /** XQuery formal semantics "prime type"
    */
   public static Type itemPrimeType (Type type)
   {

@@ -12,8 +12,12 @@ import gnu.kawa.lispexpr.LangObjType;
 
 public class ApplyWithValues extends Procedure2 {
     public static final ApplyWithValues applyWithValues = new ApplyWithValues();
+    static {
+        applyWithValues.setProperty(Procedure.validateApplyKey,
+                "gnu.kawa.functions.CompileValues:validateApplyWithValues");
+    }
 
-     public static Object applyWithValues(Object values, Procedure consumer)
+    public static Object applyWithValues(Object values, Procedure consumer)
         throws Throwable {
         if (values instanceof Values)
             return ((Values) values).call_with(consumer);

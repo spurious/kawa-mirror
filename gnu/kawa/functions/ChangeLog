@@ -1,3 +1,11 @@
+2014-12-16  Per Bothner  <per@bothner.com>
+
+	Better type-checking of 'call-with-values'.
+	* ApplyWithValues.java (applyWithValues): Set validate-apply property.
+	* CompileValues.java (validateApplyWithValues): New method for
+	validating 'apply-with-values'.
+	(validateCallWithValues): Maybe use ApplyWithValues.
+
 2014-12-12  Per Bothner  <per@bothner.com>
 
 	* CallWithValues.java: Moved from kawa/standard/call_with_values.java.

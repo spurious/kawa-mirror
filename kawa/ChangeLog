@@ -1,5 +1,8 @@
 2014-12-16  Per Bothner  <per@bothner.com>
 
+	* standard/SchemeCompilation.java (applyFunction): Return null
+	if func is a LambdaExp.
+
 	* lang/Translator.java (applyFunction) Moved to Compilation.
 
 	* standard/Scheme.java (formatType): Handle MultValuesType.

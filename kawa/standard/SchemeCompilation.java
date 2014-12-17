@@ -24,7 +24,10 @@ public class SchemeCompilation extends Translator
 
     @Override
     public Expression applyFunction(Expression func) {
-        return new ReferenceExp(applyFieldDecl);
+        if (func instanceof LambdaExp)
+            return null;
+        else
+            return new ReferenceExp(applyFieldDecl);
     }
 
   @Override

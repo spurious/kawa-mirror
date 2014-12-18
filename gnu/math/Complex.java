@@ -110,13 +110,17 @@ public abstract class Complex extends Quaternion
     return new DComplex(re, im);
   }
 
-  public static DComplex polar (double r, double t)
+  public static Complex polar (double r, double t)
   {
+    if (t == 0.0)
+      return new DFloNum(r);
     return new DComplex(r * Math.cos(t), r * Math.sin(t));
   }
 
-  public static DComplex polar (RealNum r, RealNum t)
+  public static Complex polar (RealNum r, RealNum t)
   {
+    if (t.isZero() && t.isExact())
+      return r;
     return polar(r.doubleValue(), t.doubleValue());
   }
 

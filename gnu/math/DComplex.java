@@ -126,8 +126,8 @@ public class DComplex extends Complex implements Externalizable
     return ((Numeric)y).divReversed(this);
   }
 
-  public static DComplex power (double x_re, double x_im,
-				double y_re, double y_im)
+  public static Complex power (double x_re, double x_im,
+                               double y_re, double y_im)
   {
     double h;
     /* #ifdef JAVA5 */

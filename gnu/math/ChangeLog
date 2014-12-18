@@ -1,3 +1,9 @@
+2014-12-18  Jamison Hope  <jrh@theptrgroup.com>
+
+	* Complex.java (polar): Change return type from DComplex to
+	Complex and return RealNum if angle is exact zero.
+	* DComplex.java (power): Update return type accordingly.
+
 2014-11-17  Jamison Hope  <jrh@theptrgroup.com>
 
 	Implemented quaternions.

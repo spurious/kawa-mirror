@@ -6023,10 +6023,22 @@ The multiple-value feature was added in R5RS.
 Delivers all of its arguments to its continuation.
 @end deffn
 
-@deffn Procedure call-with-values thunk receiver
-Call its @var{thunk} argument with a continuation that,
-when passed some values, calls the @var{receiver} procedure
-with those values as arguments.
+@deffn Procedure call-with-values producer consumer
+Calls its @var{producer} argument with no arguments and a
+continuation that, when passed some values, calls the
+@var{consumer} procedure with those values as arguments.
+
+@example
+(call-with-values (lambda () (values 4 5))
+                  (lambda (a b) b))
+                         @result{} 5
+
+(call-with-values * -)   @result{} -1
+@end example
+
+@emph{Performance note:}
+If either the @var{producer} or @var{consumer} is a fixed-arity
+lambda expression it is inlined.
 @end deffn
 
 @deffn Syntax define-values @stxref{formals} @stxref{expression}
@@ -8449,10 +8461,11 @@ of the given strings.
 @end deffn
 
 @deffn Procedure string-append! @var{string} @var{value} @dots{}
-The @var{string} must be a mutable string, such as one retuned
+The @var{string} must be a mutable string, such as one returned
 by @code{make-string} or @code{string-copy}.
 The @code{string-append!} procedure extends @var{string}
 by appending each @var{value} (in order) to the end of @var{string}.
+Each @code{value} should be a character or a string.
 
 @PerformanceNote{} The compiler converts a call with multiple @var{value}s
 to a multiple @code{string-append!} calls.

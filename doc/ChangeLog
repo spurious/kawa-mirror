@@ -1,3 +1,7 @@
+2014-12-18  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Multiple values): Updates for call-with-values.
+
 2014-12-11  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Keywords): Add notes on Guile-style syntax.

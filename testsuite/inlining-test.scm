@@ -430,3 +430,15 @@
      ((#\a #\b #\c #\d) 1)
      ((#\e #\f #\g #\h) 2)
      (else 3)))
+
+(define (callWithValues1 x::integer y::integer)
+  (call-with-values (lambda () (floor/ x y))
+    (lambda (a b) (list b a))))
+
+(define (callWithValues2 x::integer y::integer)
+  (call-with-values (lambda () (values (+ x 1) (- y 1)))
+    list))
+
+(define (callWithValues3 x::integer y::integer)
+  (call-with-values (lambda () (floor/ x y))
+    list))

@@ -1,3 +1,7 @@
+2014-12-17  Per Bothner  <per@bothner.com>
+
+	* CompileValues.java (validateApplyWithValues): More optimization.
+
 2014-12-16  Per Bothner  <per@bothner.com>
 
 	Better type-checking of 'call-with-values'.

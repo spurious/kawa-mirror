@@ -141,6 +141,9 @@ InliningTest.case11(int)java.lang.Object: 85 bytes
 InliningTest.case12(long)java.lang.Object: 171 bytes
 InliningTest.case13(gnu.math.IntNum)gnu.math.IntNum: 193 bytes
 InliningTest.case14(char)gnu.math.IntNum: 85 bytes
+InliningTest.callWithValues1(gnu.math.IntNum,gnu.math.IntNum)gnu.lists.Pair: 42 bytes
+InliningTest.callWithValues2(gnu.math.IntNum,gnu.math.IntNum)gnu.lists.Pair: 52 bytes
+InliningTest.callWithValues3(gnu.math.IntNum,gnu.math.IntNum)java.lang.Object: 15 bytes
 cycle1.isIsEven(int)boolean: 17 bytes
 cycle2.isIsOdd(int)boolean: 17 bytes
 binarytrees.bottomUpTree(int,int)binarytrees$TreeNode: 60 bytes

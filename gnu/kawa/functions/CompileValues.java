@@ -28,29 +28,87 @@ public class CompileValues {
 
      public static Expression validateApplyWithValues
         (ApplyExp exp, InlineCalls visitor, Type required, Procedure proc) {
-         Expression[] args = exp.getArgs();
-         if (args.length == 2) {
-             Expression producer = args[0];
-             Expression consumer = args[1];
-             Type prequired = null;
-             if (consumer instanceof LambdaExp) {
-                 LambdaExp lconsumer = (LambdaExp) consumer;
-                 if (lconsumer.min_args == lconsumer.max_args) {
-                     Type[] types = new Type[lconsumer.min_args];
-                     int i = 0;
-                     for (Declaration param = lconsumer.firstDecl();
-                          param != null; param = param.nextDecl()) {
-                         boolean typeSpecified = param.getFlag(Declaration.TYPE_SPECIFIED);
-                         Type type =
-                             param.getFlag(Declaration.TYPE_SPECIFIED)
-                             ? param.getType()
-                             : null;
-                         types[i++] = type;
-                     }
-                     prequired = MultValuesType.create(types);
+        Expression[] args = exp.getArgs();
+        if (args.length == 2) {
+            Expression producer = args[0];
+            Expression consumer = args[1];
+            Type prequired = null;
+            if (consumer instanceof LambdaExp) {
+                LambdaExp lconsumer = (LambdaExp) consumer;
+                if (lconsumer.min_args == lconsumer.max_args) {
+                    Type[] types = new Type[lconsumer.min_args];
+                    int i = 0;
+                    for (Declaration param = lconsumer.firstDecl();
+                         param != null; param = param.nextDecl()) {
+                        boolean typeSpecified = param.getFlag(Declaration.TYPE_SPECIFIED);
+                        Type type =
+                            param.getFlag(Declaration.TYPE_SPECIFIED)
+                            ? param.getType()
+                            : null;
+                        types[i++] = type;
+                    }
+                    prequired = MultValuesType.create(types);
+                }
+            }
+            producer = visitor.visit(producer, prequired);
+            if (prequired == null)
+                prequired = producer.getType();
+
+            if (prequired instanceof MultValuesType) {
+                MultValuesType mprequired = (MultValuesType) prequired;
+                int nvalues = mprequired.getValueCount();
+                Compilation comp = visitor.getCompilation();
+                comp.letStart();
+                PrimProcedure incrPosProc =
+                    new PrimProcedure(Compilation.typeValues
+                                      .getDeclaredMethod("incrPos", 2));
+                PrimProcedure getFromPosProc =
+                    new PrimProcedure(Compilation.typeValues
+                                      .getDeclaredMethod("getFromPos", 2));
+                Expression apply = visitor.getCompilation()
+                    .applyFunction(consumer);
+                int applyAdjust = apply == null ? 0 : 1;
+                Expression[] cargs = new Expression[applyAdjust+nvalues];
+                Declaration valsDecl = comp.letVariable(null, Type.objectType, producer);
+                QuoteExp zero = new QuoteExp(Integer.valueOf(0), Type.intType);
+                Declaration iposDecl = nvalues == 0 ? null
+                    : comp.letVariable(null,
+                                       Type.intType,
+                                       zero);
+                 comp.letEnter();
+                 for (int i = 0; i < nvalues; i++) {
+                     SetExp incr =
+                         new SetExp(iposDecl,
+                                    new ApplyExp(incrPosProc,
+                                                 new ReferenceExp(valsDecl),
+                                                 new ReferenceExp(iposDecl)));
+                     iposDecl.noteValueFromSet(incr);
+                     if (i + 1 == nvalues)
+                         getFromPosProc =
+                             new PrimProcedure(Compilation.typeValues
+                                               .getDeclaredMethod("getFromPosFinal", 2));
+                     cargs[applyAdjust+i] =
+                         new BeginExp(incr,
+                                      new ApplyExp(getFromPosProc,
+                                                   new ReferenceExp(valsDecl),
+                                                   new ReferenceExp(iposDecl)));
                  }
+                 Expression callCons;
+                 if (applyAdjust == 0)
+                     callCons = new ApplyExp(consumer, cargs);
+                 else {
+                     cargs[0] = consumer;
+                     callCons = new ApplyExp(apply, cargs);
+                 }
+                 if (nvalues == 0) {
+                     Method checkFinalPosMethod = Compilation.typeValues
+                         .getDeclaredMethod("checkFinalPos", 2);
+                     callCons = new BeginExp(new ApplyExp(checkFinalPosMethod,
+                                                          new ReferenceExp(valsDecl), zero),
+                                             callCons);
+                 }
+                 return visitor.visit(comp.letDone(callCons), required);
              }
-             producer = visitor.visit(producer, prequired);
              args[0] = producer;
          }
          exp.visitArgs(visitor);

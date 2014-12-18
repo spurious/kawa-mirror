@@ -150,6 +150,33 @@ public abstract class Values<E>
         return canonicalize();
     }
 
+    public static int incrPos(Object values, int pos) {
+        if (values instanceof Values)
+            return ((Values) values).nextPos(pos);
+        else
+            return 1 - pos;
+    }
+
+    public static Object getFromPos(Object values, int pos) {
+        if (pos == 0)
+            throw new IndexOutOfBoundsException("not enough values");
+        if (values instanceof Values)
+            return ((Values) values).getPosPrevious(pos);
+        else
+            return values;
+    }
+
+    public static Object getFromPosFinal(Object values, int pos) {
+        Object r = getFromPos(values, pos);
+        checkFinalPos(values, pos);
+        return r;
+    }
+
+    public static void checkFinalPos(Object values, int pos) {
+        if (incrPos(values, pos) != 0)
+            throw new IndexOutOfBoundsException("too many values");
+    }
+
     /** Helper method called by compiled code.
      * The compiled code iterates through zero or more values.
      * Return the index of the next value, or -1 if currently at eof.

@@ -24,3 +24,39 @@
 (format #t "to boolean: ~w~%"
         (map (lambda (x) (if (? b::boolean x) b -1)) '(1 #f #\X #t)))
 ;; Output: to boolean: (-1 #f -1 #t)
+
+(define (to-v o)
+  (if (? v ::vector o) v '#()))
+(format #t "to vector: ~w~%"
+        (map to-v '(4 (5) #(6))))
+;; Output: to vector: (#() #() #(6))
+
+(define (to-f64v o)
+  (if (? f64v ::f64vector o) f64v '#f64(-1 0)))
+(format #t "to f64v: ~w~%"
+        (map to-f64v '(4 #(5) #f64(7))))
+;; Output: to f64v: (#f64(-1.0 0.0) #f64(-1.0 0.0) #f64(7.0))
+
+(define (to-list o)
+  (if (? l ::list o) l '()))
+(format #t "to list: ~w~%"
+        (map to-list '(4 #(5 6) (7 6))))
+;; Output: to list: (() () (7 6))
+
+(define (to-FVector o)
+  (if (? v ::gnu.lists.FVector o) v '#()))
+(format #t "to FVector: ~w~%"
+        (map to-FVector '(4 (5) #(6))))
+;; Output: to FVector: (#() #() #(6))
+
+(define (to-F64Vector o)
+  (if (? f64v ::gnu.lists.F64Vector o) f64v '#f64(1 2)))
+(format #t "to F64Vector: ~w~%"
+        (map to-f64v '(4 #(5) #f64(7))))
+;; Output: to F64Vector: (#f64(-1.0 0.0) #f64(-1.0 0.0) #f64(7.0))
+
+(define (to-LList o)
+  (if (? l ::gnu.lists.LList o) l '()))
+(format #t "to LList: ~w~%"
+        (map to-LList '(4 #(5 6) (7 6))))
+;; Output: to LList: (() () (7 6))

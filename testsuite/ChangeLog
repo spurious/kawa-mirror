@@ -1,3 +1,8 @@
+2014-12-18  Jamison Hope  <jrh@theptrgroup.com>
+	    Per Bothner  <per@bothner.com>
+
+	* match1.scm: More conditional-binding tests.
+
 2014-12-17  Per Bothner  <per@bothner.com>
 
 	* values1.scm: New tests for call-with-values.

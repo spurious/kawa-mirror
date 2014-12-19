@@ -1,3 +1,8 @@
+2014-12-18  Per Bothner  <per@bothner.com>
+
+	* LangObjType.java (emitTestIf): Fix handling for types without
+	a coercion method.
+
 2014-12-09  Per Bothner  <per@bothner.com>
 
 	* LangPrimType.java (emitTestIf): Fix handling of boolean,

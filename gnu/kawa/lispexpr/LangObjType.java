@@ -490,25 +490,26 @@ public class LangObjType extends SpecialObjectType implements TypeValue
     return methodDeclaringClass.getDeclaredMethod(mname, 1);
   }
 
-  public void emitTestIf(Variable incoming, Declaration decl, Compilation comp)
-  {
-    CodeAttr code = comp.getCode();
-    if (incoming != null)
-      code.emitLoad(incoming);
-    Method method = coercionOrNullMethod();
-    if (method != null)
-      code.emitInvokeStatic(method);
-    if (decl != null)
-      {
-        code.emitDup();
-        decl.compileStore(comp);
-      }
-    if (method != null)
-      code.emitIfNotNull();
-    else
-      {
-        implementationType.emitIsInstance(code);
-        code.emitIfIntNotZero();
+    public void emitTestIf(Variable incoming, Declaration decl, Compilation comp) {
+        CodeAttr code = comp.getCode();
+        if (incoming != null)
+            code.emitLoad(incoming);
+        Method method = coercionOrNullMethod();
+        if (method != null) {
+            code.emitInvokeStatic(method);
+            if (decl != null) {
+                code.emitDup();
+                decl.compileStore(comp);
+            }
+            code.emitIfNotNull();
+        } else {
+            implementationType.emitIsInstance(code);
+            code.emitIfIntNotZero();
+            if (decl != null) {
+                code.emitLoad(incoming);
+                emitCoerceFromObject(code);
+                decl.compileStore(comp);
+            }
       }
   }
 

@@ -1,3 +1,11 @@
+2014-12-19  Per Bothner  <per@bothner.com>
+
+	* FilePath.java	(valueOf): If filename starts with "file:",
+	first convert to URI.
+	(resolve): If the relative path starts with "file:", create a
+	FilePath rather than a URLPath.  Use relative File creation
+	instead of URI#resolve - this is more robust with unusual characters.
+
 2014-11-23  Per Bothner  <per@bothner.com>
 
 	* Path.java (search): Fix logic error.

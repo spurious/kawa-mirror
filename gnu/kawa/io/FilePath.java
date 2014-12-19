@@ -36,30 +36,34 @@ public class FilePath
     this.path = path;
   }
 
-  public static FilePath valueOf (String str)
-  {
-    String orig = str;
-    /* FIXME: Should we expand '~'?
-       Issues: is (path "~/bar") absolute?
-       What about: (base:resolve "~/bar") ?
-       What if base above isn't a FilePath?
-    int len = str.length();
-    if (len > 0 && str.charAt(0) == '~' && File.separatorChar == '/')
-      {
-        if (len == 1 || str.charAt(1) == '/')
-          {
-            String user = System.getProperty("user.home");
-            if (user != null)
-              str = user + str.substring(1);
-          }
-        else
-          {
-            // We don't support '~USER/...'  Do that using /bin/sh. FIXME
-          }
-      }
-    */
-    return new FilePath(new File(str), orig);
-  }
+    public static FilePath valueOf(String str) {
+        String orig = str;
+        /* FIXME: Should we expand '~'?
+           Issues: is (path "~/bar") absolute?
+           What about: (base:resolve "~/bar") ?
+           What if base above isn't a FilePath?
+        int len = str.length();
+        if (len > 0 && str.charAt(0) == '~' && File.separatorChar == '/') {
+            if (len == 1 || str.charAt(1) == '/') {
+                String user = System.getProperty("user.home");
+                if (user != null)
+                    str = user + str.substring(1);
+            } else {
+                // We don't support '~USER/...'  Do that using /bin/sh. FIXME
+            }
+        }
+        */
+        File f;
+        if (str.startsWith("file:")) {
+            try {
+                f = new File(new URI(str));
+            } catch (URISyntaxException ex) {
+                throw new RuntimeException("bad file: URI syntax - "+str, ex);
+            }
+        } else
+            f = new File(str);
+        return new FilePath(f, orig);
+    }
 
     public static FilePath valueOf(File file) {
         return new FilePath(file);
@@ -265,9 +269,17 @@ public class FilePath
     }
 
     public Path resolve(String relative) {
-        if (Path.uriSchemeSpecified(relative))
-            return URLPath.valueOf(relative);
-        return valueOf(toUri().resolve(relative));
+        if (Path.uriSchemeSpecified(relative)) {
+            if (relative.startsWith("file:"))
+                return FilePath.valueOf(relative);
+            else
+                return URLPath.valueOf(relative);
+        }
+        File rfile = new File(relative);
+        if (! rfile.isAbsolute())
+            rfile = new File(isDirectory() ? file : file.getParentFile(),
+                             rfile.toString());
+        return new FilePath(rfile);
     }
 
   public Path getCanonical ()

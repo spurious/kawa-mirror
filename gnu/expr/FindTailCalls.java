@@ -3,18 +3,62 @@ import gnu.bytecode.Type;
 import java.util.HashMap;
 
 /** A visitor that checks for tails-calls; also notes read/write/call accesses.
- *
- * Does setTailCall on ApplyExp's that are tail-calls.
- * Note the final part of deciding inlineability has to be done after
- * FindTailCalls finishes (or at least after we've visited all possible
- * callers), so it is deferred to FindCapturedvars.visitLambdaExp.
- *
- * The extra parameter is the {@code returnContinuation} - the expression we
- * "return to" - i.e. when done evaluating an expression, we're also done
- * with the {@code returnContinuation}.  Normally it is is same
+ * <p>
+ * The main goal of this pass is to figure of which functions can and
+ * should be inlined.  We inline a function where possible to avoid
+ * closure allocation and related overheads, and also (more importantly)
+ * to enable tail-call-optiomization: A tail-call can be implemented cheaply
+ * and correctly using a {@code goto} bytecode instruction - but only for
+ * functions inlined in the same JVM method.
+ * <p>
+ * We currently restrict inlining to cases when we can do so without
+ * code duplication: When the function is only called once, not counting
+ * tail-calls.  Because passing a "return link" is difficult, we require
+ * that all calls to the function have the same "return continuation".
+ * <p>
+ * The extra visitor parameter is the {@code returnContinuation} - the
+ * expression we "return to" - i.e. when done evaluating an expression, we're
+ * also done with the {@code returnContinuation}.  Normally it is is same
  * {@code Expression} as we are visiting, but (for example) when visiting the
  * last expression of a {@code BeginExp} the  {@code returnContinuation}
- * is the same as that of the containing {@code BeginExp}.
+ * is the same as that of the containing {@code BeginExp}.  We're in a
+ * tail-context (in the sense of the Scheme reports) iff the current
+ * {@code returnContinuation} is the {@code body} of the current
+ * {@code LambdaExp}.
+ * <p>
+ * For each non-inlined function {@code f} we define {@code inlineSet(f)}
+ * as the set of functions {@code g} such that {@code g.inlinedIn(f)}.
+ * There are various requirements for a function {@code g} to be inlined;
+ * for example we require that it have a fixed number of arguments.
+ * Because of the no-duplication policy, all calls to {@code g} have
+ * to be known, and all calls have to be from other inlined functions:
+ * If {@code h} calls {@code g}, then {@code h==f || h.inlinedIn(f)}.
+ * In addition all calls must have the same {@code returnContinuation}.
+ * <p>
+ * This analysis is done in two parts: First this {@code FindTailCalls}
+ * visitor, and it is finished in {@code FindCapturedVars#checkInlineable}.
+ * <p>
+ * When this vistor is done, it has set the {@code returnContinuation},
+ * {@code tailCallers}, and {@code inlineHome} fields of a {@code LambdaExp}.
+ * If function {@code f} tail-calls {@code g}, then {@code f} is added
+ * to the set of {@code g}'s {@code tailCaller}s.
+ * <p>
+ * If there is a non-tail-call to {@code g} then we try to set {@code g}'s
+ * {@code returnContinuation} to the current (context)
+ * {@code returnContinuation}, if the former hasn't been set yet;
+ * otherwise we set it to the special {@code unknownContinuation} value.
+ * We also construct {@code tailCallers} as the list of functions {@code h}
+ * that make a tail-call to {@code g}.
+ * At the end of this pass, if a function's {@code returnContinuation} is
+ * is non-null and not {@code unknown} then it has a unique continuation,
+ * and the function can potentially be inlined at the location of the
+ * continuation.  However, that depends on if any tail-calls also have same
+ * return-continuation; that analysis happens later in {@code checkInlineable}.
+ * <p>
+ * (In addition a {@code validate} method (executed during the earlier
+ * {@code InlinedCalls} pass may pre-initialized the {@code returnContinuation}
+ * {@code inlineHome} fields, but only for a {@code LambdaExp} that will be
+ * inlined during code generation in a custom {@code compile} method.)
  */
 
 public class FindTailCalls extends ExpExpVisitor<Expression>

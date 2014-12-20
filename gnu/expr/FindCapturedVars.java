@@ -235,20 +235,19 @@ public class FindCapturedVars extends ExpExpVisitor<Void>
   static Expression checkInlineable (LambdaExp current,
                                      java.util.Set<LambdaExp> seen)
   {
-    if (current.returnContinuation == LambdaExp.unknownContinuation)
-      return current.returnContinuation;
-    if (seen.contains(current))
-      return current.returnContinuation;
+    Expression r = current.returnContinuation;
+    if (r == LambdaExp.unknownContinuation || seen.contains(current))
+      return r;
     if (current.getCanRead()
         || current.isClassMethod()
         || Compilation.avoidInline(current)
         || current.min_args != current.max_args)
-      {
-        current.returnContinuation = LambdaExp.unknownContinuation;
-        return LambdaExp.unknownContinuation;
-      }
+        {
+          r = LambdaExp.unknownContinuation;
+          current.returnContinuation = r;
+          return r;
+        }
     seen.add(current);
-    Expression r = current.returnContinuation;
     if (current.tailCallers != null)
       {
         for (LambdaExp p : current.tailCallers)
@@ -258,26 +257,28 @@ public class FindCapturedVars extends ExpExpVisitor<Void>
               {
                 if (r == null || r == p.body)
                   {
+                    // Can't inline p in current, but maybe we can
+                    // inline current in p
                     r = p.body;
                     current.inlineHome = p;
                   }
                 else
                   {
-                    current.returnContinuation = LambdaExp.unknownContinuation;
+                    current.returnContinuation = t;
                     return t;
                   }
               }
             else if (r == null)
               {
                 r = t;
-                if (current.inlineHome == null)
-                  current.inlineHome = current.nestedIn(p) ? p : p.inlineHome;
               }
             else if ((t != null && r != t)
+                     // FIXME why isn't this checked outside the loop?
                      || current.getFlag(LambdaExp.CANNOT_INLINE))
               {
-                current.returnContinuation = LambdaExp.unknownContinuation;
-                return LambdaExp.unknownContinuation;
+                r = LambdaExp.unknownContinuation;
+                current.returnContinuation = r;
+                return r;
               }
           }
       }
@@ -292,6 +293,8 @@ public class FindCapturedVars extends ExpExpVisitor<Void>
     if (caller != LambdaExp.unknownContinuation)
       {
         exp.setInlineOnly(true);
+        if (exp.inlineHome == null)
+            exp.inlineHome = exp.outerLambda();
         backJumpPossible++;
       }
     return super.visitLambdaExp(exp, ignored);

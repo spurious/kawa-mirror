@@ -1,5 +1,9 @@
 2014-12-19  Per Bothner  <per@bothner.com>
 
+	* FindCapturedVars.java (checkInlineable): Don't set inlineHome.
+	(visitLambdaExp): Set inlineHome if it hasn't been.
+	* FindTailCalls.java: Add documentation.
+
 	* Compilation.java (pushNewModule): Merge overloaded versions.
 	See ModuleInfo's sourceAbsPath to null if string or console.
 

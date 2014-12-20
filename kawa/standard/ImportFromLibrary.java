@@ -253,9 +253,9 @@ public class ImportFromLibrary extends Syntax
             }
         }
 
+        ModuleInfo curinfo = tr.getMinfo();
         String currentFileName = tr.getFileName();
-        Path currentSource = currentFileName == null ? null
-            : Path.valueOf(currentFileName).getAbsolute();
+        Path currentSource = curinfo.getSourceAbsPath();
         String currentExtension = currentSource == null ? null
             : currentSource.getExtension();
         if (currentExtension == null) {
@@ -274,7 +274,6 @@ public class ImportFromLibrary extends Syntax
             isAbsolute = false;
         }
 
-        ModuleInfo curinfo = tr.getMinfo();
         String currentClassName = curinfo.getClassName();
 
         // Is the current module a file - as opposed to (say) a tty?

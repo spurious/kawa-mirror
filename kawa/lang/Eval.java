@@ -78,7 +78,7 @@ public class Eval
         // to do the right thing.
         tr.setState(Compilation.BODY_PARSED-1);
         tr.setSharedModuleDefs(true);
-	ModuleExp mod = tr.pushNewModule((String) null);
+	ModuleExp mod = tr.pushNewModule(null);
         Compilation saveComp = Compilation.setSaveCurrent(tr);
         try
           {

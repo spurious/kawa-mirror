@@ -1,3 +1,7 @@
+2014-12-19  Per Bothner  <per@bothner.com>
+
+	* scheme/eval.scm (eval): Update call to pushNewModule.
+
 2014-12-16  Per Bothner  <per@bothner.com>
 
 	Better type-checking of 'values'.

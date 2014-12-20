@@ -16,7 +16,7 @@
   (define lexical (gnu.expr.NameLookup language))
   (define tr (kawa.standard.SchemeCompilation language messages lexical))
   (set! tr:immediate #t)
-  (define module (tr:pushNewModule (as java.lang.String #!null)))
+  (define module (tr:pushNewModule #!null))
   (define env (gnu.mapping.Environment:make (format #f "~{~a~^ ~}" specifiers)))
   (importer:scanForm (cons #f specifiers) module tr)
   (if (messages:seenErrors)

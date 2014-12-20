@@ -10,8 +10,7 @@ import kawa.Shell;
 import java.util.zip.*;
 import java.util.Stack;
 import gnu.kawa.functions.Convert;
-import gnu.kawa.io.OutPort;
-import gnu.kawa.io.Path;
+import gnu.kawa.io.*;
 import gnu.kawa.lispexpr.LangPrimType;
 import gnu.kawa.reflect.LazyType;
 import gnu.lists.Pair;
@@ -2529,11 +2528,7 @@ public class Compilation implements SourceLocator
   public ModuleExp pushNewModule (Lexer lexer)
   {
     this.lexer = lexer;
-    return pushNewModule(lexer.getName());
-  }
-
-  public ModuleExp pushNewModule (String filename)
-  {
+    String filename = lexer == null ? null : lexer.getName();
     ModuleExp module = new ModuleExp();
     if (filename != null)
       module.setFile(filename);
@@ -2543,7 +2538,12 @@ public class Compilation implements SourceLocator
     if (immediate)
       {
         module.setFlag(ModuleExp.IMMEDIATE);
-        new ModuleInfo().setCompilation(this);
+        ModuleInfo minfo = new ModuleInfo();
+        minfo.setCompilation(this);
+        InPort port = lexer == null ? null : lexer.getPort();
+        if (port instanceof CharArrayInPort
+            || port instanceof TtyInPort)
+            minfo.setSourceAbsPath(null);
       }
     push(module);
     return module;

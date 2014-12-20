@@ -1,3 +1,10 @@
+2014-12-19  Per Bothner  <per@bothner.com>
+
+	* standard/ImportFromLibrary.java (handleImport): Derive current
+	source name from ModuleInfo, not Compilation.  Thus we get a null
+	name for cases like <eval> or <string>.
+	* lang/Eval.java (evalBody): Update pushNewModule call.
+
 2014-12-16  Per Bothner  <per@bothner.com>
 
 	* standard/SchemeCompilation.java (applyFunction): Return null

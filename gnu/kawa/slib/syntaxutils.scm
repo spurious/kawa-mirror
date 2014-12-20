@@ -76,7 +76,7 @@
 	 (messages (<gnu.text.SourceMessages>))
 	 (translator ::kawa.lang.Translator
                      (lang:getCompilation messages namelookup))
-	 (module (! pushNewModule translator (as <String> #!null)))
+	 (module (! pushNewModule translator #!null))
 	 (saved-comp (C:set-save-current translator)))
     (try-finally
      (! rewrite translator exp)

@@ -1,4 +1,4 @@
-// Copyright (c) 1999, 2000-2005, 2006, 2010 Per M.A. Bothner.
+// Copyright (c) 1999, 2000-2005, 2006, 2010, 2014 Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.expr;
@@ -265,9 +265,14 @@ public class Compilation implements SourceLocator
   public static final int MODULE_STATIC_DEFAULT = 0;
   public static final int MODULE_STATIC = 1;
   public static final int MODULE_STATIC_RUN = 2;
-  /** If moduleStatic > 0, (module-static #t) is implied by default.
-   * If moduleStatic == 2, <clinit> calls run.
-   * If moduleStatic < 0, (module-static #f) is implied by default. */
+  /** Default for whether a module is static.
+   * If {@code moduleStatic > 0},
+   *   then {@code (module-static #t)} is implied by default.
+   * If {@code moduleStatic == MODULE_STATIC_RUN},
+   *   then {@code <clinit>} calls {@code run}.
+   * If {@code moduleStatic < 0},
+   *   then {@code (module-static #f)} is implied by default.
+   */
   public static int moduleStatic = MODULE_STATIC_DEFAULT;
 
   ClassType[] classes;
@@ -2540,10 +2545,6 @@ public class Compilation implements SourceLocator
         module.setFlag(ModuleExp.IMMEDIATE);
         ModuleInfo minfo = new ModuleInfo();
         minfo.setCompilation(this);
-        InPort port = lexer == null ? null : lexer.getPort();
-        if (port instanceof CharArrayInPort
-            || port instanceof TtyInPort)
-            minfo.setSourceAbsPath(null);
       }
     push(module);
     return module;
@@ -2714,6 +2715,24 @@ public class Compilation implements SourceLocator
   {
     messages.setLine(filename, line, column);
   }
+
+    /** Get source filename as an absolute Path, or null.
+     * Return null if there is no actual file, such as a {@code <string>}.
+     * Note the {@link ModuleInfo#getSourceAbsPath} is similar,
+     * but this version is not canonicalized.
+     */
+    public Path getSourceAbsPath() {
+        String currentFileName = getFileName();
+        if (currentFileName != null) {
+            ModuleInfo info = getMinfo();
+            // info.getSourceAbsPath() is null if the source port is
+            // a string or a console, in which we should return null.
+            if (info != null && info.getSourceAbsPath() != null) {
+                return Path.valueOf(currentFileName).getAbsolute();
+            }
+        }
+        return null;
+    }
 
   /** A help vector for building expressions. */
   public Stack<Expression> exprStack;

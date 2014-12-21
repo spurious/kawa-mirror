@@ -1,3 +1,9 @@
+2014-12-21  Per Bothner  <per@bothner.com>
+
+	* standard/ImportFromLibrary.java (handleImport): Avoid undesirable
+	canonicalization when calculating currentSource by using new
+	Compilation#getSourceAbsPath method.
+
 2014-12-19  Per Bothner  <per@bothner.com>
 
 	* standard/ImportFromLibrary.java (handleImport): Derive current

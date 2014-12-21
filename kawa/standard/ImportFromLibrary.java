@@ -254,8 +254,7 @@ public class ImportFromLibrary extends Syntax
         }
 
         ModuleInfo curinfo = tr.getMinfo();
-        String currentFileName = tr.getFileName();
-        Path currentSource = curinfo.getSourceAbsPath();
+        Path currentSource = tr.getSourceAbsPath();
         String currentExtension = currentSource == null ? null
             : currentSource.getExtension();
         if (currentExtension == null) {

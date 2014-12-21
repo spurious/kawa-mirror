@@ -4,7 +4,7 @@
 package gnu.expr;
 import gnu.mapping.*;
 import gnu.bytecode.*;
-import gnu.kawa.io.Path;
+import gnu.kawa.io.*;
 import java.util.*;
 import gnu.kawa.util.AbstractWeakHashTable;
 
@@ -42,8 +42,10 @@ public class ModuleInfo {
         String fileName;
         if (mod != null && (fileName = mod.getFileName()) != null) {
             this.sourcePath = fileName;
-            Path abs = absPath(fileName);
-            this.sourceAbsPath = abs;
+            InPort port = comp.lexer == null ? null : comp.lexer.getPort();
+            if (! (port instanceof CharArrayInPort
+                   || port instanceof TtyInPort))
+                this.sourceAbsPath = absPath(fileName);
         }
     }
 

@@ -1,3 +1,10 @@
+2014-12-21  Per Bothner  <per@bothner.com>
+
+	* ModuleInfo.java (setCompilation): Don't set sourceAbsPath if input
+	port is a string or lexer, using logic previously in pushNewModule.
+	* Compilation.java (pushNewModule): Simplify correspondingly.
+	(getSourceAbsPath): New method.
+
 2014-12-19  Per Bothner  <per@bothner.com>
 
 	* FindCapturedVars.java (checkInlineable): Don't set inlineHome.

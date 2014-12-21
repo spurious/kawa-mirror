@@ -43,7 +43,7 @@ public interface TypeValue extends java.lang.reflect.Type {
     /** Get the constructor function for this type.
      * Returns null if there is no contructor function.
      * Also returns null if this extends ClassType or ArrayType and
-     * standard Java constructors (<init> methods) should be used.
+     * standard Java constructors ({@code <init>} methods) should be used.
      */
     public Procedure getConstructor ();
 

@@ -1,3 +1,4 @@
+(require kawa.lib.prim_imports)
 (define-syntax (and-let* form)
   (syntax-case form ()
     ((and-let* (claw ...) arg1 . rest)

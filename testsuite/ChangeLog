@@ -1,3 +1,10 @@
+2014-12-21  Seth Alves <alves@hungry.com>
+            Per Bothner  <per@bothner.com>
+
+	* sva43750.scm: New test for Savannah bug #43750
+	"srfi-2 doesn't work inside r7rs library".
+	* Makefile.am: Update accordingly.
+
 2014-12-18  Jamison Hope  <jrh@theptrgroup.com>
 	    Per Bothner  <per@bothner.com>
 

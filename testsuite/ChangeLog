@@ -3,6 +3,7 @@
 
 	* sva43750.scm: New test for Savannah bug #43750
 	"srfi-2 doesn't work inside r7rs library".
+	* sva43750.scm: Add a related test.
 	* Makefile.am: Update accordingly.
 
 2014-12-18  Jamison Hope  <jrh@theptrgroup.com>

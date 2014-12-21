@@ -10,6 +10,7 @@
                 (define_syntax %define-syntax)))
 (import (rename (only (kawa standard let) let) (let %let)))
 (import (rename (only (kawa standard set_b) set) (set set!)))
+(import (only (kawa standard begin) begin))
 
 (%define-syntax define-syntax
   (syntax-rules ($lookup$)
@@ -103,9 +104,9 @@
        (%let ((bl (gnu.expr.BlockExp)))
              (bl:setRunFinallyBlocks #f)
              (bl:setBody
-              (syntax->expression #`(begin
-                    (%if-and-x #,bl then . tests)
-                    else)))
+              (gnu.expr.BeginExp
+               (syntax->expression #`(%if-and-x #,bl then . tests))
+               (syntax->expression #`else)))
              bl))
       ((_ (? . rest) then)
        #'(if (? . rest) then #!void))

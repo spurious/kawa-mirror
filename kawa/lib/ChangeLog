@@ -1,3 +1,9 @@
+2014-12-20  Per Bothner  <per@bothner.com>
+
+	* prim_syntax.scm (if): "Inline" use of begin to avoid a "reference"
+	to the begin macro.  This is needed for r7rs-library mode, which has
+	no default imports.  Redundanty, also explicitly import begin.
+
 2014-12-19  Per Bothner  <per@bothner.com>
 
 	* scheme/eval.scm (eval): Update call to pushNewModule.

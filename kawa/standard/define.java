@@ -73,8 +73,12 @@ public class define extends Syntax
     name = decl.getSymbol();
     if (makePrivate)
       {
-	decl.setFlag(Declaration.PRIVATE_SPECIFIED);
-	decl.setPrivate(true);
+        if (defs instanceof ModuleExp && defs.getFlag(ModuleExp.INTERACTIVE))
+          tr.error('w', "'define-private' should not be used in interactive mode");
+        else {
+            decl.setFlag(Declaration.PRIVATE_SPECIFIED);
+            decl.setPrivate(true);
+        }
       }
     if (makeConstant)
       decl.setFlag(Declaration.IS_CONSTANT);

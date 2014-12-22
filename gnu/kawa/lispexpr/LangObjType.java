@@ -429,7 +429,10 @@ public class LangObjType extends SpecialObjectType implements TypeValue
       case REGEX_TYPE_CODE:
         return null;
       default:
-        return ((PrimProcedure) getConstructor()).getMethod();
+        Procedure cons = getConstructor();
+        if (cons == null)
+          return null;
+        return ((PrimProcedure) cons).getMethod();
       }
   }
 

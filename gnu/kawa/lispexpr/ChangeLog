@@ -1,3 +1,8 @@
+2014-12-21  Per Bothner  <per@bothner.com>
+
+	* LangObjType.java (coercionMethod): For default case, return null
+	if getConstructor() returns null.
+
 2014-12-18  Per Bothner  <per@bothner.com>
 
 	* LangObjType.java (emitTestIf): Fix handling for types without

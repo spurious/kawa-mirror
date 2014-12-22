@@ -1941,7 +1941,7 @@ public class Translator extends Compilation
         Object declName = aliasNeeded
             ? Symbol.makeUninterned(name.toString())
             : name;
-        Declaration decl = defs.getDefine(declName, 'w', this);
+        Declaration decl = defs.getDefine(declName, this);
         if (aliasNeeded) {
             Declaration alias = makeRenamedAlias(name, decl, scope);
             if (defs instanceof LetExp)

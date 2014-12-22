@@ -199,7 +199,7 @@ public class define_autoload extends Syntax
 			       + pair.getCar());
 		    if (value != null)
 		      {
-			Declaration decl = defs.getDefine(name, 'w', tr);
+			Declaration decl = defs.getDefine(name, tr);
 			Expression ex = new QuoteExp(value);
 			decl.setFlag(Declaration.IS_CONSTANT);
 			decl.noteValue(ex);
@@ -268,7 +268,7 @@ public class define_autoload extends Syntax
     if (names instanceof String || names instanceof Symbol)
       {
 	String name = names.toString();
-	Declaration decl = defs.getDefine(name, 'w', tr);
+	Declaration decl = defs.getDefine(name, tr);
 	if (filename instanceof SimpleSymbol
 	    && (len = (fn = filename.toString()).length()) > 2
 	    && fn.charAt(0) == '<' && fn.charAt(len-1) == '>')

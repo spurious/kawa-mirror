@@ -203,7 +203,7 @@ public abstract class ScopeExp extends Expression
   }
 
   /** Add a new Declaration, with a message if there is an existing one. */
-  public Declaration getDefine (Object name, char severity, Compilation parser)
+  public Declaration getDefine (Object name, Compilation parser)
   {
     Declaration decl = lookup(name);
     if (decl == null)

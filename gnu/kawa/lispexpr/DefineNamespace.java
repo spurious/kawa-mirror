@@ -38,7 +38,7 @@ public class DefineNamespace extends Syntax
 	return false;
       }
     Symbol name = (Symbol) p1.getCar();
-    Declaration decl = defs.getDefine(name, 'w', tr);
+    Declaration decl = defs.getDefine(name, tr);
     tr.push(decl);
     decl.setFlag(Declaration.IS_CONSTANT|Declaration.IS_NAMESPACE_PREFIX
                  |Declaration.IS_SINGLE_VALUE);

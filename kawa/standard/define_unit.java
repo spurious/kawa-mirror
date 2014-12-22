@@ -36,7 +36,7 @@ public class define_unit extends Syntax
 	  {
 	    String name = q.toString();
             Symbol sym = LispLanguage.unitNamespace.getSymbol(name);
-	    Declaration decl = defs.getDefine(sym, 'w', tr);
+	    Declaration decl = defs.getDefine(sym, tr);
 	    tr.push(decl);
 	    Translator.setLine(decl, p);
 	    decl.setFlag(Declaration.IS_CONSTANT);

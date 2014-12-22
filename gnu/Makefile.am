@@ -371,6 +371,7 @@ GNU_KAWA_LISPEXPR_JSOURCES = \
   kawa/lispexpr/ReaderVector.java \
   kawa/lispexpr/ReadTable.java \
   kawa/lispexpr/ReadTableEntry.java \
+  kawa/lispexpr/SeqSizeType.java \
   $(GNU_KAWA_LISPEXPR_XML_JSOURCES)
 
 GNU_KAWA_MODELS_JSOURCES = \

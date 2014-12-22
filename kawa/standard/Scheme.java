@@ -174,6 +174,7 @@ public class Scheme extends LispLanguage
       //-- Section 4.1  -- complete
       defSntxStFld(LispLanguage.quote_str, "kawa.lang.Quote", "plainQuote");
       defSntxStFld("define", "kawa.lib.prim_syntax");
+      defSntxStFld("!", "kawa.standard.MatchDef", "matchDef");
 
       defSntxStFld("if", "kawa.lib.prim_syntax");
       defSntxStFld ("set!", "kawa.standard.set_b", "set");

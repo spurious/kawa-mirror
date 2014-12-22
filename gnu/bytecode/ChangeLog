@@ -1,3 +1,7 @@
+2014-12-22  Per Bothner  <per@bothner.com>
+
+	* Type.java (isCompatibleWithValue): New static helper.
+
 2014-12-15  Victor van den Elzen
 
 	* SpecialObjectType.java (compare): Check for comparing

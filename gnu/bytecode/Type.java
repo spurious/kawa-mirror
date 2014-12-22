@@ -451,7 +451,11 @@ public abstract class Type
         // Hack for LangPrimType.charType.
         if (this == charType && valueType.getImplementationType()== this)
             return 2;
-        int comp = compare(valueType);
+        return isCompatibleWithValue(this, valueType);
+    }
+
+    public static int isCompatibleWithValue(Type targetType, Type valueType) {
+        int comp = targetType.compare(valueType);
         return comp >= 0 ? 1 : comp == -3 ? -1 : 0;
     }
 

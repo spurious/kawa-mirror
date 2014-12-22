@@ -1,5 +1,10 @@
 2014-12-22  Per Bothner  <per@bothner.com>
 
+	* lang/BindDecls.java: New helper class for parsing pattern.
+	* standard/MatchDef.java: New class for (! ...) declaration syntax.
+	* standard/Scheme.java (initScheme): Adding binding for '!'
+	* Makefile.am :update accorinly.
+
 	* standard/define.java (scanForm): Complain about define-private
 	in interactive module.
 

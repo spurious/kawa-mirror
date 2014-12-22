@@ -14,6 +14,7 @@ JAVAX_SCRIPT_EXTRA=\
   standard/SchemeScriptEngineFactory.java
 
 KAWA_LANG_JAVA_FILES = \
+  lang/BindDecls.java \
   lang/Pattern.java \
   lang/AnyPat.java \
   lang/EqualPat.java \
@@ -66,6 +67,7 @@ KAWA_STANDARD_JAVA_FILES = \
   standard/syntax.java \
   standard/syntax_case.java \
   standard/require.java \
+  standard/MatchDef.java \
   standard/module_extends.java \
   standard/module_implements.java \
   standard/module_name.java \

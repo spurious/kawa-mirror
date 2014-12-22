@@ -24,12 +24,10 @@ public class SetExp extends AccessExp
   public SetExp (Object symbol, Expression val)
   { this.symbol = symbol;  new_value = val; }
 
-  public SetExp (Declaration decl, Expression val)
-  {
-    this.binding = decl;
-    symbol = decl.getSymbol();
-    new_value = val;
-  }
+    public SetExp(Declaration decl, Expression val) {
+        setBinding(decl);
+        new_value = val;
+    }
 
   public static SetExp makeDefinition (Object symbol, Expression val)
   {

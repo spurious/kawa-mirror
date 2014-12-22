@@ -1,5 +1,8 @@
 2014-12-21  Per Bothner  <per@bothner.com>
 
+	* AccessExp.java (setBinding): Also (maybe) set symbol.
+	* SetExp.java (<init>): Use setBinding.
+
 	* ModuleInfo.java (setCompilation): Don't set sourceAbsPath if input
 	port is a string or lexer, using logic previously in pushNewModule.
 	* Compilation.java (pushNewModule): Simplify correspondingly.

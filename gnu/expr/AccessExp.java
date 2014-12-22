@@ -47,7 +47,11 @@ public abstract class AccessExp extends Expression
   /** If non-null, the local Declaration this refers to. */
   public final Declaration getBinding() { return binding; }
 
-  public final void setBinding(Declaration decl) { binding = decl; }
+    public final void setBinding(Declaration decl) {
+        if (decl != null && symbol == null)
+            symbol = decl.getSymbol();
+        binding = decl;
+    }
 
   /** If binding has a non-static field and no base, use this instead of base.
    *  This is mainly used for aliases of imported module declarations. */

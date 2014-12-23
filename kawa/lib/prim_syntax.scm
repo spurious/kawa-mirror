@@ -154,6 +154,8 @@
     (%let ((out-bindings '()) (out-inits '()))
       (syntax-case form ()
 	((_ bindings . body)
+         ;; Simulate a (letrec ((process-binding (lambda ...) ...)) ...)
+         ;; which we can't use in here, because that is what we're defining.
 	 (%let ((process-binding #!undefined))
 	       (set! process-binding
 		     (lambda (b)

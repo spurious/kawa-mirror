@@ -1,3 +1,8 @@
+2014-12-22  Per Bothner  <per@bothner.com>
+
+	* prim_syntax.scm (if): Use mlambda rather than lambda so we can
+	handle more general patterns.
+
 2014-12-20  Per Bothner  <per@bothner.com>
 
 	* prim_syntax.scm (if): "Inline" use of begin to avoid a "reference"

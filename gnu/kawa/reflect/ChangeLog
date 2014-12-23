@@ -1,3 +1,8 @@
+2014-12-22  Per Bothner  <per@bothner.com>
+
+	* TypeSwitch.java (compile): Hanle PATTERN_NESTED parameters
+	that have init-expressions.
+
 2014-12-16  Per Bothner  <per@bothner.com>
 
 	* OccurrenceType.java: No longer extends ObjectType, just Type.

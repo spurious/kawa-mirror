@@ -55,6 +55,10 @@ public class SchemeCompilation extends Translator
   public static final kawa.repl repl;
 
   public static final Lambda lambda = new kawa.lang.Lambda();
+  public static final Lambda mlambda = new kawa.lang.Lambda();
+  static { mlambda.handlePatterns = true;
+    mlambda.setKeywords(Special.optional, Special.rest, Special.key);
+  }
 
   static
   {

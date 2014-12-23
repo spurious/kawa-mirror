@@ -236,6 +236,7 @@ public class OrdinaryLambda extends Lambda
         //        }
       }
       Declaration decl = new Declaration(name);
+      decl.setFlag(Declaration.IS_PARAMETER);
       //Declaration tmpVar = new Declaration((keyname != null) ? keyname : gnu.expr.Symbols.gentemp());
       Declaration tmpVar = new Declaration(gnu.expr.Symbols.gentemp());
       //if (suppliedp != null || keyname != null) {
@@ -243,7 +244,6 @@ public class OrdinaryLambda extends Lambda
       if (suppliedp != null)
       {
         if (rwIdx >= rewriteHelper.length-4) {
-          System.out.println("Expanding rewrite helper");
           Object[] newHelper = new Object[2 * rewriteHelper.length];
           System.arraycopy(rewriteHelper, 0, newHelper, 0, rewriteHelper.length);
           rewriteHelper = newHelper;
@@ -252,6 +252,7 @@ public class OrdinaryLambda extends Lambda
         rewriteHelper[rwIdx++] = defaultValue;
         rewriteHelper[rwIdx++] = new Declaration(suppliedp);
         rewriteHelper[rwIdx++] = tmpVar;
+        tmpVar.setFlag(Declaration.IS_PARAMETER);
       }
 
       if (mode == optionalKeyword || mode == keyKeyword || mode == auxKeyword)

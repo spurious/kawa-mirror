@@ -436,7 +436,7 @@ public class LangObjType extends SpecialObjectType implements TypeValue
       }
   }
 
-  Method coercionOrNullMethod()
+  protected Method coercionOrNullMethod()
   {
     ClassType methodDeclaringClass = implementationType;
     String mname;
@@ -493,13 +493,19 @@ public class LangObjType extends SpecialObjectType implements TypeValue
     return methodDeclaringClass.getDeclaredMethod(mname, 1);
   }
 
+    public boolean emitCoercionOrNull(CodeAttr code) {
+        Method method = coercionOrNullMethod();
+        if (method == null)
+            return false;
+        code.emitInvokeStatic(method);
+        return true;
+    }
+
     public void emitTestIf(Variable incoming, Declaration decl, Compilation comp) {
         CodeAttr code = comp.getCode();
         if (incoming != null)
             code.emitLoad(incoming);
-        Method method = coercionOrNullMethod();
-        if (method != null) {
-            code.emitInvokeStatic(method);
+        if (emitCoercionOrNull(code)) {
             if (decl != null) {
                 code.emitDup();
                 decl.compileStore(comp);

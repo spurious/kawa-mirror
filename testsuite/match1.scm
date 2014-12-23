@@ -60,3 +60,28 @@
 (format #t "to LList: ~w~%"
         (map to-LList '(4 #(5 6) (7 6))))
 ;; Output: to LList: (() () (7 6))
+
+(define (to-list2 o)
+  (if (? [a b] o) (format "[a:~w b:~w]" a b) (format "no-match:~w" o)))
+(format #t "to list2: ~a~%"
+        (map to-list2 (list 12 #(4 5) #(9) '(m n) '(m n o) '())))
+;; Output: to list2: (no-match:12 [a:4 b:5] no-match:#(9) [a:m b:n] no-match:(m n o) no-match:())
+
+(define (to-list2+1 o)
+  (if (? [[a b] c] o) (format "[a:~w b:~w c:~w]" a b c)
+      (format "no-match:~w" o)))
+(format #t "to list2+1: ~a~%"
+        (map to-list2+1 (list 12 #((4 5) 7) #(9 8) '(#(p q) r) '(m n o) '())))
+;; Output: to list2+1: (no-match:12 [a:4 b:5 c:7] no-match:#(9 8) [a:p b:q c:r] no-match:(m n o) no-match:())
+
+(format #t "to list2+1-ignore1: ~a~%"
+        (map (lambda (o) (if (? [[a _] b] o) (format "[a:~w b:~w]" a b)
+                             (format "no-match:~w" o)))
+             (list 12 #((4 5) 7) #(9 8) '(#(p q) r) '(m n o) '())))
+;; Output: to list2+1-ignore1: (no-match:12 [a:4 b:7] no-match:#(9 8) [a:p b:r] no-match:(m n o) no-match:())
+
+(format #t "to list2-int: ~a~%"
+        (map (lambda (o) (if (? [a::integer b] o) (format "[a:~w b:~w]" a b)
+                             (format "no-match:~w" o)))
+             (list 12 #((4 5) 7) #(9 8) '(#(p q) r) '(m n) '())))
+;; Output: to list2-int: (no-match:12 no-match:#((4 5) 7) [a:9 b:8] no-match:(#(p q) r) no-match:(m n) no-match:())

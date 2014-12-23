@@ -14,6 +14,9 @@ import java.util.ArrayList;
 
 public class Lambda extends Syntax
 {
+
+    public boolean handlePatterns;
+
   public Object optionalKeyword;
   public Object restKeyword;
   public Object keyKeyword;
@@ -73,6 +76,8 @@ public class Lambda extends Syntax
   public void rewriteFormals(LambdaExp lexp, Object formals,
 		      Translator tr, TemplateScope templateScopeRest)
   {
+    if (handlePatterns)
+        tr.pushScope(lexp);
     if (lexp.getSymbol() == null)
       {
         String filename = lexp.getFileName();
@@ -91,7 +96,8 @@ public class Lambda extends Syntax
     ArrayList<Expression> defaultArgs = null;
     ArrayList<Keyword> keywords = null;
     Object mode = null;
-    for (; ;  bindings = pair.getCdr())
+    Object next = null;
+    for (; ;  bindings = next)
       {
 	if (bindings instanceof SyntaxForm)
 	  {
@@ -106,6 +112,7 @@ public class Lambda extends Syntax
 	TemplateScope templateScope = templateScopeRest;
 	pair = (Pair) bindings;
 	Object pair_car = pair.getCar();
+        next = pair.getCdr();
 	if (pair_car instanceof SyntaxForm)
 	  {
 	    SyntaxForm sf = (SyntaxForm) pair_car;
@@ -178,6 +185,7 @@ public class Lambda extends Syntax
                 p = (Pair) p.getCdr();
                 typeSpecPair = p;
                 pair = p;
+                next = pair.getCdr();
               }
           }
 	else if (pair_car instanceof Pair)
@@ -249,12 +257,22 @@ public class Lambda extends Syntax
 		  }
 	      }
 	  }
-	if (name == null)
-	  {
-	    tr.syntaxError ("parameter is neither name nor (name :: type) nor (name default)"+": "+pair);
-            break;
-	  }
-	Declaration decl = new Declaration(name);
+        Declaration decl;
+        if (handlePatterns) {
+            p = (Pair) pair;
+            pair_car = p.getCar();
+            Object[] r = BindDecls.parsePatternCar((Pair) pair_car, lexp, tr);
+            //next = r[0];
+            decl = (Declaration) r[1];
+            name = decl.getSymbol();
+        } else {
+            if (name == null) {
+                tr.syntaxError ("parameter is neither name nor (name :: type) nor (name default)"+": "+pair);
+                break;
+            }
+            decl = new Declaration(name);
+        }
+        decl.setFlag(Declaration.IS_PARAMETER);
 	if (mode == optionalKeyword || mode == keyKeyword)
           {
             decl.setInitValue(new LangExp(defaultValue));
@@ -271,10 +289,15 @@ public class Lambda extends Syntax
             decl.setType(new LangExp(typeSpecPair), null);
 	    decl.setFlag(Declaration.TYPE_SPECIFIED);
 	  }
-	else if (mode == restKeyword)
-	  decl.setType(LangObjType.listType);
+        if (mode == restKeyword)
+	  {
+	    decl.setFlag(Declaration.IS_REST_PARAMETER);
+	    if (! decl.getFlag(Declaration.TYPE_SPECIFIED))
+	      decl.setType(LangObjType.listType);
+	  }
         decl.setFlag(Declaration.IS_SINGLE_VALUE);
-	addParam(decl, templateScope, lexp, tr);
+        if (! handlePatterns)
+            addParam(decl, templateScope, lexp, tr);
 	tr.popPositionOf(savePos);
       }
     if (bindings instanceof SyntaxForm)
@@ -532,7 +555,8 @@ public class Lambda extends Syntax
         && tr.getModule().getFlag(ModuleExp.SUPERTYPE_SPECIFIED))
       tr.curMethodLambda = lexp;
     ScopeExp curs = tr.currentScope();
-    tr.pushScope(lexp);
+    if (! handlePatterns)
+        tr.pushScope(lexp);
     if (lexp.nameDecl != null)
       rewriteAnnotations(lexp.nameDecl, tr);
     Declaration prev = null;
@@ -560,6 +584,8 @@ public class Lambda extends Syntax
           }
 	prev = cur;
 
+        if (cur.getFlag(Declaration.IS_PARAMETER)) {
+
         if (arg_i >= lexp.min_args
             && (arg_i < lexp.min_args + opt_args
                 || lexp.max_args >= 0
@@ -568,8 +594,10 @@ public class Lambda extends Syntax
             cur.setInitValue(tr.rewrite(cur.getInitValue()));
           }
         arg_i++;
+        }
 
-        tr.lexical.push(cur);
+        if (! handlePatterns)
+            tr.lexical.push(cur);
       }
 
     if (lexp.isClassMethod()

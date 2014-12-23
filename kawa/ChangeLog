@@ -1,5 +1,9 @@
 2014-12-22  Per Bothner  <per@bothner.com>
 
+	* lang/Lambda.java: Preliminary support for patterns, but only
+	if handlePatterns flag is set.
+	* standard/Scheme.java (mlambda): New constant static field.
+
 	* lang/BindDecls.java: New helper class for parsing pattern.
 	* standard/MatchDef.java: New class for (! ...) declaration syntax.
 	* standard/Scheme.java (initScheme): Adding binding for '!'

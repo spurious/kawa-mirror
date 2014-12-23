@@ -11,6 +11,7 @@
 (import (rename (only (kawa standard let) let) (let %let)))
 (import (rename (only (kawa standard set_b) set) (set set!)))
 (import (only (kawa standard begin) begin))
+(import (only (kawa standard SchemeCompilation) mlambda))
 
 (%define-syntax define-syntax
   (syntax-rules ($lookup$)
@@ -115,12 +116,12 @@
       ((_ (? pattern :: type init) then else)
        #`(#,gnu.kawa.reflect.TypeSwitch:typeSwitch
           init
-          (lambda ((pattern :: type)) then)
+          (mlambda ((pattern :: type)) then)
           (lambda (unused) else)))
       ((_ (? pattern init) then else)
        #`(#,gnu.kawa.reflect.TypeSwitch:typeSwitch
           init
-          (lambda ((pattern)) then)
+          (mlambda ((pattern)) then)
           (lambda (unused) else)))
       ((_ test then)
        (make <gnu.expr.IfExp>

@@ -60,7 +60,10 @@ public class TypeSwitch extends MethodProc implements Inlineable {
                 for (Declaration param = lambda.firstDecl();
                      param != null;  param = param.nextDecl()) {
                     Type type = param.getType();
-                    Type valType = args[0].getType();
+                    boolean hasInitExpr =
+                        param.getFlag(Declaration.PATTERN_NESTED);
+                    Type valType = hasInitExpr ? param.getInitValue().getType()
+                        : args[0].getType();
                     // Rather simplistic ...
                     boolean isConditional = type != Type.objectType
                         && type != Type.toStringType
@@ -72,7 +75,23 @@ public class TypeSwitch extends MethodProc implements Inlineable {
                             code.emitAndThen();
                         numConditionsThisLambda++;
                     }
-                    Variable incoming = selector;
+                    Variable incoming;
+                    if (hasInitExpr) {
+                        Expression initExpr = param.getInitValue();
+                        Target ptarget = isConditional || param.getCanRead()
+                            ? Target.pushValue(valType)
+                            : Target.Ignore;
+                        initExpr.compile(comp, ptarget);
+                        if (ptarget == Target.Ignore)
+                            incoming = null;
+                        else {
+                            incoming = param.getContext().getVarScope().addVariable(code, valType.getImplementationType(), null);
+                            code.emitStore(incoming);
+                        }
+                    }
+                    else
+                        incoming = selector;
+
                     if (LazyType.maybeLazy(valType)
                         && ! LazyType.maybeLazy(type)) {
                         code.emitLoad(incoming);

@@ -1,3 +1,7 @@
+2014-12-22  Per Bothner  <per@bothner.com>
+
+	* OrdinaryLambda.java (rewriteFormals): Set IS_PARAMETER as needed.
+
 2014-02-25  Charles Turner  <chturne@gmail.com>
 
 	* CommonLisp.java: Added funcall, minusp, plusp, flet, labels,

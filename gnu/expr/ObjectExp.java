@@ -29,13 +29,16 @@ public class ObjectExp extends ClassExp
     if (closureEnvField != null)
       {
 	LambdaExp caller = outerLambda();
-	Variable closureEnv =
-          ! comp.usingCallContext() ? getOwningLambda().heapFrame
-	  : caller.heapFrame != null ? caller.heapFrame	: caller.closureEnv;
-	if (closureEnv == null)
-	  code.emitPushThis();
-	else
-	  code.emitLoad(closureEnv);
+        if (! comp.usingCallContext())
+           getOwningLambda().loadHeapFrame(comp);
+        else {
+            Variable closureEnv = caller.heapFrame != null ? caller.heapFrame
+                : caller.closureEnv;
+            if (closureEnv == null)
+                code.emitPushThis();
+            else
+                code.emitLoad(closureEnv);
+        }
       }
     code.emitInvokeSpecial(init);
 

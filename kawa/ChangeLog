@@ -1,3 +1,12 @@
+2014-12-28  Per Bothner  <per@bothner.com>
+
+	* standard/Scheme.java (initScheme): Update class for 'receive'
+	* standard/ImportFromLibrary.java (SRFI97Map): Map srfi-8 to
+	an actual classname, rather than BUILTIN.  Needed if environment
+	is restricted, as in r7rs libraries.
+	* standard/require.java (featureMap): Add 'srfi-8, 'receive,
+	and 'srfi-26.
+
 2014-12-22  Per Bothner  <per@bothner.com>
 
 	* lang/Lambda.java: Preliminary support for patterns, but only

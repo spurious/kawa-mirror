@@ -79,9 +79,12 @@ public class require extends Syntax
         map("list-lib", SLIB_PREFIX + "srfi1");
         map("srfi-2", SLIB_PREFIX + "srfi2");
         map("and-let*", SLIB_PREFIX + "srfi2");
+        map("srfi-8", SLIB_PREFIX + "receive");
+        map("receive", SLIB_PREFIX + "receive");
         map("srfi-13", SLIB_PREFIX + "srfi13");
         map("srfi-14", SLIB_PREFIX + "srfi14");
         map("string-lib", SLIB_PREFIX + "srfi13");
+        map("srfi-26", SLIB_PREFIX + "cut");
         map("srfi-34", SLIB_PREFIX + "srfi34");
         map("srfi-35", SLIB_PREFIX + "conditions");
         map("condition", SLIB_PREFIX + "conditions");

@@ -628,6 +628,7 @@
       <filelist dir="${src.dir}/gnu/kawa/slib">
         <file name="enums.scm"/>
         <file name="readtable.scm"/>
+        <file name="receive.scm"/>
         <file name="srfi1.scm"/>
         <file name="srfi2.scm"/>
         <file name="conditions.scm"/>

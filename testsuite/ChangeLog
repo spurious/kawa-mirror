@@ -1,4 +1,9 @@
 2014-12-28  Seth Alves <alves@hungry.com>
+
+	* lib-receive.scm: New testcase.
+	* Makefile.am: Update accordingly.
+
+2014-12-28  Seth Alves <alves@hungry.com>
 	    Per Bothner  <per@bothner.com>
 
 	* lib-export.scm: Add test for parameterize.

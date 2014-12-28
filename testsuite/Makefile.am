@@ -625,7 +625,7 @@ SCRIPTS_TO_RUN = case-warnings.scm uninit1.scm \
   overload1.scm overload2.scm match1.scm symbol1.scm values1.scm \
   command1.scm command2.scm command3.scm exit1.scm exit2.scm lib-cycle.scm \
   lib-square.scm lib-squaref.scm lib-impsrc1.scm lib-impsrc2.scm lib-dup.scm \
-  lib-colon1.scm lib-colon2.scm lib-export.scm macros1.scm \
+  lib-colon1.scm lib-colon2.scm lib-export.scm lib-receive.scm macros1.scm \
   sva34005.scm sva35362.scm sva36039.scm sva36413.scm sva36556.scm \
   sva36853.scm sva36863.scm sva36917.scm sva37684.scm sva38026.scm \
   sva39060.scm sva39150.scm sva39945.scm sva39940.scm sva39947.scm \

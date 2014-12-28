@@ -32,7 +32,7 @@ public class ImportFromLibrary extends Syntax
         { "2", "and-let*", "gnu.kawa.slib.srfi2" },
         { "5", "let", MISSING },
         { "6", "basic-string-ports", BUILTIN },
-        { "8", "receive", BUILTIN },
+        { "8", "receive", "gnu.kawa.slib.receive" },
         { "9", "records", BUILTIN },
         { "11", "let-values", BUILTIN },
         { "13", "strings", "gnu.kawa.slib.srfi13" },

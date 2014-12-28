@@ -1,3 +1,7 @@
+2014-12-28  Per Bothner  <per@bothner.com>
+
+	* build.scm (slib-scm-classes): Add receive.scm.
+
 2014-12-03  Per Bothner  <per@bothner.com>
 
 	* configure.in (AC_INIT): Set version to 2.0.1.

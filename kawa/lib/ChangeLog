@@ -1,5 +1,7 @@
 2014-12-28  Per Bothner  <per@bothner.com>
 
+	* rnrs/lists.scm: Use r6rs/r7rs 'let-values' instead of 'receive'.
+
 	* parameterize.scm (kawa.lib.syntax): Add missing imports.
 
 2014-12-22  Per Bothner  <per@bothner.com>

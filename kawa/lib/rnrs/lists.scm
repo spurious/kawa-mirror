@@ -27,11 +27,11 @@ is empty, just abort and return [() ()]."
    (lambda (abort)
      (let recur ((lists lists))
        (if (pair? lists)
-           (receive (list other-lists) (car+cdr lists)
+           (let-values (((list other-lists) (car+cdr lists)))
              (if (null? list) (abort '() '()) ; LIST is empty -- bail out
-                 (receive (a d) (car+cdr list)
-                   (receive (cars cdrs) (recur other-lists)
-                     (values (cons a cars) (cons d cdrs))))))
+                 (let-values (((a d) (car+cdr list))
+                              ((cars cdrs) (recur other-lists)))
+                   (values (cons a cars) (cons d cdrs)))))
            (values '() '()))))))
 
 (define (%cars+cdrs/pair (lists ::list)) ::pair
@@ -94,10 +94,10 @@ PROC is always called in the same dynamic environment as `for-all'
 itself."
   (if (pair? lists)
       ;; N-ary case
-      (receive (heads tails) (%cars+cdrs (cons list1 lists))
+      (let-values (((heads tails) (%cars+cdrs (cons list1 lists))))
         (or (not (pair? heads))
             (let lp ((heads heads) (tails tails))
-              (receive (next-heads next-tails) (%cars+cdrs tails)
+              (let-values (((next-heads next-tails) (%cars+cdrs tails)))
                 (if (pair? next-heads)
                     (and (apply proc heads) (lp next-heads next-tails))
                     (apply proc heads)))))) ; Last PROC app is tail call.
@@ -126,7 +126,7 @@ PROC is always called in the same dynamic environment as `exists'
 itself."
   (if (pair? lists)
       ;; N-ary case
-      (receive (heads tails) (%cars+cdrs (cons list1 lists))
+      (let-values (((heads tails) (%cars+cdrs (cons list1 lists))))
         (and (pair? heads)
              (let lp ((heads heads) (tails tails))
                (let* ((split (%cars+cdrs/pair tails))
@@ -202,7 +202,7 @@ always called in the same dynamic environment as `fold-left' itself."
   (if (pair? lists)
       ;; N-ary case
       (let lp ((lists (cons list1 lists)) (ans nil))
-        (receive (cars cdrs) (%cars+cdrs lists)
+        (let-values (((cars cdrs) (%cars+cdrs lists)))
           (if (null? cars) ans ; Done.
               (lp cdrs (apply combine ans cars)))))
       ;; Fast path

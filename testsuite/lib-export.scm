@@ -1,7 +1,7 @@
 (define-library (test export)
   (export fifty-five list-4-values test-guard
-          make-foo foo? foo-x set-foo-x! foo-y)
-  (import (scheme base))
+          make-foo foo? foo-x set-foo-x! foo-y pfoo)
+  (import (scheme base) (scheme write))
   (begin
 
     (define-syntax fifty-five
@@ -24,6 +24,13 @@
       (guard
        (exn (#t #t))
        'g-5))
+
+    (define psomething (make-parameter #t))
+    (define (pfoo)
+      (parameterize ((psomething #f))
+         (display "parameter psomething: ") (display (psomething)) (newline))
+      (display "parameter psomething: ") (display (psomething)) (newline))
+
     ))
 
 (import (scheme base)
@@ -45,3 +52,7 @@
 
 (display (test-guard)) (newline)
 ;; Output: g-5
+
+(pfoo)
+;; Output: parameter psomething: #f
+;; Output: parameter psomething: #t

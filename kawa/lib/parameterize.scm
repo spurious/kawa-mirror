@@ -1,4 +1,7 @@
-(require <kawa.lib.parameters>)
+(require kawa.lib.parameters)
+(require kawa.lib.prim_imports)
+(require kawa.lib.std_syntax)
+(require kawa.lib.syntax)
 
 (define-syntax parameterize%
   (syntax-rules ()

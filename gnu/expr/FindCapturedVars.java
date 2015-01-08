@@ -240,6 +240,7 @@ public class FindCapturedVars extends ExpExpVisitor<Void>
       return r;
     if (current.getCanRead()
         || current.isClassMethod()
+        || current.getFlag(LambdaExp.CANNOT_INLINE)
         || Compilation.avoidInline(current)
         || current.min_args != current.max_args)
         {
@@ -272,9 +273,7 @@ public class FindCapturedVars extends ExpExpVisitor<Void>
               {
                 r = t;
               }
-            else if ((t != null && r != t)
-                     // FIXME why isn't this checked outside the loop?
-                     || current.getFlag(LambdaExp.CANNOT_INLINE))
+            else if (t != null && r != t)
               {
                 r = LambdaExp.unknownContinuation;
                 current.returnContinuation = r;

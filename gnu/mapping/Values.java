@@ -243,9 +243,6 @@ public abstract class Values<E>
             this.data = data;
         }
 
-        public static final FromArray<Object> empty
-            = new FromArray<Object>(noArgs);
-
         @Override
         public int size() {
             return data.length;
@@ -269,7 +266,6 @@ public abstract class Values<E>
                 arr[i] = (E) in.readObject();
             data = arr;
         }
-
     }
 
     /** An implementation of Values that uses a java.util.List.
@@ -305,6 +301,64 @@ public abstract class Values<E>
             list = lst;
         }
     }
+
+    /* * NOT CURRENTLY USED.
+     * May be useful in allowing Java type-inference.
+     *
+
+    / * Multiple values implemented using a linked list - with static typing.
+     * The first type parameter is one that all the values conform to;
+     * the second is the type of the first value;
+     * the third is the remaining values.
+     * For example you can declare a Values variable consistening of
+     * a {@code Integer} followed by a {@code Double}:
+     * {@code Chained<Number, Integer, Chained<Number, Double, Empty<Number>>> nums2;}
+     * and initialize it like this:
+     * {@code nums2 = new Chained(12.3, new Chained(3.4, empty));}
+     * /
+
+    public static class Chained<E,Tfirst extends E,Trest extends Values<E>> extends Values<E> {
+        Tfirst first;
+        Trest rest;
+
+        public Chained(Tfirst first, Trest rest) {
+            this.first = first;
+            this.rest = rest;
+        }
+
+        @Override
+        public int size() {
+            return rest == null ? 1 : 1 + rest.size();
+        }
+
+        @Override
+        public E get(int index) {
+            return index == 0 ? first : rest.get(index-1);
+        }
+
+        @Override
+        public void writeExternal(ObjectOutput out) throws IOException {
+            out.writeObject(first);
+            out.writeObject(rest);
+        }
+
+        @Override
+        public void readExternal(ObjectInput in)
+            throws IOException, ClassNotFoundException {
+            first =  (Tfirst) in.readObject();
+            rest = (Trest) in.readObject();
+        }
+    }
+
+    public static class Empty<E> extends FromArray<E> {
+        Empty() {
+            super((E[]) noArgs);
+        }
+
+        public static final Empty<?> empty = new Empty<Void>();
+
+    }
+    */
 
     /** A specialization of Values for exactly 2 values.
      */

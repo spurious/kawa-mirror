@@ -1,3 +1,7 @@
+2015-01-09  Andrea Bernardini <andrebask@gmail.com>
+
+	* repl.java: Add --enable-anf and --debug-print-anf options.
+
 2014-12-28  Per Bothner  <per@bothner.com>
 
 	* standard/Scheme.java (initScheme): Update class for 'receive'

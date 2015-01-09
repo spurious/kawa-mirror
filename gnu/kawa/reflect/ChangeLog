@@ -1,6 +1,10 @@
+2015-01-09  Andrea Bernardini <andrebask@gmail.com>
+
+	* TypeSwitch.java (compile): Tweak for enableANF.
+
 2014-12-22  Per Bothner  <per@bothner.com>
 
-	* TypeSwitch.java (compile): Hanle PATTERN_NESTED parameters
+	* TypeSwitch.java (compile): Handle PATTERN_NESTED parameters
 	that have init-expressions.
 
 2014-12-16  Per Bothner  <per@bothner.com>

@@ -1,3 +1,9 @@
+2015-01-09  Andrea Bernardini <andrebask@gmail.com>
+
+	* ANormalize.java: New Visitor that performs transformation to
+	Administrative Normal Form.
+	* Compilation.java: Flags and debug output to enable ANormalize.
+
 2015-01-08  Per Bothner  <per@bothner.com>
 
 	* FindCapturedVars.java (checkInlineable): Move CANNOT_INLINE check.

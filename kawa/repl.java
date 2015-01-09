@@ -602,6 +602,14 @@ public class repl extends Procedure0or1
 	  {
 	    gnu.expr.ModuleExp.dumpZipPrefix = "kawa-zip-dump-";
 	  }
+	else if (arg.equals("--enable-anf"))
+	  {
+            Compilation.enableANF = true;
+	  }                
+	else if (arg.equals("--debug-print-anf") && Compilation.enableANF)
+	  {
+            Compilation.debugPrintANF = true;
+          }
 	else if (arg.equals("--debug-print-expr"))
 	  {
             Compilation.debugPrintExpr = true;

@@ -117,7 +117,7 @@ public class GetNamedPart extends Procedure2 implements HasSetter
       {
         // FIXME!
       }
-    MethodProc methods = ClassMethods.apply((ClassType) ClassType.make(container.getClass()),
+    MethodProc methods = ClassMethods.apply((ObjectType) ClassType.make(container.getClass()),
                                             Compilation.mangleName(name), '\0',
                                             Language.getDefaultLanguage());
     if (methods != null)

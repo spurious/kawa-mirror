@@ -234,6 +234,7 @@ KAWA_COMPILER = $(JAVA) -classpath "$(CLASSPATH)" kawa.repl -d $(top_builddir) \
 
 GNU_EXPR_JSOURCES = \
   expr/AccessExp.java \
+  expr/ANormalize.java \
   expr/ApplicationMainSupport.java \
   expr/ApplyExp.java \
   expr/BeginExp.java \

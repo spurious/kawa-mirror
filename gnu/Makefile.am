@@ -2,6 +2,7 @@ include $(top_srcdir)/Make-rules
 
 GNU_EXPR_JSOURCES = \
   expr/AccessExp.java \
+  expr/ANormalize.java \
   expr/ApplicationMainSupport.java \
   expr/ApplyExp.java \
   expr/BeginExp.java \

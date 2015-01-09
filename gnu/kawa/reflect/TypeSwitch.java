@@ -54,6 +54,11 @@ public class TypeSwitch extends MethodProc implements Inlineable {
         for (int i = 1;  i < args.length;  ) {
             Expression arg = args[i++];
 
+            if (Compilation.enableANF
+                && arg instanceof ReferenceExp) {
+                arg = ((ReferenceExp)arg).getBinding().getValue();
+            }
+            
             if (arg instanceof LambdaExp) {
                 LambdaExp lambda = (LambdaExp) arg;
                 int numConditionsThisLambda = 0;

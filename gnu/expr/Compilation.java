@@ -127,6 +127,9 @@ public class Compilation implements SourceLocator
   /** If true, print out final expressions after optimizations etc. */
   public static boolean debugPrintFinalExpr;
 
+  public static boolean debugPrintANF = false;
+  public static boolean enableANF = false;
+  
   public static Options options = new Options();
   public static Options.OptionInfo fullTailCallsVariable =
     options.add("full-tailcalls",
@@ -193,7 +196,7 @@ public class Compilation implements SourceLocator
   }
   public boolean warnVoidUsed()
   {
-    return currentOptions.getBoolean(warnVoidUsed);
+    return (!enableANF) && currentOptions.getBoolean(warnVoidUsed);
   }
   public boolean warnAsError ()
   {
@@ -1980,6 +1983,17 @@ public class Compilation implements SourceLocator
 
         if (wantedState >= WALKED && getState() < WALKED)
           {
+            if (enableANF)
+                ANormalize.aNormalize(mexp, this);
+            if (debugPrintANF) {
+                options.set("warn-void-used", Boolean.FALSE);
+                OutPort dout = OutPort.errDefault();
+                dout.println ("[Normalized module: "+mexp.getName()
+                             + " to " + mainClass.getName() + ":");
+                mexp.print(dout);
+                dout.println(']');
+                dout.flush();
+            }
             InlineCalls.inlineCalls(mexp, this);
             ChainLambdas.chainLambdas(mexp, this);
             FindTailCalls.findTailCalls(mexp, this);

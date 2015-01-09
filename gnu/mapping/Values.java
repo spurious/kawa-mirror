@@ -15,7 +15,7 @@ public abstract class Values<E>
 {
     public static final Object[] noArgs = new Object[0];
 
-    public static final Values empty = FromArray.empty;
+    public static final Values empty = new FromArray<Object>(noArgs);
 
     protected Values () {
     }

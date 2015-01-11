@@ -1,5 +1,6 @@
 package kawa;
 
+import gnu.kawa.io.CheckConsole;
 import gnu.kawa.io.InPort;
 import gnu.kawa.io.OutPort;
 import gnu.mapping.*;
@@ -27,7 +28,7 @@ public class GuiConsole extends JFrame
   ReplDocument document;
 
   public static void main(String[] args) {
-    InPort.noConsole = false;
+    CheckConsole.setHaveConsole(true);
     int iArg = repl.processArgs(args, 0, args.length);
     repl.getLanguage();
     repl.setArgs(args, iArg);

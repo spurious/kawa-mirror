@@ -12,6 +12,7 @@ import java.util.List;
 import gnu.bytecode.ClassType;
 import gnu.kawa.servlet.HttpRequestContext;
 import gnu.kawa.io.CharArrayInPort;
+import gnu.kawa.io.CheckConsole;
 import gnu.kawa.io.InPort;
 import gnu.kawa.io.OutPort;
 import gnu.kawa.io.Path;
@@ -651,7 +652,9 @@ public class repl extends Procedure0or1
 	    Compilation.inlineOk = false;
 	  }
         else if (arg.equals("--no-console"))
-          InPort.noConsole = true;
+            CheckConsole.setHaveConsole(false);
+	else if (arg.equals("--console"))
+            CheckConsole.setHaveConsole(true);
 	else if (arg.equals("--inline"))
 	  {
 	    Compilation.inlineOk = true;
@@ -893,7 +896,7 @@ public class repl extends Procedure0or1
 	    getLanguage();
 	    setArgs (args, iArg);
 	    checkInitFile();
-            if (! InPort.haveConsole())
+            if (! CheckConsole.haveConsole())
               startGuiConsole();
             else
               {

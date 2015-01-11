@@ -596,6 +596,8 @@ public class ApplyExp extends Expression
       vars = vars.nextVar();
     if (vars != null && vars.getName() == "$ctx")
       vars = vars.nextVar();
+    if (vars != null && vars.getName() == LambdaExp.CLOSURE_ENV_NAME)
+      vars = vars.nextVar();
     popParams (code, 0, lexp.min_args, toArray, incValues, decls, vars);
   }
 

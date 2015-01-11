@@ -1,3 +1,11 @@
+2015-01-10  Per Bothner  <per@bothner.com>
+
+	* LambdaExp.java (capture): Rename "heapFrame" to "$heapFrame".
+	(CLOSURE_ENV_NAME): New field.  Rename to "$closureEnv".
+	(declareClosureEnv): Use CLOSURE_ENV_NAME.
+	* ApplyExp.java (popParams): Also skip parameter variable
+	named CLOSURE_ENV_NAME.
+
 2015-01-09  Andrea Bernardini <andrebask@gmail.com>
 
 	* ANormalize.java: New Visitor that performs transformation to

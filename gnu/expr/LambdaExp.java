@@ -57,7 +57,7 @@ public class LambdaExp extends ScopeExp {
             if (capturedVars == null
                 && ! decl.isStatic()
                 && ! (this instanceof ModuleExp || this instanceof ClassExp)) {
-                heapFrame = new gnu.bytecode.Variable("heapFrame");
+                heapFrame = new gnu.bytecode.Variable("$heapFrame");
             }
             decl.setSimple(false);
             if (! decl.isPublic()) {
@@ -114,8 +114,10 @@ public class LambdaExp extends ScopeExp {
     /** If non-null, a Declaration whose value is (only) this LambdaExp. */
     public Declaration nameDecl;
 
+    public static final String CLOSURE_ENV_NAME = "$closureEnv";
+
     /** If non-null, this is a Field that is used for implementing lexical closures.
-     * If getName() is "closureEnv", it is our parent's heapFrame,
+     * If getName() is CLOSURE_ENV_NAME, it is our parent's heapFrame,
      * which is an instance of one of our siblings.
      * (Otherwise, we use "this" as the implicit "closureEnv" field.) */
     public Field closureEnvField;
@@ -480,7 +482,7 @@ public class LambdaExp extends ScopeExp {
                     closureEnv = declareThis(primMethod.getDeclaringClass());
                 else {
                     Type envType = primMethod.getParameterTypes()[0];
-                    closureEnv = new Variable("closureEnv", envType);
+                    closureEnv = new Variable(CLOSURE_ENV_NAME, envType);
                     Variable prev;
                     if (isInit)
                         prev = declareThis(primMethod.getDeclaringClass());
@@ -495,7 +497,7 @@ public class LambdaExp extends ScopeExp {
                 if (inlinedIn(parent))
                     closureEnv = parentFrame;
                 else {
-                    closureEnv = new Variable("closureEnv", parentFrame.getType());
+                    closureEnv = new Variable(CLOSURE_ENV_NAME, parentFrame.getType());
                     getVarScope().addVariable(closureEnv);
                 }
             }

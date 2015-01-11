@@ -22,6 +22,7 @@ import gnu.kawa.io.TtyInPort;
 import gnu.kawa.io.URIPath;
 import gnu.kawa.reflect.OccurrenceType;
 import gnu.kawa.reflect.SingletonType;
+import gnu.kawa.functions.AppendValues;
 import gnu.kawa.functions.Convert;
 import gnu.lists.FString;
 import gnu.lists.LList;
@@ -1297,12 +1298,9 @@ public class XQParser extends Lexer
     return new ApplyExp(func, args);
   }
 
-  static Expression makeExprSequence(Expression exp1, Expression exp2)
-  {
-    return makeBinary(makeFunctionExp
-		      ("gnu.kawa.functions.AppendValues", "appendValues"),
-		      exp1, exp2);
-  }
+    static Expression makeExprSequence(Expression exp1, Expression exp2) {
+        return new ApplyExp(AppendValues.appendValues, exp1, exp2);
+    }
 
   Expression makeBinary(int op, Expression exp1, Expression exp2)
       throws java.io.IOException, SyntaxException
@@ -2765,7 +2763,7 @@ public class XQParser extends Lexer
       {
         if (! optional)
           syntaxError("missing expression");
-        return QuoteExp.voidExp;
+        return QuoteExp.voidObjectExp;
       }
     Expression exp = null;
     for (;;)

@@ -117,12 +117,10 @@ public class CompileMisc
     Expression[] args = exp.getArgs();
     if (args.length == 1)
       return args[0];
-    if (args.length == 0)
-      return QuoteExp.voidExp;
     Expression folded = exp.inlineIfConstant(proc, visitor);
-    if (folded != exp)
-      return folded;
-    return exp;
+    if (folded.valueIfConstant() == Values.empty)
+        folded = QuoteExp.voidObjectExp;
+    return folded;
   }
 
   public static Expression validateApplyMakeProcedure

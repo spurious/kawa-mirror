@@ -1,3 +1,7 @@
+2015-01-11  Andrea Bernardini <andrebask@gmail.com>
+
+	* bad-voidexp.scm: Add new test.
+
 2014-12-28  Seth Alves <alves@hungry.com>
 
 	* lib-receive.scm: New testcase.

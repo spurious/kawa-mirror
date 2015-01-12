@@ -78,7 +78,7 @@ public class InlineCalls extends ExpExpVisitor<Type> {
                 comp.error('w', "void-valued expression where value is needed",
                        exp0);
             // To avoid cascading warnings.
-            return Compilation.makeCoercion(exp, Type.objectType);
+            return new BeginExp(exp, QuoteExp.nullExp);
         }
         return checkType(exp, required);
     }

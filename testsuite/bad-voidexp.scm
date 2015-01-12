@@ -71,9 +71,20 @@
 ;; Diagnostic: bad-voidexp.scm:69:9: warning - missing else where value is required
 ;; Output: compare 3 2: greater
 
+(let ()
+  (define (bar) :: void
+    (let ((y (display "foo")))
+      y))
+  (let ((x (bar)))
+    x)
+  (newline))
+;; Diagnostic: bad-voidexp.scm:76:14: warning - void-valued expression where value is needed
+;; Diagnostic: bad-voidexp.scm:78:12: warning - void-valued expression where value is needed
+;; Output: foo
+
 ;; Savannah bug #27014 "AND vs. VOID"
 (begin
   (define (foo) (and (bar) (bar)))
   (define baz #f)
   (define (bar) (set! baz #f)))
-;; Diagnostic: bad-voidexp.scm:76:22: warning - void-valued expression where value is needed
+;; Diagnostic: bad-voidexp.scm:87:22: warning - void-valued expression where value is needed

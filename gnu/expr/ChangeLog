@@ -1,3 +1,9 @@
+2015-01-11  Per Bothner  <per@bothner.com>
+
+	* InlineCalls.java (visit): Using a BeginExp rather than a coercion
+	is a more robust recovery when using a void expression when a value
+	is required.
+
 2015-01-10  Per Bothner  <per@bothner.com>
 
 	* LambdaExp.java (capture): Rename "heapFrame" to "$heapFrame".

@@ -145,7 +145,7 @@ check-ppfile:
 	  -e '(define out (open-output-file "tmpP"))' \
 	  -e '(pprint-file "@top_srcdir@/gnu/kawa/slib/ppfile.scm" out)' \
 	  -e '(close-output-port out)'
-	diff tmpP $(srcdir)/ppfile.out
+	$(DIFF) tmpP $(srcdir)/ppfile.out
 	rm tmpP
 
 scribble.class: $(srcdir)/scribble.scm

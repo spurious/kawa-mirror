@@ -1,3 +1,8 @@
+2015-01-20  Per Bothner  <per@bothner.com>
+
+	* config.guess: Update to new version, from gnulib.
+	* config.sub: Likewise.
+
 2014-12-28  Per Bothner  <per@bothner.com>
 
 	* build.scm (slib-scm-classes): Add receive.scm.

@@ -2,6 +2,7 @@
 
 	* config.guess: Update to new version, from gnulib.
 	* config.sub: Likewise.
+	* mkinstalldirs: Likewise.
 
 2014-12-28  Per Bothner  <per@bothner.com>
 

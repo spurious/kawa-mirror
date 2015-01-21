@@ -1,3 +1,8 @@
+2015-01-20  Per Bothner  <per@bothner.com>
+
+	* KawaAutoHandler.java (run): Generalize to use Path in place of
+	URLPath.
+
 2014-02-16  Per Bothner  <per@bothner.com>
 
 	* KawaServlet.java: Make sure Error is uncaught or re-thrown.

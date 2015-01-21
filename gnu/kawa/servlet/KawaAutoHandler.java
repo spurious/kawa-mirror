@@ -73,7 +73,7 @@ public class KawaAutoHandler
     // If the path matches a directory rather than a file, keep looking.
     URL url = (plen == 0 || path.charAt(plen-1) == '/') ? null
       : hctx.getResourceURL(path);
-    Path absPath = url == null ? null : URLPath.valueOf(url);
+    Path absPath = url == null ? null : Path.valueOf(url);
     String upath = path;
     if (url == null || absPath.isDirectory())
       {
@@ -91,7 +91,7 @@ public class KawaAutoHandler
             if (url != null)
               {
                 hctx.setScriptAndLocalPath(path.substring(0, sl+1), path.substring(sl+1));
-                absPath = URLPath.valueOf(url);
+                absPath = Path.valueOf(url);
                 break;
               }
           }

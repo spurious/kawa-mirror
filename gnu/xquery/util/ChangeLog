@@ -1,3 +1,7 @@
+2015-01-20  Per Bothner  <per@bothner.com>
+
+	* NodeUtils.java (resolve): Fix an 'oops' - actually use base.
+
 2014-08-28  Per Bothner  <per@bothner.com>
 
 	* CompileMisc.java validateApplyValuesFilter): Fix two errors

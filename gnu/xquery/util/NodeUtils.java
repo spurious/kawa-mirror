@@ -429,7 +429,7 @@ public class NodeUtils
       uri = StringUtils.coerceToString(uri, fname, 1, null);
     if (uri == Values.empty || uri == null)
       return null;
-    return Path.currentPath().resolve(Path.valueOf(uri));
+    return Path.valueOf(base).resolve(Path.valueOf(uri));
   }
 
   /** Parse an XML document, caching the result.

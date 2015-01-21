@@ -1,5 +1,7 @@
 2015-01-20  Per Bothner  <per@bothner.com>
 
+	* configure.ac: Remove most links, to avoid Windows problems.
+
 	* config.guess: Update to new version, from gnulib.
 	* config.sub: Likewise.
 	* mkinstalldirs: Likewise.

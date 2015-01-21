@@ -2992,7 +2992,7 @@ fi
 
 Make_rules="$srcdir/Make-rules"
 
-ac_config_links="$ac_config_links gnu/xquery/testsuite/outline.xml:gnu/xquery/testsuite/outline.xml.in gnu/xquery/testsuite/tab.xml:gnu/xquery/testsuite/tab.xml.in gnu/xquery/testsuite/bib.xml:gnu/xquery/testsuite/bib.xml.in gnu/xquery/testsuite/auction.xml:gnu/xquery/testsuite/auction.xml.in gnu/xquery/testsuite/book1.xml:gnu/xquery/testsuite/book1.xml.in gnu/xquery/testsuite/report1.xml:gnu/xquery/testsuite/report1.xml.in gnu/xquery/testsuite/reviews.xml:gnu/xquery/testsuite/reviews.xml.in gnu/xquery/testsuite/items.xml:gnu/xquery/testsuite/items.xml.in gnu/xquery/testsuite/bids.xml:gnu/xquery/testsuite/bids.xml.in gnu/xquery/testsuite/users.xml:gnu/xquery/testsuite/users.xml.in testsuite/scribble.html:testsuite/scribble.html.in"
+ac_config_links="$ac_config_links testsuite/scribble.html:testsuite/scribble.html.in"
 
 
 
@@ -3801,16 +3801,6 @@ cat >>$CONFIG_STATUS <<\_ACEOF || ac_write_fail=1
 for ac_config_target in $ac_config_targets
 do
   case $ac_config_target in
-    "gnu/xquery/testsuite/outline.xml") CONFIG_LINKS="$CONFIG_LINKS gnu/xquery/testsuite/outline.xml:gnu/xquery/testsuite/outline.xml.in" ;;
-    "gnu/xquery/testsuite/tab.xml") CONFIG_LINKS="$CONFIG_LINKS gnu/xquery/testsuite/tab.xml:gnu/xquery/testsuite/tab.xml.in" ;;
-    "gnu/xquery/testsuite/bib.xml") CONFIG_LINKS="$CONFIG_LINKS gnu/xquery/testsuite/bib.xml:gnu/xquery/testsuite/bib.xml.in" ;;
-    "gnu/xquery/testsuite/auction.xml") CONFIG_LINKS="$CONFIG_LINKS gnu/xquery/testsuite/auction.xml:gnu/xquery/testsuite/auction.xml.in" ;;
-    "gnu/xquery/testsuite/book1.xml") CONFIG_LINKS="$CONFIG_LINKS gnu/xquery/testsuite/book1.xml:gnu/xquery/testsuite/book1.xml.in" ;;
-    "gnu/xquery/testsuite/report1.xml") CONFIG_LINKS="$CONFIG_LINKS gnu/xquery/testsuite/report1.xml:gnu/xquery/testsuite/report1.xml.in" ;;
-    "gnu/xquery/testsuite/reviews.xml") CONFIG_LINKS="$CONFIG_LINKS gnu/xquery/testsuite/reviews.xml:gnu/xquery/testsuite/reviews.xml.in" ;;
-    "gnu/xquery/testsuite/items.xml") CONFIG_LINKS="$CONFIG_LINKS gnu/xquery/testsuite/items.xml:gnu/xquery/testsuite/items.xml.in" ;;
-    "gnu/xquery/testsuite/bids.xml") CONFIG_LINKS="$CONFIG_LINKS gnu/xquery/testsuite/bids.xml:gnu/xquery/testsuite/bids.xml.in" ;;
-    "gnu/xquery/testsuite/users.xml") CONFIG_LINKS="$CONFIG_LINKS gnu/xquery/testsuite/users.xml:gnu/xquery/testsuite/users.xml.in" ;;
     "testsuite/scribble.html") CONFIG_LINKS="$CONFIG_LINKS testsuite/scribble.html:testsuite/scribble.html.in" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
     "gnu/bytecode/Makefile") CONFIG_FILES="$CONFIG_FILES gnu/bytecode/Makefile" ;;

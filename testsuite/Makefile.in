@@ -899,7 +899,7 @@ MySAXApp.class: $(srcdir)/MySAXApp.java
 
 check-MySAXApp: MySAXApp.class
 	$(CPJAVA) -Dorg.xml.sax.driver=gnu.kawa.sax.KawaXMLReader\
-	  MySAXApp ../gnu/xquery/testsuite/reviews.xml > tmp.out
+	  MySAXApp $(top_srcdir)/gnu/xquery/testsuite/reviews.xml > tmp.out
 	@if $(DIFF) -b $(srcdir)/MySAXApp.expected tmp.out; \
 	  then echo '# MySAXApp test passes'; \
 	  else echo FAIL MySAXApp test; fi
@@ -937,7 +937,7 @@ JaxbAnnotations3.class: $(srcdir)/jaxb-annotations3.scm
 	$(KAWA) -d .. -P testsuite. -T JaxbAnnotations3 -C $<
 tmp-jaxb-annotations3.out: JaxbAnnotations3.class
 	CLASSPATH="..$(CLASSPATH_SEPARATOR)@conf_classpath@.$(CLASSPATH_SEPARATOR)$$CLASSPATH" \
-	$(KAWA) testsuite.JaxbAnnotations3 <../gnu/xquery/testsuite/bib.xml >tmp-jaxb-annotations3.out
+	$(KAWA) testsuite.JaxbAnnotations3 <$(top_srcdir)/gnu/xquery/testsuite/bib.xml >tmp-jaxb-annotations3.out
 check-jaxb-annotations3: tmp-jaxb-annotations3.out
 	@if $(DIFF) $(srcdir)/jaxb-annotations3.expected tmp-jaxb-annotations3.out; \
 	  then echo '# jaxb-annotations3 test passes'; \

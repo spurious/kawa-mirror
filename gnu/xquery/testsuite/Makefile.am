@@ -45,13 +45,8 @@ check-suite:  TestSuite.class
 	CLASSPATH=$(KAWALIB) \
 	  $(JAVA) gnu.xquery.testsuite.TestSuite $(srcdir)/use-cases.xml
 
-maketab1.class:  maketab1.xql
-	$(KAWA) --main --xquery -C $<
-
-# Should not run $(JAVA) when built --with-gcj, as that runs
-# interpreter gij.  Instead, should compile to native.
-check-maketab1:  maketab1.class
-	CLASSPATH=".$(CLASSPATH_SEPARATOR)$(KAWALIB)" $(JAVA) maketab1 >tmp2
+check-maketab1:  maketab1.xql
+	CLASSPATH=".$(CLASSPATH_SEPARATOR)$(KAWALIB)" $(KAWA) $< >tmp2
 	@if diff -b $(srcdir)/tab.html tmp2; then echo '# maketab1 test passes'; else echo FAIL maketab1 test; fi
 
 # FIXME - this does not do the correct thing
@@ -78,13 +73,13 @@ check-latin1a:
 	@if diff -b $(srcdir)/latin1a.expected tmplatin1a; then echo '# latin1a test passes'; else echo FAIL latin1a test; fi
 
 check-xsltest1:
-	$(KAWA) --xslt -f $(srcdir)/xsltest1.xsl outline.xml >tmp-xsltest1.log
+	$(KAWA) --xslt -f $(srcdir)/xsltest1.xsl $(srcdir)/outline.xml >tmp-xsltest1.log
 	@if diff -b $(srcdir)/xsltest1.expected tmp-xsltest1.log; \
 	  then echo '# xsltest1 test passes'; \
 	  else echo FAIL xsltest1 test; fi
 
 check-format-users:
-	$(KAWA) --xslt $(srcdir)/format-users.xsl users.xml \
+	$(KAWA) --xslt $(srcdir)/format-users.xsl $(srcdir)/users.xml \
 	  |sed 's/^ *//'>tmp-format-users.html
 	@if diff -b -B $(srcdir)/exp-format-users.html tmp-format-users.html; then echo '#  format-users test passes'; else echo FAIL format-users test; fi
 

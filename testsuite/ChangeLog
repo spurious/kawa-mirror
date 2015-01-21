@@ -1,3 +1,7 @@
+2015-01-20  Per Bothner  <per@bothner.com>
+
+	* Makefile.am: Use test files from srcdir instead of symlinks.
+
 2015-01-19  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (check-ppfile): Use DIFF macro, so it works on Windows.

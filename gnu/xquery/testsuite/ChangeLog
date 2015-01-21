@@ -1,3 +1,21 @@
+2015-01-20  Per Bothner  <per@bothner.com>
+
+	Don't create links to data files, since links are difficult on Windows.
+	Instead use the files directly from the srcdir.
+	* TestMisc.java: If base-uri passed in, set it in XQParser.
+	* TestSuite.java: Set base-uri from "suite" file.
+	* Makefile.am: Upadte accordingly.
+	* auction.xml.in: Rename to auction.xml.
+	* bib.xml.in: Rename to bib.xml.
+	* bids.xml.in: Rename to bids.xml.
+	* book1.xml.in: Rename to book1.xml.
+	* items.xml.in: Rename to items.xml.
+	* outline.xml.in: Rename to outline.xml.
+	* report1.sxml.in: Rename to report1.sxml.
+	* reviews.xml.in: Rename to reviews.xml.
+	* tab.xml.in: Rename to tab.xml.
+	* users.xml.in: Rename to users.xml.
+
 2014-02-23  Per Bothner  <per@bothner.com>
 
 	* latin1a.xql: New test for "ISO-8859-1" encoding declaration.

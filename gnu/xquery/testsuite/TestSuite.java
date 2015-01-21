@@ -41,6 +41,7 @@ public class TestSuite extends FilterConsumer
 
   String query = null;
   String expect = null;
+  String baseUri;
 
   private TestSuite()
   {
@@ -59,6 +60,13 @@ public class TestSuite extends FilterConsumer
     xout.canonicalizeCDATA = true;
     this.cout = cout;
     this.xout = xout;
+  }
+
+  public void beginEntity (Object baseUri)
+  {
+    if (baseUri != null)
+        this.baseUri = baseUri.toString();
+      super.beginEntity(baseUri);
   }
 
   public void startElement(Object type)
@@ -93,7 +101,7 @@ public class TestSuite extends FilterConsumer
 	&& (nesting == 0 || (inTestSuite && nesting == 1)))
       {
 	inTest = false;
-	TestMisc.evalTest(query, expect);
+	TestMisc.evalTest(query, baseUri, expect);
       }
     else if (inTestSuite ? nesting == 2 : nesting == 1)
       {

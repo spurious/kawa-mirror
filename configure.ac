@@ -247,16 +247,6 @@ AC_SUBST(KAWA_SHELL)
 Make_rules="$srcdir/Make-rules"
 AC_SUBST_FILE(Make_rules)
 AC_CONFIG_LINKS(
-  gnu/xquery/testsuite/outline.xml:gnu/xquery/testsuite/outline.xml.in
-  gnu/xquery/testsuite/tab.xml:gnu/xquery/testsuite/tab.xml.in
-  gnu/xquery/testsuite/bib.xml:gnu/xquery/testsuite/bib.xml.in
-  gnu/xquery/testsuite/auction.xml:gnu/xquery/testsuite/auction.xml.in
-  gnu/xquery/testsuite/book1.xml:gnu/xquery/testsuite/book1.xml.in
-  gnu/xquery/testsuite/report1.xml:gnu/xquery/testsuite/report1.xml.in
-  gnu/xquery/testsuite/reviews.xml:gnu/xquery/testsuite/reviews.xml.in
-  gnu/xquery/testsuite/items.xml:gnu/xquery/testsuite/items.xml.in
-  gnu/xquery/testsuite/bids.xml:gnu/xquery/testsuite/bids.xml.in
-  gnu/xquery/testsuite/users.xml:gnu/xquery/testsuite/users.xml.in
   testsuite/scribble.html:testsuite/scribble.html.in)
 
 AM_COND_IF([ENABLE_KAWA_FRONTEND],

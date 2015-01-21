@@ -94,7 +94,7 @@ public class XQParser extends Lexer
   char defaultEmptyOrder = 'L';
   boolean emptyOrderDeclarationSeen;
 
-  Path baseURI = null;
+  private Path baseURI = null;
   boolean baseURIDeclarationSeen;
 
   public void setStaticBaseUri (String uri)

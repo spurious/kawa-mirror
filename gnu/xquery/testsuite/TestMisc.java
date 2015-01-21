@@ -12,6 +12,7 @@ public class TestMisc
   static { XQuery.registerEnvironment(); }
   static XQuery interp = XQuery.getInstance();
   static Environment env = Environment.getCurrent();
+  static String defaultBaseUri;
 
   static int expectedPasses = 0;
   static int unexpectedPasses = 0;
@@ -24,6 +25,7 @@ public class TestMisc
   {
       String srcdir = System.getProperty("srcdir");
       String srcprefix = srcdir == null ? "" : (srcdir+"/");
+      defaultBaseUri = srcprefix;
 
     // gnu.expr.ModuleExp.dumpZipPrefix = "kawa-zip-dump-";
     // Compilation.debugPrintExpr = true;
@@ -529,10 +531,15 @@ public class TestMisc
 
   public static void evalTest(String expr, String expected)
   {
+    evalTest(expr, defaultBaseUri, expected);
+  }
+
+  public static void evalTest(String expr, String baseUri, String expected)
+  {
     Object result;
     try
       {
-	result = eval(expr);
+        result = eval(expr, baseUri);
       }
     catch (Throwable ex)
       {
@@ -606,11 +613,19 @@ public class TestMisc
   public static String eval(String expr)
     throws Throwable
   {
+    return eval(expr, null);
+  }
+
+  public static String eval(String expr, String baseUri)
+    throws Throwable
+  {
     CharArrayOutPort out = new CharArrayOutPort();
     InPort in = new CharArrayInPort(expr);
     SourceMessages messages = new SourceMessages();
-
-    Compilation comp = interp.parse(in, messages, Language.PARSE_IMMEDIATE);
+    XQParser lexer = new XQParser(in, messages, interp);
+    if (baseUri != null)
+      lexer.setStaticBaseUri(baseUri);
+    Compilation comp = interp.parse(lexer, Language.PARSE_IMMEDIATE, null);
     SourceError firstError = messages.getErrors();
     if (firstError != null)
       return "*** syntax error - " + firstError;

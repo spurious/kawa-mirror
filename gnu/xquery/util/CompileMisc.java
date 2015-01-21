@@ -117,9 +117,7 @@ public class CompileMisc
     dotArg.setCanRead(true);
     posArg.setCanRead(true);
 
-    lexp2.setInlineOnly(true);
-    lexp2.returnContinuation = exp;
-    lexp2.inlineHome = visitor.getCurrentLambda();
+    lexp2.setInlineOnly(exp, visitor.getCurrentLambda());
 
     // Splice out lastArg
     lexp2.remove(posArg, lastArg);
@@ -218,9 +216,7 @@ public class CompileMisc
 	|| lexp2.max_args != 3)
       return exp;
 
-    lexp2.setInlineOnly(true);
-    lexp2.returnContinuation = exp;
-    lexp2.inlineHome = visitor.getCurrentLambda();
+    lexp2.setInlineOnly(exp, visitor.getCurrentLambda());
 
     exp2 = lexp2.body;
 

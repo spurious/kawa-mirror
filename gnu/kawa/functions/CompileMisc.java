@@ -192,11 +192,7 @@ public class CompileMisc
     // do a tree rewrite here, instead of in ValuesMap#compile.
     exp.visitArgs(visitor);
     if (lexp != null)
-      {
-	lexp.setInlineOnly(true);
-        lexp.returnContinuation = exp;
-        lexp.inlineHome = visitor.getCurrentLambda();
-      }
+        lexp.setInlineOnly(exp, visitor.getCurrentLambda());
     return exp;
   }
 
@@ -518,9 +514,7 @@ public class CompileMisc
     LambdaExp lexp = canInlineCallCC(exp);
     if (lexp != null)
       {
-	lexp.setInlineOnly(true);
-	lexp.returnContinuation = exp;
-        lexp.inlineHome = visitor.getCurrentLambda();
+        lexp.setInlineOnly(exp, visitor.getCurrentLambda());
         Declaration contDecl = lexp.firstDecl();
         if (! contDecl.getFlag(Declaration.TYPE_SPECIFIED))
           contDecl.setType(typeContinuation);

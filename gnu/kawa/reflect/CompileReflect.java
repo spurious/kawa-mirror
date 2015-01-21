@@ -331,12 +331,8 @@ public class CompileReflect
     for (int i = 1;  i < args.length;  i++)
       {
 	if (args[i] instanceof LambdaExp)
-	  {
-	    LambdaExp lexp = (LambdaExp) args[i];
-	    lexp.setInlineOnly(true);
-	    lexp.returnContinuation = exp;
-            lexp.inlineHome = visitor.getCurrentLambda();
-	  }
+            ((LambdaExp) args[i])
+                .setInlineOnly(exp, visitor.getCurrentLambda());
       }
     return exp;
   }

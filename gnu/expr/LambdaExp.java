@@ -165,6 +165,17 @@ public class LambdaExp extends ScopeExp {
     public final void setInlineOnly(boolean inlineOnly)
     { setFlag(inlineOnly, INLINE_ONLY); }
 
+    /** Note this function is inlined in a give context.
+     * This is meant to be used during validate-apply processing,
+     * for procedures that will be inlined in a compile method.
+     */
+    public final void setInlineOnly(Expression returnContinuation,
+                                    LambdaExp caller) {
+        setInlineOnly(true);
+        this.returnContinuation = returnContinuation;
+        this.inlineHome = caller;
+    }
+
     public final boolean getNeedsClosureEnv() {
         return (flags & (NEEDS_STATIC_LINK|IMPORTS_LEX_VARS)) != 0;
     }

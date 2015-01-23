@@ -1,3 +1,7 @@
+2015-01-23  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (EXTRA_DIST): Update for recent renaming.
+
 2015-01-20  Per Bothner  <per@bothner.com>
 
 	Don't create links to data files, since links are difficult on Windows.

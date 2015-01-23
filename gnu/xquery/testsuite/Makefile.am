@@ -8,13 +8,13 @@ mostlyclean-am: mostlyclean-generic mostlyclean-libtool
 
 java_sources = TestMisc.java TestSuite.java RunXQTS.java
 
-EXTRA_DIST = tab.xml.in maketab1.xql tab.html usemod.exp \
+EXTRA_DIST = tab.xml maketab1.xql tab.html usemod.exp \
   multab.xql expectedmul.xml descend.xql expdescend.xml \
   latin1a.xql latin1a.expected latin1b.xml \
-  auction.xml.in outline.xml.in usemod.xql mod1.xql mod2.xql mod2a.xql \
+  auction.xml outline.xml usemod.xql mod1.xql mod2.xql mod2a.xql \
   bad-1.xql expected-1.errs XQTS-trace.exp xsltest1.xsl xsltest1.expected\
-  bib.xml.in use-cases.xml book1.xml.in reviews.xml.in report1.xml.in \
-  bids.xml.in users.xml.in items.xml.in format-users.xsl exp-format-users.html
+  bib.xml use-cases.xml book1.xml reviews.xml report1.xml \
+  bids.xml users.xml items.xml format-users.xsl exp-format-users.html
 
 all:
 

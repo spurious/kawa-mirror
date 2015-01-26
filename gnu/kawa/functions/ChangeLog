@@ -1,3 +1,7 @@
+2015-01-26  Per Bothner  <per@bothner.com>
+
+	* CompileMisc.java (validateApplyCallCC): Set DONT_COPY flag.
+
 2015-01-21  Per Bothner  <per@bothner.com>
 
 	* CompileMisc.java (validateApplyValuesMap, validateApplyCallCC):

@@ -529,6 +529,7 @@ public class Declaration
   public static final int IS_SYNTAX = 0x8000;
   public static final int IS_UNKNOWN = 0x10000;
   public static final int IS_IMPORTED = 0x20000;
+    public static final int IS_CAPTURED = IS_IMPORTED; // Re-use bit.
 
   // This should be a type property, not a variable property, at some point!
   public static final int IS_SINGLE_VALUE = 0x40000;
@@ -607,6 +608,7 @@ public class Declaration
     public static final long SKIP_FOR_METHOD_PARAMETER = 0x8000000000l;
     public static final long IS_REST_PARAMETER = 0x10000000000l;
     public static final long IS_PARAMETER = 0x20000000000l;
+    public static final long DONT_COPY = 0x40000000000l;
 
     protected long flags = IS_SIMPLE;
 

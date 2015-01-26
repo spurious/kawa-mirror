@@ -92,8 +92,19 @@ public class FindCapturedVars extends ExpExpVisitor<Void>
       }
     if (! skipFunc)
       exp.func = exp.func.visit(this, ignored);
-    if (exitValue == null && ! skipArgs)
-      exp.args = visitExps(exp.args, ignored);
+    if (exitValue == null && ! skipArgs) {
+        int nargs = exp.args.length;
+        for (int i = 0; i < nargs;  i++) {
+            Expression arg = visit(exp.args[i], null);
+            // It is possible that visiting args[i] may cause prefix
+            // arguments to be inserted (search for IS_CAPTURED)
+            // so we need to adjust for that.
+            int inserted = exp.args.length - nargs;
+            i += inserted;
+            exp.args[i] = arg;
+            nargs += inserted;
+        }
+    }
     if (backJumpPossible > oldBackJumpPossible)
       exp.setFlag(ApplyExp.MAY_CONTAIN_BACK_JUMP);
     return exp;
@@ -181,7 +192,7 @@ public class FindCapturedVars extends ExpExpVisitor<Void>
             Declaration bind = allocUnboundDecl(name, false);
             if (! decl.getFlag(Declaration.IS_DYNAMIC))
               maybeWarnNoDeclarationSeen(name, comp, exp);
-            capture(bind);
+            capture(bind, null);
             decl.base = bind;
           }
       }
@@ -314,7 +325,7 @@ public class FindCapturedVars extends ExpExpVisitor<Void>
         return exp;
     }
 
-  public void capture(Declaration decl)
+  public void capture(Declaration decl, ReferenceExp rexp)
   {
     if (! decl.getCanReadOrCall())
       return;
@@ -405,13 +416,60 @@ public class FindCapturedVars extends ExpExpVisitor<Void>
     if (decl.base != null)
       {
 	decl.base.setCanRead(true);
-	capture(decl.base);
+	capture(decl.base, null);
       }
     else if (decl.getCanReadOrCall() || declValue == null)
       {
 	if (! decl.isStatic())
 	  {
 	    LambdaExp heapLambda = curLambda;
+
+            // Perform the "lambda lifting" optimization, if possible:
+            //   (define (f x) ... y ...)
+            //   (f a)
+            // to:
+            //   (define (f y$ x) ... y$ ...)
+            //   (f y a)
+            // This can avoid the need for creating a closure.
+            if (rexp != null
+                && false // FIXME - doesn't quite work yesy
+                && decl.nvalues == 1
+                && ! (decl.getValueRaw() instanceof LambdaExp)
+                // don't confuse call/cc inlining (over-conservative )
+                && ! decl.getFlag(Declaration.DONT_COPY)
+                && ! curLambda.getInlineOnly() // FIXME - for simplicity
+                && ! curLambda.getCanRead() && curLambda.nameDecl != null
+                && ! curLambda.nameDecl.context.isClassGenerated()
+                && curLambda.min_args == curLambda.max_args) {
+                Declaration ndecl = null;
+                for (ndecl = curLambda.firstDecl();  ndecl != null;
+                     ndecl = ndecl.nextDecl()) {
+                    if (ndecl.getFlag(Declaration.IS_CAPTURED)
+                        && ndecl.base == decl)
+                        break;
+                }
+                if (ndecl == null) {
+                    ndecl = new Declaration(decl.getSymbol());
+                    ndecl.base = decl;
+                    ndecl.setFlag(Declaration.IS_CAPTURED);
+                    ndecl.setCanRead(true);
+                    curLambda.add(null, ndecl);
+                    curLambda.min_args++;
+                    curLambda.max_args++;
+                    for (ApplyExp exp = curLambda.nameDecl.firstCall;
+                         exp != null;  exp = exp.nextCall) {
+                        Expression[] args = exp.getArgs();
+                        Expression[] nargs = new Expression[args.length+1];
+                        boolean recursive = exp.context == curLambda;
+                        nargs[0] = new ReferenceExp(recursive ? ndecl : decl);
+                        System.arraycopy(args, 0, nargs, 1, args.length);
+                        exp.setArgs(nargs);
+                    }
+                }
+                rexp.setBinding(ndecl);
+                return;
+            }
+
             if (! decl.isFluid())
               heapLambda.setImportsLexVars();
 	    LambdaExp parent = heapLambda.outerLambda();
@@ -497,11 +555,11 @@ public class FindCapturedVars extends ExpExpVisitor<Void>
       maybeWarnNoDeclarationSeen(exp.getSymbol(), exp.isProcedureName(),
                                  comp, exp);
 
-    capture(exp.contextDecl(), decl);
+    capture(exp.contextDecl(), decl, exp);
     return exp;
   }
 
-  void capture (Declaration containing, Declaration decl)
+  void capture(Declaration containing, Declaration decl, ReferenceExp exp)
   {
     Expression dvalue;
     if (decl.isAlias() && (dvalue = decl.getValue()) instanceof ReferenceExp)
@@ -511,7 +569,7 @@ public class FindCapturedVars extends ExpExpVisitor<Void>
 	if (orig != null
 	    && (containing == null || ! orig.needsContext()))
 	  {
-	    capture(rexp.contextDecl(), orig);
+            capture(rexp.contextDecl(), orig, null);
 	    return;
 	  }
       }
@@ -520,9 +578,9 @@ public class FindCapturedVars extends ExpExpVisitor<Void>
         decl = decl.base;
       }
     if (containing != null && decl.needsContext())
-      capture(containing);
+        capture(containing, null);
     else
-      capture(decl);
+        capture(decl, exp);
   }
 
   protected Expression visitThisExp (ThisExp exp, Void ignored)
@@ -552,7 +610,7 @@ public class FindCapturedVars extends ExpExpVisitor<Void>
       {
 	if (! exp.isDefining())
 	  decl = Declaration.followAliases(decl);
-	capture(exp.contextDecl(), decl);
+	capture(exp.contextDecl(), decl, null);
       }
     return super.visitSetExp(exp, ignored);
   }

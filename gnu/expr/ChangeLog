@@ -1,5 +1,9 @@
 2015-01-26  Per Bothner  <per@bothner.com>
 
+	* FindCapturedVars.java (capture): Implemented "lambda lifting".
+	The implementation is disabled for now as it only "99% working".
+	* Declaration.java (IS_CAPTURED, DONT_COPY): New flags;
+
 	* LambdaExp.java (isClassGenerated): Move to ...
 	* ScopeExp (isClassGenerated): ... here.
 	* LambdaExp.java: Use isClassGenerated more places.

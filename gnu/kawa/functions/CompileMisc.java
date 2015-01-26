@@ -518,6 +518,7 @@ public class CompileMisc
         Declaration contDecl = lexp.firstDecl();
         if (! contDecl.getFlag(Declaration.TYPE_SPECIFIED))
           contDecl.setType(typeContinuation);
+        contDecl.setFlag(Declaration.DONT_COPY);
         LambdaExp.maybeSetReturnType(lexp, required);
         // FIXME (future): (after visiting lexp), do:
         // exp.setType(lexp.body.getType() UNION continuation-arguments);

@@ -56,7 +56,7 @@ public class LambdaExp extends ScopeExp {
         if (decl.isSimple()) {
             if (capturedVars == null
                 && ! decl.isStatic()
-                && ! (this instanceof ModuleExp || this instanceof ClassExp)) {
+                && ! isClassGenerated()) {
                 heapFrame = new gnu.bytecode.Variable("$heapFrame");
             }
             decl.setSimple(false);
@@ -249,11 +249,6 @@ public class LambdaExp extends ScopeExp {
 
     /** True iff this is the dummy top-level function of a module body. */
     public final boolean isModuleBody() { return this instanceof ModuleExp; }
-
-    /** True if a class is generated for this procedure.  */
-    public final boolean isClassGenerated() {
-        return isModuleBody() || this instanceof ClassExp;
-    }
 
     public boolean isAbstract() {
         return body == QuoteExp.abstractExp;
@@ -794,7 +789,7 @@ public class LambdaExp extends ScopeExp {
     }
 
     public ClassType getHeapFrameType() {
-        if (this instanceof ModuleExp || this instanceof ClassExp)
+        if (isClassGenerated())
             return (ClassType) getType();
         else
             return (ClassType) heapFrame.getType();
@@ -1218,7 +1213,7 @@ public class LambdaExp extends ScopeExp {
         }
         if (! getNeedsClosureEnv())
             closureEnvType = null;
-        else if (outer instanceof ClassExp || outer instanceof ModuleExp)
+        else if (outer.isClassGenerated())
             closureEnvType = outer.getCompiledClassType(comp);
         else {
             LambdaExp owner = outer;
@@ -1236,7 +1231,7 @@ public class LambdaExp extends ScopeExp {
                 ClassExp cl = (ClassExp) child;
                 if (cl.getNeedsClosureEnv())  {
                     ClassType parentFrameType;
-                    if (this instanceof ModuleExp || this instanceof ClassExp)
+                    if (isClassGenerated())
                         parentFrameType = (ClassType) getType();
                     else {
                         Variable parentFrame = this.heapFrame != null
@@ -1254,7 +1249,7 @@ public class LambdaExp extends ScopeExp {
     public void allocFrame(Compilation comp) {
         if (heapFrame != null)  {
             ClassType frameType;
-            if (this instanceof ModuleExp || this instanceof ClassExp)
+            if (isClassGenerated())
                 frameType = getCompiledClassType(comp);
             else  {
                 frameType = new ClassType(comp.generateClassName("frame"));
@@ -1322,7 +1317,7 @@ public class LambdaExp extends ScopeExp {
             if (closureEnv != null && ! (this instanceof ModuleExp))
                 staticLinkField = frameType.addField("staticLink",
                                                      closureEnv.getType());
-            if (! (this instanceof ModuleExp) && ! (this instanceof ClassExp)) {
+            if (! isClassGenerated()) {
                 frameType.setEnclosingMember(comp.method);
                 code.emitNew(frameType);
                 code.emitDup(frameType);

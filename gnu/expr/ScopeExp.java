@@ -313,6 +313,11 @@ public abstract class ScopeExp extends Expression
     return visitor.visitScopeExp(this, d);
   }
 
+    /** True if a class is generated for this scope.  */
+    public final boolean isClassGenerated() {
+        return this instanceof ModuleExp || this instanceof ClassExp;
+    }
+
   public String toString() { return getClass().getName()+"#"+id; }
 
   static int counter;

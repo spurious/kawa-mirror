@@ -1,3 +1,8 @@
+2015-01-28  Per Bothner  <per@bothner.com>
+
+	* vector.scm (vector-map, vector-map-one, vector-for-each):
+	Generalize to java.util.List arguments.
+
 2014-12-28  Per Bothner  <per@bothner.com>
 
 	* syntax.scm (receive): Moved to new file gnu/kawa/slib/receive.scm.

@@ -118,6 +118,7 @@
 (define (vector-for-each (f :: procedure) (vec :: java.util.List)
                          #!rest (vecs :: java.util.List[]))
   :: void
+  validate-apply: "kawa.lib.compile_map:vectorForEachValidateApply"
   (define (vector-for-each-one (f :: procedure) (vec :: java.util.List))
     :: void
     (let ((len :: int (vec:size)))

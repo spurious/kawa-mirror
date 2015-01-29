@@ -107,7 +107,7 @@ InliningTest.stringForEach2(java.lang.CharSequence)void: 42 bytes
 InliningTest.stringForEach3(java.lang.CharSequence)void: 49 bytes
 InliningTest.stringForEach4(java.lang.CharSequence,int,int)void: 38 bytes
 InliningTest.stringForEach5(java.lang.CharSequence,int,int)void: 52 bytes
-InliningTest.stringForEach6(java.lang.CharSequence)void: 144 bytes
+InliningTest.stringForEach6(java.lang.CharSequence)void: 142 bytes
 InliningTest.stringAppend1(gnu.lists.FString,char)gnu.lists.FString: 6 bytes
 InliningTest.stringAppend2(gnu.lists.FString,int)gnu.lists.FString: 6 bytes
 InliningTest.stringAppend3(gnu.lists.FString,gnu.lists.FString)gnu.lists.FString: 6 bytes

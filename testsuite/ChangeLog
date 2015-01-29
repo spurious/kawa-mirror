@@ -1,3 +1,7 @@
+2015-01-29  Per Bothner  <per@bothner.com>
+
+	* inlining.expected: Update.
+
 2015-01-20  Per Bothner  <per@bothner.com>
 
 	* Makefile.am: Use test files from srcdir instead of symlinks.

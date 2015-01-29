@@ -1,3 +1,10 @@
+2015-01-29  Per Bothner  <per@bothner.com>
+
+	* compile_map.scm (validate-generic-for-each): New procedure.
+	(stringForEachValidateApply): Use validate-generic-for-each.
+	(vectorForEachValidateApply): New procedure.
+	* vectors.scm (vector-for-each): Set validate-apply property.
+
 2015-01-28  Per Bothner  <per@bothner.com>
 
 	* vector.scm (vector-map, vector-map-one, vector-for-each):

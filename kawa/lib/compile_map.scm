@@ -1,5 +1,6 @@
 (require <kawa.lib.kawa.expressions>)
 (import (kawa lib kawa string-cursors))
+(define-alias Convert gnu.kawa.functions.Convert)
 
 ;; Optimize (string-cursor-for-each proc str [start [end]])
 (define-validate stringCursorForEachValidateApply (exp required proc)
@@ -87,19 +88,76 @@
                 (or (> string-compat 0)
                     (and (>= string-compat 0)
                          (< (invoke integer 'isCompatibleWithValue t2) 0)))))))
+   (let* ((n (- (exp:getArgCount) 1))
+          (seqDecls (gnu.expr.Declaration[] length: n))
+          (idxDecls (gnu.expr.Declaration[] length: n))
+          (endDecls (gnu.expr.Declaration[] length: n))
+          (comp (get-compilation)))
+     (define (init-each i arg)
+       (set! (seqDecls i)
+             (comp:letVariable #!null #!null
+                               (visit-exp (apply-exp Convert:cast string arg))))
+       (set! (idxDecls i) (comp:letVariable #!null string-cursor
+                                            (apply-exp as string-cursor 0)))
+       (set! (endDecls i) (comp:letVariable #!null string-cursor
+                                         (apply-exp invoke (seqDecls i) 'length))))
+     (define (test-each i)
+       (apply-exp string-cursor<? (idxDecls i) (endDecls i)))
+     (define (eval-each i)
+       (comp:letVariable #!null character
+                         (apply-exp string-cursor-ref
+                                    (seqDecls i) (idxDecls i))))
+     (define (incr-each value i)
+       (set-exp (idxDecls i)
+                (apply-exp as string-cursor
+                           (apply-exp + (apply-exp as int (idxDecls i))
+                                      (if-exp
+                                       (apply-exp > value #xFFFF)
+                                       2 1)))))
+     (validate-generic-for-each exp required
+                                init-each test-each eval-each incr-each))))
+
+; Validate (vector-for-each proc str1 str...)
+(define-validate vectorForEachValidateApply (exp required proc)
+  ((exp:isSimple 2)
+   (let* ((n (- (exp:getArgCount) 1))
+          (seqDecls (gnu.expr.Declaration[] length: n))
+          (idxDecls (gnu.expr.Declaration[] length: n))
+          (endDecls (gnu.expr.Declaration[] length: n))
+          (comp (get-compilation)))
+     (define (init-each i arg)
+       (let* ((seqArg (visit-exp (apply-exp Convert:cast java.util.List arg)))
+              (seqDecl (comp:letVariable #!null #!null seqArg)))
+         (seqDecl:setLocation arg)
+         (set! (seqDecls i) seqDecl)
+         (set! (idxDecls i)
+               (comp:letVariable #!null int (->exp 0)))
+         (set! (endDecls i)
+               (comp:letVariable #!null int (apply-exp invoke seqDecl 'size)))))
+     (define (test-each i)
+       (apply-exp < (idxDecls i) (endDecls i)))
+     (define (eval-each i)
+       (comp:letVariable #!null #!null
+                         (apply-exp invoke (seqDecls i) 'get (idxDecls i))))
+     (define (incr-each value i)
+       (set-exp (idxDecls i)
+                (apply-exp + (idxDecls i) 1)))
+     (validate-generic-for-each exp required
+                                init-each test-each eval-each incr-each))))
+
+(define (validate-generic-for-each exp::gnu.expr.ApplyExp
+                                   required::gnu.bytecode.Type
+                                   init-each::procedure
+                                   test-each::procedure
+                                   eval-each::procedure
+                                   incr-each::procedure)
    (let ((n (- (exp:getArgCount) 1))
          (comp (get-compilation))
          (func (exp:getArg 0)))
      (comp:letStart)
-     (define seqDecls (gnu.expr.Declaration[] length: n))
-     (define idxDecls (gnu.expr.Declaration[] length: n))
-     (define endDecls (gnu.expr.Declaration[] length: n))
+     (define decls (gnu.expr.Declaration[][] length: n))
      (do ((i ::int 0 (+ i 1))) ((= i n))
-       (set! (seqDecls i) (comp:letVariable #!null string (exp:getArg (+ i 1))))
-       (set! (idxDecls i) (comp:letVariable #!null string-cursor
-                                            (apply-exp as string-cursor 0)))
-       (set! (endDecls i)  (comp:letVariable #!null string-cursor
-                                             (apply-exp invoke (seqDecls i) 'length))))
+       (init-each i (exp:getArg (+ i 1))))
      (comp:letEnter)
      (comp:letDone
       (let* ((loopLambda (comp:loopStart)))
@@ -112,22 +170,13 @@
                    (comp:loopRepeat loopLambda)))
                  (else
                   (if-exp
-                   (apply-exp string-cursor<? (idxDecls i) (endDecls i))
+                   (test-each i)
                    (begin
                     (comp:letStart)
-                    (define chDecl
-                      (comp:letVariable #!null character
-                                        (apply-exp string-cursor-ref
-                                                   (seqDecls i) (idxDecls i))))
+                    (define chValue (eval-each i))
                     (comp:letEnter)
                     (comp:letDone
                      (begin-exp
-                      (set-exp (idxDecls i)
-                               (apply-exp as string-cursor
-                                          (apply-exp + (apply-exp as int (idxDecls i))
-                                                     (if-exp
-                                                      (apply-exp > chDecl #xFFFF)
-                                                      2 1))))
+                      (incr-each chValue i)
                       (loop (+ i 1)
-                            (cons chDecl chlist)))))))))))))))
-
+                            (cons chValue chlist))))))))))))))

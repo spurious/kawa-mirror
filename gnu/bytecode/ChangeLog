@@ -1,3 +1,9 @@
+2015-01-29  Per Bothner  <per@bothner.com>
+
+	* ClassType.java (isCompatibleWithValue): If this is an interface,
+	and the value type is a class that does not implement the interface
+	consider it incompatible.
+
 2014-12-22  Per Bothner  <per@bothner.com>
 
 	* Type.java (isCompatibleWithValue): New static helper.

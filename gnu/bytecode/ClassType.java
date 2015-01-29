@@ -1354,6 +1354,19 @@ public class ClassType extends ObjectType
     public int isCompatibleWithValue(Type valueType) {
         if (this == objectType && valueType instanceof ObjectType)
             return 2;
+        if (isInterface()) {
+            Type rawType = valueType.getRawType();
+            if (! (rawType instanceof ClassType))
+                return -1;
+            else if (rawType == objectType)
+                return 0;
+            else if (((ClassType) rawType).implementsInterface(this))
+                return 2;
+            else
+                // In theory a subclass of valueType might implement this
+                // interface, but that is not normal practice.
+                return -1;
+        }
         int comp = compare(valueType);
         if (comp >= 0) {
             if (valueType instanceof ClassType

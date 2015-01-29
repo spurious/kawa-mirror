@@ -1,3 +1,9 @@
+2015-01-29  Per Bothner  <per@bothner.com>
+
+	* CompileMisc.java (validateApplyConvert): If expression type is
+	compatible without-coercion with type, just use expression.
+	That provides a more precise type.
+
 2015-01-26  Per Bothner  <per@bothner.com>
 
 	* CompileMisc.java (validateApplyCallCC): Set DONT_COPY flag.

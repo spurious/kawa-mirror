@@ -1,3 +1,8 @@
+2015-01-30  Per Bothner  <per@bothner.com>
+
+	* Declaration.java (checkNameDecl): Also set nameDecl to null
+	if LambdaExp binding comes *after* other assignment.
+
 2015-01-26  Per Bothner  <per@bothner.com>
 
 	* FindCapturedVars.java (capture): Implemented "lambda lifting".

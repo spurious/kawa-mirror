@@ -1595,8 +1595,8 @@ public class Declaration
         if (old instanceof LambdaExp)
           ((LambdaExp) old).nameDecl = null;
       }
-    if (nvalues == 0 && value instanceof LambdaExp)
-      ((LambdaExp) value).nameDecl = this;
+    else if (value instanceof LambdaExp)
+      ((LambdaExp) value).nameDecl = nvalues == 0 ? this : null;
   }
 
   public static class ValueSource

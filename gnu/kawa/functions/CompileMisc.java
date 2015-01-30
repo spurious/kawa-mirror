@@ -46,7 +46,9 @@ public class CompileMisc
             args[1] = visitor.checkType(args[1], xtype);
             CompileReflect.checkKnownClass(type, comp);
             exp.setType(type);
-            if (type.isCompatibleWithValue(args[1].getType()) == 2)
+            Type argType = args[1].getType();
+            if (argType != Type.nullType
+                && type.isCompatibleWithValue(argType) == 2)
                 return args[1];
             return exp;
           }

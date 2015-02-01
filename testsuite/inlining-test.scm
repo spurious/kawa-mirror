@@ -442,3 +442,9 @@
 (define (callWithValues3 x::integer y::integer)
   (call-with-values (lambda () (floor/ x y))
     list))
+
+(define (mmemq x list)
+  (let lp ((lst list))
+    (and (? p::pair lst)
+         (if (eq? x p:car) lst
+             (lp p:cdr)))))

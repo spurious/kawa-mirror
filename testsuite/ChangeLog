@@ -1,3 +1,9 @@
+2015-02-01  Per Bothner  <per@bothner.com>
+
+	* inlining-test.scm (mmemq): Test tail-recursion through TypeSwitch.
+	* Makefile.am: Update accordingly.
+	* inlining.expected: Likewise.
+
 2015-01-29  Per Bothner  <per@bothner.com>
 
 	* inlining.expected: Update.

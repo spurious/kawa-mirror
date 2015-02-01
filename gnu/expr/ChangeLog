@@ -1,3 +1,17 @@
+2015-02-01  Per Bothner  <per@bothner.com>
+
+	Change handling of tail-calls and return-continuations so we
+	recognize tail-calls in known-inlined lambdas like in TypeSwitch.
+	These lambdas get PASSES_TAILCALLS set during validation.
+	* LambdaExp.java (PASSES_TAILCALLS): New flag.
+	* FindTailCalls.java (visitLambdaExp): Change the convention so the
+	returnContinuation for the lambda body is the LambdaExp itself.
+	This enables the PASSES_TAILCALLS optimization.
+	(visitDefaultArgs): New override.
+	(visitApplyExp): Update accordingly.
+	Also skip out past a lambda that PASSES_TAILCALLS.
+	* FindTailCalls.java (visitLambdaExp): Use a LinkedHashSet.
+
 2015-01-30  Per Bothner  <per@bothner.com>
 
 	* Declaration.java (checkNameDecl): Also set nameDecl to null

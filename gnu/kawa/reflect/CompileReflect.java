@@ -323,19 +323,19 @@ public class CompileReflect
     return exp;
   }
 
-  public static Expression validateApplyTypeSwitch
-  (ApplyExp exp, InlineCalls visitor, Type required, Procedure proc)
-  {
-    exp.visitArgs(visitor);
-    Expression[] args = exp.getArgs();
-    for (int i = 1;  i < args.length;  i++)
-      {
-	if (args[i] instanceof LambdaExp)
-            ((LambdaExp) args[i])
-                .setInlineOnly(exp, visitor.getCurrentLambda());
-      }
-    return exp;
-  }
+    public static Expression validateApplyTypeSwitch
+        (ApplyExp exp, InlineCalls visitor, Type required, Procedure proc) {
+        exp.visitArgs(visitor);
+        Expression[] args = exp.getArgs();
+        for (int i = 1;  i < args.length;  i++) {
+            if (args[i] instanceof LambdaExp) {
+                LambdaExp lexp = (LambdaExp) args[i];
+                lexp.setInlineOnly(exp, visitor.getCurrentLambda());
+                lexp.setFlag(LambdaExp.PASSES_TAILCALLS);
+            }
+        }
+        return exp;
+    }
 
  public static Expression makeSetterCall (Expression receiver, Object slot, Expression newValue)
   {

@@ -152,6 +152,8 @@ public class LambdaExp extends ScopeExp {
     public static final int OVERLOADABLE_FIELD = 2048;
     public static final int ATTEMPT_INLINE = 4096;
     public static final int IN_EXPWALKER = 0x2000;
+    /** Treat as inlined in outer lambda when determining tailcalls. */
+    public static final int PASSES_TAILCALLS = 0x4000;
 
     /** True of emitted method should be public.
      * Needed if PrimProcedure.getMethodFor shold be able to find it.

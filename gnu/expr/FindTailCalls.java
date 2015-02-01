@@ -90,10 +90,13 @@ public class FindTailCalls extends ExpExpVisitor<Expression>
 
   protected Expression visitApplyExp (ApplyExp exp, Expression returnContinuation)
   {
-    boolean inTailContext = returnContinuation == currentLambda.body;
+    LambdaExp effectiveLambda = currentLambda;
+    while (effectiveLambda.getFlag(LambdaExp.PASSES_TAILCALLS))
+        effectiveLambda = effectiveLambda.outerLambda();
+    boolean inTailContext = returnContinuation == effectiveLambda;
     if (inTailContext)
       exp.setTailCall(true);
-    exp.context = currentLambda;
+    exp.context = effectiveLambda;
     LambdaExp lexp = null;
     boolean isAppendValues = false;
     if (exp.func instanceof ReferenceExp)
@@ -135,14 +138,15 @@ public class FindTailCalls extends ExpExpVisitor<Expression>
           ; // (Self-)tail-recursion is OK.
         else if (inTailContext)
           {
+            // Use LinkedHashSet for deterministic behavior.
             if (lexp.tailCallers == null)
-              lexp.tailCallers = new java.util.HashSet();
-            lexp.tailCallers.add(currentLambda);
+              lexp.tailCallers = new java.util.LinkedHashSet();
+            lexp.tailCallers.add(effectiveLambda);
           }
         else if (lexp.returnContinuation == null)
           {
             lexp.returnContinuation = returnContinuation;
-            lexp.inlineHome = currentLambda;
+            lexp.inlineHome = effectiveLambda;
           }
         else
           {
@@ -274,6 +278,15 @@ public class FindTailCalls extends ExpExpVisitor<Expression>
     return exp;
   }
 
+    @Override
+    public void visitDefaultArgs(LambdaExp exp, Expression d) {
+        for (Declaration p = exp.firstDecl(); p != null; p = p.nextDecl()) {
+            Expression init = p.getInitValue();
+            if (init != null)
+                p.setInitValue(visitAndUpdate(init, init));
+        }
+    }
+
   final void visitLambdaExp (LambdaExp exp)
   {
     LambdaExp parent = currentLambda;
@@ -281,8 +294,23 @@ public class FindTailCalls extends ExpExpVisitor<Expression>
     try
       {
         visitDefaultArgs(exp, exp);
+
+        Expression bodyContinuation;
+        if (exp.getInlineOnly()) {
+            bodyContinuation = new QuoteExp(null);
+            if (exp.returnContinuation instanceof ApplyExp) {
+                ApplyExp expContinuation = (ApplyExp) exp.returnContinuation;
+                if (expContinuation.isTailCall()
+                    && exp.getFlag(LambdaExp.PASSES_TAILCALLS)
+                    && expContinuation.context != null)
+                    bodyContinuation = expContinuation.context;
+            }
+        }
+        else
+            bodyContinuation = exp;
+         
 	if (exitValue == null && exp.body != null)
-	  exp.body = exp.body.visit(this, exp.getInlineOnly() ? exp : exp.body);
+            exp.body = exp.body.visit(this,bodyContinuation);
       }
     finally
       {

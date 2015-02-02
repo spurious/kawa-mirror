@@ -407,4 +407,66 @@ public class FindTailCalls extends ExpExpVisitor<Expression>
     exp.body = exp.body.visit(this, exp.body);
     return exp;
   }
+
+    static Expression checkInlineable(LambdaExp current,
+                                      java.util.Set<LambdaExp> seen) {
+        Expression r = current.returnContinuation;
+        if (r == LambdaExp.unknownContinuation || seen.contains(current))
+            return r;
+        if (current.getCanRead()
+            || current.isClassMethod()
+            || current.getFlag(LambdaExp.CANNOT_INLINE)
+            || Compilation.avoidInline(current)
+            || current.min_args != current.max_args) {
+            r = LambdaExp.unknownContinuation;
+            current.returnContinuation = r;
+            return r;
+        }
+        seen.add(current);
+        if (current.tailCallers != null) {
+            for (LambdaExp p : current.tailCallers) {
+                Expression t = checkInlineable(p, seen);
+                if (t == LambdaExp.unknownContinuation) {
+                    if (r == null || r == p.body) {
+                        // Can't inline p in current, but maybe we can
+                        // inline current in p
+                        r = p.body;
+                        current.inlineHome = p;
+                    } else {
+                        current.returnContinuation = t;
+                        return t;
+                    }
+                } else if (r == null) {
+                    r = t;
+                } else if (t != null && r != t) {
+                    r = LambdaExp.unknownContinuation;
+                    current.returnContinuation = r;
+                    return r;
+                }
+            }
+        }
+        return r;
+    }
+
+    static void checkInlineable(LambdaExp exp) {
+        java.util.Set<LambdaExp> seen = new java.util.LinkedHashSet<LambdaExp>();
+        Expression caller = checkInlineable(exp, seen);
+        if (caller != LambdaExp.unknownContinuation) {
+            exp.setInlineOnly(true);
+            if (exp.inlineHome == null) {
+                exp.inlineHome = exp.outerLambda();
+            }
+        }
+        for (LambdaExp child = exp.firstChild; child != null;
+             child = child.nextSibling) {
+            checkInlineable(child);
+        }
+    }
+
+    @Override
+    protected Expression visitModuleExp(ModuleExp exp, Expression returnContinuation) {
+        Expression ret = super.visitModuleExp(exp, returnContinuation);
+        checkInlineable(exp);
+        return ret;
+    }
 }

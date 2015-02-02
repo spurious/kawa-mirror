@@ -48,7 +48,7 @@ public class XQResolveNames extends ResolveNames
   /** Code number for the special <code>doc-available</code> function. */
   public static final int DOC_AVAILABLE_BUILTIN = -10;
 
-  /** Code number for the special <code>doc-available</code> function. */
+  /** Code number for the special <code>base-uri</code> function. */
   public static final int BASE_URI_BUILTIN = -11;
 
   /** Code number for the special <code>ressolve-uri</code> function. */

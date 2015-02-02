@@ -1,5 +1,14 @@
 2015-02-02  Per Bothner  <per@bothner.com>
 
+	* FindTailCalls.java (checkInlineable): Set inlineHome only after
+	we're checked all the tailCallers.
+	(visitApplyExp): Minor tweaks.
+	(checkInlineCycle): New static method.
+	* LambdaExp.java (declareClosureEnv): Better inline handling.
+	(compile): Follow inlining.
+
+2015-02-02  Per Bothner  <per@bothner.com>
+
 	* FindCapturedVars.java (checkInlineable): Move method to ...
 	* FindTailCalls.java: ... here.
 	(visitModuleExp): Call checkInlineable here, at end of pass.

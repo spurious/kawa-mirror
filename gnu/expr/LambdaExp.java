@@ -500,14 +500,11 @@ public class LambdaExp extends ScopeExp {
                     closureEnv.setParameter(true);
                 }
             } else {
-                Variable parentFrame = parent.heapFrame != null ?  parent.heapFrame
+                while (parent.getInlineOnly() && parent.heapFrame == null)
+                    parent = parent.getCaller();
+
+                closureEnv = parent.heapFrame != null ?  parent.heapFrame
                     : parent.closureEnv;
-                if (inlinedIn(parent))
-                    closureEnv = parentFrame;
-                else {
-                    closureEnv = new Variable(CLOSURE_ENV_NAME, parentFrame.getType());
-                    getVarScope().addVariable(closureEnv);
-                }
             }
         }
         return closureEnv;
@@ -779,6 +776,8 @@ public class LambdaExp extends ScopeExp {
                     code.emitGetStatic(field);
                 else {
                     LambdaExp parent = comp.curLambda;
+                    while (parent.getInlineOnly() && parent.heapFrame == null)
+                        parent = parent.outerLambda();
                     Variable frame
                         = parent.heapFrame != null ? parent.heapFrame
                         : parent.closureEnv;

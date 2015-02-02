@@ -1,3 +1,8 @@
+2015-02-02  Seth Alves <alves@hungry.com>
+
+	* inline1.scm: New test - use to cuase VerifyError.
+	* Makefile.am (SCRIPTS_TO_RUN): Update accordingly.
+
 2015-02-01  Per Bothner  <per@bothner.com>
 
 	* inlining-test.scm (mmemq): Test tail-recursion through TypeSwitch.

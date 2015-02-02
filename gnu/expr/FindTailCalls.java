@@ -35,8 +35,9 @@ import java.util.HashMap;
  * If {@code h} calls {@code g}, then {@code h==f || h.inlinedIn(f)}.
  * In addition all calls must have the same {@code returnContinuation}.
  * <p>
- * This analysis is done in two parts: First this {@code FindTailCalls}
- * visitor, and it is finished in {@code FindCapturedVars#checkInlineable}.
+ * This analysis is done in two parts: First the main expression-walker,
+ * and at the end (in {@code visitModuleExp}) we check each procedure
+ * using the data from the main pass.
  * <p>
  * When this vistor is done, it has set the {@code returnContinuation},
  * {@code tailCallers}, and {@code inlineHome} fields of a {@code LambdaExp}.
@@ -134,7 +135,7 @@ public class FindTailCalls extends ExpExpVisitor<Expression>
     if (lexp != null)
       {
         if (lexp.returnContinuation == returnContinuation) ; // OK
-        else if (lexp == currentLambda && inTailContext)
+        else if (lexp == effectiveLambda && inTailContext)
           ; // (Self-)tail-recursion is OK.
         else if (inTailContext)
           {
@@ -143,7 +144,8 @@ public class FindTailCalls extends ExpExpVisitor<Expression>
               lexp.tailCallers = new java.util.LinkedHashSet();
             lexp.tailCallers.add(effectiveLambda);
           }
-        else if (lexp.returnContinuation == null)
+        else if (lexp.returnContinuation == null
+                 && ! effectiveLambda.nestedIn(lexp))
           {
             lexp.returnContinuation = returnContinuation;
             lexp.inlineHome = effectiveLambda;
@@ -408,6 +410,14 @@ public class FindTailCalls extends ExpExpVisitor<Expression>
     return exp;
   }
 
+    static boolean checkInlineCycle(LambdaExp from, LambdaExp to) {
+        for (LambdaExp x = from; x != null; x = x.inlineHome) {
+            if (x == to)
+                return true;
+        }
+        return false;
+    }
+
     static Expression checkInlineable(LambdaExp current,
                                       java.util.Set<LambdaExp> seen) {
         Expression r = current.returnContinuation;
@@ -427,11 +437,9 @@ public class FindTailCalls extends ExpExpVisitor<Expression>
             for (LambdaExp p : current.tailCallers) {
                 Expression t = checkInlineable(p, seen);
                 if (t == LambdaExp.unknownContinuation) {
-                    if (r == null || r == p.body) {
-                        // Can't inline p in current, but maybe we can
-                        // inline current in p
-                        r = p.body;
-                        current.inlineHome = p;
+                    if ((r == null || r == p)
+                        && ! p.nestedIn(current)) {
+                        r = p;
                     } else {
                         current.returnContinuation = t;
                         return t;
@@ -443,6 +451,32 @@ public class FindTailCalls extends ExpExpVisitor<Expression>
                     current.returnContinuation = r;
                     return r;
                 }
+            }
+        }
+        if (r != LambdaExp.unknownContinuation) {
+            if (current.inlineHome != null) {
+                if (checkInlineCycle(current.inlineHome, current)) {
+                    r = LambdaExp.unknownContinuation;
+                    current.returnContinuation = r;
+                }
+            }
+            else {
+                LambdaExp x = null;
+                if (current.returnContinuation instanceof ApplyExp)
+                    x = ((ApplyExp) current.returnContinuation).context;
+                else if (current.returnContinuation instanceof LambdaExp)
+                    x = (LambdaExp) current.returnContinuation;
+                if (x != null && ! checkInlineCycle(x, current))
+                    current.inlineHome = x;
+                else if (current.tailCallers != null) {
+                    for (LambdaExp p : current.tailCallers) {
+                        if (! checkInlineCycle(p, current)) {
+                            current.inlineHome = p;
+                            break;
+                        }
+                    }
+                } else
+                    r = LambdaExp.unknownContinuation;
             }
         }
         return r;

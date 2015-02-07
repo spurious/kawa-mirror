@@ -815,7 +815,7 @@
 
 ;; Savannah bug #26940 "Compiler stuck in endless loop"
 ;; Reported by Helmut Eller
-(define (mutual-tailcals x)
+(define (mutual-tailcalls x)
   ;; Note that the order of the functions is reversed relative to the
   ;; Savannah bug report, because I recently fixed the implementation of
   ;; the letrec macro, which used to create declarations in reverse order.
@@ -823,7 +823,7 @@
            (f1 (lambda () (if (= x 0) (f0) (f2))))
 	   (f2 (lambda () (if (= x 0) (f1) 0))))
     (f2)))
-(test 0 mutual-tailcals 4)
+(test 0 mutual-tailcalls 4)
 
 ;; Savannah bug #24249 "Local define miscompiled"
 (let ()

@@ -1,3 +1,8 @@
+2015-02-07  Per Bothner  <per@bothner.com>
+
+	* FindTailCalls.java (checkInlineable): Do checkInlineCycle
+	before setting inlineHome.
+
 2015-02-02  Per Bothner  <per@bothner.com>
 
 	* FindTailCalls.java (checkInlineable): Set inlineHome only after

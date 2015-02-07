@@ -488,7 +488,10 @@ public class FindTailCalls extends ExpExpVisitor<Expression>
         if (caller != LambdaExp.unknownContinuation) {
             exp.setInlineOnly(true);
             if (exp.inlineHome == null) {
-                exp.inlineHome = exp.outerLambda();
+                LambdaExp outer = exp.outerLambda();
+                if (! checkInlineCycle(outer, exp)) {
+                    exp.inlineHome = outer;
+                }
             }
         }
         for (LambdaExp child = exp.firstChild; child != null;

@@ -1,5 +1,10 @@
 2015-02-07  Per Bothner  <per@bothner.com>
 
+	* FindCapturedVars.java (capture): Enable lambda lifting, after
+	fixing some problems.
+
+2015-02-07  Per Bothner  <per@bothner.com>
+
 	* FindTailCalls.java (checkInlineable): Do checkInlineCycle
 	before setting inlineHome.
 

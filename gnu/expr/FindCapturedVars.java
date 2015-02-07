@@ -372,8 +372,7 @@ public class FindCapturedVars extends ExpExpVisitor<Void>
             //   (f y a)
             // This can avoid the need for creating a closure.
             if (rexp != null
-                && false // FIXME - doesn't quite work yesy
-                && decl.nvalues == 1
+                && decl.nvalues == 1 && ! decl.hasUnknownValue()
                 && ! (decl.getValueRaw() instanceof LambdaExp)
                 // don't confuse call/cc inlining (over-conservative )
                 && ! decl.getFlag(Declaration.DONT_COPY)
@@ -398,12 +397,19 @@ public class FindCapturedVars extends ExpExpVisitor<Void>
                     curLambda.max_args++;
                     for (ApplyExp exp = curLambda.nameDecl.firstCall;
                          exp != null;  exp = exp.nextCall) {
+                        LambdaExp context = exp.context;
                         Expression[] args = exp.getArgs();
                         Expression[] nargs = new Expression[args.length+1];
                         boolean recursive = exp.context == curLambda;
-                        nargs[0] = new ReferenceExp(recursive ? ndecl : decl);
+                        ReferenceExp ref =
+                            new ReferenceExp(recursive ? ndecl : decl);
+                        nargs[0] = ref;
                         System.arraycopy(args, 0, nargs, 1, args.length);
                         exp.setArgs(nargs);
+                        LambdaExp saveLambda = currentLambda;
+                        currentLambda = context;
+                        capture(decl, ref);
+                        currentLambda = saveLambda;
                     }
                 }
                 rexp.setBinding(ndecl);

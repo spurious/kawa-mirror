@@ -445,11 +445,12 @@ public class LambdaExp extends ScopeExp {
      * outer.  Usually the same as (this.outerLambdaNotInline()==outer),
      * except in the case that outer.getInlineOnly(). */
     boolean inlinedIn(LambdaExp outer) {
-        for (LambdaExp exp = this; exp.getInlineOnly(); exp = exp.getCaller()) {
+        for (LambdaExp exp = this; ; exp = exp.getCaller()) {
             if (exp == outer)
                 return true;
+            if (! exp.getInlineOnly())
+                return false;
         }
-        return false;
     }
 
     /** For an INLINE_ONLY function, return the function it gets inlined in. */
@@ -1271,9 +1272,6 @@ public class LambdaExp extends ScopeExp {
         int line = getLineNumber();
         if (line > 0)
             code.putLineNumber(getFileName(), line);
-
-        if (heapFrame != null)
-            heapFrame.allocateLocal(code);
     }
 
     static Method searchForKeywordMethod3;
@@ -1330,7 +1328,9 @@ public class LambdaExp extends ScopeExp {
                     code.emitLoad(closureEnv);
                     code.emitPutField(staticLinkField);
                 }
+                heapFrame.allocateLocal(code);
                 code.emitStore(heapFrame);
+                code.pushAutoPoppableScope().addVariable(heapFrame);
             }
         }
 

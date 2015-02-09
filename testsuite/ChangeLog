@@ -1,10 +1,15 @@
+2015-02-09 Seth Alves <alves@hungry.com>
+
+	* inline2.scm: New test - used to cause VerifyError.
+	* Makefile.am (SCRIPTS_TO_RUN): Update accordingly.
+
 2015-02-07  Per Bothner  <per@bothner.com>
 
 	* misc-test.scm: Rename mutual-tailcals to mutual-tailcalls.
 
 2015-02-02  Seth Alves <alves@hungry.com>
 
-	* inline1.scm: New test - use to cuase VerifyError.
+	* inline1.scm: New test - used to cause VerifyError.
 	* Makefile.am (SCRIPTS_TO_RUN): Update accordingly.
 
 2015-02-01  Per Bothner  <per@bothner.com>

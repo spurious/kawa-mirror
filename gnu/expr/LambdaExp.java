@@ -501,10 +501,9 @@ public class LambdaExp extends ScopeExp {
                     closureEnv.setParameter(true);
                 }
             } else {
-                while (parent.getInlineOnly() && parent.heapFrame == null)
-                    parent = parent.getCaller();
-
-                closureEnv = parent.heapFrame != null ?  parent.heapFrame
+                closureEnv =
+                    parent.heapFrame != null && parent == outerLambda()
+                    ? parent.heapFrame
                     : parent.closureEnv;
             }
         }

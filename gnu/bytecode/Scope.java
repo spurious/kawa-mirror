@@ -186,4 +186,9 @@ public class Scope
 	  }
       }
   }
+
+    /* DEBUG
+    static int counter; int id=++counter;
+    public String toString() { return "Scope#"+id; }
+    */
 }

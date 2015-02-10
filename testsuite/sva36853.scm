@@ -1,6 +1,6 @@
 (module-compile-options warn-as-error: #t)
 
-(define (my-member (key String) (strings java.util.List[String]))
+(define (my-member (key::String) (strings::java.util.List[String]))
   (let ((iter (strings:iterator)))
     (let loop ()
       (if (iter:hasNext)

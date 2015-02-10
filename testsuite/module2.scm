@@ -45,7 +45,7 @@
     diff))
 
 ;; Testcase from Jocelyn Paine
-(define (make-boolean-literal (boolean <boolean>)) :: <list>
+(define (make-boolean-literal (boolean ::<boolean>)) :: <list>
   (list 'boolean boolean))
 (define (make-literal value) :: <list>
   (cond

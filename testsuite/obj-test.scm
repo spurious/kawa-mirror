@@ -86,7 +86,7 @@
 				  (object (<java.lang.Object>
 					   <java.awt.event.ItemListener>)
 					  ((itemStateChanged
-					    (arg <java.awt.event.ItemEvent>))
+					    (arg::java.awt.event.ItemEvent))
 					   <void>
 					   (display name) 
 					   (newline)))))))
@@ -101,7 +101,7 @@
 			  (let ((listener
 				 (object (<java.lang.Object>
 					  <java.awt.event.ItemListener>) 
-					 ((itemStateChanged (arg <java.awt.event.ItemEvent>)) 
+					 ((itemStateChanged (arg::java.awt.event.ItemEvent)) 
 					  <void> 
 					  (display "listener of checkbutton ") 
 					  (display c-name) 

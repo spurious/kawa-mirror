@@ -1,5 +1,5 @@
 ;; From Savannah bug #36863 "then clause grows stack with no else clause"
-(define (first (iterable java.lang.Iterable))
+(define (first (iterable ::java.lang.Iterable))
   (let ((f (lambda (x) #t))
 	(iter (iterable:iterator)))
     (let loop ()
@@ -11,7 +11,7 @@
 	  #f))))
 
 ;; These are variations, with different bodies for the function f.
-(define (no-match (iterable java.lang.Iterable))
+(define (no-match (iterable ::java.lang.Iterable))
   (let ((f (lambda (x) #f))
 	(iter (iterable:iterator)))
     (let loop ()
@@ -22,7 +22,7 @@
 		(loop)))
 	  #f))))
 
-(define (odd-match (iterable java.lang.Iterable))
+(define (odd-match (iterable ::java.lang.Iterable))
   (let ((f (lambda (x) (odd? x)))
 	(iter (iterable:iterator)))
     (let loop ()

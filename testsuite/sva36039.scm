@@ -6,7 +6,7 @@
              (equal? x y))
            #f))
 
-(define (find-if (i java.lang.Iterable) test default)
+(define (find-if (i ::java.lang.Iterable) test default)
   (let ((iter (invoke i 'iterator))
         (found #f))
     (do ()

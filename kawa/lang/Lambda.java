@@ -169,7 +169,8 @@ public class Lambda extends Syntax
             break;
 	  }
         pair_car = tr.namespaceResolve(pair_car);
-	if (pair_car instanceof Symbol)
+	if (pair_car instanceof Symbol
+            && ! (handlePatterns && mode == null))
           {
             name = pair_car;
             if (pair.getCdr() instanceof Pair
@@ -188,7 +189,8 @@ public class Lambda extends Syntax
                 next = pair.getCdr();
               }
           }
-	else if (pair_car instanceof Pair)
+	else if (pair_car instanceof Pair
+                 && ! (handlePatterns && mode == null))
 	  {
 	    p = (Pair) pair_car;
 	    pair_car = p.getCar();
@@ -254,17 +256,33 @@ public class Lambda extends Syntax
 				       + name + '\''+" after type "+p.getCar());
 			break;
 		      }
+                    tr.error('w', "deprecated type specifier syntax - use (VAR :: TYPE) rather than (VAR TYPE)");
 		  }
 	      }
 	  }
         Declaration decl;
-        if (handlePatterns) {
+        if (handlePatterns && mode == null) {
             p = (Pair) pair;
             pair_car = p.getCar();
-            Object[] r = BindDecls.parsePatternCar((Pair) pair_car, lexp, tr);
-            //next = r[0];
+            boolean extraParens = false;
+            if (pair_car instanceof Pair) {
+                Object pair_car_cdr = ((Pair) pair_car).getCdr();
+                if (pair_car_cdr instanceof Pair
+                    && tr.matches(((Pair) pair_car_cdr).getCar(), "::"))
+                    extraParens = true;
+            }
+            Object[] r = BindDecls.parsePatternCar(extraParens ? (Pair) pair_car : p, lexp, tr);
+            if (! extraParens)
+                next = r[0];
+            else if (r[0] != LList.Empty) {
+                Object savePos1 = tr.pushPositionOf(r[0]);
+                tr.syntaxError("junk at end of specifier for parameter");
+                tr.popPositionOf(savePos1);
+            }
             decl = (Declaration) r[1];
-            name = decl.getSymbol();
+            if (decl == null)
+                decl = new Declaration("<error>");
+            name = decl == null ? null : decl.getSymbol();
         } else {
             if (name == null) {
                 tr.syntaxError ("parameter is neither name nor (name :: type) nor (name default)"+": "+pair);
@@ -296,7 +314,7 @@ public class Lambda extends Syntax
 	      decl.setType(LangObjType.listType);
 	  }
         decl.setFlag(Declaration.IS_SINGLE_VALUE);
-        if (! handlePatterns)
+        if (! handlePatterns || mode != null)
             addParam(decl, templateScope, lexp, tr);
 	tr.popPositionOf(savePos);
       }
@@ -347,14 +365,16 @@ public class Lambda extends Syntax
       lexp.keywords = keywords.toArray(new Keyword[keywords.size()]);
   }
 
-  protected static void addParam (Declaration decl, ScopeExp templateScope,
-				  LambdaExp lexp, Translator tr)
+  protected void addParam (Declaration decl, ScopeExp templateScope,
+                           LambdaExp lexp, Translator tr)
   {
     if (templateScope != null)
       decl = tr.makeRenamedAlias(decl, templateScope);
     lexp.addDeclaration(decl);
     if (templateScope != null)
       decl.context = templateScope;
+    if (handlePatterns)
+        tr.push(decl);
   }
 
   public Object rewriteAttrs(LambdaExp lexp, Object body, Translator tr)

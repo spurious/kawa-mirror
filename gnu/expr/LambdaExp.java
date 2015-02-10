@@ -1811,7 +1811,8 @@ public class LambdaExp extends ScopeExp {
             i = -1;
         for (; decl != null;  decl = decl.nextDecl()) {
             Special mode;
-            if (i < min_args)
+            if (i < min_args
+                || (i == min_args && decl.getFlag(Declaration.PATTERN_NESTED)))
                 mode = null;
             else if (i < min_args + opt_args)
                 mode = Special.optional;
@@ -1825,9 +1826,7 @@ public class LambdaExp extends ScopeExp {
                 out.print(mode);
                 out.writeSpaceFill();
             }
-            Expression defaultArg = null;
-            if (mode == Special.optional || mode == Special.key)
-                defaultArg = decl.getInitValue();
+            Expression defaultArg = decl.getInitValue();
             if (defaultArg != null)
                 out.print('(');
             decl.printInfo(out);
@@ -1836,7 +1835,8 @@ public class LambdaExp extends ScopeExp {
                 defaultArg.print(out);
                 out.print(')');
             }
-            i++;
+            if (decl.getFlag(Declaration.IS_PARAMETER))
+                i++;
             prevMode = mode;
         }
         out.endLogicalBlock(")");

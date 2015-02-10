@@ -1,5 +1,7 @@
 2015-02-09  Per Bothner  <per@bothner.com>
 
+	* LambdaExp.java (print): Add support for patterns.
+
 	* LambdaExp.java (declareClosureEnv): Only use parent's heapFrame
 	if parent is outer.
 

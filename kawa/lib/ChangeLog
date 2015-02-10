@@ -1,5 +1,7 @@
 2015-02-09  Per Bothner  <per@bothner.com>
 
+	* prim_syntax.scm (if): Update for mlambda syntax change.
+
 	* characters.scm: Update to use new type specifier syntax.
 	* lists.scm: Likewise.
 	* misc.scm: Likewise.

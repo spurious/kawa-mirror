@@ -9,7 +9,7 @@
 (define (vector-length x :: <vector>) :: <int>
   (invoke x 'size))
 
-(define (vector-set! (vector <vector>) (k <int>) obj) :: <void>
+(define (vector-set! (vector ::vector) (k ::int) obj) :: <void>
   (invoke vector 'set k obj))
 
 (define-procedure vector-ref

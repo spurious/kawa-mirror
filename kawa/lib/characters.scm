@@ -8,7 +8,7 @@
   validate-apply: "kawa.lib.compile_misc:charToIntegerValidateApply"
   (as int ch))
 
-(define (integer->char (n <int>)) ::character
+(define (integer->char n::int) ::character
   validate-apply: "kawa.lib.compile_misc:integerToCharValidateApply"
   (as character n))
 

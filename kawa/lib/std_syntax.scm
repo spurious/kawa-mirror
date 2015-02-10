@@ -119,9 +119,9 @@
 (define-syntax %let-lambda1
   (syntax-rules (::)
 		((%let-lambda1 ((var type init) . in) out body)
-		 (%let-lambda1 in ((var type) . out) body))
+		 (%let-lambda1 in ((var :: type) . out) body))
 		((%let-lambda1 ((var :: type init) . in) out body)
-		 (%let-lambda1 in ((var type) . out) body))
+		 (%let-lambda1 in ((var :: type) . out) body))
 		((%let-lambda1 ((var init) . in) out body)
 		 (%let-lambda1 in (var . out) body))
 		((%let-lambda1 () out body)

@@ -83,7 +83,7 @@
      (C:restore-current saved-comp))))
 
 ;; Given an Expresssion try to reconstruct the corresponding Sexp.
-(define (unrewrite (exp <gnu.expr.Expression>))
+(define (unrewrite (exp ::gnu.expr.Expression))
   (typecase exp
     (<gnu.expr.LetExp> (unrewrite-let exp))
     (<gnu.expr.QuoteExp> (unrewrite-quote exp))
@@ -103,7 +103,7 @@
 		  (list (unrewrite eclause))))))
     (#t exp)))
 
-(define (unrewrite-arglist (exp <gnu.expr.LambdaExp>))
+(define (unrewrite-arglist (exp ::gnu.expr.LambdaExp))
   (let* ((min (|@| min_args exp))
 	 (rest? (negative? (|@| max_args exp)))
 	 (key? (not (eq? (|@| keywords exp) #!null)))
@@ -138,14 +138,14 @@
       ,@(cond (key? `(#!key . ,(reverse key)))
 	      (#t '())))))
 
-(define (unrewrite* (exps <gnu.expr.Expression[]>))
+(define (unrewrite* (exps ::gnu.expr.Expression[]))
   (packing (pack)
     (do ((len (|@| length exps))
 	 (i 0 (+ i 1)))
 	((= i len))
       (pack (unrewrite (exps i))))))
 
-(define (unrewrite-let (exp <gnu.expr.LetExp>))
+(define (unrewrite-let (exp ::gnu.expr.LetExp))
   `(let ,(packing (pack)
            (do ((decl :: <gnu.expr.Declaration> 
 		      (! first-decl exp) (! next-decl decl))
@@ -155,7 +155,7 @@
                          (unrewrite (! getInitValue decl))))))
      ,(unrewrite (|@| body exp))))
 
-(define (unrewrite-quote (exp <gnu.expr.QuoteExp>))
+(define (unrewrite-quote (exp ::gnu.expr.QuoteExp))
   (let ((val (|@| value exp))
         (type-name (lambda (name) (string->symbol (format "<~a>" name)))))
     (typecase val
@@ -166,7 +166,7 @@
       (<java.lang.Class> (type-name (! get-name val)))
       (#t `(quote ,val)))))
 
-(define (unrewrite-apply (exp <gnu.expr.ApplyExp>))
+(define (unrewrite-apply (exp ::gnu.expr.ApplyExp))
   (let* ((fun (! get-function exp))
          (args (unrewrite* (! get-args exp)))
          (fbinding (typecase fun

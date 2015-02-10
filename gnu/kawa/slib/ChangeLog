@@ -1,3 +1,7 @@
+2015-02-09  Per Bothner  <per@bothner.com>
+
+	* syntaxutils.scm: Update to use new type specifier syntax.
+
 2014-12-28  Per Bothner  <per@bothner.com>
 
 	* receive.scm: New file.

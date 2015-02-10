@@ -1,3 +1,16 @@
+2015-02-09  Per Bothner  <per@bothner.com>
+
+	* characters.scm: Update to use new type specifier syntax.
+	* lists.scm: Likewise.
+	* misc.scm: Likewise.
+	* numbers.scm: Likewise.
+	* ports.scm: Likewise.
+	* prim_syntax.scm: Likewise.
+	* reflection.scm: Likewise.
+	* std_syntax.scm: Likewise.
+	* strings.scm: Likewise.
+	* vectors.scm: Likewise.
+
 2015-01-29  Per Bothner  <per@bothner.com>
 
 	* compile_map.scm (validate-generic-for-each): New procedure.

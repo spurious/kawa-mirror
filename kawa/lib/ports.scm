@@ -128,7 +128,7 @@
 (define (open-output-string) :: <string-output-port>
   (<string-output-port>))
 
-(define (get-output-string (output-port  <string-output-port>))
+(define (get-output-string (output-port :: <string-output-port>))
   (<gnu.lists.FString> (output-port:toCharArray)))
 
 (define (open-input-bytevector (bvector ::bytevector))

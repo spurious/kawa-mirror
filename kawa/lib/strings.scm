@@ -82,7 +82,7 @@
 (define-compare string<=? string <= %string-compare2)
 (define-compare string>=? string >= %string-compare2)
 
-(define (substring (str <string>) (start <int>) (end <int>))
+(define (substring str::<string> start::<int> end::<int>)
   :: <string>
   (with-start-end str (start end) (istart iend)
                   (gnu.lists.FString str istart (- iend istart))))

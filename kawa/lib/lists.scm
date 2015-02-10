@@ -20,10 +20,10 @@
 (define (null? x) :: <boolean>
   (eq? (gnu.mapping.Promise:force x) '()))
 
-(define (set-car! (p <pair>) x)
+(define (set-car! (p ::pair) x)
   (set! p:car x))
 
-(define (set-cdr! (p <pair>) x)
+(define (set-cdr! (p ::pair) x)
   (set! p:cdr x))
 
 (define-procedure car

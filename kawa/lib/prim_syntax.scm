@@ -116,12 +116,12 @@
       ((_ (? pattern :: type init) then else)
        #`(#,gnu.kawa.reflect.TypeSwitch:typeSwitch
           init
-          (mlambda ((pattern :: type)) then)
+          (mlambda (pattern :: type) then)
           (lambda (unused) else)))
       ((_ (? pattern init) then else)
        #`(#,gnu.kawa.reflect.TypeSwitch:typeSwitch
           init
-          (mlambda ((pattern)) then)
+          (mlambda (pattern) then)
           (lambda (unused) else)))
       ((_ test then)
        (make <gnu.expr.IfExp>

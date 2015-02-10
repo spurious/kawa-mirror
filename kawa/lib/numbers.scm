@@ -426,7 +426,7 @@
   :: <integer>
   (invoke-static <gnu.math.BitOps> 'extract i start end))
 
-(define (bitwise-if (e1 :: integer) (e2 :: integer) (e3  integer)) :: integer
+(define (bitwise-if (e1 :: integer) (e2 :: integer) (e3 :: integer)) :: integer
   (gnu.math.BitOps:ior (gnu.math.BitOps:and e1 e2)
 		       (gnu.math.BitOps:and (gnu.math.BitOps:not e1) e3)))
 

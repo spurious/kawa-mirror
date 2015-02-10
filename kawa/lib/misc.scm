@@ -29,7 +29,7 @@
 (define (symbol? x) :: <boolean>
   (instance? x <gnu.mapping.Symbol>))
 
-(define (symbol->string (s <symbol>)) :: constant-string
+(define (symbol->string (s::<symbol>)) :: constant-string
   (s:toString))
 
 (define (symbol=? s1::symbol s2::symbol #!rest r)::boolean
@@ -54,7 +54,7 @@
 (define (namespace-prefix (ns::gnu.mapping.Namespace)) ::string
   (invoke ns 'getPrefix))
 
-(define (string->symbol (str <string>))
+(define (string->symbol (str ::string))
   (gnu.mapping.SimpleSymbol:valueOf (str:toString)))
 
 (define (procedure? x) :: <boolean>

@@ -271,7 +271,7 @@ public class Lambda extends Syntax
                     && tr.matches(((Pair) pair_car_cdr).getCar(), "::"))
                     extraParens = true;
             }
-            Object[] r = BindDecls.parsePatternCar(extraParens ? (Pair) pair_car : p, lexp, tr);
+            Object[] r = BindDecls.instance.parsePatternCar(extraParens ? (Pair) pair_car : p, lexp, tr);
             if (! extraParens)
                 next = r[0];
             else if (r[0] != LList.Empty) {

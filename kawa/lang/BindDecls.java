@@ -12,11 +12,29 @@ import gnu.kawa.lispexpr.LispLanguage;
 /** Methods for parsing patterns. */
 
 public class BindDecls {
+    public static final BindDecls instance = new BindDecls();
+
+    public boolean allowShadowing = false;
+
+    public boolean makeConstant = true;
+
     static final Symbol underScoreSymbol = Symbol.valueOf("_");
 
-    public static Object[] parsePatternCar(Pair patList,
-                                         ScopeExp scope,
-                                         Translator comp) {
+    public Declaration define(Symbol name, SyntaxForm nameSyntax,
+                              ScopeExp scope, Translator comp) {
+        Declaration oldDecl = comp.lexical.lookup(name, false);
+        Declaration decl = comp.define(name, nameSyntax, scope);
+        if (! allowShadowing
+            && oldDecl != null && oldDecl.context != scope) {
+            comp.error('w', decl, "new declaration '", "' shadows old declaration");
+            comp.error('w', oldDecl, "(this is the previous declaration of '", "')");
+        }
+        return decl;
+    }
+
+    public Object[] parsePatternCar(Pair patList,
+                                    ScopeExp scope,
+                                    Translator comp) {
         Object next = patList.getCdr();
         Type type = null;
         if (next instanceof Pair) {
@@ -51,19 +69,15 @@ public class BindDecls {
             if (patval == underScoreSymbol) {
                 decl = scope.addDeclaration((Object) null);
             } else {
-                Declaration oldDecl = comp.lexical.lookup(patval, false);
-                decl = comp.define(patval, nameSyntax, scope);
-                if (oldDecl != null && oldDecl.context != scope) {
-                    comp.error('w', decl, "new declaration '", "' shadows old declaration");
-                    comp.error('w', oldDecl, "(this is the previous declaration of '", "')");
-                }
+                decl = define((Symbol) patval, nameSyntax, scope, comp);
                 Translator.setLine(decl, patList);
             }
             if (scope instanceof ModuleExp
                 && (patval == underScoreSymbol
                     || ! scope.getFlag(ModuleExp.INTERACTIVE)))
                 decl.setPrivate(true);
-            decl.setFlag(Declaration.IS_CONSTANT);
+            if (makeConstant)
+                decl.setFlag(Declaration.IS_CONSTANT);
             decl.setFlag(Declaration.IS_SINGLE_VALUE);
         }
         else if (pattern instanceof Pair) {
@@ -94,7 +108,7 @@ public class BindDecls {
 
     /** Handle patterns of the form {@code [pat1 ... patN]}.
      */
-    public static void parseBracketListPattern
+    public void parseBracketListPattern
         (Pair patpair, ScopeExp scope, Declaration decl, Translator comp) {
         ClassType listType = ClassType.make("java.util.List");
         decl.setFlag(Declaration.SKIP_FOR_METHOD_PARAMETER);
@@ -129,7 +143,7 @@ public class BindDecls {
         decl.setType(type);
     }
 
-    private static void setInitializer(Declaration decl, Expression init, ScopeExp scope, Translator comp) {
+    private void setInitializer(Declaration decl, Expression init, ScopeExp scope, Translator comp) {
         if ((scope instanceof ModuleExp)
             // scope is a <body> (artificial LetExp allocated in rewrite_body)
             || (scope instanceof LetExp && scope.firstDecl() == null)) {

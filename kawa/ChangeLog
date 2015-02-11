@@ -1,5 +1,14 @@
 2015-02-11  Per Bothner  <per@bothner.com>
 
+	Implement support for patterns in 'let'.
+	* lang/BindDecls.java: Make the methods non-static.
+	(instance): New static fields.
+	(allowShadowing, makeConstant): New fields to control variants.
+	(define): New overridable method.
+	* lang/Lambda.java (rewriteFormals): Use BindDecls.instance.
+	* standard/MatchDef.java (scanDecls): Likewise.
+	* standard/let.java: Rewrite to use BindDecls.
+
 	* lang/Translator.java (renamedAliasCount): New helper method.
 
 2015-02-09  Per Bothner  <per@bothner.com>

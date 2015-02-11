@@ -1610,8 +1610,7 @@ public class Translator extends Compilation
     // This is confusing, at the least.  FIXME.
     Object saved = pushPositionOf(exp);
     LetExp defs = new LetExp();
-    int renamedAliasOldSize =
-        renamedAliasStack == null ? 0 : renamedAliasStack.size();
+    int renamedAliasOldSize = renamedAliasCount();
     Pair first = formStack.last;
     defs.setOuter(current_scope);
     current_scope = defs;
@@ -1630,9 +1629,8 @@ public class Translator extends Compilation
               }
           }
         rewriteBody(list);
-        int renamedAliasNewSize =
-            renamedAliasStack == null ? 0 : renamedAliasStack.size();
-        popRenamedAlias((renamedAliasNewSize - renamedAliasOldSize) >> 1);
+        int renamedAliasNewSize = renamedAliasCount();
+        popRenamedAlias(renamedAliasNewSize - renamedAliasOldSize);
 	Expression body = makeBody(first, null);
 	setLineOf(body);
 	if (ndecls == 0)
@@ -1916,6 +1914,10 @@ public class Translator extends Compilation
     renamedAliasStack.push(old);
     renamedAliasStack.push(alias);
   }
+
+    public int renamedAliasCount() {
+        return renamedAliasStack == null ? 0 : renamedAliasStack.size() >> 1;
+    }
 
   /** Remove one or more aliases created by <code>pushRenamedAlias</code>. */
   public void popRenamedAlias (int count)

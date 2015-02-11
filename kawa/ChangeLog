@@ -1,3 +1,7 @@
+2015-02-11  Per Bothner  <per@bothner.com>
+
+	* lang/Translator.java (renamedAliasCount): New helper method.
+
 2015-02-09  Per Bothner  <per@bothner.com>
 
 	* lang/Lambda.java: Add support for future pattern-matching

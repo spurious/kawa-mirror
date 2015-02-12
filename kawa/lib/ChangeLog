@@ -1,3 +1,9 @@
+2015-02-11  Per Bothner  <per@bothner.com>
+
+	* syntax.scm (let-values): Use syntax-case instead of syntax-rules.
+	This lets us generating "matching" names for the helper variables,
+	rather than calling all of them 'x'.
+
 2015-02-09  Per Bothner  <per@bothner.com>
 
 	* prim_syntax.scm (if): Update for mlambda syntax change.

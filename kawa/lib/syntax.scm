@@ -76,29 +76,33 @@
 ;; This code is in the public domain.
 
 (define-syntax let-values
-  (syntax-rules ()
-    ((let-values (?binding ...) ?body0 ?body1 ...)
-     (let-values "bind" (?binding ...) () (begin ?body0 ?body1 ...)))
-    ((let-values "bind" () ?tmps ?body)
-     (let ?tmps ?body))
+  (lambda (form)
+    (syntax-case form ()
+      ((let-values (?binding ...) ?body0 ?body1 ...)
+       #'(let-values "bind" (?binding ...) () (begin ?body0 ?body1 ...)))
+      ((let-values "bind" () ?tmps ?body)
+       #'(let ?tmps ?body))
     
-    ((let-values "bind" ((?b0 ?e0) ?binding ...) ?tmps ?body)
-     (let-values "mktmp" ?b0 ?e0 () (?binding ...) ?tmps ?body))
+      ((let-values "bind" ((?b0 ?e0) ?binding ...) ?tmps ?body)
+       #'(let-values "mktmp" ?b0 ?e0 () (?binding ...) ?tmps ?body))
     
-    ((let-values "mktmp" () ?e0 ?args ?bindings ?tmps ?body)
-     (call-with-values 
-       (lambda () ?e0)
-       (lambda ?args
-         (let-values "bind" ?bindings ?tmps ?body))))
+      ((let-values "mktmp" () ?e0 ?args ?bindings ?tmps ?body)
+       #'(call-with-values 
+           (lambda () ?e0)
+           (lambda ?args
+             (let-values "bind" ?bindings ?tmps ?body))))
     
-    ((let-values "mktmp" (?a . ?b) ?e0 (?arg ...) ?bindings (?tmp ...) ?body)
-     (let-values "mktmp" ?b ?e0 (?arg ... x) ?bindings (?tmp ... (?a x)) ?body))
+      ((let-values "mktmp" (?a . ?b) ?e0 (?arg ...) ?bindings (?tmp ...) ?body)
+       (let ((xvar (datum->syntax #'x (syntax->datum #'?a))))
+         #`(let-values "mktmp" ?b ?e0 (?arg ... #,xvar)
+                       ?bindings (?tmp ... (?a #,xvar)) ?body)))
     
-    ((let-values "mktmp" ?a ?e0 (?arg ...) ?bindings (?tmp ...) ?body)
-     (call-with-values
-       (lambda () ?e0)
-       (lambda (?arg ... . x)
-         (let-values "bind" ?bindings (?tmp ... (?a x)) ?body))))))
+      ((let-values "mktmp" ?a ?e0 (?arg ...) ?bindings (?tmp ...) ?body)
+       (let ((xvar (datum->syntax #'x (syntax->datum #'?a))))
+         #`(call-with-values
+             (lambda () ?e0)
+             (lambda (?arg ... . #,xvar)
+               (let-values "bind" ?bindings (?tmp ... (?a #,xvar)) ?body))))))))
 
 (define-syntax let*-values
   (syntax-rules ()

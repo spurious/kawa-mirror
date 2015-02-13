@@ -15,24 +15,30 @@ import gnu.kawa.reflect.LazyType;
 import gnu.kawa.reflect.MultValuesType;
 import gnu.kawa.servlet.HttpRequestContext;
 
-public class Scheme extends LispLanguage
-{
-  public static final Environment nullEnvironment;
-  public static final Environment r4Environment;
-  public static final Environment r5Environment;
-  public static final Environment r6Environment;
-  protected static final SimpleEnvironment kawaEnvironment;
+public class Scheme extends LispLanguage {
+    public static final int FOLLOW_R5RS = 5;
+    public static final int FOLLOW_R6RS = 6;
+    public static final int FOLLOW_R7RS = 7;
 
-  public static final LangPrimType booleanType;
+    public static final Environment nullEnvironment =
+        Environment.make("null-environment");
+    public static final Environment r4Environment =
+        Environment.make("r4rs-environment", nullEnvironment);
+    public static final Environment r5Environment =
+        Environment.make("r5rs-environment", r4Environment);
+    public static final Environment r6Environment =
+        Environment.make("r6rs-environment", r5Environment);
+    protected static final SimpleEnvironment kawaEnvironment =
+        Environment.make("kawa-environment", r6Environment);
 
-  public static final int FOLLOW_R5RS = 5;
-  public static final int FOLLOW_R6RS = 6;
-  public static final int FOLLOW_R7RS = 7;
+    public static final Scheme instance = new Scheme(kawaEnvironment);
+    public static final Scheme r5rsInstance = newStandardInstance(FOLLOW_R5RS);
+    public static final Scheme r6rsInstance = newStandardInstance(FOLLOW_R6RS);
+    public static final Scheme r7rsInstance = newStandardInstance(FOLLOW_R7RS);
 
-  public static final Scheme instance;
-  private static Scheme r5rsInstance;
-  private static Scheme r6rsInstance;
-  private static Scheme r7rsInstance;
+    public static final LangPrimType booleanType =
+        new LangPrimType(Type.booleanType, instance);
+
   int standardToFollow;
 
   public int getStandardToFollow() { return standardToFollow; }
@@ -63,14 +69,6 @@ public class Scheme extends LispLanguage
     public static final String emptyStringRight = new String();
 
   static {
-    // (null-environment)
-    nullEnvironment = Environment.make("null-environment");
-    r4Environment = Environment.make("r4rs-environment", nullEnvironment);
-    r5Environment = Environment.make("r5rs-environment", r4Environment);
-    r6Environment = Environment.make("r6rs-environment", r5Environment);
-    kawaEnvironment = Environment.make("kawa-environment", r6Environment);
-
-    instance = new Scheme(kawaEnvironment);
     instanceOf = new gnu.kawa.reflect.InstanceOf(instance, "instance?");
     not = new Not(instance, "not");
     applyToArgs = new ApplyToArgs("apply-to-args", instance);
@@ -95,8 +93,6 @@ public class Scheme extends LispLanguage
 
     instance.initScheme();
 
-    booleanType = new LangPrimType(Type.booleanType, instance);
-            
     int withServlets = HttpRequestContext.importServletDefinitions;
     if (withServlets > 0)
       {
@@ -123,26 +119,17 @@ public class Scheme extends LispLanguage
     return instance;
   }
 
-  public static synchronized Scheme getR5rsInstance()
-  {
-    if (r5rsInstance == null)
-      r5rsInstance = newStandardInstance(FOLLOW_R5RS);
-    return r5rsInstance;
-  }
+    public static synchronized Scheme getR5rsInstance() {
+        return r5rsInstance;
+    }
 
-  public static synchronized Scheme getR6rsInstance()
-  {
-    if (r6rsInstance == null)
-      r6rsInstance = newStandardInstance(FOLLOW_R6RS);
-    return r6rsInstance;
-  }
+    public static synchronized Scheme getR6rsInstance() {
+        return r6rsInstance;
+    }
 
-  public static synchronized Scheme getR7rsInstance()
-  {
-    if (r7rsInstance == null)
-      r7rsInstance = newStandardInstance(FOLLOW_R7RS);
-    return r7rsInstance;
-  }
+    public static synchronized Scheme getR7rsInstance() {
+        return r7rsInstance;
+    }
 
   public static Environment builtin ()
   {

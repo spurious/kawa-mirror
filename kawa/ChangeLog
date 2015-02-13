@@ -1,3 +1,13 @@
+2015-02-12  Per Bothner  <per@bothner.com>
+
+	* standard/Scheme.java (r5rsInstance, r6rsInstance, r7rsInstance):
+	Make final and initialize in static initializer.
+	(getR5rsInstance, getR5rsInstance, getR5rsInstance): Simplify
+	accordingly.
+	This fixes Savannah bug #44230 "slot-ref not working in r7rs mode".
+	* standard/Scheme.java: Also some code cleanup/simplification by
+	moving some initialization out of a 'static {...}' block.
+
 2015-02-11  Per Bothner  <per@bothner.com>
 
 	Implement support for patterns in 'let'.

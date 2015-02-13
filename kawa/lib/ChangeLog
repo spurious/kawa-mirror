@@ -1,3 +1,7 @@
+2015-02-12  Per Bothner  <per@bothner.com>
+
+	* syntax.scm (let-values): Simplification/optimization of common case.
+
 2015-02-11  Per Bothner  <per@bothner.com>
 
 	* syntax.scm (let-values): Use syntax-case instead of syntax-rules.

@@ -78,6 +78,12 @@
 (define-syntax let-values
   (lambda (form)
     (syntax-case form ()
+      ;; Optimize the common/simple case.  Not only is macro expansion faster,
+      ;; but (more importantly) the resulting Expression tree is simpler.
+      ((let-values ((formals init)) . body)
+       #'(call-with-values
+             (lambda() init)
+           (lambda formals . body)))
       ((let-values (?binding ...) ?body0 ?body1 ...)
        #'(let-values "bind" (?binding ...) () (begin ?body0 ?body1 ...)))
       ((let-values "bind" () ?tmps ?body)

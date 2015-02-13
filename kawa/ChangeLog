@@ -1,3 +1,8 @@
+2015-02-13  Per Bothner  <per@bothner.com>
+
+	* standard/let.java (rewrite): Mark parameter 'tr' as final.  Java 8
+	recognizes it as "effectively final" but in Java 7 it must be explicit.
+
 2015-02-12  Per Bothner  <per@bothner.com>
 
 	* standard/Scheme.java (r5rsInstance, r6rsInstance, r7rsInstance):

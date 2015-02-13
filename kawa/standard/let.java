@@ -30,7 +30,7 @@ public class let extends Syntax {
     }
 
     @Override
-    public Expression rewrite (Object obj, Translator tr) {
+    public Expression rewrite (Object obj, final Translator tr) {
         final ArrayList<Declaration> decls = new ArrayList<Declaration>();
         final Stack<Declaration> renamedAliases = new Stack<Declaration>();
         // Used to check for duplicate definitions.

@@ -380,7 +380,7 @@ public class InlineCalls extends ExpExpVisitor<Type> {
                     && (dtype == null || dtype == Type.objectType
                         // We could also allow (some) widening conversions.
                         || dtype == rdecl.getType()))
-                    return visitReferenceExp(rval, required);
+                    return visitReferenceExp(new ReferenceExp(rval), required);
             }
             if (dval instanceof ClassExp && processingAnnotations()) {
                 ClassExp cval = (ClassExp) dval;

@@ -76,6 +76,12 @@ public class ReferenceExp extends AccessExp
     this(binding.getSymbol(), binding);
   }
 
+    public ReferenceExp(ReferenceExp old) {
+        this(old.symbol, old.binding);
+        this.setContextDecl(old.contextDecl());
+        this.flags = old.flags;
+    }
+
   protected boolean mustCompile () { return false; }
 
   public final Object valueIfConstant()

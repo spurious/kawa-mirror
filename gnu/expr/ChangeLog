@@ -1,3 +1,9 @@
+2015-02-12  Per Bothner  <per@bothner.com>
+
+	* InlineCalls.java (visitReferenceExp): Make a copy of the ReferenceExp
+	when using the Declaration's value.
+	* ReferenceExp.java: New copy constructor.
+
 2015-02-09  Per Bothner  <per@bothner.com>
 
 	* LambdaExp.java (print): Add support for patterns.

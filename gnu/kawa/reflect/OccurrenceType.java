@@ -293,13 +293,6 @@ public class OccurrenceType extends Type
       
   }
 
-  public void writeExternal(ObjectOutput out) throws IOException
-  {
-    out.writeObject(base);
-    out.writeInt(minOccurs);
-    out.writeInt(maxOccurs);
-  }
-
   public String toString ()
   {
     String b = base.toString();
@@ -330,6 +323,13 @@ public class OccurrenceType extends Type
 	sbuf.append('}');
       }
     return sbuf.toString();
+  }
+
+  public void writeExternal(ObjectOutput out) throws IOException
+  {
+    out.writeObject(base);
+    out.writeInt(minOccurs);
+    out.writeInt(maxOccurs);
   }
 
   public void readExternal(ObjectInput in)

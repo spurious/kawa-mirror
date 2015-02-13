@@ -1,3 +1,9 @@
+2015-02-12  Per Bothner  <per@bothner.com>
+
+	* SingletonType.java: Implement Externalizable.
+	(writeExternal, readExternal, readResolve): New methods.
+	* MultValuesType.java (writeExternal, readExternal): New methods.
+
 2015-02-01  Per Bothner  <per@bothner.com>
 
 	* CompileReflect.java (validateApplyTypeSwitch): Set PASSES_TAILCALLS.

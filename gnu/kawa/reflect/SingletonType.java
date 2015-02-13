@@ -5,8 +5,9 @@ package gnu.kawa.reflect;
 import gnu.bytecode.*;
 import gnu.mapping.*;
 import gnu.expr.*;
+import java.io.*;
 
-public class SingletonType extends ObjectType // implements TypeValue
+public class SingletonType extends ObjectType implements Externalizable //, TypeValue
 {
   static final SingletonType instance = new SingletonType("singleton");
 
@@ -16,6 +17,7 @@ public class SingletonType extends ObjectType // implements TypeValue
   }
 
   public static final SingletonType getInstance () { return instance; }
+  public static final SingletonType valueOf() { return instance; }
 
   public java.lang.Class getReflectClass()
   {
@@ -66,4 +68,14 @@ public class SingletonType extends ObjectType // implements TypeValue
   {
     return obj != null && ! (obj instanceof Values);
   }
+
+    public void writeExternal(ObjectOutput out) throws IOException {
+    }
+
+    public void readExternal(ObjectInput in)  throws IOException, ClassNotFoundException {
+    }
+
+    public Object readResolve() throws ObjectStreamException {
+        return instance;
+    }
 }

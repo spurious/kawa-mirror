@@ -1,6 +1,7 @@
 package gnu.kawa.reflect;
 import gnu.bytecode.*;
 import gnu.expr.Compilation;
+import java.io.*;
 
 public class MultValuesType extends OccurrenceType {
 
@@ -68,4 +69,14 @@ public class MultValuesType extends OccurrenceType {
         return super.compare(other);
     }
 
+    public void writeExternal(ObjectOutput out) throws IOException {
+        out.writeObject(itemTypes);
+    }
+
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        itemTypes = (Type[]) in.readObject();
+        base = SingletonType.instance;
+        minOccurs = itemTypes.length;
+        maxOccurs = itemTypes.length;
+    }
 }

@@ -1,3 +1,9 @@
+2015-02-14  Per Bothner  <per@bothner.com>
+
+	* FindTailCalls.java (checkInlineable): Make sure to null inlineHome
+	if we can't be inlined.  This may allow some other lambda to be
+	inlined in the current function even if we ourselves can't be.
+
 2015-02-12  Per Bothner  <per@bothner.com>
 
 	* InlineCalls.java (visitReferenceExp): Make a copy of the ReferenceExp

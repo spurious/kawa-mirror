@@ -441,24 +441,21 @@ public class FindTailCalls extends ExpExpVisitor<Expression>
                         && ! p.nestedIn(current)) {
                         r = p;
                     } else {
-                        current.returnContinuation = t;
-                        return t;
+                        r = t;
+                        break;
                     }
                 } else if (r == null) {
                     r = t;
                 } else if (t != null && r != t) {
                     r = LambdaExp.unknownContinuation;
-                    current.returnContinuation = r;
-                    return r;
+                    break;
                 }
             }
         }
         if (r != LambdaExp.unknownContinuation) {
             if (current.inlineHome != null) {
-                if (checkInlineCycle(current.inlineHome, current)) {
+                if (checkInlineCycle(current.inlineHome, current))
                     r = LambdaExp.unknownContinuation;
-                    current.returnContinuation = r;
-                }
             }
             else {
                 LambdaExp x = null;
@@ -479,7 +476,11 @@ public class FindTailCalls extends ExpExpVisitor<Expression>
                     r = LambdaExp.unknownContinuation;
             }
         }
-        return r;
+        if (r == LambdaExp.unknownContinuation) {
+            current.returnContinuation = r;
+            current.inlineHome = null;
+        }
+       return r;
     }
 
     static void checkInlineable(LambdaExp exp) {

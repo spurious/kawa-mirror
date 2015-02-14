@@ -1,3 +1,8 @@
+2015-02-14  Seth Alves <alves@hungry.com>
+
+	* inline3.scm: New test - used to cause VerifyError.
+	* Makefile.am (SCRIPTS_TO_RUN): Update accordingly.
+
 2015-02-09  Per Bothner  <per@bothner.com>
 
 	* inlining-test.scm: Update to use new type specifier syntax.

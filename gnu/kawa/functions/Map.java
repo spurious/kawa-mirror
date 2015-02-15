@@ -24,7 +24,8 @@ public class Map extends gnu.mapping.ProcedureN
     this.applyToArgs = applyToArgs;
     this.isEq = isEq;
     setProperty(Procedure.validateApplyKey,
-                "gnu.kawa.functions.CompileMisc:validateApplyMap");
+                collect ? "gnu.kawa.functions.CompileMisc:validateApplyMap"
+                : "kawa.lib.compile_map:listForEachValidateApply");
   }
 
   /** An optimized single-list version of map. */

@@ -117,6 +117,33 @@
      (validate-generic-for-each exp required
                                 init-each test-each eval-each incr-each))))
 
+; Validate plain list-only (for-each proc lst1 lst...)
+(define-validate listForEachValidateApply (exp required proc)
+  ((exp:isSimple 2)
+   (let* ((n (- (exp:getArgCount) 1))
+          (listDecls (gnu.expr.Declaration[] length: n))
+          (pairDecls (gnu.expr.Declaration[] length: n))
+          (comp (get-compilation)))
+     (define (init-each i arg)
+       (let* ((listArg (visit-exp arg))
+              (listDecl (comp:letVariable #!null #!null listArg)))
+         (listDecl:setLocation arg)
+         (set! (listDecls i) listDecl)))
+     (define (test-each i)
+       (apply-exp not (apply-exp eq? (listDecls i) '())))
+     (define (eval-each i)
+       (define pairDecl (comp:letVariable #!null #!null
+                                          (apply-exp Convert:cast gnu.lists.Pair
+                                                     (listDecls i))))
+       (set! (pairDecls i) pairDecl)
+       (comp:letVariable #!null #!null
+                         (apply-exp invoke pairDecl 'getCar)))
+     (define (incr-each value i)
+       (set-exp (listDecls i)
+                (apply-exp invoke (pairDecls i) 'getCdr)))
+     (validate-generic-for-each exp required
+                                init-each test-each eval-each incr-each))))
+
 ; Validate (vector-for-each proc str1 str...)
 (define-validate vectorForEachValidateApply (exp required proc)
   ((exp:isSimple 2)
@@ -153,9 +180,11 @@
                                    incr-each::procedure)
    (let ((n (- (exp:getArgCount) 1))
          (comp (get-compilation))
-         (func (exp:getArg 0)))
+         (func ::gnu.expr.Expression (exp:getArg 0)))
      (comp:letStart)
-     (define decls (gnu.expr.Declaration[][] length: n))
+     (if (func:side_effects)
+         (set! func (gnu.expr.ReferenceExp
+                     (comp:letVariable #!null #!null func))))
      (do ((i ::int 0 (+ i 1))) ((= i n))
        (init-each i (exp:getArg (+ i 1))))
      (comp:letEnter)

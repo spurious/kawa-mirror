@@ -1,3 +1,9 @@
+2015-02-14  Per Bothner  <per@bothner.com>
+
+	* compile_map.scm (listForEachValidateApply): New method, for
+	inlining list-based for-each.
+	(validate-generic-for-each): Handle if procedure has side-effects.
+
 2015-02-12  Per Bothner  <per@bothner.com>
 
 	* syntax.scm (let-values): Simplification/optimization of common case.

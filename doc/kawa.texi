@@ -1218,7 +1218,8 @@ One method uses the traditional GNU @code{configure} script,
 followed by running @code{make}.  This works well on Unix-like
 systems, such as GNU/Linux.
 You can also use this method on Microsoft Windows,
-as long as use @uref{http://www.cygwin.org/. Cygwin}.
+with the help of tools from @uref{http://www.MinGW.org/, MinGW}
+or @uref{http://www.cygwin.org/, Cygwin}.
 
 The other method uses the @code{ant} command, a Java-based
 build system released by Apache's Jakarta project.  This uses
@@ -1228,6 +1229,9 @@ the @code{ant} method does not support all
 the features of the @code{configure}+@code{make} method.
 
 @subsection Build Kawa using @code{configure} and @code{make}
+
+(See @ref{building-on-Windows-with-make,below} for some notes for building
+on Microsoft Windows.)
 
 In your build directory do:
 @example
@@ -1284,11 +1288,6 @@ make
 @end example
 This assumes that @samp{java} and @samp{javac} are the java interpreter
 and compiler, respectively.
-For example, if you are using the Kaffe Java interpreter,
-you need to instead say:
-@example
-make JAVA=kaffe
-@end example
 
 It has been reported that parallel make doesn't work,
 so don't use the @code{-j2} or above options.
@@ -1328,6 +1327,36 @@ CLASSPATH=$PREFIX/share/java/kawa.jar
 export CLASSPATH
 @end example
 This is done automatically if you use the @samp{kawa} script.
+
+@anchor{building-on-Windows-with-make}
+@subsubsection Building on Windows using MinGW
+
+The Kawa @code{configure} and @code{make} process assumes Unix-like
+tools, which you can get from @uref{http://mingw.org, the MinGW project}.
+Download the MingGW Installation Manager, and use it to install
+at least @code{mingw-developer-toolkit}.
+(Also installing @code{msys-groff} avoids a minor problem
+building the documentation.)
+
+The @code{C:\MinGW\msys\1.0\msys.bat} script creates a command window
+with the @code{bash} shell and the @code{PATH} set up as needed.
+Alternatively, you can use the standard Windows command prompt
+if you set your @code{PATH} as described in @uref{http://mingw.org/wiki/Getting_Started, here}.
+
+@subsubsection Building on Windows using Cygwin
+
+The free @uref{http://sourceware.org/cygwin/,Cygwin}
+environment can be used for building Kawa: The Kawa configure script
+recognizes Cygwin, and modifies the classpath to use Windows-style
+path separators.
+
+Beyond the base packages, you probably want to install @code{autoconf},
+@code{automake}, @code{subversion}, @code{texinfo}, @code{groff},
+@code{make}, and @code{diffutils}.
+
+Cygwin (unlike MinGW) has a current version of @code{makeinfo}, but
+an undiagnosed bug still prevents building @code{kawa.info}.
+You can work around that problem with @code{touch doc/kawa.info}.
 
 @subsection Build Kawa using @code{ant}
 
@@ -1460,24 +1489,6 @@ Alternatively, you can use configure option
 @code{--with-gcj-dbtool}.  This allows gcj to automatically
 find the kawa shared libraries from the @code{.jar} file.
 @end ignore
-
-@subsection Building Kawa under MS-Windows
-
-Using the @code{ant} method is recommended for building
-Kawa under Microsoft Windows.
-You may get an error message "@code{Out of environment space}."
-See @uref{http://support.microsoft.com/support/kb/articles/Q230/2/05.ASP}
-for a solution.  Alternatively you can run
-the class @code{org.apache.tools.ant.Main} directly from the Ant jar.
-
-The Kawa @code{configure} and @code{make} process assumes a Unix-like
-environment.  The free @uref{http://sourceware.org/cygwin/,Cygwin}
-environment can be used for building Kawa: The Kawa configure script
-recognizes Cygwin, and modifies the classpath to use Windows-style
-path separators.  (At the time of writing there were still some
-path issues with running the testsuite.)
-
-@uref{http://www.mingw.org/,MinGW} may also work but has not been tested.
 
 @node Tutorial
 @chapter Kawa Scheme Tutorial

@@ -686,7 +686,7 @@ chameneosredux.class: $(srcdir)/chameneosredux.scm
 check-chameneosredux: chameneosredux.class
 	CLASSPATH="$(KAWARTLIB)$(CLASSPATH_SEPARATOR)@conf_classpath@.$(CLASSPATH_SEPARATOR)$$CLASSPATH" \
 	$(KAWA) chameneosredux 600 | \
-	  sed -e 's|^[1-9][0-9]* |NNN |' >chameneosredux600.log
+	  sed -e 's|^[0-9][0-9]* |NNN |' >chameneosredux600.log
 	@if $(DIFF) $(srcdir)/chameneosredux-output.txt chameneosredux600.log; \
 	  then echo '# chameneosredux test passes'; \
 	  else echo FAIL chameneosredux test; fi

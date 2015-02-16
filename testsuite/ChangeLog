@@ -1,3 +1,7 @@
+2015-02-16  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (check-chameneosredux): Also convert '0' to 'NNN'.
+
 2015-02-14  Seth Alves <alves@hungry.com>
 
 	* inline3.scm: New test - used to cause VerifyError.

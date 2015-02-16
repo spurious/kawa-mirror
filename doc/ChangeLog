@@ -1,3 +1,8 @@
+2015-02-16  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Source distribution): Document configure options
+	in more detail.
+
 2015-02-15  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Tutorial - Variables): Show '!' as alternative to 'define'.

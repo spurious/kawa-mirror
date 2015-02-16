@@ -1246,40 +1246,11 @@ you can just run the configure script with no arguments:
 @example
 ./configure
 @end example
-
-This will specify that a later @code{make install} will install the
-compiled @samp{.class} files into @code{/usr/local/share/java}.
-If you want them
-to be installed someplace else, such as @code{$PREFIX/share/java}, then
-specify that when you run configure:
-@example
-./configure --prefix $PREFIX
-@end example
-
-If you have the GNU @samp{readline} library installed, you might try
-adding the @samp{--enable-kawa-frontend} flag.  This will build the
-@samp{kawa} front-end program, which provides input-line editing
-and an input history.  You can get @samp{readline} from archives
-of GNU programs, including @uref{ftp://www.gnu.org/}.
-
-If you have Swing installed, and want to use JEmacs (Emacs in Java),
-also pass the @code{--with-swing} flag to @code{configure}.
+The @code{configure} script takes a number of @ref{configure options,options}.
 
 If you have installed Kawa before, make sure your @code{CLASSPATH}
 does not include old versions of Kawa, or other classes that may
 conflict with the new ones.
-
-As distributed, the Kawa source code requires Java 7.
-If you only have Java 6 or Java 5, use the @code{--with-have-source} option:
-@example
-./configure --with-java-source=5
-@end example
-
-Kawa no longer supports older verisons of Java (JDK 1.4 or older).
-It might be possible to use a tool
-like @uref{http://retroweaver.sourceforge.net/, Retroweaver}
-on the Kawa @code{.jar} to fix up Java 5 dependencies.
-Contact the Kawa author if you want to be a tester for this.
 
 Then you need to compile all the .java source files.
 Just run make:
@@ -1291,14 +1262,6 @@ and compiler, respectively.
 
 It has been reported that parallel make doesn't work,
 so don't use the @code{-j2} or above options.
-
-If you configured with @code{--enable-kawa-frontend}, you
-may need to specify @code{READLINE_INCLUDE_PATH} or @code{READINE_LIB_PATH}.
-For example on OS/X you need to do:
-@example
-make READLINE_INCLUDE_PATH=-I/usr/local/unix/readline/include \
-     READLINE_LIB_PATH=-L/usr/local/unix/readline/lib
-@end example
 
 You can now test the system by running Kawa in place:
 @example
@@ -1327,6 +1290,92 @@ CLASSPATH=$PREFIX/share/java/kawa.jar
 export CLASSPATH
 @end example
 This is done automatically if you use the @samp{kawa} script.
+
+@anchor{configure options}
+@cindex configure options
+@subsubsection Configure options
+
+The @code{configure} script takes a number of options.
+The @code{--help} switch gives you a list of options.
+The following are some of the more common or important ones.
+
+@table @asis
+@item @code{--prefix=@var{install-dir}}
+@itemx @code{--prefix @var{install-dir}}
+By default @code{make install} will install the compiled @code{.jar}
+files info @code{/usr/local/share/java},
+the @code{kawa} command into @code{/usr/local/bin},
+and so on in @code{/usr/local}.
+The @code{--prefix} option causes the files to be installed
+under @code{@var{install-dir}} instead of @code{/usr/local}.
+For example to install the @code{.jar} in @code{/opt/kawa/share/java}
+and otherwise use @code{/opt/kawa} do:
+@example
+./configure --prefix=/opt/kawa
+@end example
+
+@item @code{--with-java-source=@var{version}}
+As distributed, the Kawa source code requires Java 7.
+If you only have Java 6 or Java 5, use the @code{--with-java-source} option:
+@example
+./configure --with-java-source=5
+@end example
+
+Kawa no longer supports older verisons of Java (JDK 1.4 or older).
+It might be possible to use a tool
+like @uref{http://retroweaver.sourceforge.net/, Retroweaver}
+on the Kawa @code{.jar} to fix up Java 5 dependencies.
+Contact the Kawa author if you want to be a tester for this.
+
+@item @code{--enable-kawa-frontend}
+If you have the GNU @samp{readline} library installed, you might try
+adding the @samp{--enable-kawa-frontend} flag.  This will build the
+@samp{kawa} front-end program, which provides input-line editing
+and an input history.  You can get @samp{readline} from archives
+of GNU programs, including @uref{ftp://www.gnu.org/}.
+
+If so, you may need to specify to @code{make} where to find
+the @code{readline} include files (with @code{READLINE_INCLUDE_PATH})
+and the library (with @code{READINE_LIB_PATH}).
+For example on OS/X you need to do:
+@example
+make READLINE_INCLUDE_PATH=-I/usr/local/unix/readline/include \
+     READLINE_LIB_PATH=-L/usr/local/unix/readline/lib
+@end example
+
+@item @code{--with-servlet}
+@itemx @code{--with-servlet=@var{servlet-jar}}
+Build support for @ref{Servlets,servlets}, which are used in web servers.
+This requires the @code{servlet-api.jar} (available various places including
+@uref{http://tomcat.apache.org/,Tomcat} or
+@uref{https://glassfish.java.net/,Glassfish}),
+for @code{javax.servlet.Servlet} and related classes.
+If this class isn't in your classpath, specify its location
+as @code{@var{servlet-jar}}. For example:
+@example
+./configure --with-servlet=/path/to/servlet-api.jar 
+@end example
+
+@item @code{--enable-jemacs}
+Build JEmacs (enable Emacs-like text editor) and support (a subset of)
+the Emacs Lisp language.  JEmacs is a proof of concept - not really
+usable or maintained.
+
+@item @code{--with-javafx}
+@itemx @code{--with-javafx=@var{javafx-jar}}
+@itemx @code{--with-javafx=@var{java-home}}
+Set this flag enable the convenience features
+for @ref{Building JavaFX applications,JavaFX}.
+The JavaFX classes are included in JDK 8 (but not OpenJDK 8),
+and you don't need to specify @code{@var{javafx-jar}} or @code{@var{java-home}}.
+For JDK 7 you need to specify @code{@var{javafx-jar}}
+(the path to @code{javafx.rt}) or @code{@var{java-home}}
+(the value of the @code{$JAVA_HOME}).
+
+@item @code{--with-android=@var{android-jar}}
+Build for the Android platform.
+This requires @ref{Building for Android,special instructons}.
+@end table
 
 @anchor{building-on-Windows-with-make}
 @subsubsection Building on Windows using MinGW
@@ -16666,6 +16715,9 @@ work, for security systems.)
 @example
 cp @var{kawa-home}/kawa-@value{VERSION}.jar WEB-INF/lib/kawa.jar
 @end example
+
+If you build Kawa from source, you must specify the
+@code{--with-servlet} @ref{configure options,configure option}.
 
 You should also create the file @code{WEB-INF/web.xml}.
 For now, this is is just a place-holder:

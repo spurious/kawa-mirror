@@ -1751,21 +1751,40 @@ You can also use keyword parameters.
 @node Tutorial - Variables
 @section Variables
 
-You can declare a variable using a @code{define} form.
+You can declare a variable using a @code{!} form.
 This takes a variable name, and an expression.  It declares a new
-variable with the given name, and assigned the value of the
+variable with the given name, and gives it the value of the expression:
 expression to the variable.
+@example
+#|kawa:1|# (! binary-kilo 1024)
+#|kawa:2|# (! binary-mega (* binary-kilo binary-kilo))
+#|kawa:3|# binary-mega
+1048576
+@end example
+
+If you prefer, you can use @code{define} instead of @code{!}:
+
 @example
 #|kawa:1|# (define binary-kilo 1024)
 #|kawa:2|# (define binary-mega (* binary-kilo binary-kilo))
 #|kawa:3|# binary-mega
 1048576
 @end example
-A @code{define} typed into the command-line
+
+The advantage of using @code{define} is that it is portable
+to other Scheme implementations.
+The advantages of using @code{!} is that it is shorter;
+it generalizes to patterns (see later);
+and it guards against accidentally ``shadowing'' a variable
+by a nested variable with the same name.
+
+A @code{!} (or @code{define}) typed into the command-line
 defines a top-level variable.
 
-You can also declare local variables.  TODO.
+You can also declare local variables.  NEED EXAMPLES.
 
+Alternative forms for defining local variables are
+@code{let}, @code{let*}, or @code{letrec}/@code{letrec*}.
 
 @node Tutorial - Sequences
 @section Lists and sequences

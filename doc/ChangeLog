@@ -1,5 +1,7 @@
 2015-02-15  Per Bothner  <per@bothner.com>
 
+	* kawa.texi (Tutorial - Variables): Show '!' as alternative to 'define'.
+
 	* kawa.texi (Source distribution): Add notes for building on Windows.
 
 2014-12-18  Per Bothner  <per@bothner.com>

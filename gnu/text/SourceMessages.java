@@ -180,37 +180,33 @@ public class SourceMessages implements SourceLocator {
         error(err);
     }
 
-    /** Return {@code 2*(max_non_fatal_messages_to_display)+(should_warnings_be_skipped?1:0)}.
-     * @param max maximum total messages to display
-     */
-    int adjustDisplayMax(int max) {
-        int count = getCount("iwef");
-        boolean skipWarnings = false;
-        if (count > max) {
-            skipWarnings = true;
-            max = max - getCount("f");
-        }
-        return (max << 1) | (skipWarnings?1:0);
-    }
-
-    boolean skipDisplayMessage(int max, SourceError error) {
-        char severity = error.severity;
-        if (max <= 0 && severity != 'f')
-            return true;
-        boolean skipWarnings = (max & 1) != 0;
-        if (skipWarnings && (severity == 'i' || severity == 'w'))
-            return true;
-        return false;
-    }
-
     /** Print all the error messages to an Appendable. */
     public void printAll(Appendable out, int max) {
-        max = adjustDisplayMax(max);
+        int errCount = getCount("ef");
+        int wrnCount = getCount("iw");
+        int errLimit = max >= 0 && errCount > max ? max : errCount;
+        int wrnLimit = max >= 0 && errCount + wrnCount > max ? max - errLimit
+            : wrnCount;
+        int skippedErrors = 0;
+        int skippedWarnings = 0;
+        int skippedInfo = 0;
         for (SourceError err = firstError;  err != null;  err = err.next) {
-            if (skipDisplayMessage(max, err))
-                continue;
+            if (err.severity == 'e' && --errLimit < 0)
+                skippedErrors++;
+            else if (err.severity == 'w' && --wrnLimit < 0)
+                skippedWarnings++;
+            else if (err.severity == 'i' && --wrnLimit < 0)
+                skippedInfo++;
+            else
+                err.println(out, stripDirectories);
+        }
+        if (skippedErrors + skippedWarnings + skippedInfo > 0) {
+            SourceError err =
+                new SourceError('i', firstError.getFileName(), 0, 0,
+                                "skipped "+skippedErrors+" errors, "
+                                +skippedWarnings+" warnings, "
+                                +skippedInfo+" notes");
             err.println(out, stripDirectories);
-            max -= 2;
         }
     }
 

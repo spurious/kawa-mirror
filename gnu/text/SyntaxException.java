@@ -52,21 +52,11 @@ public class SyntaxException extends RuntimeException
 
   public int maxToPrint = 10;
 
-  public String getMessage ()
-  {
-    int max = messages.adjustDisplayMax(maxToPrint);
-    StringBuffer buffer = new StringBuffer ();
-    if (header != null)
-      buffer.append(header);
-    for (SourceError err = messages.firstError;
-	 err != null;  err = err.next)
-      {
-        if (messages.skipDisplayMessage(max, err))
-          continue;
-	buffer.append('\n');
-	buffer.append(err);
-        max -= 2;
-      }
-    return buffer.toString();
-  }
+    public String getMessage() {
+        StringBuilder buffer = new StringBuilder();
+        if (header != null)
+            buffer.append(header);
+        messages.printAll(buffer, maxToPrint);
+        return buffer.toString().replace("\r\n", "\n");
+    }
 }

@@ -1,5 +1,10 @@
 2015-02-16  Per Bothner  <per@bothner.com>
 
+	* SourceError.java (printAll): Fix logic in handling excess diagnostics.
+	This fixes Savannah bug #44262 "Too many errors".
+	(adjustDisplayMax, skipDisplayMessage): Remove methods.
+	* SyntaxException (getMessage): Simplify to use printAll.
+
 	* SourceError.java (appendTo): New method, works with Appendable.
 	(toString, print, println): Use appendTo.
 	(print, println): Generalize and simplify to Appendable.

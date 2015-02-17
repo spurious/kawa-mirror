@@ -1,3 +1,8 @@
+2015-02-16  Per Bothner  <per@bothner.com>
+
+	* standard/ImportFromLibrary.java (handleImport): When searching
+	for a class catch NoClassDefFoundError in addition to Exception.
+
 2015-02-13  Per Bothner  <per@bothner.com>
 
 	* standard/let.java (rewrite): Mark parameter 'tr' as final.  Java 8

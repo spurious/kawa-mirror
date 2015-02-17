@@ -250,6 +250,7 @@ public class ImportFromLibrary extends Syntax
                 existingClass = ObjectType.getContextClass(tname);
                 break;
             } catch (Exception ex) {
+            } catch (NoClassDefFoundError ex) {
             }
         }
 

@@ -1,5 +1,7 @@
 2015-02-16  Per Bothner  <per@bothner.com>
 
+	* standard/Scheme.java: Some cleanups in initialization.
+
 	* standard/ImportFromLibrary.java (handleImport): When searching
 	for a class catch NoClassDefFoundError in addition to Exception.
 

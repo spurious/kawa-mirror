@@ -20,6 +20,10 @@ public class Scheme extends LispLanguage {
     public static final int FOLLOW_R6RS = 6;
     public static final int FOLLOW_R7RS = 7;
 
+    int standardToFollow;
+
+    public int getStandardToFollow() { return standardToFollow; }
+
     public static final Environment nullEnvironment =
         Environment.make("null-environment");
     public static final Environment r4Environment =
@@ -39,73 +43,53 @@ public class Scheme extends LispLanguage {
     public static final LangPrimType booleanType =
         new LangPrimType(Type.booleanType, instance);
 
-  int standardToFollow;
+    public static final ApplyToArgs applyToArgs =
+        new ApplyToArgs("apply-to-args", instance);
+    public static final Apply apply =
+        new Apply("apply", applyToArgs);
 
-  public int getStandardToFollow() { return standardToFollow; }
+    public static final gnu.kawa.reflect.InstanceOf instanceOf =
+        new gnu.kawa.reflect.InstanceOf(instance, "instance?");
+    public static final Not not =
+        new Not(instance, "not");
 
-  public static final gnu.kawa.reflect.InstanceOf instanceOf;
-  public static final Not not;
-  public static final gnu.kawa.functions.Map map;
-  public static final gnu.kawa.functions.Map forEach;
-  public static final gnu.kawa.functions.IsEq isEq;
-  public static final gnu.kawa.functions.IsEqv isEqv;
-  public static final gnu.kawa.functions.IsEqual isEqual;
+    public static final gnu.kawa.functions.IsEq isEq =
+        new gnu.kawa.functions.IsEq(instance, "eq?");
+    public static final gnu.kawa.functions.IsEqv isEqv =
+        new gnu.kawa.functions.IsEqv(instance, "eqv?", isEq);
+    public static final gnu.kawa.functions.IsEqual isEqual =
+        new gnu.kawa.functions.IsEqual(instance, "equal?");
+   
+    public static final gnu.kawa.functions.Map map =
+        new gnu.kawa.functions.Map(true, applyToArgs, isEq);
+    public static final gnu.kawa.functions.Map forEach =
+        new gnu.kawa.functions.Map(false, applyToArgs, isEq);
+    public static final NumberCompare numEqu =
+        NumberCompare.make(instance, "=", NumberCompare.TRUE_IF_EQU);
+    public static final NumberCompare numGrt =
+        NumberCompare.make(instance, ">", NumberCompare.TRUE_IF_GRT);
+    public static final NumberCompare numGEq =
+        NumberCompare.make(instance, ">=",
+                           NumberCompare.TRUE_IF_GRT|NumberCompare.TRUE_IF_EQU);
+    public static final NumberCompare numLss =
+        NumberCompare.make(instance, "<", NumberCompare.TRUE_IF_LSS);
+    public static final NumberCompare numLEq =
+        NumberCompare.make(instance, "<=",
+                           NumberCompare.TRUE_IF_LSS|NumberCompare.TRUE_IF_EQU);
+    public static final NumberPredicate isOdd =
+        new NumberPredicate(instance, "odd?", NumberPredicate.ODD);
+    public static final NumberPredicate isEven =
+        new NumberPredicate(instance, "even?", NumberPredicate.EVEN);
 
-  public static final NumberCompare numEqu;
-  public static final NumberCompare numGrt;
-  public static final NumberCompare numGEq;
-  public static final NumberCompare numLss;
-  public static final NumberCompare numLEq;
-  public static final NumberPredicate isOdd;
-  public static final NumberPredicate isEven;
-
-  public static final Apply apply;
-  public static final ApplyToArgs applyToArgs;
-
-  private static final String[] uniformVectorTags =
+    private static final String[] uniformVectorTags =
     {"s8", "s16", "s32", "s64", "u8", "u16", "u32", "u64", "f32", "f64" };
 
     public static final String emptyStringLeft = new String();
     public static final String emptyStringRight = new String();
 
-  static {
-    instanceOf = new gnu.kawa.reflect.InstanceOf(instance, "instance?");
-    not = new Not(instance, "not");
-    applyToArgs = new ApplyToArgs("apply-to-args", instance);
-    apply = new Apply("apply", applyToArgs);
-    isEq = new gnu.kawa.functions.IsEq(instance, "eq?");
-    isEqv = new gnu.kawa.functions.IsEqv(instance, "eqv?", isEq);
-    isEqual = new gnu.kawa.functions.IsEqual(instance, "equal?");
-    map = new gnu.kawa.functions.Map(true, applyToArgs, isEq);
-    forEach = new gnu.kawa.functions.Map(false, applyToArgs, isEq);
-    numEqu = NumberCompare.make(instance, "=",
-                                NumberCompare.TRUE_IF_EQU);
-    numGrt = NumberCompare.make(instance, ">",
-                                NumberCompare.TRUE_IF_GRT);
-    numGEq = NumberCompare.make(instance, ">=",
-                                NumberCompare.TRUE_IF_GRT|NumberCompare.TRUE_IF_EQU);
-    numLss = NumberCompare.make(instance, "<",
-                                NumberCompare.TRUE_IF_LSS);
-    numLEq = NumberCompare.make(instance, "<=",
-                                NumberCompare.TRUE_IF_LSS|NumberCompare.TRUE_IF_EQU);
-    isOdd = new NumberPredicate(instance, "odd?", NumberPredicate.ODD);
-    isEven = new NumberPredicate(instance, "even?", NumberPredicate.EVEN);
-
-    instance.initScheme();
-
-    int withServlets = HttpRequestContext.importServletDefinitions;
-    if (withServlets > 0)
-      {
-        try
-          {
-            instance.loadClass(withServlets > 1 ? "gnu.kawa.servlet.servlets"
-                               : "gnu.kawa.servlet.HTTP");
-          }
-        catch (Exception ex)
-          {
-          }
-      }
-  }
+    static {
+        instance.initScheme();
+    }
 
   public static Scheme getInstance()
   {
@@ -957,7 +941,16 @@ public class Scheme extends LispLanguage {
       defProcStFld("annotation", "gnu.kawa.reflect.MakeAnnotation", "instance");
 
       kawaEnvironment.setLocked();
-  }
+
+        int withServlets = HttpRequestContext.importServletDefinitions;
+        if (withServlets > 0) {
+            try {
+                loadClass(withServlets > 1 ? "gnu.kawa.servlet.servlets"
+                          : "gnu.kawa.servlet.HTTP");
+            } catch (Exception ex) {
+            }
+        }
+    }
 
   public Scheme ()
   {

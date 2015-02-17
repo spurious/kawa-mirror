@@ -203,19 +203,8 @@ public class SourceMessages implements SourceLocator {
         return false;
     }
 
-    /** Print all the error messages to a PrintStream. */
-    public void printAll(java.io.PrintStream out, int max) {
-        max = adjustDisplayMax(max);
-        for (SourceError err = firstError;  err != null;  err = err.next) {
-            if (skipDisplayMessage(max, err))
-                continue;
-            err.println(out, stripDirectories);
-            max -= 2;
-        }
-    }
-
-    /** Print all the error messages to a PrintWriter. */
-    public void printAll(java.io.PrintWriter out, int max) {
+    /** Print all the error messages to an Appendable. */
+    public void printAll(Appendable out, int max) {
         max = adjustDisplayMax(max);
         for (SourceError err = firstError;  err != null;  err = err.next) {
             if (skipDisplayMessage(max, err))
@@ -232,11 +221,10 @@ public class SourceMessages implements SourceLocator {
     public String toString(int max) {
         if (firstError == null)
             return null;
-        StringBuffer buffer = new StringBuffer ();
+        StringBuilder buffer = new StringBuilder();
         for (SourceError err = firstError;
              err != null && --max >= 0;  err = err.next) {
-            buffer.append(err.toString(stripDirectories));
-            buffer.append('\n');
+            err.appendTo(buffer, stripDirectories, "\n");
         }
         return buffer.toString();
     }
@@ -245,21 +233,7 @@ public class SourceMessages implements SourceLocator {
      * @param out where to write the error message to
      * @param max maximum number of messages to print (can be 0)
      */
-    public boolean checkErrors(java.io.PrintWriter out, int max) {
-        if (firstError != null) {
-            printAll(out, max);
-            firstError = lastError = null;
-            int saveCount = errorCount;
-            errorCount = 0;
-            return saveCount > 0;
-        }
-        return false;
-    }
-
-    /** Checks if an error was seen; if so, prints and clears the messages.
-     * @param out where to write the error message to
-     * @param max maximum number of messages to print (can be 0) */
-    public boolean checkErrors(java.io.PrintStream out, int max) {
+    public boolean checkErrors(Appendable out, int max) {
         if (firstError != null) {
             printAll(out, max);
             firstError = lastError = null;

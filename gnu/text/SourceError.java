@@ -75,72 +75,65 @@ public class SourceError implements SourceLocator
      * The String starts with filename, line and option column,
      * followed by the message.  Warning messages are indicated as such. */
     public String toString(boolean stripDirectories) {
-        StringBuffer buffer = new StringBuffer ();
-        String fname;
-        if (filename == null)
-            fname = "<unknown>";
-        else {
-            fname = filename;
-            if (stripDirectories)
-                fname = new File(fname).getName();
-        }
-        buffer.append(fname);
-        if (line > 0 || column > 0) {
-            buffer.append (':');
-            buffer.append (line);
-            if (column > 0) {
-                buffer.append (':');
-                buffer.append (column);
-            }
-        }
-        buffer.append (": ");
-        if (severity == 'w')
-            buffer.append("warning - ");
-        else if (severity == 'i')
-            buffer.append("note - ");
-        buffer.append (message);
-        if (code != null) {
-            buffer.append(" [");
-            buffer.append(code);
-            buffer.append("]");
-        }
-        if (fakeException != null) {
-            StackTraceElement[] stackTrace = fakeException.getStackTrace();
-            for (int i = 0; i < stackTrace.length; i++) {
-                buffer.append("\n");
-                buffer.append("    ");
-                buffer.append(stackTrace[i].toString());
-            }
-        }
+        StringBuilder buffer = new StringBuilder();
+        appendTo(buffer, stripDirectories, null);
         return buffer.toString ();
     }
+   
+    public void appendTo(Appendable out, boolean stripDirectories,
+                         String newLine) {
+        try {
+            String fname;
+            if (filename == null)
+                fname = "<unknown>";
+            else {
+                fname = filename;
+                if (stripDirectories)
+                    fname = new File(fname).getName();
+            }
+            out.append(fname);
+            if (line > 0 || column > 0) {
+                out.append(':');
+                out.append(Integer.toString(line));
+                if (column > 0) {
+                    out.append(':');
+                    out.append(Integer.toString(column));
+                }
+            }
+            out.append(": ");
+            if (severity == 'w')
+                out.append("warning - ");
+            else if (severity == 'i')
+                out.append("note - ");
+            out.append(message);
+            if (code != null) {
+                out.append(" [");
+                out.append(code);
+                out.append("]");
+            }
 
-    public void print(java.io.PrintWriter out) {
-        out.print(this);
+            if (fakeException != null) {
+                StackTraceElement[] stackTrace = fakeException.getStackTrace();
+                for (int i = 0; i < stackTrace.length; i++) {
+                    out.append(newLine != null ? newLine : "\n");
+                    out.append("    ");
+                    out.append(stackTrace[i].toString());
+                }
+            }
+            if (newLine != null)
+                out.append(newLine);
+        } catch (java.io.IOException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
-    public void println(java.io.PrintWriter out, boolean stripDirectories) {
-        String line = toString(stripDirectories);
-        for (;;) {
-            int nl = line.indexOf('\n');
-            if (nl < 0)
-                break;
-            out.println(line.substring(0, nl));
-            line = line.substring(nl+1);
-        }
-        out.println(line);
+    public void print(Appendable out) {
+        appendTo(out, false, null);
     }
 
-    public void println(java.io.PrintStream out, boolean stripDirectories) {
-        String line = toString();
-        for (;;) {
-            int nl = line.indexOf('\n');
-            if (nl < 0)
-                break;
-            out.println(line.substring(0, nl));
-            line = line.substring(nl+1);
-        }
-        out.println(line);
+    public void println(Appendable out, boolean stripDirectories) {
+        appendTo(out, stripDirectories,
+                 System.getProperty("line.separator", "\n"));
     }
 
     public int getLineNumber () { return line == 0 ? -1 : line; }

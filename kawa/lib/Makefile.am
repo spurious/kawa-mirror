@@ -33,7 +33,8 @@ java_SCM_ALWAYS =\
   kawa/expressions.scm \
   kawa/string-cursors.scm \
   kawa/quaternions.scm \
-  kawa/hashtable.scm kawa/regex.scm rnrs/hashtables.scm rnrs/lists.scm \
+  kawa/hashtable.scm kawa/regex.scm kawa/reflect.scm kawa/all.scm \
+  rnrs/hashtables.scm rnrs/lists.scm \
   srfi95.scm rnrs/unicode.scm rnrs/sorting.scm rnrs/programs.scm \
   scheme/base.scm scheme/case-lambda.scm scheme/char.scm \
   scheme/complex.scm scheme/cxr.scm scheme/eval.scm scheme/file.scm \
@@ -43,7 +44,11 @@ java_SCM_ALWAYS =\
   compile_misc.scm compile_map.scm trace.scm
 
 scm_WITH_SWING = windows.scm
-EXTRA_DIST = $(java_SCM_ALWAYS) $(scm_WITH_SWING)
+EXTRA_DIST = $(java_SCM_ALWAYS) $(scm_WITH_SWING) \
+  scheme/base-exports scheme/char-exports scheme/complex-exports \
+  scheme/cxr-exports scheme/eval-exports scheme/file-exports \
+  scheme/inexact-exports scheme/lazy-exports \
+  scheme/process-context-exports scheme/time-exports scheme/write-exports
 
 if WITH_SWING
 java_SCM= $(java_SCM_ALWAYS) $(scm_WITH_SWING)

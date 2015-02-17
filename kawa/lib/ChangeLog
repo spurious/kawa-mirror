@@ -1,3 +1,16 @@
+2015-02-16  Helmut Eller <eller.helmut@gmail.com>
+	    Per Bothner  <per@bothner.com>
+
+	* kawa/reflect.scm: New Scheme library (kawa reflect).
+	* kawa/all.scm: New Scheme library.
+	* scheme/base-exports, scheme/char-exports, scheme/complex-exports,
+	scheme/cxr-exports, scheme/eval-exports, scheme/file-exports,
+	scheme/inexact-exports, scheme/lazy-exports,
+	scheme/process-context-exports, scheme/time-exports,
+	scheme/write-exports: New files containing corresponding exports lists.
+	* scheme/*.scm: Use new *-exports files.
+	* Makefile.am: Update accordingly.
+
 2015-02-14  Per Bothner  <per@bothner.com>
 
 	* compile_map.scm (listForEachValidateApply): New method, for

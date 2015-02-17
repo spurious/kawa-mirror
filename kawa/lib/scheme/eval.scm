@@ -1,6 +1,5 @@
 (module-name (scheme eval))
-(export environment eval)
-
+(include "eval-exports")
 (require <kawa.lib.std_syntax>)
 (require <kawa.lib.lists>)
 

@@ -1,9 +1,9 @@
 2015-02-16  Per Bothner  <per@bothner.com>
 
-	* SourceError.java (apendTo): New method, works with Appendable.
+	* SourceError.java (appendTo): New method, works with Appendable.
 	(toString, print, println): Use appendTo.
 	(print, println): Generalize and simplify to Appendable.
-	* SourceMessages.java (SourceLocator): 
+	* SourceMessages.java (printAll, checkErrors): Likewise.
 
 2014-12-09  Per Bothner  <per@bothner.com>
 

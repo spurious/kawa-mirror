@@ -15,11 +15,11 @@
 
 ;;; READ AND PRINT
 
-(define (open-output-buffer (buffer <buffer>))
+(define (open-output-buffer (buffer ::<buffer>))
   (make <gnu.jemacs.buffer.BufferWriter> buffer))
 
-(define (open-output-marker (marker <marker>))
-  (make <gnu.jemacs.buffer.BufferWriter> marker #f))
+(define (open-output-marker (marker ::<marker>))
+  (make gnu.jemacs.buffer.BufferWriter marker #f))
 
 ;;; MINIBUFFERS
 
@@ -41,10 +41,10 @@
 
 (define (set-keymap-name keymap new-name) #!void)  ;; ignored FIXME
 
-(define (keymap-name (keymap <keymap>))
+(define (keymap-name (keymap ::<keymap>))
   (invoke keymap 'getName))
 
-(define (set-keymap-parent (keymap  :: <keymap>) parent)
+(define (set-keymap-parent (keymap  ::<keymap>) parent)
   (invoke keymap 'setParent (or parent #!null)))
 
 (define (set-keymap-parents (keymap  :: <keymap>) parents)
@@ -435,23 +435,23 @@
 	(make <marker>
 	  buffer
 	  (invoke buffer 'positionToOffset position)
-	  (if kind 2 1)))))
+          kind))))
 
-(define (marker-position (marker <marker>))
+(define (marker-position (marker ::<marker>))
   (let ((value (invoke marker 'getPoint)))
     (if (= value 0) #f value)))
 
-(define (marker-buffer (marker <marker>))
+(define (marker-buffer (marker ::<marker>))
   (invoke marker 'getBuffer))
 
-(define (set-marker (marker <marker>) position
-                    #!optional (buffer :: <buffer> (current-buffer)))
+(define (set-marker (marker ::<marker>) position
+                    #!optional (buffer ::<buffer> (current-buffer)))
   (invoke marker 'set buffer (invoke buffer 'positionToOffset position)))
 
 ;;; TEXT
 
 (define (insert-char ch #!optional (count '())
-		     (buffer :: <buffer> (current-buffer)))
+		     (buffer ::<buffer> (current-buffer)))
   (invoke buffer 'insertChar
 	  (gnu.jemacs.lang.ELisp:asChar ch)
 	  (if (eq? count '()) 1 count) #!null))

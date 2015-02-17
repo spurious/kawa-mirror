@@ -1,3 +1,7 @@
+2015-02-16  Per Bothner  <per@bothner.com>
+
+	* PrimOps.scm: Update type specifier syntax.
+
 2014-02-25  Charles Turner  <chturne@gmail.com>
 
 	* PrimOps.scm (flet, apply, funcall): Move to primitives.lisp

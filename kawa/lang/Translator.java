@@ -768,9 +768,11 @@ public class Translator extends Compilation
                     LambdaExp caller = (LambdaExp) scope;
                     ClassExp cexp = (ClassExp) scope.getOuter();
                     ClassType ctype = (ClassType) cexp.getClassType();
-                    // BUG: lookupMember doesn't work if ctype
-                    // is a class that hasn't been compiled yet,
-                    // such that ClassExp#declareParts hasn't been called.
+                    // If ctype is a class that hasn't been compiled yet (and
+                    // ClassExp#declareParts hasn't been called yet)
+                    // then we may may get a tentative Field created
+                    // by ClassExp#createFields.
+                    // BUG: This doesn't work for not-yet compiled methods.
                     Member part = SlotGet.lookupMember(ctype, dname, ctype);
                     boolean contextStatic
                         = (caller == cexp.clinitMethod

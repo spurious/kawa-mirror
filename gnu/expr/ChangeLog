@@ -1,3 +1,11 @@
+2015-02-17  Per Bothner  <per@bothner.com>
+
+	* ClassExp.java: Add support for a reference from a subclass to a
+	field in a not-yet-compiler superclass.
+	(createField): New method.
+	(setTypes, declareParts): Change accordingly.
+	* Declaration.java (getterMethod, setterMethod): New fields.
+
 2015-02-14  Per Bothner  <per@bothner.com>
 
 	* FindTailCalls.java (checkInlineable): Make sure to null inlineHome

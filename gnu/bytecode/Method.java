@@ -322,6 +322,7 @@ public class Method implements AttrContainer, Member {
     public ClassType getDeclaringClass() { return classfile; }
 
     public final Type getReturnType() { return return_type; }
+    public final void setReturnType(Type type) { return_type = type; }
 
     public final Type[] getParameterTypes() { return arg_types; }
 

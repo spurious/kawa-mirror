@@ -683,6 +683,18 @@ public class ClassType extends ObjectType
     flags |= ADD_FIELDS_DONE;
   }
 
+    public void removeField(Field field, Field prev) {
+        if (field != (prev == null ? fields : prev.next))
+            new Error();
+        if (prev == null)
+            fields = field.next;
+        else
+            prev.next = field.next;
+        if (last_field == field)
+            last_field = null;
+        fields_count--;
+    }
+
   Method methods;
   int methods_count;
   Method last_method;

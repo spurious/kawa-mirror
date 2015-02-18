@@ -10,9 +10,13 @@ import java.lang.annotation.ElementType;
 
 public class ClassExp extends LambdaExp
 {
-    boolean simple;
+    int state;
+    static final int PARTS_PREDECLARED = 1;
+    static final int TYPES_SET = 2;
+    static final int PARTS_DECLARED = 3;
+
+    private boolean simple;
     public boolean isSimple() { return simple; }
-    public void setSimple(boolean value) { simple = value; }
 
     public final boolean isAbstract() { return getFlag(IS_ABSTRACT); }
     public static final int IS_ABSTRACT = LambdaExp.NEXT_AVAIL_FLAG;
@@ -125,7 +129,44 @@ public class ClassExp extends LambdaExp
         return compiledType;
     }
 
+    /** Create a Field in the instanceClass for each declared field.
+     * This allows name SlotGet.lookupMember (used in Translator.rewrite
+     * when looking for a binding for a symbol) to return a match.
+     * Note that if we later (in setTypes) create a pair-type, then the
+     * field will be replaced by a getter/setter pair.  Later yet
+     * (in declareParts): We set the types of the Field or getter/setter pair.
+     * We should create tentative Methods for methods in the same manner,
+     * but that is is a project for another day.
+     */
+    public void createFields(Compilation comp) {
+        if (state >= PARTS_PREDECLARED)
+            return;
+        state = PARTS_PREDECLARED;
+        Hashtable<String,Declaration> seenFields
+            = new Hashtable<String,Declaration>();
+        for (Declaration decl = firstDecl();
+             decl != null;  decl = decl.nextDecl()) {
+            // If the declaration derives from a method, don't create field.
+            if (decl.getCanRead()) {
+                int flags = decl.getAccessFlags(Access.PUBLIC);
+                if (decl.getFlag(Declaration.STATIC_SPECIFIED))
+                    flags |= Access.STATIC;
+                String fname = Compilation.mangleNameIfNeeded(decl.getName());
+                decl.field
+                    = instanceType.addField(fname, null, flags);
+                Declaration old = seenFields.get(fname);
+                if (old != null)
+                    duplicateDeclarationError(old, decl, comp);
+                seenFields.put(fname, decl);
+            }
+        }
+    }
+
     public void setTypes(Compilation comp) {
+        if (state >= TYPES_SET)
+            return;
+        createFields(comp);
+        state = TYPES_SET;
         int nsupers = supers == null ? 0 : supers.length;
         ClassType[] superTypes = new ClassType[nsupers];
         ClassType superType = null;
@@ -196,6 +237,29 @@ public class ClassExp extends LambdaExp
         if (isMakingClassPair()) {
             instanceType.setName(compiledType.getName()+"$class");
             comp.addClass(instanceType);
+
+            // Convert fields to getter/setter pairs.
+            // Note we don't know their types yet.
+            Field prev = null;
+            for (Declaration decl = firstDecl();
+                 decl != null;  decl = decl.nextDecl()) {
+                Field fld = decl.field;
+                if (decl.getCanRead()) {
+                    int fflags = decl.field.getFlags() | Access.ABSTRACT;
+                    String gname = slotToMethodName("get", decl.getName());
+                    decl.getterMethod =
+                        compiledType.addMethod(gname,
+                                               fflags, Type.typeArray0, null);
+                    String sname = slotToMethodName("set", decl.getName());
+                    Type[] stypes = { null };
+                    decl.setterMethod =
+                        compiledType.addMethod(sname, fflags, stypes,
+                                               Type.voidType);
+                    instanceType.removeField(fld, prev);
+                    decl.field = null;
+                }
+                prev = fld;
+            }
         }
     }
 
@@ -270,40 +334,21 @@ public class ClassExp extends LambdaExp
         return name;
     }
 
-    boolean partsDeclared;
-
     public void declareParts(Compilation comp) {
-        if (partsDeclared)
+        if (state >= PARTS_DECLARED)
             return;
-        partsDeclared = true;
-        Hashtable<String,Declaration> seenFields
-            = new Hashtable<String,Declaration>();
+        setTypes(comp);
+        state = PARTS_DECLARED;
         for (Declaration decl = firstDecl();
              decl != null;  decl = decl.nextDecl()) {
-            // If the declaration derives from a method, don't create field.
             if (decl.getCanRead()) {
-                int flags = decl.getAccessFlags(Access.PUBLIC);
-                if (decl.getFlag(Declaration.STATIC_SPECIFIED))
-                    flags |= Access.STATIC;
                 if (isMakingClassPair()) {
-                    flags |= Access.ABSTRACT;
                     Type ftype = decl.getType().getImplementationType();
-                    String gname = slotToMethodName("get", decl.getName());
-                    compiledType.addMethod(gname,
-                                           flags, Type.typeArray0, ftype);
-                    Type[] stypes = { ftype };
-                    String sname = slotToMethodName("set",decl.getName());
-                    compiledType.addMethod(sname, flags, stypes, Type.voidType);
+                    decl.getterMethod.setReturnType(ftype);
+                    decl.setterMethod.getParameterTypes()[0] = ftype;
                 } else {
-                    String fname
-                        = Compilation.mangleNameIfNeeded(decl.getName());
-                    decl.field
-                        = instanceType.addField(fname, decl.getType(), flags);
                     decl.setSimple(false);
-                    Declaration old = seenFields.get(fname);
-                    if (old != null)
-                        duplicateDeclarationError(old, decl, comp);
-                    seenFields.put(fname, decl);
+                    decl.field.setType(decl.getType());
                 }
             }
         }

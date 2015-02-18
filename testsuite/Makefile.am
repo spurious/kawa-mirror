@@ -619,7 +619,7 @@ SCRIPTS_TO_RUN = case-warnings.scm uninit1.scm \
   convert1.scm inner-1.scm lambda-in-class-1.scm reflect1.scm reflect2.scm \
   promise1.scm bad-keywords1.scm splice1.scm standards1.scm \
   anonymous-lambda-1.scm unreach1.scm unreach2.scm unreach3.scm \
-  bad-defclass.scm defclass1.scm defclass2.scm bad-voidexp.scm \
+  bad-defclass.scm defclass1.scm defclass2.scm defclass3.scm bad-voidexp.scm \
   srfi-45-test1.scm srfi-45-test2.scm bad-srfi-109.scm \
   inline1.scm inline2.scm inline3.scm \
   define1.scm define2.scm define3.scm mac-obj.scm objexp1.scm \

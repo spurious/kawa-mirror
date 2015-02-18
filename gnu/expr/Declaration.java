@@ -246,7 +246,9 @@ public class Declaration
    * If IS_FLUID, base points to IS_UNKNOWN Symbol. */
   public Declaration base;
 
-  public Field field;
+    public Field field;
+    public Method getterMethod;
+    public Method setterMethod;
 
   /** If this is a field in some object, load a reference to that object. */
   void loadOwningObject (Declaration owner, Compilation comp)

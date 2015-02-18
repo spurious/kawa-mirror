@@ -103,6 +103,7 @@ public class define_class extends Syntax
     else
       ctype = new ClassType(clname);
     oexp.setClassType(ctype);
+    oexp.createFields(tr);
     if (saved == null)
 	return false;
     st = Translator.makePair(st, this, Translator.makePair(p, decl, saved));

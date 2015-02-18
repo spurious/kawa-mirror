@@ -107,8 +107,8 @@ public class PropertyLocation extends Location<Object>
   }
 
   /** Set the property list assocated with an object in a given Environment.
-   * Corresponds to Common Lisp's <code>(setf symbol-plist)</code> function.
-   * @see #setPropertyList(Object, Object, Environment).
+   * Corresponds to Common Lisp's {@code (setf symbol-plist)} function.
+   * @see #setPropertyList(Object,Object,Environment)
    */
   public static void setPropertyList (Object symbol, Object plist)
   {
@@ -117,11 +117,11 @@ public class PropertyLocation extends Location<Object>
   }
 
   /** Gets a property value associated with an object.
-   * @param symbol Usually a <code>Symbol</code>, but can be any
-   *   <code>Object>/code>.  A <code>String</code> is converted to a
-   *   <code>Symbol</code> using <code>env.getSymbol()</code>.
+   * @param symbol Usually a {@code Symbol}, but can be any
+   *   {@code Object}.  A {@code String} is converted to a
+   *   {@code Symbol} using {@code env.getSymbol()}.
    *   Symbols require a constant-type hash lookup; other object
-   *   are serached linearly.
+   *   are searched linearly.
    */
   public static Object getProperty (Object symbol, Object property,
 				    Object defaultValue, Environment env)
@@ -139,7 +139,7 @@ public class PropertyLocation extends Location<Object>
 
   /** Gets a property value associated with an object.
    * Corresponds to Common Lisp's <code>get</code> function.
-   * @see #getProperty(Object, Object, Object, Environment).
+   * @see #getProperty(Object,Object,Object,Environment)
    */
   public static Object getProperty (Object symbol, Object property,
 				    Object defaultValue)

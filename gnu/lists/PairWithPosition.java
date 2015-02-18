@@ -109,8 +109,8 @@ public class PairWithPosition extends ImmutablePair
 
   /**
    * @serialData Write the car followed by the cdr,
-   *   followed by filename (as an Object, so it can be shared),
-   *   followed by position (line|(column<<20)).
+   *   followed by filename (as an {@code Object}, so it can be shared),
+   *   followed by position {@code (line|(column<<20))}.
    */
   public void writeExternal(ObjectOutput out) throws IOException
   {

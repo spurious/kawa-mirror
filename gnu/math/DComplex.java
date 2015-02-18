@@ -156,7 +156,7 @@ public class DComplex extends Complex implements Externalizable
   // The code below is adapted from f2c's libF77, and is subject to this
   // copyright:
  
-  /****************************************************************
+  /*
     Copyright 1990, 1991, 1992, 1993 by AT&T Bell Laboratories and Bellcore.
  
     Permission to use, copy, modify, and distribute this software
@@ -177,7 +177,7 @@ public class DComplex extends Complex implements Externalizable
     in an action of contract, negligence or other tortious action,
     arising out of or in connection with the use or performance of
     this software.
-    ****************************************************************/
+   */
 
   public static DComplex div (double x_re, double x_im,
 			      double y_re, double y_im)

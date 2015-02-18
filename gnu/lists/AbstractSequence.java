@@ -294,9 +294,9 @@ public abstract class AbstractSequence<E>
    * following (poses, posNumber); if negative the negative of the number
    * of elements to remove before (poses, posNumber).
    * @exception java.lang.IndexOutOfBoundsException
-   *   if (count >= 0 ? (index < 0 || index + count > size())
-   *       : (index + count < 0 || index > size())),
-   *   where index == nextIndex(ipos, xpos).
+   *   if {@code (count >= 0 ? (index < 0 || index + count > size())
+   *       : (index + count < 0 || index > size()))},
+   *   where {@code index == nextIndex(ipos, xpos)}.
    */
   public void removePos(int ipos, int count)
   {
@@ -312,8 +312,8 @@ public abstract class AbstractSequence<E>
    * @param ipos0 start of range, as a poistion
    * @param ipos1 end of range
    * @exception java.lang.IndexOutOfBoundsException
-   *   if nextIndex(ipos0) > nextIndex(ipos1)
-   *   || nextIndex(ipos0) < 0 || nextIndex(ipos1) > size()
+   *   if {@code nextIndex(ipos0) > nextIndex(ipos1)}
+   *   or {@code nextIndex(ipos0) < 0} or {@code nextIndex(ipos1) > size()}.
    */
   protected void removePosRange(int ipos0, int ipos1)
   {

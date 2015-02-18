@@ -101,7 +101,7 @@ public abstract class Numeric extends java.lang.Number
     return compare (x) >= 0;
   }
 
-  /** Calculate x+k&this. */
+  /** Calculate {@code x+k&this}. */
   public Numeric addReversed (Numeric x, int k)
   {
     throw new IllegalArgumentException ();

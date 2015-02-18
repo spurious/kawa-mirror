@@ -3,7 +3,7 @@ import gnu.mapping.*;
 import gnu.lists.*;
 
 /** Compare nodes for document order.
- * Implements the XQuery operators '<<', '>>', 'is', 'isnot'.
+ * Implements the XQuery operators '{@code <<}', '{@code >>}', '{@code is}', '{@code isnot}'.
  */
 
 public class NodeCompare extends Procedure2

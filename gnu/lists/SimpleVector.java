@@ -19,7 +19,7 @@ public abstract class SimpleVector<E> extends AbstractSequence<E>
     implements Sequence<E>, Array<E>, RandomAccess
 {
   /** The (current) number of elements.
-   * Must always have size() >= 0 && size() <= getBufferLength(). */
+   * Must always have{@code size() >= 0 && size() <= getBufferLength()}. */
   protected int size;
 
   public final int size() { return size; }

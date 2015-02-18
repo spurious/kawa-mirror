@@ -288,9 +288,9 @@ public class Nodes extends Values.FromList<SeqPosition>
   }
   /* #endif */
 
-    /** Optimization of ((SeqPosition) get(index)).sequence.
+    /** Optimization of {@code ((SeqPosition) get(index)).sequence}.
      * However returns null instead of throwing IndexOutOfBoundsException
-     * if index >= count. */
+     * if {@code index >= count}. */
     public AbstractSequence getSeq(int index) {
         if (index >= vector.gapStart) {
             index += vector.gapEnd - vector.gapStart;

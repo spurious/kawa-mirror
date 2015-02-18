@@ -12,9 +12,6 @@ AC_ARG_ENABLE(kawa-frontend,
   [  --enable-kawa-frontend  Build "kawa" front-end program using readline],
   enable_kawa_frontend=$enableval, enable_kawa_frontend=no)
 
-AC_ARG_WITH(libtool,
-  AS_HELP_STRING(--with-libtool, Use libtool))
-
 AC_ARG_ENABLE(xml,
   AS_HELP_STRING(--disable-xml,Don't build support for XML processing),
   enable_xml=$enableval, enable_xml=yes)
@@ -175,7 +172,6 @@ AM_CONDITIONAL(WITH_JAVAX_SCRIPT, test "$with_javax_script" = "yes")
 AM_CONDITIONAL(WITH_HTTPSERVER, test "$with_httpserver" = "yes")
 AM_CONDITIONAL(WITH_XQTS, test "$with_XQTS" != "" -a "$with_XQTS" != "no")
 AM_CONDITIONAL(ENABLE_KAWA_FRONTEND, test "$enable_kawa_frontend" = "yes")
-AM_CONDITIONAL(WITH_LIBTOOL, test "$with_libtool" = "yes")
 AM_CONDITIONAL(ON_WINDOWS, test "$CLASSPATH_SEPARATOR" = ";")
 
 JEMACS_VERSION=`echo $VERSION | sed  -e 's/^1/0/'`

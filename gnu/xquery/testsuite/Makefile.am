@@ -3,7 +3,7 @@ include $(top_srcdir)/Make-rules
 KAWALIB = $(top_builddir)
 KAWA = ../../../bin/kawa.sh
 EXTRA_CLEAN = tmp* *.log testing.zip */*.class
-mostlyclean-am: mostlyclean-generic mostlyclean-libtool
+mostlyclean-am: mostlyclean-generic
 	rm -rf Mod1 Mod2
 
 java_sources = TestMisc.java TestSuite.java RunXQTS.java

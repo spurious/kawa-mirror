@@ -1,5 +1,8 @@
 2015-02-17  Per Bothner  <per@bothner.com>
 
+	* configure.ac: Remove WITH_LIBTOOL macro and --with-libtool option.
+	* Make-rules: Remove libtool junk.
+
 	* build.xml (lib-scm-classes): Update to match kawa/lib/Makefile.am.
 
 2015-01-20  Per Bothner  <per@bothner.com>

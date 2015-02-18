@@ -214,14 +214,10 @@ CLASSPATH = $(JAVAROOT)$(CLASSPATH_SEPARATOR)$(srcdir)@filesep@$(JAVAROOT)$(CLAS
 CLASSPATH_ENV = CLASSPATH="$(CLASSPATH)"
 JAVAROOT = $(top_builddir)
 JAR = fastjar
-OFILES_DIR = $(TO_TOPDIR)/bin
 TO_TOPDIR = $(top_builddir)
-@WITH_LIBTOOL_TRUE@LIBTOOL = libtool
-@WITH_LIBTOOL_FALSE@PACKAGE_OFILE = $(OFILES_DIR)/$(PACKAGE_FNAME).o
-@WITH_LIBTOOL_TRUE@PACKAGE_OFILE = $(OFILES_DIR)/$(PACKAGE_FNAME).lo
 java_Java = $(java_BUILT) $(java_sources)
 DISTFILES = $(DIST_COMMON)  $(java_sources) $(java_SCM) $(TEXINFOS) $(EXTRA_DIST)
-CLEANFILES = $(java_BUILT) *.class *.stamp *.jar $(PACKAGE_OFILE) $(EXTRA_CLEAN)
+CLEANFILES = $(java_BUILT) *.class *.stamp *.jar $(EXTRA_CLEAN)
 KAWA_COMPILER = $(JAVA) -classpath "$(CLASSPATH)" kawa.repl -d $(top_builddir) \
   -P `echo $(PACKAGE_FNAME)|sed -e s/-/./g`.
 
@@ -274,12 +270,6 @@ $(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
 $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(am__aclocal_m4_deps):
-
-mostlyclean-libtool:
-	-rm -f *.lo
-
-clean-libtool:
-	-rm -rf .libs _libs
 tags TAGS:
 
 ctags CTAGS:
@@ -354,7 +344,7 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-am
 
-clean-am: clean-generic clean-libtool mostlyclean-am
+clean-am: clean-generic mostlyclean-am
 
 distclean: distclean-am
 	-rm -f Makefile
@@ -406,7 +396,7 @@ maintainer-clean-am: distclean-am maintainer-clean-generic
 
 mostlyclean: mostlyclean-am
 
-mostlyclean-am: mostlyclean-generic mostlyclean-libtool
+mostlyclean-am: mostlyclean-generic
 
 pdf: pdf-am
 
@@ -420,17 +410,16 @@ uninstall-am:
 
 .MAKE: install-am install-strip
 
-.PHONY: all all-am check check-am clean clean-generic clean-libtool \
-	cscopelist-am ctags-am distclean distclean-generic \
-	distclean-libtool distdir dvi dvi-am html html-am info info-am \
-	install install-am install-data install-data-am install-dvi \
-	install-dvi-am install-exec install-exec-am install-html \
-	install-html-am install-info install-info-am install-man \
-	install-pdf install-pdf-am install-ps install-ps-am \
-	install-strip installcheck installcheck-am installdirs \
-	maintainer-clean maintainer-clean-generic mostlyclean \
-	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
-	tags-am uninstall uninstall-am
+.PHONY: all all-am check check-am clean clean-generic cscopelist-am \
+	ctags-am distclean distclean-generic distdir dvi dvi-am html \
+	html-am info info-am install install-am install-data \
+	install-data-am install-dvi install-dvi-am install-exec \
+	install-exec-am install-html install-html-am install-info \
+	install-info-am install-man install-pdf install-pdf-am \
+	install-ps install-ps-am install-strip installcheck \
+	installcheck-am installdirs maintainer-clean \
+	maintainer-clean-generic mostlyclean mostlyclean-generic pdf \
+	pdf-am ps ps-am tags-am uninstall uninstall-am
 
 
 java-classes.stamp: $(java_Java)

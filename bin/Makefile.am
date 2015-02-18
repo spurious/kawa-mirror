@@ -29,8 +29,8 @@ install-binPROGRAMS: $(bin_PROGRAMS)
 	@$(NORMAL_INSTALL)
 	test -z "$(bindir)" || $(mkdir_p) "$(DESTDIR)$(bindir)"
 if ENABLE_KAWA_FRONTEND
-	$(INSTALL_PROGRAM_ENV) $(LIBTOOL_INSTALL) $(binPROGRAMS_INSTALL) kawa$(EXEEXT) $(DESTDIR)$(bindir)/kawa$(EXEEXT)
+	$(INSTALL_PROGRAM_ENV) $(binPROGRAMS_INSTALL) kawa$(EXEEXT) $(DESTDIR)$(bindir)/kawa$(EXEEXT)
 endif
 if ENABLE_SERVLET
-	$(INSTALL_PROGRAM_ENV) $(LIBTOOL_INSTALL) $(binPROGRAMS_INSTALL) cgi-servlet$(EXEEXT) $(DESTDIR)$(bindir)/cgi-servlet$(EXEEXT)
+	$(INSTALL_PROGRAM_ENV) $(binPROGRAMS_INSTALL) cgi-servlet$(EXEEXT) $(DESTDIR)$(bindir)/cgi-servlet$(EXEEXT)
 endif

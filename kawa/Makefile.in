@@ -276,14 +276,10 @@ CLASSPATH = $(JAVAROOT)$(CLASSPATH_SEPARATOR)$(srcdir)@filesep@$(JAVAROOT)$(CLAS
 CLASSPATH_ENV = CLASSPATH="$(CLASSPATH)"
 JAVAROOT = $(top_builddir)
 JAR = fastjar
-OFILES_DIR = $(TO_TOPDIR)/bin
 TO_TOPDIR = $(top_builddir)
-@WITH_LIBTOOL_TRUE@LIBTOOL = libtool
-@WITH_LIBTOOL_FALSE@PACKAGE_OFILE = $(OFILES_DIR)/$(PACKAGE_FNAME).o
-@WITH_LIBTOOL_TRUE@PACKAGE_OFILE = $(OFILES_DIR)/$(PACKAGE_FNAME).lo
 java_Java = $(java_BUILT) $(java_sources)
 DISTFILES = $(DIST_COMMON)  $(java_sources) $(java_SCM) $(TEXINFOS) $(EXTRA_DIST)
-CLEANFILES = $(java_BUILT) *.class *.stamp *.jar $(PACKAGE_OFILE) $(EXTRA_CLEAN)
+CLEANFILES = $(java_BUILT) *.class *.stamp *.jar $(EXTRA_CLEAN)
 KAWA_COMPILER = $(JAVA) -classpath "$(CLASSPATH)" kawa.repl -d $(top_builddir) \
   -P `echo $(PACKAGE_FNAME)|sed -e s/-/./g`.
 
@@ -425,12 +421,6 @@ $(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
 $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(am__aclocal_m4_deps):
-
-mostlyclean-libtool:
-	-rm -f *.lo
-
-clean-libtool:
-	-rm -rf .libs _libs
 
 # This directory's subdirectories are mostly independent; you can cd
 # into them and run 'make' without going through this Makefile.
@@ -624,7 +614,7 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-recursive
 
-clean-am: clean-generic clean-libtool mostlyclean-am
+clean-am: clean-generic mostlyclean-am
 
 distclean: distclean-recursive
 	-rm -f Makefile
@@ -676,7 +666,7 @@ maintainer-clean-am: distclean-am maintainer-clean-generic
 
 mostlyclean: mostlyclean-recursive
 
-mostlyclean-am: mostlyclean-generic mostlyclean-libtool
+mostlyclean-am: mostlyclean-generic
 
 pdf: pdf-recursive
 
@@ -691,17 +681,16 @@ uninstall-am:
 .MAKE: $(am__recursive_targets) install-am install-strip
 
 .PHONY: $(am__recursive_targets) CTAGS GTAGS TAGS all all-am check \
-	check-am clean clean-generic clean-libtool cscopelist-am ctags \
-	ctags-am distclean distclean-generic distclean-libtool \
-	distclean-tags distdir dvi dvi-am html html-am info info-am \
-	install install-am install-data install-data-am install-dvi \
-	install-dvi-am install-exec install-exec-am install-html \
-	install-html-am install-info install-info-am install-man \
-	install-pdf install-pdf-am install-ps install-ps-am \
-	install-strip installcheck installcheck-am installdirs \
-	installdirs-am maintainer-clean maintainer-clean-generic \
-	mostlyclean mostlyclean-generic mostlyclean-libtool pdf pdf-am \
-	ps ps-am tags tags-am uninstall uninstall-am
+	check-am clean clean-generic cscopelist-am ctags ctags-am \
+	distclean distclean-generic distclean-tags distdir dvi dvi-am \
+	html html-am info info-am install install-am install-data \
+	install-data-am install-dvi install-dvi-am install-exec \
+	install-exec-am install-html install-html-am install-info \
+	install-info-am install-man install-pdf install-pdf-am \
+	install-ps install-ps-am install-strip installcheck \
+	installcheck-am installdirs installdirs-am maintainer-clean \
+	maintainer-clean-generic mostlyclean mostlyclean-generic pdf \
+	pdf-am ps ps-am tags tags-am uninstall uninstall-am
 
 
 java-classes.stamp: $(java_Java)

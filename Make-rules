@@ -5,17 +5,10 @@ CLASSPATH = $(JAVAROOT)$(CLASSPATH_SEPARATOR)$(srcdir)@filesep@$(JAVAROOT)$(CLAS
 CLASSPATH_ENV = CLASSPATH="$(CLASSPATH)"
 JAVAROOT = $(top_builddir)
 JAR = fastjar
-OFILES_DIR = $(TO_TOPDIR)/bin
 TO_TOPDIR = $(top_builddir)
-if WITH_LIBTOOL
-LIBTOOL = libtool
-PACKAGE_OFILE = $(OFILES_DIR)/$(PACKAGE_FNAME).lo
-else
-PACKAGE_OFILE = $(OFILES_DIR)/$(PACKAGE_FNAME).o
-endif
 java_Java= $(java_BUILT) $(java_sources)
 DISTFILES = $(DIST_COMMON)  $(java_sources) $(java_SCM) $(TEXINFOS) $(EXTRA_DIST)
-CLEANFILES = $(java_BUILT) *.class *.stamp *.jar $(PACKAGE_OFILE) $(EXTRA_CLEAN)
+CLEANFILES = $(java_BUILT) *.class *.stamp *.jar $(EXTRA_CLEAN)
 
 java-classes.stamp: $(java_Java)
 	$(JAVAC) -d $(JAVAROOT) -classpath "$(CLASSPATH)" $(JAVACFLAGS) $?

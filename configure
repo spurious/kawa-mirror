@@ -603,8 +603,6 @@ SAX2_PREPROCESS
 XQTS_PATH
 ON_WINDOWS_FALSE
 ON_WINDOWS_TRUE
-WITH_LIBTOOL_FALSE
-WITH_LIBTOOL_TRUE
 ENABLE_KAWA_FRONTEND_FALSE
 ENABLE_KAWA_FRONTEND_TRUE
 WITH_XQTS_FALSE
@@ -722,7 +720,6 @@ enable_option_checking
 enable_maintainer_mode
 enable_silent_rules
 enable_kawa_frontend
-with_libtool
 enable_xml
 with_servlet
 with_android
@@ -1376,7 +1373,6 @@ Optional Features:
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
-  --with-libtool          Use libtool
   --with-servlet[=servlet-api.jar]
                           Build support for generating servlets
   --with-android[=android.jar]
@@ -2532,13 +2528,6 @@ else
 fi
 
 
-
-# Check whether --with-libtool was given.
-if test "${with_libtool+set}" = set; then :
-  withval=$with_libtool;
-fi
-
-
 # Check whether --enable-xml was given.
 if test "${enable_xml+set}" = set; then :
   enableval=$enable_xml; enable_xml=$enableval
@@ -2907,14 +2896,6 @@ else
   ENABLE_KAWA_FRONTEND_FALSE=
 fi
 
- if test "$with_libtool" = "yes"; then
-  WITH_LIBTOOL_TRUE=
-  WITH_LIBTOOL_FALSE='#'
-else
-  WITH_LIBTOOL_TRUE='#'
-  WITH_LIBTOOL_FALSE=
-fi
-
  if test "$CLASSPATH_SEPARATOR" = ";"; then
   ON_WINDOWS_TRUE=
   ON_WINDOWS_FALSE='#'
@@ -3224,10 +3205,6 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${ENABLE_KAWA_FRONTEND_TRUE}" && test -z "${ENABLE_KAWA_FRONTEND_FALSE}"; then
   as_fn_error $? "conditional \"ENABLE_KAWA_FRONTEND\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
-if test -z "${WITH_LIBTOOL_TRUE}" && test -z "${WITH_LIBTOOL_FALSE}"; then
-  as_fn_error $? "conditional \"WITH_LIBTOOL\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${ON_WINDOWS_TRUE}" && test -z "${ON_WINDOWS_FALSE}"; then

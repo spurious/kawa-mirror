@@ -8,7 +8,7 @@ import java.util.zip.*;
 /** A class to manipulate a .zip archive.
  * Does not handle compression/uncompression, though that could be added.
  * When used an an application. provides a simplified tar-like interface.
- * @author	Per Bothner <bothner@cygnus.com>
+ * @author	Per Bothner bothner@cygnus.com
  */
 
 public class ZipArchive

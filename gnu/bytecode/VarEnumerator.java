@@ -5,7 +5,7 @@ package gnu.bytecode;
 
 /** Use this Enuemration class to iterate over the Variables in a Scope.
  * Descends into child scopes.
- * @author	Per Bothner <bothner@cygnus.com>
+ * @author	Per Bothner bothner@cygnus.com
  */
 
 public class VarEnumerator implements java.util.Enumeration

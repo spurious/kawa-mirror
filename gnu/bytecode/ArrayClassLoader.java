@@ -33,7 +33,9 @@ public class ArrayClassLoader extends ClassLoader
   public void setResourceContext (URL context) { this.context = context; }
 
   /** Load classes from the given byte arrays.
-    By convention, the classes we manage are named "lambda"+<INTEGER>. */
+   * By convention, the classes we manage are named
+   * {@code "lambda"+<INTEGER>}.
+   */
   public ArrayClassLoader (byte[][] classBytes)
   {
     for (int i = classBytes.length;  --i >= 0; )

@@ -1,4 +1,4 @@
-(define-library (kawa all)
+(define-library (kawa base)
   (include-library-declarations
    "../scheme/base-exports"
    "../scheme/char-exports"

@@ -33,7 +33,7 @@ java_SCM_ALWAYS =\
   kawa/expressions.scm \
   kawa/string-cursors.scm \
   kawa/quaternions.scm \
-  kawa/hashtable.scm kawa/regex.scm kawa/reflect.scm kawa/all.scm \
+  kawa/hashtable.scm kawa/regex.scm kawa/reflect.scm kawa/base.scm \
   rnrs/hashtables.scm rnrs/lists.scm \
   srfi95.scm rnrs/unicode.scm rnrs/sorting.scm rnrs/programs.scm \
   scheme/base.scm scheme/case-lambda.scm scheme/char.scm \

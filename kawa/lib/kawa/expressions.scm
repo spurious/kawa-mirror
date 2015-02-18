@@ -1,14 +1,24 @@
 ;; Experimental API for manipulating and validating expressions.
 
 (module-name (kawa expressions))
+(export ->exp get-visitor get-compilation visit-exp
+        syntax-as-exp define-validate
+        apply-exp begin-exp if-exp set-exp
+        Declaration Expression ApplyExp QuoteExp Compilation)
+(define-alias Expression gnu.expr.Expression)
+(define-alias ApplyExp gnu.expr.ApplyExp)
+(define-alias QuoteExp gnu.expr.QuoteExp)
+(define-alias Compilation gnu.expr.Compilation)
+(define-alias Declaration gnu.expr.Declaration)
+
 (require <kawa.lib.prim_syntax>)
 (require <kawa.lib.std_syntax>)
 
-(define (->exp obj) ::gnu.expr.Expression
+(define (->exp obj) ::Expression
   (cond ((gnu.expr.Expression? obj)
          obj)
         ((gnu.expr.Declaration? obj)
-         (gnu.expr.ReferenceExp (->gnu.expr.Declaration obj)))
+         (gnu.expr.ReferenceExp (->Declaration obj)))
         (else
          (gnu.expr.QuoteExp:getInstance obj))))
 
@@ -31,10 +41,10 @@
 
 (define (apply-exp func . args) ::gnu.expr.ApplyExp
   (gnu.expr.ApplyExp (->exp func)
-                     @(map ->exp args)))
+                     @(gnu.kawa.functions.Map:map1 ->exp args)))
 
 (define (begin-exp . args)
-  (gnu.expr.BeginExp @(map ->exp args)))
+  (gnu.expr.BeginExp @(gnu.kawa.functions.Map:map1 ->exp args)))
 
 (define (if-exp a b #!optional (c #!null))
   (gnu.expr.IfExp (->exp a) (->exp b) (if (eq? c #!null) c (->exp c))))

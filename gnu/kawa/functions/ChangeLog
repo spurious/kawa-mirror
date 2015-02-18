@@ -1,3 +1,8 @@
+2015-02-17  Per Bothner  <per@bothner.com>
+
+	* Map.java: Use Scheme-written optimizer for map.
+	* CompileMisc.java (validateApplyMap): Removed.
+
 2015-02-14  Per Bothner  <per@bothner.com>
 
 	* Map.java: Use Scheme-written optimizer for for-each.

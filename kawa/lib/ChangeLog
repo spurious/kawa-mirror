@@ -1,5 +1,16 @@
 2015-02-17  Per Bothner  <per@bothner.com>
 
+	* compile_map.scm: Implement inlining for map and for-each.
+	(MapHelper): New abstract class.
+	(validate-generic-for-each): Change API to depend on a MapHelper
+	instance, rather than multiple functions.
+	* kawa/expressions.scm (Declaration, Expression, ApplyExp, QuoteExp)
+	Compilation): Define and export some type aliases.
+	(begin-exp, apply-exp): Don't use the map function, since
+	compiling it depends on compile_map, which isn't compiled yet.
+	* Makefile.am (java_SCM_ALWAYS): Re-arrange, since vector depends
+	on map, which depends on kawa/expression and compile_map.
+
 	* kawa/all.scm:  Rename to ...
 	* kawa/base.scm: ... new name.
 	* Makefile.am: Update accordingly.

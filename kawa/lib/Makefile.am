@@ -14,6 +14,8 @@ java_SCM_ALWAYS =\
   DefineRecordType.scm \
   ExceptionClasses.scm \
   exceptions.scm \
+  kawa/expressions.scm \
+  compile_misc.scm compile_map.scm \
   thread.scm \
   characters.scm \
   keywords.scm \
@@ -30,7 +32,6 @@ java_SCM_ALWAYS =\
   bytevectors.scm \
   arrays.scm \
   system.scm \
-  kawa/expressions.scm \
   kawa/string-cursors.scm \
   kawa/quaternions.scm \
   kawa/hashtable.scm kawa/regex.scm kawa/reflect.scm kawa/base.scm \
@@ -41,7 +42,7 @@ java_SCM_ALWAYS =\
   scheme/inexact.scm scheme/lazy.scm scheme/load.scm \
   scheme/process-context.scm scheme/read.scm scheme/repl.scm scheme/time.scm \
   scheme/write.scm scheme/r5rs.scm \
-  compile_misc.scm compile_map.scm trace.scm
+  trace.scm
 
 scm_WITH_SWING = windows.scm
 EXTRA_DIST = $(java_SCM_ALWAYS) $(scm_WITH_SWING) \

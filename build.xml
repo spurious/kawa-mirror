@@ -552,6 +552,9 @@
         <file name="DefineRecordType.scm"/>
         <file name="ExceptionClasses.scm"/>
         <file name="exceptions.scm"/>
+        <file name="kawa/expressions.scm"/>
+        <file name="compile_misc.scm"/>
+        <file name="compile_map.scm"/>
         <file name="thread.scm"/>
         <file name="characters.scm"/>
         <file name="keywords.scm"/>
@@ -568,11 +571,12 @@
         <file name="bytevectors.scm"/>
         <file name="arrays.scm"/>
         <file name="system.scm"/>
-        <file name="kawa/expressions.scm"/>
         <file name="kawa/string-cursors.scm"/>
         <file name="kawa/quaternions.scm"/>
         <file name="kawa/hashtable.scm"/>
         <file name="kawa/regex.scm"/>
+        <file name="kawa/reflect.scm"/>
+        <file name="kawa/base.scm"/>
         <file name="rnrs/hashtables.scm"/>
         <file name="rnrs/lists.scm"/>
         <file name="srfi95.scm"/>
@@ -595,8 +599,6 @@
         <file name="scheme/time.scm"/>
         <file name="scheme/write.scm"/>
         <file name="scheme/r5rs.scm"/>
-        <file name="compile_misc.scm"/>
-        <file name="compile_map.scm"/>
         <file name="trace.scm"/>
       </filelist>
       <fileset dir="${src.dir}/kawa/lib">

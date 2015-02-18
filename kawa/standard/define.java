@@ -10,15 +10,15 @@ import gnu.kawa.reflect.Invoke;
 /**
  * The Syntax transformer that re-writes the "%define" internal form.
  * This is used to implement define, define-private, and define-constant.
- * Syntax: <code>(%define name code type value)</code>.
- * The <code>name</code> is an identifier (<code>String</code> or
- * <code>Symbol</code>) or </code>Declaration</code>.
- * The <code>code</code> is an integer mask,
+ * Syntax: {@code (%define name code type value)}.
+ * The {@code name} is an identifier ({@code String}> or
+ * {@code Symbol}) or {@code Declaration}.
+ * The {@code code} is an integer mask,
  * where 1 means type specified, 2 means a function definition,
  * 4 means private, 8 means constant, and 16 means an early constant.
  * As a special case, define-procedure is 1+2+8+16=27
- * The <code>type</code> is the declarated type or <code>null</code>.
- * The <code>value</code> is the initializing value.
+ * The {@code type} is the declarated type or{@code null}.
+ * The {@code value} is the initializing value.
  * @author	Per Bothner
  */
 

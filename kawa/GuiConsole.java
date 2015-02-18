@@ -10,7 +10,7 @@ import javax.swing.*;
 import java.awt.event.*;
 
 /** A Frame containing a Kawa read-eval-print loop.
-  * @author Albert Ting <alt@artisan.com> (original base)
+  * @author Albert Ting alt@artisan.com (original base)
   * @author Per Bothner (extensive changes).
   */
 

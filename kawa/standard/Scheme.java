@@ -1120,7 +1120,7 @@ public class Scheme extends LispLanguage {
     }
 
  /** Convert expression to a Type.
-   * Allow "TYPE" or 'TYPE or <TYPE>.
+   * Allow {@code "TYPE"} or {@code 'TYPE} or {@code <TYPE>}.
    */
   public static Type exp2Type (Expression exp)
   {

@@ -10,7 +10,7 @@ import gnu.kawa.models.Viewable;
 import gnu.kawa.swingviews.SwingDisplay;
 
 /** A Writer that appends its output to a ReplPane.
-  * Based on code from Albert L. Ting" <alt@artisan.com>.
+  * Based on code from Albert L. Ting" alt@artisan.com.
   */
 
 public class ReplPaneOutPort extends OutPort

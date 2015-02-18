@@ -80,7 +80,7 @@ public class ApplyExp extends Expression
 
     /** Copy over splice and keyword start indexes.
      * @param src orginal ApplyExp (may be the same as this)
-     * @aram amount to adjust indexes by
+     * @param amount to adjust indexes by
      */
     public void adjustSplice(ApplyExp src, int delta) {
         if (src.firstSpliceArg >= 0)

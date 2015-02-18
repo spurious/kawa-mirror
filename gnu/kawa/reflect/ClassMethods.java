@@ -157,8 +157,8 @@ public class ClassMethods extends Procedure2
    * those possibly applicable next (argtype overlaps parameter types);
    * and ending with those definitely not applicable (some argtype does
    * overlap its parameter type).
-   * @return ((number of definitely applicable methods) << 32
-   *          + (number of possibly applicable methods.
+   * @return {@code ((number of definitely applicable methods) << 32
+   *          + (number of possibly applicable methods}.
    */
   public static long selectApplicable(PrimProcedure[] methods,
                                       Type[] atypes, Type restType)

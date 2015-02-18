@@ -1449,7 +1449,7 @@ public class CodeAttr extends Attribute implements AttrContainer
   }
 
   /** Compile code to get a static field value.
-   * Stack:  ... => ..., value */
+   * Stack: {@code ... => ..., value} */
 
   public final void emitGetStatic(Field field)
   {
@@ -1458,7 +1458,7 @@ public class CodeAttr extends Attribute implements AttrContainer
   }
 
   /** Compile code to get a non-static field value.
-   * Stack:  ..., objectref => ..., value */
+   * Stack: {@code ..., objectref => ..., value} */
 
   public final void emitGetField(Field field)
   {
@@ -1468,7 +1468,7 @@ public class CodeAttr extends Attribute implements AttrContainer
   }
 
   /** Compile code to put a static field value.
-   * Stack:  ..., value => ... */
+   * Stack: {@code ..., value => ...} */
 
   public final void emitPutStatic (Field field)
   {
@@ -1768,7 +1768,7 @@ public class CodeAttr extends Attribute implements AttrContainer
     emitIfCompare1(155); // iflt
   }
 
-  /** Compile start of a conditional:  <tt>if (!(x opcode null)) ...</tt>.
+  /** Compile start of a conditional:  {@code if (!(x opcode null)) ...}.
    * The value of <tt>x</tt> must already have been pushed and must be of
    * reference type. */
   public final void emitIfRefCompare1 (int opcode)
@@ -1780,19 +1780,19 @@ public class CodeAttr extends Attribute implements AttrContainer
     emitTransfer (new_if.end_label, opcode);
   }  
   
-  /** Compile start of conditional:  if (x != null) */
+  /** Compile start of conditional:  {@code if (x != null) ...}. */
   public final void emitIfNotNull()
   {
     emitIfRefCompare1(198); // ifnull
   }
 
-  /** Compile start of conditional:  if (x == null) */
+  /** Compile start of conditional:  {@code if (x == null) ...} */
   public final void emitIfNull()
   {
     emitIfRefCompare1(199); // ifnonnull
   }  
   
-  /** Compile start of a conditional:  if (!(x OPCODE y)) ...
+  /** Compile start of a conditional:  {@code if (!(x OPCODE y)) ...}
    * The value of x and y must already have been pushed. */
   public final void emitIfIntCompare(int opcode)
   {
@@ -1823,7 +1823,7 @@ public class CodeAttr extends Attribute implements AttrContainer
     emitGotoIfEq(new_if.end_label);
   }
 
-  /** Compile start of a conditional:  if (x == y) ...
+  /** Compile start of a conditional:  {@code if (x == y) ...}
    * The values of x and y must already have been pushed. */
   public final void emitIfEq ()
   {
@@ -1831,7 +1831,7 @@ public class CodeAttr extends Attribute implements AttrContainer
     emitGotoIfNE(new_if.end_label);
   }
 
-  /** Compile start of a conditional:  if (x < y) ...
+  /** Compile start of a conditional:  {@code if (x < y) ...}
    * The values of x and y must already have been pushed. */
   public final void emitIfLt ()
   {
@@ -1839,7 +1839,7 @@ public class CodeAttr extends Attribute implements AttrContainer
     emitGotoIfGe(new_if.end_label);
   }
 
-  /** Compile start of a conditional:  if (x >= y) ...
+  /** Compile start of a conditional:  {@code if (x >= y) ...}
    * The values of x and y must already have been pushed. */
   public final void emitIfGe ()
   {
@@ -1847,7 +1847,7 @@ public class CodeAttr extends Attribute implements AttrContainer
     emitGotoIfLt(new_if.end_label);
   }
 
-  /** Compile start of a conditional:  if (x > y) ...
+  /** Compile start of a conditional:  {@code if (x > y) ...}
    * The values of x and y must already have been pushed. */
   public final void emitIfGt ()
   {
@@ -1855,7 +1855,7 @@ public class CodeAttr extends Attribute implements AttrContainer
     emitGotoIfLe(new_if.end_label);
   }
 
-  /** Compile start of a conditional:  if (x <= y) ...
+  /** Compile start of a conditional:  {@code if (x <= y) ...}
    * The values of x and y must already have been pushed. */
   public final void emitIfLe ()
   {

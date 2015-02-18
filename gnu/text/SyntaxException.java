@@ -5,7 +5,7 @@ package gnu.text;
 
 /** Used to signal a non-recoverable (fatal) syntax error.
  * Can also be used to signal a syntax error from embedded parsers,
- * such as an <code>eval</code> or </code>execute</code> method,
+ * such as an {@code eval} or {@code execute} method,
  * or well-formedness errors when reading an XML document.
  */
 

@@ -1,7 +1,7 @@
 package gnu.expr;
 import gnu.bytecode.*;
 
-/** A piece of code that needs to be added to <clinit>, <init>, or whatever. */
+/** A piece of code that needs to be added to {@code <clinit>}, {@code <init>}, or whatever. */
 
 public abstract class Initializer
 {

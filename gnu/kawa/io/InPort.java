@@ -25,8 +25,6 @@ import java.nio.charset.CharsetDecoder;
   * It would be nice if we could inherit from LineNumberReader.
   * That may be possible in theory, but it is difficult and
   * expensive (because we don't get access to BufferedReader's buffer).
-  *
-  * @author Per Bothner <bothner@cygnus.com>
   */
 
 public class InPort extends Reader implements Printable

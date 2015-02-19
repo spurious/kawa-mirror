@@ -19,59 +19,60 @@
   <p>This is the default handler, written in Kawa-Scheme.</>
   <p>Here are various request properties:</>
 <pre>
-(request-scheme) &{arrow} &(request-scheme)
-(request-method) &{arrow} &(request-method)
+(request-scheme) &[arrow] &(request-scheme)
+(request-method) &[arrow] &(request-method)
 
-(request-path) &{arrow} &(request-path)
-(request-URI) &{arrow} &(request-URI)
-(request-context-path) &{arrow} &(request-context-path)
-(request-script-path) &{arrow} &(request-script-path)
-(request-local-path) &{arrow} &(request-local-path)
-(request-uri) &{arrow} &(request-uri) (deprecated - use request-path instead)
-(request-url) &{arrow} &(request-url)
+(request-path) &[arrow] &(request-path)
+(request-URI) &[arrow] &(request-URI)
+(request-context-path) &[arrow] &(request-context-path)
+(request-script-path) &[arrow] &(request-script-path)
+(request-local-path) &[arrow] &(request-local-path)
+(request-uri) &[arrow] &(request-uri) (deprecated - use request-path instead)
+(request-url) &[arrow] &(request-url)
 
-(module-uri) &{arrow} (module-uri)
-(resource-url "example.png") &{arrow} &(resource-url "example.png")
-(request-path-translated) &{arrow} &(request-path-translated)
+(module-uri) &[arrow] &(module-uri)
+(resource-url "images/p1.png") &[arrow] &(resource-url "images/p1.png")
+(request-path-translated) &[arrow] &(request-path-translated)
 
-(request-local-socket-address) &{arrow} &(request-local-socket-address)
-(request-local-IP-address) &{arrow} &(request-local-IP-address)
-(request-local-host) &{arrow} &(request-local-host)
-(request-local-port) &{arrow} &(request-local-port)
+(request-local-socket-address) &[arrow] &(request-local-socket-address)
+(request-local-IP-address) &[arrow] &(request-local-IP-address)
+(request-local-host) &[arrow] &(request-local-host)
+(request-local-port) &[arrow] &(request-local-port)
 
-(request-remote-socket-address) &{arrow} &(request-remote-socket-address)
-(request-remote-IP-address) &{arrow} &(request-remote-IP-address)
-(request-remote-host) &{arrow} &(request-remote-host)
-(request-remote-port) &{arrow} &(request-remote-port)
+(request-remote-socket-address) &[arrow] &(request-remote-socket-address)
+(request-remote-IP-address) &[arrow] &(request-remote-IP-address)
+(request-remote-host) &[arrow] &(request-remote-host)
+(request-remote-port) &[arrow] &(request-remote-port)
 
-(request-query-string) &{arrow} &(request-query-string)
-(request-parameters "abc") &{arrow} &(request-parameters "abc")
+(request-query-string) &[arrow] &(request-query-string)
+(request-parameters "abc") &[arrow] &(request-parameters "abc")
 </pre>
-<p><tt>(request-parameter-map)</tt> &{arrow}
+<p><tt>(request-parameter-map)</tt> &[arrow]
 	  &(show-entries (request-parameter-map))</p>
- <p><tt>(request-header-map)</tt> &{arrow}
+ <p><tt>(request-header-map)</tt> &[arrow]
 	  &(show-entries (request-header-map))</p>
- &{
+&[
   (cond-expand
    (in-servlet
 #<div>
 <p>Servlet-specific request properties:</>
 <pre>
-(current-servlet-context) &{arrow} &(current-servlet-context)
-(get-request) &{arrow} &(get-request)
-(get-response) &{arrow} &(get-response)
+(current-servlet) &[arrow] &(current-servlet)
+(current-servlet-context) &[arrow] &(current-servlet-context)
+(get-request) &[arrow] &(get-request)
+(get-response) &[arrow] &(get-response)
 
-((get-request):getContextPath) &{arrow} &((get-request):getContextPath)
-((get-request):getServletPath) &{arrow} &((get-request):getServletPath)
-((get-request):getPathInfo) &{arrow} &((get-request):getPathInfo) "
-((get-request):getPathTranslated) &{arrow} &((get-request):getPathTranslated) "
-((current-servlet-context):getRealPath "/") &{arrow} &((current-servlet-context):getRealPath "/")
-((current-servlet-context):getResource "/") &{arrow} &((current-servlet-context):getResource "/")
+((get-request):getContextPath) &[arrow] &((get-request):getContextPath)
+((get-request):getServletPath) &[arrow] &((get-request):getServletPath)
+((get-request):getPathInfo) &[arrow] "&((get-request):getPathInfo)"
+((get-request):getPathTranslated) &[arrow] "&((get-request):getPathTranslated)"
+((current-servlet-context):getRealPath "/") &[arrow] &((current-servlet-context):getRealPath "/")
+((current-servlet-context):getResource "/") &[arrow] &((current-servlet-context):getResource "/")
 
-(request-servlet-path) &{arrow} &(request-servlet-path)
-(request-path-info) &{arrow} &(request-path-info)</pre>
+(request-servlet-path) &[arrow] &(request-servlet-path)
+(request-path-info) &[arrow] &(request-path-info)</pre>
      </div>)
    (else
     #<p>(Not running in a servlet container.)</p>))
-}</body>
+]</body>
 </html>

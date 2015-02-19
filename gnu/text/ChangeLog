@@ -1,3 +1,10 @@
+2015-02-19  Per Bothner  <per@bothner.com>
+
+	* ResourceStreamHandler.java (clas): New Class field.
+	(makeURL): Set class field in addition to cloader field.
+	(openConnection): If we can't find a matching resource, try again
+	using the constructed name of the ".class" file.
+
 2015-02-16  Per Bothner  <per@bothner.com>
 
 	* SourceError.java (printAll): Fix logic in handling excess diagnostics.

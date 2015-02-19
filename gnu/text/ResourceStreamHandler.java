@@ -14,6 +14,7 @@ import java.net.*;
  * {@code class-resource:/RESOURCE}.
  * The former two are "base URLs" which need to be resolved.
  * The latter two are resolved resource names.
+ * Levels of a {@code PACKAGE} are separated by {@code '.'}, not {@code '/'}.
  */
 
 public class ResourceStreamHandler extends URLStreamHandler
@@ -28,7 +29,14 @@ public class ResourceStreamHandler extends URLStreamHandler
 
   ClassLoader cloader;
 
-  public ResourceStreamHandler (ClassLoader cloader)
+    Class clas;
+
+    public ResourceStreamHandler(Class clas) {
+        this.clas = clas;
+        this.cloader = clas.getClassLoader();
+    }
+
+    public ResourceStreamHandler (ClassLoader cloader)
   {
     this.cloader = cloader;
   }
@@ -52,8 +60,7 @@ public class ResourceStreamHandler extends URLStreamHandler
       }
     sbuf.append(cname);
     String str = sbuf.toString();
-    ClassLoader loader = clas.getClassLoader();
-    return new URL(null, str, new ResourceStreamHandler(loader));
+    return new URL(null, str, new ResourceStreamHandler(clas));
   }
 
   public URLConnection openConnection (URL u) throws IOException
@@ -64,8 +71,18 @@ public class ResourceStreamHandler extends URLStreamHandler
     if (sl > 0)
       rstr = rstr.substring(0, sl).replace('.', '/') + rstr.substring(sl);
     URL url = cloader.getResource(rstr);
+    if (url == null && clas != null) {
+        String clasName = clas.getName().replace('.', '/');
+        url = cloader.getResource(clasName+".class");
+        StringBuilder adjusted = new StringBuilder();
+        for (int i = clasName.length(); -- i >= 0; )
+            if (clasName.charAt(i) == '/')
+                adjusted.append("../");
+        adjusted.append(rstr);
+        url = new URL(url, adjusted.toString());
+    }
     if (url == null)
-      throw new FileNotFoundException(ustr);
+        throw new FileNotFoundException(ustr);
     return url.openConnection();
   }
 }

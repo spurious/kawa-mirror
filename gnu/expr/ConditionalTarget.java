@@ -33,10 +33,31 @@ public class ConditionalTarget extends Target
 
   public Type getType() { return Type.booleanType; }
 
-  public void compileFromStack(Compilation comp, Type stackType)
-  {
-    CodeAttr code = comp.getCode();
-    char sig = stackType.getSignature().charAt(0);
+    public void compileFromStack(Compilation comp, Type stackType) {
+        CodeAttr code = comp.getCode();
+        char sig = stackType.getSignature().charAt(0);
+
+        if (language != null) {
+            // For primitive types, check if zero is considered true.
+            // If so any value of the type can be considered true.
+            // FIXME This should probably be done at validate-apply time.
+            Object zero;
+            switch (sig) {
+            case 'I':  case 'J':  case 'B':  case 'S':  case 'F': case 'D':
+                zero = Integer.valueOf(0);
+                break;
+            case 'C':
+                zero = Character.valueOf('\0');
+                break;
+            default:
+                zero = null;
+            }
+            if (zero != null && language.isTrue(zero)) {
+                code.emitGoto(ifTrue);
+                return;
+            }
+        }
+
     switch (sig)
       {
       case 'V':

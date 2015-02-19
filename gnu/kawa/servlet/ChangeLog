@@ -1,3 +1,10 @@
+2015-02-19  Per Bothner  <per@bothner.com>
+
+	* KawaServlet.java (getInstanceOrNull): New static method.
+	(getServlet): New method.  Oops - was expected by current-servlet.
+	* servlets.scm (current-servlet): It now works.
+	Also fix so it returns null rather than throwing exception if missing.
+
 2015-01-20  Per Bothner  <per@bothner.com>
 
 	* KawaAutoHandler.java (run): Generalize to use Path in place of

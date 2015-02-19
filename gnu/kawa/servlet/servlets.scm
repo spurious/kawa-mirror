@@ -19,7 +19,8 @@
 (require 'http)
 
 (define (current-servlet) ::javax.servlet.http.HttpServlet
-  ((gnu.kawa.servlet.KawaServlet$Context:getInstance "current-servlet"):getServlet))
+  (let ((ctx (gnu.kawa.servlet.KawaServlet$Context:getInstanceOrNull)))
+    (if (eq? ctx #!null) #!null (ctx:getServlet))))
 
 (define (current-servlet-context) ::javax.servlet.ServletContext
   ((gnu.kawa.servlet.KawaServlet$Context:getInstance "current-servlet-context"):getServletContext))
@@ -41,5 +42,3 @@
 
 (define (request-path-info) ::String
   (((gnu.kawa.servlet.KawaServlet$Context:getInstance "request-path-info"):getRequest):getPathInfo))
-
-  

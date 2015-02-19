@@ -139,6 +139,13 @@ extends HttpServlet
       return (KawaServlet.Context) hctx;
     }
 
+      public static Context getInstanceOrNull() {
+          HttpRequestContext hctx = instance.get();
+          return hctx instanceof KawaServlet.Context
+              ? (KawaServlet.Context) hctx
+              : null;
+      }
+
     public static HttpServletRequest getCurrentRequest()
     {
       return getInstance("request").getRequest();
@@ -148,6 +155,10 @@ extends HttpServlet
     {
       return getInstance("response").getResponse();
     }
+
+      public HttpServlet getServlet() {
+          return servlet;
+      }
 
     public HttpServletRequest getRequest ()
     {

@@ -236,7 +236,8 @@ public class IfFeature extends Syntax {
             if (name == "in-http-server")
                 return (mflags & ModuleContext.IN_HTTP_SERVER) != 0;
             if (name == "in-servlet")
-                return (mflags & ModuleContext.IN_SERVLET) != 0;
+                return (mflags & ModuleContext.IN_SERVLET) != 0
+                    || Compilation.getCurrent().generatingServlet();
         }
     
         String classExistsPrefix = "class-exists:";

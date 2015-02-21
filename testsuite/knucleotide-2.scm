@@ -101,7 +101,7 @@
 	   (or (eq? line #!null) (line:startsWith ">THREE")))))
     (let loop ()
       (let ((line (in:readLine)))
-	(cond ((not (eq? line #!null))
+	(cond (line
 	       (sb:append line)
 	       (loop)))))
     ((sb:toString):toUpperCase)))

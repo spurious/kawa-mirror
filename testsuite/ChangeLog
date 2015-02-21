@@ -1,5 +1,7 @@
 2015-02-20  Per Bothner  <per@bothner.com>
 
+	* knucleotide-2.scm: Simplify since #!null is now false.
+
 	* inlining.expected: Update because constant pool grew, since we
 	now call CallContext#isTrue.
 

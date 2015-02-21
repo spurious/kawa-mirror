@@ -1,3 +1,7 @@
+2015-02-20  Per Bothner  <per@bothner.com>
+
+	* MakeScene.scm:  Simplify since #!null is now false.
+
 2013-03-23  Per Bothner  <per@bothner.com>
 
 	* defs.scm (KawaJavafxApplication): Remove unused make-scape method.

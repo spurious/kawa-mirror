@@ -16,12 +16,12 @@
   ((setWidth x::double)::void (builder:width x))
   ((setHeight x::double)::void (builder:height x))
   ((setRoot r::javafx.scene.Parent)::void
-   (if (not (eq? group #!null))
+   (if group
        (primitive-throw (java.lang.IllegalArgumentException "setting root after adding children")))
    (set! root r))
   ((getGroup)::javafx.scene.Group
-   (cond ((eq? group #!null)
-          (if (not (eq? root #!null))
+   (cond ((not group)
+          (if root
               (primitive-throw (java.lang.IllegalArgumentException "adding children after setting root")))
           (set! group (javafx.scene.Group))))
    group)
@@ -34,5 +34,5 @@
        (do ((i ::int 0 (+ i 1))) ((= i k))
          (ch:add (n:get i))))))
   ((build)::javafx.scene.Scene
-   (builder:root (if (eq? root #!null) (getGroup) root))
+   (builder:root (if root root (getGroup)))
    (builder:build)))

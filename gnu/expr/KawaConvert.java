@@ -74,5 +74,8 @@ public class KawaConvert extends Convert
     return gnu.math.DFloNum.make(value);
   }
 
-
+    public static boolean isTrue(Object value) {
+        return value != null &&
+            ! (value instanceof Boolean && ! ((Boolean) value).booleanValue());
+    }
 }

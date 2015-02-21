@@ -694,25 +694,45 @@ public class Compilation implements SourceLocator
                             : Type.make(value.getClass()));
   }
 
-  public void emitPushBoolean(boolean value)
-  {
-    getCode().emitGetStatic(value ? Compilation.trueConstant
-                            : Compilation.falseConstant);
-  }
+    /** Push language-specific boxed true or false value. */
+    public void emitPushBoolean(boolean value) {
+        CodeAttr code = getCode();
+        Object valObject = language.booleanObject(value);
+        if (valObject == Boolean.TRUE)
+            code.emitGetStatic(Compilation.trueConstant);
+        else if (valObject == Boolean.FALSE)
+            code.emitGetStatic(Compilation.falseConstant);
+        else compileConstant(valObject);
+    }
 
   /** Generate code to test if an object is considered true.
    * Assume the object has been pushed on the JVM stack.
-   * Generate code to push true or false as appropriate. */
+   * Generate code to push (unboxed) true or false as appropriate. */
   public void emitCoerceToBoolean()
   {
     CodeAttr code = getCode();
-    emitPushBoolean(false);
-    code.emitIfNEq();
+    Label trueLabel = new Label(code);
+    Label falseLabel = new Label(code);
+    ConditionalTarget ctarget
+        = new ConditionalTarget(trueLabel, falseLabel, getLanguage());
+    ctarget.compileFromStack(this, Type.objectType);
+    code.emitIfThen();
+    trueLabel.define(code);
     code.emitPushInt(1);
     code.emitElse();
+    falseLabel.define(code);
     code.emitPushInt(0);
     code.emitFi();
   }
+
+    /** Hook for language-specific handling in ConditionalTarget.
+     * @param stackType Value to be treated as boolean, already pushed.
+     * @return null if we've handled the conditional transfer;
+     *    otherwise type value has been converted to (usually booleanType).
+     */
+    public Type asBooleanValue(ConditionalTarget target, Type stackType) {
+        return stackType;
+    }
 
     boolean dumpingInitializers;
 

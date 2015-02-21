@@ -267,11 +267,24 @@ public abstract class Language
       }
   }
 
-  /** Test if a value is considered "true" in this language. */
-  public boolean isTrue(Object value)
-  {
-    return value != Boolean.FALSE;
-  }
+    /** Test if a value is considered "true" in this language.
+     * Throws an exception if value can't be used in a boolean context.
+     * Use booleanValue to catch that exception. */
+    public boolean isTrue(Object value) {
+        return value != null &&
+            ! (value instanceof Boolean && ! ((Boolean) value).booleanValue());
+    }
+
+    /** Test if a value is considered "true" in this language.
+     * @return 1 if true; 0 if false; -1 if not a valid boolean
+     */
+    public int booleanValue(Object value) {
+        try {
+            return isTrue(value) ? 1 : 0;
+        } catch (Exception ex) {
+            return -1;
+        }
+    }
 
   public Object booleanObject(boolean b)
   {

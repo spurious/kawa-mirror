@@ -12,6 +12,9 @@ public class ConditionalTarget extends Target
   public Label ifTrue, ifFalse;
   Language language;
 
+    public static final Method isTrueMethod =
+        ClassType.make("gnu.expr.KawaConvert").getDeclaredMethod("isTrue", 1);
+
   /**
     * @param ifTrue label to jump to if this evaluates to true
     * @param ifFalse label to jump to if true
@@ -37,6 +40,10 @@ public class ConditionalTarget extends Target
         CodeAttr code = comp.getCode();
         char sig = stackType.getSignature().charAt(0);
 
+        stackType = comp.asBooleanValue(this, stackType);
+        if (stackType == null)
+            return;
+
         if (language != null) {
             // For primitive types, check if zero is considered true.
             // If so any value of the type can be considered true.
@@ -52,7 +59,7 @@ public class ConditionalTarget extends Target
             default:
                 zero = null;
             }
-            if (zero != null && language.isTrue(zero)) {
+            if (zero != null && language.booleanValue(zero) > 0) {
                 code.emitGoto(ifTrue);
                 return;
             }
@@ -61,9 +68,16 @@ public class ConditionalTarget extends Target
     switch (sig)
       {
       case 'V':
-          code.emitGoto(language == null || language.isTrue(Values.empty)
-                        ? ifTrue
-                        : ifFalse);
+          Label lab;
+          int voidValue = language.booleanValue(Values.empty);
+          if (voidValue > 0)
+              lab = ifTrue;
+          else {
+              if (voidValue < 0) // hopefully caught earlier ...
+                  comp.error('e', "invalid void value in condition");
+              lab = ifFalse;
+          }
+          code.emitGoto(lab);
           return;
       case 'J':
 	code.emitPushLong(0);
@@ -76,19 +90,27 @@ public class ConditionalTarget extends Target
 	break;
       default:
 	if (trueBranchComesFirst)
-	  {
 	    code.emitGotoIfIntEqZero(ifFalse);
-	    code.emitGoto(ifTrue);
-	  }
 	else
-	  {
 	    code.emitGotoIfIntNeZero(ifTrue);
-	    code.emitGoto(ifFalse);
-	  }
+        emitGotoFirstBranch(code);
 	return;
       case 'L':  case '[':
-	comp.compileConstant(language == null ? Boolean.FALSE
-			     : language.booleanObject(false));
+          if (language.booleanValue(null) == 0) {
+              if (Type.javalangBooleanType.compare(stackType) == -3)
+                  comp.compileConstant(null);
+              else {
+                  code.emitInvokeStatic(isTrueMethod);
+                  if (trueBranchComesFirst)
+                      code.emitGotoIfIntEqZero(ifFalse);
+                  else
+                      code.emitGotoIfIntNeZero(ifTrue);
+                  emitGotoFirstBranch(code);  // Usually a no-op.
+                  return;
+              }
+          }
+          else
+              comp.compileConstant(language.booleanObject(false));
 	break;
       }
     if (trueBranchComesFirst)

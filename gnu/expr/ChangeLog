@@ -1,3 +1,16 @@
+2015-02-20  Per Bothner  <per@bothner.com>
+
+	Change boolean value to null to (by default) false.
+	* Language.java (isTrue): Change so that null and new Boolean(false)
+	are both considered false.
+	(booleanValue): New convenience method.
+	* Compilation.java (emitPushBoolean, emitCoerceToBoolean):
+	Make more general accross languages.
+	(asBooleanValue): New hook for ConditionalTarget - currently unused.
+	* ConditionalTarget.java (compileFromTarget): Make more general.
+	Possibly generate call to KawaContext.isTrue.
+	* KawaConvert.java (isTrue): Static method for compiled code.
+
 2015-02-19  Per Bothner  <per@bothner.com>
 
 	* ConditionalTarget.java (compileFromTarget): Fix bug that treated

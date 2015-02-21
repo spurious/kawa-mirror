@@ -432,7 +432,8 @@ public class XQResolveNames extends ResolveNames
         static final Integer SCANNED_CYCLE = 1;
         static final Integer SCANNED_NO_CYCLE = -1;
 
-        //public boolean cycleSeen;
+        Declaration target;
+        boolean cycleSeen;
 
         protected Expression visitReferenceExp(ReferenceExp exp, Void ignored) {
             Declaration decl = exp.getBinding();
@@ -441,8 +442,13 @@ public class XQResolveNames extends ResolveNames
             return exp;
         }
 
-        /** Return true if cycle detected. */
         public void scanDependencies(Declaration decl) {
+            if (target == null)
+                target = decl;
+            else if (target == decl) {
+                cycleSeen = true;
+                return;
+            }
             Integer state = depsScanState.get(decl);
             if (state != null) {
                 if (state == SCANNING)
@@ -458,10 +464,11 @@ public class XQResolveNames extends ResolveNames
                 depsScanState.put(decl, SCANNED_NO_CYCLE);
         }
 
-        public boolean scanVariable(Declaration decl) {
-            scanDependencies(decl);
-            Integer state = depsScanState.get(decl);
-            return state == SCANNED_CYCLE;
+        /** Return true if cycle detected. */
+        public static boolean scanVariable(Declaration decl) {
+            CycleDetector cycleDetector = new CycleDetector();
+            cycleDetector.scanDependencies(decl);
+            return cycleDetector.cycleSeen;
          }
     }
 
@@ -477,12 +484,10 @@ public class XQResolveNames extends ResolveNames
     moduleDecl = exp.firstDecl();
     exp.body = visitStatements(exp.body);
 
-    CycleDetector cycleDetector = new CycleDetector();
-
     for (Declaration decl = exp.firstDecl();
          decl != null;  decl = decl.nextDecl())
       {
-        if (! decl.isProcedureDecl() && cycleDetector.scanVariable(decl))
+        if (! decl.isProcedureDecl() && CycleDetector.scanVariable(decl))
             getCompilation().error('e',
                 "cycle detected initializing $"+decl.getName(),
                 "XQST0054", decl);

@@ -1,3 +1,8 @@
+2015-02-23  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Importing): New subsection 'Builtin libraries'.
+	* kawa.texi (Servlets): Minor changes.
+
 2015-02-16  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Source distribution): Document configure options

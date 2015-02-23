@@ -14541,6 +14541,45 @@ use the value of @code{(current-path)} with a @code{"/"} appended.)
 The default search path is @code{"."} - i.e. just search relative
 to the current root.
 
+@subsection Builtin libraries
+
+The following libraries are bundled with Kawa:
+
+@table @code
+@item (scheme base)
+@itemx (scheme case-lambda)
+@itemx (scheme char)
+@itemx (scheme complex)
+@itemx (scheme cxr)
+@itemx (scheme cxr)
+@itemx (scheme eval)
+@itemx (scheme inexact)
+@itemx (scheme lazy)
+@itemx (scheme load)
+@itemx (scheme process-context)
+@itemx (scheme read)
+@itemx (scheme repl)
+@itemx (scheme time)
+@itemx (scheme write)
+@itemx (scheme r5rs)
+These are standard libraries as defined by R7RS.
+@item (rnrs hashtables)
+@itemx (rnrs lists)
+@itemx (rnrs programs)
+@itemx (rnrs sorting)
+@itemx (rnrs unicode)
+These are standard libraries as defined by R6RS.
+@item (kawa expressions)
+@itemx (kawa hashtable)
+@itemx (kawa quaternions)
+@itemx (kawa reflect)
+@itemx (kawa regex)
+@itemx (kawa string-cursors)
+Various Kawa libraries @i{add details}.
+@item (kawa base)
+All the bindings by default available to the kawa top-level.
+@end table
+
 @subsection Importing from a plain class
 
 Note you can import from many classes, even if they weren't
@@ -16844,7 +16883,8 @@ To use these functions, first do:
 (require 'servlets)
 @end example
 
-You can conditionalize your code to check for servlets, like this:
+You can conditionalize your code to check at compile-time for servlets,
+like this:
 
 @example
 (cond-expand
@@ -16855,9 +16895,16 @@ You can conditionalize your code to check for servlets, like this:
    "[Not in a servlet]"))
 @end example
 
+For a run-time check you can test if @code{(current-servlet)} is
+non-@code{#!null}.
+
 @deffn Procedure current-servlet
 When called from a Kawa servlet handler, returns the
 actual @code{javax.servlet.http.HttpServlet} instance.
+Returns @code{#!null} if the current context is not that of
+@code{KawaServlet}.
+(Hence this function also returns @code{#!null} if you compile a servlet
+``by hand'' rather that using the @code{--servet} option.)
 @end deffn
 
 @deffn Procedure current-servlet-context

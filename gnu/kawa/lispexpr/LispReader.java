@@ -187,8 +187,15 @@ public class LispReader extends Lexer
   protected Object readAndHandleToken(int ch, int startPos, ReadTable rtable)
     throws java.io.IOException, SyntaxException
   {
-    char readCase = getReadCase();
     readToken(ch, rtable);
+    return handleToken(startPos, rtable);
+  }
+
+  protected Object handleToken(int startPos, ReadTable rtable)
+    throws java.io.IOException, SyntaxException
+  {
+    int ch;
+    char readCase = getReadCase();
     int endPos = tokenBufferLength;
     if (! seenEscapes)
       {

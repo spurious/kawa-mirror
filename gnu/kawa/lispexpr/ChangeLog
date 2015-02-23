@@ -1,3 +1,10 @@
+2015-02-23  Per Bothner  <per@bothner.com>
+
+	* ReaderTypespec.java (read): Allow non-terminating-macro characters.
+	After '>' call readToken to handle anything else.
+	* LispReader.java (handleToken): New method
+	(readAndHandleToken): Use handleToken.
+
 2014-12-22  Per Bothner  <per@bothner.com>
 
 	* LangObjType.java (emitCoercionOrNull): New method.

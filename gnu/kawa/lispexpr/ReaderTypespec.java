@@ -10,16 +10,17 @@ import gnu.kawa.io.InPort;
  * @author Bruce R. Lewis.
  */
 
-public class ReaderTypespec extends ReadTableEntry
+public class ReaderTypespec extends ReaderConstituent
 {
-  public int getKind()
-  {
-    return ReadTable.NON_TERMINATING_MACRO;
-  }
+  public ReaderTypespec() { super(ReadTable.NON_TERMINATING_MACRO); }
 
   public Object read (Lexer in, int ch, int count)
     throws java.io.IOException, SyntaxException
   {
+    if (! (in instanceof LispReader))
+        return super.read(in, ch, count);
+    int endChar = ch == '<' ? '>' : -2;
+    LispReader reader = (LispReader) in;
     int startPos = in.tokenBufferLength;
     InPort port = in.getPort();
     ReadTable rtable = ReadTable.getCurrent();
@@ -47,18 +48,24 @@ public class ReaderTypespec extends ReadTableEntry
 	      c = port.read();
 	    if (c == '\\')
 	      {
-		if (in instanceof LispReader)
-		  c = ((LispReader) in).readEscape();
-		else
-		  c = port.read();
+                in.tokenBufferAppend(LispReader.TOKEN_ESCAPE_CHAR);
+                reader.seenEscapes = true;
 	      }
+            else if (c == endChar && ! got_open_square)
+              {
+                reader.readToken('>', rtable);
+                break;
+              }
 	    else
 	      {
+                int kind;
 		if ( (!got_open_square && c == '['
 		      && true == (got_open_square = true))
 		     || (got_open_square && c == ']'
 			 && false == (got_open_square = false))
-		     || rtable.lookup(c).getKind() == ReadTable.CONSTITUENT)
+		     || ((kind = rtable.lookup(c).getKind())
+                         == ReadTable.CONSTITUENT
+                         || kind == ReadTable.NON_TERMINATING_MACRO))
 		  {
 		      in.tokenBufferAppend(c);
 		      continue;
@@ -70,8 +77,7 @@ public class ReaderTypespec extends ReadTableEntry
 		  }
 	      }
 	    }
-	return rtable.makeSymbol(new java.lang.String(in.tokenBuffer, startPos,
-                                                      in.tokenBufferLength - startPos));
+	return reader.handleToken(startPos, rtable);
       }
     finally
       {

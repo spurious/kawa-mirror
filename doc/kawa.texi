@@ -841,23 +841,9 @@ At some point we want to compile lambdas in the same way
 as the Java 8 preview does. This can potenitally
 be more efficient than Kawa's current mechanism.
 
-@subsection R6RS and R7RS libraries and syntax
-Kawa supports most of the functionality of R6RS and R7RS.
-However, various R6R7 or (more importantly) R7RS features
-are missing, and should be added.
-For example, both R6RS or R7RS library definition syntax are unimplemented.
-In a related matter, Kawa supports most of the functionality of
-@code{syntax-case}, but some pieces are missing, and no
-doubt some of it is incorrect.  Adding the missing pieces
-and testing for correctness of corner cases is needed.
-@uref{http://lists.r6rs.org/pipermail/r6rs-discuss/2007-October/003387.html,Andre van Tonder's R6RS expander} may be helpful.
-
-It would be useful to extend the @code{import} form (and also the
-@code{require} form when no explicit filename is given) to search a
-``source path'' for a matching source file, automatically compiling it as
-needed (as done in the @code{require} form when an explicit filename is given).
-In interactive mode, if the module is already loaded, check if it is updated
-- if not recompile and re-load it.
+Remi Forax's @uref{https://github.com/forax/vmboiler,vmboiler} is
+a small library on top of ASM that generates optimistically typed bytecodes.
+It could be useful for ideas.
 
 @anchor{task-parameterized-types}
 @subsection Parameterized types
@@ -876,6 +862,8 @@ function types would be a major task, possibly depending on
 improvements in @ref{task-parameterized-types,Parameterized types}.
 
 @subsection Full continuations
+@emph{Currently being worked on.}
+
 Add support for full continuations, which is the major
 feature missing for Kawa to qualify as a ``true Scheme''.
 One way to implement continuations is to add a add that converts
@@ -913,6 +901,8 @@ This is related to full continuations, as the re-writing is similar.
 
 @anchor{task-REPL-improvements}
 @subsection REPL console and other REPL improvement
+@emph{Currently being worked on.}
+
 Improvements to the read-eval-print console.
 In addition to a traditional Swing console,
 it would be useful to support using a web browser as a a remote terminal,
@@ -931,9 +921,9 @@ framework.  There are existing ports for Scala: either
 @uref{https://github.com/mattpap/IScala,IScala}
 or @uref{https://github.com/Bridgewater/scala-notebook, Scala Notebook}.
 
-@subsection XQuery-1.1-functionality
+@subsection XQuery-3.0 functionality
 It would be nice to update the XQuery (Qexo) support
-to @uref{http://www.w3.org/TR/xquery-30/,XQuery 1.1}.
+to some subset of @uref{http://www.w3.org/TR/xquery-30/,XQuery 3.0}.
 
 @subsection XQuery-updates
 It would be nice to support @uref{http://www.w3.org/TR/xquery-update-10/, XQuery updates}.  This depends on @ref{task-TreeList-optimization,TreeList-optimization}. 
@@ -1075,6 +1065,53 @@ When it comes to top-level variables, an issue is when
 to re-evaluate the initializing expression.  It is reasonable
 to do so if and only if the expression is modified, which
 again requires a textual comparison.
+
+@subsection Unsigned primitive number types
+
+Implement unsigned arithmetic types @code{ulong}, @code{uint}, @code{ushort},
+and @code{ubyte}.  These should be primitive types that are represented
+using the corresponding signed types, similar to how the @code{character}
+type is represented using @code{int}.  Also implement corresponding
+``boxed'' types as sibling types of @code{gnu.math,IntNum}.
+Implement arithmetic, comparisons,
+and conversions both at run-time, and optimized when the types are known
+at compile-time.
+(In the latter case there should be no object allocation.)
+Use same promotion rules
+@uref{https://msdn.microsoft.com/en-us/library/09ka8bxx.aspx,as @code{C#}},
+except that combining @code{long} and @code{uint} should
+arguably be @code{long}.
+@ref{Uniform vectors,Uniform vector} operations
+(such as @code{u16vector-ref}) should be optimized to return the
+primitive values (such as @code{ushort}).
+
+@subsection Optional strict typing along with an explicit @code{dynamic} type
+
+Kawa currently implements ``optimistic'' typing: The compiler only
+complains if an expression has no values in common with the target type
+- for example if assigning a @code{string} expression to an @code{integer}
+variable.
+It would be interesting to experiment with a
+@code{--strict-typing} option (which would never be the default):
+Strict typing would only allow ``widening'' conversions - i.e.
+that the expression type be a subtype of the target type.
+For example it would complain if assigning a @code{number} to an @code{integer}
+unless you used an explicit cast.
+
+To make this easier to deal with we'd want to introduce a new type
+@code{dynamic} similar to
+@uref{https://msdn.microsoft.com/en-us/library/dd264736.aspx,what
+@code{C#} has}: Any expression can be converted
+to or from @code{dynamic} without the compiler complaining.
+Similarly, if @code{x} is @code{dynamic} then @code{x:name}
+is allowed by the compiler regardless of @code{name}, with all checking
+being deferred to run-time.  If a variable is declared without a type,
+it should default to @code{dynamic}.  The @code{dynamic} type
+is represented in the VM as @code{object} but with an annotation
+(like we do with @code{character}).
+
+The type-checker might need some changes to better distinguish
+implicit conversions from explicit casts.
 
 @node Installation
 @chapter Getting and installing Kawa

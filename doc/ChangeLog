@@ -1,5 +1,9 @@
 2015-02-23  Per Bothner  <per@bothner.com>
 
+	* kawa.texi (Ideas and tasks): Various updates.
+	New subsections 'Unsigned primitive number types' and
+	'Optional strict typing along with an explicit dynamic type'.
+
 	* kawa.texi (Importing): New subsection 'Builtin libraries'.
 	* kawa.texi (Servlets): Minor changes.
 

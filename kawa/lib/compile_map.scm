@@ -2,17 +2,20 @@
 (import (kawa lib kawa string-cursors))
 (define-alias Convert gnu.kawa.functions.Convert)
 
+(define-simple-class ScanHelper ()
+  (comp ::Compilation)
+  ((init (arg::Expression))::void #!abstract)
+  ((test)::Expression #!abstract)
+  ((eval)::Declaration #!abstract)
+  ((incr (value::Declaration))::Expression  #!abstract))
+
 (define-simple-class MapHelper ()
   (comp ::Compilation)
+  (scanners ::ScanHelper[])
   ((initialize (exp::ApplyExp) (comp::Compilation))::void
+   (! n (- (exp:getArgCount) 1))
+   (set! scanners (ScanHelper[] length: n))
    (set! (this):comp comp))
-  ;; initialize for the i'th argument
-  ((initEach (i::int) (arg::Expression))::void #!abstract)
-  ;; emit test for if the i'th sequence has more values
-  ((testEach (i::int))::Expression #!abstract)
-  ((evalEach (i::int))::Declaration #!abstract)
-  ((incrEach (value::Declaration) (i::int))::Expression  #!abstract)
-  ;; may not need if never overridden
   ((applyFunction func args)::Expression
    (let* ((fexp (->exp func))
           (applyFunction (comp:applyFunction fexp)))
@@ -84,7 +87,32 @@
                    (apply-exp string-cursor-next decl1
                               (apply-exp as string-cursor 0)
                               (exp:getArg 3)))))))
-                   
+
+(define-simple-class StringScanner (ScanHelper)
+  (seqDecl ::Declaration)
+  (idxDecl ::Declaration)
+  (endDecl ::Declaration)
+  ((init arg)
+   (set! seqDecl
+         (comp:letVariable #!null #!null
+                           (visit-exp (apply-exp Convert:cast string arg))))
+   (set! idxDecl (comp:letVariable #!null string-cursor
+                                   (apply-exp as string-cursor 0)))
+   (set! endDecl (comp:letVariable #!null string-cursor
+                                   (apply-exp invoke seqDecl 'length))))
+  ((test)
+   (apply-exp string-cursor<? idxDecl endDecl))
+  ((eval)
+   (comp:letVariable #!null character
+                     (apply-exp string-cursor-ref seqDecl idxDecl)))
+  ((incr value)
+   (set-exp idxDecl
+            (apply-exp as string-cursor
+                       (apply-exp + (apply-exp as int idxDecl)
+                                  (if-exp
+                                   (apply-exp > value #xFFFF)
+                                   2 1))))))
+
 ;; Validate (string-for-each proc str1 [str... | start [end]]
 (define-validate stringForEachValidateApply (exp required proc)
   ;; check-for SRFI-13-style (string-for-each proc str start [end])
@@ -111,65 +139,46 @@
                     (and (>= string-compat 0)
                          (< (invoke integer 'isCompatibleWithValue t2) 0)))))))
    (let* ((n (- (exp:getArgCount) 1))
-          (seqDecls (gnu.expr.Declaration[] length: n))
-          (idxDecls (gnu.expr.Declaration[] length: n))
-          (endDecls (gnu.expr.Declaration[] length: n))
           (comp (get-compilation)))
      (validate-generic-for-each
       exp required
       (object (MapHelper)
-              ((initEach i arg)
-               (set! (seqDecls i)
-                     (comp:letVariable #!null #!null
-                                       (visit-exp (apply-exp Convert:cast string arg))))
-               (set! (idxDecls i) (comp:letVariable #!null string-cursor
-                                                    (apply-exp as string-cursor 0)))
-               (set! (endDecls i) (comp:letVariable #!null string-cursor
-                                                    (apply-exp invoke (seqDecls i) 'length))))
-              ((testEach i)
-               (apply-exp string-cursor<? (idxDecls i) (endDecls i)))
-              ((evalEach i)
-               (comp:letVariable #!null character
-                                 (apply-exp string-cursor-ref
-                                            (seqDecls i) (idxDecls i))))
-              ((incrEach value i)
-               (set-exp (idxDecls i)
-                        (apply-exp as string-cursor
-                                   (apply-exp + (apply-exp as int (idxDecls i))
-                                              (if-exp
-                                               (apply-exp > value #xFFFF)
-                                               2 1))))))))))
+              ((initialize (exp::ApplyExp) (comp::Compilation))::void
+               (invoke-special MapHelper (this) 'initialize exp comp)
+               (do ((i ::int 0 (+ i 1))) ((= i n))
+                 (set! (scanners i) (StringScanner comp: comp)))))))))
+
+(define-simple-class ListScanner (ScanHelper)
+  (listDecl ::Declaration)
+  (pairDecl ::Declaration)
+  ((init arg)
+   (! listArg (visit-exp arg))
+   (set! listDecl (comp:letVariable #!null #!null listArg))
+   (listDecl:setLocation arg))
+  ((test)
+   (apply-exp not (apply-exp eq? listDecl '())))
+  ((eval)
+   (define pDecl (comp:letVariable #!null #!null
+                                   (apply-exp Convert:cast gnu.lists.Pair
+                                              listDecl)))
+   (set! pairDecl pDecl)
+   (comp:letVariable #!null #!null
+                     (apply-exp invoke pDecl 'getCar)))
+  ((incr value)
+   (set-exp listDecl
+            (apply-exp invoke pairDecl 'getCdr))))
 
 (define-simple-class ListMapHelper (MapHelper)
   (collecting ::boolean)
-  (listDecls ::Declaration[])
-  (pairDecls ::Declaration[])
   (resultDecl ::Declaration)
   ((initialize exp comp)
    (invoke-special MapHelper (this) 'initialize exp comp)
    (! n (- (exp:getArgCount) 1))
-   (set! listDecls (Declaration[] length: n))
-   (set! pairDecls (Declaration[] length: n))
+   (do ((i ::int 0 (+ i 1))) ((= i n))
+     (set! (scanners i) (ListScanner comp: comp)))
    (if collecting
        (set! resultDecl (comp:letVariable #!null list
                                           (QuoteExp:getInstance '())))))
-  ((initEach i arg)
-   (let* ((listArg (visit-exp arg))
-          (listDecl (comp:letVariable #!null #!null listArg)))
-     (listDecl:setLocation arg)
-     (set! (listDecls i) listDecl)))
-  ((testEach i)
-   (apply-exp not (apply-exp eq? (listDecls i) '())))
-  ((evalEach i)
-   (define pairDecl (comp:letVariable #!null #!null
-                                      (apply-exp Convert:cast gnu.lists.Pair
-                                                 (listDecls i))))
-   (set! (pairDecls i) pairDecl)
-   (comp:letVariable #!null #!null
-                     (apply-exp invoke pairDecl 'getCar)))
-  ((incrEach value i)
-   (set-exp (listDecls i)
-            (apply-exp invoke (pairDecls i) 'getCdr)))
   ((doCollect value)
    (if collecting
        (set-exp resultDecl
@@ -190,39 +199,38 @@
   ((exp:isSimple 2)
    (validate-generic-for-each exp required (ListMapHelper collecting: #t))))
 
+(define-simple-class VectorScanner (ScanHelper)
+  (seqDecl ::Declaration)
+  (idxDecl ::Declaration)
+  (endDecl ::Declaration)
+  ((init arg)
+   (let* ((seqArg (visit-exp (apply-exp Convert:cast java.util.List arg))))
+     (set! seqDecl (comp:letVariable #!null #!null seqArg))
+     (seqDecl:setLocation arg)
+     (set! idxDecl (comp:letVariable #!null int (->exp 0)))
+     (set! endDecl
+           (comp:letVariable #!null int (apply-exp invoke seqDecl 'size)))))
+  ((eval)
+   (comp:letVariable #!null #!null
+                     (apply-exp invoke seqDecl 'get idxDecl)))
+  ((incr value)
+   (set-exp idxDecl
+            (apply-exp + idxDecl 1)))
+  ((test)
+   (apply-exp < idxDecl endDecl)))
+  
 (define-simple-class VectorMapHelper (MapHelper)
   (collecting ::boolean)
-  (seqDecls ::Declaration[])
-  (idxDecls ::Declaration[])
-  (endDecls ::Declaration[])
   ((initialize exp comp)
    (invoke-special MapHelper (this) 'initialize exp comp)
    (! n (- (exp:getArgCount) 1))
-   (set! seqDecls (Declaration[] length: n))
-   (set! idxDecls (Declaration[] length: n))
-   (set! endDecls (Declaration[] length: n)))
-  ((initEach i arg)
-   (let* ((seqArg (visit-exp (apply-exp Convert:cast java.util.List arg)))
-          (seqDecl (comp:letVariable #!null #!null seqArg)))
-     (seqDecl:setLocation arg)
-     (set! (seqDecls i) seqDecl)
-     (set! (idxDecls i)
-           (comp:letVariable #!null int (->exp 0)))
-     (set! (endDecls i)
-           (comp:letVariable #!null int (apply-exp invoke seqDecl 'size)))))
-  ((evalEach i)
-   (comp:letVariable #!null #!null
-                     (apply-exp invoke (seqDecls i) 'get (idxDecls i))))
-  ((incrEach value i)
-   (set-exp (idxDecls i)
-            (apply-exp + (idxDecls i) 1)))
-  ((testEach i)
-   (apply-exp < (idxDecls i) (endDecls i))))
+   (do ((i ::int 0 (+ i 1))) ((= i n))
+     (set! (scanners i) (VectorScanner comp: comp)))))
 
 ;; Validate (vector-for-each proc str1 str...)
 (define-validate vectorForEachValidateApply (exp required proc)
   ((exp:isSimple 2)
-   (validate-generic-for-each  exp required (VectorMapHelper))))
+   (validate-generic-for-each exp required (VectorMapHelper))))
 
 (define (validate-generic-for-each exp::gnu.expr.ApplyExp
                                    required::gnu.bytecode.Type
@@ -236,7 +244,7 @@
          (set! func (gnu.expr.ReferenceExp
                      (comp:letVariable #!null #!null func))))
      (do ((i ::int 0 (+ i 1))) ((= i n))
-       (helper:initEach i (exp:getArg (+ i 1))))
+       ((helper:scanners i):init (exp:getArg (+ i 1))))
      (comp:letEnter)
      (comp:letDone
       (let* ((loopLambda (comp:loopStart)))
@@ -251,13 +259,13 @@
                     (comp:loopRepeat loopLambda)))
                   (else
                    (if-exp
-                    (helper:testEach i)
+                    ((helper:scanners i):test)
                     (begin
                       (comp:letStart)
-                      (define chValue (helper:evalEach i))
+                      (define chValue ((helper:scanners i):eval))
                       (comp:letEnter)
                       (comp:letDone
                        (begin-exp
-                        (helper:incrEach chValue i)
+                        ((helper:scanners i):incr chValue)
                         (loop (+ i 1)
                               (cons chValue chlist)))))))))))))))

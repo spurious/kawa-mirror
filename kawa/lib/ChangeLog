@@ -1,3 +1,10 @@
+2015-02-24  Per Bothner  <per@bothner.com>
+
+	* compile_map.scm (MapHelper): Separate handling of scanning input
+	sequences from that of creating result.
+	(ScanHelper): New abstract class for scanning input sequences.
+	(StringScanner, ListScanner, VectorScanner): New sub-classes.
+
 2015-02-17  Per Bothner  <per@bothner.com>
 
 	* compile_map.scm: Implement inlining for map and for-each.

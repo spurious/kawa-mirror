@@ -4,12 +4,13 @@
 (export ->exp get-visitor get-compilation visit-exp
         syntax-as-exp define-validate
         apply-exp begin-exp if-exp set-exp
-        Declaration Expression ApplyExp QuoteExp Compilation)
+        Declaration Expression ApplyExp QuoteExp Compilation Type)
 (define-alias Expression gnu.expr.Expression)
 (define-alias ApplyExp gnu.expr.ApplyExp)
 (define-alias QuoteExp gnu.expr.QuoteExp)
 (define-alias Compilation gnu.expr.Compilation)
 (define-alias Declaration gnu.expr.Declaration)
+(define-alias Type gnu.bytecode.Type)
 
 (require <kawa.lib.prim_syntax>)
 (require <kawa.lib.std_syntax>)

@@ -1,5 +1,7 @@
 2015-02-24  Per Bothner  <per@bothner.com>
 
+	* kawa/expressions.scm (Type): Add exported alias.
+
 	* compile_map.scm (MapHelper): Separate handling of scanning input
 	sequences from that of creating result.
 	(ScanHelper): New abstract class for scanning input sequences.

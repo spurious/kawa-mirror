@@ -28,26 +28,29 @@ public class MultiplyOp extends ArithOp
     return IntNum.one();
   }
 
-  public static Object apply (Object arg1, Object arg2)
-  {
-    return ((Numeric) arg1).mul(arg2);
-  }
-
-  public Object applyN (Object[] args)
-  {
-    int len = args.length;
-    if (len == 0)
-      return IntNum.one ();
-    Number result = (Number) Promise.force(args[0]);
-    int code = Arithmetic.classifyValue(result);
-    for (int i = 1; i < len; i++)
-      {
-	Object arg2 = args[i];
+    public static Object apply(Object arg1, Object arg2) {
+        int code1 = Arithmetic.classifyValue(arg1);
 	int code2 = Arithmetic.classifyValue(arg2);
-	code = code < code2 ? code2 : code;
+        return combine((Number) arg1, arg2, code1 < code2 ? code2 : code1);
+    }
 
-	switch (code)
-	  {
+    public Object applyN(Object[] args) {
+        int len = args.length;
+        if (len == 0)
+            return IntNum.one ();
+        Number result = (Number) Promise.force(args[0]);
+        int code = Arithmetic.classifyValue(result);
+        for (int i = 1; i < len; i++) {
+            Object arg2 = args[i];
+            int code2 = Arithmetic.classifyValue(arg2);
+            code = code < code2 ? code2 : code;
+            result = combine(result, arg2, code);
+        }
+        return result;
+    }
+
+    public static Number combine(Number result, Object arg2, int code) {
+	switch (code) {
 	  case Arithmetic.INT_CODE:
 	    int i1 = Arithmetic.asInt(result);
 	    int i2 = Arithmetic.asInt(arg2);
@@ -94,9 +97,7 @@ public class MultiplyOp extends ArithOp
 	  default:
 	    result = Arithmetic.asNumeric(result)
 	      .mul(Arithmetic.asNumeric(arg2));
-	  }
-      }
-    return result;
-   }
-
+        }
+        return result;
+    }
 }

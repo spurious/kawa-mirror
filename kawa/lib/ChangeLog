@@ -1,5 +1,9 @@
 2015-02-24  Per Bothner  <per@bothner.com>
 
+	* compile_map.scm (MapHelper:makeScanner): New sbatract method.
+	(initialize): Call makeScanner for each argument.
+	(class InertableScanner): New ScanHelper class.
+
 	* kawa/expressions.scm (Type): Add exported alias.
 
 	* compile_map.scm (MapHelper): Separate handling of scanning input

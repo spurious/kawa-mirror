@@ -7,15 +7,19 @@
   ((init (arg::Expression))::void #!abstract)
   ((test)::Expression #!abstract)
   ((eval)::Declaration #!abstract)
-  ((incr (value::Declaration))::Expression  #!abstract))
+  ((incr (value::Declaration))::Expression  QuoteExp:voidExp))
 
 (define-simple-class MapHelper ()
   (comp ::Compilation)
   (scanners ::ScanHelper[])
+  ((makeScanner seqArg::Expression etype::Type)::ScanHelper #!abstract)
   ((initialize (exp::ApplyExp) (comp::Compilation))::void
    (! n (- (exp:getArgCount) 1))
+   (set! (this):comp comp)
    (set! scanners (ScanHelper[] length: n))
-   (set! (this):comp comp))
+   (do ((i ::int 0 (+ i 1))) ((= i n))
+     (set! (scanners i)
+           (makeScanner (exp:getArg (+ i 1)) #!null))))
   ((applyFunction func args)::Expression
    (let* ((fexp (->exp func))
           (applyFunction (comp:applyFunction fexp)))
@@ -144,9 +148,21 @@
       exp required
       (object (MapHelper)
               ((initialize (exp::ApplyExp) (comp::Compilation))::void
-               (invoke-special MapHelper (this) 'initialize exp comp)
-               (do ((i ::int 0 (+ i 1))) ((= i n))
-                 (set! (scanners i) (StringScanner comp: comp)))))))))
+               (invoke-special MapHelper (this) 'initialize exp comp))
+              ((makeScanner exp etype) (StringScanner comp: comp)))))))
+
+(define-simple-class IterableScanner (ScanHelper)
+  (iteratorDecl ::Declaration)
+  ((init arg)
+   (! seqArg (apply-exp as java.lang.Iterable (visit-exp arg)))
+   (set! iteratorDecl (comp:letVariable #!null java.util.Iterator
+                                        (apply-exp invoke seqArg 'iterator)))
+   (iteratorDecl:setLocation arg))
+  ((test)
+   (apply-exp invoke iteratorDecl 'hasNext))
+  ((eval)
+   (comp:letVariable #!null #!null
+                     (apply-exp invoke iteratorDecl 'next))))
 
 (define-simple-class ListScanner (ScanHelper)
   (listDecl ::Declaration)
@@ -171,11 +187,11 @@
 (define-simple-class ListMapHelper (MapHelper)
   (collecting ::boolean)
   (resultDecl ::Declaration)
+  ;;((makeScanner exp etype) (ListScanner comp: comp))
+  ((makeScanner exp etype) (IterableScanner comp: comp))
   ((initialize exp comp)
    (invoke-special MapHelper (this) 'initialize exp comp)
    (! n (- (exp:getArgCount) 1))
-   (do ((i ::int 0 (+ i 1))) ((= i n))
-     (set! (scanners i) (ListScanner comp: comp)))
    (if collecting
        (set! resultDecl (comp:letVariable #!null list
                                           (QuoteExp:getInstance '())))))
@@ -221,11 +237,7 @@
   
 (define-simple-class VectorMapHelper (MapHelper)
   (collecting ::boolean)
-  ((initialize exp comp)
-   (invoke-special MapHelper (this) 'initialize exp comp)
-   (! n (- (exp:getArgCount) 1))
-   (do ((i ::int 0 (+ i 1))) ((= i n))
-     (set! (scanners i) (VectorScanner comp: comp)))))
+  ((makeScanner exp etype) (VectorScanner comp: comp)))
 
 ;; Validate (vector-for-each proc str1 str...)
 (define-validate vectorForEachValidateApply (exp required proc)

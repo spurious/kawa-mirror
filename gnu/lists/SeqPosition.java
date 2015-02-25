@@ -150,14 +150,15 @@ implements
     return sequence.hasPrevious(getPos());
   }
 
-  /** See java.util.ListIterator. */
-  public E next()
-  {
-    Object result = getNext();
-    if (result == Sequence.eofValue || ! gotoNext())
-      throw new NoSuchElementException();
-    return (E) result;
-  }
+    /** See java.util.ListIterator. */
+    public E next() {
+        Object result = getNext();
+        int next = sequence.nextPos(ipos);
+        if (next == 0)
+            throw new NoSuchElementException();
+        ipos = next;
+        return (E) result;
+    }
 
   /** Move one element forwards, if possible.
    * @return if we succeeded in moving forwards (i.e. not at end of sequence).

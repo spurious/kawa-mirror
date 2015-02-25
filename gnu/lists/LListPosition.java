@@ -3,6 +3,8 @@
 
 package gnu.lists;
 
+import java.util.NoSuchElementException;
+
 /** LListPosition - a SeqPosition for LLists.
  * Normally, we just use an int pos to indicate a position in a
  * sequence.  But for linked lists that would be very inefficient.
@@ -161,8 +163,15 @@ class LListPosition extends ExtPosition<Object, LList>
     return ipos >> 1;
   }
 
-  public boolean gotoNext()
-  {
+    /** @Override */
+    public Object next() {
+        Pair pair = getNextPair();
+        if (pair == null || ! gotoNext())
+            throw new NoSuchElementException();
+        return pair.car;
+    }
+
+  public boolean gotoNext() {
     boolean isAfter = (ipos & 1) != 0;
     int old_i = ipos;
     Object xp = xpos;

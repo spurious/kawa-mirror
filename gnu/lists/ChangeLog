@@ -1,3 +1,10 @@
+2015-02-24  Per Bothner  <per@bothner.com>
+
+	Minor performance improvements.
+	* LListPosition.java (next): New method.
+	* SeqPosition.java (next): New method.  Should be afster/simpler.
+	Also fixes bug where next would fail if a value is eofValue.
+
 2014-09-17  Per Bothner  <per@bothner.com>
 
 	* PairWithPosition.java (init): New method.

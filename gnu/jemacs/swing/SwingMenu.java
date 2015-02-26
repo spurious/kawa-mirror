@@ -32,13 +32,7 @@ public class SwingMenu extends JMenu implements EMenu
     for (int i = 0;  e.hasMoreElements(); i++)
       {
 	Object item = e.nextElement();
-	if (
-            /* #ifdef use:java.lang.CharSequence */
-            item instanceof CharSequence
-            /* #else */
-            // item instanceof String || item instanceof CharSeq
-            /* #endif */
-            )
+	if (item instanceof CharSequence)
 	  {
 	    if (i == 0)
 		this.setText(item.toString());
@@ -50,13 +44,7 @@ public class SwingMenu extends JMenu implements EMenu
 	  {
 	    FVector menuEntry = (FVector) item;
             Object entry = menuEntry.get(0);
-	    if (
-                /* #ifdef use:java.lang.CharSequence */
-                entry instanceof CharSequence
-                /* #else */
-                // entry instanceof String || entry instanceof CharSeq
-                /* #endif */
-                )
+	    if (entry instanceof CharSequence)
 	      {
 		Object proc = menuEntry.get(1);
 

@@ -1,3 +1,11 @@
+2015-02-26  Per Bothner  <per@bothner.com>
+
+	* Sequences.java: New file.
+	(getIterator): New method.
+	(class CharacterIterator): New static member class.
+	* Range.java: New class, extends AbstractSequence.
+	(class IntRange): New static member class.
+
 2015-02-24  Per Bothner  <per@bothner.com>
 
 	Minor performance improvements.

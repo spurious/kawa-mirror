@@ -1,3 +1,10 @@
+2015-02-26  Per Bothner  <per@bothner.com>
+
+	* Map.java: Generailize to list arguments to "sequence-like" values.
+	(map1, forEach1): Add overloads - one version requires LList,
+	the other general sequences.
+	(applyN): Re-written to work with general sequences.
+
 2015-02-24  Per Bothner  <per@bothner.com>
 
 	* MultiplyOp.java (2-argument apply): Handle non-Numeric numbers.

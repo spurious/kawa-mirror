@@ -532,10 +532,13 @@ check-interpreted-cyclebr:
 InliningTest.class: $(srcdir)/inlining-test.scm
 	$(CPKAWA) -T InliningTest -C $(srcdir)/inlining-test.scm
 
+map1.class: $(srcdir)/map1.scm
+	$(CPKAWA) -C $(srcdir)/map1.scm
+
 LIST_CODE_SIZE = $(CPJAVA) gnu.bytecode.ListCodeSize
 
 inlining.log: InliningTest.class cycle1.class cycle2.class \
-  binarytrees.class fannkuch.class fannkuchredux.class fasta.class mandelbrot.class nbody.class pidigits.class regexdna.class revcomp1.class revcomp2.class spectralnorm.class Makefile
+  binarytrees.class fannkuch.class fannkuchredux.class fasta.class mandelbrot.class nbody.class pidigits.class regexdna.class revcomp1.class revcomp2.class spectralnorm.class map1.class Makefile
 	$(LIST_CODE_SIZE) InliningTest.class \
 	setCar getCar getHome setHome isPair isEmpty castToPair newPair tohex \
 	makeIarr lengthIarr getIarr setIarr varargs \
@@ -564,6 +567,9 @@ inlining.log: InliningTest.class cycle1.class cycle2.class \
 	$(LIST_CODE_SIZE) revcomp2.class run >>inlining.log
 	$(LIST_CODE_SIZE) 'revcomp2$$RevByteArray'.class reverseAndPrint >>inlining.log
 	$(LIST_CODE_SIZE) spectralnorm.class A multiplyAv multiplyAtv multiplyAtAv >>inlining.log
+	$(LIST_CODE_SIZE) map1.class genericMapFormat genericVmapFormat \
+	  listMapFormat stringMapFormat charArrayMapFormat vector1VmapFormat \
+	  vector2VmapFormat >>inlining.log
 
 check-inlining: inlining.log $(srcdir)/inlining.expected
 	@if $(DIFF) $(srcdir)/inlining.expected inlining.log; \
@@ -621,7 +627,7 @@ SCRIPTS_TO_RUN = case-warnings.scm uninit1.scm \
   anonymous-lambda-1.scm unreach1.scm unreach2.scm unreach3.scm \
   bad-defclass.scm defclass1.scm defclass2.scm defclass3.scm bad-voidexp.scm \
   srfi-45-test1.scm srfi-45-test2.scm bad-srfi-109.scm \
-  inline1.scm inline2.scm inline3.scm \
+  inline1.scm inline2.scm inline3.scm map1.scm \
   define1.scm define2.scm define3.scm mac-obj.scm objexp1.scm \
   overload1.scm overload2.scm match1.scm symbol1.scm values1.scm \
   command1.scm command2.scm command3.scm exit1.scm exit2.scm lib-cycle.scm \

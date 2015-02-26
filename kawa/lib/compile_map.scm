@@ -1,6 +1,7 @@
 (require <kawa.lib.kawa.expressions>)
 (import (kawa lib kawa string-cursors))
 (define-alias Convert gnu.kawa.functions.Convert)
+(define-alias FVector gnu.lists.FVector)
 
 (define-simple-class ScanHelper ()
   (comp ::Compilation)
@@ -9,23 +10,30 @@
   ((eval)::Declaration #!abstract)
   ((incr (value::Declaration))::Expression  QuoteExp:voidExp))
 
+(define (scanner-for exp::Expression etype::Type comp::Compilation)::ScanHelper
+  (let ((stype (exp:getType)))
+    (cond ((stype:isSubtype gnu.kawa.lispexpr.LangObjType:listType)
+           (ListScanner comp: comp))
+          ((? atype::gnu.bytecode.ArrayType stype)
+           (let ((etype atype:componentType))
+             (ArrayScanner comp: comp elementType: etype)))
+          ((stype:isSubtype (Type:make java.lang.CharSequence))
+           (StringScanner comp: comp))
+          ((and (stype:isSubtype (Type:make java.util.List))
+                (stype:isSubtype (Type:make java.util.RandomAccess)))
+           (VectorScanner comp: comp))
+          ((stype:isSubtype (Type:make java.lang.Iterable))
+           (IterableScanner comp: comp useGeneric: #f))
+          (else
+           (IterableScanner comp: comp useGeneric: #t)))))
+
 (define-simple-class MapHelper ()
   (comp ::Compilation)
   (scanners ::ScanHelper[])
   ((makeScanner seqArg::Expression etype::Type)::ScanHelper #!abstract)
-  ((initialize (exp::ApplyExp) (comp::Compilation))::void
-   (! n (- (exp:getArgCount) 1))
-   (set! (this):comp comp)
-   (set! scanners (ScanHelper[] length: n))
-   (do ((i ::int 0 (+ i 1))) ((= i n))
-     (set! (scanners i)
-           (makeScanner (exp:getArg (+ i 1)) #!null))))
+  ((initialize (exp::ApplyExp) (comp::Compilation))::void #!void)
   ((applyFunction func args)::Expression
-   (let* ((fexp (->exp func))
-          (applyFunction (comp:applyFunction fexp)))
-     (if (eq? applyFunction #!null)
-         (apply-exp fexp @args)
-         (apply-exp applyFunction fexp @args))))
+   (apply-to-args-exp func @args))
   ((doCollect result::Expression)::Expression
    result)
   ((collectResult result::Expression)::Expression
@@ -147,16 +155,22 @@
      (validate-generic-for-each
       exp required
       (object (MapHelper)
-              ((initialize (exp::ApplyExp) (comp::Compilation))::void
-               (invoke-special MapHelper (this) 'initialize exp comp))
               ((makeScanner exp etype) (StringScanner comp: comp)))))))
 
 (define-simple-class IterableScanner (ScanHelper)
+  (useGeneric ::boolean init: #t)
   (iteratorDecl ::Declaration)
   ((init arg)
-   (! seqArg (apply-exp as java.lang.Iterable (visit-exp arg)))
-   (set! iteratorDecl (comp:letVariable #!null java.util.Iterator
-                                        (apply-exp invoke seqArg 'iterator)))
+   (! seqArg (visit-exp arg))
+   (cond (useGeneric
+          (set! iteratorDecl
+                (comp:letVariable #!null #!null
+                                  (apply-exp invoke-static gnu.lists.Sequences
+                                             'getIterator seqArg))))
+         (else
+          (! seqItArg (apply-exp as java.lang.Iterable seqArg))
+          (set! iteratorDecl (comp:letVariable #!null java.util.Iterator
+                                               (apply-exp invoke seqArg 'iterator)))))
    (iteratorDecl:setLocation arg))
   ((test)
    (apply-exp invoke iteratorDecl 'hasNext))
@@ -187,11 +201,9 @@
 (define-simple-class ListMapHelper (MapHelper)
   (collecting ::boolean)
   (resultDecl ::Declaration)
-  ;;((makeScanner exp etype) (ListScanner comp: comp))
-  ((makeScanner exp etype) (IterableScanner comp: comp))
+  ((makeScanner exp etype) (scanner-for exp etype comp))
   ((initialize exp comp)
    (invoke-special MapHelper (this) 'initialize exp comp)
-   (! n (- (exp:getArgCount) 1))
    (if collecting
        (set! resultDecl (comp:letVariable #!null list
                                           (QuoteExp:getInstance '())))))
@@ -215,6 +227,28 @@
   ((exp:isSimple 2)
    (validate-generic-for-each exp required (ListMapHelper collecting: #t))))
 
+(define-simple-class ArrayScanner (ScanHelper)
+  (elementType ::gnu.bytecode.Type)
+  (seqDecl ::Declaration)
+  (idxDecl ::Declaration)
+  (lenDecl ::Declaration)
+  ((init arg)
+   (let* ((arrayType (gnu.bytecode.ArrayType:make elementType))
+          (seqArg (visit-exp (apply-exp Convert:cast arrayType arg))))
+     (set! seqDecl (comp:letVariable #!null arrayType seqArg))
+     (seqDecl:setLocation arg)
+     (set! idxDecl (comp:letVariable #!null int (->exp 0)))
+     (set! lenDecl
+           (comp:letVariable #!null int (apply-exp field seqDecl 'length)))))
+  ((eval)
+   (comp:letVariable #!null #!null
+                     (apply-to-args-exp seqDecl idxDecl)))
+  ((incr value)
+   (set-exp idxDecl
+            (apply-exp + idxDecl 1)))
+  ((test)
+   (apply-exp < idxDecl lenDecl)))
+  
 (define-simple-class VectorScanner (ScanHelper)
   (seqDecl ::Declaration)
   (idxDecl ::Declaration)
@@ -235,30 +269,69 @@
   ((test)
    (apply-exp < idxDecl endDecl)))
   
-(define-simple-class VectorMapHelper (MapHelper)
-  (collecting ::boolean)
-  ((makeScanner exp etype) (VectorScanner comp: comp)))
-
 ;; Validate (vector-for-each proc str1 str...)
 (define-validate vectorForEachValidateApply (exp required proc)
   ((exp:isSimple 2)
-   (validate-generic-for-each exp required (VectorMapHelper))))
+   (validate-generic-for-each
+    exp required
+    (object (MapHelper)
+            ((makeScanner exp etype) (VectorScanner comp: comp))))))
+
+(define-validate vectorMapValidateApply (exp required proc)
+  ((exp:isSimple 2)
+   (validate-generic-for-each
+    exp required
+    (object (MapHelper)
+            (idxDecl ::Declaration)
+            (resultDecl ::Declaration)
+            ((makeScanner exp etype) (scanner-for exp etype comp))
+            ((initialize exp comp)
+             (invoke-special MapHelper (this) 'initialize exp comp)
+             (cond ((and (= scanners:length 1)
+                         (? vscanner ::VectorScanner (scanners 0)))
+                    (set! idxDecl vscanner:idxDecl)
+                    ;(comp:letVariable #!null int (->exp 0)))
+                    (set! resultDecl
+                          (comp:letVariable
+                           #!null (Type:make FVector)
+                           (apply-to-args-exp FVector
+                                              (apply-exp as int
+                                                         vscanner:endDecl)))))
+                   (else
+                    (set! resultDecl
+                          (comp:letVariable #!null (Type:make FVector)
+                                            (apply-to-args-exp FVector))))))
+            ((doCollect value)
+             (cond (idxDecl
+                  ;  (begin-exp
+                    (apply-exp invoke resultDecl 'set idxDecl value))
+                   (else
+                    (apply-exp invoke resultDecl 'add value))))
+            ((collectResult result)
+             (begin-exp result resultDecl))))))
 
 (define (validate-generic-for-each exp::gnu.expr.ApplyExp
                                    required::gnu.bytecode.Type
                                    helper::MapHelper)
-   (let ((n (- (exp:getArgCount) 1))
-         (comp (get-compilation))
-         (func ::gnu.expr.Expression (exp:getArg 0)))
-     (comp:letStart)
-     (helper:initialize exp comp)
-     (if (func:side_effects)
-         (set! func (gnu.expr.ReferenceExp
-                     (comp:letVariable #!null #!null func))))
-     (do ((i ::int 0 (+ i 1))) ((= i n))
-       ((helper:scanners i):init (exp:getArg (+ i 1))))
-     (comp:letEnter)
-     (comp:letDone
+  (let ((n (- (exp:getArgCount) 1))
+        (comp (get-compilation))
+        (func ::gnu.expr.Expression (exp:getArg 0)))
+    (comp:letStart)
+    (set! helper:comp comp)
+    (set! helper:scanners (ScanHelper[] length: n))
+    (do ((i ::int 0 (+ i 1))) ((= i n))
+      (set! (helper:scanners i)
+            (helper:makeScanner (exp:getArg (+ i 1)) #!null)))
+    (if (func:side_effects)
+        (set! func (gnu.expr.ReferenceExp
+                    (comp:letVariable #!null #!null func))))
+    (do ((i ::int 1 (+ i 1))) ((> i n))
+      (let ((arg (visit-exp (exp:getArg i))))
+        (exp:setArg i arg)
+        ((helper:scanners (- i 1)):init arg)))
+    (helper:initialize exp comp)
+    (comp:letEnter)
+    (comp:letDone
       (let* ((loopLambda (comp:loopStart)))
         (comp:loopEnter)
         (helper:collectResult
@@ -268,6 +341,14 @@
                    (begin-exp
                     (helper:doCollect
                      (helper:applyFunction func (reverse chlist)))
+                    @(let loop-incr ((j ::int n) (chlist chlist) (incrs '()))
+                       (if (= j 0) incrs
+                           (let* ((j1 (- j 1))
+                                  (scanner (helper:scanners j1)))
+                             (loop-incr j1
+                                        (cdr chlist)
+                                        (cons (scanner:incr (car chlist))
+                                              incrs)))))
                     (comp:loopRepeat loopLambda)))
                   (else
                    (if-exp
@@ -277,7 +358,5 @@
                       (define chValue ((helper:scanners i):eval))
                       (comp:letEnter)
                       (comp:letDone
-                       (begin-exp
-                        ((helper:scanners i):incr chValue)
-                        (loop (+ i 1)
-                              (cons chValue chlist)))))))))))))))
+                       (loop (+ i 1)
+                             (cons chValue chlist))))))))))))))

@@ -1,3 +1,9 @@
+2015-02-26  Per Bothner  <per@bothner.com>
+
+	* map1.scm: New tests.
+	* Makefile.am (map1.class, inlining.log): More inlining tests.
+	* inlining.expected: Update accordingly.
+
 2015-02-20  Per Bothner  <per@bothner.com>
 
 	* knucleotide-2.scm: Simplify since #!null is now false.

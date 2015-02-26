@@ -84,36 +84,43 @@
 ;;; implementations are optimized for the one-vector case, and permit
 ;;; vectors of varying length, using the shortest vector as the
 ;;; limiting factor.
-(define (vector-map (f :: procedure) (vec :: java.util.List)
-                    #!rest (vecs :: vector[]))
+(define (vector-map (proc :: procedure) vec1 #!rest (vecs :: object[]))
   :: vector
-  (define (vector-map-one (f :: procedure) (vec :: java.util.List)) :: vector
+  validate-apply: "kawa.lib.compile_map:vectorMapValidateApply"
+  (define (vector-map-simple proc::procedure vec::java.util.List) :: vector
     (let* ((len :: int (vec:size))
            (r :: vector (make-vector len)))
       (do ((i :: int 0 (+ i 1)))
           ((= i len) r)
-        (vector-set! r i (f (vec:get i))))))
-  (define (vector-map-generic (f :: procedure)
-                              (vec :: java.util.List)
-                              #!rest (vecs :: java.util.List[]))
-    :: vector
-    (let loop ((ls :: list '())
-                (len :: int (vec:size))
-                (i :: int (- vecs:length 1)))
-      (if (>= i 0)
-          (loop (cons (vecs i) ls)
-                (min len ((vecs i):size))
-                (- i 1))
-          (do ((r :: vector (make-vector len))
-               (i :: int 0 (+ i 1)))
-              ((= i len) r)
-            (vector-set! r i
-                         (apply f (vec:get i)
-                                (map (lambda (v::java.util.List) (v:get i))
-                                     ls)))))))
+        (vector-set! r i (proc (vec:get i))))))
+  (define (vector-map-one proc vec) :: vector
+    (if (and (? fp::procedure proc) (? vlist::gnu.lists.SimpleVector vec))
+        (vector-map-simple fp vlist)
+        (let* ((r :: vector (make-vector 0))
+               (it (gnu.lists.Sequences:getIterator vec)))
+          (do ((i :: int 0 (+ i 1))) ((not (it:hasNext)) r)
+            (vector-set! r i (proc (it:next)))))))
+
   (if (= 0 vecs:length)
-      (vector-map-one f vec)
-      (vector-map-generic f vec vecs)))
+      (vector-map-one proc vec1)
+      (let* ((nargs (+ vecs:length 1))
+             (iterators (java.util.Iterator[] length: nargs))
+             (elements (object[] length: nargs))
+             (result (make-vector 0)))
+        (do ((i ::int 0 (+ i 1))) ((= i nargs))
+          (set! (iterators i)
+                (gnu.lists.Sequences:getIterator
+                 (if (= i 0) vec1 (vecs (- i 1))))))
+        (let loop1 ()
+          (let loop2 ((i ::int 0))
+            (cond ((= i nargs)
+                   (result:add (proc @elements))
+                   (loop1))
+                  (((iterators i):hasNext)
+                   (set! (elements i) ((iterators i):next))
+                   (loop2 (+ i 1)))
+                  (else
+                   result)))))))
 
 (define (vector-for-each (f :: procedure) (vec :: java.util.List)
                          #!rest (vecs :: java.util.List[]))

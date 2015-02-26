@@ -117,6 +117,7 @@ GNU_LISTS_JSOURCES = \
   lists/PositionConsumer.java \
   lists/PositionManager.java \
   lists/PrintConsumer.java \
+  lists/Range.java \
   lists/RAPair.java \
   lists/S8Vector.java \
   lists/S16Vector.java \
@@ -124,6 +125,7 @@ GNU_LISTS_JSOURCES = \
   lists/S64Vector.java \
   lists/SeqPosition.java \
   lists/Sequence.java \
+  lists/Sequences.java \
   lists/SimpleVector.java \
   lists/SubCharSeq.java \
   lists/SubSequence.java \

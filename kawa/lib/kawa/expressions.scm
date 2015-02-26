@@ -3,7 +3,7 @@
 (module-name (kawa expressions))
 (export ->exp get-visitor get-compilation visit-exp
         syntax-as-exp define-validate
-        apply-exp begin-exp if-exp set-exp
+        apply-exp begin-exp if-exp set-exp apply-to-args-exp
         Declaration Expression ApplyExp QuoteExp Compilation Type)
 (define-alias Expression gnu.expr.Expression)
 (define-alias ApplyExp gnu.expr.ApplyExp)
@@ -43,6 +43,17 @@
 (define (apply-exp func . args) ::gnu.expr.ApplyExp
   (gnu.expr.ApplyExp (->exp func)
                      @(gnu.kawa.functions.Map:map1 ->exp args)))
+
+;; A generalization of apply-to-exp, that uses ApplyToArgs if apropriate
+(define (apply-to-args-exp func . args)
+  (let* ((fexp (->exp func))
+         (comp (get-compilation))
+         (applyFunction (comp:applyFunction fexp)))
+    (if (eq? applyFunction #!null)
+        (gnu.expr.ApplyExp (->exp func)
+                           @(gnu.kawa.functions.Map:map1 ->exp args))
+        (gnu.expr.ApplyExp applyFunction (->exp func)
+                           @(gnu.kawa.functions.Map:map1 ->exp args)))))
 
 (define (begin-exp . args)
   (gnu.expr.BeginExp @(gnu.kawa.functions.Map:map1 ->exp args)))

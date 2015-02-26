@@ -1,6 +1,16 @@
+2015-02-26  Per Bothner  <per@bothner.com>
+
+	* compile_map.scm: Enhance to allow general sequences as arguments
+	to map, for-each, and vector-map.
+	(scanner-for-exp): New function to pick best ScanHelper.
+	(ArrayScaller): New simple class.
+	(validate-generic-for-each): Move code from ScanHelper:initialize.
+	* kawa/expressions.scm (apply-to-args-exp): New procedure.
+	* vectors.scm (vector-map): Generalize to general sequences.
+
 2015-02-24  Per Bothner  <per@bothner.com>
 
-	* compile_map.scm (MapHelper:makeScanner): New sbatract method.
+	* compile_map.scm (MapHelper:makeScanner): New abstract method.
 	(initialize): Call makeScanner for each argument.
 	(class InertableScanner): New ScanHelper class.
 

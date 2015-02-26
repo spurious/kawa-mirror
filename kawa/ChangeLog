@@ -1,3 +1,8 @@
+2015-02-26  Per Bothner  <per@bothner.com>
+
+	* standard/let.java (rewrite): Remove unused local variable - which
+	could cause a NullPointerException after an error.
+
 2015-02-19  Per Bothner  <per@bothner.com>
 
 	* standard/IfFeature.java (hasfeature): Also assume "in-servlet"

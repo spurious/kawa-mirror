@@ -84,7 +84,6 @@ public class let extends Syntax {
             Object binding_cdr = r[0];
             Declaration decl = (Declaration) r[1];
             maybeSetProcedure(decl);
-            Object name = decl.getSymbol();
         
             if (binding_cdr instanceof Pair) {
                 Pair init = (Pair) binding_cdr;

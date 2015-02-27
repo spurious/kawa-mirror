@@ -179,10 +179,10 @@ spectralnorm.A(int,int)double: 19 bytes
 spectralnorm.multiplyAv(int,double[],double[])void: 53 bytes
 spectralnorm.multiplyAtv(int,double[],double[])void: 53 bytes
 spectralnorm.multiplyAtAv(int,double[],double[])void: 17 bytes
-map1.genericMapFormat(java.lang.Object)gnu.lists.LList: 59 bytes
+map1.genericMapFormat(java.lang.Object)gnu.lists.LList: 77 bytes
 map1.genericVmapFormat(java.lang.Object)gnu.lists.FVector: 56 bytes
-map1.listMapFormat(gnu.lists.LList)gnu.lists.LList: 69 bytes
-map1.stringMapFormat(java.lang.CharSequence)gnu.lists.LList: 78 bytes
-map1.charArrayMapFormat(char[])gnu.lists.LList: 66 bytes
+map1.listMapFormat(gnu.lists.LList)gnu.lists.LList: 88 bytes
+map1.stringMapFormat(java.lang.CharSequence)gnu.lists.LList: 98 bytes
+map1.charArrayMapFormat(char[])gnu.lists.LList: 85 bytes
 map1.vector1VmapFormat(gnu.lists.FVector)gnu.lists.FVector: 60 bytes
 map1.vector2VmapFormat(gnu.lists.FVector,gnu.lists.FVector)gnu.lists.FVector: 96 bytes

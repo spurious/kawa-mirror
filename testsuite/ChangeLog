@@ -1,5 +1,7 @@
 2015-02-26  Per Bothner  <per@bothner.com>
 
+	* testsuite/inlining.expected: Update output.
+
 	* match1.scm: Fix output when converting to the String type.
 
 	* map1.scm: New tests.

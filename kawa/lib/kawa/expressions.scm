@@ -4,10 +4,11 @@
 (export ->exp get-visitor get-compilation visit-exp
         syntax-as-exp define-validate
         apply-exp begin-exp if-exp set-exp apply-to-args-exp
-        Declaration Expression ApplyExp QuoteExp Compilation Type)
+        Declaration Expression ApplyExp QuoteExp ReferenceExp Compilation Type)
 (define-alias Expression gnu.expr.Expression)
 (define-alias ApplyExp gnu.expr.ApplyExp)
 (define-alias QuoteExp gnu.expr.QuoteExp)
+(define-alias ReferenceExp gnu.expr.ReferenceExp)
 (define-alias Compilation gnu.expr.Compilation)
 (define-alias Declaration gnu.expr.Declaration)
 (define-alias Type gnu.bytecode.Type)
@@ -56,7 +57,8 @@
                            @(gnu.kawa.functions.Map:map1 ->exp args)))))
 
 (define (begin-exp . args)
-  (gnu.expr.BeginExp @(gnu.kawa.functions.Map:map1 ->exp args)))
+  (gnu.expr.BeginExp
+   (Expression[] @(gnu.kawa.functions.Map:map1 ->exp args))))
 
 (define (if-exp a b #!optional (c #!null))
   (gnu.expr.IfExp (->exp a) (->exp b) (if (eq? c #!null) c (->exp c))))

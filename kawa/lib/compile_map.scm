@@ -201,21 +201,37 @@
 (define-simple-class ListMapHelper (MapHelper)
   (collecting ::boolean)
   (resultDecl ::Declaration)
+  (lastDecl ::Declaration)
   ((makeScanner exp etype) (scanner-for exp etype comp))
   ((initialize exp comp)
-   (invoke-special MapHelper (this) 'initialize exp comp)
-   (if collecting
-       (set! resultDecl (comp:letVariable #!null list
-                                          (QuoteExp:getInstance '())))))
+   (cond (collecting
+          (set! resultDecl (comp:letVariable #!null list
+                                             (QuoteExp:getInstance '())))
+          (set! lastDecl (comp:letVariable #!null pair QuoteExp:nullExp)))))
   ((doCollect value)
-   (if collecting
-       (set-exp resultDecl
-                (apply-exp make gnu.lists.Pair value resultDecl))
-       value))
+   (cond (collecting
+          ;; It would be simpler to just cons up the results in reverse order,
+          ;; and call reverseInPlace at the end.  However, that would be
+          ;; bad for cache locality.
+          (comp:letStart)
+          (! pairDecl (comp:letVariable #!null pair
+                                        (apply-exp make gnu.lists.Pair
+                                                   value '())))
+          (pairDecl:setFlag Declaration:ALLOCATE_ON_STACK)
+          (! pairLastRef (ReferenceExp pairDecl))
+          (pairLastRef:setFlag ReferenceExp:ALLOCATE_ON_STACK_LAST)
+          (comp:letEnter)
+          (comp:letDone
+           (begin-exp
+            (if-exp (apply-exp eq? lastDecl #!null)
+                    (set-exp resultDecl pairDecl)
+                    (apply-exp invoke lastDecl 'setCdr pairDecl))
+            (set-exp lastDecl pairLastRef))))
+         (else
+          value)))
   ((collectResult result)
    (if collecting
-       (begin-exp result
-                   (apply-exp gnu.lists.LList:reverseInPlace resultDecl))
+       (begin-exp result resultDecl)
        result)))
 
 (define-validate listForEachValidateApply (exp required proc)
@@ -286,7 +302,6 @@
             (resultDecl ::Declaration)
             ((makeScanner exp etype) (scanner-for exp etype comp))
             ((initialize exp comp)
-             (invoke-special MapHelper (this) 'initialize exp comp)
              (cond ((and (= scanners:length 1)
                          (? vscanner ::VectorScanner (scanners 0)))
                     (set! idxDecl vscanner:idxDecl)
@@ -323,7 +338,7 @@
       (set! (helper:scanners i)
             (helper:makeScanner (exp:getArg (+ i 1)) #!null)))
     (if (func:side_effects)
-        (set! func (gnu.expr.ReferenceExp
+        (set! func (ReferenceExp
                     (comp:letVariable #!null #!null func))))
     (do ((i ::int 1 (+ i 1))) ((> i n))
       (let ((arg (visit-exp (exp:getArg i))))

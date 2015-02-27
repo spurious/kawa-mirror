@@ -1,5 +1,11 @@
 2015-02-26  Per Bothner  <per@bothner.com>
 
+	* compile_map.scm (ListMapHelper): Rewrite result collect to
+	immediately setCdr the previous pair, instead of building in
+	reverse order and replaceInPlace at the end.  The latter is simpler
+	and generates more compact bytecode - but is very cache-unfriendly.
+	* kawa/expressions.scm (ReferenceExp): New alias.
+
 	* compile_map.scm: Enhance to allow general sequences as arguments
 	to map, for-each, and vector-map.
 	(scanner-for-exp): New function to pick best ScanHelper.

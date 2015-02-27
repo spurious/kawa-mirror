@@ -1,5 +1,7 @@
 2015-02-26  Per Bothner  <per@bothner.com>
 
+	* MakeSplice.java: Support splicing of CharSequences.
+
 	* Map.java: Generailize to list arguments to "sequence-like" values.
 	(map1, forEach1): Add overloads - one version requires LList,
 	the other general sequences.

@@ -2,6 +2,8 @@ package gnu.kawa.functions;
 import gnu.bytecode.Type;
 import gnu.expr.*;
 import gnu.mapping.*;
+import gnu.lists.*;
+import gnu.text.Char;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +36,8 @@ public class MakeSplice extends Procedure1 {
     public static int count(Object values) {
         if (values instanceof Object[])
             return ((Object[]) values).length;
+        else if (values instanceof CharSequence)
+            return Strings.sizeInCodePoints((CharSequence) values);
         else if (values instanceof List<?>)
             return ((List<?>) values).size();
         else if (values.getClass().isArray())
@@ -48,6 +52,15 @@ public class MakeSplice extends Procedure1 {
             Object[] arr = (Object[]) values;
             int nlen = arr.length;
             System.arraycopy(arr, 0, target, start, size);
+        } else if (values instanceof CharSequence) {
+            CharSequence cseq = (CharSequence) values;
+            int len = cseq.length();
+            for (int i = 0; i < len; i++) {
+                int ch = Character.codePointAt(cseq, i);
+                target[start++] = Char.make(ch);
+                if (ch > 0xFFFF)
+                    i++;
+            }
         } else if (values instanceof List<?>) {
             for (Object val : (List<?>) values)
                 target[start++] = val;
@@ -62,6 +75,16 @@ public class MakeSplice extends Procedure1 {
                              Object values, Type elementType) {
         if (elementType == Type.objectType) {
             copyTo((Object[]) target, start, size, values);
+        } else if (values instanceof CharSequence) {
+            CharSequence cseq = (CharSequence) values;
+            int len = cseq.length();
+            for (int i = 0; i < len; i++) {
+                int ch = Character.codePointAt(cseq, i);
+                Object value = elementType.coerceFromObject(Char.make(ch));
+                java.lang.reflect.Array.set(target, start++, value);
+                if (ch > 0xFFFF)
+                    i++;
+            }
         } else if (values instanceof List<?>) {
             for (Object val : (List<?>) values) {
                 Object value = elementType.coerceFromObject(val);
@@ -84,6 +107,15 @@ public class MakeSplice extends Procedure1 {
             int nlen = arr.length;
             for (int i = 0; i < nlen;  i++)
                 list.add(arr[i]);
+        } else if (values instanceof CharSequence) {
+            CharSequence cseq = (CharSequence) values;
+            int len = cseq.length();
+            for (int i = 0; i < len; i++) {
+                int ch = Character.codePointAt(cseq, i);
+                list.add(Char.make(ch));
+                if (ch > 0xFFFF)
+                    i++;
+            }
         } else if (values instanceof List<?>) {
             list.addAll((List<?>) values);
         } else if (values.getClass().isArray()) {

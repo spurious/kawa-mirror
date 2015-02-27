@@ -518,6 +518,7 @@
       <include name="kawa/repl.java"/>
       <include name="kawa/Shell.java"/>
       <include name="kawa/Version.java"/>
+      <include name="kawa/Source*.java"/>
       <include name="kawa/Telnet*.java"/>
       <include name="kawa/Gui*.java" if="${with-swing}"/>
       <include name="kawa/Repl*.java" if="${with-swing}"/>

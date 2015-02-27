@@ -1,3 +1,7 @@
+2015-02-26  Per Bothner  <per@bothner.com>
+
+	* TypeSwitch.java (compile): Fix handling of toStringType.
+
 2015-02-12  Per Bothner  <per@bothner.com>
 
 	* SingletonType.java: Implement Externalizable.

@@ -1,5 +1,7 @@
 2015-02-26  Per Bothner  <per@bothner.com>
 
+	* match1.scm: Fix output when converting to the String type.
+
 	* map1.scm: New tests.
 	* Makefile.am (map1.class, inlining.log): More inlining tests.
 	* inlining.expected: Update accordingly.

@@ -4,7 +4,7 @@
 
 (format #t "to String: ~w~%"
         (map (lambda (x) (if (? s ::String x) s "N/A")) '(3 "hello" 3.5 #\?)))
-;; Output: to String: (3 "hello" 3.5 #\?)
+;; Output: to String: ("3" "hello" "3.5" "'?'")
 
 (format #t "to character: ~w~%"
         (map (lambda (x) (if (? c ::character x) c #\?))

@@ -118,7 +118,7 @@ public class TypeSwitch extends MethodProc implements Inlineable {
                     }
                     if (storeNeeded) {
                         code.emitLoad(incoming);
-                        if (isConditional)
+                        if (isConditional || type == Type.toStringType)
                             type.emitCoerceFromObject(code);
                         param.compileStore(comp);
                     }

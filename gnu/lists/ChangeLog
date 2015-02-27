@@ -1,3 +1,8 @@
+2015-02-27  Per Bothner  <per@bothner.com>
+
+	* Sequences.java (CharacterIterator.remove): Add method required
+	for Java 7 or earlier.
+
 2015-02-26  Per Bothner  <per@bothner.com>
 
 	* Sequences.java: New file.

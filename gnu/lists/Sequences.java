@@ -64,6 +64,12 @@ public class Sequences {
                 }
             }
             return Char.make(ch1);
-       }
+        }
+
+        /* #ifndef JAVA8 */
+        public void remove() {
+            throw new UnsupportedOperationException("remove");
+        }
+        /* #endif */
     }
 }

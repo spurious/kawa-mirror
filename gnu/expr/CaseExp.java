@@ -176,16 +176,26 @@ public class CaseExp extends Expression {
         HashMap<Integer, ArrayList<Object>> hashToClauseMap 
             = new HashMap<Integer, ArrayList<Object>>();
 
-        for (int i = 0; i < clauses.length; i++) {
-            Expression e = clauses[i].exp;
-            for (int j = 0; j < clauses[i].datums.length; j++) {
-                Expression dexp = clauses[i].datums[j];
+        // Map that contains, for each expression (the key),
+        // a label, that will be defined immediately before
+        // compiling the expression. 
+        HashMap<Expression, Label> expToLabelMap
+            = new HashMap<Expression, Label>();
+        HashMap<Expression, Integer> expToPendingDatumCounts
+            = new HashMap<Expression, Integer>();
+        
+        for (CaseClause clause : clauses) {
+            Expression e = clause.exp;
+            int saneDatums = 0;
+            for (int j = 0; j < clause.datums.length; j++) {
+                Expression dexp = clause.datums[j];
                 Object d = calculateDatumValue(dexp);
 
                 if (!integer && d instanceof ConstVector
                         || (!(d instanceof EmptyList) && d instanceof PairWithPosition)) {
                     continue;
                 }
+                saneDatums++;
                 int hash = d.hashCode();
                 ArrayList<Object> a = hashToClauseMap.get(hash);
                 if (a == null) {
@@ -195,14 +205,10 @@ public class CaseExp extends Expression {
                 a.add(d);
                 a.add(e);
             }
+            expToPendingDatumCounts.put(e, saneDatums);
+
         }
         
-        // Map that contains, for each expression (the key),
-        // a label, that will be defined immediately before
-        // compiling the expression. 
-        HashMap<Expression, Label> expToLabelMap 
-            = new HashMap<Expression, Label>();
-
         SwitchState sw = code.startSwitch();
         Label before_label = new Label();
         before_label.setTypes(code);
@@ -265,23 +271,32 @@ public class CaseExp extends Expression {
                         code.emitIfIntNotZero();
                     }
                 }
-                // check if the expression has been compiled yet,
-                // if not, define a label and compile it, then store
-                // both in the expToLabelMap.
-                // When the same expression has been already compiled
-                // we don't need to generate its bytecode again, we
-                // can jump directly to the associated label, because
-                // here each compiled expression must be followed by 
-                // an exitSwitch (a jump to the code after the case).
+
+                // We only compile a given expression once.  To avoid
+                // backwards jumps (which the verifier dislikes in certain
+                // contexts - specifically between new and the constructor)
+                // we compile the expression the *last* time it is needed.
+                // The value of pendingDatumCount is the number of times
+                // the expression is used (i.e. the number of datums in its
+                // clause) minus the number of times we've already used it
+                // minus one for using it this time.
+                int pendingDatumCount = expToPendingDatumCounts.get(exp) - 1;
                 Label expLabel = expToLabelMap.get(exp);
-                if (expLabel != null) {
-                    code.emitGoto(expLabel);
-                } else {
-                    expLabel = new Label(code);
-                    expToLabelMap.put(exp, expLabel);
-                    expLabel.define(code);
+                if (pendingDatumCount == 0) {
+                    // It's the last time we use the exp, so compile it.
+                    if (expLabel != null)
+                        expLabel.define(code);
                     exp.compile(comp, target);
                     sw.exitSwitch(code);
+                } else {
+                    // It's not the last time we use the exp. Compile a goto
+                    // to where exp will be compiled.
+                    expToPendingDatumCounts.put(exp, pendingDatumCount);
+                    if (expLabel == null) {
+                        expLabel = new Label(code);
+                        expToLabelMap.put(exp, expLabel);
+                    }
+                    code.emitGoto(expLabel);
                 }
                 if (!integer) code.emitFi();
             }

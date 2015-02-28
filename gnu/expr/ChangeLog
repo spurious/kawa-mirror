@@ -1,3 +1,9 @@
+2015-02-27  Per Bothner  <per@bothner.com>
+
+	* CaseExp.java: Compile the body of a clause for the last datum
+	that needs it, rather than the first.  This avoids backwards goto,
+	which is preferable - see ApplyExp.MAY_CONTAIN_BACK_JUMP.
+
 2015-02-20  Per Bothner  <per@bothner.com>
 
 	Change boolean value to null to (by default) false.

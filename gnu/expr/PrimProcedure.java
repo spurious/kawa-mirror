@@ -798,6 +798,10 @@ public class PrimProcedure extends MethodProc {
         returnType = Type.objectType;
         code.pushScope();
         Variable saveIndex = code.addLocal(Type.intType);
+
+        // FIXME: It would be better (unless we're in a try block) to put
+        // the cleanupFromContext handler inside a fragment (moved to the
+        // end of the Code attribute). See CheckedTarget#emitCheckedCoerce
         comp.loadCallContext();
         code.emitInvokeVirtual(Compilation.typeCallContext.
                                getDeclaredMethod("startFromContext", 0));

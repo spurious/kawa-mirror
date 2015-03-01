@@ -57,4 +57,9 @@ public class TryState {
       innerTry = innerTry.previous;
     return innerTry;
   }
+
+    /* DEBUGGING:
+    static int counter; int id=++counter;
+    public String toString() { return "TryState#"+id; }
+    */
 }

@@ -1,3 +1,10 @@
+2015-02-28  Per Bothner  <per@bothner.com>
+
+	* CodeAttr.java (emitWithCleanupCatch, emitWithCleanupDone):
+	Don't save/restore stack types - that is handled by the Label objects.
+	(emitTryEnd - 0-argument): Decprecate and make empty.
+	(emitFinallyStart): Re-order code we only have forward gotos.
+
 2015-02-17  Per Bothner  <per@bothner.com>
 
 	* ClassType.java (removeField): New method.

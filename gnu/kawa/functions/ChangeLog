@@ -1,3 +1,7 @@
+2015-02-28  Per Bothner  <per@bothner.com>
+
+	* CompileMisc.java: Remove unneeded call to code.emitTryEnd.
+
 2015-02-26  Per Bothner  <per@bothner.com>
 
 	* MakeSplice.java: Support splicing of CharSequences.

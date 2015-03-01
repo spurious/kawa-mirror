@@ -2166,7 +2166,7 @@ public class CodeAttr extends Attribute implements AttrContainer
   public void emitWithCleanupStart ()
   {
     int savedSP = SP;
-    SP = 0;
+    SP = 0; // Hack to disable emitTryStart needlessly saving the stack.
     emitTryStart(false, null);
     SP = savedSP;
   }
@@ -2176,20 +2176,8 @@ public class CodeAttr extends Attribute implements AttrContainer
    */
   public void emitWithCleanupCatch (Variable catchVar)
   {
-    emitTryEnd();
-    Type[] savedTypes;
-    if (SP > 0)
-      {
-        savedTypes = new Type[SP];
-        System.arraycopy(stack_types, 0, savedTypes, 0, SP);
-        SP = 0;
-      }
-    else
-      savedTypes = null;
-    try_stack.savedTypes = savedTypes;
-
+    emitTryEnd(false);
     try_stack.saved_result = catchVar;
-    int save_SP = SP;
     emitCatchStart(catchVar);
   }
 
@@ -2203,18 +2191,7 @@ public class CodeAttr extends Attribute implements AttrContainer
       emitLoad(catchVar);
     emitThrow();
     emitCatchEnd();
-    Type[] savedTypes = try_stack.savedTypes;
     emitTryCatchEnd();
-    if (savedTypes != null)
-      {
-        SP = savedTypes.length;
-        if (SP >= stack_types.length)
-          stack_types = savedTypes;
-        else
-          System.arraycopy(savedTypes, 0, stack_types, 0, SP);
-      }
-    else
-      SP = 0;
   }
 
 
@@ -2263,10 +2240,10 @@ public class CodeAttr extends Attribute implements AttrContainer
       try_state.finally_subr = new Label();
   }
 
-  public void emitTryEnd ()
-  {
-    emitTryEnd(false);
-  }
+    @Deprecated
+    public void emitTryEnd() {
+    }
+
   private void emitTryEnd (boolean fromFinally)
   {
     if (try_stack.tryClauseDone)
@@ -2342,9 +2319,8 @@ public class CodeAttr extends Attribute implements AttrContainer
       }
     else
       {
-        setUnreachable();
-        Label endLabel = new Label(this);
-        int fragment_cookie = beginFragment(endLabel);
+        if (reachableHere())
+          emitGoto(try_stack.finally_subr);
         addHandler(try_stack.start_try, try_stack.end_try, Type.javalangThrowableType);
         if (try_stack.saved_result != null)
           emitStoreDefaultValue(try_stack.saved_result);
@@ -2353,8 +2329,6 @@ public class CodeAttr extends Attribute implements AttrContainer
             emitPushInt(-1);  // Return switch case code.
             emitSwap();
           }
-        emitGoto(try_stack.finally_subr);
-        endFragment(fragment_cookie);
       }
     try_stack.finally_subr.define(this);
     

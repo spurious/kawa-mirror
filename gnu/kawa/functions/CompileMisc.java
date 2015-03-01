@@ -576,7 +576,6 @@ public class CompileMisc
         code.emitPushInt(1);
         code.emitPutField(typeContinuation.getField("invoked"));
       }
-    code.emitTryEnd();
 
     // Emit: catch (Throwable ex) { handleException$(ex, cont, ctx); }
     code.emitCatchStart(null);

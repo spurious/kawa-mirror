@@ -1,3 +1,7 @@
+2015-02-28  Per Bothner  <per@bothner.com>
+
+	* NodeConstructor.java: Remove unneeded call to code.emitTryEnd.
+
 2014-08-27  Per Bothner  <per@bothner.com>
 
 	* XIntegerType.java (coerceFromObject): First coerce asIntNumOrNull

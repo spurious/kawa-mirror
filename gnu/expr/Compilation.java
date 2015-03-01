@@ -2247,7 +2247,6 @@ public class Compilation implements SourceLocator
 	    code.emitPushNull();
 	    code.emitStore(exceptionVar);
 	    // } catch (Throwable th) { exception = th; }
-	    code.emitTryEnd();
 	    code.emitCatchStart(exceptionVar);
 	    code.emitCatchEnd();
 	    code.emitTryCatchEnd();

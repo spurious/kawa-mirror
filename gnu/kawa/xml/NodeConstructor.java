@@ -160,7 +160,6 @@ implements Inlineable
 	    code.emitTryStart(true, Type.void_type);
             ConsumerTarget xtarget = new ConsumerTarget(xvar);
 	    compileToNode(exp, comp, xtarget);
-	    code.emitTryEnd();
 	    code.emitFinallyStart();
 	    code.emitLoad(cvar);
 	    if (ctarget.isContextTarget())

@@ -634,7 +634,10 @@ public class PrimProcedure extends MethodProc {
     Expression[] args = exp.getArgs();
     if (isConstructor())
       {
-        if (exp.getFlag(ApplyExp.MAY_CONTAIN_BACK_JUMP))
+        if (exp.getFlag(ApplyExp.MAY_CONTAIN_BACK_JUMP)
+            // See https://bugs.openjdk.java.net/browse/JDK-8046233
+            // The fix was released in JDK 8u25.
+            && Compilation.defaultClassFileVersion <= ClassType.JDK_1_8_VERSION)
           {
             // JVM spec for Java6:
             // "There must never be an uninitialized class instance

@@ -146,6 +146,9 @@ public class ApplyToArgs extends ProcedureN
             int index = ((Number) Promise.force(args[1])).intValue();
             return ((java.util.List) proc).get(index);
         }
+        if (proc instanceof gnu.lists.Array) {
+            return ArrayRef.arrayRef.applyN(args);
+        }
         /*
           What should happen if key has no associated value?
           Throw an exception?  Return null?

@@ -1,3 +1,8 @@
+2015-03-02  Per Bothner  <per@bothner.com>
+
+	* ApplyToArgs.java (applyN): Handle multi-dimensional Arrays.
+	* Setter.java (HasSetter): Likewise.
+
 2015-02-28  Jamison Hope  <jrh@theptrgroup.com>
 
 	* ArrayRef.java (arrayRef): Set setter property to ArraySet.arraySet.

@@ -8,6 +8,9 @@ import gnu.mapping.*;
 public class ArrayRef extends ProcedureN
 {
   public static final ArrayRef arrayRef = new ArrayRef();
+    static {
+        arrayRef.setSetter(ArraySet.arraySet);
+    }
 
   public static Object arrayRef(Array array, Sequence index)
   {

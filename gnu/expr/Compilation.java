@@ -2003,6 +2003,7 @@ public class Compilation implements SourceLocator
 
         if (wantedState >= WALKED && getState() < WALKED)
           {
+            InlineCalls.inlineCalls(mexp, this);
             if (enableANF)
                 ANormalize.aNormalize(mexp, this);
             if (debugPrintANF) {
@@ -2014,7 +2015,6 @@ public class Compilation implements SourceLocator
                 dout.println(']');
                 dout.flush();
             }
-            InlineCalls.inlineCalls(mexp, this);
             ChainLambdas.chainLambdas(mexp, this);
             FindTailCalls.findTailCalls(mexp, this);
             setState(messages.seenErrors() ? ERROR_SEEN : WALKED);

@@ -5,7 +5,7 @@ KAWARTLIB = ../kawart-$(VERSION).jar
 KAWA = ../bin/kawa.sh
 CPJAVA = CLASSPATH="..$(CLASSPATH_SEPARATOR)@conf_classpath@.$(CLASSPATH_SEPARATOR)$$CLASSPATH" $(JAVA)
 CPKAWA = CLASSPATH="@conf_classpath@.$(CLASSPATH_SEPARATOR)$$CLASSPATH" $(KAWA)
-KAWATEST = CLASSPATH=".$(CLASSPATH_SEPARATOR)$$CLASSPATH" $(KAWA) -e '(load "testing.zip")' $(OPTIONS)
+KAWATEST = CLASSPATH=".$(CLASSPATH_SEPARATOR)$$CLASSPATH" $(KAWA) $(OPTIONS) -e '(load "testing.zip")'
 DIFF = diff --strip-trailing-cr
 
 if ENABLE_SERVLET
@@ -28,6 +28,9 @@ check: check2-no-full-tailcalls check1 check2-full-tailcalls check-no-inline \
   $(SERVLET_TESTS) $(SAX2_TESTS) \
   check-inlining check-jmc check-use-slots check-load-require check-sva31180 \
   check-bridge check-life-grid
+
+check-anf:
+	$(MAKE) check1 check2 OPTIONS=--enable-anf
 
 check2-no-full-tailcalls:
 	$(MAKE) check2 OPTIONS=--no-full-tailcalls
@@ -69,7 +72,7 @@ check-case: testing.zip
 	$(KAWATEST) -f "$(srcdir)/case-test.scm" -e '(test-report)'
 
 check-r7rs:
-	$(KAWA) --no-warn-void-used -f $(srcdir)/r7rs-tests.scm
+	$(KAWA) $(OPTIONS) --no-warn-void-used -f $(srcdir)/r7rs-tests.scm
 
 check-num:
 	$(KAWA) $(OPTIONS) "$(srcdir)/num-test.scm"
@@ -135,7 +138,7 @@ check-obj: testing.zip module2.class module3.class classes2.class \
 	$(KAWATEST) --no-warn-unknown-member -f "$(srcdir)/obj-test.scm" -e '(test-report)'
 
 check-polytype:
-	$(KAWA) "$(srcdir)/polytype.scm"
+	$(KAWA) $(OPTIONS) "$(srcdir)/polytype.scm"
 
 check-format: testing.zip
 	$(KAWA) "$(srcdir)/formatst.scm"

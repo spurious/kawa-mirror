@@ -1,3 +1,9 @@
+2015-03-02  Andrea Bernardini <andrebask@gmail.com>
+
+	* Makefile.am: New target to check a-normalization
+	correctness. Add OPTIONS to KAWATEST variable.
+	Add OPTIONS to check-r7rs and check-polytype.
+
 2015-02-26  Per Bothner  <per@bothner.com>
 
 	* testsuite/inlining.expected: Update output.
@@ -364,7 +370,7 @@
        * unreach1.scm: Add a test that contains a non terminating
        case expression.
 
- 22014-08-14  Per Bothner  <per@bothner.com>
+2014-08-14  Per Bothner  <per@bothner.com>
 
 	* text-test.scm: Add some tests of string-replace!.
 

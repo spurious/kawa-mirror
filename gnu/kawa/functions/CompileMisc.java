@@ -603,7 +603,8 @@ public class CompileMisc
   {
     Expression[] args = exp.getArgs();
     Expression arg0;
-    if (args.length == 1 && (arg0 = args[0]) instanceof LambdaExp)
+    if (args.length == 1 && (arg0 = args[0]) instanceof LambdaExp
+        && ! Compilation.enableANF)
       {
         LambdaExp lexp = (LambdaExp) arg0;
         if (lexp.min_args == 1 && lexp.max_args == 1

@@ -1,3 +1,9 @@
+2015-03-02  Andrea Bernardini <andrebask@gmail.com>
+
+	* Compilation.java: Move ANormalize pass after InlineCalls.
+	* ANormalize.java: Needed changes to make ANormalize work after
+	InlineCalls.
+
 2015-02-28  Per Bothner  <per@bothner.com>
 
 	* Compilation.java: Remove unneeded call to code.emitTryEnd.

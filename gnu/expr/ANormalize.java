@@ -130,17 +130,12 @@ public class ANormalize extends ExpExpVisitor<ANormalize.Context> {
         if (!isProvided) {
             // set the properties for the newly generated Declaration
           
-            if (!(val instanceof ClassExp) 
-                && val instanceof LambdaExp) {
+            decl.setCanRead();
+            decl.setType(val.getType());
+            if (val.getClass() == LambdaExp.class)
                 decl.setCanCall();
-                if (let instanceof FluidLetExp)
-                    decl.setProcedureDecl(true);
-                decl.setType(Compilation.typeProcedure);
-            }
-
-            if (val != QuoteExp.undefined_exp)
                 decl.noteValueFromLet(let);
-
+            decl.numReferences++;
         } else {
 
             // if decl has ben provided, we need to update its base,
@@ -153,13 +148,9 @@ public class ANormalize extends ExpExpVisitor<ANormalize.Context> {
             }
         }   
 
-        if (val == QuoteExp.undefined_exp)
-            decl.setFlag(Declaration.MAYBE_UNINITIALIZED_ACCESS);
-        if (val == QuoteExp.undefined_exp
-            || (val instanceof SetExp)) {
-            // in this case the declaration is ignorable
-            decl.setCanRead(false);
-            decl.setCanWrite(false);
+        if (val.getClass() == LambdaExp.class) {
+            LambdaExp lexp = (LambdaExp) val;
+            decl.setCanRead(lexp.getCanRead());
         }        
         
         return decl;
@@ -319,6 +310,7 @@ public class ANormalize extends ExpExpVisitor<ANormalize.Context> {
     
     private static boolean isApplyToArgs(Expression func) {
         return (func instanceof ReferenceExp)
+                && func.getName() != null
                 && func.getName().equals("applyToArgs");
     }    
 
@@ -495,6 +487,17 @@ public class ANormalize extends ExpExpVisitor<ANormalize.Context> {
         
         if (bin != null) {
             bin.setCanWrite();
+            
+            // optimizing letrec-like forms
+            if (bin.getInitValue() == QuoteExp.undefined_exp) {
+                Expression value = bin.getValue();
+                if (value instanceof LambdaExp
+                    || (value != bin.getInitValue() && value instanceof QuoteExp)) {
+                    bin.setInitValue(normalizeTerm(value));
+                    return context.invoke(QuoteExp.voidExp);
+                }
+            }
+                
         }
         
         if (exp.isDefining()) {      
@@ -506,11 +509,6 @@ public class ANormalize extends ExpExpVisitor<ANormalize.Context> {
             return context.invoke(exp);
         }
 
-        if ((exp.new_value instanceof LambdaExp)
-            && bin.getInitValue() == QuoteExp.undefined_exp) {
-            bin.noteValueUnknown();
-        }        
-        
         Context newContext = new Context() {
 
             @Override

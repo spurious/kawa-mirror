@@ -103,6 +103,12 @@ public abstract class AbstractHashTable<Entry extends Map.Entry<K,V>, K, V>
     return node == null ? defaultValue : node.getValue();
   }
 
+  // Java 8 added defaultOrValue to the Map interface.
+  public V getOrDefault(Object key, V defaultValue)
+  {
+    return get(key, defaultValue);
+  }
+
   protected void rehash ()
   {
     Entry[] oldTable = table;

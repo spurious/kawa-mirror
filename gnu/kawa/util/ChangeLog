@@ -1,3 +1,7 @@
+2015-03-06  Per Bothner  <per@bothner.com>
+
+	* AbstractHashTable.java (getOrDefault):  New method.
+
 2014-04-23  Per Bothner  <per@bothner.com>
 
 	* generate-charsets.scm: New helper script to generate the

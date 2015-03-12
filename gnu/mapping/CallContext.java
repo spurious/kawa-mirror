@@ -32,14 +32,7 @@ public class CallContext // implements Runnable
   /** Get but don't create a CallContext for the current thread. */
   public static CallContext getOnlyInstance()
   {
-    /* #ifdef JAVA2 */
     return (CallContext) currentContext.get();
-    /* #else */
-    // Thread thread = Thread.currentThread();
-    // if (thread instanceof Future)
-    //   return ((Future) thread).getCallContext();
-    // return (CallContext) threadMap.get(thread);
-    /* #endif */
   }
 
   /** Get or create a CallContext for the current thread. */
@@ -66,7 +59,7 @@ public class CallContext // implements Runnable
 
   /** Default place for function results.
    * In the future, function arguments will also use vstack. */
-  public ValueStack vstack = new ValueStack();  // ?? super
+  private ValueStack vstack = new ValueStack();
   /** Function results are written to this Consumer.
    * This may point to vstack - or some other Consumer. */
   public Consumer consumer = vstack;
@@ -242,71 +235,81 @@ public class CallContext // implements Runnable
    * temporary, After the method, getFromContext extract the method's result
    * from the vstack and restores the state.
    */
-  public final int startFromContext ()
-  {
-    ValueStack vst = vstack;
-    TreeList buffer = vst.buffer;
-    int oindex = buffer.find(consumer);
-    buffer.ensureSpace(3);
-    int gapStart = buffer.gapStart;
-    buffer.data[gapStart++] = TreeList.INT_FOLLOWS;
-    buffer.setIntN(gapStart, oindex);
-    gapStart += 2;
-    consumer = vst;
-    buffer.gapStart = gapStart;
-    return gapStart;
-  }
+    public final int startFromContext() {
+        if (vstack.gapStart == vstack.gapStartOnPush
+            && consumer == vstack) { // Simple efficient case.
+            return -1;
+        } else {
+            vstack.push();
+            vstack.consumerOnPush = consumer;
+            vstack.oindexOnPush = vstack.oindex;
+            vstack.gapStartOnPush = vstack.gapStart;
+            consumer = vstack;
+            return vstack.gapStart;
+        }
+    }
 
-  /** Routine to extract result and restore state after startFromContext.
-   */
-  public final Object getFromContext (int oldIndex) throws Throwable
-  {
-    runUntilDone();
-    TreeList buffer = vstack.buffer;
-    Object result = Values.make(buffer, oldIndex, buffer.gapStart);
-    cleanupFromContext(oldIndex);
-    return result;
-  }
+    /** Routine to extract result and restore state after startFromContext.
+     */
+    public final Object getFromContext(int saved) throws Throwable {
+        runUntilDone();
+        Object result = ((ValueStack) consumer).getValue();
+        cleanupFromContext(saved);
+        return result;
+    }
 
-  /** Cleanup-only part of getFromContext.
-   * This can be in an exception handler as an alternative
-   * to getFromContext, which is called in the non-exception case.
-   * (Alternatively, the compiler could call cleanupFromContext
-   * from a finally clause but that is less efficient, partly
-   * because the JVM stack must be empty before a finally subroutine.)
-   */
-  public final void cleanupFromContext (int oldIndex)
-  {
-    TreeList buffer = vstack.buffer;
-    char[] data = buffer.data;
-    int oindex = (data[oldIndex-2] << 16) | (data[oldIndex -1] & 0xFFFF);
-    consumer = (Consumer) buffer.objects[oindex];
-    buffer.objects[oindex] = null;
-    buffer.oindex = oindex;
-    buffer.gapStart = oldIndex - 3;
-  }
+    /** Cleanup-only part of getFromContext.
+     * This can be in an exception handler as an alternative
+     * to getFromContext, which is called in the non-exception case.
+     * (Alternatively, the compiler could call cleanupFromContext
+     * from a finally clause but that is less efficient, partly
+     * because the JVM stack must be empty before a finally subroutine.)
+     */
+    public final void cleanupFromContext(int saved) {
+        vstack.gapStart = vstack.gapStartOnPush;
+        int oindexOnPush = vstack.oindexOnPush;
+        for (int i = vstack.oindex;  --i >= oindexOnPush; )
+            vstack.objects[i] = null;
+        vstack.oindex = oindexOnPush;
+        vstack.lastObject = vstack;
+        if (saved >= 0) {
+            consumer = vstack.consumerOnPush;
+            vstack.pop(saved);
+        }
+    }
 
-  /** Run until no more continuations, returning final result. */
-  public final Object runUntilValue() throws Throwable
-  {
-    Consumer consumerSave = consumer;
-    ValueStack vst = vstack;
-    TreeList buffer = vst.buffer;
-    consumer = vst;
-    int dindexSave = buffer.gapStart;
-    int oindexSave = buffer.oindex;
-    try
-      {
-	runUntilDone();
-	return Values.make(buffer, dindexSave, buffer.gapStart);
-      }
-    finally
-      {
-	consumer = consumerSave;
-	buffer.gapStart = dindexSave;
-	buffer.oindex = oindexSave;
-      }
-  }
+    /** Run until no more continuations, returning final result. */
+    public final Object runUntilValue() throws Throwable {
+        // Functionally equivalent to the following, but more efficient.
+        // int saved = startFromContext();
+        // try {
+        //     return getFromContext(saved);
+        // } catch (Throwable ex) {
+        //     cleanupFromContext(saved);
+        // throw ex;
+        // }
+
+        Consumer consumerSave = consumer;
+        ValueStack vst = vstack;
+        consumer = vst;
+        Object lastSave = vst.lastObject;
+        vst.lastObject = vst;
+        int dindexSave = vst.gapStart;
+        int gapStartOnPushSave = vst.gapStartOnPush;
+        vstack.gapStartOnPush = vst.gapStart;
+        int oindexSave = vst.oindex;
+        try {
+            runUntilDone();
+            return vst.getValue();
+        } finally {
+            consumer = consumerSave;
+            vst.gapStart = dindexSave;
+            vst.oindex = oindexSave;
+            vst.gapStartOnPush = gapStartOnPushSave;
+            vst.lastObject = lastSave;
+            
+        }
+    }
 
   /** Run until no more continuations, sending result to a COnsumer. */
   public final void runUntilValue(Consumer out) throws Throwable

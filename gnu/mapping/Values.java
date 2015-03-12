@@ -74,10 +74,6 @@ public abstract class Values<E>
         return new FromList<E>(seq);
     }
 
-    public static Object make(TreeList list) {
-        return make(list, 0, list.data.length);
-    }
-
     /**
      * Extract a value (single or Values) from a sub-range of a TreeList.
      * @param list the TreeList to copy

@@ -1,3 +1,16 @@
+2015-03-11  Per Bothner  <per@bothner.com>
+
+	* CallContext.java: Change result method of getting result as Object
+	given method that writes result to Consumer.  Specifically avoid
+	fiddly TreeList operations in common case.
+	(startFromContext, getFromContext, cleanupFromContext,
+	runUntilValue): Major re-write.
+	* ValueStack.java (lastObject, gapStartOnPush, gapStartOnPush)
+	(oindexOnPush): New fields.
+	(push, pop, getValue): New methods.
+	(ensureSpace, writeObject): New overrides.
+	* Values.java (make): Remove unused method.
+
 2015-01-09  Per Bothner  <per@bothner.com>
 
 	* Values.java (empty): Initialize directly as new FromArray.

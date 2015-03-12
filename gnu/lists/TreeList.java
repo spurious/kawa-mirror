@@ -417,7 +417,8 @@ public class TreeList extends AbstractSequence<Object>
 
   public void writeObject(Object v)
   {
-    ensureSpace(3);
+    if (gapEnd - gapStart < 3)
+      ensureSpace(3);
     int index = find(v);
     if (index < 0x1000)
       data[gapStart++] = (char) (OBJECT_REF_SHORT | index);

@@ -1,3 +1,8 @@
+2015-03-11  Per Bothner  <per@bothner.com>
+
+	* TreeList.java (ensureSpace): Parrial inline to allow overrride
+	in ValueSpace.
+
 2015-02-27  Per Bothner  <per@bothner.com>
 
 	* Sequences.java (CharacterIterator.remove): Add method required

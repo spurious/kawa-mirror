@@ -344,7 +344,7 @@
            (gnu.math.Quantity:make ((num:number):sqrt)
                                    ((num:unit):sqrt))))))
 
-(define (square x::quantity) ::quantity
+(define (square x::java.lang.Number) ::java.lang.Number
   (* x x))
 
 (define-procedure make-rectangular

@@ -1,3 +1,7 @@
+2015-03-12  Jamison Hope  <jrh@theptrgroup.com>
+
+	* numbers.scm (square): Generalize to java.lang.Number.
+
 2015-02-26  Per Bothner  <per@bothner.com>
 
 	* compile_map.scm (ListMapHelper): Rewrite result collect to

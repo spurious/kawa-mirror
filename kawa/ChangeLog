@@ -1,3 +1,8 @@
+2015-03-18  Per Bothner  <per@bothner.com>
+
+	* lang/Lambda.java (rewriteFormals): Set IS_REST_PARAMETER and
+	IS_PARAMETER for old-fashioned dotted rest argument.
+
 2015-02-26  Per Bothner  <per@bothner.com>
 
 	* standard/let.java (rewrite): Remove unused local variable - which

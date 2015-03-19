@@ -336,7 +336,9 @@ public class Lambda extends Syntax
             rest_args = 1;
             Declaration decl = new Declaration(bindings);
             decl.setType(LangObjType.listType);
-            decl.setFlag(Declaration.IS_SINGLE_VALUE);
+            decl.setFlag(Declaration.IS_SINGLE_VALUE
+                         |Declaration.IS_PARAMETER
+                         |Declaration.IS_REST_PARAMETER);
             decl.noteValueUnknown();
             addParam(decl, templateScopeRest, lexp, tr);
           }

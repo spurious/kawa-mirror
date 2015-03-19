@@ -30,6 +30,8 @@ public class LangPrimType extends PrimType implements TypeValue {
     public static final PrimType voidType = Type.voidType;
 
     static final ClassType scmCharType = ClassType.make("gnu.text.Char");
+    static final ClassType boxedStringCursorType =
+        ClassType.make("gnu.text.StringCursor");
 
     public static final LangPrimType characterType
        = new LangPrimType(Type.intType);
@@ -72,6 +74,8 @@ public class LangPrimType extends PrimType implements TypeValue {
     public ClassType boxedType() {
         if (this == characterType)
             return scmCharType;
+        if (this == stringCursorType)
+            return boxedStringCursorType;
         if (this == characterOrEofType)
             return Type.objectType;
         return super.boxedType();
@@ -324,12 +328,15 @@ public class LangPrimType extends PrimType implements TypeValue {
             || this == charType) {
             code.emitInvokeStatic(scmCharType
                                   .getDeclaredMethod("checkCharOrEof", 1));
+        } else if (this == stringCursorType) {
+            code.emitInvokeStatic(boxedStringCursorType
+                                  .getDeclaredMethod("checkStringCursor", 1));
         }
         if (decl != null) {
             code.emitDup();
             decl.compileStore(comp);
         }
-        if (this == characterType) {
+        if (this == characterType || this == stringCursorType) {
             code.emitIfIntGEqZero();
         } else if (this == charType) {
             code.emitPushInt(16);

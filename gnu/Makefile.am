@@ -216,6 +216,7 @@ GNU_TEXT_JSOURCES = \
   text/SourceError.java \
   text/SourceMessages.java \
   text/StandardNamedChars.java \
+  text/StringCursor.java \
   text/SyntaxException.java
 
 GNU_KAWA_IO_JSOURCES = \

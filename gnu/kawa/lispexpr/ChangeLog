@@ -1,3 +1,8 @@
+2015-03-18  Per Bothner  <per@bothner.com>
+
+	* LangPrimType.java (boxedStringCursorType): New constant ClassType.
+	(boxedType, emitTestIf): Handle stringCursorType.
+
 2015-02-23  Per Bothner  <per@bothner.com>
 
 	* ReaderTypespec.java (read): Allow non-terminating-macro characters.

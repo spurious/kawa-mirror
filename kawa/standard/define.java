@@ -226,6 +226,8 @@ public class define extends Syntax
                         }
                         bexp1.add(addCall);
                     } else {
+                        if (bexp2 == null)
+                            bexp2 = new BeginExp();
                         bexp2.add(addCall);
                     }
                 }

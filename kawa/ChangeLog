@@ -1,3 +1,9 @@
+2014-12-19  Jamison Hope  <jrh@theptrgroup.com>
+
+	* standard/define.java (rewriteForm): Make sure BeginExp bexp2 is
+	instantiated before attempting to add expressions to it.  This avoids
+	a NullPointerException in some define-procedure	invocations.
+
 2015-03-18  Per Bothner  <per@bothner.com>
 
 	* lang/Lambda.java (rewriteFormals): Set IS_REST_PARAMETER and

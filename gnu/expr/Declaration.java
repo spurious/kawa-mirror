@@ -294,9 +294,9 @@ public class Declaration
           }
       }
     CodeAttr code = comp.getCode();
-    Type rtype = getType();
-    if (! isIndirectBinding()
-        && (flags & ReferenceExp.DONT_DEREFERENCE) != 0)
+    boolean dontDeref = (flags & ReferenceExp.DONT_DEREFERENCE) != 0;
+    Type rtype = dontDeref ? Compilation.typeLocation : getType();
+    if (! isIndirectBinding() && dontDeref)
       {
         if (field == null)
           throw new Error("internal error: cannot take location of "+this);
@@ -402,8 +402,7 @@ public class Declaration
               var = allocateVariable(code, true);
             code.emitLoad(var);
           }
-        if (isIndirectBinding()
-            && (flags & ReferenceExp.DONT_DEREFERENCE) == 0)
+        if (isIndirectBinding() && ! dontDeref)
           {
             String filename;
             int line;
@@ -448,8 +447,7 @@ public class Declaration
               }
             else
               code.emitInvokeVirtual(getLocationMethod);
-
-            rtype = Type.pointer_type;
+            rtype = Type.objectType;
           }
       }
     target.compileFromStack(comp, rtype);

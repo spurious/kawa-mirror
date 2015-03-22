@@ -1,3 +1,7 @@
+2015-03-22  Per Bothner  <per@bothner.com>
+
+	* standard/location.java (makeLocationProc): More precise return type.
+
 2014-12-19  Jamison Hope  <jrh@theptrgroup.com>
 
 	* standard/define.java (rewriteForm): Make sure BeginExp bexp2 is

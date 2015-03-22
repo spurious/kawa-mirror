@@ -147,7 +147,7 @@ public class location extends Syntax
     return new ProcLocation(proc, args);
   }
 
-  public static Procedure
+  public static LocationProc
   makeLocationProc (Location loc)
   {
     return new LocationProc(loc);

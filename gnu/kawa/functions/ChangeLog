@@ -1,3 +1,9 @@
+2015-03-22  Per Bothner  <per@bothner.com>
+
+	* CompilationHelpers.java (validateSetter): Optimize case when
+	argument is unknown Procedure - just call getSetter.
+	(getSetterProc): New field.
+
 2015-03-02  Andrea Bernardini <andrebask@gmail.com>
 
 	* CompileMisc.java (canInlineCallCC): If a-normalization is

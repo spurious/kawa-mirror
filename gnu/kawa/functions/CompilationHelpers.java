@@ -175,9 +175,16 @@ public class CompilationHelpers
                   }
               }
           }
+        if (argType instanceof ClassType
+            && ((ClassType) argType).isSubclass(Compilation.typeProcedure)) {
+            return new ApplyExp(getSetterProc, arg);
+        }
       }
     return exp;
   }
+
+    public static final PrimProcedure getSetterProc = new PrimProcedure
+      (Compilation.typeProcedure.getDeclaredMethod("getSetter", 0));
 
   public static Expression validateIsEqv
   (ApplyExp exp, InlineCalls visitor, Type required, Procedure proc)

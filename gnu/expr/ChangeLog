@@ -1,5 +1,8 @@
 2015-03-22  Per Bothner  <per@bothner.com>
 
+	* Declaration.java (makeField): Only create BindingInitializer
+	if the context is a ModuleExp.
+
 	* Declaration.java (load): The resulting stack type is Location
 	in the don't-dereference case.
 

@@ -1296,6 +1296,7 @@ public class Declaration
       }
     // The EARLY_INIT case is handled in SetExp.compile.
     if (! shouldEarlyInit()
+        && context instanceof ModuleExp
 	&& (isIndirectBinding()
 	    || (value != null && ! (value instanceof ClassExp))))
       {

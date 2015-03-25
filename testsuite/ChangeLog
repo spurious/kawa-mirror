@@ -1,3 +1,9 @@
+2015-03-25  Andrea Bernardini <andrebask@gmail.com>
+            Per Bothner  <per@bothner.com>
+
+	* exception1.scm: Check throw in finally clause.
+	* Makefile.am: Update accordingly.
+
 2015-03-22  Andrea Bernardini <andrebask@gmail.com>
             Per Bothner  <per@bothner.com>
 

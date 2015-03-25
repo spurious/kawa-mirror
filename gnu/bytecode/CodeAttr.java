@@ -2348,8 +2348,10 @@ public class CodeAttr extends Attribute implements AttrContainer
   }
 
   public void emitFinallyEnd()
-  { 
-    if (useJsr())
+  {
+    if (! reachableHere())
+      try_stack.end_label = null;
+    else if (useJsr())
       emitRet(try_stack.finally_ret_addr);
     else if (try_stack.end_label == null && try_stack.exitCases == null)
       {

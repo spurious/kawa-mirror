@@ -1,3 +1,8 @@
+2015-03-25  Per Bothner  <per@bothner.com>
+
+	* CodeAttr.java (emitFinallyEnd): Check if reachableHere() - otherwise
+	clear end_label and don't generate any code.
+
 2015-02-28  Per Bothner  <per@bothner.com>
 
 	* CodeAttr.java (emitWithCleanupCatch, emitWithCleanupDone):

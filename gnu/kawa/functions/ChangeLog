@@ -1,3 +1,8 @@
+2015-03-26  Per Bothner  <per@bothner.com>
+
+	* CompilationHelpers.java (validateSetter): Fix bug in previous
+	change that led to an expression being used twice.
+
 2015-03-22  Per Bothner  <per@bothner.com>
 
 	* CompilationHelpers.java (validateSetter): Optimize case when

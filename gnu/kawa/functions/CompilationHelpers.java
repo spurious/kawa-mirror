@@ -177,7 +177,7 @@ public class CompilationHelpers
           }
         if (argType instanceof ClassType
             && ((ClassType) argType).isSubclass(Compilation.typeProcedure)) {
-            return new ApplyExp(getSetterProc, arg);
+            return new ApplyExp(getSetterProc, args);
         }
       }
     return exp;

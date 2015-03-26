@@ -1,3 +1,10 @@
+2015-03-26  Andrea Bernardini <andrebask@gmail.com>
+	    Per Bothner  <per@bothner.com>
+
+	* location2.scm: New testcase - triggered bug in recent setter
+	optimization.
+	* Makefile.am: Update accordingly.
+
 2015-03-25  Andrea Bernardini <andrebask@gmail.com>
             Per Bothner  <per@bothner.com>
 

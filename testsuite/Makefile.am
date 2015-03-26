@@ -631,7 +631,7 @@ SCRIPTS_TO_RUN = case-warnings.scm uninit1.scm \
   bad-defclass.scm defclass1.scm defclass2.scm defclass3.scm bad-voidexp.scm \
   srfi-45-test1.scm srfi-45-test2.scm bad-srfi-109.scm \
   inline1.scm inline2.scm inline3.scm let1.scm map1.scm \
-  location1.scm location2.scm \
+  location1.scm location2.scm location3.scm \
   define1.scm define2.scm define3.scm mac-obj.scm objexp1.scm \
   overload1.scm overload2.scm match1.scm symbol1.scm values1.scm \
   command1.scm command2.scm command3.scm exit1.scm exit2.scm lib-cycle.scm \

@@ -172,7 +172,6 @@ public class Declaration
     if (type.isVoid())
       type = Type.objectType;
     this.type = type;
-    if (var != null) var.setType(type);
     typeExp = QuoteExp.getInstance(type);
   }
 

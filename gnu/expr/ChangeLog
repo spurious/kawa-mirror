@@ -1,3 +1,9 @@
+2015-03-25  Per Bothner  <per@bothner.com>
+
+	* InlineCalls.java (visitLetExp): Remove minor optimization because
+	it is difficult to handle type-checking and related issues, and it
+	doesn't have much benefit.  Instead allocate on stack.
+
 2015-03-22  Per Bothner  <per@bothner.com>
 
 	* Declaration.java (makeField): Only create BindingInitializer

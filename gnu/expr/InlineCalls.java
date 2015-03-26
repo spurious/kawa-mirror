@@ -605,13 +605,26 @@ public class InlineCalls extends ExpExpVisitor<Type> {
         return exp;
     }
 
-    protected Expression visitLetExp (LetExp exp, Type required)
-    {
-        if (! (exp instanceof CatchClause) && ! (exp instanceof FluidLetExp))
-        {
+    protected Expression visitLetExp(LetExp exp, Type required) {
+        if (! (exp instanceof CatchClause) && ! (exp instanceof FluidLetExp)) {
             for (Declaration decl = exp.firstDecl();  decl != null;
-                 decl = decl.nextDecl())
-            {
+                 decl = decl.nextDecl()) {
+
+                // Minor optimization. Even better would be to replace
+                // the entire LetExp with the Declaration's init expression:
+                // (let ((x expr)) x) ==> expr
+                // However, that runs into various complications with
+                // type-checking, void-value-checking, and correctly setting
+                // CAN_READ on a LambdaExp. This is simpler and (because
+                // we have the value-propagation framework) almost as good.
+                if (exp.body instanceof ReferenceExp) {
+                    ReferenceExp ref = (ReferenceExp) exp.body;
+                    if (ref.getBinding() == decl
+                            && ! ref.getDontDereference()) {
+                        decl.setFlag(Declaration.ALLOCATE_ON_STACK);
+                        ref.setFlag(ReferenceExp.ALLOCATE_ON_STACK_LAST);
+                    }
+                }
                 Expression init = decl.getInitValue();
                 if (init == QuoteExp.undefined_exp
                     && decl.getValueRaw() instanceof LambdaExp)
@@ -640,24 +653,6 @@ public class InlineCalls extends ExpExpVisitor<Type> {
 
         if (exitValue == null)
             exp.body = visit(exp.body, required);
-        if (exp.body instanceof ReferenceExp) {
-            ReferenceExp ref = (ReferenceExp) exp.body;
-            Declaration d = ref.getBinding();
-            if (d != null && d.context == exp && ! ref.getDontDereference()) {
-                if (exp.firstDecl() == d && d.nextDecl() == null) // Single decl
-                {
-                    Expression init = d.getInitValue();
-                    Expression texp = d.getTypeExp();
-                    // Note this optimization does yield worse error messages
-                    // than using CheckedTarget.  FIXME.
-                    if (texp != QuoteExp.classObjectExp)
-                        init = visitApplyOnly(Compilation.makeCoercion(init, texp), null);
-                    return init;
-                }
-                // Can also optimize if n > 1, but have to check if any
-                // other inits can cause side-effects.  Probably not worth it.
-            }
-        }
         visitRemainingDeclaredLambdas(exp);
         return exp;
     }

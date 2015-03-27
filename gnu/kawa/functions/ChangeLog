@@ -1,3 +1,10 @@
+2015-03-25  Jamison Hope  <jrh@theptrgroup.com>
+	    Per Bothner  <per@bothner.com>
+
+	* CompileValues.java (validateApplyWithValues): Optimize case
+	consumer is single-argument procedure.
+	Also extract parameter types from a constant Procedure.
+
 2015-03-26  Per Bothner  <per@bothner.com>
 
 	* CompilationHelpers.java (validateSetter): Fix bug in previous

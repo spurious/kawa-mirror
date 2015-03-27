@@ -1,3 +1,9 @@
+2015-03-26  Per Bothner  <per@bothner.com>
+
+	* values2.scm: Test for inlined called-with-values.
+	* inlining.expected: Add expected Code size for above functions.
+	* Makefile.am: Update accordingly.
+
 2015-03-26  Andrea Bernardini <andrebask@gmail.com>
 	    Per Bothner  <per@bothner.com>
 

@@ -33,8 +33,14 @@ public class CompileValues {
             Expression producer = args[0];
             Expression consumer = args[1];
             Type prequired = null;
-            if (consumer instanceof LambdaExp) {
-                LambdaExp lconsumer = (LambdaExp) consumer;
+            boolean singleArgConsumer = false;
+            Expression cvalue = consumer;
+            if (cvalue instanceof ReferenceExp) {
+                Declaration d = ((ReferenceExp) cvalue).getBinding();
+                cvalue = Declaration.followAliases(d).getValue();
+            }
+            if (cvalue instanceof LambdaExp) {
+                LambdaExp lconsumer = (LambdaExp) cvalue;
                 if (lconsumer.min_args == lconsumer.max_args) {
                     Type[] types = new Type[lconsumer.min_args];
                     int i = 0;
@@ -48,9 +54,35 @@ public class CompileValues {
                         types[i++] = type;
                     }
                     prequired = MultValuesType.create(types);
+                    singleArgConsumer = (lconsumer.min_args == 1);
+                }
+            } else if (cvalue instanceof QuoteExp) {
+                Object rconsumer = cvalue.valueIfConstant();
+                if (rconsumer instanceof Procedure) {
+                    Procedure pconsumer = (Procedure) rconsumer;
+                    if (pconsumer.minArgs() == pconsumer.maxArgs()) {
+                        Type[] types = new Type[pconsumer.minArgs()];
+                        if (pconsumer instanceof MethodProc) {
+                            MethodProc mpconsumer = (MethodProc) pconsumer;
+                            for (int i = 0; i < types.length; ++i) {
+                                types[i] = mpconsumer.getParameterType(i);
+                            }
+                        } else {
+                            for (int i = 0; i < types.length; ++i) {
+                                types[i] = Type.objectType;
+                            }
+                        }
+                        prequired = MultValuesType.create(types);
+                        singleArgConsumer = (pconsumer.minArgs() == 1);
+                    }
                 }
             }
             producer = visitor.visit(producer, prequired);
+            if (singleArgConsumer) {
+                ApplyExp ae = new ApplyExp(consumer, producer);
+                ae.setLine(exp);
+                return visitor.visit(ae, required);
+            }
             if (prequired == null)
                 prequired = producer.getType();
 

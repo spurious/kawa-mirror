@@ -5336,7 +5336,38 @@ returning the value of the last one.
 @node Definitions
 @section Definitions
 
-@deffn Syntax define name [@stxlit{::} @stxref{type}] value
+A variable definition binds one or more identifiers and specifies
+an initial value for each of them. The simplest kind of
+variable definition takes one of the following forms:
+
+@deffn Syntax define name [@stxlit{::} @stxref{type}] @stxref{expression}
+Evaluate the @var{expression}, optionally converting it to @var{type},
+and bind the @var{name} to the result.
+@end deffn
+
+@deffn Syntax define (name @stxref{formal-arguments}) @arbno{(@stxref{annotation} | @stxref{option-pair})} @stxref{opt-return-type} @stxref{body}
+@deffnx Syntax define (name @stxlit{.} @stxref{rest-arg}) @arbno{(@stxref{annotation} | @stxref{option-pair})} @stxref{opt-return-type} @stxref{body}
+
+Bind the @var{name} to a function definition.  The form:
+@example
+(define (@var{name} @stxref{formal-arguments}) @arbno{@stxref{option-pair}} @stxref{opt-return-type} @stxref{body})
+@end example
+is equivalent to:
+@example
+(define @var{name} (lambda @stxref{formal-arguments}) name: @var{name} @arbno{@stxref{option-pair}} @stxref{opt-return-type} @stxref{body}))
+@end example
+while the form:
+@example
+(define (@var{name} . @stxref{rest-arg}) @arbno{@stxref{option-pair}} @stxref{opt-return-type} @stxref{body})
+@end example
+is equivalent to:
+@example
+(define @var{name} (lambda @stxref{rest-arg}) name: @var{name} @arbno{@stxref{option-pair}} @stxref{opt-return-type} @stxref{body}))
+@end example
+
+You can associate @ref{Annotations,annotations} with @var{name}.
+A field annotation will be associated with the generated field;
+a method annotation will be associated with the generated method(s).
 @end deffn
 
 In addition to @code{define} (which can take an optional type specifier),
@@ -6719,6 +6750,7 @@ has not been re-bound.
 * Procedure properties::
 * Generic procedures::
 * Extended formals::
+* Partial application::
 @end menu
 
 @node Procedure properties, Generic procedures, , Procedures
@@ -6770,10 +6802,35 @@ one method, as well as the @code{setter} property:
 @example
 (define-procedure vector-ref
   setter: vector-set!
-  (lambda ((vector :: <vector>) (k :: <int>))
+  (lambda (vector::vector k ::int)
     (invoke vector 'get k)))
 @end example
 @end deffn
+
+You can also specify properties in the lambda body:
+
+@example
+(define (vector-ref vector::vector k ::int)
+    setter: vector-set!
+    (invoke vector 'get k))
+@end example
+
+@subsection Standard properties
+
+@table @code
+@item name
+The name of a procedure (as a symbol), which is used
+when the procedure is printed.
+@item setter
+Set the setter procedure associated with the procedure.
+@item validate-apply
+@itemx validate-xapply
+Used during the validation phase of the compiler.
+@item compile-apply
+Used during the bytecode-generation phase of the compiler:
+If we see a call to a known function with this property,
+we can emit custom bytecode for the call.
+@end table
 
 @node Generic procedures, Extended formals, Procedure properties, Procedures
 @section Generic (dynamically overloaded) procedures
@@ -6812,7 +6869,7 @@ Unrecognized keywords are used to set the procedure properties of the result.
 @end example
 @end deffn
 
-@node Extended formals, , Generic procedures, Procedures
+@node Extended formals
 @section Extended Formal Arguments List
 
 The formal arguments list of a lambda expression has two
@@ -6821,7 +6878,7 @@ Kawa borrows the extended formal argument list of DSSSL,
 and Kawa allows you to declare the type of the parameter.
 
 @display
-@stxdef{lambda-expression} @stxlit{(lambda} @stxref{formals} @stxref{opt-return-type} @stxref{body}@stxlit{)}
+@stxdef{lambda-expression} @stxlit{(lambda} @stxref{formals} @arbno{@stxref{option-pair}} @stxref{opt-return-type} @stxref{body}@stxlit{)}
 @stxdef{return-type} @stxref{type}
 @stxdef{opt-return-type} [[@stxlit{::}] @stxref{type}]
 @end display
@@ -6829,7 +6886,7 @@ where
 @display
 @stxdef{formals} @stxlit{(}@stxref{formal-arguments}@stxlit{)} | @stxref{rest-arg}
 @end display
-You can of course also use the extended format in a @code{define}:
+You can of course also use the extended format in a @ref{Definitions,@code{define}}:
 @example
 @b{(define (}@var{name} @var{formal-arguments}@b{)} [@var{rtype}] @var{body}@b{)}
 @end example
@@ -6894,6 +6951,18 @@ identifier of the form @code{<TYPE>} (that is the first character
 is @samp{<} and the last is @samp{>}), then that specifies the
 function's return type.  It is syntactic sugar for
 @code{(as <TYPE> (begin BODY))}.
+
+You can set the @ref{Procedure properties,properties}
+of the resulting procedure using an @var{option-pair}.  For example
+to the set the @code{setter} property of a procedure
+to @code{my-set-car} do the following:
+@example
+(define my-car
+  (lambda (arg) setter: my-set-car (primitive-car arg)))
+@end example
+
+@node Partial application
+@section Partial application
 
 @deffn Syntax cut slot-or-expr slot-or-expr* [@code{<...>}]
 where each @var{slot-or-expr} is either an @var{expression} or
@@ -10980,7 +11049,7 @@ or
 @end example
 or
 @example
-(import (srfi :69 basic-hash-tables))
+(import (srfi 69 basic-hash-tables))
 @end example
 
 @subsubsection Type constructors and predicate
@@ -13431,8 +13500,8 @@ efficient, and it is easier to access it from Java code.
 The syntax of @code{define-class} are mostly compatible with that
 in the Guile and Stk dialects of Scheme.
 
-@deffn Syntax define-class @stxref{class-name} @stxlit{(}supers ...@stxlit{)} (@stxref{annotation}|@stxref{option-pair})* @stxref{field-or-method-decl} ...
-@deffnx Syntax define-simple-class @stxref{class-name} @stxlit{(}supers ...@stxlit{)} (@stxref{annotation}|@stxref{option-pair})*  @stxref{field-or-method-decl} ...
+@deffn Syntax define-class @stxref{class-name} @stxlit{(}supers ...@stxlit{)} @arbno{(@stxref{annotation}|@stxref{option-pair})} @stxref{field-or-method-decl} ...
+@deffnx Syntax define-simple-class @stxref{class-name} @stxlit{(}supers ...@stxlit{)} @arbno{(@stxref{annotation}|@stxref{option-pair})}  @stxref{field-or-method-decl} ...
 
 Defines a new class named @var{class-name}.  If @code{define-simple-class} is
 used, creates a normal Java class named @var{class-name} in the current package.
@@ -13593,7 +13662,7 @@ then its value is doubled.
 
 @display
 @stxdef{method-decl} @stxlit{((}@stxref{method-name} @stxref{formal-arguments}@stxlit{)}
-    (@stxref{annotation} | @stxref{opt-return-type} | @stxref{option-pair})* [@stxref{deprecated-return-specifier}] @stxref{method-body}@stxlit{)}
+    @arbno{(@stxref{annotation} | @stxref{opt-return-type} | @stxref{option-pair})} [@stxref{deprecated-return-specifier}] @stxref{method-body}@stxlit{)}
 @stxdef{method-name} @stxref{identifier}
 @stxdef{method-body} @stxref{body} | @stxlit{#!abstract} | @stxlit{#!native}
 @stxdef{deprecated-return-specifier} @stxref{identifier}

@@ -1,3 +1,12 @@
+2015-03-27  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Definitions): Add details for define, including
+	extended syntax for function define.
+	(Procedure properties): Show syntax with lambda option-pair.
+	New subsection for Standard properties.
+	(Extended formals): Update for option-pairs.
+	(Partial application): Move cut and cute to new section.
+
 2015-02-23  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Ideas and tasks): Various updates.
@@ -1129,7 +1138,7 @@
 
 	* kawa.texi (Top): Thank Merced in addition to Brainfood.
 
-	* kawa.texi (Procedures): Replace $* (line-break) commands by new 
+	* kawa.texi (Procedures): Replace $* (line-break) commands by new
 	paragraphs, since DocBook doesn't handle internals line-breaks.
 
 	* kawa.texi (Ports): Document *print-base*, *print-radix*,

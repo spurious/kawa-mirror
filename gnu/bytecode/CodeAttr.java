@@ -968,12 +968,13 @@ public class CodeAttr extends Attribute implements AttrContainer
         pushType(Type.javalanginvokeMethodHandleType);
     }
 
-  public void emitPushNull ()
-  {
-    reserve(1);
-    put1(1);  // aconst_null
-    pushType(Type.nullType);
-  }
+    public void emitPushNull() { emitPushNull(Type.nullType); }
+
+    public void emitPushNull(ObjectType type) {
+        reserve(1);
+        put1(1);  // aconst_null
+        pushType(type);
+    }
 
   /** Push zero or null as appropriate for the given type. */
   public void emitPushDefaultValue (Type type)
@@ -2293,7 +2294,7 @@ public class CodeAttr extends Attribute implements AttrContainer
           {
             if (try_stack.exitCases != null)
               emitPushInt(0);
-            emitPushNull(); // No caught Throwable.
+            emitPushNull(Type.javalangThrowableType); // No caught Throwable.
             if (! fromFinally)
               emitGoto(try_stack.finally_subr);
           }

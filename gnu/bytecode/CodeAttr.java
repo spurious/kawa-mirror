@@ -2155,6 +2155,7 @@ public class CodeAttr extends Attribute implements AttrContainer
     handler.stackTypes[0] = handler_class;
     setTypes(handler);
     fixupAdd(FIXUP_TRY_HANDLER, 0, handler);
+    setReachable(true);
   }
 
   /** Beginning of code that has a cleanup handler.
@@ -2294,7 +2295,7 @@ public class CodeAttr extends Attribute implements AttrContainer
           {
             if (try_stack.exitCases != null)
               emitPushInt(0);
-            emitPushNull(Type.javalangThrowableType); // No caught Throwable.
+            emitPushNull(); // No caught Throwable.
             if (! fromFinally)
               emitGoto(try_stack.finally_subr);
           }

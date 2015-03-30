@@ -125,11 +125,6 @@ public class ObjectType extends Type
     return reflectClass;
   }
 
-  public Type promote ()
-  {
-    return this == nullType ? objectType : this;
-  }
-
   public boolean isInstance (Object obj)
   {
     if (this == nullType)

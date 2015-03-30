@@ -19,7 +19,8 @@
   (syntax-rules ()
     ((test-begin suite-name)
      (begin
-       (cond-expand (srfi-64 #!void) (else (require 'srfi-64)))
+       (cond-expand (srfi-64 #!void)
+                    (else (import (except (srfi 64 testing) test-begin))))
        (%test-begin suite-name #f)))
     ((test-begin suite-name count)
      (begin

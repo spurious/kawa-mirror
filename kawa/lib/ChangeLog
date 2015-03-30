@@ -1,3 +1,7 @@
+2015-03-29  Per Bothner  <per@bothner.com>
+
+	* misc_syntax.scm (test-begin): Tweak to work with srfi-64 changes.
+
 2015-03-12  Jamison Hope  <jrh@theptrgroup.com>
 
 	* numbers.scm (square): Generalize to java.lang.Number.

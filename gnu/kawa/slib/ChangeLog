@@ -1,3 +1,10 @@
+2015-03-29  Per Bothner  <per@bothner.com>
+
+	* testing.scm: Some cleanup so we can use r7rs-style import
+	of this library info a clean r7rs environment, where test-begin
+	is not predefined.  Thus all imported bindings must be bound at
+	compile-time, and not depend on the importing context.
+
 2015-02-09  Per Bothner  <per@bothner.com>
 
 	* syntaxutils.scm: Update to use new type specifier syntax.

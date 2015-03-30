@@ -42,19 +42,26 @@
  (kawa
   (module-compile-options warn-undefined-variable: #t
 			  warn-invoke-unknown-method: #t)
+  (import (scheme base)
+          (only (kawa base) try-catch))
   (provide 'srfi-64)
   (provide 'testing)
-  (require 'srfi-34)
   (require 'srfi-35))
  (else ()
   ))
 
 (cond-expand
  (kawa
+  ;; Kawa's default top-level environment has test-begin built in,
+  ;; as a magic macro that imports this library (without test-begin).
+  ;; This puts test-begin but only test-begin in the default environment,
+  ;; which makes normal test suites loadable without non-portable commands.
+  ;; Therefore we need to export %test-begin, which performs the
+  ;; functionality of test-begin without the magic import.
   (define-syntax %test-export
     (syntax-rules ()
       ((%test-export test-begin . other-names)
-       (module-export %test-begin . other-names)))))
+       (module-export %test-begin test-begin . other-names)))))
  (else
   (define-syntax %test-export
     (syntax-rules ()
@@ -293,22 +300,12 @@
 				   (%test-runner-count-list runner)))
     (test-runner-group-stack! runner (cons suite-name
 					(test-runner-group-stack runner)))))
-(cond-expand
- (kawa
-  ;; Kawa has test-begin built in, implemented as:
-  ;; (begin
-  ;;   (cond-expand (srfi-64 #!void) (else (require 'srfi-64)))
-  ;;   (%test-begin suite-name [count]))
-  ;; This puts test-begin but only test-begin in the default environment.,
-  ;; which makes normal test suites loadable without non-portable commands.
-  )
- (else
-  (define-syntax test-begin
-    (syntax-rules ()
-      ((test-begin suite-name)
-       (%test-begin suite-name #f))
-      ((test-begin suite-name count)
-       (%test-begin suite-name count))))))
+(define-syntax test-begin
+  (syntax-rules ()
+    ((test-begin suite-name)
+     (%test-begin suite-name #f))
+    ((test-begin suite-name count)
+     (%test-begin suite-name count))))
 
 (define (test-on-group-begin-simple runner suite-name count)
   (if (null? (test-runner-group-stack runner))

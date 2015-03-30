@@ -1,3 +1,10 @@
+2015-03-30  Per Bothner  <per@bothner.com>
+
+	* Expression.java (compileWithPosition): Do nothing if unreachable.
+	Change 2-parameter method to just call 3-parameter method.
+	(compileNotePosition): Inline into compileWithPosition and remove.
+	* PrimProcedure.java (compileArgs): Update accordingly.
+
 2015-03-26  Per Bothner  <per@bothner.com>
 
 	* Declaration.java (setType): Don't set Variable's type, as it is

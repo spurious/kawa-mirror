@@ -1,4 +1,5 @@
 package gnu.expr;
+import gnu.bytecode.CodeAttr;
 import gnu.bytecode.Type;
 import gnu.mapping.*;
 import gnu.text.Printable;
@@ -122,44 +123,31 @@ public abstract class Expression extends Procedure0
   /** Same as compile, but emit line number beforehard. */
   public final void compileWithPosition(Compilation comp, Target target)
   {
-    int line = getLineNumber ();
-    if (line > 0)
-      {
-        comp.getCode().putLineNumber(getFileName(), line);
-        compileNotePosition(comp, target, this);
-      }
-    else
-      compile(comp, target);
+    compileWithPosition(comp, target, this);
   }
 
   /** Same as 2-argument compileWithPosition,
    * but use some other Expression's line number. */
-  public final void compileWithPosition(Compilation comp, Target target,
-					Expression position)
-  {
-    int line = position.getLineNumber ();
-    if (line > 0)
-      {
-        comp.getCode().putLineNumber(position.getFileName(), line);
-        compileNotePosition(comp, target, position);
-      }
-    else
-      compile(comp, target);
-  }
-
-  /** Compile, but take note of line number. */
-  public final void compileNotePosition(Compilation comp, Target target,
-					Expression position)
-  {
-    String saveFilename = comp.getFileName();
-    int saveLine = comp.getLineNumber();
-    int saveColumn = comp.getColumnNumber();
-    comp.setLine(position);
-    compile(comp, target);
-    // This might logically belong in a `finally' clause.
-    // It is intentionally not so, so if there is an internal error causing
-    // an exception, we get the line number where the exception was thrown.
-    comp.setLine(saveFilename, saveLine, saveColumn);
+    public final void compileWithPosition(Compilation comp, Target target,
+                                          Expression position) {
+        CodeAttr code = comp.getCode();
+        if (! code.reachableHere())
+            return;
+        int line = position.getLineNumber ();
+        if (line > 0) {
+            code.putLineNumber(position.getFileName(), line);
+            String saveFilename = comp.getFileName();
+            int saveLine = comp.getLineNumber();
+            int saveColumn = comp.getColumnNumber();
+            comp.setLine(position);
+            compile(comp, target);
+            // This might logically belong in a `finally' clause. It is
+            // intentionally not so, so that if there is an internal error
+            // causing an exception, we get the line number where the
+            // exception was thrown.
+            comp.setLine(saveFilename, saveLine, saveColumn);
+        } else
+            compile(comp, target);
   }
 
   public final void compile (Compilation comp, Type type)

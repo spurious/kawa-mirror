@@ -1,4 +1,4 @@
-// Copyright (c) 1999, 2000, 2008  Per M.A. Bothner.
+// Copyright (c) 1999, 2000, 2008, 2015  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.expr;
@@ -592,7 +592,7 @@ public class PrimProcedure extends MethodProc {
 	Target target =
 	  source == null ? CheckedTarget.getInstance(argTypeForTarget, name, i+1)
 	  : CheckedTarget.getInstance(argTypeForTarget, source, i);
-	args[startArg+i].compileNotePosition(comp, target, args[startArg+i]);
+	args[startArg+i].compileWithPosition(comp, target);
         if (createVarargsNow) // Only if explicitArrayAsVarArgsAllowed
           {
             // Wrap final argument in array if not already an array:

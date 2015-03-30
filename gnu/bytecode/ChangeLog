@@ -1,3 +1,7 @@
+2015-03-30  Per Bothner  <per@bothner.com>
+
+	* CodeAttr.java (disAssembleWithFixups): Print FIXUP_TRY_HANDLER.
+
 2015-03-29  Per Bothner  <per@bothner.com>
 
 	* CodeAttr.java (emitPushNull): Add overload that takes a type.

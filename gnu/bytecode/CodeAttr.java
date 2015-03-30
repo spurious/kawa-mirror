@@ -2962,6 +2962,8 @@ public class CodeAttr extends Attribute implements AttrContainer
                 dst.print(" type: ");
                 dst.println(fixup_offsets[i] >> 4);
                 i++;
+                dst.print(" - handler: ");
+                dst.println(fixup_labels[i]);
                 break;
             case FIXUP_LINE_PC:
                 dst.print(" LINE ");

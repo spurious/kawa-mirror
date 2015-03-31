@@ -218,52 +218,10 @@ public class GenericProc extends MethodProc
   {
     if (count == 1)
       return methods[0].matchN(args, ctx);
-    int alen = args.length;
-    Type[] atypes = new Type[alen];
-    Language language = Language.getDefaultLanguage();
-    // As a rough approximation of finding the "best match", and also
-    // an approximation of what we do when selecting a method at compile-time,
-    // let's make a pre-pass to check which methods are applicable.
-    for (int j = 0;  j < alen;  j++)
-      {
-        Object arg = args[j];
-        Type atype;
-        if (arg == null)
-          atype = Type.nullType;
-        else
-          {
-            Class aclass = arg.getClass();
-            if (language != null)
-              atype = language.getTypeFor(aclass);
-            else
-              atype = Type.make(aclass);
-          }
-        atypes[j] = atype;
-      }
-    int[] codes = new int[count];
-    int defCount = 0;
-    int maybeCount = 0;
-    int bestIndex = -1;
     for (int i = 0;  i < count;  i++)
       {
-          int code = methods[i].isApplicable(atypes, null);
-        if (defCount == 0 && code >= 0)
-          bestIndex = i;
-        if (code > 0)
-          defCount++;
-        else if (code == 0)
-          maybeCount++;
-        codes[i] = code;
-      }
-    if (defCount == 1 || (defCount == 0 && maybeCount == 1))
-      return methods[bestIndex].matchN(args, ctx);
-    for (int i = 0;  i < count;  i++)
-      {
-        int code = codes[i];
-        if (code < 0 || (code == 0 && defCount > 0))
-          continue;
         MethodProc method = methods[i];
-	code = method.matchN(args, ctx);
+	int code = method.matchN(args, ctx);
 	if (code == 0)
 	  return 0;
       }

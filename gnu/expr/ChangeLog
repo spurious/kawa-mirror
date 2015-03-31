@@ -1,5 +1,8 @@
 2015-03-30  Per Bothner  <per@bothner.com>
 
+	* GenericProc.java (matchN): Remove convoluted logic.
+	Instead make compatible with other matchX methods.
+
 	* Expression.java (compileWithPosition): Do nothing if unreachable.
 	Change 2-parameter method to just call 3-parameter method.
 	(compileNotePosition): Inline into compileWithPosition and remove.

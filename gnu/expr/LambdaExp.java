@@ -769,7 +769,10 @@ public class LambdaExp extends ScopeExp {
                     allocMethod(outerLambda(), comp);
                 compileAsMethod(comp);
                 addApplyMethod(comp, null);
+                Variable savedInstance = comp.moduleInstanceVar;
+                comp.moduleInstanceVar = null;
                 ProcInitializer.emitLoadModuleMethod(this, comp);
+                comp.moduleInstanceVar = savedInstance;
             } else {
                 Field field = compileSetField(comp);
                 if (field.getStaticFlag())

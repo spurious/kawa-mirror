@@ -1,3 +1,8 @@
+2015-04-02  Per Bothner  <per@bothner.com>
+
+	* LambdaExp.java (compile): Null out moduleInstanceVar
+	before caling emitLoadModuleMethod.
+
 2015-03-30  Per Bothner  <per@bothner.com>
 
 	* GenericProc.java (matchN): Remove convoluted logic.

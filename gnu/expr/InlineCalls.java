@@ -243,9 +243,13 @@ public class InlineCalls extends ExpExpVisitor<Type> {
     }
 
     protected Expression visitQuoteExp(QuoteExp exp, Type required) {
-        Object value;
-        if (exp.getRawType() == null && ! exp.isSharedConstant()
-            && (value = exp.getValue()) != null) {
+        if (exp.getRawType() != null)
+            return exp;
+        Object value = exp.getValue();
+        if (value instanceof Boolean && ! exp.isExplicitlyTyped())
+            return ((Boolean) value).booleanValue() ? QuoteExp.trueExp
+                : QuoteExp.falseExp;
+        if (! exp.isSharedConstant() && value != null) {
             Language language = comp.getLanguage();
             Type vtype = language.getTypeFor(value.getClass());
             if (vtype == Type.toStringType)

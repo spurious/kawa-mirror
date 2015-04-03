@@ -1,5 +1,8 @@
 2015-04-02  Per Bothner  <per@bothner.com>
 
+	* InlineCalls.java (visitQuoteExp): If the value is a Boolean that is
+	not explicitly typed, change to use primitive boolean.
+
 	* LambdaExp.java (compile): Null out moduleInstanceVar
 	before caling emitLoadModuleMethod.
 

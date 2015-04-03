@@ -1,3 +1,7 @@
+2015-04-03  Per Bothner  <per@bothner.com>
+
+	* primitives.lisp (car, cdr): Minor optimization.
+
 2015-02-16  Per Bothner  <per@bothner.com>
 
 	* PrimOps.scm: Update type specifier syntax.

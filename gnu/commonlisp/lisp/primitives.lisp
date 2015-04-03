@@ -1,15 +1,15 @@
 (defun car (x)
-  (if (null x)
-      nil
-      (invoke (the pair x) '|getCar|)))
+  (if x
+      (invoke (the pair x) '|getCar|)
+      nil))
 
 (defun first (x)
   (car x))
 
 (defun cdr (x)
-  (if (null x)
-      nil
-      (invoke (the pair x) '|getCdr|)))
+  (if x
+      (invoke (the pair x) '|getCdr|)
+      nil))
 
 (defun rest (x)
   (cdr x))

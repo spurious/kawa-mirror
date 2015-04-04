@@ -1,3 +1,10 @@
+2015-04-03  Per Bothner  <per@bothner.com>
+
+	* Lisp2.java (isTrueLisp): New static method.
+	(isTrue): Use isTrueLisp.
+	* Lisp2Compilation.java (asBooleanValue): New method.
+	(isTrueMethod): New constant.
+
 2014-12-22  Per Bothner  <per@bothner.com>
 
 	* OrdinaryLambda.java (rewriteFormals): Set IS_PARAMETER as needed.

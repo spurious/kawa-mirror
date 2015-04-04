@@ -38,12 +38,11 @@ public class ConditionalTarget extends Target
 
     public void compileFromStack(Compilation comp, Type stackType) {
         CodeAttr code = comp.getCode();
-        char sig = stackType.getSignature().charAt(0);
 
         stackType = comp.asBooleanValue(this, stackType);
         if (stackType == null)
             return;
-
+        char sig = stackType.getSignature().charAt(0);
         if (language != null) {
             // For primitive types, check if zero is considered true.
             // If so any value of the type can be considered true.

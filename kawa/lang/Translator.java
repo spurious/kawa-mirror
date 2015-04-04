@@ -920,6 +920,10 @@ public class Translator extends Compilation
             return (Expression) exp;
         else if (exp == Special.abstractSpecial)
             return QuoteExp.abstractExp;
+        else if (exp == Boolean.TRUE)
+            return QuoteExp.trueExp;
+        else if (exp == Boolean.FALSE)
+            return QuoteExp.falseExp;
         else if (exp == Special.nativeSpecial)
             return QuoteExp.nativeExp;
         else {

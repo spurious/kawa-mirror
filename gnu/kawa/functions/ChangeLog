@@ -1,3 +1,8 @@
+2015-04-03  Per Bothner  <per@bothner.com>
+
+	* CompileMisc.java (compileNot): Use a helper IfExp to compile
+	even when the target is a StackTraget expecting a primitive.
+
 2015-03-25  Jamison Hope  <jrh@theptrgroup.com>
 	    Per Bothner  <per@bothner.com>
 

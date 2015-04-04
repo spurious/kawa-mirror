@@ -253,17 +253,16 @@ public class CompileMisc
         }
         CodeAttr code = comp.getCode();
         Type type = target.getType();
+        QuoteExp trueExp, falseExp;
         if (target instanceof StackTarget
                 && type.getSignature().charAt(0) == 'Z') {
-            arg.compile(comp, target);
-            code.emitNot(target.getType());
+            trueExp = QuoteExp.trueExp;
+            falseExp = QuoteExp.falseExp;
         } else {
-            QuoteExp trueExp
-                = QuoteExp.getInstance(language.booleanObject(true));
-            QuoteExp falseExp
-                = QuoteExp.getInstance(language.booleanObject(false));
-            IfExp.compile(arg, falseExp, trueExp, comp, target);
+            trueExp = QuoteExp.getInstance(language.booleanObject(true));
+            falseExp = QuoteExp.getInstance(language.booleanObject(false));
         }
+        IfExp.compile(arg, falseExp, trueExp, comp, target);
         return true;
     }
 

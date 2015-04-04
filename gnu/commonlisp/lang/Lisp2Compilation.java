@@ -1,6 +1,9 @@
 package gnu.commonlisp.lang;
 import gnu.bytecode.ClassType;
 import gnu.bytecode.CodeAttr;
+import gnu.bytecode.Method;
+import gnu.bytecode.ObjectType;
+import gnu.bytecode.Type;
 import gnu.expr.*;
 import gnu.lists.LList;
 import gnu.lists.Pair;
@@ -24,6 +27,19 @@ public class Lisp2Compilation extends Translator
       code.emitGetStatic(Compilation.scmListType.getDeclaredField("Empty"));
   }
   
+    static final Method isTrueMethod =
+        ClassType.make("gnu.commonlisp.lang.Lisp2")
+        .getDeclaredMethod("isTrueLisp", 1);
+
+    @Override
+    public Type asBooleanValue(ConditionalTarget target, Type stackType) {
+        if (stackType instanceof ObjectType) {
+            getCode().emitInvoke(isTrueMethod);
+            stackType = Type.booleanType;
+        }
+        return stackType;
+    }
+
   /**
    * Process the DECLARE (if any) in a Common Lisp form.
    *

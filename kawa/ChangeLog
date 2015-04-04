@@ -1,3 +1,8 @@
+2015-04-03  Per Bothner  <per@bothner.com>
+
+	* lang/Translator.java (rewrite): Convert literal TRUE and FALSE
+	to literals with primitive boolean type.
+
 2015-03-22  Per Bothner  <per@bothner.com>
 
 	* standard/location.java (makeLocationProc): More precise return type.

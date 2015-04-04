@@ -1,3 +1,12 @@
+2015-04-03  Per Bothner  <per@bothner.com>
+
+	* InlineCalls.java (visitQuoteExp): Revert previous change. It doesn't
+	work when the argument is shared: VALIDATED is set the first time,
+	and then this method is never called again.  Instead map boolean
+	literals to primitive types at Lisp-rewrite-times.
+	* ConditionalTarget.java (compileFromStack): Compute sig
+	variable *after* call to asBooleanValue.
+
 2015-04-02  Per Bothner  <per@bothner.com>
 
 	* InlineCalls.java (visitQuoteExp): If the value is a Boolean that is

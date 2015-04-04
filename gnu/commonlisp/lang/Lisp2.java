@@ -18,7 +18,13 @@ public abstract class Lisp2 extends LispLanguage {
 
     @Override
     public boolean isTrue(Object value) {
-        return value != FALSE;
+        return isTrueLisp(value);
+    }
+
+    public static boolean isTrueLisp(Object value) {
+        return value != FALSE && value != null &&
+            ! (value instanceof Boolean
+               && ! ((Boolean) value).booleanValue());
     }
 
     @Override

@@ -1,3 +1,7 @@
+2015-04-04  Per Bothner  <per@bothner.com>
+
+	* standard/location.java (rewriteApply): Add missing null check.
+
 2015-04-03  Per Bothner  <per@bothner.com>
 
 	* lang/Translator.java (rewrite): Convert literal TRUE and FALSE

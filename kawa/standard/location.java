@@ -93,7 +93,7 @@ public class location extends Syntax
             String name = nam.toString();
             ClassType ctype = (ClassType) cls;
             Member member = SlotGet.lookupMember(ctype, name, caller);
-            if (member.getStaticFlag()) {
+            if (member != null && member.getStaticFlag()) {
                 if (member instanceof Field) {
                     StaticFieldLocation sloc =
                         new StaticFieldLocation(ctype, Compilation.mangleNameIfNeeded(name));

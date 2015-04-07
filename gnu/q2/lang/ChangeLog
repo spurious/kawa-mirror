@@ -1,3 +1,7 @@
+2015-04-06  Per Bothner  <per@bothner.com>
+
+	* Q2Apply.java (q2Apply):  Make final, so it can be compiled as literal.
+
 2014-05-07  Per Bothner  <per@bothner.com>
 
 	* Q2Translator.java (applyFunction): New method.

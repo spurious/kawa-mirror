@@ -29,7 +29,7 @@ public class Operator extends Syntax
     new Operator("*", 6, 6, RHS_NEEDED, 
                  new StaticFieldLocation("gnu.kawa.functions.MultiplyOp", "$St"));
   public static final Operator SLASH =
-    new Operator("*", 6, 6, RHS_NEEDED, 
+    new Operator("/", 6, 6, RHS_NEEDED, 
                  new StaticFieldLocation("gnu.kawa.functions.DivideOp", "$Sl"));
   public static final Operator LT =
     new Operator("<", 3, 3, RHS_NEEDED, 

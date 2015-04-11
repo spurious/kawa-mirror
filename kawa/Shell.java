@@ -226,9 +226,7 @@ public class Shell
   {
     Language saveLanguage = Language.setSaveCurrent(language);
     Lexer lexer = language.getLexer(inp, messages);
-    // Wrong for the case of '-f' '-':
-    //boolean interactive = inp instanceof TtyInPort;
-    boolean interactive = perr != null;
+    boolean interactive = inp instanceof TtyInPort;
     lexer.setInteractive(interactive);
     CallContext ctx = CallContext.getInstance();
     Consumer saveConsumer = null;
@@ -522,6 +520,12 @@ public class Shell
                                : new VoidConsumer());
                         Throwable ex
                             = run(language, env, src, out, perr, url, messages);
+                        if (ex instanceof SyntaxException
+                            && ((SyntaxException) ex).getMessages() == messages) {
+                            messages.printAll(perr, 20);
+                            perr.flush();
+                            return false;
+                        }
                         if (ex != null)
                             throw ex;
                     } else {
@@ -559,6 +563,7 @@ public class Shell
             ctx.values = Values.noArgs;
             Object inst = ModuleExp.evalModule1(env, comp, url, null);
             messages.printAll(perr, 20);
+            perr.flush();
             if (inst == null || messages.seenErrors())
                 return null;
             return new CompiledModule(comp.getModule(), inst, language);

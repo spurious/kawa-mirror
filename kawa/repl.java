@@ -882,14 +882,14 @@ public class repl extends Procedure0or1
 	int iArg = processArgs(args, 0, args.length);
 	if (iArg < 0)
 	  return;
-        boolean ok;
 	if (iArg < args.length)
 	  {
 	    String filename = args[iArg];
 	    getLanguageFromFilenameExtension(filename);
 	    setArgs (args, iArg+1);
 	    checkInitFile();
-	    ok = Shell.runFileOrClass(filename, false, 0);
+	    if (! Shell.runFileOrClass(filename, false, 0))
+              System.exit(-1);
 	  }
 	else
 	  {
@@ -900,8 +900,8 @@ public class repl extends Procedure0or1
               startGuiConsole();
             else
               {
-                ok = Shell.run(Language.getDefaultLanguage(),
-                               Environment.getCurrent());
+                boolean ok = Shell.run(Language.getDefaultLanguage(),
+                                       Environment.getCurrent());
                 if (! ok)
                   System.exit(-1);
               }

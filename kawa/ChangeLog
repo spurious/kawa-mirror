@@ -1,3 +1,12 @@
+2015-04-10  Per Bothner  <per@bothner.com>
+
+	* repl.java (main): Exit with -1 return code if
+	Shell.runFileOrClass reports failure.
+	* Shell.java (run): Assume interactive if input is TtyInPort.
+	This should work better now that we use CheckConsole.
+	(runFile): Check for and handle SyntaxException returned by run.
+	(compileSource): Flush standard error after printing messages.
+
 2015-04-04  Per Bothner  <per@bothner.com>
 
 	* standard/location.java (rewriteApply): Add missing null check.

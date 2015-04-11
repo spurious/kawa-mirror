@@ -212,6 +212,8 @@ public class ModuleExp extends LambdaExp
     ModuleExp mexp = comp.getModule();
     Language language = comp.getLanguage();
     Object inst = evalModule1(env, comp, url, msg);
+    if (msg != null)
+      msg.flush();
     if (inst == null) {
 	comp.pop(comp.mainLambda);
 	return false;

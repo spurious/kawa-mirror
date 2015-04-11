@@ -1,3 +1,9 @@
+2015-04-05  Jamison Hope  <jrh@theptrgroup.com>
+
+	* kawa/quaternions.scm (vector-quaternion?,
+	make-vector-quaternion, vector-quaternion->list): New procedures.
+	* kawa/rotations.scm: New Scheme library (kawa rotations).
+
 2015-03-29  Per Bothner  <per@bothner.com>
 
 	* misc_syntax.scm (test-begin): Tweak to work with srfi-64 changes.

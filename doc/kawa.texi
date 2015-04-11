@@ -7835,6 +7835,22 @@ Return the colatitude of @var{q}.
 Return the longitude of @var{q}.
 @end deffn
 
+@deffn Procedure {vector-quaternion?} @var{obj}
+Return @true{} if @var{obj} is a vector quaternion, i.e. a quaternion
+with zero real--part.
+@end deffn
+
+@deffn Procedure make-vector-quaternion @var{x} @var{y} @var{z}
+Construct vector quaternion @code{xi+yj+zk}.  This is equivalent to
+@code{(make-rectangular 0 x y z)}.
+@end deffn
+
+@deffn Procedure {vector-quaternion->list} @var{vq}
+Return a newly allocated list of the x, y, and z components of
+@var{vq}.  This is equivalent to
+@code{(list (imag-part vq) (jmag-part vq) (kmag-part vq))}.
+@end deffn
+
 @deffn Procedure dot-product @vari{q} @varii{q}
 For two vector quaternions @vari{q} = @code{ai+bj+ck} and @varii{q} =
 @code{di+ej+fk}, return @code{ad + be + cf}.  This is equal to the
@@ -7859,6 +7875,286 @@ Return @code{(+ (real-part q) (* -1 (vector-part q)))}.
 (conjugate -i)         @result{}  +1i
 (conjugate 1+2i-3j+4k) @result{}  1-2i+3j-4k
 @end example
+@end deffn
+
+@subsection The @code{(kawa rotations)} module
+
+The @code{(kawa rotations)} library provides a set of functions which
+use unit quaternions to represent 3D spatial rotations.  To use these
+functions, the library must be imported:
+@example
+(import (kawa rotations))
+@end example
+
+These functions normalize their quaternion inputs as needed to be of
+length 1.
+
+@subsubsection Rotation Representation Conversions
+
+Conversions to and from several alternate representations of rotations
+are supported.
+
+The set of unit quaternions provides a double covering of all
+possible 3D rotations: @code{q} and @code{-q} represent the same
+rotation.  Most other representations also have multiple numerical
+values which map to the same rotation (for example, the rotation about
+@code{axis-vec} by @code{angle} is the same as the rotation about
+@code{-axis-vec} by @code{-angle+2pi}).  Therefore, these functions do
+not necessarily act as inverses in the sense of @func{equal?}.
+Furthermore, rotations involve trigonometric functions, so there will
+typically be some floating point error: @code{(acos (cos 0.1))} returns
+0.09999999999999945, which is very close to 0.1 but not exact.
+
+@subsubheading Rotation Matrices
+
+@deffn Procedure {quaternion->rotation-matrix} @var{q}
+@deffnx Procedure {rotation-matrix->quaternion} @var{m}
+
+The @func{quaternion->rotation-matrix} procedure returns a 3x3 rotation
+matrix representing the same rotation as @var{q}.  The rotation matrix
+is instantiated as a @ref{Arrays,SRFI-25 multi-dimensional array} backed
+by an @ref{Uniform vectors,f64vector}.
+
+The @func{rotation-matrix->quaternion} procedure performs the reverse
+operation, producing an equivalent unit quaternion for the rotation
+matrix (multi-dimensional array) @var{m}.
+
+@example
+(rotation-matrix->quaternion (quaternion->rotation-matrix -1)) @result{} 1.0
+@end example
+@end deffn
+
+@subsubheading Axis-Angle Representation
+
+@deffn Procedure rotation-axis @var{q}
+@deffnx Procedure rotation-angle @var{q}
+@deffnx Procedure rotation-axis/angle @var{q}
+
+The @func{rotation-axis} procedure returns the axis of rotation of the
+quaternion @var{q} as a unit-length vector quaternion.  If the axis of
+rotation is not well-defined (the angle of rotation is 0), then
+@code{+i} is arbitrarily chosen as the axis.
+
+The @func{rotation-angle} procedure returns the corresponding angle of
+rotation.  Note that this is not the same as the result of the
+@func{angle} procedure.
+
+The @func{rotation-axis/angle} procedure returns the rotation axis and
+angle as multiple values.
+
+@example
+(let* ((q 1/2+1/2i+1/2j+1/2k)
+       (ar (rotation-angle q))
+       (ad (java.lang.Math:toDegrees ar))
+       (exact-ad (exact ad)))
+  (rationalize exact-ad 1/10)) @result{} 120
+@end example
+@end deffn
+
+@deffn Procedure {make-axis/angle} @var{axis-vec} @var{angle}
+@deffnx Procedure {make-axis/angle} @var{axis-x} @var{axis-y} @var{axis-z} @var{angle}
+
+The @func{make-axis/angle} procedure returns a quaternion representing
+the given axis/angle rotation.  The axis is specified as either a single
+vector quaternion argument @var{axis-vec}, or as three reals
+@var{axis-x}, @var{axis-y}, and @var{axis-z}.
+@end deffn
+
+@deffn Procedure rotx @var{angle}
+@deffnx Procedure roty @var{angle}
+@deffnx Procedure rotz @var{angle}
+
+The procedures @func{rotx}, @func{roty}, and @func{rotz} return
+quaternions representing rotations about the X-, Y-, and Z-axes.
+@end deffn
+
+@subsubheading Intrinsic Angle Sets
+
+The intrinsic angle sets represent arbitrary rotations as a sequence of
+three rotations about coordinate frame axes attached to the rotating
+body (i.e. the axes rotate with the body).
+
+There are twelve possible angle sets which neatly divide into two groups
+of six.  The six with same first and third axes are also known as
+``Euler angles''.  The six with different first and third axes are also
+known as ``Tait-Bryan angles''.
+
+@deffn Procedure intrinsic-xyx @var{q}
+@deffnx Procedure intrinsic-xzx @var{q}
+@deffnx Procedure intrinsic-yxy @var{q}
+@deffnx Procedure intrinsic-yzy @var{q}
+@deffnx Procedure intrinsic-zxz @var{q}
+@deffnx Procedure intrinsic-zyz @var{q}
+
+These functions decompose the rotation represented by @var{q} into Euler
+angles of the given set (XYX, XZX, YXY, YZY, ZXZ, or ZYZ) and returns
+the three angles as multiple values.  The middle angle will be in the
+range [0,pi].  If it is on the edges of that range (within 1.0E-12 of 0
+or pi), such that the first and third axes are colinear, then the first
+angle will be set to 0.
+
+@example
+(intrinsic-zyz (* (rotz 0.3) (roty 0.8) (rotz -0.6))) @result{} 0.3000000000000001 0.7999999999999999 -0.5999999999999999
+@end example
+@end deffn
+
+@deffn Alias euler-xyx
+@deffnx Alias euler-xzx
+@deffnx Alias euler-yxy
+@deffnx Alias euler-yzy
+@deffnx Alias euler-zxz
+@deffnx Alias euler-zyz
+Aliases for the corresponding @code{intrinsic-} procedures.
+@end deffn
+
+@deffn Procedure intrinsic-xyz @var{q}
+@deffnx Procedure intrinsic-xzy @var{q}
+@deffnx Procedure intrinsic-yxz @var{q}
+@deffnx Procedure intrinsic-yzx @var{q}
+@deffnx Procedure intrinsic-zxy @var{q}
+@deffnx Procedure intrinsic-zyx @var{q}
+
+These functions decompose the rotation represented by @var{q} into
+Tait-Bryan angles of the given set (XYZ, XZY, YXZ, YZX, ZXY, or ZYX) and
+returns the three angles as multiple values.  The middle angle will be
+in the range [-pi/2,pi/2].  If it is on the edges of that range, such
+that the first and third axes are colinear, then the first angle will be
+set to 0.
+@end deffn
+
+@deffn Alias tait-bryan-xyz
+@deffnx Alias tait-bryan-xzy
+@deffnx Alias tait-bryan-yxz
+@deffnx Alias tait-bryan-yzx
+@deffnx Alias tait-bryan-zxy
+@deffnx Alias tait-bryan-zyx
+Aliases for the corresponding @code{intrinsic-} procedures.
+@end deffn
+
+@deffn Procedure make-intrinsic-xyx @var{alpha} @var{beta} @var{gamma}
+@deffnx Procedure make-intrinsic-xzx @var{alpha} @var{beta} @var{gamma}
+@deffnx Procedure make-intrinsic-yxy @var{alpha} @var{beta} @var{gamma}
+@deffnx Procedure make-intrinsic-yzy @var{alpha} @var{beta} @var{gamma}
+@deffnx Procedure make-intrinsic-zxz @var{alpha} @var{beta} @var{gamma}
+@deffnx Procedure make-intrinsic-zyz @var{alpha} @var{beta} @var{gamma}
+
+These functions return quaternions representing the given Euler angle
+rotations.
+@end deffn
+
+@deffn Alias make-euler-xyx
+@deffnx Alias make-euler-xzx
+@deffnx Alias make-euler-yxy
+@deffnx Alias make-euler-yzy
+@deffnx Alias make-euler-zxz
+@deffnx Alias make-euler-zyz
+Aliases for the corresponding @code{make-intrinsic-} procedures.
+
+@example
+(let-values (((a b c) (euler-xyx (make-euler-xyx 1.0 0.0 2.0))))
+  (list a b c)) @result{} (0.0 0.0 3.0)
+@end example
+@end deffn
+
+@deffn Procedure make-intrinsic-xyz @var{alpha} @var{beta} @var{gamma}
+@deffnx Procedure make-intrinsic-xzy @var{alpha} @var{beta} @var{gamma}
+@deffnx Procedure make-intrinsic-yxz @var{alpha} @var{beta} @var{gamma}
+@deffnx Procedure make-intrinsic-yzx @var{alpha} @var{beta} @var{gamma}
+@deffnx Procedure make-intrinsic-zxy @var{alpha} @var{beta} @var{gamma}
+@deffnx Procedure make-intrinsic-zyx @var{alpha} @var{beta} @var{gamma}
+
+These functions return quaternions representing the given Tait-Bryan
+angle rotations.
+@end deffn
+
+@deffn Alias make-tait-bryan-xyz
+@deffnx Alias make-tait-bryan-xzy
+@deffnx Alias make-tait-bryan-yxz
+@deffnx Alias make-tait-bryan-yzx
+@deffnx Alias make-tait-bryan-zxy
+@deffnx Alias make-tait-bryan-zyx
+Aliases for the corresponding @code{make-intrinsic-} procedures.
+@end deffn
+
+@subsubheading Extrinsic Angle Sets
+
+The extrinsic angle sets represent arbitrary rotations as a sequence of
+three rotations about fixed-frame axes (i.e. the axes do not rotate with
+the body).
+
+There are twelve possible extrinsic angle sets, and each is the dual of
+an intrinsic set.  The extrinsic rotation about axes @code{A}, @code{B},
+and @code{C} by angles @code{a}, @code{b}, and @code{c} is the same as
+the intrinsic rotation about axes @code{C}, @code{B}, and @code{A} by
+angles @code{c}, @code{b}, and @code{a}, with the order of the three
+axes reversed.
+
+@deffn Procedure extrinsic-xyx @var{q}
+@deffnx Procedure extrinsic-xyz @var{q}
+@deffnx Procedure extrinsic-xzx @var{q}
+@deffnx Procedure extrinsic-zxy @var{q}
+@deffnx Procedure extrinsic-yxy @var{q}
+@deffnx Procedure extrinsic-yxz @var{q}
+@deffnx Procedure extrinsic-yzx @var{q}
+@deffnx Procedure extrinsic-yzy @var{q}
+@deffnx Procedure extrinsic-zxy @var{q}
+@deffnx Procedure extrinsic-zxz @var{q}
+@deffnx Procedure extrinsic-zyx @var{q}
+@deffnx Procedure extrinsic-zyz @var{q}
+
+These functions decompose the rotation represented by @var{q} into
+extrinsic angles of the given set and returns the three angles as
+multiple values.
+@end deffn
+
+@deffn Procedure make-extrinsic-xyx @var{gamma} @var{beta} @var{alpha}
+@deffnx Procedure make-extrinsic-xyz @var{gamma} @var{beta} @var{alpha}
+@deffnx Procedure make-extrinsic-xzx @var{gamma} @var{beta} @var{alpha}
+@deffnx Procedure make-extrinsic-xzy @var{gamma} @var{beta} @var{alpha}
+@deffnx Procedure make-extrinsic-yxy @var{gamma} @var{beta} @var{alpha}
+@deffnx Procedure make-extrinsic-yxz @var{gamma} @var{beta} @var{alpha}
+@deffnx Procedure make-extrinsic-yzx @var{gamma} @var{beta} @var{alpha}
+@deffnx Procedure make-extrinsic-yzy @var{gamma} @var{beta} @var{alpha}
+@deffnx Procedure make-extrinsic-zxy @var{gamma} @var{beta} @var{alpha}
+@deffnx Procedure make-extrinsic-zxz @var{gamma} @var{beta} @var{alpha}
+@deffnx Procedure make-extrinsic-zyx @var{gamma} @var{beta} @var{alpha}
+@deffnx Procedure make-extrinsic-zyz @var{gamma} @var{beta} @var{alpha}
+
+These functions return quaternions representing the given extrinsic
+angle rotations.
+@end deffn
+
+@deffn Alias rpy
+@deffnx Alias make-rpy
+Aliases for @func{extrinsic-xyz} and @func{make-extrinsic-xyz}.
+
+@example
+(let ((r (make-rpy 0.12 -0.23 0.34)))
+  (let-values (((a b c) (tait-bryan-zyx r)))
+    (list a b c))) @result{} (0.3400000000000001 -0.2300000000000001 0.12000000000000002)
+@end example
+@end deffn
+
+@subsubsection Rotation Operations
+
+@deffn Procedure rotate-vector @var{rq} @var{vq}
+Applies the rotation represented by quaternion @var{rq} to the vector
+represented by vector quaternion @var{vq}, and returns the rotated
+vector.  This is equivalent to @code{(* rq vq (conjugate rq))} for
+normalized @var{rq}.
+
+@example
+(rotate-vector +k +2i)                      @result{} -2i
+(rotate-vector 1/2+1/2i+1/2j+1/2k +i+2j+3k) @result{} +3.0i+1.0j+2.0k
+@end example
+@end deffn
+
+@deffn Procedure make-rotation-procedure @var{rq}
+A partial application of @func{rotate-vector}.  Returns a
+single-argument procedure which will take a vector quaternion argument
+and rotate it by @var{rq}.  The returned procedure closes over both
+@var{rq} and its conjugate, so this will likely be more efficient than
+@func{rotate-vector} at rotating many vectors by the same rotation.
 @end deffn
 
 @node Quantities
@@ -14678,6 +14974,7 @@ These are standard libraries as defined by R6RS.
 @item (kawa expressions)
 @itemx (kawa hashtable)
 @itemx (kawa quaternions)
+@itemx (kawa rotations)
 @itemx (kawa reflect)
 @itemx (kawa regex)
 @itemx (kawa string-cursors)

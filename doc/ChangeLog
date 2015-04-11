@@ -1,3 +1,9 @@
+2015-04-05  Jamison Hope  <jrh@theptrgroup.com>
+
+	* kawa.texi (Quaternions): Document functions vector-quaternion?,
+	make-vector-quaternion, and vector-quaternion->list.
+	New subsection 'The (kawa rotations) module'.
+
 2015-03-27  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Definitions): Add details for define, including

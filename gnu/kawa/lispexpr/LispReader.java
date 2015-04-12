@@ -510,7 +510,8 @@ public class LispReader extends Lexer
 
     /** After reading a value check for following {@code '['} or {@code ':'}.
      */
-    Object handlePostfix (Object value, ReadTable rtable, int line, int column)
+    protected Object handlePostfix(Object value, ReadTable rtable,
+                                   int line, int column)
         throws java.io.IOException, SyntaxException {
         if (value == QuoteExp.voidExp)
             value = Values.empty;

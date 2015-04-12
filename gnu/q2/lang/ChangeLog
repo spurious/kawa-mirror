@@ -1,3 +1,9 @@
+2015-04-12  Per Bothner  <per@bothner.com>
+
+	* Q2.java (createReadTable): Handle ':' and '@' as in Kawa-Schemee.
+	* Q2Read.java (readIndentCommand): Add call to handlePostfix,
+	so colon notation works.
+
 2015-04-06  Per Bothner  <per@bothner.com>
 
 	* Operator.java (SLASH): Fix copy+paste error.

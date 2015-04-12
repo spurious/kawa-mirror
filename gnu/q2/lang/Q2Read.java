@@ -161,8 +161,10 @@ public class Q2Read extends LispReader
           break;
         Object val = readValues(ch, rtable, -1);
         prev = val;
-        if (val != Values.empty)
+        if (val != Values.empty) {
+            val = handlePostfix(val, rtable, line, column);
           rresult = makePair(val, rresult, line, column);
+        }
       }
     return makeCommand(LList.reverseInPlace(rresult));
   }

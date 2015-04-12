@@ -114,6 +114,9 @@ public class Q2 extends Scheme
     //Also want to allow #!/ at start of file as comment start.
     //rdispatch.set('!', ReaderIgnoreRestOfLine.getInstance());
     rt.setFinalColonIsKeyword(true);
+    rt.postfixLookupOperator = ':';
+    rt.set('@', new ReaderQuote(LispLanguage.splice_sym,
+                                ReadTable.NON_TERMINATING_MACRO));
     return rt;
   }
 

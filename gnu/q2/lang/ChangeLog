@@ -1,5 +1,11 @@
 2015-04-12  Per Bothner  <per@bothner.com>
 
+	* CompileMisc.java: New file.
+	(optimizeSimpleApply): New temporary flag - false for now.
+	(validateQ2Apply): Inline Q2Apply - but only if optimizeSimpleApply.
+	* Makefile.am: Update accordingly.
+	* Q2Apply.java (q2Apply): Set validate property.
+
 	* Q2.java (createReadTable): Handle ':' and '@' as in Kawa-Schemee.
 	* Q2Read.java (readIndentCommand): Add call to handlePostfix,
 	so colon notation works.

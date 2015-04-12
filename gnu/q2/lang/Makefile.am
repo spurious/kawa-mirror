@@ -3,6 +3,7 @@
 include $(top_srcdir)/Make-rules
 
 java_sources = \
+  CompileMisc.java \
   Operator.java \
   Q2.java \
   Q2Apply.java \

@@ -7,6 +7,10 @@ import java.util.Vector;
 public class Q2Apply extends MethodProc
 {
   public final static Q2Apply q2Apply = new Q2Apply();
+    static {
+        q2Apply.setProperty(Procedure.validateXApplyKey,
+                            "gnu.q2.lang.CompileMisc:validateQ2Apply");
+    }
 
   public void apply (CallContext ctx)  throws Throwable
   {

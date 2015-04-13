@@ -33,15 +33,10 @@ public class Q2Translator extends SchemeCompilation
           ; // FIXME
         Operator op = null;
         Pair pp;
-        if (p == LList.Empty)
+        if (! (p instanceof Pair))
           {
             op = Operator.FENCE;
             pp = null;
-          }
-        else if (! (p instanceof Pair))
-          {
-            tr.error('e', "unexpected non-list");
-            break;
           }
         else
           {
@@ -64,7 +59,7 @@ public class Q2Translator extends SchemeCompilation
           {
             if (prev == null)
               larg = LList.Empty;
-            else
+            else if (p instanceof Pair)
               prev.setCdrBackdoor(LList.Empty);
             int stsz = st.size();
             Operator topop = (Operator) st.get(stsz-1);

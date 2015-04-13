@@ -4,11 +4,11 @@ define (mx a b)
   if (a > b) a b
 format #t "{~s}{~s}~%"
   vector 'a 'b
-    define yy
+    ! yy
         mx 13
           14
     list xx yy 99
-    define zz (yy + 100)
+    ! zz (yy + 100)
     zz + 100
   'f
 # Output: {#(a b (20 14 99) 214)}{f}

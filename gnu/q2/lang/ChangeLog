@@ -1,5 +1,8 @@
 2015-04-13  Per Bothner  <per@bothner.com>
 
+	* Q2Translator.java (partition): Allow an improper list - as may
+	result from the scan-expansion of MatchDef.
+
 	* Q2.java (getLexer): No longer set defaultCallContention
 	to CALL_WITH_CONSUMER.
 	* CompileMisc.java: Minor cleaning up.

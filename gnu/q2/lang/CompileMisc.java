@@ -37,16 +37,16 @@ public class CompileMisc {
             if (arg instanceof ApplyExp) {
                 ApplyExp aarg = (ApplyExp) arg;
                 if (aarg.isAppendValues()) {
-                    System.err.println("isAppendValue");
                     int naarg = aarg.getArgCount();
                     int vargs = 0;
                     for (int j = 0; j < naarg;  j++) {
                         Expression xaarg = aarg.getArg(j);
+                        /*
                         //System.err.println("xxarg "+xaarg);
                         if (xaarg instanceof SetExp) {
-                            //System.err.println("set xxarg");
                             vargs++;
                         }
+                        */
                         rargs.add(xaarg);
                     }
                     continue;

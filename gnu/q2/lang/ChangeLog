@@ -1,3 +1,9 @@
+2015-04-13  Per Bothner  <per@bothner.com>
+
+	* Q2.java (getLexer): No longer set defaultCallContention
+	to CALL_WITH_CONSUMER.
+	* CompileMisc.java: Minor cleaning up.
+
 2015-04-12  Per Bothner  <per@bothner.com>
 
 	* CompileMisc.java: New file.

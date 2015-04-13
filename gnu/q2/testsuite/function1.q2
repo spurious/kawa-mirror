@@ -1,7 +1,7 @@
 define counter 0
-define (foo #!optional (x 10)) (
+define (foo #!optional (x 10))
   counter := counter + 1
-  format #t "foo called x=~s counter=~s!~%~!" x counter)
+  format #t "foo called x=~s counter=~s!~%~!" x counter
 foo
 foo 5
 foo

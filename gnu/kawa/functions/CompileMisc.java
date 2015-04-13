@@ -117,11 +117,28 @@ public class CompileMisc
   {
     exp.visitArgs(visitor);
     Expression[] args = exp.getArgs();
-    if (args.length == 1)
+    int nargs = args.length;
+    if (nargs == 1)
       return args[0];
+    if (nargs == 0)
+        return QuoteExp.voidExp;
     Expression folded = exp.inlineIfConstant(proc, visitor);
     if (folded.valueIfConstant() == Values.empty)
         folded = QuoteExp.voidObjectExp;
+    else if (folded == exp) {
+        args = exp.getArgs();
+        Type typeSoFar = Type.voidType;
+        for (int i = 0;  i < nargs;  i++) {
+            Type atype = args[i].getType();
+            if (OccurrenceType.itemCountCode(atype) == '0')
+                continue;
+            if (typeSoFar == Type.voidType)
+                typeSoFar = atype;
+            else
+                typeSoFar = Type.objectType; // FIXME - can do better.
+        }
+        exp.setType(typeSoFar);
+    }
     return folded;
   }
 

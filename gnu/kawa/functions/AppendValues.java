@@ -60,9 +60,4 @@ public class AppendValues extends MethodProc implements Inlineable
 	*/
       }
   }
-
-  public Type getReturnType (Expression[] args)
-  {
-    return Compilation.typeObject;
-  }
 }

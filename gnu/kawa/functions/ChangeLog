@@ -1,3 +1,9 @@
+2015-04-13  Per Bothner  <per@bothner.com>
+
+	* CompileMisc.java (validateApplyAppendValues): Some simple
+	type calculation.
+	* AppendValues.java (getReturnType): Remove obsolete method.
+
 2015-04-03  Per Bothner  <per@bothner.com>
 
 	* CompileMisc.java (compileNot): Use a helper IfExp to compile

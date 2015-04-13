@@ -1,3 +1,8 @@
+2015-04-13  Jamison Hope  <jrh@theptrgroup.com>
+
+	* kawa/reflect.scm (set-field!, set-static-field!): New exports.
+	* kawa/base.scm (set-field!, set-static-field!): Likewise.
+
 2015-04-05  Jamison Hope  <jrh@theptrgroup.com>
 
 	* kawa/quaternions.scm (vector-quaternion?,

@@ -32,6 +32,8 @@
 	  invoke-special
 	  field
 	  static-field
+          set-field!
+          set-static-field!
 	  make
 	  instance?
 	  as

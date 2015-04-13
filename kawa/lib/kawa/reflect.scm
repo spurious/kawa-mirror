@@ -4,6 +4,8 @@
 	  invoke-special
 	  field
 	  static-field
+          set-field!
+          set-static-field!
 	  make
 	  instance?
 	  as
@@ -22,6 +24,10 @@
 		 (staticField static-field))
 	 field
 	 static-field)
+
+   (only (gnu kawa reflect SlotSet)
+         set-field!
+         set-static-field!)
 
    (only (rename (gnu kawa reflect Throw)
 		 (primitiveThrow primitive-throw))

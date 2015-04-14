@@ -1,3 +1,9 @@
+2015-04-13  Per Bothner  <per@bothner.com>
+
+	* NodeType.java (isInstance): If sequence item has OBJECT_VALUE,
+	check type of actual item.
+	(isInstance): New static overload.
+
 2015-02-28  Per Bothner  <per@bothner.com>
 
 	* NodeConstructor.java: Remove unneeded call to code.emitTryEnd.

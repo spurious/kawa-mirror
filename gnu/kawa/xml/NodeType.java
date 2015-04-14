@@ -65,15 +65,17 @@ public class NodeType extends ObjectType implements TypeValue, NodePredicate, Ex
     return getImplementationType().compare(other);
   }
 
-  public boolean isInstance (Object obj)
-  { 
-    if (obj instanceof KNode)
-      {
-	KNode pos = (KNode) obj;
-	return isInstancePos(pos.sequence, pos.getPos());
-      }
-    return false;
-  }
+    public boolean isInstance(Object obj) {
+        return isInstance(obj, kinds);
+    }
+
+    static boolean isInstance(Object obj, int kinds) { 
+        if (obj instanceof KNode) {
+            KNode pos = (KNode) obj;
+            return isInstance(pos.sequence, pos.getPos(), kinds);
+        }
+        return false;
+    }
 
   public boolean isInstancePos(AbstractSequence seq, int ipos)
   {
@@ -91,6 +93,8 @@ public class NodeType extends ObjectType implements TypeValue, NodePredicate, Ex
 	  {
 	  case Sequence.EOF_VALUE:
 	    return false;
+	  case Sequence.OBJECT_VALUE:
+              return isInstance(seq.getPosNext(ipos), kinds);
 	  case Sequence.INT_U8_VALUE:
 	  case Sequence.INT_S8_VALUE:
 	  case Sequence.INT_U16_VALUE:
@@ -104,8 +108,7 @@ public class NodeType extends ObjectType implements TypeValue, NodePredicate, Ex
 	  case Sequence.BOOLEAN_VALUE:
 	  case Sequence.TEXT_BYTE_VALUE:
 	  case Sequence.CHAR_VALUE:
-	  case Sequence.OBJECT_VALUE:
-	    return (kinds & TEXT_OK) != 0;
+            return (kinds & TEXT_OK) != 0;
 	  case Sequence.ELEMENT_VALUE:
 	    return (kinds & ELEMENT_OK) != 0;
 	  case Sequence.ATTRIBUTE_VALUE:

@@ -1,5 +1,10 @@
 2015-04-13  Per Bothner  <per@bothner.com>
 
+	* AppendValues.java (compile): Optimize if there is at most one
+	non-void argument.
+
+2015-04-13  Per Bothner  <per@bothner.com>
+
 	* CompileMisc.java (validateApplyAppendValues): Some simple
 	type calculation.
 	* AppendValues.java (getReturnType): Remove obsolete method.

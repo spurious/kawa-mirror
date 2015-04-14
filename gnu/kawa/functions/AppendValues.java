@@ -44,6 +44,21 @@ public class AppendValues extends MethodProc implements Inlineable
       }
     else
       {
+        int nonVoid = -1; // Index of unique non-void argument.
+        for (int i = 0;  i < nargs;  i++) {
+            if (! args[i].getType().isVoid()) {
+                nonVoid = nonVoid == -1 ? i : -2;
+            }
+        }
+        if (nonVoid == -1)
+            nonVoid = nargs - 1;
+        if (nonVoid >= 0) {
+            for (int i = 0;  i < nargs;  i++)
+                args[i].compileWithPosition(comp,
+                                            i==nonVoid ? target
+                                            : Target.Ignore);
+            return;
+        }
 	ConsumerTarget.compileUsingConsumer(exp, comp, target);
 	/*
 	CodeAttr code = comp.getCode();

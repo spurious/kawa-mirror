@@ -1,3 +1,8 @@
+2015-04-15  Per Bothner  <per@bothner.com>
+
+	* SourceMessages.java (error): Don't set fakeException
+	if it is already set.
+
 2015-03-18  Per Bothner  <per@bothner.com>
 
 	* StringCursor.java: New class.

@@ -202,8 +202,10 @@ public class Macro extends Syntax implements Printable, Externalizable
       }
     catch (Throwable ex)
       {
-        return tr.syntaxError("evaluating syntax transformer '"
-                              + getName() + "' threw " + ex);
+          String msg = "evaluating syntax transformer '"
+              + getName() + "' threw " + ex;
+          tr.getMessages().error('e', msg, ex);
+          return new ErrorExp(msg);
       }
     finally
       {

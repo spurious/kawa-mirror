@@ -1,3 +1,8 @@
+2015-04-15  Per Bothner  <per@bothner.com>
+
+	* lang/Macro.java (expand): If transformer throws an exception,
+	pass this to the SourceError.
+
 2015-04-14  Per Bothner  <per@bothner.com>
 
 	* standard/ImportFromLibrary.java (scanImportSet): Implement

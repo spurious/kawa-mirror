@@ -303,8 +303,8 @@ public class require extends Syntax
 
         ModuleExp mod = info.setupModuleExp();
 
-        Map<Symbol,Declaration> dmap
-            = new LinkedHashMap<Symbol,Declaration>();
+        Map<Symbol,Expression> dmap
+            = new LinkedHashMap<Symbol,Expression>();
         Map<String,Declaration> moduleReferences = null;
        
         for (Declaration fdecl = mod.firstDecl();
@@ -327,15 +327,17 @@ public class require extends Syntax
                     moduleReferences = new HashMap<String,Declaration>();
                 moduleReferences.put(fdecl.field.getName(), fdecl);
             } else
-                dmap.put((Symbol) fdecl.getSymbol(), fdecl);
+                dmap.put((Symbol) fdecl.getSymbol(),
+                         new ReferenceExp(fdecl));
         }
 
         if (mapper != null)
             dmap = mapper.map(dmap, tr);
 
-        for (Map.Entry<Symbol,Declaration> entry : dmap.entrySet()) {
+        for (Map.Entry<Symbol,Expression> entry : dmap.entrySet()) {
             Symbol aname = entry.getKey();
-            Declaration fdecl = entry.getValue();
+            ReferenceExp fref = (ReferenceExp) entry.getValue();
+            Declaration fdecl = fref.getBinding();
 
             // We create an alias in the current context that points
             // a dummy declaration in the exported module.  Normally,
@@ -387,7 +389,6 @@ public class require extends Syntax
             adecl.setAlias(true);
             adecl.setIndirectBinding(true);
 
-            ReferenceExp fref = new ReferenceExp(fdecl);
             fref.setContextDecl(decl);
             fref.setDontDereference(true);
             if (! sharedModule)
@@ -471,6 +472,6 @@ public class require extends Syntax
     }
 
     public static interface DeclSetMapper {
-        public Map<Symbol, Declaration> map(Map<Symbol, Declaration> decls, Compilation comp);
+        public Map<Symbol, Expression> map(Map<Symbol, Expression> decls, Compilation comp);
     }
 }

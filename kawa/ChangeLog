@@ -1,5 +1,11 @@
 2015-04-14  Per Bothner  <per@bothner.com>
 
+	* standard/ImportFromLibrary.java (scanImportSet): Implement
+	'class' clause for import, as an alternative to define-alias.
+	(ImportSetMapper.map): Add 'rename' functionality to the 'only' clause.
+	* standard/require.java (DeclSetMapper): Change parameter and return
+	type of map method to be more general.
+
 	* Shell.java (run): Call flush after checkErrors.  This is needed
 	now since checkError uses Appendable which doens't auto-flush.
 

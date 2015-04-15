@@ -180,6 +180,64 @@ public class ImportFromLibrary extends Syntax
         else if (first == librarySymbol && specLength == 2
                  && cdrPair.getCar() instanceof Pair)
             pimport = (Pair) cdrPair.getCar();
+        else if (first == classSymbol && specLength >= 2
+                 && cdrPair.getCar() instanceof SimpleSymbol) {
+            Map<Symbol, Expression> decls =
+                new LinkedHashMap<Symbol, Expression>();
+            SimpleSymbol name1 = (SimpleSymbol) cdrPair.getCar();
+            String str1 = name1.getName();
+            rest = cdrPair.getCdr();
+            if (rest == LList.Empty) {
+                tr.error('e', "class-prefix must be followed by class-names");
+            }
+            while (rest != LList.Empty) {
+                cdrPair = (Pair) rest;
+                Object part2 = cdrPair.getCar();
+                String cname = null;
+                SimpleSymbol dname = null;
+                if (part2 instanceof SimpleSymbol) {
+                    dname = (SimpleSymbol) part2;
+                    String str2 = dname.getName();
+                    cname = name1+"."+str2;
+                } else if (part2 instanceof Pair
+                           && Translator.listLength(part2) == 2) {
+                    Pair rpair1 = (Pair) part2;
+                    Pair rpair2 = (Pair) rpair1.getCdr();
+                    Object rname1 = rpair1.getCar();
+                    Object rname2 = rpair2.getCar();
+                    if (rname1 instanceof SimpleSymbol
+                        && rname2 instanceof SimpleSymbol) {
+                        cname = name1 + "." + ((SimpleSymbol) rname1).getName();
+                        dname = (SimpleSymbol) rname2;
+                    }
+                }
+                if (dname == null) {
+                    tr.error('e', "imported class-name must be NAME or (NAME NEW-NAME)");
+                } else {
+                    try {
+                        Class clas = ObjectType.getContextClass(cname);
+                        decls.put(dname, tr.makeQuoteExp(clas));
+                    } catch (ClassNotFoundException ex) {
+                        tr.error('e', "no class found named "+cname);
+                    }
+                }
+                rest = cdrPair.getCdr();
+            }
+            if (mapper != null)
+                decls = mapper.map(decls, tr);
+            for (Map.Entry<Symbol,Expression> entry : decls.entrySet()) {
+                Symbol aname = entry.getKey();
+                Declaration decl = tr.define(aname, null, defs);
+                decl.setAlias(true);
+                decl.setFlag(Declaration.IS_CONSTANT|Declaration.EARLY_INIT);
+                SetExp sexp = new SetExp(decl, entry.getValue());
+                tr.setLineOf(sexp);
+                decl.noteValueFromSet(sexp);
+                sexp.setDefining (true);
+                tr.formStack.push(sexp);
+            }
+            return;
+        }
         if (specLength >= 2 && kind != '\0'
             // A keyword such as 'only must be followed by an <import set>.
             && cdrPair.getCar() instanceof LList) {
@@ -424,32 +482,47 @@ public class ImportFromLibrary extends Syntax
             this.listLength = listLength;
         }
 
-        public Map<Symbol, Declaration> map(Map<Symbol, Declaration> decls, Compilation comp) {
+        public Map<Symbol, Expression> map(Map<Symbol, Expression> decls, Compilation comp) {
             Translator tr = (Translator) comp;
             Object lst = this.list;
-            Map<Symbol,Declaration> nmap = decls;
+            Map<Symbol,Expression> nmap = decls;
 
             switch (kind) {
             case 'E': // 'except; list has the form (name ...)
             case 'O': // 'only; list has the form (name ...)
                 if (kind == 'O')
-                    nmap = new LinkedHashMap<Symbol,Declaration>();
+                    nmap = new LinkedHashMap<Symbol,Expression>();
                 while (lst instanceof Pair) {
                     Pair pair = (Pair) lst;
                     Object save1 = tr.pushPositionOf(pair);
                     Object name = Translator.stripSyntax(pair.getCar());
+                    Symbol oldsym = null;
+                    Symbol newsym = null;
                     if (name instanceof Symbol) {
-                        Symbol sym = (Symbol) name;
-                        Declaration old = decls.get(sym);
-                        if (old == null)
-                            tr.error('e', "unknown symbol in import set: "+sym);
-                        else if (kind == 'E')
-                            nmap.remove(sym);
-                        else
-                            nmap.put(sym, old);
+                        oldsym = (Symbol) name;
+                        newsym = oldsym;
+                    } else if (kind == 'O' && name instanceof Pair
+                           && Translator.listLength(name) == 2) {
+                        Pair rpair1 = (Pair) name;
+                        Object rname1 = rpair1.getCar();
+                        Object rname2 = ((Pair) rpair1.getCdr()).getCar();
+                        if (rname1 instanceof Symbol
+                            && rname2 instanceof Symbol) {
+                            oldsym = (Symbol) rname1;
+                            newsym = (Symbol) rname2;
+                        }
                     }
-                    else
+                    if (oldsym == null)
                         tr.error('e', "non-symbol in name list");
+                    else {
+                        Expression old = decls.get(oldsym);
+                        if (old == null)
+                            tr.error('e', "unknown symbol in import set: "+oldsym);
+                        else if (kind == 'E')
+                            nmap.remove(oldsym);
+                        else
+                            nmap.put(newsym, old);
+                    }
                     tr.popPositionOf(save1);
                     lst = pair.getCdr();
                 }
@@ -457,7 +530,7 @@ public class ImportFromLibrary extends Syntax
 
             case 'R': // 'rename; list has the form: ((oldname newname) ...)
                 Symbol[] pendingSymbols = new Symbol[listLength];
-                Declaration[] pendingDecls = new Declaration[listLength];
+                Expression[] pendingDecls = new Expression[listLength];
                 int npending = 0;
                 while (lst instanceof Pair) {
                     Pair pair = (Pair) lst;
@@ -472,12 +545,12 @@ public class ImportFromLibrary extends Syntax
                             && newname instanceof Symbol) {
                             Symbol oldSymbol = (Symbol) oldname;
                             Symbol newSymbol = (Symbol) newname;
-                            Declaration oldDecl = decls.remove(oldSymbol);
-                            if (oldDecl == null)
+                            Expression oldValue = decls.remove(oldSymbol);
+                            if (oldValue == null)
                                 tr.error('e', "missing binding "+oldSymbol);
                             else {
                                 pendingSymbols[npending] = newSymbol;
-                                pendingDecls[npending] = oldDecl;
+                                pendingDecls[npending] = oldValue;
                                 npending++;
                             }
                         }
@@ -491,25 +564,25 @@ public class ImportFromLibrary extends Syntax
                 }
                 for (int i = 0;  i < npending;  i++) {
                     Symbol newSymbol = pendingSymbols[i];
-                    Declaration decl = pendingDecls[i];
+                    Expression decl = pendingDecls[i];
                     if (decls.put(newSymbol, decl) != null)
                         tr.error('e', "duplicate binding for "+newSymbol);
                 }
                 break;
 
             case 'P':  // 'prefix; list has the form: (name-prefix)
-                nmap = new LinkedHashMap<Symbol,Declaration>();
+                nmap = new LinkedHashMap<Symbol,Expression>();
                 if (listLength != 1
                     || ! (((Pair) list).getCar() instanceof SimpleSymbol))
                     tr.error('e', "bad syntax for prefix import specifier");
                 else {
                     String prefix
                         = ((SimpleSymbol) ((Pair) list).getCar()).getName();
-                    for (Map.Entry<Symbol,Declaration> entry : decls.entrySet()) {
+                    for (Map.Entry<Symbol,Expression> entry : decls.entrySet()) {
                         Symbol aname = entry.getKey();
-                        Declaration decl = entry.getValue();
+                        Expression old = entry.getValue();
                         Symbol nname = Symbol.valueOf(prefix+aname);
-                        nmap.put(nname, decl);
+                        nmap.put(nname, old);
                     }
                 }
                 break;
@@ -549,6 +622,7 @@ public class ImportFromLibrary extends Syntax
         return Include.getSearchPath(searchPath, "kawa.import.path", ".");
     }
 
+    public static final SimpleSymbol classSymbol = Symbol.valueOf("class");
     public static final SimpleSymbol exceptSymbol = Symbol.valueOf("except");
     public static final SimpleSymbol librarySymbol = Symbol.valueOf("library");
     public static final SimpleSymbol onlySymbol = Symbol.valueOf("only");

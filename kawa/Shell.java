@@ -259,8 +259,10 @@ public class Shell
 	      {
 		Compilation comp = language.parse(lexer, opts, null);
                 boolean sawError;
-                if (interactive)
+                if (interactive) {
                   sawError = messages.checkErrors(perr, 20);
+                  perr.flush();
+                }
                 else if (messages.seenErrors())
                   throw new SyntaxException(messages);
                 else

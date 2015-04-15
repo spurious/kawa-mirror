@@ -1,3 +1,10 @@
+2015-04-14  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Importing): Document new import-class form.
+	Document the renaming option to the only form.
+	(FAQs - What is the equivalent of Java import): Rewrite	to make use
+	of the new import-class form.
+
 2015-04-05  Jamison Hope  <jrh@theptrgroup.com>
 
 	* kawa.texi (Quaternions): Document functions vector-quaternion?,

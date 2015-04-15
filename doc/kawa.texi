@@ -14756,12 +14756,15 @@ for the imported bindings.
 @display
 @stxdef{import-set} @stxref{library-reference}
   | @stxlit{(library} @stxref{library-reference} @stxlit{)}
-  | @stxlit{(only} @stxref{import-set} @arbno{@var{identifier}}@stxlit{)}
+  | @stxlit{(class} @var{class-prefix} @arbno{@var{import-only-name}}@stxlit{)}
+  | @stxlit{(only} @stxref{import-set} @arbno{@var{import-only-name}}@stxlit{)}
   | @stxlit{(except} @stxref{import-set} @arbno{@var{identifier}}@stxlit{)}
   | @stxlit{(prefix} @stxref{import-set} @var{identifier} @stxlit{)}
-  | @stxlit{(rename} @stxref{import-set} @arbno{@stxlit{(} @stxref{identifier}@sub{1} @stxref{identifier}@sub{2} @stxlit{)}}@stxlit{)}
+  | @stxlit{(rename} @stxref{import-set} @arbno{@stxref{rename-pair}}@stxlit{)}
 @stxdef{library-reference} @stxlit{(} @stxref{library-name-parts} [@stxref{explicit-source-name}]@stxlit{)}
+@stxdef{import-only-name} @var{identifier}|@stxref{rename-pair}
 @stxdef{explicit-source-name} @stxref{string}
+@stxdef{rename-pair} @stxlit{(} @var{identifier}@sub{1} @var{identifier}@sub{2}@stxlit{)}
 @end display
 
 A @var{library-reference} is mapped to a class name by concatenating
@@ -14787,6 +14790,20 @@ described below.
 An @code{only} form produces a subset of the bindings from another
 @meta{import-set}, including only the listed @meta{identifier}s.  The
 included @meta{identifier}s must be in the original @meta{import-set}.
+If a @var{rename-pair} is used, then the @code{@var{identifier}@sub{1}}
+must be in the original @meta{import-set},
+and is renamed to @code{@var{identifier}@sub{2}}.  For example:
+@example
+(import (only (kawa example) A (B1 B2) C (D1 D2)))
+@end example
+is equivalent to:
+@example
+(import (rename (only (kawa example) A B1 C D1)
+                (B1 B2) (D1 D2)))
+@end example
+The names @code{A}, @code{B1}, @code{C}, and @code{D1} must
+existing in the library @code{(kawa example)}.  The bindings are
+accessible using the names @code{A}, @code{B2}, @code{C}, and @code{D2}.
 
 @item 
 An @code{except} form produces a subset of the bindings from another
@@ -14807,11 +14824,37 @@ A @code{rename} form:
 removes the bindings for @code{@var{identifier}@sub{1} @dots{}} to form an
 intermediate @meta{import-set}, then adds the bindings back for the
 corresponding @code{@var{identifier}@sub{2} @dots{}} to form the final
-@meta{import-set}.  Each @var{identifier}@sub{1} must be in the original
+@meta{import-set}.  Each @code{@var{identifier}@sub{1}} must be in the original
 @meta{import-set}, each @var{identifier}@sub{2} must not be in the
 intermediate @meta{import-set}, and the @var{identifier}@sub{2}s must be
 distinct.
 @end itemize
+
+A @code{class} form is a convenient way to define abbreviations
+for class names; it may be more convenient than @code{define-alias}.
+The @var{class-prefix} is concatenated with each @meta{identifier}
+(with a period in between) to produce a classname.
+Each @meta{identifier} becomes an alias for the class.
+You can think of the @code{class} form as similar to a @code{only} form,
+where the @var{class-prefix} names a special kind of
+library represented of a Java package, and whose exported
+bindings are the classes in the package.
+
+You can combine the @code{class} form with
+@code{only}, @code{except}, @code{rename}, and @code{prefix},
+though only @code{prefix} is likely to be useful.  For example:
+@example
+(import (prefix (class java.lang Long Short) jl-))
+@end example
+is equivalent to
+@example
+(import (class java.lang (Long jl-Long) (Short jl-Short)))
+@end example
+which is equivalent to:
+@example
+(define-private-alias jl-Short java.lang.Short)
+(define-private-alias jl-Long java.lang.Long)
+@end example
 @end deffn
 
 @deffn Syntax require @stxlit{'}featureName
@@ -18999,16 +19042,40 @@ Applying the procedure returns the length of the array.
 
 @subsubheading What is the equivalent of Java import?
 
-Kawa's @code{import} follows R6RS, so it is bit like
-Java's @code{import static TypeName.*} (static-import-on-demand) declaration.
+To provide a short name for a class instead of the complete fully-qualified
+name use either @code{define-alias} (or @code{define-private-alias})
+or the @code{import}-@code{class} combination.
+For example, to be able to write @code{ArrayList} instead
+of @code{java.util.ArrayList} do either:
+@example
+(define-alias ArrayList java.util.ArrayList)
+@end example
+or
+@example
+(import (class java.util ArrayList))
+@end example
+The latter form allows you to define multiple aliases conveniently:
+@example
+(import (class java.util Map HashMap))
+@end example
 
-Kawa doesn't have a direct equivalent of
-Java's @code{import TypeName} (single-type-import) declaration,
-but @code{define-alias} provides similar functionality:
+Both forms allow renaming.  For example if you want to refer
+to @code{java.lang.StringBuffer} as @code{StrBuf} do:
 @example
 (define-alias StrBuf java.lang.StringBuffer)
 @end example
-This has the advantage that you can pick an arbitrary name as an alias.
+or:
+@example
+(import (class java.lang (StringBuffer StrBuf)))
+@end example
+
+The name(s) defined by @code{import} are by default private.
+A name defined using @code{define-alias} is by default exported;
+to avoid that use @code{define-private-alias} instead.
+
+You can also use @code{define-namespace} to introduce an abbreviation or
+renaming of a class name, but as a matter of style @code{define-alias}
+is preferred.
 
 There is no direct equivalent to Java's @code{import PackageOrTypeName.*}
 (type-import-on-demand) declaration, but you can alias a package:
@@ -19017,9 +19084,20 @@ There is no direct equivalent to Java's @code{import PackageOrTypeName.*}
 (define mylist :: jutil:List (jutil:ArrayList))
 @end example
 
-You can also use @code{define-namespace} to introduce an abbreviation or
-renaming of a class name, but as a matter of style @code{define-alias}
-is preferred.
+To import a static member, giving it a shortened name
+(like Java's static-import-on-demand declaration), you can use
+@code{define-alias}.  For example:
+@example
+(define-alias console java.lang.System:console)
+@end example
+
+For static fields only (not methods or member classes) you can
+use an @code{import} form:
+@example
+(import (only (java lang System) out))
+@end example
+This works because Kawa can treat any class as a ``library'';
+in which case it considers all public static fields as exported bindings.
 
 @subsubheading How do I refer to a Java member (nested) class?
 

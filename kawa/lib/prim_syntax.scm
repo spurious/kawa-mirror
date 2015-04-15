@@ -5,11 +5,10 @@
  report-syntax-error syntax->expression syntax-body->expression
  if try-catch letrec)
 
-(import (rename (only (kawa standard define) defineRaw) (defineRaw %define)))
-(import (rename (only (kawa standard define_syntax) define_syntax)
-                (define_syntax %define-syntax)))
-(import (rename (only (kawa standard let) let) (let %let)))
-(import (rename (only (kawa standard set_b) set) (set set!)))
+(import (only (kawa standard define) (defineRaw %define)))
+(import (only (kawa standard define_syntax) (define_syntax %define-syntax)))
+(import (only (kawa standard let) (let %let)))
+(import (only (kawa standard set_b) (set set!)))
 (import (only (kawa standard begin) begin))
 (import (only (kawa standard SchemeCompilation) mlambda))
 

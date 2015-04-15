@@ -1,3 +1,10 @@
+2015-04-14  Per Bothner  <per@bothner.com>
+
+	* numbers.scm: Use new '(import (class ...))' syntax.
+	* prim_imports.scm: Use new rename support in i'mport only' clause.
+	* prim_syntax.scm: Likewise.
+	* scheme/base.scm: Likewise.
+
 2015-04-13  Jamison Hope  <jrh@theptrgroup.com>
 
 	* kawa/reflect.scm (set-field!, set-static-field!): New exports.

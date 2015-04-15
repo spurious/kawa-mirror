@@ -2,13 +2,10 @@
 (require <kawa.lib.std_syntax>)
 (require <kawa.lib.syntax>)
 (require <kawa.lib.misc>)
-(define-alias Double java.lang.Double)
-(define-alias IntNum gnu.math.IntNum)
-(define-alias Numeric gnu.math.Numeric)
-(define-alias RatNum gnu.math.RatNum)
-(define-alias RealNum gnu.math.RealNum)
-(define-alias LangObjType gnu.kawa.lispexpr.LangObjType)
-(define-alias quaternion gnu.math.Quaternion)
+
+(import (class java.lang Double)
+        (class gnu.math IntNum Numeric RatNum RealNum (Quaternion quaternion))
+        (class gnu.kawa.lispexpr LangObjType))
 
 (define-private (java.lang.real? x) ::boolean
   (and (java.lang.Number? x)

@@ -18,5 +18,5 @@
 (require kawa.lib.misc_syntax) ;; FIXME only for deprecated include
 (require kawa.lib.DefineRecordType)
 (require kawa.lib.prim_imports)
-(import (rename (only (kawa lib prim_syntax) letrec) (letrec letrec*)))
+(import (only (kawa lib prim_syntax) (letrec letrec*)))
 (include "base-exports")

@@ -1,3 +1,7 @@
+2015-04-16  Per Bothner  <per@bothner.com>
+
+	* SetExp.java (apply): Handle null symbol.
+
 2015-04-10  Per Bothner  <per@bothner.com>
 
 	* ModuleExp.java (evalModule): Flush any messages from evalModule1

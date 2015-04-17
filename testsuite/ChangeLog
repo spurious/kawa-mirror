@@ -1,3 +1,8 @@
+2015-04-16  Andrea Bernardini <andrebask@gmail.com>
+	    Per Bothner  <per@bothner.com>
+
+	* exception2.scm: New test for when exception variable is captured.
+
 2015-04-05  Jamison Hope  <jrh@theptrgroup.com>
 
 	* quaternion-test.scm: Add tests for quaternions as vectors and

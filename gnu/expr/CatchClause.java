@@ -53,9 +53,11 @@ public class CatchClause extends LetExp
   {
     gnu.bytecode.CodeAttr code = comp.getCode();
     Declaration catchDecl = firstDecl();
-    Variable catchVar = catchDecl.allocateVariable(code);
+    if (catchDecl.isSimple())
+      catchDecl.allocateVariable(code);
     code.enterScope(getVarScope());
-    code.emitCatchStart(catchVar);
+    code.emitCatchStart((ClassType) catchDecl.getType());
+    catchDecl.compileStore(comp);
     body.compileWithPosition(comp, target);
     code.emitCatchEnd();
     code.popScope ();

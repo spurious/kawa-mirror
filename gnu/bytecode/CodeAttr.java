@@ -2257,18 +2257,24 @@ public class CodeAttr extends Attribute implements AttrContainer
     try_stack.end_try = getLabel();
   }
 
-  public void emitCatchStart(Variable var)
+    public void emitCatchStart(Variable var) {
+        if (var == null)
+            emitCatchStart((ClassType) null);
+        else {
+            emitCatchStart((ClassType) var.getType());
+            emitStore(var);
+        }
+    }
+
+  public void emitCatchStart(ClassType type)
   {
     emitTryEnd(false);
     setTypes(try_stack.start_try.localTypes, Type.typeArray0);
     if (try_stack.try_type != null)
       emitCatchEnd();
-    ClassType type = var == null ? null : (ClassType) var.getType();
     try_stack.try_type = type;
     addHandler(try_stack.start_try, try_stack.end_try, type);
     setReachable(true);
-    if (var != null)
-      emitStore(var);
   }
 
   public void emitCatchEnd()
@@ -2313,7 +2319,7 @@ public class CodeAttr extends Attribute implements AttrContainer
     if (useJsr())
       {
         SP = 0;
-        emitCatchStart(null);
+        emitCatchStart((ClassType) null);
         emitStore(try_stack.exception);
         emitJsr(try_stack.finally_subr);
         emitLoad(try_stack.exception);

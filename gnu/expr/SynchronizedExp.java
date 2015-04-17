@@ -44,7 +44,7 @@ public class SynchronizedExp extends Expression
     body.compileWithPosition(comp, target); 
     code.emitLoad(objvar);
     code.emitMonitorExit();
-    code.emitCatchStart(null);
+    code.emitCatchStart((ClassType) null);
     code.emitLoad(objvar);
     code.emitMonitorExit(); 
     code.emitThrow(); 

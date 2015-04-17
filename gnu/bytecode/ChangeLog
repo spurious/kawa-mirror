@@ -1,3 +1,8 @@
+2015-04-16  Per Bothner  <per@bothner.com>
+
+	* CodeAttr.java (emitCatchStart): New overload that takes a type,
+	and leaves it to the caller to save/use the exception.
+
 2015-03-30  Per Bothner  <per@bothner.com>
 
 	* ObjectType.java (promote): Remove - we don't want to promote

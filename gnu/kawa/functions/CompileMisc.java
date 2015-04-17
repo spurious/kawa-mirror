@@ -594,7 +594,7 @@ public class CompileMisc
       }
 
     // Emit: catch (Throwable ex) { handleException$(ex, cont, ctx); }
-    code.emitCatchStart(null);
+    code.emitCatchStart((ClassType) null);
     code.emitLoad(contVar);
     if (target instanceof ConsumerTarget)
       {

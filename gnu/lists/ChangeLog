@@ -1,5 +1,7 @@
 2015-04-18  Per Bothner  <per@bothner.com>
 
+	* Sequences.java (subList, drop, drop): New convenience methods.
+
 	* FString.java (setCharacterAt): Handle IGNORABLE_CHAR.
 	(appendCharacter): Likewise.
 	* Strings.java (characterAt): New method.

@@ -72,4 +72,22 @@ public class Sequences {
         }
         /* #endif */
     }
+
+    public static Object subList(Object base, int fromIndex, int toIndex) {
+        List<?> lbase = (List<?>) base;
+        if (toIndex == -1)
+            toIndex = lbase.size();
+        return lbase.subList(fromIndex, toIndex);
+    }
+
+    public static Object drop(Object base, int count) {
+        if (count >= 0)
+            return subList(base, count, -1);
+        else
+            return subList(base, 0, -count);
+    }
+    public static Object drop(Object base, int fromStart, int fromEnd) {
+        List<?> lbase = (List<?>) base;
+        return subList(base, fromStart, lbase.size() - fromEnd);
+    }
 }

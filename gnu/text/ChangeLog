@@ -4,6 +4,7 @@
 	(append): Ignore IGNORABLE_CHAR.
 	(nameToChar): Map "ignorable-char" to IGNORABLE_CHAR.
 	(toScmReadableString): Perform reverse mapping.
+	(writeExternal, readExternal): Simplify - write/read an int.
 
 2015-04-15  Per Bothner  <per@bothner.com>
 

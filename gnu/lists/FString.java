@@ -2,6 +2,8 @@
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.lists;
+
+import gnu.text.Char;
 import java.io.*;
 
 /** Simple adjustable-length vector whose elements are 32-bit floats.
@@ -371,6 +373,12 @@ public class FString extends SimpleVector
                 size--;
             }
             data[index] = (char) ch;
+        } else if (ch == Char.IGNORABLE_CHAR) {
+            int shrinkage = oldIsSupp ? 2 : 1;
+            System.arraycopy(data, index+shrinkage,
+                             data, index,
+                             size-index-shrinkage);
+            size -= shrinkage;
         } else {
             char c1 = (char) (((ch - 0x10000) >> 10) + 0xD800);
             char c2 = (char) ((ch & 0x3FF) + 0xDC00);
@@ -539,8 +547,14 @@ public class FString extends SimpleVector
 
     /** Append a Unicode code point. */
     public FString appendCharacter(int c) {
+        int delta;
+        if (c < 0x10000)
+            delta = 1;
+        else if (c == Char.IGNORABLE_CHAR)
+            return this;
+        else
+            delta = 2;
         int sz = size;
-        int delta = c >= 0x10000 ? 2 : 1;
         if (sz + delta > data.length)
             ensureBufferLength(sz+delta);
         char[] d = data;

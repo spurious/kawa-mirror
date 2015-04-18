@@ -2,12 +2,32 @@
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.lists;
+
+import gnu.text.Char;
 import java.io.IOException;
 
 /** Various static utility methods for general strings (CharSeqs). */
 
 public class Strings
 {
+    public static int characterAt(CharSequence cseq, int index) {
+        char ch1 = cseq.charAt(index);
+        if (ch1 >= 0xD800 && ch1 <= 0xDBFF) {
+            if (index + 1 < cseq.length()) {
+                char ch2 = cseq.charAt(index+1);
+                if (ch2 >= 0xDC00 && ch2 <= 0xDFFF)
+                    return ((ch1 - 0xD800) << 10) + (ch2 - 0xDC00) + 0x10000;
+            }
+        } else if (ch1 >= 0xDC00 && ch1 <= 0xDFFF) {
+            if (index > 0) {
+                char ch0 = cseq.charAt(index-1);
+                if (ch0 >= 0xD800 && ch0 <= 0xDBFF)
+                    return Char.IGNORABLE_CHAR;
+            }
+        }
+        return ch1;
+    }
+
     public static int sizeInCodePoints(CharSequence str) {
         int len = str.length();
         int nsurr = 0;

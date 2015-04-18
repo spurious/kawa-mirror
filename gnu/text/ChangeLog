@@ -1,3 +1,10 @@
+2015-04-18  Per Bothner  <per@bothner.com>
+
+	* Char.java (IGNORABLE_CHAR): New constant.
+	(append): Ignore IGNORABLE_CHAR.
+	(nameToChar): Map "ignorable-char" to IGNORABLE_CHAR.
+	(toScmReadableString): Perform reverse mapping.
+
 2015-04-15  Per Bothner  <per@bothner.com>
 
 	* SourceMessages.java (error): Don't set fakeException

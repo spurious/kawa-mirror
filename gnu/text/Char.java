@@ -26,6 +26,8 @@ public class Char implements Comparable, Externalizable {
     // Leave open the possibility for characters beyond Unicode.
     int value;
 
+    public static final int IGNORABLE_CHAR = 0x1FFFFF;
+
     /** Should only be used for serialization. */
     public Char() {
     }
@@ -89,12 +91,12 @@ public class Char implements Comparable, Externalizable {
     }
 
     public static void append(int i, Appendable out) throws IOException {
-        if (i >= 0x10000) {
+        if (i < 0x10000)
+            out.append((char) i);
+        else if (i != IGNORABLE_CHAR) {
             out.append((char) (((i - 0x10000) >> 10) + 0xD800));
             out.append((char) ((i & 0x3FF) + 0xDC00));
         }
-        else
-            out.append((char) i);
     }
 
     public final char charValue() {
@@ -175,6 +177,8 @@ public class Char implements Comparable, Externalizable {
             if (charNames[i].equalsIgnoreCase(name))
                 return charNameValues.charAt(i);
         }
+        if ("ignorable-char".equalsIgnoreCase(name))
+            return IGNORABLE_CHAR;
         int len = name.length();
         if (len > 1 && name.charAt(0) == 'u') {
             int value = 0;
@@ -249,38 +253,23 @@ public class Char implements Comparable, Externalizable {
         if (ch < ' ' || ch > 0x7F) {
             sbuf.append('x');
             sbuf.append(Integer.toString(ch, 16));
+        } else if (ch == IGNORABLE_CHAR) {
+            sbuf.append("ignorable-char");
         } else
             sbuf.append((char) ch);
         return sbuf.toString();
     }
 
     /**
-     * @serialData Writes the char value as a char.
-     *   If the value is {@code > 0xFFFF}, write a pair of surrogate values.
-     *   If the value is is a high surrogate only,
-     *   write it followed by {@code '\0'}.
+     * @serialData Writes the char value as an int.
      */
     public void writeExternal(ObjectOutput out) throws IOException {
-        if (value > 0xD800) {
-            if (value > 0xFFFF) {
-                out.writeChar(((value - 0x10000) >> 10) + 0xD800);
-                value = (value & 0x3FF) + 0xDC00;
-            } else if (value <= 0xDBFF) {
-                out.writeChar(value);
-                value = '\0';
-            }
-        }
-        out.writeChar(value);
+        out.writeInt(value);
     }
 
     public void readExternal(ObjectInput in)
         throws IOException, ClassNotFoundException {
-        value = in.readChar();
-        if (value >= 0xD800 && value <= 0xDBFF) {
-            char next = in.readChar();
-            if (next >= 0xDC00 && next <= 0xDFFF)
-                value = ((value - 0xD800) << 10) + (next - 0xDC00) + 0x10000;
-        }
+        value = in.readInt();
     }
 
     public Object readResolve() throws ObjectStreamException {

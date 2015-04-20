@@ -220,6 +220,15 @@ public class Declaration
   Variable var;
   public Variable getVariable() { return var; }
 
+    /** If non-zero, indicates this names a 'scan' of a sequence.
+     * The value property is a sequence; the declaration names
+     * "each" of the elements.
+     * This field is the amount of nesting within scan ('...') contexts.
+     */
+    public int getScanNesting() { return scanNesting; }
+    public void setScanNesting(int value) { scanNesting = value; }
+    int scanNesting;
+
   public final boolean isSimple()
   { return (flags & IS_SIMPLE) != 0; }
 

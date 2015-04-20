@@ -368,6 +368,7 @@ KAWA_STANDARD_JAVA_FILES = \
   standard/define_variable.java \
   standard/define_autoload.java \
   standard/define_member_alias.java \
+  standard/Scan.java \
   standard/Scheme.java \
   standard/SchemeCompilation.java \
   standard/object.java \

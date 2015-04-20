@@ -25,6 +25,7 @@ public abstract class LispLanguage extends Language
   static public final String quasiquote_str = "quasiquote";
     public static final Symbol quasiquote_sym =
         Namespace.EmptyNamespace.getSymbol(quasiquote_str);
+    public static final SimpleSymbol dots3_sym = Symbol.valueOf("...");
   static public final String splice_str = "$splice$";
   static public final Symbol splice_sym = Namespace.EmptyNamespace.getSymbol(splice_str);
   /** Used for Kawa infix ':' operator. */

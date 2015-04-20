@@ -4,17 +4,22 @@ import gnu.bytecode.*;
 import java.util.List;
 
 /** This matches a sequences of a specific length.
- * This is used for {@code [pat1 ... panN} patterns.
+ * This is used for {@code [pat1 ... panN]} patterns.
  */
 
 public class SeqSizeType extends LangObjType {
     int requiredSize;
     boolean requiredExact;
 
-    public SeqSizeType(String name, String implClass, int requiredSize, boolean requiredExact) {
+    public SeqSizeType(String name, int requiredSize, boolean requiredExact, String implClass) {
         super(name, implClass, -1);
         this.requiredSize = requiredSize;
         this.requiredExact = requiredExact;
+    }
+
+    public SeqSizeType(int requiredSize, boolean requiredExact, String implClass) {
+        this((requiredExact ? "list#=" : "list#>=") + requiredSize,
+             requiredSize, requiredExact, implClass);
     }
 
     @Override

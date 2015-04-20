@@ -1,3 +1,24 @@
+2015-04-18  Per Bothner  <per@bothner.com>
+
+	Implement "scan" (ellipsis) patterns and context.
+	* lang/BindDecls.java (parsePatternCar, parseBracketListPattern):
+	Take extra scanNesting parameter.
+	(parsePatternCar): Set scanNesting of declarations.
+	(parseBracketListPattern): If we see ellipsis, increment scan-nesting.
+	* lang/SyntaxTemplate.java (dots3Symbol): Redefine.
+	* lang/Translator.java (rewrite_pair): Check for ellipsis.
+	(rewrite): Check if referencing a scan declaration.
+	(currentScanContext): New field.
+	(getScanContext, setScanContext, pushScanContext, popScanContext):
+	New methods.
+	(class ScanContext): Helper class.
+	* standard/Scan.java: New Syntax.
+	* Makefile.am: Update accordingly.
+	* standard/Scheme.java: Define 'scan' syntax.
+	* lang/Lambda.java: Update parsePatternCar invocation.
+	* standard/MatchDef.java: Likewise.
+	* standard/let.java: Likewise.
+
 2015-04-15  Per Bothner  <per@bothner.com>
 
 	* lang/Macro.java (expand): If transformer throws an exception,

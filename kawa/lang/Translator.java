@@ -446,7 +446,8 @@ public class Translator extends Compilation
     int first_keyword = -1;
     int last_keyword = -1;
     int firstSpliceArg = -1;
-    for (int i = 0; i < cdr_length;)
+    int i = 0;
+    while (cdr != LList.Empty)
       {
 	if (cdr instanceof SyntaxForm)
 	  {
@@ -460,6 +461,7 @@ public class Translator extends Compilation
         Object save_pos = pushPositionOf(cdr);
 	Pair cdr_pair = (Pair) cdr;
         Object cdr_car = cdr_pair.getCar();
+        Object cdr_cdr = cdr_pair.getCdr();
         Expression arg;
         if (cdr_car instanceof Keyword) {
             if (first_keyword < 0)
@@ -473,8 +475,25 @@ public class Translator extends Compilation
             last_keyword = i;
             arg = QuoteExp.getInstance(cdr_car, this);
             arg.setFlag(QuoteExp.IS_KEYWORD);
-        }
-        else {
+        } else if (cdr_cdr instanceof Pair
+                   // FIXME should check binding for ... is builtin ...
+                   && ((Pair) cdr_cdr).getCar() == LispLanguage.dots3_sym) { 
+            LambdaExp dotsLambda = new LambdaExp();
+            pushScanContext(dotsLambda);
+            dotsLambda.body = rewrite_car(cdr_pair, false);
+            List<Expression> seqs = currentScanContext.sequences;
+            int nseqs = seqs.size();
+            Expression[] subargs = new Expression[nseqs + 1];
+            subargs[0] = dotsLambda;
+            for (int j = 0;  j < nseqs; j++)
+                subargs[j+1] = seqs.get(j);
+            arg = new ApplyExp(Scheme.map, subargs);
+            arg = new ApplyExp(MakeSplice.quoteInstance, arg);
+            popScanContext();
+            cdr_cdr = ((Pair) cdr_cdr).getCdr();
+            if (firstSpliceArg < 0)
+                firstSpliceArg = i + (applyFunction != null ? 1 : 0);
+        } else {
             if (cdr_car instanceof Pair
                 && ((Pair) cdr_car).getCar() == LispLanguage.splice_sym) {
                 arg = rewrite_car((Pair) ((Pair) cdr_car).getCdr(), false);
@@ -488,7 +507,7 @@ public class Translator extends Compilation
         i++;
 
         vec.addElement(arg);
-	cdr = cdr_pair.getCdr();
+	cdr = cdr_cdr;
         popPositionOf(save_pos);
       }
 
@@ -908,9 +927,20 @@ public class Translator extends Compilation
             if (decl == null && function
                 && nameToLookup==LispLanguage.lookup_sym)
                 decl = getNamedPartDecl;
+            int scanNesting = decl == null ? 0 : decl.getScanNesting();
             ReferenceExp rexp = new ReferenceExp (nameToLookup, decl);
             rexp.setContextDecl(cdecl);
             rexp.setLine(this);
+            if (scanNesting > 0) {
+                if (getScanContext() == null)
+                    error('e', "using scan variable "+decl.getName()+" while not in scan context");
+                else {
+                    Declaration paramDecl =
+                        currentScanContext.getLambda().addParameter(null);
+                    currentScanContext.addSeqExpression(rexp);
+                    return new ReferenceExp(paramDecl);
+                }
+            }
             if (function && separate)
                 rexp.setFlag(ReferenceExp.PREFER_BINDING2);
             return rexp;
@@ -2049,6 +2079,32 @@ public class Translator extends Compilation
         public ValuesFromLList(LList values) {
             super(values);
             this.values = values;
+        }
+    }
+
+    private ScanContext currentScanContext;
+
+    public ScanContext getScanContext() { return currentScanContext; }
+    public void setScanContext(ScanContext ctx) { currentScanContext = ctx; }
+
+    public void pushScanContext (LambdaExp lambda) {
+        ScanContext newContext = new ScanContext();
+        newContext.outer = currentScanContext;
+        currentScanContext = newContext;
+        newContext.lambda = lambda;
+    }
+    public void popScanContext() {
+        currentScanContext = currentScanContext.outer;
+    }
+    public static class ScanContext {
+        ScanContext outer;
+        ArrayList<Expression> sequences = new ArrayList<Expression>();
+        LambdaExp lambda;
+
+        public LambdaExp getLambda() { return lambda; }
+
+        public void addSeqExpression(Expression exp) {
+            sequences.add(exp);
         }
     }
 }

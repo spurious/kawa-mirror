@@ -6,6 +6,7 @@ import gnu.expr.*;
 import gnu.kawa.functions.DisplayFormat;
 import gnu.kawa.io.OutPort;
 import java.util.*;
+import gnu.kawa.lispexpr.LispLanguage;
 
 /** The translated form of a <code>(syntax <var>template</var>)</code>. */
 
@@ -79,7 +80,7 @@ public class SyntaxTemplate implements Externalizable {
 
     Object[] literal_values;
 
-    public static final SimpleSymbol dots3Symbol = Symbol.valueOf("...");
+    public static final SimpleSymbol dots3Symbol = LispLanguage.dots3_sym;
 
     /* DEBUGGING:
     void print_template_program(java.util.Vector patternNames,

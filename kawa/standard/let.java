@@ -80,7 +80,7 @@ public class let extends Syntax {
                                        " binding is not a pair:"+bind_pair_car);
             Pair binding = (Pair) bind_pair_car;
             Object saveLoc1 = tr.pushPositionOf(binding);
-            Object[] r = bindDecls.parsePatternCar(binding, let, tr);
+            Object[] r = bindDecls.parsePatternCar(binding, 0, let, tr);
             Object binding_cdr = r[0];
             Declaration decl = (Declaration) r[1];
             maybeSetProcedure(decl);

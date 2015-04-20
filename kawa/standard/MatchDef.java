@@ -20,7 +20,7 @@ public class MatchDef extends Syntax {
         st = Translator.makePair(st, this,  sexp);
 
         tr.pushForm(st);
-        Object[] r = BindDecls.instance.parsePatternCar(p1, defs, tr);
+        Object[] r = BindDecls.instance.parsePatternCar(p1, 0, defs, tr);
         Object rest = r[0];
         Declaration decl = (Declaration) r[1];
         sexp.setBinding(decl);

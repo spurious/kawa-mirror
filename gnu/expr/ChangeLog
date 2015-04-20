@@ -1,3 +1,10 @@
+2015-04-18  Per Bothner  <per@bothner.com>
+
+	* Declaration.java (scanNesting): New field.
+	(getScanNesting, setScanNesting): Access methods.
+
+	* LambdaExp.java (addParameter): New convenience method.
+
 2015-04-16  Per Bothner  <per@bothner.com>
 
 	* CatchClause.java (compile): Use Declaration#compileStore to

@@ -1,3 +1,9 @@
+2015-04-18  Per Bothner  <per@bothner.com>
+
+	* LispLanguage.java (dots3_sym): New constant.
+	* SeqSizeType.java: New constructor.  Re-order arguments
+	of old constructor to avoid ambiguity.
+
 2015-04-12  Per Bothner  <per@bothner.com>
 
 	* LispReader.java (handlePostfix): Make protected.

@@ -67,6 +67,12 @@ public class LambdaExp extends ScopeExp {
         }
     }
 
+    public Declaration addParameter(Object name) {
+        min_args++;
+        max_args++;
+        return super.addDeclaration(name);
+    }
+
     /** A local variable that points to the heap-allocated part of the frame.
      * Each captured variable is a field in the heapFrame.  A procedure has
      * a heapFrame iff if has a parameter or local variable that is

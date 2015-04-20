@@ -882,7 +882,7 @@ public class Scheme extends LispLanguage {
 
       defSntxStFld("cut", "gnu.kawa.slib.cut");
       defSntxStFld("cute", "gnu.kawa.slib.cut");
-
+      defSntxStFld("scan", "kawa.standard.Scan", "scan");
       defSntxStFld("cond-expand", "kawa.standard.IfFeature", "condExpand");
 
       defAliasStFld("*print-base*", "gnu.kawa.functions.DisplayFormat",

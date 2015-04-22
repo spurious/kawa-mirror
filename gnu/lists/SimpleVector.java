@@ -48,7 +48,8 @@ public abstract class SimpleVector<E> extends AbstractSequence<E>
 	int oldLength = getBufferLength();
 	if (size > oldLength)
 	  {
-	    int newLength = oldLength < 16 ? 16 : 2 * oldLength;
+            int newLength = oldLength < 16 ? 16
+              : oldLength + (oldLength >> 1);
 	    setBufferLength(size > newLength ? size : newLength);
 	  }
       }

@@ -31,6 +31,10 @@ public class repl extends Procedure0or1
 
   static int defaultParseOptions = Language.PARSE_PROLOG|Language.PARSE_EXPLICIT;
 
+  public repl()
+  {
+  }
+
   public repl(Language language)
   {
     this.language = language;
@@ -189,10 +193,35 @@ public class repl extends Procedure0or1
     return null;
   }
 
-  public static void setArgs (String[] args, int arg_start)
-  {
-    ApplicationMainSupport.setArgs(args, arg_start);
-  }
+    public static String messagePrefix = "kawa: ";
+
+    protected void error(String message) {
+        if (messagePrefix != null)
+            message = messagePrefix + message;
+        System.err.println(message);
+	System.exit (-1);
+    }
+
+    int getArgs(String[] args, int iArg) {
+        int avail = args.length - iArg;
+        if (nextActionArgCount >= 0) {
+            if (nextActionArgCount > avail)
+                error("there are only "+avail+" arguments remaining");
+            ApplicationMainSupport.setArgs(args, iArg, nextActionArgCount);
+            iArg += nextActionArgCount;
+            nextActionArgCount = -1;
+            usedActionArgCount = true;
+        } else {
+            ApplicationMainSupport.setArgs(args, iArg, avail);
+            usedActionArgCount = false;
+        }
+        return iArg;
+    }
+
+   public static void setArgs(String[] args, int arg_start) {
+        ApplicationMainSupport.setArgs(args, arg_start,
+                                       args.length - arg_start);
+    }
 
   public static void getLanguageFromFilenameExtension(String name)
   {
@@ -220,26 +249,31 @@ public class repl extends Procedure0or1
   static boolean shutdownRegistered
     = WriterManager.instance.registerShutdownHook();
 
-  public static int processArgs(String[] args, int iArg, int maxArg)
-  {
-    boolean something_done = false;
-    int returnDelta = 0;
-    for ( ;  iArg < maxArg;  iArg++)
-      {
-	String arg = args[iArg];
+    public static int processArgs(String[] args, int iArg, int maxArg) {
+        return new repl().processArgs(args, iArg, maxArg, true);
+    }
+
+    int nextActionArgCount = -1;
+    boolean usedActionArgCount = false;
+
+    public int processArgs(String[] args, int iArg, int maxArg, boolean argsOnly) {
+        boolean something_done = false;
+        int returnDelta = 0;
+        for ( ;  iArg < maxArg;  )  {
+	String arg = args[iArg++];
 	if (arg.equals ("-c") || arg.equals ("-e"))
 	  {
-	    iArg++;
 	    if (iArg == maxArg)
-	      bad_option (arg);
+	      bad_option(arg);
+            String expr = args[iArg++];
 	    getLanguage();
-	    setArgs (args, iArg+1);
-	    if (arg.equals ("-c"))
+            iArg = getArgs(args, iArg);
+            if (arg.equals ("-c"))
 	      checkInitFile();
 	    Language language = Language.getDefaultLanguage();
             SourceMessages messages = new SourceMessages();
             Throwable ex = Shell.run(language, Environment.getCurrent(),
-                                     new CharArrayInPort(args[iArg]),
+                                     new CharArrayInPort(expr),
                                      OutPort.outDefault(),
                                      null, messages);
             if (ex != null)
@@ -251,12 +285,11 @@ public class repl extends Procedure0or1
 	  }
 	else if (arg.equals ("-f"))
 	  {
-	    iArg++;
 	    if (iArg == maxArg)
 	      bad_option (arg);
-	    String filename = args[iArg];
+	    String filename = args[iArg++];
 	    getLanguageFromFilenameExtension(filename);
-	    setArgs (args, iArg+1);
+	    iArg = getArgs(args, iArg);
 	    checkInitFile();
 	    if (! Shell.runFileOrClass(filename, true, 0))
               System.exit(-1);
@@ -265,7 +298,6 @@ public class repl extends Procedure0or1
 	else if (arg.startsWith("--script"))
 	  {
             String count = arg.substring(8);
-	    iArg++;
             int skipLines = 0;
             if (count.length() > 0)
               {
@@ -280,9 +312,9 @@ public class repl extends Procedure0or1
               }
 	    if (iArg == maxArg)
 	      bad_option (arg);
-	    String filename = args[iArg];
+	    String filename = args[iArg++];
 	    getLanguageFromFilenameExtension(filename);
-	    setArgs (args, iArg+1);
+	    iArg = getArgs(args, iArg);
 	    checkInitFile();
 	    if (! Shell.runFileOrClass(filename, true, skipLines))
               System.exit(-1);
@@ -290,8 +322,8 @@ public class repl extends Procedure0or1
 	  }
 	else if (arg.equals("\\"))
 	  {
-	    // Scsh-like "meta-arg".  See Kawa manual (SOON-FIXME).
-	    if (++iArg == maxArg)
+	    // Scsh-like "meta-arg".  See Kawa manual.
+	    if (iArg == maxArg)
 	      bad_option (arg);
 	    String filename = args[iArg];
             ApplicationMainSupport.commandName.set(filename);
@@ -347,17 +379,16 @@ public class repl extends Procedure0or1
 		    if (sbuf.length() > 0)
 		      xargs.add(sbuf.toString());
 		    int nxargs = xargs.size();
-                    iArg--;
                     String[] nargs = new String[maxArg+nxargs-1];
+                    iArg--; // back up to just before '\'
                     System.arraycopy(args, 0, nargs, 0, iArg);
                     for (int i = 0;  i < nxargs;  i++)
                         nargs[iArg+i] = xargs.get(i);
                     System.arraycopy(args, iArg+1, nargs, iArg+nxargs,
                                      maxArg-iArg-1);
-                    maxArg = maxArg+nxargs-1;
-                    returnDelta += nargs.length-args.length;
+                    maxArg = nargs.length;
+                    returnDelta += maxArg-args.length;
                     args = nargs;
-                    iArg--;
                     continue;
 		  }
 	      }
@@ -370,36 +401,34 @@ public class repl extends Procedure0or1
 	  }
 	else if (arg.equals ("-s") || arg.equals ("--"))
 	  {
-	    iArg++;
 	    getLanguage();
-	    setArgs (args, iArg);
+	    iArg = getArgs(args, iArg);
 	    checkInitFile();
 	    Shell.run(Language.getDefaultLanguage(), Environment.getCurrent());
-	    return -1;
+	    something_done = true;
+            if (! usedActionArgCount)
+                return -1;
 	  }
 	else if (arg.equals ("-w"))
 	  {
-	    iArg++;
 	    getLanguage();
-	    setArgs (args, iArg);
+	    iArg = getArgs(args, iArg);
 	    checkInitFile();
             startGuiConsole();
 	    something_done = true;
 	  }
 	else if (arg.equals ("-d"))
 	  {
-	    iArg++;
 	    if (iArg == maxArg)
 	      bad_option (arg);
             ModuleManager manager = ModuleManager.getInstance();
-	    manager.setCompilationDirectory(args[iArg]);
+	    manager.setCompilationDirectory(args[iArg++]);
 	  }
         else if (arg.equals("--target") || arg.equals("-target"))
           {
-	    iArg++;
 	    if (iArg == maxArg)
-	      bad_option (arg);
-            arg = args[iArg];
+	      bad_option(arg);
+            arg = args[iArg++];
             if (arg.equals("8") || arg.equals("1.8"))
               Compilation.defaultClassFileVersion = ClassType.JDK_1_8_VERSION;
             else if (arg.equals("7") || arg.equals("1.7"))
@@ -421,25 +450,37 @@ public class repl extends Procedure0or1
           }
 	else if (arg.equals ("-P"))
 	  {
-	    iArg++;
 	    if (iArg == maxArg)
 	      bad_option (arg);
-	    Compilation.classPrefixDefault = args[iArg];
+	    Compilation.classPrefixDefault = args[iArg++];
 	  }
 	else if (arg.equals ("-T"))
 	  {
-	    iArg++;
 	    if (iArg == maxArg)
 	      bad_option (arg);
-	    compilationTopname = args[iArg];
+	    compilationTopname = args[iArg++];
 	  }
         else if (arg.equals ("--main"))
           {
 	    defaultParseOptions |= Language.PARSE_EMIT_MAIN;
           }
+        else if (arg.startsWith("--with-arg-count="))
+          {
+            String count = arg.substring(17);
+            if (count.length() > 0)
+            {
+                try
+                {
+                    nextActionArgCount = Integer.parseInt(count);
+                }
+                catch (Exception ex)
+                {
+                    // ERROR FIXME
+                }
+            }
+          }
 	else if (arg.equals ("-C"))
 	  {
-	    ++iArg;
 	    if (iArg == maxArg)
 	      bad_option (arg);
             compileFiles(args, iArg, maxArg);
@@ -448,23 +489,23 @@ public class repl extends Procedure0or1
 	else if (arg.equals("--output-format")
 		 || arg.equals("--format"))
 	  {
-	    if (++iArg == maxArg)
+	    if (iArg == maxArg)
 	      bad_option (arg);
-	    Shell.setDefaultFormat(args[iArg]);
+	    Shell.setDefaultFormat(args[iArg++]);
 	  }
 	else if (arg.equals("--connect"))
 	  {
-	    ++iArg;
 	    if (iArg == maxArg)
 	      bad_option (arg);
 	    int port;
-	    if (args[iArg].equals("-"))
+	    String portArg = args[iArg++];
+	    if (portArg.equals("-"))
 	      port = 0;
 	    else
 	      {
 		try
 		  {
-		    port = Integer.parseInt(args[iArg]);
+		    port = Integer.parseInt(portArg);
 		  }
 		catch (NumberFormatException ex)
 		  {
@@ -492,17 +533,17 @@ public class repl extends Procedure0or1
 	else if (arg.equals("--server"))
 	  {
 	    getLanguage();
-	    ++iArg;
 	    if (iArg == maxArg)
 	      bad_option (arg);
 	    int port;
-	    if (args[iArg].equals("-"))
+            String portArg = args[iArg++];
+	    if (portArg.equals("-"))
 	      port = 0;
 	    else
 	      {
 		try
 		  {
-		    port = Integer.parseInt(args[iArg]);
+		    port = Integer.parseInt(portArg);
 		  }
 		catch (NumberFormatException ex)
 		  {
@@ -533,13 +574,14 @@ public class repl extends Procedure0or1
 	  }
         else if (arg.equals("--http-auto-handler"))
           {
-            iArg += 2;
-	    if (iArg >= maxArg)
+	    if (iArg + 1 >= maxArg)
 	      bad_option (arg);
             /* #ifdef use:com.sun.net.httpserver */
+            String uriRoot = args[iArg++];
+            String resourceRoot = args[iArg++];
             try
               {
-                gnu.kawa.servlet.KawaHttpHandler.addAutoHandler(args[iArg-1], args[iArg]);
+                  gnu.kawa.servlet.KawaHttpHandler.addAutoHandler(uriRoot, resourceRoot);
               }
             catch (java.io.IOException ex)
               {
@@ -557,14 +599,14 @@ public class repl extends Procedure0or1
           }
         else if (arg.equals("--http-start"))
           {
-            iArg += 1;
 	    if (iArg >= maxArg)
 	      bad_option("missing httpd port argument");
             /* #ifdef use:com.sun.net.httpserver */
+            String portArg = args[iArg++];
             int port;
             try
               {
-                port = Integer.parseInt(args[iArg]);
+                port = Integer.parseInt(portArg);
               }
             catch (NumberFormatException ex)
               {
@@ -751,20 +793,45 @@ public class repl extends Procedure0or1
 		      }
 		    else
 		      {
-			System.err.println ("kawa: bad option '"
-					    + arg + "': " + msg);
-			System.exit (-1);
+			error("bad option '" + arg + "': " + msg);
 		      }
 		  }
 	      }
 	  }
-	else if (! ApplicationMainSupport.processSetProperty(arg))
-          break;
-      }
-    // Adjust return value to index in *incoming* array.
-    // This is a hack to compensate for meta-arg handling.
-    return something_done ? -1 : iArg-returnDelta;
-  }
+	else if (ApplicationMainSupport.processSetProperty(arg))
+            ;
+        else if (argsOnly || (something_done && !usedActionArgCount))
+                break;
+            else {
+                String filename = arg;
+                getLanguageFromFilenameExtension(filename);
+                iArg = getArgs(args, iArg);
+                checkInitFile();
+                if (! Shell.runFileOrClass(filename, false, 0))
+                    System.exit(-1);
+                something_done = true;
+                if (! usedActionArgCount)
+                    break;
+            }
+        }
+        if (! something_done) {
+            getLanguage();
+            iArg = getArgs(args, iArg);
+            checkInitFile();
+            if (! CheckConsole.haveConsole())
+                startGuiConsole();
+            else {
+                boolean ok = Shell.run(Language.getDefaultLanguage(),
+                                       Environment.getCurrent());
+                if (! ok)
+                    System.exit(-1);
+            }
+        }
+
+        // Adjust return value to index in *incoming* array.
+        // This is a hack to compensate for meta-arg handling.
+        return something_done ? -1 : iArg-returnDelta;
+    }
 
   public static void compileFiles (String[] args, int iArg, int maxArg)
   {
@@ -879,33 +946,7 @@ public class repl extends Procedure0or1
     try
       {
         ExitCalled.push();
-	int iArg = processArgs(args, 0, args.length);
-	if (iArg < 0)
-	  return;
-	if (iArg < args.length)
-	  {
-	    String filename = args[iArg];
-	    getLanguageFromFilenameExtension(filename);
-	    setArgs (args, iArg+1);
-	    checkInitFile();
-	    if (! Shell.runFileOrClass(filename, false, 0))
-              System.exit(-1);
-	  }
-	else
-	  {
-	    getLanguage();
-	    setArgs (args, iArg);
-	    checkInitFile();
-            if (! CheckConsole.haveConsole())
-              startGuiConsole();
-            else
-              {
-                boolean ok = Shell.run(Language.getDefaultLanguage(),
-                                       Environment.getCurrent());
-                if (! ok)
-                  System.exit(-1);
-              }
-          }
+        new repl().processArgs(args, 0, args.length, false);
       }
     finally
       {

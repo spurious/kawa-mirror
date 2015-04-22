@@ -44,6 +44,9 @@ public class ApplicationMainSupport
   }
 
     public static void setArgs (String[] args, int arg_start) {
+        setArgs(args, arg_start, args.length - arg_start);
+    }
+    public static void setArgs (String[] args, int arg_start, int nargs) {
         if (commandName.get(null) == null) {
             try {
                 String name = System.getProperty("kawa.command.name");
@@ -54,7 +57,6 @@ public class ApplicationMainSupport
             }
         }
 
-        int nargs = args.length - arg_start;
         if (arg_start == 0)
             commandLineArgArray = args;
         else {

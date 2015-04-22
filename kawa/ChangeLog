@@ -1,3 +1,14 @@
+2015-04-22  Per Bothner  <per@bothner.com>
+
+	* repl.java: Re-write to support "--with-arg-count=N" option.
+	(processArgs): Move argument-processing logic to new non-static method.
+	Also handle processing of final named-module or repl default action.
+	(processArgs): Old method creates instance and calls new method.
+	(main): Simplify by calling new processArgs.
+	(getArgs): new method to handle --with-arg-count processing.
+	(<init>): New default constructor.
+	(error): New convenience method.
+
 2015-04-18  Per Bothner  <per@bothner.com>
 
 	Implement "scan" (ellipsis) patterns and context.

@@ -1,3 +1,8 @@
+2015-04-22  Per Bothner  <per@bothner.com>
+
+	* ApplicationMainSupport.java (setArgs): New method takes explicit
+	argument count.
+
 2015-04-18  Per Bothner  <per@bothner.com>
 
 	* Declaration.java (scanNesting): New field.

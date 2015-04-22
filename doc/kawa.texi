@@ -2028,13 +2028,28 @@ or before the first @code{-f} or @code{-c} argument.  (It is not run
 for a @code{-e} command, to allow you to set options to override
 the defaults.)
 
-If there are no command-line arguments following the options,
-then Kawa enters an interactive read-eval-print loop,
-but only if none of the @samp{-c}, @samp{-e}, @samp{-f}, @samp{-s},
-@samp{-C}, or @samp{--} options were specified.
+@subsection Argument processing
 
-If there are command-line arguments after processing options,
-then the first remaining argument names either a
+Kawa processes the command-line arguments in order.
+Options (which either start with @samp{-} or contain a @samp{=})
+may ``use up'' one or more command arguments.
+Some of the options (@samp{-c}, @samp{-e}, @samp{-f}, @samp{-s},
+@samp{-C}, or @samp{--}) are @dfn{action options};
+others set various properties.
+
+When all the command-line arguments have been ``used up''
+and if no action options have been seen,
+then Kawa enters an interactive read-eval-print loop.
+(If an action option has been seen, we're done.)
+
+If the next command-line argument is not an option
+(does not start with @samp{-} nor contains a @samp{=})
+then we're done if we've seen an action option (and the
+last action option wasn't preceded by @code{--with-arg-count}).
+(Presumably any remaining arguments were command-line-arguments
+used by the action option.)
+
+Otherwise, the first remaining argument names either a
 file that is read and evaluated, or a compiled class.
 In the former case, the whole file is read and compiled as a module
 before being loaded (unlike the @code{-f} flag which reads and
@@ -2044,6 +2059,10 @@ then the class is loaded, an instance allocated,
 and its @code{run} method invoked.  If the class was compiled from
 a Kawa Scheme module, then invoking @code{run} has the
 effect of evaluating the module body.
+The @code{command-line-arguments} vector is set to any remaining
+arguments after the file/class name.
+(This can be overridden with the @code{--with-arg-count} option.
+Command-line processing continues if there are any further arguments.)
 
 @subsection General options
 
@@ -2095,6 +2114,36 @@ Start a server listening from connections on the specified @var{portnum}.
 Each connection using the Telnet protocol causes a new read-eval-print-loop
 to started.  This option allows you to connect using any
 Telnet client program to a remote "Kawa server".
+@item --with-arg-count=@var{argc}
+This option is used before an action option (such as @code{-f}).
+The @var{argc} arguments after the action become the
+value of the @code{command-line-arguments} duing the action.
+When the action is finished, command-line-processing resumes
+after skipping the @var{argc} arguments.
+
+For example:
+@example
+$ kawa -f a.scm -f b.scm x y
+@end example
+When evaluating @code{a.scm} the @code{command-line-arguments}
+by default is @emph{all} the remaining arguments: @code{["-f" "b.scm" "x" "y"]}.
+Then @code{b.scm} is evaluated with @code{command-line-arguments}
+set to @code{["x" "y"]}
+
+@example
+$ kawa --with-arg-count=0 -f a.scm -f b.scm x y
+@end example
+In this case @code{a.scm} is evaluated with @code{command-line-arguments}
+set to the empty vector @code{[]}, and then @code{b.scm} is evaluated with @code{command-line-arguments}
+set to @code{["x" "y"]}
+
+@example
+$ kawa --with-arg-count=4 -f a.scm -f b.scm x y
+@end example
+In this case @code{b.scm} is evaluated with @code{command-line-arguments}
+set to @code{["-f" "b.scm" "x" "y"]}. Since command-line processing
+skips the arguments specified by @code{--with-arg-count=4},
+in this case @code{b.scm} is not evaluated.
 @end table
 
 @subsection Options for language selection

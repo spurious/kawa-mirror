@@ -1,0 +1,91 @@
+# Kawa-options: --no-warn-void-used %F
+# The above option is only needed if CompileMisc.optimizeSimpleApply is false.
+
+define (print-sign1 x)
+  x > 0 ?> format #t "~s is positive~%" x
+  x < 0 ?> format #t "~s is negative~%" x
+  format #t "~s is zero~%" x
+
+format #t "Using print-sign1:~%"
+print-sign1 20
+print-sign1 -7
+print-sign1 (7 - 7)
+# Output: Using print-sign1:
+# Output: 20 is positive
+# Output: -7 is negative
+# Output: 0 is zero
+
+define (print-sign2 x)
+  x > 0 ?>
+     display x
+     display " is positive"
+     newline
+  x < 0 ?>
+     display x
+     display " is negative"
+     newline
+  display x
+  display " is zero"
+  newline
+
+format #t "Using print-sign2:~%"
+print-sign2 20
+print-sign2 -7
+print-sign2 (7 - 7)
+# Output: Using print-sign2:
+# Output: 20 is positive
+# Output: -7 is negative
+# Output: 0 is zero
+
+define (print-sign3 x)
+  display x
+  (x > 0 ?> display " is positive" ; x < 0 ?> display " is negative"; display " is zero")
+  newline
+
+format #t "Using print-sign3:~%"
+print-sign3 20
+print-sign3 -7
+print-sign3 (7 - 7)
+# Output: Using print-sign3:
+# Output: 20 is positive
+# Output: -7 is negative
+# Output: 0 is zero
+
+# This doesn't work.  Should it?
+define (print-sign4 x)
+  display x
+  x > 0 ?> display " is positive " ; x < 0 ?> display " is negative "; display " is zero "
+  newline
+
+define (print-comps1 x)
+  (x > 0 ?> format #t "~s is > 0~%" x)
+  (x < 0 ?> format #t "~s is < 0~%" x)
+  (x >= 0 ?> format #t "~s is >= 0~%" x)
+  (x <= 0 ?> format #t "~s is <= 0~%" x)
+
+format #t "Using print-comps1:~%"
+print-comps1 20
+print-comps1 -7
+print-comps1 (7 - 7)
+# Output: Using print-comps1:
+# Output: 20 is > 0
+# Output: 20 is >= 0
+# Output: -7 is < 0
+# Output: -7 is <= 0
+# Output: 0 is >= 0
+# Output: 0 is <= 0
+
+define (print-comps2 x)
+  x > 0 ?> format #t "~s is > 0~%" x
+  x < 0 ?> format #t "~s is < 0~%" x
+  x >= 0 ?> format #t "~s is >= 0~%" x
+  x <= 0 ?> format #t "~s is <= 0~%" x
+
+format #t "Using print-comps2:~%"
+print-comps2 20
+print-comps2 -7
+print-comps2 (7 - 7)
+# Output: Using print-comps2:
+# Output: 20 is > 0
+# Output: -7 is < 0
+# Output: 0 is >= 0

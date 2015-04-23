@@ -85,6 +85,29 @@ public class Q2Translator extends SchemeCompilation
       }
     return larg;
   }
+    public Expression makeBody(Expression[] exps) {
+        int nlen = exps.length;
+        for (int i = 0; i < nlen-1; i++) {
+            Expression exp = exps[i];
+            if (exp instanceof IfExp) {
+                IfExp iexp = (IfExp) exp;
+                if (iexp.getElseClause() == null) {
+                    Expression[] rest = new Expression[nlen-i-1];
+                    System.arraycopy(exps, i+1, rest, 0, rest.length);
+                    iexp = new IfExp(iexp.getTest(), iexp.getThenClause(),
+                                     makeBody(rest));
+                    iexp.setLine(exp);
+                    if (i == 0)
+                        return iexp;
+                    Expression[] init = new Expression[i+1];
+                    System.arraycopy(exps, 0, init, 0, i);
+                    init[i] = iexp;
+                    return super.makeBody(init);
+                }
+            }
+        }
+        return super.makeBody(exps);
+    }
 
   public void scanForm (Object st, ScopeExp defs)
   {

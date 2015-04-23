@@ -48,6 +48,9 @@ public class Operator extends Syntax
                  new StaticFieldLocation("kawa.standard.Scheme", "numEqu"));
   public static final Operator ASSIGN =
     new Operator(":=", 2, 2, RHS_NEEDED|ASSIGN_OP, null);
+  public static final Operator IF_THEN =
+    new Operator("?>", 2, 2, RHS_NEEDED,
+                 new StaticFieldLocation("kawa.lib.prim_syntax", "if"));
 
   public Operator (String name, int lprio, int rprio, int flags,
                    Object function)

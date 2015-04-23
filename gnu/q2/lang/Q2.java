@@ -63,9 +63,10 @@ public class Q2 extends Scheme
     defSntxStFld("<", "gnu.q2.lang.Operator", "LT");
     defSntxStFld(">", "gnu.q2.lang.Operator", "GT");
     defSntxStFld("==", "gnu.q2.lang.Operator", "EQ");
-    defSntxStFld("=<", "gnu.q2.lang.Operator", "LE");
+    defSntxStFld("<=", "gnu.q2.lang.Operator", "LE");
     defSntxStFld(">=", "gnu.q2.lang.Operator", "GE");
     defSntxStFld(":=", "gnu.q2.lang.Operator", "ASSIGN");
+    defSntxStFld("?>", "gnu.q2.lang.Operator", "IF_THEN");
   }
 
   public String getName()

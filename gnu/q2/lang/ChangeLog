@@ -1,3 +1,10 @@
+2015-04-23  Per Bothner  <per@bothner.com>
+
+	* Operator.java (IF_THEN): New operator.
+	* Q2.java (initQ2): Bind "?>" to IF_THEN.
+	* Q2Translator.java (makeBody): New method.  Maps ((if c e0); e1)
+	to (if c e0 e1).
+
 2015-04-13  Per Bothner  <per@bothner.com>
 
 	* Q2Translator.java (partition): Allow an improper list - as may

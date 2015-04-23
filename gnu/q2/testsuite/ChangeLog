@@ -1,3 +1,8 @@
+2015-04-23  Per Bothner  <per@bothner.com>
+
+	* cond1.q2: New tests for if-then ('?>') operator.
+	* Makefile.am: Update accordingly.
+
 2015-04-13  Per Bothner  <per@bothner.com>
 
 	* indent1.q2: Use '!' operator for local definitions.

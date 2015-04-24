@@ -2031,19 +2031,24 @@ public class Compilation implements SourceLocator
           }
         if (wantedState >= COMPILED && getState() < COMPILED)
           {
-            if (immediate)
+            if (mexp.subModulesOnly())
               {
-                ClassLoader parentLoader = ObjectType.getContextClassLoader();
-                loader = new ArrayClassLoader(parentLoader);
+                setState(wantedState < CLASS_WRITTEN ? COMPILED : CLASS_WRITTEN);
               }
-            generateBytecode();
-            setState(messages.seenErrors() ? ERROR_SEEN : COMPILED);
+            else
+              {
+                if (immediate)
+                  {
+                    ClassLoader parentLoader = ObjectType.getContextClassLoader();
+                    loader = new ArrayClassLoader(parentLoader);
+                  }
+                generateBytecode();
+                setState(messages.seenErrors() ? ERROR_SEEN : COMPILED);
+              }
           }
         if (wantedState >= CLASS_WRITTEN && getState() < CLASS_WRITTEN)
           {
-            if (! (mexp.getFlag(ModuleExp.HAS_SUB_MODULE)
-                   && mexp.body == QuoteExp.voidExp && mexp.firstDecl() == null))
-                outputClass(ModuleManager.getInstance().getCompilationDirectory());
+            outputClass(ModuleManager.getInstance().getCompilationDirectory());
             setState(CLASS_WRITTEN);
           }
       }

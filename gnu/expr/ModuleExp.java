@@ -45,6 +45,11 @@ public class ModuleExp extends LambdaExp
   {
   }
 
+    public boolean subModulesOnly() {
+        return getFlag(ModuleExp.HAS_SUB_MODULE)
+            && body == QuoteExp.voidExp && firstDecl() == null;
+    }
+
     public static ModuleExp valueOf(ClassType type) {
         return ModuleInfo.find(type).getModuleExp();
     }
@@ -65,10 +70,12 @@ public class ModuleExp extends LambdaExp
     SourceMessages messages = comp.getMessages();
     try
       {
-
+        Class clas = null;
+          if ( mexp.subModulesOnly()) {
+              clas = Object.class;
+          } else {
         minfo.loadByStages(Compilation.COMPILED);
-
-	if (messages.seenErrors())
+	if (messages.seenErrors()) // || mexp.subModulesOnly())
 	  return null;
 
 	ArrayClassLoader loader = comp.loader;
@@ -93,9 +100,9 @@ public class ModuleExp extends LambdaExp
 
 	for (int iClass = 0;  iClass < comp.numClasses;  iClass++)
 	  {
-	    ClassType clas = comp.classes[iClass];
-	    String className = clas.getName ();
-	    byte[] classBytes = clas.writeToArray ();
+	    ClassType clasi = comp.classes[iClass];
+	    String className = clasi.getName ();
+	    byte[] classBytes = clasi.writeToArray ();
 	    loader.addClass(className, classBytes);
 
 	    if (zout != null)
@@ -122,9 +129,8 @@ public class ModuleExp extends LambdaExp
 	  ClassTypeWriter.print(comp.classes[iClass], System.out, 0);
 	*/
 
-        Class clas = null;
         // Use the "session" ClassLoader, for remembering classes
-        // created in one command (Compilation) through further command,
+        // created in one command (Compilation) through further commands,
         // while still allowing the classes to be replaced and collected.
         ArrayClassLoader context = loader;
         while (context.getParent() instanceof ArrayClassLoader)
@@ -147,6 +153,7 @@ public class ModuleExp extends LambdaExp
 
         minfo.setModuleClass(clas);
         comp.cleanupAfterCompilation();
+          }
         int ndeps = minfo.numDependencies;
 
         for (int idep = 0;  idep < ndeps;  idep++)
@@ -155,7 +162,8 @@ public class ModuleExp extends LambdaExp
             Class dclass = dep.getModuleClassRaw();
             if (dclass == null)
               dclass = evalToClass(dep.getCompilation(), null);
-            comp.loader.addClass(dclass);
+            if (comp.loader != null)
+                comp.loader.addClass(dclass);
           }
 
         return clas;

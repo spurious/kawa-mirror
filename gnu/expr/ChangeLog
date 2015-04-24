@@ -1,3 +1,9 @@
+2015-04-24  Per Bothner  <per@bothner.com>
+
+	* ModuleExp.java (subModulesOnly): New helper method.
+	(evalToClass): Skip compilation and more if subModulesOnly().
+	* Compilation.java (process): Skip code-generation if subModulesOnly().
+
 2015-04-22  Per Bothner  <per@bothner.com>
 
 	* ApplicationMainSupport.java (setArgs): New method takes explicit

@@ -1,3 +1,9 @@
+2015-04-24  Per Bothner  <per@bothner.com>
+
+	* lang/Translator.java (rewrite_pair): Remove support for
+	'equivalent-syntax' - it was only used for 'raise' - and ran into
+	hygiene there.  It is now easier to use a validate-apply property.
+
 2015-04-22  Per Bothner  <per@bothner.com>
 
 	* repl.java: Re-write to support "--with-arg-count=N" option.

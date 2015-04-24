@@ -12,7 +12,7 @@
  cons current-error-port current-input-port current-output-port
  define define-record-type define-syntax define-values denominator do
  dynamic-wind
- eof-object? eq? equal? eqv? error
+ eof-object eof-object? eq? equal? eqv? error
  error-object-irritants error-object-message error-object? even?
  exact exact-integer-sqrt exact-integer? exact? expt
  features file-error? floor floor-quotient floor-remainder floor/

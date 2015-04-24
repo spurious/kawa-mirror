@@ -1,3 +1,7 @@
+2015-04-23  Per Bothner  <per@bothner.com>
+
+	* scheme/base-exports: Add missing eof-object.
+
 2015-04-14  Per Bothner  <per@bothner.com>
 
 	* numbers.scm: Use new '(import (class ...))' syntax.

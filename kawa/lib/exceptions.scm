@@ -3,6 +3,7 @@
 (require <kawa.lib.syntax>)
 (require <kawa.lib.prim_syntax>)
 (require kawa.lib.prim_imports)
+(import (only (kawa reflect) primitive-throw invoke-static))
 ;(import (rename (only (gnu kawa lispexpr LispLanguage) getNamedPartLocation)
 ;                (getNamedPartLocation $lookup$)))
 
@@ -23,13 +24,8 @@
        (ex java.lang.Throwable
            (primitive-throw (link:handle ex)))))))
 
-(define (%%raise form)
-  (syntax-case form ()
-     ((_ obj)
-      #'(primitive-throw (invoke-static kawa.lib.ExceptionWithValue 'wrap obj)))))
-
 (define (raise obj)
-  equivalent-syntax: %%raise
+  validate-apply: "kawa.lib.compile_misc:raiseValidateApply"
   ;; Would be nice to just write: (raise obj) and have that expand %%raise
   (primitive-throw (invoke-static kawa.lib.ExceptionWithValue 'wrap obj)))
 

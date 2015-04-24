@@ -1,6 +1,7 @@
 (require <kawa.lib.characters>)
 (require <kawa.lib.strings>)
 (require <kawa.lib.kawa.expressions>)
+(require <kawa.lib.ExceptionClasses>)
 (define-alias MultValuesType gnu.kawa.reflect.MultValuesType)
 (define-alias OccurrenceType gnu.kawa.reflect.OccurrenceType)
 
@@ -136,6 +137,11 @@
          (set! (args i) e)))
      (exp:setType (MultValuesType:create rtypes))
      exp)))
+
+(define-validate raiseValidateApply (exp required proc)
+  ((exp:isSimple 1 1)
+   (apply-exp primitive-throw
+              (apply-exp invoke-static ExceptionWithValue 'wrap (exp:getArg 0)))))
 
 (define (valuesCompile exp::gnu.expr.ApplyExp comp::gnu.expr.Compilation
                        target::gnu.expr.Target proc::gnu.mapping.Procedure)

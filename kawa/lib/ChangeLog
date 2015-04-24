@@ -1,5 +1,11 @@
 2015-04-23  Per Bothner  <per@bothner.com>
 
+	* compile_misc.scm (raiseValidateApply): New validate function.
+	* exceptions.scm (raise): Set validate-apply property to above
+	function.  Also remove equivalent-syntax property as it causes
+	hygiene problems (missing definitions) in a r7rs library context.
+	(%%raise): Remove procedure.
+
 	* scheme/base-exports: Add missing eof-object.
 
 2015-04-14  Per Bothner  <per@bothner.com>

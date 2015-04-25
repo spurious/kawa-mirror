@@ -71,11 +71,13 @@
 (define (port? x)
   (or (input-port? x) (output-port? x)))
 
-(define (input-port-open? (port ::input-port))
-  (port:isOpen))
+(define (input-port-open? port)
+  (if (gnu.kawa.io.OutPort? port) #f
+      ((->gnu.kawa.io.InPort port):isOpen)))
 
-(define (output-port-open? (port ::output-port))
-  (port:isOpen))
+(define (output-port-open? port)
+  (if (gnu.kawa.io.InPort? port) #f
+      ((->gnu.kawa.io.OutPort port):isOpen)))
 
 (define-alias-parameter current-input-port <input-port>
   (static-field <input-port> 'inLocation))

@@ -1,3 +1,9 @@
+2015-04-25  Per Bothner  <per@bothner.com>
+
+	* ports.scm (input-port-open?): R7RS implies this should also
+	work for output ports - and return #f.
+	(output-port-open?): Likewise for input ports.
+
 2015-04-23  Per Bothner  <per@bothner.com>
 
 	* compile_misc.scm (raiseValidateApply): New validate function.

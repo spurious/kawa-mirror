@@ -1,3 +1,7 @@
+2015-04-25  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Options): Document that -D can now be handled by Kawa.
+
 2015-04-22  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Options): Document new --with-arg-count option.

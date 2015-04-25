@@ -2277,6 +2277,12 @@ If you want a Kawa application compiled with @code{--main}
 to process these these assignments, call the
 @code{process-command-line-assignments} utility function.
 
+@table @code
+@item -D@var{variable-name}=@var{variable-value}
+Sets the JVM property @var{variable-name} to @var{variable-value},
+using the @code{setProperty} method of @code{java.lang.System}.
+@end table
+
 @subsection Options for controlling output formatting
 
 @table @code
@@ -2425,13 +2431,15 @@ using @code{-J} or @code{-D} options.
 These must be given @emph{before} any other arguments.
 For example:
 @example
-kawa -J-Xms48m -Dkawa.command.name=foo foo.scm --
+kawa -J-Xms48m -Dkawa.command.name=foo foo.scm
 @end example
 is equivalent to (ignoring classpath issues):
 @example
-java -Xms48m -Dkawa.command.name=foo kawa.repl foo.scm --
+java -Xms48m -Dkawa.command.name=foo kawa.repl foo.scm
 @end example
-
+You can also pass a @code{-D} option (but not a @code{-J} option) after the
+class name, in which case it is processed by the Kawa command-line processor
+rather than the @code{java} launcher.  The effect is normally the same.
 
 @table @code
 @item -J@var{jvm-option}

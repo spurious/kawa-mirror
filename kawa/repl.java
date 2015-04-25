@@ -592,6 +592,20 @@ public class repl extends Procedure0or1 {
                 System.out.println();
                 System.out.println("Copyright (C) 2015 Per Bothner");
                 something_done = true;
+            } else if (arg.startsWith("-D")) {
+                int eq = arg.indexOf('=');
+                if (eq == 2)
+                    error("bad option '"+arg+"' - empty key before '='");
+                String key, val;
+                if (eq < 0) {
+                    key = arg.substring(2);
+                    val = "";
+                }
+                else {
+                    key = arg.substring(2, eq);
+                    val = arg.substring(eq+1);
+                }
+                System.setProperty(key, val);
             } else if (arg.length () > 0 && arg.charAt(0) == '-') {
                 // Check if arg is a known language name.
                 boolean doubleDash = arg.length() > 2 && arg.charAt(1) == '-';

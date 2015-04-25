@@ -1,3 +1,8 @@
+2015-04-25  Per Bothner  <per@bothner.com>
+
+	* repl.java (processArgs): Handle -D options by calling
+	System.setProperty.
+
 2015-04-24  Per Bothner  <per@bothner.com>
 
 	* lang/Translator.java (rewrite_pair): Remove support for

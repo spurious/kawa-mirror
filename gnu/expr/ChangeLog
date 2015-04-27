@@ -1,3 +1,8 @@
+2015-04-27  Per Bothner  <per@bothner.com>
+
+	* Declaration.java (checkNameDecl): Generalize check for old value,
+	specifically so it also handles SET_RHS_KIND.
+
 2015-04-24  Per Bothner  <per@bothner.com>
 
 	* ModuleExp.java (subModulesOnly): New helper method.

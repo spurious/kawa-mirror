@@ -1,4 +1,4 @@
-(test-init "Objects" 143)
+(test-init "Objects" 144)
 
 ;; Force procedure to be applied without being inlined:
 (define-syntax force-eval
@@ -230,6 +230,8 @@
 (define IsClass2-value (make <IdClass2>))
 (require <classes1>)
 (require <classes2>)
+
+(test "thunk re-initialized" thunk "thunk re-initialized")
 
 (test 3 slot-ref IsClass2-value 'var1)
 (test 4 slot-ref IsClass2-value 'var2)

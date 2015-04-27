@@ -63,3 +63,10 @@
 (define my-id-instance-2 :: my-id-class-2
   (let ((ii :: my-id-class-2 (my-id-class-2)))
     ii))
+
+;; Based on bug-report from Andrea Bernardini 2015-04-27:
+(define thunk (lambda (x) "thunk Initialized"))
+(define thunk-init
+  (lambda (f)
+    (set! thunk f)))
+(thunk-init (lambda (x) x))

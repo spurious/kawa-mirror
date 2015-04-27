@@ -1594,19 +1594,16 @@ public class Declaration
         return true;
     }
 
-  private void checkNameDecl (Expression value)
-  {
-    if (nvalues == 1 && values[0].kind == ValueSource.GENERAL_KIND)
-      {
-        Expression old = values[0].base;
-        if (old == value)
-          return;
-        if (old instanceof LambdaExp)
-          ((LambdaExp) old).nameDecl = null;
-      }
-    else if (value instanceof LambdaExp)
-      ((LambdaExp) value).nameDecl = nvalues == 0 ? this : null;
-  }
+    private void checkNameDecl(Expression value) {
+        if (nvalues == 1) {
+            Expression old = values[0].getValue(this);
+            if (old == value)
+                return;
+            if (old instanceof LambdaExp)
+                ((LambdaExp) old).nameDecl = null;
+        } else if (value instanceof LambdaExp)
+            ((LambdaExp) value).nameDecl = nvalues == 0 ? this : null;
+    }
 
   public static class ValueSource
   {

@@ -1,3 +1,7 @@
+2015-04-29  Per Bothner  <per@bothner.com>
+
+	* cgi-servlet.c: Include unistd.h to avoid a warning about execvp.
+
 2015-02-17  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (install-binPROGRAMS): Remove use of LIBTOOL_INSTALL.

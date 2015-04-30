@@ -1,3 +1,9 @@
+2015-04-29  Per Bothner  <per@bothner.com>
+
+	* Declaration.java (checkNameDecl): Minor tweak to prevous change, to
+	handle case where nameDecl was manually preset (as in define.java),
+	then bound to a different value before being bound to the lambda.
+
 2015-04-27  Per Bothner  <per@bothner.com>
 
 	* Declaration.java (checkNameDecl): Generalize check for old value,

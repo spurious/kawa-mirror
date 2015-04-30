@@ -1601,7 +1601,8 @@ public class Declaration
                 return;
             if (old instanceof LambdaExp)
                 ((LambdaExp) old).nameDecl = null;
-        } else if (value instanceof LambdaExp)
+        }
+        if (value instanceof LambdaExp)
             ((LambdaExp) value).nameDecl = nvalues == 0 ? this : null;
     }
 

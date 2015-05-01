@@ -97,9 +97,8 @@
 (define (hashtable-mutable? (ht :: hashtable)) :: boolean
   ht:mutable)
 
-;; FIXME is supposed to always terminate, but that is not guaranteed.
 (define (equal-hash key)
-  (key:hashCode))
+  (gnu.kawa.util.HashUtils:boundedHash key))
 
 (define (string-hash (s :: <string>))
   (s:hashCode))

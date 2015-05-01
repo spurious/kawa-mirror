@@ -1,3 +1,7 @@
+2015-05-01  Per Bothner  <per@bothner.com>
+
+	* rnrs/hashtables.scm (equal-hash): Use HashUtils#boundedHash.
+
 2015-04-25  Per Bothner  <per@bothner.com>
 
 	* ports.scm (input-port-open?): R7RS implies this should also

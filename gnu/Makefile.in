@@ -487,12 +487,14 @@ GNU_KAWA_ECHO2_JSOURCES = \
 GNU_KAWA_UTIL_JSOURCES = \
   kawa/util/AbstractHashTable.java \
   kawa/util/AbstractWeakHashTable.java \
+  kawa/util/BoundedHashable.java \
   kawa/util/ExitCalled.java \
   kawa/util/FixupHtmlToc.java \
   kawa/util/GeneralHashTable.java \
   kawa/util/IdentityHashTable.java \
   kawa/util/IntHashTable.java \
   kawa/util/HashNode.java \
+  kawa/util/HashUtils.java \
   kawa/util/RangeTable.java \
   kawa/util/RunTestScript.java \
   kawa/util/WeakHashNode.java \

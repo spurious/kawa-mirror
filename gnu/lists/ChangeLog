@@ -1,3 +1,10 @@
+2015-05-01  Per Bothner  <per@bothner.com>
+
+	* AbstractSequence.java (boundedHash): New method.
+	* LList.java (boundedHash): New method.
+	* Pair.java (hashCode): Moved to ...
+	* LList.java (hashCode): ... here.
+
 2015-04-22  Per Bothner  <per@bothner.com>
 
 	* SimpleVector.java (setSize): Grow buffer by a factor of 1.5, not 2.

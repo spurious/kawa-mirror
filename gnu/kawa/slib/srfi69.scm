@@ -58,7 +58,7 @@
     (if (eq? bound #!null) h (modulo h bound))))
 
 (define (hash obj #!optional (bound :: <integer> #!null))
-  (let ((h :: <int> (if (eq? obj #!null) 0 (*:hashCode obj))))
+  (let ((h (gnu.kawa.util.HashUtils:boundedHash obj)))
     (if (eq? bound #!null) h (modulo h bound))))
 
 (define (hash-by-identity obj #!optional (bound :: <integer> #!null))

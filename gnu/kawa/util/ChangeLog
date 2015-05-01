@@ -1,3 +1,8 @@
+2015-05-01  Per Bothner  <per@bothner.com>
+
+	* BoundedHashable.java: New interface.
+	* HashUtils.java: New class with convenience methods.
+
 2015-03-06  Per Bothner  <per@bothner.com>
 
 	* AbstractHashTable.java (getOrDefault):  New method.

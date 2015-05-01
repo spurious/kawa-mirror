@@ -4,6 +4,8 @@
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.lists;
+
+import gnu.kawa.util.HashUtils;
 import java.io.*;
 
 /**
@@ -213,6 +215,44 @@ public class LList extends ExtSequence<Object>
     for ( ; arg instanceof Pair; arg = ((Pair)arg).cdr)
       count++;
     return count;
+  }
+
+    public int boundedHash(int seed, int limit) {
+        // Compatible with the AbstractSequence.boundedHash for true lists.
+        Object list = this;
+        int sublimit = limit >> 1;
+        int count = 0;
+        while (list instanceof Pair) {
+            if (++count > limit)
+                break;
+            Pair pair = (Pair) list;
+            int h = HashUtils.boundedHash(pair.getCar(), 0, sublimit);
+            seed = HashUtils.murmur3step(seed, h);
+            list = pair.getCdr();
+        }
+        if (--limit >= 0 && list != LList.Empty && list != null) {
+            int h = HashUtils.boundedHash(list, 0, sublimit);
+            seed = HashUtils.murmur3step(seed, h);
+            count++;
+        }
+        return HashUtils.murmur3finish(seed, count);
+    }
+
+  public int hashCode()
+  {
+    // Compatible with the AbstractSequence hashCode for true lists.
+    int hash = 1;
+    Object list = this;
+    while (list instanceof Pair)
+      {
+	Pair pair = (Pair) list;
+	Object obj = pair.getCar();
+	hash = 31*hash + (obj==null ? 0 : obj.hashCode());
+	list = pair.getCdr();
+      }
+    if (list != LList.Empty && list != null)
+      hash = hash ^ list.hashCode();
+    return hash;
   }
 
   /* #ifdef JAVA2 */

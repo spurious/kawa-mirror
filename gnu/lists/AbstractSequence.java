@@ -2,6 +2,8 @@
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.lists;
+
+import gnu.kawa.util.HashUtils;
 import java.util.*;
 
 /**
@@ -713,6 +715,18 @@ public abstract class AbstractSequence<E>
       }
     return hash;
   }
+
+    public int boundedHash(int seed, int limit) {
+        int count = 0;
+        int sublimit = limit >> 1;
+        for (int i = startPos(); (i = nextPos(i)) != 0;  )  {
+            if (++count > limit)
+                break;
+            int h = HashUtils.boundedHash(getPosPrevious(i), 0, sublimit);
+            seed = HashUtils.murmur3step(seed, h);
+        }
+        return HashUtils.murmur3finish(seed, count);
+   }
 
   public boolean equals(Object o)
   {

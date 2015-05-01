@@ -2,6 +2,7 @@
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.lists;
+import gnu.kawa.util.BoundedHashable;
 
 /**
  * A Sequence is an ordered list of elements.
@@ -17,11 +18,7 @@ package gnu.lists;
  */
 
 public interface Sequence<E>
-extends
-    /* #ifdef JAVA2 */
-    java.util.List<E>,
-    /* #endif */
-    Consumable
+    extends java.util.List<E>, Consumable, BoundedHashable
 {
   /** Special magic end-of-file marker. */
   public static final Object eofValue = EofClass.eofValue;

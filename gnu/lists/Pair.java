@@ -2,6 +2,7 @@
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.lists;
+
 import java.io.*;
 
 /** A "pair" object, as used in Lisp-like languages.
@@ -150,23 +151,6 @@ public class Pair extends LList implements Externalizable
     ps.print(")");
   }
   */
-
-  public int hashCode()
-  {
-    // Compatible with the AbstractSequence hashCode for true lists.
-    int hash = 1;
-    Object list = this;
-    while (list instanceof Pair)
-      {
-	Pair pair = (Pair) list;
-	Object obj = pair.getCar();
-	hash = 31*hash + (obj==null ? 0 : obj.hashCode());
-	list = pair.getCdr();
-      }
-    if (list != LList.Empty && list != null)
-      hash = hash ^ list.hashCode();
-    return hash;
-  }
 
   static public boolean equals (Pair pair1, Pair pair2)
   {

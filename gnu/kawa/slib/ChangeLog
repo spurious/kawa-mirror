@@ -1,3 +1,7 @@
+2015-05-01  Per Bothner  <per@bothner.com>
+
+	* srfi69.scm (hash): Use HashUtils#boundedHash.
+
 2015-03-29  Per Bothner  <per@bothner.com>
 
 	* testing.scm: Some cleanup so we can use r7rs-style import

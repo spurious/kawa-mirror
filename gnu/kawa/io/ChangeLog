@@ -1,3 +1,8 @@
+2015-05-02  Per Bothner  <per@bothner.com>
+
+	* TtyInPort.java (lineStart): Only call freshLine if we have
+	a prompter.
+
 2015-01-11  Per Bothner  <per@bothner.com>
 
 	* CheckConsole.java: New helper class to support --console flag.

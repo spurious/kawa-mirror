@@ -62,10 +62,10 @@ public class TtyInPort extends InPort
   {
     if (! revisited)
       {
-        if (tie != null)
-          tie.freshLine();
         if (prompter != null)
           {
+            if (tie != null)
+                tie.freshLine();
             try
               {
                 Object prompt = prompter.apply1(this);
@@ -83,6 +83,10 @@ public class TtyInPort extends InPort
               { throw new java.io.IOException("Error when evaluating prompt:"
                                               + ex); }
           }
+        else if (tie != null) {
+            tie.flush();
+            tie.clearBuffer();
+        }
       }
   }
 

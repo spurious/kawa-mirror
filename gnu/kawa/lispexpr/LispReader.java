@@ -734,7 +734,7 @@ public class LispReader extends Lexer
             return "no digits";
         if (pos < end) {
             Object jmag = parseNumber(buffer, pos, end-pos, exactness,
-                                      10, flags);
+                                      radix, flags);
             if (jmag instanceof String)
                 return jmag;
             if (! (jmag instanceof Quaternion))
@@ -765,7 +765,7 @@ public class LispReader extends Lexer
             return "no digits";
         if (pos < end) {
             Object kmag = parseNumber(buffer, pos, end-pos, exactness,
-                                      10, flags);
+                                      radix, flags);
             if (kmag instanceof String)
                 return kmag;
             if (! (kmag instanceof Quaternion))
@@ -950,18 +950,48 @@ public class LispReader extends Lexer
 	  digits_start = decimal_point;
 	if (numerator != null)
 	  return "floating-point number after fraction symbol '/'";
-	String str = new String(buffer, digits_start, pos - digits_start);
-        if (exp_seen >= 0)
-          {
-            exp_char = Character.toLowerCase(buffer[exp_seen]);
-            if (exp_char != 'e')
-              {
-                int prefix = exp_seen - digits_start;
-                str = str.substring(0, prefix)+'e'+str.substring(prefix+1);
-              }
-          }
-	double d = Convert.parseDouble(str);
-	number = new DFloNum(negative ? - d : d);
+        if (exactness == 'e' || exactness == 'E') {
+            int exp = 0;
+            IntNum inumber;
+            if (decimal_point < 0) {
+                inumber = valueOf(buffer, digits_start,
+                                  exp_seen - digits_start,
+                                  radix, negative, lvalue);
+            }
+            else {
+                StringBuilder sbuf = new StringBuilder();
+                if (negative)
+                    sbuf.append('-');
+                sbuf.append(buffer, digits_start, decimal_point-digits_start);
+                decimal_point++;
+                int fracdigits = (exp_seen >= 0 ? exp_seen : pos)
+                    - decimal_point;
+                sbuf.append(buffer, decimal_point, fracdigits);
+                inumber = IntNum.valueOf(sbuf.toString());
+                exp -= fracdigits;
+            }
+            if (exp_seen >= 0) {
+                exp += Integer.parseInt(new String(buffer, exp_seen+1,
+                                                   pos - (exp_seen+1)));
+            }
+            if (exp > 0)
+                number = IntNum.times(inumber, IntNum.power(IntNum.ten(), exp));
+            else if (exp < 0)
+                number = RatNum.make(inumber, IntNum.power(IntNum.ten(), -exp));
+            else
+                number = inumber;
+        } else {
+            String str = new String(buffer, digits_start, pos - digits_start);
+            if (exp_seen >= 0) {
+                exp_char = Character.toLowerCase(buffer[exp_seen]);
+                if (exp_char != 'e') {
+                    int prefix = exp_seen - digits_start;
+                    str = str.substring(0, prefix)+'e'+str.substring(prefix+1);
+                }
+            }
+            double d = Convert.parseDouble(str);
+            number = new DFloNum(negative ? - d : d);
+        }
       }
     else
       {
@@ -1006,7 +1036,7 @@ public class LispReader extends Lexer
 	if (ch == '@')
 	  { /* polar notation */
 	    Object angle = parseNumber(buffer, pos, end - pos,
-				       exactness, 10, flags|SCM_ANGLE);
+				       exactness, radix, flags|SCM_ANGLE);
 	    if (angle instanceof String)
 	      return angle;
 	    if (! (angle instanceof RealNum) && ! (angle instanceof RealNum[]))
@@ -1031,7 +1061,7 @@ public class LispReader extends Lexer
         if (ch == '%') {
             /* extended polar notation */
             Object colatitude = parseNumber(buffer, pos, end - pos,
-                                            exactness, 10,
+                                            exactness, radix,
                                             flags|SCM_COLATITUDE);
             if (colatitude instanceof String)
                 return colatitude;
@@ -1069,7 +1099,7 @@ public class LispReader extends Lexer
         if (ch == '&') {
             /* extended polar notation */
             Object longitude = parseNumber(buffer, pos, end - pos,
-                                           exactness, 10, flags);
+                                           exactness, radix, flags);
             if (longitude instanceof String)
                 return longitude;
             if (! (longitude instanceof RealNum))
@@ -1094,7 +1124,7 @@ public class LispReader extends Lexer
 	  {
 	    pos--;
 	    Object imag = parseNumber(buffer, pos, end - pos,
-				      exactness, 10, flags);
+				      exactness, radix, flags);
 	    if (imag instanceof String)
 	      return imag;
 	    if (! (imag instanceof Quaternion))
@@ -1125,7 +1155,7 @@ public class LispReader extends Lexer
             if (prev == 'i' || prev == 'I') {
                 if (pos < end) {
                     Object jmag = parseNumber(buffer, pos, end-pos,
-                                              exactness, 10, flags);
+                                              exactness, radix, flags);
                     if (jmag instanceof String)
                         return jmag;
                     if (! (jmag instanceof Quaternion))
@@ -1143,7 +1173,7 @@ public class LispReader extends Lexer
             if (prev == 'j' || prev == 'J') {
                 if (pos < end) {
                     Object kmag = parseNumber(buffer, pos, end-pos,
-                                              exactness, 10, flags);
+                                              exactness, radix, flags);
                     if (kmag instanceof String)
                         return kmag;
                     if (! (kmag instanceof Quaternion))

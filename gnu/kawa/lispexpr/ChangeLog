@@ -1,3 +1,9 @@
+2015-05-02  Per Bothner  <per@bothner.com>
+
+	* LispReader.java (parseNumber): If specified as exact, do exact
+	calculation even if decimal point or exponent seen.
+	Honor radix request even for complex numbers.
+
 2015-04-18  Per Bothner  <per@bothner.com>
 
 	* LispLanguage.java (dots3_sym): New constant.

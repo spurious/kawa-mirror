@@ -29,7 +29,7 @@ check: check2-no-full-tailcalls check1 check2-full-tailcalls check-no-inline \
   check-interpreted-cycle check-interpreted-cycleb check-interpreted-cyclebr \
   $(SERVLET_TESTS) $(SAX2_TESTS) \
   check-inlining check-jmc check-use-slots check-load-require check-sva31180 \
-  check-bridge check-life-grid
+  check-bridge check-life-grid check-larceny-tests
 
 check-anf:
 	$(MAKE) check1 check2 OPTIONS=--enable-anf
@@ -624,6 +624,17 @@ check-life-grid:
 	@if $(DIFF) $(srcdir)/life-grid.expected life-grid.log; \
 	  then echo '# check-life-grid passes'; \
 	  else echo FAIL check-life-grid passes; fi
+
+check-larceny-tests: \
+  check-scheme-case-lambda
+
+LARCENY_IMPORT_PATH = \
+  -Dkawa.import.path="<tests scheme>$(abs_srcdir)/larceny-tests/*.sld"
+LARCENY_TEST_OPTIONS = $(LARCENY_IMPORT_PATH) \
+  $(OPTIONS) --r7rs --no-warn-unused 
+
+check-scheme-case-lambda:
+	$(KAWA) $(LARCENY_TEST_OPTIONS) $(srcdir)/larceny-tests/case-lambda.sps
 
 CLEANFILES = tmp* *.log testing.zip revcomp-input.txt knucleotide-input.txt regexdna-input.txt *.class HelloCgiK HelloCgiS
 SCRIPTS_TO_RUN = case-warnings.scm uninit1.scm \

@@ -137,7 +137,15 @@ public class ModuleMethod extends MethodProc
 
   public int matchN (Object[] args, CallContext ctx)
   {
-    ctx.count = args.length;
+    int num = numArgs();
+    int min = minArgs(num);
+    int nargs = args.length;
+    if (nargs < min)
+      return MethodProc.NO_MATCH_TOO_FEW_ARGS|min;
+    int max = maxArgs(num);
+    if (max > 0 && nargs > max)
+      return MethodProc.NO_MATCH_TOO_MANY_ARGS|max;
+    ctx.count = nargs;
     ctx.where = 0;
     return module.matchN(this, args, ctx);
   }

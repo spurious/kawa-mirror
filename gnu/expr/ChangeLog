@@ -1,3 +1,7 @@
+2015-05-03  Per Bothner  <per@bothner.com>
+
+	* ModuleMethod.java (matchN): Check for valid argument-list length.
+
 2015-04-29  Per Bothner  <per@bothner.com>
 
 	* Declaration.java (checkNameDecl): Minor tweak to prevous change, to

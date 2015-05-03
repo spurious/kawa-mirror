@@ -53,6 +53,7 @@ public class TtyInPort extends InPort
 
   public void emitPrompt (String prompt) throws java.io.IOException
   {
+    tie.freshLine();
     tie.print(prompt);
     tie.flush();
     tie.clearBuffer();
@@ -62,10 +63,12 @@ public class TtyInPort extends InPort
   {
     if (! revisited)
       {
+        if (tie != null) {
+            tie.flush();
+            tie.clearBuffer();
+        }
         if (prompter != null)
           {
-            if (tie != null)
-                tie.freshLine();
             try
               {
                 Object prompt = prompter.apply1(this);
@@ -83,10 +86,6 @@ public class TtyInPort extends InPort
               { throw new java.io.IOException("Error when evaluating prompt:"
                                               + ex); }
           }
-        else if (tie != null) {
-            tie.flush();
-            tie.clearBuffer();
-        }
       }
   }
 

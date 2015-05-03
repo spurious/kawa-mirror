@@ -1,3 +1,8 @@
+2015-05-03  Per Bothner  <per@bothner.com>
+
+	* TtyInPort.java: Minor tweak to previous change: Don't call
+	freshLine if resuluting promot string is null or empty.
+
 2015-05-02  Per Bothner  <per@bothner.com>
 
 	* TtyInPort.java (lineStart): Only call freshLine if we have

@@ -1,5 +1,11 @@
 2015-05-05  Per Bothner  <per@bothner.com>
 
+	* PrettyWriter.java (enqueue): If we're sharing, we don't wrap around,
+	so may need to re-allocate even there is unused space at the start.
+	(enoughSpace): Use 1.5 rather than 2.0 as grow factor.
+	(enqueue): Simplify re-allocation to just use enoughSpace value.
+	(itemKindString): Update debug helper.
+
 	* TtyInPort.java (lineStart): Try again ...
 
 2015-05-03  Per Bothner  <per@bothner.com>

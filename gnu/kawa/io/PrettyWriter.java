@@ -906,9 +906,9 @@ public class PrettyWriter extends java.io.Writer
    */
   private static int enoughSpace(int current, int want)
   {
-    int doubled = 2 * current;
+    int scaled = current + (current>>1); // Multiply by 1.5
     int enough = current + ((5 * want) >> 2);
-    return doubled > enough ? doubled : enough;
+    return scaled > enough ? scaled : enough;
   }
 
   public void setIndentation (int column)
@@ -963,43 +963,29 @@ public class PrettyWriter extends java.io.Writer
   public int enqueue (int kind, int size)
   {
     int oldLength = queueInts.length;
-    int endAvail = oldLength - queueTail - queueSize;
+    int endAvail = oldLength - queueTail - queueSize; // negative if wrapped
     // If there are 5 int's left at the end of the queue, and we need to
-    // enqueue an item of size 7, the we don't "bend" the item around the
+    // enqueue an item of size 7, then we don't "bend" the item around the
     // queue, we just place a dummy formatting token that consumes the rest
     // of this end, and start again from the beginning.
     if (endAvail > 0 && size > endAvail && !sharing)
       enqueue(QITEM_NOP_TYPE, endAvail);
-    if (queueSize + size > oldLength)
+    if (endAvail < size && (sharing || oldLength - queueSize < size))
       {
-        int newLength = oldLength;
         int enough = enoughSpace(oldLength, size);
+        int newLength = enough;
 
-        int[] newInts;
-        String[] newStrings;
+        int[] newInts = new int[newLength];
+        String[] newStrings = new String[newLength];
 
         if (sharing) // then do a linear array expansion
           {
-            newLength = oldLength;
-            do
-              {
-                newLength <<= 1;
-              } while (newLength < enough);
-
             //log("sharing expand: oldLength="+oldLength+" newLength="+newLength+" queueTail="+queueTail);
-            
-            newInts = new int[newLength];
-            newStrings = new String[newLength];
-
-            System.arraycopy(queueInts, 0, newInts, 0, queueSize);
+            System.arraycopy(queueInts, 0, newInts, 0, queueInts.length);
             System.arraycopy(queueStrings, 0, newStrings, 0, queueStrings.length);
           }
         else // shift the old items to the top, and insert from the front of a doubled array
           {            
-            newLength = enough;
-            newInts = new int[newLength];
-            newStrings = new String[newLength];
-            
             //log("non-sharing expand: oldLength="+oldLength+" newLength="+newLength+" queueTail="+queueTail);
             
             int queueHead = queueTail + queueSize - oldLength;
@@ -2174,6 +2160,10 @@ public class PrettyWriter extends java.io.Writer
       case QITEM_BLOCK_START_TYPE:  return "block-start";
       case QITEM_BLOCK_END_TYPE:  return "block-end";
       case QITEM_TAB_TYPE:  return "tab";
+      case QITEM_POSNMARKER_TYPE: return "posn-marker";
+      case QITEM_BACKREF_TYPE: return "backref";
+      case QITEM_PAIR_END_TYPE: return "pair-end";
+      case QITEM_EOE_TYPE: return "eoe";
       default: return "("+kind+" - unknown)";
       }
   }

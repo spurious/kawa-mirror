@@ -1,3 +1,12 @@
+2015-05-05  Per Bothner  <per@bothner.com>
+
+	* NumberPredicate.java: Change ODD/EVEN predicates to allow
+	non-exact integer arguments, as specified by R7RS.
+	(isOdd, isEven, isOddEven): New static methods.
+	(apply1): Use isOddEven.
+	* CompileMisc.java (compileNumPredicate): Call isOdd/isEven methods
+	if argument types unknown.
+
 2015-04-25  Per Bothner  <per@bothner.com>
 
 	* IsEqual.java: Various changes so we can handle cyclic data structures.

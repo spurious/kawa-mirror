@@ -508,10 +508,10 @@ public class CompileMisc
             && (op == NumberPredicate.ODD || op == NumberPredicate.EVEN)) {
             Expression arg0 = args[0];
             int kind = Arithmetic.classifyType(arg0.getType());
+            CodeAttr code = comp.getCode();
             if (kind <= Arithmetic.INTNUM_CODE) {
                 PrimType wtype = Type.intType;
                 Target wtarget = StackTarget.getInstance(wtype);
-                CodeAttr code = comp.getCode();
                 if (op == NumberPredicate.EVEN)
                     code.emitPushInt(1);
                 arg0.compile(comp, wtarget);
@@ -519,9 +519,16 @@ public class CompileMisc
                 code.emitAnd();
                 if (op == NumberPredicate.EVEN)
                     code.emitSub(Type.intType);
-                target.compileFromStack(comp, Type.booleanType);
-                return true;
+            } else {
+                arg0.compile(comp, Target.pushObject);
+                String mname = op == NumberPredicate.EVEN ? "isEven" : "isOdd";
+                Method m = ClassType
+                    .make("gnu.kawa.functions.NumberPredicate")
+                    .getDeclaredMethod(mname, 1);
+                code.emitInvokeStatic(m);
             }
+            target.compileFromStack(comp, Type.booleanType);
+            return true;
         }
         return false;
     }

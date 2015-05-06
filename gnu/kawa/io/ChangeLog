@@ -1,3 +1,7 @@
+2015-05-05  Per Bothner  <per@bothner.com>
+
+	* TtyInPort.java (lineStart): Try again ...
+
 2015-05-03  Per Bothner  <per@bothner.com>
 
 	* TtyInPort.java: Minor tweak to previous change: Don't call

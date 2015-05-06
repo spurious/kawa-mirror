@@ -1,3 +1,10 @@
+2015-05-05  Per Bothner  <per@bothner.com>
+
+	* NameLookup.java (getInstance, setInstance): Don't implement
+	lookup by using a "magic" binding in the Environmement (which may
+	fail if the Environment is locked).
+	Instead use a static WeakIdentityHashMap.
+
 2015-05-03  Per Bothner  <per@bothner.com>
 
 	* ModuleMethod.java (matchN): Check for valid argument-list length.

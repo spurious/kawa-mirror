@@ -6,6 +6,8 @@ import java.util.*;
 import gnu.mapping.*;
 import gnu.kawa.util.GeneralHashTable;
 import gnu.kawa.util.HashNode;
+import gnu.kawa.util.HashNode;
+import gnu.kawa.util.WeakIdentityHashMap;
 
 /** Manages the set of declarations "currently" in scope. */
 
@@ -21,34 +23,36 @@ public class NameLookup extends GeneralHashTable<Object,Declaration>
     this.language = language;
   }
 
-  static final Symbol KEY = Symbol.makeUninterned("<current-NameLookup>");
+    private static WeakIdentityHashMap<Environment,NameLookup> instanceMap;
 
-  /** Get or create a NameLookup instance for a given Environment.
-   * We want the same NameLookup instance to be used for multiple
-   * interactive commands in the same "session", to preserve top-level
-   * declarations.  We do that by registering it in the Environment.
-   */
-  public static NameLookup getInstance (Environment env, Language language)
-  {
-    Location loc = env.getLocation(KEY);
-    NameLookup nl = (NameLookup) loc.get(null);
-    if (nl == null)
-      {
-        nl = new NameLookup(language);
-        loc.set(nl);
-      }
-    else
-      nl.setLanguage(language);
-    return nl;
-  }
+    /** Get or create a NameLookup instance for a given Environment.
+     * We want the same NameLookup instance to be used for multiple
+     * interactive commands in the same "session", to preserve top-level
+     * declarations.  We do that by registering it in the Environment.
+     */
+    public static synchronized NameLookup
+    getInstance(Environment env, Language language) {
+        if (instanceMap == null)
+            instanceMap = new WeakIdentityHashMap<Environment,NameLookup>();
+        NameLookup nl = instanceMap.get(env);
+        if (nl == null) {
+            nl = new NameLookup(language);
+            instanceMap.put(env, nl);
+        }
+        else
+            nl.setLanguage(language);
+        return nl;
+    }
 
-  public static void setInstance (Environment env, NameLookup instance)
-  {
-    if (instance == null)
-      env.remove(KEY);
-    else
-      env.put(KEY, null, instance);
-  }
+    public static synchronized void
+    setInstance(Environment env, NameLookup instance) {
+        if (instanceMap == null)
+            instanceMap = new WeakIdentityHashMap<Environment,NameLookup>();
+        if (instance == null)
+            instanceMap.remove(env);
+        else
+            instanceMap.put(env, instance);
+    }
 
   /** When true, top-level defs should push rather then replace old ones.
    * Otherwise, a module-level declaration should replace a matching

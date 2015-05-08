@@ -82,13 +82,14 @@
      (! rewrite translator exp)
      (C:restore-current saved-comp))))
 
-;; Given an Expresssion try to reconstruct the corresponding Sexp.
+;; Given an Expression try to reconstruct the corresponding Sexp.
 (define (unrewrite (exp ::gnu.expr.Expression))
   (typecase exp
     (<gnu.expr.LetExp> (unrewrite-let exp))
     (<gnu.expr.QuoteExp> (unrewrite-quote exp))
     (<gnu.expr.SetExp> 
      `(set ,(! get-symbol exp) ,(unrewrite (! get-new-value exp))))
+    (<gnu.expr.ClassExp> (unrewrite-class exp))
     (<gnu.expr.LambdaExp>
      `(lambda ,(unrewrite-arglist exp)
 	,(unrewrite (|@| body exp))))
@@ -128,6 +129,7 @@
 				 (if rest? 1 0)
 				 (|@| length (|@| keywords exp)))))
 	       (set! key (cons var key)))
+              ((! is-this-parameter decl))
 	      (#t 
 	       (error "nyi")))))
     `(,@(reverse required)
@@ -160,11 +162,45 @@
         (type-name (lambda (name) (string->symbol (format "<~a>" name)))))
     (typecase val
       ((or <number> <boolean> <character> <keyword> <string> 
-           (eql #!undefined) (eql #!eof))
+           (eql #!undefined) (eql #!eof) (eql #!abstract) (eql #!native))
        val)
       (<gnu.bytecode.Type> (type-name (! get-name val)))
       (<java.lang.Class> (type-name (! get-name val)))
+      ((eql #!void) exp)
       (#t `(quote ,val)))))
+
+(define (unrewrite-class (exp ::gnu.expr.ClassExp))
+  `(class ,(unrewrite* (|@| supers exp))
+          ,@(let loop ((decl ::gnu.expr.Declaration (! first-decl exp)))
+              (cond ((eq? decl #!null) '())
+                    ((eq? (! get-type decl)
+                          gnu.expr.Compilation:typeProcedure)
+                     (loop (! next-decl decl)))
+                    (else
+                     (cons (list (! get-symbol decl) ':: (! get-type decl))
+                           (loop (! next-decl decl))))))
+          ,@(let loop ((child ::gnu.expr.LambdaExp (|@| firstChild exp)))
+              (if (eq? child #!null) '()
+                  (cons
+                   (unrewrite-method child)
+                   (loop (|@| nextSibling child)))))))
+
+(define (unrewrite-method (exp ::gnu.expr.LambdaExp))
+  (let* ((decl ::gnu.expr.Declaration (|@| nameDecl exp))
+         (name (! get-name exp))
+         (static? (or (and decl (! get-flag decl
+                                   gnu.expr.Declaration:STATIC_SPECIFIED))
+                      (eq? name "$clinit$")))
+         (private? (and decl (! get-flag decl
+                                gnu.expr.Declaration:PRIVATE_ACCESS)))
+         (protected? (and decl (! get-flag decl
+                                  gnu.expr.Declaration:PROTECTED_ACCESS))))
+    `((,name
+       ,@(unrewrite-arglist exp))
+      ,@(if static? '(allocation: 'static) '())
+      ,@(if (or private? protected?)
+            `(access: ,(if private? ''private ''protected)) '())
+      ,(unrewrite (|@| body exp)))))
 
 (define (unrewrite-apply (exp ::gnu.expr.ApplyExp))
   (let* ((fun (! get-function exp))

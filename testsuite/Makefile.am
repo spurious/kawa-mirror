@@ -625,16 +625,26 @@ check-life-grid:
 	  then echo '# check-life-grid passes'; \
 	  else echo FAIL check-life-grid passes; fi
 
-check-larceny-tests: \
-  check-scheme-case-lambda
-
 LARCENY_IMPORT_PATH = \
-  -Dkawa.import.path="<tests scheme>$(abs_srcdir)/larceny-tests/*.sld"
+  -Dkawa.import.path="$(abs_srcdir)/larceny-tests/*.sld"
 LARCENY_TEST_OPTIONS = $(LARCENY_IMPORT_PATH) \
-  $(OPTIONS) --r7rs --no-warn-unused 
+  $(OPTIONS) --r7rs --no-warn-unused
 
-check-scheme-case-lambda:
-	$(KAWA) $(LARCENY_TEST_OPTIONS) $(srcdir)/larceny-tests/case-lambda.sps
+LARCENY_SIMPLE_TESTS1 = case-lambda char cxr eval file time
+check-larceny-simple1:
+	for test in $(LARCENY_SIMPLE_TESTS1); do \
+	  $(KAWA) $(LARCENY_TEST_OPTIONS) larceny-tests/run/$$test.sps; \
+	done
+
+# tests using load, so change directories so load can find needed files
+# (However, don't cd to srcdir for any tests that write files.)
+LARCENY_SIMPLE_TESTS2 = load repl
+check-larceny-simple2:
+	for test in $(LARCENY_SIMPLE_TESTS2); do \
+	  $(KAWA) $(LARCENY_TEST_OPTIONS) -e '(current-path "$(srcdir)/larceny-tests")' -f run/$$test.sps; \
+	done
+
+check-larceny-tests: check-larceny-simple1 check-larceny-simple2
 
 CLEANFILES = tmp* *.log testing.zip revcomp-input.txt knucleotide-input.txt regexdna-input.txt *.class HelloCgiK HelloCgiS
 SCRIPTS_TO_RUN = case-warnings.scm uninit1.scm \

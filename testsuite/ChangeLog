@@ -1,3 +1,9 @@
+2015-05-07  Per Bothner  <per@bothner.com>
+
+	* larceny-tests: Imported more tests from the Larceny sources.
+	Re-arranged to use tests/scheme and run sub-directories to match.
+	* Makefile.am: Update accordingly.
+
 2015-05-03  Per Bothner  <per@bothner.com>
 
 	* larceny-tests/test.sld: Larceny test driver library.

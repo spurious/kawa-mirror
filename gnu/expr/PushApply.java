@@ -129,6 +129,7 @@ public class PushApply extends ExpVisitor<Expression,Void>
         else { 
             exp.test = visit(exp.test, ignored);
             forkPush();
+            canFinishTracker.associatedExpression = exp;
             exp.then_clause = visit(exp.then_clause, ignored);
             forkNext();
             if (exp.else_clause != null)
@@ -162,6 +163,7 @@ public class PushApply extends ExpVisitor<Expression,Void>
         } else {
             exp.key = visit(exp.key, ignored);
             forkPush();
+            canFinishTracker.associatedExpression = exp;
             if (exp.clauses.length > 0) {
                 exp.clauses[0].exp = visit(exp.clauses[0].exp, ignored);
                 for (int i = 1; i < exp.clauses.length; i++) {
@@ -181,6 +183,7 @@ public class PushApply extends ExpVisitor<Expression,Void>
 
     protected Expression visitTryExp (TryExp exp, Void ignored) {
         forkPush();
+        canFinishTracker.associatedExpression = exp;
         exp.try_clause = visit(exp.try_clause, ignored);
         CatchClause catch_clause = exp.catch_clauses;
         while (catch_clause != null) {
@@ -192,6 +195,33 @@ public class PushApply extends ExpVisitor<Expression,Void>
 
         if (exp.finally_clause != null)
             exp.finally_clause = visit(exp.finally_clause, ignored);
+        return exp;
+    }
+
+    @Override
+    protected Expression visitBlockExp(BlockExp exp, Void ignored) {
+        forkPush();
+        canFinishTracker.associatedExpression = exp;
+        exp.body = visit(exp.body, ignored);
+        if (exp.exitBody != null) {
+            forkNext();
+            exp.exitBody = visit(exp.exitBody, ignored);
+        }
+        forkPop();
+        return exp;
+    }
+
+    @Override
+    protected Expression visitExitExp(ExitExp exp, Void ignored) {
+        exp.result = visit(exp.result, ignored);
+        CanFinishTracker tracker = canFinishTracker;
+        BlockExp block = exp.block;
+        while (tracker != null && tracker.associatedExpression != block)
+            tracker = tracker.outer;
+        CanFinishTracker saveTracker = canFinishTracker;
+        canFinishTracker = tracker;
+        forkNext();
+        canFinishTracker = saveTracker;
         return exp;
     }
 
@@ -235,7 +265,9 @@ public class PushApply extends ExpVisitor<Expression,Void>
     protected Expression visitLambdaExp (LambdaExp exp, Void ignored) {
         CanFinishTracker oldTracker = canFinishTracker;
         CanFinishTracker newTracker = new CanFinishTracker();
+        newTracker.outer = oldTracker;
         canFinishTracker = newTracker;
+        canFinishTracker.associatedExpression = exp;
         newTracker.dependenciesAtForkStart = CanFinishMap.CAN_FINISH;
         LambdaExp saveLambda = currentLambda;
         exp.setFlag(true, LambdaExp.IN_EXPWALKER);
@@ -266,6 +298,7 @@ public class PushApply extends ExpVisitor<Expression,Void>
         boolean dependencyAddedThisFork;
         CanFinishMap dependenciesAtForkStart;
         CanFinishMap dependenciesPreviousForks;
+        Expression associatedExpression;
     }
 
     CanFinishTracker canFinishTracker;

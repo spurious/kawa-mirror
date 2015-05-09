@@ -3127,7 +3127,7 @@ public class CodeAttr extends Attribute implements AttrContainer
 		  {
 		    int index;
 		    dst.print("ret ");
-		    if (wide) { index = readUnsignedShort(i); index += 2; }
+		    if (wide) { index = readUnsignedShort(i); i += 2; }
 		    else { index = code[i] & 0xff; i++; }
 		    wide = false;
 		    dst.print(index);

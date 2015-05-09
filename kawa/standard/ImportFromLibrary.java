@@ -467,7 +467,7 @@ public class ImportFromLibrary extends Syntax
     }
 
     public Expression rewriteForm(Pair form, Translator tr) {
-        return null;
+        return tr.syntaxError(getName()+" is only allowed in a <body>");
     }
 
     static class ImportSetMapper implements require.DeclSetMapper {

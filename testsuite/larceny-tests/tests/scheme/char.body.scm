@@ -1,30 +1,6 @@
 ;;; Included only if the tested implementation claims to support
 ;;; the unicode feature.
 
-;;; Given a unary predicate on characters, returns a sorted
-;;; list of all characters that satisfy the predicate.
-
-(define (filter-all-chars p?)
-  (do ((i 0 (+ i 1))
-       (chars '()
-              (if (and (not (<= #xd800 i #xdfff))
-                       (p? (integer->char i)))
-                  (cons (integer->char i) chars)
-                  chars)))
-      ((= i #x110000)
-       (reverse chars))))
-
-;;; Given a unary predicate and a list, returns a list of
-;;; all elements of the given list that satisfy the predicate.
-
-(define (filter p? xs)
-  (do ((xs (reverse xs) (cdr xs))
-       (ys '() (if (p? (car xs))
-                   (cons (car xs) ys)
-                   ys)))
-      ((null? xs)
-       ys)))             
-
 (define (run-char-tests-for-unicode)
     
   (test (char-upcase #\xDF) #\xDF)
@@ -81,53 +57,46 @@
   ;; The counts are likely to increase monotonically (if at all) in later
   ;; versions, but that's not a given.
 
-  (test (length (filter-all-chars (lambda (c)
-                                    (and (char? c)
-                                         (char? (char-upcase c))
-                                         (char? (char-downcase c))
-                                         (char? (char-foldcase c))
-                                         (char=? c
-                                                 (integer->char
-                                                  (char->integer c)))))))
-        1112064)
-
-  (test (<= 93217 (length (filter-all-chars char-alphabetic?)))
-        #t)
-
-  (test (<= 282 (length (filter-all-chars char-numeric?)))
-        #t)
-
-  (test (<= 25 (length (filter-all-chars char-whitespace?)))
-        #t)
-
-  (test (<= 1362 (length (filter-all-chars char-upper-case?)))
-        #t)
-
-  (test (<= 1791 (length (filter-all-chars char-lower-case?)))
-        #t)
-
-  (test (let* ((chars (filter-all-chars char-numeric?))
-               (vals (map digit-value chars))
-               (mask (map (lambda (n)
-                            (and (exact-integer? n)
-                                 (<= 0 n 9)))
-                          vals))
-               (mask (map not mask))
-               (bad  (filter values
-                             (map (lambda (char is-bad?)
-                                    (and is-bad? char))
-                                  chars mask))))
-          bad)
-        '())
-
-  (test (let* ((chars (filter-all-chars (lambda (c) (not (char-numeric? c)))))
-               (vals (map digit-value chars))
-               (bad  (filter values
-                             (map (lambda (char is-bad?)
-                                    (and is-bad? char))
-                                  chars vals))))
-          bad)
-        '())
-
+  (let ((all-count 0)
+        (bad-digit-value-count 0)
+        (alpha-count 0)
+        (numeric-count 0)
+        (white-count 0)
+        (upper-count 0)
+        (lower-count 0))
+    (do ((i 0 (+ i 1)))
+        ((= i #x110000)
+         (test all-count 1112064)
+         (test bad-digit-value-count 0)
+         (test (<= 93217 alpha-count) #t)
+         (test (<= 282 numeric-count) #t)
+         (test (<= 25 white-count) #t)
+         (test (<= 1362 upper-count) #t)
+         (test (<= 1791 lower-count) #t))
+      (if (not (<= #xd800 i #xdfff))
+          (let* ((c (integer->char i))
+                 (n (digit-value c)))
+            (if (and (char? c)
+                     (char? (char-upcase c))
+                     (char? (char-downcase c))
+                     (char? (char-foldcase c))
+                     (char=? c
+                             (integer->char
+                              (char->integer c))))
+                (set! all-count (+ all-count 1)))
+            (if (if (char-numeric? c)
+                    (not (and (exact-integer? n) (<= 0 n 9)))
+                    n)
+                (set! bad-digit-value-count
+                      (+ bad-digit-value-count 1)))
+            (if (char-alphabetic? c)
+                (set! alpha-count (+ alpha-count 1)))
+            (if (char-numeric? c)
+                (set! numeric-count (+ numeric-count 1)))
+            (if (char-whitespace? c)
+                (set! white-count (+ white-count 1)))
+            (if (char-upper-case? c)
+                (set! upper-count (+ upper-count 1)))
+            (if (char-lower-case? c)
+                (set! lower-count (+ lower-count 1)))))))
   )
-

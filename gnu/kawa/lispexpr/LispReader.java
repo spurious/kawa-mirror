@@ -200,7 +200,7 @@ public class LispReader extends Lexer
     if (! seenEscapes)
       {
         Object value = parseNumber(tokenBuffer, startPos, endPos - startPos,
-                                   '\0', 0, SCM_NUMBERS);
+                                   '\0', 0, SCM_NUMBERS|rtable.extraFlags);
         if (value != null && ! (value instanceof String))
           {
             tokenBufferLength = startPos;
@@ -586,6 +586,7 @@ public class LispReader extends Lexer
   public static final int SCM_NUMBERS = SCM_COMPLEX;
   public static final int SCM_ANGLE = SCM_NUMBERS << 1;
   public static final int SCM_COLATITUDE = SCM_ANGLE << 1;
+  public static final int SCM_LEXPONENT_IS_BIGDECIMAL = SCM_COLATITUDE << 1;
 
   public static Object parseNumber
   /* #ifdef use:java.lang.CharSequence */
@@ -1209,7 +1210,9 @@ public class LispReader extends Lexer
           case 'd':
             return Double.valueOf(d);
           case 'l':
-            return java.math.BigDecimal.valueOf(d);
+            if ((flags & SCM_LEXPONENT_IS_BIGDECIMAL) != 0)
+              return java.math.BigDecimal.valueOf(d);
+            // else fall through
           }
       }
     return number;

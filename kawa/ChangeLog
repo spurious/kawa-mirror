@@ -1,5 +1,10 @@
 2015-05-09  Per Bothner  <per@bothner.com>
 
+	* standard/Scheme.java (createReadTable): Only recognize 'l'
+	exponent marker if in non-standard mode.
+
+2015-05-09  Per Bothner  <per@bothner.com>
+
 	* standard/export.java (rewriteForm): Emit error; don't return null.
 	* standard/ImportFromLibrary.java (rewriteForm): Likewise.
 

@@ -1162,6 +1162,7 @@ public class Scheme extends LispLanguage {
       {
         tab.postfixLookupOperator = ':';
         tab.setFinalColonIsKeyword(true);
+        tab.extraFlags = LispReader.SCM_LEXPONENT_IS_BIGDECIMAL;
         tab.set('@', new ReaderQuote(LispLanguage.splice_sym,
                                      ReadTable.NON_TERMINATING_MACRO));
       }

@@ -31,6 +31,8 @@ public class ReadTable extends RangeTable
   /** True if "IDENTIFIER:" should be treated as a keyword. */
   protected boolean finalColonIsKeyword;
 
+  public int extraFlags;
+
   /** Control whether we should handle R6RS inline hex escape.
    * I.e. "\x"<hexdigits>";".
    */

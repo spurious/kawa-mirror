@@ -52,7 +52,7 @@
                       (j (current-jiffy))
                       (t (current-second)))
                  (set! loops/s n)
-                 (list (- (exact (round t)) (exact (round t0)))
+                 (list (exact (round (- t t0)))
                        (<= j1 j)
                        (<= j (+ j1 (/ jifs/second 10)))))))
            '(1 #t #t))

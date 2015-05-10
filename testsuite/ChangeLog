@@ -1,5 +1,10 @@
 2015-05-10  Per Bothner  <per@bothner.com>
 
+	* larceny-tests/tests/scheme/inexact.sld: New test from Larceny.
+	* larceny-tests/run/inexact.sps: New test main program.
+	* clisp-number-tests.scm: New file with numerics tests.
+	* Makefile.am: Update accordingly.
+
 	* num-test.scm: Expected rationalize failure no longer fails.
 
 	* larceny-tests/tests/scheme/char.body.scm: Re-implement to run

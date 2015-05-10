@@ -29,7 +29,7 @@ check: check2-no-full-tailcalls check1 check2-full-tailcalls check-no-inline \
   check-interpreted-cycle check-interpreted-cycleb check-interpreted-cyclebr \
   $(SERVLET_TESTS) $(SAX2_TESTS) \
   check-inlining check-jmc check-use-slots check-load-require check-sva31180 \
-  check-bridge check-life-grid check-larceny-tests
+  check-bridge check-life-grid check-larceny-tests check-numbers-clisp
 
 check-anf:
 	$(MAKE) check1 check2 OPTIONS=--enable-anf
@@ -630,7 +630,7 @@ LARCENY_IMPORT_PATH = \
 LARCENY_TEST_OPTIONS = $(LARCENY_IMPORT_PATH) \
   $(OPTIONS) --r7rs --no-warn-unused
 
-LARCENY_SIMPLE_TESTS1 = case-lambda char cxr eval file time
+LARCENY_SIMPLE_TESTS1 = case-lambda char cxr eval file inexact time
 check-larceny-simple1:
 	for test in $(LARCENY_SIMPLE_TESTS1); do \
 	  $(KAWA) $(LARCENY_TEST_OPTIONS) larceny-tests/run/$$test.sps; \
@@ -645,6 +645,9 @@ check-larceny-simple2:
 	done
 
 check-larceny-tests: check-larceny-simple1 check-larceny-simple2
+
+check-numbers-clisp:
+	$(KAWA) --r7rs -f $(srcdir)/clisp-number-tests.scm
 
 CLEANFILES = tmp* *.log testing.zip revcomp-input.txt knucleotide-input.txt regexdna-input.txt *.class HelloCgiK HelloCgiS
 SCRIPTS_TO_RUN = case-warnings.scm uninit1.scm \

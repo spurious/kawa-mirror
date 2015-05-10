@@ -177,7 +177,6 @@
 (test-equal #i1/3 (rationalize .3 1/10)) ; approximately
 (test-equal +inf.0 (rationalize +inf.0 3))
 (test-equal +nan.0 (rationalize +inf.0 +inf.0))
-(test-expect-fail 1)
 (test-equal 0.0 (rationalize 3 +inf.0))
 
 (test-end "convert")

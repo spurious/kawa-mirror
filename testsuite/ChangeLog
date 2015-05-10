@@ -1,5 +1,7 @@
 2015-05-10  Per Bothner  <per@bothner.com>
 
+	* larceny-tests/README: New file, lightly edited from Larceny version.
+
 	* larceny-tests/tests/scheme/time.sld: Fix rounding calculation error.
 
 2015-05-07  Per Bothner  <per@bothner.com>

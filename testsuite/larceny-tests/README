@@ -1,0 +1,102 @@
+This directory contains an R7RS test suite obtained by modifying
+Racket's R6RS test suite.  Racket's R6RS test suite is covered by
+the LGPL, so this derivative work is also covered by the LGPL.
+See README2 for more information on copyright and licensing.
+
+Matthew Flatt wrote most of Racket's R6RS test suite, and Will
+Clinger rewrote that test suite as necessary for R7RS.  There
+have been other contributors as well.
+
+------------------------- An R7RS Test Suite -------------------------
+
+======================================================================
+Requirements
+======================================================================
+
+It should be possible to run the test suite in any implementation of
+R7RS (small) that provides the standard libraries (scheme base) and
+(scheme write) and implements R7RS include and cond-expand correctly.
+Tests of unavailable libraries and unsupported number syntax will be
+bypassed using cond-expand and include.
+
+======================================================================
+Files and libraries
+======================================================================
+
+Files that end with ".sps" are R7RS programs.  Programs that test
+just one library can be found in the "tests/scheme/run" directory.
+(Eventually there should be a run.sps program that runs all tests.)
+
+Files that end with ".sld" are R7RS libraries. For example,
+"base.sld" is a library that implements `(tests scheme base)', which
+is a set of tests for `(scheme base)'. Many R7RS implementations
+will auto-load these ".sld" files if you tell them to search the
+"tests" subdirectory (or its parent directory "tests/..").
+
+For each `(scheme <id>)' library described by the R7RS (small)
+standard:
+
+ * There's a library of tests named "tests/scheme/<id>.sld". It
+   defines and exports a procedure named `run-<id>-tests'.
+
+ * There may be a file named "tests/scheme/<id>.body.scm".  If it
+   exists, it contains source code to be included by "<id>.sld".
+
+ * There's also a program "tests/scheme/run/<id>.sps" that imports
+   `(tests scheme <id>)', runs the exported `run-<id>-tests'
+   procedure, and reports the results.
+
+And then there's 
+
+ * "tests/scheme/test.sld", containing `(tests scheme test)', which
+   implements the testing utilities used by all the other libraries
+
+======================================================================
+Limitations and feedback
+======================================================================
+
+The test suite tries to cover all of the bindings of R7RS, and tries
+to check a variety of uses.
+
+One goal of this test suite is to avoid using `eval' (except when
+specifically testing `eval'). Avoiding `eval' makes the test suite as
+useful as possible to ahead-of-time compilers that implement `eval'
+with a separate interpreter. A drawback of the current approach,
+however, is that if an R7RS implementation doesn't supply one binding
+or does not support a bit of syntax used by a set of tests, then the
+whole set of tests fails to load.
+
+A related problem is that each set of tests may be placed into one
+function that runs all the tests. This format creates a block of code
+that is much larger than in a typical program, which might give some
+compilers trouble.
+
+In any case, reports of bugs (in the tests) and new tests would be
+very much appreciated. Please send bug reports and new tests to
+larceny@ccs.neu.edu.
+
+======================================================================
+Original source and copyright
+======================================================================
+
+Racket's source code currently resides at
+
+    https://github.com/racket/r6rs
+
+The R6RS tests are r6rs-test/tests/r6rs within that repository:
+
+    https://github.com/racket/r6rs/tree/master/r6rs-test/tests/r6rs
+
+The LICENSE.txt file within the r6rs-test directory says:
+
+r6rs
+Copyright (c) 2010-2014 PLT Design Inc.
+
+This package is distributed under the GNU Lesser General Public
+License (LGPL).  This means that you can link this package into proprietary
+applications, provided you follow the rules stated in the LGPL.  You
+can also modify this package; if you distribute a modified version,
+you must distribute it under the terms of the LGPL, which in
+particular means that you must release the source code for the
+modified software.  See http://www.gnu.org/copyleft/lesser.html
+for more information.

@@ -194,7 +194,7 @@ public class DivideOp extends ArithOp
               {
               case DIVIDE_GENERIC:
               case DIVIDE_INEXACT:
-                result = DFloNum.make(d1 / d2);
+                result = DFloNum.valueOf(d1 / d2);
                 break;
               case QUOTIENT:
                 result = RealNum.toInt(d1 / d2, getRoundingMode());
@@ -206,7 +206,7 @@ public class DivideOp extends ArithOp
               case MODULO:
                 if (d2 != 0)
                   d1 = d1 - RealNum.toInt(d1 / d2, getRoundingMode()) * d2;
-                result = DFloNum.make(d1);
+                result = DFloNum.valueOf(d1);
                 break;
               }
 	    break;

@@ -208,7 +208,7 @@ public class ArithOp extends Procedure1or2
             double d2 = Arithmetic.asDouble(arg2);
             double d = d1 % d2;
             if (code == Arithmetic.FLONUM_CODE)
-              return DFloNum.make(d);
+              return DFloNum.valueOf(d);
             else
               return gnu.kawa.xml.XDataType.makeDouble(d);
           }

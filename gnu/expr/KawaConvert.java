@@ -26,53 +26,52 @@ public class KawaConvert extends Convert
 
   public Object byteToObject(byte value)
   {
-    return gnu.math.IntNum.make(value);
+    return gnu.math.IntNum.valueOf(value);
   }
 
   public Object shortToObject(short value)
   {
-    return gnu.math.IntNum.make(value);
+    return gnu.math.IntNum.valueOf(value);
   }
 
   public Object intToObject(int value)
   {
-    return gnu.math.IntNum.make(value);
+    return gnu.math.IntNum.valueOf(value);
   }
 
   public Object longToObject(long value)
   {
-    return gnu.math.IntNum.make(value);
+    return gnu.math.IntNum.valueOf(value);
   }
 
   public Object byteToObjectUnsigned(byte value)
   {
-    return gnu.math.IntNum.make(value & 0xFF);
+    return gnu.math.IntNum.valueOf(value & 0xFF);
   }
 
   public Object shortToObjectUnsigned(short value)
   {
-    return gnu.math.IntNum.make(value & 0xFFFF);
+    return gnu.math.IntNum.valueOf(value & 0xFFFF);
   }
 
   public Object intToObjectUnsigned(int value)
   {
-    return gnu.math.IntNum.make((long) value & 0xFFFFFFFFL);
+    return gnu.math.IntNum.valueOf((long) value & 0xFFFFFFFFL);
   }
 
   public Object longToObjectUnsigned(long value)
   {
-    return gnu.math.IntNum.makeU(value);
+    return gnu.math.IntNum.valueOfUnsigned(value);
   }
 
   public Object floatToObject(float value)
   {
-    return gnu.math.DFloNum.make(value);
+    return gnu.math.DFloNum.valueOf(value);
   }
 
-  public Object doubleToObject(double value)
-  {
-    return gnu.math.DFloNum.make(value);
-  }
+    public Object doubleToObject(double value) {
+        return gnu.math.DFloNum.valueOf(value);
+    }
 
     public static boolean isTrue(Object value) {
         return value != null &&

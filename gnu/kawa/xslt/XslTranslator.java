@@ -252,7 +252,7 @@ public class XslTranslator extends Lexer implements Consumer
 	double prio = 0.0; // FIXME
 	args[0] = resolveQNameExpression(name);
 	args[1] = new QuoteExp(match);
-	args[2] = new QuoteExp(DFloNum.make(prio));
+	args[2] = new QuoteExp(DFloNum.valueOf(prio));
 	args[3] = resolveQNameExpression(mode);
 	args[4] = templateLambda;
 	push(new ApplyExp(new QuoteExp(defineTemplateProc), args));
@@ -395,7 +395,7 @@ public class XslTranslator extends Lexer implements Consumer
     if (inAttribute)
       attributeValue.append(v);
     else
-      push(DFloNum.make(v));
+      push(DFloNum.valueOf(v));
   }
 
   public void writeDouble(double v)
@@ -403,7 +403,7 @@ public class XslTranslator extends Lexer implements Consumer
     if (inAttribute)
       attributeValue.append(v);
     else
-      push(DFloNum.make(v));
+      push(DFloNum.valueOf(v));
   }
 
   public void writeInt(int v)
@@ -411,7 +411,7 @@ public class XslTranslator extends Lexer implements Consumer
     if (inAttribute)
       attributeValue.append(v);
     else
-      push(IntNum.make(v));
+      push(IntNum.valueOf(v));
   }
 
   public void writeLong(long v)
@@ -419,7 +419,7 @@ public class XslTranslator extends Lexer implements Consumer
     if (inAttribute)
       attributeValue.append(v);
     else
-      push(IntNum.make(v));
+      push(IntNum.valueOf(v));
   }
 
   public void startDocument()

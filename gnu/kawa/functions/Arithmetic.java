@@ -217,7 +217,7 @@ public class Arithmetic
       return IntNum.valueOf(value.toString(), 10);
     if (value instanceof BigDecimal)
       return asIntNum((BigDecimal) value);
-    return IntNum.make(((Number) value).longValue());
+    return IntNum.valueOf(((Number) value).longValue());
   }
 
   public static BigDecimal asBigDecimal (Object value)
@@ -243,7 +243,7 @@ public class Arithmetic
     if (value instanceof BigDecimal)
       return RatNum.valueOf((BigDecimal) value);
     else
-      return IntNum.make(((Number) value).longValue());
+      return IntNum.valueOf(((Number) value).longValue());
   }
 
   public static Numeric asNumeric (Object value)
@@ -344,7 +344,7 @@ public class Arithmetic
       case Arithmetic.FLONUM_CODE:
         if (value instanceof DFloNum)
           return value;
-        return DFloNum.make(Arithmetic.asDouble(value));
+        return DFloNum.valueOf(Arithmetic.asDouble(value));
       case Arithmetic.NUMERIC_CODE:
         return Arithmetic.asNumeric(value);
       case Arithmetic.REALNUM_CODE:

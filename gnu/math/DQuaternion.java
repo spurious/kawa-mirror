@@ -191,7 +191,7 @@ public class DQuaternion extends Quaternion implements Externalizable {
         double expr = Math.exp(p_r);
 
         if (pvmag == 0.0 || sinpvmag == 0.0)
-            return DFloNum.make(expr * Math.cos(pvmag));
+            return DFloNum.valueOf(expr * Math.cos(pvmag));
 
         return Quaternion.make(expr * Math.cos(pvmag),
                                expr * sinpvmag * p_i / pvmag,

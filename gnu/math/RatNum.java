@@ -203,8 +203,10 @@ public abstract class RatNum extends RealNum
     else if (y.isNegative ())
       return (RealNum) (simplest_rational2 ((RealNum)y.neg(),
 					    (RealNum)x.neg())).neg();
-    else
+    else if (x.isExact() && y.isExact())
       return IntNum.zero ();
+    else
+        return DFloNum.valueOf(0.0);
   }
 
   private static RealNum simplest_rational2 (RealNum x, RealNum y)

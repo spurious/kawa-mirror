@@ -1,3 +1,12 @@
+2015-05-10  Per Bothner  <per@bothner.com>
+
+	* DFloNum.java (valueOf): New method.
+	(make): Deprecate and call valueOf.
+	* IntNum.java (valueOf): Various new aliases of make.
+	(makeU): Renamed to valueOfUnsigned.
+	* RatNum.java (rationalize): Return inexact 0 rather than exact 0
+	if arguments are inexact.
+
 2014-12-18  Jamison Hope  <jrh@theptrgroup.com>
 
 	* Complex.java (polar): Change return type from DComplex to

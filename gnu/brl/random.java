@@ -21,7 +21,7 @@ public class random extends Procedure1 {
 	// When passed an integer N, return an int M s.t. 0 <= M < N.
 	if (arg1 instanceof IntNum)
 	    {
-		IntNum.divide(IntNum.makeU(Math.abs(prg.nextLong()) >> 1),
+		IntNum.divide(IntNum.valueOfUnsigned(Math.abs(prg.nextLong()) >> 1),
 			      (IntNum) arg1, null, retval, Numeric.FLOOR);
 		return retval;
 	    }

@@ -66,7 +66,7 @@ public class XQuery extends Language
   public static gnu.math.Numeric asNumber(Object arg)
   {
     if (arg instanceof Char)
-      return gnu.math.IntNum.make(((Char) arg).intValue());
+      return gnu.math.IntNum.valueOf(((Char) arg).intValue());
     return (gnu.math.Numeric) arg;
   }
 
@@ -296,7 +296,7 @@ public class XQuery extends Language
     throws Throwable
   {
     CallContext ctx = CallContext.getInstance();
-    proc.check3(item, IntNum.make(position),IntNum.make(size), ctx);
+    proc.check3(item, IntNum.valueOf(position), IntNum.valueOf(size), ctx);
     Consumer save = ctx.consumer;
     try
       {
@@ -325,7 +325,7 @@ public class XQuery extends Language
     int oldIndex = ctx.startFromContext();
     try
       {
-	proc.check3(item, IntNum.make(position),IntNum.make(size), ctx);
+	proc.check3(item, IntNum.valueOf(position), IntNum.valueOf(size), ctx);
 	return ctx.getFromContext(oldIndex);
       }
     catch (Throwable ex)
@@ -404,10 +404,10 @@ public class XQuery extends Language
 	if (count == 0)
 	  return;
 	int ipos = 0;
-	IntNum size = IntNum.make(count);
+	IntNum size = IntNum.valueOf(count);
 	for (int i = 1;  ;  i++)
 	  {
-	    proc.check3(v.getPosNext(ipos), IntNum.make(i), size, ctx);
+	    proc.check3(v.getPosNext(ipos), IntNum.valueOf(i), size, ctx);
 	    ctx.runUntilDone();
 	    if (i == count)
 	      break;
@@ -547,7 +547,7 @@ public class XQuery extends Language
     throws Throwable
   {
     Procedure proc = evalToFocusProc(expr);
-    proc.check3(item, IntNum.make(position), IntNum.make(size), ctx);
+    proc.check3(item, IntNum.valueOf(position), IntNum.valueOf(size), ctx);
   }
 
   public static final Environment xqEnvironment
@@ -1017,7 +1017,7 @@ public class XQuery extends Language
         if ("gnu.math.IntNum".equals(cname))
           return IntNum.valueOf(value.toString());
         if ("gnu.math.RealNum".equals(cname))
-          return gnu.math.DFloNum.make(Double.parseDouble(value.toString()));
+          return gnu.math.DFloNum.valueOf(Double.parseDouble(value.toString()));
       }
     try
       {

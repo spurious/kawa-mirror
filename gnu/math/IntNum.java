@@ -42,15 +42,6 @@ public class IntNum extends RatNum implements Externalizable
     ival = value;
   }
 
-  /** Return a (possibly-shared) IntNum with a given int value. */
-  public static IntNum make (int value)
-  {
-    if (value >= minFixNum && value <= maxFixNum)
-      return smallFixNums[(int) value - minFixNum];
-    else
-      return new IntNum (value);
-  }
-
   public static final IntNum zero ()
   {
     return smallFixNums[- minFixNum];
@@ -72,21 +63,6 @@ public class IntNum extends RatNum implements Externalizable
     return smallFixNums[-1 - minFixNum];
   }
 
-  /** Return a (possibly-shared) IntNum with a given long value. */
-  public static IntNum make (long value)
-  {
-    if (value >= minFixNum && value <= maxFixNum)
-      return smallFixNums[(int)value - minFixNum];
-    int i = (int) value;
-    if ((long)i == value)
-      return new IntNum (i);
-    IntNum result = alloc (2);
-    result.ival = 2;
-    result.words[0] = i;
-    result.words[1] = (int) (value >> 32);
-    return result;
-  }
-
   public static IntNum asIntNumOrNull (Object value)
   {
     if (value instanceof IntNum)
@@ -98,39 +74,6 @@ public class IntNum extends RatNum implements Externalizable
             || value instanceof Short || value instanceof Byte))
       return IntNum.make(((Number) value).longValue());
     return null;
-  }
-
-  /** Make an IntNum from an unsigned 64-bit value. */
-  public static IntNum makeU (long value)
-  {
-    if (value >= 0)
-      return make(value);
-    IntNum result = alloc(3);
-    result.ival = 3;
-    result.words[0] = (int) value;
-    result.words[1] = (int) (value >> 32);
-    result.words[2] = 0;
-    return result;
-  }
-
-  /** Make a canonicalized IntNum from an array of words.
-   * The array may be reused (without copying). */
-  public static IntNum make (int[] words, int len)
-  {
-    if (words == null)
-      return make (len);
-    len = IntNum.wordsNeeded (words, len);
-    if (len <= 1)
-      return len == 0 ? zero () : make (words[0]);
-    IntNum num = new IntNum ();
-    num.words = words;
-    num.ival = len;
-    return num;
-  }
-
-  public static IntNum make (int[] words)
-  {
-    return make(words, words.length);
   }
 
   /** Allocate a new non-shared IntNum.
@@ -1317,6 +1260,62 @@ public class IntNum extends RatNum implements Externalizable
       return false;
     return IntNum.equals (this, (IntNum) obj);
   }
+
+    /** Return a (possibly-shared) IntNum with a given int value. */
+    public static IntNum make (int value) { return valueOf(value); }
+
+    /** Make an IntNum from an unsigned 64-bit value. */
+    public static IntNum valueOfUnsigned(long value) {
+        if (value >= 0)
+            return make(value);
+        IntNum result = alloc(3);
+        result.ival = 3;
+        result.words[0] = (int) value;
+        result.words[1] = (int) (value >> 32);
+        result.words[2] = 0;
+        return result;
+    }
+
+  /** Make a canonicalized IntNum from an array of words.
+   * The array may be reused (without copying). */
+  public static IntNum make (int[] words, int len)
+  {
+    if (words == null)
+      return make (len);
+    len = IntNum.wordsNeeded (words, len);
+    if (len <= 1)
+      return len == 0 ? zero () : make (words[0]);
+    IntNum num = new IntNum ();
+    num.words = words;
+    num.ival = len;
+    return num;
+  }
+
+    public static IntNum make(long value) {
+        return valueOf(value);
+    }
+
+    /** Return a (possibly-shared) IntNum with a given int value. */
+    public static IntNum valueOf(int value) {
+        if (value >= minFixNum && value <= maxFixNum)
+            return smallFixNums[(int) value - minFixNum];
+        else
+            return new IntNum(value);
+    }
+
+    /** Return a (possibly-shared) IntNum with a given long value. */
+    public static IntNum valueOf(long value) {
+        if (value >= minFixNum && value <= maxFixNum)
+            return smallFixNums[(int)value - minFixNum];
+        int i = (int) value;
+        if ((long)i == value)
+            return new IntNum (i);
+        IntNum result = alloc (2);
+        result.ival = 2;
+        result.words[0] = i;
+        result.words[1] = (int) (value >> 32);
+        return result;
+    }
 
   public static IntNum valueOf (char[] buf, int offset, int length,
 				int radix, boolean negative)

@@ -38,10 +38,15 @@ public class DFloNum extends RealNum implements Externalizable
       value = -0.0;
   }
 
+  @Deprecated
   public static DFloNum make (double value)
   {
     return new DFloNum (value);
   }
+
+    public static DFloNum valueOf(double value) {
+        return new DFloNum(value);
+    }
 
   public static DFloNum asDFloNumOrNull (Object value)
   {

@@ -87,7 +87,10 @@ public class Label {
           throw new InternalError("inconsistent stack length");
         for (int i = 0; i < SP; i++)
           {
-            stackTypes[i] = mergeTypes(stackTypes[i], stack[i]);
+            Type t = mergeTypes(stackTypes[i], stack[i]);
+            if (t == null)
+              throw new InternalError("inconsistent stackType");
+            stackTypes[i] = t;
           }
         for (int i = 0; i < localTypes.length;  i++)
           {

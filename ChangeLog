@@ -1,3 +1,7 @@
+2015-05-13  Per Bothner  <per@bothner.com>
+
+	* compile: New file, from gnulib, used by autoconf.
+
 2015-02-27  Per Bothner  <per@bothner.com>
 
 	* build.xml (java-classes): Add kawa/Source*.java.

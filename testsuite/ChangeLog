@@ -1,3 +1,7 @@
+2015-05-13  Per Bothner  <per@bothner.com>
+
+	* larceny-tests/tests/scheme/time.sld: Update from Larceny.
+
 2015-05-10  Per Bothner  <per@bothner.com>
 
 	* larceny-tests/tests/scheme/inexact.sld: New test from Larceny.

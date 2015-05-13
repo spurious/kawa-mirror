@@ -5,7 +5,7 @@ READLINE_LIB_PATH =
 kawa_EXTRA_LIBS = -lncurses  # For Linux
 #kawa_EXTRA_LIBS = -lcurses -lsocket # For Solaris2
 AM_CPPFLAGS = $(READLINE_INCLUDE_PATH)
-kawa_LDADD = $(READLINE_LIB_PATH) -lreadline -lhistory $(kawa_EXTRA_LIBS)
+kawa_LDADD = $(READLINE_LIB_PATH) -lreadline $(LIBHISTORY) $(kawa_EXTRA_LIBS)
 
 kawa_SOURCES = kawa.c kawapath.c
 cgi_servlet_SOURCES = cgi-servlet.c kawapath.c

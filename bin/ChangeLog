@@ -1,3 +1,11 @@
+2015-05-13  Per Bothner  <per@bothner.com>
+
+	* configure.ac: Add check for libhistory. Some platforms such as
+	OpenBSD do not have a libhistory and therefore Kawa fails to build.
+	Patch submitted anonymously to Savannah #45069
+	"kawa frontend unconditionally links with libhistory".
+	* Makefile.am (kawa-LDADD): Add value of LIBHISTORY.
+
 2015-04-29  Per Bothner  <per@bothner.com>
 
 	* cgi-servlet.c: Include unistd.h to avoid a warning about execvp.

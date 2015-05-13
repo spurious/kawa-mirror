@@ -25,6 +25,26 @@ WITH_SERVLET_ARG="${with_servlet}"
 AC_ARG_WITH(android,
   AS_HELP_STRING(--with-android@<:@=android.jar@:>@,Build for the Android platform))
 
+ac_enable_history=yes
+ac_cv_libhistory=
+AC_ARG_ENABLE(history,
+        [  --disable-history       disable libhistory support [no]],
+        if test "$enableval" = "no" ; then
+                AC_MSG_RESULT([support for libhistory disabled])
+                ac_enable_history=no
+        fi
+)
+if test "x$ac_enable_history" = "xyes" ; then
+        AC_CHECK_LIB(history, add_history,
+        [
+                AC_DEFINE_UNQUOTED(HAVE_LIBHISTORY,1,
+                        [Define this, if you have libhistory])
+                ac_cv_libhistory=-lhistory
+        ])
+fi
+LIBHISTORY=${ac_cv_libhistory}
+AC_SUBST(LIBHISTORY)
+
 AM_CONDITIONAL(ENABLE_BRL, test "$enable_brl" = "yes")
 AM_CONDITIONAL(ENABLE_JEMACS, test "$enable_jemacs" = "yes")
 AM_CONDITIONAL(ENABLE_XML, test "$enable_xml" = "yes")

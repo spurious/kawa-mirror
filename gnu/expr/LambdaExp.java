@@ -51,6 +51,10 @@ public class LambdaExp extends ScopeExp {
 
     /** The location for function start, before arguments are stored. */
     Label startForInlining;
+    /** Queue of deferred inline class.
+     * The items are (deferred-lambda, Target) pairs.
+     */
+    LinkedList<Object> pendingInlines;
 
     public void capture(Declaration decl) {
         if (decl.isSimple()) {
@@ -571,14 +575,31 @@ public class LambdaExp extends ScopeExp {
 
     public void compileEnd (Compilation comp) {
         gnu.bytecode.CodeAttr code = comp.getCode();
+        HashMap<String,Variable> varMap = new HashMap<String,Variable>();
+
+        Label endLabel = new Label(code);
+        while (pendingInlines != null && ! pendingInlines.isEmpty()) {
+            LambdaExp child = (LambdaExp) pendingInlines.remove();
+            Target ctarget = (Target) pendingInlines.remove();
+            if (child.getInlineOnly()
+                && ! child.getFlag(LambdaExp.METHODS_COMPILED)
+                && child.startForInlining != null) {
+                if (code.reachableHere())
+                    code.emitGoto(endLabel);
+                child.compileAsInlined(comp, ctarget);
+            }
+        }
+        if (endLabel.isUsed())
+            endLabel.define(code);
+        code.getCurrentScope().fixParamNames(varMap);
+        popScope(code);        // Undoes enterScope in allocParameters
+
         if (! getInlineOnly()) {
             if (comp.method.reachableHere()
                 && (getCallConvention() < Compilation.CALL_WITH_TAILCALLS
-                    || isModuleBody() || isClassMethod() || isHandlingTailCalls()))
+                    || isModuleBody() || isClassMethod() || isHandlingTailCalls())) {
                 code.emitReturn();
-            HashMap<String,Variable> varMap = new HashMap<String,Variable>();
-            code.getCurrentScope().fixParamNames(varMap);
-            popScope(code);        // Undoes enterScope in allocParameters
+            }
             code.getCurrentScope().fixParamNames(varMap);
             code.popScope(); // Undoes pushScope in method.initCode.
         }
@@ -1157,8 +1178,14 @@ public class LambdaExp extends ScopeExp {
     public void allocChildClasses(Compilation comp) {
         Method main = getMainMethod();
 	
-        if (main != null && ! main.getStaticFlag())
+        if (main != null && ! main.getStaticFlag()) {
+            CodeAttr code = comp.getCode();
+            // So this gets declared in the parameter_scope.
+            scope = code.getCurrentScope();
             declareThis(main.getDeclaringClass());
+            thisVariable.allocateLocal(code);
+            scope = null;
+        }
 
         Declaration decl = firstDecl();
         for (;;) {
@@ -1181,7 +1208,8 @@ public class LambdaExp extends ScopeExp {
             Variable var = decl.var;
             // i is the register to use for the current parameter
             if (var != null
-                || (getInlineOnly() && decl.ignorable()))
+                || (getInlineOnly() && decl.ignorable())
+                || ! decl.parameterForMethod())
                 ;
             else if (decl.isSimple () && ! decl.isIndirectBinding()) {
                 // For a simple parameter not captured by an inferior lambda,
@@ -1272,11 +1300,8 @@ public class LambdaExp extends ScopeExp {
 
     void allocParameters(Compilation comp) {
         CodeAttr code = comp.getCode();
-
-        int i = 0;
-        int j = 0;
-
-        code.locals.enterScope(getVarScope());
+        Scope sc = getVarScope();
+        code.locals.enterScope(sc);
         int line = getLineNumber();
         if (line > 0)
             code.putLineNumber(getFileName(), line);
@@ -1505,6 +1530,24 @@ public class LambdaExp extends ScopeExp {
             }
         }
         comp.callContextVar = callContextSave;
+    }
+
+    void compileAsInlined(Compilation comp, Target target) {
+        flags |= LambdaExp.METHODS_COMPILED;
+	LambdaExp saveLambda = comp.curLambda;
+	comp.curLambda = this;
+	allocChildClasses(comp);
+	allocParameters(comp);
+        CodeAttr code = comp.getCode();
+        if (startForInlining == null)
+            startForInlining = new Label(code);
+        startForInlining.define(code);
+	ApplyExp.popParams(code, this, null, false);
+	enterFunction(comp);
+	body.compileWithPosition(comp, target);
+	compileEnd(comp);
+	generateApplyMethods(comp);
+	comp.curLambda = saveLambda;
     }
 
     void compileAsMethod(Compilation comp) {

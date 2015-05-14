@@ -1,3 +1,14 @@
+2015-05-14  Per Bothner  <per@bothner.com>
+
+	* ApplyExp.java (compile): If doing a tail-call to an inlined function,
+	defer the call until we're at the end of the calling scope.
+	See comment in testsuite/inline4.scm.
+	* LambdaExp.java (pendingInlined): Queue of deferred inline calls.
+	(compileEnd): Process pendingInlines queue.
+	(alloChildClass): Define thisVariable in parameter_scope.
+	* ClassExp.java (compileMembers): Don't call declareThis yet.
+	* ScopeExp.java (scope): Make protected rather than private.
+
 2015-05-09  Per Bothner  <per@bothner.com>
 
 	* PushApply.java: Add can-finish checking for block-exit.

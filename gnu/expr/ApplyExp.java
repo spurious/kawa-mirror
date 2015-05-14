@@ -10,6 +10,7 @@ import gnu.kawa.reflect.CompileArrays;
 import gnu.kawa.io.OutPort;
 import gnu.text.SourceMessages;
 import gnu.text.SyntaxException;
+import java.util.LinkedList;
 /* #ifdef use:java.lang.invoke */
 import java.lang.invoke.*;
 /* #endif */
@@ -374,26 +375,22 @@ public class ApplyExp extends Expression
 	&& func_lambda.min_args == nonSpliceCount)
       {
         pushArgs(func_lambda, exp.args, exp.args.length, null, comp);
-        if (func_lambda.getFlag(LambdaExp.METHODS_COMPILED))
+        if (func_lambda.getFlag(LambdaExp.METHODS_COMPILED)
+            || (exp.isTailCall()
+                && func_lambda.nameDecl != null
+                && ! func_lambda.nestedIn(comp.curLambda)))
           {
+              if (func_lambda.startForInlining == null) {
+                  func_lambda.startForInlining = new Label(code);
+                  if (comp.curLambda.pendingInlines == null)
+                      comp.curLambda.pendingInlines = new LinkedList<Object>();
+                  comp.curLambda.pendingInlines.add(func_lambda);
+                  comp.curLambda.pendingInlines.add(target);
+              }
             code.emitTailCall(false, func_lambda.startForInlining);
             return;
           }
-        func_lambda.flags |= LambdaExp.METHODS_COMPILED;
-	LambdaExp saveLambda = comp.curLambda;
-	comp.curLambda = func_lambda;
-	func_lambda.allocChildClasses(comp);
-	func_lambda.allocParameters(comp);
-        Label startForInlining = new Label(code);
-        startForInlining.define(code);
-        func_lambda.startForInlining = startForInlining;
-	popParams (code, func_lambda, null, false);
-	func_lambda.enterFunction(comp);
-	func_lambda.body.compileWithPosition(comp, target);
-	func_lambda.compileEnd(comp);
-	func_lambda.generateApplyMethods(comp);
-        code.popScope(); // Matches enterScope in allocParameters.
-	comp.curLambda = saveLambda;
+        func_lambda.compileAsInlined(comp, target);
 	return;
       }
 
@@ -587,7 +584,7 @@ public class ApplyExp extends Expression
       }
   }
 
-  private static void popParams (CodeAttr code, LambdaExp lexp,
+  static void popParams (CodeAttr code, LambdaExp lexp,
                                  int[] incValues, boolean toArray)
   {
     Variable vars = lexp.getVarScope().firstVar();

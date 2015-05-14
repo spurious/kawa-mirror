@@ -1,3 +1,8 @@
+2015-05-14  Per Bothner  <per@bothner.com>
+
+	* inline4.scm: New test.
+	* Makefile.am: Update accordingly.
+
 2015-05-13  Per Bothner  <per@bothner.com>
 
 	* clisp-number-tests.scm: Hyperbolic functions are no

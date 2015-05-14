@@ -2543,7 +2543,6 @@
 (test (asin 2) 1.5707964-1.316958i)
 (test (acos 1.00001) 0.0+0.0044751023i)
 (test (atan 1) 0.7853981)
-(test-expect-fail 6)
 (test (sinh 0) 0.0)
 (test (cosh 0) 1.0)
 (test (tanh 50) 1.0)

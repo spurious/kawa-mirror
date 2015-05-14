@@ -1,5 +1,8 @@
 2015-05-13  Per Bothner  <per@bothner.com>
 
+	* clisp-number-tests.scm: Hyperbolic functions are no
+	longer expected to fail.
+
 	* larceny-tests/tests/scheme/time.sld: Update from Larceny.
 
 2015-05-10  Per Bothner  <per@bothner.com>

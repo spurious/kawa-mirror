@@ -333,6 +333,76 @@
                   (v (if (= 0 u) +i u)))
              (* 1/2 v (log (* (+ v q) (/ (- v q))))))))))
 
+(define-procedure sinh
+  (lambda (z ::complex)
+    ::complex
+    (let ((x ::double (real-part z))
+          (y ::double (imag-part z)))
+      (complex:make (* (java.lang.Math:sinh x) (java.lang.Math:cos y))
+                    (* (java.lang.Math:cosh x) (java.lang.Math:sin y)))))
+  (lambda (q ::quaternion)
+    ::quaternion
+    (/ (- (exp q) (exp (- q))) 2))
+  (lambda (x ::double)
+    ::double
+    (java.lang.Math:sinh x)))
+
+(define-procedure cosh
+  (lambda (z ::complex)
+    ::complex
+    (let ((x ::double (real-part z))
+          (y ::double (imag-part z)))
+      (complex:make (* (java.lang.Math:cosh x) (java.lang.Math:cos y))
+                    (* (java.lang.Math:sinh x) (java.lang.Math:sin y)))))
+  (lambda (q ::quaternion)
+    ::quaternion
+    (/ (+ (exp q) (exp (- q))) 2))
+  (lambda (x ::double)
+    ::double
+    (java.lang.Math:cosh x)))
+
+(define-procedure tanh
+  (lambda (z ::complex)
+    ::complex
+    (let ((x ::double (* 2 (real-part z)))
+          (y ::double (* 2 (imag-part z))))
+      (let ((w ::double (+ (java.lang.Math:cosh x)
+                           (java.lang.Math:cos y))))
+        (complex:make (/ (java.lang.Math:sinh x) w)
+                      (/ (java.lang.Math:sin y) w)))))
+  (lambda (q ::quaternion)
+    ::quaternion
+    (let ((e^q ::quaternion (exp q))
+          (e^-q ::quaternion (exp (- q))))
+      (/ (- e^q e^-q) (+ e^q e^-q))))
+  (lambda (x ::double)
+    ::double
+    (java.lang.Math:tanh x)))
+
+(define-procedure asinh
+  (lambda (q ::quaternion)
+    ::quaternion
+    (log (+ q (sqrt (+ (* q q) 1)))))
+  (lambda (x ::double)
+    ::double
+    (java.lang.Math:log (+ x (java.lang.Math:sqrt (+ (* x x) 1))))))
+
+(define-procedure acosh
+  (lambda (q ::quaternion)
+    ::quaternion
+    (log (+ q (* (sqrt (+ q 1)) (sqrt (- q 1))))))
+  (lambda (x ::double)
+    ::double
+    (java.lang.Math:log (+ x (java.lang.Math:sqrt (- (* x x) 1))))))
+
+(define-procedure atanh
+  (lambda (q ::quaternion)
+    ::quaternion
+    (/ (- (log (+ 1 q)) (log (- 1 q))) 2))
+  (lambda (x ::double)
+    ::double
+    (* 0.5 (java.lang.Math:log (/ (+ 1 x) (- 1 x))))))
+
 (define (sqrt x::java.lang.Number) ::java.lang.Number
   (cond ((java.lang.real? x)
          (java.lang.Math:sqrt x))

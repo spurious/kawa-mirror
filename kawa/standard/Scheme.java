@@ -325,6 +325,12 @@ public class Scheme extends LispLanguage {
       defProcStFld("asin", "kawa.lib.numbers");
       defProcStFld("acos", "kawa.lib.numbers");
       defProcStFld("atan", "kawa.lib.numbers");
+      defProcStFld("sinh", "kawa.lib.numbers");
+      defProcStFld("cosh", "kawa.lib.numbers");
+      defProcStFld("tanh", "kawa.lib.numbers");
+      defProcStFld("asinh", "kawa.lib.numbers");
+      defProcStFld("acosh", "kawa.lib.numbers");
+      defProcStFld("atanh", "kawa.lib.numbers");
       defProcStFld("sqrt", "kawa.lib.numbers");
       defProcStFld("square", "kawa.lib.numbers");
       defProcStFld("expt", "kawa.standard.expt");

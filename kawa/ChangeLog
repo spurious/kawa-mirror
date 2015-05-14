@@ -1,3 +1,8 @@
+2015-05-13  Per Bothner  <per@bothner.com>
+
+	* standard/Scheme.java (initScheme): Added sinh, cosh, tanh,
+	asinh, acosh, atanh.
+
 2015-05-09  Per Bothner  <per@bothner.com>
 
 	* standard/Scheme.java (createReadTable): Only recognize 'l'

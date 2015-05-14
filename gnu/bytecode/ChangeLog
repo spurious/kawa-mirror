@@ -1,5 +1,12 @@
 2015-05-13  Per Bothner  <per@bothner.com>
 
+	* Variable.java (scope): Make private.
+	(getScope, setScope): New accessor methods.
+	* LocalVarsAttr.java: Update accordingly.
+	* Scope.java: Likewise.
+
+2015-05-13  Per Bothner  <per@bothner.com>
+
 	* Label.java (setTypes): Add sanity check.
 
 2015-05-08  Jamison Hope  <jrh@theptrgroup.com>

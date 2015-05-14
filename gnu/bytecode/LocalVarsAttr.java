@@ -130,7 +130,7 @@ public class LocalVarsAttr extends Attribute
       {
 	if (var.shouldEmit())
 	  {
-	    Scope scope = var.scope;
+            Scope scope = var.getScope();
 	    int start_pc = scope.start.position;
 	    int end_pc = scope.end.position;
 	    dstr.writeShort(start_pc);
@@ -166,7 +166,7 @@ public class LocalVarsAttr extends Attribute
 	    dst.printOptionalIndex(var.signature_index);
 	    dst.printSignature(var.getType());
 	    dst.print(" (pc: ");
-	    Scope scope = var.scope;
+	    Scope scope = var.getScope();
 	    int start_pc, end_pc;
 	    if (scope == null || scope.start == null || scope.end == null
 		|| (start_pc = scope.start.position) < 0

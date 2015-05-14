@@ -48,7 +48,9 @@ public class Variable extends Location implements java.util.Enumeration
    * Only relevant if isSimple (). */
   public final boolean isAssigned () { return offset != UNASSIGNED; }
 
-  Scope scope;
+    private Scope scope;
+    public Scope getScope() { return scope; }
+    void setScope(Scope scope) { this.scope = scope; }
 
   public final boolean dead () { return (flags & LIVE_FLAG) == 0; }
 

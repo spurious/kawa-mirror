@@ -65,7 +65,7 @@ public class Scope
     else
       last_var.next = var;
     last_var = var;
-    var.scope = this;
+    var.setScope(this);
   }
 
   /* Add a new Variable, linking it in after a given Variable, */
@@ -85,7 +85,7 @@ public class Scope
       last_var = var;
     if (var.next == var)
       throw new Error("cycle");
-    var.scope = this;
+    var.setScope(this);
   }
 
   public void addVariable (CodeAttr code, Variable var)

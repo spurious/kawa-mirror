@@ -1,3 +1,7 @@
+2015-05-15  Per Bothner  <per@bothner.com>
+
+	* CaseExp.java (compile): Simplify label handling. 
+
 2015-05-14  Per Bothner  <per@bothner.com>
 
 	* ApplyExp.java (compile): If doing a tail-call to an inlined function,

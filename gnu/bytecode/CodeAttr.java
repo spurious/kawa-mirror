@@ -35,7 +35,8 @@ public class CodeAttr extends Attribute implements AttrContainer
   int flags;
 
   public Type[] stack_types;
-  Type[] local_types;
+  Type[] local_types = new Type[20];
+
   /** Previously-defined label. */
   Label previousLabel;
   /** Set of vars set in current block (since previousLabel).
@@ -65,17 +66,16 @@ public class CodeAttr extends Attribute implements AttrContainer
      in exception_table. */
   int exception_table_length;
 
-  /** Not a fixup - a no-op. */
-  static final int FIXUP_NONE = 0;
   /** The definition of a label. */
-  static final int FIXUP_DEFINE = 1;
+  static final int FIXUP_DEFINE = 0;
+  static final int FIXUP_DEFINE_UNREACHABLE = 1;
+  // From FIXUP_SWITCH up to FIXUP_TRANSFER2 must be contiguous
+  // - see the jump-to-jump optimization in processFixups.
   /** The offset points to a tableswitch/lookupswitch - handle padding. */
   static final int FIXUP_SWITCH = 2;
   /** The offset contains a label relative to the previous FIXUP_SWITCH. */
   static final int FIXUP_CASE = 3;
-  /** The offset points to a goto instruction.
-   * This case up to FIXUP_TRANSFER2 must be contiguous
-   * - see the jump-to-jump optimization in processFixups. */
+  /** The offset points to a goto instruction. */
   static final int FIXUP_GOTO = 4;
   /** The offset points to a jsr instruction. */
   static final int FIXUP_JSR = 5;
@@ -127,8 +127,9 @@ public class CodeAttr extends Attribute implements AttrContainer
    */
   public final void fixupChain (Label here, Label target)
   {
-    fixupAdd(CodeAttr.FIXUP_MOVE, 0, target);
+    fixupAdd(CodeAttr.FIXUP_MOVE, -1, target);
     here.defineRaw(this);
+    setPreviousLabelHere(here);
   }
 
   /** Add a fixup at this location.
@@ -141,8 +142,8 @@ public class CodeAttr extends Attribute implements AttrContainer
 
   final void fixupAdd (int kind, int offset, Label label)
   {
-    if (label != null && kind != FIXUP_DEFINE
-        && kind != FIXUP_NONE && kind != FIXUP_SWITCH && kind != FIXUP_TRY)
+    if (label != null && kind != FIXUP_DEFINE && kind != FIXUP_DEFINE_UNREACHABLE
+        && kind != FIXUP_SWITCH && kind != FIXUP_TRY)
       label.needsStackMapEntry = true;
     int count = fixup_count;
     if (count == 0)
@@ -160,7 +161,7 @@ public class CodeAttr extends Attribute implements AttrContainer
 	System.arraycopy (fixup_offsets, 0, new_offsets, 0, count);
 	fixup_offsets = new_offsets;
       }
-    fixup_offsets[count] = (offset << 4) | kind;
+    fixupSet(count, kind, offset);
     fixup_labels[count] = label;
     fixup_count = count + 1;
   }
@@ -174,6 +175,13 @@ public class CodeAttr extends Attribute implements AttrContainer
   {
     return fixup_offsets[index] & 15;
   }
+
+    private void fixupSet(int index, int kind, int offset) {
+         fixup_offsets[index] = fixupEncode(kind, offset);
+    }
+    private int fixupEncode(int kind, int offset) {
+        return (offset << 4) | kind;
+    }
 
   /** If true we get a line number entry for each instruction.
    * Normally false, but can be a convenient hack to allow instruction-level
@@ -357,6 +365,13 @@ public class CodeAttr extends Attribute implements AttrContainer
         stackMap.countStack = 0;
       }
   }
+
+    void setPreviousLabelHere(Label here) {
+        previousLabel = here;
+        boolean[] varsSet = varsSetInCurrentBlock;
+        if (varsSet != null)
+            for (int i = varsSet.length;  --i >= 0; ) varsSet[i] = false;
+    }
 
   public void noteVarType (int offset, Type type)
   {
@@ -1544,8 +1559,10 @@ public class CodeAttr extends Attribute implements AttrContainer
                 var.setType(ctype);
           }
         for (int i = local_types == null ? 0 : local_types.length;  --i >= 0; )
-          if (local_types[i] == t)
-            local_types[i] = ctype;
+          {
+            if (local_types[i] == t)
+                local_types[i] = ctype;
+          }
       }
    if (method.return_type.size != 0)
       pushType(method.return_type);
@@ -2495,21 +2512,23 @@ public class CodeAttr extends Attribute implements AttrContainer
             return;
 
         // For each label, set it to its maximum limit, assuming all
-        // fixups causes the code the be expanded.  We need a prepass
+        // fixups causes the code to be expanded.  We need a prepass
         // for this, since FIXUP_MOVEs can cause code to be reordered.
         // Also, convert each FIXUP_MOVE_TO_END to FIXUP_MOVE.
 
         int delta = 0;
         int instruction_tail = fixup_count;
-        fixupAdd(CodeAttr.FIXUP_MOVE, 0, null);
+        fixupAdd(CodeAttr.FIXUP_MOVE, -1, null);
 
-        /* DEBUGGING:
-        System.err.println("processFixups for "+getMethod());
-        ClassTypeWriter writer =
-            new ClassTypeWriter(getMethod().getDeclaringClass(), System.err, 0);
-        writer.println("processFixups for "+getMethod());
-        disAssembleWithFixups(writer);
-        writer.flush();
+        /* DEBUGGING
+        if (false) {
+            ClassTypeWriter writer =
+                new ClassTypeWriter(getMethod().getDeclaringClass(),
+                                    System.err, 0);
+            writer.println("processFixups1 for "+getMethod());
+            disAssembleWithFixups(writer);
+            writer.flush();
+        }
         */
 
   loop1:
@@ -2519,6 +2538,28 @@ public class CodeAttr extends Attribute implements AttrContainer
 	int kind = offset & 15;
 	offset >>= 4;
 	Label label = fixup_labels[i];
+        // Optimize: TRANSFER L1; ...; L1: GOTO L2
+        // to: TRANSFER L2; ...; L1: GOTO L2
+        // If L1 is a FIXUP_DEFINE_UNREACHABLE then we can delete the GOTO L2
+        // (replace it with a DELETE3), since L1 is never reached.
+	while (label != null
+	       && kind >= FIXUP_CASE && kind <= FIXUP_TRANSFER2)
+	  {
+            int labpc = fixupOffset(label.first_fixup);
+            int def = label.first_fixup+1;
+            for (; def < fixup_count; def++) {
+                if (labpc != fixupOffset(def)) {
+                    def = fixup_count;
+                } else if (fixupKind(def) == FIXUP_GOTO
+                           || fixupKind(def) == FIXUP_DELETE3) {
+                    label = fixup_labels[def];
+                    fixup_labels[i] = label;
+                    break;
+                }
+            }
+            if (def >= fixup_count)
+                break;
+	  }
 	switch (kind)
 	  {
 	  case FIXUP_TRY:
@@ -2526,10 +2567,33 @@ public class CodeAttr extends Attribute implements AttrContainer
             break;
 	  case FIXUP_LINE_PC:
 	    i++;
-	  case FIXUP_NONE:
 	  case FIXUP_CASE:
 	  case FIXUP_DELETE3:
 	    break;
+          case FIXUP_DEFINE_UNREACHABLE:
+              // If we're currently "unreachable" and we see
+              //    L0: L1: ... Ln: GOTO Lg
+              // then we can delete the "GOTO Lg" because we also (separately)
+              // patch each use of Li to Lg.
+              while (i + 1 < fixup_count && fixupKind(i+1) == FIXUP_DEFINE
+                     && fixupOffset(i+1) == offset) {
+                  i++;
+                  label.position += delta;
+                  label = fixup_labels[i];
+              }
+              if (i + 1 < fixup_count && fixupKind(i+1) == FIXUP_GOTO
+                  && fixupOffset(i+1) == offset) {
+                  for (int j = i; ; j--) {
+                      fixup_labels[j].needsStackMapEntry = false;
+                      if (fixupKind(j) == FIXUP_DEFINE_UNREACHABLE)
+                          break;
+                  }
+                  i++;
+                  fixupSet(i, FIXUP_DELETE3, offset);
+                  delta -= 3;
+                  continue;
+              }
+              // fall through
 	  case FIXUP_DEFINE:
 	    label.position += delta;
 	    break;
@@ -2537,13 +2601,10 @@ public class CodeAttr extends Attribute implements AttrContainer
 	    delta += 3;  // May need to add up to 3 padding bytes.
 	    break;
 	  case FIXUP_GOTO:
-	    // The first test fails in this case:  GOTO L2; L1: L2:  FIXME
-	    if (label.first_fixup == i + 1
-		&& fixupOffset(i+1) == offset + 3)
+            if (fixupOffset(label.first_fixup) == offset + 3)
 	      {
 		// Optimize: GOTO L; L:
-		fixup_offsets[i] = (offset << 4) | FIXUP_DELETE3;
-		fixup_labels[i] = null;
+                fixupSet(i, FIXUP_DELETE3, offset);
 		delta -= 3;
 		break;
 	      }
@@ -2561,9 +2622,9 @@ public class CodeAttr extends Attribute implements AttrContainer
 	    instruction_tail = offset;
 	    // ... fall through ...
 	  case FIXUP_MOVE:
-	    int cur_pc = ((i+1) >= fixup_count ? PC
-			  : fixupOffset(fixup_labels[i+1].first_fixup));
-	    fixup_offsets[i] = (cur_pc << 4) | FIXUP_MOVE;
+            int cur_pc = ((i+1) >= fixup_count ? PC
+                          : fixupOffset(fixup_labels[i+1].first_fixup));
+            fixupSet(i, FIXUP_MOVE, cur_pc);
 	    if (label == null)
 	      break loop1;
 	    else
@@ -2593,19 +2654,7 @@ public class CodeAttr extends Attribute implements AttrContainer
 	Label label = fixup_labels[i];
 	if (label != null && label.position < 0)
 	  throw new Error ("undefined label "+label);
-	while (label != null
-	       && kind >= FIXUP_GOTO && kind <= FIXUP_TRANSFER2
-	       && label.first_fixup + 1 < fixup_count
-	       && (fixup_offsets[label.first_fixup + 1]
-		   == ((fixup_offsets[label.first_fixup] & 15) | FIXUP_GOTO)))
-	  {
-	    // Optimize  JUMP L; ... L:  GOTO X
-	    // (where the JUMP is any GOTO or other transfer)
-	    // by changing the JUMP L to JUMP X.
-	    label = fixup_labels[label.first_fixup + 1];
-	    fixup_labels[i] = label;
-	  }
-	offset = offset >> 4;
+        offset = offset >> 4;
 	switch (kind)
 	  {
 	  case FIXUP_TRY:
@@ -2614,13 +2663,13 @@ public class CodeAttr extends Attribute implements AttrContainer
             break;
 	  case FIXUP_LINE_PC:
 	    i++;
-	  case FIXUP_NONE:
 	  case FIXUP_CASE:
 	    break;
 	  case FIXUP_DELETE3:
 	    delta -= 3;
 	    new_size -= 3;
 	    break;
+          case FIXUP_DEFINE_UNREACHABLE:
 	  case FIXUP_DEFINE:
 	    label.position = offset + delta;
 	    break;
@@ -2635,7 +2684,7 @@ public class CodeAttr extends Attribute implements AttrContainer
 	    int rel = label.position - (offset+delta);
 	    if ((short) rel == rel)
 	      {
-		fixup_offsets[i] = (offset << 4) | FIXUP_TRANSFER2;
+                fixupSet(i, FIXUP_TRANSFER2, offset);
 	      }
 	    else
 	      {
@@ -2658,6 +2707,16 @@ public class CodeAttr extends Attribute implements AttrContainer
 	  }
 	i++;
       }
+
+    /* DEBUGGING
+    if (false) {
+        ClassTypeWriter writer =
+            new ClassTypeWriter(getMethod().getDeclaringClass(), System.err, 0);
+        writer.println("processFixups3 for "+getMethod());
+        disAssembleWithFixups(writer);
+        writer.flush();
+    }
+    */
 
     byte[] new_code = new byte[new_size];
     int prev_linenumber = -1;
@@ -2686,10 +2745,9 @@ public class CodeAttr extends Attribute implements AttrContainer
               throw new Error("labels out of order");
 	    switch (kind)
 	      {
-	      case FIXUP_NONE:
-		break;
 	      case FIXUP_DEFINE:
-                if (stackMap != null && label != null && label.stackTypes != null && label.needsStackMapEntry)
+              case FIXUP_DEFINE_UNREACHABLE:
+                  if (stackMap != null && label != null && label.isUsed() && label.needsStackMapEntry)
                   {
                     pendingStackMapLabel
                       = mergeLabels(pendingStackMapLabel, label);
@@ -2923,11 +2981,11 @@ public class CodeAttr extends Attribute implements AttrContainer
             dst.print(" @");  dst.print(offset);
             prev_pc = pc;
             switch (kind) {
-            case FIXUP_NONE:
-                dst.println(" NONE");
-                break;
             case FIXUP_DEFINE:
+            case FIXUP_DEFINE_UNREACHABLE:
                 dst.print(" DEFINE ");
+                if (kind == FIXUP_DEFINE_UNREACHABLE)
+                    dst.print("(unreachable) ");
                 dst.println(label);
                 break;
             case FIXUP_SWITCH:
@@ -3320,9 +3378,11 @@ public class CodeAttr extends Attribute implements AttrContainer
    */
   public void endFragment (int cookie)
   {
-    fixup_offsets[cookie] = (fixup_count << 4) | FIXUP_MOVE_TO_END;
+    fixupSet(cookie, FIXUP_MOVE_TO_END, fixup_count);
     Label after = fixup_labels[cookie];
-    fixupAdd(FIXUP_MOVE, 0, null);
+    fixupAdd(FIXUP_MOVE, -1, null);
     after.define(this);
+    int fx = fixup_count - 1;
+    fixupSet(fx, FIXUP_DEFINE, fixupOffset(fx));
   }
 }

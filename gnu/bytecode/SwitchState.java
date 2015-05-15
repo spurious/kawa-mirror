@@ -79,10 +79,13 @@ public class SwitchState {
      * Called implicitly by {@link CodeAttr#startSwitch}.
      */
     public void switchValuePushed(CodeAttr code) {
-        switch_label.setTypes(code);
-        code.popType();  // pop switch value
+        Type top = code.popType();  // pop switch value
         cases_label.setTypes(code);
-        code.fixupChain(cases_label, switch_label);
+        code.pushType(top);
+        switch_label.setTypes(code);
+        code.fixupAdd(CodeAttr.FIXUP_MOVE, -1, switch_label);
+        code.setUnreachable();
+        cases_label.define(code);
     }
 
     /** Emit a new case, for the given value, whose label is here. */
@@ -130,12 +133,9 @@ public class SwitchState {
             labels[0] = label;
             return true;
         }
+
         int[] old_values = values;
         Label[] old_labels = labels;
-        if (numCases >= values.length) {
-            values = new int[2 * numCases];
-            labels = new Label[2 * numCases];
-        }
         int copyBefore;
         if (value < minValue) {
             copyBefore = 0;
@@ -158,6 +158,10 @@ public class SwitchState {
 
             if (value == old_values[copyBefore])
                 return false;
+        }
+        if (numCases >= values.length) {
+            values = new int[2 * numCases];
+            labels = new Label[2 * numCases];
         }
         int copyAfter = numCases - copyBefore;
         System.arraycopy(old_values, copyBefore, values, copyBefore+1, copyAfter);
@@ -199,15 +203,9 @@ public class SwitchState {
             code.emitInvokeSpecial(con);
             code.emitThrow();
         }
-        Label end_label = new Label(code);
+        code.fixupAdd(CodeAttr.FIXUP_MOVE, -1, after_label);
+        switch_label.define(code);
 
-        // When numCases > 1 we are going to generate code
-        // that will be moved before the already generated 
-        // code of the case clauses. We need to set the 
-        // stack map to reflect the correct state.
-        code.setTypes((numCases <= 1) ? switch_label : cases_label);
-
-        code.fixupChain(switch_label, end_label);
         if (numCases <= 1) {
             if (numCases == 1) {
                 if (minValue == 0)
@@ -257,9 +255,11 @@ public class SwitchState {
                 }
             }
         }
-        code.fixupChain(end_label, cases_label);
+        code.fixupAdd(CodeAttr.FIXUP_MOVE, cases_label);
         code.setUnreachable();
-        if (after_label.localTypes != null)
+        if (after_label.isUsed())
             after_label.define(code);
+        else
+            after_label.defineRaw(code);
     }
 }

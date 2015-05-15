@@ -215,16 +215,8 @@ public class CaseExp extends Expression {
         Label defaultl = new Label();
 
         for (int h : hashToClauseMap.keySet()) {
-            Label label = new Label(code);
-
-            // when we are dealing with the conditionals
-            // needed for collision detection, we have to
-            // merge the stack maps, otherwise we get verify errors
-            if (!integer) label.setTypes(code);
-
-            label.setTypes(before_label);
-            label.define(code);
-            sw.insertCase(h, label, code);
+            if (! integer)
+                sw.addCase(h, code);
             ArrayList<Object> dwes = hashToClauseMap.get(h);
             Object datum;
             for (int i = 0; i < dwes.size(); i = i + 2) {
@@ -284,6 +276,9 @@ public class CaseExp extends Expression {
                 Label expLabel = expToLabelMap.get(exp);
                 if (pendingDatumCount == 0) {
                     // It's the last time we use the exp, so compile it.
+                    if (integer) {
+                        sw.addCase(h, code);
+                    }
                     if (expLabel != null)
                         expLabel.define(code);
                     exp.compile(comp, target);
@@ -296,7 +291,10 @@ public class CaseExp extends Expression {
                         expLabel = new Label(code);
                         expToLabelMap.put(exp, expLabel);
                     }
-                    code.emitGoto(expLabel);
+                    if (integer)
+                        sw.addCaseGoto(h, code, expLabel);
+                    else
+                        code.emitGoto(expLabel);
                 }
                 if (!integer) code.emitFi();
             }
@@ -330,7 +328,7 @@ public class CaseExp extends Expression {
             || key.getType() == Type.byteType
             || key.getType() == LangPrimType.charType
             || key.getType() == LangPrimType.characterType) {
-            // hasCode for an int is the int itself
+            // hashCode for an int is the int itself
             key.compile(comp, Type.intType);
         } else if (key.getType() == Type.longType) {
             // hashCode function for longs, inlined

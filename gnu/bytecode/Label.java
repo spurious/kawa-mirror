@@ -200,18 +200,23 @@ public class Label {
           }
       }
   }
+
   /**
    * Define the value of a label as having the current location.
    * @param code the "Code" attribute of the current method
    */
-  public void defineRaw (CodeAttr code)
+  public void defineRaw (CodeAttr code) {
+      defineRaw(code, CodeAttr.FIXUP_DEFINE);
+  }
+
+  void defineRaw (CodeAttr code, int fixupKind)
   {
     if (position >= 0)
       throw new Error ("label definition more than once");
     position = code.PC;
     first_fixup = code.fixup_count;
     if (first_fixup >= 0)
-      code.fixupAdd(CodeAttr.FIXUP_DEFINE, this);
+      code.fixupAdd(fixupKind, this);
   }
 
   /**
@@ -220,7 +225,8 @@ public class Label {
    */
   public void define (CodeAttr code)
   {
-    if (code.reachableHere())
+    boolean wasReachable=code.reachableHere();
+    if (wasReachable)
       {
         setTypes(code);
       }
@@ -235,12 +241,13 @@ public class Label {
               }
           }
       }
-    code.previousLabel = this;
-    code.varsSetInCurrentBlock = null; // FIXME - zero out instead.
-    defineRaw(code);
-    if (localTypes != null)
+    code.setPreviousLabelHere(this);
+    defineRaw(code, (wasReachable ? CodeAttr.FIXUP_DEFINE
+                     : CodeAttr.FIXUP_DEFINE_UNREACHABLE));
+    if (localTypes != null) {
       // Copy merged type back to current state.
       code.setTypes(this);
+    }
     code.setReachable(true);
   }
 

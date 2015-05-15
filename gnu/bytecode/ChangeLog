@@ -1,3 +1,13 @@
+2015-05-15  Per Bothner  <per@bothner.com>
+
+	Optimizations to avoid redundant goto.
+	* CodeAttr.java (FIXUP_DEFINE_UNREACHABLE): New kind of fixup.
+	(FIXUP_NONE): Remove unneeded fixup kind.
+	(fixupSet, fixupEncode, setPreviousLabelHere): New convenience methods.
+	(processFixups): Optimize many redundant gotos and transfer-to-goto.
+	* Label.java (defineRaw): Add overload to specify fixup-kind.
+	* SwitchState.java: Tweaks to stack-types and fixup-chaining.
+
 2015-05-13  Per Bothner  <per@bothner.com>
 
 	* Variable.java (scope): Make private.

@@ -129,6 +129,12 @@ public class DComplex extends Complex implements Externalizable
   public static Complex power (double x_re, double x_im,
                                double y_re, double y_im)
   {
+    if (x_re == 0.0 && x_im == 0.0) {
+      if (y_re > 0.0)
+        return DFloNum.valueOf(0.0);
+      else if (y_re == 0.0 && y_im == 0.0)
+        return DFloNum.valueOf(1.0);
+    }
     double h;
     /* #ifdef JAVA5 */
     h = Math.hypot(x_re, x_im);

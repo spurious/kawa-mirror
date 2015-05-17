@@ -128,10 +128,16 @@ public abstract class Complex extends Quaternion
   {
     if (y instanceof IntNum)
       return (Complex) x.power((IntNum) y);
-    double x_re = x.doubleRealValue();
-    double x_im = x.doubleImagValue();
     double y_re = y.doubleRealValue();
     double y_im = y.doubleImagValue();
+    if (x.isZero() && x.isExact() && y.isExact()) {
+        if (y_re > 0)
+            return IntNum.zero();
+        else if (y_re == 0 && y_im == 0)
+            return IntNum.one();
+    }
+    double x_re = x.doubleRealValue();
+    double x_im = x.doubleImagValue();
     if (x_im == 0.0 && y_im == 0
 	&& (x_re >= 0 || Double.isInfinite(x_re) || Double.isNaN(x_re)))
       return new DFloNum (Math.pow (x_re, y_re));

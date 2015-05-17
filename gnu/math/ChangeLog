@@ -1,3 +1,19 @@
+2015-05-15  Jamison Hope  <jrh@theptrgroup.com>
+
+	Fixes for (expt 0 q) and (expt 0.0 q) to conform to R7RS
+	language.
+	* Complex.java (power): If both arguments are exact and the first
+	argument is zero, return exact zero if the real-part of the second
+	argument is positive and return exact one if the second argument
+	is zero.
+	* Quaternion.java (power): Likewise.
+	* DComplex.java (power): If x_re and x_im are both 0.0, return
+	inexact zero if y_re > 0 and return inexact one if y_re and y_im
+	are both 0.0.
+	* DQuaternion.java (power): If x_re, x_im, x_jm, and x_km are all
+	0.0, return inexact zero if y_re > 0 and return inexact one if
+	y_re, y_im, y_jm, and y_km are all 0.0.
+
 2015-05-10  Per Bothner  <per@bothner.com>
 
 	* DFloNum.java (valueOf): New method.

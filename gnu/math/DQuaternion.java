@@ -168,6 +168,13 @@ public class DQuaternion extends Quaternion implements Externalizable {
         if (x_jm == 0.0 && x_km == 0.0 && y_jm == 0.0 && y_km == 0.0)
             return DComplex.power(x_re, x_im, y_re, y_im);
 
+        if (x_re == 0.0 && x_im == 0.0 && x_jm == 0.0 && x_km == 0.0)
+            if (y_re > 0.0)
+                return DFloNum.valueOf(0.0);
+            else if (y_re == 0.0 && y_im == 0.0 &&
+                     y_jm == 0.0 && y_km == 0.0)
+                return DFloNum.valueOf(1.0);
+
         // ln(x)
         double qmag = hypot4(x_re, x_im, x_jm, x_km);
         double vmag = hypot3(x_im, x_jm, x_km);

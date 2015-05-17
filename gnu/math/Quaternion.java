@@ -220,14 +220,20 @@ public abstract class Quaternion extends Quantity {
     public static Quaternion power(Quaternion x, Quaternion y) {
         if (y instanceof IntNum)
             return (Quaternion) x.power((IntNum) y);
-        double x_re = x.doubleRealValue();
-        double x_im = x.doubleImagValue();
-        double x_jm = x.doubleJmagValue();
-        double x_km = x.doubleKmagValue();
         double y_re = y.doubleRealValue();
         double y_im = y.doubleImagValue();
         double y_jm = y.doubleJmagValue();
         double y_km = y.doubleKmagValue();
+        if (x.isZero() && x.isExact() && y.isExact()) {
+            if (y_re > 0)
+                return IntNum.zero();
+            else if (y_re == 0 && y_im == 0 && y_jm == 0 && y_km == 0)
+                return IntNum.one();
+        }
+        double x_re = x.doubleRealValue();
+        double x_im = x.doubleImagValue();
+        double x_jm = x.doubleJmagValue();
+        double x_km = x.doubleKmagValue();
         if (x_im == 0.0 && y_im == 0.0 && x_jm == 0.0 && y_jm == 0.0 &&
             x_km == 0.0 && y_km == 0.0 &&
             (x_re >= 0 || Double.isInfinite(x_re) || Double.isNaN(x_re)))

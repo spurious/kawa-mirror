@@ -1,4 +1,4 @@
-(test-init "Miscellaneous" 218)
+(test-init "Miscellaneous" 217)
 
 ;;; DSSSL spec example 11
 (test '(3 4 5 6) (lambda x x) 3 4 5 6)
@@ -48,10 +48,9 @@
 (test #t keyword? 'foo:)
 (test #f keyword? 'foo\:)
 (test #t keyword? 'foo:)
-(test #t keyword? foo:)
 (test #f keyword? 'foo)
 (test #f keyword? ':)
-(test #t keyword? ||:)
+(test #t keyword? '||:)
 (test #t keyword? (car '(a: b:)))
 (test #f keyword? "bar")
 
@@ -70,12 +69,12 @@
 (test '("default c" "a" 1) 'key-2b (key-2 a: "a"))
 
 ;;; DSSSL spec example 44
-(test "Argentina" keyword->string \Argentina:)
-(test "foo" keyword->string foo:)
-(test "" keyword->string ||:)
+(test "Argentina" keyword->string 'Argentina:)
+(test "foo" keyword->string 'foo:)
+(test "" keyword->string '||:)
 (test "a b c" keyword->string (string->keyword "a b c"))
-(test foo: string->keyword "foo")
-(test ||: string->keyword "")
+(test 'foo: string->keyword "foo")
+(test '||: string->keyword "")
 
 ;; Test keyword parameter with primitive type.
 (define (fun-with-keys1 #!key (code ::int 400) (message ::string "brrp"))

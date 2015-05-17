@@ -131,7 +131,7 @@
       (let loop ((i :: <int> 0))
 	(if (< i num-args)
 	    (let ((arg ((primitive-array-get <object>) args i)))
-	      (cond ((and (eq? arg label:) (< (+ i 1) num-args))
+	      (cond ((and (eq? arg 'label:) (< (+ i 1) num-args))
 		     (invoke menu 'setText
 			     (as <String>
 				 ((primitive-array-get <object>) args (+ i 1))))

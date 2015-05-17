@@ -11,11 +11,14 @@
 
 (list 0 k1: 'k2: 5 8)
 (list 0 k1: k2: 5 8)
-;; Diagnostic: bad-keywords1.scm:13:13: warning - missing keyword value
+;; Diagnostic: bad-keywords1.scm:13:13: warning - missing value after unquoted keyword
 
 (list 0 k1: 3 'k2:)
 (list 0 k1: 3 k2:)
-;; Diagnostic: bad-keywords1.scm:17:15: warning - missing keyword value
+;; Diagnostic: bad-keywords1.scm:17:15: warning - missing value after unquoted keyword
 
 (list k1: k2: 5 9)
-;; Diagnostic: bad-keywords1.scm:20:11: warning - missing keyword value
+;; Diagnostic: bad-keywords1.scm:20:11: warning - missing value after unquoted keyword
+
+(list 5 6 k2:)
+;; Diagnostic: bad-keywords1.scm:23:11: warning - missing value after unquoted keyword

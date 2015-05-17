@@ -1,3 +1,9 @@
+2015-05-16  Per Bothner  <per@bothner.com>
+
+	* misc-test.scm: Quote keywords as needed.  Remove now-redundant test.
+	* bad-keywords1.scm: Add test for single final keyword.
+	Update warning message text.
+
 2015-05-15  Per Bothner  <per@bothner.com>
 
 	* inlining.expected: Update for removed redundant gotos.

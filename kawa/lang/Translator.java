@@ -449,12 +449,14 @@ public class Translator extends Compilation
         Object cdr_cdr = cdr_pair.getCdr();
         Expression arg;
         if (cdr_car instanceof Keyword) {
-            if (first_keyword < 0)
+            if (first_keyword < 0) {
                 first_keyword = i;
-            else if (keywordsAreSelfEvaluating())
+                last_keyword = i - 2; // To suppress incorrect warnings
+            }
+            if (keywordsAreSelfEvaluating())
                 ;
             else if (i == last_keyword + 1 || i + 1 == cdr_length)
-                error('w', "missing keyword value");
+                error('w', "missing value after unquoted keyword");
             else if (i != last_keyword + 2)
                 error('w', "keyword separated from other keyword arguments");
             last_keyword = i;

@@ -206,7 +206,7 @@ public abstract class RatNum extends RealNum
     else if (x.isExact() && y.isExact())
       return IntNum.zero ();
     else
-        return DFloNum.valueOf(0.0);
+      return DFloNum.zero();
   }
 
   private static RealNum simplest_rational2 (RealNum x, RealNum y)

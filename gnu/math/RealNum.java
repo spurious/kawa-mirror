@@ -13,7 +13,7 @@ public abstract class RealNum extends Complex
   public final RealNum im() { return IntNum.zero(); }
 
   public final RealNum angle() {
-    return isNegative() ? DFloNum.valueOf(Math.PI) :IntNum.zero();
+    return isNegative() ? DFloNum.valueOf(Math.PI) : DFloNum.zero();
   }
 
     @Override public final Quaternion vectorPart() { return IntNum.zero(); }

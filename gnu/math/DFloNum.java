@@ -48,6 +48,9 @@ public class DFloNum extends RealNum implements Externalizable
         return new DFloNum(value);
     }
 
+    private static final DFloNum zero = new DFloNum(0.0);
+    public static DFloNum zero() { return zero; }
+
   public static DFloNum asDFloNumOrNull (Object value)
   {
     if (value instanceof DFloNum)

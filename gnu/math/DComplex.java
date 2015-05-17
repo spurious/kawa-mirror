@@ -131,7 +131,7 @@ public class DComplex extends Complex implements Externalizable
   {
     if (x_re == 0.0 && x_im == 0.0) {
       if (y_re > 0.0)
-        return DFloNum.valueOf(0.0);
+        return DFloNum.zero();
       else if (y_re == 0.0 && y_im == 0.0)
         return DFloNum.valueOf(1.0);
     }

@@ -1,3 +1,9 @@
+2015-05-17  Per Bothner  <per@bothner.com>
+
+	* RealNum.java (angle): Return floating zero for non-negative value.
+	* DFloNum.java (zero): New constant.
+	* DComplex.java, RatNum.java: Use zero.
+
 2015-05-15  Jamison Hope  <jrh@theptrgroup.com>
 
 	Fixes for (expt 0 q) and (expt 0.0 q) to conform to R7RS

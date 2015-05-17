@@ -457,7 +457,7 @@
 (define (angle (x ::java.lang.Number)):: <real>
   (if (gnu.math.Quaternion? x)
       ((->gnu.math.Quaternion x):angle)
-      (if (< (x:doubleValue) 0) java.lang.Math:PI 0)))
+      (if (< (x:doubleValue) 0) java.lang.Math:PI 0.0)))
 
 (define (inexact (num :: java.lang.Number)) :: java.lang.Number
   (gnu.kawa.functions.Arithmetic:toInexact num))

@@ -1,5 +1,8 @@
 2015-05-17  Per Bothner  <per@bothner.com>
 
+	* larceny-tests/run/time.sps: Don't write megaflops-per-second
+	output since it breaks diff-ing the output.
+
 	* larceny-tests/tests/scheme/read.sld: Another Larceny test.
 	* larceny-tests/run/read.sps: New test driver.
 	* Makefile.am (LARCENY_SIMPLE_TESTS1): Add read.

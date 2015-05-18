@@ -393,9 +393,10 @@ public class PrimProcedure extends MethodProc {
         }
     }
 
-    static Type decodeType(Type javaType, String[] annotTypes, int annotIndex,
-                           ParameterizedType parameterizedType,
-                           Language lang) {
+    public static Type decodeType(Type javaType,
+                                  String[] annotTypes, int annotIndex,
+                                  ParameterizedType parameterizedType,
+                                  Language lang) {
         String annotType = annotTypes != null && annotTypes.length > annotIndex
             ? annotTypes[annotIndex] : null;
         return lang.decodeType(javaType, annotType, parameterizedType);

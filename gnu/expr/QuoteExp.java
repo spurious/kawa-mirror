@@ -166,6 +166,10 @@ public class QuoteExp extends Expression
       return inlined;
     Expression[] args = exp.args;
     MethodProc asMProc = proc instanceof MethodProc ? (MethodProc) proc : null;
+    // FIXME There is duplicate work with resolving parameter types first
+    // here then in PrimProcedure.getMethodFor.  For an overloaded method
+    // or GenericProc we should try to narrow down applicable methods before
+    // validating the arguments, as in CompileInvoke.
     for (int i = 0;  i < nargs;  i++)
       {
         Type ptype = asMProc != null ? asMProc.getParameterType(i) : null;

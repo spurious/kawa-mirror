@@ -1,6 +1,12 @@
+2015-05-18  Per Bothner  <per@bothner.com>
+
+	* ModuleMethod.java (resolveParameterTypes): Check and possibly use
+	SourceMethodType annotation.
+	* PrimProcedure (decodeType): Make public.
+
 2015-05-15  Per Bothner  <per@bothner.com>
 
-	* CaseExp.java (compile): Simplify label handling. 
+	* CaseExp.java (compile): Simplify label handling.
 
 2015-05-14  Per Bothner  <per@bothner.com>
 

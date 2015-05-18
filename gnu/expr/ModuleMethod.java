@@ -3,6 +3,7 @@
 
 package gnu.expr;
 import gnu.mapping.*;
+import kawa.SourceMethodType;
 import java.lang.reflect.*;
 
 /** Call a specified method in in a ModuleBody.
@@ -75,9 +76,21 @@ public class ModuleMethod extends MethodProc
                     Class[] parameterClasses = method.getParameterTypes();
                     int numParamTypes = parameterClasses.length;
                     gnu.bytecode.Type[] atypes = new gnu.bytecode.Type[numParamTypes];
+                    String[] annotTypes;
+                    try {
+                        SourceMethodType sourceType = method.getAnnotation(SourceMethodType.class);
+                        annotTypes = sourceType == null ? null : sourceType.value();
+                    } catch (Throwable ex) {
+                        annotTypes = null;
+                    }
                     for (int i = numParamTypes;  --i >= 0; )
                       {
                         atypes[i] = lang.getTypeFor(parameterClasses[i]);
+                        if (annotTypes != null)
+                            atypes[i] =
+                                PrimProcedure.decodeType(atypes[i],
+                                                         annotTypes, i+1,
+                                                         null, lang);
                       }
                     this.argTypes = atypes;
                   }

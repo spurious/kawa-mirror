@@ -1,3 +1,10 @@
+2015-05-17  Per Bothner  <per@bothner.com>
+
+	* larceny-tests/tests/scheme/complex.sld: Another Larceny test.
+	* larceny-tests/tests/scheme/complex.body.scm: Part of new test,
+	* larceny-tests/run/complex.sps: New test driver.
+	* Makefile.am (LARCENY_SIMPLE_TESTS1): Add complex.
+
 2015-05-16  Per Bothner  <per@bothner.com>
 
 	* misc-test.scm: Quote keywords as needed.  Remove now-redundant test.

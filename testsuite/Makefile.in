@@ -244,7 +244,7 @@ LARCENY_IMPORT_PATH = \
 LARCENY_TEST_OPTIONS = $(LARCENY_IMPORT_PATH) \
   $(OPTIONS) --r7rs --no-warn-unused
 
-LARCENY_SIMPLE_TESTS1 = case-lambda char cxr complex eval file inexact time
+LARCENY_SIMPLE_TESTS1 = case-lambda char complex cxr eval file inexact read time
 
 # tests using load, so change directories so load can find needed files
 # (However, don't cd to srcdir for any tests that write files.)

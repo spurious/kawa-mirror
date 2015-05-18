@@ -191,7 +191,7 @@ public abstract class RealNum extends Complex
   public Complex log ()
   {
     double x = doubleValue();
-    if (x < 0)
+    if (x <= 0)
       return DComplex.log(x, 0.0);
     return new DFloNum(Math.log(x));
   }

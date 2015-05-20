@@ -1,3 +1,9 @@
+2015-05-20  William D Clinger <will@ccs.neu.edu>
+
+	* larceny-tests/run/time.sps: Updated versionfrom Larceny.
+	* larceny-tests/tests/scheme/char.body-alt.scm: New, from Larceny.
+	* larceny-tests/tests/scheme/char.sld: Updated runner from Larceny.
+
 2015-05-17  Per Bothner  <per@bothner.com>
 
 	* larceny-tests/run/time.sps: Don't write megaflops-per-second

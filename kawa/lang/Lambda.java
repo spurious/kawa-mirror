@@ -647,6 +647,8 @@ public class Lambda extends Syntax
         lexp.setCoercedReturnValue(texp, tr.getLanguage());
       }
     else if (lexp.body instanceof BeginExp
+        && body instanceof Pair
+        && ((Pair) body).getCar() instanceof Symbol
         && (len = (exps = ((BeginExp) lexp.body).getExpressions()).length) > 1
         && (exps[0] instanceof ReferenceExp
             || ((val = exps[0].valueIfConstant()) instanceof Type

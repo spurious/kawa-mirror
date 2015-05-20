@@ -1,3 +1,8 @@
+2015-05-20  Per Bothner  <per@bothner.com>
+
+	* lang/Lambda.java (rewriteBody): Only allow colon-less return-type
+	specifier as a single symbol.
+
 2015-05-16  Per Bothner  <per@bothner.com>
 
 	* lang/Translator.java (rewrite_pair): Fix bug in test for missing

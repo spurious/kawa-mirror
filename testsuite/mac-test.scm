@@ -391,9 +391,9 @@
      (field (this) (quote slotname)))))
 (define-simple-class <xclass> ()
   (x init: 0)
-  ((incx) <void>
+  ((incx) ::void
    (set! (slot x) (+ 1 (slot x))))
-  ((incx2) <void>
+  ((incx2) ::void
    (set! (slot (this) x) (+ 1 (slot (this) x)))))
 (define xinstance (make <xclass>))
 (with-compile-options warn-invoke-unknown-method: #f

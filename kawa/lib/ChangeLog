@@ -1,3 +1,7 @@
+2015-05-20  Per Bothner  <per@bothner.com>
+
+	* reflection.scm: Fix deprecated return-type specifier syntax.
+
 2015-05-17  Per Bothner  <per@bothner.com>
 
 	* numbers.scm (angle): Return floating (exact) zero if non-negative.

@@ -110,7 +110,7 @@
 		  make <gnu.kawa.reflect.StaticSet>
 		  ctype fname ftype 9 #|PUBLIC|STATIC|#))))
 
-(define (subtype? (t1 ::type) (t2 ::type)) <boolean>
+(define (subtype? (t1 ::type) (t2 ::type)) ::boolean
   ((primitive-virtual-method <type> "isSubtype" <boolean> (<type>))
    t1 t2))
 

@@ -44,7 +44,7 @@
        (let*
 	   ((obj (object (<object>)
 			 (fld 10)
-			 ((toString) <String> fld)))
+			 ((toString) ::String fld)))
 	    (val1 (field obj 'fld))
 	    (str1 (as <String> obj)))
 	 (begin
@@ -59,7 +59,7 @@
 	   ((val0 100)
 	    (obj (object (<object>)
 			 (fld val0)
-			 ((toString) <String> fld)))
+			 ((toString) ::String fld)))
 	    (val1 (field obj 'fld))
 	    (str1 (as <String> obj)))
 	 (begin
@@ -83,11 +83,11 @@
 		(letrec ((opt
 			  (lambda (args)
 			    (list obj
-				  (object (<java.lang.Object>
-					   <java.awt.event.ItemListener>)
+				  (object (java.lang.Object
+					   java.awt.event.ItemListener)
 					  ((itemStateChanged
 					    (arg::java.awt.event.ItemEvent))
-					   <void>
+					   ::void
 					   (display name) 
 					   (newline)))))))
 		  (opt 3)))))
@@ -102,7 +102,7 @@
 				 (object (<java.lang.Object>
 					  <java.awt.event.ItemListener>) 
 					 ((itemStateChanged (arg::java.awt.event.ItemEvent)) 
-					  <void> 
+					  ::void
 					  (display "listener of checkbutton ") 
 					  (display c-name) 
 					  (display arg) 
@@ -117,8 +117,7 @@
 (define (document-filter arg1)
   (lambda (arg2)
     (object ()
-            ((toString)
-             <String>
+            ((toString) ::String
              (format #f "{arg1: ~s arg2: ~s}" arg1 arg2)))))
 
 (test "{arg1: 23 arg2: 12}" 'object-with-closure-3

@@ -1,3 +1,10 @@
+2015-05-19  Jamison Hope  <jrh@theptrgroup.com>
+
+	* build.xml (has-java{2,4,5,6,7,8}): Move out of
+	-select-java-non-android up to top level so that they are defined
+	in the initial Ant environment.
+	(java-classes): Add q2.
+
 2015-05-13  Per Bothner  <per@bothner.com>
 
 	* compile: New file, from gnulib, used by autoconf.

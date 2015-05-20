@@ -286,7 +286,14 @@
     -->
 
   </target>
-  
+
+  <available property="has-java2" classname="java.lang.ThreadLocal"/>
+  <available property="has-java4" classname="java.lang.CharSequence"/>
+  <available property="has-java5" classname="java.lang.Appendable"/>
+  <available property="has-java6" classname="javax.script.AbstractScriptEngine"/>
+  <available property="has-java7" classname="java.lang.invoke.MethodHandle"/>
+  <available property="has-java8" classname="java.util.stream.Stream"/>
+
   <target name="select-java1" depends="build-settings">
     <pathconvert property="fileList" pathSep=" " dirSep="${file.separator}">
       <path><fileset refid="build.selectjava"/></path>
@@ -406,12 +413,6 @@
   </target>
 
   <target name="-select-java-non-android" unless="${enable-android}">
-    <available property="has-java2" classname="java.lang.ThreadLocal"/>
-    <available property="has-java4" classname="java.lang.CharSequence"/>
-    <available property="has-java5" classname="java.lang.Appendable"/>
-    <available property="has-java6" classname="javax.script.AbstractScriptEngine"/>
-    <available property="has-java7" classname="java.lang.invoke.MethodHandle"/>
-    <available property="has-java8" classname="java.util.stream.Stream"/>
     <antcall target="-maybe-select-java1"/>
     <antcall target="-maybe-select-java2"/>
     <antcall target="-maybe-select-java4"/>
@@ -512,6 +513,7 @@
       <include name="gnu/lists/"/>
       <include name="gnu/mapping/"/>
       <include name="gnu/math/"/>
+      <include name="gnu/q2/lang/"/>
       <include name="gnu/text/"/>
       <include name="kawa/lang/"/>
       <include name="kawa/standard/"/>

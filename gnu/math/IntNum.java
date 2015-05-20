@@ -67,6 +67,8 @@ public class IntNum extends RatNum implements Externalizable
   {
     if (value instanceof IntNum)
       return (IntNum) value;
+    if (value instanceof UnsignedPrim)
+      return ((UnsignedPrim) value).toIntNum();
     if (value instanceof BigInteger)
       return IntNum.valueOf(value.toString(), 10);
     if (value instanceof Number

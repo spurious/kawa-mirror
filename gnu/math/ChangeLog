@@ -1,3 +1,14 @@
+2015-05-20  Per Bothner  <per@bothner.com>
+
+	* UnsignedPrim.java: New abstract class, extends Number.
+	* UByte.java: New class, extends UnsignedPrim.
+	* UInt.java: New class, extends UnsignedPrim.
+	* ULong.java: New class, extends UnsignedPrim.
+	* UShort.java: New class, extends UnsignedPrim.
+	* Makefile.am: Update accordingly.
+	* IntNum.java (asIntNumOrNull): Handle UnsignedPrim values.
+	* Numeric.java (asNumericOrNull): Handle UnsignedPrim values.
+
 2015-05-17  Jamison Hope  <jrh@theptrgroup.com>
 
 	* RealNum.java (log): Call DComplex.log if zero to ensure that

@@ -13,6 +13,7 @@ java_sources = \
   IntFraction.java \
   MPN.java \
   IntNum.java \
+  UnsignedPrim.java UByte.java UShort.java UInt.java ULong.java \
   BitOps.java \
   DateTime.java Duration.java \
   FixedRealFormat.java \

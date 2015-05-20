@@ -35,7 +35,7 @@ public abstract class Numeric extends java.lang.Number
       return (Numeric) value;
     if (value instanceof BigInteger || value instanceof Long
         || value instanceof Short || value instanceof Byte
-        || value instanceof Integer)
+        || value instanceof Integer || value instanceof UnsignedPrim)
       return IntNum.asIntNumOrNull(value);
     if (value instanceof BigDecimal)
       return RatNum.asRatNumOrNull(value);

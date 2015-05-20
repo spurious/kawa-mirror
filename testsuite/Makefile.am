@@ -630,7 +630,8 @@ LARCENY_IMPORT_PATH = \
 LARCENY_TEST_OPTIONS = $(LARCENY_IMPORT_PATH) \
   $(OPTIONS) --r7rs --no-warn-unused
 
-LARCENY_SIMPLE_TESTS1 = case-lambda char complex cxr eval file inexact read time
+LARCENY_SIMPLE_TESTS1 = case-lambda char complex cxr eval file inexact \
+  lazy read time
 check-larceny-simple1:
 	for test in $(LARCENY_SIMPLE_TESTS1); do \
 	  $(KAWA) $(LARCENY_TEST_OPTIONS) larceny-tests/run/$$test.sps; \

@@ -655,6 +655,7 @@ public class Lambda extends Syntax
                 || val instanceof Class)))
       {
 	// Handle '<TYPENAME> BODY':
+        tr.error('w', "deprecated return-type specifier - use '::TYPE'");
         Expression rexp = exps[0];
         len--;
         if (len == 1)

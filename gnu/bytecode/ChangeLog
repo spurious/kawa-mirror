@@ -1,3 +1,8 @@
+2015-05-20  Per Bothner  <per@bothner.com>
+
+	* ClassType.java (getDeclaredMethod): Prefer non-synthetic
+	non-bridge methods.
+
 2015-05-15  Per Bothner  <per@bothner.com>
 
 	Optimizations to avoid redundant goto.

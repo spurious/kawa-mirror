@@ -957,15 +957,22 @@ public class ClassType extends ObjectType
   public Method getDeclaredMethod(String name, Type[] arg_types)
   {
     int needOuterLinkArg = "<init>".equals(name) && hasOuterLink() ? 1 : 0;
+    Method found = null;
     for (Method method = getDeclaredMethods();
 	 method != null;  method = method.next)
       {
 	if (! name.equals(method.getName()))
 	  continue;
 	Type[] method_args = method.getParameterTypes();
+        boolean synthetic =
+            (method.getModifiers() & (Access.SYNTHETIC|Access.BRIDGE)) != 0;
 	if (arg_types == null
             || (arg_types == method_args && needOuterLinkArg==0))
-	  return method;
+          {
+            if (! synthetic)
+              return method;
+            found = method;
+          }
 	int i = arg_types.length;
 	if (i != method_args.length-needOuterLinkArg)
 	  continue;
@@ -981,9 +988,13 @@ public class ClassType extends ObjectType
 	      break;
 	  }
 	if (i < 0)
-	  return method;
+          {
+            if (! synthetic)
+              return method;
+            found = method;
+          }
       }
-    return null;
+    return found;
   }
 
   synchronized Method getDeclaredMethod(String name, boolean mustBeStatic, int argCount)

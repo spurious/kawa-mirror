@@ -15,32 +15,45 @@ public class Arithmetic
 {
   /** Promotion code for byte/Byte, short/Short, int/Integer. */
   public static final int INT_CODE = 1;
+  public static final int UINT_CODE = 2;
   /** Promotion code for long/Long. */
-  public static final int LONG_CODE = 2;
+  public static final int LONG_CODE = 3;
+  public static final int ULONG_CODE = 4;
   /** Promotion code for java.math.BigInteger. */
-  public static final int BIGINTEGER_CODE = 3;
+  public static final int BIGINTEGER_CODE = 5;
   /** Promotion code for gnu.math.IntNum. */
-  public static final int INTNUM_CODE = 4;
+  public static final int INTNUM_CODE = 6;
   /** Promotion code for java.math.BigDecimal. */
-  public static final int BIGDECIMAL_CODE = 5;
+  public static final int BIGDECIMAL_CODE = 7;
   /** Promotion code for gnu.math.RatNum. */
-  public static final int RATNUM_CODE = 6;
+  public static final int RATNUM_CODE = 8;
   /** Promotion code float/Float. */
-  public static final int FLOAT_CODE = 7;
+  public static final int FLOAT_CODE = 9;
   /** Promotion code double/Double. */
-  public static final int DOUBLE_CODE = 8;
+  public static final int DOUBLE_CODE = 10;
   /** Promotion code for gnu.math.FloNum. */
-  public static final int FLONUM_CODE = 9;
+    public static final int FLONUM_CODE = 11;
   /** Promotion code for gnu.math.RealNum. */
-  public static final int REALNUM_CODE = 10;
+  public static final int REALNUM_CODE = 12;
   /** Promotion code for other gnu.math.Numeric. */
-  public static final int NUMERIC_CODE = 11;
+  public static final int NUMERIC_CODE = 13;
 
     public static int classifyValue(Object value) {
 	for (;;) {
 	    if (value instanceof Numeric) {
 		if (value instanceof IntNum)
 		    return INTNUM_CODE;
+                else if (value instanceof UnsignedPrim) {
+                    int nb = ((UnsignedPrim) value).numBits();
+                    if (nb < 32)
+                        return INT_CODE;
+                    else if (nb == 32)
+                        return UINT_CODE;
+                    else if (nb < 64)
+                        return LONG_CODE;
+                    else
+                        return ULONG_CODE;
+                }
 		else if (value instanceof RatNum)
 		    return RATNUM_CODE;
 		else if (value instanceof DFloNum)
@@ -64,6 +77,9 @@ public class Arithmetic
 		    return BIGINTEGER_CODE;
 		else if (value instanceof BigDecimal)
 		    return BIGDECIMAL_CODE;
+                else if (value instanceof UnsignedPrim)
+                    return value instanceof ULong ? ULONG_CODE
+                        : value instanceof UInt ? UINT_CODE : INT_CODE;
 		else
 		    break;
 	    }
@@ -85,8 +101,12 @@ public class Arithmetic
       {
       case INT_CODE:
         return LangPrimType.intType;
+      case UINT_CODE:
+        return LangPrimType.unsignedIntType;
       case LONG_CODE:
         return LangPrimType.longType;
+      case ULONG_CODE:
+        return LangPrimType.unsignedLongType;
       case BIGINTEGER_CODE:
         return ClassType.make("java.math.BigInteger");
       case INTNUM_CODE:
@@ -133,9 +153,9 @@ public class Arithmetic
 	else if (sig == 'F')
 	  return FLOAT_CODE;
         else if (sig == 'J')
-          return LONG_CODE;
+          return type == LangPrimType.unsignedLongType ? ULONG_CODE : LONG_CODE;
 	else
-	  return INT_CODE;
+	  return type == LangPrimType.unsignedIntType ? UINT_CODE :INT_CODE;
       }
     String tname = type.getName();
     if (type.isSubtype(typeIntNum))
@@ -150,9 +170,15 @@ public class Arithmetic
       return FLOAT_CODE;
     else if ("java.lang.Long".equals(tname))
       return LONG_CODE;
+    else if ("gnu.math.ULong".equals(tname))
+      return ULONG_CODE;
+    else if ("gnu.math.UInt".equals(tname))
+      return UINT_CODE;
     else if ("java.lang.Integer".equals(tname)
              || "java.lang.Short".equals(tname)
-             || "java.lang.Byte".equals(tname))
+             || "java.lang.Byte".equals(tname)
+             || "gnu.math.UShort".equals(tname)
+             || "gnu.math.UByte".equals(tname))
       return INT_CODE;
     else if ("java.math.BigInteger".equals(tname))
       return BIGINTEGER_CODE;
@@ -193,7 +219,7 @@ public class Arithmetic
     value = Promise.force(value);
     if (value instanceof BigInteger)
       return (BigInteger) value;
-    if (value instanceof IntNum)
+    if (value instanceof IntNum || value instanceof ULong)
       return new BigInteger(value.toString());
     return BigInteger.valueOf(((Number) value).longValue());
   }
@@ -213,6 +239,8 @@ public class Arithmetic
     value = Promise.force(value);
     if (value instanceof IntNum)
       return (IntNum) value;
+    if (value instanceof UnsignedPrim)
+      return ((UnsignedPrim) value).toIntNum();
     if (value instanceof BigInteger)
       return IntNum.valueOf(value.toString(), 10);
     if (value instanceof BigDecimal)
@@ -240,6 +268,8 @@ public class Arithmetic
       return (RatNum) value;
     if (value instanceof BigInteger)
       return IntNum.valueOf(value.toString(), 10);
+    if (value instanceof ULong)
+        return IntNum.valueOfUnsigned(((ULong) value).longValue());
     if (value instanceof BigDecimal)
       return RatNum.valueOf((BigDecimal) value);
     else

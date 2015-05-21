@@ -1,3 +1,15 @@
+2015-05-20  Per Bothner  <per@bothner.com>
+
+	* Arithmetic.java (UINT_CODE, ULONG_CODE): New promotion codes.
+	(classifyValue): Support the gnu.math.UXxxx classes.
+	(asIntNum): Likewise.
+	(kindType): Handle UINT_CODE and ULONG_CODE.
+	(classifyType):  Handle boxed and unboxed unsigned integer types.
+	(asBigInteger): ULong needs special handling as it doesn't fit in long.
+	(asRatNum): Likewise.
+	* AddOp.java (apply2): Support UINT_CODE and ULONG_CODE.
+	($Mn):  Likewise.
+
 2015-05-05  Per Bothner  <per@bothner.com>
 
 	* NumberPredicate.java: Change ODD/EVEN predicates to allow

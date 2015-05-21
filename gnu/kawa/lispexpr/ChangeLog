@@ -1,4 +1,12 @@
-2015-05-09  Per Bothner  <per@bothner.com>
+2015-05-20  Per Bothner  <per@bothner.com>
+
+	* LangPrimType.java (unsignedLongType, unsignedIntType)
+	unsignedShortType, unsignedByteType): New LangPrimType constants.
+	(boxedType, encodeType): Update accordingly.
+	* LispLanguage.java (getTypeMap): Add bindings for ulong, uint,
+	ushort, and ubyte.
+
+(2015-05-09  Per Bothner  <per@bothner.com>
 
 	* LispReader.java (SCM_LEXPONENT_IS_BIGDECIMAL): New flags value.
 	(parseNumber): Only map 'l' exponent marker to BigDecimal if above

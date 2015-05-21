@@ -42,13 +42,19 @@ public class AddOp extends ArithOp
     switch (code)
       {
       case Arithmetic.INT_CODE:
+      case Arithmetic.UINT_CODE:
 	int i1 = Arithmetic.asInt(arg1);
 	int i2 = Arithmetic.asInt(arg2);
-	return new Integer(plusOrMinus > 0 ? i1 + i2 : i1 - i2);
+        int is = plusOrMinus > 0 ? i1 + i2 : i1 - i2;
+	return code == Arithmetic.INT_CODE ? Integer.valueOf(is)
+            : UInt.valueOf(is);
       case Arithmetic.LONG_CODE:
+      case Arithmetic.ULONG_CODE:
 	long l1 = Arithmetic.asLong(arg1);
 	long l2 = Arithmetic.asLong(arg2);
-	return new Long(plusOrMinus > 0 ? l1 + l2 : l1 - l2);
+        long ls = plusOrMinus > 0 ? l1 + l2 : l1 - l2;
+	return code == Arithmetic.INT_CODE ? Long.valueOf(ls)
+            : ULong.valueOf(ls);
       case Arithmetic.BIGINTEGER_CODE:
 	BigInteger bi1 = Arithmetic.asBigInteger(arg1);
 	BigInteger bi2 = Arithmetic.asBigInteger(arg2);
@@ -98,9 +104,13 @@ public class AddOp extends ArithOp
     switch (code)
       {
       case Arithmetic.INT_CODE:
-	return new Integer(- Arithmetic.asInt(arg1));
+	return Integer.valueOf(- Arithmetic.asInt(arg1));
+      case Arithmetic.UINT_CODE:
+	return UInt.valueOf(- Arithmetic.asInt(arg1));
       case Arithmetic.LONG_CODE:
-	return new Long(- Arithmetic.asLong(arg1));
+	return Long.valueOf(- Arithmetic.asLong(arg1));
+      case Arithmetic.ULONG_CODE:
+	return ULong.valueOf(- Arithmetic.asLong(arg1));
       case Arithmetic.BIGINTEGER_CODE:
 	return Arithmetic.asBigInteger(arg1).negate();
       case Arithmetic.INTNUM_CODE:

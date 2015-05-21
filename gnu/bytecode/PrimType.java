@@ -253,10 +253,10 @@ public class PrimType extends Type {
    * Classes with letters later in alphabet are more general.
    */
   private static final String numberHierarchy =
-    "A:java.lang.Byte;" +
-    "B:java.lang.Short;" +
-    "C:java.lang.Integer;" +
-    "D:java.lang.Long;" +
+    "A:java.lang.Byte;A:gnu.math.UByte;" +
+    "B:java.lang.Short;B:gnu.math.UShort;" +
+    "C:java.lang.Integer;C:gnu.math.UInt;" +
+    "D:java.lang.Long;D:gnu.math.ULong;" +
     "E:gnu.math.IntNum;E:java.gnu.math.BitInteger;" +
     "G:gnu.math.RatNum;" +
     "H:java.lang.Float;" +

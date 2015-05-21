@@ -229,6 +229,10 @@ public abstract class LispLanguage extends Language
             types.put("long", LangPrimType.longType);
             types.put("float", LangPrimType.floatType);
             types.put("double", LangPrimType.doubleType);
+            types.put("ubyte", LangPrimType.unsignedByteType);
+            types.put("ushort", LangPrimType.unsignedShortType);
+            types.put("uint", LangPrimType.unsignedIntType);
+            types.put("ulong", LangPrimType.unsignedLongType);
             types.put("never-returns", Type.neverReturnsType);
 
             types.put("Object", Type.objectType);

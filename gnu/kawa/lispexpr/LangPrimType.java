@@ -40,6 +40,26 @@ public class LangPrimType extends PrimType implements TypeValue {
        = new LangPrimType(Type.intType);
     static { characterOrEofType.setName("character-or-eof"); }
 
+    public static final LangPrimType unsignedLongType
+        = new LangPrimType(Type.longType);
+    static { unsignedLongType.setName("ulong"); }
+    static final ClassType boxedULongType = ClassType.make("gnu.math.ULong");
+
+    public static final LangPrimType unsignedIntType
+        = new LangPrimType(Type.intType);
+    static { unsignedIntType.setName("uint"); }
+    static final ClassType boxedUIntType = ClassType.make("gnu.math.UInt");
+
+    public static final LangPrimType unsignedShortType
+        = new LangPrimType(Type.shortType);
+    static { unsignedShortType.setName("ushort"); }
+    static final ClassType boxedUShortType = ClassType.make("gnu.math.UShort");
+
+    public static final LangPrimType unsignedByteType
+        = new LangPrimType(Type.byteType);
+    static { unsignedByteType.setName("ubyte"); }
+    static final ClassType boxedUByteType = ClassType.make("gnu.math.UByte");
+
     public static final LangPrimType stringCursorType
        = new LangPrimType(Type.intType);
     static { stringCursorType.setName("string-cursor"); }
@@ -78,6 +98,14 @@ public class LangPrimType extends PrimType implements TypeValue {
             return boxedStringCursorType;
         if (this == characterOrEofType)
             return Type.objectType;
+        if (this == unsignedLongType)
+            return boxedULongType;
+        if (this == unsignedIntType)
+            return boxedUIntType;
+        if (this == unsignedShortType)
+            return boxedUShortType;
+        if (this == unsignedByteType)
+            return boxedUByteType;
         return super.boxedType();
     }
 
@@ -368,6 +396,10 @@ public class LangPrimType extends PrimType implements TypeValue {
         if (this == characterType) return "character";
         if (this == characterOrEofType) return "character-or-eof";
         if (this == stringCursorType) return "string-cursor";
+        if (this == unsignedLongType) return "ulong";
+        if (this == unsignedIntType) return "uint";
+        if (this == unsignedShortType) return "ushort";
+        if (this == unsignedByteType) return "ubyte";
         return null;
     }
 }

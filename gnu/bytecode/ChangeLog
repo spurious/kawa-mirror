@@ -1,5 +1,7 @@
 2015-05-20  Per Bothner  <per@bothner.com>
 
+	* PrimType.java (numberHierarchy): Add gnu.math.UXxx classes.
+
 	* ClassType.java (getDeclaredMethod): Prefer non-synthetic
 	non-bridge methods.
 

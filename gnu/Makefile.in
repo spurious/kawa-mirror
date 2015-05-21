@@ -348,6 +348,7 @@ GNU_LISTS_JSOURCES = \
   lists/GeneralArray1.java \
   lists/ItemPredicate.java \
   lists/ImmutablePair.java \
+  lists/IntSequence.java \
   lists/LList.java \
   lists/LListPosition.java \
   lists/NodePredicate.java \

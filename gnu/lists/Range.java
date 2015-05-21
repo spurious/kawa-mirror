@@ -32,7 +32,8 @@ public class Range<E> extends AbstractSequence implements Sequence {
         return ipos == -1 ? size : ipos >>> 1;
     }
 
-    public static class IntRange extends Range<Integer> {
+    public static class IntRange extends Range<Integer>
+    implements IntSequence {
         int istart;
         int istep;
 
@@ -50,7 +51,7 @@ public class Range<E> extends AbstractSequence implements Sequence {
 
         public int getStartInt() { return istart; }
 
-        public int getInt(int index) {
+        public int intAt(int index) {
             if (index >= size && size >= 0)
                 throw new IndexOutOfBoundsException();
             return istart + istep * index;
@@ -58,8 +59,9 @@ public class Range<E> extends AbstractSequence implements Sequence {
 
         @Override
         public Integer getStart() { return getStartInt(); }
+
         @Override
-        public Integer get(int index) { return getInt(index); }
+        public Integer get(int index) { return intAt(index); }
     };
 
     //public static interface ByOne {

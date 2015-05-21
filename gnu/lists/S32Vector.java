@@ -7,10 +7,7 @@ import java.io.*;
 /** Simple adjustable-length vector of signed 32-bit integers (ints). */
 
 public class S32Vector extends SimpleVector
-  implements Externalizable
-  /* #ifdef JAVA2 */
-  , Comparable
-  /* #endif */
+    implements Externalizable, IntSequence, Comparable
 {
   int[] data;
   protected static int[] empty = new int[0];

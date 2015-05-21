@@ -1,7 +1,6 @@
 package gnu.kawa.lispexpr;
 import gnu.bytecode.*;
-import gnu.math.IntNum;
-import gnu.math.DFloNum;
+import gnu.math.*;
 import gnu.expr.*;
 import gnu.kawa.reflect.LazyType;
 import gnu.lists.Sequence;
@@ -389,6 +388,51 @@ public class LangPrimType extends PrimType implements TypeValue {
     }
 
     public Procedure getConstructor() {
+        return null;
+    }
+    
+    public static Object convertIntegerLiteral(IntNum ivalue, PrimType type, boolean nativeValue) {
+        boolean unsigned;
+        switch (type.getSignature().charAt(0)) {
+        case 'B':
+            unsigned = type == LangPrimType.unsignedByteType;
+            if (unsigned ? ivalue.inRange(0, 255)
+                : ivalue.inRange(Byte.MIN_VALUE, Byte.MAX_VALUE)) {
+                byte i = ivalue.byteValue();
+                return unsigned && ! nativeValue ? UByte.valueOf(i)
+                    : Byte.valueOf(i);
+            }
+            break;
+        case 'S':
+            unsigned = type == LangPrimType.unsignedShortType;
+            if (unsigned ? ivalue.inRange(0, 0xFFFF)
+                : ivalue.inRange(Short.MIN_VALUE, Short.MAX_VALUE)) {
+                short i = ivalue.shortValue();
+                return unsigned && ! nativeValue ? UShort.valueOf(i)
+                    : Short.valueOf(i);
+            }
+            break;
+        case 'I':
+            unsigned = type == LangPrimType.unsignedIntType;
+            if (unsigned ? ivalue.inRange(0, 0xFFFFFFFFl)
+                : ivalue.inRange(Integer.MIN_VALUE, Integer.MAX_VALUE)) {
+                int i = ivalue.intValue();
+                return unsigned && ! nativeValue ? UInt.valueOf(i)
+                    : Integer.valueOf(i);
+            }
+            break;
+        case 'J':
+            unsigned = type == LangPrimType.unsignedLongType;
+            if (unsigned ? (IntNum.compare(ivalue, 0) >= 0
+                            && IntNum.compare(ivalue,
+                                              IntNum.valueOfUnsigned(-1)) <= 0)
+                : ivalue.inRange(Long.MIN_VALUE, Long.MAX_VALUE)) {
+                long i = ivalue.longValue();
+                return unsigned && ! nativeValue ? ULong.valueOf(i)
+                    : Long.valueOf(i);
+            }
+            break;
+        }
         return null;
     }
 

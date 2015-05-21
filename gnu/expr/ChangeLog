@@ -1,3 +1,11 @@
+2015-05-20  Per Bothner  <per@bothner.com>
+
+	* ConsumerTarget.java (compileFromStack): Handle unsigned
+	integer types in a reasonable manner.
+
+	* InlineCalls.java (visitQuoteExp): Use new method
+	LangPrimType.convertIntegerLiteral.
+
 2015-05-18  Per Bothner  <per@bothner.com>
 
 	* ModuleMethod.java (resolveParameterTypes): Check and possibly use

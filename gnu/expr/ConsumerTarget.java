@@ -140,8 +140,11 @@ public class ConsumerTarget extends Target
     }
     // We don't want to push a character as an int (which is its
     // implementation type) since it isn't an integer.  So we box it.
-    if (stackType == LangPrimType.characterType
-        || stackType == LangPrimType.characterOrEofType) {
+    if (stackType instanceof LangPrimType
+        && (stackType == LangPrimType.characterType ||
+            stackType == LangPrimType.characterOrEofType ||
+            stackType == LangPrimType.unsignedLongType ||
+            stackType == LangPrimType.unsignedIntType)) {
         stackType.emitCoerceToObject(code);
         stackType = Type.objectType;
     }
@@ -152,6 +155,11 @@ public class ConsumerTarget extends Target
 	switch (sig)
 	  {
 	  case 'B': case 'S': case 'I':
+            boolean isShort = stackType == LangPrimType.unsignedShortType;
+            if (isShort || stackType == LangPrimType.unsignedByteType) {
+                code.emitPushInt(isShort ? 0xFFFF : 0xFF);
+                code.emitAnd();
+            }
 	    methodName = "writeInt";
             methodArg = Type.intType;
             break;

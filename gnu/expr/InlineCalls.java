@@ -262,20 +262,11 @@ public class InlineCalls extends ExpExpVisitor<Type> {
                         Object ival = null;
                         switch (sig1) {
                         case 'B':
-                            if (ivalue.inRange(Byte.MIN_VALUE, Byte.MAX_VALUE))
-                                ival = Byte.valueOf(ivalue.byteValue());
-                            break;
                         case 'S':
-                            if (ivalue.inRange(Short.MIN_VALUE, Short.MAX_VALUE))
-                                ival = Short.valueOf(ivalue.shortValue());
-                            break;
                         case 'I':
-                            if (ivalue.inRange(Integer.MIN_VALUE, Integer.MAX_VALUE))
-                                ival = Integer.valueOf(ivalue.intValue());
-                            break;
                         case 'J':
-                            if (ivalue.inRange(Long.MIN_VALUE, Long.MAX_VALUE))
-                                ival = Long.valueOf(ivalue.longValue());
+                            ival = LangPrimType.convertIntegerLiteral(ivalue,
+                                    (PrimType) primRequired, false);
                             break;
                         case 'F':
                             ival = Float.valueOf(ivalue.floatValue());

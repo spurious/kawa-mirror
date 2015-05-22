@@ -4,18 +4,17 @@
 package gnu.lists;
 
 public interface IntSequence
-    extends
-        /* #ifdef JAVA8 */
-        java.util.function.IntUnaryOperator
-        /* #endif */
+    /* #ifdef JAVA8 */
+    // extends java.util.function.IntUnaryOperator
+    /* #endif */
 {
     public int intAt(int index);
 
     public int size();
 
     /* #ifdef JAVA8 */
-    default int applyAsInt(int operand) {
-        return intAt(operand);
-    }
+    // default int applyAsInt(int operand) {
+    //     return intAt(operand);
+    // }
     /* #endif */
 }

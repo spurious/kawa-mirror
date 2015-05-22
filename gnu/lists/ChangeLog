@@ -1,3 +1,7 @@
+2015-05-21  Per Bothner  <per@bothner.com>
+
+	* IntSequence.java: Fix pre-processing syntax error.
+
 2015-05-20  Per Bothner  <per@bothner.com>
 
 	* IntSequence.java: New interface.

@@ -1,3 +1,10 @@
+2015-05-29  Per Bothner  <per@bothner.com>
+
+	* PrimType.java (isUnsigned): New method.
+	* CodeAttr.java (fixUnsigned): New method.
+	(emitConvert): Change parameter types to PrimType.
+	Handle converting to/from unsigned integer types.
+
 2015-05-20  Per Bothner  <per@bothner.com>
 
 	* PrimType.java (numberHierarchy): Add gnu.math.UXxx classes.

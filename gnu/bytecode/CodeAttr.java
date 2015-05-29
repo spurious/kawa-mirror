@@ -1961,26 +1961,62 @@ public class CodeAttr extends Attribute implements AttrContainer
         return new IfState(this);
     }
 
-  public final void emitConvert (Type from, Type to)
-  {
-    String to_sig = to.getSignature();
-    String from_sig = from.getSignature();
-    int op = -1;
-    if (to_sig.length() == 1 || from_sig.length() == 1)
-      {
+    public final void fixUnsigned(Type stackType) {
+        if (stackType instanceof PrimType
+            && ((PrimType) stackType).isUnsigned()) {
+            char sig1 = stackType.getSignature().charAt(0);
+            if (sig1 == 'S') {
+                reserve(1);
+                put1(146); // i2c
+            } else if (sig1 == 'B') {
+                emitPushInt(255);
+                emitAnd();
+            }
+        }
+    }
+
+    public final void emitConvert(PrimType from, PrimType to) {
+        String to_sig = to.getSignature();
+        String from_sig = from.getSignature();
+        int op = -1;
 	char to_sig0 = to_sig.charAt(0);
 	char from_sig0 = from_sig.charAt(0);
 	if (from_sig0 == to_sig0)
-	  return;
+            return;
 	if (from.size < 4)
 	  from_sig0 = 'I';
-	if (to.size < 4)
-	  {
+	if (to.size < 4) {
 	    emitConvert(from, Type.intType);
 	    from_sig0 = 'I';
-	  }
+            if (to.isUnsigned()) {
+                if (to_sig0 == 'S')
+                    to_sig0 = 'C';
+                else if (to_sig0 == 'B') {
+                    emitPushInt(0xff);
+                    emitAnd();
+                    return;
+                }
+            }
+        }
+        if (from_sig0 == 'J' && from.isUnsigned()
+            && (to_sig0 == 'F' || to_sig0 == 'D')) {
+            emitPushInt(1);
+            emitUshr();
+            emitConvert(Type.longType, to);
+            emitPushConstant(2, to);
+            emitMul();
+            return;
+        }
+        if (from_sig0 == 'I' && from.isUnsigned()
+            && (to_sig0 == 'J' || to_sig0 == 'F' || to_sig0 == 'D')) {
+            emitConvert(Type.intType, Type.longType);
+            reserve(4);
+            emitPushLong(0xffffffffL);
+            emitAnd();
+            from_sig0 = 'J';
+        }
 	if (from_sig0 == to_sig0)
-	  return;
+            return;
 	switch (from_sig0)
 	  {
 	  case 'I':
@@ -2019,14 +2055,13 @@ public class CodeAttr extends Attribute implements AttrContainer
 	      }
 	    break;
 	  }
-      }
-    if (op < 0)
-      throw new Error ("unsupported CodeAttr.emitConvert");
-    reserve(1);
-    popType();
-    put1(op);
-    pushType(to);
-  }
+        if (op < 0)
+            throw new Error ("unsupported CodeAttr.emitConvert");
+        reserve(1);
+        popType();
+        put1(op);
+        pushType(to);
+    }
 
   private void emitCheckcast (Type type, int opcode)
   {

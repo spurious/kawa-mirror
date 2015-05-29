@@ -368,6 +368,7 @@ public class Declaration
               }
             else
               code.emitGetStatic(field);
+            code.fixUnsigned(getType());
           }
         else if (isClassField())
           {

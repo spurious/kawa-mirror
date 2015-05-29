@@ -17,6 +17,7 @@ import gnu.mapping.Values;
 public class LangPrimType extends PrimType implements TypeValue {
     Language language;
     PrimType implementationType;
+    boolean isUnsigned;
 
     public static final PrimType byteType = Type.byteType;
     public static final PrimType shortType = Type.shortType;
@@ -42,21 +43,25 @@ public class LangPrimType extends PrimType implements TypeValue {
     public static final LangPrimType unsignedLongType
         = new LangPrimType(Type.longType);
     static { unsignedLongType.setName("ulong"); }
+    static { unsignedLongType.isUnsigned = true; }
     static final ClassType boxedULongType = ClassType.make("gnu.math.ULong");
 
     public static final LangPrimType unsignedIntType
         = new LangPrimType(Type.intType);
     static { unsignedIntType.setName("uint"); }
+    static { unsignedIntType.isUnsigned = true; }
     static final ClassType boxedUIntType = ClassType.make("gnu.math.UInt");
 
     public static final LangPrimType unsignedShortType
         = new LangPrimType(Type.shortType);
     static { unsignedShortType.setName("ushort"); }
+    static { unsignedShortType.isUnsigned = true; }
     static final ClassType boxedUShortType = ClassType.make("gnu.math.UShort");
 
     public static final LangPrimType unsignedByteType
         = new LangPrimType(Type.byteType);
     static { unsignedByteType.setName("ubyte"); }
+    static { unsignedByteType.isUnsigned = true; }
     static final ClassType boxedUByteType = ClassType.make("gnu.math.UByte");
 
     public static final LangPrimType stringCursorType
@@ -88,6 +93,8 @@ public class LangPrimType extends PrimType implements TypeValue {
     public Type getImplementationType() {
         return implementationType;
     }
+
+    public boolean isUnsigned() { return isUnsigned; }
 
     @Override
     public ClassType boxedType() {

@@ -1,3 +1,10 @@
+2015-05-29  Per Bothner  <per@bothner.com>
+
+	* LangPrimType.java (isUnsigned): New field.  Set appropriately.
+	(isUnsigned): New method.
+	* LangObjType.java (emitConvertFromPrimitive): Update call to
+	emitConvert.
+
 2015-05-20  Per Bothner  <per@bothner.com>
 
 	* LangPrimType.java (convertIntegerLiteral): New method.

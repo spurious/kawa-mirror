@@ -16,6 +16,11 @@ public class PrimType extends Type {
     reflectClass = type.reflectClass;
   }
 
+    public boolean isUnsigned() {
+        char sig1 = signature.charAt(0);
+        return sig1 == 'C' || sig1 == 'Z';
+    }
+
   public Object coerceFromObject (Object obj)
   {
     if (obj.getClass() == reflectClass)

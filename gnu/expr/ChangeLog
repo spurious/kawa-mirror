@@ -1,3 +1,12 @@
+2015-05-29  Per Bothner  <per@bothner.com>
+
+	* Declaration.java (load): Call fixUnsigned to correct loading
+	from unsigned byte or short fields, by masking.
+	* ConsumerTarget.java (compileFromStack): Revert previous change.
+	No longer needed, thanks to above change.
+	* StackTarget.java (compileFromStack0): Add casts to call
+	to emitConvert, which now requires PrimType arguments.
+
 2015-05-20  Per Bothner  <per@bothner.com>
 
 	* ConsumerTarget.java (compileFromStack): Handle unsigned

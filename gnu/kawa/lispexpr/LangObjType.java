@@ -585,7 +585,7 @@ public class LangObjType extends SpecialObjectType implements TypeValue
                 || stackType == Type.longType
                 || stackType == Type.floatType)
               {
-                code.emitConvert(stackType, Type.doubleType);
+                code.emitConvert((PrimType) stackType, Type.doubleType);
                 stackType = Type.doubleType;
               }
             if (stackType == Type.doubleType)

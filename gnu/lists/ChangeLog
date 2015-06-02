@@ -1,3 +1,17 @@
+2015-06-01  Per Bothner  <per@bothner.com>
+
+	* SubCharSeq.java: Reimplement to handle substring of arbitrary
+	CharSequence.  Hence we can't extends SubSequence.
+
+	* AbstractSequence.java (nextIndex): Make non-abstract by
+	adding a default implementation.
+	* Range.java (nextIndex): Remove - subsumed by inherited default.
+	* GeneralArray1.java (nextIndex): Likewise.
+	* SimpleVector.java (nextIndex): Likewise.
+
+	* SimpleVector.java (removePos): Fix one-by-one error.
+	(removePos): Fix logic error.
+
 2015-05-21  Per Bothner  <per@bothner.com>
 
 	* IntSequence.java: Fix pre-processing syntax error.

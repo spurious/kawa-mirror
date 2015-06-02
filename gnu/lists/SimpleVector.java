@@ -97,11 +97,6 @@ public abstract class SimpleVector<E> extends AbstractSequence<E>
     return (ipos & 1) != 0;
   }
 
-  protected int nextIndex(int ipos)
-  {
-    return ipos == -1 ? size : ipos >>> 1;
-  }
-
   public int nextPos (int ipos)
   {
     if (ipos == -1)
@@ -316,7 +311,7 @@ public abstract class SimpleVector<E> extends AbstractSequence<E>
 	ipos1 = index;
 	count = - count;
       }
-    if (ipos0 < 0 || ipos1 >= size)
+    if (ipos0 < 0 || ipos1 > size)
       throw new IndexOutOfBoundsException();
     shift(ipos1, ipos0, size - ipos1);
     size = size - count;
@@ -328,7 +323,7 @@ public abstract class SimpleVector<E> extends AbstractSequence<E>
     if (index < 0 || index >= size)
       throw new IndexOutOfBoundsException();
     Object result = get(index);
-    shift(index + 1, index, 1);
+    shift(index + 1, index, size - index - 1);
     size = size - 1;
     clearBuffer(size, 1);
     return (E) result;

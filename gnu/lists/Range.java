@@ -27,11 +27,6 @@ public class Range<E> extends AbstractSequence implements Sequence {
     @Override
     public int size() { return size; }
 
-    @Override
-    protected int nextIndex(int ipos) {
-        return ipos == -1 ? size : ipos >>> 1;
-    }
-
     public static class IntRange extends Range<Integer>
     implements IntSequence {
         int istart;

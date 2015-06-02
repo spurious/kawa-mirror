@@ -439,7 +439,9 @@ public abstract class AbstractSequence<E>
   /**
    * Get the offset from the beginning corresponding to a position cookie.
    */
-  protected abstract int nextIndex(int ipos);
+  protected int nextIndex(int ipos) {
+    return ipos == -1 ? size() : ipos >>> 1;
+  }
 
   protected int fromEndIndex(int ipos)
   {

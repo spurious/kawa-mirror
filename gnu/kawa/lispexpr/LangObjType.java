@@ -574,16 +574,15 @@ public class LangObjType extends SpecialObjectType implements TypeValue
   {
     Type argType = null;
     String cname = null;
+    String mname = "make";
     switch (typeCode)
       {
       case DFLONUM_TYPE_CODE:
         if (stackType instanceof PrimType)
           {
-            if (stackType == Type.intType
-                || stackType == Type.byteType
-                || stackType == Type.shortType
-                || stackType == Type.longType
-                || stackType == Type.floatType)
+            char sig1 = stackType.getSignature().charAt(0);
+            if (sig1 == 'I' || sig1 == 'B' || sig1 == 'S' || sig1 == 'J'
+                || sig1 == 'F')
               {
                 code.emitConvert((PrimType) stackType, Type.doubleType);
                 stackType = Type.doubleType;
@@ -603,15 +602,24 @@ public class LangObjType extends SpecialObjectType implements TypeValue
           {
             if (stackType == Type.intType
                 || stackType == Type.byteType
-                || stackType == Type.shortType)
+                || stackType == Type.shortType
+                || stackType == LangPrimType.unsignedByteType
+                || stackType == LangPrimType.unsignedShortType)
               {
                 cname = "gnu.math.IntNum";
                 argType = Type.int_type;
               }
-            else if (stackType == Type.longType)
+            else if (stackType == Type.longType
+                     || stackType == LangPrimType.unsignedIntType)
               {
                 cname = "gnu.math.IntNum";
                 argType = Type.long_type;
+              }
+            else if (stackType == LangPrimType.unsignedLongType)
+              {
+                cname = "gnu.math.IntNum";
+                argType = Type.long_type;
+                mname = "valueOfUnsigned";
               }
             else if (typeCode == REAL_TYPE_CODE
                      || typeCode == NUMERIC_TYPE_CODE)
@@ -634,7 +642,7 @@ public class LangObjType extends SpecialObjectType implements TypeValue
       {
 	ClassType clas = ClassType.make(cname);
 	Type[] args = { argType };
-	code.emitInvokeStatic(clas.getDeclaredMethod("make", args));
+	code.emitInvokeStatic(clas.getDeclaredMethod(mname, args));
       }
      else
        super.emitConvertFromPrimitive(stackType, code);

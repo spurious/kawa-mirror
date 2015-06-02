@@ -1,3 +1,10 @@
+2015-06-02  Per Bothner  <per@bothner.com>
+
+	* num-test.scm: Add some tests for primitive unsigned comparison.
+	* inlining-test.scm: Likewise.
+	* Makefile.am: Update accordingly.
+	* inlining.expected: Update accordingly.
+
 2015-05-20  Per Bothner  <per@bothner.com>
 
 	* obj-test.scm: Fix deprecated return-type specifier syntax.

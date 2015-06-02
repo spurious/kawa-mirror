@@ -1,4 +1,4 @@
-(test-begin "num" 1881)
+(test-begin "num" 1891)
 
 (test-equal 7 (+ 3 4))
 (test-equal 3 (+ 3))
@@ -464,5 +464,24 @@
 (test-approximate 28.27 (circle-area 3) 0.1)
 
 (test-assert (not (gnu.math.Complex:equals 3+4i 3+5i)))
+
+(require <InliningTest>)
+
+(for-each (lambda (vals)
+            (let (([x y r] vals))
+              (test-equal r (greater-equal-u32-s32 x y))
+              (test-equal r (greater-equal-u32-s32-generic x y))))
+          '((#xffffffff 3 #t)
+            (#xfffffffc #x7fffffff #t)
+            (#xfffffffc #xffffffff #t)
+            (#x7ffffffc #x7fffffff #f)
+            (#xffffffff -3 #t)))
+
+(for-each (lambda (vals)
+            (let (([x y r] vals))
+              (test-equal r (greater-equal-u64-u64 x y))
+              (test-equal r (greater-equal-u64-u64-generic x y))))
+          '((#xffffffffffffffff 3 #t)
+            (#xfffffffffffffffA #xfffffffffffffffC #f)))
 
 (test-end)

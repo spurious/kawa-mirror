@@ -448,3 +448,16 @@
     (and (? p::pair lst)
          (if (eq? x p:car) lst
              (lp p:cdr)))))
+
+(define (greater-equal x y)::boolean
+  (>= x y))
+(define (greater-equal-u32-s32 x::uint y::int)
+  (>= x y))
+(define (greater-equal-u32-s32-generic x::uint y::int)
+  (greater-equal x y))
+(define (greater-equal-u64-s32 x::ulong y::int)
+  (>= x y))
+(define (greater-equal-u64-u64 x::ulong y::ulong)
+  (>= x y))
+(define (greater-equal-u64-u64-generic x::ulong y::ulong)
+  (greater-equal x y))

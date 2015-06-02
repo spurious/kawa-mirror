@@ -145,6 +145,12 @@ InliningTest.callWithValues1(gnu.math.IntNum,gnu.math.IntNum)gnu.lists.Pair: 42 
 InliningTest.callWithValues2(gnu.math.IntNum,gnu.math.IntNum)gnu.lists.Pair: 52 bytes
 InliningTest.callWithValues3(gnu.math.IntNum,gnu.math.IntNum)java.lang.Object: 15 bytes
 InliningTest.mmemq(java.lang.Object,java.lang.Object)java.lang.Object: 52 bytes
+InliningTest.greaterEqual(java.lang.Object,java.lang.Object)boolean: 6 bytes
+InliningTest.greaterEqualU32S32(int,int)boolean: 18 bytes
+InliningTest.greaterEqualU32S32Generic(int,int)boolean: 12 bytes
+InliningTest.greaterEqualU64S32(long,int)boolean: 18 bytes
+InliningTest.greaterEqualU64U64(long,long)boolean: 20 bytes
+InliningTest.greaterEqualU64U64Generic(long,long)boolean: 12 bytes
 cycle1.isIsEven(int)boolean: 17 bytes
 cycle2.isIsOdd(int)boolean: 17 bytes
 binarytrees.bottomUpTree(int,int)binarytrees$TreeNode: 60 bytes

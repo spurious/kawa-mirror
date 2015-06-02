@@ -162,9 +162,20 @@ public class NumberCompare extends ProcedureN
 	int i2 = Arithmetic.asInt(arg2);
         comp = i1 < i2 ? -1 : i1 > i2 ? 1 : 0;
 	break;
+      case Arithmetic.UINT_CODE:
       case Arithmetic.LONG_CODE:
+      case Arithmetic.ULONG_CODE:
 	long l1 = Arithmetic.asLong(arg1);
 	long l2 = Arithmetic.asLong(arg2);
+        if (code == Arithmetic.ULONG_CODE)
+          {
+            if (code1 == Arithmetic.INT_CODE && l1 < 0)
+                return -1;
+            if (code2 == Arithmetic.INT_CODE && l2 < 0)
+                return 1;
+            l1 += Long.MIN_VALUE;
+            l2 += Long.MIN_VALUE;
+          }
         comp = l1 < l2 ? -1 : l1 > l2 ? 1 : 0;
         break;
       case Arithmetic.BIGINTEGER_CODE:

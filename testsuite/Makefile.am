@@ -76,7 +76,7 @@ check-case: testing.zip
 check-r7rs:
 	$(KAWA) $(OPTIONS) --no-warn-void-used -f $(srcdir)/r7rs-tests.scm
 
-check-num:
+check-num: InliningTest.class
 	$(KAWA) $(OPTIONS) "$(srcdir)/num-test.scm"
 	$(KAWA) $(OPTIONS) "$(srcdir)/numeric-tests.scm"
 	$(KAWA) $(OPTIONS) "$(srcdir)/quaternion-test.scm"
@@ -553,7 +553,7 @@ inlining.log: InliningTest.class cycle1.class cycle2.class \
 	factorialInfer1 getFromVector1 getFromVector2 read1 stringForEach \
 	stringAppend translateSpaceToNewline \
 	topLevelRecurse1 topLevelRecurse2 sum1 sum2 numcomp eqv raise \
-	case callWithValues mmemq >inlining.log
+	case callWithValues mmemq greaterEqual >inlining.log
 	$(LIST_CODE_SIZE) cycle1.class isIsEven >>inlining.log
 	$(LIST_CODE_SIZE) cycle2.class isIsOdd >>inlining.log
 	$(LIST_CODE_SIZE) binarytrees.class bottomUpTree test >>inlining.log

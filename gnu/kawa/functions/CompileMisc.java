@@ -374,7 +374,13 @@ public class CompileMisc
                 if (kind0 <= Arithmetic.INTNUM_CODE
                     && kind1 <= Arithmetic.INTNUM_CODE
                     && (kind0 > Arithmetic.LONG_CODE
-                        || kind1 > Arithmetic.LONG_CODE)) {
+                        || kind1 > Arithmetic.LONG_CODE)
+                    && ! (kind0 == Arithmetic.ULONG_CODE
+                          && kind1 == Arithmetic.ULONG_CODE)) {
+                    // Use either IntNum.compare(intNum,IntNum)
+                    // or (if possible) IntNum.compare(IntNum,long).
+                    // Note we handle (ulong,int) and (ulong,long) by
+                    // delegating to IntNum.compare.  FIXME
                     Type[] ctypes = new Type[2];
                     ctypes[0] = Arithmetic.typeIntNum;
                     if (kind1 <= Arithmetic.LONG_CODE) {
@@ -395,7 +401,8 @@ public class CompileMisc
                         ctypes[1] = Arithmetic.typeIntNum;
                     Method cmeth
                         = Arithmetic.typeIntNum.getMethod("compare", ctypes);
-                    PrimProcedure compare = new PrimProcedure(cmeth);
+                    PrimProcedure compare =
+                        new PrimProcedure(cmeth, comp.getLanguage());
                     arg0 = new ApplyExp(compare, args);
                     arg1 = new QuoteExp(IntNum.zero());
                     kind0 = kind1 = Arithmetic.INT_CODE;
@@ -403,9 +410,37 @@ public class CompileMisc
                 Type commonType;
                 if (kind0 <= Arithmetic.INT_CODE && kind1 <= Arithmetic.INT_CODE)
                     commonType = Type.intType;
-                else if (kind0 <= Arithmetic.LONG_CODE && kind1 <= Arithmetic.LONG_CODE)
+                else if (kind0 <= Arithmetic.UINT_CODE
+                         && kind1 <= Arithmetic.UINT_CODE) {
+                    if (kind0 <= Arithmetic.INT_CODE
+                        || kind1 <= Arithmetic.INT_CODE) {
+                        // Mix of signed and unsigned int - use long
+                        commonType = Type.longType;
+                        kind0 = kind1 = Arithmetic.LONG_CODE;
+                    } else {
+                        // Both operands are unsigned int.
+                        Expression signBit =
+                            QuoteExp.makeShared(Integer.MIN_VALUE,
+                                                Type.intType);
+                        arg0 = new ApplyExp(AddOp.$Pl, arg0, signBit);
+                        arg1 = new ApplyExp(AddOp.$Pl, arg1, signBit);
+                        kind0 = kind1 = Arithmetic.INT_CODE;
+                        commonType = Type.intType;
+                    }
+                } else if (kind0 <= Arithmetic.LONG_CODE
+                           && kind1 <= Arithmetic.LONG_CODE) {
                     commonType = Type.longType;
-                else
+                } else if (kind0 <= Arithmetic.ULONG_CODE
+                           && kind1 <= Arithmetic.ULONG_CODE) {
+                    // Both operands unsigned long.
+                    // (Mix of unsigned long and signed int/long handled above.)
+                    Expression signBit =
+                        QuoteExp.makeShared(Long.MIN_VALUE, Type.longType);
+                    arg0 = new ApplyExp(AddOp.$Pl, arg0, signBit);
+                    arg1 = new ApplyExp(AddOp.$Pl, arg1, signBit);
+                    kind0 = kind1 = Arithmetic.LONG_CODE;
+                    commonType = Type.longType;
+                } else
                     commonType = Type.doubleType;
                 StackTarget subTarget = new StackTarget(commonType);
                 ConditionalTarget ctarget = (ConditionalTarget) target;

@@ -1,3 +1,7 @@
+2015-06-02  Per Bothner  <per@bothner.com>
+
+	* QuoteExp.java (makeShared): Make public.
+
 2015-05-29  Per Bothner  <per@bothner.com>
 
 	* Declaration.java (load): Call fixUnsigned to correct loading

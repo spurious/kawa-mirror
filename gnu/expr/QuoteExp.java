@@ -97,7 +97,7 @@ public class QuoteExp extends Expression
     return exp;
   }
 
-  static QuoteExp makeShared (Object value, Type type)
+  public static QuoteExp makeShared (Object value, Type type)
   {
     QuoteExp exp = new QuoteExp(value, type);
     exp.setFlag(SHARED_CONSTANT);

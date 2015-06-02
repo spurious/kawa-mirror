@@ -1,3 +1,8 @@
+2015-06-02  Per Bothner  <per@bothner.com>
+
+	* NumberCompare.java (compare): Handle uint and ulong.
+	* CompileMisc.java (compileNumberCompare): Likewise.
+
 2015-05-20  Per Bothner  <per@bothner.com>
 
 	* Arithmetic.java (UINT_CODE, ULONG_CODE): New promotion codes.

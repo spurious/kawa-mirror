@@ -451,7 +451,7 @@
 
   </target>
 
-  <target name="kawa.sh">
+  <target name="kawa.sh" depends="build-settings">
     <copy file="${src.dir}/bin/kawa.sh.in" tofile="bin/kawa.sh">
       <filterset>
         <filter token="ENABLE_KAWA_FRONTEND_TRUE" value="#"/>
@@ -899,6 +899,7 @@
        <fileset refid="build.classes"/>
        <fileset refid="build.preprocessed"/>
        <fileset file="bin/kawa.bat"/>
+       <fileset file="bin/kawa.sh"/>
     </delete>
     <delete dir="META-INF"/>
   </target>

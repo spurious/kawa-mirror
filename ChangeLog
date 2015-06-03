@@ -1,3 +1,8 @@
+2015-06-03  Per Bothner  <per@bothner.com>
+
+	* build.xml (kawa.sh): Add dependency on build-settings.
+	(clean-build): Remove bin/kawa.sh.
+
 2015-06-02  Jamison Hope  <jrh@theptrgroup.com>
 
 	* build.xml (-maybe-select-java{2,4,5,6,7}): Use both "if" and

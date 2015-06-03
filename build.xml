@@ -385,19 +385,19 @@
   <target name="-maybe-select-java1" unless="has-java2">
     <antcall target="select-java1"/>
   </target>
-  <target name="-maybe-select-java2" unless="has-java4">
+  <target name="-maybe-select-java2" if="has-java2" unless="has-java4">
     <antcall target="select-java2"/>
   </target>
-  <target name="-maybe-select-java4" unless="has-java5">
+  <target name="-maybe-select-java4" if="has-java4" unless="has-java5">
     <antcall target="select-java4"/>
   </target>
-  <target name="-maybe-select-java5" unless="has-java6">
+  <target name="-maybe-select-java5" if="has-java5" unless="has-java6">
     <antcall target="select-java5"/>
   </target>
-  <target name="-maybe-select-java6" if="has-java6">
+  <target name="-maybe-select-java6" if="has-java6" unless="has-java7">
     <antcall target="select-java6"/>
   </target>
-  <target name="-maybe-select-java7" if="has-java7">
+  <target name="-maybe-select-java7" if="has-java7" unless="has-java8">
     <antcall target="select-java7"/>
   </target>
   <target name="-maybe-select-java8" if="has-java8">

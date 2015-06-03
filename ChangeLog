@@ -1,3 +1,9 @@
+2015-06-02  Jamison Hope  <jrh@theptrgroup.com>
+
+	* build.xml (-maybe-select-java{2,4,5,6,7}): Use both "if" and
+	"unless" attributes so that only one of the select-java* targets
+	gets called.
+
 2015-05-19  Jamison Hope  <jrh@theptrgroup.com>
 
 	* build.xml (has-java{2,4,5,6,7,8}): Move out of

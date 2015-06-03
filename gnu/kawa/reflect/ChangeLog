@@ -1,3 +1,7 @@
+2015-06-03  Per Bothner  <per@bothner.com>
+
+	* CompileArrays.java (compileSet): Get a truncating StackTarget.
+
 2015-02-26  Per Bothner  <per@bothner.com>
 
 	* TypeSwitch.java (compile): Fix handling of toStringType.

@@ -1,3 +1,14 @@
+2015-06-03  Per Bothner  <per@bothner.com>
+
+	Avoid redundant int to byte/short conversion when storing
+	in field or array, since VM does that anyway.
+	* StackTarget.java (autoTruncates): New field.
+	(autoTruncates): New method.
+	(getTruncatingInstance): New static method.
+	(compileFromStack): Don't convert if auto-truncating.
+	* CheckedTarget.java (getInstance(Declaration)):
+	If the target is a field, set autoTruncates.
+
 2015-06-02  Per Bothner  <per@bothner.com>
 
 	* QuoteExp.java (makeShared): Make public.

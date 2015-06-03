@@ -11,6 +11,21 @@ public class StackTarget extends Target
   Type type;
   public StackTarget(Type type) { this.type = type; }
 
+    /** Target is field or array element that automatically truncates.
+     * Relevant if type is (signed or unsigned) byte or short, and
+     * the given type is an int.  Hence we can avoid the truncation.
+     */
+    protected boolean autoTruncates;
+
+    boolean autoTruncates(Type stackType) {
+        if (autoTruncates && stackType == Type.intType) {
+            char sig1 = type.getSignature().charAt(0);
+            if (sig1 == 'B' || sig1 == 'S' || sig1 == 'C')
+                return true;
+        }
+        return false;
+    }
+
   public Type getType() { return type; }
 
   public static Target getInstance(Type type)
@@ -19,6 +34,16 @@ public class StackTarget extends Target
 	    : type == Type.pointer_type ? Target.pushObject
             : new StackTarget(type));
   }
+
+    public static Target getTruncatingInstance(Type type) {
+        if (type.isVoid())
+            return Target.Ignore;
+        if (type == Type.pointer_type)
+            return Target.pushObject;
+        StackTarget target = new StackTarget(type);
+        target.autoTruncates = true;
+        return target;
+    }
 
     protected StackTarget getClonedInstance(Type type) {
         return new StackTarget(type);
@@ -122,7 +147,8 @@ public class StackTarget extends Target
             comp.getCode().emitInvokeStatic(wrapMethod);
             comp.getCode().emitCheckcast(ltype.getRawType());
         }
-        else if (! compileFromStack0(comp, stackType))
+        else if (! autoTruncates(stackType)
+                 && ! compileFromStack0(comp, stackType))
             doCoerce(comp);
     }
 

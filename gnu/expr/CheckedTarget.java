@@ -56,10 +56,16 @@ public class CheckedTarget extends StackTarget
             : new CheckedTarget(type));
   }
 
-  public static Target getInstance (Declaration decl)
-  {
-    return getInstance(decl.getType(), decl.getName(), WrongType.ARG_VARNAME);
-  }
+    public static Target getInstance(Declaration decl) {
+        Type type = decl.getType();
+        if (type == Type.objectType)
+            return Target.pushObject;
+        StackTarget targ = new CheckedTarget(type, decl.getName(),
+                                             WrongType.ARG_VARNAME);
+        if (decl.field != null)
+            targ.autoTruncates = true;
+        return targ;
+    }
 
     protected StackTarget getClonedInstance(Type type) {
         CheckedTarget target = new CheckedTarget(type);

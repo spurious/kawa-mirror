@@ -60,7 +60,8 @@ public class CompileArrays
         Expression[] args = exp.getArgs();
         args[0].compile(comp, ArrayType.make(element_type));
         args[1].compile(comp, Type.int_type);
-        args[2].compile(comp, element_type);
+        Target valueTarget = StackTarget.getTruncatingInstance(element_type);
+        args[2].compile(comp, valueTarget);
         comp.getCode().emitArrayStore(element_type);
         comp.compileConstant(Values.empty, target);
         return true;

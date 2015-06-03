@@ -461,3 +461,7 @@
   (>= x y))
 (define (greater-equal-u64-u64-generic x::ulong y::ulong)
   (greater-equal x y))
+
+(define s8a::byte 123)
+(define (increment-s8a) (set! s8a (+ s8a 1)))
+(define (increment-arr-s8 arr::byte[] i::int) (set! (arr i) (+ (arr i) 1)))

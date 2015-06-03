@@ -151,6 +151,8 @@ InliningTest.greaterEqualU32S32Generic(int,int)boolean: 12 bytes
 InliningTest.greaterEqualU64S32(long,int)boolean: 18 bytes
 InliningTest.greaterEqualU64U64(long,long)boolean: 20 bytes
 InliningTest.greaterEqualU64U64Generic(long,long)boolean: 12 bytes
+InliningTest.incrementS8a()void: 9 bytes
+InliningTest.incrementArrS8(byte[],int)void: 9 bytes
 cycle1.isIsEven(int)boolean: 17 bytes
 cycle2.isIsOdd(int)boolean: 17 bytes
 binarytrees.bottomUpTree(int,int)binarytrees$TreeNode: 60 bytes

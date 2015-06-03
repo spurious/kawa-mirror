@@ -47,8 +47,12 @@ public class BitwiseOp extends ArithOp
       {
       case Arithmetic.INT_CODE:
         return Integer.valueOf(value.intValue());
+      case Arithmetic.UINT_CODE:
+        return UInt.valueOf(value.intValue());
       case Arithmetic.LONG_CODE:
         return Long.valueOf(value.longValue());
+      case Arithmetic.ULONG_CODE:
+        return ULong.valueOf(value.longValue());
       case Arithmetic.BIGINTEGER_CODE:
         return new BigInteger(value.toString());
       default:

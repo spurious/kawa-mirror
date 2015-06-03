@@ -1,4 +1,4 @@
-(test-begin "num" 1895)
+(test-begin "num" 1896)
 
 (test-equal 7 (+ 3 4))
 (test-equal 3 (+ 3))
@@ -483,5 +483,7 @@
               (test-equal r (greater-equal-u64-u64-generic x y))))
           '((#xffffffffffffffff 3 #t)
             (#xfffffffffffffffA #xfffffffffffffffC #f)))
+
+(test-equal 65586 (add-u8a-u16a))
 
 (test-end)

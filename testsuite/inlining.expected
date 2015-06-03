@@ -153,6 +153,9 @@ InliningTest.greaterEqualU64U64(long,long)boolean: 20 bytes
 InliningTest.greaterEqualU64U64Generic(long,long)boolean: 12 bytes
 InliningTest.incrementS8a()void: 9 bytes
 InliningTest.incrementArrS8(byte[],int)void: 9 bytes
+InliningTest.incrementU8a()void: 13 bytes
+InliningTest.setU16a(int)void: 5 bytes
+InliningTest.addU8aU16a()int: 13 bytes
 cycle1.isIsEven(int)boolean: 17 bytes
 cycle2.isIsOdd(int)boolean: 17 bytes
 binarytrees.bottomUpTree(int,int)binarytrees$TreeNode: 60 bytes
@@ -172,7 +175,7 @@ pidigits$PiDigitSpigot.digit()int: 9 bytes
 pidigits$PiDigitSpigot.isSafe(int)boolean: 18 bytes
 pidigits$PiDigitSpigot.produce(int)pidigits$Transformation: 27 bytes
 pidigits$PiDigitSpigot.consume(pidigits$Transformation)pidigits$Transformation: 9 bytes
-mandelbrot.compute(int,java.io.PrintStream)void: 309 bytes
+mandelbrot.compute(int,java.io.PrintStream)void: 307 bytes
 nbody.nbodySystem(int)void: 187 bytes
 nbody.advance(nbody$Body[],double)void: 330 bytes
 nbody.energy(nbody$Body[])double: 181 bytes
@@ -180,7 +183,7 @@ nbody.jupiter()nbody$Body: 57 bytes
 nbody$Body.offsetMomentum(double,double,double)void: 32 bytes
 regexdna.regexdna(java.io.InputStream)void: 329 bytes
 revcomp1.revcomp(java.io.InputStream)void: 341 bytes
-revcomp2.run(gnu.mapping.CallContext)void: 197 bytes
+revcomp2.run(gnu.mapping.CallContext)void: 194 bytes
 revcomp2$RevByteArray.reverseAndPrint()void: 117 bytes
 spectralnorm.Approximate(int)double: 110 bytes
 spectralnorm.A(int,int)double: 19 bytes

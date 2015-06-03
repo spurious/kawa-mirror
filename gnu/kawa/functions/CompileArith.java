@@ -162,17 +162,20 @@ public class CompileArith implements Inlineable
       }
     Type targetType = target.getType();
     int tkind = Arithmetic.classifyType(targetType);
+
+    // Figure what type to use as the "working type", taking into account
+    // the target type.  E.g. no point in using fractional arithmetic if
+    // we're going to convert the result to an inexact float.
     Type wtype;
-    if ((tkind == Arithmetic.INT_CODE || tkind == Arithmetic.LONG_CODE)
+    if (tkind >= Arithmetic.INT_CODE && tkind <= Arithmetic.ULONG_CODE
         && kind >= Arithmetic.INT_CODE && kind <= Arithmetic.INTNUM_CODE)
       {
         kind = tkind;
-        wtype = tkind == Arithmetic.INT_CODE ? LangPrimType.intType
-          : LangPrimType.longType;
+        wtype = Arithmetic.kindType(tkind);
       }
     else if ((tkind == Arithmetic.DOUBLE_CODE
               || tkind == Arithmetic.FLOAT_CODE)
-             && kind > Arithmetic.LONG_CODE && kind <= Arithmetic.REALNUM_CODE)
+             && kind > Arithmetic.ULONG_CODE && kind <= Arithmetic.REALNUM_CODE)
       {
         kind = tkind;
         wtype = tkind == Arithmetic.FLOAT_CODE ? LangPrimType.floatType
@@ -255,6 +258,10 @@ public class CompileArith implements Inlineable
       }
     else if (kind == Arithmetic.INT_CODE
              || kind == Arithmetic.LONG_CODE
+             || ((kind == Arithmetic.UINT_CODE || kind == Arithmetic.ULONG_CODE)
+                 && (op == ADD || op == SUB || op == MUL
+                     // FIXME also handle shifts
+                     || op == AND || op == IOR || op == XOR))
              || ((kind == Arithmetic.FLOAT_CODE
                   || kind == Arithmetic.DOUBLE_CODE)
                  && (op <= MODULO || op >= AND)))
@@ -272,7 +279,9 @@ public class CompileArith implements Inlineable
             switch (kind)
               {
               case Arithmetic.INT_CODE:
+              case Arithmetic.UINT_CODE:
               case Arithmetic.LONG_CODE:
+              case Arithmetic.ULONG_CODE:
               case Arithmetic.FLOAT_CODE:
               case Arithmetic.DOUBLE_CODE:
                 if (op == ASHIFT_GENERAL)
@@ -304,10 +313,12 @@ public class CompileArith implements Inlineable
         Object val = arg2.valueIfConstant();
         long lval;
         boolean negateOk;
-        if (kind2 <= Arithmetic.LONG_CODE)
+        if (kind2 <= Arithmetic.ULONG_CODE)
           {
             lval = ((Number) val).longValue();
-            negateOk = lval > Integer.MIN_VALUE && lval <= Integer.MAX_VALUE;
+            negateOk = ((kind2 == Arithmetic.ULONG_CODE ? lval >= 0
+                         : lval > Integer.MIN_VALUE)
+                        && lval <= Integer.MAX_VALUE);
           }
         else if (val instanceof IntNum)
           {

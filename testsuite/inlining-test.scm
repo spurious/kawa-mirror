@@ -465,3 +465,10 @@
 (define s8a::byte 123)
 (define (increment-s8a) (set! s8a (+ s8a 1)))
 (define (increment-arr-s8 arr::byte[] i::int) (set! (arr i) (+ (arr i) 1)))
+
+(define u8a::ubyte 253)
+(define u16a::ushort #xff35)
+(define (increment-u8a) (set! u8a (+ u8a 1)))
+(define (set-u16a val::int) (set! u16a val))
+(define (add-u8a-u16a)
+  (+ u8a u16a))

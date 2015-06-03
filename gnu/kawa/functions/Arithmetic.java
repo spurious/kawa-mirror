@@ -43,17 +43,6 @@ public class Arithmetic
 	    if (value instanceof Numeric) {
 		if (value instanceof IntNum)
 		    return INTNUM_CODE;
-                else if (value instanceof UnsignedPrim) {
-                    int nb = ((UnsignedPrim) value).numBits();
-                    if (nb < 32)
-                        return INT_CODE;
-                    else if (nb == 32)
-                        return UINT_CODE;
-                    else if (nb < 64)
-                        return LONG_CODE;
-                    else
-                        return ULONG_CODE;
-                }
 		else if (value instanceof RatNum)
 		    return RATNUM_CODE;
 		else if (value instanceof DFloNum)
@@ -69,6 +58,9 @@ public class Arithmetic
 		    return INT_CODE;
 		else if (value instanceof Long)
 		    return LONG_CODE;
+                else if (value instanceof UnsignedPrim)
+                    return value instanceof ULong ? ULONG_CODE
+                        : value instanceof UInt ? UINT_CODE : INT_CODE;
 		else if (value instanceof Float)
 		    return FLOAT_CODE;
 		else if (value instanceof Double)
@@ -77,9 +69,6 @@ public class Arithmetic
 		    return BIGINTEGER_CODE;
 		else if (value instanceof BigDecimal)
 		    return BIGDECIMAL_CODE;
-                else if (value instanceof UnsignedPrim)
-                    return value instanceof ULong ? ULONG_CODE
-                        : value instanceof UInt ? UINT_CODE : INT_CODE;
 		else
 		    break;
 	    }
@@ -256,7 +245,9 @@ public class Arithmetic
     if (value instanceof BigInteger)
       return new BigDecimal((BigInteger) value);
     if (value instanceof Long || value instanceof Integer
-	|| value instanceof Short || value instanceof Byte)
+	|| value instanceof Short || value instanceof Byte
+        || value instanceof UInt
+	|| value instanceof UShort || value instanceof UByte)
       return BigDecimal.valueOf(((Number) value).longValue());
     return new BigDecimal(value.toString());
   }
@@ -294,8 +285,18 @@ public class Arithmetic
       {
       case Arithmetic.INT_CODE:
         return Integer.toString(Arithmetic.asInt(number), radix);
+      case Arithmetic.UINT_CODE:
       case Arithmetic.LONG_CODE:
         return Long.toString(Arithmetic.asLong(number), radix);
+      case Arithmetic.ULONG_CODE:
+          long lval = Arithmetic.asLong(number);
+          /* #ifdef JAVA8 */
+          // return Long.toUnsignedString(lval, radix);
+          /* #else */
+          if (lval >= 0)
+              return Long.toString(lval, radix);
+          return IntNum.valueOfUnsigned(lval).toString(radix);
+          /* #endif */
       case Arithmetic.BIGINTEGER_CODE:
         return Arithmetic.asBigInteger(number).toString(radix);
       case Arithmetic.INTNUM_CODE:
@@ -330,21 +331,19 @@ public class Arithmetic
       case Arithmetic.INT_CODE:
         if (value instanceof Integer)
           return value;
-        int i = ((Number) value).intValue();
-        /* #ifdef JAVA5 */
-        return Integer.valueOf(i);
-        /* #else */
-        // return new Integer(i);
-        /* #endif */
+        return Integer.valueOf(((Number) value).intValue());
+      case Arithmetic.UINT_CODE:
+        if (value instanceof UInt)
+          return value;
+        return UInt.valueOf(((Number) value).intValue());
       case Arithmetic.LONG_CODE:
         if (value instanceof Long)
           return value;
-        long l = ((Number) value).longValue();
-        /* #ifdef JAVA5 */
-        return Long.valueOf(l);
-        /* #else */
-        // return new Long(l);
-        /* #endif */
+        return Long.valueOf(((Number) value).longValue());
+      case Arithmetic.ULONG_CODE:
+        if (value instanceof ULong)
+          return value;
+        return ULong.valueOf(((Number) value).longValue());
       case Arithmetic.BIGINTEGER_CODE:
         return Arithmetic.asBigInteger(value);
       case Arithmetic.INTNUM_CODE:

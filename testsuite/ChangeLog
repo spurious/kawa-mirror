@@ -1,6 +1,8 @@
 2015-06-03  Per Bothner  <per@bothner.com>
 
-	* inlining-test.scm (increment-s8a, increment-arr-s8): New functions.
+	* num-test.scm: Add test.
+	* inlining-test.scm (increment-s8a, increment-arr-s8)
+	incrementU8a setU16a addU8aU16a): New functions.
 	* Makefile.am: Update accordingly.
 	* inlining.expected: Update accordingly.
 

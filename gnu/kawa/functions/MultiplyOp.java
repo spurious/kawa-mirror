@@ -51,16 +51,20 @@ public class MultiplyOp extends ArithOp
 
     public static Number combine(Number result, Object arg2, int code) {
 	switch (code) {
-	  case Arithmetic.INT_CODE:
+          case Arithmetic.INT_CODE:
+          case Arithmetic.UINT_CODE:
 	    int i1 = Arithmetic.asInt(result);
 	    int i2 = Arithmetic.asInt(arg2);
-	    result = new Integer(i1 * i2);
-	    break;
+            int ir = i1 * i2;
+            return code == Arithmetic.INT_CODE ? Integer.valueOf(ir)
+                : UInt.valueOf(ir);
 	  case Arithmetic.LONG_CODE:
+	  case Arithmetic.ULONG_CODE:
 	    long l1 = Arithmetic.asLong(result);
 	    long l2 = Arithmetic.asLong(arg2);
-	    result = new Long(l1 * l2);
-	    break;
+	    long lr = l1 * l2;
+            return code == Arithmetic.LONG_CODE ? Long.valueOf(lr)
+                : ULong.valueOf(lr);
 	  case Arithmetic.BIGINTEGER_CODE:
 	    BigInteger bi1 = Arithmetic.asBigInteger(result);
 	    BigInteger bi2 = Arithmetic.asBigInteger(arg2);

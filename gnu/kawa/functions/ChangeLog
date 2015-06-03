@@ -1,3 +1,15 @@
+2015-06-03  Per Bothner  <per@bothner.com>
+
+	More support for unsigned arithmetic.
+	* Arithmetic.java (classifyValue): Removed unused code,
+	since UnsignedPrim does not extend Numeric.
+	(asRatNum): Handle unsigned types more efficiently.
+	(toString, convert): Handle unsigned types.
+	* BitwiseOp.java (adjustResult): Handle unsigned types.
+	* MultiplyOp.java (combine): Likewise.
+	* CompileArith.java (compile): Fixes for unsigned primitive types.
+	(compileIntNum): Tweak subtraction optimization for ulong.
+
 2015-06-02  Per Bothner  <per@bothner.com>
 
 	* NumberCompare.java (compare): Handle uint and ulong.

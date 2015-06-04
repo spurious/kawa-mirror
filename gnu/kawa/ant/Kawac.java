@@ -37,6 +37,7 @@ import org.apache.tools.ant.types.selectors.PresentSelector;
 import org.apache.tools.ant.types.selectors.SelectSelector;
 import org.apache.tools.ant.types.selectors.SizeSelector;
 import org.apache.tools.ant.types.selectors.modifiedselector.ModifiedSelector;
+import org.apache.tools.ant.util.ChainedMapper;
 import org.apache.tools.ant.util.CompositeMapper;
 import org.apache.tools.ant.util.FileNameMapper;
 import org.apache.tools.ant.util.GlobPatternMapper;
@@ -755,6 +756,30 @@ public class Kawac extends MatchingTask {
     }
   }
 
+  private static class MangleFileNameMapper implements FileNameMapper {
+    // A simplified version of Language.mangleNameIfNeeded().
+    private String mangleNameIfNeeded(String name) {
+      if (name == null || !name.contains("-")) return name;
+      int len = name.length();
+      StringBuffer mangled = new StringBuffer(len);
+      for (int i  = 0; i < len; ++i) {
+        char ch = name.charAt(i);
+        if (ch == '-') mangled.append("$Mn");
+        else mangled.append(ch);
+      }
+      return mangled.toString();
+    }
+
+    public String[] mapFileName(String sourceFileName) {
+      String mangled = mangleNameIfNeeded(sourceFileName);
+      if (mangled == null) return null;
+      return new String[] { mangled };
+    }
+    public void setFrom(String from) {}
+    public void setTo(String to) {}
+    public static MangleFileNameMapper INSTANCE = new MangleFileNameMapper();
+  }
+
   /**
    * Compares the language property to each of the given strings, and
    * returns true if there is a match.
@@ -805,7 +830,10 @@ public class Kawac extends MatchingTask {
     GlobPatternMapper m = new GlobPatternMapper();
     m.setFrom("*" + ext);
     m.setTo("*.class");
-    return m;
+    ChainedMapper c = new ChainedMapper();
+    c.add(m);
+    c.add(MangleFileNameMapper.INSTANCE);
+    return c;
   }
 
   /**

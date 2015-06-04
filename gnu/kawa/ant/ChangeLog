@@ -1,3 +1,9 @@
+2015-06-02  Jamison Hope  <jrh@theptrgroup.com>
+
+	* Kawac.java (getMapper): Add file name mangling step to replace
+	"-" with "$Mn", so that Kawac looks for the right class files for
+	hyphenated source file names.
+
 2014-01-05  Per Bothner  <per@bothner.com>
 
 	* Makefile.am: Merge into ../../../gnu/Makefile.am and remove.

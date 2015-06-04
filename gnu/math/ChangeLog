@@ -1,5 +1,11 @@
 2015-06-04  Per Bothner  <per@bothner.com>
 
+	* IntNum.java (shift(int,int), shift(long,int)):
+	Move to BitOps.  This avoids inadvertent incorrect overload
+	resolutions (as in calls to (arithmetic-shift -1 n)).
+	* BitOps.java (shift(int,int), shift(long,int)): Moved here.
+	(shiftUnsigned(int,int), shiftUnsigned(long,int)): New methods.
+
 	* BitOps.java (maskMark): New static method.
 
 2015-05-20  Per Bothner  <per@bothner.com>

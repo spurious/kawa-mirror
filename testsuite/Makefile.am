@@ -553,7 +553,7 @@ inlining.log: InliningTest.class cycle1.class cycle2.class \
 	factorialInfer1 getFromVector1 getFromVector2 read1 stringForEach \
 	stringAppend translateSpaceToNewline \
 	topLevelRecurse1 topLevelRecurse2 sum1 sum2 numcomp eqv raise \
-	case callWithValues mmemq greaterEqual \
+	case callWithValues mmemq greaterEqual rshift lshift \
 	incrementS8a incrementArrS8 incrementU8a setU16a addU8aU16a>inlining.log
 	$(LIST_CODE_SIZE) cycle1.class isIsEven >>inlining.log
 	$(LIST_CODE_SIZE) cycle2.class isIsOdd >>inlining.log

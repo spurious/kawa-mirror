@@ -1050,30 +1050,6 @@ public class IntNum extends RatNum implements Externalizable
     return result.canonicalize ();
   }
 
-  public static int shift (int x, int count)
-  {
-    if (count >= 32)
-      return 0;
-    if (count >= 0)
-      return x << count;
-    count = -count;
-    if (count >= 32)
-        return x < 0 ? -1 : 0;
-    return x >> count;
-  }
-
-  public static long shift (long x, int count)
-  {
-    if (count >= 64)
-      return 0;
-    if (count >= 0)
-      return x << count;
-    count = -count;
-    if (count >= 64)
-        return x < 0 ? -1 : 0;
-    return x >> count;
-  }
-
   /* #ifdef JAVA5 */
   public void format (int radix, StringBuffer buffer)
   {

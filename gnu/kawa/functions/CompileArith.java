@@ -260,7 +260,7 @@ public class CompileArith implements Inlineable
              || kind == Arithmetic.LONG_CODE
              || ((kind == Arithmetic.UINT_CODE || kind == Arithmetic.ULONG_CODE)
                  && (op == ADD || op == SUB || op == MUL
-                     // FIXME also handle shifts
+                     || (op >= ASHIFT_GENERAL && op <= LSHIFT_RIGHT)
                      || op == AND || op == IOR || op == XOR))
              || ((kind == Arithmetic.FLOAT_CODE
                   || kind == Arithmetic.DOUBLE_CODE)
@@ -276,23 +276,38 @@ public class CompileArith implements Inlineable
             args[i].compile(comp, wtarget);
             if (i == 0)
               continue;
-            switch (kind)
-              {
-              case Arithmetic.INT_CODE:
-              case Arithmetic.UINT_CODE:
-              case Arithmetic.LONG_CODE:
-              case Arithmetic.ULONG_CODE:
-              case Arithmetic.FLOAT_CODE:
-              case Arithmetic.DOUBLE_CODE:
-                if (op == ASHIFT_GENERAL)
-                  {
-                    Type[] margs = { wtype, Type.intType };
-                    Method method = ClassType.make("gnu.math.IntNum").getDeclaredMethod("shift", margs);
-                    code.emitInvokeStatic(method);
-                  }
-                else
-                  code.emitBinop(primitiveOpcode(), (PrimType) wtype.getImplementationType());
-                break;
+            if (op == ASHIFT_GENERAL) {
+                String mname;
+                switch (kind) {
+                case Arithmetic.INT_CODE:
+                case Arithmetic.LONG_CODE:
+                    mname = "shift";
+                    break;
+                case Arithmetic.UINT_CODE:
+                case Arithmetic.ULONG_CODE:
+                    mname = "shiftUnsigned";
+                    break;
+                default:
+                    mname = null;
+                }
+                Type[] margs = { wtype, Type.intType };
+                Method method = ClassType.make("gnu.math.BitOps")
+                    .getDeclaredMethod(mname, margs);
+                code.emitInvokeStatic(method);
+            } else {
+                switch (kind) {
+                case Arithmetic.UINT_CODE:
+                case Arithmetic.ULONG_CODE:
+                    if (op == ASHIFT_RIGHT)
+                        op = LSHIFT_RIGHT;
+                    // ... fall through ...
+                case Arithmetic.INT_CODE:
+                case Arithmetic.LONG_CODE:
+                case Arithmetic.FLOAT_CODE:
+                case Arithmetic.DOUBLE_CODE:
+                    code.emitBinop(primitiveOpcode(), (PrimType) wtype.getImplementationType());
+                    break;
+                }
               }
           }
       }

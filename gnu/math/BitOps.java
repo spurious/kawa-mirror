@@ -602,4 +602,44 @@ public class BitOps
       }
     return IntNum.make(data, data.length);
   }
+
+    public static int shift(int x, int count) {
+        if (count >= 32)
+            return 0;
+        if (count >= 0)
+            return x << count;
+        count = -count;
+        if (count >= 32)
+            return x < 0 ? -1 : 0;
+        return x >> count;
+    }
+
+    public static int shiftUnsigned(int x, int count) {
+        if (count >= 32)
+            return 0;
+        if (count >= 0)
+            return x << count;
+        count = -count;
+        return count >= 32 ? 0 : x >>> count;
+    }
+
+    public static long shift(long x, int count) {
+        if (count >= 64)
+            return 0;
+        if (count >= 0)
+            return x << count;
+        count = -count;
+        if (count >= 64)
+            return x < 0 ? -1 : 0;
+        return x >> count;
+    }
+
+    public static long shiftUnsigned(long x, int count) {
+        if (count >= 64)
+            return 0;
+        if (count >= 0)
+            return x << count;
+        count = -count;
+        return count >= 64 ? 0 : x >>> count;
+    }
 }

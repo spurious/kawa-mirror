@@ -1,5 +1,7 @@
 2015-06-04  Per Bothner  <per@bothner.com>
 
+	* CompileArith.java (compile): Better job with shift.
+
 	* DivideOp.java (applyN): Handle unsigned integer types.
 
 2015-06-03  Per Bothner  <per@bothner.com>

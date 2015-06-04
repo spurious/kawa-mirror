@@ -1,3 +1,9 @@
+2015-06-04  Per Bothner  <per@bothner.com>
+
+	* testsuite/inlining-test.scm: Add various shifts.
+	* testsuite/Makefile.am: Update accordingly.
+	* testsuite/inlining.expected: Update accordingly.
+
 2015-06-03  Per Bothner  <per@bothner.com>
 
 	* quaternion-test.scm: Changes tests of quaternion->rotation-matrix

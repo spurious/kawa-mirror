@@ -1,3 +1,8 @@
+2015-06-03  Per Bothner  <per@bothner.com>
+
+	* LispLanguage.java (getTypeFor): Add reverse mappings
+	for uniform vector classes, such as F64Vector.
+
 2015-06-02  Per Bothner  <per@bothner.com>
 
 	* LangObjType.java (emitConvertFromPrimitive): Handle unsigned types.

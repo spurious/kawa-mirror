@@ -321,6 +321,9 @@ public abstract class LispLanguage extends Language
         String name = clas.getName();
         if (clas.isPrimitive())
             return getNamedType(name);
+        /* #ifdef JAVA7 */
+        ; // FIXME - FUTURE: Use a switch with string keys.
+        /* #endif */
         if ("java.lang.String".equals(name))
             return Type.toStringType;
         if ("gnu.math.IntNum".equals(name))
@@ -349,6 +352,26 @@ public abstract class LispLanguage extends Language
             return LangObjType.typeType;
         if ("gnu.bytecode.ClassType".equals(name))
             return LangObjType.typeClassType;
+        if ("gnu.lists.F64Vector".equals(name))
+            return LangObjType.f64vectorType;
+        if ("gnu.lists.F32Vector".equals(name))
+            return LangObjType.f32vectorType;
+        if ("gnu.lists.S64Vector".equals(name))
+            return LangObjType.s64vectorType;
+        if ("gnu.lists.S32Vector".equals(name))
+            return LangObjType.s32vectorType;
+        if ("gnu.lists.S16Vector".equals(name))
+            return LangObjType.s16vectorType;
+        if ("gnu.lists.S8Vector".equals(name))
+            return LangObjType.s8vectorType;
+        if ("gnu.lists.U64Vector".equals(name))
+            return LangObjType.u64vectorType;
+        if ("gnu.lists.U32Vector".equals(name))
+            return LangObjType.u32vectorType;
+        if ("gnu.lists.U16Vector".equals(name))
+            return LangObjType.u16vectorType;
+        if ("gnu.lists.U8Vector".equals(name))
+            return LangObjType.u8vectorType;
         return super.getTypeFor(clas);
     }
 

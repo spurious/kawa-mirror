@@ -71,8 +71,14 @@ public class DivideOp extends ArithOp
                 scode = code = Arithmetic.INTNUM_CODE;
                 break;
               default:
-                if (rounding_mode == Numeric.TRUNCATE
-                    && (code == Arithmetic.INT_CODE || code == Arithmetic.LONG_CODE))
+                  if (rounding_mode == Numeric.TRUNCATE
+                      && code >= Arithmetic.INT_CODE
+                      /* #ifdef JAVA8 */
+                      // && code <= Arithmetic.ULONG_CODE
+                      /* #else */
+                      && code <= Arithmetic.LONG_CODE
+                      /* #endif */
+                      )
                   ; // handled specifically
                 else
                   scode = Arithmetic.INTNUM_CODE;
@@ -107,9 +113,15 @@ public class DivideOp extends ArithOp
               }
 	    result = Integer.valueOf(i1);
 	    break;
+	  case Arithmetic.UINT_CODE:
 	  case Arithmetic.LONG_CODE:
 	    long l1 = Arithmetic.asLong(result);
 	    long l2 = Arithmetic.asLong(arg2);
+            if (scode == Arithmetic.UINT_CODE)
+              {
+                l1 &= 0xffffffffl;
+                l2 &= 0xffffffffl;
+              }
             switch (op)
               {
               case MODULO:
@@ -119,8 +131,27 @@ public class DivideOp extends ArithOp
                 l1 = l1 / l2;
                 break;
               }
-	    result = Long.valueOf(l1);
+            if (scode == Arithmetic.UINT_CODE)
+                result = UInt.valueOf((int) l1);
+            else
+                result = Long.valueOf(l1);
 	    break;
+          /* #ifdef JAVA8 */
+          // case Arithmetic.ULONG_CODE:
+          //   l1 = Arithmetic.asLong(result);
+          //   l2 = Arithmetic.asLong(arg2);
+          //   switch (op)
+          //     { // FIXME Hacker's Delight has better algorithms than jdk8
+          //     case MODULO:
+          //       l1 = Long.divideUnsigned(l1, l2);
+          //       break;
+          //     default:
+          //       l1 = Long.remainderUnsigned(l1, l2);
+          //       break;
+          //     }
+          //   result = ULong.valueOf(l1);
+          //   break;
+          /* #endif */
 	  case Arithmetic.INTNUM_CODE:
             switch (op)
               {
@@ -242,8 +273,14 @@ public class DivideOp extends ArithOp
               case Arithmetic.INT_CODE:
                 result = Integer.valueOf(result.intValue());
                 break;
+               case Arithmetic.UINT_CODE:
+                result = UInt.valueOf(result.intValue());
+                break;
               case Arithmetic.LONG_CODE:
                 result = Long.valueOf(result.longValue());
+                break;
+              case Arithmetic.ULONG_CODE:
+                result = ULong.valueOf(result.longValue());
                 break;
               case Arithmetic.FLOAT_CODE:
                 result = Float.valueOf(result.floatValue());

@@ -63,7 +63,7 @@ public abstract class Numeric extends java.lang.Number
   public static final int CEILING = 2;
   public static final int TRUNCATE = 3;
   public static final int ROUND = 4;
-  /** Rounding mode to always produce a non-regative remainder.
+  /** Rounding mode to always produce a non-negative remainder.
    * Like FLOOR if the divisor is non-negative; CEILING otherwise.
    * Used to implement R6RS's div/mod operators.
    */

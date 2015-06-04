@@ -263,7 +263,7 @@ public class PrimType extends Type {
     "C:java.lang.Integer;C:gnu.math.UInt;" +
     "D:java.lang.Long;D:gnu.math.ULong;" +
     "E:gnu.math.IntNum;E:java.gnu.math.BitInteger;" +
-    "G:gnu.math.RatNum;" +
+    "G:gnu.math.RatNum;G:gnu.math.IntFraction;" +
     "H:java.lang.Float;" +
     "I:java.lang.Double;I:gnu.math.DFloNum;" +
     "J:gnu.math.RealNum;" +

@@ -1,3 +1,8 @@
+2015-06-04  Per Bothner  <per@bothner.com>
+
+	* numbers.scm (bitwise-copy-bit-field, exact-integer-sqrt):
+	Use new BitsOps:makeMask method.
+
 2015-05-20  Per Bothner  <per@bothner.com>
 
 	* reflection.scm: Fix deprecated return-type specifier syntax.

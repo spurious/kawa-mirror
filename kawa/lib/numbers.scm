@@ -4,7 +4,8 @@
 (require <kawa.lib.misc>)
 
 (import (class java.lang Double)
-        (class gnu.math IntNum Numeric RatNum RealNum (Quaternion quaternion))
+        (class gnu.math
+               IntNum BitOps Numeric RatNum RealNum (Quaternion quaternion))
         (class gnu.kawa.lispexpr LangObjType))
 
 (define-private (java.lang.real? x) ::boolean
@@ -472,48 +473,45 @@
   (gnu.kawa.functions.Arithmetic:toExact num))
 
 (define (logop (op :: <int>) (i :: <integer>) (j :: <integer>)) :: <integer>
-  (invoke-static <gnu.math.BitOps> 'bitOp op i j))
+  (BitOps:bitOp op i j))
 
 (define (bitwise-bit-set? (i :: <integer>) (bitno :: <int>)) :: <boolean>
-  (gnu.math.BitOps:bitValue i bitno))
+  (BitOps:bitValue i bitno))
 
 (define (bitwise-copy-bit (i :: integer) (bitno :: int) (new-value :: int))
   :: integer
-  (gnu.math.BitOps:setBitValue i bitno new-value))
+  (BitOps:setBitValue i bitno new-value))
 
 (define (bitwise-copy-bit-field (to :: integer) (start :: int) (end :: int) (from :: integer)) ::  integer
-  (let* ((mask1 (gnu.math.IntNum:shift -1 start))
-	 (mask2 (gnu.math.BitOps:not (gnu.math.IntNum:shift -1 end)))
-	 (mask (gnu.math.BitOps:and mask1 mask2)))
-    (bitwise-if mask
-		(gnu.math.IntNum:shift from start)
-		to)))
+  (bitwise-if (BitOps:makeMask start end)
+              (IntNum:shift from start)
+              to))
 
 (define (bitwise-bit-field (i :: <integer>) (start :: <int>) (end :: <int>))
   :: <integer>
-  (invoke-static <gnu.math.BitOps> 'extract i start end))
+  (BitOps:extract i start end))
 
 (define (bitwise-if (e1 :: integer) (e2 :: integer) (e3 :: integer)) :: integer
-  (gnu.math.BitOps:ior (gnu.math.BitOps:and e1 e2)
-		       (gnu.math.BitOps:and (gnu.math.BitOps:not e1) e3)))
+  (BitOps:ior (BitOps:and e1 e2)
+		       (BitOps:and (BitOps:not e1) e3)))
 
 (define (logtest (i :: <integer>) (j :: <integer>))
-  (invoke-static <gnu.math.BitOps> 'test i j))
+  (BitOps:test i j))
 
 (define (logcount (i :: <integer>)) :: <int>
-  (gnu.math.BitOps:bitCount
-   (if (>= i 0) i (gnu.math.BitOps:not i))))
+  (BitOps:bitCount
+   (if (>= i 0) i (BitOps:not i))))
 
 (define (bitwise-bit-count (i :: <integer>)) :: <int>
   (if (>= i 0)
-      (gnu.math.BitOps:bitCount i)
-      (- -1 (gnu.math.BitOps:bitCount (gnu.math.BitOps:not i)))))  
+      (BitOps:bitCount i)
+      (- -1 (BitOps:bitCount (BitOps:not i)))))  
 
 (define (bitwise-length (i :: <integer>)) :: <int>
   (invoke i 'intLength))
 
 (define (bitwise-first-bit-set (i :: <integer>)) :: <int>
-  (gnu.math.BitOps:lowestBitSet i))
+  (BitOps:lowestBitSet i))
 
 (define (bitwise-rotate-bit-field (n :: integer) (start :: int) (end :: int) (count :: int)) :: integer
   (let ((width (- end start)))
@@ -524,12 +522,12 @@
 	       (field0 (bitwise-bit-field n start end))
 	       (field1 (gnu.math.IntNum:shift field0 count))
 	       (field2 (gnu.math.IntNum:shift field0 (- count width)))
-	       (field (gnu.math.BitOps:ior field1 field2)))
+	       (field (BitOps:ior field1 field2)))
 	  (bitwise-copy-bit-field n start end field))
 	n)))
 
 (define (bitwise-reverse-bit-field (n :: integer) (start :: int) (end :: int)) :: integer
-  (gnu.math.BitOps:reverseBits n start end))
+  (BitOps:reverseBits n start end))
 
 (define (number->string (arg :: <java.lang.Number>)
 			#!optional (radix :: <int> 10)) ::string
@@ -575,8 +573,9 @@
                         (format #f "negative argument: ~A" i))))
   (let* ((dval ::double (i:doubleValue))
          (init ::integer ;; initial approximation
-               (if (Double:isInfinite dval) 
-                   (IntNum:shift 1 (i:intLength))
+               (if (Double:isInfinite dval)
+                   (let ((il (i:intLength)))
+                     (BitOps:makeMask il (+ il 1)))
                    (RealNum:toExactInt (java.lang.Math:sqrt dval)
                                        Numeric:TRUNCATE))))
     ;; "Babylonian method"

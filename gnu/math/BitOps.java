@@ -388,6 +388,27 @@ public class BitOps
     result.ival = i;
   }
 
+    /** Create a mask with bits true form bits form startBit to endBit. */
+    public static IntNum makeMask(int startBit, int endBit) {
+        int width = endBit-startBit;
+        if (width <= 0)
+            return IntNum.zero();
+        if (endBit < 64)
+            return IntNum.make(~(-1L << width) << startBit);
+        int len = (endBit >> 5) + 1;
+        int[] buf = new int[len];
+        int startWord = startBit >> 5;
+        int i = width >> 5;
+        buf[i] = ~(-1 << (width & 31));
+        while (--i >= 0)
+            buf[i] = -1;
+        // Now buf contains '1' in the width low-order bits.
+        MPN.lshift(buf, startWord, buf, len-startWord, startBit&31);
+        for (i = startWord; --i >= 0; )
+            buf[i] = 0;
+        return IntNum.make(buf, len);
+    }
+
   /** Extract a bit-field as an unsigned integer. */
   public static IntNum extract (IntNum x, int startBit, int endBit)
   {

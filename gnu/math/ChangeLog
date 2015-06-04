@@ -1,3 +1,7 @@
+2015-06-04  Per Bothner  <per@bothner.com>
+
+	* BitOps.java (maskMark): New static method.
+
 2015-05-20  Per Bothner  <per@bothner.com>
 
 	* UnsignedPrim.java: New abstract class, extends Number.

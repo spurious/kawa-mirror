@@ -46,7 +46,7 @@
   (fields)
   (all-fields)
   ((*init* name supertype fields all-fields)
-   (set! (*:.name (this)) name)
+   (set! (this):name name)
    (set! (*:.supertype (this)) supertype)
    (set! (*:.fields (this)) fields)
    (set! (*:.all-fields (this)) all-fields))

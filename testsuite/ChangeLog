@@ -1,5 +1,8 @@
 2015-06-03  Per Bothner  <per@bothner.com>
 
+	* quaternion-test.scm: Changes tests of quaternion->rotation-matrix
+	to be independent of whether Double or DFloNum is used.
+
 	* num-test.scm: Add test.
 	* inlining-test.scm (increment-s8a, increment-arr-s8)
 	incrementU8a setU16a addU8aU16a): New functions.

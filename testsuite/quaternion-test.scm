@@ -167,19 +167,19 @@
        (m3 (quaternion->rotation-matrix (* q q q)))) ; 360 degrees
   ;; for a 120-degree rotation about (1,1,1),  +X->+Y, +Y->+Z, +Z->+X
   ;; m1 is #2a((0 0 1) (1 0 0) (0 1 0))
-  (test-equal '(0.0 1.0 0.0) (list (m1 0 0) (m1 1 0) (m1 2 0))) ; col 0
-  (test-equal '(0.0 0.0 1.0) (list (m1 0 1) (m1 1 1) (m1 2 1))) ; col 1
-  (test-equal '(1.0 0.0 0.0) (list (m1 0 2) (m1 1 2) (m1 2 2))) ; col 2
+  (test-equal (double[] 0 1 0) (double[] (m1 0 0) (m1 1 0) (m1 2 0))) ; col 0
+  (test-equal (double[] 0 0 1) (double[] (m1 0 1) (m1 1 1) (m1 2 1))) ; col 1
+  (test-equal (double[] 1 0 0) (double[] (m1 0 2) (m1 1 2) (m1 2 2))) ; col 2
   ;; for 240 degrees, +X->+Z, +Y->+X, +Z->+Y
-  (test-equal '(0.0 0.0 1.0) (list (m2 0 0) (m2 1 0) (m2 2 0))) ; col 0
-  (test-equal '(1.0 0.0 0.0) (list (m2 0 1) (m2 1 1) (m2 2 1))) ; col 1
-  (test-equal '(0.0 1.0 0.0) (list (m2 0 2) (m2 1 2) (m2 2 2))) ; col 2
+  (test-equal (double[] 0 0 1) (double[] (m2 0 0) (m2 1 0) (m2 2 0))) ; col 0
+  (test-equal (double[] 1 0 0) (double[] (m2 0 1) (m2 1 1) (m2 2 1))) ; col 1
+  (test-equal (double[] 0 1 0) (double[] (m2 0 2) (m2 1 2) (m2 2 2))) ; col 2
   ;; for 360 degrees, matrix is identity -- but we're on the other
   ;; side of the hypersphere: q^3 == -1
   (test-equal -1 (* q q q))
-  (test-equal '(1.0 0.0 0.0) (list (m3 0 0) (m3 1 0) (m3 2 0))) ; col 0
-  (test-equal '(0.0 1.0 0.0) (list (m3 0 1) (m3 1 1) (m3 2 1))) ; col 1
-  (test-equal '(0.0 0.0 1.0) (list (m3 0 2) (m3 1 2) (m3 2 2)))) ; col 2
+  (test-equal (double[] 1 0 0) (double[] (m3 0 0) (m3 1 0) (m3 2 0))) ; col 0
+  (test-equal (double[] 0 1 0) (double[] (m3 0 1) (m3 1 1) (m3 2 1))) ; col 1
+  (test-equal (double[] 0 0 1) (double[] (m3 0 2) (m3 1 2) (m3 2 2)))) ; col 2
 (test-end "rotation-matrix")
 
 (test-begin "rotation-axis/angle")

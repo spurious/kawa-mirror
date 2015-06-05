@@ -1,3 +1,8 @@
+2015-06-04  Per Bothner  <per@bothner.com>
+
+	* LangPrimType.java (coerceFromObject): Handle unsigned types.
+	(compare): Simplify - use PrimType.compare.
+
 2015-06-03  Per Bothner  <per@bothner.com>
 
 	* LispLanguage.java (getTypeFor): Add reverse mappings

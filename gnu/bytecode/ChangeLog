@@ -1,3 +1,7 @@
+2015-06-04  Per Bothner  <per@bothner.com>
+
+	* PrimType.java (compare): Handle signed vs unsigned types.
+
 2015-06-03  Per Bothner  <per@bothner.com>
 
 	* PrimType.java (numberHierarchy): Add IntFraction.

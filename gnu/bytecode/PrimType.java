@@ -193,54 +193,48 @@ public class PrimType extends Type {
       }
   }
 
-  public static int compare(PrimType type1, PrimType type2)
-  {
-    char sig1 = type1.signature.charAt(0);
-    char sig2 = type2.signature.charAt(0);
+    public static int compare(PrimType type1, PrimType type2) {
+        char sig1 = type1.signature.charAt(0);
+        char sig2 = type2.signature.charAt(0);
 
-    if (sig1 == sig2)
-      return 0;
+        if (sig1 == sig2)
+            return type1.isUnsigned() == type2.isUnsigned() ? 0 : -2;
 
-    // Anything can be converted to void, but not vice versa.
-    if (sig1 == 'V')
-      return 1;
-    if (sig2 == 'V')
-      return -1;
+        // Anything can be converted to void, but not vice versa.
+        if (sig1 == 'V')
+            return 1;
+        if (sig2 == 'V')
+            return -1;
 
-    // In Java, no other type can be converted to/from boolean.
-    // Other languages, including C and Scheme are different:
-    // "everything" can be converted to a boolean.
-    if (sig1 == 'Z' || sig2 == 'Z')
-      return -3;
+        // In Java, no other type can be converted to/from boolean.
+        // Other languages, including C and Scheme are different:
+        // "everything" can be converted to a boolean.
+        if (sig1 == 'Z' || sig2 == 'Z')
+            return -3;
 
-    if (sig1 == 'C')
-      return type2.size > 2 ? -1 : -3;
-    if (sig2 == 'C')
-      return type1.size > 2 ? 1 : -3;
+        if (sig1 == 'C')
+            return type2.size > 2 ? -1 : -3;
+        if (sig2 == 'C')
+            return type1.size > 2 ? 1 : -3;
 
-    if (sig1 == 'D')
-      return 1;
-    if (sig2 == 'D')
-      return -1;
-    if (sig1 == 'F')
-      return 1;
-    if (sig2 == 'F')
-      return -1;
-    if (sig1 == 'J')
-      return 1;
-    if (sig2 == 'J')
-      return -1;
-    if (sig1 == 'I')
-      return 1;
-    if (sig2 == 'I')
-      return -1;
-    if (sig1 == 'S')
-      return 1;
-    if (sig2 == 'S')
-      return -1;
-    // Can we get here?
-    return -3;
-  }
+        if (sig1 == 'D')
+            return 1;
+        if (sig2 == 'D')
+            return -1;
+        if (sig1 == 'F')
+            return 1;
+        if (sig2 == 'F')
+            return -1;
+        int r = (sig1 == 'J' ? 1 : sig2 == 'J' ? -1 :
+                 sig1 == 'I' ? 1 : sig2 == 'I' ? -1 :
+                 sig1 == 'S' ? 1 : sig2 == 'S' ? -1 :
+                 sig1 == 'B' ? 1 : sig2 == 'B' ? -1 :
+                 -3); // Can be get here?
+        if ((r == 1 && type1.isUnsigned() && ! type2.isUnsigned()) ||
+            (r == -1 && type2.isUnsigned() && ! type1.isUnsigned()))
+            r = -2;
+        return r;
+    }
 
   public Type promotedType ()
   {

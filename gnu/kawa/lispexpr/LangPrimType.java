@@ -121,6 +121,10 @@ public class LangPrimType extends PrimType implements TypeValue {
             return obj;
         char sig1 = getSignature().charAt(0);
         switch (sig1) {
+        case 'J':
+            if (isUnsigned())
+                return ULong.valueOf(((Number) obj).longValue());
+            break;
         case 'I':
             if (this == characterType || this == characterOrEofType) {
                 int ival;
@@ -134,6 +138,16 @@ public class LangPrimType extends PrimType implements TypeValue {
                     ival = ((Character) obj).charValue();
                 return Integer.valueOf(ival);
             }
+            if (isUnsigned())
+                return UInt.valueOf(((Number) obj).intValue());
+            break;
+        case 'S':
+            if (isUnsigned())
+                return UShort.valueOf(((Number) obj).shortValue());
+            break;
+        case 'B':
+            if (isUnsigned())
+                return UByte.valueOf(((Number) obj).byteValue());
             break;
         case 'Z':
             return language.isTrue(obj) ? Boolean.TRUE : Boolean.FALSE;
@@ -318,12 +332,7 @@ public class LangPrimType extends PrimType implements TypeValue {
             return other == Type.objectType ? -1 : -3;
         }
         if (other instanceof PrimType) {
-            if (sig1 == sig2)
-                return 0;
-            if (sig1 == 'V')
-                return 1;
-            if (sig2 == 'V')
-                return -1;
+            return getImplementationType().compare(other);
         }
         if (sig1 == 'V')
             return 1;

@@ -27,6 +27,9 @@ public class IsEqual extends gnu.mapping.Procedure2
   {
     boolean exact1 = Arithmetic.isExact(num1);
     boolean exact2 = Arithmetic.isExact(num2);
+    // FIXME This follows the letter of r7rs but arguably not its spirit.
+    // Specifically, different exact integer types should compare
+    // differently since they behave differently when it comes to overflow.
     if (exact1 && exact2)
       return NumberCompare.$Eq(num1, num2);
     return exact1 == exact2 && num1.equals(num2);

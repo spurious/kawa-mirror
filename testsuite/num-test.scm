@@ -1,4 +1,25 @@
-(test-begin "num" 1896)
+(test-begin "num" 1902)
+
+(define-syntax jequals
+  (syntax-rules ()
+    ((jequals x y)
+     (invoke x 'equals y))))
+(define-syntax test-jequals
+  (syntax-rules ()
+    ((test-jequals x y)
+     (test-assert (jequals x y)))))
+
+(test-assert (not (jequals (java.lang.Integer:valueOf 45)
+                           (gnu.math.UInt:valueOf 45))))
+(test-assert (not (jequals (java.lang.Integer:valueOf 45)
+                           (gnu.math.IntNum:valueOf 45))))
+#|
+Not currently true, but perhaps it should be.
+(test-assert (not (eqv? (java.lang.Integer:valueOf 45)
+                        (gnu.math.UInt:valueOf 45))))
+(test-assert (not (eqv? (java.lang.Integer:valueOf 45)
+                        (gnu.math.IntNum:valueOf 45))))
+|#
 
 (test-equal 7 (+ 3 4))
 (test-equal 3 (+ 3))
@@ -485,5 +506,12 @@
             (#xfffffffffffffffA #xfffffffffffffffC #f)))
 
 (test-equal 65586 (add-u8a-u16a))
+
+;; To avoid inlining, use a wrapper function.
+(define (my-ashift x y::int) (arithmetic-shift x y))
+(test-jequals (->uint #xf80000A8) (my-ashift (->uint #xFF000015) 3))
+(test-jequals (->uint #x1fe00002) (my-ashift (->uint #xFF000015) -3))
+(test-jequals (->int -134217560) (my-ashift (->int (->uint #xFF000015)) 3))
+(test-jequals (->int -2097150) (my-ashift (->int (->uint #xFF000015)) -3))
 
 (test-end)

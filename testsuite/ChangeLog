@@ -1,5 +1,7 @@
 2015-06-04  Per Bothner  <per@bothner.com>
 
+	* num-test.scm: Add some tests for shifts.
+
 	* testsuite/inlining-test.scm: Add various shifts.
 	* testsuite/Makefile.am: Update accordingly.
 	* testsuite/inlining.expected: Update accordingly.

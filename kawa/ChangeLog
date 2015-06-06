@@ -1,3 +1,8 @@
+2015-06-06  Per Bothner  <per@bothner.com>
+
+	* repl.java (setLanguage): New static method.
+	(processArgs): Use it.
+
 2015-05-20  Per Bothner  <per@bothner.com>
 
 	* lang/Lambda.java (rewriteBody): Emit warning if using deprecated

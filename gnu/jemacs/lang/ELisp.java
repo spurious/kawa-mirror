@@ -267,7 +267,7 @@ public class ELisp extends Lisp2
 
   public static void main(String[] args)
   {
-    kawa.repl.processArgs(new String[] { "--elisp" }, 0, 1);
+    kawa.repl.setLanguage("elisp");
     if (args.length == 0)
       args = new String[] { "-e", "(emacs)", "--" };
     kawa.repl.main(args);

@@ -226,6 +226,18 @@ public class repl extends Procedure0or1 {
         }
     }
 
+    public static Language setLanguage(String name) {
+        Language lang = Language.getInstance(name);
+        if (lang != null) {
+            if (previousLanguage == null)
+                Language.setDefaults(lang);
+            else
+                Language.setCurrentLanguage(lang);
+            previousLanguage = lang;
+        }
+        return lang;
+    }
+
     static boolean shutdownRegistered
         = WriterManager.instance.registerShutdownHook();
 
@@ -610,14 +622,8 @@ public class repl extends Procedure0or1 {
                 // Check if arg is a known language name.
                 boolean doubleDash = arg.length() > 2 && arg.charAt(1) == '-';
                 String name = arg.substring(doubleDash ? 2 : 1);
-                Language lang = Language.getInstance(name);
-                if (lang != null) {
-                    if (previousLanguage == null)
-                        Language.setDefaults(lang);
-                    else
-                        Language.setCurrentLanguage(lang);
-                    previousLanguage = lang;
-                } else {
+                Language lang = setLanguage(name);
+                if (lang == null) {
                     // See if arg is a valid Compilation option, and if so set it.
                     int eq = name.indexOf('=');
                     String opt_value;

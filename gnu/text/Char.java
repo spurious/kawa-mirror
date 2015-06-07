@@ -121,12 +121,16 @@ public class Char implements Comparable, Externalizable {
             ascii[i] = new Char(i);
     }
 
-    public static Char make(int ch) {
+    public static Char valueOf(int ch) {
         if (ch < 128)
             return ascii[ch];
         synchronized (hashTable) {
             return hashTable.get(ch);
         }
+    }
+
+    public static Char make(int ch) {
+        return valueOf(ch);
     }
 
     public static Object makeOrEof(int ch) {

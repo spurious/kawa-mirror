@@ -1,3 +1,7 @@
+2015-06-07  Per Bothner  <per@bothner.com>
+
+	* Char.java (valueOf): Add new method - same as old 'make'.
+
 2015-04-18  Per Bothner  <per@bothner.com>
 
 	* Char.java (IGNORABLE_CHAR): New constant.

@@ -6,7 +6,7 @@ import java.io.*;
 
 /** Simple adjustable-length vector of signed 8-bit integers (bytes). */
 
-public class S8Vector extends ByteVector
+public class S8Vector extends ByteVector<Byte>
 {
 
   public S8Vector ()
@@ -46,22 +46,22 @@ public class S8Vector extends ByteVector
     return data[index];
   }
 
-  public final Object get(int index)
+  public final Byte get(int index)
   {
-    if (index > size)
+    if (index >= size)
       throw new IndexOutOfBoundsException();
-    return Convert.toObject(data[index]);
+    return Byte.valueOf(data[index]);
   }
 
-  public final Object getBuffer(int index)
+  public final Byte getBuffer(int index)
   {
-    return Convert.toObject(data[index]);
+    return Byte.valueOf(data[index]);
   }
 
   @Override
-  public void setBuffer(int index, Object value)
+  public void setBuffer(int index, Byte value)
   {
-    data[index] = Convert.toByte(value);
+    data[index] = value.byteValue();
   }
 
   public int getElementKind()

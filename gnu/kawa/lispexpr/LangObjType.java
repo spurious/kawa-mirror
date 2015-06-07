@@ -8,6 +8,8 @@ import gnu.kawa.io.Path;
 import gnu.kawa.io.URIPath;
 import gnu.kawa.functions.Arithmetic;
 import gnu.kawa.functions.LProcess;
+import gnu.kawa.reflect.CompileBuildObject;
+import gnu.kawa.reflect.CompileInvoke;
 import gnu.kawa.reflect.Invoke;
 import gnu.kawa.reflect.LazyType;
 import gnu.lists.Blob;
@@ -736,6 +738,64 @@ public class LangObjType extends SpecialObjectType implements TypeValue
     public String encodeType(Language language) { return null; }
     /* #endif */
 
-  public static final ClassType typeLangObjType =
-    ClassType.make("gnu.kawa.lispexpr.LangObjType");
+    public Type getElementType() {
+        switch (typeCode) {
+        case S8VECTOR_TYPE_CODE:  return LangPrimType.byteType; 
+        case S16VECTOR_TYPE_CODE: return LangPrimType.shortType; 
+        case S32VECTOR_TYPE_CODE: return LangPrimType.intType; 
+        case S64VECTOR_TYPE_CODE: return LangPrimType.longType; 
+        case U8VECTOR_TYPE_CODE:  return LangPrimType.unsignedByteType; 
+        case U16VECTOR_TYPE_CODE: return LangPrimType.unsignedShortType; 
+        case U32VECTOR_TYPE_CODE: return LangPrimType.unsignedIntType; 
+        case U64VECTOR_TYPE_CODE: return LangPrimType.unsignedLongType; 
+        case F32VECTOR_TYPE_CODE: return LangPrimType.floatType; 
+        case F64VECTOR_TYPE_CODE: return LangPrimType.doubleType; 
+        }
+        return null;
+    }
+
+    public static final ClassType typeLangObjType =
+        ClassType.make("gnu.kawa.lispexpr.LangObjType");
+
+    public CompileBuildObject getBuildObject() {
+        switch (typeCode) {
+        case U8VECTOR_TYPE_CODE:
+            return new SimpleVectorBuilder(LangPrimType.unsignedByteType);
+        case U16VECTOR_TYPE_CODE:
+            return new SimpleVectorBuilder(LangPrimType.unsignedShortType);
+        case U32VECTOR_TYPE_CODE:
+            return new SimpleVectorBuilder(LangPrimType.unsignedIntType);
+        case U64VECTOR_TYPE_CODE:
+            return new SimpleVectorBuilder(LangPrimType.unsignedLongType);
+        case S8VECTOR_TYPE_CODE:
+            return new SimpleVectorBuilder(LangPrimType.byteType);
+        case S16VECTOR_TYPE_CODE:
+            return new SimpleVectorBuilder(LangPrimType.shortType);
+        case S32VECTOR_TYPE_CODE:
+            return new SimpleVectorBuilder(LangPrimType.intType);
+        case S64VECTOR_TYPE_CODE:
+            return new SimpleVectorBuilder(LangPrimType.longType);
+        case F32VECTOR_TYPE_CODE:
+            return new SimpleVectorBuilder(LangPrimType.floatType);
+        case F64VECTOR_TYPE_CODE:
+            return new SimpleVectorBuilder(LangPrimType.doubleType);
+        default:
+            return new CompileBuildObject();
+        }
+    }
+
+    public static class SimpleVectorBuilder extends CompileBuildObject {
+        Type elementType;
+        public SimpleVectorBuilder(Type elementType) {
+            this.elementType = elementType;
+        }
+
+        @Override
+        public Expression buildAddChild(Declaration target, Expression child) {
+            child = new ApplyExp(gnu.kawa.functions.Convert.cast,
+                                 new QuoteExp(elementType),
+                                 child);
+            return super.buildAddChild(target, child);
+        }
+    }
 }

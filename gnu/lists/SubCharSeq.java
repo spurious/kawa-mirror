@@ -2,8 +2,8 @@ package gnu.lists;
 
 import java.util.*;
 
-public class SubCharSeq extends AbstractSequence
-    implements Sequence, CharSeq, RandomAccess
+public class SubCharSeq extends AbstractSequence<Character>
+    implements CharSeq, RandomAccess
 {
     CharSequence base;
     int start;
@@ -28,8 +28,7 @@ public class SubCharSeq extends AbstractSequence
         return base.charAt(start + index);
     }
 
-    public Object get(int index) {
-        // FIXME assuming sequence of 16-bit char.
+    public Character get(int index) {
         return Character.valueOf(charAt(index));
     }
 
@@ -46,13 +45,13 @@ public class SubCharSeq extends AbstractSequence
   }
 
     public void setCharAt(int index, char ch) {
-        if (index < 0 || index >=size())
+        if (index < 0 || index >= size())
             throw new IndexOutOfBoundsException();
         ((CharSeq) base).setCharAt(start + index, ch);
     }
 
     public void setCharacterAt(int index, int ch) {
-        if (index < 0 || index >=size())
+        if (index < 0 || index >= size())
             throw new IndexOutOfBoundsException();
         ((CharSeq) base).setCharacterAt(start + index, ch);
     }

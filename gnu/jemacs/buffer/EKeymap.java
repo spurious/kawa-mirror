@@ -209,12 +209,20 @@ implements gnu.mapping.Named
             str = keySpec.toString();
             len = str.length();
           }
-        for (int i = 0;  i < len; )
+        for (int i = 0;  i < len; i++)
           {
-            Object keyValue = (seq != null ? seq.get(i)
-                               : Convert.toObject(str.charAt(i)));
+            Object keyValue;
+            if (seq != null) {
+                keyValue = seq.get(i);
+                if (keyValue instanceof Character)
+                    keyValue = Char.valueOf(((Character) keyValue).charValue());
+            } else {
+                int ch = Strings.characterAt(str, i);
+                if (ch == Char.IGNORABLE_CHAR)
+                    continue;
+                keyValue = Char.valueOf(ch);
+            }
             boolean sawMeta = false;
-            i++;
 	    int key = asKeyStroke(keyValue);
 	    if (key == 0)
 	      throw new Error("unknown keyspec: "+keyValue);

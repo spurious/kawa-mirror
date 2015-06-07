@@ -4,7 +4,9 @@ import gnu.mapping.*;
 import gnu.expr.Language;
 import gnu.mapping.Procedure;
 import gnu.kawa.reflect.Invoke;
+import gnu.kawa.lispexpr.LangPrimType;
 import gnu.lists.Array;
+import gnu.lists.SimpleVector;
 
 /** Implements Kawa extension function "setter", as in SRFI-17. */
 
@@ -49,23 +51,55 @@ public class Setter extends Procedure1 implements HasSetter {
         }
 
         public Object apply2(Object index, Object value) {
-            value = elementType.coerceFromObject(value);
+            if (elementType != null)
+                value = elementType.coerceFromObject(value);
             java.lang.reflect.Array.set(array,
                                         ((Number) index).intValue(),
                                         value);
             return Values.empty;
         }
     }
-
+ 
     public static class SetList extends Procedure2 {
         java.util.List list;
         public SetList(java.util.List list) {
+            if (list instanceof SimpleVector) {
+                String tag = ((SimpleVector) list).getTag();
+                int tlen = tag == null ? 0 : tag.length();
+                switch (tag.charAt(0)) {
+                case 'f':
+                    if (tag.equals("f32"))
+                        elementType = LangPrimType.floatType;
+                    else if (tag.equals("f64"))
+                        elementType = LangPrimType.doubleType;
+                    break;
+                case 'u':
+                    if (tag.equals("u64"))
+                        elementType = LangPrimType.unsignedLongType;
+                    else if (tag.equals("u32"))
+                        elementType = LangPrimType.unsignedIntType;
+                    else if (tag.equals("u16"))
+                        elementType = LangPrimType.unsignedShortType;
+                    else if (tag.equals("u8"))
+                        elementType = LangPrimType.unsignedByteType;
+                case 's':
+                    if (tag.equals("s64"))
+                        elementType = LangPrimType.longType;
+                    else if (tag.equals("s32"))
+                        elementType = LangPrimType.intType;
+                    else if (tag.equals("s16"))
+                        elementType = LangPrimType.shortType;
+                    else if (tag.equals("s8"))
+                        elementType = LangPrimType.byteType;
+                }
+            }
             this.list = list;
         }
 
         Type elementType;
 
         public Object apply2(Object index, Object value) {
+            value = elementType.coerceFromObject(value);
             list.set(((Number) index).intValue(), value);
             return Values.empty;
         }

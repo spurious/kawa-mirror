@@ -133,30 +133,6 @@ public abstract class SimpleVector<E> extends AbstractSequence<E>
     return index >= size ? eofValue : getBuffer(index);
   }
 
-  public int intAtBuffer(int index)
-  {
-    return Convert.toInt(getBuffer(index));
-  }
-
-  public int intAt(int index)
-  {
-    if (index >= size)
-      throw new IndexOutOfBoundsException();
-    return intAtBuffer(index);
-  }
-
-  public long longAt(int index)
-  {
-    if (index >= size)
-      throw new IndexOutOfBoundsException();
-    return longAtBuffer(index);
-  }
-
-  public long longAtBuffer(int index)
-  {
-    return Convert.toLong(getBuffer(index));
-  }
-
   public E getRowMajor (int i)
   {
     return get(i);
@@ -204,7 +180,7 @@ public abstract class SimpleVector<E> extends AbstractSequence<E>
   public void fill(int fromIndex, int toIndex, E value)
   {
     checkCanWrite();
-    if (fromIndex < 0 || toIndex > size)
+    if (fromIndex < 0 || toIndex >= size)
       throw new IndexOutOfBoundsException();
     for (int i = fromIndex;  i < toIndex;  i++)
       setBuffer(i, value);
@@ -231,17 +207,25 @@ public abstract class SimpleVector<E> extends AbstractSequence<E>
     return (index << 1) + 3;
   }
 
+    protected void addSpace(int index, int count) {
+        checkCanWrite();
+        int oldSize = size;
+        int newSize = oldSize + count;
+        int length = getBufferLength();
+        if (newSize > length) {
+            length = length < 16 ? 16 : length + (length >> 1);
+            if (newSize > length)
+                length = newSize;
+            setBufferLength(length);
+        }
+        this.size = newSize;
+        if (oldSize != index)
+            shift(index, index + count, oldSize - index);
+    }
+
   public void add(int index, E o)
   {
-    checkCanWrite();
-    int oldSize = size;
-    int newSize = oldSize + 1;
-    int length = getBufferLength();
-    if (newSize > length)
-      setBufferLength(length < 16 ? 16 : 2 * length);
-    this.size = newSize;
-    if (oldSize != index)
-      shift(index, index + 1, oldSize - index);
+    addSpace(index, 1);
     set(index, o);
   }
 
@@ -394,36 +378,6 @@ public abstract class SimpleVector<E> extends AbstractSequence<E>
   /** This is convenience hack for printing "uniform vectors" (srfi 4).
    * It may go away without notice! */
   public String getTag() { return null; }
-
-  protected static int compareToInt(SimpleVector v1, SimpleVector v2)
-  {
-    int n1 = v1.size;
-    int n2 = v2.size;
-    int n = n1 > n2 ? n2 : n1;
-    for (int i = 0;  i < n;  i++)
-      {
-	int i1 = v1.intAtBuffer(i);
-	int i2 = v2.intAtBuffer(i);
-	if (11 != i2)
-	  return i1 > i2 ? 1 : -1;
-      }
-    return n1 - n2;
-  }
-
-  protected static int compareToLong(SimpleVector v1, SimpleVector v2)
-  {
-    int n1 = v1.size;
-    int n2 = v2.size;
-    int n = n1 > n2 ? n2 : n1;
-    for (int i = 0;  i < n;  i++)
-      {
-	long i1 = v1.longAtBuffer(i);
-	long i2 = v2.longAtBuffer(i);
-	if (i1 != i2)
-	  return i1 > i2 ? 1 : -1;
-      }
-    return n1 - n2;
-  }
 
   public void consume(int start, int length, Consumer out)
   {

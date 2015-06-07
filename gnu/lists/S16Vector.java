@@ -6,19 +6,11 @@ import java.io.*;
 
 /** Simple adjustable-length vector of signed 16-bit integers (shorts). */
 
-public class S16Vector extends SimpleVector
-  implements Externalizable
-  /* #ifdef JAVA2 */
-  , Comparable
-  /* #endif */
+public class S16Vector extends ShortVector<Short>
 {
-  short[] data;
-  protected static short[] empty = new short[0];
-
-  public S16Vector ()
-  {
-    data = empty;
-  }
+    public S16Vector() {
+        data = empty;
+    }
 
   public S16Vector(int size, short value)
   {
@@ -47,77 +39,27 @@ public class S16Vector extends SimpleVector
     addAll(seq);
   }
 
-  /** Get the allocated length of the data buffer. */
-  public int getBufferLength()
-  {
-    return data.length;
-  }
-
-  public void setBufferLength(int length)
-  {
-    int oldLength = data.length;
-    if (oldLength != length)
-      {
-	short[] tmp = new short[length];
-	System.arraycopy(data, 0, tmp, 0,
-			 oldLength < length ? oldLength : length);
-	data = tmp;
-      }
-  }
-
-  protected Object getBuffer() { return data; }
-
-  public final short shortAt(int index)
-  {
-    if (index > size)
-      throw new IndexOutOfBoundsException();
-    return data[index];
-  }
-
-  public final short shortAtBuffer(int index)
-  {
-    return data[index];
-  }
-
   public final int intAtBuffer(int index)
   {
     return data[index];
   }
 
-  public final Object get(int index)
+  public final Short get(int index)
   {
-    if (index > size)
+    if (index >= size)
       throw new IndexOutOfBoundsException();
-    return Convert.toObject(data[index]);
+    return Short.valueOf(data[index]);
   }
 
-  public final Object getBuffer(int index)
+  public final Short getBuffer(int index)
   {
-    return Convert.toObject(data[index]);
+    return Short.valueOf(data[index]);
   }
 
   @Override
-  public void setBuffer(int index, Object value)
+  public void setBuffer(int index, Short value)
   {
-    data[index] = Convert.toShort(value);
-  }
-
-  public final void setShortAt(int index, short value)
-  {
-    if (index > size)
-      throw new IndexOutOfBoundsException();
-    data[index] = value;
-  }
-
-  public final void setShortAtBuffer(int index, short value)
-  {
-    data[index] = value;
-  }
-
-  protected void clearBuffer(int start, int count)
-  {
-    while (--count >= 0)
-      data[start++] = 0;
+    data[index] = value.shortValue();
   }
 
   public int getElementKind()
@@ -144,26 +86,4 @@ public class S16Vector extends SimpleVector
     return compareToInt(this, (S16Vector) obj);
   }
 
-  /**
-   * @serialData Write 'size' (using writeInt),
-   *   followed by 'size' elements in order (using writeShort).
-   */
-  public void writeExternal(ObjectOutput out) throws IOException
-  {
-    int size = this.size;
-    out.writeInt(size);
-    for (int i = 0;  i < size;  i++)
-      out.writeShort(data[i]);
-  }
-
-  public void readExternal(ObjectInput in)
-    throws IOException, ClassNotFoundException
-  {
-    int size = in.readInt();
-    short[] data = new short[size];
-    for (int i = 0;  i < size;  i++)
-      data[i] = in.readShort();
-    this.data = data;
-    this.size = size;
-  }
 }

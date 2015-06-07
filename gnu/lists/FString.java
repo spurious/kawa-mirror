@@ -11,7 +11,7 @@ import java.io.*;
  * @author Per Bothner
  */
 
-public class FString extends SimpleVector
+public class FString extends SimpleVector<Character>
   implements Comparable, Appendable, CharSeq, Externalizable, Consumable
 {
   public char[] data;
@@ -156,22 +156,22 @@ public class FString extends SimpleVector
 
   protected Object getBuffer() { return data; }
 
-  public final Object getBuffer(int index)
+  public final Character getBuffer(int index)
   {
-    return Convert.toObject(data[index]);
+    return Character.valueOf(data[index]);
   }
 
   @Override
-  public final void setBuffer(int index, Object value)
+  public final void setBuffer(int index, Character value)
   {
-    data[index] = Convert.toChar(value);
+    data[index] = value.charValue();
   }
 
-  public final Object get (int index)
+  public final Character get (int index)
   {
     if (index >= size)
       throw new ArrayIndexOutOfBoundsException();
-    return Convert.toObject(data[index]);
+    return getBuffer(index);
   }
 
   public final char charAt(int index)

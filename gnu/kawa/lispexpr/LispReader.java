@@ -7,7 +7,10 @@ import gnu.expr.*;
 import gnu.kawa.io.BinaryInPort;
 import gnu.kawa.io.InPort;
 import gnu.kawa.util.GeneralHashTable;
+import gnu.bytecode.PrimType;
+import gnu.bytecode.Type;
 import java.util.regex.*;
+import java.lang.reflect.Array;
 
 /** A Lexer for reading S-expressions in generic Lisp-like syntax.
  * This class may have outlived its usefulness: It's mostly just a
@@ -1647,6 +1650,45 @@ public class LispReader extends Lexer
     return readSimpleVector(reader, kind, ch, size);
   }
 
+    private Object convertListToArray(Object list, int len, PrimType elementType) {
+        char sig1 = elementType.getSignature().charAt(0);
+        Object array = Array.newInstance(elementType.getReflectClass(), len);
+        for (int i = 0;  i < len; i++) {
+            Pair pair = (Pair) list;
+            Object value = pair.getCar();
+            if (sig1 == 'B' || sig1 == 'S' || sig1 == 'I' || sig1 == 'J') {
+                String msg = null;
+                if (! (value instanceof IntNum))
+                    msg = "expected integer value";
+                else {
+                    value = LangPrimType.convertIntegerLiteral((IntNum) value, elementType, true);
+                    if (value == null)
+                        msg = "integer "+pair.getCar()+" not in range of "+elementType.getName();
+                }
+                if (msg != null) {
+                    getMessages().error('e', (SourceLocator) pair, msg);
+                    value = LangPrimType.convertIntegerLiteral(IntNum.zero(),
+                                                               elementType, true);
+                }
+            }
+            if (sig1 == 'F' || sig1 == 'D') {
+                RealNum rvalue = RealNum.asRealNumOrNull(value);
+                if (rvalue != null) {
+                    if (sig1 == 'F')
+                        value = Float.valueOf(rvalue.floatValue());
+                    else
+                        value = Double.valueOf(rvalue.doubleValue());
+                } else {
+                    getMessages().error('e', (SourceLocator) pair,
+                                        "expected real value");
+                }
+            }
+            Array.set(array, i, value);
+            list = pair.getCdr();
+        }
+        return array;
+    }
+
   public static SimpleVector
       readSimpleVector(LispReader reader, char kind, int ch, int size)
     throws java.io.IOException, SyntaxException
@@ -1671,24 +1713,54 @@ public class LispReader extends Lexer
       case 'F':
         switch (size)
           {
-          case 32:  return new F32Vector(q);
-          case 64:  return new F64Vector(q);
+          case 32:
+              return new F32Vector((float[])
+                                  reader.convertListToArray(list, len,
+                                          LangPrimType.floatType));
+          case 64:
+              return new F64Vector((double[])
+                                  reader.convertListToArray(list, len,
+                                          LangPrimType.doubleType));
           }
       case 'S':
         switch (size)
           {
-          case  8:  return new S8Vector(q);
-          case 16:  return new S16Vector(q);
-          case 32:  return new S32Vector(q);
-          case 64:  return new S64Vector(q);
-          }
+         case  8:
+              return new S8Vector((byte[])
+                                  reader.convertListToArray(list, len,
+                                          LangPrimType.byteType));
+          case 16:
+              return new S16Vector((short[])
+                                  reader.convertListToArray(list, len,
+                                          LangPrimType.shortType));
+          case 32:
+              return new S32Vector((int[])
+                                   reader.convertListToArray(list, len,
+                                           LangPrimType.intType));
+          case 64:
+               return new S64Vector((long[])
+                                  reader.convertListToArray(list, len,
+                                          LangPrimType.longType));
+         }
       case 'U':
         switch (size)
           {
-          case  8:  return new U8Vector(q);
-          case 16:  return new U16Vector(q);
-          case 32:  return new U32Vector(q);
-          case 64:  return new U64Vector(q);
+         case  8:
+              return new U8Vector((byte[])
+                                  reader.convertListToArray(list, len,
+                                          LangPrimType.unsignedByteType));
+          case 16:
+              return new U16Vector((short[])
+                                  reader.convertListToArray(list, len,
+                                          LangPrimType.unsignedShortType));
+          case 32:
+              return new U32Vector((int[])
+                                   reader.convertListToArray(list, len,
+                                           LangPrimType.unsignedIntType));
+          case 64:
+               return new U64Vector((long[])
+                                 reader.convertListToArray(list, len,
+                                          LangPrimType.unsignedLongType));
           }
       }
     return null;

@@ -9,7 +9,7 @@ package gnu.lists;
  * javax.swing.text.AbstractDocument.Content
  */
 
-public class CharBuffer extends StableVector
+public class CharBuffer extends StableVector<Character>
   implements CharSeq, java.io.Serializable
 {
   // Same as super.base but pre-cast to FString.

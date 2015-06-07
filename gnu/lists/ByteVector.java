@@ -1,11 +1,7 @@
 package gnu.lists;
 import java.io.*;
 
-public abstract class ByteVector extends SimpleVector
-  implements Externalizable
-  /* #ifdef JAVA2 */
-  , Comparable
-  /* #endif */
+public abstract class ByteVector<E> extends PrimIntegerVector<E>
 {
   byte[] data;
   protected static byte[] empty = new byte[0];
@@ -32,7 +28,7 @@ public abstract class ByteVector extends SimpleVector
 
   public final byte byteAt(int index)
   {
-    if (index > size)
+    if (index >= size)
       throw new IndexOutOfBoundsException();
     return data[index];
   }
@@ -56,7 +52,7 @@ public abstract class ByteVector extends SimpleVector
 
   public final void setByteAt(int index, byte value)
   {
-    if (index > size)
+    if (index >= size)
       throw new IndexOutOfBoundsException();
     data[index] = value;
   }
@@ -65,6 +61,12 @@ public abstract class ByteVector extends SimpleVector
   {
     data[index] = value;
   }
+
+    public void add(byte v) {
+        int sz = size;
+        addSpace(sz, 1);
+        setByteAt(sz, v);
+    }
 
     public void copyFrom(byte[] src, int soffset, int doffset, int length) {
         if (doffset + length > size)

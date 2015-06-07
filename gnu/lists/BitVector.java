@@ -6,7 +6,7 @@ import java.io.*;
 
 /** Simple adjustable-length vector of boolean values. */
 
-public class BitVector extends SimpleVector implements Externalizable
+public class BitVector extends SimpleVector<Boolean> implements Externalizable
 {
   boolean[] data;
   protected static boolean[] empty = new boolean[0];
@@ -68,7 +68,7 @@ public class BitVector extends SimpleVector implements Externalizable
 
   public final boolean booleanAt(int index)
   {
-    if (index > size)
+    if (index >= size)
       throw new IndexOutOfBoundsException();
     return data[index];
   }
@@ -78,27 +78,27 @@ public class BitVector extends SimpleVector implements Externalizable
     return data[index];
   }
 
-  public final Object get(int index)
+  public final Boolean get(int index)
   {
-    if (index > size)
+    if (index >= size)
       throw new IndexOutOfBoundsException();
-    return Convert.toObject(data[index]);
+    return Boolean.valueOf(data[index]);
   }
 
-  public final Object getBuffer(int index)
+  public final Boolean getBuffer(int index)
   {
-    return Convert.toObject(data[index]);
+    return Boolean.valueOf(data[index]);
   }
 
   @Override
-  public void setBuffer(int index, Object value)
+  public void setBuffer(int index, Boolean value)
   {
-    data[index] = Convert.toBoolean(value);
+    data[index] = value.booleanValue();
   }
 
   public final void setBooleanAt(int index, boolean value)
   {
-    if (index > size)
+    if (index >= size)
       throw new IndexOutOfBoundsException();
     data[index] = value;
   }

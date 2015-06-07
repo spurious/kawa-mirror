@@ -1,3 +1,13 @@
+2015-06-07  Per Bothner  <per@bothner.com>
+
+	* LangObjType.java (getElementType): New method.
+	(class SimpleVectorBuilder): New class to optimize constructor
+	calls to uniform vector such as U32Vector using 'add' method.
+	(getBuildObject): New method.
+	* LispReader.java (convertListToArray): New helper method to help
+	convert and range-check uniform vector elements.
+	(readSimpleVector): Use convertListToArray.
+
 2015-06-04  Per Bothner  <per@bothner.com>
 
 	* LangPrimType.java (coerceFromObject): Handle unsigned types.

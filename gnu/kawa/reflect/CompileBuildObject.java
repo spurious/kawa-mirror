@@ -2,6 +2,7 @@ package gnu.kawa.reflect;
 import gnu.bytecode.*;
 import gnu.mapping.*;
 import gnu.expr.*;
+import gnu.kawa.lispexpr.LangObjType;
 
 /** Support for custom class-specific compile-time object builders.
  * This class as-is supports compiling the Scheme form:
@@ -62,6 +63,16 @@ public class CompileBuildObject {
             keywordStart++;
     }
 
+    protected void init(ApplyExp exp, InlineCalls visitor,
+                        Type required, int keywordStart, ObjectType ctype, ClassType caller) {
+        this.exp = exp;
+        this.visitor = visitor;
+        this.required = required;
+        this.keywordStart = keywordStart;
+        this.ctype = ctype;
+        this.caller = caller;
+    }
+
     public static CompileBuildObject make(ApplyExp exp, InlineCalls visitor,
                                           Type required, int keywordStart, ObjectType ctype, ClassType caller) {
         CompileBuildObject builder;
@@ -73,7 +84,6 @@ public class CompileBuildObject {
             for (;;) {
                 Symbol sym = ns.lookup(btype.getName());
                 if (sym != null) {
-                    ModuleExp mexp = comp.getModule();
                     Declaration builderDecl = comp.lookup(sym, Language.VALUE_NAMESPACE);
                     if (builderDecl != null) {
                         Object val = builderDecl.getValue().valueIfConstant();
@@ -96,15 +106,11 @@ public class CompileBuildObject {
                 comp.error('w', "while creating JavafxObjectBuilder for "+ctype+" - caught "+ex);
                 builder = new CompileBuildObject();
             }
-        }
+        } else if (ctype instanceof LangObjType)
+            builder = ((LangObjType) ctype).getBuildObject();
         else
             builder = new CompileBuildObject();
-        builder.exp = exp;
-        builder.visitor = visitor;
-        builder.required = required;
-        builder.keywordStart = keywordStart;
-        builder.ctype = ctype;
-        builder.caller = caller;
+        builder.init(exp, visitor, required, keywordStart, ctype, caller);
         return builder;
     }
 
@@ -208,7 +214,7 @@ public class CompileBuildObject {
         int i = keywordStart;
         for (;  i + 1 < args.length; i += 2) {
             Object value = args[i].valueIfConstant();
-            if (! (value instanceof Keyword))
+            if (! (value instanceof Keyword)) // FIXME - use keyword-count
                 break;
             String name = ((Keyword) value).getName();
             Member slot = findNamedMember(name);

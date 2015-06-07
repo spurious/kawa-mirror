@@ -252,7 +252,7 @@ public class SwingBuffer extends Buffer
     return content.buffer.createPos(index, isAfter);
   }
 
-  public Object get (int index)
+  public Character get (int index)
   {
     return content.buffer.get(index);
   }

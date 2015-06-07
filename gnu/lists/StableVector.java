@@ -7,7 +7,7 @@ package gnu.lists;
  * I.e if you have a position, it gets automatically updated after
  * insertions and deletions. */
 
-public class StableVector extends GapVector
+public class StableVector<E> extends GapVector<E>
 {
   /** This array maps from the exported ipos values (indexes in the positions
    * array) to the ipos of the underlying SimpleVector base.
@@ -281,7 +281,7 @@ public class StableVector extends GapVector
       }
   }
 
-  protected int addPos(int ipos, Object value)
+  protected int addPos(int ipos, E value)
   {
     int ppos = positions[ipos];
     int index = ppos >>> 1;

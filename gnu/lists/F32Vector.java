@@ -6,11 +6,8 @@ import java.io.*;
 
 /** Simple adjustable-length vector whose elements are 32-bit floats. */
 
-public class F32Vector extends SimpleVector
-  implements Externalizable
-  /* #ifdef JAVA2 */
-  , Comparable
-  /* #endif */
+public class F32Vector extends SimpleVector<Float>
+  implements Externalizable, Comparable
 {
   float[] data;
   protected static float[] empty = new float[0];
@@ -67,11 +64,6 @@ public class F32Vector extends SimpleVector
 
   protected Object getBuffer() { return data; }
 
-  public final int intAtBuffer(int index)
-  {
-    return (int) data[index];
-  }
-
   public final float floatAt(int index)
   {
     if (index >= size)
@@ -84,21 +76,19 @@ public class F32Vector extends SimpleVector
     return data[index];
   }
 
-  public final Object get (int index)
-  {
-    if (index > size)
-      throw new IndexOutOfBoundsException();
-    return Convert.toObject(data[index]);
-  }
+    public final Float get(int index) {
+        if (index >= size)
+            throw new IndexOutOfBoundsException();
+        return Float.valueOf(data[index]);
+    }
 
-  public final Object getBuffer (int index)
-  {
-    return Convert.toObject(data[index]);
-  }
+    public final Float getBuffer(int index) {
+        return Float.valueOf(data[index]);
+    }
 
   public final void setFloatAt(int index, float value)
   {
-    if (index > size)
+    if (index >= size)
       throw new IndexOutOfBoundsException();
     data[index] = value;
   }
@@ -108,11 +98,16 @@ public class F32Vector extends SimpleVector
     data[index] = value;
   }
 
-  @Override
-  public final void setBuffer(int index, Object value)
-  {
-    data[index] = Convert.toFloat(value);
-  }
+    @Override
+    public final void setBuffer(int index, Float value) {
+        data[index] = value.floatValue();
+    }
+
+    public void add(float v) {
+        int sz = size;
+        addSpace(sz, 1);
+        setFloatAt(sz, v);
+    }
 
   protected void clearBuffer(int start, int count)
   {

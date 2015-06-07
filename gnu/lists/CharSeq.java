@@ -7,11 +7,7 @@ package gnu.lists;
  */
 
 public interface CharSeq
-  extends
-  /* #ifdef use:java.lang.CharSequence */
-  CharSequence, 
-  /* #endif */
-  Sequence
+  extends CharSequence, Sequence<Character>
 {
   /** Get length of string, in characters.
    * Synonym for size(), for compatibility with String and StringBuffer. */

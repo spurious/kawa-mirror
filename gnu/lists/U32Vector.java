@@ -2,21 +2,17 @@
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.lists;
+
+import gnu.math.UInt;
 import java.io.*;
 
 /** Simple adjustable-length vector of unsigned 32-bit integers (ints). */
 
-public class U32Vector extends SimpleVector
-  implements Externalizable
-  /* #ifdef JAVA2 */
-  , Comparable
-  /* #endif */
+public class U32Vector extends IntVector<UInt>
 {
-  int[] data;
-
   public U32Vector ()
   {
-    data = S32Vector.empty;
+    data = empty;
   }
 
   public U32Vector(int size, int value)
@@ -28,17 +24,14 @@ public class U32Vector extends SimpleVector
       array[size] = value;
   }
 
-  public U32Vector(int size)
-  {
-    this.data = new int[size];
-    this.size = size;
-  }
+    public U32Vector(int size) {
+        this(new int[size]);
+    }
 
-  public U32Vector (int[] data)
-  {
-    this.data = data;
-    size = data.length;
-  }
+    public U32Vector(int[] data) {
+        this.data = data;
+        size = data.length;
+    }
 
   public U32Vector(Sequence seq)
   {
@@ -46,77 +39,27 @@ public class U32Vector extends SimpleVector
     addAll(seq);
   }
 
-  /** Get the allocated length of the data buffer. */
-  public int getBufferLength()
-  {
-    return data.length;
-  }
-
-  public void setBufferLength(int length)
-  {
-    int oldLength = data.length;
-    if (oldLength != length)
-      {
-	int[] tmp = new int[length];
-	System.arraycopy(data, 0, tmp, 0,
-			 oldLength < length ? oldLength : length);
-	data = tmp;
-      }
-  }
-
-  protected Object getBuffer() { return data; }
-
-  public final int intAtBuffer(int index)
-  {
-    return data[index];
-  }
-
   public final long longAtBuffer(int index)
   {
     return (long) data[index] & 0xffffffffL;
   }
 
-  public final long longAt(int index)
+  public final UInt get(int index)
   {
-    if (index > size)
+    if (index >= size)
       throw new IndexOutOfBoundsException();
-    return longAtBuffer(index);
+    return UInt.valueOf(data[index]);
   }
 
-  public final Object get(int index)
+  public final UInt getBuffer(int index)
   {
-    if (index > size)
-      throw new IndexOutOfBoundsException();
-    return Convert.toObjectUnsigned(data[index]);
-  }
-
-  public final Object getBuffer(int index)
-  {
-    return Convert.toObjectUnsigned(data[index]);
+    return UInt.valueOf(data[index]);
   }
 
   @Override
-  public void setBuffer(int index, Object value)
+  public void setBuffer(int index, UInt value)
   {
-    data[index] = Convert.toIntUnsigned(value);
-  }
-
-  public final void setIntAt(int index, int value)
-  {
-    if (index > size)
-      throw new IndexOutOfBoundsException();
-    data[index] = value;
-  }
-
-  public final void setIntAtBuffer(int index, int value)
-  {
-    data[index] = value;
-  }
-
-  protected void clearBuffer(int start, int count)
-  {
-    while (--count >= 0)
-      data[start++] = 0;
+    data[index] = value.intValue();
   }
 
   public int getElementKind()
@@ -141,28 +84,5 @@ public class U32Vector extends SimpleVector
   public int compareTo(Object obj)
   {
     return compareToLong(this, (U32Vector) obj);
-  }
-
-  /**
-   * @serialData Write 'size' (using writeInt),
-   *   followed by 'size' elements in order (using writeInt).
-   */
-  public void writeExternal(ObjectOutput out) throws IOException
-  {
-    int size = this.size;
-    out.writeInt(size);
-    for (int i = 0;  i < size;  i++)
-      out.writeInt(data[i]);
-  }
-
-  public void readExternal(ObjectInput in)
-    throws IOException, ClassNotFoundException
-  {
-    int size = in.readInt();
-    int[] data = new int[size];
-    for (int i = 0;  i < size;  i++)
-      data[i] = in.readInt();
-    this.data = data;
-    this.size = size;
   }
 }

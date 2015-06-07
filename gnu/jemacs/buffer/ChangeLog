@@ -1,3 +1,8 @@
+2015-06-07  Per Bothner  <per@bothner.com>
+
+	* EKeymap.java (defineKey): Handle both Char and Character values.
+	* Buffer.java: Changes to extend AbstractSequence<Character>.
+
 2015-02-16  Per Bothner  <per@bothner.com>
 
 	* emacs.scm: Update type specifier syntax.

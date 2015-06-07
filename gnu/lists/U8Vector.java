@@ -3,10 +3,11 @@
 
 package gnu.lists;
 import java.io.*;
+import gnu.math.UByte;
 
 /** Simple adjustable-length vector of unsigned 8-bit integers (bytes). */
 
-public class U8Vector extends ByteVector
+public class U8Vector extends ByteVector<UByte>
 {
   public U8Vector ()
   {
@@ -59,8 +60,7 @@ public class U8Vector extends ByteVector
 
   public U8Vector(byte[] buffer, int offset, int length)
   {
-    size = length;
-    data = new byte[length];
+    this(length);
     System.arraycopy(buffer, offset, data, 0, length);
   }
 
@@ -69,22 +69,22 @@ public class U8Vector extends ByteVector
     return data[index] & 0xff;
   }
 
-  public final Object get(int index)
+  public final UByte get(int index)
   {
-    if (index > size)
+    if (index >= size)
       throw new IndexOutOfBoundsException();
-    return Convert.toObjectUnsigned(data[index]);
+    return UByte.valueOf(data[index]);
   }
 
-  public final Object getBuffer(int index)
+  public final UByte getBuffer(int index)
   {
-    return Convert.toObjectUnsigned(data[index]);
+    return UByte.valueOf(data[index]);
   }
 
   @Override
-  public void setBuffer(int index, Object value)
+  public void setBuffer(int index, UByte value)
   {
-    data[index] = Convert.toByteUnsigned(value);
+    data[index] = value.byteValue();
   }
 
   public int getElementKind()

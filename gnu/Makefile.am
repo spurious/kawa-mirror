@@ -110,13 +110,16 @@ GNU_LISTS_JSOURCES = \
   lists/ItemPredicate.java \
   lists/ImmutablePair.java \
   lists/IntSequence.java \
+  lists/IntVector.java \
   lists/LList.java \
   lists/LListPosition.java \
+  lists/LongVector.java \
   lists/NodePredicate.java \
   lists/Pair.java \
   lists/PairWithPosition.java \
   lists/PositionConsumer.java \
   lists/PositionManager.java \
+  lists/PrimIntegerVector.java \
   lists/PrintConsumer.java \
   lists/Range.java \
   lists/RAPair.java \
@@ -127,6 +130,7 @@ GNU_LISTS_JSOURCES = \
   lists/SeqPosition.java \
   lists/Sequence.java \
   lists/Sequences.java \
+  lists/ShortVector.java \
   lists/SimpleVector.java \
   lists/SubCharSeq.java \
   lists/SubSequence.java \

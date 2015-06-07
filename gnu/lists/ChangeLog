@@ -1,3 +1,36 @@
+2015-06-07  Per Bothner  <per@bothner.com>
+
+	Tweak SimpleVector classes for performace (use primitive values more),
+	and to use new unsigned primitive types.
+	Also fix pervasive off-by-one comparison bug.
+	Add add 'add' methods taking primitive value.
+	* BitVector.java: Parameterize as SimpleVector<Boolean>.
+	* CharBuffer.java: Parameterize as <Character>.
+	* CharSeq.java: Parameterize as Sequence<Character>.
+	* F32Vector.java: Parameterize as SimpleVector<Float>.
+	* F64Vector.java: Parameterize as SimpleVector<Double>.
+	* FString.java: Parameterize as SimpleVector<Character>.
+	* PrimIntegerVector.java: New abstract class extends SimpleVector.
+	* SimpleVector.java (intAt, intBuffer, longAt, longAtBuffer):
+	Methods moved to PrimIntegerVector.
+	* IntVector.java: New abstract class extends PrimIntegerVector.
+	Move code there from S32Vector and U32Vector.
+	* S32Vector.java: Change to extend IntVector<Integer>.
+	* U32Vector.java: Change to extend IntVector<UInt>.
+	* LongVector.java: New abstract class extends PrimIntegerVector.
+	Move code there from S64Vector and U64Vector.
+	* S64Vector.java: Change to extend LongVector<Long>.
+	* U64Vector.java: Change to extend LongVector<ULong>.
+	* ByteVector.java: Add type parameter.
+	* S8Vector.java: Change to extend ByteVector<Byte>.
+	* U8Vector.java: Change to extend ByteVector<UByte>.
+	* ShortVector.java: New abstract class extends PrimIntegerVector.
+	Move code there from S16Vector and U16Vector.
+	* S16Vector.java: Change to extend ShortVector<Short>.
+	* U16Vector.java: Change to extend ShortVector<UShort>.
+	* StableVector.java: Add type parameter.
+	* SubCharSeq.java: Parameterize as AbstractSequence<Character>.
+
 2015-06-01  Per Bothner  <per@bothner.com>
 
 	* SubCharSeq.java: Reimplement to handle substring of arbitrary

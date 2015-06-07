@@ -10,7 +10,8 @@ import gnu.lists.*;
 import gnu.commonlisp.lang.Symbols; // FIXME
 import gnu.text.Char;
 
-public abstract class Buffer extends AbstractSequence implements CharSeq
+public abstract class Buffer extends AbstractSequence<Character>
+    implements CharSeq
 {
   String name;
   Path path;

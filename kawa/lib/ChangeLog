@@ -1,3 +1,9 @@
+2015-06-07  Per Bothner  <per@bothner.com>
+
+	* uniform.scm: Use prcide types (byte rather than int).
+	Use new unsigned primitive types.
+	(list->XXXvector): Rewrite to use loop with converion.
+
 2015-06-04  Per Bothner  <per@bothner.com>
 
 	* numbers.scm (bitwise-copy-bit-field, exact-integer-sqrt):

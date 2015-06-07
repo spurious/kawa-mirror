@@ -6,12 +6,8 @@ import java.io.*;
 
 /** Simple adjustable-length vector of signed 32-bit integers (ints). */
 
-public class S32Vector extends SimpleVector
-    implements Externalizable, IntSequence, Comparable
+public class S32Vector extends IntVector<Integer>
 {
-  int[] data;
-  protected static int[] empty = new int[0];
-
   public S32Vector ()
   {
     data = empty;
@@ -26,17 +22,14 @@ public class S32Vector extends SimpleVector
       array[size] = value;
   }
 
-  public S32Vector(int size)
-  {
-    this.data = new int[size];
-    this.size = size;
-  }
+    public S32Vector(int size) {
+        this(new int[size]);
+    }
 
-  public S32Vector (int[] data)
-  {
-    this.data = data;
-    size = data.length;
-  }
+    public S32Vector(int[] data) {
+        this.data = data;
+        size = data.length;
+    }
 
   public S32Vector(Sequence seq)
   {
@@ -44,72 +37,27 @@ public class S32Vector extends SimpleVector
     addAll(seq);
   }
 
-  /** Get the allocated length of the data buffer. */
-  public int getBufferLength()
+  public final long longAtBuffer(int index)
   {
-    return data.length;
+    return (long) data[index];
   }
 
-  public void setBufferLength(int length)
+  public final Integer get(int index)
   {
-    int oldLength = data.length;
-    if (oldLength != length)
-      {
-	int[] tmp = new int[length];
-	System.arraycopy(data, 0, tmp, 0,
-			 oldLength < length ? oldLength : length);
-	data = tmp;
-      }
-  }
-
-  protected Object getBuffer() { return data; }
-
-  public final int intAt(int index)
-  {
-    if (index > size)
+    if (index >= size)
       throw new IndexOutOfBoundsException();
-    return data[index];
+    return Integer.valueOf(data[index]);
   }
 
-  public final int intAtBuffer(int index)
+  public final Integer getBuffer(int index)
   {
-    return data[index];
-  }
-
-  public final Object get(int index)
-  {
-    if (index > size)
-      throw new IndexOutOfBoundsException();
-    return Convert.toObject(data[index]);
-  }
-
-  public final Object getBuffer(int index)
-  {
-    return Convert.toObject(data[index]);
+    return Integer.valueOf(data[index]);
   }
 
   @Override
-  public void setBuffer(int index, Object value)
+  public void setBuffer(int index, Integer value)
   {
-    data[index] = Convert.toInt(value);
-  }
-
-  public final void setIntAt(int index, int value)
-  {
-    if (index > size)
-      throw new IndexOutOfBoundsException();
-    data[index] = value;
-  }
-
-  public final void setIntAtBuffer(int index, int value)
-  {
-    data[index] = value;
-  }
-
-  protected void clearBuffer(int start, int count)
-  {
-    while (--count >= 0)
-      data[start++] = 0;
+    data[index] = value.intValue();
   }
 
   public int getElementKind()
@@ -134,28 +82,5 @@ public class S32Vector extends SimpleVector
   public int compareTo(Object obj)
   {
     return compareToInt(this, (S32Vector) obj);
-  }
-
-  /**
-   * @serialData Write 'size' (using writeInt),
-   *   followed by 'size' elements in order (using writeInt).
-   */
-  public void writeExternal(ObjectOutput out) throws IOException
-  {
-    int size = this.size;
-    out.writeInt(size);
-    for (int i = 0;  i < size;  i++)
-      out.writeInt(data[i]);
-  }
-
-  public void readExternal(ObjectInput in)
-    throws IOException, ClassNotFoundException
-  {
-    int size = in.readInt();
-    int[] data = new int[size];
-    for (int i = 0;  i < size;  i++)
-      data[i] = in.readInt();
-    this.data = data;
-    this.size = size;
   }
 }

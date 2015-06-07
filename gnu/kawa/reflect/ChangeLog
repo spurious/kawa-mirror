@@ -1,3 +1,8 @@
+2015-06-07  Per Bothner  <per@bothner.com>
+
+	* CompileBuildObject.java (make): If type is a LangObjType,
+	call the latter's getBuildObject method.
+
 2015-06-03  Per Bothner  <per@bothner.com>
 
 	* CompileArrays.java (compileSet): Get a truncating StackTarget.

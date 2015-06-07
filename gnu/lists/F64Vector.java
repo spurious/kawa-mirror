@@ -6,11 +6,8 @@ import java.io.*;
 
 /** Simple adjustable-length vector whose elements are 64-bit floats. */
 
-public class F64Vector extends SimpleVector
-  implements Externalizable
-  /* #ifdef JAVA2 */
-  , Comparable
-  /* #endif */
+public class F64Vector extends SimpleVector<Double>
+  implements Externalizable, Comparable
 {
   double[] data;
   protected static double[] empty = new double[0];
@@ -79,26 +76,19 @@ public class F64Vector extends SimpleVector
     return data[index];
   }
 
-  public final Object get (int index)
-  {
-    if (index > size)
-      throw new IndexOutOfBoundsException();
-    return Convert.toObject(data[index]);
-  }
+    public final Double get(int index) {
+        if (index >= size)
+            throw new IndexOutOfBoundsException();
+        return Double.valueOf(data[index]);
+    }
 
-  public final Object getBuffer (int index)
-  {
-    return Convert.toObject(data[index]);
-  }
-
-  public final int intAtBuffer(int index)
-  {
-    return (int) data[index];
-  }
+    public final Double getBuffer(int index) {
+        return Double.valueOf(data[index]);
+    }
 
   public final void setDoubleAt(int index, double value)
   {
-    if (index > size)
+    if (index >= size)
       throw new IndexOutOfBoundsException();
     data[index] = value;
   }
@@ -108,11 +98,16 @@ public class F64Vector extends SimpleVector
     data[index] = value;
   }
 
-  @Override
-  public final void setBuffer(int index, Object value)
-  {
-    data[index] = Convert.toDouble(value);
-  }
+    @Override
+    public final void setBuffer(int index, Double value) {
+        data[index] = value.doubleValue();
+    }
+
+    public void add(double v) {
+        int sz = size;
+        addSpace(sz, 1);
+        setDoubleAt(sz, v);
+    }
 
   /*
   public final void setElementAt(Object value, int index)

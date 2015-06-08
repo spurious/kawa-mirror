@@ -517,9 +517,9 @@ check-interpreted-cycle:
 	CLASSPATH=.. $(KAWA) \
 	  -e '(require "$(srcdir)/cycle1.scm")' \
 	  -e '(test-begin "interpreted cycle")' \
-	  -e '(test-assert (is-even? 6))' \
 	  -e '(test-equal #f (is-even? 7))' \
-	  -e '(test-error (is-odd? 4))' \
+	  -e "(test-assert (eval '(is-even? 6)))" \
+	  -e "(test-error (eval '(is-odd? 4)))" \
 	  -e '(test-end)'
 
 check-interpreted-cycleb:

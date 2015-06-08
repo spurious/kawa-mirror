@@ -267,7 +267,7 @@ public class repl extends Procedure0or1 {
                 Throwable ex = Shell.run(language, Environment.getCurrent(),
                                          new CharArrayInPort(expr),
                                          OutPort.outDefault(),
-                                         null, messages);
+                                         OutPort.errDefault(), messages);
                 if (ex != null) {
                     Shell.printError(ex, messages, OutPort.errDefault());
                     System.exit(-1);

@@ -86,8 +86,9 @@ public class ProcInitializer extends Initializer
                 code.emitNew(comp.moduleClass);
                 code.emitDup(comp.moduleClass);
                 code.emitInvokeSpecial(comp.moduleClass.constructor);
-		comp.moduleInstanceMainField = 
-		  comp.moduleClass.addField("$main", comp.mainClass, 0);
+                if (comp.moduleInstanceMainField == null)
+                    comp.moduleInstanceMainField = 
+                        comp.moduleClass.addField("$main", comp.mainClass, 0);
 		code.emitDup(comp.moduleClass);
 		code.emitPushThis();
 		code.emitPutField(comp.moduleInstanceMainField);

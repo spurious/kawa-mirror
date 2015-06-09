@@ -1,3 +1,9 @@
+2015-06-08  Per Bothner  <per@bothner.com>
+
+	* ProcInitializer.java (emitLoadModuleMethod): Only set
+	comp.moduleInstanceMainField if not already set.  This avoids
+	creating a duplicate field.
+
 2015-06-03  Per Bothner  <per@bothner.com>
 
 	Avoid redundant int to byte/short conversion when storing

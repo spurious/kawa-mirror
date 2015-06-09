@@ -1,3 +1,7 @@
+2015-06-08  Per Bothner  <per@bothner.com>
+
+	* bytevectors.scm ($make$bytevector$): Remove no-longer-needed helper.
+
 2015-06-07  Per Bothner  <per@bothner.com>
 
 	* uniform.scm: Use prcide types (byte rather than int).

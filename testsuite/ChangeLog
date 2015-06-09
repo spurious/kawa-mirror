@@ -1,5 +1,10 @@
 2015-06-08  Per Bothner  <per@bothner.com>
 
+	* inlining-test.scm: Tests for uniform vectors, especially indexing.
+	* inlining.expected: Update accordingly.
+	* Makefile.am: Update accordingly.
+	* num-test.scm: Test indexing of u8vector, with "negative" value.
+
 	* Makefile.am (check-interpreted-cycle): Tweak command line to
 	avoid warning.
 	* sva31180.scm (bar): Update formal argument list to avoid warning.

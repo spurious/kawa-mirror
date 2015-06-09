@@ -371,7 +371,7 @@ public class CompileMisc
     Method mm = typeTuples.getDeclaredMethod("run$X", 1);
     code.emitLoad(consumer);
     PrimProcedure.compileInvoke(comp, mm, target, exp.isTailCall(),
-                                182/*invokevirtual*/, Type.pointer_type);
+                                182/*invokevirtual*/, Type.pointer_type, false);
     code.popScope();
   }
 

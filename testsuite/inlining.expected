@@ -78,6 +78,7 @@ InliningTest.tohex3(Int)java.lang.Object: 5 bytes
 InliningTest.makeIarr1(int)int[]: 4 bytes
 InliningTest.makeIarr2(int)int[]: 4 bytes
 InliningTest.makeIarr3(int)int[]: 18 bytes
+InliningTest.makeU8v1(int)gnu.lists.U8Vector: 28 bytes
 InliningTest.lengthIarr1(int[])int: 3 bytes
 InliningTest.lengthIarr2(int[])int: 3 bytes
 InliningTest.lengthIarr3(int[])int: 3 bytes
@@ -163,6 +164,11 @@ InliningTest.lshiftS32(int,int)int: 4 bytes
 InliningTest.lshiftS64(long,int)long: 4 bytes
 InliningTest.lshiftU32(int,int)int: 4 bytes
 InliningTest.lshiftU64(long,int)long: 4 bytes
+InliningTest.indexS16(int)short: 8 bytes
+InliningTest.indexU8v1(int)byte: 15 bytes
+InliningTest.indexU8i1(int)int: 15 bytes
+InliningTest.indexU8i2(int)int: 5 bytes
+InliningTest.indexF32(int)float: 8 bytes
 InliningTest.incrementS8a()void: 9 bytes
 InliningTest.incrementArrS8(byte[],int)void: 9 bytes
 InliningTest.incrementU8a()void: 13 bytes

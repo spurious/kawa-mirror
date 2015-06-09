@@ -1,5 +1,10 @@
 2015-06-08  Per Bothner  <per@bothner.com>
 
+	* PrimProcedure.java (doFixUnsigned): New flag.
+	(setReturnType): set it.
+	(compileInvoke): Take doFixUnsigned parameter; if true
+	call CodeAttr.fixUnsigned to fixup ubyte/ushort from Java methods.
+
 	* PrimProcedure.java (<init>): New constructor.
 
 	* ConsumerTarget.java (compileUsingValues): New method.

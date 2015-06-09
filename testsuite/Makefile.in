@@ -1016,14 +1016,14 @@ inlining.log: InliningTest.class cycle1.class cycle2.class \
   binarytrees.class fannkuch.class fannkuchredux.class fasta.class mandelbrot.class nbody.class pidigits.class regexdna.class revcomp1.class revcomp2.class spectralnorm.class map1.class values2.class Makefile
 	$(LIST_CODE_SIZE) InliningTest.class \
 	setCar getCar getHome setHome isPair isEmpty castToPair newPair tohex \
-	makeIarr lengthIarr getIarr setIarr varargs \
+	make lengthIarr getIarr setIarr varargs \
 	factoriali1 factoriali2 factoriall1 plusLambda1 firstNegative \
 	inlineTwoCalls inlineTwoFunctions checkEven \
 	constantPropagation1 constantPropagation2 constantPropagation3 \
 	factorialInfer1 getFromVector1 getFromVector2 read1 stringForEach \
 	stringAppend translateSpaceToNewline \
 	topLevelRecurse1 topLevelRecurse2 sum1 sum2 numcomp eqv raise \
-	case callWithValues mmemq greaterEqual rshift lshift \
+	case callWithValues mmemq greaterEqual rshift lshift index \
 	incrementS8a incrementArrS8 incrementU8a setU16a addU8aU16a>inlining.log
 	$(LIST_CODE_SIZE) cycle1.class isIsEven >>inlining.log
 	$(LIST_CODE_SIZE) cycle2.class isIsOdd >>inlining.log

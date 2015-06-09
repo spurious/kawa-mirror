@@ -498,3 +498,21 @@
   (bitwise-arithmetic-shift-left x y))
 (define (lshift-u64 x::ulong y::int)
   (bitwise-arithmetic-shift-left x y))
+
+(define (index-s16 i::int)
+  (let ((v #s16(3 5 -12 2)))
+    (v i)))
+(define (make-u8v1 x::int)
+  (u8vector 5 253 x))
+(define (index-u8v1 i::int)
+  (let ((v (make-u8v1 3)))
+    (v i)))
+(define (index-u8i1 i::int) ::int
+  (let ((v (make-u8v1 3)))
+    (v i)))
+(define (index-u8i2 i::int) ::int
+  (index-u8v1 i))
+(define (index-f32 i::int)
+  (let ((v #f32(3.4 1/2 55)))
+    (f32vector-ref v i)))
+

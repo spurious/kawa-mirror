@@ -36,6 +36,12 @@ public class PrimProcedure extends MethodProc {
      * '\0' means don't expect a target. */
     private char mode;
     private boolean sideEffectFree;
+    /** Do we needs to zero-truncate the returned result?
+     * A Kawa-compiled function will do so before loading the value
+     * on the stack (and hence before returning), but post-return
+     * truncation may be needed if calling a Java method.
+     */     
+    private boolean doFixUnsigned;
 
     /** If non-null, the LambdaExp that this PrimProcedure implements. */
     private LambdaExp source;
@@ -45,7 +51,10 @@ public class PrimProcedure extends MethodProc {
     public final int opcode() { return op_code; }
 
     public Type getReturnType () { return retType; }
-    public void setReturnType (Type retType) { this.retType = retType; }
+    public void setReturnType (Type retType) {
+        this.doFixUnsigned = true;
+        this.retType = retType;
+    }
 
     public boolean isSpecial() { return mode == 'P'; }
 
@@ -740,7 +749,7 @@ public class PrimProcedure extends MethodProc {
     else
       {
         compileInvoke(comp, methodForInvoke, target,
-                      exp.isTailCall(), op_code, retType);
+                      exp.isTailCall(), op_code, retType, doFixUnsigned);
       }
   }
 
@@ -750,7 +759,8 @@ public class PrimProcedure extends MethodProc {
    */
   public static void
   compileInvoke (Compilation comp, Method method, Target target,
-                 boolean isTailCall, int op_code, Type returnType)
+                 boolean isTailCall, int op_code, Type returnType,
+                 boolean doFixUnsigned)
   {
     CodeAttr code = comp.getCode();
     comp.usedClass(method.getDeclaringClass());
@@ -849,7 +859,8 @@ public class PrimProcedure extends MethodProc {
             } else
                 returnType = method.getReturnType().getRawType();
         }
-
+        if (doFixUnsigned)
+          code.fixUnsigned(returnType);
       target.compileFromStack(comp, returnType);
     }
   }

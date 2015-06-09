@@ -1,4 +1,4 @@
-(test-begin "num" 1902)
+(test-begin "num" 1905)
 
 (define-syntax jequals
   (syntax-rules ()
@@ -513,5 +513,9 @@ Not currently true, but perhaps it should be.
 (test-jequals (->uint #x1fe00002) (my-ashift (->uint #xFF000015) -3))
 (test-jequals (->int -134217560) (my-ashift (->int (->uint #xFF000015)) 3))
 (test-jequals (->int -2097150) (my-ashift (->int (->uint #xFF000015)) -3))
+
+(test-equal (->int 253) (->int (index-u8v1 1)))
+(test-equal (->int 253) (->int (index-u8i1 1)))
+(test-equal (->int 253) (->int (index-u8i2 1)))
 
 (test-end)

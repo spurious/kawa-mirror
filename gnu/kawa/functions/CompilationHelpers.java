@@ -2,6 +2,7 @@ package gnu.kawa.functions;
 import gnu.bytecode.*;
 import gnu.expr.*;
 import gnu.mapping.*;
+import gnu.kawa.lispexpr.LangPrimType;
 import gnu.kawa.reflect.CompileReflect;
 import gnu.kawa.reflect.Invoke;
 import gnu.kawa.reflect.ArrayGet;
@@ -97,13 +98,71 @@ public class CompilationHelpers
 		 && ctype.isSubclass(Compilation.typeList)
                  && nargs == 1)
           {
+            String mname = "get";
+            Type retType = null;
+            String cname = ctype.getName();
+            if (cname.startsWith("gnu.lists.")) {
+                switch (cname.charAt(10)) {
+                case 'U':
+                    if ("gnu.lists.U64Vector".equals(cname)) {
+                        mname = "longAt";
+                        retType = LangPrimType.unsignedLongType;
+                    }
+                    else if ("gnu.lists.U32Vector".equals(cname)) {
+                        mname = "intAt";
+                        retType = LangPrimType.unsignedIntType;
+                    }
+                    else if ("gnu.lists.U16Vector".equals(cname)) {
+                        mname = "shortAt";
+                        retType = LangPrimType.unsignedShortType;
+                    }
+                    else if ("gnu.lists.U8Vector".equals(cname)) {
+                        mname = "byteAt";
+                        retType = LangPrimType.unsignedByteType;
+                    }
+                    break;
+                case 'S':
+                    if ("gnu.lists.S64Vector".equals(cname)) {
+                        mname = "longAt";
+                        retType = LangPrimType.longType;
+                    }
+                    else if ("gnu.lists.S32Vector".equals(cname)) {
+                        mname = "intAt";
+                        retType = LangPrimType.intType;
+                    }
+                    else if ("gnu.lists.S16Vector".equals(cname)) {
+                        mname = "shortAt";
+                        retType = LangPrimType.shortType;
+                    }
+                    else if ("gnu.lists.S8Vector".equals(cname)) {
+                        mname = "byteAt";
+                        retType = LangPrimType.byteType;
+                    }
+                    break;
+                case 'F':
+                    if ("gnu.lists.F64Vector".equals(cname)) {
+                        mname = "doubleAt";
+                        retType = LangPrimType.doubleType;
+                    }
+                    else if ("gnu.lists.F32Vector".equals(cname)) {
+                        mname = "floatAt";
+                        retType = LangPrimType.floatType;
+                    }
+                    break;
+                }
+            }
+            
             // We search for a "get(int)" method, rather than just using
             // typeList.getDeclaredMethod("get", 1) to see if we make a
             // a virtual call rather than an interface call.
-            Method get = ctype.getMethod("get", new Type[] { Type.intType  });
+            Method get = ctype.getMethod(mname, new Type[] { Type.intType  });
 	    ParameterizedType prtype = ptype instanceof ParameterizedType ?
 		((ParameterizedType) ptype) : null;
-            result = exp.setFuncArgs(new PrimProcedure(get, 'V', language, prtype), args);
+            PrimProcedure prproc =
+                new PrimProcedure(get, 'V', language, prtype);
+            if (retType != null)
+                prproc.setReturnType(retType);
+            result = exp.setFuncArgs(prproc, args);
           }
         if (result != null)
           {

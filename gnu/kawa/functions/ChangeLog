@@ -1,5 +1,8 @@
 2015-06-08  Per Bothner  <per@bothner.com>
 
+	* CompilationHelpers.java (validateApplyToArgs): Optimize when
+	"procedure" is a uniform vector, like U16Vector.
+
 	* AppendValues.java (compile): Do the all-but-one-void-expression
 	optimization even for ConsumerTarget, because it might be non-simple.
 	That is the appended type may differ from the type of the parts.

@@ -6,6 +6,7 @@ import gnu.lists.*;
 import gnu.mapping.*;
 import gnu.bytecode.*;
 import gnu.expr.*;
+import gnu.kawa.reflect.OccurrenceType;
 
 public class AppendValues extends MethodProc implements Inlineable
 {
@@ -33,17 +34,10 @@ public class AppendValues extends MethodProc implements Inlineable
       }
   }
 
-  public void compile (ApplyExp exp, Compilation comp, Target target)
-  {
-    Expression[] args = exp.getArgs();
-    int nargs = args.length;
-    if (target instanceof ConsumerTarget || target instanceof IgnoreTarget)
-      {
-	for (int i = 0;  i < nargs;  i++)
-	  args[i].compileWithPosition(comp, target);
-      }
-    else
-      {
+    public void compile(ApplyExp exp, Compilation comp, Target target) {
+        Expression[] args = exp.getArgs();
+        int nargs = args.length;
+
         int nonVoid = -1; // Index of unique non-void argument.
         for (int i = 0;  i < nargs;  i++) {
             if (! args[i].getType().isVoid()) {
@@ -59,20 +53,29 @@ public class AppendValues extends MethodProc implements Inlineable
                                             : Target.Ignore);
             return;
         }
-	ConsumerTarget.compileUsingConsumer(exp, comp, target);
-	/*
-	CodeAttr code = comp.getCode();
-	Scope scope = code.pushScope();
-	Variable values = scope.addVariable(code, comp.typeValues, null);
-	ConsumerTarget ctarget = new ConsumerTarget(values);
-	code.emitInvokeStatic(comp.typeValues.getDeclaredMethod("make", 0));
-	code.emitStore(values);
-	for (int i = 0;  i < nargs;  i++)
-	  args[i].compile(comp, ctarget);
-	code.emitLoad(values);
-	code.popScope();
-	target.compileFromStack(comp, Compilation.typeValues);
-	*/
-      }
-  }
+
+        boolean simple;
+        if (target instanceof IgnoreTarget)
+            simple = true;
+        else if (target instanceof ConsumerTarget) {
+            Type type = target.getType();
+            simple = type == Type.objectType
+                || (type instanceof OccurrenceType
+                    && ((OccurrenceType) type).minOccurs() == 0);
+        } else
+            simple = false;
+
+        if (simple) {
+            for (int i = 0;  i < nargs;  i++)
+                args[i].compileWithPosition(comp, target);
+        } else {
+            Expression nexp;
+            if (target instanceof ConsumerTarget) {
+                nexp = new BeginExp(new Expression[] { exp } );
+                nexp.setType(Type.objectType);
+            } else
+                nexp = exp;
+            ConsumerTarget.compileUsingValues(nexp, comp, target);
+        }
+    }
 }

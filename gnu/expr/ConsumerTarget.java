@@ -66,20 +66,22 @@ public class ConsumerTarget extends Target
     return target;
   }
 
-  /** Compile an expression using a temporary Consumer, if needed. */
-  public static void compileUsingConsumer(Expression exp,
-					  Compilation comp, Target target)
-  {
-    if (target instanceof ConsumerTarget || target instanceof IgnoreTarget)
-      exp.compile(comp, target);
-    else
-      {
-	ClassType typeValues = Compilation.typeValues;
+    public static void compileUsingValues(Expression exp, Compilation comp,
+                                          Target target) {
+        ClassType typeValues = Compilation.typeValues;
 	compileUsingConsumer(exp, comp, target,
 			     typeValues.getDeclaredMethod("make", 0),
 			     typeValues.getDeclaredMethod("canonicalize", 0));
-      }
-  }
+    }
+
+    /** Compile an expression using a temporary Consumer, if needed. */
+    public static void compileUsingConsumer(Expression exp, Compilation comp,
+                                            Target target) {
+        if (target instanceof IgnoreTarget || target instanceof ConsumerTarget)
+            exp.compile(comp, target);
+        else
+            compileUsingValues(exp, comp, target);
+    }
 
   public static void compileUsingConsumer (Expression exp, Compilation comp,
 					   Target target,

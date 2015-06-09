@@ -1,5 +1,8 @@
 2015-06-08  Per Bothner  <per@bothner.com>
 
+	* ConsumerTarget.java (compileUsingValues): New method.
+	(compileUsingConsumer/3):  Use compileUsingValues.
+
 	* ProcInitializer.java (emitLoadModuleMethod): Only set
 	comp.moduleInstanceMainField if not already set.  This avoids
 	creating a duplicate field.

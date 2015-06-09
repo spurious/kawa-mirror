@@ -1,5 +1,7 @@
 2015-06-08  Per Bothner  <per@bothner.com>
 
+	* PrimProcedure.java (<init>): New constructor.
+
 	* ConsumerTarget.java (compileUsingValues): New method.
 	(compileUsingConsumer/3):  Use compileUsingValues.
 

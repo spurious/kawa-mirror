@@ -1,3 +1,12 @@
+2015-06-08  Per Bothner  <per@bothner.com>
+
+	* LangObjType.java (class SimpleVectorBuilder):	Modify constructor.
+	(SimpleVectorBuilder.useBuilder): New method.
+	(SimpleVectorBuilder.addProc): New field.
+	(SimpleVectorBuilder.buildAddChild): Use addProc.
+	(getBuildObject): Factor and update.
+	(getConstructor): Remove obsolete U8VECTOR_TYPE_CODE case.
+
 2015-06-07  Per Bothner  <per@bothner.com>
 
 	* LangObjType.java (getElementType): New method.

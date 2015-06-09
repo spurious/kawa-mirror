@@ -8,15 +8,6 @@
 (define (make-bytevector (n ::int) #!optional (init ::int 0)) :: bytevector
   (make gnu.lists.U8Vector n init))
 
-;; Needed to suppress warning/error if an argument is >= 128.
-;; FUTURE: (define ($make$bytevector$ #!rest args ::ubyte[]) ::bytevector
-(define ($make$bytevector$ #!rest args ::int[]) ::bytevector
-  (let* ((n ::int args:length)
-         (arr ::byte[] (byte[] length: n)))
-    (do ((i :: <int> 0 (+ i 1)))
-	((>= i n)  (make gnu.lists.U8Vector arr))
-      (set! (arr i) (args i)))))
-
 (define (bytevector-length (v :: bytevector)) ::int
   (invoke v 'size))
 

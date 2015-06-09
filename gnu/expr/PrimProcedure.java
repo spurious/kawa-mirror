@@ -342,6 +342,13 @@ public class PrimProcedure extends MethodProc {
       : method.getReturnType();
   }
 
+    public PrimProcedure(Method method, Type retType, Type[] argTypes) {
+        init(method);
+        this.retType = retType;
+        if (argTypes != null)
+            this.argTypes = argTypes;
+    }
+
   public PrimProcedure(Method method, Language language)
   {
     this(method, '\0', language, null);

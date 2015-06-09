@@ -721,8 +721,6 @@ public class LangObjType extends SpecialObjectType implements TypeValue
         return new PrimProcedure("gnu.kawa.io.URIPath", "makeURI", 1);
       case VECTOR_TYPE_CODE:
         return new PrimProcedure("gnu.lists.FVector", "make", 1);
-      case U8VECTOR_TYPE_CODE:
-        return new PrimProcedure("kawa.lib.bytevectors", "$make$bytevector$"+VARARGS_SUFFIX, 1);
       case LIST_TYPE_CODE:
         return gnu.kawa.functions.MakeList.list;
       case STRING_TYPE_CODE:
@@ -759,26 +757,17 @@ public class LangObjType extends SpecialObjectType implements TypeValue
 
     public CompileBuildObject getBuildObject() {
         switch (typeCode) {
-        case U8VECTOR_TYPE_CODE:
-            return new SimpleVectorBuilder(LangPrimType.unsignedByteType);
-        case U16VECTOR_TYPE_CODE:
-            return new SimpleVectorBuilder(LangPrimType.unsignedShortType);
-        case U32VECTOR_TYPE_CODE:
-            return new SimpleVectorBuilder(LangPrimType.unsignedIntType);
-        case U64VECTOR_TYPE_CODE:
-            return new SimpleVectorBuilder(LangPrimType.unsignedLongType);
         case S8VECTOR_TYPE_CODE:
-            return new SimpleVectorBuilder(LangPrimType.byteType);
         case S16VECTOR_TYPE_CODE:
-            return new SimpleVectorBuilder(LangPrimType.shortType);
         case S32VECTOR_TYPE_CODE:
-            return new SimpleVectorBuilder(LangPrimType.intType);
         case S64VECTOR_TYPE_CODE:
-            return new SimpleVectorBuilder(LangPrimType.longType);
+        case U8VECTOR_TYPE_CODE:
+        case U16VECTOR_TYPE_CODE:
+        case U32VECTOR_TYPE_CODE:
+        case U64VECTOR_TYPE_CODE:
         case F32VECTOR_TYPE_CODE:
-            return new SimpleVectorBuilder(LangPrimType.floatType);
         case F64VECTOR_TYPE_CODE:
-            return new SimpleVectorBuilder(LangPrimType.doubleType);
+            return new SimpleVectorBuilder(this);
         default:
             return new CompileBuildObject();
         }
@@ -786,16 +775,26 @@ public class LangObjType extends SpecialObjectType implements TypeValue
 
     public static class SimpleVectorBuilder extends CompileBuildObject {
         Type elementType;
-        public SimpleVectorBuilder(Type elementType) {
-            this.elementType = elementType;
+        PrimProcedure addProc;
+        public SimpleVectorBuilder(LangObjType vectorType) {
+            this.elementType = vectorType.getElementType();
+            Method addMethod = ((ClassType) vectorType.getImplementationType())
+                .getMethod("add",
+                           new Type[] { elementType.getImplementationType() });
+            addProc = new PrimProcedure(addMethod, Type.voidType,
+                                        new Type[] {elementType});
+        }
+
+        @Override
+        public boolean useBuilder(int numCode, InlineCalls visitor) {
+            return (numKeywordArgs() == 0 && hasDefaultConstructor())
+                || super.useBuilder(numCode, visitor);
         }
 
         @Override
         public Expression buildAddChild(Declaration target, Expression child) {
-            child = new ApplyExp(gnu.kawa.functions.Convert.cast,
-                                 new QuoteExp(elementType),
-                                 child);
-            return super.buildAddChild(target, child);
+            return new ApplyExp(addProc, new ReferenceExp(target),
+                                child);
         }
     }
 }

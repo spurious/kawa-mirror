@@ -194,7 +194,7 @@ public class CompileInvoke {
             : comp.mainClass;
         ObjectType ctype = (ObjectType) type;
         int numCode;
-        int keywordStart = kind == 'N' ? hasKeywordArgument(1, args) : nargs;
+        int keywordStart = kind == 'N' && exp.numKeywordArgs > 0 ? exp.firstKeywordArgIndex - 1 : nargs;
         int tailArgs = nargs - keywordStart;
         int spliceCount = exp.spliceCount();
         try {
@@ -241,7 +241,7 @@ public class CompileInvoke {
                 exp.visitArgs(visitor);
                 return exp;
             }
-            CompileBuildObject builder = CompileBuildObject.make(exp, visitor, required, keywordStart, ctype, caller);
+            CompileBuildObject builder = CompileBuildObject.make(exp, visitor, required, ctype, caller);
             if (usingConstVector) {
                 builder.setDefaultConstructor(methods[0]);  
                 return builder.build();
@@ -412,14 +412,6 @@ public class CompileInvoke {
                                        : kind == '*' || kind == 'V' ? 'V'
                                        : '\0',
                                        caller, iproc.language);
-    }
-
-    static int hasKeywordArgument(int argsStartIndex, Expression[] args) {
-        for (int i = argsStartIndex; i < args.length; i++) {
-            if (args[i].valueIfConstant() instanceof Keyword)
-                return i;
-        }
-        return args.length;
     }
 
     private static long selectApplicable(PrimProcedure[] methods,

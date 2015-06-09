@@ -29,7 +29,6 @@ public class CompileBuildObject {
     ApplyExp exp;
     InlineCalls visitor;
     Type required;
-    int keywordStart;
     ObjectType ctype;
     ClassType caller;
 
@@ -50,6 +49,9 @@ public class CompileBuildObject {
     public Expression getArg(int i) { return exp.getArg(i); }
     public int getArgCount() { return exp.getArgCount(); }
     public void setArg(int i, Expression arg) { exp.setArg(i, arg); }
+    public int numKeywordArgs() { return exp.numKeywordArgs; }
+    public int keywordStart() { return exp.numKeywordArgs==0 ? 1
+            : exp.firstKeywordArgIndex - 1; }
 
     /** Insert an expression into the argument list. */
     public void insertArgument(int index, Expression arg) {
@@ -59,22 +61,20 @@ public class CompileBuildObject {
         xargs[index] = arg;
         System.arraycopy(args, index, xargs, index+1, args.length-index);
         exp.setArgs(xargs);
-        if (keywordStart >= index)
-            keywordStart++;
+        exp.adjustSplice(exp, 1);
     }
 
     protected void init(ApplyExp exp, InlineCalls visitor,
-                        Type required, int keywordStart, ObjectType ctype, ClassType caller) {
+                        Type required, ObjectType ctype, ClassType caller) {
         this.exp = exp;
         this.visitor = visitor;
         this.required = required;
-        this.keywordStart = keywordStart;
         this.ctype = ctype;
         this.caller = caller;
     }
 
     public static CompileBuildObject make(ApplyExp exp, InlineCalls visitor,
-                                          Type required, int keywordStart, ObjectType ctype, ClassType caller) {
+                                          Type required, ObjectType ctype, ClassType caller) {
         CompileBuildObject builder;
         String builderName = null;
         Compilation comp = visitor.getCompilation();
@@ -110,7 +110,7 @@ public class CompileBuildObject {
             builder = ((LangObjType) ctype).getBuildObject();
         else
             builder = new CompileBuildObject();
-        builder.init(exp, visitor, required, keywordStart, ctype, caller);
+        builder.init(exp, visitor, required, ctype, caller);
         return builder;
     }
 
@@ -177,12 +177,11 @@ public class CompileBuildObject {
      *   otherwise caller ({@link CompileInvoke}) should do the work itself.
      */
     public boolean useBuilder(int numCode, InlineCalls visitor) {
-        if (getArgCount() > keywordStart && numCode > 0) // Have keywords
+        if (numKeywordArgs() > 0 && numCode > 0)
             return true;
         else if (numCode == MethodProc.NO_MATCH_TOO_MANY_ARGS
-                 && hasDefaultConstructor()
+                   && hasDefaultConstructor()
                  && hasAddChildMethod()) {
-            keywordStart = 1;
             return true;
         }
         else
@@ -195,7 +194,8 @@ public class CompileBuildObject {
         StringBuffer errbuf = null;
 
         Expression e;
-        if (keywordStart < args.length) {
+        if (numKeywordArgs() > 0) {
+            int keywordStart = keywordStart();
             Expression[] xargs = new Expression[keywordStart];
             System.arraycopy(args, 0, xargs, 0, keywordStart);
             e = visitor.visit(new ApplyExp(exp.getFunction(), xargs), ctype);
@@ -211,11 +211,11 @@ public class CompileBuildObject {
         adecl.setFlag(Declaration.ALLOCATE_ON_STACK);
         adecl.setCanRead(true);
         BeginExp begin = new BeginExp();
-        int i = keywordStart;
-        for (;  i + 1 < args.length; i += 2) {
+        int numKeys = numKeywordArgs();
+        int keywordStart = keywordStart();
+        for (int j = 0; j < numKeys;  j++) {
+            int i = keywordStart + 2 * j;
             Object value = args[i].valueIfConstant();
-            if (! (value instanceof Keyword)) // FIXME - use keyword-count
-                break;
             String name = ((Keyword) value).getName();
             Member slot = findNamedMember(name);
             if (slot == null) {
@@ -224,8 +224,7 @@ public class CompileBuildObject {
                  begin.add(visitor.visit(buildSetter(adecl, slot, args[i+1]), Type.voidType));
             }
         }
-
-        for (; i < args.length;  i++) {
+        for (int i = keywordStart + 2 * numKeys; i < args.length;  i++) {
             begin.add(visitor.visit(buildAddChild(adecl, args[i]), null));
         }
         ReferenceExp aref = new ReferenceExp(adecl);

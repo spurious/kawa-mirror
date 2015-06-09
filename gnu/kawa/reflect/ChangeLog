@@ -1,3 +1,11 @@
+2015-06-08  Per Bothner  <per@bothner.com>
+
+	* CompileBuildObject.java: Re-write keyword handling.
+	(keywordStart): Replace field by method.
+	(numKeywordArgs): New methods.
+	* CompileInvoke.java: Update accordingly.
+	(hasKeywordArgument): Remove method.
+
 2015-06-07  Per Bothner  <per@bothner.com>
 
 	* CompileBuildObject.java (make): If type is a LangObjType,

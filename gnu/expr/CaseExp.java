@@ -354,13 +354,14 @@ public class CaseExp extends Expression {
 
     @Override
     protected <R, D> void visitChildren(ExpVisitor<R, D> visitor, D d) {
+        key = visitor.visitAndUpdate(key, d);
         for (int i = 0; visitor.exitValue == null && i < clauses.length; i++) {
             CaseClause clause = clauses[i];
-            visitor.visitAndUpdate(clause.exp, d);
+            clause.exp = visitor.visitAndUpdate(clause.exp, d);
         }
 
         if (visitor.exitValue == null && elseClause != null)
-            visitor.visitAndUpdate(elseClause.exp, d);
+            elseClause.exp = visitor.visitAndUpdate(elseClause.exp, d);
     }
 
     /** 

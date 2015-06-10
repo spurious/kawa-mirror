@@ -1,5 +1,13 @@
 2015-06-09  Andrea Bernardini <andrebask@gmail.com>
 
+        * Compilation.java: Move again ANormalize pass before InlineCalls.
+        (classTypeComparator): New field used in findNamedClass.
+        (classesArrayIsSorted): New field used in addClass and findNamedClass.
+        (findNamedClass): Use binary search when the classes are more then 1.
+        (registerClass): set classesArrayIsSorted to false when adding a class.
+
+2015-06-09  Andrea Bernardini <andrebask@gmail.com>
+
         * CaseExp.java (visitChildren): Fix in case side effects are involved.
 
 2015-06-08  Per Bothner  <per@bothner.com>

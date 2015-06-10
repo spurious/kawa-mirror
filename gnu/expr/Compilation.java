@@ -744,17 +744,38 @@ public class Compilation implements SourceLocator
         dumpingInitializers = false;
     }
 
+    static final Comparator<ClassType> 
+            classTypeComparator = new Comparator<ClassType>() {
+        public int compare(ClassType arg0, ClassType arg1) {
+            return arg0.getName().compareTo(arg1.getName());
+        }
+    };
+
+    boolean classesArrayIsSorted;
+
   /** Search this Compilation for a ClassType with a given name.
    * @param name the name of the class desired
    * @return the matching ClassType, or null if none is found */
-  public ClassType findNamedClass (String name)
-  {
-    for (int i = 0;  i < numClasses; i++)
-      {
-	if (name.equals (classes[i].getName ()))
-	  return classes[i];
-      }
-    return null;
+    public ClassType findNamedClass(String name) {
+
+        if (classes == null || numClasses == 0)
+            return null;
+
+        if (name.equals(classes[0].getName()))
+                return classes[0];
+
+        if (numClasses == 1)
+            return null;
+
+        if (! classesArrayIsSorted) {
+            Arrays.sort(classes, 1, numClasses, classTypeComparator);
+            classesArrayIsSorted = true;
+        }
+
+        ClassType nameType = new ClassType(name); // wrapper for key
+        int index = Arrays.binarySearch
+                      (classes, 1, numClasses, nameType, classTypeComparator);
+        return (index > -1) ? classes[index] : null;
   }
 
   public static String classPrefixDefault = "";
@@ -1112,6 +1133,7 @@ public class Compilation implements SourceLocator
         classes[0] = mainClass;
       }
     classes[numClasses++] = new_class;
+    classesArrayIsSorted = false;
   }
 
   public void addClass (ClassType new_class)

@@ -1,3 +1,24 @@
+2015-06-10  Per Bothner  <per@bothner.com>
+
+	Efficient treatment of CharSequences as sequences of Unicode characters.
+	* AbstractCharVector.java: New abstract class extends SimpleVector.
+	Move some code from FString.java to here.
+	* CharSeq.java: Change to extend Sequence<Char> (20-bit code points)
+	rather than Sequence<Character> (16-bit code units).
+	(subSequence): Return CharSeq rather than CharSequence.
+	* CharVector.java: New class, extends AbstractCharVector.
+	This extends Sequence<Character>, and is meant to wrap char arrays.
+	* FString.java: Change to extend AbstractCharVector.
+	* Sequences.java (getIterator): For char[] return a CharVector
+	rather than an FString.
+	* CharBuffer.java: Parameterize by Char, not Character.
+	* Strings.java (characterAt) Add overload which takes start and
+	end indexes.
+	* SubCharSeq.java: Parameterize by Char, not Character.
+	Use new Strings.characterAt method.
+	* FString.java (delete, insertRepeated): New methods.
+	(<init>(int,int)): Re-write to use insetRepeated.
+
 2015-06-07  Per Bothner  <per@bothner.com>
 
 	Tweak SimpleVector classes for performace (use primitive values more),

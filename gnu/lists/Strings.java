@@ -11,15 +11,21 @@ import java.io.IOException;
 public class Strings
 {
     public static int characterAt(CharSequence cseq, int index) {
+        return characterAt(cseq, 0, cseq.length(), index);
+    }
+    public static int characterAt(CharSequence cseq, int start, int end,
+                                  int index) {
+        if (index < start || index >= end)
+            throw new IndexOutOfBoundsException();
         char ch1 = cseq.charAt(index);
         if (ch1 >= 0xD800 && ch1 <= 0xDBFF) {
-            if (index + 1 < cseq.length()) {
+            if (index + 1 < end) {
                 char ch2 = cseq.charAt(index+1);
                 if (ch2 >= 0xDC00 && ch2 <= 0xDFFF)
                     return ((ch1 - 0xD800) << 10) + (ch2 - 0xDC00) + 0x10000;
             }
         } else if (ch1 >= 0xDC00 && ch1 <= 0xDFFF) {
-            if (index > 0) {
+            if (index > start) {
                 char ch0 = cseq.charAt(index-1);
                 if (ch0 >= 0xD800 && ch0 <= 0xDBFF)
                     return Char.IGNORABLE_CHAR;

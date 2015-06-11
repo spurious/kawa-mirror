@@ -1,3 +1,7 @@
+2015-06-10  Per Bothner  <per@bothner.com>
+
+	* SwingBuffer.java (get) Returns a Char rather than a Character.
+
 2013-09-15  Per Bothner  <per@bothner.com>
 
 	* SwingBuffer.java (defaultStyle): Rename to "plain" - a style

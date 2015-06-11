@@ -1,3 +1,8 @@
+2015-06-10  Per Bothner  <per@bothner.com>
+
+	* ApplyToArgs.java (applyN): Handle indexing CharSequence.
+	* CompilationHelpers.java (validateApplyToArgs): Likewise.
+
 2015-06-08  Per Bothner  <per@bothner.com>
 
 	* CompilationHelpers.java (validateApplyToArgs): Optimize when

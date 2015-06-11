@@ -7,6 +7,7 @@ import gnu.jemacs.buffer.*;
 import gnu.mapping.*;
 import gnu.kawa.io.InPort;
 import gnu.lists.CharSeq;
+import gnu.text.Char;
 import java.awt.Color;
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
@@ -252,7 +253,7 @@ public class SwingBuffer extends Buffer
     return content.buffer.createPos(index, isAfter);
   }
 
-  public Character get (int index)
+  public Char get (int index)
   {
     return content.buffer.get(index);
   }

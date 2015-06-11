@@ -516,3 +516,5 @@
   (let ((v #f32(3.4 1/2 55)))
     (f32vector-ref v i)))
 
+(define (index-str1 x::string i::int)
+  (x i))

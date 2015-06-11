@@ -155,7 +155,10 @@
   (string-replace! str 5 5 str 3)
   (test-equal "😂abc😂c😂" str)
   (string-replace! str 0 2 "ABC" 1 2)
-  (test-equal "Bbc😂c😂" str))
-
+  (test-equal "Bbc😂c😂" str)
+  (test-equal #\c (str 2))
+  (test-equal #\x1f602 (str 3))
+  (test-equal #\ignorable-char (str 4))
+  (test-equal #\c (str 5)))
 
 (test-end)

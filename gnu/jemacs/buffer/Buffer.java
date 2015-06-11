@@ -10,7 +10,7 @@ import gnu.lists.*;
 import gnu.commonlisp.lang.Symbols; // FIXME
 import gnu.text.Char;
 
-public abstract class Buffer extends AbstractSequence<Character>
+public abstract class Buffer extends AbstractSequence<Char>
     implements CharSeq
 {
   String name;
@@ -118,12 +118,10 @@ public abstract class Buffer extends AbstractSequence<Character>
     getStringContent().getChars(srcBegin, srcEnd, dst, dstBegin);
   }
 
-  /* #ifdef use:java.lang.CharSequence */
-  public CharSequence subSequence(int start, int end)
+  public CharSeq subSequence(int start, int end)
   {
     return getStringContent().subSequence(start, end);
   }
-  /* #endif */
   /* #ifdef JAVA5 */
   /**
    * @see gnu.lists.CharSeq#writeTo(int, int, Appendable)

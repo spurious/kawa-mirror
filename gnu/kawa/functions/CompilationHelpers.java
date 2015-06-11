@@ -95,6 +95,16 @@ public class CompilationHelpers
             result = exp;
           }
         else if (ctype != null
+		 && ctype.isSubclass(Compilation.typeCharSequence)
+                 && nargs == 1)
+          {
+              Method method = ClassType.make("gnu.lists.Strings")
+                  .getDeclaredMethod("characterAt", 2);
+              PrimProcedure prproc =
+                  new PrimProcedure(method, LangPrimType.characterType, null);
+              result = exp.setFuncArgs(prproc, args);
+          }
+        else if (ctype != null
 		 && ctype.isSubclass(Compilation.typeList)
                  && nargs == 1)
           {

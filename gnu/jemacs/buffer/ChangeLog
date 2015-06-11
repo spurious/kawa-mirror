@@ -1,3 +1,7 @@
+2015-06-10  Per Bothner  <per@bothner.com>
+
+	* Buffer.java: Now extends AbstractSequence<Char>.
+
 2015-06-07  Per Bothner  <per@bothner.com>
 
 	* EKeymap.java (defineKey): Handle both Char and Character values.

@@ -3,13 +3,15 @@
 
 package gnu.lists;
 
-/** Editable character sequence using a a buffer-gap implementstion and
+import gnu.text.Char;
+
+/** Editable character sequence using a buffer-gap implementstion and
  * self-adjusting position.
  * Can implement (the text part of) an Emacs buffer, or a
  * javax.swing.text.AbstractDocument.Content
  */
 
-public class CharBuffer extends StableVector<Character>
+public class CharBuffer extends StableVector<Char>
   implements CharSeq, java.io.Serializable
 {
   // Same as super.base but pre-cast to FString.
@@ -183,8 +185,7 @@ public class CharBuffer extends StableVector<Character>
   }
   
 
-  /* #ifdef use:java.lang.CharSequence */
-  public CharSequence subSequence(int start, int end)
+  public CharSeq subSequence(int start, int end)
   {
     int sz = size();
     if (start < 0 || end < start || end > sz)
@@ -193,7 +194,6 @@ public class CharBuffer extends StableVector<Character>
                           base.createPos(start, false),
                           base.createPos(end, true));
   }
-  /* #endif */
 
   public void fill(int fromIndex, int toIndex, char value)
   {

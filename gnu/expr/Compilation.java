@@ -310,6 +310,7 @@ public class Compilation implements SourceLocator
   static public ClassType typeObject = Type.objectType;
   static public ClassType scmBooleanType = ClassType.make("java.lang.Boolean");
   static public ClassType typeString = ClassType.make("java.lang.String");
+  static public ClassType typeCharSequence = ClassType.make("java.lang.CharSequence");
   static public ClassType javaStringType = typeString;
   static public ClassType scmKeywordType = ClassType.make("gnu.expr.Keyword");
   static public ClassType scmSequenceType = ClassType.make("gnu.lists.Sequence");

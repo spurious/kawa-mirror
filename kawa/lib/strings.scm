@@ -142,14 +142,23 @@
 (define (string-fill! str ::abstract-string ch ::character
                       #!optional
                       (start ::int 0)
-                      (end ::int (string-length str)))
+                      (end ::int -1))
   ::void
-  (let ((width ::int (if (> (as int ch) #xffff) 2 1)))
-    (do ((to-do ::int (- end start) (- to-do 1))
-         (pos ::int (java.lang.Character:offsetByCodePoints str 0 start)
-              (+ pos width)))
-        ((<= to-do 0))
-      (str:setCharacterAt pos (as int ch)))))
+  (! cstart ::int (java.lang.Character:offsetByCodePoints str 0 start))
+  (! send (if (>= end 0) end (gnu.lists.Strings:sizeInCodePoints str)))
+  (cond ((? fstr::gnu.lists.FString str)
+         (gnu.lists.FString? str)
+         (let ((cend (if (< end 0) (fstr:length)
+                         (java.lang.Character:offsetByCodePoints str 0 end))))
+           (fstr:delete cstart cend)
+           (fstr:insertRepeated cstart (as int ch) (- send start))))
+        (else
+         ;; Can be O(n^2) if a bad mix of 1-char and 2-char characters.
+         (let ((width ::int (if (> (as int ch) #xffff) 2 1)))
+           (do ((to-do ::int (- send start) (- to-do 1))
+                (pos ::int cstart (+ pos width)))
+               ((<= to-do 0))
+             (str:setCharacterAt pos (as int ch)))))))
 
 (define (string-upcase! str ::abstract-string) ::string
   (gnu.lists.Strings:makeUpperCase str)

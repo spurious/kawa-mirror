@@ -30,7 +30,7 @@ public class Sequences {
             if (object instanceof boolean[])
                 return new BitVector((boolean[]) object).iterator();
             if (object instanceof char[])
-                return new FString((char[]) object).iterator();
+                return new CharVector((char[]) object).iterator();
         }
         // Causes ClassCastException if neither Iterable or otherwise handled.
         return ((Iterable) object).iterator();

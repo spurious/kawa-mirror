@@ -1,7 +1,9 @@
 package gnu.kawa.functions;
 import gnu.expr.Language;
+import gnu.lists.Strings;
 import gnu.mapping.*;
 import gnu.kawa.reflect.Invoke;
+import gnu.text.Char;
 
 /** Implement the standard Scheme function "apply".
  * This has been generalized so that the last (list argument)
@@ -139,6 +141,13 @@ public class ApplyToArgs extends ProcedureN
         if (proc instanceof gnu.bytecode.Type
             || proc instanceof Class) {
             return gnu.kawa.reflect.Invoke.make.applyN(args);
+        }
+        if (proc instanceof CharSequence) {
+            if (args.length != 2)
+                throw new WrongArguments(this, args.length); // FIXME
+            int index = ((Number) Promise.force(args[1])).intValue();
+            return Char.valueOf(Strings.characterAt((CharSequence) proc,
+                                                    index));
         }
         if (proc instanceof java.util.List) {
             if (args.length != 2)

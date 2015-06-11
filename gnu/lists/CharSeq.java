@@ -3,11 +3,13 @@
 
 package gnu.lists;
 
+import gnu.text.Char;
+
 /** A sequence where each element is a character.
  */
 
 public interface CharSeq
-  extends CharSequence, Sequence<Character>
+  extends CharSequence, Sequence<Char>
 {
   /** Get length of string, in characters.
    * Synonym for size(), for compatibility with String and StringBuffer. */
@@ -27,9 +29,7 @@ public interface CharSeq
 
   public void fill(int fromIndex, int toIndex, char value);
 
-  /* #ifdef use:java.lang.CharSequence */
-  public CharSequence subSequence(int start, int end);
-  /* #endif */
+  public CharSeq subSequence(int start, int end);
 
   /* #ifdef JAVA5 */
   /** Append a specified subsequence to an <code>Appendable</code>.

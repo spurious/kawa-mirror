@@ -1,5 +1,9 @@
 2015-06-10  Per Bothner  <per@bothner.com>
 
+	* Compilation.java (typeCharSequence): New static field.
+
+2015-06-10  Per Bothner  <per@bothner.com>
+
 	* FindTailCalls.java (visitApplyExp): Set inlineHome to immediate
 	currentLambda, which fixes a problem with inlining.
 

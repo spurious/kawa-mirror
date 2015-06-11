@@ -109,11 +109,7 @@ public class XDataType extends Type implements TypeValue
 
   public static final XDataType stringType =
     new XDataType("string",
-                  /* #ifdef use:java.lang.CharSequence */
-                  ClassType.make("java.lang.CharSequence"),
-                  /* #else */
-                  // ClassType.make("java.lang.String"),
-                  /* #endif */
+                  Compilation.typeCharSequence,
                   STRING_TYPE_CODE);
 
   /** A value implemented as java.lang.String.

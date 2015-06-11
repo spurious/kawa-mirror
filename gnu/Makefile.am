@@ -80,6 +80,7 @@ JAVAX_SCRIPT_EXTRA = \
   expr/KawaScriptEngine.java
 
 GNU_LISTS_JSOURCES = \
+  lists/AbstractCharVector.java \
   lists/AbstractFormat.java \
   lists/AbstractSequence.java \
   lists/Array.java \
@@ -89,6 +90,7 @@ GNU_LISTS_JSOURCES = \
   lists/ByteVector.java \
   lists/CharBuffer.java \
   lists/CharSeq.java \
+  lists/CharVector.java \
   lists/ConstVector.java \
   lists/Consumer.java \
   lists/ConsumerWriter.java \

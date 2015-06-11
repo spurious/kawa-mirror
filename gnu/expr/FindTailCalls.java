@@ -148,7 +148,7 @@ public class FindTailCalls extends ExpExpVisitor<Expression>
                  && ! effectiveLambda.nestedIn(lexp))
           {
             lexp.returnContinuation = returnContinuation;
-            lexp.inlineHome = effectiveLambda;
+            lexp.inlineHome = currentLambda;
           }
         else
           {

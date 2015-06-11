@@ -1,3 +1,8 @@
+2015-06-10  Per Bothner  <per@bothner.com>
+
+	* FindTailCalls.java (visitApplyExp): Set inlineHome to immediate
+	currentLambda, which fixes a problem with inlining.
+
 2015-06-09  Andrea Bernardini <andrebask@gmail.com>
 
         * Compilation.java: Move again ANormalize pass before InlineCalls.

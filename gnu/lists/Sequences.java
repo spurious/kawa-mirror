@@ -1,8 +1,65 @@
 package gnu.lists;
-import java.util.*;
+
 import gnu.text.Char;
+import java.util.*;
+import java.lang.reflect.Array;
 
 public class Sequences {
+    public static List asSequenceOrNull(Object value) {
+        if (value instanceof List)
+            return (List) value;
+        if (value instanceof CharSequence) {
+            CharSequence cseq = (CharSequence) value;
+            return new SubCharSeq(cseq, 0, cseq.length());
+        }
+        if (value instanceof Object[])
+            return new FVector((Object[]) value);
+        if (value.getClass().isArray()) {
+            if (value instanceof long[])
+                return new S64Vector((long[]) value);
+            if (value instanceof int[])
+                return new S32Vector((int[]) value);
+            if (value instanceof short[])
+                return new S16Vector((short[]) value);
+            if (value instanceof byte[])
+                return new S8Vector((byte[]) value);
+            if (value instanceof double[])
+                return new F64Vector((double[]) value);
+            if (value instanceof float[])
+                return new F32Vector((float[]) value);
+            if (value instanceof boolean[])
+                return new BitVector((boolean[]) value);
+            if (value instanceof char[])
+                return new CharVector((char[]) value);
+        }
+        return null;
+    }
+
+    public static List coerceToSequence(Object value) {
+        List lst = asSequenceOrNull(value);
+        if (lst == null) {
+            String msg;
+            if (value == null)
+                msg = "null is not a sequence";
+            else
+                msg = "cannot cast a "+value.getClass().getName()+" to a sequence";
+            throw new ClassCastException(msg);
+        }
+        return lst;
+    }
+
+    public static int getSize(Object values) {
+        if (values instanceof Object[])
+            return ((Object[]) values).length;
+        else if (values instanceof CharSequence)
+            return ((CharSequence) values).length();
+        else if (values instanceof List<?>)
+            return ((List<?>) values).size();
+        else if (values.getClass().isArray())
+            return Array.getLength(values);
+        else
+            throw new ClassCastException("value is neither List or array");
+    }
 
     /** Get an Iterator for a "sequence-like" object.
      * This handles Iterables, CharSequences, and Java arrays.
@@ -13,24 +70,9 @@ public class Sequences {
         if (object instanceof CharSequence)
             return new CharacterIterator((CharSequence) object);
         if (! (object instanceof Iterable)) {
-            if (object instanceof Object[])
-                return new FVector((Object[]) object).iterator();
-            if (object instanceof long[])
-                return new S64Vector((long[]) object).iterator();
-            if (object instanceof int[])
-                return new S32Vector((int[]) object).iterator();
-            if (object instanceof short[])
-                return new S16Vector((short[]) object).iterator();
-            if (object instanceof byte[])
-                return new S8Vector((byte[]) object).iterator();
-            if (object instanceof double[])
-                return new F64Vector((double[]) object).iterator();
-            if (object instanceof float[])
-                return new F32Vector((float[]) object).iterator();
-            if (object instanceof boolean[])
-                return new BitVector((boolean[]) object).iterator();
-            if (object instanceof char[])
-                return new CharVector((char[]) object).iterator();
+            List list = asSequenceOrNull(object);
+            if (list != null)
+                return list.iterator();
         }
         // Causes ClassCastException if neither Iterable or otherwise handled.
         return ((Iterable) object).iterator();

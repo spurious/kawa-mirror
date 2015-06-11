@@ -1,5 +1,9 @@
 2015-06-11  Per Bothner  <per@bothner.com>
 
+	* lists.scm (lenegth): No handles general sequences.
+	* compile_misc.scm (lengthValidateApply): New function.
+	* string.scm (list->string): Tweak to avoid compilation order issue.
+
 	* strings.scm (string-fill!): Optimize if string is an FString.
 
 2015-06-08  Per Bothner  <per@bothner.com>

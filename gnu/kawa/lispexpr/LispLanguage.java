@@ -257,6 +257,7 @@ public abstract class LispLanguage extends Language
             types.put("vector", LangObjType.vectorType);
             types.put("string", LangObjType.stringType);
             types.put("empty-list", ClassType.make("gnu.lists.EmptyList"));
+            types.put("sequence", LangObjType.sequenceType);
             types.put("list", LangObjType.listType);
             types.put("function", ClassType.make("gnu.mapping.Procedure"));
             types.put("procedure", LangObjType.procedureType);

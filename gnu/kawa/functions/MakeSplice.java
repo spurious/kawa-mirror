@@ -34,16 +34,10 @@ public class MakeSplice extends Procedure1 {
     }
 
     public static int count(Object values) {
-        if (values instanceof Object[])
-            return ((Object[]) values).length;
-        else if (values instanceof CharSequence)
+        if (values instanceof CharSequence)
             return Strings.sizeInCodePoints((CharSequence) values);
-        else if (values instanceof List<?>)
-            return ((List<?>) values).size();
-        else if (values.getClass().isArray())
-            return Array.getLength(values);
         else
-            throw new ClassCastException("value is neither List or array");
+            return Sequences.getSize(values);
     }
 
     public static void copyTo(Object[] target, int start, int size,

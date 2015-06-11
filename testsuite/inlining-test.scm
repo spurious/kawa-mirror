@@ -516,5 +516,12 @@
   (let ((v #f32(3.4 1/2 55)))
     (f32vector-ref v i)))
 
+(define (index-seq q::sequence i::int)
+  (q i))
+
 (define (index-str1 x::string i::int)
   (x i))
+
+(define (index-str2 x::string i::int)
+  (index-seq x i))
+

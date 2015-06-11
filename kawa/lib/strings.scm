@@ -100,7 +100,7 @@
            (loop (make <pair> (string-cursor-ref str prev) result) prev))))))
 
 (define (list->string (lst ::list)) ::string
-  (let* ((len ::int (length lst))
+  (let* ((len ::int (lst:size))
 	 (result ::string (make gnu.lists.FString len)))
     (do ((i ::int 0 (+ i 1)))
 	((>= i len) result)

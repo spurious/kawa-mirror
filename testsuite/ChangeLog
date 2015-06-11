@@ -1,3 +1,8 @@
+2015-06-11  Per Bothner  <per@bothner.com>
+
+	* inlining-test.scm (index-seq, index-str2): New functions.
+	* inlining.expected: Update accordingly.
+
 2015-06-10  Per Bothner  <per@bothner.com>
 
 	* inlining-test.scm (index-str1): New test for string indexing.

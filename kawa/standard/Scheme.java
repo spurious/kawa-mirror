@@ -913,6 +913,9 @@ public class Scheme extends LispLanguage {
       defProcStFld("resolve-uri", "kawa.lib.files");
 
       defAliasStFld("$bracket-list$", "gnu.kawa.lispexpr.LangObjType", "constVectorType");
+      defAliasStFld("sequence", "gnu.kawa.lispexpr.LangObjType", "sequenceType");
+      defAliasStFld("constant-vector",
+                    "gnu.kawa.lispexpr.LangObjType", "constVectorType");
       defAliasStFld("vector", "gnu.kawa.lispexpr.LangObjType", "vectorType");
       defAliasStFld("string", "gnu.kawa.lispexpr.LangObjType", "stringType");
       defAliasStFld("list", "gnu.kawa.lispexpr.LangObjType", "listType");

@@ -1,3 +1,7 @@
+2015-06-11  Per Bothner  <per@bothner.com>
+
+	* MakeSplice.java (count): Simplify by using Sequences.getSize.
+
 2015-06-10  Per Bothner  <per@bothner.com>
 
 	* ApplyToArgs.java (applyN): Handle indexing CharSequence.

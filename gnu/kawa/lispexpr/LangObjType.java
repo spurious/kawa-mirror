@@ -13,6 +13,7 @@ import gnu.kawa.reflect.CompileInvoke;
 import gnu.kawa.reflect.Invoke;
 import gnu.kawa.reflect.LazyType;
 import gnu.lists.Blob;
+import gnu.lists.Sequences;
 import gnu.lists.U8Vector;
 import java.util.*;
 
@@ -52,6 +53,7 @@ public class LangObjType extends SpecialObjectType implements TypeValue
   private static final int F64VECTOR_TYPE_CODE = 26;
   private static final int PROCEDURE_TYPE_CODE = 27;
   private static final int PROMISE_TYPE_CODE = 28;
+  private static final int SEQUENCE_TYPE_CODE = 29;
 
   public static final LangObjType pathType =
     new LangObjType("path", "gnu.kawa.io.Path",
@@ -164,6 +166,10 @@ public class LangObjType extends SpecialObjectType implements TypeValue
     new LangObjType("promise", "gnu.mapping.Lazy",
                     PROMISE_TYPE_CODE);
 
+  public static final LangObjType sequenceType =
+    new LangObjType("sequence", "java.util.List",
+                    SEQUENCE_TYPE_CODE);
+
     LangObjType(String name, String implClass, int typeCode) {
         super(name, ClassType.make(implClass));
         this.typeCode = typeCode;
@@ -171,6 +177,13 @@ public class LangObjType extends SpecialObjectType implements TypeValue
 
     @Override
     public int isCompatibleWithValue(Type valueType) {
+        switch (typeCode) {
+        case SEQUENCE_TYPE_CODE:
+            if (valueType instanceof ArrayType)
+                return 1;
+            if (stringType.isCompatibleWithValue(valueType) > 0)
+                return 1;
+        }
         return getImplementationType().isCompatibleWithValue(valueType);
     }
 
@@ -204,6 +217,10 @@ public class LangObjType extends SpecialObjectType implements TypeValue
         if (other == typeClassType)
           return 1;
         break;
+      case SEQUENCE_TYPE_CODE:
+          if (other instanceof ArrayType
+              || isCompatibleWithValue(stringType, other) > 0)
+          return 1;
       }
     return getImplementationType().compare(other);
   }
@@ -430,6 +447,8 @@ public class LangObjType extends SpecialObjectType implements TypeValue
       case LIST_TYPE_CODE:
       case REGEX_TYPE_CODE:
         return null;
+      case SEQUENCE_TYPE_CODE:
+        return ClassType.make("gnu.lists.Sequences").getDeclaredMethod("coerceToSequence", 1);
       default:
         Procedure cons = getConstructor();
         if (cons == null)
@@ -488,6 +507,10 @@ public class LangObjType extends SpecialObjectType implements TypeValue
       case INTEGER_TYPE_CODE:
         methodDeclaringClass = implementationType;
         mname = "asIntNumOrNull";
+        break;
+      case SEQUENCE_TYPE_CODE:
+        methodDeclaringClass = ClassType.make("gnu.lists.Sequences");
+        mname = "asSequenceOrNull";
         break;
       default:
         return null;
@@ -552,6 +575,8 @@ public class LangObjType extends SpecialObjectType implements TypeValue
         return coerceIntNum(obj);
       case DFLONUM_TYPE_CODE:
         return coerceDFloNum(obj);
+      case SEQUENCE_TYPE_CODE:
+          return Sequences.coerceToSequence(obj);
       case VECTOR_TYPE_CODE:
       case CONST_VECTOR_TYPE_CODE:
       case S8VECTOR_TYPE_CODE:
@@ -732,9 +757,10 @@ public class LangObjType extends SpecialObjectType implements TypeValue
       }
   }
 
-    /* #ifndef JAVA8 */
-    public String encodeType(Language language) { return null; }
-    /* #endif */
+    public String encodeType(Language language) {
+        if (this == sequenceType) return "sequence";
+        return null;
+    }
 
     public Type getElementType() {
         switch (typeCode) {

@@ -92,8 +92,9 @@
 (define-cxr cdddar (cdr cdr cdr car))
 (define-cxr cddddr (cdr cdr cdr cdr))
 
-(define (length list :: <list>) :: <int>
-  (invoke-static <list> 'length list))
+(define (length list ::sequence) :: int
+  validate-apply: "kawa.lib.compile_misc:lengthValidateApply"
+  (list:size))
 
 (define (reverse (list :: <list>)) :: <list>
   (let loop ((arg list) (result '()))

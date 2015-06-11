@@ -153,3 +153,15 @@
   (ae:compile comp target)
   #t)
 
+(define-validate lengthValidateApply (exp required proc)
+  ((exp:isSimple 1 1)
+   (let* ((arg (exp:getArg 0))
+          (atype (arg:getType)))
+     (cond ((atype:isSubtype (Type:make java.util.List))
+            (apply-exp invoke arg 'size))
+           ((atype:isSubtype (Type:make java.lang.CharSequence))
+            (apply-exp invoke arg 'length))
+           ((gnu.bytecode.ArrayType? atype)
+            (apply-exp field arg 'length))
+           (else
+            (apply-exp gnu.lists.Sequences:getSize arg))))))

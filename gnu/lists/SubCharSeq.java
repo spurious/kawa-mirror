@@ -1,10 +1,11 @@
 package gnu.lists;
 
-import java.util.*;
 import gnu.text.Char;
+import java.io.*;
+import java.util.*;
 
 public class SubCharSeq extends AbstractSequence<Char>
-    implements CharSeq, RandomAccess
+    implements CharSeq, RandomAccess, Externalizable
 {
     CharSequence base;
     int start;
@@ -107,4 +108,18 @@ public class SubCharSeq extends AbstractSequence<Char>
     public CharSeq subSequence(int start, int end) {
         return subCharSeq(start, end);
     }
+
+    public void writeExternal(ObjectOutput out) throws IOException {
+        out.writeObject(base);
+        out.writeInt(start);
+        out.writeInt(end);
+    }
+    public void readExternal(ObjectInput in)
+        throws IOException, ClassNotFoundException {
+        base = (CharSequence) in.readObject();
+        start = in.readInt();
+        end = in.readInt();
+    }
+
+
 }

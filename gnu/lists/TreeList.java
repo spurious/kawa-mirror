@@ -1566,6 +1566,7 @@ public class TreeList extends AbstractSequence<Object>
       case DOUBLE_FOLLOWS:
 	return Sequence.DOUBLE_VALUE;
       case CHAR_FOLLOWS:
+        return Sequence.CHAR_VALUE;
       case BEGIN_DOCUMENT:
 	return Sequence.DOCUMENT_VALUE;
       case BEGIN_ENTITY:

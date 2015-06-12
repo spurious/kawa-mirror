@@ -1,7 +1,7 @@
 2015-06-12  Per Bothner  <per@bothner.com>
 
 	* ApplyToArgs.java (applyN): Allowing indexing of a sequence
-	using a sequence of integers.
+	or a string using a sequence of integers.
 	* CompilationHelpers.java (validateApplyToArgs): Likewise.
 
 2015-06-11  Per Bothner  <per@bothner.com>

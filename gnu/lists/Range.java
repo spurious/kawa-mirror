@@ -28,6 +28,8 @@ public class Range<E> extends AbstractSequence implements Sequence {
     @Override
     public int size() { return size; }
 
+    boolean isUnbounded() { return size == -1; }
+
     public static class IntRange extends Range<Integer>
     implements IntSequence {
         int istart;

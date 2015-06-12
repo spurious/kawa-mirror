@@ -1,5 +1,8 @@
 2015-06-12  Per Bothner  <per@bothner.com>
 
+	* Strings.java (indirectIndexed): New method.
+	* Range.java (isUnbounded): New method.
+
 	* IndirectIndexedSeq.java: New class.
 	* S32Vector.java: Also implement IntSequence.
 	* Sequences.java (asIntSequenceOrNull): New method.

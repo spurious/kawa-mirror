@@ -76,6 +76,7 @@ public class CompilationHelpers
                 ? ((ParameterizedType) ptype).getRawType()
                 : null;
             ApplyExp result = null;
+            boolean isString;
             if (CompileReflect.checkKnownClass(ptype, comp) < 0)
                 ; // This might be more cleanly handled at the type specifier. FIXME
             else if (ptype.isSubtype(Compilation.typeType)
@@ -86,15 +87,8 @@ public class CompilationHelpers
                 exp.setFuncArgs(new ArrayGet(elementType), args);
                 result = exp;
             } else if (ctype != null
-                     && ctype.isSubclass(Compilation.typeCharSequence)
-                     && nargs == 1) {
-                Method method = ClassType.make("gnu.lists.Strings")
-                    .getDeclaredMethod("characterAt", 2);
-                PrimProcedure prproc =
-                    new PrimProcedure(method, LangPrimType.characterType, null);
-                result = exp.setFuncArgs(prproc, args);
-            } else if (ctype != null
-                       && ctype.isSubclass(Compilation.typeList)
+                       && ((isString = ctype.isSubclass(Compilation.typeCharSequence))
+                           || ctype.isSubclass(Compilation.typeList))
                        && nargs == 1) {
                 Type itype = args[1].getType();
                 int listIndexCompat = LangObjType.sequenceType
@@ -106,6 +100,13 @@ public class CompilationHelpers
                         .error('w', "index is neither integer or sequence");
                 else if (listIndexCompat > 0) {
                     // maybe optimize later
+                } else if (intIndexCompat > 0 & isString) {
+                    Method method = ClassType.make("gnu.lists.Strings")
+                        .getDeclaredMethod("characterAt", 2);
+                    PrimProcedure prproc =
+                        new PrimProcedure(method, LangPrimType.characterType,
+                                          null);
+                    result = exp.setFuncArgs(prproc, args);
                 } else if (intIndexCompat > 0) {
                     String mname = "get";
                     Type retType = null;

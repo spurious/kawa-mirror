@@ -147,9 +147,15 @@ public class ApplyToArgs extends ProcedureN
         if (proc instanceof CharSequence) {
             if (args.length != 2)
                 throw new WrongArguments(this, args.length); // FIXME
-            int index = ((Number) Promise.force(args[1])).intValue();
-            return Char.valueOf(Strings.characterAt((CharSequence) proc,
-                                                    index));
+            Object index = Promise.force(args[1]);
+            IntSequence indexes = Sequences.asIntSequenceOrNull(index);
+            CharSequence str = (CharSequence) proc;
+            if (indexes != null) {
+                return Strings.indirectIndexed(str, indexes);
+            } else {
+                int iindex = ((Number) index).intValue();
+                return Char.valueOf(Strings.characterAt(str, iindex));
+            }
         }
         if (proc instanceof List) {
             if (args.length != 2)

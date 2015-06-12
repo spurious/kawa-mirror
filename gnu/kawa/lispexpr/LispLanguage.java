@@ -327,53 +327,9 @@ public abstract class LispLanguage extends Language
         /* #endif */
         if ("java.lang.String".equals(name))
             return Type.toStringType;
-        if ("gnu.math.IntNum".equals(name))
-            return LangObjType.integerType;
-        if ("gnu.math.DFloNum".equals(name))
-            return LangObjType.dflonumType;
-        if ("gnu.math.RatNum".equals(name))
-            return LangObjType.rationalType;
-        if ("gnu.math.RealNum".equals(name))
-            return LangObjType.realType;
-        if ("gnu.math.Numeric".equals(name))
-            return LangObjType.numericType;
-        if ("gnu.lists.FVector".equals(name))
-            return LangObjType.vectorType;
-        if ("gnu.lists.LList".equals(name))
-            return LangObjType.listType;
-        if ("gnu.kawa.io.Path".equals(name))
-            return LangObjType.pathType;
-        if ("gnu.kawa.io.URIPath".equals(name))
-            return LangObjType.URIType;
-        if ("gnu.kawa.io.FilePath".equals(name))
-            return LangObjType.filepathType;
-        if ("java.lang.Class".equals(name))
-            return LangObjType.typeClass;
-        if ("gnu.bytecode.Type".equals(name))
-            return LangObjType.typeType;
-        if ("gnu.bytecode.ClassType".equals(name))
-            return LangObjType.typeClassType;
-        if ("gnu.lists.F64Vector".equals(name))
-            return LangObjType.f64vectorType;
-        if ("gnu.lists.F32Vector".equals(name))
-            return LangObjType.f32vectorType;
-        if ("gnu.lists.S64Vector".equals(name))
-            return LangObjType.s64vectorType;
-        if ("gnu.lists.S32Vector".equals(name))
-            return LangObjType.s32vectorType;
-        if ("gnu.lists.S16Vector".equals(name))
-            return LangObjType.s16vectorType;
-        if ("gnu.lists.S8Vector".equals(name))
-            return LangObjType.s8vectorType;
-        if ("gnu.lists.U64Vector".equals(name))
-            return LangObjType.u64vectorType;
-        if ("gnu.lists.U32Vector".equals(name))
-            return LangObjType.u32vectorType;
-        if ("gnu.lists.U16Vector".equals(name))
-            return LangObjType.u16vectorType;
-        if ("gnu.lists.U8Vector".equals(name))
-            return LangObjType.u8vectorType;
+        Type t = LangObjType.getInstanceFromClass(name);
+        if (t != null)
+            return t;
         return super.getTypeFor(clas);
     }
-
 }

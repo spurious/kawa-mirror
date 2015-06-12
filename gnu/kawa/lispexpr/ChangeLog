@@ -1,7 +1,12 @@
 2015-06-11  Per Bothner  <per@bothner.com>
 
+	* LangObjType.java (getInstanceFromClass): New static method.
+	(elementGetterMethodName, elementSetterMethodName): New methods.
+	* LispLanguage.java (getTypeFor): Use getInstanceFromClass.
+
 	* LangObjType.java (sequenceType): New "sequence" type, implemented
 	as java.util.List.
+
 	* LispLanguage.java (getTYpeMap): Add binding for "sequence".
 
 2015-06-08  Per Bothner  <per@bothner.com>

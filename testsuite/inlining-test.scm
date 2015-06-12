@@ -516,6 +516,12 @@
   (let ((v #f32(3.4 1/2 55)))
     (f32vector-ref v i)))
 
+(define (set-u8vector1 v::u8vector i::int x::long)
+  (u8vector-set! v i x))
+
+(define (set-u8vector2 v::u8vector i::int x::long)
+  (set! (v i) x))
+
 (define (index-seq q::sequence i::int)
   (q i))
 

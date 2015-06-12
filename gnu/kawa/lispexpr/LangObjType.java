@@ -175,6 +175,56 @@ public class LangObjType extends SpecialObjectType implements TypeValue
         this.typeCode = typeCode;
     }
 
+    public static LangObjType getInstanceFromClass(String name) {
+        if ("gnu.math.IntNum".equals(name))
+            return LangObjType.integerType;
+        if ("gnu.math.DFloNum".equals(name))
+            return LangObjType.dflonumType;
+        if ("gnu.math.RatNum".equals(name))
+            return LangObjType.rationalType;
+        if ("gnu.math.RealNum".equals(name))
+            return LangObjType.realType;
+        if ("gnu.math.Numeric".equals(name))
+            return LangObjType.numericType;
+        if ("gnu.lists.FVector".equals(name))
+            return LangObjType.vectorType;
+        if ("gnu.lists.LList".equals(name))
+            return LangObjType.listType;
+        if ("gnu.kawa.io.Path".equals(name))
+            return LangObjType.pathType;
+        if ("gnu.kawa.io.URIPath".equals(name))
+            return LangObjType.URIType;
+        if ("gnu.kawa.io.FilePath".equals(name))
+            return LangObjType.filepathType;
+        if ("java.lang.Class".equals(name))
+            return LangObjType.typeClass;
+        if ("gnu.bytecode.Type".equals(name))
+            return LangObjType.typeType;
+        if ("gnu.bytecode.ClassType".equals(name))
+            return LangObjType.typeClassType;
+        if ("gnu.lists.F64Vector".equals(name))
+            return LangObjType.f64vectorType;
+        if ("gnu.lists.F32Vector".equals(name))
+            return LangObjType.f32vectorType;
+        if ("gnu.lists.S64Vector".equals(name))
+            return LangObjType.s64vectorType;
+        if ("gnu.lists.S32Vector".equals(name))
+            return LangObjType.s32vectorType;
+        if ("gnu.lists.S16Vector".equals(name))
+            return LangObjType.s16vectorType;
+        if ("gnu.lists.S8Vector".equals(name))
+            return LangObjType.s8vectorType;
+        if ("gnu.lists.U64Vector".equals(name))
+            return LangObjType.u64vectorType;
+        if ("gnu.lists.U32Vector".equals(name))
+            return LangObjType.u32vectorType;
+        if ("gnu.lists.U16Vector".equals(name))
+            return LangObjType.u16vectorType;
+        if ("gnu.lists.U8Vector".equals(name))
+            return LangObjType.u8vectorType;
+        return null;
+    }
+
     @Override
     public int isCompatibleWithValue(Type valueType) {
         switch (typeCode) {
@@ -776,6 +826,36 @@ public class LangObjType extends SpecialObjectType implements TypeValue
         case F64VECTOR_TYPE_CODE: return LangPrimType.doubleType; 
         }
         return null;
+    }
+
+    public String elementGetterMethodName() {
+        switch (typeCode) {
+        case S8VECTOR_TYPE_CODE:
+        case U8VECTOR_TYPE_CODE:
+            return "byteAt";
+        case S16VECTOR_TYPE_CODE:
+        case U16VECTOR_TYPE_CODE:
+            return "shortAt";
+        case S32VECTOR_TYPE_CODE:
+        case U32VECTOR_TYPE_CODE:
+            return "intAt";
+        case S64VECTOR_TYPE_CODE:
+        case U64VECTOR_TYPE_CODE:
+            return "longAt";
+        case F32VECTOR_TYPE_CODE:
+            return "floatAt";
+        case F64VECTOR_TYPE_CODE:
+            return "doubleAt";
+        }
+        return null;
+    }
+
+    public String elementSetterMethodName() {
+         String gname = elementGetterMethodName();
+         if (gname == null)
+             return null;
+         return "set" + Character.toUpperCase(gname.charAt(0))
+             + gname.substring(1);
     }
 
     public static final ClassType typeLangObjType =

@@ -1,5 +1,9 @@
 2015-06-11  Per Bothner  <per@bothner.com>
 
+	* inlining-test.scm: Tests for setting of uniform vectors.
+	* inlining.expected: Update accordingly.
+	* Makefile.am: Update accordingly.
+
 	* inlining-test.scm (index-seq, index-str2): New functions.
 	* inlining.expected: Update accordingly.
 

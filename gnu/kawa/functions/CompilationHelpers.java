@@ -8,6 +8,7 @@ import gnu.kawa.reflect.Invoke;
 import gnu.kawa.reflect.ArrayGet;
 import gnu.kawa.reflect.ArraySet;
 import gnu.kawa.reflect.LazyType;
+import gnu.kawa.lispexpr.LangObjType;
 import gnu.math.*;
 import gnu.text.Char;
 
@@ -111,56 +112,11 @@ public class CompilationHelpers
             String mname = "get";
             Type retType = null;
             String cname = ctype.getName();
-            if (cname.startsWith("gnu.lists.")) {
-                switch (cname.charAt(10)) {
-                case 'U':
-                    if ("gnu.lists.U64Vector".equals(cname)) {
-                        mname = "longAt";
-                        retType = LangPrimType.unsignedLongType;
-                    }
-                    else if ("gnu.lists.U32Vector".equals(cname)) {
-                        mname = "intAt";
-                        retType = LangPrimType.unsignedIntType;
-                    }
-                    else if ("gnu.lists.U16Vector".equals(cname)) {
-                        mname = "shortAt";
-                        retType = LangPrimType.unsignedShortType;
-                    }
-                    else if ("gnu.lists.U8Vector".equals(cname)) {
-                        mname = "byteAt";
-                        retType = LangPrimType.unsignedByteType;
-                    }
-                    break;
-                case 'S':
-                    if ("gnu.lists.S64Vector".equals(cname)) {
-                        mname = "longAt";
-                        retType = LangPrimType.longType;
-                    }
-                    else if ("gnu.lists.S32Vector".equals(cname)) {
-                        mname = "intAt";
-                        retType = LangPrimType.intType;
-                    }
-                    else if ("gnu.lists.S16Vector".equals(cname)) {
-                        mname = "shortAt";
-                        retType = LangPrimType.shortType;
-                    }
-                    else if ("gnu.lists.S8Vector".equals(cname)) {
-                        mname = "byteAt";
-                        retType = LangPrimType.byteType;
-                    }
-                    break;
-                case 'F':
-                    if ("gnu.lists.F64Vector".equals(cname)) {
-                        mname = "doubleAt";
-                        retType = LangPrimType.doubleType;
-                    }
-                    else if ("gnu.lists.F32Vector".equals(cname)) {
-                        mname = "floatAt";
-                        retType = LangPrimType.floatType;
-                    }
-                    break;
-                }
-            }
+            LangObjType ltype = null;
+            if (cname.startsWith("gnu.lists."))
+                ltype = LangObjType.getInstanceFromClass(cname);
+            if (ltype != null && (retType = ltype.getElementType()) != null)
+                mname = ltype.elementGetterMethodName();
             
             // We search for a "get(int)" method, rather than just using
             // typeList.getDeclaredMethod("get", 1) to see if we make a
@@ -203,13 +159,14 @@ public class CompilationHelpers
           {
             return new SetArrayExp(arg, (ArrayType) argType);
           }
-        if (argType instanceof ClassType
-            && (ctype = (ClassType) argType).isSubclass(Compilation.typeList))
+        Type implType = argType.getImplementationType();
+        if (implType instanceof ClassType
+            && ((ClassType) implType).isSubclass(Compilation.typeList))
           {
             if (exp instanceof SetListExp)
               return exp;
             else
-              return new SetListExp(exp.getFunction(), args);
+              return new SetListExp(exp.getFunction(), (ObjectType) argType, args);
           }
         if (arg instanceof ReferenceExp)
           {
@@ -305,9 +262,11 @@ class SetArrayExp extends ApplyExp
 
 class SetListExp extends ApplyExp
 {
-  public SetListExp (Expression func, Expression[] args)
+  ObjectType funcType;
+  public SetListExp (Expression func, ObjectType funcType, Expression[] args)
   {
     super(func, args);
+    this.funcType = funcType;
   }
 
   public Expression validateApply (ApplyExp exp, InlineCalls visitor,
@@ -318,13 +277,26 @@ class SetListExp extends ApplyExp
     if (args.length == 2)
       {
         Expression[] xargs = new Expression[4];
+        Expression value = args[1];
+        if (funcType instanceof LangObjType) {
+            LangObjType ltype = (LangObjType) funcType;
+            Type elementType = ltype.getElementType();
+            if (elementType != null) {
+                String mname = ltype.elementSetterMethodName();
+                Type[] atypes = { Type.intType, elementType.getImplementationType() };
+                Method setter = ltype.getMethod(mname, atypes);
+                PrimProcedure prproc =
+                    new PrimProcedure(setter, Type.voidType,
+                                      new Type[]{ Type.intType, elementType } );
+                return visitor.visit(new ApplyExp(prproc, this.getArgs()[0], args[0], args[1]),
+                                     required);
+            }
+        }
         xargs[0] = this.getArgs()[0];
         xargs[1] = QuoteExp.getInstance("set");
         xargs[2] = Compilation.makeCoercion(args[0], Type.intType);
-        xargs[3] = args[1];
-        Expression set
-          = visitor.visitApplyOnly(new ApplyExp(Invoke.invoke, xargs), required);
-        return Compilation.makeCoercion(set, Type.voidType);
+        xargs[3] = value;
+        return visitor.visit(Compilation.makeCoercion(new ApplyExp(Invoke.invoke, xargs), Type.voidType), required);
       }
     return exp;
   }

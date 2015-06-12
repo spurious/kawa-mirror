@@ -3,6 +3,8 @@ import gnu.expr.Language;
 import gnu.lists.Strings;
 import gnu.mapping.*;
 import gnu.kawa.reflect.Invoke;
+import gnu.lists.*;
+import java.util.List;
 import gnu.text.Char;
 
 /** Implement the standard Scheme function "apply".
@@ -149,11 +151,19 @@ public class ApplyToArgs extends ProcedureN
             return Char.valueOf(Strings.characterAt((CharSequence) proc,
                                                     index));
         }
-        if (proc instanceof java.util.List) {
+        if (proc instanceof List) {
             if (args.length != 2)
                 throw new WrongArguments(this, args.length); // FIXME
-            int index = ((Number) Promise.force(args[1])).intValue();
-            return ((java.util.List) proc).get(index);
+            List lst = (List) proc;
+            Object arg1 = Promise.force(args[1]);
+            IntSequence indexes = Sequences.asIntSequenceOrNull(arg1);
+            if (indexes != null) {
+                return new IndirectIndexedSeq(lst, indexes);
+            } else {
+                int index = ((Number) arg1).intValue();
+                return lst.get(index);
+
+            }
         }
         if (proc instanceof gnu.lists.Array) {
             return ArrayRef.arrayRef.applyN(args);

@@ -6,7 +6,7 @@ import java.io.*;
 
 /** Simple adjustable-length vector of signed 32-bit integers (ints). */
 
-public class S32Vector extends IntVector<Integer>
+public class S32Vector extends IntVector<Integer> implements IntSequence
 {
   public S32Vector ()
   {

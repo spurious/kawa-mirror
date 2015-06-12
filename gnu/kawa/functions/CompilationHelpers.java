@@ -96,26 +96,42 @@ public class CompilationHelpers
             } else if (ctype != null
                        && ctype.isSubclass(Compilation.typeList)
                        && nargs == 1) {
-                String mname = "get";
-                Type retType = null;
-                String cname = ctype.getName();
-                LangObjType ltype = null;
-                if (cname.startsWith("gnu.lists."))
-                    ltype = LangObjType.getInstanceFromClass(cname);
-                if (ltype != null && (retType = ltype.getElementType()) != null)
-                    mname = ltype.elementGetterMethodName();
+                Type itype = args[1].getType();
+                int listIndexCompat = LangObjType.sequenceType
+                    .isCompatibleWithValue(itype);
+                int intIndexCompat = Type.intType
+                    .isCompatibleWithValue(itype);
+                if (listIndexCompat < 0 && intIndexCompat < 0)
+                    visitor.getCompilation()
+                        .error('w', "index is neither integer or sequence");
+                else if (listIndexCompat > 0) {
+                    // maybe optimize later
+                } else if (intIndexCompat > 0) {
+                    String mname = "get";
+                    Type retType = null;
+                    String cname = ctype.getName();
+                    LangObjType ltype = null;
+                    if (cname.startsWith("gnu.lists."))
+                        ltype = LangObjType.getInstanceFromClass(cname);
+                    if (ltype != null
+                        && (retType = ltype.getElementType()) != null)
+                        mname = ltype.elementGetterMethodName();
             
-                // We search for a "get(int)" method, rather than just using
-                // typeList.getDeclaredMethod("get", 1) to see if we make a
-                // a virtual call rather than an interface call.
-                Method get = ctype.getMethod(mname, new Type[] { Type.intType  });
-                ParameterizedType prtype = ptype instanceof ParameterizedType ?
-                    ((ParameterizedType) ptype) : null;
-                PrimProcedure prproc =
-                    new PrimProcedure(get, 'V', language, prtype);
-                if (retType != null)
-                    prproc.setReturnType(retType);
-                result = exp.setFuncArgs(prproc, args);
+                    // We search for a "get(int)" method, rather than just using
+                    // typeList.getDeclaredMethod("get", 1) to see if we make a
+                    // a virtual call rather than an interface call.
+                    Method get = ctype
+                        .getMethod(mname, new Type[] { Type.intType  });
+                    ParameterizedType prtype =
+                        ptype instanceof ParameterizedType ?
+                        ((ParameterizedType) ptype) :
+                        null;
+                    PrimProcedure prproc =
+                        new PrimProcedure(get, 'V', language, prtype);
+                    if (retType != null)
+                        prproc.setReturnType(retType);
+                    result = exp.setFuncArgs(prproc, args);
+                }
             }
             if (result != null) {
                 result.setLine(exp);

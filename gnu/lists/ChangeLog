@@ -1,5 +1,9 @@
 2015-06-12  Per Bothner  <per@bothner.com>
 
+	* IndirectIndexedSeq.java: New class.
+	* S32Vector.java: Also implement IntSequence.
+	* Sequences.java (asIntSequenceOrNull): New method.
+
 	* Range.java (IntRange.getStepInt): New method.
 	(valueOfUnbounded, valueOfLT, valueOfLE, valueOfGT, valueOfGE):
 	New factory methods.

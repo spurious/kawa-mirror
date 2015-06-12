@@ -35,6 +35,21 @@ public class Sequences {
         return null;
     }
 
+    public static IntSequence asIntSequenceOrNull(Object value) {
+        List lst = asSequenceOrNull(value);
+        if (lst == null)
+            return null;
+        if (lst instanceof IntSequence)
+            return (IntSequence) lst;
+        int len = lst.size();
+        int[] arr = new int[len];
+        int i = 0;
+        for (Object el : lst) {
+            arr[i++] = ((Number) el).intValue();
+        }
+        return new S32Vector(arr);
+    }
+
     public static List coerceToSequence(Object value) {
         List lst = asSequenceOrNull(value);
         if (lst == null) {

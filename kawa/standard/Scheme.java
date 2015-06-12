@@ -126,6 +126,7 @@ public class Scheme extends LispLanguage {
 
       defSntxStFld("lambda", "kawa.standard.SchemeCompilation", "lambda");
       defSntxStFld("$bracket-apply$", "gnu.kawa.lispexpr.BracketApply", "instance");
+      defSntxStFld("$bracket-list$", "kawa.lib.syntax");
       defSntxStFld("$string$", "kawa.lib.syntax");
       defSntxStFld("$string-with-default-format$", "kawa.lib.syntax");
       defSntxStFld("$format$", "kawa.lib.syntax");
@@ -912,7 +913,6 @@ public class Scheme extends LispLanguage {
       defAliasStFld("URI", "gnu.kawa.lispexpr.LangObjType", "URIType");
       defProcStFld("resolve-uri", "kawa.lib.files");
 
-      defAliasStFld("$bracket-list$", "gnu.kawa.lispexpr.LangObjType", "constVectorType");
       defAliasStFld("sequence", "gnu.kawa.lispexpr.LangObjType", "sequenceType");
       defAliasStFld("constant-vector",
                     "gnu.kawa.lispexpr.LangObjType", "constVectorType");

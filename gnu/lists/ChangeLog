@@ -1,3 +1,9 @@
+2015-06-12  Per Bothner  <per@bothner.com>
+
+	* Range.java (IntRange.getStepInt): New method.
+	(valueOfUnbounded, valueOfLT, valueOfLE, valueOfGT, valueOfGE):
+	New factory methods.
+
 2015-06-11  Per Bothner  <per@bothner.com>
 
 	* Sequences.java (asSequenceOrNull, coerceToSequence, getSize):

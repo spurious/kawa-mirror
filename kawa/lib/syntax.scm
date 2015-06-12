@@ -2,7 +2,7 @@
 	       begin-for-syntax define-for-syntax
                when unless try-finally synchronized
                let-values let*-values case-lambda define-values
-               define-alias-parameter
+               define-alias-parameter $bracket-list$
                $string$ $string-with-default-format$ $format$ $sprintf$
                $string-with-delimiter-marks$ define-simple-constructor)
 
@@ -275,6 +275,15 @@
   (syntax-rules ()
     ((_ fmt . args)
      (gnu.kawa.functions.Format:sprintfToString fmt . args))))
+
+(define-syntax $bracket-list$
+  (syntax-rules (<: <=: >: >=:)
+    ((_ x <: y) (invoke-static gnu.lists.Range 'valueOfLT x y))
+    ((_ x <=: y) (invoke-static gnu.lists.Range 'valueOfLE x y))
+    ((_ x >: y) (invoke-static gnu.lists.Range 'valueOfGT x y))
+    ((_ x >=: y) (invoke-static gnu.lists.Range 'valueOfGE x y))
+    ((_ x <:) (invoke-static gnu.lists.Range 'valueOfUnbounded x))
+    ((_ . args) (constant-vector . args))))
 
 (cond-expand
  (kawa

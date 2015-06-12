@@ -2,6 +2,7 @@ package gnu.lists;
 
 import gnu.kawa.functions.AddOp;
 import gnu.kawa.functions.MultiplyOp;
+import gnu.math.IntNum;
 
 public class Range<E> extends AbstractSequence implements Sequence {
     E start;
@@ -45,6 +46,7 @@ public class Range<E> extends AbstractSequence implements Sequence {
         }
 
         public int getStartInt() { return istart; }
+        public int getStepInt() { return istep; }
 
         public int intAt(int index) {
             if (index >= size && size >= 0)
@@ -66,5 +68,72 @@ public class Range<E> extends AbstractSequence implements Sequence {
         for (Object x : r) {
             System.err.println("["+(i++)+"]: "+r);
         }
+    }
+
+   public static Range<?> valueOfUnbounded(Object start) {
+        return new Range<Object>(start, IntNum.one(), -1);
+    }
+
+    public static Range<?> valueOfLT(Object start, Object end) {
+        IntNum iistart = IntNum.asIntNumOrNull(start);
+        IntNum iiend = IntNum.asIntNumOrNull(end);
+        if (iistart != null && iiend != null
+            && iistart.inIntRange() && iiend.inIntRange()) {
+            int istart = iistart.intValue();
+            int iend = iiend.intValue();
+            if (iend >= istart)
+                return new IntRange(istart, 1, iend-istart);
+        } else {
+            int size = ((Number) AddOp.$Mn(end, start)).intValue();
+            if (size >= 0)
+                return new Range<Object>(start, IntNum.one(), size);
+        }
+        throw new IndexOutOfBoundsException("start index "+start+" is greater than end index "+end);
+    }
+
+    public static Range<?> valueOfLE(Object start, Object end) {
+        IntNum iistart = IntNum.asIntNumOrNull(start);
+        IntNum iiend = IntNum.asIntNumOrNull(end);
+        if (iistart != null && iiend != null
+            && iistart.inIntRange() && iiend.inIntRange()
+            && iiend.intValue() != Integer.MAX_VALUE) {
+            int istart = iistart.intValue();
+            int iend = iiend.intValue() + 1;
+            if (iend >= istart)
+                return new IntRange(istart, 1, iend-istart);
+        } else {
+            int size = ((Number) AddOp.$Mn(end, start)).intValue() + 1;
+            if (size >= 0)
+                return new Range<Object>(start, IntNum.one(), size);
+        }
+        throw new IndexOutOfBoundsException("size (end-start+1 or "+end+"-"+start+"+1) is negative");
+    }
+
+    public static Range<?> valueOfGT(Object start, Object end) {
+        if (start instanceof Integer && end instanceof Integer) {
+            int istart = (Integer) start;
+            int iend = (Integer) end;
+            if (iend <= istart)
+                return new IntRange(istart, -1, iend-istart);
+        } else {
+            int size = ((Number) AddOp.$Mn(start, end)).intValue();
+            if (size >= 0)
+                return new Range<Object>(start, IntNum.minusOne(), size);
+        }
+        throw new IndexOutOfBoundsException("start index "+start+" is less than end index "+end);
+    }
+
+    public static Range<?> valueOfGE(Object start, Object end) {
+        if (start instanceof Integer && end instanceof Integer) {
+            int istart = (Integer) start;
+            int iend = (Integer) end;
+            if (iend <= istart)
+                return new IntRange(istart, -1, iend-istart+1);
+        } else {
+            int size = ((Number) AddOp.$Mn(start, end)).intValue() + 1;
+            if (size >= 0)
+                return new Range<Object>(start, IntNum.minusOne(), size);
+        }
+        throw new IndexOutOfBoundsException("size (start-end+1 or "+start+"-"+end+"+1) is negative");
     }
 }

@@ -5,7 +5,7 @@ package gnu.lists;
 
 import gnu.text.Char;
 
-/** Editable character sequence using a buffer-gap implementstion and
+/** Editable character sequence using a buffer-gap implementation and
  * self-adjusting position.
  * Can implement (the text part of) an Emacs buffer, or a
  * javax.swing.text.AbstractDocument.Content

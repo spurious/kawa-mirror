@@ -510,6 +510,12 @@ HTTPD_PORT = 8888
 check-server:
 	$(CPJAVA) kawa.repl --http-auto-handler / $(srcdir)/webtest/ --http-start $(HTTPD_PORT)
 
+WEBTEST_FILES = \
+  webtest/adder.scm \
+  webtest/date.scm \
+  webtest/hello.scm \
+  webtest/info/+default+
+
 cycle1.class cycle2.class: $(srcdir)/cycle1.scm $(srcdir)/cycle2.scm
 	$(CPKAWA) -C $^
 
@@ -636,7 +642,7 @@ LARCENY_SIMPLE_TESTS1 = case-lambda char complex cxr eval file inexact \
   lazy read time
 check-larceny-simple1:
 	for test in $(LARCENY_SIMPLE_TESTS1); do \
-	  $(KAWA) $(LARCENY_TEST_OPTIONS) larceny-tests/run/$$test.sps; \
+	  $(KAWA) $(LARCENY_TEST_OPTIONS) $(srcdir)/larceny-tests/run/$$test.sps; \
 	done
 
 # tests using load, so change directories so load can find needed files
@@ -646,6 +652,29 @@ check-larceny-simple2:
 	for test in $(LARCENY_SIMPLE_TESTS2); do \
 	  $(KAWA) $(LARCENY_TEST_OPTIONS) -e '(current-path "$(srcdir)/larceny-tests")' -f run/$$test.sps; \
 	done
+
+LARCENY_TEST_FILES =\
+  larceny-tests/tests/scheme/test.sld larceny-tests/README \
+  larceny-tests/run/case-lambda.sps larceny-tests/tests/scheme/case-lambda.sld \
+  larceny-tests/run/char.sps larceny-tests/tests/scheme/char.sld \
+    larceny-tests/tests/scheme/char.body.scm \
+    larceny-tests/tests/scheme/char.body-alt.scm \
+  larceny-tests/run/complex.sps larceny-tests/tests/scheme/complex.sld \
+    larceny-tests/tests/scheme/complex.body.scm \
+  larceny-tests/run/cxr.sps larceny-tests/tests/scheme/cxr.sld \
+  larceny-tests/run/eval.sps larceny-tests/tests/scheme/eval.sld \
+    larceny-tests/tests/scheme/eval.body.scm \
+  larceny-tests/run/file.sps larceny-tests/tests/scheme/file.sld \
+  larceny-tests/run/inexact.sps larceny-tests/tests/scheme/inexact.sld \
+  larceny-tests/run/lazy.sps larceny-tests/tests/scheme/lazy.sld \
+  larceny-tests/run/load.sps larceny-tests/tests/scheme/load.sld \
+    larceny-tests/tests/scheme/load-test1.scm \
+    larceny-tests/tests/scheme/load-test2.scm \
+    larceny-tests/tests/scheme/load-test3.scm \
+  larceny-tests/run/read.sps larceny-tests/tests/scheme/read.sld \
+  larceny-tests/run/repl.sps larceny-tests/tests/scheme/repl.sld\
+    larceny-tests/tests/scheme/repl-test2.scm \
+  larceny-tests/run/time.sps larceny-tests/tests/scheme/time.sld
 
 check-larceny-tests: check-larceny-simple1 check-larceny-simple2
 
@@ -676,12 +705,14 @@ SCRIPTS_TO_RUN = case-warnings.scm uninit1.scm \
   sva43750.scm
 # Files needed for SCRIPTS_TO_RUN
 AUX_FOR_SCRIPTS_TO_RUN = aux-libs.scm
+
 EXTRA_DIST = testing.scm test-utils.scm \
   test.scm case-test.scm num-test.scm numeric-tests.scm quaternion-test.scm \
-  mac-test.scm mac1.scm r7rs-tests.scm \
+  mac-test.scm mac1.scm r7rs-tests.scm clisp-number-tests.scm \
   classes1.scm classes2.scm SimpleB.java obj-test.scm arr-test.scm \
-  lib-test.scm srfi-38-test.scm srfi-64-test.scm srfi-69-test.scm \
-  srfi-108-test.scm srfi-109-test.scm system-test.scm \
+  lib-test.scm bridge.scm srfi-16-test.scm srfi-38-test.scm \
+  srfi-64-test.scm srfi-69-test.scm srfi-101-test.scm \
+  srfi-108-test.scm srfi-109-test.scm system-test.scm xml-test.scm \
   text-test.scm regex-test.scm java-array-test.scm lazy-test.scm \
   jmc.scm jmc.expected sva31180.scm use-slots.scm ASupport.scm Base.java \
   MyFunc.java MyModule.java MyDate.java MyTimestamp.java \
@@ -710,4 +741,5 @@ EXTRA_DIST = testing.scm test-utils.scm \
   spectralnorm.scm spectralnorm-output.txt \
   threadring.scm threadring-output.txt \
   libx.scm moduleM.scm moduleM.expected life-grid.scm life-grid.expected \
-  $(SCRIPTS_TO_RUN) $(AUX_FOR_SCRIPTS_TO_RUN)
+  $(SCRIPTS_TO_RUN) $(AUX_FOR_SCRIPTS_TO_RUN) $(LARCENY_TEST_FILES) \
+  $(WEBTEST_FILES)

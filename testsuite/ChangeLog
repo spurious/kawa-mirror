@@ -1,5 +1,8 @@
 2015-06-15  Per Bothner  <per@bothner.com>
 
+	* Makefile.am: Add files to EXTRA_DIST do 'make distcheck' works.
+	(check-larceny-simple1): Make use of srcdir.
+
 	* libx.scm: New class, check for library for same name as module.
 	This tests Savannah bug #45313 "Multiple libraries in one file".
 	* obj-test.scm: Import and test libx.

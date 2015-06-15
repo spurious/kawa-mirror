@@ -1,4 +1,4 @@
-(test-init "Objects" 144)
+(test-init "Objects" 145)
 
 ;; Force procedure to be applied without being inlined:
 (define-syntax force-eval
@@ -408,3 +408,6 @@
 (test #!null 'before-m2-close m2-object:my-array-7)
 (let ((cl ::java.io.Closeable m2-object)) (cl:close))
 (test #f 'after-m2-close m2-object:my-array-7)
+
+(import (libx))
+(test '(ax in libx) libx-report)

@@ -309,7 +309,7 @@ EXTRA_DIST = testing.scm test-utils.scm \
   revcomp.scm revcomp-2.scm revcomp-output.txt \
   spectralnorm.scm spectralnorm-output.txt \
   threadring.scm threadring-output.txt \
-  moduleM.scm moduleM.expected life-grid.scm life-grid.expected \
+  libx.scm moduleM.scm moduleM.expected life-grid.scm life-grid.expected \
   $(SCRIPTS_TO_RUN) $(AUX_FOR_SCRIPTS_TO_RUN)
 
 all: all-am
@@ -612,7 +612,7 @@ check-mac: testing.zip
 	  -e '(define src-prefix "$(srcdir)/")' -f "$(srcdir)/mac-test.scm" -e '(test-report)'
 
 check-obj: testing.zip module2.class module3.class classes2.class \
-  MyFunc.class MyModule.class cycle1.class cycle2.class
+  MyFunc.class MyModule.class cycle1.class cycle2.class libx.class
 	$(KAWATEST) --no-warn-unknown-member -f "$(srcdir)/obj-test.scm" -e '(test-report)'
 
 check-polytype:

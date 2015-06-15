@@ -1,3 +1,10 @@
+2015-06-15  Per Bothner  <per@bothner.com>
+
+	* libx.scm: New class, check for library for same name as module.
+	This tests Savannah bug #45313 "Multiple libraries in one file".
+	* obj-test.scm: Import and test libx.
+	* Makefile.am: Update accordingly.
+
 2015-06-11  Per Bothner  <per@bothner.com>
 
 	* inlining-test.scm: Tests for setting of uniform vectors.

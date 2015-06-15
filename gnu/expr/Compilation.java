@@ -2069,7 +2069,8 @@ public class Compilation implements SourceLocator
                 setState(messages.seenErrors() ? ERROR_SEEN : COMPILED);
               }
           }
-        if (wantedState >= CLASS_WRITTEN && getState() < CLASS_WRITTEN)
+        if (wantedState >= CLASS_WRITTEN && getState() < CLASS_WRITTEN
+            && ! mexp.subModulesOnly())
           {
             outputClass(ModuleManager.getInstance().getCompilationDirectory());
             setState(CLASS_WRITTEN);

@@ -1,3 +1,9 @@
+2015-06-15  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (process): Don't output class if subModulesOnly.
+	This fixes a bug introduced 2015-04-24 and
+	Savannah bug #45313 "Multiple libraries in one file".
+
 2015-06-10  Per Bothner  <per@bothner.com>
 
 	* Compilation.java (typeCharSequence): New static field.

@@ -73,7 +73,7 @@
 
 (define-syntax define-validate
   (syntax-rules ()
-    ((_ name (exp req proc) clauses ...)
+    ((_ name (exp required proc) clauses ...)
      (define (name
               exp::gnu.expr.ApplyExp
               visitor::gnu.expr.InlineCalls

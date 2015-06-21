@@ -1,3 +1,7 @@
+2015-06-21  Per Bothner  <per@bothner.com>
+
+	* kawa/expressions.scm (define-validate): Fix thinko in macro.
+
 2015-06-12  Per Bothner  <per@bothner.com>
 
 	* syntax.scm ($bracket-list$): New macro.  Handle range and

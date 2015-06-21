@@ -48,11 +48,12 @@ public class define extends Syntax
     Pair p1 = (Pair) st.getCdr();
     Pair p2 = (Pair) p1.getCdr();
     Pair p3 = (Pair) p2.getCdr();
-    SyntaxForm nameSyntax = null;
+    TemplateScope templateScope = null;
     Object name = p1.getCar();
     while (name instanceof SyntaxForm)
       {
-	nameSyntax = (SyntaxForm) name;
+        SyntaxForm nameSyntax = (SyntaxForm) name;
+        templateScope = nameSyntax.getScope();
 	name = nameSyntax.getDatum();
       }
     int options = ((Number) Translator.stripSyntax(p2.getCar())).intValue();
@@ -68,7 +69,7 @@ public class define extends Syntax
       }
 
     Object savePos = tr.pushPositionOf(p1);
-    Declaration decl = tr.define(name, nameSyntax, defs);
+    Declaration decl = tr.define(name, templateScope, defs);
     tr.popPositionOf(savePos);
     name = decl.getSymbol();
     if (makePrivate)

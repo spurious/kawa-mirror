@@ -1960,7 +1960,13 @@ public class Translator extends Compilation
 
     public Declaration define(Object name, SyntaxForm nameSyntax,
                               ScopeExp defs) {
-        ScopeExp scope = nameSyntax != null ? nameSyntax.getScope()
+        return define(name, nameSyntax == null ? null : nameSyntax.getScope(),
+                      defs);
+    }
+
+    public Declaration define(Object name, TemplateScope templateScope,
+                              ScopeExp defs) {
+        ScopeExp scope = templateScope != null ? templateScope
             : currentScope();
         boolean aliasNeeded = scope != defs;
         Object declName = aliasNeeded

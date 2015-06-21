@@ -1,3 +1,9 @@
+2015-06-21  Per Bothner  <per@bothner.com>
+
+	* lang/Translator.java (defined): Overload.
+	* standard/define.java (scanForm): Use new overload.
+	* standard/ImportFromLibrary.java: Add cast to disambiguate.
+
 2015-06-12  Per Bothner  <per@bothner.com>
 
 	* standard/Scheme.java (initScheme): Change binding of

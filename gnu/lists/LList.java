@@ -19,10 +19,7 @@ import java.io.*;
  */
 
 public class LList extends ExtSequence<Object>
-  implements Sequence<Object>, Externalizable
-  /* #ifdef JAVA2 */
-  , Comparable
-  /* #endif */
+    implements Sequence<Object>, Externalizable, Comparable
 {
   /** Do not use - only public for serialization! */
   public LList () { }
@@ -56,20 +53,21 @@ public class LList extends ExtSequence<Object>
 	    return -2;
 	  }
 	Pair fast_pair = (Pair) fast;
-	if (fast_pair.cdr == Empty)
+        Object fast_cdr = fast_pair.getCdr();
+	if (fast_cdr == Empty)
 	  return n+1;
 	if (fast == slow && n > 0)
 	  return -1;
-	if (! (fast_pair.cdr instanceof Pair))
+	if (! (fast_cdr instanceof Pair))
 	  {
 	    n++;
-	    fast = fast_pair.cdr;
+	    fast = fast_cdr;
 	    continue;
 	  }
 	if (!(slow instanceof Pair))
 	  return -2;
-	slow = ((Pair)slow).cdr;
-	fast = ((Pair)fast_pair.cdr).cdr;
+	slow = ((Pair)slow).getCdr();
+	fast = ((Pair)fast_cdr).getCdr();
 	n += 2;
       }
   }
@@ -80,12 +78,10 @@ public class LList extends ExtSequence<Object>
     return this == obj;
   }
 
-  /* #ifdef JAVA2 */
   public int compareTo(Object obj)
   { // Over-ridden in Pair!
     return obj == Empty ? 0 : -1;
   }
-  /* #endif */
 
   public int size()
   {
@@ -148,7 +144,7 @@ public class LList extends ExtSequence<Object>
 	  break;
 	Pair p = (Pair) it_xpos;
 	it_ipos += 2;
-	it_xpos = p.cdr;
+	it_xpos = p.getCdr();
       }
     it.ipos = it_ipos;
     it.xpos = it_xpos;
@@ -212,7 +208,7 @@ public class LList extends ExtSequence<Object>
   static public final int length (Object arg)
   {
     int count = 0;
-    for ( ; arg instanceof Pair; arg = ((Pair)arg).cdr)
+    for ( ; arg instanceof Pair; arg = ((Pair)arg).getCdr())
       count++;
     return count;
   }
@@ -255,7 +251,6 @@ public class LList extends ExtSequence<Object>
     return hash;
   }
 
-  /* #ifdef JAVA2 */
   public static LList makeList (java.util.List vals)
   {
     java.util.Iterator e = vals.iterator();
@@ -272,25 +267,6 @@ public class LList extends ExtSequence<Object>
       }
     return result;
   }
-  /* #endif */
-  /* #ifndef JAVA2 */
-  // public static LList makeList (Sequence vals)
-  // {
-  //   java.util.Enumeration e = ((AbstractSequence) vals).elements();
-  //   LList result = LList.Empty;
-  //   Pair last = null;
-  //   while (e.hasMoreElements())
-  //     {
-  //       Pair pair = new Pair(e.nextElement(), LList.Empty);
-  //       if (last == null)
-  //         result = pair;
-  //       else
-  //         last.cdr = pair;
-  //       last = pair;
-  //     }
-  //   return result;
-  // }
-  /* #endif */
 
   public static LList makeList (Object[] vals, int offset, int length)
   {
@@ -343,8 +319,8 @@ public class LList extends ExtSequence<Object>
 	if (list != this)
 	  out.write(' ');
 	Pair pair = (Pair) list;
-	out.writeObject(pair.car);
-	list = pair.cdr;
+	out.writeObject(pair.getCar());
+	list = pair.getCdr();
       }
     if (list != Empty)
       {

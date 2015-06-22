@@ -63,7 +63,7 @@ class LListPosition extends ExtPosition<Object, LList>
 	Object p = seq;
         while (--skip >= 0)
           {
-            p = ((Pair) p).cdr;
+            p = ((Pair) p).getCdr();
           }
 	xpos = p;
       }
@@ -78,12 +78,12 @@ class LListPosition extends ExtPosition<Object, LList>
       {
         if ((ipos >> 1) == 0)
           return sequence != LList.Empty;
-        return ((Pair) sequence).cdr != LList.Empty;
+        return ((Pair) sequence).getCdr() != LList.Empty;
       }
     else
-      next = ((Pair) xpos).cdr;
+        next = ((Pair) xpos).getCdr();
     if ((ipos & 1) > 0) // if isAfter
-      next = ((Pair) next).cdr;
+      next = ((Pair) next).getCdr();
     return next != LList.Empty;
   }
 
@@ -103,17 +103,17 @@ class LListPosition extends ExtPosition<Object, LList>
           {
 	    next = sequence;
 	    if ((ipos >> 1) != 0)
-	      next = ((Pair) next).cdr;
+              next = ((Pair) next).getCdr();
           }
         else
-          next = ((Pair) (((Pair) xpos).cdr)).cdr;
+          next = ((Pair) (((Pair) xpos).getCdr())).getCdr();
       }
     else
       {
         if (xpos == null)
           next = sequence;
         else
-          next = ((Pair) xpos).cdr;
+          next = ((Pair) xpos).getCdr();
       }
     if (next == LList.Empty)
       return null;
@@ -123,7 +123,7 @@ class LListPosition extends ExtPosition<Object, LList>
   public Object getNext ()
   {
     Pair pair = getNextPair();
-    return pair == null ? LList.eofValue : pair.car;
+    return pair == null ? LList.eofValue : pair.getCar();
   }
 
   public void setNext (Object value)
@@ -138,7 +138,7 @@ class LListPosition extends ExtPosition<Object, LList>
     int isAfter = (ipos & 1);
     Object p = xpos;
     if (isAfter > 0)
-      p = p == null ? sequence : ((Pair) p).cdr;
+      p = p == null ? sequence : ((Pair) p).getCdr();
     else if (p == null)
       return null;
     if (p == LList.Empty)
@@ -149,7 +149,7 @@ class LListPosition extends ExtPosition<Object, LList>
   public Object getPrevious ()
   {
     Pair pair = getPreviousPair();
-    return pair == null ? LList.eofValue : pair.car;
+    return pair == null ? LList.eofValue : pair.getCar();
   }
 
   public void setPrevious(Object value)
@@ -168,7 +168,7 @@ class LListPosition extends ExtPosition<Object, LList>
         Pair pair = getNextPair();
         if (pair == null || ! gotoNext())
             throw new NoSuchElementException();
-        return pair.car;
+        return pair.getCar();
     }
 
   public boolean gotoNext() {
@@ -178,8 +178,8 @@ class LListPosition extends ExtPosition<Object, LList>
     if (xp != null)
       {
 	if (isAfter)
-	  xp = ((Pair) xp).cdr;
-	if (((Pair) xp).cdr == LList.Empty)
+          xp = ((Pair) xp).getCdr();
+	if (((Pair) xp).getCdr() == LList.Empty)
 	  return false;
 	xpos = xp;
 	ipos = (ipos | 1) + 2;
@@ -193,7 +193,7 @@ class LListPosition extends ExtPosition<Object, LList>
     else // position is 1, iAfter must be true
       {
 	xp = sequence;
-	if (((Pair) xp).cdr == LList.Empty)
+	if (((Pair) xp).getCdr() == LList.Empty)
 	  return false;
 	ipos = (2 << 1) | 1;
 	xpos = xp;

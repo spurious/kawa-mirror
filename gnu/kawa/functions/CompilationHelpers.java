@@ -60,7 +60,15 @@ public class CompilationHelpers
                 proc = visitor.visit(proc, InlineCalls.typeForCalledFunction(proc));
                 args[0] = proc;
             }
-            Type ptype = proc.getType().getRealType();
+            Type ptype0 = proc.getType();
+            if (ptype0 == LangObjType.dynamicType) {
+                // For a 'dynamic' object, always defer resolution to runtime.
+                // Never complain at compile-time.  Result is also dynamic.
+                exp.visitArgs(visitor);
+                exp.setType(LangObjType.dynamicType);
+                return exp;
+            }
+            Type ptype = ptype0.getRealType();
             Compilation comp = visitor.getCompilation();
             Language language = comp.getLanguage();
             if (ptype.isSubtype(Compilation.typeProcedure)) {

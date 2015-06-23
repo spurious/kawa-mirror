@@ -3,6 +3,7 @@ import gnu.expr.*;
 import gnu.mapping.*;
 import gnu.bytecode.*;
 import gnu.kawa.reflect.*;
+import gnu.kawa.lispexpr.LangObjType;
 import kawa.lang.Translator;
 
 public class CompileNamedPart
@@ -27,6 +28,14 @@ public class CompileNamedPart
 
     String mname = ((QuoteExp) args[1]).getValue().toString();
     Type type = context.getType();
+
+    if (type == LangObjType.dynamicType) {
+        // For a 'dynamic' object, always defer lookup to runtime.
+        // Never complain at compile-time.  Result is also dynamic.
+        exp.setType(LangObjType.dynamicType);
+        return exp;
+    }
+
     boolean isInstanceOperator = context == QuoteExp.nullExp;
     Compilation comp = visitor.getCompilation();
     Language language = comp.getLanguage();

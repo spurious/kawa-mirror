@@ -746,6 +746,25 @@ public class CompileMisc
         return exp;
     }
 
+    public static Expression validateApplyMakeDynamic
+        (ApplyExp exp, InlineCalls visitor, Type required, Procedure proc) {
+        if (exp.isSimple(1, 1)) {
+            Expression[] args = exp.getArgs();
+            args[0] = visitor.visit(args[0], null);
+            exp.setType(LangObjType.dynamicType);
+        } else
+            exp.visitArgs(visitor);
+        return exp;
+    }
+
+    public static boolean compileMakeDynamic(ApplyExp exp, Compilation comp,
+                                             Target target,
+                                             Procedure procedure) {
+        if (! exp.isSimple())
+            return false;
+        exp.getArg(0).compile(comp, target);
+        return true;
+    }
 
   /** An ExpVisitor class to check if callcc exits through a try-finally. */
   static class ExitThroughFinallyChecker extends ExpVisitor<Expression,TryExp>

@@ -529,5 +529,7 @@
   (x i))
 
 (define (index-str2 x::string i::int)
-  (index-seq x i))
+  ((dynamic x) i))
 
+(define (index-str3 x::string i::int)
+  (index-seq x i))

@@ -235,6 +235,7 @@ public abstract class LispLanguage extends Language
             types.put("ulong", LangPrimType.unsignedLongType);
             types.put("never-returns", Type.neverReturnsType);
 
+            types.put("dynamic", LangObjType.dynamicType);
             types.put("Object", Type.objectType);
             types.put("String", Type.toStringType);
 

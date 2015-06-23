@@ -8,6 +8,7 @@ import gnu.kawa.io.Path;
 import gnu.kawa.io.URIPath;
 import gnu.kawa.functions.Arithmetic;
 import gnu.kawa.functions.LProcess;
+import gnu.kawa.functions.MakeDynamic;
 import gnu.kawa.reflect.CompileBuildObject;
 import gnu.kawa.reflect.CompileInvoke;
 import gnu.kawa.reflect.Invoke;
@@ -54,6 +55,7 @@ public class LangObjType extends SpecialObjectType implements TypeValue
   private static final int PROCEDURE_TYPE_CODE = 27;
   private static final int PROMISE_TYPE_CODE = 28;
   private static final int SEQUENCE_TYPE_CODE = 29;
+  private static final int DYNAMIC_TYPE_CODE = 30;
 
   public static final LangObjType pathType =
     new LangObjType("path", "gnu.kawa.io.Path",
@@ -170,6 +172,10 @@ public class LangObjType extends SpecialObjectType implements TypeValue
     new LangObjType("sequence", "java.util.List",
                     SEQUENCE_TYPE_CODE);
 
+    public static final LangObjType dynamicType =
+    new LangObjType("dynamic", "java.lang.Object",
+                    DYNAMIC_TYPE_CODE);
+
     LangObjType(String name, String implClass, int typeCode) {
         super(name, ClassType.make(implClass));
         this.typeCode = typeCode;
@@ -233,6 +239,9 @@ public class LangObjType extends SpecialObjectType implements TypeValue
                 return 1;
             if (stringType.isCompatibleWithValue(valueType) > 0)
                 return 1;
+            break;
+        case DYNAMIC_TYPE_CODE:
+            return 2;
         }
         return getImplementationType().isCompatibleWithValue(valueType);
     }
@@ -802,6 +811,8 @@ public class LangObjType extends SpecialObjectType implements TypeValue
         return new PrimProcedure("kawa.lib.strings", "$make$string$"+VARARGS_SUFFIX, 1);
       case REGEX_TYPE_CODE:
         return new PrimProcedure("java.util.regex.Pattern", "compile", 1);
+      case DYNAMIC_TYPE_CODE:
+          return MakeDynamic.instance;
       default:
         return null;
       }

@@ -332,6 +332,7 @@ GNU_KAWA_FUNCTIONS_JSOURCES = \
   kawa/functions/IsEqual.java \
   kawa/functions/IsEqv.java \
   kawa/functions/LProcess.java \
+  kawa/functions/MakeDynamic.java \
   kawa/functions/MakeList.java \
   kawa/functions/MakeProcedure.java \
   kawa/functions/MakePromise.java \

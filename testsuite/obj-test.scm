@@ -3,7 +3,7 @@
 ;; Force procedure to be applied without being inlined:
 (define-syntax force-eval
   (syntax-rules () ((force-eval proc arg ...)
-                    (apply proc (list arg ...)))))
+                    ((dynamic proc) arg ...))))
 
 ;; Force call to be compiled with (hopefully) inlining:
 (define-syntax force-compile

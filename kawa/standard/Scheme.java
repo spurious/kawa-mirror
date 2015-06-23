@@ -908,6 +908,7 @@ public class Scheme extends LispLanguage {
       defAliasStFld("$entity$", "gnu.kawa.lispexpr.LispLanguage", "entityNamespace");
       defAliasStFld("$construct$", "gnu.kawa.lispexpr.LispLanguage", "constructNamespace");
 
+      defAliasStFld("dynamic", "gnu.kawa.lispexpr.LangObjType", "dynamicType");
       defAliasStFld("path", "gnu.kawa.lispexpr.LangObjType", "pathType");
       defAliasStFld("filepath", "gnu.kawa.lispexpr.LangObjType", "filepathType");
       defAliasStFld("URI", "gnu.kawa.lispexpr.LangObjType", "URIType");

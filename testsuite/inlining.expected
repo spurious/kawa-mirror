@@ -171,7 +171,8 @@ InliningTest.indexU8i2(int)int: 5 bytes
 InliningTest.indexF32(int)float: 8 bytes
 InliningTest.indexSeq(java.util.List,int)java.lang.Object: 8 bytes
 InliningTest.indexStr1(java.lang.CharSequence,int)int: 6 bytes
-InliningTest.indexStr2(java.lang.CharSequence,int)java.lang.Object: 25 bytes
+InliningTest.indexStr2(java.lang.CharSequence,int)java.lang.Object: 12 bytes
+InliningTest.indexStr3(java.lang.CharSequence,int)java.lang.Object: 25 bytes
 InliningTest.incrementS8a()void: 9 bytes
 InliningTest.incrementArrS8(byte[],int)void: 9 bytes
 InliningTest.incrementU8a()void: 13 bytes

@@ -419,9 +419,6 @@ current function named using @code{define} or @code{letrec},
 and many cases of mutual tail-recursion (including
 state-machines using @code{letrec}).
 
-The @code{equal?} predicate does not handle infinite (self-referential)
-data structures.  (Checking for cycles is difficult to implement efficiently.)
-
 By default, symbols are case sensitive.
 
 Kawa implements most of the features of the expression language of DSSSL,
@@ -1084,6 +1081,23 @@ arguably be @code{long}.
 @ref{Uniform vectors,Uniform vector} operations
 (such as @code{u16vector-ref}) should be optimized to return the
 primitive values (such as @code{ushort}).
+
+@subsection Decimal arithmetic and repeated decimals
+
+Exact decimal arithmetic is a variation of exact rational arithmetic,
+but may more user-friendly.  In particular printing using
+decimals is generally nicer than fractions.
+It is also sometimes useful to specify an explicit scale,
+so we can distinguish 0.2 from 0.20.
+We can use the Java @code{BigDecimal} class, but run into problems
+with division - for example @code{(/ 1.0 3.0)}.
+We should implement a subclass of @code{RatNum} that generalizes
+@code{BigDecimal} to also handle repeating decimals.
+We need a lexical syntax for repeating decimals.
+Possible ideas: @code{0._81_} or @code{0.#81}.
+If a Scheme number literal is specied as exact and has either
+a decimal point or an exponent (for example @code{#e1.25}), then it should
+read as an exact decimal, not a fraction.
 
 @subsection Optional strict typing along with an explicit @code{dynamic} type
 
@@ -6937,7 +6951,7 @@ and Kawa allows you to declare the type of the parameter.
 @display
 @stxdef{lambda-expression} @stxlit{(lambda} @stxref{formals} @arbno{@stxref{option-pair}} @stxref{opt-return-type} @stxref{body}@stxlit{)}
 @stxdef{return-type} @stxref{type}
-@stxdef{opt-return-type} [[@stxlit{::}] @stxref{type}]
+@stxdef{opt-return-type} [@stxlit{::} @stxref{type}]
 @end display
 where
 @display
@@ -6954,7 +6968,7 @@ You can of course also use the extended format in a @ref{Definitions,@code{defin
 @display
 @stxdef{req-opt-args} @stxref{req-arg} ... [@stxlit{#!optional} @stxref{opt-arg} ...]
 @stxdef{rest-key-args} [@stxlit{#!rest} @stxref{rest-arg}] [@stxlit{#!key} @stxref{key-arg} ...]
-@stxdef{req-arg}  @var{variable} [@stxlit{::} @var{type}] | @stxlit{(}@var{variable} [[@stxlit{::}] @var{type}] @stxlit{)}
+@stxdef{req-arg}  @var{variable} [@stxlit{::} @var{type}] | @stxlit{(}@var{variable} @stxlit{::} @var{type} @stxlit{)}
 @stxdef{opt-arg} @stxref{arg-with-default}
 @stxdef{key-arg} @stxref{arg-with-default}
 @stxdef{arg-with-default} @var{variable} [@stxlit{::} @var{type}]
@@ -7087,6 +7101,7 @@ Kawa converts between Scheme number types
 and Java number types as appropriate.
 
 @menu
+* Numeric types::
 * Arithmetic operations::
 * Numerical input and output::
 * Quaternions::
@@ -7094,6 +7109,94 @@ and Java number types as appropriate.
 * Logical Number Operations::
 * Performance of numeric operations::
 @end menu
+
+@node Numeric types
+@section Numeric types
+
+@subsection Exactness
+@cindex exactness
+It is useful to distinguish between numbers that are represented
+exactly and those that might not be. For example,
+indexes into data structures must be known exactly, as
+must some polynomial coefficients in a symbolic algebra
+system. On the other hand, the results of measurements
+are inherently inexact, and irrational numbers may be approximated
+by rational and therefore inexact approximations.
+In order to catch uses of inexact numbers where exact numbers
+are required, Scheme explicitly distinguishes
+exact from inexact numbers. This distinction is orthogonal
+to the dimension of type.
+
+@cindex exact complex number
+@cindex inexact complex number
+A Scheme number is @dfn{exact} if it was written as an exact
+constant or was derived from exact numbers using only exact operations.
+A number is @dfn{inexact} if it was written as
+an inexact constant, if it was derived using inexact ingredients,
+or if it was derived using inexact operations. Thus
+inexactness is a contagious property of a number.
+In particular, an @dfn{exact complex number} has an exact real part
+and an exact imaginary part; all other complex numbers
+are @dfn{inexact complex numbers}.
+
+If two implementations produce exact results for a computation
+that did not involve inexact intermediate results, the
+two ultimate results will be mathematically equal. This
+is generally not true of computations involving inexact
+numbers since approximate methods such as floating-point
+arithmetic may be used, but it is the duty of the implementation
+to make the result as close as practical to the
+mathematically ideal result.
+
+Rational operations such as @code{+} should always produce exact
+results when given exact arguments. If the operation
+is unable to produce an exact result, then it may either
+report the violation of an implementation restriction or it
+may silently coerce its result to an inexact value.
+
+Except for @code{exact}, the operations described in this section
+must generally return inexact results when given any inexact arguments.
+An operation may, however, return an
+exact result if it can prove that the value of the result is
+unaffected by the inexactness of its arguments. For example,
+multiplication of any number by an exact zero may
+produce an exact zero result, even if the other argument is inexact.
+
+Specifically, the expression @code{(* 0 +inf.0)} may return @code{0},
+or @code{+nan.0}, or report that inexact numbers are not supported,
+or report that non-rational real numbers are not supported,
+or fail silently or noisily in other implementation-specific ways.
+
+The procedures listed below will always return exact integer
+results provided all their arguments are exact integers
+and the mathematically expected results are representable
+as exact integers within the implementation:
+@code{-},
+@code{*},
+@code{+},
+@code{abs},
+@code{ceiling},
+@code{denominator},
+@code{exact-integer-sqrt},
+@code{expt},
+@code{floor},
+@code{floor/},
+@code{floor-quotient},
+@code{floor-remainder},
+@code{gcd},
+@code{lcm},
+@code{max},
+@code{min},
+@code{modulo},
+@code{numerator},
+@code{quotient},
+@code{rationalize},
+@code{remainder},
+@code{square},
+@code{truncate},
+@code{truncate/},
+@code{truncate-quotient},
+@code{truncate-remainder}.
 
 @node Arithmetic operations
 @section Arithmetic operations
@@ -8447,7 +8550,14 @@ The @var{amount} must be non-negative
 The @code{bitwise-arithmetic-shift-left} procedure returns the same
 result as @code{bitwise-arithmetic-shift},
 and @code{(bitwise-arithmetic-shift-right @var{i} @var{amount})} returns the
-same result as @code{(bitwise-arithmetic-shift @var{i} (- @var{amount}))};
+same result as @code{(bitwise-arithmetic-shift @var{i} (- @var{amount}))}.
+
+If @var{i} is a primitive integer type,
+then @var{amount} must be less than the number of bits in the
+promoted type of @var{i} (32 or 64).
+If the type is unsigned, an unsigned (logic) shift is
+done for @code{bitwise-arithmetic-shift-right},
+rather than a signed (arithmetic) shift.
 @end deffn
 
 @deffn Procedure bitwise-rotate-bit-field n start end count
@@ -14859,7 +14969,7 @@ is equivalent to:
                 (B1 B2) (D1 D2)))
 @end example
 The names @code{A}, @code{B1}, @code{C}, and @code{D1} must
-existing in the library @code{(kawa example)}.  The bindings are
+exist in the library @code{(kawa example)}.  The bindings are
 accessible using the names @code{A}, @code{B2}, @code{C}, and @code{D2}.
 
 @item 

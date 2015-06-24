@@ -187,10 +187,7 @@ public class ChainLambdas extends ExpExpVisitor<ScopeExp> {
     unreachableCodeSeen = false;
     LambdaExp parent = currentLambda;
     if (parent != null && ! (parent instanceof ClassExp))
-      {
-	exp.nextSibling = parent.firstChild;
-	parent.firstChild = exp;
-      }
+        parent.pushChild(exp);
 
     exp.setOuter(scope);
     exp.firstChild = null;
@@ -198,15 +195,7 @@ public class ChainLambdas extends ExpExpVisitor<ScopeExp> {
     exp.visitProperties(this, exp);
 
     // Put list of children in proper order.
-    LambdaExp prev = null, child = exp.firstChild;
-    while (child != null)
-      {
-	LambdaExp next = child.nextSibling;
-	child.nextSibling = prev;
-	prev = child;
-	child = next;
-      }
-    exp.firstChild = prev;
+    exp.reverseChildList();
 
     if (exp.getName() == null && exp.nameDecl != null)
       exp.setName(exp.nameDecl.getName());
@@ -221,10 +210,7 @@ public class ChainLambdas extends ExpExpVisitor<ScopeExp> {
   {
     LambdaExp parent = currentLambda;
     if (parent != null && ! (parent instanceof ClassExp))
-      {
-	exp.nextSibling = parent.firstChild;
-	parent.firstChild = exp;
-      }
+        parent.pushChild(exp);
 
     visitScopeExp(exp, scope);
 

@@ -1262,6 +1262,22 @@ public class LambdaExp extends ScopeExp {
         addMethodFor(comp, closureEnvType);
     }
 
+    public void pushChild(LambdaExp child) {
+        child.nextSibling = firstChild;
+        firstChild = child;
+    }
+
+    public void reverseChildList() {
+        LambdaExp prev = null, child = firstChild;
+        while (child != null) {
+            LambdaExp next = child.nextSibling;
+            child.nextSibling = prev;
+            prev = child;
+            child = next;
+        }
+        firstChild = prev;
+    }
+
     void allocChildMethods(Compilation comp) {
         for (LambdaExp child = firstChild;  child != null;
              child = child.nextSibling) {

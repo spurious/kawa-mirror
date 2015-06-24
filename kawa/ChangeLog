@@ -1,3 +1,8 @@
+2015-06-24  Per Bothner  <per@bothner.com>
+
+	* standard/object.java: Simplify chaining of methods by
+	using new pushChild and reverseChildList methods in LambdaExp.
+
 2015-06-23  Per Bothner  <per@bothner.com>
 
 	* standard/Scheme.java (initScheme): Bind 'dynamic' type.

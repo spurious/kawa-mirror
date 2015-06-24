@@ -62,8 +62,6 @@ public class object extends Syntax
     Object superlist = pair.getCar();
     Object components = pair.getCdr();
     Object classNamePair = null;
-    LambdaExp method_list = null;
-    LambdaExp last_method = null;
     long classAccessFlag = 0;
     // First pass (get Declarations).
     Vector inits = new Vector(20);
@@ -324,16 +322,13 @@ public class object extends Syntax
 	    LambdaExp lexp = new LambdaExp();
 	    Declaration decl = oexp.addMethod(lexp, mname);
 	    Translator.setLine(decl, mpair);
-	    if (last_method == null)
-	      method_list = lexp;
-	    else
-	      last_method.nextSibling = lexp;
-	    last_method = lexp;
+            oexp.pushChild(lexp);
 	  }
 	else
 	  tr.error ('e', "invalid field/method definition");
 	tr.popPositionOf(savedPos1);
       }
+    oexp.reverseChildList();
     if (classAccessFlag != 0 && oexp.nameDecl != null)
       {
         oexp.nameDecl.setFlag(classAccessFlag);
@@ -347,11 +342,7 @@ public class object extends Syntax
         Object classNameVal = classNameExp.valueIfConstant();
         String classNameSpecifier;
         boolean isString;
-        /* #ifdef use:java.lang.CharSequence */
         isString = classNameVal instanceof CharSequence;
-        /* #else */
-        // isString = classNameVal instanceof CharSeq || classNameVal instanceof String;
-        /* #endif */
         if (isString
             && (classNameSpecifier = classNameVal.toString()).length() > 0)
           oexp.classNameSpecifier = classNameSpecifier;
@@ -363,7 +354,6 @@ public class object extends Syntax
       oexp,
       components,
       inits,
-      method_list,
       superlist
     };
     return result;
@@ -374,9 +364,8 @@ public class object extends Syntax
     ClassExp oexp = (ClassExp) saved[0];
     Object components = saved[1];
     Vector inits = (Vector) saved[2];
-    LambdaExp method_list = (LambdaExp) saved[3];
-    Object superlist = saved[4];
-    oexp.firstChild = method_list;
+    Object superlist = saved[3];
+    LambdaExp method_list = oexp.firstChild;
 
     int num_supers = Translator.listLength(superlist);
     if (num_supers < 0)
@@ -621,8 +610,7 @@ public class object extends Syntax
             // Is type getting set?  FIXME
             initMethod.add(null, new Declaration(ThisExp.THIS_NAME));
           }
-        initMethod.nextSibling = oexp.firstChild;
-        oexp.firstChild = initMethod;
+        oexp.pushChild(initMethod);
       }
     tr.push(initMethod);
     LambdaExp saveLambda = tr.curMethodLambda;

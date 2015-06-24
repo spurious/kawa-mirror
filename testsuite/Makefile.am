@@ -642,7 +642,7 @@ LARCENY_SIMPLE_TESTS1 = case-lambda char complex cxr eval file inexact \
   lazy read time
 check-larceny-simple1:
 	for test in $(LARCENY_SIMPLE_TESTS1); do \
-	  $(KAWA) $(LARCENY_TEST_OPTIONS) $(srcdir)/larceny-tests/run/$$test.sps; \
+	  $(KAWA) $(LARCENY_TEST_OPTIONS) "$(srcdir)/larceny-tests/run/$$test.sps"; \
 	done
 
 # tests using load, so change directories so load can find needed files
@@ -652,6 +652,34 @@ check-larceny-simple2:
 	for test in $(LARCENY_SIMPLE_TESTS2); do \
 	  $(KAWA) $(LARCENY_TEST_OPTIONS) -e '(current-path "$(srcdir)/larceny-tests")' -f run/$$test.sps; \
 	done
+
+check-larceny-process:
+	export TEMPORARY_ENV_VAR=2776e8e; \
+	$(MAKE) -s check-larceny-process-context \
+	  LARCENY_PROCESS_ARGS="--test-getenv TEMPORARY_ENV_VAR 2776e8e" \
+	  LARCENY_PROCESS_EXPECTED=0
+	$(MAKE) -s check-larceny-process-context \
+	  LARCENY_PROCESS_ARGS="--test-emergency-exit" \
+	  LARCENY_PROCESS_EXPECTED=0
+	$(MAKE) -s check-larceny-process-context \
+	  LARCENY_PROCESS_ARGS="--test-emergency-exit 37" \
+	  LARCENY_PROCESS_EXPECTED=37
+	$(MAKE) -s check-larceny-process-context \
+	  LARCENY_PROCESS_ARGS="--test-exit" \
+	  LARCENY_PROCESS_EXPECTED=0
+	$(MAKE) -s check-larceny-process-context \
+	  LARCENY_PROCESS_ARGS="--test-exit 46" \
+	  LARCENY_PROCESS_EXPECTED=46
+
+check-larceny-process-context:
+	${KAWA} $(LARCENY_TEST_OPTIONS) ${KAWA_OPTIONS} "$(srcdir)/larceny-tests/run/process-context.sps" $(LARCENY_PROCESS_ARGS); \
+	if [ $$? = $(LARCENY_PROCESS_EXPECTED) ]; then\
+	   echo "# larceny process-context" $(LARCENY_PROCESS_ARGS) passes;\
+	else\
+	    echo "FAIL larceny process-context" $(LARCENY_PROCESS_ARGS);\
+	    echo "Incorrect exit status from exit or emergency-exit:" $$?;\
+	    echo "1 of 1 tests failed.";\
+	fi
 
 LARCENY_TEST_FILES =\
   larceny-tests/tests/scheme/test.sld larceny-tests/README \
@@ -676,7 +704,8 @@ LARCENY_TEST_FILES =\
     larceny-tests/tests/scheme/repl-test2.scm \
   larceny-tests/run/time.sps larceny-tests/tests/scheme/time.sld
 
-check-larceny-tests: check-larceny-simple1 check-larceny-simple2
+check-larceny-tests: check-larceny-simple1 check-larceny-simple2 \
+  check-larceny-process
 
 check-numbers-clisp:
 	$(KAWA) --r7rs -f $(srcdir)/clisp-number-tests.scm

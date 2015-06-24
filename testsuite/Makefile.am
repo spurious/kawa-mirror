@@ -654,6 +654,9 @@ check-larceny-simple2:
 	done
 
 check-larceny-process:
+	$(MAKE) -s check-larceny-process-context \
+	  LARCENY_PROCESS_ARGS="" \
+	  LARCENY_PROCESS_EXPECTED=0
 	export TEMPORARY_ENV_VAR=2776e8e; \
 	$(MAKE) -s check-larceny-process-context \
 	  LARCENY_PROCESS_ARGS="--test-getenv TEMPORARY_ENV_VAR 2776e8e" \

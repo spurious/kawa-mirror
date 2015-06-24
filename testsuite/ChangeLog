@@ -1,4 +1,5 @@
-2015-06-24  Per Bothner  <per@bothner.com>
+2015-06-24  William D Clinger <will@ccs.neu.edu>
+            Per Bothner  <per@bothner.com>
 
 	* larceny-tests/tests/scheme/process-context.sld: Larceny test.
 	* larceny-tests/run/process-context.sps: Larceny test runner.

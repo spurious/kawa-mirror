@@ -254,11 +254,11 @@ public class Char implements Comparable, Externalizable {
                 return sbuf.toString();
             }
         }
-        if (ch < ' ' || ch > 0x7F) {
+        if (ch == IGNORABLE_CHAR) {
+            sbuf.append("ignorable-char");
+        } else if (ch < ' ' || ch > 0x7F) {
             sbuf.append('x');
             sbuf.append(Integer.toString(ch, 16));
-        } else if (ch == IGNORABLE_CHAR) {
-            sbuf.append("ignorable-char");
         } else
             sbuf.append((char) ch);
         return sbuf.toString();

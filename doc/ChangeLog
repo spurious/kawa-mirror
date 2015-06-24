@@ -1,3 +1,8 @@
+2015-06-24  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (String): New subsubsection 'Strings as sequences'.
+	(Sequences): Document 'length' function.
+
 2015-06-23  Per Bothner  <per@bothner.com>
 
 	* kawa.texi: Update/expand numerical types and conversions.

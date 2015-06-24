@@ -9551,6 +9551,151 @@ the argument instead of a newly allocated string.
 @end example
 @end deffn
 
+@subsection Strings as sequences
+
+@subsubsection Indexing a string
+
+Using function-call syntax with strings is convenient
+and efficient.  However, it has some ``gotchas''.
+
+We will use the following example string:
+@example
+(! str1 "Smile \x1f603;!")
+@end example
+or if you're brave:
+@example
+(! str1 "Smile 😃!")
+@end example
+
+This is @code{"Smile "} followed by an emoticon (``smiling face with
+open mouth'') followed by @code{"!"}.
+The emoticon has scalar value @code{\x1f603} - it is not
+in the 16-bit Basic Multilanguage Plan,
+and so it must be encoded by a surrogate pair
+(@code{#\xd83d} followed by @code{#\xde03}).
+
+The number of scalar values (@code{character}s) is 8,
+while the number of 16-bits code units (@code{char}s) is 9.
+The @code{java.lang.CharSequence#length} method
+counts @code{char}s; the @code{length} function calls that method;
+the @code{string-length} procedure counts @code{character}s.  Thus:
+
+@example
+(length str1)          @result{} 9
+(str1:length)          @result{} 9
+(string-length str1)   @result{} 8
+@end example
+
+Counting @code{char}s is a constant-time operation (since it
+is stored in the data structure), while counting @code{character}s
+takes time propertional to the length of the string,
+since it has subtract one for each surrogate pair.
+
+Similarly we can can index the string in 3 ways:
+
+@example
+(str1 1)              @result{} #\m :: character
+(str1:charAt 1)       @result{} #\m :: char
+(string-ref str1 1)   @result{} #\m :: character
+@end example
+
+Note using the function-call syntax returns a @code{character}.
+
+Things become interesting when we reach the emoticon:
+
+@example
+(str1 6)              @result{} #\😃 :: character
+(str1:charAt 6)       @result{} #\d83d :: char
+(string-ref str1 6)   @result{} #\😃 :: character
+@end example
+
+Both @code{string-ref} and the function-call syntax return the
+real character, while the @code{charAt} methods returns a partial character.
+However, @code{string-ref} needs to linearly count from the
+start of the string, while the function-call syntax can do a constant-time
+lookup.  It does this by calling @code{(str1:charAt 6)} first.
+If that returns a leading-surrogate character, it checks that the
+next character (i.e. @code{(str1:charAt 7)}) is a trailing-surrogate character,
+and if so combines the two.  (If there is no next character or it is not
+a trailing-surrogate, then indexing just returns the leading-surrogate
+partial character.)
+
+In other words @code{(string-ref s i)} returns the @code{i}'th
+@code{character}, while @code{(s i)} return the @code{character}
+at the @code{i}'th index.
+
+If the character at the @code{i}'th index is a surrogate pair,
+then @code{(s (+ i 1))} returns a special pseudo-character
+named @code{#\ignorable-char}.  This pseudo-character should
+generally be ignored.  (It is automatically ignored by
+Kawa functions including @code{write-char}, @code{string-append!},
+and the @code{string} constructor.)
+
+@example
+(str1 7)              @result{} #\ignorable-char :: character
+(str1 8)              @result{} #\! :: character
+(str1:charAt 7)       @result{} #\de03 :: char
+(str1:charAt 8)       @result{} #\! :: char
+(string-ref str1 7)   @result{} #\! :: character
+(string-ref str1 8)   @result{} @i{throws} StringIndexOutOfBoundsException
+@end example
+
+Following are two possible implementations
+of a single-string version of @code{string-for-each}.
+The @code{string-for-each-1} version is simple,
+obvious, and traditional - but the execution time is
+quadratic in the string length.
+The @code{string-for-each-2} version requires filtering
+out any @code{#\ignorable-char}, but the execution time
+is only linear.
+
+@example
+(define (string-for-each-1 proc s::string)
+  (! slen (string-length s))
+  (do ((i ::int 0 (+ i 1))) ((= i slen))
+    (proc (string-ref s i))))
+
+(define (string-for-each-2 proc s::string)
+  (! slen (length s))
+  (do ((i ::int 0 (+ i 1))) ((= i slen))
+    (let ((ch (s i)))
+      (if (not (char=? ch #\ignorable-char))
+          (proc ch)))))
+@end example
+
+@subsubsection Indexing with a sequence
+
+You can index a string with a list of integer indexes,
+most commonly a range:
+@example
+(@var{str} [@var{i} ...])
+@end example
+is basically the same as:
+@example
+(string (@var{str}:charAt @var{i}) ...)
+@end example
+This is usually the same as the following:
+@example
+(string (@var{str} @var{i}) ...)
+@end example
+(The exception is if you select only part of a surrogate pair.)
+
+Generally when working with strings it is best to
+work with substrings rather than individual characters:
+@example
+(@var{str} [@var{start} <: @var{end}])
+@end example
+This is equivalent to invoking the @code{CharSequence:subSequence} method:
+@example
+(@var{str}:subSequence @var{start} @var{end})
+@end example
+This is much more efficient than the @code{substring} procedure,
+since the latter has to convert @code{character} indexes
+to @code{char} offsets.
+
+@c not implemented yet
+@c @subsubsection Assigning to a subsequence
+
 @subsection String Cursor API
 
 Indexing into a string (using for example @code{string-ref})
@@ -10480,6 +10625,30 @@ Again, you can use the function call syntax:
 (set! (vec1 2) 'x)
 vec1 @result{} #(5 9 x 8)
 @end example
+
+@deffn Procedure length seq
+Returns the number of elements of the @var{seq}.
+
+@example
+(length '(a b c))             @result{}  3
+(length '(a (b) (c d e)))     @result{}  3
+(length '())                  @result{}  0
+(length [3 4 [] 12])          @result{}  4
+(length (vector))             @result{}  0
+(length (int[] 7 6))          @result{}  2
+@end example
+
+The length of a string is the number of 16-bit code units,
+not the number the code points.
+That is the result of the @code{java.lang.CharSequence#length}
+method, not the @code{string-length} procedure.
+@example
+(length "Hello")              @result{}  5
+(define str1 "Hello \x1f603;!")
+(length str1)                 @result{}  9
+(string-length str1)          @result{}  8
+@end example
+@end deffn
 
 @node Lists
 @section Lists

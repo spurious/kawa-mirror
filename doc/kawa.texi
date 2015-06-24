@@ -107,16 +107,16 @@
 @end ifinfo
 @ifnotinfo
 @macro vari{THING}
-@var{\THING\}@math{_1}
+@var{\THING\}@sub{1}
 @end macro
 @macro varii{THING}
-@var{\THING\}@math{_2}
+@var{\THING\}@sub{2}
 @end macro
 @macro variii{THING}
-@var{\THING\}@math{_3}
+@var{\THING\}@sub{3}
 @end macro
 @macro variv{THING}
-@var{\THING\}@math{_4}
+@var{\THING\}@sub{4}
 @end macro
 @end ifnotinfo
 
@@ -1062,25 +1062,6 @@ When it comes to top-level variables, an issue is when
 to re-evaluate the initializing expression.  It is reasonable
 to do so if and only if the expression is modified, which
 again requires a textual comparison.
-
-@subsection Unsigned primitive number types
-
-Implement unsigned arithmetic types @code{ulong}, @code{uint}, @code{ushort},
-and @code{ubyte}.  These should be primitive types that are represented
-using the corresponding signed types, similar to how the @code{character}
-type is represented using @code{int}.  Also implement corresponding
-``boxed'' types as sibling types of @code{gnu.math,IntNum}.
-Implement arithmetic, comparisons,
-and conversions both at run-time, and optimized when the types are known
-at compile-time.
-(In the latter case there should be no object allocation.)
-Use same promotion rules
-@uref{https://msdn.microsoft.com/en-us/library/09ka8bxx.aspx,as @code{C#}},
-except that combining @code{long} and @code{uint} should
-arguably be @code{long}.
-@ref{Uniform vectors,Uniform vector} operations
-(such as @code{u16vector-ref}) should be optimized to return the
-primitive values (such as @code{ushort}).
 
 @subsection Decimal arithmetic and repeated decimals
 
@@ -7101,7 +7082,7 @@ Kawa converts between Scheme number types
 and Java number types as appropriate.
 
 @menu
-* Numeric types::
+* Numerical types::
 * Arithmetic operations::
 * Numerical input and output::
 * Quaternions::
@@ -7110,8 +7091,101 @@ and Java number types as appropriate.
 * Performance of numeric operations::
 @end menu
 
-@node Numeric types
-@section Numeric types
+@node Numerical types
+@section Numerical types
+
+Mathematically, numbers are arranged into a tower of subtypes
+in which each level is a subset of the level before it:
+number; complex number; real number; rational number; integer.
+
+For example, @code{3} is an integer. Therefore @code{3} is also a rational,
+a real, and a complex number. The same is true of the
+Scheme numbers that model 3. For Scheme numbers, these
+types are defined by the predicates @code{number?}, @code{complex?},
+@code{real?}, @code{rational?}, and @code{integer?}.
+
+There is no simple relationship between a number’s type
+and its representation inside a computer. Although most
+implementations of Scheme will offer at least two different
+representations of 3, these different representations denote
+the same integer.
+
+Scheme’s numerical operations treat numbers as abstract
+data, as independent of their representation as possible.
+Although an implementation of Scheme may use multiple
+internal representations of numbers, this ought not to be
+apparent to a casual programmer writing simple programs.
+
+@deffn Type number
+The type of Scheme numbers.
+@end deffn
+
+@deffn Type quantity
+The type of quantities optionally with units.
+This is a sub-type of @code{number}.
+@end deffn
+
+@deffn Type complex
+The type of complex numbers.
+This is a sub-type of @code{quantity}.
+@end deffn
+
+@deffn Type real
+The type of real numbers.
+This is a sub-type of @code{complex}.
+@end deffn
+
+@deffn Type rational
+The type of exact rational numbers.
+This is a sub-type of @code{real}.
+@end deffn
+
+@deffn Type integer
+The type of exact Scheme integers.
+This is a sub-type of @code{rational}.
+@end deffn
+
+Kawa allows working with expressions of ``primitive'' types,
+which are supported by the JVM without object allocation,
+and using builtin arithmetic.  Using these types may be much
+faster, assuming if compiler is able to infer
+that the variable or expression has primitive type.
+
+@deffn Type long
+@deffnx Type int
+@deffnx Type short
+@deffnx Type byte
+These are fixed-sized primitive signed exact integer types,
+of respectively 64, 32, 18, and 8 bits.
+If a value of one of these types needs to be converted to an
+object, the standard classes @code{java.lang.Long}, @code{java.lang.Integer},
+@code{java.lang.Short}, or @code{java.lang.Byte}, respectively, are used.
+@end deffn
+
+@deffn Type ulong
+@deffnx Type uint
+@deffnx Type ushort
+@deffnx Type ubyte
+These are fixed-sized primitive unsigned exact integer types,
+of respectively 64, 32, 18, and 8 bits.
+These are presented at runtime using the corresponding
+signed types (@code{long}, @code{int}, @code{short}, or @code{byte}).
+However, for arithmetic the Kawa compiler generates code to perform the
+``mathematically correct'' result, truncated to an unsigned result
+rather than signed.
+If a value of one of these types needs to be converted to an
+object, the classes @code{gnu.math.ULong}, @code{gnu.math.UInt},
+@code{gnu.math.UShort}, or  @code{gnu.math.UByte} is used.
+@end deffn
+
+@deffn Type double
+@deffnx Type float
+These are fixed-size primitive in-exact floating-point real types,
+using the standard 64-bit or 32-bit IEEE representation.
+If a value of one of these types needs to be converted to an
+object, the standard classes @code{java.lang.Double},
+or @code{java.lang.Float} is used.
+@end deffn
 
 @subsection Exactness
 @cindex exactness
@@ -7197,6 +7271,57 @@ as exact integers within the implementation:
 @code{truncate/},
 @code{truncate-quotient},
 @code{truncate-remainder}.
+
+@subsection Numerical promotion and conversion
+
+When combining two values of different numeric types,
+the values are converted to the first line in the following
+that subsumes (follows) both types.  The computation is done using
+values of that types, and so is the result.
+For example adding a @code{long} and @code{float} converts the former
+to the latter, yielding a @code{float}.
+
+Note that @code{short}, @code{byte}, @code{ushort}, @code{ubyte}
+are converted to @code{int} regardless, even in the case of
+a single-operand operation, such as unary negation.
+Another exception is trancendental functions (such as @code{cos}),
+where integer operands are converted to @code{double}.
+
+@itemize
+@item
+@code{int} subsumes @code{short}, @code{byte}, @code{ushort}, @code{ubyte}.
+@item
+@code{uint}
+@item
+@code{long}
+@item
+@code{ulong}
+@item
+@code{java.lang.BigInteger}
+@item
+@code{integer} (i.e. @code{gnu.math.IntNum})
+@item
+@code{rational} (i.e. @code{gnu.math.RatNum})
+@item
+@code{float}
+@item
+@code{double}
+@item
+@code{gnu.math.FloNum}
+@item
+@code{real} (i.e. @code{gnu.math.RealNum})
+@item
+@code{number}
+@item
+@code{complex}
+@item
+@code{quantity}
+@end itemize
+
+When comparing a primitive signed integer value with a primitive unsigned
+integer (for example @code{<} applied to a @code{int} and a @code{ulong})
+the mathemically correct result is computed, as it converting both
+operands to @code{integer}.
 
 @node Arithmetic operations
 @section Arithmetic operations
@@ -7711,6 +7836,20 @@ an exact argument.
 (sqrt +inf.0)               @result{}  +inf.0
 (sqrt -inf.0)               @result{}  +inf.0i
 @end example
+
+Note that if the argument is a primitive number (such as @code{double}) or an
+instance of the corresponding boxed class (such as @code{java.lang.Double})
+then we use the real-number version of @code{sqrt}:
+@example
+(sqrt (->double -5))        @result{}  NaN
+@end example
+That is we get different result for @code{java.lang.Double}
+and @code{gnu.math.DFloNum}, even for arguments that are numerically equal
+in the sense of @code{=}.
+This so that the compiler can use the @code{java.lang.Math.sqrt}
+method without object allocation when the argument is a @code{double}
+(and because we want @code{double} and @code{java.lang.Double} to behave
+consistently).
 @end deffn
 
 @deffn Procedure exact-integer-sqrt @var{k}
@@ -13718,7 +13857,7 @@ that map to primitive Java types or java classes.
 
 These types are predefined with the following names.
 
-Instead if plain @code{@var{typename}} you can also use
+Instead of plain @code{@var{typename}} you can also use
 the syntax @code{<@var{typename}>} with angle brackets,
 but that syntax is no longer recommended, because it doesn't
 ``fit'' as well with some ways type names are used.
@@ -13730,37 +13869,18 @@ Note that the value of these variables are instances
 of @code{gnu.bytecode.Type},
 not (as you might at first expect) @code{java.lang.Class}.
 
+The numeric types (@code{number}, @code{quantity},
+@code{complex}, @code{real}, @code{rational}, @code{integer},
+@code{long}, @code{int}, @code{short}, @code{byte}
+@code{ulong}, @code{uint}, @code{ushort}, @code{ubyte},
+@code{double}, @code{float})
+are discussed in @ref{Numerical types}.
+
+The types @code{character} and @code{char}
+are discussed in @ref{Characters}.
+
 @defvar Object
 An arbitrary Scheme value - and hence an arbitrary Java object.
-@end defvar
-
-@defvar number
-The type of Scheme numbers.
-@end defvar
-
-@defvar quantity
-The type of quantities optionally with units.
-This is a sub-type of @code{number}.
-@end defvar
-
-@defvar complex
-The type of complex numbers.
-This is a sub-type of @code{quantity}.
-@end defvar
-
-@defvar real
-The type of real numbers.
-This is a sub-type of @code{complex}.
-@end defvar
-
-@defvar rational
-The type of exact rationl numbers.
-This is a sub-type of @code{real}.
-@end defvar
-
-@defvar integer
-The type of exact Scheme integers.
-This is a sub-type of @code{rational}.
 @end defvar
 
 @defvar symbol

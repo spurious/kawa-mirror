@@ -20,7 +20,8 @@
    (current-handler:set outer))
   ((handle ex::java.lang.Throwable) ::java.lang.Throwable
    (current-handler:set outer)
-   (if (not (kawa.lang.CalledContinuation? ex))
+   (if (not (or (kawa.lang.CalledContinuation? ex)
+                (gnu.kawa.util.ExitCalled? ex)))
        (let ((cause (ExceptionWithValue:unwrap ex)))
          (handlerProc cause)))
    ex) ;;FIXME "secondary handler" ? Change

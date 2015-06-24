@@ -48,6 +48,8 @@
          (begin
            (current-handler:set #!null)
            e1 e2 ...)
+         (ex gnu.kawa.util.ExitCalled
+             (primitive-throw ex))
          (ex java.lang.Throwable
              (let ((var (ExceptionWithValue:unwrap ex)))
                (guard-aux

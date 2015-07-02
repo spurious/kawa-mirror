@@ -4,7 +4,7 @@ import gnu.kawa.functions.AddOp;
 import gnu.kawa.functions.MultiplyOp;
 import gnu.math.IntNum;
 
-public class Range<E> extends AbstractSequence implements Sequence {
+public class Range<E> extends AbstractSequence<E> implements Sequence<E> {
     E start;
     Object step;
     int size;

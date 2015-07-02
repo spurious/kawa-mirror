@@ -151,7 +151,7 @@ public class CharBuffer extends StableVector<Char>
             && (old2 = charAt(index+1)) >= 0xDC00 && old2 <= 0xDFFF;
         if (ch <= 0xFFFF) {
             if (oldIsSupp)
-                delete(index+1, 1);
+                delete(index+1, index+2);
             setCharAt(index, (char) ch);
         } else {
             char c1 = (char) (((ch - 0x10000) >> 10) + 0xD800);
@@ -221,10 +221,10 @@ public class CharBuffer extends StableVector<Char>
 
   public char[] getArray() { return (char[]) base.getBuffer(); }
 
-  public void delete(int where, int count)
+  public void delete(int start, int end)
   {
-    int ipos = createPos(where, false);
-    removePos(ipos, count);
+    int ipos = createPos(start, false);
+    removePos(ipos, end-start);
     releasePos(ipos);
   }
 

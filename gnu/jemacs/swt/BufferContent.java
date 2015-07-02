@@ -116,7 +116,7 @@ public class BufferContent extends SwtCharBuffer
   {
     newText = newText == null ? "" : newText; 
     notifyListeners(makeTextChangingEvent(start, length, newText));
-    delete(start, length);
+    delete(start, start+length);
     insert(start, newText);
     notifyListeners(new TextChangedEvent(this));
   }

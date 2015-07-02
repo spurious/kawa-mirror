@@ -132,12 +132,9 @@ public class SwtCharBuffer extends GapVector implements CharSequence
     lineOffsets.textInserted(where, str);
   }
   
-  /**
-   * @param where
-   * @param count
-   */
-  public void delete(int where, int count)
+  public void delete(int where, int end)
   {
+    int count = end - where;
     shiftGap(where + count);
     gapStart -= count;
     lineOffsets.textDeleted(where, where + count);

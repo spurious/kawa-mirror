@@ -62,7 +62,7 @@ public class SwingContent
     if (nitems < 0 || where < 0 || where + nitems > b.length())
       throw new BadLocationException("invalid remove", where);
 
-    b.delete(where, nitems);
+    b.delete(where, where+nitems);
 
     GapUndoableEdit undo = new GapUndoableEdit(where);
     undo.content = this;

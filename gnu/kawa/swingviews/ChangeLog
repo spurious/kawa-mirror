@@ -1,3 +1,8 @@
+2015-07-02  Per Bothner  <per@bothner.com>
+
+	* SwingContent.java (delete): Update parameter convention.
+	* SwingContent.java: Likewise.
+
 2014-02-16  Per Bothner  <per@bothner.com>
 
 	* SwingDisplay.java: Make sure Error is uncaught or re-thrown.

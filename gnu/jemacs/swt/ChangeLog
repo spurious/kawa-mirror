@@ -1,3 +1,8 @@
+2015-07-02  Per Bothner  <per@bothner.com>
+
+	* SwtCharBuffer.java (delete): Update parameter convention.
+	* BufferContent.java: Likewise.
+
 2014-02-16  Per Bothner  <per@bothner.com>
 
 	* SwtHelper.java: Make sure Error is uncaught or re-thrown.

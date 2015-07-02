@@ -1,5 +1,8 @@
 2015-07-02  Per Bothner  <per@bothner.com>
 
+	* CharBuffer.java (delete): Change parameters to be consistent
+	with String.delete's (start,end) convention.
+
 	* Range.java: Add generic parameter to supertypes.
 
 2015-06-22  Per Bothner  <per@bothner.com>

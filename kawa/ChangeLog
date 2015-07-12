@@ -1,3 +1,7 @@
+2015-07-12  Per Bothner  <per@bothner.com>
+
+	* lang/SyntaxPattern.java (translate): Treat Keywords as literals.
+
 2015-06-24  Per Bothner  <per@bothner.com>
 
 	* standard/object.java: Simplify chaining of methods by

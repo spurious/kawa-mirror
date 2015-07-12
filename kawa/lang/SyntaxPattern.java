@@ -354,7 +354,7 @@ public class SyntaxPattern extends Pattern implements Externalizable
 		tr.popPositionOf(savePos);
 	      }
 	  }
-	else if (pattern instanceof Symbol)
+	else if (pattern instanceof Symbol && ! (pattern instanceof Keyword))
 	  {
             ScopeExp current = tr.currentScope();
             ScopeExp scope1 = syntax == null ? current : syntax.getScope();

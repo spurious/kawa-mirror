@@ -20,11 +20,27 @@
 	  define-syntax-case
 	  identifier?
 
-	  define-alias
+          bitwise-not
+          bitwise-and bitwise-ior bitwise-xor bitwise-if
+          bitwise-bit-count bitwise-length bitwise-first-bit-set
+          bitwise-bit-set? bitwise-copy-bit
+          bitwise-bit-field bitwise-copy-bit-field
+          bitwise-arithmetic-shift
+          bitwise-arithmetic-shift-left
+          bitwise-arithmetic-shift-right
+          bitwise-rotate-bit-field
+          bitwise-reverse-bit-field
+
+          logop logtest
+          logand logior logxor lognot logcount
+          integer-length arithmetic-shift ash
+
+          define-alias
 	  define-variable
 
 	  define-class
 	  define-simple-class
+          object
 	  this
 
 	  invoke
@@ -72,6 +88,7 @@
    (scheme repl)
    (scheme time)
    (scheme write)
+   (rnrs arithmetic bitwise)
    (only (scheme r5rs) exact->inexact inexact->exact)
 
    (only (rename (kawa standard syntax)
@@ -105,11 +122,21 @@
 		 (define_class define-class))
 	 define-simple-class define-class)
 
+   (only (kawa standard object)
+         (objectSyntax object))
+
    (only (rename (kawa standard thisRef)
 		 (thisSyntax this))
 	 this)
 
    (kawa reflect)
+
+   (only (kawa lib numbers)
+         logop logcount logtest (bitwise-length integer-length))
+
+   (only (gnu kawa functions BitwiseOp)
+         (and logand) (ior logior) (xor logxor) (not lognot)
+         (ashift arithmetic-shift) (ashift ash))
    
    (only (kawa lib ports)
 	 call-with-input-string

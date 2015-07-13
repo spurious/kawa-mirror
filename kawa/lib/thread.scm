@@ -1,5 +1,8 @@
 (require <kawa.lib.prim_syntax>)
 (require <kawa.lib.std_syntax>)
+(require <kawa.lib.prim_imports>) ;; needed for lambda
+
+(module-export future sleep runnable)
 
 (define (sleep (time :: <quantity>)) :: <void>
   (kawa.standard.sleep:sleep time))

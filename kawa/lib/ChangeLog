@@ -1,5 +1,8 @@
 2015-07-12  Per Bothner  <per@bothner.com>
 
+	* base.scm: Also define runnable and future.
+	* thread.scm: Make sure lambda is bound, for r7rs libraries.
+
 	* rnrs/arithmetic/bitwise.scm: Implement the R6RS
 	module (rnrs arithmetic bitwise).
 	* Makefile.am: Update accordingly.

@@ -67,7 +67,7 @@
 	  make-process
 	  command-parse
 
-	  runnable
+	  runnable future sleep
 	  
 	  scheme-implementation-version
 	  reverse!
@@ -156,6 +156,6 @@
 	 make-process command-parse)
 
    (only (kawa lib thread)
-	 runnable)
+	 future sleep runnable)
 
    ))

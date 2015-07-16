@@ -42,6 +42,8 @@ public class module_static extends Syntax
             // (module-static 'init-run) implies (module-static #t)
             mexp.setFlag(ModuleExp.STATIC_SPECIFIED);
             mexp.setFlag(ModuleExp.STATIC_RUN_SPECIFIED);
+            if (tr.generateMainMethod())
+                tr.error('e', "init-run option incompatible with --main");
           }
           else
           {

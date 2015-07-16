@@ -2000,6 +2000,9 @@ public class Compilation implements SourceLocator
             // dealing with eval, mutually recursive modules, etc
             // it doesn't quite work.
             addMainClass(mexp);
+            if (generateMainMethod() && mexp.staticInitRun()) {
+                error('e', "a static init-run module cannot have a 'main' method");
+            }
             setState(messages.seenErrors() ? ERROR_SEEN : RESOLVED);
           }
 

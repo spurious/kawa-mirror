@@ -147,7 +147,7 @@ public class LambdaExp extends ScopeExp {
      * See declareClosureEnv and closureEnvField. */
     Variable closureEnv;
 
-    static final int CAN_READ = 2;
+    static final int CAN_READ = Expression.NEXT_AVAIL_FLAG; // 2
     static final int INLINE_ONLY = 4;
     static final int IMPORTS_LEX_VARS = 8;
     static final int NEEDS_STATIC_LINK = 16;

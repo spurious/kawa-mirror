@@ -1633,6 +1633,7 @@ public class Translator extends Compilation
     // This is confusing, at the least.  FIXME.
     Object saved = pushPositionOf(exp);
     LetExp defs = new LetExp();
+    defs.setFlag(LetExp.IS_BODY_SCOPE);
     int renamedAliasOldSize = renamedAliasCount();
     Pair first = formStack.last;
     defs.setOuter(current_scope);

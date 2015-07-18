@@ -12,6 +12,8 @@ public class LetExp extends ScopeExp
 {
   Expression body;
 
+    public static final int IS_BODY_SCOPE = 2;
+
   public LetExp () { }
 
   public Expression getBody() { return body; }

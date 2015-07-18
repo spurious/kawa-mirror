@@ -185,8 +185,8 @@ public class BindDecls {
 
     private void setInitializer(Declaration decl, Expression init, ScopeExp scope, Translator comp) {
         if ((scope instanceof ModuleExp)
-            // scope is a <body> (artificial LetExp allocated in rewrite_body)
-            || (scope instanceof LetExp && scope.firstDecl() == null)) {
+            || (scope instanceof LetExp
+                && scope.getFlag(LetExp.IS_BODY_SCOPE))) {
             SetExp sexp = new SetExp(decl, init);
             comp.pushForm(sexp);
             decl.noteValueFromSet(sexp);

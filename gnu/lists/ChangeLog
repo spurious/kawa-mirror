@@ -1,3 +1,7 @@
+2015-07-22  Per Bothner  <per@bothner.com>
+
+	* Sequences.java (writeUInt, writeULong): New methods.
+
 2015-07-02  Per Bothner  <per@bothner.com>
 
 	* CharBuffer.java (delete): Change parameters to be consistent

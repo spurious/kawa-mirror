@@ -132,6 +132,7 @@ public class ConsumerTarget extends Target
     CodeAttr code = comp.getCode();
     String methodName = null;
     Method method = null;
+    ClassType methodClass = Compilation.typeConsumer;
     Type methodArg = null;
     boolean islong = false;
     char sig; 
@@ -144,9 +145,7 @@ public class ConsumerTarget extends Target
     // implementation type) since it isn't an integer.  So we box it.
     if (stackType instanceof LangPrimType
         && (stackType == LangPrimType.characterType ||
-            stackType == LangPrimType.characterOrEofType ||
-            stackType == LangPrimType.unsignedLongType ||
-            stackType == LangPrimType.unsignedIntType)) {
+            stackType == LangPrimType.characterOrEofType)) {
         stackType.emitCoerceToObject(code);
         stackType = Type.objectType;
     }
@@ -156,13 +155,25 @@ public class ConsumerTarget extends Target
 	sig = implType.getSignature().charAt(0);
 	switch (sig)
 	  {
-	  case 'B': case 'S': case 'I':
+          case 'I':
+              if (stackType == LangPrimType.unsignedIntType) {
+                  methodName = "writeUInt";
+                  methodClass = typeSequences;
+                  break;
+              }
+              // ... otherwise fall through ...
+	  case 'B': case 'S':
 	    methodName = "writeInt";
             methodArg = Type.intType;
             break;
 	  case 'J':
-            methodName = "writeLong";
-            methodArg = Type.longType;
+              if (stackType == LangPrimType.unsignedLongType) {
+                  methodName = "writeULong";
+                  methodClass = typeSequences;
+              } else {
+                  methodName = "writeLong";
+                  methodArg = Type.longType;
+              }
             islong = true;
             break;
 	  case 'F':
@@ -210,7 +221,13 @@ public class ConsumerTarget extends Target
 	  }
       }
     if (consumerPushed >= 0)
-      ;
+      {
+        if (methodClass == typeSequences) throw new InternalError();
+      }
+    else if (methodClass == typeSequences)
+      {
+	code.emitLoad(consumer);
+      }
     else if (islong)
       {
 	code.pushScope();
@@ -225,14 +242,17 @@ public class ConsumerTarget extends Target
 	code.emitLoad(consumer);
 	code.emitSwap();
       }
-    if (method == null && methodName != null)
+    if (methodClass == typeSequences)
+      {
+        method = methodClass.getDeclaredMethod(methodName, 2);
+      }
+    else if (method == null && methodName != null)
       {
         Type[] methodArgs = { methodArg };
-        method = Compilation.typeConsumer
-          .getDeclaredMethod(methodName, methodArgs);
+        method = methodClass.getDeclaredMethod(methodName, methodArgs);
       }
     if (method != null)
-      code.emitInvokeInterface(method);
+      code.emitInvoke(method);
     if (sig == 'C')
       code.emitPop(1); // Pop consumer result.
   }
@@ -243,7 +263,9 @@ public class ConsumerTarget extends Target
     Type implType = stackType.getImplementationType();
     if ((implType instanceof PrimType && ! implType.isVoid()
          && stackType != LangPrimType.characterType
-         && stackType != LangPrimType.characterOrEofType)
+         && stackType != LangPrimType.characterOrEofType
+         && stackType != LangPrimType.unsignedLongType
+         && stackType != LangPrimType.unsignedIntType)
         || gnu.kawa.reflect.OccurrenceType.itemCountIsOne(implType))
       {
         // Optimization to avoid a 'swap'.
@@ -257,4 +279,7 @@ public class ConsumerTarget extends Target
    }
 
   public Type getType() { return type; }
+
+    public static final ClassType typeSequences =
+      ClassType.make("gnu.lists.Sequences");
 }

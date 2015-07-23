@@ -1,6 +1,7 @@
 package gnu.lists;
 
 import gnu.text.Char;
+import gnu.math.ULong;
 import java.util.*;
 import java.lang.reflect.Array;
 
@@ -146,5 +147,19 @@ public class Sequences {
     public static Object drop(Object base, int fromStart, int fromEnd) {
         List<?> lbase = (List<?>) base;
         return subList(base, fromStart, lbase.size() - fromEnd);
+    }
+
+    public static void writeUInt(int value, Consumer out) {
+        if (value >= 0)
+            out.writeInt(value);
+        else
+            out.writeLong((long) value & 0xffffffffl);
+    }
+
+    public static void writeULong(long value, Consumer out) {
+        if (value >= 0)
+            out.writeLong(value);
+        else
+            out.writeObject(ULong.valueOf(value));
     }
 }

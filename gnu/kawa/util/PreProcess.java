@@ -9,12 +9,13 @@ import java.util.*;
 
 public class PreProcess
 {
-    // JAVA5:
-    // Hashtable<String,Boolean> keywords = new Hashtable<String,Boolean>();
-    Hashtable keywords = new Hashtable();
+    Hashtable<String,Boolean> keywords = new Hashtable<String,Boolean>();
+    ArrayList<?>[] substitutions = new ArrayList<?>[128];
+    int maxkey;
 
     String filename;
     int lineno;
+    String outFilename;
 
     static final String JAVA4_FEATURES = "+JAVA2 +use:java.util.IdentityHashMap +use:java.lang.CharSequence +use:java.lang.Throwable.getCause +use:java.net.URI +use:java.util.regex +SAX2 +use:java.nio";
     static final String NO_JAVA4_FEATURES = "-JAVA5 -use:java.util.IdentityHashMap -use:java.lang.CharSequence -use:java.lang.Throwable.getCause -use:java.net.URI -use:java.util.regex -use:org.w3c.dom.Node -JAXP-1.3 -use:javax.xml.transform -JAVA5 -JAVA6 -JAVA6COMPAT5 -JAXP-QName -use:java.text.Normalizer -use:javax.lang.model -SAX2 -use:java.nio -Android";
@@ -45,11 +46,17 @@ public class PreProcess
     int resultLength;
 
     public void filter(String filename) throws Throwable {
-        if (filter(filename, new BufferedInputStream(new FileInputStream(filename)))) {
-            FileOutputStream out = new FileOutputStream(filename);
+        boolean changed =
+            filter(filename,
+                   new BufferedInputStream(new FileInputStream(filename)));
+        String outname = outFilename == null ? filename : outFilename;
+        boolean overwrite = filename.equals(outname);
+        if (changed || ! overwrite) {
+            FileOutputStream out = new FileOutputStream(outname);
             out.write(resultBuffer, 0, resultLength);
             out.close();
-            System.err.println("Pre-processed "+filename);
+            System.err.println("Pre-processed "+filename
+                               +(overwrite ? "" : (" to "+outname)));
         }
     }
 
@@ -62,7 +69,9 @@ public class PreProcess
         int len = 0;
         int lineStart = 0;
         int dataStart = -1;
-        int cmdLine= 0;
+        int cmdLine = 0;
+        boolean removeCommented = outFilename != null
+            && ! filename.equals(outFilename);
         lineno = 1;
         // If non-negative, comment out at this indentation.
         int commentAt = -1;
@@ -73,13 +82,16 @@ public class PreProcess
         int skipNesting = 0;
         String cmd = null;
         int changedLine = 0; // -1: comment added or moved; +1 comment removed
-        for (;;)
-        {
+        boolean skipLine = false;
+        for (;;) {
             int c = in.read();
             if (c < 0)
                 break;
-            if (len + 10 >= buf.length) {// Allow a little extra for look-ahead.
-                byte[] nbuf = new byte[2 * len];
+            // Allow a little extra for look-ahead.
+            int needed = len + maxkey + 10;
+            int buflen = buf.length;
+            if (needed >= buflen) {
+                byte[] nbuf = new byte[needed + (buflen >> 2)];
                 System.arraycopy(buf, 0, nbuf, 0, len);
                 buf = nbuf;
             }
@@ -109,6 +121,7 @@ public class PreProcess
                 else
                     doComment = true;
                 if (doComment) {
+                    skipLine = removeCommented;
                     buf[len++] = '/';
                     buf[len++] = '/';
                     buf[len++] = ' ';
@@ -140,8 +153,45 @@ public class PreProcess
                     }
                 }
             }
-            buf[len] = (byte) c;
-            len++;
+            buf[len++] = (byte) c;
+            if (c < 127 && c > ' ' && substitutions[c] != null) {
+                int keystart = len-1;
+                ArrayList<String> subs = (ArrayList<String>) substitutions[c];
+                int nsub = subs.size();
+                int next = in.read();
+                for (int i = 0; ; i+=2) {
+                    if (i == nsub) {
+                        break;
+                    }
+                    String key = subs.get(i);
+                    String val = subs.get(i+1);
+                    int keylen = key.length();
+                    int j = 1; // already matched key.charAt(0).
+                    for (; j < keylen; j++) {
+                        if (j == len-keystart) {
+                            if (next == key.charAt(j)) {
+                                buf[len++] = (byte) next;
+                                next = in.read();
+                            } else {
+                                break;
+                            }
+                        } else if (buf[keystart+j] != key.charAt(j))
+                            break;
+                    }
+                    if (j == keylen) {
+                        // found match
+                        len = keystart;
+                        int vallen = val.length();
+                        for (int k = 0; k < vallen; k++)
+                            buf[len++] = (byte) val.charAt(k);
+                        break;
+                    }
+                }
+                if (next < 0)
+                    break;
+                c = next;
+                buf[len++] = (byte) c;
+            }
             if (c == '\n') {
                 int firstNonSpace = -1;
                 int lastNonSpace = 0;
@@ -196,6 +246,7 @@ public class PreProcess
                                 commentAt = curIndent;
                                 skipNesting = nesting;
                             }
+                            skipLine = removeCommented;
                         } else if ("#else".equals(cmd)) {
                             if (nesting == 0)
                                 error("unexpected "+cmd);
@@ -216,14 +267,19 @@ public class PreProcess
                             } else if (skipNesting > 0)
                                 commentAt = curIndent;
                             nesting--;
+                            skipLine = removeCommented;
                         } else
                             error("unknown command: "+cmnt);
                     }
                 }
-                lineStart = len;
+                if (skipLine)
+                    len = lineStart;
+                else
+                    lineStart = len;
                 dataStart = -1;
                 curIndent = 0;
                 lineno++;
+                skipLine = false;
                 changedLine = 0;
             } else if (dataStart < 0)
                 curIndent = c == '\t' ? (curIndent + 8) & ~7 : curIndent + 1;
@@ -238,7 +294,27 @@ public class PreProcess
     }
 
     void handleArg(String arg) {
-        if (arg.charAt(0) == '%') {
+        if (arg.charAt(0) == '=') {
+            int eq = arg.indexOf('=', 1);
+            if (eq < 0)
+                error("missing substiution keyword in "+arg);
+            String key = arg.substring(1, eq);
+            String val = arg.substring(eq+1);
+            char key0 = key.charAt(0);
+            if (key0 <= ' ' || key0 >= 127)
+                error("invalid start character of substituton "+key);
+            ArrayList<String> substitution =
+                (ArrayList<String>) substitutions[key0];
+            if (substitution == null) {
+                substitution = new ArrayList<String>();
+                substitutions[key0] = substitution;
+            }
+            int keylen = key.length();
+            if (keylen > maxkey)
+                maxkey = keylen;
+            substitution.add(key);
+            substitution.add(val);
+        } else if (arg.charAt(0) == '%') {
             arg = arg.substring(1);
             for (int i = 0;  ;  i += 2 ) {
                 if (i >= version_features.length) {
@@ -289,7 +365,12 @@ public class PreProcess
         pp.keywords.put("true", Boolean.TRUE);
         pp.keywords.put("false", Boolean.FALSE);
 
-        for (int i = 0;  i < args.length;  i++)
-            pp.handleArg(args[i]);
+        for (int i = 0;  i < args.length;  i++) {
+            String arg = args[i];
+            if (arg.equals("-o") && i + 1 < args.length)
+                pp.outFilename = args[++i];
+            else
+                pp.handleArg(arg);
+        }
     }
 }

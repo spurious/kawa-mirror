@@ -1,3 +1,10 @@
+2015-07-29  Per Bothner  <per@bothner.com>
+
+	* PreProcess.java: Add support for "-o" option, to write to a
+	separate output file.  In this mode we remove rather than
+	comment out unused code.
+	Add support for substitutions, with arguments like "=KEY=SUBST".
+
 2015-05-01  Per Bothner  <per@bothner.com>
 
 	* BoundedHashable.java: New interface.

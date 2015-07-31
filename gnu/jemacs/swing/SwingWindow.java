@@ -258,7 +258,7 @@ implements java.awt.event.FocusListener,
       panel.remove(modeline);
     panel.remove(scrollPane);
 
-    // Mow remove the Panel from its parent.
+    // Now remove the Panel from its parent.
     Container oldParent = panel.getParent();
     if (oldParent instanceof JSplitPane)
       {

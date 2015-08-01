@@ -382,6 +382,8 @@ The @code{read-with-shared-structure} is missing, but subsumed by @code{read}.
 @uref{http://srfi.schemers.org/srfi-108/,SRFI 108}: Named quasi-literal constructors - @pxref{Named quasi-literals}.
 @item
 @uref{http://srfi.schemers.org/srfi-109/srfi-109.html, SRFI-109}: Extended string quasi-literals - @pxref{string quasi-literals}.
+@item
+@uref{http://srfi.schemers.org/srfi-118/srfi-118.html, SRFI-118}: Simple adjustable-size strings (@code{string-append!} and @code{string-replace!}).
 @end itemize
 
 @node Compatibility
@@ -15039,7 +15041,7 @@ compiler-generate field types implemented the @code{Named} interface.
 
 There are two kinds of module class:
 A @dfn{static module} is a class (or gets compiled to a class)
-all of whose public fields a static, and that does not have a
+all of whose public fields are static, and that does not have a
 public constructor.  A JVM can only have a single global instance of
 a static module.
 An @dfn{instance module} has a public default constructor,
@@ -15108,10 +15110,9 @@ Otherwise the default is @code{(module-static #t)}.
 (It used to be @code{(module-static #f)} in older Kawa versions.)
 @end enumerate
 
-Note @code{(module-static #t)} usually produces more efficient
+The default is @code{(module-static #t)}.  It usually produces more efficient
 code, and is recommended if a module contains only procedure or macro
-definitions.  (This may become the default.)
-However, a static module means that all environments in a JVM
+definitions. However, a static module means that all environments in a JVM
 share the same bindings, which you may not want if you use
 multiple top-level environments.
 @end deffn

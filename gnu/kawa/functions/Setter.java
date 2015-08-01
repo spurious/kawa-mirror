@@ -6,6 +6,7 @@ import gnu.mapping.Procedure;
 import gnu.kawa.reflect.Invoke;
 import gnu.kawa.lispexpr.LangPrimType;
 import gnu.lists.Array;
+import gnu.lists.FString;
 import gnu.lists.Range;
 import gnu.lists.Sequences;
 import gnu.lists.SimpleVector;
@@ -114,8 +115,13 @@ public class Setter extends Procedure1 implements HasSetter {
                 int size = range.size();
                 if (range.getStepInt() != 1)
                     throw new ClassCastException("step of index range must be 1");
-                Sequences.replace(list, istart, istart+size,
-                                  Sequences.coerceToSequence(value));
+                if (list instanceof FString && value instanceof CharSequence) {
+                    CharSequence sval = (CharSequence) value;
+                    ((FString) list).replace(sval, 0, sval.length(),
+                                             istart, istart+size);
+                } else
+                    Sequences.replace(list, istart, istart+size,
+                                      Sequences.coerceToSequence(value));
             } else {
                 if (elementType != null)
                     value = elementType.coerceFromObject(value);

@@ -4,7 +4,7 @@
 	* CompilationHelpers.java (SetListExp.validateApply):
 	Check if indexing using a sequence.
 	* ParseFormat.java (asFormat): Use new FStream.openReader.
-	* Setter.java (SetLiast): Handle indexing string using index array.
+	* Setter.java (SetList): Handle indexing string using index array.
 
 2015-06-23  Per Bothner  <per@bothner.com>
 

@@ -235,7 +235,6 @@ KAWA_COMPILER = $(JAVA) -classpath "$(CLASSPATH)" kawa.repl -d $(top_builddir) \
 java_sources = \
   BufferContent.java \
   IgnoreAction.java \
-  MarkerReader.java \
   Modeline.java \
   SwingBuffer.java \
   SwingFrame.java \

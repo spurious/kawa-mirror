@@ -4,20 +4,27 @@
 package gnu.lists;
 import java.util.List;
 
+/** Wrap a List (or an indexed selection of it) as a Sequence. */
+
 public class IndirectIndexedSeq<E>
-    extends AbstractSequence<E> implements Sequence<E> {
+    extends IndirectIndexable<E> {
 
     List<E> base;
-    IntSequence indexes;
 
     public IndirectIndexedSeq(List<E> base, IntSequence indexes) {
         this.base = base;
         this.indexes = indexes;
+        new Error("new IndirectIndexedSeq").printStackTrace();
+    }
+
+    public int size() {
+        return indexes == null || indexes == cantWriteMarker
+            // or generally indexes.isUnbounded() ??? FIXME
+            ? base.size()
+            : indexes.size();
     }
 
     public E get(int index) {
         return base.get(indexes.intAt(index));
     }
-
-    public int size() { return indexes.size(); }
 }

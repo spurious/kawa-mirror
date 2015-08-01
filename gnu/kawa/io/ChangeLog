@@ -1,3 +1,9 @@
+2015-07-31  Per Bothner  <per@bothner.com>
+
+	* CharArrayInPort.java: Add support for reading from
+	indirect-indexable AbstractCharVector.
+	* InPort.java (read): Kludge for CharArrayInPort.
+
 2015-05-05  Per Bothner  <per@bothner.com>
 
 	* PrettyWriter.java (enqueue): If we're sharing, we don't wrap around,

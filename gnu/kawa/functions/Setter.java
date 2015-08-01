@@ -6,6 +6,8 @@ import gnu.mapping.Procedure;
 import gnu.kawa.reflect.Invoke;
 import gnu.kawa.lispexpr.LangPrimType;
 import gnu.lists.Array;
+import gnu.lists.Range;
+import gnu.lists.Sequences;
 import gnu.lists.SimpleVector;
 
 /** Implements Kawa extension function "setter", as in SRFI-17. */
@@ -65,8 +67,15 @@ public class Setter extends Procedure1 implements HasSetter {
         public SetList(java.util.List list) {
             if (list instanceof SimpleVector) {
                 String tag = ((SimpleVector) list).getTag();
-                int tlen = tag == null ? 0 : tag.length();
-                switch (tag.charAt(0)) {
+                char tag0 = tag == null || tag.length() == 0 ? 0
+                    : tag.charAt(0);
+                switch (tag0) {
+                case 'c':
+                    if (tag.equals("c16"))
+                        elementType = LangPrimType.charType;
+                    else if (tag.equals("c32"))
+                        elementType = LangPrimType.characterType;
+                    break;
                 case 'f':
                     if (tag.equals("f32"))
                         elementType = LangPrimType.floatType;
@@ -99,8 +108,19 @@ public class Setter extends Procedure1 implements HasSetter {
         Type elementType;
 
         public Object apply2(Object index, Object value) {
-            value = elementType.coerceFromObject(value);
-            list.set(((Number) index).intValue(), value);
+            if (index instanceof Range.IntRange) {
+                Range.IntRange range = (Range.IntRange) index;
+                int istart = range.getStartInt();
+                int size = range.size();
+                if (range.getStepInt() != 1)
+                    throw new ClassCastException("step of index range must be 1");
+                Sequences.replace(list, istart, istart+size,
+                                  Sequences.coerceToSequence(value));
+            } else {
+                if (elementType != null)
+                    value = elementType.coerceFromObject(value);
+                list.set(((Number) index).intValue(), value);
+            }
             return Values.empty;
         }
     }

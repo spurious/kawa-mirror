@@ -106,11 +106,12 @@ GNU_LISTS_JSOURCES = \
   lists/FilterConsumer.java \
   lists/FString.java \
   lists/FVector.java \
-  lists/GapVector.java \
+  lists/GapManager.java \
   lists/GeneralArray.java \
   lists/GeneralArray1.java \
   lists/ItemPredicate.java \
   lists/ImmutablePair.java \
+  lists/IndirectIndexable.java \
   lists/IndirectIndexedSeq.java \
   lists/IntSequence.java \
   lists/IntVector.java \
@@ -137,7 +138,7 @@ GNU_LISTS_JSOURCES = \
   lists/SimpleVector.java \
   lists/SubCharSeq.java \
   lists/SubSequence.java \
-  lists/StableVector.java \
+  lists/StableManager.java \
   lists/Strings.java \
   lists/TreeList.java \
   lists/TreePosition.java \

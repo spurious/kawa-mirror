@@ -1,10 +1,11 @@
-// Copyright (c) 2015  Per M.A. Bothner.
+// This file is generated from PrimVector.template. DO NOT EDIT! 
+// Copyright (c) 2001, 2002, 2015  Per M.A. Bothner and Brainfood Inc.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.lists;
 import java.io.*;
 
-/** Simple adjustable-length vector of 64-bit integers (signed or unsigned). */
+/** Simple adjustable-length vector of signed or unsigned 64-bit integers (longs). */
 
 public abstract class LongVector<E> extends PrimIntegerVector<E>
 {
@@ -26,11 +27,13 @@ public abstract class LongVector<E> extends PrimIntegerVector<E>
         }
     }
 
-    protected Object getBuffer() { return data; }
+    public long[] getBuffer() { return data; }
+
+    protected void setBuffer(Object buffer) { data = (long[]) buffer; }
 
     public final long longAt(int index) {
-        if (index >= size)
-            throw new IndexOutOfBoundsException();
+        if (indexes != null)
+            index = indexes.intAt(index);
         return data[index];
     }
 
@@ -43,8 +46,9 @@ public abstract class LongVector<E> extends PrimIntegerVector<E>
     }
 
     public final void setLongAt(int index, long value) {
-        if (index >= size)
-            throw new IndexOutOfBoundsException();
+        checkCanWrite(); // FIXME maybe inline and fold into following
+        if (indexes != null)
+            index = indexes.intAt(index);
         data[index] = value;
     }
 
@@ -53,34 +57,15 @@ public abstract class LongVector<E> extends PrimIntegerVector<E>
     }
 
     public void add(long v) {
-        int sz = size;
+        int sz = size();
         addSpace(sz, 1);
         setLongAt(sz, v);
     }
 
     protected void clearBuffer(int start, int count) {
+        long[] d = data;
         while (--count >= 0)
-            data[start++] = 0;
+            d[start++] = 0;
     }
 
-    /**
-     * @serialData Write 'size' (using writeInt),
-     *   followed by 'size' elements in order (using writeLong).
-     */
-    public void writeExternal(ObjectOutput out) throws IOException {
-        int size = this.size;
-        out.writeInt(size);
-        for (int i = 0;  i < size;  i++)
-            out.writeLong(data[i]);
-    }
-
-    public void readExternal(ObjectInput in)
-        throws IOException, ClassNotFoundException {
-        int size = in.readInt();
-        long[] data = new long[size];
-        for (int i = 0;  i < size;  i++)
-            data[i] = in.readLong();
-        this.data = data;
-        this.size = size;
-    }
 }

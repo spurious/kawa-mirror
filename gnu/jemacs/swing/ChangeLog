@@ -1,3 +1,11 @@
+2015-07-31  Per Bothner  <per@bothner.com>
+
+	* MarkerReader.java: Removed class.
+	* Makefile.am: Update accordingly.
+	* SwingBuffer.java (openReader): Use contents's openReader.
+	* BufferCOntent.java: Some code moved/changed to deal with new
+	FString/StableManager APIs.
+
 2015-06-10  Per Bothner  <per@bothner.com>
 
 	* SwingBuffer.java (get) Returns a Char rather than a Character.

@@ -14,10 +14,8 @@ import gnu.xml.*;
 public class SortedNodes extends Nodes {
 
     private int compareIndex(int index, AbstractSequence seq2, int ipos2) {
-        if (index >= vector.gapStart)
-            index += vector.gapEnd - vector.gapStart;
-        AbstractSequence seq1 = nvector.getSeq(index);
-        int ipos1 = nvector.getPos(index);
+        AbstractSequence seq1 = vector.getSeq(index);
+        int ipos1 = vector.getPos(index);
         return AbstractSequence.compare(seq1, ipos1, seq2, ipos2);
     }
 
@@ -54,7 +52,7 @@ public class SortedNodes extends Nodes {
             return 0;
         // Optimize for the already sorted case, or secondarily for good
         // locality.  So use the gapStart as the initial "mid-point".
-        int lastIndex = vector.gapStart - 1;
+        int lastIndex = vector.getGapStart() - 1;
         int cmp = lastIndex < 0 ? -1 : compareIndex(lastIndex, seq, ipos);
         if (cmp < 0) {
             // The new node is after all nodes up to gapStart.
@@ -84,7 +82,7 @@ public class SortedNodes extends Nodes {
         int i = find(seq, ipos);
         if (i >= 0) {
             vector.add(i, (SeqPosition) null);
-            nvector.setBuffer(i, seq, ipos);
+            vector.setBuffer(i, seq, ipos);
         }
     }
 }

@@ -383,7 +383,9 @@ EXTRA_DIST = debian/control debian/rules debian/changelog debian/dirs \
 MOSTLYCLEANFILES = tmp* *.o bin/*.o *.stamp classes.list classes-rt.list
 CLEANFILES = *.jar bin/qexo kawa/Version.java bin/kawa.bat $(META_ScriptEngineFactory)
 DISTCLEANFILES = selected-java-source bin/kawa.sh
-MAINTAINERCLEANFILES = $(srcdir)/patch-source-list
+MAINTAINERCLEANFILES = \
+  $(GENERATED_SIMPLEVECTOR_FILES) $(srcdir)/patch-source-list
+
 HTML_HOME = $$HOME/public_html
 JAVADOC_DIR = $$HOME/Kawa/api
 JAVADOC_PACKAGES = \
@@ -406,6 +408,24 @@ JAVADOC_EXTRA_PATH = $(JAVADOC_ECLIPSE_JARS):$(JAVADOC_ANT_JARS)
 @WITH_HTTPSERVER_TRUE@PREPROCESS_HTTPSERVER = +use:com.sun.net.httpserver
 @ENABLE_XML_FALSE@PREPROCESS_XML = -enable:XML
 @ENABLE_XML_TRUE@PREPROCESS_XML = +enable:XML
+GENERATED_SIMPLEVECTOR_FILES = \
+  $(srcdir)/gnu/lists/FVector.java \
+  $(srcdir)/gnu/lists/BitVector.java \
+  $(srcdir)/gnu/lists/ByteVector.java \
+  $(srcdir)/gnu/lists/ShortVector.java \
+  $(srcdir)/gnu/lists/IntVector.java \
+  $(srcdir)/gnu/lists/LongVector.java \
+  $(srcdir)/gnu/lists/F32Vector.java \
+  $(srcdir)/gnu/lists/F64Vector.java \
+  $(srcdir)/gnu/lists/S8Vector.java \
+  $(srcdir)/gnu/lists/S16Vector.java \
+  $(srcdir)/gnu/lists/S32Vector.java \
+  $(srcdir)/gnu/lists/S64Vector.java \
+  $(srcdir)/gnu/lists/U8Vector.java \
+  $(srcdir)/gnu/lists/U16Vector.java \
+  $(srcdir)/gnu/lists/U32Vector.java \
+  $(srcdir)/gnu/lists/U64Vector.java
+
 @ON_WINDOWS_FALSE@KAWASCRIPTS_KAWA = bin/kawa.sh
 
 # kawa.sh is still needed for 'make check', even on Windows.
@@ -1024,7 +1044,7 @@ kawa/Version.java: $(srcdir)/kawa/Version.java.in $(srcdir)/configure.ac
 	&& SVN_REVISION=" (revision $${SVN_REVISION})"; \
 	sed -e 's|VERSION|@VERSION@'"$$SVN_REVISION|" <$(srcdir)/kawa/Version.java.in >$@
 
-all-recursive:  kawa/Version.java selected-java-source
+all-recursive:  kawa/Version.java selected-java-source $(GENERATED_SIMPLEVECTOR_FILES)
 all: kawa-@VERSION@.jar kawart-@VERSION@.jar
 
 selected-java-source: Makefile
@@ -1115,6 +1135,47 @@ set-selected-java-source:
 	   test "$(JAVA_SOURCE)" != "`cat selected-java-source`"; \
 	   then echo "$(JAVA_SOURCE)" >selected-java-source; \
 	fi
+
+.PHONY: make-primvector-source
+make-primvector-source: $(srcdir)/gnu/lists/PrimVector.template gnu/kawa/util/PreProcess.class
+	CLASSPATH=".$(CLASSPATH_SEPARATOR)$$CLASSPATH" $(JAVA) gnu.kawa.util.PreProcess \
+	  '%$(TAG)' '%UniformVector' -o $(OUT) $<
+
+$(srcdir)/gnu/lists/FVector.java: $(srcdir)/gnu/lists/PrimVector.template
+	$(MAKE) make-primvector-source OUT=$@ TAG=OBJECT
+$(srcdir)/gnu/lists/BitVector.java: $(srcdir)/gnu/lists/PrimVector.template
+	$(MAKE) make-primvector-source OUT=$@ TAG=BIT
+$(srcdir)/gnu/lists/ByteVector.java: $(srcdir)/gnu/lists/PrimVector.template
+	$(MAKE) make-primvector-source OUT=$@ TAG=BYTE
+$(srcdir)/gnu/lists/ShortVector.java: $(srcdir)/gnu/lists/PrimVector.template
+	$(MAKE) make-primvector-source OUT=$@ TAG=SHORT
+$(srcdir)/gnu/lists/IntVector.java: $(srcdir)/gnu/lists/PrimVector.template
+	$(MAKE) make-primvector-source OUT=$@ TAG=INT
+$(srcdir)/gnu/lists/LongVector.java: $(srcdir)/gnu/lists/PrimVector.template
+	$(MAKE) make-primvector-source OUT=$@ TAG=LONG
+$(srcdir)/gnu/lists/F32Vector.java: $(srcdir)/gnu/lists/PrimVector.template
+	$(MAKE) make-primvector-source OUT=$@ TAG=F32
+$(srcdir)/gnu/lists/F64Vector.java: $(srcdir)/gnu/lists/PrimVector.template
+	$(MAKE) make-primvector-source OUT=$@ TAG=F64
+$(srcdir)/gnu/lists/S8Vector.java: $(srcdir)/gnu/lists/PrimVector.template
+	$(MAKE) make-primvector-source OUT=$@ TAG=S8
+$(srcdir)/gnu/lists/S16Vector.java: $(srcdir)/gnu/lists/PrimVector.template
+	$(MAKE) make-primvector-source OUT=$@ TAG=S16
+$(srcdir)/gnu/lists/S32Vector.java: $(srcdir)/gnu/lists/PrimVector.template
+	$(MAKE) make-primvector-source OUT=$@ TAG=S32
+$(srcdir)/gnu/lists/S64Vector.java: $(srcdir)/gnu/lists/PrimVector.template
+	$(MAKE) make-primvector-source OUT=$@ TAG=S64
+$(srcdir)/gnu/lists/U8Vector.java: $(srcdir)/gnu/lists/PrimVector.template
+	$(MAKE) make-primvector-source OUT=$@ TAG=U8
+$(srcdir)/gnu/lists/U16Vector.java: $(srcdir)/gnu/lists/PrimVector.template
+	$(MAKE) make-primvector-source OUT=$@ TAG=U16
+$(srcdir)/gnu/lists/U32Vector.java: $(srcdir)/gnu/lists/PrimVector.template
+	$(MAKE) make-primvector-source OUT=$@ TAG=U32
+$(srcdir)/gnu/lists/U64Vector.java: $(srcdir)/gnu/lists/PrimVector.template
+	$(MAKE) make-primvector-source OUT=$@ TAG=U64
+
+clean-generated-simplevector-files:
+	-rm -f $(GENERATED_SIMPLEVECTOR_FILES)
 
 bin/kawa.bat: $(srcdir)/bin/kawa.bat.in
 	sed -e 's|%DEFAULT_KAWA_VERSION%|$(VERSION)|' \

@@ -1,4 +1,5 @@
-// Copyright (c) 2001, 2002  Per M.A. Bothner and Brainfood Inc.
+// This file is generated from PrimVector.template. DO NOT EDIT! 
+// Copyright (c) 2001, 2002, 2015  Per M.A. Bothner and Brainfood Inc.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.lists;
@@ -7,84 +8,73 @@ import gnu.math.UShort;
 
 /** Simple adjustable-length vector of unsigned 16-bit integers (shorts). */
 
-public class U16Vector extends ShortVector<UShort>
+public  class U16Vector extends ShortVector<UShort>
 {
     public U16Vector() {
         data = empty;
     }
 
-  public U16Vector(int size, short value)
-  {
-    short[] array = new short[size];
-    data = array;
-    this.size = size;
-    while (--size >= 0)
-      array[size] = value;
-  }
+    public U16Vector(int size, short value) {
+        short[] array = new short[size];
+        data = array;
+        if (value != 0) {
+            while (--size >= 0)
+                array[size] = value;
+        }
+    }
 
-  public U16Vector(int size)
-  {
-    this.data = new short[size];
-    this.size = size;
-  }
+    public U16Vector(int size) {
+        this(new short[size]);
+    }
 
-  public U16Vector (short[] data)
-  {
-    this.data = data;
-    size = data.length;
-  }
+    /** Reuses the argument without making a copy. */
+    public U16Vector(short[] data) {
+        this.data = data;
+    }
 
-  public U16Vector(Sequence seq)
-  {
-    data = new short[seq.size()];
-    addAll(seq);
-  }
+    /*
+    public U16Vector(Sequence seq) {
+        data = new short[seq.size()];
+        addAll(seq);
+    }
+    */
 
-  public final int intAtBuffer(int index)
-  {
-    return data[index] & 0xffff;
-  }
+    public U16Vector(short[] data, IntSequence indexes) {
+        this.data = data;
+        this.indexes = indexes;
+    }
 
-  public final UShort get(int index)
-  {
-    if (index >= size)
-      throw new IndexOutOfBoundsException();
-    return UShort.valueOf(data[index]);
-  }
+    /** Makes a copy of (part of) the argument array. */
+    public U16Vector(short[] values, int offset, int length) {
+        this(length);
+        System.arraycopy(values, offset, data, 0, length);
+    }
 
-  public final UShort getBuffer(int index)
-  {
-    return UShort.valueOf(data[index]);
-  }
+    public final int intAtBuffer(int index) {
+        return (int) data[index] & 0xffff;
+    }
 
-  @Override
-  public void setBuffer(int index, UShort value)
-  {
-    data[index] = value.shortValue();
-  }
+    public final UShort get(int index) {
+        if (indexes != null)
+            index = indexes.intAt(index);
+        return UShort.valueOf(data[index]);
+    }
 
-  public int getElementKind()
-  {
-    return INT_U16_VALUE;
-  }
+    public final UShort getBuffer(int index) {
+        return UShort.valueOf(data[index]);
+    }
 
-  public String getTag() { return "u16"; }
+    @Override
+    public final void setBuffer(int index, UShort value) {
+        data[index] = value.shortValue();
+    }
 
-  public void consumePosRange (int iposStart, int iposEnd, Consumer out)
-  {
-    if (out.ignoring())
-      return;
-    int i = iposStart >>> 1;
-    int end = iposEnd >>> 1;
-    if (end > size)
-      end = size;
-    for (;  i < end;  i++)
-      out.writeInt(data[i] & 0xffff);
-  }
+    public int getElementKind() { return INT_U16_VALUE; }
 
-  public int compareTo(Object obj)
-  {
-    return compareToInt(this, (U16Vector) obj);
-  }
+    public String getTag() { return "u16"; }
+
+    public int compareTo(Object obj) {
+        return compareToInt(this, (U16Vector) obj);
+    }
 
 }

@@ -20,7 +20,9 @@
 (define (bytevector-copy v::bytevector
                          #!optional (start ::int 0) (end ::int (v:size)))
   ::bytevector
-  (gnu.lists.U8Vector v start (- end start)))
+  (let ((result (gnu.lists.U8Vector(- end start))))
+    (result:copyFrom 0 v start end)
+    result))
 
 (define (bytevector-copy! (to ::bytevector)
                           (at ::int)

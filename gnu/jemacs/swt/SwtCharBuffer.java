@@ -3,26 +3,22 @@
 package gnu.jemacs.swt;
 
 import gnu.lists.FString;
-import gnu.lists.GapVector;
 
 /**
  * TODO Explain that this is all about.
  * @author Christian Surlykke
  *         18-07-2004
  */
-public class SwtCharBuffer extends GapVector implements CharSequence
+public class SwtCharBuffer extends FString
 {
-  protected FString chars;
   protected LineOffsets lineOffsets;
   
   public SwtCharBuffer(int initialSize)
   { 
-    super(new FString(new char[initialSize]));
-    chars = (FString) base;
+    super(new char[initialSize]);
     this.lineOffsets = new LineOffsets(initialSize/50);
   }
     
-  /* #ifdef use:java.lang.CharSequence */
   public CharSequence subSequence(int start, int end)
   {
     return new SubSequence(start, end);
@@ -63,7 +59,6 @@ public class SwtCharBuffer extends GapVector implements CharSequence
       return SwtCharBuffer.this.subSequence(this.start + start, this.start + end);
     }
   }
-  /* #endif */
 
   public int pos2offset(int pos)
   {
@@ -75,9 +70,6 @@ public class SwtCharBuffer extends GapVector implements CharSequence
     return offset <= gapStart ? offset : offset - gapEnd + gapStart;
   }
   
-  /**
-   * @see gnu.lists.GapVector#gapReserve(int)
-   */
   protected void gapReserve(int where, int needed)
   {
     int oldGapSize = gapEnd - gapStart;
@@ -88,9 +80,7 @@ public class SwtCharBuffer extends GapVector implements CharSequence
       lineOffsets.textRegionMoved(gapStart + oldGapSize, size(), newGapSize - oldGapSize);
     }
   }
-  /**
-   * @see gnu.lists.GapVector#shiftGap(int)
-   */
+
   protected void shiftGap(int newGapStart)
   {
     int oldGapStart = gapStart;
@@ -127,7 +117,7 @@ public class SwtCharBuffer extends GapVector implements CharSequence
   public void insert(int where, String str)
   {
     gapReserve(where, str.length());
-    str.getChars(0, str.length(), chars.data, where);
+    str.getChars(0, str.length(), data, where);
     gapStart += str.length();
     lineOffsets.textInserted(where, str);
   }

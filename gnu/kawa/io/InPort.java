@@ -400,7 +400,8 @@ public class InPort extends Reader implements Printable
             if (pos >= limit) {
                 if (buffer == null)
                     buffer = new char[BUFFER_SIZE];
-                else if (limit == buffer.length)
+                else if (limit == buffer.length
+                         && ! (this instanceof CharArrayInPort)) // KLUDGE FIXME
                     reserve(buffer, 1);
                 if (pos == 0) {
                     if (prev == '\r')

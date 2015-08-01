@@ -175,4 +175,16 @@ public class Strings
             sbuf.append(base.charAt(indexes.intAt(i)));
         return sbuf.toString();
     }
+
+    public static String toUtf8(byte[] bytes, int start, int length) {
+        /* #ifdef JAVA7 */  
+        return new String(bytes, start, length, java.nio.charset.StandardCharsets.UTF_8);
+        /* #else */
+        // try {
+        //   return new String(bytes, start, length, "UTF-8");
+        // } catch (UnsupportedEncodingException ex) {
+        //     throw new RuntimeException(ex);
+        // }
+        /* #endif */
+    }
 }

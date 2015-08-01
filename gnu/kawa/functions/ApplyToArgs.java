@@ -164,7 +164,7 @@ public class ApplyToArgs extends ProcedureN
             Object arg1 = Promise.force(args[1]);
             IntSequence indexes = Sequences.asIntSequenceOrNull(arg1);
             if (indexes != null) {
-                return new IndirectIndexedSeq(lst, indexes);
+                return Sequences.indirectIndexed(lst, indexes);
             } else {
                 int index = ((Number) arg1).intValue();
                 return lst.get(index);

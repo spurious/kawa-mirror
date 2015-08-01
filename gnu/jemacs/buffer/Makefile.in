@@ -235,7 +235,6 @@ KAWA_COMPILER = $(JAVA) -classpath "$(CLASSPATH)" kawa.repl -d $(top_builddir) \
 java_sources = \
   Buffer.java \
   BufferLocal.java \
-  BufferReader.java \
   BufferWriter.java \
   CancelledException.java \
   Command.java \

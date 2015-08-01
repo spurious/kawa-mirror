@@ -1,21 +1,19 @@
-// Copyright (c) 2015  Per M.A. Bothner.
+// This file is generated from PrimVector.template. DO NOT EDIT! 
+// Copyright (c) 2001, 2002, 2015  Per M.A. Bothner and Brainfood Inc.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.lists;
-
 import java.io.*;
 
-/** Simple adjustable-length vector of 32-bit integers (signed or unsigned). */
+/** Simple adjustable-length vector of signed or unsigned 32-bit integers (ints). */
 
 public abstract class IntVector<E> extends PrimIntegerVector<E>
 {
     int[] data;
-
     protected static int[] empty = new int[0];
 
     /** Get the allocated length of the data buffer. */
-    public int getBufferLength()
-    {
+    public int getBufferLength() {
         return data.length;
     }
 
@@ -29,11 +27,13 @@ public abstract class IntVector<E> extends PrimIntegerVector<E>
         }
     }
 
-    protected Object getBuffer() { return data; }
+    public int[] getBuffer() { return data; }
+
+    protected void setBuffer(Object buffer) { data = (int[]) buffer; }
 
     public final int intAt(int index) {
-        if (index >= size)
-            throw new IndexOutOfBoundsException();
+        if (indexes != null)
+            index = indexes.intAt(index);
         return data[index];
     }
 
@@ -41,15 +41,10 @@ public abstract class IntVector<E> extends PrimIntegerVector<E>
         return data[index];
     }
 
-    public final long longAt(int index) {
-        if (index >= size)
-            throw new IndexOutOfBoundsException();
-        return longAtBuffer(index);
-    }
-
     public final void setIntAt(int index, int value) {
-        if (index >= size)
-            throw new IndexOutOfBoundsException();
+        checkCanWrite(); // FIXME maybe inline and fold into following
+        if (indexes != null)
+            index = indexes.intAt(index);
         data[index] = value;
     }
 
@@ -58,34 +53,15 @@ public abstract class IntVector<E> extends PrimIntegerVector<E>
     }
 
     public void add(int v) {
-        int sz = size;
+        int sz = size();
         addSpace(sz, 1);
         setIntAt(sz, v);
     }
 
     protected void clearBuffer(int start, int count) {
+        int[] d = data;
         while (--count >= 0)
-            data[start++] = 0;
+            d[start++] = 0;
     }
 
-    /**
-     * @serialData Write 'size' (using writeInt),
-     *   followed by 'size' elements in order (using writeInt).
-     */
-    public void writeExternal(ObjectOutput out) throws IOException {
-        int size = this.size;
-        out.writeInt(size);
-        for (int i = 0;  i < size;  i++)
-            out.writeInt(data[i]);
-    }
-
-    public void readExternal(ObjectInput in)
-        throws IOException, ClassNotFoundException {
-        int size = in.readInt();
-        int[] data = new int[size];
-        for (int i = 0;  i < size;  i++)
-            data[i] = in.readInt();
-        this.data = data;
-        this.size = size;
-    }
 }

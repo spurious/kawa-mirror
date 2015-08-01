@@ -284,11 +284,23 @@ class SetListExp extends ApplyExp
                                          required);
                 }
             }
-            xargs[0] = this.getArgs()[0];
-            xargs[1] = QuoteExp.getInstance("set");
-            xargs[2] = Compilation.makeCoercion(args[0], Type.intType);
-            xargs[3] = value;
-            return visitor.visit(Compilation.makeCoercion(new ApplyExp(Invoke.invoke, xargs), Type.voidType), required);
+            Type itype = args[0].getType();
+            int listIndexCompat = LangObjType.sequenceType
+                .isCompatibleWithValue(itype);
+            int intIndexCompat = Type.intType
+                .isCompatibleWithValue(itype);
+            if (listIndexCompat < 0 && intIndexCompat < 0)
+                visitor.getCompilation()
+                    .error('w', "index is neither integer or sequence");
+            else if (listIndexCompat > 0) {
+                // maybe optimize later
+            } else if (intIndexCompat > 0) {
+                xargs[0] = this.getArgs()[0];
+                xargs[1] = QuoteExp.getInstance("set");
+                xargs[2] = Compilation.makeCoercion(args[0], Type.intType);
+                xargs[3] = value;
+                return visitor.visit(Compilation.makeCoercion(new ApplyExp(Invoke.invoke, xargs), Type.voidType), required);
+            }
         }
         return exp;
     }

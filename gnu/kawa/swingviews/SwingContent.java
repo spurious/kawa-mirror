@@ -21,8 +21,7 @@ public class SwingContent
     CharBuffer b = new CharBuffer(initialSize);
     // Swing assumes that a Content object is initialized to contain
     // a single '\n'.  This of course is not clearly documented ...
-    b.gapEnd = initialSize-1;
-    b.getArray()[b.gapEnd] = '\n';
+    b.append('\n');
     this.buffer = b;
   }
 
@@ -59,16 +58,16 @@ public class SwingContent
     throws BadLocationException
   {
     CharBuffer b = buffer;
-    if (nitems < 0 || where < 0 || where + nitems > b.length())
+    int end = where + nitems;
+    if (nitems < 0 || where < 0 || end > b.length())
       throw new BadLocationException("invalid remove", where);
-
-    b.delete(where, where+nitems);
 
     GapUndoableEdit undo = new GapUndoableEdit(where);
     undo.content = this;
-    undo.data = new String(b.getArray(), b.gapEnd - nitems, nitems);
+    undo.data = b.substring(where, end);
     undo.nitems = nitems;
     undo.isInsertion = false;
+    b.delete(where, end);
     return undo;
   }
 

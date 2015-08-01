@@ -1,4 +1,5 @@
-// Copyright (c) 2001, 2002  Per M.A. Bothner and Brainfood Inc.
+// This file is generated from PrimVector.template. DO NOT EDIT! 
+// Copyright (c) 2001, 2002, 2015  Per M.A. Bothner and Brainfood Inc.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.lists;
@@ -6,81 +7,74 @@ import java.io.*;
 
 /** Simple adjustable-length vector of signed 32-bit integers (ints). */
 
-public class S32Vector extends IntVector<Integer> implements IntSequence
+public  class S32Vector extends IntVector<Integer>
+    implements IntSequence
 {
-  public S32Vector ()
-  {
-    data = empty;
-  }
+    public S32Vector() {
+        data = empty;
+    }
 
-  public S32Vector(int size, int value)
-  {
-    int[] array = new int[size];
-    data = array;
-    this.size = size;
-    while (--size >= 0)
-      array[size] = value;
-  }
+    public S32Vector(int size, int value) {
+        int[] array = new int[size];
+        data = array;
+        if (value != 0) {
+            while (--size >= 0)
+                array[size] = value;
+        }
+    }
 
     public S32Vector(int size) {
         this(new int[size]);
     }
 
+    /** Reuses the argument without making a copy. */
     public S32Vector(int[] data) {
         this.data = data;
-        size = data.length;
     }
 
-  public S32Vector(Sequence seq)
-  {
-    data = new int[seq.size()];
-    addAll(seq);
-  }
+    /*
+    public S32Vector(Sequence seq) {
+        data = new int[seq.size()];
+        addAll(seq);
+    }
+    */
 
-  public final long longAtBuffer(int index)
-  {
-    return (long) data[index];
-  }
+    public S32Vector(int[] data, IntSequence indexes) {
+        this.data = data;
+        this.indexes = indexes;
+    }
 
-  public final Integer get(int index)
-  {
-    if (index >= size)
-      throw new IndexOutOfBoundsException();
-    return Integer.valueOf(data[index]);
-  }
+    /** Makes a copy of (part of) the argument array. */
+    public S32Vector(int[] values, int offset, int length) {
+        this(length);
+        System.arraycopy(values, offset, data, 0, length);
+    }
 
-  public final Integer getBuffer(int index)
-  {
-    return Integer.valueOf(data[index]);
-  }
+    public final long longAtBuffer(int index) {
+        return (long) data[index];
+    }
 
-  @Override
-  public void setBuffer(int index, Integer value)
-  {
-    data[index] = value.intValue();
-  }
+    public final Integer get(int index) {
+        if (indexes != null)
+            index = indexes.intAt(index);
+        return Integer.valueOf(data[index]);
+    }
 
-  public int getElementKind()
-  {
-    return INT_S32_VALUE;
-  }
+    public final Integer getBuffer(int index) {
+        return Integer.valueOf(data[index]);
+    }
 
-  public String getTag() { return "s32"; }
+    @Override
+    public final void setBuffer(int index, Integer value) {
+        data[index] = value.intValue();
+    }
 
-  public void consumePosRange (int iposStart, int iposEnd, Consumer out)
-  {
-    if (out.ignoring())
-      return;
-    int i = iposStart >>> 1;
-    int end = iposEnd >>> 1;
-    if (end > size)
-      end = size;
-    for (;  i < end;  i++)
-      out.writeInt(data[i]);
-  }
+    public int getElementKind() { return INT_S32_VALUE; }
 
-  public int compareTo(Object obj)
-  {
-    return compareToInt(this, (S32Vector) obj);
-  }
+    public String getTag() { return "s32"; }
+
+    public int compareTo(Object obj) {
+        return compareToInt(this, (S32Vector) obj);
+    }
+
 }

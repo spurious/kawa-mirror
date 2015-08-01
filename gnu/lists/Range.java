@@ -3,6 +3,7 @@ package gnu.lists;
 import gnu.kawa.functions.AddOp;
 import gnu.kawa.functions.MultiplyOp;
 import gnu.math.IntNum;
+import java.io.*;
 
 public class Range<E> extends AbstractSequence<E> implements Sequence<E> {
     E start;
@@ -31,9 +32,12 @@ public class Range<E> extends AbstractSequence<E> implements Sequence<E> {
     boolean isUnbounded() { return size == -1; }
 
     public static class IntRange extends Range<Integer>
-    implements IntSequence {
+        implements IntSequence, Externalizable {
         int istart;
         int istep;
+
+        /** Magic value used by IndirectIndexable objects. */
+        public static final IntRange cantWriteMarker = new IntRange(0, 1);
 
         public IntRange(int start, int step, int size) {
             super(start, step, size);
@@ -61,6 +65,23 @@ public class Range<E> extends AbstractSequence<E> implements Sequence<E> {
 
         @Override
         public Integer get(int index) { return intAt(index); }
+
+        public void writeExternal(ObjectOutput out) throws IOException {
+            out.writeInt(this == cantWriteMarker ? -2 : size);
+            out.writeInt(istart);
+            out.writeInt(istep);
+        }
+
+        public void readExternal(ObjectInput in)
+            throws IOException, ClassNotFoundException {
+            size = in.readInt();
+            istart = in.readInt();
+            istep = in.readInt();
+        }
+
+        public Object readResolve() throws ObjectStreamException {
+            return size == -2 ? cantWriteMarker: this;
+        }
     };
 
     //public static interface ByOne {
@@ -72,7 +93,11 @@ public class Range<E> extends AbstractSequence<E> implements Sequence<E> {
         }
     }
 
-   public static Range<?> valueOfUnbounded(Object start) {
+    public String toString() {
+        return "#<range start:"+getStart()+" step:"+getStep()+" size:"+size+">";
+    }
+
+    public static Range<?> valueOfUnbounded(Object start) {
         return new Range<Object>(start, IntNum.one(), -1);
     }
 

@@ -138,6 +138,16 @@ public class Sequences {
         return lbase.subList(fromIndex, toIndex);
     }
 
+    public static List indirectIndexed(List lst, IntSequence indexes) {
+        if (lst instanceof SimpleVector) {
+            SimpleVector svec = (SimpleVector) lst;
+            // FIXME - should do better!
+            if (svec.indexes == null && svec instanceof FVector)
+                return new FVector(((FVector) svec).data, indexes);
+        }
+        return new IndirectIndexedSeq(lst, indexes);
+    }
+
     public static Object drop(Object base, int count) {
         if (count >= 0)
             return subList(base, count, -1);
@@ -147,6 +157,87 @@ public class Sequences {
     public static Object drop(Object base, int fromStart, int fromEnd) {
         List<?> lbase = (List<?>) base;
         return subList(base, fromStart, lbase.size() - fromEnd);
+    }
+
+    public static void replace(List lst, int fromStart, int fromEnd,
+                               List values) {
+        if (lst instanceof SimpleVector && values instanceof SimpleVector) {
+            SimpleVector svec = (SimpleVector) values;
+            SimpleVector dvec = (SimpleVector) lst;
+            if (svec.getTag() == dvec.getTag()) {
+                int srcLength = svec.size();
+                int dstLength = fromEnd - fromStart;
+                int grow = srcLength - dstLength;
+                if (grow > 0)
+                    dvec.addSpace(fromEnd, grow);
+                Object dbuffer = dvec.getBuffer();
+                Object sbuffer = svec.getBuffer();
+                int sstart;
+                int dstart = dvec.getSegment(fromStart, srcLength);
+                if (dstart >= 0
+                    && (sstart = svec.getSegmentReadOnly(0, srcLength)) >= 0) {
+                    System.arraycopy(sbuffer, sstart,
+                                     dbuffer, dstart, srcLength);
+                } else {
+                    int srcStart = 0;
+                    boolean copied = dbuffer == sbuffer;
+                    if (copied)
+                        sbuffer = svec.toDataArray();
+                    while (srcLength > 0) {
+                        int step = srcLength;
+                        long dresult = dvec.getSegment(fromStart);
+                        int dwhere = (int) dresult;
+                        int dsize = (int) (dresult >> 32);
+                        if (dsize < step)
+                            step = dsize;
+                        int swhere;
+                        if (copied) {
+                            swhere = srcStart;
+                        } else {
+                            long sresult = svec.getSegment(srcStart);
+                            swhere = (int) sresult;
+                            int ssize = (int) (sresult >> 32);
+                            if (ssize < step)
+                                step = ssize;
+                        }
+                        if (step == 0)
+                            throw new Error("zero step in replace loop!");
+                        System.arraycopy(sbuffer, swhere, dbuffer, dwhere,
+                                         step);
+                        srcLength -= step;
+                        srcStart += step;
+                        fromStart += step;
+                    }
+                }
+                if (grow < 0)
+                    dvec.delete(fromEnd+grow, fromEnd);
+                return;
+            }
+        }
+        int oldSize = fromEnd - fromStart;
+        int newSize = values.size();
+        // Making a copy is unfortunate, but it is hard to handle overlap
+        // in the general case.  We do at least optimize SimpleVectors above.
+        Object[] varray = values.toArray();
+        int i = 0;
+        for (Object el : varray) {
+            if (i < oldSize)
+                lst.set(fromStart+i, el);
+            else
+                lst.add(fromStart+i, el);
+            i++;
+        }
+        if (i < oldSize) {
+            if (lst instanceof AbstractSequence) {
+                AbstractSequence alst = (AbstractSequence) lst;
+                alst.removePos(alst.createPos(fromStart+i, false), oldSize - i);
+            } else {
+                while (i < oldSize) {
+                    lst.remove(fromStart+i);
+                    oldSize--;
+                }
+            }
+        }
     }
 
     public static void writeUInt(int value, Consumer out) {

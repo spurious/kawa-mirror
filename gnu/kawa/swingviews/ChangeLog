@@ -1,3 +1,7 @@
+2015-07-31  Per Bothner  <per@bothner.com>
+
+	* SwingContent.java: Update for CharBuffer changes.
+
 2015-07-02  Per Bothner  <per@bothner.com>
 
 	* SwingContent.java (delete): Update parameter convention.

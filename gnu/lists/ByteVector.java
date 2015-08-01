@@ -1,127 +1,167 @@
+// This file is generated from PrimVector.template. DO NOT EDIT! 
+// Copyright (c) 2001, 2002, 2015  Per M.A. Bothner and Brainfood Inc.
+// This is free software;  for terms and warranty disclaimer see ./COPYING.
+
 package gnu.lists;
 import java.io.*;
 
+/** Simple adjustable-length vector of signed or unsigned 8-bit integers (bytes). */
+
 public abstract class ByteVector<E> extends PrimIntegerVector<E>
 {
-  byte[] data;
-  protected static byte[] empty = new byte[0];
+    byte[] data;
+    protected static byte[] empty = new byte[0];
 
-  /** Get the allocated length of the data buffer. */
-  public int getBufferLength()
-  {
-    return data.length;
-  }
+    /** Get the allocated length of the data buffer. */
+    public int getBufferLength() {
+        return data.length;
+    }
 
-  public void setBufferLength(int length)
-  {
-    int oldLength = data.length;
-    if (oldLength != length)
-      {
-	byte[] tmp = new byte[length];
-	System.arraycopy(data, 0, tmp, 0,
-			 oldLength < length ? oldLength : length);
-	data = tmp;
-      }
-  }
+    public void setBufferLength(int length) {
+        int oldLength = data.length;
+        if (oldLength != length) {
+            byte[] tmp = new byte[length];
+            System.arraycopy(data, 0, tmp, 0,
+                             oldLength < length ? oldLength : length);
+            data = tmp;
+        }
+    }
 
-  public byte[] getBuffer() { return data; }
+    public byte[] getBuffer() { return data; }
 
-  public final byte byteAt(int index)
-  {
-    if (index >= size)
-      throw new IndexOutOfBoundsException();
-    return data[index];
-  }
+    protected void setBuffer(Object buffer) { data = (byte[]) buffer; }
 
-  public final byte byteAtBuffer(int index)
-  {
-    return data[index];
-  }
+    public final byte byteAt(int index) {
+        if (indexes != null)
+            index = indexes.intAt(index);
+        return data[index];
+    }
 
-  public void consumePosRange (int iposStart, int iposEnd, Consumer out)
-  {
-    if (out.ignoring())
-      return;
-    int i = iposStart >>> 1;
-    int end = iposEnd >>> 1;
-    if (end > size)
-      end = size;
-    for (;  i < end;  i++)
-      out.writeInt(intAtBuffer(i));
-  }
+    public final byte byteAtBuffer(int index) {
+        return data[index];
+    }
 
-  public final void setByteAt(int index, byte value)
-  {
-    if (index >= size)
-      throw new IndexOutOfBoundsException();
-    data[index] = value;
-  }
+    public final void setByteAt(int index, byte value) {
+        checkCanWrite(); // FIXME maybe inline and fold into following
+        if (indexes != null)
+            index = indexes.intAt(index);
+        data[index] = value;
+    }
 
-  public final void setByteAtBuffer(int index, byte value)
-  {
-    data[index] = value;
-  }
+    public final void setByteAtBuffer(int index, byte value) {
+        data[index] = value;
+    }
 
     public void add(byte v) {
-        int sz = size;
+        int sz = size();
         addSpace(sz, 1);
         setByteAt(sz, v);
     }
 
-    public void copyFrom(byte[] src, int soffset, int doffset, int length) {
-        if (doffset + length > size)
-            throw new IndexOutOfBoundsException();
-        System.arraycopy(src, soffset, data, doffset, length);
-    }
-
-  protected void clearBuffer(int start, int count)
-  {
-    while (--count >= 0)
-      data[start++] = 0;
-  }
-
-    public void copyFrom (int index, ByteVector src, int start, int end) {
-        int count = end-start;
-        if (count < 0 || index+count > size || end > src.size)
-            throw new ArrayIndexOutOfBoundsException();
-        System.arraycopy(src.data, start, data, index, count);
-    }
-
-  /**
-   * @serialData Write 'size' (using writeInt),
-   *   followed by 'size' elements in order (using writeByte).
-   */
-  public void writeExternal(ObjectOutput out) throws IOException
-  {
-    int size = this.size;
-    out.writeInt(size);
-    for (int i = 0;  i < size;  i++)
-      out.writeByte(data[i]);
-  }
-
-  public void readExternal(ObjectInput in)
-    throws IOException, ClassNotFoundException
-  {
-    int size = in.readInt();
-    byte[] data = new byte[size];
-    for (int i = 0;  i < size;  i++)
-      data[i] = in.readByte();
-    this.data = data;
-    this.size = size;
-  }
-
-    public InputStream getInputStream() {
-        return new ByteArrayInputStream(data, 0, size);
+    protected void clearBuffer(int start, int count) {
+        byte[] d = data;
+        while (--count >= 0)
+            d[start++] = 0;
     }
 
     public int readFrom(int start, int count, InputStream in)
         throws IOException {
-        return in.read(data, start, count);
+        int pos = start;
+        while (count > 0) {
+            long result = getSegment(pos);
+            int where = (int) result;
+            int size = (int) (result >> 32);
+            if (size > count)
+                size = count;
+            int n = in.read(data, where, size);
+            if (n < 0) {
+                if (pos == start)
+                    return -1;
+                break;
+            }
+            pos += n;
+            count -= n;
+        }
+        return pos - start;
     }
 
     public void writeTo(int start, int count, OutputStream out)
         throws IOException {
-        out.write(data, start, count);
+        while (count > 0) {
+            long result = getSegment(start);
+            int where = (int) result;
+            int size = (int) (result >> 32);
+            if (size > count)
+                size = count;
+            out.write(data, where, size);
+            start += size;
+            count -= size;
+        }
     }
 
+    public void copyFrom (int index, ByteVector src, int start, int end) {
+        int count = end-start;
+        int sz = size();
+        int src_sz = src.size();
+        if (count < 0 || index+count > sz || end > src_sz)
+            throw new ArrayIndexOutOfBoundsException();
+        int sseg, dseg;
+        if ((sseg = src.getSegmentReadOnly(start, count)) >= 0 &&
+            (dseg = getSegment(index, count)) >= 0) {
+            System.arraycopy(src.data, sseg, data, dseg, count);
+        } else {
+            for (int i = 0; i < count; i++)
+                setByteAt(index+i, src.byteAt(start+i));
+        }
+    }
+
+    public InputStream getInputStream() {
+        int sz = size();
+        int seg = getSegmentReadOnly(0, sz);
+        if (seg >= 0)
+            return new ByteArrayInputStream(data, seg, sz);
+        else
+            return new ByteVectorInputStream(this);
+    }
+
+    static class ByteVectorInputStream extends InputStream {
+        ByteVector bvec;
+        int pos;
+        int mark;
+        int size;
+        public ByteVectorInputStream(ByteVector bvec) {
+            this.bvec = bvec;
+            this.size = bvec.size();
+        }
+        public int read() {
+            return pos >= size ? -1 :
+                (0xff & bvec.byteAt(pos++));
+        }
+        public boolean markSupported() { return true; }
+        public void mark(int readLimit) { mark = pos; }
+        public void reset() { pos = mark; }
+        public void close() { }
+        public int available() { return size-pos; }
+        public long skip(long n) {
+            if (n < 0) n = 0;
+            if (n < size-pos) { pos = size; return size-pos; }
+            else { pos += n; return n; }
+        }
+    }
+
+    /** Covert bytes, interpreted as UTF-8 characters, to a String. */
+    public String toUtf8(int start, int length) {
+        if (start+length>size()) throw new IndexOutOfBoundsException();
+        int seg = getSegmentReadOnly(start, length);
+        byte[] buf;
+        if (seg >= 0) {
+            buf = data;
+            start = seg;
+        } else {
+            buf = new byte[length];
+            for (int i = 0; i < length; i++)
+                buf[i] = byteAt(start+i);
+        }
+        return Strings.toUtf8(buf, start, length);
+    }
 }

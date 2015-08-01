@@ -2,22 +2,28 @@
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.lists;
+import java.io.*;
 import java.util.*;
+
+/* A constant vector of arbitrary objects.
+ * This class is probably no longer needed,
+ * single any SimpleVector can now be made constant.  FIXME.
+ */
 
 public class ConstVector<E> extends FVector<E>
 {
-  public ConstVector ()
-  {
-  }
+    public ConstVector() {
+        indexes = cantWriteMarker;
+    }
 
-  public ConstVector (Object[] data)
-  {
-    super(data);
-  }
+    public ConstVector(Object[] data) {
+        super(data);
+        indexes = cantWriteMarker;
+    }
 
   public ConstVector(java.util.List seq)
   {
-    super(new Object[seq.size()]);
+    this(new Object[seq.size()]);
     int index = 0;
     for (Iterator<?> it = seq.iterator();  it.hasNext(); )
       {
@@ -38,6 +44,29 @@ public class ConstVector<E> extends FVector<E>
   public void setDataBackDoor(Object[] data)
   {
     this.data = data;
-    this.size = data.length;
+  }
+
+  /**
+   * @serialData Write the number of elements (using writeInt), followed by
+   *   the elements in order (written using writeObject).
+   *   (It might seem simpler (and increase sharing) to just call
+   *   writeObject(value), but that exposes the implementation.)
+   */
+  public void writeExternal(ObjectOutput out) throws IOException
+  {
+    int n = size();
+    out.writeInt(n);
+    for (int i = 0;  i < n;  i++)
+      out.writeObject(data[i]);
+  }
+
+  public void readExternal(ObjectInput in)
+    throws IOException, ClassNotFoundException
+  {
+    int n = in.readInt();
+    Object[] data = new Object[n];
+    for (int i = 0;  i < n;  i++)
+      data[i] = in.readObject();
+    this.data = data;
   }
 }

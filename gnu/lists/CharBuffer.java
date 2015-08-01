@@ -11,169 +11,25 @@ import gnu.text.Char;
  * javax.swing.text.AbstractDocument.Content
  */
 
-public class CharBuffer extends StableVector<Char>
-  implements CharSeq, java.io.Serializable
+public class CharBuffer extends FString
 {
-  // Same as super.base but pre-cast to FString.
-  private FString string;
-
-  public CharBuffer(FString str)
-  {
-    super(str);
-    string = str;
-  }
-
-  public CharBuffer(int initialSize)
-  {
-    this(new FString(initialSize));
-  }
-
-  protected CharBuffer ()
-  {
-  }
-
-  public int length() { return size(); }
-
-  public char charAt(int index)
-  {
-    // If index is out of bounds, the base.get will catch that.
-    if (index >= gapStart)
-      index += gapEnd - gapStart;
-    return string.charAt(index);
-  }
-
-  public int indexOf (int ch, int fromChar)
-  {
-    char c1, c2;
-    if (ch >= 0x10000)
-      {
-        c1 = (char) (((ch - 0x10000) >> 10) + 0xD800);
-        c2 = (char) ((ch & 0x3FF) + 0xDC00);
-      }
-    else
-      {
-        c1 = (char) ch;
-        c2 = 0;
-      }
-    char[] arr = getArray();
-    int i = fromChar;
-    int limit = gapStart;
-    if (i >= limit)
-      {
-        i += gapEnd-gapStart;
-        limit = arr.length;
-      }
-    for ( ; ; i++)
-      {
-        if (i == limit)
-          {
-            limit = arr.length;
-            if (i < limit)
-              i = gapEnd;
-            else
-              break;
-          }
-        if (arr[i] == c1
-            && (c2 == 0
-                || (i+1 < limit ? arr[i+1] == c2
-                    : gapEnd < arr.length && arr[gapEnd] == c2)))
-          return i > gapStart ? i - (gapEnd - gapStart) : i;
-      }
-    return -1;
-  }
-
-  public int lastIndexOf (int ch, int fromChar)
-  {
-    char c1, c2;
-    if (ch >= 0x10000)
-      {
-        c1 = (char) (((ch - 0x10000) >> 10) + 0xD800);
-        c2 = (char) ((ch & 0x3FF) + 0xDC00);
-      }
-    else
-      {
-        c1 = 0;
-        c2 = (char) ch;
-      }
-    for (int i = fromChar; --i >= 0; )
-      {
-        if (charAt(i) == c2)
-          {
-            if (c1 == 0)
-              return i;
-            if (i > 0 && charAt(i-1) == c1)
-              return i - 1;
-          }
-      }
-    return -1;
-  }
-
-  /** Copy characters into a destination buffer.
-   * Same interface as java.lang.String's getChars. */
-  public void getChars (int srcBegin, int srcEnd, char[] dst, int dstBegin)
-  {
-    char[] array = string.data;
-    int count;
-    if (srcBegin < gapStart)
-      {
-	count = (srcEnd < gapStart ? srcEnd : gapStart) - srcBegin;
-	if (count > 0)
-	  {
-	    System.arraycopy(array, srcBegin, dst, dstBegin, count);
-	    srcBegin += count;
-	    dstBegin += count;
-	  }
-      }
-    int gapSize = gapEnd - gapStart;
-    srcBegin += gapSize;
-    srcEnd += gapSize;
-    count = srcEnd - srcBegin;
-    if (count > 0)
-      System.arraycopy(array, srcBegin, dst, dstBegin, count);
-  }
-
-  public void setCharAt(int index, char value)
-  {
-    // If index is out of bounds, the base.get will catch that.
-    if (index >= gapStart)
-      index += gapEnd - gapStart;
-    string.setCharAt(index, value);
-  }
-
-    public void setCharacterAt(int index, int ch) {
-        int sz = size();
-        if (index < 0 || index >= sz)
-            throw new StringIndexOutOfBoundsException(index);
-        char old1 = charAt(index);
-        char old2;
-        boolean oldIsSupp = old1 >= 0xD800 && old1 <= 0xDBFF
-            && index+1 < sz
-            && (old2 = charAt(index+1)) >= 0xDC00 && old2 <= 0xDFFF;
-        if (ch <= 0xFFFF) {
-            if (oldIsSupp)
-                delete(index+1, index+2);
-            setCharAt(index, (char) ch);
-        } else {
-            char c1 = (char) (((ch - 0x10000) >> 10) + 0xD800);
-            char c2 = (char) ((ch & 0x3FF) + 0xDC00);
-            setCharAt(index, c1);
-            if (oldIsSupp) {
-                setCharAt(index+1, c2);
-            } else {
-                // Optimization of:
-                // insert(index+1, new String(new char[] { c2 }), true);
-                gapReserve(index+1, 1);
-                string.setCharAt(index+1, c2);
-                gapStart += 1;
-                // Any position after old single-wide char are now in the
-                // middle of the new char pair.  Adjust to be after c2.
-                int oldPos = (gapStart-1)<<1;
-                adjustPositions(oldPos, oldPos + 1, 2);
-            }
-        }
+    public CharBuffer(FString str) {
+        super((CharSequence) str);
+        indexes = new StableManager(this);
     }
 
+    public CharBuffer(int initialSize) {
+        super(initialSize);
+        indexes = new StableManager(this);
+    }
 
+    protected CharBuffer() {
+        indexes = new StableManager(this);
+    }
+
+    public int length() { return size(); }
+
+    /* REDUNDANT - but perhaps needs to be optimized
   public String substring (int start, int end)
   {
     int sz = size();
@@ -183,8 +39,9 @@ public class CharBuffer extends StableVector<Char>
     start = getSegment(start, len);
     return new String(getArray(), start, len);
   }
-  
+    */
 
+    /* REDUNDANT - but perhaps needs to be optimized
   public CharSeq subSequence(int start, int end)
   {
     int sz = size();
@@ -194,7 +51,9 @@ public class CharBuffer extends StableVector<Char>
                           base.createPos(start, false),
                           base.createPos(end, true));
   }
+*/
 
+    /* REDUNDANT - but perhaps needs to be optimized
   public void fill(int fromIndex, int toIndex, char value)
   {
     char[] array = string.data;
@@ -209,7 +68,7 @@ public class CharBuffer extends StableVector<Char>
       array[i] = value;
   }
 
-  /** Set all the elements to a given character. */
+  / ** Set all the elements to a given character. * /
   public final void fill (char value)
   {
     char[] array = string.data;
@@ -218,8 +77,9 @@ public class CharBuffer extends StableVector<Char>
     for (int i = gapStart;  --i >= 0; )
       array[i] = value;
   }
+    */
 
-  public char[] getArray() { return (char[]) base.getBuffer(); }
+  public char[] getArray() { return (char[]) getBuffer(); }
 
   public void delete(int start, int end)
   {
@@ -228,22 +88,11 @@ public class CharBuffer extends StableVector<Char>
     releasePos(ipos);
   }
 
-  public void insert(int where, String str, boolean beforeMarkers)
-  {
-    int len = str.length();
-    gapReserve(where, len);
-    str.getChars(0, len, string.data, where);
-    gapStart += len;
-    if (beforeMarkers) {
-        // Adjust markers at insertion point to be after inserted next.
-        int oldPos = (gapStart-len) << 1;
-        adjustPositions(oldPos, oldPos + 1, len << 1);
-    }
-  }
-
   public void consume(int start, int count, Consumer dest)
   {
-    char[] array = string.data;
+      throw new Error();
+      /*
+    char[] array = data;
     if (start < gapStart)
       {
 	int count0 = gapStart - start;
@@ -258,6 +107,7 @@ public class CharBuffer extends StableVector<Char>
 	start += gapEnd - gapStart;
 	dest.write(array, start, count);
       }
+      */
   }
 
   public String toString()
@@ -284,36 +134,14 @@ public class CharBuffer extends StableVector<Char>
   }
   /* #endif */
 
-  public void writeTo(int start, int count, java.io.Writer dest)
-    throws java.io.IOException
-  {
-    char[] array = string.data;
-    if (start < gapStart)
-      {
-	int count0 = gapStart - start;
-	if (count0 > count)
-	  count0 = count;
-	dest.write(array, start, count0);
-	count -= count0;
-	start += count;
-      }
-    if (count > 0)
-      {
-	start += gapEnd - gapStart;
-	dest.write(array, start, count);
-      }
-  }
-
-  public void writeTo(java.io.Writer dest) throws java.io.IOException
-  {
-    char[] array = string.data;
-    dest.write(array, 0, gapStart);
-    dest.write(array, gapEnd, array.length - gapEnd);
-  }
-
   public void dump()
   {
     System.err.println("Buffer Content dump.  size:"+size()+"  buffer:"+getArray().length);
+    StableManager manager = (StableManager) indexes;
+    int gapStart = manager.getGapStart();
+    int gapEnd = manager.getGapEnd();
+    int[] positions = manager.positions;
+    int free = manager.free;
     System.err.print("before gap: \"");
     System.err.print(new String(getArray(), 0, gapStart));
     System.err.println("\" (gapStart:"+gapStart+" gapEnd:"+gapEnd+')');
@@ -332,7 +160,7 @@ public class CharBuffer extends StableVector<Char>
     for (int i = 0;  i < poslen;  i++)
       {
 	int pos = positions[i];
-	if (free == -2 ? pos != FREE_POSITION : ! isFree[i]) {
+	if (free == -2 ? pos != StableManager.FREE_POSITION : ! isFree[i]) {
             int p = pos>>1;
             if (p > gapStart)
                 p -= gapEnd-gapStart;
@@ -340,4 +168,8 @@ public class CharBuffer extends StableVector<Char>
         }
       }
   }
+
+    // Needed for SwingBuffer:
+    public int nextIndex(int ipos) { return super.nextIndex(ipos); }
+    public void releasePos(int ipos) { super.releasePos(ipos); }
 }

@@ -1,4 +1,4 @@
-// Copyright (c) 2001, 2002, 2003  Per M.A. Bothner and Brainfood Inc.
+// Copyright (c) 2001, 2002, 2003, 2015  Per M.A. Bothner and Brainfood Inc.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.lists;
@@ -7,8 +7,9 @@ package gnu.lists;
  * I.e if you have a position, it gets automatically updated after
  * insertions and deletions. */
 
-public class StableVector<E> extends GapVector<E>
+public class StableManager extends GapManager
 {
+  SimpleVector base;
   /** This array maps from the exported ipos values (indexes in the positions
    * array) to the ipos of the underlying SimpleVector base.
    * The first two elements are reserved for START_POSITION and END_POSITION.
@@ -17,10 +18,10 @@ public class StableVector<E> extends GapVector<E>
   protected int[] positions;
 
   /** The head of the free elements in position, if they are chained.
-   * We need track of available elements in the positions array in two ways:
+   * We keep track of available elements in the positions array in two ways:
    * In unchained mode, there is no free list per se.  Instead an index i
-   * is available if positions[i]==FREE_POSITION.  This modemakes it
-   * easy to loop over all positions, ignores the unused ones.
+   * is available if positions[i]==FREE_POSITION.  This mode makes it
+   * easy to loop over all positions, ignoring the unused ones.
    * In chained mode, there is a free list and if index i is available,
    * then positions[i] is the next available index, with -1 if there is none.
    * Unchained mode is indicated by free==-2.
@@ -73,9 +74,10 @@ public class StableVector<E> extends GapVector<E>
   public int startPos () { return START_POSITION; }
   public int endPos () { return END_POSITION; }
 
-  public StableVector(SimpleVector base)
+  public StableManager(SimpleVector base)
   {
     super(base);
+    this.base = base;
     positions = new int[16];
     positions[START_POSITION] = 0;
     positions[END_POSITION] = (base.getBufferLength() << 1) | 1;
@@ -87,9 +89,12 @@ public class StableVector<E> extends GapVector<E>
       }
   }
 
-  protected StableVector ()
-  {
-  }
+    public StableManager(SimpleVector base, GapManager old) {
+        this(base);
+        this.gapStart = old.gapStart;
+        this.gapEnd = old.gapEnd;
+    }
+
 
   protected int allocPositionIndex()
   {
@@ -191,7 +196,7 @@ public class StableVector<E> extends GapVector<E>
     fillPosRange(positions[fromPos], positions[toPos], value);
   }
 
-  protected void shiftGap(int newGapStart)
+  protected void shiftGap(SimpleVector base, int newGapStart)
   {
     int oldGapStart = gapStart;
     int delta = newGapStart - oldGapStart;
@@ -215,22 +220,22 @@ public class StableVector<E> extends GapVector<E>
 	high = (oldGapStart << 1) + 1;
 	adjust = (gapEnd - oldGapStart) << 1;
       }
-    super.shiftGap(newGapStart);
+    super.shiftGap(base, newGapStart);
 
     adjustPositions(low, high, adjust);
   }
 
   /** Adjust gap to 'where', and make sure it is least `needed'
    * elements long. */
-  protected void gapReserve(int where, int needed)
+  protected void gapReserve(SimpleVector base, int where, int needed)
   {
     int oldGapEnd = gapEnd;
     int oldGapStart = gapStart;
     if (needed > oldGapEnd - oldGapStart)
       {
-        int oldLength = base.size;
-        super.gapReserve(where, needed);
-        int newLength = base.size;
+        int oldLength = base.size();
+        super.gapReserve(base, where, needed);
+        int newLength = base.size();
         if (where == oldGapStart) // Optimization.
           adjustPositions(oldGapEnd << 1, (newLength << 1) | 1,
                           (newLength - oldLength) << 1);
@@ -244,7 +249,7 @@ public class StableVector<E> extends GapVector<E>
           }
       }
     else if (where != gapStart)
-      shiftGap(where);
+        shiftGap(base, where);
   }
 
   /** Add a delta to all positions elements that point into a given range.
@@ -281,6 +286,7 @@ public class StableVector<E> extends GapVector<E>
       }
   }
 
+    /*
   protected int addPos(int ipos, E value)
   {
     int ppos = positions[ipos];
@@ -298,10 +304,13 @@ public class StableVector<E> extends GapVector<E>
     add(index, value);
     return ipos;
   }
+    */
 
   protected void removePosRange(int ipos0, int ipos1)
   {
-    super.removePosRange(positions[ipos0], positions[ipos1]);
+      throw new Error();
+      /*
+      super.removePosRange(positions[ipos0], positions[ipos1]);
 
     // adjust positions in gap
     int low = gapStart;
@@ -327,6 +336,7 @@ public class StableVector<E> extends GapVector<E>
               }
 	  }
       }
+      */
   }
 
   /*
@@ -338,7 +348,8 @@ public class StableVector<E> extends GapVector<E>
 
   public void consumePosRange (int iposStart, int iposEnd, Consumer out)
   {
-    super.consumePosRange(positions[iposStart], positions[iposEnd], out);
+      throw new Error();
+      //super.consumePosRange(positions[iposStart], positions[iposEnd], out);
   }
 
   /* DEBUGGING

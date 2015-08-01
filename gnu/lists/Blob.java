@@ -14,8 +14,7 @@ import java.nio.charset.Charset;
 
 public class Blob
     extends U8Vector
-    implements Consumable
-               , CharSequence
+    implements Consumable, CharSequence
 {
     private String stringValue;
     Charset charset;
@@ -29,16 +28,27 @@ public class Blob
         this.charset = charset;
     }
 
+    public Blob(byte[] data, IntSequence indexes) {
+        this.data = data;
+        this.indexes = indexes;
+    }
+
     public static Blob wrap(byte[] data, int size) {
-        Blob blob = new Blob(data);
-        blob.size = size;
-        return blob;
+        return new Blob(data, new Range.IntRange(0, 1, size));
     }
 
     public U8Vector asPlainBytevector() {
-        U8Vector vec = new U8Vector(data);
-        vec.size = size;
-        return vec;
+        if (indexes == null || indexes == cantWriteMarker) {
+            U8Vector vec = new U8Vector(data);
+            vec.indexes = indexes;
+            return vec;
+        } else {
+            int sz = size();
+            byte[] b = new byte[sz];
+            U8Vector vec = new U8Vector(b);
+            vec.copyFrom(0, this, 0, sz);
+            return vec;
+        }
     }
 
     public void consume(Consumer out) {
@@ -50,7 +60,7 @@ public class Blob
     public String toString() {
         synchronized (this) {
             if (stringValue == null) {
-                BinaryInPort in = new BinaryInPort(data, size, null);
+                BinaryInPort in = new BinaryInPort(data, size(), null);
                 // Caching the string value may not be a good idea.
                 // Especially if we're just printing it.
                 StringBuilder buf = new StringBuilder();

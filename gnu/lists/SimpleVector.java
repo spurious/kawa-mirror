@@ -2,136 +2,147 @@
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.lists;
-/* #ifdef JAVA2 */
+import java.io.*;
 import java.util.*;
-/* #endif */
 
-/** A SimpleVector implement as a simple array plus a current size.
- *
- * Methods with the word "Buffer" are methods which use the underlying
- * array, ignoring the 'size' field.
- *
- * Can be used to implement CommonLisp simple vectors, but all simple
- * vectors are also adjustable (by re-allocating the buffer)
- * and have a fill pointer (the size field). */
+/** A generic simple vector.
+ * <p>
+ * This uses a simple data array along with an optional index mapper.
+ * If {@code indexes} (the index mapper) is null, then {@code get(i)}
+ * is {@code data[i]}.
+ * Otherwise, {@code get(i)} is  {@code data[indexes.intAt(i)]}.
+ * This allows general indirection and selection: Typically {@code indexes}
+ * will be a {@code Range} but it can be any {@code IntSequence}.
+ * <p>
+ * If the sequence change size, then {@code indexes} is restricted
+ * to either a {@code GapManager} or a {@code StableManager} (which
+ * extends {@code GapManager}).  Those are usually created lazily: A plain
+ * {@code GapManager} on the first insertion or deletion;
+ * a {@code StableManager} if a Marker is requested.
+ * <p>
+ * If {@code indexes} is the special object {@code cantWriteMarker}
+ * then this sequence is immutable.
+ */
 
-public abstract class SimpleVector<E> extends AbstractSequence<E>
-    implements Sequence<E>, Array<E>, RandomAccess
+public abstract class SimpleVector<E> extends IndirectIndexable<E>
+    implements Array<E>, Externalizable, RandomAccess
 {
-  /** The (current) number of elements.
-   * Must always have{@code size() >= 0 && size() <= getBufferLength()}. */
-  protected int size;
+    public int size() {
+        return indexes == null || indexes == cantWriteMarker
+            // or generally indexes.isUnbounded() ??? FIXME
+            ? getBufferLength()
+            : indexes.size();
+    }
 
-  public final int size() { return size; }
+    protected GapManager getGapManager() {
+        IntSequence ind = indexes;
+        if (ind instanceof GapManager)
+            return (GapManager) ind;
+        if (ind != null) {
+            checkCanWrite();
+            String msg = indexes == cantWriteMarker ?
+                "can't adjust size of constant vector" :
+                "can't adjust size of indirect vector";
+            throw new UnsupportedOperationException(msg);
+        }
+        GapManager manager = new GapManager(this);
+        indexes = manager;
+        return manager;
+    }
 
-  protected void checkCanWrite () { }
+    protected StableManager getStableManager() {
+        IntSequence ind = indexes;
+        if (ind instanceof StableManager)
+            return (StableManager) ind;
+        StableManager manager;
+        if (ind instanceof GapManager) {
+            manager = new StableManager(this, (GapManager) ind);
+        } else if (ind != null) {
+            checkCanWrite();
+            String msg = indexes == cantWriteMarker ?
+                "can't adjust size of constant vector" :
+                "can't adjust size of indirect vector";
+            throw new UnsupportedOperationException(msg);
+        } else
+            manager = new StableManager(this);
+        indexes = manager;
+        return manager;
+    }
 
-  /**
-   * Set the size to a specified value.
-   * The data buffer is grown if needed, with new elements set to zero/null. If
-   * size is less than the current value, removed values are set to zero/null..
-   * (This is because if you decrease and then increase the vector the
-   * should be zero/null, and it is cleaner and better for gc to do the
-   * zeroing/nulling on remove rather than add.)
-   * If you need to change the size without setting removed elements to
-   * zero/null (e.g. to change Common Lisp's fill pointer) set size directly.
-   */
-  public void setSize(int size)
-  {
-    checkCanWrite();
-    int oldSize = this.size;
-    this.size = size;
-    if (size < oldSize)
-      clearBuffer(size, oldSize - size);
-    else
-      {
-	int oldLength = getBufferLength();
-	if (size > oldLength)
-	  {
-            int newLength = oldLength < 16 ? 16
-              : oldLength + (oldLength >> 1);
-	    setBufferLength(size > newLength ? size : newLength);
-	  }
-      }
+    public abstract int getBufferLength();
+
+    protected abstract void setBuffer(Object obj);
+    public abstract void setBufferLength(int length);
+
+    /** Get sub-range of this vector, starting at given index.
+     * @return {@code (size<<32)|where}
+     *   such that {@code get(i)} is {@code data[where]};
+     *   {@code get(i+1)} is {@code data[where+1]};
+     *   until {@code get(i+size-1)}.
+     *   The {@code size} is at least 1 (unless {@code index==size()}),
+     *   but we try to do better.
+     */
+    public long getSegment(int index) {
+        IntSequence ind = indexes;
+        int sz = size();
+        int where, size;
+        Range.IntRange range;
+        if (ind == null || ind == cantWriteMarker) {
+            where = index;
+            size = sz - where;
+        } else if (ind instanceof Range.IntRange
+                   && (range = (Range.IntRange) ind).getStepInt() == 1) {
+            int istart = range.getStartInt();
+            where = index + istart;
+            size = ind.size() - index;
+        } else if (ind instanceof GapManager) {
+            GapManager gman = (GapManager) ind;
+            int gapStart = gman.getGapStart();
+            if (index < gapStart) {
+                where = index;
+                size = gapStart-index;
+            } else {
+                where = index + gman.getGapEnd() - gapStart;
+                size = getBufferLength() - where;
+            }
+        } else {
+            where = ind.intAt(index);
+            size = index < sz ? 1 : 0;
+        }
+        return ((long) size << 32) | (long) where;
+    }
+
+    public int getSegment(int index, int len) {
+        IntSequence ind = indexes;
+        if (ind instanceof GapManager)
+            return ((GapManager) ind).getSegment(this, index, len, false);
+        return getSegmentReadOnly(index, len);
+    }
+
+    public int getSegmentReadOnly(int start, int len) {
+        int sz = size();
+        if (start < 0 || len < 0 || start + len > sz)
+            return -1;
+        long result = getSegment(start);
+        int where = (int) result;
+        int size = (int) (result >> 32);
+        return size >= len ? where : -1;
+    }
+
+    // Should isAfterPos, nextPos, getPosNext ... be moved to
+    // IndirectIndexable or to AbstractSequence?  FIXME
+
+  protected boolean isAfterPos(int ipos) {
+      return (ipos & 1) != 0;
   }
 
-  /** Used by GapVector to grow and maybe move gap. */
-  protected void resizeShift(int oldGapStart, int oldGapEnd,
-                             int newGapStart, int newGapEnd)
-  {
-    checkCanWrite();
-    int oldGapSize = oldGapEnd - oldGapStart;
-    int newGapSize = newGapEnd - newGapStart;
-    int oldLength = getBufferLength();
-    int newLength = oldLength - oldGapSize + newGapSize;
-    if (newLength > oldLength)
-      {
-        setBufferLength(newLength);
-        size = newLength;
-      }
-    int gapDelta = oldGapStart - newGapStart;
-    if (gapDelta >= 0)
-      {
-        int endLength = oldLength - oldGapEnd;
-        shift(oldGapEnd, newLength - endLength, endLength);
-        if (gapDelta > 0)
-          shift(newGapStart, newGapEnd, gapDelta);
-      }
-    else
-      {
-        int endLength = newLength - newGapEnd;
-        shift(oldLength-endLength, newGapEnd, endLength);
-        shift(oldGapEnd, oldGapStart, newGapStart-oldGapStart);
-      }
-    clearBuffer(newGapStart, newGapSize);
-  }
-  
+   protected abstract Object getBuffer();
 
-  /** Get the allocated length of the data buffer. */
-  public abstract int getBufferLength();
-
-  public abstract void setBufferLength(int length);
-
-  protected boolean isAfterPos (int ipos)
-  {
-    return (ipos & 1) != 0;
-  }
-
-  public int nextPos (int ipos)
-  {
-    if (ipos == -1)
-      return 0;
-    int index = ipos >>> 1;
-    if (index == size)
-      return 0;
-    return (index << 1) + 3;
-  }
-
-  /*
-  protected void ensureSize(int space)
-  {
-    int oldLength = data.length;
-    int newLength = size +
-    if (size > space)
-      setBufferLength(space < 16 ? 16 : 2 * space);
-    this.size = size;
-  }
-  */
-
-  protected abstract Object getBuffer();
-
-  public E get(int index)
-  {
-    if (index >= size)
-      throw new IndexOutOfBoundsException();
-    return getBuffer(index);
-  }
-
-  public Object getPosNext (int ipos)
-  {
-    int index = ipos >>> 1;
-    return index >= size ? eofValue : getBuffer(index);
-  }
+    public E get(int index) {
+        if (indexes != null)
+            index = indexes.intAt(index);
+        return getBuffer(index);
+    }
 
   public E getRowMajor (int i)
   {
@@ -140,51 +151,34 @@ public abstract class SimpleVector<E> extends AbstractSequence<E>
 
   protected abstract E getBuffer(int index);
 
-  public E set(int index, E value)
-  {
-    checkCanWrite();
-    if (index >= size)
-      throw new IndexOutOfBoundsException();
-    E old = getBuffer(index);
-    setBuffer(index, value);
-    return old;
-  }
+    public E set(int index, E value) {
+        checkCanWrite(); // FIXME maybe inline and fold into following
+        if (indexes != null) {
+            index = indexes.intAt(index);
+        }
+        E old = getBuffer(index);
+        setBuffer(index, value);
+        return old;
+    }
 
-  protected abstract void setBuffer(int index, E value);
+    protected abstract void setBuffer(int index, E value);
 
     /* #ifdef JAVA8 */
     // @Override
     // public void forEach(java.util.function.Consumer<? super E> action) {
-    //     int len = size;
+    //     if (indexes != null) FIXME;
+    //     int len = size();
     //     for (int i = 0;  i < len;  i++)
     //         action.accept(getBuffer(i));
     // }
     /* #endif */
 
-  public void fill(E value)
-  {
-    checkCanWrite();
-    for (int i = size;  --i >= 0; )
-      setBuffer(i, value);
-  }
-
-  public void fillPosRange(int fromPos, int toPos, E value)
-  {
-    checkCanWrite();
-    int i = fromPos == -1 ? size : fromPos >>> 1;
-    int j = toPos == -1 ? size : toPos >>> 1;
-    for (; i < j;  i++)
-      setBuffer(i, value);
-  }
-
-  public void fill(int fromIndex, int toIndex, E value)
-  {
-    checkCanWrite();
-    if (fromIndex < 0 || toIndex >= size)
-      throw new IndexOutOfBoundsException();
-    for (int i = fromIndex;  i < toIndex;  i++)
-      setBuffer(i, value);
-  }
+    public void fill(E value) {
+        checkCanWrite();
+        IntSequence ind = getIndexesForce();
+        for (int i = size();  --i >= 0; )
+            setBuffer(ind.intAt(i), value);
+    }
 
   public void shift(int srcStart, int dstStart, int count)
   {
@@ -193,218 +187,74 @@ public abstract class SimpleVector<E> extends AbstractSequence<E>
     System.arraycopy(data, srcStart, data, dstStart, count);
   }
 
-  public boolean add(E o)
-  {
-    add(size, o);
-    return true;
-  }
-
-  protected int addPos(int ipos, E value)
-  {
-    int index = ipos >>> 1;
-    add(index, value);
-    // Increment index and set isAfter bit.
-    return (index << 1) + 3;
-  }
-
-    protected void addSpace(int index, int count) {
-        checkCanWrite();
-        int oldSize = size;
-        int newSize = oldSize + count;
-        int length = getBufferLength();
-        if (newSize > length) {
-            length = length < 16 ? 16 : length + (length >> 1);
-            if (newSize > length)
-                length = newSize;
-            setBufferLength(length);
-        }
-        this.size = newSize;
-        if (oldSize != index)
-            shift(index, index + count, oldSize - index);
+    @Override
+    public boolean add(E o) {
+        add(size(), o);
+        return true;
     }
 
-  public void add(int index, E o)
-  {
-    addSpace(index, 1);
-    set(index, o);
-  }
+    @Override
+    public void add(int index, E o) {
+        addSpace(index, 1);
+        setBuffer(index, o);
+    }
 
-  /* #ifdef JAVA2 */
-  public boolean addAll(int index, Collection<? extends E> c)
-  {
-    checkCanWrite();
-    boolean changed = false;
-    int count = c.size();
-    setSize(size + count);
-    shift(index, index + count, size - count - index);
-    for (Iterator<? extends E> it = c.iterator();  it.hasNext(); )
-      {
-        set(index++, it.next());
-        changed = true;
-      }
-    return changed;
-  }
-  /* #endif */
-  /* #ifndef JAVA2 */
-  // public boolean addAll(int index, Sequence c)
-  // {
-  //   checkCanWrite();
-  //   boolean changed = false;
-  //   int count = c.size();
-  //   setSize(size + count);
-  //   shift(index, index + count, size - count - index);
-  //   for (java.util.Enumeration it = c.elements();  it.hasMoreElements(); )
-  //     {
-  //       set(index++, it.nextElement());
-  //       changed = true;
-  //     }
-  //   return changed;
-  // }
-  /* #endif */
+    protected int addPos(int ipos, E value) {
+        int index = nextIndex(ipos);
+        add(index, value);
+        // FIXME should use a 'adjustPos' method
+        int ret = createPos(index+1, true);
+        releasePos(ipos);
+        return ret;
+    }
 
-  protected abstract void clearBuffer(int start, int count);
+    /** Insert count unspecified elements at index. */
+    protected void addSpace(int index, int count) {
+        getGapManager().insertUnspecified(this, index, count);
+    }
 
-  protected void removePosRange(int ipos0, int ipos1)
-  {
-    ipos0 = ipos0 >>> 1;
-    ipos1 = ipos1 >>> 1;
-    if (ipos0 >= ipos1)
-      return;
-    if (ipos1 > size)
-      ipos1 = size;
-    shift(ipos1, ipos0, size - ipos1);
-    int count = ipos1 - ipos0;
-    size = size - count;
-    clearBuffer(size, count);
-  }
+    public void delete(int start, int end) {
+        GapManager manager = getGapManager();
+        int count = end-start;
+        manager.delete(this, start, count);
+        clearBuffer(start, count);
+    }
 
-  public void removePos(int ipos, int count)
-  {
-    int index = ipos >>> 1;
-    if (index > size)
-      index = size;
-    int ipos0, ipos1;
-    if (count >= 0)
-      {
-	ipos0 = index;
-	ipos1 = index + count;
-      }
-    else
-      {
-	ipos0 = index + count;
-	ipos1 = index;
-	count = - count;
-      }
-    if (ipos0 < 0 || ipos1 > size)
-      throw new IndexOutOfBoundsException();
-    shift(ipos1, ipos0, size - ipos1);
-    size = size - count;
-    clearBuffer(size, count);
-  }
+    protected abstract void clearBuffer(int start, int count);
 
-  public E remove(int index)
-  {
-    if (index < 0 || index >= size)
-      throw new IndexOutOfBoundsException();
-    Object result = get(index);
-    shift(index + 1, index, size - index - 1);
-    size = size - 1;
-    clearBuffer(size, 1);
-    return (E) result;
-  }
-
-  public boolean remove(Object o)
-  {
-    int index = indexOf(o);
-    if (index < 0)
-      return false;
-    shift(index + 1, index, 1);
-    size = size - 1;
-    clearBuffer(size, 1);
-    return true;
-  }
-
-  /* #ifdef JAVA2 */
-  public boolean removeAll(Collection<?> c)
-  {
-    boolean changed = false;
-    int j = 0;
-    for (int i = 0;  i < size;  i++)
-      {
-        Object value = get(i);
-        if (c.contains(value))
-          {
-            changed = true;
-          }
-        else
-        {
-          if (changed)
-            set(j, (E) value);
-          j++;
+    public Object toDataArray() {
+        Object buffer = getBuffer();
+        Class componentType = buffer.getClass().getComponentType();
+        int count = size();
+        int index = 0;
+        Object copy = java.lang.reflect.Array.newInstance(componentType, count);
+        while (count > 0) {
+            long result = getSegment(index);
+            int where = (int) result;
+            int size = (int) (result >> 32);
+            if (size > count)
+                size = count;
+            System.arraycopy(buffer, where, copy, index, size);
+            index += size;
+            count -= size;
         }
-      }
-    setSize(j);
-    return changed;
-  }
+        return copy;
+    }
 
-  public boolean retainAll(Collection<?> c)
-  {
-    boolean changed = false;
-    int j = 0;
-    for (int i = 0;  i < size;  i++)
-      {
-        Object value = get(i);
-        if (! c.contains(value))
-          {
-            changed = true;
-          }
-        else
-          {
-            if (changed)
-              set(j, (E) value);
-            j++;
-          }
-      }
-    setSize(j);
-    return changed;
-  }
-  /* #endif */
+    /** This is convenience hack for printing "uniform vectors" (srfi 4).
+     * It may go away without notice! */
+    public String getTag() { return null; }
 
-  public void clear ()
-  {
-    setSize(0);
-  }
+    public void writeExternal(ObjectOutput out) throws IOException {
+        out.writeObject(getBuffer());
+        out.writeObject(indexes);
+    }
 
-  /** This is convenience hack for printing "uniform vectors" (srfi 4).
-   * It may go away without notice! */
-  public String getTag() { return null; }
-
-  public void consume(int start, int length, Consumer out)
-  {
-    consumePosRange(start << 1, (start + length) << 1, out);
-  }
-
-  public void consumePosRange(int iposStart, int iposEnd, Consumer out)
-  {
-    if (out.ignoring())
-      return;
-    int i = iposStart >>> 1;
-    int end = iposEnd >>> 1;
-    if (end > size)
-      end = size;
-    for (;  i < end;  i++)
-      out.writeObject(getBuffer(i));
-  }
-
-  public int getNextKind(int ipos)
-  {
-    return hasNext(ipos) ? getElementKind() : EOF_VALUE;
-  }
-
-  public int getElementKind()
-  {
-    return OBJECT_VALUE;
-  }
+    public void readExternal(ObjectInput in)
+        throws IOException, ClassNotFoundException {
+        setBuffer(in.readObject());
+        indexes = (IntSequence) in.readObject();
+    }
 
   public Array transpose(int[] lowBounds, int[] dimensions,
 			 int offset0, int[] factors)

@@ -1,0 +1,394 @@
+// $PREAMBLE$ -*- java -*-
+// Copyright (c) 2001, 2002, 2015  Per M.A. Bothner and Brainfood Inc.
+// This is free software;  for terms and warranty disclaimer see ./COPYING.
+
+package gnu.lists;
+import java.io.*;
+/* #ifdef U8|U16|U32|U64 */
+import gnu.math.$BTYPE$;
+/* #endif */
+
+/** Simple adjustable-length vector of $DESC$. */
+
+public @Abstract class $CNAME$ extends $SUPER$
+    /* #ifdef OBJECT */
+    implements Consumable, Comparable
+    /* #endif */
+    /* #ifdef S32 */
+    implements IntSequence
+    /* #endif */
+    /* #ifdef BIT|F32|F64 */
+    implements Comparable
+    /* #endif */
+{
+    /* #ifdef OBJECT|BIT|BYTE|SHORT|INT|LONG|F32|F64 */
+    $ptype$[] data;
+    protected static $ptype$[] empty = new $ptype$[0];
+
+    /* #endif */
+    /* #ifdef OBJECT|BIT|S8|S16|S32|S64|U8|U16|U32|U64|F32|F64 */
+    public $TAG$Vector() {
+        data = empty;
+    }
+
+    public $TAG$Vector(int size, $ptype$ value) {
+        $ptype$[] array = new $ptype$[size];
+        data = array;
+        if (value != $ZERO$) {
+            while (--size >= 0)
+                array[size] = value;
+        }
+    }
+
+    public $TAG$Vector(int size) {
+        this(new $ptype$[size]);
+    }
+
+    /** Reuses the argument without making a copy. */
+    public $TAG$Vector($ptype$[] data) {
+        this.data = data;
+    }
+
+    /*
+    public $TAG$Vector(Sequence seq) {
+        data = new $ptype$[seq.size()];
+        addAll(seq);
+    }
+    */
+
+    public $TAG$Vector($ptype$[] data, IntSequence indexes) {
+        this.data = data;
+        this.indexes = indexes;
+    }
+
+    /** Makes a copy of (part of) the argument array. */
+    public $TAG$Vector($ptype$[] values, int offset, int length) {
+        this(length);
+        System.arraycopy(values, offset, data, 0, length);
+    }
+
+    /* #endif */
+    /* #ifdef OBJECT */
+    public FVector(java.util.List seq) {
+        this.data = new Object[seq.size()];
+        int i = 0;
+        for (java.util.Iterator<? extends E> it = seq.iterator();  it.hasNext(); )
+            data[i++] = it.next();
+    }
+
+    public static FVector make(Object... data) {
+        return new FVector(data);
+    }
+
+    public void copyFrom (int index, FVector<E> src, int start, int end) {
+        int count = end-start;
+        int sz = size();
+        int src_sz = src.size();
+        if (count < 0 || index+count > sz || end > src_sz)
+            throw new ArrayIndexOutOfBoundsException();
+        int sseg, dseg;
+        if ((sseg = src.getSegmentReadOnly(start, count)) >= 0 &&
+            (dseg = getSegment(index, count)) >= 0) {
+            System.arraycopy(src.data, sseg, data, dseg, count);
+        } else {
+            for (int i = 0; i < count; i++)
+                set(index+i, src.get(start+i));
+        }
+    }
+
+    /* #endif */
+    /* #ifdef OBJECT|BIT|BYTE|SHORT|INT|LONG|F32|F64 */
+    /** Get the allocated length of the data buffer. */
+    public int getBufferLength() {
+        return data.length;
+    }
+
+    public void setBufferLength(int length) {
+        int oldLength = data.length;
+        if (oldLength != length) {
+            $ptype$[] tmp = new $ptype$[length];
+            System.arraycopy(data, 0, tmp, 0,
+                             oldLength < length ? oldLength : length);
+            data = tmp;
+        }
+    }
+
+    public $ptype$[] getBuffer() { return data; }
+
+    protected void setBuffer(Object buffer) { data = ($ptype$[]) buffer; }
+
+    /* #endif */
+    /* #ifdef BIT|BYTE|SHORT|INT|LONG|F32|F64 */
+    public final $ptype$ $ptype$At(int index) {
+        if (indexes != null)
+            index = indexes.intAt(index);
+        return data[index];
+    }
+
+    public final $ptype$ $ptype$AtBuffer(int index) {
+        return data[index];
+    }
+
+    /* #endif */
+    /* #ifdef S8|S16|U8|U16|LONG */
+    public final int intAtBuffer(int index) {
+        return (int) data[index]$MASK$;
+    }
+
+    /* #endif */
+    /* #ifdef S32|U32 */
+    public final long longAtBuffer(int index) {
+        return (long) data[index]$MASK$;
+    }
+
+    /* #endif */
+    /* #ifdef OBJECT */
+    public final E get(int index) {
+        if (indexes != null)
+            index = indexes.intAt(index);
+        return (E) data[index];
+    }
+
+    public final E getBuffer(int index) {
+        return (E) data[index];
+    }
+
+    /* #endif */
+    /* #ifdef BIT|S8|S16|S32|S64|U8|U16|U32|U64|F32|F64 */
+    public final $BTYPE$ get(int index) {
+        if (indexes != null)
+            index = indexes.intAt(index);
+        return $BTYPE$.valueOf(data[index]);
+    }
+
+    public final $BTYPE$ getBuffer(int index) {
+        return $BTYPE$.valueOf(data[index]);
+    }
+
+    /* #endif */
+    /* #ifdef BIT|BYTE|SHORT|INT|LONG|F32|F64 */
+    public final void set$Ptype$At(int index, $ptype$ value) {
+        checkCanWrite(); // FIXME maybe inline and fold into following
+        if (indexes != null)
+            index = indexes.intAt(index);
+        data[index] = value;
+    }
+
+    public final void set$Ptype$AtBuffer(int index, $ptype$ value) {
+        data[index] = value;
+    }
+
+    /* #endif */
+    /* #ifdef OBJECT */
+    @Override
+    public final void setBuffer(int index, $BTYPE$ value) {
+        data[index] = value;
+    }
+
+    /* #endif */
+    /* #ifdef BIT|S8|S16|S32|S64|U8|U16|U32|U64|F32|F64 */
+    @Override
+    public final void setBuffer(int index, $BTYPE$ value) {
+        data[index] = value.$ptype$Value();
+    }
+
+    /* #endif */
+    /* #ifdef BIT|BYTE|SHORT|INT|LONG|F32|F64 */
+    public void add($ptype$ v) {
+        int sz = size();
+        addSpace(sz, 1);
+        set$Ptype$At(sz, v);
+    }
+
+    /* #endif */
+    /* #ifdef OBJECT|BIT|BYTE|SHORT|INT|LONG|F32|F64 */
+    protected void clearBuffer(int start, int count) {
+        $ptype$[] d = data;
+        while (--count >= 0)
+            d[start++] = $ZERO$;
+    }
+
+    /* #endif */
+    /* #ifdef BIT|S8|S16|S32|S64|U8|U16|U32|U64|F32|F64 */
+    public int getElementKind() { return $KIND$_VALUE; }
+
+    public String getTag() { return "$tag$"; }
+
+    /* #endif */
+    /* #ifdef OBJECT */
+    public final void fill(int start, int end, E new_value) {
+        if (indexes == null)
+            java.util.Arrays.fill(data, start, end, new_value);
+        else
+            super.fill(start, end, new_value);
+    }
+
+    /* #endif */
+    /* #ifdef OBJECT|BIT|S64|U32|U64|F32|F64 */
+    public void consumePosRange(int iposStart, int iposEnd, Consumer out) {
+        if (out.ignoring())
+            return;
+        int i = nextIndex(iposStart);
+        int end = nextIndex(iposEnd);
+        for (;  i < end;  i++)
+            $WRITE(i,out);
+    }
+
+    /* #endif */
+    /* #ifdef OBJECT */
+    public void consume(Consumer out) {
+        out.startElement("#vector");
+        int len = size();
+        for (int i = 0;  i < len;  i++)
+            out.writeObject(get(i));
+        out.endElement();
+    }
+
+    public boolean equals(Object obj) {
+        if (obj == null || !(obj instanceof FVector))
+            return false;
+        FVector obj_vec = (FVector) obj;
+        int n = size();
+        if (obj_vec.data == null || obj_vec.size() != n)
+            return false;
+        Object[] this_data = data;
+        Object[] obj_data = obj_vec.data;
+        IntSequence inds1 = getIndexesForce();
+        IntSequence inds2 = obj_vec.getIndexesForce();
+        for (int i = 0;  i < n;  i++) {
+            if (! (this_data[inds1.intAt(i)].equals(obj_data[inds2.intAt(i)])))
+                return false;
+        }
+        return true;
+    }
+
+    /* #endif */
+    /* #ifdef S8|S16|S32|U8|U16|U32 */
+    public int compareTo(Object obj) {
+        return compareToInt(this, ($TAG$Vector) obj);
+    }
+
+    /* #endif */
+    /* #ifdef OBJECT|BIT|F32|F64|S64|U64 */
+    public int compareTo(Object obj) {
+        $TAG$Vector vec2 = ($TAG$Vector) obj;
+        $ptype$[] arr1 = data;
+        $ptype$[] arr2 = vec2.data;
+        int n1 = size();
+        int n2 = vec2.size();
+        IntSequence inds1 = getIndexesForce();
+        IntSequence inds2 = vec2.getIndexesForce();
+        int n = n1 > n2 ? n2 : n1;
+        for (int i = 0;  i < n;  i++) {
+            $ptype$ v1 = arr1[inds1.intAt(i)];
+            $ptype$ v2 = arr2[inds2.intAt(i)];
+            if (v1 != v2)
+                $RETURN_IF_UNEQUAL$(v1,v2);
+        }
+        return n1 - n2;
+    }
+
+    /* #endif */
+    /* #ifdef BYTE */
+    public int readFrom(int start, int count, InputStream in)
+        throws IOException {
+        int pos = start;
+        while (count > 0) {
+            long result = getSegment(pos);
+            int where = (int) result;
+            int size = (int) (result >> 32);
+            if (size > count)
+                size = count;
+            int n = in.read(data, where, size);
+            if (n < 0) {
+                if (pos == start)
+                    return -1;
+                break;
+            }
+            pos += n;
+            count -= n;
+        }
+        return pos - start;
+    }
+
+    public void writeTo(int start, int count, OutputStream out)
+        throws IOException {
+        while (count > 0) {
+            long result = getSegment(start);
+            int where = (int) result;
+            int size = (int) (result >> 32);
+            if (size > count)
+                size = count;
+            out.write(data, where, size);
+            start += size;
+            count -= size;
+        }
+    }
+
+    public void copyFrom (int index, ByteVector src, int start, int end) {
+        int count = end-start;
+        int sz = size();
+        int src_sz = src.size();
+        if (count < 0 || index+count > sz || end > src_sz)
+            throw new ArrayIndexOutOfBoundsException();
+        int sseg, dseg;
+        if ((sseg = src.getSegmentReadOnly(start, count)) >= 0 &&
+            (dseg = getSegment(index, count)) >= 0) {
+            System.arraycopy(src.data, sseg, data, dseg, count);
+        } else {
+            for (int i = 0; i < count; i++)
+                setByteAt(index+i, src.byteAt(start+i));
+        }
+    }
+
+    public InputStream getInputStream() {
+        int sz = size();
+        int seg = getSegmentReadOnly(0, sz);
+        if (seg >= 0)
+            return new ByteArrayInputStream(data, seg, sz);
+        else
+            return new ByteVectorInputStream(this);
+    }
+
+    static class ByteVectorInputStream extends InputStream {
+        ByteVector bvec;
+        int pos;
+        int mark;
+        int size;
+        public ByteVectorInputStream(ByteVector bvec) {
+            this.bvec = bvec;
+            this.size = bvec.size();
+        }
+        public int read() {
+            return pos >= size ? -1 :
+                (0xff & bvec.byteAt(pos++));
+        }
+        public boolean markSupported() { return true; }
+        public void mark(int readLimit) { mark = pos; }
+        public void reset() { pos = mark; }
+        public void close() { }
+        public int available() { return size-pos; }
+        public long skip(long n) {
+            if (n < 0) n = 0;
+            if (n < size-pos) { pos = size; return size-pos; }
+            else { pos += n; return n; }
+        }
+    }
+
+    /** Covert bytes, interpreted as UTF-8 characters, to a String. */
+    public String toUtf8(int start, int length) {
+        if (start+length>size()) throw new IndexOutOfBoundsException();
+        int seg = getSegmentReadOnly(start, length);
+        byte[] buf;
+        if (seg >= 0) {
+            buf = data;
+            start = seg;
+        } else {
+            buf = new byte[length];
+            for (int i = 0; i < length; i++)
+                buf[i] = byteAt(start+i);
+        }
+        return Strings.toUtf8(buf, start, length);
+    }
+    /* #endif */
+}

@@ -1,5 +1,47 @@
 2015-07-31  Per Bothner  <per@bothner.com>
 
+	Re-implement SimpleVector to use an index mapper.
+	* AbstractCharVector.java
+	* GapVector.java: Replace by ...
+	* GapManager.java: which is an IntSequence index mapper. Thus any
+	SimpleVector subclass can be dynamically switch to a gap vector.
+	* StableVector.java: Likewise replace by ...
+	* StableManager.java: which is a subclass of GapManager.
+	* IndirectIndexable.java: New abstract class for sequences that can
+	be re-mappings of other sequences or Lists.
+	* IndirectIndexedSeq.java: Changed to extend IndirectIndexable.
+	* SimpleVector.java: Re-write to be IndirectIndexable.
+	* Sequences.java (indirectIndexed, replace): New helper methods.
+	* Strings.java (toUtf8): New helper method.
+	* Range.java: Make Externalizable.
+	(cantWriteMarker): New static field.
+	(toString): New method.
+	* PrimIntegerVector.java: New abstract class.
+	* Blob.java: Update for being based on IndirectIndexable.
+	* ConstVector.java: Likewise.
+	* FString.java: Likewise.
+	* CharVector.java: Likewise.
+	* CharBuffer.java: Change to extend FString, and using a
+	StableManager for the indexes.  Move some code to FString.
+	* PrimVector.template: New source template to be pre-processed
+	into any of the following classes.
+	* BitVector.java: Now auto-generated from PrimVector.template.
+	* ByteVector.java: Likewise.
+	* ShortVector.java: Likewise.
+	* IntVector.java: Likewise.
+	* LongVector.java: Likewise.
+	* F32Vector.java: Likewise.
+	* F64Vector.java: Likewise.
+	* S16Vector.java: Likewise.
+	* S32Vector.java: Likewise.
+	* S64Vector.java: Likewise.
+	* S8Vector.java: Likewise.
+	* U16Vector.java: Likewise.
+	* U32Vector.java: Likewise.
+	* U64Vector.java: Likewise.
+	* U8Vector.java: Likewise.
+	* FVector.java: Likewise.
+
 	* CharSeq.java: Remove some pre-Java5 cruft.
 
 2015-07-22  Per Bothner  <per@bothner.com>

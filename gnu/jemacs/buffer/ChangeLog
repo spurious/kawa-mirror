@@ -1,3 +1,8 @@
+2015-07-31  Per Bothner  <per@bothner.com>
+
+	* BufferReader.java: Remove class - use CharrArrayInPort.
+	* Makefile.am: Upadte accordingly.
+
 2015-06-10  Per Bothner  <per@bothner.com>
 
 	* Buffer.java: Now extends AbstractSequence<Char>.

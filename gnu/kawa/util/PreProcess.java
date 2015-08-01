@@ -1,4 +1,4 @@
-// Copyright (c) 2005, 2009, 2010  Per M.A. Bothner
+// Copyright (c) 2005, 2009, 2010, 2015  Per M.A. Bothner
 // This is free software;  for terms and warranty disclaimer see COPYING.
 
 package gnu.kawa.util;
@@ -10,7 +10,9 @@ import java.util.*;
 public class PreProcess
 {
     Hashtable<String,Boolean> keywords = new Hashtable<String,Boolean>();
-    ArrayList<?>[] substitutions = new ArrayList<?>[128];
+    @SuppressWarnings("unchecked")
+    ArrayList<String>[] substitutions =
+        (ArrayList<String>[]) new ArrayList[128];
     int maxkey;
 
     String filename;
@@ -35,6 +37,81 @@ public class PreProcess
         "java7", JAVA5_FEATURES+" +JAVA6 +JAVA7 -JAVA8 -JAVA6COMPAT5 +use:java.text.Normalizer +use:javax.lang.model +use:java.lang.invoke -Android",
         "java8", JAVA5_FEATURES+" +JAVA6 +JAVA7 +JAVA8 -JAVA6COMPAT5 +use:java.text.Normalizer +use:javax.lang.model +use:java.lang.invoke -Android",
         "android", "+JAVA5 "+JAVA4_FEATURES+" +use:org.w3c.dom.Node +JAXP-1.3 -JAXP-QName -use:javax.xml.transform -JAVA6 -JAVA6COMPAT5 +Android "+NO_JAVA6_FEATURES,
+
+        "OBJECT",
+        "/+OBJECT/$DESC$=objects"
+        +"/$TAG$=F/$ptype$=Object/$BTYPE$=Object"
+        +"/$CNAME$=FVector<E>/$SUPER$=SimpleVector<E>/$KIND$=OBJECT"
+        +"/$RETURN_IF_UNEQUAL$(v1,v2)={int d = ((Comparable) v1).compareTo((Comparable) v2); if (d != 0)  return d; }"
+        +"/$WRITE(i,out)=out.writeObject(get(i))/$ZERO$=null",
+        "BIT",
+        "/+BIT/$DESC$=Boolean values"
+        +"/$TAG$=Bit/$tag$=b/$ptype$=boolean/$BTYPE$=Boolean"
+        +"/$CNAME$=BitVector/$SUPER$=SimpleVector<Boolean>/$KIND$=BOOLEAN"
+        +"/$RETURN_IF_UNEQUAL$(v1,v2)=return v1 && ! v2 ? 1 : -1"
+        +"/$WRITE(i,out)=out.writeBoolean(booleanAt(i))/$ZERO$=false",
+        "BYTE",
+        "/+BYTE/$DESC$=signed or unsigned 8-bit integers (bytes)"
+        +"/$TAG$=Byte/$ptype$=byte/$BTYPE$=E"
+        +"/$CNAME$=ByteVector<E>/$SUPER$=PrimIntegerVector<E>/@Abstract=abstract",
+        "SHORT",
+        "/+SHORT/$DESC$=signed or unsigned 16-bit integers (shorts)"
+        +"/$TAG$=Short/$ptype$=short/$BTYPE$=E"
+        +"/$CNAME$=ShortVector<E>/$SUPER$=PrimIntegerVector<E>/@Abstract=abstract",
+        "INT",
+        "/+INT/$DESC$=signed or unsigned 32-bit integers (ints)"
+        +"/$TAG$=Int/$ptype$=int/$BTYPE$=E"
+        +"/$CNAME$=IntVector<E>/$SUPER$=PrimIntegerVector<E>/@Abstract=abstract",
+        "LONG",
+        "/+LONG/$DESC$=signed or unsigned 64-bit integers (longs)"
+        +"/$TAG$=Long/$ptype$=long/$BTYPE$=E"
+        +"/$CNAME$=LongVector<E>/$SUPER$=PrimIntegerVector<E>/@Abstract=abstract",
+        "F32",
+        "/+F32/$DESC$=32-bit floats"
+        +"/$TAG$=F32/$ptype$=float/$BTYPE$=Float"
+        +"/$CNAME$=F32Vector/$SUPER$=SimpleVector<Float>/$KIND$=FLOAT"
+        +"/$WRITE(i,out)=out.writeFloat(floatAt(i))",
+        "F64",
+        "/+F64/$DESC$=64-bit doubles"
+        +"/$TAG$=F64/$ptype$=double/$BTYPE$=Double"
+        +"/$CNAME$=F64Vector/$SUPER$=SimpleVector<Double>/$KIND$=DOUBLE"
+        +"/$WRITE(i,out)=out.writeDouble(doubleAt(i))",
+        "S8",
+        "/+S8/$DESC$=signed 8-bit integers (bytes)"
+        +"/$TAG$=S8/$ptype$=byte/$BTYPE$=Byte/$KIND$=INT_S8"
+        +"/$CNAME$=S8Vector/$SUPER$=ByteVector<Byte>",
+        "S16",
+        "/+S16/$DESC$=signed 16-bit integers (shorts)"
+        +"/$TAG$=S16/$ptype$=short/$BTYPE$=Short/$KIND$=INT_S16"
+        +"/$CNAME$=S16Vector/$SUPER$=ShortVector<Short>",
+        "S32",
+        "/+S32/$DESC$=signed 32-bit integers (ints)"
+        +"/$TAG$=S32/$ptype$=int/$BTYPE$=Integer/$KIND$=INT_S32"
+        +"/$CNAME$=S32Vector/$SUPER$=IntVector<Integer>",
+        "S64",
+        "/+S64/$DESC$=signed 64-bit integers (longs)"
+        +"/$TAG$=S64/$ptype$=long/$BTYPE$=Long/$KIND$=INT_S64"
+        +"/$CNAME$=S64Vector/$SUPER$=LongVector<Long>"
+        +"/$WRITE(i,out)=out.writeLong(longAt(i))",
+        "U8",
+        "/+U8/$DESC$=unsigned 8-bit integers (bytes)"
+        +"/$TAG$=U8/$ptype$=byte/$BTYPE$=UByte/$KIND$=INT_U8"
+        +"/$CNAME$=U8Vector/$SUPER$=ByteVector<UByte>/$MASK$= & 0xff",
+        "U16",
+        "/+U16/$DESC$=unsigned 16-bit integers (shorts)"
+        +"/$TAG$=U16/$ptype$=short/$BTYPE$=UShort/$KIND$=INT_U16"
+        +"/$CNAME$=U16Vector/$SUPER$=ShortVector<UShort>/$MASK$= & 0xffff",
+        "U32",
+        "/+U32/$DESC$=unsigned 32-bit integers (ints)"
+        +"/$TAG$=U32/$ptype$=int/$BTYPE$=UInt/$KIND$=INT_U32"
+        +"/$CNAME$=U32Vector/$SUPER$=IntVector<UInt>/$MASK$= & 0xffffffffL"
+        +"/$WRITE(i,out)=Sequences.writeUInt(intAt(i), out)",
+        "U64",
+        "/+U64/$DESC$=unsigned 64-bit integers (longs)"
+        +"/$TAG$=U64/$ptype$=long/$BTYPE$=ULong/$KIND$=INT_U64"
+        +"/$CNAME$=U64Vector/$SUPER$=LongVector<ULong>"
+        +"/$WRITE(i,out)=Sequences.writeULong(longAt(i), out)"
+        +"/$RETURN_IF_UNEQUAL(v1,v2)=return (v1^0x8000000000000000L) > (v2^0x8000000000000000L) ? 1 : -1",
     };
 
     void error(String msg) {
@@ -87,7 +164,7 @@ public class PreProcess
             int c = in.read();
             if (c < 0)
                 break;
-            // Allow a little extra for look-ahead.
+            // Allow a little extra for look-ahead and substitution.
             int needed = len + maxkey + 10;
             int buflen = buf.length;
             if (needed >= buflen) {
@@ -156,7 +233,7 @@ public class PreProcess
             buf[len++] = (byte) c;
             if (c < 127 && c > ' ' && substitutions[c] != null) {
                 int keystart = len-1;
-                ArrayList<String> subs = (ArrayList<String>) substitutions[c];
+                ArrayList<String> subs = substitutions[c];
                 int nsub = subs.size();
                 int next = in.read();
                 for (int i = 0; ; i+=2) {
@@ -182,8 +259,11 @@ public class PreProcess
                         // found match
                         len = keystart;
                         int vallen = val.length();
-                        for (int k = 0; k < vallen; k++)
+                        for (int k = 0; k < vallen; k++) {
+                            if (len >= buf.length)
+                                throw new ArrayIndexOutOfBoundsException("index:"+len+" arr-len:"+buf.length+" vallen:"+vallen);
                             buf[len++] = (byte) val.charAt(k);
+                        }
                         break;
                     }
                 }
@@ -193,6 +273,8 @@ public class PreProcess
                 buf[len++] = (byte) c;
             }
             if (c == '\n') {
+                if (len == lineStart+1 && commentAt >= 0)
+                    skipLine = removeCommented;
                 int firstNonSpace = -1;
                 int lastNonSpace = 0;
                 for (int i = lineStart; i < len-1; i++) {
@@ -226,7 +308,17 @@ public class PreProcess
                         if (sp > 0) {
                             cmd = cmnt.substring(0, sp);
                             rest = cmnt.substring(sp).trim();
-                            binding = keywords.get(rest);
+                            for(;;) {
+                                int bar = rest.indexOf('|');
+                                if (bar < 0) {
+                                    binding = keywords.get(rest);
+                                    break;
+                                }
+                                binding = keywords.get(rest.substring(0,bar));
+                                if (binding == Boolean.TRUE)
+                                    break;
+                                rest = rest.substring(bar+1);
+                            }
                         } else {
                             cmd = cmnt;
                             rest = "";
@@ -234,8 +326,10 @@ public class PreProcess
                         }
                         if ("#ifdef".equals(cmd) || "#ifndef".equals(cmd)) {
                             if (binding == null) {
+                                /*
                                 System.err.println(filename+":"+lineno
                                                    +": warning - undefined keyword: "+rest);
+                                */
                                 binding = Boolean.FALSE;
                             } 
                             nesting++;
@@ -293,30 +387,78 @@ public class PreProcess
         return changed;
     }
 
+    void putSubstitution(String key, String val) {
+        char key0 = key.charAt(0);
+        if (key0 <= ' ' || key0 >= 127)
+            error("invalid start character of substituton "+key);
+        ArrayList<String> substitution = substitutions[key0];
+        if (substitution == null) {
+            substitution = new ArrayList<String>();
+            substitutions[key0] = substitution;
+        }
+        int keylen = key.length();
+        if (keylen > maxkey)
+            maxkey = keylen;
+        int vallen = val.length();
+        if (vallen > maxkey)
+            maxkey = vallen;
+        substitution.add(key);
+        substitution.add(val);
+    }
+
+    String getSubstitution(String key) {
+        char key0 = key.charAt(0);
+        if (key0 <= ' ' || key0 >= 127)
+            return null;
+        ArrayList<String> substitution = substitutions[key0];
+        if (substitution == null)
+            return null;
+        int sz = substitution.size();
+        for (int i = 0; i < sz; i+=2) {
+            if (substitution.get(i).equals(key))
+                return substitution.get(i+1);
+        }
+        return null;
+    }
+
     void handleArg(String arg) {
-        if (arg.charAt(0) == '=') {
+        char arg0 = arg.charAt(0);
+        if (arg0 == '=' || arg0 == '$' || arg0 == '@') {
             int eq = arg.indexOf('=', 1);
             if (eq < 0)
                 error("missing substiution keyword in "+arg);
-            String key = arg.substring(1, eq);
+            String key = arg.substring(arg0 == '=' ? 1 : 0, eq);
             String val = arg.substring(eq+1);
-            char key0 = key.charAt(0);
-            if (key0 <= ' ' || key0 >= 127)
-                error("invalid start character of substituton "+key);
-            ArrayList<String> substitution =
-                (ArrayList<String>) substitutions[key0];
-            if (substitution == null) {
-                substitution = new ArrayList<String>();
-                substitutions[key0] = substitution;
-            }
-            int keylen = key.length();
-            if (keylen > maxkey)
-                maxkey = keylen;
-            substitution.add(key);
-            substitution.add(val);
+            putSubstitution(key, val);            
         } else if (arg.charAt(0) == '%') {
             arg = arg.substring(1);
             for (int i = 0;  ;  i += 2 ) {
+                if (arg.equals("UniformVector")) {
+                    // Special hacks for gnu.lists.
+                    putSubstitution("-*- java -*-", "");
+                    putSubstitution("$PREAMBLE$",
+                                    "This file is generated from PrimVector.template. DO NOT EDIT!");
+                    String TAG = getSubstitution("$TAG$");
+                    if (TAG != null && getSubstitution("$tag$") == null)
+                        putSubstitution("$tag$", TAG.toLowerCase());
+                    String ptype = getSubstitution("$ptype$");
+                    if (ptype != null && getSubstitution("$Ptype$") == null)
+                        putSubstitution("$Ptype$",
+                                        Character.toUpperCase(ptype.charAt(0))
+                                        +ptype.substring(1));
+                    if (getSubstitution("$MASK$") == null)
+                        putSubstitution("$MASK$", "");
+                    if (getSubstitution("@Abstract") == null)
+                        putSubstitution("@Abstract", "");
+                    if (getSubstitution("$ZERO$") == null)
+                        putSubstitution("$ZERO$", "0");
+                    if (getSubstitution("$RETURN_IF_UNEQUAL$(v1,v2)") == null)
+                        putSubstitution("$RETURN_IF_UNEQUAL$(v1,v2)",
+                                        "return v1 > v2 ? 1 : -1");
+                    //if (getSubstitution("$GT$(v1,v2)") == null)
+                    //    putSubstitution("$GT$(v1,v2)", "v1 > v2");
+                    break;
+                }
                 if (i >= version_features.length) {
                     System.err.println("Unknown version: "+arg);
                     System.exit(-1);
@@ -324,9 +466,22 @@ public class PreProcess
                 if (arg.equals(version_features[i])) {
                     String features = version_features[i+1];
                     System.err.println("(variant "+arg+" maps to: "+features+")");
-                    StringTokenizer tokenizer = new StringTokenizer(features);
-                    while (tokenizer.hasMoreTokens())
-                        handleArg(tokenizer.nextToken());
+                    char feat0 = features.charAt(0);
+                    char sep = feat0 == '/' || feat0 == ';' ? feat0 : ' ';
+                    int start = 0;
+                    while (start >= 0) {
+                        int ind = features.indexOf(feat0, start);
+                        String farg;
+                        if (ind >= 0) {
+                            farg = features.substring(start, ind);
+                            start = ind + 1;
+                        } else {
+                            farg = features.substring(start);
+                            start = -1;
+                        }
+                        if (farg.length() > 0)
+                            handleArg(farg);
+                    }
                     break;
                 }
             }

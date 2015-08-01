@@ -4,7 +4,8 @@
 package gnu.lists;
 
 import gnu.text.Char;
-import gnu.text.Char;
+import java.io.IOException;
+import java.io.Writer;
 
 /** Simple adjustable-length vector whose elements are 32-bit code points
  * Used for the Scheme string type.
@@ -21,27 +22,29 @@ public class FString extends AbstractCharVector<Char>
 
   public FString (int num)
   {
-    size = num;
     data = new char[num];
   }
 
     public FString(int num, int value) {
         data = new char[value < 0x10000 ? num : 2 * num];
-        insertRepeated(0, value, num);
+        insertRepeatedRaw(0, value, num);
     }
 
   /** Create an FString from a char[].
    * Note that this contructor does *not* copy the argument. */
   public FString (char[] values)
   {
-    size = values.length;
     data = values;
   }
+
+    public FString(char[] data, IntSequence indexes) {
+        this.data = data;
+        this.indexes = indexes;
+    }
 
   public FString (String str)
   {
     data = str.toCharArray();
-    size = data.length;
   }
 
     public FString (StringBuilder buffer) {
@@ -49,7 +52,6 @@ public class FString extends AbstractCharVector<Char>
     }
 
     public FString (StringBuilder buffer, int offset, int length) {
-        this.size = length;
         data = new char[length];
         if (length > 0)
             buffer.getChars(offset, offset+length, data, 0);
@@ -60,15 +62,14 @@ public class FString extends AbstractCharVector<Char>
     }
 
     public FString (StringBuffer buffer, int offset, int length) {
-        this.size = length;
         data = new char[length];
         if (length > 0)
             buffer.getChars (offset, offset+length, data, 0);
     }
 
+  /** This constructor makes a copy. */
   public FString (char[] buffer, int offset, int length)
   {
-    this.size = length;
     data = new char[length];
     System.arraycopy(buffer, offset, data, 0, length);
   }
@@ -94,13 +95,12 @@ public class FString extends AbstractCharVector<Char>
                 data[i] = seq.charAt(offset+i);
         }
         this.data = data;
-        this.size = length;
     }
 
     /** Create a empty string, but with a given initial buffer size. */
     public static FString alloc(int sz) {
         FString str = new FString(sz);
-        str.size = 0;
+        str.indexes = GapManager.getEmptyInstance(str);
         return str;
     }
 
@@ -109,9 +109,53 @@ public class FString extends AbstractCharVector<Char>
       return Char.valueOf(characterAt(index));
   }
 
-  public final Char get(int index) {
-      return Char.valueOf(characterAt(index));
-  }
+    public final Char get(int index) {
+        return Char.valueOf(characterAt(index));
+    }
+
+    public int indexOf(int ch, int fromChar) {
+        char c1, c2;
+        if (ch >= 0x10000) {
+            c1 = (char) (((ch - 0x10000) >> 10) + 0xD800);
+            c2 = (char) ((ch & 0x3FF) + 0xDC00);
+        } else {
+            c1 = 0;
+            c2 = (char) ch;
+        }
+        int sz = size();
+        char prev = 0;
+        for (int i = fromChar;  i < sz; i++) {
+            char cur = charAt(i);
+            if (cur == c2) {
+                if (c1 == 0)
+                    return i;
+                if (prev == c1)
+                    return i-1;
+            }
+            prev = cur;
+        }
+        return -1;
+    }
+
+    public int lastIndexOf(int ch, int fromChar) {
+        char c1, c2;
+        if (ch >= 0x10000) {
+            c1 = (char) (((ch - 0x10000) >> 10) + 0xD800);
+            c2 = (char) ((ch & 0x3FF) + 0xDC00);
+        } else {
+            c1 = 0;
+            c2 = (char) ch;
+        }
+        for (int i = fromChar; --i >= 0; ) {
+            if (charAt(i) == c2) {
+                if (c1 == 0)
+                    return i;
+                if (i > 0 && charAt(i-1) == c1)
+                    return i - 1;
+            }
+        }
+        return -1;
+    }
 
   // Undefined if index>=size (unlike for other SimpleVector classes).
   @Override
@@ -121,52 +165,22 @@ public class FString extends AbstractCharVector<Char>
   }
 
     public final int characterAt(int index) {
-        // Maybe inline? FIXME
-        return Strings.characterAt(this, 0, size, index);
+        // The following uses charAt, which handles adjusting for indexes.
+        return Strings.characterAt(this, 0, size(), index);
     }
-
-  public void getChars (int srcBegin, int srcEnd, char dst[], int dstBegin)
-  {
-    if (srcBegin < 0 || srcBegin > srcEnd)
-      throw new StringIndexOutOfBoundsException(srcBegin);
-    if (srcEnd > size)
-      throw new StringIndexOutOfBoundsException(srcEnd);
-    if (dstBegin+srcEnd-srcBegin > dst.length)
-      throw new StringIndexOutOfBoundsException(dstBegin);
-    if (srcBegin < srcEnd)
-      System.arraycopy(data, srcBegin, dst, dstBegin, srcEnd - srcBegin);
-  }
-
-  public void getChars (int srcBegin, int srcEnd, StringBuffer dst)
-  {
-    if (srcBegin < 0 || srcBegin > srcEnd)
-      throw new StringIndexOutOfBoundsException(srcBegin);
-    if (srcEnd > size)
-      throw new StringIndexOutOfBoundsException(srcEnd);
-    if (srcBegin < srcEnd)
-      dst.append(data, srcBegin, srcEnd - srcBegin);
-  }
-
-  public void getChars (StringBuffer dst)
-  {
-    dst.append(data, 0, size);
-  }
 
   /** Return a char[] contain the characters of this string.
    * It is unspecified if the result is a copy or shares with this FString.
    */
   public char[] toCharArray()
   {
-    int val_length = data.length;
-    int seq_length = size;
-    if (seq_length == val_length)
-      return data;
-    else
-      {
-	char[] tmp = new char[seq_length];
-	System.arraycopy(data, 0, tmp, 0, seq_length);
-	return tmp;
-      }
+    if (indexes == null || indexes == cantWriteMarker)
+        return data;
+    int seq_length = size();
+    char[] arr = new char[seq_length];
+    for (int i = 0;  i < seq_length;  i++)
+        arr[i] = charAt(i);
+    return arr;
   }
 
   public void shift(int srcStart, int dstStart, int count)
@@ -183,35 +197,56 @@ public class FString extends AbstractCharVector<Char>
     return new FString(copy);
   }
 
-  /** Append all the characters of another <code>FString</code>. */
-  public boolean addAll(FString s)
-  {
-    int newSize = size + s.size;
-    if (data.length < newSize)
-      setBufferLength(newSize);
-    System.arraycopy(s.data, 0, data, size, s.size);
-    size = newSize;
-    return s.size > 0;
-  }
-
   public boolean addAll (CharSequence s)
   {
     int ssize = s.length();
-    int newSize = size + ssize;
-    if (data.length < newSize)
-      setBufferLength(newSize);
-    if (s instanceof FString)
-      System.arraycopy(((FString) s).data, 0, data, size, ssize);
-    else if (s instanceof String)
-      ((String) s).getChars(0, ssize, data, size);
+    int sz = size();
+    addSpace(sz, ssize); 
+    if (s instanceof String)
+      ((String) s).getChars(0, ssize, data, sz);
     else if (s instanceof CharSeq)
-      ((CharSeq) s).getChars(0, ssize, data, size);
+      ((CharSeq) s).getChars(0, ssize, data, sz);
     else
       for (int i = ssize; --i >= 0; )
-        data[size+i] = s.charAt(i);
-    size = newSize;
+        data[sz+i] = s.charAt(i);
     return ssize > 0;
   }
+
+    public void insert(int where, int ch, boolean beforeMarkers) {
+        int len;
+        char c1, c2;
+        if (ch >= 0x10000) {
+            c1 = (char) (((ch - 0x10000) >> 10) + 0xD800);
+            c2 = (char) ((ch & 0x3FF) + 0xDC00);
+            len = 2;
+        } else {
+            c1 = (char) ch;
+            c2 = 0;
+            len = 1;
+        }
+        addSpace(where, len);
+        data[where] = c1;
+        if (c2 > 0)
+            data[where+1] = c2;
+        if (beforeMarkers) {
+            // Adjust markers at insertion point to be after inserted next.
+            GapManager manager = getGapManager();
+            int oldPos = (manager.getGapStart()-len) << 1;
+            manager.adjustPositions(oldPos, oldPos + 1, len << 1);
+        }
+    }
+
+    public void insert(int where, String str, boolean beforeMarkers) {
+        int len = str.length();
+        addSpace(where, len);
+        str.getChars(0, len, data, where);
+        if (beforeMarkers) {
+            // Adjust markers at insertion point to be after inserted next.
+            GapManager manager = getGapManager();
+            int oldPos = (manager.getGapStart()-len) << 1;
+            manager.adjustPositions(oldPos, oldPos + 1, len << 1);
+        }
+    }
 
   /** Append arguments to this FString.
    * Used to implement Scheme's string-append.
@@ -220,14 +255,15 @@ public class FString extends AbstractCharVector<Char>
    */
   public void addAllStrings(Object[] args, int startIndex)
   {
-    int total = size;
+    int sz = size();
+    int count = 0;
     for (int i = startIndex; i < args.length; ++i)
       {
         Object arg = args[i];
-        total += ((CharSequence) arg).length();
+        count += ((CharSequence) arg).length();
       }
-    if (data.length < total)
-      setBufferLength(total);
+    //if (data.length < total)      setBufferLength(total);
+    getGapManager().gapReserve(this, sz, count);
     
     for (int i = startIndex; i < args.length; ++i)
       {
@@ -235,58 +271,51 @@ public class FString extends AbstractCharVector<Char>
       }
   }
   
-  public String toString ()
-  {
-    return new String (data, 0, size);
-  }
+    public String toString() {
+        return substring(0, size());
+    }
 
-  public String substring(int start, int end)
-  {
-    return new String (data, start, end - start);
-  }
+    public String substring(int start, int end) {
+        if (indexes == null)
+            return new String(data, start, end - start);
+        return new StringBuilder().append(this, start, end).toString();
+    }
 
   public CharSeq subSequence(int start, int end)
   {
-    return new FString(data, start, end-start);
+    return new FString(this, start, end-start);
   }
 
-  public void setCharAt (int index, char ch)
-  {
-    if (index < 0 || index >= size)
-      throw new StringIndexOutOfBoundsException(index);
-    data[index] = ch;
-  }
+    public void setCharAt(int index, char ch) {
+        checkCanWrite(); // FIXME maybe inline and fold into following
+        if (indexes != null) {
+            index = indexes.intAt(index);
+        }
+        data[index] = ch;
+    }
 
     public void setCharacterAt(int index, int ch) {
-        if (index < 0 || index >= size)
+        int sz = size();
+        if (index < 0 || index >= sz)
             throw new StringIndexOutOfBoundsException(index);
-        char old1 = data[index];
+        char old1 = charAt(index);
         char old2;
         boolean oldIsSupp = old1 >= 0xD800 && old1 <= 0xDBFF
-            && index+1 < size
-            && (old2 = data[index+1]) >= 0xDC00 && old2 <= 0xDFFF;
+            && index+1 < sz
+            && (old2 = charAt(index+1)) >= 0xDC00 && old2 <= 0xDFFF;
         if (ch <= 0xFFFF) {
-            if (oldIsSupp) {
-                System.arraycopy(data, index+2, data, index+1, size-index-2);
-                size--;
-            }
-            data[index] = (char) ch;
-        } else if (ch == Char.IGNORABLE_CHAR) {
-            int shrinkage = oldIsSupp ? 2 : 1;
-            System.arraycopy(data, index+shrinkage,
-                             data, index,
-                             size-index-shrinkage);
-            size -= shrinkage;
+            if (oldIsSupp)
+                delete(index+1, index+2);
+            setCharAt(index, (char) ch);
         } else {
             char c1 = (char) (((ch - 0x10000) >> 10) + 0xD800);
             char c2 = (char) ((ch & 0x3FF) + 0xDC00);
-            if (!oldIsSupp) {
-                ensureBufferLength(size+1);
-                System.arraycopy(data, index+1, data, index+2, size-index-1);
-                size++;
+            setCharAt(index, c1);
+            if (oldIsSupp) {
+                setCharAt(index+1, c2);
+            } else {
+                insert(index+1, c2, true);
             }
-            data[index] = c1;
-            data[index+1] = c2;
         }
     }
 
@@ -296,30 +325,39 @@ public class FString extends AbstractCharVector<Char>
      */
     public void replace(CharSequence src, int srcStart, int srcEnd,
                         int dstStart, int dstEnd) {
-        if (dstStart < 0 || dstStart > dstEnd || dstEnd > size
+        if (dstStart < 0 || dstStart > dstEnd || dstEnd > length()
             || srcStart < 0 || srcStart > srcEnd || srcEnd > src.length())
             throw new StringIndexOutOfBoundsException();
         int srcLength = srcEnd - srcStart;
         int dstLength = dstEnd - dstStart;
         int grow = srcLength - dstLength;
-        if (grow != 0) {
-            if (grow > 0)
-                ensureBufferLength(size + grow);
-            System.arraycopy(data, dstEnd, data, dstEnd+grow, size-dstEnd);
-            size += grow;
-        }
-        if (dstStart <= srcStart) {
-            int i = dstStart;
-            int j = srcStart;
-            for (; j < srcEnd; i++, j++) {
-                data[i] = src.charAt(j);
+        if (grow > 0)
+            addSpace(dstEnd, grow);
+        if (src instanceof FString) {
+            FString fsrc = (FString) src;
+            // Try to get the destination segment before getting the
+            // source segment read-only, in case src.data == this.data.
+            int dstart = getSegment(dstStart, srcLength);
+            int sstart;
+            if (dstart >= 0
+                && (sstart = fsrc.getSegmentReadOnly(srcStart, srcLength)) >= 0) {
+                System.arraycopy(fsrc.data, sstart, data, dstart, srcLength);
+                if (grow < 0)
+                    delete(dstEnd+grow, dstEnd);
+                return;
             }
+            else if (fsrc.data == data)
+                src = src.toString();
         } else {
-            int i = dstEnd + grow;
-            int j = srcEnd;
-            while (--j >= srcStart) {
-                data[--i] = src.charAt(j);
-            }
+            src = src.toString(); // just in case
+        }
+        if (grow < 0)
+            delete(dstEnd+grow, dstEnd);
+        IntSequence ind = getIndexesForce();
+        int i = dstStart;
+        int j = srcStart;
+        for (; j < srcEnd; i++, j++) {
+            data[ind.intAt(i)] = src.charAt(j);
         }
     }
 
@@ -328,31 +366,29 @@ public class FString extends AbstractCharVector<Char>
     data[index] = ch;
   }
 
-  /** Set all the elements to a given character. */
-  public final void fill (char ch)
-  {
-    char[] d = data; // Move to local to help optimizer.
-    for (int i = size;  --i >= 0; )
-      d[i] = ch;
-  }
+    /** Set all the elements to a given character. */
+    public final void fill(char ch) {
+        fill(0, size(), ch);
+    }
 
-  public void fill(int fromIndex, int toIndex, char value)
-  {
-    if (fromIndex < 0 || toIndex > size)
-      throw new IndexOutOfBoundsException();
-    char[] d = data; // Move to local to help optimizer.
-    for (int i = fromIndex;  i < toIndex;  i++)
-      d[i] = value;
-  }
-
-    public void delete(int start, int end) {
-        int len = size;
-        if (len != end)
-            System.arraycopy(data, end, data, start, len-end);
-        size -= end-start;
+    public void fill(int fromIndex, int toIndex, char value) {
+        if (fromIndex < 0 || toIndex > size())
+            throw new IndexOutOfBoundsException();
+        if (indexes == null) { // Minor optimization
+            char[] d = data; // Move to local to help optimizer.
+            for (int i = fromIndex;  i < toIndex;  i++)
+                d[i] = value;
+        } else {
+            for (int i = fromIndex;  i < toIndex;  i++)
+                setCharAt(i, value);
+        }
     }
 
     public void insertRepeated(int where, int value, int count) {
+        addSpace(where, value < 0x10000 ? count : 2 * count);
+        insertRepeatedRaw(where, value, count);
+    }
+    private void insertRepeatedRaw(int where, int value, int count) {
         char c1, c2;
         int len;
         if (value >= 0x10000) {
@@ -364,7 +400,6 @@ public class FString extends AbstractCharVector<Char>
             c2 = 0;
             len = count;
         }
-        addSpace(where, len);
         char[] array = data;
         int end = where + len;
         for (int i = where;  i < end;  ) {
@@ -393,30 +428,32 @@ public class FString extends AbstractCharVector<Char>
     return CHAR_VALUE;
   }
 
+    public String getTag() { return "c32"; }
+
   public void consume(Consumer out)
   {
     out.write(data, 0, data.length);
   }
 
-  public void consumePosRange (int iposStart, int iposEnd, Consumer out)
-  {
-    if (out.ignoring())
-      return;
-    int i = iposStart >>> 1;
-    int end = iposEnd >>> 1;
-    if (end > size)
-      end = size;
-    if (end > i)
-      out.write(data, i, end - i);
-  }
+    public void consumePosRange(int iposStart, int iposEnd, Consumer out) {
+        if (out.ignoring())
+            return;
+        int i = nextIndex(iposStart);
+        int end = nextIndex(iposEnd);
+        while (i < end) {
+            long result = getSegment(i);
+            int where = (int) result;
+            int size = (int) (result >> 32);
+            out.write(data, where, size);
+            i += size;
+        }
+    }
 
     public FString append(char c) {
-        int sz = size;
-        if (sz >= data.length)
-            ensureBufferLength(sz+1);
+        int sz = size();
+        addSpace(sz, 1);
         char[] d = data;
         d[sz] = c;
-        size = sz + 1;
         return this;
     }
 
@@ -429,16 +466,14 @@ public class FString extends AbstractCharVector<Char>
             return this;
         else
             delta = 2;
-        int sz = size;
-        if (sz + delta > data.length)
-            ensureBufferLength(sz+delta);
+        int sz = size();
+        addSpace(sz, delta);
         char[] d = data;
         if (delta > 1) {
             d[sz++] = (char) (((c - 0x10000) >> 10) + 0xD800);
             c = (c & 0x3FF) + 0xDC00;
         }
         d[sz++] = (char) c;
-        size = sz;
         return this;
     }
 
@@ -452,9 +487,8 @@ public class FString extends AbstractCharVector<Char>
         if (csq == null)
             csq = "null";
         int len = end - start;
-        int sz = size;
-        if (sz+len > data.length)
-            ensureBufferLength(sz+len);
+        int sz = size();
+        addSpace(sz, len);
         char[] d = data;
         if (csq instanceof String)
             ((String) csq).getChars(start, end, d, sz);
@@ -465,7 +499,6 @@ public class FString extends AbstractCharVector<Char>
             for (int i = start; i < end;  i++)
                 d[j++] = csq.charAt(i);;
         }
-        size = sz+len;
         return this;
     }
 
@@ -479,29 +512,27 @@ public class FString extends AbstractCharVector<Char>
         return this;
     }
 
-  public void writeTo(int start, int count, Appendable dest)
-     throws java.io.IOException
-  {
-    if (dest instanceof java.io.Writer)
-      {
-        try
-          {
-            ((java.io.Writer) dest).write(data, start, count);
-          }
-        catch (java.io.IOException ex)
-          {
-            throw new RuntimeException(ex);
-          }
-      }
-    else
-      {
-        dest.append(this, start, start+count);
-      }
-  }
+    public void writeTo(int start, int count, Appendable dest)
+        throws IOException {
+        IntSequence ind = indexes;
+        if (dest instanceof Writer) {
+            Writer wr = (Writer) dest;
+            while (count > 0) {
+                long result = getSegment(start);
+                int where = (int) result;
+                int size = (int) (result >> 32);
+                if (size > count)
+                    size = count;
+                wr.write(data, where, size);
+                start += size;
+                count -= size;
+            }
+        }
+        else
+            dest.append(this, start, start+count);
+    }
 
-  public void writeTo(Appendable dest) throws java.io.IOException
-  {
-    writeTo(0, size, dest);
-  }
-
+    public void writeTo(Appendable dest) throws IOException {
+        writeTo(0, size(), dest);
+    }
 }

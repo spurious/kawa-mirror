@@ -285,10 +285,9 @@ public class SwingBuffer extends Buffer
     // content.releasePosition(markPosition);
   }
 
-  public InPort openReader (int start, int count)
-  {
-    return new BufferReader(content.buffer, getPath(), start, count);
-  }
+    public InPort openReader(int start, int count) {
+        return content.buffer.openReader(start, start+count);
+    }
 
   /**
    * @see gnu.jemacs.buffer.Buffer#invoke(java.lang.Runnable)

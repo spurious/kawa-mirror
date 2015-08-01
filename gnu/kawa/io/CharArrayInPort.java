@@ -1,6 +1,7 @@
 package gnu.kawa.io;
 import gnu.text.*;
 import gnu.lists.*;
+import java.io.IOException;
 
 /** An Inport for reading from a char array.
   * Essentially the same as an InPort wrapped around a CharArrayReader, but
@@ -8,17 +9,17 @@ import gnu.lists.*;
 
 public class CharArrayInPort extends InPort
 {
-  static final Path stringPath = Path.valueOf("<string>");
+    static final Path stringPath = Path.valueOf("<string>");
 
-  public static CharArrayInPort make
-  /* #ifdef use:java.lang.CharSequence */
-  (CharSequence seq)
-  /* #else */ 
-  // (CharSeq seq)
-  /* #endif */
+    private AbstractCharVector string;
+    /** Index in string corresponding to limit. */
+    int limitIndex;
+    int start, end; // currently only used if string!=null
+
+  public static CharArrayInPort make(CharSequence seq)
   {
     if (seq instanceof FString)
-      return new CharArrayInPort((FString) seq);
+        return ((FString) seq).openReader(0, seq.length());
     else
       {
         int len = seq.length();
@@ -60,14 +61,71 @@ public class CharArrayInPort extends InPort
     this(string.toCharArray());
   }
 
-    public CharArrayInPort(FString string) {
-        this(string.data, string.size());
+    public CharArrayInPort(AbstractCharVector string, char[] buffer,
+                           int start, int end) {
+        this(buffer, 0);
+        this.string = string;
+        this.start = start;
+        this.end = end;
+        this.limitIndex = start;
     }
 
-  public int read () throws java.io.IOException
+    @Override
+    protected int fill(int len) throws java.io.IOException {
+        if (string != null) {
+            long result = string.getSegment(limitIndex);
+            int where = (int) result;
+            int size = (int) (result >> 32);
+            if (size <= 0)
+                return -1;
+            limitIndex += size;
+            if (limitIndex > end) {
+                size -= limitIndex - end;
+                limitIndex = end;
+            }
+            pos = where;
+            limit = pos;
+            return size;
+        }
+        return -1;
+
+    }
+
+    public void mark(int readAheadLimit) {
+        synchronized (lock) {
+            /* FIXME FUTURE
+            if (string != null) {
+                markPos = limitIndex - (limit - pos);
+                this.readAheadLimit = readAheadLimit;
+            } else
+            */
+                super.mark(readAheadLimit);
+        }
+    }
+    public void reset() throws IOException {
+        if (false/*FIXME*/ && string != null) {
+            if (readAheadLimit < 0)
+                throw new IOException ("mark invalid");
+            // Minor potential optimization - requires being able
+            // to determine if markPos is in the current "fragment".
+            if (false) {
+                pos = markPos + (limit - limitIndex);
+            } else {
+                limitIndex = markPos;
+                pos = 0;
+                limit = 0;
+            }
+            readAheadLimit = -1;
+        } else {
+            super.reset();
+        }
+    }
+    /*
+    public int read () throws java.io.IOException
   {
     if (pos >= limit)
       return -1;
     return super.read();
   }
+    */
 }

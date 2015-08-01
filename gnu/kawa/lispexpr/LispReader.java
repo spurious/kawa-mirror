@@ -591,21 +591,20 @@ public class LispReader extends Lexer
   public static final int SCM_COLATITUDE = SCM_ANGLE << 1;
   public static final int SCM_LEXPONENT_IS_BIGDECIMAL = SCM_COLATITUDE << 1;
 
-  public static Object parseNumber
-  /* #ifdef use:java.lang.CharSequence */
-  (CharSequence str, int radix)
-  /* #else */
-  // (CharSeq str, int radix)
-  /* #endif */
-  {
-    char[] buf;
-    if (str instanceof FString)
-      buf = ((FString) str).data;
-    else
-      buf = str.toString().toCharArray();
-    int len = str.length();
-    return parseNumber(buf, 0, len, '\0', radix, LispReader.SCM_NUMBERS);
-  }
+    public static Object parseNumber(CharSequence str, int radix) {
+        char[] buf;
+        int len = str.length();
+        int where;
+        if (str instanceof FString
+            && (where = ((FString) str).getSegmentReadOnly(0, len)) >= 0) {
+            buf = ((FString) str).getBuffer();
+        } else {
+            where = 0;
+            buf = str.toString().toCharArray();
+        }
+        return parseNumber(buf, where, len,
+                           '\0', radix, LispReader.SCM_NUMBERS);
+    }
 
   /** Parse a number.
    * @param buffer contains the characters of the number

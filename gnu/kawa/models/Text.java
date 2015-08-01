@@ -20,8 +20,7 @@ public class Text extends Model
 
   public Text (String text)
   {
-    buffer.gapEnd = 100-1;
-    buffer.getArray()[buffer.gapEnd] = '\n';
+    buffer.append('\n');
     setText(text);
   }
 

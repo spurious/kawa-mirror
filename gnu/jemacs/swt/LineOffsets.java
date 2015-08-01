@@ -2,8 +2,6 @@ package gnu.jemacs.swt;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import gnu.lists.GapVector;
 import gnu.lists.U32Vector;
 
 /**
@@ -14,9 +12,8 @@ import gnu.lists.U32Vector;
  * position where it begins, and back, reasonably fast. 
  * (O(1) for line number to line offset, O(log(#lines)) for line offset to line number)
  * <p>
- * LineOffsets extends GapVector with an U32Vector as base, allowing new line offsets to be inserted
- * quickly during normal text typing.
- * <p>
+ * LineOffsets extends U32Vector with a GapManager, allowing new line offsets
+ * to be inserted quickly during normal text typing.
  * <p>
  * Instances of SwtCharBuffer should hold an instance LineOffsets class and notify it whenever the it's text changes.
  * The notification happens through the methods: 
@@ -51,43 +48,37 @@ import gnu.lists.U32Vector;
  * @author Christian Surlykke
  *         12-07-2004
  */
-public class LineOffsets extends GapVector
+public class LineOffsets extends U32Vector
 {
-  
-  public final static int minGapSize = 100;
   private static Pattern newLinePattern = Pattern.compile("\n|\r\n|\r"); // We recognize all the usual forms of 
                                                                          // linedelimiters
 
-  
-  private U32Vector offsets;
-  
   public LineOffsets(int initialSize)
   {
-    super(new U32Vector(Math.max(101, initialSize)));
-    offsets = (U32Vector) base;
+    super(Math.max(101, initialSize));
     insertLine(0, 0); // Line 0 allways starts at position 0 -
                       // even if the text is just the empty string
   }
   
   private void setOffset(int index, int Offset)
   {
-    offsets.setIntAt(index < gapStart ? index : index + gapEnd - gapStart, Offset);
+    setIntAt(index, Offset);
   }
 
   private int getOffset(int index)
   {
-    return offsets.intAt(index < gapStart ? index : index + gapEnd - gapStart);
+    return intAt(index);
   }
 
   public void insertLine(int index, int offSet)
   {
-    gapReserve(index, 1);
-    offsets.setIntAt(gapStart++, offSet);
+    addSpace(index, 1)
+    setIntAt(index, offSet);
   }
 
   public int index2offset(int index) 
   {
-    return offsets.intAt(index < gapStart ? index : index + gapEnd - gapStart); 
+    return offsets.intAt(index); 
   }
   
   /**
@@ -99,6 +90,7 @@ public class LineOffsets extends GapVector
     // Adhoc optimization: Very often this class will be asked for the line index belonging to the point
     // where insertion happens, i.e. at the start of the gap. 
     // We try this before the full search so that we may return in O(1) time in this case.
+    int gapStart = getGapManager().getGapStart();
     try 
     {
       if (index2offset(gapStart - 1) <= offset && index2offset(gapStart) > offset)
@@ -178,7 +170,8 @@ public class LineOffsets extends GapVector
   public String toString()
   {
     StringBuffer sbuf = new StringBuffer();
-    sbuf.append("Lines: {" + size() + ", " + gapStart + ", " + gapEnd);
+    int gapStart = getGapManager().getGapStart();
+    sbuf.append("Lines: {" + size() + ", " + gapStart);
     sbuf.append(" [");
     for (int i = 0; i < size(); i++) 
     { 
@@ -186,7 +179,7 @@ public class LineOffsets extends GapVector
       {
         sbuf.append("|");
       }
-      sbuf.append(offsets.intAt(i < gapStart ? i : i + gapEnd - gapStart));
+      sbuf.append(offsets.intAt(i));
       
       if (i < size() - 1) 
       {
@@ -237,12 +230,12 @@ public class LineOffsets extends GapVector
 
   public void textDeleted(int startOffset, int endOffset)
   {
-    int index = offset2index(startOffset);
-    shiftGap(index + 1);
-    while (gapEnd < offsets.getBufferLength() && offsets.intAt(gapEnd) <= endOffset)
-    {
-      gapEnd++;
-    }
+    int index1 = offset2index(startOffset);
+    int index2 = index1;
+    int sz = size();
+    while (index2 < sz && intAt(index2) <= endOffset)
+        index2++;
+    delete(index1, index2);
   }
 
   public boolean isLineDelimiter(char c)

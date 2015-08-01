@@ -19,17 +19,11 @@ public class Nodes extends Values.FromList<SeqPosition>
                /* #endif */
                Consumer
 {
-    protected GapVector<SeqPosition> vector;
-    protected NodeVector nvector;
-
-    private Nodes(GapVector<SeqPosition> vector) {
-        super(vector);
-        this.vector = vector;
-    }
+    protected NodeVector vector;
 
     private Nodes(NodeVector nvector) {
-        this(new GapVector<SeqPosition>(nvector));
-        this.nvector = nvector;
+        super(nvector);
+        this.vector = nvector;
     }
 
     public Nodes() {
@@ -58,11 +52,11 @@ public class Nodes extends Values.FromList<SeqPosition>
     XMLFilter curFragment;
 
     public void writePosition (AbstractSequence seq, int ipos) {
-        nvector.writePosition(seq, ipos);
+        vector.writePosition(seq, ipos);
     }
   
     public void writePosition(SeqPosition position) {
-        nvector.writePosition(position);
+        vector.writePosition(position);
     }
 
     public void writeObject(Object v) {
@@ -292,19 +286,14 @@ public class Nodes extends Values.FromList<SeqPosition>
      * However returns null instead of throwing IndexOutOfBoundsException
      * if {@code index >= count}. */
     public AbstractSequence getSeq(int index) {
-        if (index >= vector.gapStart) {
-            index += vector.gapEnd - vector.gapStart;
-            if (index >= nvector.size())
-                return null;
-        }
-        return nvector.getSeq(index);
+        if (index >= vector.size())
+            return null;
+        return vector.getSeq(index);
     }
 
     /** Optimization of ((SeqPosition) get(index)). ipos. */
     public int getPos(int index) {
-        if (index >= vector.gapStart)
-            index += vector.gapEnd - vector.gapStart;
-        return nvector.getPos(index);
+        return vector.getPos(index);
     }
 
     public void consumePosRange (int iposStart, int iposEnd, Consumer out) {
@@ -312,10 +301,17 @@ public class Nodes extends Values.FromList<SeqPosition>
     }
 
     public static class NodeVector
+        // should maybe extend IndirectIndexable<SeqPosition> instead
         extends SimpleVector<SeqPosition>
         implements PositionConsumer {
         Object[] odata;
         int[] idata;
+        public GapManager getGapManager() { return super.getGapManager(); }
+
+        int id=++counter; static int counter;
+        public String toString() { return "NodeVec#"+id+"/sz:"+size(); }
+
+        protected int getGapStart() { return getGapManager().getGapStart(); }
 
         public int getBufferLength() {
             return odata == null ? 0 : odata.length;
@@ -339,6 +335,7 @@ public class Nodes extends Values.FromList<SeqPosition>
         }
 
         protected Object getBuffer() { throw new Error(); }
+        protected void setBuffer(Object buffer) { throw new Error(); }
 
         protected SeqPosition getBuffer(int index) {
             Object obj = odata[index];
@@ -348,6 +345,9 @@ public class Nodes extends Values.FromList<SeqPosition>
         }
 
         public AbstractSequence getSeq(int index) {
+            return getSeqBuffer(indexes.intAt(index));
+        }
+        public AbstractSequence getSeqBuffer(int index) {
             Object obj = odata[index];
             if (obj instanceof SeqPosition)
                 return ((SeqPosition) obj).sequence;
@@ -355,13 +355,17 @@ public class Nodes extends Values.FromList<SeqPosition>
         }
 
         public int getPos(int index) {
+            return getPosBuffer(indexes.intAt(index));
+        }
+
+        public int getPosBuffer(int index) {
             Object obj = odata[index];
             if (obj instanceof SeqPosition)
                 return ((SeqPosition) obj).ipos;
             return idata[index];
         }
 
-        protected SeqPosition makeSeqPos(AbstractSequence seq, int ipos) {
+        protected static SeqPosition makeSeqPos(AbstractSequence seq, int ipos) {
             if (seq instanceof NodeTree)
                 return KNode.make((NodeTree) seq, ipos);
             else
@@ -392,7 +396,7 @@ public class Nodes extends Values.FromList<SeqPosition>
         }
 
         public void writePosition(AbstractSequence seq, int ipos) {
-            int sz = size;
+            int sz = size();
             add((SeqPosition) null);
             odata[sz] = seq;
             idata[sz] = ipos;
@@ -407,18 +411,21 @@ public class Nodes extends Values.FromList<SeqPosition>
         public void consumePosRange (int iposStart, int iposEnd, Consumer out) {
             if (out.ignoring())
                 return;
-            int i = iposStart >>> 1;
-            int end = iposEnd >>> 1;
+            int i = nextIndex(iposStart);
+            int end = nextIndex(iposEnd);
+            int size = size();
             if (end > size)
                 end = size;
+            IntSequence inds = getIndexesForce();
             for (;  i < end;  i++) {
                 if (out instanceof PositionConsumer) {
                     PositionConsumer pout = (PositionConsumer) out;
-                    Object obj = odata[i];
+                    int ii = inds.intAt(i);
+                    Object obj = odata[ii];
                     if (obj instanceof SeqPosition)
                         pout.writePosition((SeqPosition) obj);
                     else
-                        pout.writePosition((AbstractSequence) obj, idata[i]);
+                        pout.writePosition((AbstractSequence) obj, idata[ii]);
                 }
                 else
                     out.writeObject(getBuffer(i));

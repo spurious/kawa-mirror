@@ -78,7 +78,7 @@
 (define (vector-fill! (vec :: vector) fill
                       #!optional (start ::int 0) (end ::int (vec:size)))
   :: void
-  (vec:fill fill start end))
+  (vec:fill start end fill))
 
 ;;; vector-map and vector-for-each are mandated by R6RS. These
 ;;; implementations are optimized for the one-vector case, and permit

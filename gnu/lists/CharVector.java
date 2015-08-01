@@ -18,8 +18,12 @@ public class CharVector extends AbstractCharVector<Character>
     /** Create an CharVector from a char[].
      * Note that this contructor does *not* copy the argument. */
     public CharVector(char[] values) {
-        size = values.length;
         data = values;
+    }
+
+    public CharVector(char[] data, IntSequence indexes) {
+        this.data = data;
+        this.indexes = indexes;
     }
 
     public final Character getBuffer(int index) {
@@ -34,4 +38,8 @@ public class CharVector extends AbstractCharVector<Character>
     public boolean equals(Object obj) {
         return obj instanceof CharVector && equals(this, (CharVector) obj);
     }
+
+    public int getElementKind() { return CHAR_VALUE; }
+
+    public String getTag() { return "c16"; }
 }

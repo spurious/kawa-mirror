@@ -280,7 +280,7 @@ public class ParseFormat extends Procedure1
 	  {
 	    InPort iport;
 	    if (arg instanceof FString)
-	      iport = new CharArrayInPort((FString) arg);
+              iport = ((FString) arg).openReader();
 	    else 
 	      iport = new CharArrayInPort(arg.toString()); 
 	    try

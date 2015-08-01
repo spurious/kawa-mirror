@@ -1,156 +1,154 @@
-// Copyright (c) 2001  Per M.A. Bothner and Brainfood Inc.
+// This file is generated from PrimVector.template. DO NOT EDIT! 
+// Copyright (c) 2001, 2002, 2015  Per M.A. Bothner and Brainfood Inc.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.lists;
 import java.io.*;
 
-/** Simple adjustable-length vector of boolean values. */
+/** Simple adjustable-length vector of Boolean values. */
 
-public class BitVector extends SimpleVector<Boolean> implements Externalizable
+public  class BitVector extends SimpleVector<Boolean>
+    implements Comparable
 {
-  boolean[] data;
-  protected static boolean[] empty = new boolean[0];
+    boolean[] data;
+    protected static boolean[] empty = new boolean[0];
 
-  public BitVector ()
-  {
-    data = empty;
-  }
+    public BitVector() {
+        data = empty;
+    }
 
-  public BitVector(int size, boolean value)
-  {
-    boolean[] array = new boolean[size];
-    data = array;
-    this.size = size;
-    if (value)
-      {
-	while (--size >= 0)
-	  array[size] = true;
-      }
-  }
+    public BitVector(int size, boolean value) {
+        boolean[] array = new boolean[size];
+        data = array;
+        if (value != false) {
+            while (--size >= 0)
+                array[size] = value;
+        }
+    }
 
-  public BitVector(int size)
-  {
-    this.data = new boolean[size];
-    this.size = size;
-  }
+    public BitVector(int size) {
+        this(new boolean[size]);
+    }
 
-  public BitVector (boolean[] data)
-  {
-    this.data = data;
-    size = data.length;
-  }
+    /** Reuses the argument without making a copy. */
+    public BitVector(boolean[] data) {
+        this.data = data;
+    }
 
-  public BitVector(Sequence seq)
-  {
-    data = new boolean[seq.size()];
-    addAll(seq);
-  }
+    /*
+    public BitVector(Sequence seq) {
+        data = new boolean[seq.size()];
+        addAll(seq);
+    }
+    */
 
-  /** Get the allocated length of the data buffer. */
-  public int getBufferLength()
-  {
-    return data.length;
-  }
+    public BitVector(boolean[] data, IntSequence indexes) {
+        this.data = data;
+        this.indexes = indexes;
+    }
 
-  public void setBufferLength(int length)
-  {
-    int oldLength = data.length;
-    if (oldLength != length)
-      {
-	boolean[] tmp = new boolean[length];
-	System.arraycopy(data, 0, tmp, 0,
-			 oldLength < length ? oldLength : length);
-	data = tmp;
-      }
-  }
+    /** Makes a copy of (part of) the argument array. */
+    public BitVector(boolean[] values, int offset, int length) {
+        this(length);
+        System.arraycopy(values, offset, data, 0, length);
+    }
 
-  protected Object getBuffer() { return data; }
+    /** Get the allocated length of the data buffer. */
+    public int getBufferLength() {
+        return data.length;
+    }
 
-  public final boolean booleanAt(int index)
-  {
-    if (index >= size)
-      throw new IndexOutOfBoundsException();
-    return data[index];
-  }
+    public void setBufferLength(int length) {
+        int oldLength = data.length;
+        if (oldLength != length) {
+            boolean[] tmp = new boolean[length];
+            System.arraycopy(data, 0, tmp, 0,
+                             oldLength < length ? oldLength : length);
+            data = tmp;
+        }
+    }
 
-  public final boolean booleanAtBuffer(int index)
-  {
-    return data[index];
-  }
+    public boolean[] getBuffer() { return data; }
 
-  public final Boolean get(int index)
-  {
-    if (index >= size)
-      throw new IndexOutOfBoundsException();
-    return Boolean.valueOf(data[index]);
-  }
+    protected void setBuffer(Object buffer) { data = (boolean[]) buffer; }
 
-  public final Boolean getBuffer(int index)
-  {
-    return Boolean.valueOf(data[index]);
-  }
+    public final boolean booleanAt(int index) {
+        if (indexes != null)
+            index = indexes.intAt(index);
+        return data[index];
+    }
 
-  @Override
-  public void setBuffer(int index, Boolean value)
-  {
-    data[index] = value.booleanValue();
-  }
+    public final boolean booleanAtBuffer(int index) {
+        return data[index];
+    }
 
-  public final void setBooleanAt(int index, boolean value)
-  {
-    if (index >= size)
-      throw new IndexOutOfBoundsException();
-    data[index] = value;
-  }
+    public final Boolean get(int index) {
+        if (indexes != null)
+            index = indexes.intAt(index);
+        return Boolean.valueOf(data[index]);
+    }
 
-  public final void setBooleanAtBuffer(int index, boolean value)
-  {
-    data[index] = value;
-  }
+    public final Boolean getBuffer(int index) {
+        return Boolean.valueOf(data[index]);
+    }
 
-  protected void clearBuffer(int start, int count)
-  {
-    while (--count >= 0)
-      data[start++] = false;
-  }
+    public final void setBooleanAt(int index, boolean value) {
+        checkCanWrite(); // FIXME maybe inline and fold into following
+        if (indexes != null)
+            index = indexes.intAt(index);
+        data[index] = value;
+    }
 
-  public int getElementKind()
-  {
-    return BOOLEAN_VALUE;
-  }
+    public final void setBooleanAtBuffer(int index, boolean value) {
+        data[index] = value;
+    }
 
-  public String getTag() { return "b"; }
+    @Override
+    public final void setBuffer(int index, Boolean value) {
+        data[index] = value.booleanValue();
+    }
 
-  public void consumePosRange(int iposStart, int iposEnd, Consumer out)
-  {
-    if (out.ignoring())
-      return;
-    int i = iposStart >>> 1;
-    int end = iposEnd >>> 1;
-    for (;  i < end;  i++)
-      out.writeBoolean(data[i]);
-  }
+    public void add(boolean v) {
+        int sz = size();
+        addSpace(sz, 1);
+        setBooleanAt(sz, v);
+    }
 
-  /**
-   * @serialData Write 'size' (using writeInt),
-   *   followed by 'size' elements in order (using writeBoolean).
-   */
-  public void writeExternal(ObjectOutput out) throws IOException
-  {
-    int size = this.size;
-    out.writeInt(size);
-    for (int i = 0;  i < size;  i++)
-      out.writeBoolean(data[i]);
-  }
+    protected void clearBuffer(int start, int count) {
+        boolean[] d = data;
+        while (--count >= 0)
+            d[start++] = false;
+    }
 
-  public void readExternal(ObjectInput in)
-    throws IOException, ClassNotFoundException
-  {
-    int size = in.readInt();
-    boolean[] data = new boolean[size];
-    for (int i = 0;  i < size;  i++)
-      data[i] = in.readBoolean();
-    this.data = data;
-    this.size = size;
-  }
+    public int getElementKind() { return BOOLEAN_VALUE; }
+
+    public String getTag() { return "b"; }
+
+    public void consumePosRange(int iposStart, int iposEnd, Consumer out) {
+        if (out.ignoring())
+            return;
+        int i = nextIndex(iposStart);
+        int end = nextIndex(iposEnd);
+        for (;  i < end;  i++)
+            out.writeBoolean(booleanAt(i));
+    }
+
+    public int compareTo(Object obj) {
+        BitVector vec2 = (BitVector) obj;
+        boolean[] arr1 = data;
+        boolean[] arr2 = vec2.data;
+        int n1 = size();
+        int n2 = vec2.size();
+        IntSequence inds1 = getIndexesForce();
+        IntSequence inds2 = vec2.getIndexesForce();
+        int n = n1 > n2 ? n2 : n1;
+        for (int i = 0;  i < n;  i++) {
+            boolean v1 = arr1[inds1.intAt(i)];
+            boolean v2 = arr2[inds2.intAt(i)];
+            if (v1 != v2)
+                return v1 && ! v2 ? 1 : -1;
+        }
+        return n1 - n2;
+    }
+
 }

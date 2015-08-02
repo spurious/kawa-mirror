@@ -1,3 +1,8 @@
+2015-08-02  Per Bothner  <per@bothner.com>
+
+	* ArithOp.java: Use new leastSpecificCode and/or UNKNOWN_CODE.
+	* MinMax.java: Likewise.
+
 2015-06-08  Per Bothner  <per@bothner.com>
 
 	* CompileMisc.java (compiledOrderedMap): Update call to compileInvoke.

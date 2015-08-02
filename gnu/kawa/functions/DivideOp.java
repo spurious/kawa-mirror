@@ -60,9 +60,9 @@ public class DivideOp extends ArithOp
       {
 	Object arg2 = args[i];
 	int code2 = Arithmetic.classifyValue(arg2);
-	code = code < code2 ? code2 : code;
+	code = Arithmetic.leastSpecificCode(code, code2);
         int scode = code;
-        if (code < Arithmetic.INTNUM_CODE)
+        if (code < Arithmetic.INTNUM_CODE && code != Arithmetic.UNKNOWN_CODE)
           {
             switch (op)
               {
@@ -85,7 +85,8 @@ public class DivideOp extends ArithOp
                 break;
               }
           }
-        if (op == DIVIDE_INEXACT && code <= Arithmetic.REALNUM_CODE)
+        if (op == DIVIDE_INEXACT && code <= Arithmetic.REALNUM_CODE
+                 && code != Arithmetic.UNKNOWN_CODE)
           {
             scode = Arithmetic.REALNUM_CODE;
             if (code != Arithmetic.DOUBLE_CODE && code != Arithmetic.FLOAT_CODE)

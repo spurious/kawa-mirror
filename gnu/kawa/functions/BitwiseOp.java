@@ -76,7 +76,11 @@ public class BitwiseOp extends ArithOp
   {
     int kind1 = Arithmetic.classifyValue(arg1);
     int kind2 = Arithmetic.classifyValue(arg2);
-    int kind = (op >= ASHIFT_GENERAL && op <= LSHIFT_RIGHT) || kind1 <= 0 || (kind1 > kind2 && kind2 > 0) ? kind1 : kind2;
+    int kind =
+        (op >= ASHIFT_GENERAL && op <= LSHIFT_RIGHT
+         && kind1 != Arithmetic.UNKNOWN_CODE)
+        ? kind1
+        : Arithmetic.leastSpecificCode(kind1, kind2);
     IntNum iarg1 = LangObjType.coerceIntNum(arg1);
     IntNum iarg2 = LangObjType.coerceIntNum(arg2);
     IntNum result;

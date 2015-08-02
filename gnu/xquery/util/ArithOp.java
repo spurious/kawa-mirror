@@ -105,11 +105,11 @@ public class ArithOp extends Procedure1or2
       }
     int code1 = Arithmetic.classifyValue(arg1);
     int code2 = Arithmetic.classifyValue(arg2);
-    int code = code1 < code2 ? code2 : code1;
+    int code = Arithmetic.leastSpecificCode(code1, code2);
     switch (op)
       {
       case 'd': // 'div'
-        if (code1 < 0 || code2 < 0)
+          if (code == Arithmetic.UNKNOWN_CODE)
           break;
         else if (code <= Arithmetic.RATNUM_CODE)
           {
@@ -151,10 +151,10 @@ public class ArithOp extends Procedure1or2
               }
             throw new ArithmeticException("divide of incompatible durations");
           }
-        else if (code >= 0)
+        else if (code != Arithmetic.UNKNOWN_CODE)
           return Arithmetic.asNumeric(arg1).div(Arithmetic.asNumeric(arg2));
       case 'i': // 'idiv'
-        if (code1 < 0 || code2 < 0)
+          if (code == Arithmetic.UNKNOWN_CODE)
           break;
         else if (code <= Arithmetic.INTNUM_CODE)
           {
@@ -184,7 +184,7 @@ public class ArithOp extends Procedure1or2
             return RealNum.toExactInt(d, RealNum.TRUNCATE); 
           }
       case 'm': // 'mod'
-        if (code1 < 0 || code2 < 0)
+        if (code == Arithmetic.UNKNOWN_CODE)
           break;
         else if (code <= Arithmetic.INTNUM_CODE)
           {

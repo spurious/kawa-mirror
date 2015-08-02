@@ -1,3 +1,13 @@
+2015-08-02  Per Bothner  <per@bothner.com>
+
+	* Arithmetic.java (leastSpecificCode): New method.
+	(UNKNOWN_CODE): New constant.
+	* AddOp.java: Use leastSpecificCode and/or UNKNOWN_CODE.
+	* BitwiseOp.java: Likewise.
+	* DivideOp.java: Likewise.
+	* MultiplyOp.java: Likewise.
+	* NumberCompare.java: Likewise.
+
 2015-07-31  Per Bothner  <per@bothner.com>
 
 	* ApplyToArgs.java (applyN): Use Sequences.indirectIndexed.

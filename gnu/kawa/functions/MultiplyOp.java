@@ -31,7 +31,8 @@ public class MultiplyOp extends ArithOp
     public static Object apply(Object arg1, Object arg2) {
         int code1 = Arithmetic.classifyValue(arg1);
 	int code2 = Arithmetic.classifyValue(arg2);
-        return combine((Number) arg1, arg2, code1 < code2 ? code2 : code1);
+        return combine((Number) arg1, arg2,
+                       Arithmetic.leastSpecificCode(code1, code2));
     }
 
     public Object applyN(Object[] args) {
@@ -43,7 +44,7 @@ public class MultiplyOp extends ArithOp
         for (int i = 1; i < len; i++) {
             Object arg2 = args[i];
             int code2 = Arithmetic.classifyValue(arg2);
-            code = code < code2 ? code2 : code;
+            code = Arithmetic.leastSpecificCode(code, code2);
             result = combine(result, arg2, code);
         }
         return result;

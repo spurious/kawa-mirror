@@ -37,6 +37,12 @@ public class Arithmetic
   public static final int REALNUM_CODE = 12;
   /** Promotion code for other gnu.math.Numeric. */
   public static final int NUMERIC_CODE = 13;
+  public static final int UNKNOWN_CODE = 0;
+
+    public static int leastSpecificCode(int code1, int code2) {
+        return code1 <= UNKNOWN_CODE || code2 <= UNKNOWN_CODE ? UNKNOWN_CODE
+            : code1 < code2 ? code2 : code1;
+    }
 
     public static int classifyValue(Object value) {
 	for (;;) {
@@ -81,7 +87,7 @@ public class Arithmetic
 	    else
 		break;
 	}
-        return -1;
+        return UNKNOWN_CODE;
     }
 
   public static Type kindType (int kind)
@@ -136,7 +142,7 @@ public class Arithmetic
       {
 	char sig = type.getSignature().charAt(0);
 	if (sig == 'V' || sig == 'Z' || sig == 'C')
-	  return 0;
+	  return UNKNOWN_CODE;
 	else if (sig == 'D')
 	  return DOUBLE_CODE;
 	else if (sig == 'F')
@@ -180,7 +186,7 @@ public class Arithmetic
     else if (type instanceof LazyType)
       return classifyType(((LazyType) type).getValueType());
     else
-      return 0;
+      return UNKNOWN_CODE;
   }
 
   public static int asInt (Object value)

@@ -151,9 +151,9 @@ public class NumberCompare extends ProcedureN
                              Object arg2, int code2,
                              boolean exact)
   {
-    if (code1 < 0 || code2 < 0)
-      return -3;
-    int code = code1 < code2 ? code2 : code1;
+    int code = Arithmetic.leastSpecificCode(code1, code2);
+    if (code == Arithmetic.UNKNOWN_CODE)
+        return -3;
     int comp; // A Numeric.compare return code: -1, 0, 1, or rarely: -2, or -3.
     switch (code)
       {

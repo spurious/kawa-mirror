@@ -38,7 +38,7 @@ public class AddOp extends ArithOp
     if (code1 < 0 || code2 < 0)
     throw new ClasscastException(); // FIXME
     */
-    int code = code1 < code2 ? code2 : code1;
+    int code = Arithmetic.leastSpecificCode(code1, code2);
     switch (code)
       {
       case Arithmetic.INT_CODE:

@@ -48,7 +48,7 @@ public class MinMax
                                                  cur, code2, false);
                  if (rcode == -3)
                    throw new IllegalArgumentException("values cannot be compared");
-                 int code = code1 < code2 ? code2 : code1;
+                 int code = Arithmetic.leastSpecificCode(code1, code2);
                  boolean castNeeded;
                  if (rcode == -2)
                    {

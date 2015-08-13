@@ -41,7 +41,7 @@ public class ModuleContext
 
   private ClassToInstanceMap table = new ClassToInstanceMap();
 
-  /** If there is no instance of the argument's class, allocated one. */
+  /** If there is no instance of the argument's class, allocate one. */
   public synchronized Object findInstance (ModuleInfo info)
   {
     Class clas;

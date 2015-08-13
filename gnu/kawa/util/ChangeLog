@@ -1,3 +1,8 @@
+2015-08-10  Jamison Hope  <jrh@theptrgroup.com>
+
+	* PreProcess.java (handleArg): Fix typo: repeatedly search for
+	separator character, not charAt(0).
+
 2015-07-31  Per Bothner  <per@bothner.com>
 
 	* PreProcess.java: Bunch of changes to support pre-processing

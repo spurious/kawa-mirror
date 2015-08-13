@@ -470,7 +470,7 @@ public class PreProcess
                     char sep = feat0 == '/' || feat0 == ';' ? feat0 : ' ';
                     int start = 0;
                     while (start >= 0) {
-                        int ind = features.indexOf(feat0, start);
+                        int ind = features.indexOf(sep, start);
                         String farg;
                         if (ind >= 0) {
                             farg = features.substring(start, ind);

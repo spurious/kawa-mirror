@@ -583,6 +583,7 @@
         <file name="kawa/base.scm"/>
         <file name="rnrs/hashtables.scm"/>
         <file name="rnrs/lists.scm"/>
+        <file name="rnrs/arithmetic/bitwise.scm"/>
         <file name="srfi95.scm"/>
         <file name="rnrs/unicode.scm"/>
         <file name="rnrs/sorting.scm"/>

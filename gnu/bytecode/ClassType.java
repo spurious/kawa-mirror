@@ -1128,6 +1128,18 @@ public class ClassType extends ObjectType
     return result;
   }
 
+    public <T extends java.lang.annotation.Annotation>
+    T getAnnotation(Class<T> clas) {
+        T ann = RuntimeAnnotationsAttr.getAnnotation(this, clas);
+        if (ann != null)
+            return ann;
+        if ((flags & EXISTING_CLASS) != 0 && getReflectClass() != null) {
+            Class<?> c = getReflectClass();
+            return c.getAnnotation(clas);
+        }
+        return null;
+    }
+
   /** Do various fixups after generating code but before we can write it out.
    * This includes assigning constant pool indexes where needed,
    * finalizing labels, etc. */

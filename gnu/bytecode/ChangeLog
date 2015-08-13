@@ -1,3 +1,11 @@
+2015-08-13  Jamison Hope  <jrh@theptrgroup.com>
+
+	* ClassType.java (getAnnotation): New method.
+	* RuntimeAnnotationsAttr.java (readAnnotationEntry): Set
+	annotationType when entry is read to avoid NullPointerException in
+	getAnnotation() later.
+	* AnnotationEntry.java (Value.getValue): Convert enum values.
+
 2015-06-04  Per Bothner  <per@bothner.com>
 
 	* PrimType.java (compare): Handle signed vs unsigned types.

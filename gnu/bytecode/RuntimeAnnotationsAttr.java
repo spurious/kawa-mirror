@@ -129,6 +129,7 @@ public class RuntimeAnnotationsAttr extends Attribute
         int tindex = dstr.readUnsignedShort();
         CpoolEntry cpentry = constants.getForced(tindex, ConstantPool.UTF8);
         aentry.annotationTypeIndex = tindex;
+        aentry.annotationType = (ClassType) Type.signatureToType(((CpoolUtf8)cpentry).getString());
         int count = dstr.readUnsignedShort();
         for (int i = 0;  i < count;  i++) {
             int nindex = dstr.readUnsignedShort();

@@ -310,6 +310,31 @@ implements java.lang.reflect.InvocationHandler
             }
           return valuex;
         }
+      else if (kind == 'e') {
+          if (valuex == null) {
+              if (value instanceof Enum) {
+                  valuex = value;
+              } else {
+                  ClassType type;
+                  String name;
+
+                  if (value instanceof Field) {
+                      Field f = (Field) value;
+                      type = f.getDeclaringClass();
+                      name = f.getName();
+                  } else {
+                      String[] sarr = (String[]) value;
+                      type = (ClassType) Type.signatureToType(sarr[0]);
+                      name = sarr[1];
+                  }
+                  Class<?> clas = type.getReflectClass();
+                  Class<? extends Enum> eclas = clas.asSubclass(Enum.class);
+                  Enum val = Enum.valueOf(eclas, name);
+                  valuex = val;
+              }
+          }
+          return valuex;
+      }
       // FIXME other conversions needed?
       return value;
     }

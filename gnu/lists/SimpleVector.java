@@ -166,10 +166,17 @@ public abstract class SimpleVector<E> extends IndirectIndexable<E>
     /* #ifdef JAVA8 */
     // @Override
     // public void forEach(java.util.function.Consumer<? super E> action) {
-    //     if (indexes != null) FIXME;
     //     int len = size();
-    //     for (int i = 0;  i < len;  i++)
-    //         action.accept(getBuffer(i));
+    //     int index = 0;
+    //     while (len > 0) {
+    //         long result = getSegment(index);
+    //         int where = (int) result;
+    //         int size = (int) (result >> 32);
+    //         for (int i = 0; i < size; i++)
+    //             action.accept(getBuffer(where+i));
+    //         len -= size;
+    //         index += size;
+    //     }
     // }
     /* #endif */
 

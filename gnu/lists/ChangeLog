@@ -1,3 +1,8 @@
+2015-08-13  Per Bothner  <per@bothner.com>
+
+	* SimpleVector.java (forEach): (JAVA8-only)  Fix syntax errors,
+	reported by Jamison Hope. Replace by implementation using segments.
+
 2015-07-31  Per Bothner  <per@bothner.com>
 
 	Re-implement SimpleVector to use an index mapper.

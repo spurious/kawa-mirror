@@ -75,12 +75,7 @@ public abstract class AbstractSequence<E>
 
   public static RuntimeException unsupportedException (String text)
   {
-    /* #ifdef JAVA2 */
     return new UnsupportedOperationException(text);
-    /* #endif */
-    /* #ifndef JAVA2 */
-    // return new RuntimeException(text);
-    /* #endif */
   }
 
   public E set(int index, E element)
@@ -173,7 +168,6 @@ public abstract class AbstractSequence<E>
     return indexOf(o) >= 0;
   }
 
-  /* #ifdef JAVA2 */
   /** See java.util.List. */
   public boolean containsAll(Collection<?> c)
   {
@@ -186,7 +180,6 @@ public abstract class AbstractSequence<E>
       }
     return true;
   }
-  /* #endif */
 
   public final Enumeration<E> elements()
   {
@@ -208,7 +201,6 @@ public abstract class AbstractSequence<E>
     return new SeqPosition<E,AbstractSequence<E>>(this, copyPos(ipos));
   }
 
-  /* #ifdef JAVA2 */
   public final Iterator<E> iterator()
   {
     return getIterator();
@@ -223,7 +215,6 @@ public abstract class AbstractSequence<E>
   {
     return getIterator(index);
   }
-  /* #endif */
 
   /** Add a value at a specified Pos.
    * @return the updated Pos, which is after the inserted value..
@@ -248,7 +239,6 @@ public abstract class AbstractSequence<E>
     releasePos(pos);
   }
 
-  /* #ifdef JAVA2 */
   /** See java.util.Collection. */
   public boolean addAll(Collection<? extends E> c)
   {
@@ -268,26 +258,6 @@ public abstract class AbstractSequence<E>
     releasePos(pos);
     return changed;
   }
-  /* #endif */
-  /* #ifndef JAVA2 */
-  // public boolean addAll(Sequence c)
-  // {
-  //   return addAll(size(), c);
-  // }
-
-  // public boolean addAll(int index, Sequence c)
-  // {
-  //   boolean changed = false;
-  //   int pos = createPos(index, false);
-  //   for (int iter = startPos();  (iter = nextPos(iter)) != 0; )
-  //     {
-  //       pos = addPos(pos, getPosPrevious(iter));
-  //       changed = true;
-  //     }
-  //   releasePos(pos);
-  //   return changed;
-  // }
-  /* #endif */
 
   /**
    * Remove one or more elements.
@@ -344,7 +314,6 @@ public abstract class AbstractSequence<E>
     return true;
   }
 
-  /* #ifdef JAVA2 */
   public boolean removeAll(Collection<?> c)
   {
     boolean changed = false;
@@ -374,7 +343,6 @@ public abstract class AbstractSequence<E>
       }
     return changed;
   }
-  /* #endif */
 
   public void clear()
   {
@@ -734,42 +702,22 @@ public abstract class AbstractSequence<E>
   {
     // Compatible with the Collections specification.
     // FIXME should also depend on class?
-    /* #ifdef JAVA2 */
     if (! (this instanceof java.util.List)
         || ! (o instanceof java.util.List))
       return this == o;
     Iterator<E> it1 = iterator();
     Iterator<E> it2 = ((java.util.List<E>) o).iterator();
-    /* #endif */
-    /* #ifndef JAVA2 */
-    // if (! (this instanceof Sequence) || ! (o instanceof Sequence))
-    //   return this == o;
-    // Enumeration it1 = elements();
-    // Enumeration it2 = ((Sequence) o).elements();
-    /* #endif */
     for (;;)
       {
-        /* #ifdef JAVA2 */
         boolean more1 = it1.hasNext();
         boolean more2 = it2.hasNext();
-        /* #endif */
-        /* #ifndef JAVA2 */
-        // boolean more1 = it1.hasMoreElements();
-        // boolean more2 = it2.hasMoreElements();
-        /* #endif */
         if (more1 != more2)
           return false;
         if (! more1)
           return true;
-	/* #ifdef JAVA2 */
         E e1 = it1.next();
         E e2 = it2.next();
-	/* #endif */
-	/* #ifndef JAVA2 */
-        // Object e1 = it1.nextElement();
-        // Object e2 = it2.nextElement();
-	/* #endif */
-        if (e1 == null)
+	if (e1 == null)
           {
             if (e2 != null)
               return false;
@@ -789,13 +737,11 @@ public abstract class AbstractSequence<E>
     return new SubSequence<E>(this, ipos0, ipos1);
   }
 
-  /* #ifdef JAVA2 */
   public List<E> subList(int fromIx, int toIx)
   {
     return subSequencePos(createPos(fromIx, false),
                           createPos(toIx, true));
   }
-  /* #endif */
 
   /** Copy an element specified by a position pair to a Consumer.
    * @return if hasNext(ipos). */

@@ -557,7 +557,8 @@ public abstract class Type
 
     /** Convert an object to a value of this Type.
      * The result is actually of the implementation type, boxed as appropriate,
-     * so it is suitable for standard reflective operations.
+     * so it is suitable for standard reflective operations,
+     * like the arguments to Field#set or Method#invoke.
      * Throw a ClassCastException when this is not possible.
      */
     public abstract Object coerceFromObject (Object obj);

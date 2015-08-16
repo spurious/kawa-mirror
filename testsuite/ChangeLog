@@ -1,5 +1,7 @@
 2015-08-16  Per Bothner  <per@bothner.com>
 
+	* text-test.scm: Test simple set! of indexed string.
+
 	* num-test.scm: Added more tests for uint.
 
 2015-06-24  William D Clinger <will@ccs.neu.edu>

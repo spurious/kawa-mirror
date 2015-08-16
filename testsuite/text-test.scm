@@ -161,4 +161,8 @@
   (test-equal #\ignorable-char (str 4))
   (test-equal #\c (str 5)))
 
+(let ((str1 (string-copy "abcdef")))
+  (set! (str1 2) #\D)
+  (test-equal "abDdef" str1))
+
 (test-end)

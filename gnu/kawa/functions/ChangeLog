@@ -1,3 +1,8 @@
+2015-08-16  Per Bothner  <per@bothner.com>
+
+	* Setter.java (apply2): Use coerceToObject rather than coerceFromObject
+	because we're converting to real value, not a reflection value.
+
 2015-08-02  Per Bothner  <per@bothner.com>
 
 	* Arithmetic.java (leastSpecificCode): New method.

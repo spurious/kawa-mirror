@@ -124,7 +124,7 @@ public class Setter extends Procedure1 implements HasSetter {
                                       Sequences.coerceToSequence(value));
             } else {
                 if (elementType != null)
-                    value = elementType.coerceFromObject(value);
+                    value = elementType.coerceToObject(value);
                 list.set(((Number) index).intValue(), value);
             }
             return Values.empty;

@@ -55,6 +55,7 @@ public class SlotSet extends Procedure3 implements Inlineable
           = member instanceof Field ? ((Field) member).getReflectField()
           : clas.getField(fname);
 	Class ftype = field.getType();
+        // FIXME should use SourceType annotation/decodeType.
         field.set(obj, language.coerceFromObject(ftype, value));
         return;
       }
@@ -92,8 +93,8 @@ public class SlotSet extends Procedure3 implements Inlineable
         setArgTypes[0] = getmethod.getReturnType();
         java.lang.reflect.Method setmethod
           = clas.getMethod(setName, setArgTypes);
-        Object[] args = new Object[1];
-        args[0] = language.coerceFromObject(setArgTypes[0], value);
+        // FIXME should use SourceType annotation/decodeType.
+        Object[] args = { language.coerceFromObject(setArgTypes[0], value) };
         setmethod.invoke(obj, args);
         return;
       }

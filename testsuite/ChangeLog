@@ -1,3 +1,7 @@
+2015-08-16  Per Bothner  <per@bothner.com>
+
+	* num-test.scm: Added more tests for uint.
+
 2015-06-24  William D Clinger <will@ccs.neu.edu>
             Per Bothner  <per@bothner.com>
 
@@ -13,7 +17,7 @@
 	since we plan to optimize 'apply'.
 
 2015-06-15  Per Bothner  <per@bothner.com>
-
+st
 	* Makefile.am: Add files to EXTRA_DIST do 'make distcheck' works.
 	(check-larceny-simple1): Make use of srcdir.
 

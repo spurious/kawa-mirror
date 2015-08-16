@@ -696,16 +696,13 @@ public class LangObjType extends SpecialObjectType implements TypeValue
                 argType = Type.int_type;
               }
             else if (stackType == Type.longType
-                     || stackType == LangPrimType.unsignedIntType)
+                     || stackType == LangPrimType.unsignedIntType
+                     || stackType == LangPrimType.unsignedLongType)
               {
                 cname = "gnu.math.IntNum";
-                argType = Type.long_type;
-              }
-            else if (stackType == LangPrimType.unsignedLongType)
-              {
-                cname = "gnu.math.IntNum";
-                argType = Type.long_type;
-                mname = "valueOfUnsigned";
+                mname = stackType == Type.longType ? "valueOf"
+                    : "valueOfUnsigned";
+                argType = stackType.getImplementationType();
               }
             else if (typeCode == REAL_TYPE_CODE
                      || typeCode == NUMERIC_TYPE_CODE)

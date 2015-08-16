@@ -1,4 +1,4 @@
-(test-begin "num" 1905)
+(test-begin "num" 1909)
 
 (define-syntax jequals
   (syntax-rules ()
@@ -518,4 +518,11 @@ Not currently true, but perhaps it should be.
 (test-equal (->int 253) (->int (index-u8i1 1)))
 (test-equal (->int 253) (->int (index-u8i2 1)))
 
+(define u32x ::uint #xFFFFFFF0)
+(test-assert (= u32x #xFFFFFFF0))
+(test-assert (= u32x (+ (->uint #xFFFFFFE8) 8)))
+(let* ((vec1 ::dynamic (u32vector 4 5 6 7)))
+  (set! (vec1 2) u32x)
+  (test-equal u32x (vec1 2))
+  (test-equal 7 (vec1 3)))
 (test-end)

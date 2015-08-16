@@ -1245,12 +1245,23 @@ public class IntNum extends RatNum implements Externalizable
     /** Make an IntNum from an unsigned 64-bit value. */
     public static IntNum valueOfUnsigned(long value) {
         if (value >= 0)
-            return make(value);
+            return valueOf(value);
         IntNum result = alloc(3);
         result.ival = 3;
         result.words[0] = (int) value;
         result.words[1] = (int) (value >> 32);
         result.words[2] = 0;
+        return result;
+    }
+
+    /** Make an IntNum from an unsigned 32-bit value. */
+    public static IntNum valueOfUnsigned(int value) {
+        if (value >= 0)
+            return valueOf(value);
+        IntNum result = alloc(2);
+        result.ival = 2;
+        result.words[0] = value;
+        result.words[1] = 0;
         return result;
     }
 

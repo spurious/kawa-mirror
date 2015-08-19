@@ -35,6 +35,9 @@ public interface Sequence<E>
   /** See java.util.List. */
   public E set (int index, E value);
 
+    /** A set without a get - may avoid useless boxing. */
+    public void setAt(int index, E value);
+
   public void fill(E value);
 
   public java.util.Enumeration<E> elements();

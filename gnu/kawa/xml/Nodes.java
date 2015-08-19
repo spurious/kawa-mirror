@@ -391,6 +391,15 @@ public class Nodes extends Values.FromList<SeqPosition>
                 d[start++] = null;
         }
 
+        @Override
+        protected NodeVector withIndexes(IntSequence ind) {
+            NodeVector nvec = new NodeVector();
+            nvec.odata = this.odata;
+            nvec.idata = this.idata;
+            nvec.indexes = ind;
+            return nvec;
+        }
+
         public void writePosition(SeqPosition seq) {
             add(seq);
         }

@@ -65,6 +65,16 @@ public  class U64Vector extends LongVector<ULong>
         data[index] = value.longValue();
     }
 
+    @Override
+    protected U64Vector withIndexes(IntSequence ind) {
+        return new U64Vector(data, ind);
+    }
+
+    @Override
+    public U64Vector subList(int fromIx, int toIx) {
+        return new U64Vector(data, indexesSubList(fromIx, toIx));
+    }
+
     public int getElementKind() { return INT_U64_VALUE; }
 
     public String getTag() { return "u64"; }

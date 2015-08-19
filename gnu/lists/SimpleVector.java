@@ -27,13 +27,6 @@ import java.util.*;
 public abstract class SimpleVector<E> extends IndirectIndexable<E>
     implements Array<E>, Externalizable, RandomAccess
 {
-    public int size() {
-        return indexes == null || indexes == cantWriteMarker
-            // or generally indexes.isUnbounded() ??? FIXME
-            ? getBufferLength()
-            : indexes.size();
-    }
-
     protected GapManager getGapManager() {
         IntSequence ind = indexes;
         if (ind instanceof GapManager)
@@ -68,8 +61,6 @@ public abstract class SimpleVector<E> extends IndirectIndexable<E>
         indexes = manager;
         return manager;
     }
-
-    public abstract int getBufferLength();
 
     protected abstract void setBuffer(Object obj);
     public abstract void setBufferLength(int length);
@@ -159,6 +150,15 @@ public abstract class SimpleVector<E> extends IndirectIndexable<E>
         E old = getBuffer(index);
         setBuffer(index, value);
         return old;
+    }
+
+    @Override
+    public void setAt(int index, E value) {
+        checkCanWrite(); // FIXME maybe inline and fold into following
+        if (indexes != null) {
+            index = indexes.intAt(index);
+        }
+        setBuffer(index, value);
     }
 
     protected abstract void setBuffer(int index, E value);

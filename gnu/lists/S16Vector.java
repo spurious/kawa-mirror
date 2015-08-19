@@ -68,6 +68,16 @@ public  class S16Vector extends ShortVector<Short>
         data[index] = value.shortValue();
     }
 
+    @Override
+    protected S16Vector withIndexes(IntSequence ind) {
+        return new S16Vector(data, ind);
+    }
+
+    @Override
+    public S16Vector subList(int fromIx, int toIx) {
+        return new S16Vector(data, indexesSubList(fromIx, toIx));
+    }
+
     public int getElementKind() { return INT_S16_VALUE; }
 
     public String getTag() { return "s16"; }

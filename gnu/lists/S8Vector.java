@@ -68,6 +68,16 @@ public  class S8Vector extends ByteVector<Byte>
         data[index] = value.byteValue();
     }
 
+    @Override
+    protected S8Vector withIndexes(IntSequence ind) {
+        return new S8Vector(data, ind);
+    }
+
+    @Override
+    public S8Vector subList(int fromIx, int toIx) {
+        return new S8Vector(data, indexesSubList(fromIx, toIx));
+    }
+
     public int getElementKind() { return INT_S8_VALUE; }
 
     public String getTag() { return "s8"; }

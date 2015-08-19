@@ -46,6 +46,11 @@ public class GapManager implements IntSequence {
         return index < gapStart ? index : index + (gapEnd-gapStart);
     }
 
+    public IntSequence subList(int fromIx, int toIx) {
+        IntSequence range = new Range.IntRange(fromIx, 1, toIx-fromIx);
+        return new Sequences.ComposedIndexes(this, range);
+    }
+
     public int size() { return size; }
 
     /** Adjust gap to 'where', and make sure it is least `needed' elements long. */

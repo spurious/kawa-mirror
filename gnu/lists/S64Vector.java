@@ -64,6 +64,16 @@ public  class S64Vector extends LongVector<Long>
         data[index] = value.longValue();
     }
 
+    @Override
+    protected S64Vector withIndexes(IntSequence ind) {
+        return new S64Vector(data, ind);
+    }
+
+    @Override
+    public S64Vector subList(int fromIx, int toIx) {
+        return new S64Vector(data, indexesSubList(fromIx, toIx));
+    }
+
     public int getElementKind() { return INT_S64_VALUE; }
 
     public String getTag() { return "s64"; }

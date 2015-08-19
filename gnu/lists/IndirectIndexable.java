@@ -13,7 +13,14 @@ public abstract class IndirectIndexable<E>
 {
     protected IntSequence indexes;
 
-    public int size() { return indexes.size(); }
+    public int size() {
+        return indexes == null || indexes == cantWriteMarker
+            // or generally indexes.isUnbounded() ??? FIXME
+            ? getBufferLength()
+            : indexes.size();
+    }
+
+    public abstract int getBufferLength();
 
     public static final Range.IntRange cantWriteMarker =
         Range.IntRange.cantWriteMarker;
@@ -25,6 +32,31 @@ public abstract class IndirectIndexable<E>
     protected IntSequence getIndexesForce() {
         // cantWriteMarker doubles as [0 .. infinity]
         return indexes == null ? cantWriteMarker : indexes;
+    }
+
+    /** Create a new instance with the same data and replaces indexes. */
+    protected abstract IndirectIndexable<E> withIndexes(IntSequence ind);
+
+    protected IntSequence indexesSelect(IntSequence selected) {
+        IntSequence ind = indexes == null || indexes == cantWriteMarker
+            ? new Range.IntRange(0, 1, getBufferLength())
+            : indexes;
+        return Sequences.indirectIndexed(ind, selected);
+    }
+
+    protected IntSequence indexesSubList(int fromIx, int toIx) {
+        if (indexes == null || indexes == cantWriteMarker)
+            return new Range.IntRange(fromIx, 1, toIx-fromIx);
+        else
+            return indexes.subList(fromIx, toIx);
+    }
+
+    public IndirectIndexable<E> select(IntSequence indexes) {
+        return withIndexes(indexesSelect(indexes));
+    }
+
+    public IndirectIndexable<E> subList(int fromIx, int toIx) {
+        return withIndexes(indexesSubList(fromIx, toIx));
     }
 
     protected boolean isAfterPos(int ipos) {

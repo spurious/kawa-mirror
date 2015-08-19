@@ -12,6 +12,8 @@ public interface IntSequence
 
     public int size();
 
+    public IntSequence subList(int fromIx, int toIx);
+
     /* #ifdef JAVA8 */
     // default int applyAsInt(int operand) {
     //     return intAt(operand);

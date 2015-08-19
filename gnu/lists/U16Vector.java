@@ -69,6 +69,16 @@ public  class U16Vector extends ShortVector<UShort>
         data[index] = value.shortValue();
     }
 
+    @Override
+    protected U16Vector withIndexes(IntSequence ind) {
+        return new U16Vector(data, ind);
+    }
+
+    @Override
+    public U16Vector subList(int fromIx, int toIx) {
+        return new U16Vector(data, indexesSubList(fromIx, toIx));
+    }
+
     public int getElementKind() { return INT_U16_VALUE; }
 
     public String getTag() { return "u16"; }

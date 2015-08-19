@@ -120,6 +120,16 @@ public  class BitVector extends SimpleVector<Boolean>
             d[start++] = false;
     }
 
+    @Override
+    protected BitVector withIndexes(IntSequence ind) {
+        return new BitVector(data, ind);
+    }
+
+    @Override
+    public BitVector subList(int fromIx, int toIx) {
+        return new BitVector(data, indexesSubList(fromIx, toIx));
+    }
+
     public int getElementKind() { return BOOLEAN_VALUE; }
 
     public String getTag() { return "b"; }

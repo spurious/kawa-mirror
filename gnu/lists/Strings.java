@@ -154,6 +154,9 @@ public class Strings
 
     public static CharSequence indirectIndexed(CharSequence base,
                                                IntSequence indexes) {
+        if (base instanceof FString) {
+            return (FString) ((FString) base).select(indexes);
+        }
         if (indexes instanceof Range.IntRange) {
             Range.IntRange range = (Range.IntRange) indexes;
             if (range.getStepInt() == 1) {
@@ -162,11 +165,11 @@ public class Strings
                 if (start < 0 || start > bsize)
                     throw new IndexOutOfBoundsException();
                 if (range.isUnbounded())
-                    return new SubCharSeq(base, start, bsize);
+                    return SubCharSeq.valueOf(base, start, bsize);
                 int size = range.size();
                 if (start+size < 0 || start+size > bsize)
                     throw new IndexOutOfBoundsException();
-                return new SubCharSeq(base, start, start+size);
+                return SubCharSeq.valueOf(base, start, start+size);
             }
         }
         int len = indexes.size();

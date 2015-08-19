@@ -1,3 +1,8 @@
+2015-08-18  Per Bothner  <per@bothner.com>
+
+	* text-test.scm: Add more tests for string indexing.
+	* misc-test.scm: Update expected output.
+
 2015-08-16  Per Bothner  <per@bothner.com>
 
 	* text-test.scm: Test simple set! of indexed string.

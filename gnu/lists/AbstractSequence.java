@@ -83,6 +83,10 @@ public abstract class AbstractSequence<E>
     throw unsupported("set");
   }
 
+    public void setAt(int index, E element) {
+        throw unsupported("setAt");
+    }
+
   public void fill(E value)
   {
     for (int i = startPos(); (i = nextPos(i)) != 0; )

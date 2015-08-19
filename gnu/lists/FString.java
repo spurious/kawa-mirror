@@ -104,10 +104,9 @@ public class FString extends AbstractCharVector<Char>
         return str;
     }
 
-  // Undefined if index>=size (unlike for other SimpleVector classes).
-  public final Char getBuffer(int index) {
-      return Char.valueOf(characterAt(index));
-  }
+    public final Char getBuffer(int index) {
+        throw unsupported("getBuffer");
+    }
 
     public final Char get(int index) {
         return Char.valueOf(characterAt(index));
@@ -157,12 +156,21 @@ public class FString extends AbstractCharVector<Char>
         return -1;
     }
 
-  // Undefined if index>=size (unlike for other SimpleVector classes).
-  @Override
-  public final void setBuffer(int index, Char value)
-  {
-      setCharacterAt(index, value.intValue());
-  }
+    public Char set(int index, Char value) {
+        checkCanWrite();
+        Char old = Char.valueOf(characterAt(index));
+        setCharacterAt(index, value.intValue());
+        return old;
+    }
+
+    public void setAt(int index, Char value) {
+        setCharacterAt(index, value.intValue());
+    }
+
+    @Override
+    public final void setBuffer(int index, Char value) {
+        throw unsupported("setBuffer");
+    }
 
     public final int characterAt(int index) {
         // The following uses charAt, which handles adjusting for indexes.
@@ -422,6 +430,12 @@ public class FString extends AbstractCharVector<Char>
     public boolean equals(Object obj) {
         return obj instanceof FString && equals(this, (FString) obj);
     }
+
+    @Override
+    protected FString withIndexes(IntSequence ind) {
+        return new FString(data, ind);
+    }
+
 
   public int getElementKind()
   {

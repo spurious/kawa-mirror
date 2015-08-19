@@ -1,3 +1,31 @@
+2015-08-18  Per Bothner  <per@bothner.com>
+
+	Make result of sequence-as-index return same type, with sharing.
+	* FString.java (getBuffer, setBuffer): Change to throw exception.
+	(set): Re-implement.
+	(setAt): Add implementation.
+	* GapManager.java (subList): New method.
+	* IndirectIndexable.java (size): Move implementation from sub-classes.
+	(getBufferLength): New abstract method, used by size.
+	(withIndexes): New abstract method.
+	(indexesSelect, indexesSubList): New protected helper methods.
+	(select, subList): New methods.
+	* IndirectIndexedSeq.java (getBufferLength): New method.
+	(size): Removed - subsumed by IndirectIndexable version.
+	* IntSequence.java (subList): New, with overriding returning types.
+	* PrimVector.template (withIndexes, subList): New methods.
+	* Range.java (subListFromRange, subList): New methods.
+	(valueOfUnbounded): Create an IntRnge if appropriate.
+	* Sequences.java (class ComposedIndexes): New member class.
+	(indirectIndexed(IntSequence,IntSequence)): New method.
+	(indirectIndexed(List,IntSequence)): Improve.
+	* SimpleVector.java (size, getBufferLength): Moved to super-class.
+	(setAt): New method.
+	* Strings.java (indirectIndexed): Optimize for FString.
+	* SubCharSeq.java (valueOf): New convenience/factory method.
+	* Sequence.java (setAt): New method.
+	* AbstractSequence.java (setAt): New dummy implementation.
+
 2015-08-13  Per Bothner  <per@bothner.com>
 
 	* SimpleVector.java (forEach): (JAVA8-only)  Fix syntax errors,

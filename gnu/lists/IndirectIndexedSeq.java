@@ -17,14 +17,14 @@ public class IndirectIndexedSeq<E>
         new Error("new IndirectIndexedSeq").printStackTrace();
     }
 
-    public int size() {
-        return indexes == null || indexes == cantWriteMarker
-            // or generally indexes.isUnbounded() ??? FIXME
-            ? base.size()
-            : indexes.size();
-    }
+    public int getBufferLength() { return base.size(); }
 
     public E get(int index) {
         return base.get(indexes.intAt(index));
+    }
+
+    @Override
+    protected IndirectIndexedSeq<E> withIndexes(IntSequence ind) {
+        return new IndirectIndexedSeq<E>(base, ind);
     }
 }

@@ -120,6 +120,11 @@ public  class FVector<E> extends SimpleVector<E>
             d[start++] = null;
     }
 
+    @Override
+    protected FVector<E> withIndexes(IntSequence ind) {
+        return new FVector<E>(data, ind);
+    }
+
     public final void fill(int start, int end, E new_value) {
         if (indexes == null)
             java.util.Arrays.fill(data, start, end, new_value);

@@ -39,6 +39,11 @@ public class CharVector extends AbstractCharVector<Character>
         return obj instanceof CharVector && equals(this, (CharVector) obj);
     }
 
+    @Override
+    protected CharVector withIndexes(IntSequence ind) {
+        return new CharVector(data, ind);
+    }
+
     public int getElementKind() { return CHAR_VALUE; }
 
     public String getTag() { return "c16"; }

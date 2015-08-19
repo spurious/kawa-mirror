@@ -138,13 +138,55 @@ public class Sequences {
         return lbase.subList(fromIndex, toIndex);
     }
 
-    public static List indirectIndexed(List lst, IntSequence indexes) {
-        if (lst instanceof SimpleVector) {
-            SimpleVector svec = (SimpleVector) lst;
-            // FIXME - should do better!
-            if (svec.indexes == null && svec instanceof FVector)
-                return new FVector(((FVector) svec).data, indexes);
+    public static class ComposedIndexes implements IntSequence {
+        IntSequence is1;
+        IntSequence is2;
+        int size;
+        public ComposedIndexes(IntSequence is1, IntSequence is2) {
+            this.is1 = is1;
+            this.is2 = is2;
+            this.size = -2;
         }
+        public ComposedIndexes(IntSequence is1, IntSequence is2, int size) {
+            this.is1 = is1;
+            this.is2 = is2;
+            this.size = size;
+        }
+        public int size() {
+            return size != -2 ? size : is2.size();
+        }
+        public int intAt(int index) {
+            return is1.intAt(is2.intAt(index));
+        }
+        public IntSequence subList(int fromIx, int toIx) {
+            return new ComposedIndexes(is1, is2.subList(fromIx, toIx));
+        }
+    }
+
+    static IntSequence indirectIndexed(IntSequence base, IntSequence indexes) {
+        if (base == null)
+            return indexes;
+        int sz = indexes.size();
+        if (indexes instanceof Range.IntRange) {
+            Range.IntRange range = (Range.IntRange) indexes;
+            int start = range.getStartInt();
+            int step = range.getStepInt();
+            if (base instanceof Range.IntRange) {
+                return ((Range.IntRange) base)
+                    .subListFromRange(start, step, sz);
+            }
+            if (range.isUnbounded())
+                return new ComposedIndexes(base, range,
+                                           (base.size()-start+step-1) / step);
+            if (step == 1)
+                return base.subList(start, sz);
+        }
+        return new ComposedIndexes(base, indexes);
+    }
+
+    public static List indirectIndexed(List lst, IntSequence indexes) {
+        if (lst instanceof SimpleVector)
+            return ((SimpleVector) lst).select(indexes);
         return new IndirectIndexedSeq(lst, indexes);
     }
 

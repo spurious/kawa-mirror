@@ -60,6 +60,29 @@ public class Range<E> extends AbstractSequence<E> implements Sequence<E> {
             return istart + istep * index;
         }
 
+        public IntRange subListFromRange(int rstart, int rstep, int rsize) {
+            int nstart = istart + rstart * istep;
+            int nstep = istep * rstep;
+            if (isUnbounded() && rsize == -1)
+                return new IntRange(nstart, nstep);
+            int nsize;
+            if (isUnbounded())
+                nsize = rsize;
+            else {
+                nsize = (size-rstart+rstep-1) / rstep;
+                if (rsize != -1) {
+                    if (rsize > nsize)
+                        throw new IndexOutOfBoundsException();
+                    nsize = rsize;
+                }
+            }
+            return new IntRange(nstart, nstep, nsize);
+        }
+
+        public IntRange subList(int fromIx, int toIx) {
+            return subListFromRange(fromIx, 1, toIx - fromIx);
+        }
+
         @Override
         public Integer getStart() { return getStartInt(); }
 
@@ -98,6 +121,11 @@ public class Range<E> extends AbstractSequence<E> implements Sequence<E> {
     }
 
     public static Range<?> valueOfUnbounded(Object start) {
+        IntNum iistart = IntNum.asIntNumOrNull(start);
+        if (iistart != null && iistart.inIntRange()) {
+             int istart = iistart.intValue();
+             return new IntRange(istart, 1);
+        }
         return new Range<Object>(start, IntNum.one(), -1);
     }
 

@@ -1,3 +1,7 @@
+2015-08-18  Per Bothner  <per@bothner.com>
+
+	* Nodes.java (NodeVector.withIndexes): New method.
+
 2015-07-31  Per Bothner  <per@bothner.com>
 
 	* Nodes.java: Updates for GapVector being removed by a

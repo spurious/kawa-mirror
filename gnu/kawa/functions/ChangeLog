@@ -1,3 +1,7 @@
+2015-08-18  Per Bothner  <per@bothner.com>
+
+	* Setter.java (apply2): Add an optimization.
+
 2015-08-16  Per Bothner  <per@bothner.com>
 
 	* Setter.java (apply2): Use coerceToObject rather than coerceFromObject

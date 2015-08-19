@@ -8,6 +8,7 @@ import gnu.kawa.lispexpr.LangPrimType;
 import gnu.lists.Array;
 import gnu.lists.FString;
 import gnu.lists.Range;
+import gnu.lists.Sequence;
 import gnu.lists.Sequences;
 import gnu.lists.SimpleVector;
 
@@ -125,7 +126,11 @@ public class Setter extends Procedure1 implements HasSetter {
             } else {
                 if (elementType != null)
                     value = elementType.coerceToObject(value);
-                list.set(((Number) index).intValue(), value);
+                int ind = ((Number) index).intValue();
+                if (list instanceof Sequence)
+                    ((Sequence) list).setAt(ind, value);
+                else
+                    list.set(ind, value);
             }
             return Values.empty;
         }

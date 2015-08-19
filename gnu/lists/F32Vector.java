@@ -120,6 +120,16 @@ public  class F32Vector extends SimpleVector<Float>
             d[start++] = 0;
     }
 
+    @Override
+    protected F32Vector withIndexes(IntSequence ind) {
+        return new F32Vector(data, ind);
+    }
+
+    @Override
+    public F32Vector subList(int fromIx, int toIx) {
+        return new F32Vector(data, indexesSubList(fromIx, toIx));
+    }
+
     public int getElementKind() { return FLOAT_VALUE; }
 
     public String getTag() { return "f32"; }

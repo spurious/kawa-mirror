@@ -47,7 +47,7 @@ public class CharBuffer extends FString
     int sz = size();
     if (start < 0 || end < start || end > sz)
       throw new IndexOutOfBoundsException();
-    return new SubCharSeq(this,
+    return SubCharSeq.valueOf(this,
                           base.createPos(start, false),
                           base.createPos(end, true));
   }

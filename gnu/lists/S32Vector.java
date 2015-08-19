@@ -69,6 +69,16 @@ public  class S32Vector extends IntVector<Integer>
         data[index] = value.intValue();
     }
 
+    @Override
+    protected S32Vector withIndexes(IntSequence ind) {
+        return new S32Vector(data, ind);
+    }
+
+    @Override
+    public S32Vector subList(int fromIx, int toIx) {
+        return new S32Vector(data, indexesSubList(fromIx, toIx));
+    }
+
     public int getElementKind() { return INT_S32_VALUE; }
 
     public String getTag() { return "s32"; }

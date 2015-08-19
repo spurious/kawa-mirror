@@ -69,6 +69,16 @@ public  class U32Vector extends IntVector<UInt>
         data[index] = value.intValue();
     }
 
+    @Override
+    protected U32Vector withIndexes(IntSequence ind) {
+        return new U32Vector(data, ind);
+    }
+
+    @Override
+    public U32Vector subList(int fromIx, int toIx) {
+        return new U32Vector(data, indexesSubList(fromIx, toIx));
+    }
+
     public int getElementKind() { return INT_U32_VALUE; }
 
     public String getTag() { return "u32"; }

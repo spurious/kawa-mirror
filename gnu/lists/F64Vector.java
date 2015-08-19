@@ -120,6 +120,16 @@ public  class F64Vector extends SimpleVector<Double>
             d[start++] = 0;
     }
 
+    @Override
+    protected F64Vector withIndexes(IntSequence ind) {
+        return new F64Vector(data, ind);
+    }
+
+    @Override
+    public F64Vector subList(int fromIx, int toIx) {
+        return new F64Vector(data, indexesSubList(fromIx, toIx));
+    }
+
     public int getElementKind() { return DOUBLE_VALUE; }
 
     public String getTag() { return "f64"; }

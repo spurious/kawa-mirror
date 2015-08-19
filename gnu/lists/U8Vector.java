@@ -69,6 +69,16 @@ public  class U8Vector extends ByteVector<UByte>
         data[index] = value.byteValue();
     }
 
+    @Override
+    protected U8Vector withIndexes(IntSequence ind) {
+        return new U8Vector(data, ind);
+    }
+
+    @Override
+    public U8Vector subList(int fromIx, int toIx) {
+        return new U8Vector(data, indexesSubList(fromIx, toIx));
+    }
+
     public int getElementKind() { return INT_U8_VALUE; }
 
     public String getTag() { return "u8"; }

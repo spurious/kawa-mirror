@@ -209,7 +209,19 @@ public @Abstract class $CNAME$ extends $SUPER$
     }
 
     /* #endif */
+    /* #ifdef OBJECT|BIT|S8|S16|S32|S64|U8|U16|U32|U64|F32|F64 */
+    @Override
+    protected $CNAME$ withIndexes(IntSequence ind) {
+        return new $CNAME$(data, ind);
+    }
+
+    /* #endif */
     /* #ifdef BIT|S8|S16|S32|S64|U8|U16|U32|U64|F32|F64 */
+    @Override
+    public $CNAME$ subList(int fromIx, int toIx) {
+        return new $CNAME$(data, indexesSubList(fromIx, toIx));
+    }
+
     public int getElementKind() { return $KIND$_VALUE; }
 
     public String getTag() { return "$tag$"; }

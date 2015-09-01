@@ -65,4 +65,4 @@ all: Makefile scm-classes.stamp
 
 PACKAGE_FNAME = kawa-lib
 SCM_COMPILE_FLAGS = --warn-undefined-variable --warn-unknown-member --warn-as-error
-EXTRA_CLEAN = */*.class
+EXTRA_CLEAN = */*.class */*/*.class

@@ -185,7 +185,7 @@ public class Strings
         /* #else */
         // try {
         //   return new String(bytes, start, length, "UTF-8");
-        // } catch (UnsupportedEncodingException ex) {
+        // } catch (java.io.UnsupportedEncodingException ex) {
         //     throw new RuntimeException(ex);
         // }
         /* #endif */

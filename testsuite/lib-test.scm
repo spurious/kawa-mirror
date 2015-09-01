@@ -614,7 +614,12 @@
     ((_ count)
      (cond-expand (java-8)
                   (else (test-expect-fail count))))))
-(expect-fail-unless-unicode-6_2 6)
+(define-syntax expect-fail-unless
+  (syntax-rules ()
+    ((_ version count)
+     (cond-expand (version)
+                  (else (test-expect-fail count))))))
+(expect-fail-unless java-8 6)
 (test-equal #t (char-set=               ; only on Java 8
                 char-set:lower-case
                 (char-set-filter
@@ -662,6 +667,7 @@
               (= type java.lang.Character:MODIFIER_SYMBOL)
               (= type java.lang.Character:OTHER_SYMBOL))))
       char-set:full)))
+(expect-fail-unless java-7 2)
 (test-equal
  #t (char-set=
      char-set:whitespace
@@ -733,7 +739,7 @@
 
 (test-equal #f (char-set-any char-upper-case? char-set:lower-case))
 
-(expect-fail-unless-unicode-6_2 1)
+(expect-fail-unless java-8 1)
 (test-equal #t (char-set-every char-upper-case? char-set:upper-case))
 ; char-set-adjoin, char-set-adjoin!
 (test-equal #t (char-set= abc

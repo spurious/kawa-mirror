@@ -87,7 +87,7 @@
 (test-equal "" (let ((x "")) (and-let* (x)  )))
 (test-equal 2 (let ((x 1)) (and-let* (x) (+ x 1))))
 (define xf #f)
-(test-equal #f (and-let* (xf) (+ xf 1)))
+(test-equal #f (and-let* (xf) (+ (dynamic xf) 1)))
 (test-equal 2 (let ((x 1)) (and-let* (((positive? x))) (+ x 1))))
 (test-equal #t (let ((x 1)) (and-let* (((positive? x))) )))
 (test-equal #f (let ((x 0)) (and-let* (((positive? x))) (+ x 1))))
@@ -99,12 +99,12 @@
 (test-equal 2 (let ((x 1)) (and-let* (x ((positive? x))) (+ x 1))))
 (test-equal 2 (let ((x 1)) (and-let* ( ((begin x)) ((positive? x))) (+ x 1))))
 (test-equal #f (let ((x 0)) (and-let* (x ((positive? x))) (+ x 1))))
-(test-equal #f (and-let* (xf ((positive? xf))) (+ xf 1)))
-(test-equal #f (and-let* (((begin xf)) ((positive? xf))) (+ xf 1)))
+(test-equal #f (and-let* (xf ((positive? xf))) (+ (dynamic xf) 1)))
+(test-equal #f (and-let* (((begin xf)) ((positive? xf))) (+ (dynamic xf) 1)))
 
 (test-equal #f  (let ((x 1)) (and-let* (x (y (- x 1)) ((positive? y))) (/ x y))))
 (test-equal #f  (let ((x 0)) (and-let* (x (y (- x 1)) ((positive? y))) (/ x y))))
-(test-equal #f (and-let* (xf (y (- xf 1)) ((positive? y))) (/ xf y)))
+(test-equal #f (and-let* (xf (y (- (dynamic xf) 1)) ((positive? y))) (/ xf y)))
 (test-equal 3/2  (let ((x 3)) (and-let* (x (y (- x 1)) ((positive? y))) (/ x y))))
 
 (define (symbol-parts s::symbol)
@@ -606,36 +606,36 @@
                  (lambda (c) (java.lang.Character:title-case?
                               (char->integer c))) char-set:full)))
 
-; Some of these tests only succeed on Java 7 (or later), which supports
-; Unicode 6. On earlier Javas, the java.lang.Character predicates will
-; disagree with the char-set definitions.
-(define-syntax expect-fail-unless-unicode-6
+;; Some of these tests only succeed on Java 8 (or later), which
+;; supports Unicode 6.2. On earlier Javas, the java.lang.Character
+;; predicates will disagree with the char-set definitions.
+(define-syntax expect-fail-unless-unicode-6_2
   (syntax-rules ()
-    ((expect-fail-unless-unicode-6 count)
-     (cond-expand ((or java-7 class-exists:java.util.concurrent.TransferQueue))
+    ((_ count)
+     (cond-expand (java-8)
                   (else (test-expect-fail count))))))
-(expect-fail-unless-unicode-6 8)
-(test-equal #t (char-set=               ; only on Java 7
+(expect-fail-unless-unicode-6_2 6)
+(test-equal #t (char-set=               ; only on Java 8
                 char-set:lower-case
                 (char-set-filter
                  (lambda (c) (java.lang.Character:lower-case?
                               (char->integer c))) char-set:full)))
-(test-equal #t (char-set=               ; only on Java 7
+(test-equal #t (char-set=               ; only on Java 8
                 char-set:upper-case
                 (char-set-filter
                  (lambda (c) (java.lang.Character:upper-case?
                               (char->integer c))) char-set:full)))
-(test-equal #t (char-set=               ; only on Java 7
+(test-equal #t (char-set=               ; only on Java 8
                 char-set:letter
                 (char-set-filter
                  (lambda (c) (java.lang.Character:letter?
                               (char->integer c))) char-set:full)))
-(test-equal #t (char-set=               ; only on Java 7
+(test-equal #t (char-set=               ; only on Java 8
                 char-set:digit
                 (char-set-filter
                  (lambda (c) (java.lang.Character:digit?
                               (char->integer c))) char-set:full)))
-(test-equal                             ; only on Java 7
+(test-equal                             ; only on Java 8
  #t (char-set=
      char-set:punctuation
      (char-set-filter
@@ -650,7 +650,7 @@
               (= type java.lang.Character:FINAL_QUOTE_PUNCTUATION)
               (= type java.lang.Character:OTHER_PUNCTUATION))))
       char-set:full)))
-(test-equal                             ; only on Java 7
+(test-equal                             ; only on Java 8
  #t (char-set=
      char-set:symbol
      (char-set-filter
@@ -662,7 +662,7 @@
               (= type java.lang.Character:MODIFIER_SYMBOL)
               (= type java.lang.Character:OTHER_SYMBOL))))
       char-set:full)))
-(test-equal                             ; only on Java 7
+(test-equal
  #t (char-set=
      char-set:whitespace
      (char-set-filter
@@ -678,7 +678,7 @@
                   (= type java.lang.Character:LINE_SEPARATOR)
                   (= type java.lang.Character:PARAGRAPH_SEPARATOR)))))
       char-set:full)))
-(test-equal                             ; only on Java 7
+(test-equal
  #t (char-set=
      char-set:blank
      (char-set-filter
@@ -733,7 +733,7 @@
 
 (test-equal #f (char-set-any char-upper-case? char-set:lower-case))
 
-(expect-fail-unless-unicode-6 1)
+(expect-fail-unless-unicode-6_2 1)
 (test-equal #t (char-set-every char-upper-case? char-set:upper-case))
 ; char-set-adjoin, char-set-adjoin!
 (test-equal #t (char-set= abc

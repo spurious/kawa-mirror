@@ -1283,6 +1283,7 @@
 (test "ßa" (string-downcase "ßa"))
 (test "ssa" (string-downcase "SSA"))
 (test "İ" (string-upcase "İ"))
+(test-expect-fail (cond-expand (java-8 0) (else 1)))
 (test "i̇" (string-downcase "İ"))
 (test "i̇" (string-foldcase "İ"))
 (test "J̌" (string-upcase "ǰ"))

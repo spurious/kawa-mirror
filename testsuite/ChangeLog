@@ -1,3 +1,10 @@
+2015-09-01  Per Bothner  <per@bothner.com>
+
+	* r7rs-tests.scm: Note conditional failure for Java-7,
+	with Unicode 6, where Kawa and Java-8 use Unicode 6.2.
+	* lib-test.scm: Likewise.
+	Also use 'dynamic' to avoid some warnings.
+
 2015-08-18  Per Bothner  <per@bothner.com>
 
 	* text-test.scm: Add more tests for string indexing.

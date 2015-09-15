@@ -237,7 +237,8 @@ public class CallContext // implements Runnable
    */
     public final int startFromContext() {
         if (vstack.gapStart == vstack.gapStartOnPush
-            && consumer == vstack) { // Simple efficient case.
+            && consumer == vstack
+            && vstack.lastObject==vstack) { // Simple efficient case.
             return -1;
         } else {
             vstack.push();

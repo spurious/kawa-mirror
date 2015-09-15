@@ -1,3 +1,8 @@
+2015-09-15  Per Bothner  <per@bothner.com>
+
+	* CallContext.java (startFromContext): Only do simple case
+	if lastObject not set.
+
 2015-03-11  Per Bothner  <per@bothner.com>
 
 	* CallContext.java: Change result method of getting result as Object

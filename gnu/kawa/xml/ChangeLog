@@ -1,3 +1,9 @@
+2015-09-17  Per Bothner  <per@bothner.com>
+
+	* NodeSetType.java (writeExternal, readExternal): New overriding
+	methods.  These are compatible with the constructor and hence literals.
+	* OccurrenceType.java (setBae): New protected method.
+
 2015-08-18  Per Bothner  <per@bothner.com>
 
 	* Nodes.java (NodeVector.withIndexes): New method.

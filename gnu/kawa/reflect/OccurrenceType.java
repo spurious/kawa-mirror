@@ -19,6 +19,7 @@ public class OccurrenceType extends Type
   int maxOccurs;
 
   public Type getBase () { return base; }
+  protected void setBase(Type base) { this.base = base; }
   public int minOccurs() { return minOccurs; }
   public int maxOccurs() { return maxOccurs; }
 

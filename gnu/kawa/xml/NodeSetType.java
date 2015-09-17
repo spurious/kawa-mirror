@@ -2,6 +2,7 @@ package gnu.kawa.xml;
 import gnu.kawa.reflect.*;
 import gnu.bytecode.*;
 import gnu.expr.*;
+import java.io.*;
 
 public class NodeSetType extends OccurrenceType
 {
@@ -19,4 +20,15 @@ public class NodeSetType extends OccurrenceType
   {
     return super.toString()+"node-set";
   }
+
+    @Override
+    public void writeExternal(ObjectOutput out) throws IOException {
+        out.writeObject(getBase());
+    }
+
+    @Override
+    public void readExternal(ObjectInput in)
+        throws IOException, ClassNotFoundException {
+        setBase((Type) in.readObject());
+    }
 }

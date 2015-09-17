@@ -272,7 +272,7 @@ public class ImportFromLibrary extends Syntax
                 if (sbuf.length() > 0)
                     sbuf.append('/');
                 String part = car.toString();
-                cbuf.append(Compilation.mangleNameIfNeeded(part));
+                cbuf.append(Compilation.mangleClassName(part));
                 sbuf.append(part);
             }
             libref = cdr;

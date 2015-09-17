@@ -485,27 +485,29 @@ public class ModuleExp extends LambdaExp
         if (compiledType != null && compiledType != Compilation.typeProcedure)
             return (ClassType) compiledType;
         String mname = getName();
-        String className = getFileName();
+        String fileName = getFileName();
         Path path = null;
+        if (mname == null) {
+            if (fileName == null)
+                mname = "$unnamed_input_file$";
+            else if (fileName.equals("-") || fileName.equals("/dev/stdin"))
+                mname = "$stdin$";
+            else {
+                path = Path.valueOf(fileName);
+                mname = path.getLast();
+                int dotIndex = mname.lastIndexOf('.');
+                if (dotIndex > 0)
+                    mname = mname.substring (0, dotIndex);
+            }
+            setName(mname);
+        }
+        String className;
         if (comp.getModule() == this && info != null
             && info.className != null)
             // If explicitly set, perhaps using command-line flags.
             className = info.className;
         else {
-            if (mname != null)
-                className = mname;
-            else if (className == null)
-                className = "$unnamed_input_file$";
-            else if (className.equals("-") || className.equals("/dev/stdin"))
-                className = "$stdin$";
-            else {
-                path = Path.valueOf(className);
-                className = path.getLast();
-                int dotIndex = className.lastIndexOf('.');
-                if (dotIndex > 0)
-                    className = className.substring (0, dotIndex);
-            }
-            className = Compilation.mangleNameIfNeeded(className);
+            className = Compilation.mangleQualifiedName(mname);
 
             Path parentPath;
             String parent;
@@ -524,8 +526,6 @@ public class ModuleExp extends LambdaExp
             else
                 className = comp.classPrefix + className;
         }
-        if (mname == null)
-            setName(className);
         ClassType clas = new ClassType(className);
         setType(clas);
         if (comp.mainLambda == this) {

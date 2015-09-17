@@ -170,6 +170,7 @@ public class require extends Syntax
                 && requestedClass.charAt(nlen-1) == '>')
                 requestedClass = requestedClass.substring(1, nlen-1);
             String implicitSource = requestedClass.replace('.', '/');
+            requestedClass = Compilation.mangleQualifiedName(requestedClass);
             String explicitSource = null;
             if (args.getCdr() instanceof Pair) {
                 Object sname = ((Pair) args.getCdr()).getCar();

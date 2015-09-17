@@ -1,3 +1,11 @@
+2015-09-17  Per Bothner  <per@bothner.com>
+
+	Fix bug in class name mangling; modularize.
+	* standard/define_library.java: Use new Compilation.mangleClassName.
+	* standard/ImportFromLibrary.java: Likewise.
+	* standard/module_name.java: Likewise.
+	* standard/require.java: Add missing mangling from module to class name.
+
 2015-07-17  Per Bothner  <per@bothner.com>
 
 	* lang/BindDecls.java (setInitializer): Use LetExp.IS_BODY_SCOPE.

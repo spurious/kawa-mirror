@@ -864,6 +864,16 @@ public class Compilation implements SourceLocator
     return sbuf.toString();
   }
 
+    /** Mangle a simple class or package name.
+     * Does not handle qualified names.
+     */
+    public static String mangleClassName(String name) {
+        return Compilation.mangleNameIfNeeded(name);
+    }
+    public static String mangleQualifiedName(String name) {
+        return mangleClassName(name).replace("$Dt", ".");
+    }
+
   public static String mangleName (String name)
   {
     return Language.mangleName(name, -1);

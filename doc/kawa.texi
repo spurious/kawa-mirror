@@ -1872,19 +1872,145 @@ Alternative forms for defining local variables are
 @node Tutorial - Sequences
 @section Lists and sequences
 
-A @dfn{list} is a sequence of values,
-which is implemented as a chain of linked @dfn{pairs}.
+A @dfn{sequence} is a generalized array or list:
+Zero or more values treated as a compound value.
+Sequences have certain common operations including indexing and iteration.
+(@i{Technical note:} Sequences generally implement the @code{java.util.List}
+interface, but Kawa will also treat strings and native
+Java arrays as sequences.)
+
+@subheading Lists
+
+In traditional Lisp-family languages, the @dfn{list} is the
+most important kind of sequence.
+(Don't confuse Java's @code{List} interface with Kawa's use of the
+word @i{list}.  They're related, in that a Kawa ``list'' implements
+the @code{List} interface, so any @i{list} is also @code{List},
+but not vice versa.)
+
+A list is implemented as a chain of linked @dfn{pairs}.
 You can create a constant list by quoting a parenthesized list:
 @example
 '(3 4 (10 20 30) "a string")
 @end example
-A @dfn{vector} is a sequence is whose elements are
-indexed by integers.
+
+See @ref{Lists} for details and operations.
+
+@subheading Vectors
+
+A @dfn{vector} is a sequence that is implemented by storing the elements
+side-by-side in memory.
 A vector uses less space than a list of the same length,
 and is generally more efficient than a list.
-Lists and vectors are examples of @dfn{sequences},
-as are strings, and some other data types.  Sequences have certain common
-operations ...
+
+To create a vector you can use a bracketed list:
+@example
+(! vec1 ['A 'B 'C 'D 'E 'F])
+@end example
+This creates a vector of 6 symbols and binds it to @code{vec1}.
+To select an element you can use the traditional
+@code{vector-ref} procedure:
+@example
+(vector-ref vec1 3) @result{} 'D
+@end example
+Alternatively, in Kawa you can use function-call notation:
+@example
+(vec1 3) @result{} 'D
+@end example
+
+You can also create a vector using the traditional @code{vector} constructor:
+@example
+(! vec2 (vector 'A 'B 'C 'D 'E 'F))
+@end example
+There is one important difference between @code{vec1} and @code{vec2}:
+You can modify @code{vec2} by changing some or all of its elements.
+You can't do that for @code{vec1}.
+(We say that @code{vec1} is an @dfn{immutable} or @dfn{constant} vector,
+while  @code{vec1} is a @dfn{mutable} or @dfn{modifiable} vector.)
+To change an element use either the traditional @code{vector-set!}
+procedure, or function-call notation:
+@example
+(vector-set! vec2 2 'Y)
+(set! (vec2 4) 'Z)
+vec2 @result{} ['A 'B 'Y 'D 'Z 'F]
+(vector-set! vec1 2 'Y) @result{} @i{throws exception}
+@end example
+
+See @ref{Vectors} for details and operations.
+
+@subheading Java arrays and primitive vectors
+
+@subheading Indexing of general sequences
+
+You can use function-call notation to index a generalized sequence,
+whether it is a list, vector, any @code{java.util.List},
+native Java array, or string:
+@example
+((list 'A 'B 'C 'D) 2)  @result{} 'C
+("abcdef" 3)  @result{}  @result{}
+(! iarr (float[] 1.5 3 4.5])  ;; native Java array
+(iarr 2) @result{} 4.5
+@end example
+
+Note that indexing a list with an index @var{i} will be slow, since it
+has to step through the list @var{i} times.  (So don't do that!)
+
+@subheading Ranges
+
+A @dfn{range} is a sequence of numbers in order,
+spaced uniformly apart.  Usually, these are (exact) integers
+that increase by one.  The usual notation is:
+@example
+[@var{start} <: @var{end}]
+@end example
+This is the sequence of integers starting with the integer @var{start}
+(inclusive) and ending with the integer @var{end} (exclusive).
+For example @code{[3 <: 7]} is the sequence @code{[3 4 5 6]}.
+
+The @samp{<:} is a keyword; the @code{<} is a mnemonic for the
+the set of integers that are @code{<} the end value 6.
+You can also use @code{<=:} if you want to include the upper bound:
+@code{[4 <=: 8]} is @code{[4 5 6 7 8]}.
+
+You can use @code{>=:} or @code{>:} for a decreasing range.
+@code{[5 >=: 1]} or @code{[5 >: 0]} both evaluate to @code{[5 4 3 2 1]}.
+
+@subheading Using vector and ranges indexes
+
+If an index is a sequence of integers,
+the result is a new sequence (of the same type)
+selecting only the elements matching the index values.
+For example:
+@example
+#|kawa:2|# (vec1 [3 5 2])
+#(D F C)
+@end example
+In general, @code{((V1 V2) I)} is @code{(V1 (V2 I))}.
+
+You can use a range to create a slice - a contiguous subset of a list.
+@example
+#|kawa:3|# (vec1 [2 <: 6])
+#(C D E F)
+@end example
+
+A range is different from a vector integer in that you can use
+a range as the index in the LHS of a set!:
+
+@example
+#|kawa:4|# (set! (vec1 [2 <: 4]) #(a b c d e))
+#|kawa:5|# vec1
+#(A B a b c d e E F)
+@end example
+
+Notice how the number of replaced elements can be different
+then the number of elements in the replacement value.
+I.e. you can do insertion and deletion this way.
+
+@example
+#|kawa:7|# (! str1 (string-copy "ABCDEF"))
+#|kawa:8|# (set! (str1 [2 <: 5]) "98")
+AB98F
+@end example
 
 @node Tutorial - Types
 @section Types and declarations
@@ -15273,7 +15399,6 @@ another @meta{import-set}.
 
 @item 
 A @code{rename} form:
-
 @example
 (rename (@var{identifier}@sub{1} @var{identifier}@sub{2}) @dots{})
 @end example
@@ -15292,10 +15417,16 @@ for class names; it may be more convenient than @code{define-alias}.
 The @var{class-prefix} is concatenated with each @meta{identifier}
 (with a period in between) to produce a classname.
 Each @meta{identifier} becomes an alias for the class.
-You can think of the @code{class} form as similar to a @code{only} form,
+For example:
+@example
+(import (class java.util Map (HashMap HMap)))
+@end example
+This defines @code{Map} as an alias for @code{java.util.Map},
+and @code{HMap} as an alias for @code{java.util.HashMap}.
+(You can think of the @code{class} form as similar to a @code{only} form,
 where the @var{class-prefix} names a special kind of
 library represented of a Java package, and whose exported
-bindings are the classes in the package.
+bindings are the classes in the package.)
 
 You can combine the @code{class} form with
 @code{only}, @code{except}, @code{rename}, and @code{prefix},
@@ -19517,13 +19648,13 @@ The latter form allows you to define multiple aliases conveniently:
 @end example
 
 Both forms allow renaming.  For example if you want to refer
-to @code{java.lang.StringBuffer} as @code{StrBuf} do:
+to @code{java.lang.StringBuilder} as @code{StrBuf} do:
 @example
-(define-alias StrBuf java.lang.StringBuffer)
+(define-alias StrBuf java.lang.StringBuilder)
 @end example
 or:
 @example
-(import (class java.lang (StringBuffer StrBuf)))
+(import (class java.lang (StringBuilder StrBuf)))
 @end example
 
 The name(s) defined by @code{import} are by default private.

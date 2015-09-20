@@ -1,3 +1,10 @@
+2015-09-20  Per Bothner  <per@bothner.com>
+
+	Allow 'synchronized and 'strictfp as access flags for methods.
+	* lang/Lambda.java (rewriteAttrs): Use object.addAccessFlags.
+	* standard/object.java (addAccessFlags): Make public.
+	(matchAccess1): Recognize "synchronized" and "strictfp".
+
 2015-09-17  Per Bothner  <per@bothner.com>
 
 	Fix bug in class name mangling; modularize.

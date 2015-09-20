@@ -651,8 +651,8 @@ public class object extends Syntax
     return tag == null || tag.equals(value);
   }
 
-  static long addAccessFlags (Object value, long previous, long allowed,
-                             String kind, Translator tr)
+  public static long addAccessFlags(Object value, long previous, long allowed,
+                                    String kind, Translator tr)
   {
     long flags = matchAccess(value, tr);
     if (flags == 0)
@@ -719,7 +719,11 @@ public class object extends Syntax
       return Declaration.FINAL_ACCESS;
     if ("abstract".equals(value))
       return Declaration.ABSTRACT_ACCESS;
-    return 0;
+    if ("synchronized".equals(value))
+      return Declaration.SYNCHRONIZED_ACCESS;
+    if ("strictfp".equals(value))
+      return Declaration.STRICTFP_ACCESS;
+   return 0;
   }
 
 }

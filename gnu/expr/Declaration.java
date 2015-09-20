@@ -588,21 +588,25 @@ public class Declaration
   public static final long ENUM_ACCESS = 0x200000000l;
   public static final long FINAL_ACCESS = 0x400000000l;
   public static final long ABSTRACT_ACCESS = 0x800000000l;
+  public static final long SYNCHRONIZED_ACCESS = 0x1000000000l;
+  public static final long STRICTFP_ACCESS = 0x2000000000l;
   public static final long CLASS_ACCESS_FLAGS =
     PRIVATE_ACCESS|PROTECTED_ACCESS|ENUM_ACCESS|FINAL_ACCESS|ABSTRACT_ACCESS;
   public static final long FIELD_ACCESS_FLAGS = PRIVATE_ACCESS|PROTECTED_ACCESS|
     PUBLIC_ACCESS|PACKAGE_ACCESS|VOLATILE_ACCESS|TRANSIENT_ACCESS|
     ENUM_ACCESS|FINAL_ACCESS;
   public static final long METHOD_ACCESS_FLAGS = PRIVATE_ACCESS
-    |PROTECTED_ACCESS|PUBLIC_ACCESS|PACKAGE_ACCESS|FINAL_ACCESS;
-  public static final long MAYBE_UNINITIALIZED_ACCESS = 0x1000000000l;
+    |PROTECTED_ACCESS|PUBLIC_ACCESS|PACKAGE_ACCESS|FINAL_ACCESS
+    |SYNCHRONIZED_ACCESS|STRICTFP_ACCESS;
+
+    public static final long MAYBE_UNINITIALIZED_ACCESS = 0x4000000000l;
   /** Allocate variable on JVM stack as an optimization.
    * This means load is implemented as a dup instruction.
    * (This is no faster on decent JVMs, but the bytecode is more compact.)
    * Note this may cause an InternalError if this is loaded when the
    * JVM stack has grown since the variable was initialized.
    */
-  public static final long ALLOCATE_ON_STACK = 0x2000000000l;
+  public static final long ALLOCATE_ON_STACK = 0x8000000000l;
 
     /** True for a variable inside a pattern, but not the top of the pattern.
      * E.g. for a pattern [a [b c]] there is a main declaration for the
@@ -611,13 +615,13 @@ public class Declaration
      * In addition there may be helper variables which are anonymous
      * (i.e. getSymbol() returns null), like the match for the sequence [b c];
      * these also have PATTERN_NESTED set. */
-    public static final long PATTERN_NESTED = 0x4000000000l;
+    public static final long PATTERN_NESTED = 0x10000000000l;
 
     /** See parameterForMethod() */
-    public static final long SKIP_FOR_METHOD_PARAMETER = 0x8000000000l;
-    public static final long IS_REST_PARAMETER = 0x10000000000l;
-    public static final long IS_PARAMETER = 0x20000000000l;
-    public static final long DONT_COPY = 0x40000000000l;
+    public static final long SKIP_FOR_METHOD_PARAMETER = 0x20000000000l;
+    public static final long IS_REST_PARAMETER = 0x40000000000l;
+    public static final long IS_PARAMETER = 0x80000000000l;
+    public static final long DONT_COPY = 0x10000000000l;
 
     protected long flags = IS_SIMPLE;
 
@@ -674,6 +678,10 @@ public class Declaration
       flags |= Access.ENUM;
     if (getFlag(FINAL_ACCESS))
       flags |= Access.FINAL;
+    if (getFlag(SYNCHRONIZED_ACCESS))
+      flags |= Access.SYNCHRONIZED;
+    if (getFlag(STRICTFP_ACCESS))
+      flags |= Access.STRICT;
     return flags;
   }
 

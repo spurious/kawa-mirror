@@ -183,8 +183,8 @@ version of this document) is @uref{http://www.gnu.org/software/kawa/}.
 
 @c (blank line needed above) @end ifnotdocbook
 
-The (quite incomplete) @uref{tutorial/index.html,Kawa tutorial} can
-be useful to get stated; it also also links to some other more in-depth
+The @ref{Tutorial,Kawa tutorial} is be useful to get stated,
+though it is woefully incomplete.  It does link to some other more in-depth
 (but not Kawa-specific) Scheme tutorials.
 
 For copyright information on the software and documentation,
@@ -1592,9 +1592,11 @@ Paul Wilson's @uref{ftp://ftp.cs.utexas.edu/pub/garbage/cs345/schintro-v14/schin
 * Tutorial - Functions::         Functions
 * Tutorial - Variables::         Variables
 * Tutorial - Sequences::         Lists and sequences
+* Tutorial - Objects::           Creating and using objects
 * Tutorial - Types::             Types and declarations
+* Tutorial - Exceptions and errors::
 * Tutorial - Classes::           Classes
-
+* Tutorial - Other Java features::
 @end menu
 
 @node Tutorial - Introduction
@@ -2012,6 +2014,142 @@ I.e. you can do insertion and deletion this way.
 AB98F
 @end example
 
+@node Tutorial - Objects
+@section Creating and using objects
+
+An @dfn{object} is a value that has the following features:
+@itemize
+@item
+class - each object is an instance of a specific class,
+which is part of the class hierarchy, which is an important
+part of the type system;
+@item
+properties - various fields and methods, depending on the class;
+@item
+identity - it is distict from all other objects,
+even if all the properties are the same.
+@end itemize
+
+We later discuss @ref{Tutorial - Classes,how to write a new class}.
+Here we assume you're using an existing class, which
+could be written in Java or Scheme.
+
+@subheading Creating a new object
+
+To create a new object of class @code{T} you call @code{T} as if it
+were a function, passing it the various constructor arguments:
+@example
+(java.io.File "src" "build.xml")
+@end example
+
+If there are keyword arguments they are used to initialize
+the corresponding named properties:
+@example
+(! button1 (javax.swing.JButton text: "Do it!" tool-tip-text:  "do it"))
+@end example
+This create a new @code{JButton} object (using @code{JButton}'s
+default constructor), and sets the @code{text} and @code{tool-tip-text}
+properties (by calling @code{JButton}'s @code{setText}
+and @code{setToolTipText} methods).
+If there are constructor arguments, they must come before the keywords.
+
+For objects that have components or elements, you
+can list these at the end.  For example:
+@example
+(java.util.ArrayList 11 22 33)
+@end example
+This creates a fresh @code{java.util.ArrayList} (using the
+default constructor), and then calls the @code{add} method 3 times.
+
+If you prefer you can use the @code{make} procedure,
+but that only handle simple constructor calls:
+@example
+(make java.io.File "src" "build.xml")
+@end example
+
+See @ref{Allocating objects} for details.
+
+@subheading Calling instance methods
+
+Given an object @var{obj} of a class that has a method @var{meth}
+you can call it with argumens @var{v1} ... @var{v2} using @ref{Colon notation}:
+@example
+(@var{obj}:@var{meth} @var{v1} ... @var{v2})
+@end example
+For example:
+@example
+(button1:paintImmediately 10 10 30 20)
+@end example
+
+If you prefer you can use the @code{invoke} procedure,
+normally with a quoted method name:
+@example
+(invoke button1 'paintImmediately 10 10 30 20)
+@end example
+You need to use @code{invoke} (rather than colon notation)
+if @var{obj} is a @code{Class} or a type expression or its class
+implements @code{gnu.mapping.HasNamedParts}.
+
+See @ref{Method operations} for details.
+
+@subheading Accessing properties
+
+If @var{obj} has field or property named @var{fld} you can also use colon
+notation:
+@example
+@var{obj}:@var{fld}
+@end example
+
+You use the same syntax whether @var{fld} is an actual field in the
+object, or a @dfn{property} (in the Java Beans sense).  The
+latter is implemented using a getter/setter pair:
+Methods named @code{get@var{F}} and  @code{get@var{F}}, respectively.
+For example:
+@example
+button1:tool-tip-text
+@end example
+is equivalent to:
+@example
+(button1:getToolTipText)
+@end example
+
+You can also change a field or property using colon notation:
+@example
+(set! @var{obj}:@var{fld} @var{value})
+@end example
+For example:
+@example
+(set! button1:tool-tip-text "really do it!")
+@end example
+This is equivalent to:
+@example
+(button1:setToolTipText "really do it!")
+@end example
+
+Instead of colon notation, you can use the @code{field} procedure.
+
+See @ref{Field operations} for details.
+
+@subheading Static fields and method
+
+Kawa views static properties and methods as
+properties and methods of the class itself.
+To call a status method use the syntax:
+@example
+(@var{clas}:@var{meth} @var{v1} ... @var{vn})
+@end example
+For example:
+@example
+(java.math.BigDecimal:valueOf 12345 2) @result{} 123.45
+@end example
+
+To access a static field do @code{@var{clas}:@var{fld}}.  For example:
+@example
+java.awt.Color:RED
+@end example
+
+You can also use the @code{static-field} and @code{invoke-static} procedures.
+
 @node Tutorial - Types
 @section Types and declarations
 
@@ -2079,9 +2217,84 @@ for types, like a generalization of Java's @code{import} statement:
 (define-alias jframe javax.swing.JFrame)
 @end example
 
+@node Tutorial - Exceptions and errors
+@section Exceptions and errors
+
+Kawa supports the exception framework and forms
+from R^RS and R7RS.  See @ref{Exceptions} for details.
+
+@subheading Native exception handling
+
+You can also work with native Java exceptions at a low level.
+
+The @code{primitive-throw} procedure throw a @code{Throwable} value.
+It is implemented just like Java's @code{throw}.
+@example
+(primitive-throw (java.lang.IndexOutOfBoundsException "bad index"))
+@end example
+
+You can catch an exception with the @code{try-catch} syntax.  For example:
+@example
+(try-catch
+  (do-a-bunch-of-stuff)
+  (ex java.lang.Throwable
+    (format #f "caught ~a~%~!" ex)
+    (exit)))
+@end example
+
+A @code{try-finally} does the obvious:
+@example
+(define (call-with-port port proc)
+  (try-finally
+   (proc port)
+   (close-port port)))
+@end example
+
+Both @code{try-catch} and @code{try-finally} are
+expression forms that can return values, while the corresponding
+Java forms are statements that cannot return values.
+
 @node Tutorial - Classes
 @section Classes
 
+See @ref{Defining new classes} for the gory details; no tutorial yet.
+
+@node Tutorial - Other Java features
+@section Other Java features
+
+@subheading Import
+
+The @code{import} form can be used to avoid having to write
+fully-qualified class name.  For example:
+@example
+(import (class java.util
+               Map
+               (HashMap HMap)))
+@end example
+This defines @code{Map} as an alias for @code{java.util.Map},
+and @code{HMap} as an alias for @code{java.util.HashMap}.
+
+The @code{class} keyword is needed because the @code{import}
+for is also used for Kawa's module system.
+See @ref{importing-class-names} and @ref{Importing} for details.
+
+@subheading Synchronized blocks
+
+You can a use @code{synchronized} expression:
+
+@example
+(synchronized obj form1 ... formn)
+@end example
+This waits until it can get an exclusive lock on @var{obj}
+and then evaluates @var{form1} through @var{formn}.
+Unlke Java, this is an expression, and return the value of @var{formn}.
+
+@subheading Annotations
+
+You can write annotation declarations - see @ref{Annotations} for details.
+
+Kawa does not yet support annotations on types,
+or declaring new annotation classes.
 
 @part Reference Documentation
 
@@ -19628,6 +19841,7 @@ Applying the procedure returns the length of the array.
 @node FAQs
 @chapter Frequently Asked Questions
 
+@anchor{importing-class-names}
 @subsubheading What is the equivalent of Java import?
 
 To provide a short name for a class instead of the complete fully-qualified

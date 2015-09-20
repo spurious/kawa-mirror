@@ -1,3 +1,7 @@
+2015-09-20  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Tutorial): Added material, mostly on Java interop.
+
 2015-09-19  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Tutorial - Sequences): Various additions.

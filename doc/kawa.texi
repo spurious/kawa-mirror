@@ -14714,7 +14714,8 @@ Can be one of @code{'private}, @code{'protected},
 or @code{'package} (which the default "unnamed" permission
 in Java code).
 Can also be used to specify @code{volatile}, @code{transient},
-@code{enum}, or @code{final}, as in Java.
+@code{enum}, or @code{final}, as in Java,
+or a quoted list with these symbols.
 @item @stxlit{init:} @var{expr}
 An expression used to initialize the slot.
 The expression is evaluated in a scope that includes the field and
@@ -14781,6 +14782,8 @@ can have the following @var{option-keyword}s:
 Specifies the Java access permission on the method.
 Can be one of @code{'private}, @code{'protected},
 @code{'public}, or @code{'package}.
+Can also be @code{'synchronized}, @code{'final}, @code{'strictfp},
+or a quoted list.
 @item @stxlit{allocation:} @var{kind}
 If @var{kind} is @code{'class} or @code{'static} creates a static method.
 @item @stxlit{throws:} ( @var{exception-class-name} ... )
@@ -14877,23 +14880,6 @@ when allocating an object.  Using keywords requires a default constructor,
 and since having non-default constructors suppresses
 the implicit default constructor we have to explicitly define it.
 Using both styles of constructors is rather redundant, though.
-
-@subsection Synchronized methods
-@cindex synchronized methods
-Kawa doesn't directly support marking a method as @code{synchronized},
-but you can get the same effect using a @code{synchronized} expression:
-
-@example
-(define-simple-class <Bar> ()
-  ;; non-static method
-  ((foo) :: void
-   (synchronized (this)
-		 (synchronized-block)))
-  ;; static method
-  ((baz) allocation: 'static :: void
-   (synchronized <Bar>
-		 (synchronized-block))))
-@end example
 
 @node Anonymous classes
 @section Anonymous classes

@@ -1,5 +1,8 @@
 2015-09-20  Per Bothner  <per@bothner.com>
 
+	* kawa.texi (Defining new classes): We can now define
+	'synchronized or 'strictfp methods.
+
 	* kawa.texi (Tutorial): Added material, mostly on Java interop.
 
 2015-09-19  Per Bothner  <per@bothner.com>

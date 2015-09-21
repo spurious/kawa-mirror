@@ -249,8 +249,7 @@ AM_COND_IF([ENABLE_KAWA_FRONTEND],
         [AC_CONFIG_SUBDIRS([bin])])
 
 AC_CONFIG_FILES([Makefile gnu/bytecode/Makefile gnu/math/Makefile
-  gnu/Makefile bin/kawa.sh bin/qexo
-  gnu/kawa/servlet/Makefile
+  gnu/Makefile gnu/kawa/servlet/Makefile
   gnu/brl/Makefile gnu/kawa/brl/Makefile
   gnu/kawa/slib/Makefile
   gnu/commonlisp/lang/Makefile
@@ -264,5 +263,7 @@ AC_CONFIG_FILES([Makefile gnu/bytecode/Makefile gnu/math/Makefile
   gnu/xquery/testsuite/Makefile
   gnu/kawa/android/Makefile
   gnu/kawa/javafx/Makefile
-  doc/Makefile testsuite/Makefile],[chmod +x bin/qexo bin/kawa.sh])
+  doc/Makefile testsuite/Makefile])
+AC_CONFIG_FILES([bin/kawa.sh],[chmod +x bin/kawa.sh])
+AC_CONFIG_FILES([bin/qexo],[chmod +x bin/qexo])
 AC_OUTPUT

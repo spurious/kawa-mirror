@@ -2984,7 +2984,11 @@ if test -z "$ENABLE_KAWA_FRONTEND_TRUE"; then :
 
 fi
 
-ac_config_files="$ac_config_files Makefile gnu/bytecode/Makefile gnu/math/Makefile gnu/Makefile bin/kawa.sh bin/qexo gnu/kawa/servlet/Makefile gnu/brl/Makefile gnu/kawa/brl/Makefile gnu/kawa/slib/Makefile gnu/commonlisp/lang/Makefile gnu/commonlisp/lisp/Makefile gnu/commonlisp/testsuite/Makefile gnu/jemacs/lang/Makefile gnu/jemacs/buffer/Makefile gnu/jemacs/lisp/Makefile gnu/jemacs/testsuite/Makefile gnu/jemacs/swing/Makefile gnu/jemacs/swt/Makefile kawa/Makefile kawa/lib/Makefile gnu/q2/lang/Makefile gnu/q2/testsuite/Makefile gnu/xquery/util/Makefile gnu/xquery/lang/Makefile gnu/xquery/testsuite/Makefile gnu/kawa/android/Makefile gnu/kawa/javafx/Makefile doc/Makefile testsuite/Makefile"
+ac_config_files="$ac_config_files Makefile gnu/bytecode/Makefile gnu/math/Makefile gnu/Makefile gnu/kawa/servlet/Makefile gnu/brl/Makefile gnu/kawa/brl/Makefile gnu/kawa/slib/Makefile gnu/commonlisp/lang/Makefile gnu/commonlisp/lisp/Makefile gnu/commonlisp/testsuite/Makefile gnu/jemacs/lang/Makefile gnu/jemacs/buffer/Makefile gnu/jemacs/lisp/Makefile gnu/jemacs/testsuite/Makefile gnu/jemacs/swing/Makefile gnu/jemacs/swt/Makefile kawa/Makefile kawa/lib/Makefile gnu/q2/lang/Makefile gnu/q2/testsuite/Makefile gnu/xquery/util/Makefile gnu/xquery/lang/Makefile gnu/xquery/testsuite/Makefile gnu/kawa/android/Makefile gnu/kawa/javafx/Makefile doc/Makefile testsuite/Makefile"
+
+ac_config_files="$ac_config_files bin/kawa.sh"
+
+ac_config_files="$ac_config_files bin/qexo"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -3784,8 +3788,6 @@ do
     "gnu/bytecode/Makefile") CONFIG_FILES="$CONFIG_FILES gnu/bytecode/Makefile" ;;
     "gnu/math/Makefile") CONFIG_FILES="$CONFIG_FILES gnu/math/Makefile" ;;
     "gnu/Makefile") CONFIG_FILES="$CONFIG_FILES gnu/Makefile" ;;
-    "bin/kawa.sh") CONFIG_FILES="$CONFIG_FILES bin/kawa.sh" ;;
-    "bin/qexo") CONFIG_FILES="$CONFIG_FILES bin/qexo" ;;
     "gnu/kawa/servlet/Makefile") CONFIG_FILES="$CONFIG_FILES gnu/kawa/servlet/Makefile" ;;
     "gnu/brl/Makefile") CONFIG_FILES="$CONFIG_FILES gnu/brl/Makefile" ;;
     "gnu/kawa/brl/Makefile") CONFIG_FILES="$CONFIG_FILES gnu/kawa/brl/Makefile" ;;
@@ -3810,6 +3812,8 @@ do
     "gnu/kawa/javafx/Makefile") CONFIG_FILES="$CONFIG_FILES gnu/kawa/javafx/Makefile" ;;
     "doc/Makefile") CONFIG_FILES="$CONFIG_FILES doc/Makefile" ;;
     "testsuite/Makefile") CONFIG_FILES="$CONFIG_FILES testsuite/Makefile" ;;
+    "bin/kawa.sh") CONFIG_FILES="$CONFIG_FILES bin/kawa.sh" ;;
+    "bin/qexo") CONFIG_FILES="$CONFIG_FILES bin/qexo" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
   esac
@@ -4307,36 +4311,8 @@ $as_echo "$as_me: linking $ac_source to $ac_file" >&6;}
 
 
   case $ac_file$ac_mode in
-    "Makefile":F) chmod +x bin/qexo bin/kawa.sh ;;
-    "gnu/bytecode/Makefile":F) chmod +x bin/qexo bin/kawa.sh ;;
-    "gnu/math/Makefile":F) chmod +x bin/qexo bin/kawa.sh ;;
-    "gnu/Makefile":F) chmod +x bin/qexo bin/kawa.sh ;;
-    "bin/kawa.sh":F) chmod +x bin/qexo bin/kawa.sh ;;
-    "bin/qexo":F) chmod +x bin/qexo bin/kawa.sh ;;
-    "gnu/kawa/servlet/Makefile":F) chmod +x bin/qexo bin/kawa.sh ;;
-    "gnu/brl/Makefile":F) chmod +x bin/qexo bin/kawa.sh ;;
-    "gnu/kawa/brl/Makefile":F) chmod +x bin/qexo bin/kawa.sh ;;
-    "gnu/kawa/slib/Makefile":F) chmod +x bin/qexo bin/kawa.sh ;;
-    "gnu/commonlisp/lang/Makefile":F) chmod +x bin/qexo bin/kawa.sh ;;
-    "gnu/commonlisp/lisp/Makefile":F) chmod +x bin/qexo bin/kawa.sh ;;
-    "gnu/commonlisp/testsuite/Makefile":F) chmod +x bin/qexo bin/kawa.sh ;;
-    "gnu/jemacs/lang/Makefile":F) chmod +x bin/qexo bin/kawa.sh ;;
-    "gnu/jemacs/buffer/Makefile":F) chmod +x bin/qexo bin/kawa.sh ;;
-    "gnu/jemacs/lisp/Makefile":F) chmod +x bin/qexo bin/kawa.sh ;;
-    "gnu/jemacs/testsuite/Makefile":F) chmod +x bin/qexo bin/kawa.sh ;;
-    "gnu/jemacs/swing/Makefile":F) chmod +x bin/qexo bin/kawa.sh ;;
-    "gnu/jemacs/swt/Makefile":F) chmod +x bin/qexo bin/kawa.sh ;;
-    "kawa/Makefile":F) chmod +x bin/qexo bin/kawa.sh ;;
-    "kawa/lib/Makefile":F) chmod +x bin/qexo bin/kawa.sh ;;
-    "gnu/q2/lang/Makefile":F) chmod +x bin/qexo bin/kawa.sh ;;
-    "gnu/q2/testsuite/Makefile":F) chmod +x bin/qexo bin/kawa.sh ;;
-    "gnu/xquery/util/Makefile":F) chmod +x bin/qexo bin/kawa.sh ;;
-    "gnu/xquery/lang/Makefile":F) chmod +x bin/qexo bin/kawa.sh ;;
-    "gnu/xquery/testsuite/Makefile":F) chmod +x bin/qexo bin/kawa.sh ;;
-    "gnu/kawa/android/Makefile":F) chmod +x bin/qexo bin/kawa.sh ;;
-    "gnu/kawa/javafx/Makefile":F) chmod +x bin/qexo bin/kawa.sh ;;
-    "doc/Makefile":F) chmod +x bin/qexo bin/kawa.sh ;;
-    "testsuite/Makefile":F) chmod +x bin/qexo bin/kawa.sh ;;
+    "bin/kawa.sh":F) chmod +x bin/kawa.sh ;;
+    "bin/qexo":F) chmod +x bin/qexo ;;
 
   esac
 done # for ac_tag

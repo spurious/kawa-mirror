@@ -1215,7 +1215,6 @@ public class LambdaExp extends ScopeExp {
                 // For a simple parameter not captured by an inferior lambda,
                 // just allocate it in the incoming register.
                 var = decl.allocateVariable(null);
-                //var.allocateLocal(code);
             } else {
                 // This variable was captured by an inner lambda.
                 // Its home location is in the heapFrame.

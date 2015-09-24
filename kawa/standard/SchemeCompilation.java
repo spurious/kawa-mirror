@@ -83,6 +83,8 @@ public class SchemeCompilation extends Translator
             return null;
         int llen = local.length();
         // Map 'TYPE?' to '(lambda (obj) (instance? obj TYPE))'.
+        // FIXME - this should be done after/during InlineCalls,
+        // so we only do this if TYPE is a Type or Class.
         if (len > 1 && llen > 1 && name.charAt(len-1) == '?') {
             String tlocal = local.substring(0, llen-1).intern();
             Symbol tsymbol = namespace.getSymbol(tlocal);
@@ -98,6 +100,7 @@ public class SchemeCompilation extends Translator
                 LambdaExp lexp = new LambdaExp(1);
                 lexp.setSymbol(symbol);
                 Declaration param = lexp.addDeclaration((Object) null);
+                param.setFlag(Declaration.IS_PARAMETER);
                 param.noteValueUnknown();
                 lexp.body = new ApplyExp(Scheme.instanceOf,
                                          new ReferenceExp(param), texp);
@@ -105,6 +108,8 @@ public class SchemeCompilation extends Translator
             }
         }
         // Map '->TYPE' to '(lambda (obj) (as TYPE obj))'.
+        // FIXME - this should be done after/during InlineCalls,
+        // so we only do this if TYPE is a Type or Class.
         if (len > 2 && llen > 2
             && name.charAt(0) == '-' && name.charAt(1) == '>') {
             String tlocal = local.substring(2).intern();

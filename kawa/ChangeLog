@@ -1,3 +1,8 @@
+2015-09-24  Per Bothner  <per@bothner.com>
+
+	* standard/ImportFromLibrary.java (SRFI97Map): Add SRFI 35
+	and name it "conditions", even though it is not supported by SRFI 97.
+
 2015-09-20  Per Bothner  <per@bothner.com>
 
 	Allow 'synchronized and 'strictfp as access flags for methods.

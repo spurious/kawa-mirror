@@ -43,6 +43,8 @@ public class Include extends Syntax {
                          boolean ignoreCase) {
         LList result = LList.Empty;
         Pair lastPair = null;
+        if (tr.getState() == Compilation.PROLOG_PARSING)
+            tr.setState(Compilation.PROLOG_PARSED);
         while (rest instanceof Pair) {
             Pair pair = (Pair) rest;
             Object paircar = pair.getCar();

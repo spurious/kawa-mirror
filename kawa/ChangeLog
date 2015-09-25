@@ -1,5 +1,12 @@
 2015-09-24  Per Bothner  <per@bothner.com>
 
+	* standard/Include.java: Prevent require/import in included file from
+	causing the parse to be pending.
+	* lang/Translator.java: Require pendingForm to be null in addition to
+	PROLOG_state be STATE before handling the former.
+	This avoids being triggered by the above change to Include.
+	* standard/module_name.java: Error if too-late module-name.
+
 	* standard/ImportFromLibrary.java (SRFI97Map): Add SRFI 35
 	and name it "conditions", even though it is not supported by SRFI 97.
 

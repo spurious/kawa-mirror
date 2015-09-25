@@ -1582,7 +1582,7 @@ public class Translator extends Compilation
             Object savePos = pushPositionOf(pair);
 	    scanForm(pair.getCar(), defs);
             popPositionOf(savePos);
-            if (getState() == Compilation.PROLOG_PARSED)
+            if (getState() == Compilation.PROLOG_PARSED && pendingForm != null)
               {
                 // We've seen a require form during the initial pass when
                 // we're looking module names.  Defer the require and any

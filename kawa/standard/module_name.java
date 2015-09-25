@@ -64,6 +64,8 @@ public class module_name extends Syntax {
                 else if (! oldName.equals(className))
                     tr.syntaxError("inconsistent module-name - old name: "+oldName);
             }
+            if (tr.getState() > Compilation.PROLOG_PARSING)
+                tr.error('e', "too late to set module-name");
             module.setType(tr.mainClass);
             module.setName(name);
 

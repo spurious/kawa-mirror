@@ -49,10 +49,6 @@ public class define_syntax extends Syntax
         makeSkipScanForm.setSideEffectFree();
     }
 
-    public Expression rewriteForm(Pair form, Translator tr) {
-        return tr.syntaxError("define-syntax not in a body");
-    }
-
     public void scanForm(Pair st, ScopeExp defs, Translator tr) {
         SyntaxForm syntax = null;
         Object st_cdr = st.getCdr();
@@ -91,28 +87,15 @@ public class define_syntax extends Syntax
         Macro savedMacro = tr.currentMacroDefinition;
         Macro macro = Macro.make(decl);
         macro.setFlags(flags);
-        tr.currentMacroDefinition = macro;
-        Expression rule = tr.rewrite_car((Pair) p, syntax);
-        tr.currentMacroDefinition = savedMacro;
+        Expression rule;
+        ScopeExp scope = syntax != null ? syntax.getScope() : tr.currentScope();
+        rule = new LangExp(new Object[]{ p, tr, scope });
         macro.expander = rule;
-
-        if (rule instanceof LambdaExp)
-            ((LambdaExp) rule).setFlag(LambdaExp.NO_FIELD);
-        Procedure makeMacroProc =
-            (flags & Macro.SKIP_SCAN_FORM) != 0 ? makeSkipScanForm
-            : (flags & Macro.HYGIENIC) != 0 ? makeHygienic
-            : makeNonHygienic;
         // A top-level macro needs (in general) to be compiled into the
         // class-file, but for a non-top-level macro it is better to use
         // the quoted macro directly to get the right nesting, as we
         // do for letrec-syntax.
-        if (decl.context instanceof ModuleExp || makeMacroProc != makeHygienic)
-            rule = new ApplyExp(makeMacroProc,
-                                new QuoteExp(name),
-                                rule,
-                                ThisExp.makeGivingContext(defs));
-        else
-            rule = new QuoteExp(macro);
+        rule = new QuoteExp(macro);
         decl.noteValue(rule);
         decl.setProcedureDecl(true);
   
@@ -121,14 +104,49 @@ public class define_syntax extends Syntax
             result.setDefining (true);
             if (tr.getLanguage().hasSeparateFunctionNamespace())
                 result.setFuncDef(true);
-
-            tr.pushForm(result);
+            Object ret = Translator.makePair(st, this,
+                                         Translator.makePair(st, result, LList.Empty));
+            tr.pushForm(ret);
 
             if (tr.immediate) {
                 Expression[] args =
                     { new ReferenceExp(decl), new QuoteExp(defs) };
                 tr.pushForm(new ApplyExp(setCapturedScope, args));
             }
+        } else {
+            macro.rewriteIfNeeded();
         }
+    }
+
+    public Expression rewriteForm(Pair form, Translator tr) {
+        if (form instanceof Pair) {
+            Pair p1 = (Pair) form.getCdr();
+            Object x1 = p1.getCar();
+            if (x1 instanceof SetExp) {
+                SetExp sexp = (SetExp) x1;
+                Object val = sexp.getNewValue().valueIfConstant();
+                Declaration decl = sexp.getBinding();
+                Object name = decl.getSymbol();
+                ScopeExp defs = decl.getContext();
+                if (val instanceof Macro) {
+                    Macro macro = (Macro) val;
+                    macro.rewriteIfNeeded();
+                    Expression rule = (Expression) macro.expander;
+                    Procedure makeMacroProc =
+                        (flags & Macro.SKIP_SCAN_FORM) != 0 ? makeSkipScanForm
+                        : (flags & Macro.HYGIENIC) != 0 ? makeHygienic
+                        : makeNonHygienic;
+                    if (defs instanceof ModuleExp)
+                        rule = new ApplyExp(makeMacroProc,
+                                            new QuoteExp(name),
+                                            rule,
+                                            ThisExp.makeGivingContext(defs));
+                    sexp.setNewValue(rule);
+                    decl.setValue(rule);
+                }
+                return (SetExp) x1;
+            }
+        }
+        return tr.syntaxError("define-syntax not in a body");
     }
 }

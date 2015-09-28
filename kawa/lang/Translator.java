@@ -1852,8 +1852,6 @@ public class Translator extends Compilation
       }
     pendingImports = null;
 
-    processAccesses();
-
     setModule(mexp);
     Compilation save_comp = Compilation.setSaveCurrent(this);
     try
@@ -1861,6 +1859,9 @@ public class Translator extends Compilation
         Pair firstForm = formStack.getHead();
         rewriteBody((LList) formStack.popTail(firstForm));
 	mexp.body = makeBody(firstForm, mexp);
+
+        processAccesses();
+
         // In immediate mode need to preserve Declaration for current "session".
         if (! immediate)
 	  lexical.pop(mexp);

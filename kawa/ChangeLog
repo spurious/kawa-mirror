@@ -1,3 +1,17 @@
+2015-09-28  Per Bothner  <per@bothner.com>
+
+	Rewrite macro bodies lazily to beter handle forward references.
+	* standard/define_syntax.java (scanForm): Don't rewrite the macro rule
+	eagerly, as that doesn't handle forward references properly.  Instead,
+	do the rewrite lazily if the macro is used *or* later, at rewrite time.
+	(rewriteForm): Do write if not done yet.  Handle make call here.
+	* lang/Macro.java (rewriteIfNeeded): New method.
+	(expand): Call rewriteIfNeeded.
+	* lang/SyntaxTemplate.java (convert_template): Only noteAccess for
+	top-level macros.
+	* lang/Translator.java (resolveModule): Move processAccesses after
+	rewrites.
+
 2015-09-24  Per Bothner  <per@bothner.com>
 
 	* standard/Include.java: Prevent require/import in included file from

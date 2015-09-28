@@ -25,7 +25,7 @@ public class Macro extends Syntax implements Printable, Externalizable
             flags &= ~HYGIENIC;
     }
 
-    private ScopeExp capturedScope;
+    ScopeExp capturedScope;
 
     public ScopeExp getCapturedScope() {
         if (capturedScope == null) {
@@ -115,6 +115,33 @@ public class Macro extends Syntax implements Printable, Externalizable
         out.write ('>');
     }
 
+    public Object rewriteIfNeeded() {
+        Object exp = expander;
+        if (exp instanceof LangExp) {
+            Object[] lval = (Object[]) ((LangExp) exp).getLangValue();
+            Object p = lval[0];
+            Translator xtr = (Translator) lval[1];
+            ScopeExp scope = (ScopeExp) lval[2];
+            Macro savedMacro = xtr.currentMacroDefinition;
+            Compilation savedComp = Compilation.getCurrent();
+            xtr.currentMacroDefinition = this;
+            Compilation.setCurrent(xtr);
+            Expression rule;
+            ScopeExp savedScope = xtr.setPushCurrentScope(scope);
+            try {
+                rule = xtr.rewrite_car((Pair) p, false);
+            } finally {
+                xtr.setPopCurrentScope(savedScope);
+                xtr.currentMacroDefinition = savedMacro;
+                Compilation.setCurrent(savedComp);
+            }
+            if (rule instanceof LambdaExp)
+                ((LambdaExp) rule).setFlag(LambdaExp.NO_FIELD);
+            expander = exp = rule;
+        }
+        return exp;
+    }
+
     public Object expand(Object form, Translator tr) {
         Object savedMacroMark = tr.currentMacroMark;
         tr.currentMacroMark = new Object();
@@ -124,6 +151,7 @@ public class Macro extends Syntax implements Printable, Externalizable
             if (exp instanceof Procedure && ! (exp instanceof Expression))
                 pr = (Procedure) exp;
             else {
+                exp = rewriteIfNeeded();
                 if (! (exp instanceof Expression)) {
                     Macro savedMacro = tr.currentMacroDefinition;
                     tr.currentMacroDefinition = this;

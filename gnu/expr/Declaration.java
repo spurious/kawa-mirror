@@ -1239,7 +1239,7 @@ public class Declaration
               }
             if (external_access && ! getFlag(Declaration.MODULE_REFERENCE))
               {
-                fname = PRIVATE_PREFIX + fname; 
+                fname = PRIVATE_PREFIX + fname;
                 haveName = false;
               }
            nlength = fname.length();

@@ -15538,7 +15538,9 @@ exported by a library (module). Each @meta{import-set} names a set of
 bindings from a library and possibly specifies local names
 for the imported bindings.
 @display
-@stxdef{import-set} @stxref{library-reference}
+@stxdef{import-set}
+    @meta{classname}
+  | @stxref{library-reference}
   | @stxlit{(library} @stxref{library-reference} @stxlit{)}
   | @stxlit{(class} @var{class-prefix} @arbno{@var{import-only-name}}@stxlit{)}
   | @stxlit{(only} @stxref{import-set} @arbno{@var{import-only-name}}@stxlit{)}
@@ -15558,6 +15560,10 @@ For example:
 (import (gnu kawa slib srfi37))
 @end example
 is equivalent to:
+@example
+(import gnu.kawa.slib.srfi37)
+@end example
+as well as to:
 @example
 (require gnu.kawa.slib.srfi37)
 @end example
@@ -19882,9 +19888,13 @@ To import a static member, giving it a shortened name
 @end example
 
 For static fields only (not methods or member classes) you can
-use an @code{import} form:
+use an @code{import} form, either:
 @example
 (import (only (java lang System) out))
+@end example
+or:
+@example
+(import (only java.lang.System out))
 @end example
 This works because Kawa can treat any class as a ``library'';
 in which case it considers all public static fields as exported bindings.

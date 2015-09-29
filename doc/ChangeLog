@@ -2,6 +2,7 @@
 
 	* kawa.texi (Definitions): 'define-variable' can now have
 	a type-specifier.
+	(Importing): You can now reference a library as a class name with dots.
 
 	* kawa.texi (Implemented SRFIs): Add SRFI-35 to list.
 

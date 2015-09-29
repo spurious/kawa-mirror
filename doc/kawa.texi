@@ -345,6 +345,8 @@ using @uref{http://srfi.schemers.org/srfi-16/srfi-16.html, @code{case-lambda}}.
 @item
 @uref{http://srfi.schemers.org/srfi-30/srfi-30.html, SRFI 30}: Nested Multi-line Comments.
 @item
+@uref{http://srfi.schemers.org/srfi-35/srfi-35.html, SRFI 35}: Conditions.
+@item
 @uref{http://srfi.schemers.org/srfi-37/srfi-37.html, SRFI 37}: @uref{http://srfi.schemers.org/srfi-37/srfi-37.html,@code{args-fold} - a program argument processor}, if @code{(require 'args-fold)}.
 @item
 @uref{http://srfi.schemers.org/srfi-38/srfi-38.html, SRFI 38}: External Representation for Data With Shared Structure.

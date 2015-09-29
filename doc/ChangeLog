@@ -1,3 +1,7 @@
+2015-09-29  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Implemented SRFIs): Add SRFI-35 to list.
+
 2015-09-20  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Defining new classes): We can now define

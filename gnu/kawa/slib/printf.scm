@@ -21,7 +21,7 @@
 (require 'generic-write)
 
 ;; Determine the case of digits > 9.  We assume this to be constant.
-(define-constant stdio:hex-upper-case? :: <boolean>
+(define-private stdio:hex-upper-case? :: <boolean>
   (string=? "-F" (number->string -15 16)))
 
 ;; Parse the output of NUMBER->STRING and pass the results to PROC.
@@ -31,7 +31,7 @@
 ;; If STR denotes a number with imaginary part not exactly zero,
 ;; 3 additional elements for the imaginary part are passed.
 ;; If STR cannot be parsed, return #F without calling PROC.
-(define-constant (stdio:parse-float str proc)
+(define-private (stdio:parse-float str proc)
   (let ((n (string-length str)))
     (define (parse-error) #f)
     (define (prefix i cont)
@@ -135,7 +135,7 @@
 ;; If STRIP-0S is not #F then trailing zeros will be stripped from the result.
 ;; In this case, STRIP-0S should be the minimum number of digits required
 ;; after the implied decimal point.
-(define-constant (stdio:round-string (str :: <string>) ndigs strip-0s)
+(define-private (stdio:round-string (str :: <string>) ndigs strip-0s)
   (let* ((n (- (string-length str) 1))
 	 (res
 	  (cond ((< ndigs 0) "")
@@ -183,7 +183,7 @@
 	      (loop (- i 1))))
 	res)))
 
-(define-constant (stdio:iprintf out format-string . args)
+(define-private (stdio:iprintf out format-string . args)
   (cond
    ((not (equal? "" format-string))
     (let ((pos -1)

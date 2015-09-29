@@ -1,3 +1,7 @@
+2015-09-28  Per Bothner  <per@bothner.com>
+
+	* printf.scm: Fix bogus uses of define-constant to define-private.
+
 2015-05-16  Per Bothner  <per@bothner.com>
 
 	* swing.scm (menu): Add now-required quote before keyword value.

@@ -1,3 +1,7 @@
+2015-09-28  Per Bothner  <per@bothner.com>
+
+	* Declaration.java (makeField): Better field type if indirect-binding.
+
 2015-09-20  Per Bothner  <per@bothner.com>
 
 	* Declaration.java (SYNCHRONIZED_ACCESS, STRICTFP_ACCESS): New flags.

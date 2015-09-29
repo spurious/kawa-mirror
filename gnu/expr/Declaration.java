@@ -1216,8 +1216,15 @@ public class Declaration
         && (context instanceof ClassExp || context instanceof ModuleExp))
       fflags |= Access.FINAL;
     Type ftype = getType().getImplementationType();
-    if (isIndirectBinding() && ! ftype.isSubtype(Compilation.typeLocation))
-      ftype = Compilation.typeLocation;
+    if (isIndirectBinding() && ! ftype.isSubtype(Compilation.typeLocation)) {
+        if (ftype == null || ftype == Type.objectType)
+            ftype = Compilation.typeLocation;
+        else {
+            if (ftype instanceof PrimType)
+                ftype = ((PrimType) ftype).boxedType();
+            ftype = new ParameterizedType(Compilation.typeLocation, ftype);
+        }
+    }
     if (! ignorable())
       {
         String dname = getName();

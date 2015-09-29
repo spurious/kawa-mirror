@@ -158,6 +158,13 @@ public class ImportFromLibrary extends Syntax
     }
 
     void scanImportSet(Object imports, ScopeExp defs, Translator tr, require.DeclSetMapper mapper) {
+        if (imports instanceof SimpleSymbol) {
+            String sname = imports.toString();
+            handleImport(sname, null,
+                         Compilation.mangleQualifiedName(sname),
+                         defs, tr, mapper);
+            return;
+        }
         int specLength = Translator.listLength(imports);
         if (specLength <= 0) {
             Object save1 = tr.pushPositionOf(imports);
@@ -239,9 +246,7 @@ public class ImportFromLibrary extends Syntax
             }
             return;
         }
-        if (specLength >= 2 && kind != '\0'
-            // A keyword such as 'only must be followed by an <import set>.
-            && cdrPair.getCar() instanceof LList) {
+        if (specLength >= 2 && kind != '\0') {
             ImportSetMapper nmapper
                 = new ImportSetMapper(kind, cdrPair.getCdr(), specLength-2);
             nmapper.chain = mapper;

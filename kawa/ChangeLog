@@ -1,5 +1,9 @@
 2015-09-29  Per Bothner  <per@bothner.com>
 
+	* standard/ImportFromLibrary.java: Allow class name, written as
+	symbol containing dots, to be used as a library-reference in import.
+	* lib/DefineRecordType.scm: Use new syntax.
+
 	* standard/define.java: Add support for define-variable.
 	This allows define-variable to have a type-specifier.
 	* standard/define_variable.java: Remove, no longer used.

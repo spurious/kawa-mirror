@@ -1,5 +1,8 @@
 2015-09-29  Per Bothner  <per@bothner.com>
 
+	* kawa.texi (Definitions): 'define-variable' can now have
+	a type-specifier.
+
 	* kawa.texi (Implemented SRFIs): Add SRFI-35 to list.
 
 2015-09-20  Per Bothner  <per@bothner.com>

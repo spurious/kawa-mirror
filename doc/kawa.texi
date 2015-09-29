@@ -5793,7 +5793,7 @@ If the @var{value} is a compile-time constant,
 then the definition defaults to being static.
 @end deffn
 
-@deffn Syntax define-variable name [init]
+@deffn Syntax define-variable name [@stxlit{::} @stxref{type}] [init]
 If @var{init} is specified and @var{name} does not have a global variable
 binding, then @var{init} is evaluated, and @var{name} bound to the result.
 Otherwise, the value bound to @var{name} does not change.
@@ -5801,7 +5801,7 @@ Otherwise, the value bound to @var{name} does not change.
 if @var{name} does have a global variable binding.)
 
 Also, declares to the compiler that @var{name} will be looked up
-in the dynamic environment. This can be useful for shutting up
+in the per-thread dynamic environment. This can be useful for shutting up
 warnings from @code{--warn-undefined-variable}.
 
 This is similar to the Common Lisp @code{defvar} form.

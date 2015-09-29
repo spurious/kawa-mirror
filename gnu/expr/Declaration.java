@@ -456,7 +456,13 @@ public class Declaration
               }
             else
               code.emitInvokeVirtual(getLocationMethod);
-            rtype = Type.objectType;
+            if (isAlias()
+                || target.getType().getRawType() == Type.objectType)
+                rtype = Type.objectType;
+            else {
+                code.emitCheckcast(getType().getRawType());
+                rtype = getType();
+            }
           }
       }
     target.compileFromStack(comp, rtype);

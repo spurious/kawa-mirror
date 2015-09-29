@@ -376,7 +376,6 @@ KAWA_STANDARD_JAVA_FILES = \
   standard/make.java \
   standard/location.java \
   standard/define_alias.java \
-  standard/define_variable.java \
   standard/define_autoload.java \
   standard/define_member_alias.java \
   standard/Scan.java \

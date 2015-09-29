@@ -1,3 +1,13 @@
+2015-09-29  Per Bothner  <per@bothner.com>
+
+	* standard/define.java: Add support for define-variable.
+	This allows define-variable to have a type-specifier.
+	* standard/define_variable.java: Remove, no longer used.
+	* Makefile.am: Update accordingly.
+	* lib/prim_syntax.scm: Add definition of 'define-variable'.
+	* standard/Scheme.java: Update binding for 'define-variable'.
+	* lib/kawa/base.scm: Likewise.  Also add 'define-constant'.
+
 2015-09-28  Per Bothner  <per@bothner.com>
 
 	* standard/define_variable.java (scanForDefinitions): Use

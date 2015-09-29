@@ -247,7 +247,7 @@ public class ReferenceExp extends AccessExp
   protected gnu.bytecode.Type calculateType()
   {
     Declaration decl = binding;
-    if (decl == null || decl.isFluid())
+    if (decl == null)
       return Type.pointer_type;
     if (getDontDereference())
       {

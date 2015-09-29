@@ -15,7 +15,8 @@ import gnu.kawa.reflect.Invoke;
  * {@code Symbol}) or {@code Declaration}.
  * The {@code code} is an integer mask,
  * where 1 means type specified, 2 means a function definition,
- * 4 means private, 8 means constant, and 16 means an early constant.
+ * 4 means private, 8 means constant, 16 means an early constant.,
+ * and 32 means a fluid variable (define-variable).
  * As a special case, define-procedure is 1+2+8+16=27
  * The {@code type} is the declarated type or{@code null}.
  * The {@code value} is the initializing value.
@@ -34,6 +35,8 @@ public class define extends Syntax
       return "define-private";
     else if ((options & 8) != 0)
       return "define-constant";
+    else if ((options & 32) != 0)
+      return "define-variable";
     else
       return "define";
   }
@@ -59,6 +62,7 @@ public class define extends Syntax
     int options = ((Number) Translator.stripSyntax(p2.getCar())).intValue();
     boolean makePrivate = (options & 4) != 0;
     boolean makeConstant = (options & 8) != 0;
+    boolean makeFluid = (options & 32) != 0;
     boolean makeCompoundProcedure = options == 27;
 
     name = tr.namespaceResolve(name);
@@ -86,7 +90,6 @@ public class define extends Syntax
     if ((options & 16) != 0)
       decl.setFlag(Declaration.EARLY_INIT);
     decl.setFlag(Declaration.IS_SINGLE_VALUE);
-
     Expression value;
     if ((options & 2) != 0 && ! makeCompoundProcedure)
       {
@@ -108,6 +111,16 @@ public class define extends Syntax
     if (defs instanceof ModuleExp && ! makePrivate && ! makeConstant
         && (! Compilation.inlineOk || tr.sharedModuleDefs()))
       decl.setCanWrite(true);
+
+    if (makeFluid) {
+        decl.setSimple(false);
+	decl.setPrivate(true);
+	decl.setFlag(Declaration.IS_DYNAMIC);
+	decl.setCanRead(true);
+	decl.setCanWrite(true);
+	decl.setIndirectBinding(true);
+        sexp.setSetIfUnbound(true);
+    }
 
     if ((options & 1) != 0)
       {
@@ -131,6 +144,7 @@ public class define extends Syntax
     Object name = p1.getCar();
     int options = ((Number) Translator.stripSyntax(p2.getCar())).intValue();
     boolean makePrivate = (options & 4) != 0;
+    boolean makeFluid = (options & 32) != 0;
     boolean makeCompoundProcedure = options == 27;
 
     if (! (name instanceof SetExp))
@@ -147,6 +161,9 @@ public class define extends Syntax
             decl.setType(tr.exp2Type(typeSpecPair));
           }
       }
+    if (makeFluid
+        && Translator.stripSyntax(p4.getCar())==Special.undefined)
+        return QuoteExp.voidExp;
 
     BeginExp bexp2 = null;
     boolean unknownValue;

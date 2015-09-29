@@ -103,19 +103,13 @@
 	 synchronized)
 
    (only (kawa lib prim_syntax)
-	 try-catch)
+	 try-catch define-constant define-variable)
 
    (only (rename (only (kawa standard syntax_case) syntax_case)
 		 (syntax_case syntax-case))
 	 syntax-case)
 
-   (only (rename (kawa standard define_alias)
-		 (define_alias define-alias))
-	 define-alias)
-
-   (only (rename (kawa standard define_variable)
-		 (define_variable define-variable))
-	 define-variable)
+   (only (kawa standard define_alias) (define_alias define-alias))
 
    (only (rename (kawa standard define_class)
 		 (define_simple_class define-simple-class)

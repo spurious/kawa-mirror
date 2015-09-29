@@ -2,7 +2,7 @@
 
 (module-export
  define-syntax define define-private define-constant define-early-constant
- report-syntax-error syntax->expression syntax-body->expression
+ define-variable report-syntax-error syntax->expression syntax-body->expression
  if try-catch letrec)
 
 (import (only (kawa standard define) (defineRaw %define)))
@@ -57,8 +57,6 @@
      (%define ($lookup$ part1 'part2) 9 type value))
     ((define-constant ($lookup$ part1 'part2) value)
      (%define ($lookup$ part1 'part2) 8 #!null value))
-    ((define-constant (name . formals) . body)
-     (%define name 10 #t formals . body))
     ((define-constant name :: type value)
      (%define name 9 type value))
     ((define-constant name value)
@@ -74,6 +72,21 @@
      (%define name 25 type value))
     ((define-early-constant name value)
      (%define name 24 #!null value))))
+
+(%define-syntax define-variable
+  (syntax-rules (:: $lookup$)
+    ((define-variable name :: type)
+     (define-variable name :: type #!undefined))
+    ((define-variable name)
+     (define-variable name #!undefined))
+    ((define-variable ($lookup$ part1 'part2) :: type value)
+     (%define ($lookup$ part1 'part2) 33 type value))
+    ((define-variable ($lookup$ part1 'part2) value)
+     (%define ($lookup$ part1 'part2) 32 #!null value))
+    ((define-variable name :: type value)
+     (%define name 33 type value))
+    ((define-variable name value)
+     (%define name 32 #!null value))))
 
 (%define report-syntax-error 2 #!null (id #!rest (msg :: <Object[]>))
   (invoke-static <kawa.standard.syntax_error> 'error id msg))

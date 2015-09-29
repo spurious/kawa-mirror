@@ -1,3 +1,8 @@
+2015-09-29  Per Bothner  <per@bothner.com>
+
+	* Declaration.java (load): Add cast if loading from Location.
+	* ReferenceExp.java (calculateType): More precise result if fluid.
+
 2015-09-28  Per Bothner  <per@bothner.com>
 
 	* Declaration.java (makeField): Better field type if indirect-binding.

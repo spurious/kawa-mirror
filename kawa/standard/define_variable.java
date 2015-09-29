@@ -18,14 +18,10 @@ public class define_variable extends Syntax
       return super.scanForDefinitions(st, defs, tr);
     Pair p = (Pair) st.getCdr();
     Object sym = p.getCar();
-    if (sym instanceof String || sym instanceof Symbol)
+    if (sym instanceof Symbol)
       {
-	Declaration decl = defs.lookup(sym);
-	if (decl != null)
-	  tr.error('e', "duplicate declaration for '"+sym+"'");
-	decl = defs.addDeclaration(sym);
-	tr.push(decl);
-	decl.setSimple(false);
+        Declaration decl = tr.define(sym, defs);
+        decl.setSimple(false);
 	decl.setPrivate(true);
 	decl.setFlag(Declaration.IS_DYNAMIC|Declaration.IS_SINGLE_VALUE);
 	decl.setCanRead(true);

@@ -1960,6 +1960,10 @@ public class Translator extends Compilation
       }
   }
 
+    public Declaration define(Object name, ScopeExp defs) {
+        return define(name, (TemplateScope) null, defs);
+    }
+
     public Declaration define(Object name, SyntaxForm nameSyntax,
                               ScopeExp defs) {
         return define(name, nameSyntax == null ? null : nameSyntax.getScope(),

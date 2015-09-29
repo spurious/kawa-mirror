@@ -1,5 +1,11 @@
 2015-09-28  Per Bothner  <per@bothner.com>
 
+	* standard/define_variable.java (scanForDefinitions): Use
+	Transaltor.define.  This means the Declaration can be exported.
+	It also allows some simplification.
+	* lang/Translator.java (define): New convenience overload.
+	* standard/ImportFromLibrary.java: Use it.
+
 	Rewrite macro bodies lazily to beter handle forward references.
 	* standard/define_syntax.java (scanForm): Don't rewrite the macro rule
 	eagerly, as that doesn't handle forward references properly.  Instead,

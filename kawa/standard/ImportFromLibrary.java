@@ -228,7 +228,7 @@ public class ImportFromLibrary extends Syntax
                 decls = mapper.map(decls, tr);
             for (Map.Entry<Symbol,Expression> entry : decls.entrySet()) {
                 Symbol aname = entry.getKey();
-                Declaration decl = tr.define(aname, (TemplateScope) null, defs);
+                Declaration decl = tr.define(aname, defs);
                 decl.setAlias(true);
                 decl.setFlag(Declaration.IS_CONSTANT|Declaration.EARLY_INIT);
                 SetExp sexp = new SetExp(decl, entry.getValue());

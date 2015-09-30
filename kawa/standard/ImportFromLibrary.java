@@ -50,6 +50,7 @@ public class ImportFromLibrary extends Syntax
         { "29", "localization", MISSING },
         { "31", "rec", MISSING },
         { "35", "conditions", "gnu.kawa.slib.conditions" },
+        { "37", "args-fold", "gnu.kawa.slib.srfi37" },
         { "38", "with-shared-structure", MISSING },
         { "39", "parameters", BUILTIN },
         // Note the default for (srfi :41) should be "streams".  We put that last,

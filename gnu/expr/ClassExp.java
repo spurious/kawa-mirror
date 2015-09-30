@@ -294,14 +294,14 @@ public class ClassExp extends LambdaExp
             name = comp.generateClassName(name);
         else {
             int start = 0;
-            StringBuffer nbuf = new StringBuffer(100);
+            StringBuilder nbuf = new StringBuilder(100);
             // Mangle characters in name, if needed - but don't mangle '.'.
             for (;;) {
                 int dot = name.indexOf('.', start);
                 if (dot < 0)
                     break;
                 nbuf.append(Compilation
-                            .mangleNameIfNeeded(name.substring(start, dot)));
+                            .mangleClassName(name.substring(start, dot)));
                 start = dot + 1;
                 if (start < name.length())
                     nbuf.append('.');
@@ -328,7 +328,7 @@ public class ClassExp extends LambdaExp
                 setFlag(IS_PACKAGE_MEMBER);
             if (start < name.length())
                 nbuf.append(Compilation
-                            .mangleNameIfNeeded(name.substring(start)));
+                            .mangleClassName(name.substring(start)));
             name = nbuf.toString();
         }
         return name;

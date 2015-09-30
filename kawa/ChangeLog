@@ -1,3 +1,7 @@
+2015-09-30  Per Bothner  <per@bothner.com>
+
+	* standard/ImportFromLibrary.java: Use demangleSymbolic.
+
 2015-09-29  Per Bothner  <per@bothner.com>
 
 	* standard/ImportFromLibrary.java: Allow class name, written as

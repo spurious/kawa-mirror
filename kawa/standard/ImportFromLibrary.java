@@ -100,7 +100,7 @@ public class ImportFromLibrary extends Syntax
 
     public static String checkSrfi(String lname, Translator tr) {
         if (lname.startsWith("srfi.")) {
-            String demangled = Compilation.demangleName(lname.substring(5));
+            String demangled = Compilation.demangleSymbolic(lname.substring(5));
             int dot = demangled.indexOf('.');
             String srfiName;
             StringBuilder badNameBuffer = null;

@@ -1,3 +1,13 @@
+2015-09-30  Per Bothner  <per@bothner.com>
+
+	Change to mangle class and package name in "Symbolic Freedom" style.
+	See https://blogs.oracle.com/jrose/entry/symbolic_freedom_in_the_vm
+	Note this is currently *only* used for class and package names.
+	* Compilation.java (mangleSymbolic, demangleSymbolic): New methods.
+	(mangleClassName, mangleQualifiedName): Change to use new methods.
+	(generateClassName): Use mangleClassName.
+	* ClassExp.java: Use mangleClassName.
+
 2015-09-29  Per Bothner  <per@bothner.com>
 
 	* Declaration.java (load): Add cast if loading from Location.

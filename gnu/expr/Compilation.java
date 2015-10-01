@@ -923,6 +923,7 @@ public class Compilation implements SourceLocator
                 sbuf = new StringBuilder();
                 if (i != 0)
                     sbuf.append("\\=");
+                sbuf.append(name, 0, i);
                 sbuf.append('\\').append(ch2);
             }
         }

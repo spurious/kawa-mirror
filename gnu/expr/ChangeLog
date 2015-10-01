@@ -1,5 +1,11 @@
 2015-09-30  Per Bothner  <per@bothner.com>
 
+	* Compilation.java (mangleSymbolic): Fix thinko.
+	* ModuleManager.java (interactiveClassPrefix, evalClassPrefix):
+	Change to values that don't get mangled by mangleSymbolic.
+
+2015-09-30  Per Bothner  <per@bothner.com>
+
 	Change to mangle class and package name in "Symbolic Freedom" style.
 	See https://blogs.oracle.com/jrose/entry/symbolic_freedom_in_the_vm
 	Note this is currently *only* used for class and package names.

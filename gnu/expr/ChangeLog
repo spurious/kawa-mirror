@@ -1,3 +1,8 @@
+2015-10-04  Per Bothner  <per@bothner.com>
+
+	* ModuleInfo.java (setupModuleExp): Only use current value as
+	literal if field is final.
+
 2015-09-30  Per Bothner  <per@bothner.com>
 
 	* Compilation.java (mangleSymbolic): Fix thinko.

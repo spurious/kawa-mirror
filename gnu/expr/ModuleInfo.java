@@ -156,6 +156,7 @@ public class ModuleInfo {
                     if (fld == null
                         || decl.isIndirectBinding()
                         || (fld.getFlags() & Access.STATIC) == 0
+                        || (fld.getFlags() & Access.FINAL) == 0
                         || decl.getValueRaw() instanceof QuoteExp)
                         continue;
                     try {

@@ -1,3 +1,9 @@
+2015-10-05  Per Bothner  <per@bothner.com>
+
+	* standard/ImportFromLibrary.java (handleImport):
+	Don't add useless "./" prefix.
+	Canonicalize path before calling findWithSourcePath.
+
 2015-09-30  Per Bothner  <per@bothner.com>
 
 	* standard/ImportFromLibrary.java (SRFI97Map): Add SRFI 37

@@ -422,8 +422,10 @@ public class ImportFromLibrary extends Syntax
                     pbuf.append(implicitSource.substring(prefixLength));
                     pbuf.append(pathElement.substring(star+1));
                 } else {
-                    pbuf.append(pathElement);
-                    pbuf.append('/');
+                    if (! ".".equals(pathElement)) {
+                        pbuf.append(pathElement);
+                        pbuf.append('/');
+                    }
                     if (explicitSource != null)
                         pbuf.append(explicitSource);
                     else {
@@ -436,13 +438,13 @@ public class ImportFromLibrary extends Syntax
                 }
                 pathStr = pbuf.toString();
             }
-            Path path = currentRoot.resolve(pathStr);
+            Path path = currentRoot.resolve(pathStr).getCanonical();
             // Might be more efficient to first check the ModuleManager,
             // before asking the file-system.  FIXME
             long lastModifiedTime = path.getLastModified();
             if (lastModifiedTime != 0) {
                 if (minfo != null) {
-                    String pstring = path.getCanonical().toString();
+                    String pstring = path.toString();
                     Path infoPath = minfo.getSourceAbsPath();
                     if (infoPath == null
                         || ! (pstring.equals(infoPath.toString()))) {

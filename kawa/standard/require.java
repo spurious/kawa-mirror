@@ -220,10 +220,9 @@ public class require extends Syntax
                       DeclSetMapper mapper, FormStack forms, 
                       ScopeExp defs, Compilation tr) {
         ModuleManager manager = ModuleManager.getInstance();
-        long now;
         if ((info.getState() & 1) == 0
             && info.getCompilation() == null
-            && ! info.checkCurrent(manager, (now = System.currentTimeMillis()))) {
+            && ! info.checkCurrent(manager, System.currentTimeMillis())) {
             SourceMessages messages = tr.getMessages();
             Language language = Language.getDefaultLanguage();
             Compilation comp;

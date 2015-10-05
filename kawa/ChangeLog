@@ -1,5 +1,7 @@
 2015-10-05  Per Bothner  <per@bothner.com>
 
+	* standard/require.java (importDefinitions): Remove unused local 'now'.
+
 	* standard/ImportFromLibrary.java (handleImport):
 	Don't add useless "./" prefix.
 	Canonicalize path before calling findWithSourcePath.

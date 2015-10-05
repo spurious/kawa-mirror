@@ -344,13 +344,13 @@
       (test-equal 12 (array-start arr-s 0))
       (test-equal 12 (array-end arr-s 0))
       (test-equal 12 (array-start arr-s 1))
-      (test-equal 12 (array-end arr-s 1) 12))
+      (test-equal 12 (array-end arr-s 1)))
     (let ((arr-s (make-array shs)))
       (test-equal 2 (array-rank arr-s))
       (test-equal 12 (array-start arr-s 0))
       (test-equal 12 (array-end arr-s 0))
       (test-equal 12 (array-start arr-s 1))
-      (test-equal 12 (array-end arr-s 1) 12))))
+      (test-equal 12 (array-end arr-s 1)))))
 
 ;; sharing with sharing subshape
 (let ((super (array (shape 4 7 4 7)

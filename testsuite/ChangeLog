@@ -1,3 +1,8 @@
+2015-10-04  Per Bothner  <per@bothner.com>
+	    Taylan Ulrich Bayırlı/Kammer <taylanbayirli@gmail.com>
+
+	* arr-test.scm: Fix edit errors.
+
 2015-09-28  Per Bothner  <per@bothner.com>
 
 	* macros3.scm: New test for macro forward reference.

@@ -62,14 +62,19 @@ public class ModuleInfo {
     int numDependencies;
 
     /** Location of source for module, if known.
-     * This is an absolute URI, absolute filename,
+     * This can be any of an absolute URI, absolute filename,
      * or filename relative to current working directory.
      * Null if source not known; in that case className must be non-null.
      * Avoid using, since "relative to current working directory"
      * is unreliable if the working directory can change.
      */
     public String sourcePath;
+
+    /** Absolute and canonicalized location of source for module, if known.
+     */
     Path sourceAbsPath;
+    /** Absolute and canonicalized location of source for module, if known.
+     */
     String sourceAbsPathname;
 
     public long lastCheckedTime;
@@ -335,8 +340,9 @@ public class ModuleInfo {
     public boolean checkCurrent(ModuleManager manager, long now) {
         if (sourceAbsPath == null)
             return true;
-        if (lastCheckedTime + manager.lastModifiedCacheTime >= now)
-            return moduleClass != null;
+        if (lastCheckedTime + manager.lastModifiedCacheTime >= now
+            && moduleClass != null)
+            return true;
         long lastModifiedTime = sourceAbsPath.getLastModified();
         long oldModifiedTime = this.lastModifiedTime;
         this.lastModifiedTime = lastModifiedTime;

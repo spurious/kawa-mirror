@@ -1,3 +1,9 @@
+2015-10-05  Per Bothner  <per@bothner.com>
+
+	* ModuleInfo.java (checkCurrent): If moduleClass is null, it
+	may be because it was been compiled and written - but not loaded.
+	So don't automatically assume it's not current.
+
 2015-10-04  Per Bothner  <per@bothner.com>
 
 	* ModuleInfo.java (setupModuleExp): Only use current value as

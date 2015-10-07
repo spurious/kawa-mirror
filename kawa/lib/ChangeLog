@@ -1,3 +1,8 @@
+2015-10-07  Per Bothner  <per@bothner.com>
+
+	* kawa/base.scm: Add $bracket-apply$ and $bracket-list$.
+	This fixes Savannah bug #46116 "Add $bracket-apply$ to (kawa base)".
+
 2015-09-01  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (EXTRA_CLEAN): Also clean */*/*.class.

@@ -1,3 +1,9 @@
+2015-10-07  Per Bothner  <per@bothner.com>
+
+	* lib-bracket.scm: New test, for Savannah bug #46116
+	"Add $bracket-apply$ to (kawa base)".
+	* Makefile.am: Update accordingly.
+
 2015-10-04  Per Bothner  <per@bothner.com>
 	    Taylan Ulrich Bayırlı/Kammer <taylanbayirli@gmail.com>
 

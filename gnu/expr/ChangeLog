@@ -1,3 +1,9 @@
+2015-10-07  Per Bothner  <per@bothner.com>
+
+	* AbstractScriptEngineFactory.java (BindingsLocation.get):
+	Fix in the obvious way Savannah bug #45679 "Mention offending symbol
+	name when throwing UnboundLocationException".
+
 2015-10-05  Per Bothner  <per@bothner.com>
 
 	* ModuleInfo.java (checkCurrent): If moduleClass is null, it

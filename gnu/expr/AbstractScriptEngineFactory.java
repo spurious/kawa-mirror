@@ -144,7 +144,7 @@ public abstract class AbstractScriptEngineFactory implements ScriptEngineFactory
             Object unbound = Location.UNBOUND;
             Object v = get(unbound);
             if (v == unbound)
-                throw new UnboundLocationException();
+                throw new UnboundLocationException(sname);
             return v;
         }
 

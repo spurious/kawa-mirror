@@ -342,7 +342,8 @@ public class ImportFromLibrary extends Syntax
         String currentClassName = curinfo.getClassName();
 
         // Is the current module a file - as opposed to (say) a tty?
-        boolean currentIsFile = currentSource.isPlainFile();
+        boolean currentIsFile = currentSource != null
+            && currentSource.isPlainFile();
         Path currentRoot = currentIsFile ? currentSource.getDirectory()
             : Path.currentPath();
         if (currentIsFile

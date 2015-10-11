@@ -69,7 +69,7 @@ public class Include extends Syntax {
                 Path pathElement;
                 if (searchElement.length() > 0 && searchElement.charAt(0) == '|') {
                     pathElement = tr.getMinfo().getSourceAbsPath();
-                    if (! pathElement.isPlainFile())
+                    if (pathElement == null || ! pathElement.isPlainFile())
                         pathElement = Path.currentPath();
                     if (searchElement.length() > 1)
                         pathElement = pathElement.resolve(searchElement.toString()

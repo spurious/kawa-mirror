@@ -1,3 +1,8 @@
+2015-10-10  Per Bothner  <per@bothner.com>
+
+	* resolve-uri.scm: New tests from RFC-3986.
+	* Makefile.am: Update accordingly.
+
 2015-10-07  Per Bothner  <per@bothner.com>
 
 	* lib-bracket.scm: New test, for Savannah bug #46116

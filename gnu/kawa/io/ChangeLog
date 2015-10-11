@@ -1,3 +1,19 @@
+2015-10-10  Per Bothner  <per@bothner.com>
+
+	Changes in Path/URI handling, with corrected RFC-3986 'resolve'.
+	* URIPath.java (resolve): Rewrite, implementing the RFC-3986
+	resolution algorithm, rather than using java.net.URI.resolve, which
+	follows the obsolete RFC-2396.  Biggest difference is that resolve("")
+	is now basically a no-op. Use resolve(".") to get directory.
+	(resolveToUri): Helper method.
+	(toFile): New method.
+	* URLPath.java (resolve): Use resolveToUri.
+	* Path.java (toFile, isPlainFile): New methods.
+	(valueOf): Create URIPath rather than FilePath if relative.
+	(getLast): Fix thinko.
+	* FilePath.java (resolve): No-op if argument is "".
+	(toURL): Update accordingly.
+
 2015-07-31  Per Bothner  <per@bothner.com>
 
 	* CharArrayInPort.java: Add support for reading from

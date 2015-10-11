@@ -378,9 +378,9 @@ public class Shell
       {
 	if (env != orig_env)
 	  Environment.setCurrent(env);
-        if (! (path instanceof FilePath))
+        File zfile = path.toFile();
+        if (zfile == null)
           throw new RuntimeException ("load: "+name+" - not a file path");
-	File zfile = ((FilePath) path).toFile();
 	if (!zfile.exists ())
 	  throw new RuntimeException ("load: "+name+" - not found");
 	if (!zfile.canRead ())

@@ -139,10 +139,7 @@ public class XQParser extends Lexer
         if (path == null && (port = getPort()) != null)
           {
             path = port.getPath();
-            if (path instanceof FilePath
-                && (! path.exists()
-                    || port instanceof TtyInPort
-                    || port instanceof CharArrayInPort))
+            if (path != null && ! path.isPlainFile())
               path = null;
           }
 

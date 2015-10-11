@@ -72,10 +72,10 @@ implements javax.tools.FileObject
             str = path.toString();
         else
             return null;
-        if (Path.uriSchemeSpecified(str))
-            return URIPath.valueOf(str);
-        else
+        if (str.startsWith("file:"))
             return FilePath.valueOf(str);
+        else
+            return URIPath.valueOf(str);
     }
 
     public static Path valueOf(Object arg) {
@@ -150,6 +150,14 @@ implements javax.tools.FileObject
         return false;
     }
 
+    public boolean isPlainFile() {
+        File file = toFile();
+        if (file != null)
+            return file.isFile();
+        else
+            return ! isDirectory() && getPath() != null;
+    }
+
     /** Delete file - for compatibility with FileObject. */
     public boolean delete() {
         try {
@@ -195,11 +203,11 @@ implements javax.tools.FileObject
         if (isDirectory())
             return this;
         else
-            return resolve("");
+            return resolve(".");
     }
 
     public Path getParent() {
-        return resolve(isDirectory() ? ".." : "");
+        return resolve(isDirectory() ? ".." : ".");
     }
 
     public String getLast() {
@@ -210,11 +218,9 @@ implements javax.tools.FileObject
         int end = len;
         for (int i = len; ; ) {
             if (--i <= 0)
-                return "";
+                return end == len ? p : p.substring(0, end);
             char c = p.charAt(i);
-            if (c == '/'
-                || (this instanceof FilePath
-                    && c == File.separatorChar)) {
+            if (c == '/') {
                 if (i+1 == len)
                     end = i;
                 else
@@ -384,7 +390,7 @@ implements javax.tools.FileObject
 
     public Path getAbsolute() {
         if (this == Path.userDirPath)
-            return resolve("");
+            return resolve(".");
         else
             return currentPath().resolve(this);
     }
@@ -408,6 +414,11 @@ implements javax.tools.FileObject
         return java.nio.file.Paths.get(toUri());
     }
     /* #endif */
+
+    /** Return a java.io.File, or null. */
+    public File toFile() {
+        return null;
+    }
 
     public String probeContentType() {
         String contentType;

@@ -305,13 +305,16 @@ SCRIPTS_TO_RUN = case-warnings.scm uninit1.scm \
 
 # Files needed for SCRIPTS_TO_RUN
 AUX_FOR_SCRIPTS_TO_RUN = aux-libs.scm
+MISC_TESTS_WITH_SRFI64 = \
+  srfi-16-test.scm srfi-38-test.scm srfi-64-test.scm srfi-69-test.scm \
+  srfi-101-test.scm srfi-108-test.scm srfi-109-test.scm resolve-uri.scm 
+
 EXTRA_DIST = testing.scm test-utils.scm \
   test.scm case-test.scm num-test.scm numeric-tests.scm quaternion-test.scm \
   mac-test.scm mac1.scm r7rs-tests.scm clisp-number-tests.scm \
   classes1.scm classes2.scm SimpleB.java obj-test.scm arr-test.scm \
-  lib-test.scm bridge.scm srfi-16-test.scm srfi-38-test.scm \
-  srfi-64-test.scm srfi-69-test.scm srfi-101-test.scm \
-  srfi-108-test.scm srfi-109-test.scm system-test.scm xml-test.scm \
+  lib-test.scm bridge.scm \
+  $(MISC_TESTS_WITH_SRFI64) system-test.scm xml-test.scm \
   text-test.scm regex-test.scm java-array-test.scm lazy-test.scm \
   jmc.scm jmc.expected sva31180.scm use-slots.scm ASupport.scm Base.java \
   MyFunc.java MyModule.java MyDate.java MyTimestamp.java \
@@ -552,7 +555,7 @@ check-no-inline:
 
 check1:  check-num check-arr check-java-array check-lazy check-lib \
   check-srfi-16 check-srfi-38 check-srfi-64 check-srfi-69 \
-  check-srfi-101 check-srfi-108 check-srfi-109 \
+  check-srfi-101 check-srfi-108 check-srfi-109 check-resolve-uri \
   check-format check-ppfile check-system check-text check-regex check-xml \
   scribble.class check-run-test-scripts check-moduleM \
   check-annotations1 check-annotations2\
@@ -620,6 +623,9 @@ check-srfi-108:
 
 check-srfi-109:
 	$(KAWA) $(OPTIONS) "$(srcdir)/srfi-109-test.scm"
+
+check-resolve-uri:
+	$(KAWA) $(OPTIONS) "$(srcdir)/resolve-uri.scm"
 
 check-system:
 	$(KAWA) $(OPTIONS) -e '(set! port-char-encoding "UTF-8")' -f "$(srcdir)/system-test.scm"

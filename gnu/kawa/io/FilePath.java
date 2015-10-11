@@ -218,8 +218,6 @@ public class FilePath
 
   public URL toURL ()
   {
-    if (this == Path.userDirPath)
-      return resolve("").toURL();
     if (! isAbsolute())
       return getAbsolute().toURL();
     try
@@ -275,6 +273,8 @@ public class FilePath
             else
                 return URLPath.valueOf(relative);
         }
+        if (relative.length() == 0)
+            return this;
         File rfile = new File(relative);
         if (! rfile.isAbsolute())
             rfile = new File(isDirectory() ? file : file.getParentFile(),

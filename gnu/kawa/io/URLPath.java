@@ -94,13 +94,10 @@ public class URLPath extends URIPath
 
   public Path resolve (String relative)
   {
-    try
-      {
-        return valueOf(new URL(url, relative));
-      }
-    catch (Exception ex)
-      {
-        throw WrappedException.wrapIfNeeded(ex);
+      try {
+          return valueOf(resolveToUri(relative).toURL());
+      } catch (MalformedURLException ex) {
+          throw new RuntimeException(ex);
       }
   }
 

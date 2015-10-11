@@ -13,21 +13,10 @@ import gnu.mapping.*;
 
 public class URIPath
   extends Path
-  /* #ifdef JAVA2 */
-  /* #ifdef JAVA5 */
   implements Comparable<URIPath>
-  /* #else */
-  // implements Comparable
-  /* #endif */
-  /* #endif */
 {
-  /* #ifdef use:java.net.URI */
   final URI uri;
   URIPath (URI uri) { this.uri = uri; } 
-  /* #else */
-  // final String uri;
-  // protected URIPath (String uri) { this.uri = uri; } 
-  /* #endif */
 
   public static URIPath coerceToURIPathOrNull (Object path)
   {
@@ -121,67 +110,139 @@ public class URIPath
   // public String toURIString () { return uri; }
   /* #endif */
 
-  public Path resolve (String rstr)
-  {
-    if (Path.uriSchemeSpecified(rstr))
-      return URIPath.valueOf(rstr);
-    char fileSep = File.separatorChar;
-    if (fileSep != '/')
-      {
-        // Check for Windows absolute filename.
-        if (rstr.length() >= 2
-            && ((rstr.charAt(1) == ':' && Character.isLetter(rstr.charAt(0)))
-                || (rstr.charAt(0) == fileSep && rstr.charAt(1) == fileSep)))
-          {
-            return FilePath.valueOf(new File(rstr));
-          }
-        rstr = rstr.replace(fileSep, '/');
-      }
-    /* #ifdef use:java.net.URI */
-    URI resolved;
-    try
-      {
-        resolved = uri.resolve(new URI(null, rstr, null));
-      }
-    catch (Exception ex)
-      {
-        throw WrappedException.wrapIfNeeded(ex);
-      }
+    public Path resolve(String rstr) {
+        char fileSep = File.separatorChar;
+        if (fileSep != '/') {
+            // Check for Windows absolute filename.
+            if (rstr.length() >= 2
+                && ((rstr.charAt(1) == ':' && Character.isLetter(rstr.charAt(0)))
+                    || (rstr.charAt(0) == fileSep && rstr.charAt(1) == fileSep))) {
+                return FilePath.valueOf(new File(rstr));
+            }
+            rstr = rstr.replace(fileSep, '/');
+        }
+        return URIPath.valueOf(resolveToUri(rstr));
+    }
 
-    /* #else */
-    // /* The following is an appximation of URI's resolve method. */
-    // /* For example, it doesn't simplify "../" to "". */
-    // String sbase = uri;
-    // int lastSl = sbase.lastIndexOf('/');
-    // StringBuffer sbuf = new StringBuffer(sbase);
-    // if (lastSl >= 0)
-    //   sbuf.setLength(lastSl+1);
-    // else
-    //   sbuf.append('/');
-    // if (rstr.length() > 0 && rstr.charAt(0) == '/')
-    //   { 
-    //     /* Rstr is an absolute file name, but doesn't have a uri scheme. */
-    //     int baseLen = sbase.length();
-    //     int pathStart = Path.uriSchemeLength(sbase);
-    //     if (pathStart <= 1)
-    //       return URIPath.valueOf(rstr);
-    //     pathStart++;
-    //     /* Add the "authority" - usually a host-name. */
-    //     if (pathStart + 1 < baseLen
-    //         && sbase.charAt(pathStart) == '/'
-    //         && sbase.charAt(pathStart+1) == '/')
-    //       {
-    //         int p2 = sbase.indexOf('/', pathStart+2);
-    //         if (p2 < 0)
-    //           p2 = baseLen; // ? append '/'? FIXME
-    //         pathStart = p2;
-    //       }
-    //     sbuf.setLength(pathStart);
-    //   }
-    // sbuf.append(rstr);
-    // String resolved = sbuf.toString();
-    /* #endif */
-    return URIPath.valueOf(resolved);
+    public URI resolveToUri(String rstr) {
+        try {
+            URI r = new URI(rstr);
+            if (uri.isOpaque())
+                return r;
+            String bScheme = getScheme();
+            String bAuthority = getAuthority();
+            String bPath = getPath();
+            String bQuery = getQuery();
+            String bFragment = getFragment();
+            String rScheme = r.getScheme();
+            String rAuthority = r.getAuthority();
+            String rPath = r.getPath();
+            String rQuery = r.getQuery();
+            String rFragment = r.getFragment();
+            String tScheme = rScheme != null ? rScheme : bScheme;
+            String tAuthority;
+            String tPath;
+            String tQuery;
+            boolean removeDotsNeeded = true;
+            if (rScheme != null || rAuthority != null) {
+                tAuthority = rAuthority;
+                tPath = rPath;
+                tQuery = rQuery;
+            } else {
+                tAuthority = bAuthority;
+                if (rPath == null || rPath.length() == 0) {
+                    tPath = bPath;
+                    removeDotsNeeded = false;
+                    tQuery = rQuery != null ? rQuery : bQuery;
+                } else {
+                    if (rPath.charAt(0) == '/') {
+                        tPath = rPath;
+                    } else {
+                        // tPath = merge(bPath, rPath);
+                        if (bAuthority != null && bPath.length() == 0)
+                            tPath = "/" + rPath;
+                        else {
+                            int bSlash = bPath.lastIndexOf('/');
+                            if (bSlash >= 0)
+                                tPath = bPath.substring(0, bSlash+1) + rPath;
+                            else
+                                tPath = rPath;
+                        }
+                    }
+                    tQuery = rQuery;
+                }
+            }
+            int len = tPath.length();
+            if (removeDotsNeeded && len > 0) {
+                StringBuilder pbuf = new StringBuilder();
+                int ch0 = tPath.charAt(0);
+                int i = 1;
+                while (ch0 >= 0) {
+                    // The "input buffer" in the rfc 3986 algorithm is
+                    // represented by ch0 followed by the tail of tPath:
+                    // It is empty if ch0 < 0; otherwise it is ch0
+                    // followed by tPath.subString(i).
+                    // A: "../"
+                    if (ch0 == '.' && i + 1 < len && tPath.charAt(i) == '.' && tPath.charAt(i+1) == '/') {
+                        if (tScheme != null) {
+                            // Skip - for compatibility with RFC-3986.
+                            ch0 = i + 2 < len ? tPath.charAt(i+2) : -1;
+                            i += 3;
+                        } else {
+                            pbuf.append("..");
+                            ch0 = '/';
+                            i += 2;
+                        }
+                    }
+                    // A: "./"
+                    else if (ch0 == '.' && i < len && tPath.charAt(i) == '/') {
+                        ch0 = i + 1 < len ? tPath.charAt(i+1) : -1;
+                        i += 2;
+                    }
+                    // B: "/./" or "/." END
+                    else if (ch0 == '/' && i < len
+                             && tPath.charAt(i) == '.' 
+                             && (i + 1 == len
+                                 || tPath.charAt(i+1) == '/')) {
+                        ch0 = '/';
+                        i = i + 1 == len ? len : i + 2;
+                    }
+                    // C: "/../" OR "/.." END
+                    else if (ch0 == '/' && i + 1 < len
+                             && tPath.charAt(i) == '.'
+                             && tPath.charAt(i+1) == '.'
+                             && (i + 2 == len || tPath.charAt(i+2) == '/')) {
+                        ch0 = '/';
+                        i = i + 2 == len ? len : i + 3;
+                        int plen = pbuf.length();
+                        while (plen > 0 && pbuf.charAt(--plen) != '/')
+                            ;
+                        pbuf.setLength(plen);
+                    }
+                    // D "." END or ".." END
+                    else if (ch0 == '.'
+                             && (i == len || (i + 1 == len && tPath.charAt(i) == '.'))) {
+                        ch0 = -1;
+                    } else {
+                        for (;;) {
+                            pbuf.append((char) ch0);
+                            if (i == len) {
+                                ch0 = -1;
+                                break;
+                            }
+                            ch0 = tPath.charAt(i++);
+                            if (ch0 == '/')
+                                break;
+                        }
+                    }
+                    
+                }
+                tPath = pbuf.toString();
+            }
+            return new URI(tScheme, tAuthority, tPath, tQuery, rFragment);
+        } catch (Exception ex) {
+            throw WrappedException.wrapIfNeeded(ex);
+        }
   }
 
   public int compareTo (URIPath path)
@@ -216,6 +277,10 @@ public class URIPath
     return Path.toURL(uri.toString());
   }
 
+    public File toFile() {
+        return FilePath.valueOf(toURIString ()).toFile();
+    }
+
   public InputStream openInputStream () throws IOException
   {
     // If relative and base is a File, should be a File? FIXME
@@ -229,20 +294,12 @@ public class URIPath
 
   public String getScheme ()
   {
-    /* #ifdef use:java.net.URI */
     return uri.getScheme();
-    /* #else */
-    // return Path.uriSchemeSpecified(uri) ? toURL().getProtocol() : null;
-    /* #endif */
   }
 
   public String getHost ()
   {
-    /* #ifdef use:java.net.URI */
     return uri.getHost();
-    /* #else */
-    // return Path.uriSchemeSpecified(uri) ? toURL().getHost() : null;
-    /* #endif */
   }
 
   public String getAuthority ()

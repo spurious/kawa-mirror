@@ -1,3 +1,7 @@
+2015-10-12  Per Bothner  <per@bothner.com>
+
+	* StringCursor.java (getValue): New method.
+
 2015-06-24  Per Bothner  <per@bothner.com>
 
 	* Char.java (toScmReadableString): Fix logic error.

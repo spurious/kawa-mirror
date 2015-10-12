@@ -199,6 +199,12 @@ public class LangPrimType extends PrimType implements TypeValue {
                     return;
                 }
             }
+            if (this == stringCursorType) {
+                boxedStringCursorType.emitCoerceFromObject(code);
+                code.emitInvoke(boxedStringCursorType
+                                .getDeclaredMethod("getValue", 0));
+                return;
+            }
             String mname = this == characterType ? "castToCharacter"
                 : this == characterOrEofType ? "castToCharacterOrEof" : null;
             if (mname != null) {

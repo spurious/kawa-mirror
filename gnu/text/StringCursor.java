@@ -13,6 +13,8 @@ public final class StringCursor implements Comparable, Externalizable {
         return sc;        
     }
 
+    public int getValue() { return value; }
+
     public int compareTo(Object o) {
         return value - ((StringCursor) o).value;
     }

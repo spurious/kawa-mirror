@@ -1,3 +1,8 @@
+2015-10-12  Per Bothner  <per@bothner.com>
+
+	* Declaration.java (load): Do better coercion if loading from
+	indirect-binding - specifically handle primitive types.
+
 2015-10-07  Per Bothner  <per@bothner.com>
 
 	* AbstractScriptEngineFactory.java (BindingsLocation.get):

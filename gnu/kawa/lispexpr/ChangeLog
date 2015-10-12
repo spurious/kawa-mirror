@@ -1,3 +1,7 @@
+2015-10-12  Per Bothner  <per@bothner.com>
+
+	* LangPrimType.java (emitCoerceFromObject): Handle stringCursorType.
+
 2015-08-16  Per Bothner  <per@bothner.com>
 
 	* LangObjType.java (emitConvertFromPrimitive):  Fix how we

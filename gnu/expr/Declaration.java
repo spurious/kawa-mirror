@@ -460,7 +460,7 @@ public class Declaration
                 || target.getType().getRawType() == Type.objectType)
                 rtype = Type.objectType;
             else {
-                code.emitCheckcast(getType().getRawType());
+                getType().emitCoerceFromObject(code);
                 rtype = getType();
             }
           }
@@ -717,7 +717,7 @@ public class Declaration
   public final boolean isNamespaceDecl ()
   {
     return (flags & IS_NAMESPACE_PREFIX) != 0;
-  }   
+  }
 
     /** Is this a parameter for the generated method?
      * For example if a lambda's parameter is the pattern {@code [x y]}

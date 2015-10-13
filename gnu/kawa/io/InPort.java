@@ -39,6 +39,8 @@ public class InPort extends Reader implements Printable
         else
             systemInPort = new BinaryInPort(System.in, systemInPath);
     }
+    public static final String evalPathname = "<eval>";
+    public static final String stringPathname = "<string>";
   public static final ThreadLocation inLocation
     = new ThreadLocation("in-default");
   static { inLocation.setGlobal(systemInPort); }

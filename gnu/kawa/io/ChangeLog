@@ -1,6 +1,9 @@
 2015-10-12  Per Bothner  <per@bothner.com>
 
-	* Path/java (valueOf): A string starting with a '/' is a FilePath.
+	* InPort.java (stringPathname, evalPathname): New constants.
+	* CharArrayInPort.java (stringPath): Use stringPathname.
+
+	* Path.java (valueOf): A string starting with a '/' is a FilePath.
 
 2015-10-10  Per Bothner  <per@bothner.com>
 

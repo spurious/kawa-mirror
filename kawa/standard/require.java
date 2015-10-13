@@ -206,7 +206,10 @@ public class require extends Syntax
     public static ModuleInfo lookupModuleFromSourcePath (String sourceName, ScopeExp defs) {
         ModuleManager manager = ModuleManager.getInstance();
         String baseName = defs.getFileName();
-        if (baseName != null && baseName != InPort.systemInFilename)
+        if (baseName != null
+            && baseName != InPort.systemInFilename
+            && baseName != InPort.stringPathname
+            && baseName != InPort.evalPathname)
             sourceName = Path.valueOf(baseName).resolve(sourceName).toString();
         return manager.findWithSourcePath(sourceName);
     }

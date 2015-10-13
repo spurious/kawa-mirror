@@ -5,6 +5,7 @@ package kawa.lang;
 import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.text.SourceMessages;
+import gnu.kawa.io.InPort;
 import gnu.lists.*;
 
 /* This implements the R5RS "eval" procedure. */
@@ -21,7 +22,7 @@ public class Eval
     else
       {
 	body = new PairWithPosition(sexpr, LList.Empty);
-	body.setFile("<eval>");
+	body.setFile(InPort.evalPathname);
       }
     evalBody(body, env, new SourceMessages(), ctx);
   }

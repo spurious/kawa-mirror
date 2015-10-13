@@ -9,7 +9,7 @@ import java.io.IOException;
 
 public class CharArrayInPort extends InPort
 {
-    static final Path stringPath = Path.valueOf("<string>");
+    static final Path stringPath = Path.valueOf(stringPathname);
 
     private AbstractCharVector string;
     /** Index in string corresponding to limit. */

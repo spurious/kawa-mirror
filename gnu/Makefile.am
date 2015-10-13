@@ -534,6 +534,7 @@ EXTRA_DIST = \
   expr/package.html \
   mapping/package.html \
   lists/package.html \
+  lists/PrimVector.template \
   text/package.html \
   kawa/reflect/package.html \
   $(GNU_KAWA_ANT_JSOURCES)

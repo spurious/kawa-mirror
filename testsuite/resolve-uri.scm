@@ -3,6 +3,11 @@
 ;; Tests from http://www.ietf.org/rfc/rfc3986.txt
 
 (define base "http://a/b/c/d;p?q")
+(define-syntax testu
+  (syntax-rules ()
+    ((_ uri resolved)
+     (begin
+       (test-equal resolved ((resolve-uri (URI uri) (URI base)):toString))))))
 (define-syntax test1
   (syntax-rules ()
     ((_ uri resolved)
@@ -14,8 +19,8 @@
 (test1 "g"             "http://a/b/c/g")
 (test1 "./g"           "http://a/b/c/g")
 (test1 "g/"            "http://a/b/c/g/")
-(test1 "/g"            "http://a/g")
-(test1 "//g"           "http://g")
+(testu "/g"            "http://a/g")
+(testu "//g"           "http://g")
 (test1 "?y"            "http://a/b/c/d;p?y")
 (test1 "g?y"           "http://a/b/c/g?y")
 (test1 "#s"            "http://a/b/c/d;p?q#s")
@@ -36,8 +41,8 @@
 
 (test1 "../../../g"    "http://a/g")
 (test1 "../../../../g" "http://a/g")
-(test1 "/./g"          "http://a/g")
-(test1 "/../g"         "http://a/g")
+(testu "/./g"          "http://a/g")
+(testu "/../g"         "http://a/g")
 (test1 "g."            "http://a/b/c/g.")
 (test1 ".g"            "http://a/b/c/.g")
 (test1 "g.."           "http://a/b/c/g..")
@@ -56,13 +61,13 @@
 (test1 "g#s/../x"      "http://a/b/c/g#s/../x")
 
 (define fbase "file:///b/c/d")
-(define-syntax test2
+(define-syntax testf
   (syntax-rules ()
     ((_ uri resolved)
       (test-equal resolved ((resolve-uri uri (filepath fbase)):toString)))))
 
-(test2 "g"             "/b/c/g")
-(test2 "g/"            "/b/c/g")
-(test2 "/g"            "/g")
+(testf "g"             "/b/c/g")
+(testf "g/"            "/b/c/g")
+(testf "/g"            "/g")
 
 (test-end)

@@ -1,3 +1,7 @@
+2015-10-12  Per Bothner  <per@bothner.com>
+
+	* resolve-uri.scm: Tweaks, based on changed handling of Path.valueOf.
+
 2015-10-10  Per Bothner  <per@bothner.com>
 
 	* resolve-uri.scm: New tests from RFC-3986.

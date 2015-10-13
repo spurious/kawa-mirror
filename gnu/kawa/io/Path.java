@@ -72,7 +72,11 @@ implements javax.tools.FileObject
             str = path.toString();
         else
             return null;
-        if (str.startsWith("file:"))
+        char ch0;
+        if (str.startsWith("file:")
+            || (str.length() > 0
+                && ((ch0 = str.charAt(0)) == '.'
+                    || ch0 == File.separatorChar)))
             return FilePath.valueOf(str);
         else
             return URIPath.valueOf(str);

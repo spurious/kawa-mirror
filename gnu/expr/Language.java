@@ -597,7 +597,7 @@ public abstract class Language
 			mangled.append("$To$");
 			i++;
 		      }
-		    else if (! Character.isLowerCase(next))
+		    else if (! Character.isLetter(next))
 		      mangled.append("$Mn");
 		  }
 		break;

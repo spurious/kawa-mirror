@@ -6,6 +6,12 @@
 	* standard/require.java (importDefinition): Set module to be
 	interactive if current module is interactive.
 
+2015-10-12  Per Bothner  <per@bothner.com>
+
+	* standard/require.java (lookupModuleFromSourcePath): Don't resolve
+	against baseName if latter is <string> or <eval>.
+	* lang/Eval.java (evalForm$X): Use InPort.evalPathname.
+
 2015-10-11  Per Bothner  <per@bothner.com>
 
 	* standard/ImportFromLibrary.java: Check for null sourcepath.

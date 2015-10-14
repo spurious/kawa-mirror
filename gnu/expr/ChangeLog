@@ -1,5 +1,15 @@
 2015-10-13  Per Bothner  <per@bothner.com>
 
+	Clearer definition of "interactive mode".  Better re-definition support.
+	* Compilation.java (isInteractive): New method.
+	* Declaration.java (makeField): If interactive, make indirect
+	regardless of whether type is specified.
+	* ModuleInfo.java (oldClass): New field.
+	(getOldModuleClass): New access method.
+	(checkCurrent): Save moduleClass in oldClass before nulling former.
+	* ProcInitializer.java (emitLoadModuleMethod): Look for old
+	Procedure in both old module class as well as intercative environment.
+
 	* Language.java (mangleName): Allow any-case letter after '-'.
 
 2015-10-12  Per Bothner  <per@bothner.com>

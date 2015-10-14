@@ -2630,6 +2630,10 @@ public class Compilation implements SourceLocator
 
   public boolean isStatic() { return mainLambda.isStatic(); }
 
+    public boolean isInteractive() {
+        return mainLambda != null && mainLambda.getFlag(ModuleExp.INTERACTIVE);
+    }
+
   /** The same as getModule, until we allow nested modules. */
   public ModuleExp currentModule() { return current_scope.currentModule(); }
 

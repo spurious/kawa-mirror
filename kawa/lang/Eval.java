@@ -80,6 +80,8 @@ public class Eval
         tr.setState(Compilation.BODY_PARSED-1);
         tr.setSharedModuleDefs(true);
 	ModuleExp mod = tr.pushNewModule(null);
+        if (env == Environment.user())
+            mod.setFlag(ModuleExp.INTERACTIVE);
         Compilation saveComp = Compilation.setSaveCurrent(tr);
         try
           {

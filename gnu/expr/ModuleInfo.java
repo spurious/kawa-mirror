@@ -9,7 +9,6 @@ import java.util.*;
 import gnu.kawa.util.AbstractWeakHashTable;
 
 public class ModuleInfo {
-
     /** Name of class that implements module.
      * Must be non-null unless we're currently compiling the module,
      * in which case sourcePath and comp must both be non-null.
@@ -17,6 +16,7 @@ public class ModuleInfo {
     protected String className;
 
     Class moduleClass;
+    private Class oldClass;
 
     static ClassToInfoMap mapClassToInfo = new ClassToInfoMap();
 
@@ -236,6 +236,10 @@ public class ModuleInfo {
         return moduleClass;
     }
 
+    public Class getOldModuleClass() {
+        return oldClass;
+    }
+
     public void setModuleClass(Class clas) {
         moduleClass = clas;
         className = clas.getName();
@@ -377,6 +381,7 @@ public class ModuleInfo {
             }
         }
         if (lastModifiedTime > oldModifiedTime) {
+            oldClass = moduleClass;
             moduleClass = null;
             return false;
         }

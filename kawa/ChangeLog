@@ -1,3 +1,11 @@
+2015-10-13  Per Bothner  <per@bothner.com>
+
+	Clearer definition of "interactive mode".  Better re-definition support.
+	* lang/Eval.java (evalBody): Set module to be interactive
+	if the environment is the interactive environment.
+	* standard/require.java (importDefinition): Set module to be
+	interactive if current module is interactive.
+
 2015-10-11  Per Bothner  <per@bothner.com>
 
 	* standard/ImportFromLibrary.java: Check for null sourcepath.

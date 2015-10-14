@@ -25,21 +25,34 @@ public class ProcInitializer extends Initializer
         Declaration pdecl = proc.nameDecl;
         Object pname = pdecl == null ? proc.getName() : pdecl.getSymbol();
         ModuleMethod oldproc = null;
-        if (comp.immediate && pname != null
+        if (comp.isInteractive() && pname != null
             && pdecl != null && pdecl.context instanceof ModuleExp) {
             // In interactive mode allow dynamic rebinding of procedures.
             // If there is an existing ModuleMethod binding, re-use it.
-            Environment env = Environment.getCurrent();
-            Symbol sym = pname instanceof Symbol ? (Symbol) pname
-                : Symbol.make("", pname.toString().intern());
-            Object property = comp.getLanguage().getEnvPropertyFor(proc.nameDecl);
-            Object old = env.get(sym, property, null);
-            if (old instanceof ModuleMethod) {
-                String moduleName =
-                    ((ModuleMethod) old).module.getClass().getName();
-                if (moduleName.startsWith(ModuleManager.interactiveClassPrefix)
-                    || moduleName.equals(comp.moduleClass.getName()))
-                    oldproc = (ModuleMethod) old;
+            ModuleInfo minfo = comp.getMinfo();
+            Class oldClass = minfo.getOldModuleClass();
+            if (oldClass != null && pdecl.field != null) {
+                try {
+                    Object oldpval = oldClass
+                        .getField(pdecl.field.getName()).get(null);
+                    if (oldpval instanceof ModuleMethod)
+                        oldproc = (ModuleMethod) oldpval;
+                } catch (Throwable ex) {
+                }
+            }
+            if (oldproc == null) {
+                Environment env = Environment.getCurrent();
+                Symbol sym = pname instanceof Symbol ? (Symbol) pname
+                    : Symbol.make("", pname.toString().intern());
+                Object property = comp.getLanguage().getEnvPropertyFor(proc.nameDecl);
+                Object old = env.get(sym, property, null);
+                if (old instanceof ModuleMethod) {
+                    String moduleName =
+                        ((ModuleMethod) old).module.getClass().getName();
+                    if (moduleName.startsWith(ModuleManager.interactiveClassPrefix)
+                        || moduleName.equals(comp.moduleClass.getName()))
+                        oldproc = (ModuleMethod) old;
+                }
             }
         }
         CodeAttr code = comp.getCode();

@@ -1197,15 +1197,17 @@ public class Declaration
     int fflags = 0;
     boolean isConstant = getFlag(IS_CONSTANT);
     boolean typeSpecified = getFlag(TYPE_SPECIFIED);
-    if (comp.getModule().getFlag(ModuleExp.INTERACTIVE)
-        && context == comp.getModule()
-        && ! isConstant && ! typeSpecified)
-      setIndirectBinding(true);
     // In immediate mode we may need to access the field from a future
     // command in a different "runtime package" (see JVM spec) because it
     // gets loaded by a different class loader.  So make the field public.
-    if (isPublic() || external_access || comp.immediate)
-      fflags |= Access.PUBLIC;
+    if (isPublic() || external_access || comp.immediate) {
+        fflags |= Access.PUBLIC;
+        // FIXME do setIndirectBinding even if it's constant,
+        // as long as just a define-constant or ! and not a class or alias
+        if (comp.isInteractive() && context == comp.getModule()
+            && ! isConstant)
+            setIndirectBinding(true);
+    }
     if (isStatic()
         // "Dynamic" variables use ThreadLocation, based on the current
         // Environment, so we don't need more than one static field.

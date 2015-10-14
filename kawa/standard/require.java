@@ -236,6 +236,8 @@ public class require extends Syntax
                 if (tr.immediate)
                     options |= Language.PARSE_IMMEDIATE;
                 comp = language.parse(fstream, messages, options, info);
+                if (tr.getModule().getFlag(ModuleExp.INTERACTIVE));
+                    comp.getModule().setFlag(ModuleExp.INTERACTIVE);
             } catch (java.io.FileNotFoundException ex) {
                 tr.error('e', "not found: "+ex.getMessage());
                 return false;

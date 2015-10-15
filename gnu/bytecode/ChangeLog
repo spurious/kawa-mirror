@@ -1,3 +1,7 @@
+2015-10-14  Per Bothner  <per@bothner.com>
+
+	* CodeAttr.java (processFixups): Guard against 'goto' cycle/
+
 2015-08-13  Jamison Hope  <jrh@theptrgroup.com>
 
 	* ClassType.java (getAnnotation): New method.

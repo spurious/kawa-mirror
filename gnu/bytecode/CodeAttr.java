@@ -2577,24 +2577,23 @@ public class CodeAttr extends Attribute implements AttrContainer
         // to: TRANSFER L2; ...; L1: GOTO L2
         // If L1 is a FIXUP_DEFINE_UNREACHABLE then we can delete the GOTO L2
         // (replace it with a DELETE3), since L1 is never reached.
-	while (label != null
-	       && kind >= FIXUP_CASE && kind <= FIXUP_TRANSFER2)
-	  {
-            int labpc = fixupOffset(label.first_fixup);
-            int def = label.first_fixup+1;
-            for (; def < fixup_count; def++) {
-                if (labpc != fixupOffset(def)) {
-                    def = fixup_count;
-                } else if (fixupKind(def) == FIXUP_GOTO
-                           || fixupKind(def) == FIXUP_DELETE3) {
-                    label = fixup_labels[def];
-                    fixup_labels[i] = label;
-                    break;
+        if (kind >= FIXUP_CASE && kind <= FIXUP_TRANSFER2) {
+            int max = fixup_count;
+        goto_to_goto:
+            while (label != null && --max >= 0) {
+                int labpc = fixupOffset(label.first_fixup);
+                for (int def = label.first_fixup+1; ; def++) {
+                    if (def >= fixup_count || labpc != fixupOffset(def)) {
+                        break goto_to_goto;
+                    } else if (fixupKind(def) == FIXUP_GOTO
+                               || fixupKind(def) == FIXUP_DELETE3) {
+                        label = fixup_labels[def];
+                        fixup_labels[i] = label;
+                        break;
+                    }
                 }
             }
-            if (def >= fixup_count)
-                break;
-	  }
+        }
 	switch (kind)
 	  {
 	  case FIXUP_TRY:

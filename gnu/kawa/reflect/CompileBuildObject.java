@@ -77,18 +77,25 @@ public class CompileBuildObject {
                                           Type required, ObjectType ctype, ClassType caller) {
         CompileBuildObject builder;
         String builderName = null;
+        Class builderClass = null;
         Compilation comp = visitor.getCompilation();
         Namespace ns = Namespace.valueOfNoCreate("gnu.kawa.reflect/ObjectBuilder");
         if (ns != null) {
             ObjectType btype = ctype;
-            for (;;) {
+            while (builderName == null) {
                 Symbol sym = ns.lookup(btype.getName());
                 if (sym != null) {
-                    Declaration builderDecl = comp.lookup(sym, Language.VALUE_NAMESPACE);
+                    Declaration builderDecl =
+                        comp.lookup(sym, Language.VALUE_NAMESPACE);
                     if (builderDecl != null) {
+                        builderDecl = Declaration.followAliases(builderDecl);
                         Object val = builderDecl.getValue().valueIfConstant();
                         if (val instanceof String)
                             builderName = (String) val;
+                        if (val instanceof Class) {
+                            builderClass = (Class) val;
+                            builderName = builderClass.getName();
+                        }
                     }
                 }
                 if (! (btype instanceof ClassType))
@@ -99,11 +106,14 @@ public class CompileBuildObject {
             }
         }
         if (builderName != null) {
+            ClassLoader loader = ObjectType.getContextClassLoader();
             try {
-                builder = (CompileBuildObject) Class.forName(builderName).newInstance();
+                if (builderClass == null)
+                    builderClass = Class.forName(builderName, false, loader);
+                builder = (CompileBuildObject) builderClass.newInstance();
             }
             catch (Exception ex) {
-                comp.error('w', "while creating JavafxObjectBuilder for "+ctype+" - caught "+ex);
+                comp.error('w', "while creating "+builderName+" for "+ctype+" - caught "+ex+" loader:"+loader);
                 builder = new CompileBuildObject();
             }
         } else if (ctype instanceof LangObjType)
@@ -140,7 +150,7 @@ public class CompileBuildObject {
     }
 
     public boolean hasAddChildMethod() {
-        return ClassMethods.selectApplicable(ClassMethods.getMethods(ctype, "add", 'V', null, getLanguage()), 2, false/*??*/) > 0;
+        return ClassMethods.selectApplicable(ClassMethods.getMethods(ctype, getAddChildMethodName(), 'V', null, getLanguage()), 2, false/*??*/) > 0;
     }
 
     public Member findNamedMember (String name) {
@@ -150,8 +160,10 @@ public class CompileBuildObject {
             // Look for for an "add" method.
             // For example: (define b (JButton action-listener: ...))
             // maps to: (define b ...) (b:addActionListener ...)
-            member = ctype.getMethod(ClassExp.slotToMethodName("add", name), SlotSet.type1Array);
-            }
+            String mname = name.length() == 0 ? getAddChildMethodName()
+                : ClassExp.slotToMethodName("add", name);
+            member = ctype.getMethod(mname, SlotSet.type1Array);
+        }
         return member;
     }
 

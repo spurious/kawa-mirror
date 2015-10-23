@@ -1,3 +1,12 @@
+2015-10-23  Per Bothner  <per@bothner.com>
+
+	* CompileBuildObject.java: Various fixes and improvements.
+	(hasAddChildMethod): Use getAddChildMethodName instead of always "add".
+	(make): Fix warning message.
+	(findNamedMember): Likewise.
+	(make): Allow binding to be a class value, not just a string name.
+	(make): Use context ClassLoader.
+
 2015-06-08  Per Bothner  <per@bothner.com>
 
 	* CompileBuildObject.java: Re-write keyword handling.

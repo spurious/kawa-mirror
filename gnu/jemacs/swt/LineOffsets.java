@@ -72,7 +72,7 @@ public class LineOffsets extends U32Vector
 
   public void insertLine(int index, int offSet)
   {
-    addSpace(index, 1)
+    addSpace(index, 1);
     setIntAt(index, offSet);
   }
 

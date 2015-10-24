@@ -226,8 +226,9 @@ public class IntNum extends RatNum implements Externalizable
   }
 
   /** Calculate how many words are significant in words[0:len-1].
-   * Returns the least value x such that x>0 && words[0:x-1]==words[0:len-1],
-   * when words is viewed as a 2's complement integer.
+   * Returns the least value {@code x} such that
+   * {@code x>0 && words[0:x-1]==words[0:len-1]},
+   * when {@code words} is viewed as a 2's complement integer.
    */
   public static int wordsNeeded (int[] words, int len)
   {
@@ -1529,7 +1530,7 @@ public class IntNum extends RatNum implements Externalizable
   }
 
   /** Copy the abolute value of this into an array of words.
-   * Assumes words.length >= (this.words == null ? 1 : this.ival).
+   * Assumes {@code words.length >= (this.words == null ? 1 : this.ival)}.
    * Result is zero-extended, but need not be a valid 2's complement number.
    */
     

@@ -11,8 +11,8 @@ public class WrongType extends WrappedException
 {
   /** Number of the argument, 1-origin.
    * <br>
-   * Can be an integer >= 1, or one of the values <code>ARG_UNKNOWN</code>,
-   * <code>ARG_VARNAME</code>, or <code>ARG_DESCRIPTION</code>.
+   * Can be an integer {@code >= 1}, or one of the values {@code ARG_UNKNOWN},
+   * {@code ARG_VARNAME}, or {@code ARG_DESCRIPTION}.
    */
   public int number;
 

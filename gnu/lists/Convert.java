@@ -4,7 +4,7 @@
 package gnu.lists;
 
 /**
- * A class that encapsulates primitive<->Object conversions.
+ * A class that encapsulates conversions between primitive and Object.
  * Applications can override the conversion if desired.
  * For example charToObject could use an "intern" table.
  */

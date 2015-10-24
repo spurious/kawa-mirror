@@ -38,12 +38,12 @@ import gnu.lists.U32Vector;
  * Assume that lineOffset is an instance of LineOffsets, held by swtCharBuffer an instance of 
  * SwtCharBuffer. 
  * <p>
- * Then a value of <code>o</code> at index <code>i</code> in lineOffsets.base
+ * Then a value of {@code o} at index {@code i} in lineOffsets.base
  * means that the line with line number
- * <code>n = (i < lOff.gapStart ? i : i + lOff.gapEnd - lOff.gapStart)</code>  
+ * {@code n = (i < lOff.gapStart ? i : i + lOff.gapEnd - lOff.gapStart)}
  * <p>
  * starts at text position 
- * <code>p = (o < swtCB.gapStart ? o : o + swtCB.gapEnd - swtCB.gapStart)</code>
+ * {@code p = (o < swtCB.gapStart ? o : o + swtCB.gapEnd - swtCB.gapStart)}
  * <p>
  * @author Christian Surlykke
  *         12-07-2004

@@ -99,7 +99,7 @@ public abstract class EWindow
   }
 
   /** Split this window into two.
-   * Display Var>buffer</var> in the new window.
+   * Display <var>buffer</var> in the new window.
    * @return the new window.
    */
   public abstract EWindow split (Buffer buffer, int lines, boolean horizontal);

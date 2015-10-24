@@ -45,9 +45,9 @@ public class BufferContent extends gnu.kawa.swingviews.SwingContent
   }
 
     /** Search in BUF for COUNT instances of the character TARGET between START and END.
-     * If COUNT is positive, search forwards; END must be >= START.
+     * If COUNT is positive, search forwards; requires {@code END >= START}.
      * If COUNT is negative, search backwards for the -COUNTth instance;
-     *   END must be <= START.
+     *   requires {@code END <= START}.
      * If COUNT is zero, do anything you please; run rogue, for all I care.
      * START and END are both 0-origin.
    *

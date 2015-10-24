@@ -1624,7 +1624,7 @@ public class Translator extends Compilation
   }
 
   /**
-   * Re-write a Scheme <body> in S-expression format into internal form.
+   * Re-write a Scheme 'body' in S-expression format into internal form.
    */
 
   public Expression rewrite_body (Object exp)
@@ -1714,7 +1714,7 @@ public class Translator extends Compilation
 
   public boolean appendBodyValues () { return false; }
 
-  /** Combine a <body> consisting of a list of expression. */
+  /** Combine a 'body' consisting of a list of expression. */
   public Expression makeBody(Expression[] exps)
   {
     if (appendBodyValues())
@@ -1913,17 +1913,17 @@ public class Translator extends Compilation
   }
 
   /** Push an alias for a declaration in a scope.
-   * If the name of <code>decl</code> came from a syntax template
-   * whose immediate scope is <code>templateScope</code>,
+   * If the name of {@code decl}> came from a syntax template
+   * whose immediate scope is {@code templateScope},
    * then the same syntax template may contain local variable references
-   * that are also in the same <code>templateScope</code>.
+   * that are also in the same {@code templateScope}.
    * Such variable references will <em>not</em> look in the current
-   * "physical" scope, where we just created <code>decl</code>, but
-   * will instead search the "lexical" <code>templateScope</scope>.
-   * So that such references can resolve to <code>decl</code>, we
-   * create an alias in <code>templateScope</code> that points
-   * to <code>decl</code>.  We record that we did this in the
-   * <code>renamedAliasStack</code>, so we can remove the alias later.
+   * "physical" scope, where we just created {@code decl}, but
+   * will instead search the "lexical" {@code templateScope}.
+   * So that such references can resolve to {@code decl}, we
+   * create an alias in {@code templateScope} that points
+   * to {@code decl}.  We record that we did this in the
+   * {@code renamedAliasStack}, so we can remove the alias later.
    */
   public void pushRenamedAlias (Declaration alias)
   {

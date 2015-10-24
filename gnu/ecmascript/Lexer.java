@@ -307,9 +307,9 @@ public class Lexer extends gnu.text.Lexer
     * Returns the next token.
     * Returns: <dl>
     * <dt>end-of-file<dd>Sequence.eofValue
-    * <dt>end-of-line>dd>eolToken
+    * <dt>end-of-line<dd>eolToken
     * <dt>reserved word<dd> ???
-    * <dt>identifier><dd>a java.lang.String
+    * <dt>identifier<dd>a java.lang.String
     * <dt>punctuator<dd> ???
     * </dl>
     * Literals are returned a QuoteExp objects,  Specifically:

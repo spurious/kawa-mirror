@@ -11,7 +11,7 @@ import gnu.kawa.reflect.Invoke;
  * The Syntax transformer that re-writes the "%define" internal form.
  * This is used to implement define, define-private, and define-constant.
  * Syntax: {@code (%define name code type value)}.
- * The {@code name} is an identifier ({@code String}> or
+ * The {@code name} is an identifier ({@code String} or
  * {@code Symbol}) or {@code Declaration}.
  * The {@code code} is an integer mask,
  * where 1 means type specified, 2 means a function definition,

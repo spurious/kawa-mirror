@@ -262,7 +262,7 @@ public class TreeList extends AbstractSequence<Object>
    *   to the outer BEGIN_ELEMENT_SHORT/BEGIN_ELEMENT_LONG/BEGIN_DOCUMENT.
    *.  (If these is no parent, then parent_offset==0.)
    *
-   * This should is used when index < BEGIN_ELEMENT_SHORT_INDEX_MAX,
+   * This should is used when {@code index < BEGIN_ELEMENT_SHORT_INDEX_MAX},
    * both end_offset and parent_offset fit in 16 bits,
    * and the element does not straddle the gap.
    */

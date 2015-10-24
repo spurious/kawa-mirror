@@ -105,11 +105,11 @@ public class OutPort extends PrintConsumer implements Printable
     public static BinaryOutPort getSystemOut() { return outInitial; }
     public static BinaryOutPort getSystemErr() { return errInitial; }
 
-  public static final ThreadLocation outLocation
-    = new ThreadLocation("out-default");
+  public static final ThreadLocation<gnu.kawa.io.OutPort> outLocation
+    = new ThreadLocation<gnu.kawa.io.OutPort>("out-default");
   static { outLocation.setGlobal(outInitial); }
-  public static final ThreadLocation errLocation
-    = new ThreadLocation("err-default");
+  public static final ThreadLocation<gnu.kawa.io.OutPort> errLocation
+    = new ThreadLocation<gnu.kawa.io.OutPort>("err-default");
   static { errLocation.setGlobal(errInitial); }
   static public OutPort outDefault ()
   {

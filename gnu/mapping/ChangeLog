@@ -1,3 +1,8 @@
+2015-10-24  Per Bothner  <per@bothner.com>
+
+	* LocationProc.java: Make a generic type.
+	(getValue): New method.
+
 2015-09-15  Per Bothner  <per@bothner.com>
 
 	* CallContext.java (startFromContext): Only do simple case

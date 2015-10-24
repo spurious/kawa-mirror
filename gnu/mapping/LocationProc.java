@@ -7,9 +7,9 @@ package gnu.mapping;
  * Calling it with one argument sets the value, for compatibility
  * with the "parameter objects" of SRFI-39.
  */
-public class LocationProc extends Procedure0or1 implements HasSetter
+public class LocationProc<T> extends Procedure0or1 implements HasSetter
 {
-  Location loc;
+  Location<T> loc;
 
   public LocationProc (Location loc)
   {
@@ -35,20 +35,24 @@ public class LocationProc extends Procedure0or1 implements HasSetter
     loc = ConstrainedLocation.make(loc, converter);
   }
 
-  public Object apply0 () throws Throwable
+    public final T getValue() throws Throwable {
+        return loc.get();
+    }
+
+  public T apply0 () throws Throwable
   {
     return loc.get();
   }
 
   public Object apply1 (Object value) throws Throwable
   {
-    set0(value);
+    set0((T) value);
     return Values.empty;
   }
 
   public void set0 (Object value) throws Throwable
   {
-    loc.set(value);
+    loc.set((T) value);
   }
 
   public Procedure getSetter()

@@ -41,8 +41,8 @@ public class InPort extends Reader implements Printable
     }
     public static final String evalPathname = "<eval>";
     public static final String stringPathname = "<string>";
-  public static final ThreadLocation inLocation
-    = new ThreadLocation("in-default");
+  public static final ThreadLocation<gnu.kawa.io.InPort> inLocation
+    = new ThreadLocation<gnu.kawa.io.InPort>("in-default");
   static { inLocation.setGlobal(systemInPort); }
 
   static public InPort inDefault ()

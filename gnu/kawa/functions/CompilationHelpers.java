@@ -72,8 +72,15 @@ public class CompilationHelpers
             Compilation comp = visitor.getCompilation();
             Language language = comp.getLanguage();
             if (ptype.isSubtype(Compilation.typeProcedure)) {
-                Expression[] rargs = new Expression[nargs];
-                System.arraycopy(args, 1, rargs, 0, nargs);
+                Expression[] rargs;
+                if (ptype.getRawType()==Compilation.typeLocationProc
+                    && nargs==0) {
+                    rargs = new Expression[] { proc, new QuoteExp("getValue") };
+                    proc = new QuoteExp(Invoke.invoke);
+                } else {
+                    rargs = new Expression[nargs];
+                    System.arraycopy(args, 1, rargs, 0, nargs);
+                }
                 exp.setFuncArgs(proc, rargs);
                 exp.adjustSplice(exp, -1);
                 return proc.validateApply(exp, visitor, required, null);

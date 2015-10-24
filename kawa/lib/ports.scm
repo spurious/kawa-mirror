@@ -79,12 +79,12 @@
   (if (gnu.kawa.io.InPort? port) #f
       ((->gnu.kawa.io.OutPort port):isOpen)))
 
-(define-alias-parameter current-input-port <input-port>
-  (static-field <input-port> 'inLocation))
-(define-alias-parameter current-output-port <output-port>
-  (static-field <output-port> 'outLocation))
-(define-alias-parameter current-error-port <output-port>
-  (static-field <output-port> 'errLocation))
+(define-alias-parameter current-input-port input-port
+  (static-field input-port 'inLocation))
+(define-alias-parameter current-output-port output-port
+  (static-field output-port 'outLocation))
+(define-alias-parameter current-error-port output-port
+  (static-field output-port 'errLocation))
 
 (define-constant current-path ::gnu.mapping.LocationProc
   (gnu.mapping.LocationProc:makeNamed

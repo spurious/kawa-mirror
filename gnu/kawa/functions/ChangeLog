@@ -1,3 +1,9 @@
+2015-10-24  Per Bothner  <per@bothner.com>
+
+	Better type inference for Scheme 'parameter' reads.
+	* CompilationHelpers.java (validateApplyToArgs): If procedure is
+	a LocationProc (Scheme parameter object), optimize it.
+
 2015-08-18  Per Bothner  <per@bothner.com>
 
 	* Setter.java (apply2): Add an optimization.

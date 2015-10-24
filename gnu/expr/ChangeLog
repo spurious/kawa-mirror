@@ -1,3 +1,7 @@
+2015-10-24  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (typeLocationProc): New static field.
+
 2015-10-13  Per Bothner  <per@bothner.com>
 
 	Clearer definition of "interactive mode".  Better re-definition support.

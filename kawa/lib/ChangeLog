@@ -1,3 +1,9 @@
+2015-10-24  Per Bothner  <per@bothner.com>
+
+	Better type inference for Scheme 'parameter' reads.
+	* syntax.scm (define-alias-parameter): Add type parameter.
+	* ports.scm: Minor style update.
+
 2015-10-07  Per Bothner  <per@bothner.com>
 
 	* kawa/base.scm: Add $bracket-apply$ and $bracket-list$.

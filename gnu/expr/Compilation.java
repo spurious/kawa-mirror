@@ -334,6 +334,8 @@ public class Compilation implements SourceLocator
     = ClassType.make("gnu.mapping.Environment");
   static public ClassType typeLocation
     = ClassType.make("gnu.mapping.Location");
+  public static final ClassType typeLocationProc
+    = ClassType.make("gnu.mapping.LocationProc");
   static public ClassType typeFieldLocation
     = ClassType.make("gnu.kawa.reflect.FieldLocation");
   static public ClassType typeStaticFieldLocation

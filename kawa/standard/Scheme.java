@@ -1085,6 +1085,7 @@ public class Scheme extends LispLanguage {
         if (types == null) {
             types = new HashMap<String, Type>(128); // Bit more wiggle room
             types.put("boolean", booleanType);
+            types.put("parameter", Compilation.typeLocationProc);
             types.putAll(super.getTypeMap());
             for (int i = uniformVectorTags.length; --i >= 0;) {
                 String tag = uniformVectorTags[i];

@@ -177,7 +177,7 @@
   (syntax-rules ()
     ((define-alias-parameter name type location)
      (begin
-       (define-constant name :: <gnu.mapping.LocationProc>
+       (define-constant name :: gnu.mapping.LocationProc[type]
 	 (gnu.mapping.LocationProc:makeNamed 'name location))
        (gnu.mapping.LocationProc:pushConverter
 	name

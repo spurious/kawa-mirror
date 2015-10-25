@@ -1702,7 +1702,7 @@ The same prefix notation is used for special operations like assignments:
 @node Tutorial - Booleans
 @section Booleans
 
-Scheme uses the syntax @code{#t}> and @code{#f}
+Scheme uses the syntax @code{#t} and @code{#f}
 for Boolean true and false value.  For example the
 ``less-than'' function is named @code{<}.
 Its result is true if the first argument is less than the second (or if
@@ -1748,6 +1748,9 @@ You can use @code{cond} form as an alternative to
       ((> 3 3) 'less)
       (else ’equal))       @result{} equal
 @end example
+
+The null values (written as @code{#!null} in Kawa or @code{null} in Java)
+is also considered to false.
 
 @node Tutorial - Numbers
 @section Numbers
@@ -2273,8 +2276,10 @@ fully-qualified class name.  For example:
                Map
                (HashMap HMap)))
 @end example
-This defines @code{Map} as an alias for @code{java.util.Map},
-and @code{HMap} as an alias for @code{java.util.HashMap}.
+This defines aliases for two classes in the @code{java.util} package,
+one with renaming:
+@code{Map} is an alias for @code{java.util.Map},
+and @code{HMap} is an alias for @code{java.util.HashMap}.
 
 The @code{class} keyword is needed because the @code{import}
 for is also used for Kawa's module system.
@@ -5434,16 +5439,15 @@ false. The phrase ``a true value'' (or sometimes just ``true'')
 means any object treated as true by the conditional expressions, and the phrase ``a false value'' (or ``false'') means any
 object treated as false by the conditional expressions.
 
-Of all the Scheme values, only @code{#f} counts as false in conditional
-expressions. All other Scheme values, including @code{#t},
+Of all the ``proper Scheme'' values, only @code{#f} counts as false in
+conditional expressions. All other Scheme values, including @code{#t},
 count as true.  A @var{test-expression} is an expression evaluated
 in this manner for whether it is true or false.
 
-@emph{Note:} There are plans to also treat as false
-the Java values @code{#!null}, and also all @code{java.lang.Boolean}
-instances for which @code{booleanValue()}
-return @code{false} (in addition to the special @code{Boolean:FALSE}
-instance which is already false).  However, this is not yet implemented.
+In addition the null value @code{#!null} (in Java written as @code{null})
+is also considered false.  Also, if you for some strange reason create a
+fresh @code{java.lang.Boolean} object whose @code{booleanValue()}
+return @code{false}, that is also considered false.
 
 @emph{Note:} Unlike some other dialects of Lisp, Scheme distinguishes
 @code{#f} and the empty list from each other and from the symbol
@@ -9376,6 +9380,14 @@ The following @meta{character-name} forms are recognized:
 @code{#\x0009} - the tab character
 @item @b{#\vtab}
 @code{#\x000b} - the vertical tabulation character
+@item @b{#\ignorable-char}
+A special @code{character} value, but it is not a Unicode code point.
+It is a special value returned when an index refers to the second
+@code{char} (code point) of a surrogate pair, and which should be ignored.
+(When writing a @code{character} to a string or file,
+it will be written as one or two @code{char} values.
+The exception is @code{#\ignorable-char}, for which zero 
+@code{char} values are written.)
 @end table
 
 @deffn Procedure {char?} @var{obj}
@@ -9913,7 +9925,7 @@ or if you're brave:
 This is @code{"Smile "} followed by an emoticon (``smiling face with
 open mouth'') followed by @code{"!"}.
 The emoticon has scalar value @code{\x1f603} - it is not
-in the 16-bit Basic Multilanguage Plan,
+in the 16-bit Basic Multi-language Plane,
 and so it must be encoded by a surrogate pair
 (@code{#\xd83d} followed by @code{#\xde03}).
 
@@ -10988,6 +11000,7 @@ method, not the @code{string-length} procedure.
 @example
 (length "Hello")              @result{}  5
 (define str1 "Hello \x1f603;!")
+(invoke str1 'length)         @result{}  9
 (length str1)                 @result{}  9
 (string-length str1)          @result{}  8
 @end example

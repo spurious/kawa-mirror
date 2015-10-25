@@ -6582,9 +6582,8 @@ continuation that, when passed some values, calls the
 (call-with-values * -)   @result{} -1
 @end example
 
-@emph{Performance note:}
-If either the @var{producer} or @var{consumer} is a fixed-arity
-lambda expression it is inlined.
+@PerformanceNote{} If either the @var{producer} or @var{consumer} is a
+fixed-arity lambda expression it is inlined.
 @end deffn
 
 @deffn Syntax define-values @stxref{formals} @stxref{expression}
@@ -15815,24 +15814,53 @@ The following libraries are bundled with Kawa:
 @itemx (scheme time)
 @itemx (scheme write)
 @itemx (scheme r5rs)
-These are standard libraries as defined by R7RS.
+The above are standard libraries as defined by R7RS.
 @item (rnrs hashtables)
 @itemx (rnrs lists)
 @itemx (rnrs programs)
 @itemx (rnrs sorting)
 @itemx (rnrs unicode)
-These are standard libraries as defined by R6RS.
+The above are standard libraries as defined by R6RS.
+@item (kawa reflect)
+Defines procedures and syntax for acessing Java objects and members:
+  @code{as}
+  @code{field}
+  @code{instance?}
+  @code{invoke}
+  @code{invoke-static}
+  @code{invoke-special}
+  @code{make}
+  @code{primitive-throw}
+  @code{set-field!}
+  @code{set-static-field!}
+  @code{static-field}
 @item (kawa expressions)
 @itemx (kawa hashtable)
 @itemx (kawa quaternions)
 @itemx (kawa rotations)
-@itemx (kawa reflect)
 @itemx (kawa regex)
 @itemx (kawa string-cursors)
 Various Kawa libraries @i{add details}.
 @item (kawa base)
 All the bindings by default available to the kawa top-level.
 @end table
+
+@subsection Importing a SRFI library
+
+Importing a supported SRFI numbered @var{N} is conventionally
+doing using a @code{(import (srfi @var{N}))}
+or the older R6RS syntax @code{(import (srfi :@var{N}))} (with a colon, for historical reasons).  You can also give it
+a name, as specified by @uref{http://srfi.schemers.org/srfi-95/srfi-95.html,SRFI 95}. For example, any of these work:
+@example
+(import (srfi 95))
+(import (srfi 95 sorting-and-merging))
+(import (srfi :95))
+(import (srfi :95 sorting-and-merging))
+@end example
+You can also use @code{(require 'srfi-@var{N})}:
+@example
+(require 'srfi-95)
+@end example
 
 @subsection Importing from a plain class
 

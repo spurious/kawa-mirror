@@ -1,3 +1,9 @@
+2015-10-26  Per Bothner  <per@bothner.com>
+
+	* configure.in (AC_INIT): Set version to 2.1.
+	* bin/configure.in (AC_INIT): Likewise.
+	* build.xml (version.release): Likewise.
+
 2015-09-20  Per Bothner  <per@bothner.com>
 
 	* configure.ac: Fix to avoid bogus calls to chmod.

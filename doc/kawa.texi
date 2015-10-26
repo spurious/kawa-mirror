@@ -2226,7 +2226,7 @@ for types, like a generalization of Java's @code{import} statement:
 @section Exceptions and errors
 
 Kawa supports the exception framework and forms
-from R^RS and R7RS.  See @ref{Exceptions} for details.
+from R6RS and R7RS.  See @ref{Exceptions} for details.
 
 @subheading Native exception handling
 

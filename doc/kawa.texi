@@ -7299,7 +7299,7 @@ You can of course also use the extended format in a @ref{Definitions,@code{defin
 @stxdef{opt-arg} @stxref{arg-with-default}
 @stxdef{key-arg} @stxref{arg-with-default}
 @stxdef{arg-with-default} @var{variable} [@stxlit{::} @var{type}]
-    | @stxlit{(} @var{variable} [@stxlit{::} @var{type} [@var{initializer}] | @var{initializer} [[@stxlit{::}] @var{type}]] @stxlit{)}
+    | @stxlit{(} @var{variable} [@stxlit{::} @var{type} [@var{initializer}] | @var{initializer} [@stxlit{::} @var{type}]] @stxlit{)}
 @stxdef{rest-arg} @var{variable}
 @end display
 
@@ -13067,6 +13067,10 @@ part of after @samp{#}.
 Returns a @var{uri} unchanged if it is an absolute URI.
 Otherwise resolves it against a base URI @var{base},
 which is normally (though not always) absolute.
+
+This uses the algorithm specifyed by RFC-3986 (assuming @var{base}
+is absolute), unlike the obsolete RFC-2396 algorithm used
+by @code{java.net.URI.resolve}.
 @end deffn
 
 @node Files
@@ -14472,6 +14476,16 @@ whose type is @code{java.lang.String} is converted
 as if it was declared as a @code{String}.
 @end defvar
 
+@defvar parameter
+A parameter object, as created by @code{make-parameter}.
+This type can take a type parameter (sic):
+@example
+(define-constant client ::parameter[Client] (make-parameter #!null))
+@end example
+This lets Kawa know that reading the parameter (as in @code{(client)}
+return a value of the specified type (in this case @code{Client}).
+@end defvar
+
 More will be added later.
 
 A type specifier can also be one of the primitive Java types.
@@ -14490,6 +14504,15 @@ A type specifier can also be a fully-qualified Java class name
 the actual argument is cast at run time to the named class.
 Also, @code{java.lang.StringBuffer[]} represents
 an array of references to @code{java.lang.StringBuffer} objects.
+
+@defvar dynamic
+Used to specify that the type is unknown, and is likely to change
+at run-time.
+Warnings about unknown member names are supressed
+(a run-time name lookup is formed).
+An expression of type @code{dynamic} is (statically) compatible with
+any type.
+@end defvar
 
 @node Parameterized Types
 @section Parameterized Types
@@ -16886,6 +16909,11 @@ reversible mapping:  The Scheme function @samp{file-exists?}
 is mapped to the method name @samp{file$Mnexists$Qu}.
 Because @samp{$} is used to encode special characters, you
 should avoid using it in names in your source file.
+
+Class and package name generally don't need to be mangled,
+as most characters are used directly.
+The exception is a few characters
+as described @uref{https://blogs.oracle.com/jrose/entry/symbolic_freedom_in_the_vm,here}.
 
 @node Scheme types in Java, Array operations, Mangling, Objects Classes and Modules
 @section Scheme types in Java

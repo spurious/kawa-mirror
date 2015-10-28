@@ -14,7 +14,6 @@ public class IndirectIndexedSeq<E>
     public IndirectIndexedSeq(List<E> base, IntSequence indexes) {
         this.base = base;
         this.indexes = indexes;
-        new Error("new IndirectIndexedSeq").printStackTrace();
     }
 
     public int getBufferLength() { return base.size(); }

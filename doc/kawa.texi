@@ -202,7 +202,7 @@ This package has nothing to do with the defunct Kawa commercial Java IDE.
 * Running::              Invoking, Running, and Using Kawa
 * Syntax::
 * Program structure::
-* Multiple values::
+* Control features::
 * Symbols and namespaces::
 * Procedures::
 * Numbers::              Quantities and Numbers
@@ -6560,8 +6560,157 @@ exception is thrown.
 (This is implemented just like Java's @code{try}-@code{catch}.)
 @end deffn
 
+@node Control features
+@chapter Control features
+
+@menu
+* Mapping functions::
+* Multiple values::
+@end menu
+
+@node Mapping functions
+@section Mapping functions
+
+The procedures @code{string-for-each} and @code{string-map}
+are documented under @ref{Strings}.
+
+The procedure @code{string-cursor-for-each} is documented under @ref{String Cursor API}.
+
+@deffn Procedure map @var{proc} sequence@sub{1} sequence@sub{2} ...
+@deffnx Procedure for-each @var{proc} sequence@sub{1} sequence@sub{2} ...
+The @code{map} procedure applies @var{proc} element-wise to the elements
+of the @var{sequence}s and returns a list of the results, in order.
+The dynamic order in which @var{proc} is applied to
+the elements of the @var{sequence}s is unspecified.
+
+The @code{for-each} procedure does the same,
+but is executed for the side-effects of @var{proc}, whose result (if any)
+is discarded.
+Unlike @code{map}, @code{for-each} is guaranteed to call @var{proc}
+on the elements of the @var{sequences}s in order from the first element(s)
+to the last.
+The value returned by @code{for-each} is the void value.
+
+Each @var{sequence} must be a generalized sequence.
+(Traditionally, these arguments were restricted to lists,
+but Kawa allows sequences, including vectors, Java arrays, and strings.)
+If more than one @var{sequence} is given and not all
+@var{sequence}s have the same length, the procedure terminates when the
+shortest @var{sequence} runs out.
+The @var{sequence}s can be infinite (for example circular lists),
+but it is an error if all of them are infinite.
+
+The @var{proc} must be a procedure that accepts as many arguments
+as there are @var{sequence} arguments.
+It is an error for @var{proc} to mutate any of the @var{sequence}s.
+In the case of @code{map}, @var{proc} must return a single value.
+
+@example
+(map cadr '((a b) (d e) (g h)))
+    @result{} (b e h)
+
+(map (lambda (n) (expt n n))
+     '(1 2 3 4 5))
+    @result{} (1 4 27 256 3125)
+
+(map + ’(1 2 3) ’(4 5 6 7))  @result{} (5 7 9)
+
+(let ((count 0))
+  (map (lambda (ignored)
+         (set! count (+ count 1))
+         count)
+       '(a b)))
+    @result{} (1 2) @i{or} (2 1)
+@end example
+
+The result of @code{map} is a list, even if the arguments are non-lists:
+@example
+(map +
+     #(3 4 5)
+     (float[] 0.5 1.5))
+    @result{} (3.5 5.5)
+@end example
+
+To get a vector result, use @code{vector-map}.
+
+@example
+(let ((v (make-vector 5)))
+  (for-each (lambda (i)
+              (vector-set! v i (* i i)))
+            '(0 1 2 3 4))
+  v)
+    @result{}  #(0 1 4 9 16)
+@end example
+
+A string is considered a sequence of @code{character} values
+(not 16-bit @code{char} values):
+
+@example
+(let ((v (make-vector 10 #\-)))
+  (for-each (lambda (i ch)
+              (vector-set! v i ch))
+            [0 <: ]
+            "Smile 😃!")
+   v)
+    @result{} #(#\S #\m #\i #\l #\e #\space #\x1f603 #\! #\- #\-)
+@end example
+
+@PerformanceNote{} These procedures are pretty well optimized.
+For each @var{sequence} the compiler will by default create an
+iterator.
+@c FUTURE (This can be done without object allocation XXXX)
+However, if the type of the @var{sequence} is known, the compiler will
+inline the iteration code.
+@end deffn
+
+@deffn Procedure vector-map @var{proc} @vari{sequence} @varii{sequence} @dots{}
+Same as the @code{map} procedure, except the result is a vector.
+(Traditionally, these arguments were restricted to vectors,
+but Kawa allows sequences, including lists, Java arrays, and strings.)
+
+@example
+(vector-map cadr '#((a b) (d e) (g h)))
+    @result{} #(b e h)
+
+(vector-map (lambda (n) (expt n n))
+            '#(1 2 3 4 5))
+    @result{} #(1 4 27 256 3125)
+
+(vector-map + '#(1 2 3) ’#(4 5 6 7))
+    @result{} #(5 7 9)
+
+(let ((count 0))
+  (vector-map
+    (lambda (ignored)
+      (set! count (+ count 1))
+      count)
+    '#(a b)))
+    @result{} #(1 2) @i{or} #(2 1)
+@end example
+@end deffn
+
+@deffn Procedure vector-for-each @var{proc} @vari{vector} @varii{vector} @dots{}
+Mostly the same as @code{for-each},
+however the arguments should be generalized vectors.
+Specifically, they should implement @code{java.util.List}
+(which both regular vectors and uniform vectors do).
+The @var{vectors} should also be efficiently indexable.
+
+(Traditionally, these arguments were restricted to vectors,
+but Kawa allows sequences, including lists, Java arrays, and strings.)
+
+@example
+(let ((v (make-list 5)))
+  (vector-for-each
+    (lambda (i) (list-set! v i (* i i)))
+    '#(0 1 2 3 4))
+  v)
+    @result{} (0 1 4 9 16)
+@end example
+@end deffn
+
 @node Multiple values
-@chapter Multiple values
+@section Multiple values
 
 The multiple-value feature was added in R5RS.
 
@@ -6675,7 +6824,7 @@ The values resulting from evaluating each argument are appended
 together.
 @end deffn
 
-@node Symbols and namespaces, Procedures, Multiple values, Top
+@node Symbols and namespaces
 @chapter Symbols and namespaces
 
 An identifier is a name that appears in a program.
@@ -10050,6 +10199,7 @@ to @code{char} offsets.
 @c not implemented yet
 @c @subsubsection Assigning to a subsequence
 
+@anchor{String Cursor API}
 @subsection String Cursor API
 
 Indexing into a string (using for example @code{string-ref})
@@ -11336,33 +11486,8 @@ a  @result{} #(1 2 smash smash 5)
 @end example
 @end deffn
 
-@deffn Procedure vector-map @var{proc} @vari{vector} @varii{vector} @dots{}
-The @var{vector}s must all have the same length.  @var{proc} should
-accept as many arguments as there are @var{vector}s and return a single
-value.
-
-The @func{vector-map} procedure applies @var{proc} element--wise to the
-elements of the @var{vector}s and returns a vector of the results, in
-order.  @var{proc} is always called in the same dynamic environment as
-@func{vector-map} itself.  The order in which @var{proc} is applied to
-the elements of the @var{vector}s is unspecified.  If multiple returns
-occur from @func{vector-map}, the return values returned by earlier
-returns are not mutated.
-
-Analogous to @func{map}.
-@end deffn
-
-@deffn Procedure vector-for-each @var{proc} @vari{vector} @varii{vector} @dots{}
-The @var{vector}s must all have the same length.  @var{proc} should
-accept as many arguments as there are @var{vector}s.  The
-@code{vector-for-each} procedure applies @var{proc} element--wise to the
-elements of the @var{vector}s for its side effects, in order from the
-first elements to the last.  @var{proc} is always called in the same
-dynamic environment as @func{vector-for-each} itself.  The return values
-of @func{vector-for-each} are unspecified.
-
-Analogous to @func{for-each}.
-@end deffn
+The procedures @code{vector-map} and @code{vector-for-each}
+are documented in @ref{Mapping functions}.
 
 @node Uniform vectors
 @section Uniform vectors

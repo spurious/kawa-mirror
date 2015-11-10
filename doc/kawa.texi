@@ -15963,7 +15963,8 @@ The following libraries are bundled with Kawa:
 @itemx (scheme write)
 @itemx (scheme r5rs)
 The above are standard libraries as defined by R7RS.
-@item (rnrs hashtables)
+@item (rnrs arithmetic bitwise)
+@itemx (rnrs hashtables)
 @itemx (rnrs lists)
 @itemx (rnrs programs)
 @itemx (rnrs sorting)

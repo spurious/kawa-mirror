@@ -1,3 +1,7 @@
+2015-11-27  Per Bothner  <per@bothner.com>
+
+	* DomTermErrorStream.java: New class - extends PrintStream.
+
 2015-10-24  Per Bothner  <per@bothner.com>
 
 	* InPort.java (inLocation): Add type parameters.

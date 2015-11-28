@@ -13,6 +13,7 @@ import gnu.bytecode.ClassType;
 import gnu.kawa.servlet.HttpRequestContext;
 import gnu.kawa.io.CharArrayInPort;
 import gnu.kawa.io.CheckConsole;
+import gnu.kawa.io.DomTermErrorStream;
 import gnu.kawa.io.InPort;
 import gnu.kawa.io.OutPort;
 import gnu.kawa.io.Path;
@@ -438,6 +439,9 @@ public class repl extends Procedure0or1 {
                 if (iArg == maxArg)
                     bad_option (arg);
                 Shell.setDefaultFormat(args[iArg++]);
+            } else if (arg.equals("--domterm")) {
+                PrintStream err = new DomTermErrorStream(System.out);
+                System.setErr(err);
             } else if (arg.equals("--connect")) {
                 if (iArg == maxArg)
                     bad_option (arg);

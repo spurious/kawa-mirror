@@ -1246,7 +1246,7 @@ public class LambdaExp extends ScopeExp {
             if (state>=Compilation.COMPILED && state != Compilation.ERROR_SEEN)
                 comp.error('f', "internal error - allocate method for "+this
                            +" in module "+currentModule()
-                           +" that has already been compiled");
+                           +" that has already been compiled\n(Try removing all class files and doing a full re-compile.)");
         }
         if (! getNeedsClosureEnv())
             closureEnvType = null;

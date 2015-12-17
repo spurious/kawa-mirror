@@ -21,10 +21,10 @@ public class CheckConsole {
     }
 
     public static boolean haveConsole() {
+        if (haveConsole > 0 || getDomTermVersionInfo() != null)
+            return true;
         if (haveConsole < 0)
             return false;
-        if (haveConsole > 0)
-            return true;
         /* #ifdef JAVA6 */
         return System.console() != null;
         /* #else */

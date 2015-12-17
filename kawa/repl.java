@@ -252,7 +252,10 @@ public class repl extends Procedure0or1 {
     public int processArgs(String[] args, int iArg, int maxArg,
                            boolean argsOnly) {
         boolean something_done = false;
+        boolean checkedDomTerm = false;
         int returnDelta = 0;
+        if (iArg == maxArg || ! "--connect".equals(args[iArg]))
+            checkDomTerm();
         for ( ;  iArg < maxArg;  )  {
             String arg = args[iArg++];
             if (arg.equals ("-c") || arg.equals ("-e")) {
@@ -439,9 +442,6 @@ public class repl extends Procedure0or1 {
                 if (iArg == maxArg)
                     bad_option (arg);
                 Shell.setDefaultFormat(args[iArg++]);
-            } else if (arg.equals("--domterm")) {
-                PrintStream err = new DomTermErrorStream(System.out);
-                System.setErr(err);
             } else if (arg.equals("--connect")) {
                 if (iArg == maxArg)
                     bad_option (arg);
@@ -466,6 +466,7 @@ public class repl extends Procedure0or1 {
                     System.setIn(sin);
                     System.setOut(pout);
                     System.setErr(pout);
+                    checkDomTerm();
                 } catch (java.io.IOException ex) {
                     ex.printStackTrace(System.err);
                     throw new Error(ex.toString());
@@ -802,6 +803,18 @@ public class repl extends Procedure0or1 {
             }
             ModuleBody.exitDecrement();
             ExitCalled.pop();
+        }
+    }
+
+    private static boolean checkedDomTerm;
+    public static void checkDomTerm() {
+        if (checkedDomTerm)
+            return;
+        checkedDomTerm = true;
+        String dversion = CheckConsole.getDomTermVersionInfo();
+        if (dversion != null) {
+            if (dversion.indexOf("err-handled;") < 0)
+                DomTermErrorStream.setSystemErr();
         }
     }
 

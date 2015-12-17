@@ -12,6 +12,9 @@ public class TtyInPort extends InPort
 
   protected Procedure prompter;
 
+    private boolean inDomTerm;
+    public void setInDomTerm(boolean v) { inDomTerm = v; }
+
   /** Get the current prompter function. */
 
   public Procedure getPrompter () { return prompter; }
@@ -53,6 +56,8 @@ public class TtyInPort extends InPort
 
   public void emitPrompt (String prompt) throws java.io.IOException
   {
+    if (inDomTerm)
+      prompt = "\033[14u"+prompt+"\033[15u";
     tie.print(prompt);
     tie.flush();
     tie.clearBuffer();

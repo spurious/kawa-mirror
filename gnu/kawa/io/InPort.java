@@ -33,10 +33,13 @@ public class InPort extends Reader implements Printable
     private static InPort systemInPort;
     static {
         Path systemInPath = Path.valueOf(systemInFilename);
-        if (CheckConsole.haveConsole())
-            systemInPort = new TtyInPort(System.in, systemInPath,
-                                         OutPort.outInitial);
-        else
+        if (CheckConsole.haveConsole()) {
+            TtyInPort tin 
+                = new TtyInPort(System.in, systemInPath, OutPort.outInitial);
+            if (CheckConsole.getDomTermVersionInfo() != null)
+                tin.setInDomTerm(true);
+            systemInPort = tin;
+        } else
             systemInPort = new BinaryInPort(System.in, systemInPath);
     }
     public static final String evalPathname = "<eval>";

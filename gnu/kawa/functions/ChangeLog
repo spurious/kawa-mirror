@@ -1,3 +1,8 @@
+2015-12-16  Per Bothner  <per@bothner.com>
+
+	* DisplayFormat.java (writeObject): Add DomTerm escapes
+	for displaying KNode, so it gets embedded in output.
+
 2015-10-24  Per Bothner  <per@bothner.com>
 
 	Better type inference for Scheme 'parameter' reads.

@@ -13,6 +13,7 @@ import gnu.expr.Keyword;
 import gnu.kawa.xml.KNode;
 import gnu.xml.XMLPrinter;
 /* #endif */
+import gnu.kawa.io.CheckConsole;
 import gnu.kawa.io.OutPort;
 import gnu.kawa.io.PrettyWriter;
 import gnu.kawa.xml.XmlNamespace;
@@ -87,7 +88,7 @@ public class DisplayFormat extends AbstractFormat
   char language;
 
   public boolean getReadableOutput () { return readable; }
-  
+
   @Override
   public void writeBoolean(boolean v, Consumer out)
   {
@@ -378,13 +379,21 @@ public class DisplayFormat extends AbstractFormat
     /* #ifdef enable:XML */
     else if (obj instanceof KNode)
       {
+        boolean escapeForDomTerm = false;
         if (getReadableOutput())
           write("#", out);
+        else if (CheckConsole.forDomTerm(out))
+          {
+            write("\033]72;", out);
+            escapeForDomTerm = true;
+          }
         Writer wout = out instanceof Writer ? (Writer) out
           : new ConsumerWriter(out);
         XMLPrinter xout = new XMLPrinter(wout);
         xout.writeObject(obj);
         xout.closeThis();
+        if (escapeForDomTerm)
+          write("\007", out);
       }
     /* #endif */
     else if (obj == Values.empty && getReadableOutput())

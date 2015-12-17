@@ -1,3 +1,14 @@
+2015-12-16  Per Bothner  <per@bothner.com>
+
+	Add support for DomTerm.
+	* CheckConsole.java (getDomTermVersionInfo, forDomTerm):
+	New static methods.
+	* TtyInPort.java (inDomTerm): New flag.
+	(setInDomTerm): Set flag.
+	(emitPrompt): Add DomTerm delimiters around prompt.
+	* InPort.java: Maybe set dom-term flag on systemInPort.
+	* DomTermErrorStream.java (setSystemErr): New static method.
+
 2015-11-27  Per Bothner  <per@bothner.com>
 
 	* DomTermErrorStream.java: New class - extends PrintStream.

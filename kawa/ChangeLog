@@ -1,3 +1,8 @@
+2015-12-16  Per Bothner  <per@bothner.com>
+
+	* repl.java: Remove --domterm flag.
+	Use CheckConsole.getDomTermVersionInfo instead,
+
 2015-11-27  Per Bothner  <per@bothner.com>
 
 	* repl.java: Preliminary support for --domterm flag.

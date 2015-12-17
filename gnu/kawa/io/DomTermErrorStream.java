@@ -1,4 +1,5 @@
 package gnu.kawa.io;
+// Copy of org.domterm.util.DomTermErrorStream. FIXME
 
 import java.io.*;
 
@@ -30,6 +31,15 @@ public class DomTermErrorStream extends PrintStream {
     public DomTermErrorStream(PrintStream out) {
         super(out, true);
         this.out = out;
+    }
+
+    public static void setSystemErr() {
+        // KLUDGE because our DomTermErrorStream is a copy of the
+        // one in domterm.jar (and currently in a different package),
+        // so this handles either version.  FIXME.
+        if (System.err.getClass().getName().indexOf("DomTermErrorStream") < 0)
+        //if (! (System.err instanceof DomTermErrorStream))
+            System.setErr(new DomTermErrorStream(System.out));
     }
 
     @Override

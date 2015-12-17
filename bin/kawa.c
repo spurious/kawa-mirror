@@ -878,13 +878,58 @@ main(int argc, char** argv)
 		  /* Re-install callback handler for new prompt. */
 		  if (prompt != empty_string)
 		    free (prompt);
-		  prompt = malloc (buf_count + 1);
+
+                  int num_escapes = 0;
+                  int num_escape_delims = 0;
+                  int j;
+                  for (j = 0; j < buf_count; j++) {
+                    char c = buf[j];
+                    if (c == '\033')
+                      num_escapes++;
+                    else if (c == '\001' || c == '\002')
+                      num_escape_delims++;
+                  }
+                  int psize = buf_count + 1;
+                  int escaping = num_escapes > 0 && num_escape_delims == 0;
+                  if (escaping)
+                    psize += 2 * num_escapes;
+                  prompt = malloc (psize + 1);
 		  if (prompt == NULL)
 		    prompt = empty_string;
 		  else
 		    {
-		      memcpy (prompt, buf, buf_count);
-		      prompt[buf_count] = '\0';
+                      if (escaping)
+                        {
+                          int in_escape = 0;
+                          char *p = prompt;
+                          for (j = 0; j < buf_count; j++) {
+                            char c = buf[j];
+                            if (c == '\033' && ! in_escape)
+                              {
+                                *p++ = '\001';
+                                *p++ = c;
+                                in_escape = 1;
+                              }
+                            else if (in_escape
+                                  && c != '[' && c != ';'
+                                  && ! (c >= '0' && c <= '9'))
+                              {
+                                *p++ = c;
+                                *p++ = '\002';
+                                in_escape = 0;
+                              }
+                            else
+                              *p++ = c;
+                          }
+                          if (in_escape)
+                            *p++ = '\002';
+                          *p = '\0';
+                        }
+                      else
+                        {
+                          memcpy (prompt, buf, buf_count);
+                          prompt[buf_count] = '\0';
+                        }
 		      DPRINT1("New prompt '%s'\n", prompt);
 		      if (buf_count > 0)
 			write (1, "\r", 1);

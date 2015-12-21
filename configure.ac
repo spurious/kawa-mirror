@@ -71,26 +71,28 @@ test -z "${with_java_source}" -a -n "${with_android}" \
 
 with_java_source=`echo ${with_java_source} | tr A-Z a-z`
 case "/${with_java_source}/" in
-  /1/) JAVA_SOURCE=1 ;;
-  /2/) JAVA_SOURCE=2 ;;
-  /4/) JAVA_SOURCE=4 ;;
-  /4x/) JAVA_SOURCE=4x ;;
-  /5/) JAVA_SOURCE=5 ;;
-  /6/) JAVA_SOURCE=6 ;;
-  /6compat5/) JAVA_SOURCE=6compat5 ;;
-  /7/) JAVA_SOURCE=7 ;;
-  /8/) JAVA_SOURCE=8 ;;
-  /1.1*/) JAVA_SOURCE=1 ;;
-  /1.2*/) JAVA_SOURCE=2 ;;
-  /1.3*/) JAVA_SOURCE=2 ;;
-  /1.4*+jaxp1.3/) JAVA_SOURCE=4x ;;
-  /1.4*/) JAVA_SOURCE=4 ;;
-  /1.5*/) JAVA_SOURCE=5 ;;
-  /1.6*/) JAVA_SOURCE=6 ;;
-  /1.7*/) JAVA_SOURCE=7 ;;
-  /1.8*/) JAVA_SOURCE=8 ;;
+  /1/|/1.1*/) # JDK 1.1 - not supported
+    JAVA_SOURCE=1; JAVA_SOURCE_SELECTOR='%java1';;
+  /2/|/1.2*/|/1.3*/) # JDK 1.2+, GCJ-3.x - not supported
+    JAVA_SOURCE=2; JAVA_SOURCE_SELECTOR='%java2' ;;
+  /4/|/1.4*/) # JDK 1.4, GCJ-4.x, without JAXP - not supported
+    JAVA_SOURCE=4; JAVA_SOURCE_SELECTOR='%java4' ;;
+  /4x/|/1.4*+jaxp1.3/) # JDK 1.4, GCJ-4.x with JAXP 1.3 - not supported
+    JAVA_SOURCE=4x; JAVA_SOURCE_SELECTOR='%java4x' ;;
+  /5/|/1.5*/) # JDK 1.5
+    JAVA_SOURCE=5; JAVA_SOURCE_SELECTOR='%java5' ;;
+  /6/|/1.6*/) # JDK 1.6
+    JAVA_SOURCE=6; JAVA_SOURCE_SELECTOR='%java6' ;;
+  /6compat5/) # JDK 1.5 with some Java6 features.
+    # Requires building with Java6, but runs on Java5 (without those features)
+    # or on Java6 (with those features).
+    JAVA_SOURCE=6compat5; JAVA_SOURCE_SELECTOR='%java6compat5' ;;
+  /7/|/1.7*/) # JDK 1.7
+    JAVA_SOURCE=7; JAVA_SOURCE_SELECTOR='%java7' ;;
+  /8/|/1.8*/) # Java 8
+    JAVA_SOURCE=8; JAVA_SOURCE_SELECTOR='%java8' ;;
   /android*/)
-        JAVA_SOURCE=android
+        JAVA_SOURCE=android; JAVA_SOURCE_SELECTOR='%android'
         test -z "$with_swing" && with_swing="no"
         test -z "$with_awt" && with_awt="no"
         ;;
@@ -99,6 +101,7 @@ case "/${with_java_source}/" in
   (Must be 1, 2, 5, 6, 7, 8, or a JDK version such as 1.5.)]) ;;
 esac
 AC_SUBST(JAVA_SOURCE)
+AC_SUBST(JAVA_SOURCE_SELECTOR)
 
 if test -z "$with_sax2" ; then
   case "$JAVA_SOURCE" in

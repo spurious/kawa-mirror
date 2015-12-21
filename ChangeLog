@@ -1,8 +1,14 @@
 2015-12-21  Per Bothner  <per@bothner.com>
 
+	* configure.ac: Handle mapping from JAVA_SOURCE to PreProcess
+	token at configure time, rather than make time.
+	* Makefile.am: Simplify Prepocess handling.
+	(JAVA_PREPROCESS_OPTIONS): New variable - selector to PreProcess.
+	(selected-java-source): Compare JAVA_PREPROCESS_OPTIONS rather
+	than solely JAVA_SOURCE.
+
 	* configure.ac: Move some logic to new file ...
-	* config.classpath: ... so it canbe shared with bin/configure.ac.
-	* Makefile.am
+	* config.classpath: ... so it can be shared with bin/configure.ac.
 
 2015-10-28  Per Bothner  <per@bothner.com>
 

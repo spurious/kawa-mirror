@@ -258,33 +258,6 @@ else
 PREPROCESS_XML = -enable:XML
 endif
 
-selected-java-source: Makefile
-	@java_source=`cat selected-java-source 2>/dev/null || echo none`; \
-	if test "$$java_source" = "$(JAVA_SOURCE)"; \
-	then echo current java-source is ok; \
-	elif test "$(JAVA_SOURCE)" = 1; \
-	then $(MAKE) select-java1; \
-	elif test "$(JAVA_SOURCE)" = 2; \
-	then $(MAKE) select-java2; \
-	elif test "$(JAVA_SOURCE)" = 4; \
-	then $(MAKE) select-java4; \
-	elif test "$(JAVA_SOURCE)" = 4x; \
-	then $(MAKE) select-java4x; \
-	elif test "$(JAVA_SOURCE)" = 5; \
-	then $(MAKE) select-java5; \
-	elif test "$(JAVA_SOURCE)" = 6compat5; \
-	then $(MAKE) select-java6compat5; \
-	elif test "$(JAVA_SOURCE)" = 6; \
-	then $(MAKE) select-java6; \
-	elif test "$(JAVA_SOURCE)" = 7; \
-	then $(MAKE) select-java7; \
-	elif test "$(JAVA_SOURCE)" = 8; \
-	then $(MAKE) select-java8; \
-	elif test "$(JAVA_SOURCE)" = android; \
-	then $(MAKE) select-android; \
-	else echo Unrecognized JAVA_SOURCE: $(JAVA_SOURCE); exit 1; \
-	fi
-
 $(srcdir)/patch-source-list: $(top_srcdir)/configure
 	(cd $(srcdir); \
 	$(FIND) . -name '*.java' -exec grep -lE ' #endif ' '{}' ';') \
@@ -293,59 +266,19 @@ $(srcdir)/patch-source-list: $(top_srcdir)/configure
 gnu/kawa/util/PreProcess.class: $(srcdir)/gnu/kawa/util/PreProcess.java
 	$(JAVAC) -d . $(srcdir)/gnu/kawa/util/PreProcess.java
 
-# JDK 1.1
-select-java1: $(srcdir)/patch-source-list gnu/kawa/util/PreProcess.class
-	$(MAKE) do-preprocess SELECTOR='%java1'
+JAVA_PREPROCESS_OPTIONS = @JAVA_SOURCE_SELECTOR@ $(PREPROCESS_HTTPSERVER) $(PREPROCESS_XML) $(PREPROCESS_JFREESVG)
 
-# JDK 1.2+, GCJ-3.x
-select-java2: $(srcdir)/patch-source-list gnu/kawa/util/PreProcess.class
-	$(MAKE) do-preprocess SELECTOR='%java2'
-
-# JDK 1.4, GCJ-4.x, without JAXP
-select-java4: $(srcdir)/patch-source-list gnu/kawa/util/PreProcess.class
-	$(MAKE) do-preprocess SELECTOR='%java4'
-
-# JDK 1.4, GCJ-4.x with JAXP 1.3
-select-java4x: $(srcdir)/patch-source-list gnu/kawa/util/PreProcess.class
-	$(MAKE) do-preprocess SELECTOR='%java4x'
-
-# JDK 1.5 (default - matches SVN)
-select-java5: $(srcdir)/patch-source-list gnu/kawa/util/PreProcess.class
-	$(MAKE) do-preprocess SELECTOR='%java5'
-
-# JDK 1.5 with some Java6 features.
-# Requires building with Java6, but runs on Java5 (without those features)
-# or on Java6 (with those features).
-select-java6compat5: $(srcdir)/patch-source-list gnu/kawa/util/PreProcess.class
-	$(MAKE) do-preprocess SELECTOR='%java6compat5'
-
-# JDK 1.6
-select-java6: $(srcdir)/patch-source-list gnu/kawa/util/PreProcess.class
-	$(MAKE) do-preprocess SELECTOR='%java6'
-
-# JDK 1.7
-select-java7: $(srcdir)/patch-source-list gnu/kawa/util/PreProcess.class
-	$(MAKE) do-preprocess SELECTOR='%java7'
-
-# Java 8
-select-java8: $(srcdir)/patch-source-list gnu/kawa/util/PreProcess.class
-	$(MAKE) do-preprocess SELECTOR='%java8'
-
-# Android
-select-android: $(srcdir)/patch-source-list gnu/kawa/util/PreProcess.class
-	$(MAKE) do-preprocess SELECTOR='%android'
-
-do-preprocess:
-	CLASSPATH=".$(CLASSPATH_SEPARATOR)$$CLASSPATH" $(JAVA) gnu.kawa.util.PreProcess \
-	  $(SELECTOR) $(PREPROCESS_HTTPSERVER) $(PREPROCESS_XML) $(PREPROCESS_JFREESVG) \
-	  `sed -e 's|\([^ ]*\)|$(srcdir)/\1|' < $(srcdir)/patch-source-list`
-	$(MAKE) set-selected-java-source JAVA_SOURCE=$(JAVA_SOURCE)
-
-set-selected-java-source:
-	if test ! -e selected-java-source || \
-	   test "$(JAVA_SOURCE)" != "`cat selected-java-source`"; \
-	   then echo "$(JAVA_SOURCE)" >selected-java-source; \
+selected-java-source: Makefile $(srcdir)/patch-source-list
+	if test ! -e selected-java-source -o \
+	   "$(JAVA_PREPROCESS_OPTIONS)" != "`cat selected-java-source`"; \
+	   then $(MAKE) do-preprocess; \
 	fi
+	echo "$(JAVA_PREPROCESS_OPTIONS)" >selected-java-source
+
+do-preprocess: gnu/kawa/util/PreProcess.class
+	CLASSPATH=".$(CLASSPATH_SEPARATOR)$$CLASSPATH" $(JAVA) gnu.kawa.util.PreProcess \
+	  $(JAVA_PREPROCESS_OPTIONS) \
+	  `sed -e 's|\([^ ]*\)|$(srcdir)/\1|' < $(srcdir)/patch-source-list`
 
 GENERATED_SIMPLEVECTOR_FILES =\
   $(srcdir)/gnu/lists/FVector.java \

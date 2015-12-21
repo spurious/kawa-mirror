@@ -407,6 +407,7 @@ GNU_KAWA_MODELS_JSOURCES = \
   kawa/models/Paintable.java \
   kawa/models/Row.java \
   kawa/models/Spacer.java \
+  kawa/models/SVGUtils.java \
   kawa/models/Text.java \
   kawa/models/Viewable.java \
   kawa/models/WeakListener.java \

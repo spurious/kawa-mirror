@@ -594,6 +594,7 @@ JAVACFLAGS
 JAVAC
 JAVA
 WITH_JAVAFX_ARG
+WITH_JFREESVG_ARG
 WITH_SERVLET_ARG
 filesep
 pathsep
@@ -619,6 +620,8 @@ WITH_SWT_FALSE
 WITH_SWT_TRUE
 WITH_JAVAFX_FALSE
 WITH_JAVAFX_TRUE
+WITH_JFREESVG_FALSE
+WITH_JFREESVG_TRUE
 WITH_SWING_FALSE
 WITH_SWING_TRUE
 ENABLE_SERVLET_FALSE
@@ -722,6 +725,7 @@ enable_silent_rules
 enable_kawa_frontend
 enable_xml
 with_servlet
+with_jfreesvg
 with_android
 with_javafx
 with_XQTS
@@ -1375,6 +1379,7 @@ Optional Packages:
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
   --with-servlet[=servlet-api.jar]
                           Build support for generating servlets
+
   --with-android[=android.jar]
                           Build for the Android platform
   --with-javafx[=jfxrt.jar]
@@ -2546,6 +2551,14 @@ fi
 WITH_SERVLET_ARG="${with_servlet}"
 
 
+# Check whether --with-jfreesvg was given.
+if test "${with_jfreesvg+set}" = set; then :
+  withval=$with_jfreesvg;
+fi
+
+WITH_JFREESVG_ARG="${with_jfreesvg}"
+
+
 # Check whether --with-android was given.
 if test "${with_android+set}" = set; then :
   withval=$with_android;
@@ -2717,11 +2730,6 @@ case "$JAVA_SOURCE" in
   6compat5) JAVACFLAGS="${JAVACFLAGS} -target 1.5 -source 1.5" ;;
 esac
 
-pathsep="$PATH_SEPARATOR"
-case ${host} in
-  *-*-mingw*|*-*-cygwin*) CLASSPATH_SEPARATOR=";" ;;
-  *) CLASSPATH_SEPARATOR="$PATH_SEPARATOR"
-esac
 filesep='/'
 
 # Partly for compatibility (--enable/--disable-servlet was the old option);
@@ -2833,6 +2841,14 @@ else
   WITH_SWING_FALSE=
 fi
 
+ if test "$with_jfreesvg" != "" -a "$with_jfreesvg" != "no"; then
+  WITH_JFREESVG_TRUE=
+  WITH_JFREESVG_FALSE='#'
+else
+  WITH_JFREESVG_TRUE='#'
+  WITH_JFREESVG_FALSE=
+fi
+
  if test "$with_javafx" != "" -a "$with_javafx" != "no"; then
   WITH_JAVAFX_TRUE=
   WITH_JAVAFX_FALSE='#'
@@ -2909,11 +2925,23 @@ fi
 JEMACS_VERSION=`echo $VERSION | sed  -e 's/^1/0/'`
 BYTECODE_VERSION="$VERSION"
 
+pathsep="$PATH_SEPARATOR"
+case ${host} in
+  *-*-mingw*|*-*-cygwin*) CLASSPATH_SEPARATOR=";" ;;
+  *) CLASSPATH_SEPARATOR="$PATH_SEPARATOR"
+esac
+
 case ${with_servlet} in
   yes) ;;
   no) ;;
   "") ;;
   *) conf_classpath=${with_servlet}${CLASSPATH_SEPARATOR}$conf_classpath ;;
+esac
+case ${with_jfreesvg} in
+  yes) ;;
+  no) ;;
+  "") ;;
+  *) conf_classpath=${with_jfreesvg}${CLASSPATH_SEPARATOR}$conf_classpath ;;
 esac
 case ${with_javafx} in
   yes) ;;
@@ -2937,6 +2965,7 @@ case ${with_android} in
   *) conf_classpath=${with_android}${CLASSPATH_SEPARATOR}$conf_classpath ;;
 esac
 
+
 case ${with_sax2} in
   yes) SAX2_PREPROCESS="+SAX2";;
   no) SAX2_PREPROCESS="-SAX2";;
@@ -2944,6 +2973,7 @@ case ${with_sax2} in
 esac
 
 XQTS_PATH=${with_XQTS:-XQTS}
+
 
 
 
@@ -3178,6 +3208,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${WITH_SWING_TRUE}" && test -z "${WITH_SWING_FALSE}"; then
   as_fn_error $? "conditional \"WITH_SWING\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${WITH_JFREESVG_TRUE}" && test -z "${WITH_JFREESVG_FALSE}"; then
+  as_fn_error $? "conditional \"WITH_JFREESVG\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${WITH_JAVAFX_TRUE}" && test -z "${WITH_JAVAFX_FALSE}"; then

@@ -1,3 +1,8 @@
+2015-12-21  Per Bothner  <per@bothner.com>
+
+	* configure.ac: Share logic by using ../config.classpath.
+	* Makefile.am (CDEFS): Fix use of conf_classpath.
+
 2015-12-16  Per Bothner  <per@bothner.com>
 
 	* kawa.c: Add readline escape characters around simple

@@ -98,7 +98,8 @@ host_triplet = @host@
 @ENABLE_KAWA_FRONTEND_TRUE@am__append_6 = bin
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/configure.ac
+am__aclocal_m4_deps = $(top_srcdir)/config.classpath \
+	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 DIST_COMMON = $(srcdir)/Makefile.am $(top_srcdir)/configure \
@@ -286,6 +287,7 @@ STRIP = @STRIP@
 TOP_BUILDDIR = @TOP_BUILDDIR@
 VERSION = @VERSION@
 WITH_JAVAFX_ARG = @WITH_JAVAFX_ARG@
+WITH_JFREESVG_ARG = @WITH_JFREESVG_ARG@
 WITH_SERVLET_ARG = @WITH_SERVLET_ARG@
 XQTS_PATH = @XQTS_PATH@
 abs_builddir = @abs_builddir@
@@ -406,6 +408,8 @@ JAVADOC_ECLIPSE_JARS = $(ECLIPSE_PLUGINS_PATH)/org.eclipse.jface_3.1.0.jar:$(ECL
 JAVADOC_EXTRA_PATH = $(JAVADOC_ECLIPSE_JARS):$(JAVADOC_ANT_JARS)
 @WITH_HTTPSERVER_FALSE@PREPROCESS_HTTPSERVER = -use:com.sun.net.httpserver
 @WITH_HTTPSERVER_TRUE@PREPROCESS_HTTPSERVER = +use:com.sun.net.httpserver
+@WITH_JFREESVG_FALSE@PREPROCESS_JFREESVG = -with:JFreeSVG
+@WITH_JFREESVG_TRUE@PREPROCESS_JFREESVG = +with:JFreeSVG
 @ENABLE_XML_FALSE@PREPROCESS_XML = -enable:XML
 @ENABLE_XML_TRUE@PREPROCESS_XML = +enable:XML
 GENERATED_SIMPLEVECTOR_FILES = \
@@ -1126,7 +1130,7 @@ select-android: $(srcdir)/patch-source-list gnu/kawa/util/PreProcess.class
 
 do-preprocess:
 	CLASSPATH=".$(CLASSPATH_SEPARATOR)$$CLASSPATH" $(JAVA) gnu.kawa.util.PreProcess \
-	  $(SELECTOR) $(PREPROCESS_HTTPSERVER) $(PREPROCESS_XML) \
+	  $(SELECTOR) $(PREPROCESS_HTTPSERVER) $(PREPROCESS_XML) $(PREPROCESS_JFREESVG) \
 	  `sed -e 's|\([^ ]*\)|$(srcdir)/\1|' < $(srcdir)/patch-source-list`
 	$(MAKE) set-selected-java-source JAVA_SOURCE=$(JAVA_SOURCE)
 

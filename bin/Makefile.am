@@ -18,7 +18,7 @@ cgi-servlet$(EXEEXT): $(cgi_servlet_OBJECTS)
 
 KAWAJAR = kawa-$(VERSION).jar
 KAWALIB = $(datadir)/java/$(KAWAJAR)
-CDEFS = -DJAVA='"$(JAVA)"' -DKAWALIB='"$(KAWALIB)"' -DKAWAJAR='"$(KAWAJAR)"' -DEXTRAPATH='"$(conf_classpath)"'
+CDEFS = -DJAVA='"$(JAVA)"' -DKAWALIB='"$(KAWALIB)"' -DKAWAJAR='"$(KAWAJAR)"' -DEXTRAPATH='"@conf_classpath@"'
 DEFS = $(CDEFS)
 
 CLEANFILES = kawa$(EXEEXT) tmp *.stamp

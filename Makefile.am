@@ -247,6 +247,11 @@ PREPROCESS_HTTPSERVER = +use:com.sun.net.httpserver
 else
 PREPROCESS_HTTPSERVER = -use:com.sun.net.httpserver
 endif
+if WITH_JFREESVG
+PREPROCESS_JFREESVG = +with:JFreeSVG
+else
+PREPROCESS_JFREESVG = -with:JFreeSVG
+endif
 if ENABLE_XML
 PREPROCESS_XML = +enable:XML
 else
@@ -332,7 +337,7 @@ select-android: $(srcdir)/patch-source-list gnu/kawa/util/PreProcess.class
 
 do-preprocess:
 	CLASSPATH=".$(CLASSPATH_SEPARATOR)$$CLASSPATH" $(JAVA) gnu.kawa.util.PreProcess \
-	  $(SELECTOR) $(PREPROCESS_HTTPSERVER) $(PREPROCESS_XML) \
+	  $(SELECTOR) $(PREPROCESS_HTTPSERVER) $(PREPROCESS_XML) $(PREPROCESS_JFREESVG) \
 	  `sed -e 's|\([^ ]*\)|$(srcdir)/\1|' < $(srcdir)/patch-source-list`
 	$(MAKE) set-selected-java-source JAVA_SOURCE=$(JAVA_SOURCE)
 

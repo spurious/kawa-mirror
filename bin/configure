@@ -585,6 +585,7 @@ ac_subst_vars='am__EXEEXT_FALSE
 am__EXEEXT_TRUE
 LTLIBOBJS
 LIBOBJS
+conf_classpath
 JAVA
 ON_WINDOWS_FALSE
 ON_WINDOWS_TRUE
@@ -715,6 +716,7 @@ enable_dependency_tracking
 with_libtool
 enable_xml
 with_servlet
+with_jfreesvg
 with_android
 enable_history
 '
@@ -1365,6 +1367,7 @@ Optional Packages:
   --with-libtool          Use libtool
   --with-servlet[=servlet-api.jar]
                           Build support for generating servlets
+
   --with-android[=android.jar]
                           Build for the Android platform
 
@@ -4459,6 +4462,14 @@ fi
 WITH_SERVLET_ARG="${with_servlet}"
 
 
+# Check whether --with-jfreesvg was given.
+if test "${with_jfreesvg+set}" = set; then :
+  withval=$with_jfreesvg;
+fi
+
+WITH_JFREESVG_ARG="${with_jfreesvg}"
+
+
 # Check whether --with-android was given.
 if test "${with_android+set}" = set; then :
   withval=$with_android;
@@ -4613,6 +4624,48 @@ fi
 
 
 JAVA=${JAVA-java}
+
+pathsep="$PATH_SEPARATOR"
+case ${host} in
+  *-*-mingw*|*-*-cygwin*) CLASSPATH_SEPARATOR=";" ;;
+  *) CLASSPATH_SEPARATOR="$PATH_SEPARATOR"
+esac
+
+case ${with_servlet} in
+  yes) ;;
+  no) ;;
+  "") ;;
+  *) conf_classpath=${with_servlet}${CLASSPATH_SEPARATOR}$conf_classpath ;;
+esac
+case ${with_jfreesvg} in
+  yes) ;;
+  no) ;;
+  "") ;;
+  *) conf_classpath=${with_jfreesvg}${CLASSPATH_SEPARATOR}$conf_classpath ;;
+esac
+case ${with_javafx} in
+  yes) ;;
+  no) ;;
+  "") ;;
+  *)
+    if test -f "${with_javafx}" ; then true
+    elif test -f "${with_javafx}/rt/lib/jfxrt.jar"
+    then with_javafx="${with_javafx}/rt/lib/jfxrt.jar"
+    elif test -f "${with_javafx}/lib/jfxrt.jar"
+    then with_javafx="${with_javafx}/lib/jfxrt.jar"
+    elif test -f "${with_javafx}/jre/lib/jfxrt.jar"
+    then with_javafx="${with_javafx}/jre/lib/jfxrt.jar"
+    fi
+    conf_classpath=${with_javafx}${CLASSPATH_SEPARATOR}$conf_classpath ;;
+esac
+case ${with_android} in
+  yes) ;;
+  no) ;;
+  "") ;;
+  *) conf_classpath=${with_android}${CLASSPATH_SEPARATOR}$conf_classpath ;;
+esac
+
+
 
 
 

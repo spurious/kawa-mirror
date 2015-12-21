@@ -1,0 +1,39 @@
+pathsep="$PATH_SEPARATOR"
+case ${host} in
+  *-*-mingw*|*-*-cygwin*) CLASSPATH_SEPARATOR=";" ;;
+  *) CLASSPATH_SEPARATOR="$PATH_SEPARATOR"
+esac
+
+case ${with_servlet} in
+  yes) ;;
+  no) ;;
+  "") ;;
+  *) conf_classpath=${with_servlet}${CLASSPATH_SEPARATOR}$conf_classpath ;;
+esac
+case ${with_jfreesvg} in
+  yes) ;;
+  no) ;;
+  "") ;;
+  *) conf_classpath=${with_jfreesvg}${CLASSPATH_SEPARATOR}$conf_classpath ;;
+esac
+case ${with_javafx} in
+  yes) ;;
+  no) ;;
+  "") ;;
+  *)
+    if test -f "${with_javafx}" ; then true
+    elif test -f "${with_javafx}/rt/lib/jfxrt.jar"
+    then with_javafx="${with_javafx}/rt/lib/jfxrt.jar"
+    elif test -f "${with_javafx}/lib/jfxrt.jar"
+    then with_javafx="${with_javafx}/lib/jfxrt.jar"
+    elif test -f "${with_javafx}/jre/lib/jfxrt.jar"
+    then with_javafx="${with_javafx}/jre/lib/jfxrt.jar"
+    fi
+    conf_classpath=${with_javafx}${CLASSPATH_SEPARATOR}$conf_classpath ;;
+esac
+case ${with_android} in
+  yes) ;;
+  no) ;;
+  "") ;;
+  *) conf_classpath=${with_android}${CLASSPATH_SEPARATOR}$conf_classpath ;;
+esac

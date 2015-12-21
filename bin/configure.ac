@@ -22,6 +22,9 @@ AC_ARG_WITH(servlet,
   AS_HELP_STRING(--with-servlet@<:@=servlet-api.jar@:>@,Build support for generating servlets))
 WITH_SERVLET_ARG="${with_servlet}"
 
+AC_ARG_WITH(jfreesvg)
+WITH_JFREESVG_ARG="${with_jfreesvg}"
+
 AC_ARG_WITH(android,
   AS_HELP_STRING(--with-android@<:@=android.jar@:>@,Build for the Android platform))
 
@@ -60,9 +63,12 @@ AM_CONDITIONAL(ON_WINDOWS, test "$CLASSPATH_SEPARATOR" = ";")
 
 JAVA=${JAVA-java}
 
+m4_include(../config.classpath)
+
 AC_SUBST(CC)
 AC_SUBST(CFLAGS)
 AC_SUBST(JAVA)
+AC_SUBST(conf_classpath)
 
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT

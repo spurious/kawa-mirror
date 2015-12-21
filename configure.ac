@@ -20,6 +20,9 @@ AC_ARG_WITH(servlet,
   AS_HELP_STRING(--with-servlet@<:@=servlet-api.jar@:>@,Build support for generating servlets))
 WITH_SERVLET_ARG="${with_servlet}"
 
+AC_ARG_WITH(jfreesvg)
+WITH_JFREESVG_ARG="${with_jfreesvg}"
+
 AC_ARG_WITH(android,
   AS_HELP_STRING(--with-android@<:@=android.jar@:>@,Build for the Android platform))
 
@@ -131,11 +134,6 @@ case "$JAVA_SOURCE" in
   6compat5) JAVACFLAGS="${JAVACFLAGS} -target 1.5 -source 1.5" ;;
 esac
 
-pathsep="$PATH_SEPARATOR"
-case ${host} in
-  *-*-mingw*|*-*-cygwin*) CLASSPATH_SEPARATOR=";" ;;
-  *) CLASSPATH_SEPARATOR="$PATH_SEPARATOR"
-esac
 filesep='/'
 
 # Partly for compatibility (--enable/--disable-servlet was the old option);
@@ -163,6 +161,8 @@ AM_CONDITIONAL(ENABLE_XML, test "$enable_xml" = "yes")
 AM_CONDITIONAL(ENABLE_SERVLET,
   test "$enable_servlet" != "" -a "$enable_servlet" != "no")
 AM_CONDITIONAL(WITH_SWING, test "$with_swing" != "no")
+AM_CONDITIONAL(WITH_JFREESVG,
+  test "$with_jfreesvg" != "" -a "$with_jfreesvg" != "no")
 AM_CONDITIONAL(WITH_JAVAFX,
   test "$with_javafx" != "" -a "$with_javafx" != "no")
 AM_CONDITIONAL(WITH_SWT, test "$with_swt" = "yes")
@@ -177,33 +177,7 @@ AM_CONDITIONAL(ON_WINDOWS, test "$CLASSPATH_SEPARATOR" = ";")
 JEMACS_VERSION=`echo $VERSION | sed  -e 's/^1/0/'`
 BYTECODE_VERSION="$VERSION"
 
-case ${with_servlet} in
-  yes) ;;
-  no) ;;
-  "") ;;
-  *) conf_classpath=${with_servlet}${CLASSPATH_SEPARATOR}$conf_classpath ;;
-esac
-case ${with_javafx} in
-  yes) ;;
-  no) ;;
-  "") ;;
-  *)
-    if test -f "${with_javafx}" ; then true
-    elif test -f "${with_javafx}/rt/lib/jfxrt.jar"
-    then with_javafx="${with_javafx}/rt/lib/jfxrt.jar"
-    elif test -f "${with_javafx}/lib/jfxrt.jar"
-    then with_javafx="${with_javafx}/lib/jfxrt.jar"
-    elif test -f "${with_javafx}/jre/lib/jfxrt.jar"
-    then with_javafx="${with_javafx}/jre/lib/jfxrt.jar"
-    fi
-    conf_classpath=${with_javafx}${CLASSPATH_SEPARATOR}$conf_classpath ;;
-esac
-case ${with_android} in
-  yes) ;;
-  no) ;;
-  "") ;;
-  *) conf_classpath=${with_android}${CLASSPATH_SEPARATOR}$conf_classpath ;;
-esac
+m4_include(config.classpath)
 
 case ${with_sax2} in
   yes) SAX2_PREPROCESS="+SAX2";;
@@ -219,6 +193,7 @@ AC_SUBST(CLASSPATH_SEPARATOR)
 AC_SUBST(pathsep)
 AC_SUBST(filesep)
 AC_SUBST(WITH_SERVLET_ARG)
+AC_SUBST(WITH_JFREESVG_ARG)
 AC_SUBST(WITH_JAVAFX_ARG)
 
 AC_SUBST(JAVA)

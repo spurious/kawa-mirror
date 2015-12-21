@@ -91,7 +91,8 @@ host_triplet = @host@
 bin_PROGRAMS = kawa$(EXEEXT) cgi-servlet$(EXEEXT)
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/configure.ac
+am__aclocal_m4_deps = $(top_srcdir)/../config.classpath \
+	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 DIST_COMMON = $(srcdir)/Makefile.am $(top_srcdir)/configure \
@@ -255,6 +256,7 @@ build_cpu = @build_cpu@
 build_os = @build_os@
 build_vendor = @build_vendor@
 builddir = @builddir@
+conf_classpath = @conf_classpath@
 datadir = @datadir@
 datarootdir = @datarootdir@
 docdir = @docdir@
@@ -298,7 +300,7 @@ kawa_SOURCES = kawa.c kawapath.c
 cgi_servlet_SOURCES = cgi-servlet.c kawapath.c
 KAWAJAR = kawa-$(VERSION).jar
 KAWALIB = $(datadir)/java/$(KAWAJAR)
-CDEFS = -DJAVA='"$(JAVA)"' -DKAWALIB='"$(KAWALIB)"' -DKAWAJAR='"$(KAWAJAR)"' -DEXTRAPATH='"$(conf_classpath)"'
+CDEFS = -DJAVA='"$(JAVA)"' -DKAWALIB='"$(KAWALIB)"' -DKAWAJAR='"$(KAWAJAR)"' -DEXTRAPATH='"@conf_classpath@"'
 CLEANFILES = kawa$(EXEEXT) tmp *.stamp
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 all: all-am

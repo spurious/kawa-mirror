@@ -1,3 +1,8 @@
+2015-12-21  Per Bothner  <per@bothner.com>
+
+	* swing.scm: Move a number of procedures from here to ...
+	* gui.scm: ... here.
+
 2015-09-28  Per Bothner  <per@bothner.com>
 
 	* printf.scm: Fix bogus uses of define-constant to define-private.

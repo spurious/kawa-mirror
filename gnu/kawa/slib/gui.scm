@@ -20,6 +20,56 @@
 				  (handle-non-keyword obj arg)
 				  (loop (+ i 1)))))))))))
 
+(define (polygon (initial :: <complex>) #!rest (more-points :: <object[]>))
+  (let ((path :: <java.awt.geom.GeneralPath>
+	      (make <java.awt.geom.GeneralPath>))
+	(n-points :: <int>
+		  ((primitive-array-length <object>) more-points)))
+    (path:moveTo ((real-part initial):doubleValue)
+		 ((imag-part initial):doubleValue))
+    (do ((i :: <int> 0 (+ i 1)))
+	((>= i n-points)
+	 (invoke path 'closePath)
+	 path)
+      (let ((pt :: <complex> ((primitive-array-get <object>) more-points i)))
+	(path:lineTo ((real-part pt):doubleValue)
+		     ((imag-part pt):doubleValue))))))
+
+(define (fill (shape :: <java.awt.Shape>)) ::  <gnu.kawa.models.Paintable>
+  (make <gnu.kawa.models.FillShape> shape))
+
+(define (draw (shape :: <java.awt.Shape>)) ::  <gnu.kawa.models.Paintable>
+  (make <gnu.kawa.models.DrawShape> shape))
+
+(define (with-paint  (paint  :: <java.awt.Color>)
+		     (pic ::  <gnu.kawa.models.Paintable>))
+  (make  <gnu.kawa.models.WithPaint> pic paint))
+
+(define (with-composite  #!rest (arguments :: <Object[]>))
+  (gnu.kawa.models.WithComposite:make arguments))
+
+(define (composite-src-over #!optional (alpha :: <float> 1.0))
+  :: <java.awt.Composite>
+  (java.awt.AlphaComposite:getInstance
+   (static-field <java.awt.AlphaComposite> 'SRC_OVER)
+   alpha))
+
+(define (composite-src #!optional (alpha :: <float> 1.0))
+  :: <java.awt.Composite>
+  (java.awt.AlphaComposite:getInstance
+   (static-field <java.awt.AlphaComposite> 'SRC)
+   alpha))
+
+(define (rotation (theta :: <double>)) :: <java.awt.geom.AffineTransform>
+  (java.awt.geom.AffineTransform:getRotateInstance theta))
+
+(define (with-transform  (transform  :: <java.awt.geom.AffineTransform>)
+		     (pic ::  <gnu.kawa.models.Paintable>))
+  (gnu.kawa.models.WithTransform:new pic transform))
+
+(define-constant color-red :: <java.awt.Color>
+  (static-field <java.awt.Color> 'red))
+
 (define (as-color value) :: <java.awt.Color>
   (cond ((instance? value <java.awt.Color>)
 	 value)

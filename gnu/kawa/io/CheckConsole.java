@@ -21,7 +21,7 @@ public class CheckConsole {
     }
 
     public static boolean haveConsole() {
-        if (haveConsole > 0 || getDomTermVersionInfo() != null)
+        if (haveConsole > 0)
             return true;
         if (haveConsole < 0)
             return false;
@@ -50,7 +50,7 @@ public class CheckConsole {
     static {
         try {
             String version = System.getProperty("org.domterm");
-            if (version == null)
+            if (version == null && haveConsole())
                 version = System.getenv("DOMTERM");
             if (version != null) {
                 version = version.trim();

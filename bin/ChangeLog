@@ -1,3 +1,7 @@
+2016-01-09  Per Bothner  <per@bothner.com>
+
+	* kawa.c: Remove isatty test - deal with it at the Java level.
+
 2015-12-21  Per Bothner  <per@bothner.com>
 
 	* configure.ac: Share logic by using ../config.classpath.

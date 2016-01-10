@@ -1,3 +1,9 @@
+2016-01-09  Per Bothner  <per@bothner.com>
+
+	* CheckConsole.java: Change previous DomTerm handling: We don't want
+	to assume we're connected to a DomTerm terminal just because the
+	DOMTERM environment variable is set, since we might be in a pipe.
+
 2015-12-17  Per Bothner  <per@bothner.com>
 
 	* CheckConsole.java (haveConsole): If running under DomTerm,

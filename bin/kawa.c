@@ -555,6 +555,9 @@ main(int argc, char** argv)
   out_argv[out_argc++] = "kawa.repl";
 #endif
 
+#if 0
+  /* No longer needed, asssuming Java 6 or higher,
+     which has java.lang.Console. */
   if (! isatty(0) || ! isatty(1))
     {
       out_argv[out_argc++] = "--no-console";
@@ -565,6 +568,7 @@ main(int argc, char** argv)
       perror ("failed to exec " COMMAND);
       exit (-1);
     }
+#endif
 
 #ifdef DEBUG
   logfile = fopen("kawa-frontend.log", "w");

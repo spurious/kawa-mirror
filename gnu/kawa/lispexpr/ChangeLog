@@ -1,3 +1,8 @@
+2016-01-11  Per Bothner  <per@bothner.com>
+
+	* ReaderDispatch.java (read): Use new Lexer.readIntDigits.
+	* ReaderDispatchMisc.java: Better error message for #MAXr.
+
 2015-10-12  Per Bothner  <per@bothner.com>
 
 	* LangPrimType.java (emitCoerceFromObject): Handle stringCursorType.

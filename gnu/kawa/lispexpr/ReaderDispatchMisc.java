@@ -80,7 +80,14 @@ public class ReaderDispatchMisc extends ReadTableEntry
       case 'R':
 	if (count > 36)
 	  {
-	    in.error("the radix "+count+" is too big (max is 36)");
+            StringBuilder sbuf = new StringBuilder("the radix ");
+            if (count < Integer.MAX_VALUE)
+              {
+                sbuf.append(count);
+                sbuf.append(' ');
+              }
+            sbuf.append("is too big (max is 36)");
+            in.error(sbuf.toString());
 	    count = 36;
 	  }
 	return LispReader.readNumberWithRadix(0, reader, count);

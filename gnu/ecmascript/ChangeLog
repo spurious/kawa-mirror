@@ -1,3 +1,7 @@
+2016-01-11  Per Bothner  <per@bothner.com>
+
+	* Lexer.java: Update call to Lexer.readDigitsInBuffer.
+
 2014-01-05  Per Bothner  <per@bothner.com>
 
 	* Makefile.am: Merge into ../../gnu/Makefile.am and remove.

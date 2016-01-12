@@ -278,34 +278,53 @@ public class Lexer extends Reader
   }
 
   /** Read digits, up to the first non-digit or the buffer limit
-    * @return the digits seen as a non-negative long, or -1 on overflow
+    * @param ival previously-seen digits or -2 if no digits seen
+    * @return the digits seen as a non-negative long, or -1 on overflow,
+    *   or -2 if no digits seen
     */
-  public static long readDigitsInBuffer (InPort port, int radix)
+  public static long readDigitsInBuffer (InPort port, long ival, int radix)
   {
-    long ival = 0;
-    boolean overflow = false;
-    long max_val = Long.MAX_VALUE / radix;
     int i = port.pos;
     if (i >= port.limit)
-      return 0;
+      return ival;
     for (;;)
       {
 	char c = port.buffer[i];
 	int dval = Character.digit(c, radix);
 	if (dval < 0)
 	  break;
-	if (ival > max_val)
-	  overflow = true;
+        if (ival == -2) // initial digits
+          ival = dval;
+        else if (ival == -1)
+          ;
+        else if (ival > (Long.MAX_VALUE - dval) / radix)
+	  ival = -1;
 	else
 	  ival = ival * radix + dval;
-	if (ival < 0)
-	  overflow = true;
 	if (++i >= port.limit)
 	  break;
       }
     port.pos = i;
-    return overflow ? -1 : ival;
+    return ival;
   }
+
+    public static long readDigits(InPort port, int radix) throws IOException {
+        long ival = -2;
+        for (;;) {
+            ival = readDigitsInBuffer(port, ival, radix);
+            if (port.pos < port.limit || port.peek() < 0)
+                break;
+         }
+        return ival;
+    }
+
+    public int readIntDigits() throws IOException {
+        long lval = readDigits(port, 10);
+        int ival = (int) lval;
+        if (ival == -1 || ival != lval)
+            return Integer.MAX_VALUE;
+        return ival < 0 ? -1 : ival;
+    }
 
   public String getName() { return port.getName(); }
 

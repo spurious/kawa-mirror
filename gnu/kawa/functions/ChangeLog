@@ -1,5 +1,7 @@
 2016-01-16  Per Bothner  <per@bothner.com>
 
+	* Arrays.java  (makeFromSimple): Factory method to help lisp reader.
+
 	* DisplayFormat.java (write(Array,...)): Fix handling of rank 0.
 
 2015-12-21  Per Bothner  <per@bothner.com>

@@ -44,6 +44,7 @@ public class ReaderDispatch extends ReadTableEntry
     ReaderDispatch tab = new ReaderDispatch(nonTerminating);
     ReaderDispatchMisc entry = ReaderDispatchMisc.getInstance();
     tab.set(':', entry);
+    tab.set('A', entry);
     tab.set('B', entry);
     tab.set('D', entry);
     tab.set('E', entry);

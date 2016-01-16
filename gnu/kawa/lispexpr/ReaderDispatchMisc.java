@@ -4,6 +4,7 @@
 package gnu.kawa.lispexpr;
 import gnu.text.*;
 import gnu.mapping.*;
+import gnu.bytecode.PrimType;
 import gnu.bytecode.Type;
 import gnu.lists.*;
 import gnu.kawa.io.InPort;
@@ -64,19 +65,42 @@ public class ReaderDispatchMisc extends ReadTableEntry
               return Boolean.TRUE;
           if (nameLC.equals("f") || nameLC.equals("false"))
               return Boolean.FALSE;
-          int size;
-          if (nameLC.equals("f32")) size = 32;
-          else if (nameLC.equals("f64")) size = 64;
+          PrimType elementType;
+          if (nameLC.equals("f32"))
+              elementType = LangPrimType.floatType;
+          else if (nameLC.equals("f64"))
+              elementType = LangPrimType.doubleType;
           else
             {
               in.error("unexpected characters following '#'");
               return Boolean.FALSE;
             }
-          return LispReader.readSimpleVector(reader, 'F',
-                                             reader.read(), size);
+          return LispReader.readGeneralArray(reader, count, elementType);
       case 'S':
       case 'U':
-	return LispReader.readSimpleVector(reader, (char) ch);
+          int size = reader.readIntDigits();
+          switch (size) {
+          case 8:
+              elementType = ch == 'U' ? LangPrimType.unsignedByteType
+                  : LangPrimType.byteType;
+              break;
+          case 16:
+              elementType = ch == 'U' ? LangPrimType.unsignedShortType
+                  : LangPrimType.shortType;
+              break;
+           case 32:
+              elementType = ch == 'U' ? LangPrimType.unsignedIntType
+                  : LangPrimType.intType;
+              break;
+           case 64:
+              elementType = ch == 'U' ? LangPrimType.unsignedLongType
+                  : LangPrimType.longType;
+              break;
+          default:
+              in.error("expected 8, 16, 32, or 64 after #S or #U");
+              elementType = null;
+          }
+          return LispReader.readGeneralArray(reader, count, elementType);
       case 'R':
 	if (count > 36)
 	  {
@@ -104,6 +128,8 @@ public class ReaderDispatchMisc extends ReadTableEntry
 	reader.tokenBufferAppend('#');
 	reader.tokenBufferAppend(ch);
 	return LispReader.readNumberWithRadix(2, reader, 0);
+      case 'A':
+          return LispReader.readGeneralArray(reader, count, null);
       /* #ifdef use:java.util.regex */
       case '/':
       return readRegex(in, ch, count);

@@ -1,3 +1,6 @@
+// Copyright (c) 2000, 2016  Per M.A. Bothner.
+// This is free software;  for terms and warranty disclaimer see COPYING.
+
 package gnu.kawa.lispexpr;
 import gnu.text.*;
 import gnu.mapping.*;
@@ -6,9 +9,11 @@ import gnu.math.*;
 import gnu.expr.*;
 import gnu.kawa.io.BinaryInPort;
 import gnu.kawa.io.InPort;
+import gnu.kawa.functions.Arrays;
 import gnu.kawa.util.GeneralHashTable;
 import gnu.bytecode.PrimType;
 import gnu.bytecode.Type;
+import java.util.List;
 import java.util.regex.*;
 import java.lang.reflect.Array;
 
@@ -1630,42 +1635,124 @@ public class LispReader extends Lexer
     return null;
   }
 
-  public static SimpleVector
-  readSimpleVector(LispReader reader, char kind)
-    throws java.io.IOException, SyntaxException
-  {
-    int size = 0;
-    int ch;
-    for (;;)
-      {
-	ch = reader.read();
-	if (ch < 0)
-	  reader.eofError("unexpected EOF reading uniform vector");
-	int digit = Character.digit((char) ch, 10);
-	if (digit < 0)
-	  break;
-	size = size * 10 + digit;
-      }
-    return readSimpleVector(reader, kind, ch, size);
-  }
+    public static Object readGeneralArray(LispReader in, int rank,
+                                          PrimType elementType)
+            throws java.io.IOException, SyntaxException {
+        if (rank == -1)
+            rank = 1;
+        int[] dimensions = new int[rank];
+        int[] lowBounds = null;
+        boolean error = false;
+        int ch = in.read();
+        boolean explicitDim = ch == '@' || ch == ':';
+        boolean baddim = false;
+        if (explicitDim) {
+            for (int r = 0; r < rank; r++) {
+                if (ch == '@') {
+                    ch = in.read();
+                    boolean neg = ch == '-';
+                    if (! neg)
+                        in.unread(ch);
+                    int low = in.readIntDigits();
+                    if (low < 0) {
+                        in.error("expected low-bound after '@'");
+                        low = 0;
+                    }
+                    if (lowBounds == null)
+                        lowBounds = new int[rank];
+                    lowBounds[r] = neg ? - low : low;
+                    ch = in.read();
+                }
+                if (ch == ':') {
+                    int dim = in.readIntDigits();
+                    if (dim < 0) {
+                        in.error("expected dimension after ':'");
+                        error = true;
+                    }
+                      
+                    dimensions[r] = dim;
+                    ch = in.read();
+                } else {
+                    in.error("missing bounds-specifier (seen "+r
+                             +" of "+rank+")");
+                    error = true;
+                    
+                }
+            }
+            if (ch == '@' || ch == ':') {
+                in.error("too many bounds-specifiers for rank-"
+                         +rank+" array");
+                error = true;
+            }
+        }
+        while (ch >= 0 && Character.isWhitespace(ch))
+            ch = in.read();
+        SourceLocator sloc =
+            PairWithPosition.make(null, null, in.getName(),
+                                  in.getLineNumber()+1, in.getColumnNumber());
+        in.unread(ch);
+        Object data = in.readObject();
+        if (! explicitDim) {
+            if (! dimensionsFromNested(0, dimensions, data)) {
+                in.error("array value is not a nested true list");
+                error = true;
+            }
+        }
+        if (error)
+            return LList.Empty;
+        int size = 1;
+        for (int d = dimensions.length;  -- d >= 0; )
+            size *= dimensions[d];
+        Object buffer = elementType == null ? new Object[size]
+            : Array.newInstance(elementType.getReflectClass(), size);
+        SourceMessages messages = in.getMessages();
+        fromNested(buffer, 0, 0, dimensions, data, elementType, sloc, messages);
+        return Arrays.makeFromSimple(dimensions, lowBounds,
+                                     buffer, elementType);
+    }
 
-    private Object convertListToArray(Object list, int len, PrimType elementType) {
-        char sig1 = elementType.getSignature().charAt(0);
-        Object array = Array.newInstance(elementType.getReflectClass(), len);
-        for (int i = 0;  i < len; i++) {
-            Pair pair = (Pair) list;
-            Object value = pair.getCar();
+    static boolean
+    dimensionsFromNested(int dim, int[] dimensions, Object data) {
+        int rank = dimensions.length;
+        if (dim == rank)
+            return true;
+        List seq = Sequences.asSequenceOrNull(data);
+        if (seq == null)
+            return false;
+        int len;
+        if (seq instanceof Pair)
+            len = LList.listLength(seq, false);
+        else
+            len = seq.size();
+        if (len < 0)
+            return false;
+        if (len > dimensions[dim])
+            dimensions[dim] = len;
+        for (Object el : seq) {
+            if (! dimensionsFromNested(dim+1, dimensions, el))
+                return false;
+        }
+        return true;
+    }
+
+    static void fromNested(Object buffer, int index, int dim, int[] dimensions, Object value, PrimType elementType, SourceLocator sloc, SourceMessages messages) {
+        int rank = dimensions.length;
+        if (dim==rank) {
+            char sig1 = elementType == null ? 'L'
+                : elementType.getSignature().charAt(0);
             if (sig1 == 'B' || sig1 == 'S' || sig1 == 'I' || sig1 == 'J') {
                 String msg = null;
                 if (! (value instanceof IntNum))
                     msg = "expected integer value";
                 else {
-                    value = LangPrimType.convertIntegerLiteral((IntNum) value, elementType, true);
-                    if (value == null)
-                        msg = "integer "+pair.getCar()+" not in range of "+elementType.getName();
+                    Object nvalue = LangPrimType.convertIntegerLiteral((IntNum) value, elementType, true);
+                    if (nvalue == null)
+                        msg = "integer "+value+" not in range of "+elementType.getName();
+                    else
+                        value = nvalue;
                 }
                 if (msg != null) {
-                    getMessages().error('e', (SourceLocator) pair, msg);
+                    messages.error('e', sloc, msg);
                     value = LangPrimType.convertIntegerLiteral(IntNum.zero(),
                                                                elementType, true);
                 }
@@ -1678,92 +1765,31 @@ public class LispReader extends Lexer
                     else
                         value = Double.valueOf(rvalue.doubleValue());
                 } else {
-                    getMessages().error('e', (SourceLocator) pair,
-                                        "expected real value");
+                    messages.error('e', sloc, "expected real value");
                 }
             }
-            Array.set(array, i, value);
-            list = pair.getCdr();
+            Array.set(buffer, index, value);
+        } else {
+            dim++;
+            int stride = 1;
+            for (int i = dim; i < rank; i++)
+                stride *= dimensions[i];
+            while (value instanceof Pair) {
+                Pair pair = (Pair) value;
+                if (pair instanceof SourceLocator)
+                    sloc = (SourceLocator) pair;
+                fromNested(buffer, index, dim, dimensions,
+                           pair.getCar(), elementType, sloc, messages);
+                value = pair.getCdr();
+                index += stride;
+            }
+            for (Object el : Sequences.coerceToSequence(value)) {
+                fromNested(buffer, index, dim, dimensions,
+                           el, elementType, sloc, messages);
+                index += stride;
+            }
         }
-        return array;
     }
-
-  public static SimpleVector
-      readSimpleVector(LispReader reader, char kind, int ch, int size)
-    throws java.io.IOException, SyntaxException
-  {
-    if (! (size == 8 || size == 16 || size == 32 || size == 64)
-        || (kind == 'F' && size < 32)
-        || ch != '(')
-      {
-        reader.error("invalid uniform vector syntax");
-        return null;
-      }
-    Object list = ReaderParens.readList(reader, null, '(', -1, ')', -1);
-    int len = LList.listLength(list, false);
-    if (len < 0)
-      {
-        reader.error("invalid elements in uniform vector syntax");
-        return null;
-      }
-    Sequence q = (Sequence) list;
-    switch (kind)
-      {
-      case 'F':
-        switch (size)
-          {
-          case 32:
-              return new F32Vector((float[])
-                                  reader.convertListToArray(list, len,
-                                          LangPrimType.floatType));
-          case 64:
-              return new F64Vector((double[])
-                                  reader.convertListToArray(list, len,
-                                          LangPrimType.doubleType));
-          }
-      case 'S':
-        switch (size)
-          {
-         case  8:
-              return new S8Vector((byte[])
-                                  reader.convertListToArray(list, len,
-                                          LangPrimType.byteType));
-          case 16:
-              return new S16Vector((short[])
-                                  reader.convertListToArray(list, len,
-                                          LangPrimType.shortType));
-          case 32:
-              return new S32Vector((int[])
-                                   reader.convertListToArray(list, len,
-                                           LangPrimType.intType));
-          case 64:
-               return new S64Vector((long[])
-                                  reader.convertListToArray(list, len,
-                                          LangPrimType.longType));
-         }
-      case 'U':
-        switch (size)
-          {
-         case  8:
-              return new U8Vector((byte[])
-                                  reader.convertListToArray(list, len,
-                                          LangPrimType.unsignedByteType));
-          case 16:
-              return new U16Vector((short[])
-                                  reader.convertListToArray(list, len,
-                                          LangPrimType.unsignedShortType));
-          case 32:
-              return new U32Vector((int[])
-                                   reader.convertListToArray(list, len,
-                                           LangPrimType.unsignedIntType));
-          case 64:
-               return new U64Vector((long[])
-                                 reader.convertListToArray(list, len,
-                                          LangPrimType.unsignedLongType));
-          }
-      }
-    return null;
-  }
 
     boolean deprecatedXmlEnlosedReported;
 }

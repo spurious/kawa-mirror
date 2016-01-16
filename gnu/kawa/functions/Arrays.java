@@ -1,7 +1,8 @@
-// Copyright (c) 2002, 2003  Per M.A. Bothner and Brainfood Inc.
+// Copyright (c) 2002, 2003, 2016  Per M.A. Bothner and Brainfood Inc.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.kawa.functions;
+import gnu.bytecode.PrimType;
 import gnu.lists.*;
 import gnu.mapping.*;
 import gnu.math.IntNum;
@@ -45,6 +46,62 @@ public class Arrays
       }
     return GeneralArray.makeSimple(lowBounds, dimensions, new FVector(total, value));
   }
+
+    public static Array makeFromSimple(int [] dimensions, int[] lowBounds,
+                                       Object buffer,
+                                       PrimType elementType) {
+        char sig1;
+        if (elementType == null)
+            sig1 = 'L';
+        else {
+            sig1 = elementType.getSignature().charAt(0);
+            if (elementType.isUnsigned())
+                sig1 = Character.toLowerCase(sig1);
+        }
+        int rank = dimensions.length;
+        SimpleVector base;
+        switch (sig1) {
+        case 'L':
+            base = new FVector((Object[]) buffer);
+            break;
+        case 'B':
+            base = new S8Vector((byte[]) buffer);
+            break;
+        case 'b':
+            base = new U8Vector((byte[]) buffer);
+            break;
+        case 'I':
+            base = new S32Vector((int[]) buffer);
+            break;
+        case 'i':
+            base = new U32Vector((int[]) buffer);
+            break;
+        case 'J':
+            base = new S64Vector((long[]) buffer);
+            break;
+        case 'j':
+            base = new U64Vector((long[]) buffer);
+            break;
+        case 'S':
+            base = new S16Vector((short[]) buffer);
+            break;
+        case 's':
+            base = new U16Vector((short[]) buffer);
+            break;
+        case 'D':
+            base = new F64Vector((double[]) buffer);
+            break;
+        case 'F':
+            base = new F32Vector((float[]) buffer);
+            break;
+        default:
+            throw new Error("bad type for makeFromSimple");
+        }
+        if (rank == 1 && (lowBounds == null || lowBounds[0] == 0))
+            return base;
+        else
+            return GeneralArray.makeSimple(lowBounds, dimensions, base);
+    }
 
   public static Array makeSimple(Array shape, SimpleVector base)
   {

@@ -1,3 +1,14 @@
+2016-01-16  Per Bothner  <per@bothner.com>
+
+	Support for #A array reader syntax with Guile extensions.
+	* LispReader.java (readGeneralArray): New method.
+	(dimensionsFromNested, fromNested): New helper methods.
+	(readSimpleVector [2 methods], convertListToArray):
+	Remove methods specifically for uniform vectors.
+	* ReaderDispatch.java: Add entry for "#A".
+	* ReaderDispatchMisc.java: Handle #A.
+	Change uniform verctors syntax (#U8, #S8, etc) to use readGeneralArray.
+
 2016-01-11  Per Bothner  <per@bothner.com>
 
 	* ReaderDispatch.java (read): Use new Lexer.readIntDigits.

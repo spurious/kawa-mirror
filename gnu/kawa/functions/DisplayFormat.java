@@ -508,9 +508,11 @@ public class DisplayFormat extends AbstractFormat
     int count = 0;
     String start = level > 0 ? "("
       : rank == 1 ? "#("
+      : rank == 0 ? "#0a "
       : "#" + rank + "a(";
+    String end = rank == 0 ? "" : ")";
     if (out instanceof OutPort)
-      ((OutPort) out).startLogicalBlock(start, false, ")");
+      ((OutPort) out).startLogicalBlock(start, false, end);
     else
       write (start, out);
     if (rank > 0)
@@ -537,10 +539,12 @@ public class DisplayFormat extends AbstractFormat
 	    count += step;
 	  }
       }
-    if (out instanceof OutPort)
-      ((OutPort) out).endLogicalBlock(")");
     else
-      write(")", out);
+      writeObject(array.getRowMajor(index), out);
+    if (out instanceof OutPort)
+      ((OutPort) out).endLogicalBlock(end);
+    else
+      write(end, out);
     return count;
   }
 

@@ -1,3 +1,7 @@
+2016-01-19  Per Bothner  <per@bothner.com>
+
+	* GeneralArray.java (getTag): New method.
+
 2015-08-18  Per Bothner  <per@bothner.com>
 
 	Make result of sequence-as-index return same type, with sharing.

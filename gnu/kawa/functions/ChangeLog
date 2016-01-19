@@ -1,3 +1,9 @@
+2016-01-19  Per Bothner  <per@bothner.com>
+
+	* DisplayFormat.java (write(Array,...)): Better Array printing.
+	Print low-bounds and dimensions when needed.
+	Handle multi-dimensional unformm arrays, as as such #2F64(...).
+
 2016-01-16  Per Bothner  <per@bothner.com>
 
 	* Arrays.java  (makeFromSimple): Factory method to help lisp reader.

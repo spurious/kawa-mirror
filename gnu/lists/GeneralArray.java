@@ -191,6 +191,8 @@ implements Array //, Consumable
     sbuf.append('>');
   }
 
+    public String getTag() { return base.getTag(); }
+
   public String toString ()
   {
     StringBuffer sbuf = new StringBuffer();

@@ -506,10 +506,37 @@ public class DisplayFormat extends AbstractFormat
   {
     int rank = array.rank();
     int count = 0;
-    String start = level > 0 ? "("
-      : rank == 1 ? "#("
-      : rank == 0 ? "#0a "
-      : "#" + rank + "a(";
+    String start;
+    if (level > 0)
+        start = "(";
+    else {
+        boolean printDims = false;
+        int i = rank;
+        while (--i >= 0) {
+            if (array.getLowBound(i) != 0 || array.getSize(i) == 0)
+                break;
+        }
+        StringBuilder sbuf = new StringBuilder();
+        sbuf.append('#');
+        sbuf.append(rank);
+        String tag = array instanceof GeneralArray
+            ? ((GeneralArray) array).getTag()
+            : null;
+        sbuf.append(tag == null ? 'a' : tag);
+        if (i >= 0) {
+            for (i = 0; i < rank; i++) {
+                int low = array.getLowBound(i);
+                if (low != 0) {
+                    sbuf.append('@');
+                    sbuf.append(low);
+                }
+                sbuf.append(':');
+                sbuf.append(array.getSize(i));
+            }
+        }
+        sbuf.append(rank == 0 ? ' ' : '(');
+        start = sbuf.toString();
+    }
     String end = rank == 0 ? "" : ")";
     if (out instanceof OutPort)
       ((OutPort) out).startLogicalBlock(start, false, end);

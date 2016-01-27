@@ -169,7 +169,7 @@ public class LispReader extends Lexer
     public Pair readValuesAndAppend(int ch, ReadTable rtable, Pair last)
             throws java.io.IOException, SyntaxException {
         int line = port.getLineNumber();
-        int column = port.getColumnNumber();
+        int column = port.getColumnNumber() - 1; // Adjust for ch
         Object values = readValues(ch, rtable, -1);
         int index = 0;
         int next = Values.nextIndex(values, index);

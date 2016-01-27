@@ -1,3 +1,7 @@
+2016-01-26  Per Bothner  <per@bothner.com>
+
+	* configure.ac: Fix case when --with-java-source is defaulted.
+
 2015-12-21  Per Bothner  <per@bothner.com>
 
 	* configure.ac: Handle mapping from JAVA_SOURCE to PreProcess

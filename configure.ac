@@ -70,6 +70,8 @@ test -z "${with_java_source}" -a -n "${with_android}" \
   && with_java_source=android
 
 with_java_source=`echo ${with_java_source} | tr A-Z a-z`
+# Java 7 is the (current) default
+test "${with_java_source}" = "" && with_java_source=7
 case "/${with_java_source}/" in
   /1/|/1.1*/) # JDK 1.1 - not supported
     JAVA_SOURCE=1; JAVA_SOURCE_SELECTOR='%java1';;
@@ -96,7 +98,6 @@ case "/${with_java_source}/" in
         test -z "$with_swing" && with_swing="no"
         test -z "$with_awt" && with_awt="no"
         ;;
-  //) JAVA_SOURCE=7 ;;
   /*/) AC_MSG_ERROR([Invalid version for --with-java-version.
   (Must be 1, 2, 5, 6, 7, 8, or a JDK version such as 1.5.)]) ;;
 esac

@@ -1,3 +1,8 @@
+2016-01-26  Per Bothner  <per@bothner.com>
+
+	* Shell.java (run): We can simplify skipping to end-of-line,
+	since parse does that.
+
 2015-12-16  Per Bothner  <per@bothner.com>
 
 	* repl.java: Remove --domterm flag.

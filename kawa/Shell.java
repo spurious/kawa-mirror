@@ -274,19 +274,9 @@ public class Shell
                     continue;
                 }
 
-		// Skip whitespace, in case (read-char) or similar is called:
-		int ch;
-		for (;;)
-		  {
-		    ch = inp.read();
-		    if (ch < 0 || ch == '\r' || ch == '\n')
-		      break;
-		    if (ch != ' ' && ch != '\t')
-		      {
-			inp.unread();
-			break;
-		      }
-		  }
+                int ch = inp.peek();
+                if (ch == '\n')
+                    inp.skip();
 
 		if (! ModuleExp.evalModule(env, ctx, comp, url, perr))
 		  throw new SyntaxException(messages);

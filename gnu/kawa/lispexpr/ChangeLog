@@ -1,5 +1,8 @@
 2016-01-26  Per Bothner  <per@bothner.com>
 
+	* LispLanguage.java (parse): In a REPL it works better if we parse
+	forms until end-of-line.
+
 	* LispReader.java (readValuesAndAppend): Fix off-by-one error
 	in column number.
 

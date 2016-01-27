@@ -142,14 +142,7 @@ public class Symbol
     else if (spec == Boolean.TRUE)
       ns = Namespace.EmptyNamespace;
     else
-      {
-        /* #ifdef use:java.lang.CharSequence */
-        spec = (CharSequence) spec;
-        /* #else */
-        //spec = (CharSeq) spec;
-        /* #endif */
-        ns = Namespace.valueOf(spec.toString());
-      }
+      ns = Namespace.valueOf(((CharSequence) spec).toString());
     return ns.getSymbol(name.intern());
   }
 

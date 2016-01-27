@@ -93,9 +93,7 @@ public final class WriterManager implements Runnable
   }
 
   public static class WriterRef
-  /* #ifdef JAVA2 */
     extends java.lang.ref.WeakReference
-    /* #endif */
   {
     WriterRef next;
     WriterRef prev;

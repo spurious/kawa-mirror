@@ -1,3 +1,8 @@
+2016-01-28  Per Bothner  <per@bothner.com>
+
+	* standard/ImportFromLibrary.java (scanImportSet): More precise
+	error location if missing class.
+
 2016-01-27  Per Bothner  <per@bothner.com>
 
 	* lang/Quote.java (append$V): Better handling if non-list argument.

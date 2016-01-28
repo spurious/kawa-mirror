@@ -227,7 +227,9 @@ public class ImportFromLibrary extends Syntax
                         Class clas = ObjectType.getContextClass(cname);
                         decls.put(dname, tr.makeQuoteExp(clas));
                     } catch (ClassNotFoundException ex) {
+                        Object savePos = tr.pushPositionOf(cdrPair);
                         tr.error('e', "no class found named "+cname);
+                        tr.popPositionOf(savePos);
                     }
                 }
                 rest = cdrPair.getCdr();

@@ -748,7 +748,8 @@ public class ClassExp extends LambdaExp
     protected <R,D> void visitChildren (ExpVisitor<R,D> visitor, D d) {
         LambdaExp save = visitor.currentLambda;
         visitor.currentLambda = this;
-        supers = visitor.visitExps(supers, supers.length, d);
+        if (supers != null)
+            supers = visitor.visitExps(supers, supers.length, d);
         try {
             for (LambdaExp child = firstChild;
                  child != null && visitor.exitValue == null;

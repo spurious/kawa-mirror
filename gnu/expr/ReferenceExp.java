@@ -144,9 +144,7 @@ public class ReferenceExp extends AccessExp
       {
         value = dvalue.eval(ctx);
       }
-    else if (binding == null
-             || (binding.context instanceof ModuleExp
-                && ! binding.isPrivate()))
+    else if (binding == null || binding.context instanceof ModuleExp)
       {
         Environment env = Environment.getCurrent();
         Symbol sym = symbol instanceof Symbol ? (Symbol) symbol

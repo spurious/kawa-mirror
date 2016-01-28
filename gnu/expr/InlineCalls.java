@@ -753,7 +753,8 @@ public class InlineCalls extends ExpExpVisitor<Type> {
 
     protected Expression visitClassExp (ClassExp exp, Type required) {
         Expression result = super.visitClassExp(exp, required);
-        if (! exp.explicitInit && ! exp.instanceType.isInterface())
+        if (! exp.explicitInit && exp.instanceType != null
+            && ! exp.instanceType.isInterface())
             exp.checkDefaultSuperConstructor(exp.instanceType.getSuperclass(), comp);
         return result;
     }

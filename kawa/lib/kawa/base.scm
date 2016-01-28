@@ -21,6 +21,8 @@
 	  identifier?
           $bracket-apply$
           $bracket-list$
+          require
+          import
 
           bitwise-not
           bitwise-and bitwise-ior bitwise-xor bitwise-if
@@ -113,6 +115,8 @@
 	 syntax-case)
 
    (only (kawa standard define_alias) (define_alias define-alias))
+   (only kawa.standard.require require)
+   (only kawa.standard.ImportFromLibrary (instance import))
 
    (only (rename (kawa standard define_class)
 		 (define_simple_class define-simple-class)

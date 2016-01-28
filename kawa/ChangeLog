@@ -1,3 +1,9 @@
+2016-01-27  Per Bothner  <per@bothner.com>
+
+	* lang/Quote.java (append$V): Better handling if non-list argument.
+
+	* lang/Translator.java (exp2Type): On error, return Type.errorType.
+
 2016-01-26  Per Bothner  <per@bothner.com>
 
 	* Shell.java (run): We can simplify skipping to end-of-line,

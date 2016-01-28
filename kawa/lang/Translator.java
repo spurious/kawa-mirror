@@ -1349,7 +1349,7 @@ public class Translator extends Compilation
 	     else
 	       error('e',
 		 "invalid type spec (must be \"type\" or 'type or <type>)");
-	     type = Type.pointer_type;
+             type = Type.errorType;
 	   }
         if (decl != null)
           decl.setType(texp, type);

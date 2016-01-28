@@ -320,6 +320,11 @@
   ((primitive-virtual-method <input-port> "getReadState" <char> ())
    port))
 
+(define (input-port-is-domterm port)
+  ;; (and (? tport ::gnu.kawa.io.TtyPort port) (port:isDomTerm))
+  (and (gnu.kawa.io.TtyInPort? port)
+       ((->gnu.kawa.io.TtyInPort port):isDomTerm)))
+
 (define (set-port-line! (port ::input-port) (line ::int)) ::void
   (port:setLineNumber line))
 
@@ -349,12 +354,15 @@
 (define (default-prompter port)
   (let ((state (input-port-read-state port)))
     (if (char=? state #\Newline)
-	""
-	(string-append (if (char=? state #\Space)
-			   "#|kawa:"
-			   (string-append "#|" (make-string 1 state) "---:"))
-		       (number->string (input-port-line-number port))
-		       "|# "))))
+        ""
+        (let* ((initial (char=? state #\Space))
+               (line (number->string (input-port-line-number port)))
+               (pr (format (if initial "#|kawa:~a|# " "#|----:~a|# ") line)))
+          (if (input-port-is-domterm port)
+              ;; Unicode 25bc is ▼ "black down-pointing triangle"
+              (if initial (format "\e[19u\e[16u\x25bc;\e[17u\e[14u~a\e[15u\e]75; #|%P.:%N|# \a" pr)
+                  (format " \e[24u~a\e[18u" pr))
+              pr)))))
 
 (define (set-input-port-prompter!
 	 (port :: <gnu.kawa.io.TtyInPort>) (prompter :: <procedure>))

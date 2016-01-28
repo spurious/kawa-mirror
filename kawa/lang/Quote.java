@@ -412,6 +412,11 @@ public class Quote extends Syntax {
                 }
                 if (list == LList.Empty)
                     break;
+                if (! (list instanceof Pair)) {
+                    if (list instanceof ErrorExp)
+                        return list;
+                    throw new Error("expected list in quasi-quote splicing");
+                }
                 Pair list_pair = (Pair) list;
                 Object car = list_pair.getCar();
                 if (syntax != null && ! (car instanceof SyntaxForm))

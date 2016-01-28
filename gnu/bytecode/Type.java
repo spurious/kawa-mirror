@@ -689,13 +689,13 @@ public abstract class Type
     public static final ObjectType nullType
     //= new ObjectType("(type of null)");
     = new SpecialObjectType("(type of null)", objectType);
-    public static final ObjectType errorType = new ObjectType("(error type)");
+    public static final ObjectType errorType
+        = new SpecialObjectType("<error-type>", javalangObjectType);
 
     static public ClassType javalangStringType = ClassType.make("java.lang.String");
     /* The String type. but coercion is handled by toString. */
     public static final ObjectType toStringType
         = new SpecialObjectType("String", javalangStringType);
-    //= new ClassType("java.lang.String");
 
   /** @deprecated */
   public static final ClassType pointer_type = javalangObjectType;

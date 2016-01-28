@@ -8,5 +8,5 @@
      ((lambda (name ...) body1 body2 ...)
       val ...))))
 (list (simple-let (((a . b) 12)) (format #t "x:~w~%" x)))
-(list (simple-let ((x 12)) (format #t "x:~w~%" x)))
+(simple-let ((x 12)) (format #t "x:~w~%" x))
 ;; Diagnostic: errors4.scm:10:7: expected an identifier but got (a . b)

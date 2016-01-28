@@ -1,3 +1,7 @@
+2016-01-27  Per Bothner  <per@bothner.com>
+
+	* errors4.scm: Remove unintended extra error.
+
 2015-10-12  Per Bothner  <per@bothner.com>
 
 	* resolve-uri.scm: Tweaks, based on changed handling of Path.valueOf.

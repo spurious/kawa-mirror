@@ -1,3 +1,7 @@
+2016-01-27  Per Bothner  <per@bothner.com>
+
+	* kawa/base.scm (require, import): Add exported definitions.
+
 2015-10-24  Per Bothner  <per@bothner.com>
 
 	Better type inference for Scheme 'parameter' reads.

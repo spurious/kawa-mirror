@@ -1,3 +1,16 @@
+2016-01-30  Per Bothner  <per@bothner.com>
+
+	No longer use Q2Apply to evaluate "phrases".
+	Instead translate to Scheme ApplyToArgs at re-write time.
+	Slightly less flexible, but much more efficient and better errors.
+	* Q2Translator.java (convertApply): Do conversion early.
+	(applyNullary): New helper function.
+	(rewrite_pair): Call convertApply.
+	(applyFunction, isApplyFunction): Remove overridding methods.
+	* Q2Apply.java: Remve - we no longer use Q2Apply.
+	* CompileMisc.java: Remove file - we no longer need to optimize it.
+	* Makefile.am: Update accordingly
+
 2015-04-23  Per Bothner  <per@bothner.com>
 
 	* Operator.java (IF_THEN): New operator.

@@ -1,10 +1,17 @@
 package gnu.q2.lang;
-import kawa.standard.SchemeCompilation;
+
+import gnu.bytecode.Type;
+import gnu.kawa.functions.MakeSplice;
+import gnu.kawa.lispexpr.LispLanguage;
+import gnu.mapping.Procedure;
 import gnu.expr.*;
 import gnu.text.*;
 import gnu.lists.*;
 import gnu.mapping.Symbol;
 import kawa.lang.*;
+import kawa.standard.Scheme;
+import kawa.standard.SchemeCompilation;
+import java.util.ArrayList;
 import java.util.Stack;
 
 public class Q2Translator extends SchemeCompilation
@@ -127,19 +134,105 @@ public class Q2Translator extends SchemeCompilation
   public Expression rewrite_pair (Pair p, boolean function)
   {
     Object partitioned = partition(p, this);
-    if (partitioned instanceof Pair)
-      return super.rewrite_pair((Pair) partitioned, function);
+    if (partitioned instanceof Pair) {
+        Pair pair = (Pair) partitioned;
+        Object p_car = pair.getCar();
+        if (p_car instanceof Pair
+            && ((Pair) p_car).getCar() == LispLanguage.splice_sym)
+            return new ApplyExp(MakeSplice.quoteInstance,
+                                rewrite_car((Pair)((Pair) p_car).getCdr(), function));
+        else {
+            Expression exp = super.rewrite_pair(pair, function);
+            ApplyExp app;
+            if (exp instanceof ApplyExp
+                && isApplyFunction((app = (ApplyExp) exp).getFunction())) {
+                exp = convertApply(app);
+            }
+            return exp;
+        }
+    }
     else
       return rewrite(partitioned, function);
   }
 
-    @Override
-    public Expression applyFunction(Expression func) {
-        return new QuoteExp(Q2Apply.q2Apply);
+    /** If the argument has zero arguments, should we still apply it? */
+    public static boolean applyNullary(Expression exp) {
+        if (exp instanceof ReferenceExp) {
+            Declaration decl =
+                Declaration.followAliases(((ReferenceExp) exp).getBinding());
+            if (decl != null) {
+                if (decl.isProcedureDecl())
+                    return true;
+                if (decl.getFlag(Declaration.STATIC_SPECIFIED)
+                    && decl.getFlag(Declaration.IS_CONSTANT)) { // kludge
+                    Type type = decl.getType();
+                    if ("gnu.kawa.lispexpr.LangObjType" == type.getName())
+                        return true;
+                }
+            }
+        }
+        if (exp instanceof QuoteExp) {
+            Object val = exp.valueIfConstant();
+            return val instanceof Type || val instanceof Class;
+        }
+        return false;
     }
 
-  public boolean isApplyFunction (Expression exp)
-  {
-    return exp.valueIfConstant() == Q2Apply.q2Apply;
-  }
+    public static Expression convertApply
+        (ApplyExp exp) {
+ 
+        Expression[] args = exp.getArgs();
+        int nargs = args.length;
+
+        Expression arg0 = args[0];
+        if (nargs == 1 && ! applyNullary(arg0)) {
+            if (arg0 instanceof IfExp
+                && ((IfExp) arg0).getElseClause() == null)
+                arg0 = new BeginExp(args);
+            return arg0;
+        }
+
+        ArrayList<Expression> rargs = new ArrayList<Expression>();
+
+        LetExp let = null;
+        for (int i = 0; i < nargs; i++) {
+            Expression arg = exp.getArg(i);
+            Expression barg;
+            if (arg instanceof LetExp && arg.getFlag(LetExp.IS_BODY_SCOPE)
+                // Can we get more than one LetExp? FIXME
+                && let == null) {
+                barg = ((LetExp) arg).getBody();
+            } else
+                barg = arg;
+            if (barg instanceof ApplyExp) {
+                ApplyExp aarg = (ApplyExp) barg;
+                if (aarg.isAppendValues()) {
+                    if (arg != barg)
+                        let = (LetExp) arg;
+                    int naarg = aarg.getArgCount();
+                    for (int j = 0; j < naarg;  j++) {
+                        Expression xaarg = aarg.getArg(j);
+                        if (xaarg instanceof SetExp) {
+                            xaarg = new ApplyExp(MakeSplice.quoteInstance,
+                                                 new BeginExp(xaarg, QuoteExp.emptyExp));
+                            if (exp.firstSpliceArg == -1
+                                || exp.firstSpliceArg > j)
+                                exp.firstSpliceArg = j;
+                        }
+                        rargs.add(xaarg);
+                    }
+                    continue;
+                }
+            }
+            rargs.add(arg);
+        }
+        args = rargs.toArray(new Expression[rargs.size()]);
+        Procedure proc = Scheme.applyToArgs;
+        exp.setFuncArgs(new QuoteExp(proc), args);
+        if (let != null) {
+            let.setBody(exp);
+            return let;
+        }
+        return exp;
+    }
 }

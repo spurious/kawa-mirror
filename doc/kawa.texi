@@ -15176,8 +15176,7 @@ Here is a simple example illustrating use of
 an @code{XmlRootElement} annotation on a class,
 and an @code{XmlElement} annotation on a field:
 @example
-(define-alias XmlRootElement javax.xml.bind.annotation.XmlRootElement)
-(define-alias XmlElement javax.xml.bind.annotation.XmlElement)
+(import (class javax.xml.bind.annotation XmlRootElement XmlElement))
 (define-simple-class Bib ( ) (@@XmlRootElement name: "bib")
   (books (@@XmlElement name: "book" type: Book) ::java.util.ArrayList))
 (define-simple-class Book () ...)
@@ -16731,11 +16730,10 @@ not at run-time.
 Here is a working Swing demo illustrating many of these techniques:
 
 @example
-(define-alias JButton javax.swing.JButton)
-(define-simple-class HBox (javax.swing.Box)
-  ((*init*) (invoke-special javax.swing.Box (this) '*init* 0)))
-(define-alias JFrame javax.swing.JFrame)
-(define-alias Box javax.swing.Box)
+(import (class javax.swing
+               JButton Box JFrame))
+(define-simple-class HBox (Box)
+  ((*init*) (invoke-special Box (this) '*init* 0)))
 
 (define value 0)
 
@@ -20039,13 +20037,15 @@ or the @code{import}-@code{class} combination.
 For example, to be able to write @code{ArrayList} instead
 of @code{java.util.ArrayList} do either:
 @example
-(define-alias ArrayList java.util.ArrayList)
+(import (class java.util ArrayList))
 @end example
 or
 @example
-(import (class java.util ArrayList))
+(define-alias ArrayList java.util.ArrayList)
 @end example
-The latter form allows you to define multiple aliases conveniently:
+Using @code{import} is recommended:
+It handles errors better,
+and it allows you to define multiple aliases conveniently:
 @example
 (import (class java.util Map HashMap))
 @end example
@@ -20053,11 +20053,11 @@ The latter form allows you to define multiple aliases conveniently:
 Both forms allow renaming.  For example if you want to refer
 to @code{java.lang.StringBuilder} as @code{StrBuf} do:
 @example
-(define-alias StrBuf java.lang.StringBuilder)
+(import (class java.lang (StringBuilder StrBuf)))
 @end example
 or:
 @example
-(import (class java.lang (StringBuilder StrBuf)))
+(define-alias StrBuf java.lang.StringBuilder)
 @end example
 
 The name(s) defined by @code{import} are by default private.

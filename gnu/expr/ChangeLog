@@ -1,3 +1,8 @@
+2016-01-30  Per Bothner  <per@bothner.com>
+
+	* QuoteExp.java (emptyExp): New static.
+	* LambdaExp.java: Use it.
+
 2016-01-27  Per Bothner  <per@bothner.com>
 
 	* ReferenceExp.java (apply): Fix eval when context is MouleExp.

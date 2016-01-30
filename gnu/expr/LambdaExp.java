@@ -1634,7 +1634,7 @@ public class LambdaExp extends ScopeExp {
                     Expression arg;
                     String lastTypeName = restArgType.getName();
                     if ("gnu.lists.LList".equals(lastTypeName))
-                        arg = new QuoteExp(gnu.lists.LList.Empty);
+                        arg = QuoteExp.emptyExp;
                     else if ("java.lang.Object[]".equals(lastTypeName))
                         arg = new QuoteExp(Values.noArgs);
                     else // FIXME

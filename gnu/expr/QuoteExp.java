@@ -63,6 +63,7 @@ public class QuoteExp extends Expression
   static public QuoteExp falseExp = makeShared(Boolean.FALSE, Type.booleanType);
     static public QuoteExp trueObjExp = makeShared(Boolean.TRUE);
   static public QuoteExp falseObjExp = makeShared(Boolean.FALSE);
+    static public QuoteExp emptyExp = makeShared(gnu.lists.LList.Empty);
   static public QuoteExp nullExp = makeShared(null, Type.nullType);
   public static final QuoteExp classObjectExp = makeShared(Type.objectType);
 

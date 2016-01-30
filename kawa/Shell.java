@@ -343,6 +343,7 @@ public class Shell
             ex.printStackTrace(perr);
           }
       }
+    perr.flush();
   }
 
   public final static CompiledModule checkCompiledZip (InputStream fs, Path path, Environment env, Language language)

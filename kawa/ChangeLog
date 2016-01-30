@@ -1,3 +1,7 @@
+2016-01-30  Per Bothner  <per@bothner.com>
+
+	* Shell.java (printError): Add a flush.
+
 2016-01-28  Per Bothner  <per@bothner.com>
 
 	* standard/ImportFromLibrary.java (scanImportSet): More precise

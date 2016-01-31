@@ -1,5 +1,5 @@
 ;; -*- coding: utf-8 -*-
-(test-begin "arrays" 177)
+(test-begin "arrays" 178)
 
 ;;; array test
 ;;; 2001 Jussi Piitulainen
@@ -429,7 +429,7 @@
 ;;; Kawa-specific tests
 
 (test-equal &{&-
-╔#2A:2:3╗
+╔#2a:2:3╗
 ║12│3│ 4║
 ╟──┼─┼──╢
 ║ 5│9│11║
@@ -437,23 +437,23 @@
 } (format-array #2a((12 3 4) (5 9 11))))
 
 (test-equal &{&-
-╔#2A:2:3╗
-║ab│c│d ║
-╟──┼─┼──╢
-║e │f│gh║
-╚══╧═╧══╝
-} (format-array #2a((ab c d) (e f gh))))
+╔#2a:2:4╤═══╗
+║ab│c│d │e  ║
+╟──┼─┼──┼───╢
+║f │g│hi│jkl║
+╚══╧═╧══╧═══╝
+} (format-array #2a((ab c d e) (f g hi jkl))))
 
 (test-equal &{&-
-╔#2A:2:3╤═══╗
+╔#2s8:2:3═══╗
 ║012│003│004║
 ╟───┼───┼───╢
 ║005│-09│011║
 ╚═══╧═══╧═══╝
-} (format-array #2a((12 3 4) (5 -9 11)) "~3,'0d"))
+} (format-array #2S8((12 3 4) (5 -9 11)) "~3,'0d"))
 
 (test-equal &{&-
-╔#3A:2:2:3╗
+╔#3a:2:2:3╗
 ║ab│c  │d ║
 ╟──┼───┼──╢
 ║e │f  │gh║
@@ -464,9 +464,24 @@
 ╚══╧═══╧══╝
 } (format-array #3a(((ab c d) (e f gh)) ((i j k) (lm nop q)))))
 
-(test-equal "#0A -02" (format-array #0a -2 "~3,'0d"))
+(test-equal &{&-
+╔#2a:2:3═══╤═════════╗
+║  334│4545│#2f32:1:2║
+║     │    │║5.0│6.0║║
+║     │    │╚═══╧═══╝║
+╟─────┼────┼─────────╢
+║78987│abc │#2a══╗   ║
+║     │defg│║1│ 2║   ║
+║     │hi  │╟─┼──╢   ║
+║     │    │║3│14║   ║
+║     │    │╚═╧══╝   ║
+╚═════╧════╧═════════╝
+} (format-array
+   #2a((334 4545 #2f32((5 6))) (78987 "abc\ndefg\nhi" #2A((1 2) (3 14))))))
 
-(test-equal "#2A@1:3:0 ()"
+(test-equal "#0a -02" (format-array #0a -2 "~3,'0d"))
+
+(test-equal "#2a@1:3:0 ()"
             (format-array #2a@1:3:0()))
 
 (test-equal "#2a@1:2:3((a -9 c) (d 153 ef))"

@@ -551,6 +551,7 @@ GNU_KAWA_FUNCTIONS_JSOURCES = \
   kawa/functions/Arithmetic.java \
   kawa/functions/ArithOp.java \
   kawa/functions/Arrays.java \
+  kawa/functions/ArrayPrint.java \
   kawa/functions/ArrayRef.java \
   kawa/functions/ArraySet.java \
   kawa/functions/BitwiseOp.java \

@@ -858,6 +858,7 @@ public class Scheme extends LispLanguage {
       defProcStFld("array-ref", "gnu.kawa.functions.ArrayRef", "arrayRef");
       defProcStFld("array-set!", "gnu.kawa.functions.ArraySet", "arraySet");
       defProcStFld("share-array", "kawa.lib.arrays");
+      defProcStFld("format-array", "kawa.lib.arrays");
 
       for (int i = uniformVectorTags.length;  --i >= 0; )
         {

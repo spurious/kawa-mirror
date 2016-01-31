@@ -1,4 +1,5 @@
-(test-begin "arrays" 169)
+;; -*- coding: utf-8 -*-
+(test-begin "arrays" 177)
 
 ;;; array test
 ;;; 2001 Jussi Piitulainen
@@ -424,5 +425,54 @@
 	    (array-ref
 	     (share-array four-dee-array (shape 1 2) (make-simple-affine 4 1))
 	     1))
+
+;;; Kawa-specific tests
+
+(test-equal &{&-
+╔#2A:2:3╗
+║12│3│ 4║
+╟──┼─┼──╢
+║ 5│9│11║
+╚══╧═╧══╝
+} (format-array #2a((12 3 4) (5 9 11))))
+
+(test-equal &{&-
+╔#2A:2:3╗
+║ab│c│d ║
+╟──┼─┼──╢
+║e │f│gh║
+╚══╧═╧══╝
+} (format-array #2a((ab c d) (e f gh))))
+
+(test-equal &{&-
+╔#2A:2:3╤═══╗
+║012│003│004║
+╟───┼───┼───╢
+║005│-09│011║
+╚═══╧═══╧═══╝
+} (format-array #2a((12 3 4) (5 -9 11)) "~3,'0d"))
+
+(test-equal &{&-
+╔#3A:2:2:3╗
+║ab│c  │d ║
+╟──┼───┼──╢
+║e │f  │gh║
+╠══╪═══╪══╣
+║i │j  │k ║
+╟──┼───┼──╢
+║lm│nop│q ║
+╚══╧═══╧══╝
+} (format-array #3a(((ab c d) (e f gh)) ((i j k) (lm nop q)))))
+
+(test-equal "#0A -02" (format-array #0a -2 "~3,'0d"))
+
+(test-equal "#2A@1:3:0 ()"
+            (format-array #2a@1:3:0()))
+
+(test-equal "#2a@1:2:3((a -9 c) (d 153 ef))"
+            (format "~a" #2a@1:2:3((a -9 "c") (d 153 "ef"))))
+
+(test-equal &{#2a@1:2:3((a -9 "c") (d 153 "ef"))}
+            (format "~w" #2a@1:2:3((a -9 "c") (d 153 "ef"))))
 
 (test-end)

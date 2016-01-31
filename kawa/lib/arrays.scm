@@ -29,3 +29,6 @@
 (define (share-array (array :: <array>) (shape :: <array>)
 		     (mapper :: <procedure>))
   (invoke-static  <gnu.kawa.functions.Arrays> 'shareArray array shape mapper))
+
+(define (format-array value #!optional (elementFormat ::string #!null))::string
+  (gnu.kawa.functions.ArrayPrint:print value elementFormat))

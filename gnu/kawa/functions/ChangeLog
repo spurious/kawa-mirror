@@ -1,3 +1,7 @@
+2016-01-31  Per Bothner  <per@bothner.com>
+
+	* ArrayPrint.java: New helper class for pretty-printing arrays.
+
 2016-01-19  Per Bothner  <per@bothner.com>
 
 	* DisplayFormat.java (write(Array,...)): Better Array printing.

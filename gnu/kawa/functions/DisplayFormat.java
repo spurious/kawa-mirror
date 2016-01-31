@@ -378,7 +378,12 @@ public class DisplayFormat extends AbstractFormat
       }
     else if (obj instanceof Array)
       {
-	write((Array) obj, 0, 0, out);
+        if (!getReadableOutput () && out instanceof OutPort
+            && ((OutPort) out).atLineStart()
+            && ((OutPort) out).isPrettyPrinting())
+            write(ArrayPrint.print(obj, null), out);
+        else
+            write((Array) obj, 0, 0, out);
       }
     /* #ifdef enable:XML */
     else if (obj instanceof KNode)

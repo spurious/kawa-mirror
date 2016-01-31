@@ -21,9 +21,11 @@ public class ArrayPrint {
             String[][] cells = new String[size][];
             boolean[] rightAlign = new boolean[size];
             int icell = 0;
-            String vectag = "A";
+            String vectag = arr instanceof GeneralArray
+                ? ((GeneralArray) arr).getTag()
+                : "a";
             int headStart = sbuf.length();
-            sbuf.append("#"+rank+vectag);
+            sbuf.append("#" + rank + (vectag==null ? "a" : vectag));
             int headEnd = sbuf.length();
             boolean dimsNeeded = false;
             for (int r = 0; r < rank; r++) {

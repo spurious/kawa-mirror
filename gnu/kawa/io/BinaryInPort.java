@@ -1,7 +1,6 @@
 package gnu.kawa.io;
 import java.io.*;
 import gnu.text.*;
-import gnu.lists.ByteVector;
 import java.nio.*;
 import java.nio.charset.*;
 

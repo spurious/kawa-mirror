@@ -135,6 +135,8 @@ public class OutPort extends PrintConsumer implements Printable
         return bout;
     }
 
+    public boolean isPrettyPrinting() { return bout.isPrettyPrinting(); }
+
     public static OutPort openFile(Object fname)
         throws java.io.IOException {
         return openFile(fname, Environment.user().get("port-char-encoding"));
@@ -351,8 +353,7 @@ public class OutPort extends PrintConsumer implements Printable
 
   public void freshLine()
   {
-    int col = bout.getColumnNumber();
-    if (col != 0)
+    if (! atLineStart())
       println();
   }
 
@@ -366,6 +367,10 @@ public class OutPort extends PrintConsumer implements Printable
   {
     bout.setColumnNumber(column);
   }
+
+    public boolean atLineStart() {
+        return bout.atLineStart();
+    }
 
     void flushBuffer() {
         bout.forcePrettyOutput();

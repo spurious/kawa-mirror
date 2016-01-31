@@ -1,3 +1,10 @@
+2016-01-30  Per Bothner  <per@bothner.com>
+
+	* OutPort.java (isPrettyPrinting, atLineStart): New methods.
+	(freshLine): Use atLineStart.
+	* PrettyWriter.java (atLineStart): New method.
+	* BinaryOutPort.java (getColumnNumber): Remove. 
+
 2016-01-09  Per Bothner  <per@bothner.com>
 
 	* CheckConsole.java: Change previous DomTerm handling: We don't want

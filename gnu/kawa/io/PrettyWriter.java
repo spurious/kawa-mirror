@@ -1832,6 +1832,11 @@ public class PrettyWriter extends java.io.Writer
     buffer = null;
   }
 
+    public boolean atLineStart() {
+        // Could/should optimize.
+        return getColumnNumber() == 0;
+    }
+
   /** Get zero-origin column number, or -1 if unknown.
    * Not meaningful if {@code prettyPrintingMode > 0}. */
   public int getColumnNumber ()

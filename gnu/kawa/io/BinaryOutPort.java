@@ -119,9 +119,6 @@ public class BinaryOutPort extends OutPort {
             return (OutputStream) obj;
     }
 
-    @Override
-    public int getColumnNumber () { return -1; }
-
     /** This an extension of BufferedOutputStream for smarter flushing.
      * Specifically, before doing binary output, we need to flush whatever
      * is in the text buffer, but we don't want a full flush.

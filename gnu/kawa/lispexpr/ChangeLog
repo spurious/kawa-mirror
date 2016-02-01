@@ -1,3 +1,8 @@
+2016-01-31  Per Bothner  <per@bothner.com>
+
+	* ReaderDispatchMisc.java (read): Fix handling of #F.
+	For example #1F32@0:10... would read '@' as part of the token.
+
 2016-01-26  Per Bothner  <per@bothner.com>
 
 	* LispLanguage.java (parse): In a REPL it works better if we parse

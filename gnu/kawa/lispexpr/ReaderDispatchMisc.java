@@ -59,7 +59,15 @@ public class ReaderDispatchMisc extends ReadTableEntry
 	return LispReader.readSpecial(reader);
       case 'T':
       case 'F':
-          name = reader.readTokenString(ch, ReadTable.getCurrent());
+          int startPos = reader.tokenBufferLength;
+          while (ch >= 0 && Character.isLetterOrDigit(ch)) {
+              reader.tokenBufferAppend(ch);
+              ch = reader.read();
+          }
+          reader.unread(ch);
+          name = new String(reader.tokenBuffer, startPos,
+                            reader.tokenBufferLength - startPos);
+          reader.tokenBufferLength = startPos;
           String nameLC = name.toLowerCase();
           if (nameLC.equals("t") || nameLC.equals("true"))
               return Boolean.TRUE;

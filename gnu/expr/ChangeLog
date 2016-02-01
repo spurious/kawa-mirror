@@ -1,3 +1,8 @@
+2016-01-31  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (process): Defer setting ERROR_SEEN, since some
+	useful error and warning messages may happen in later states.
+
 2016-01-30  Per Bothner  <per@bothner.com>
 
 	* QuoteExp.java (emptyExp): New static.

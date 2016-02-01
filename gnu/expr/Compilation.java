@@ -2104,7 +2104,7 @@ public class Compilation implements SourceLocator
             if (generateMainMethod() && mexp.staticInitRun()) {
                 error('e', "a static init-run module cannot have a 'main' method");
             }
-            setState(messages.seenErrors() ? ERROR_SEEN : RESOLVED);
+            setState(RESOLVED);
           }
 
         // Avoid writing class needlessly.
@@ -2125,7 +2125,7 @@ public class Compilation implements SourceLocator
                 dout.flush();
             }
             PushApply.pushApply(mexp, this);  
-            setState(messages.seenErrors() ? ERROR_SEEN : PRE_WALKED);
+            setState(PRE_WALKED);
           }
 
         if (wantedState >= WALKED && getState() < WALKED)
@@ -2144,7 +2144,7 @@ public class Compilation implements SourceLocator
             }
             ChainLambdas.chainLambdas(mexp, this);
             FindTailCalls.findTailCalls(mexp, this);
-            setState(messages.seenErrors() ? ERROR_SEEN : WALKED);
+            setState(WALKED);
           }
 
         if (wantedState >= COMPILE_SETUP && getState() < COMPILE_SETUP)
@@ -2154,8 +2154,10 @@ public class Compilation implements SourceLocator
             FindCapturedVars.findCapturedVars(mexp, this);
             mexp.allocFields(this);
             mexp.allocChildMethods(this);
-            setState(messages.seenErrors() ? ERROR_SEEN : COMPILE_SETUP);
+            setState(COMPILE_SETUP);
           }
+        if (wantedState >= COMPILED && messages.seenErrors())
+            setState(ERROR_SEEN);
         if (wantedState >= COMPILED && getState() < COMPILED)
           {
             if (mexp.subModulesOnly())

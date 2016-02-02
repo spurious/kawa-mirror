@@ -1,3 +1,9 @@
+2016-02-02  Per Bothner  <per@bothner.com>
+
+	* KawaConvert.java (isTrue): A Lazy value has to be forced.
+	* ConditionalTarget.java (compileFromStack): Check if value might
+	be Lazy.
+
 2016-01-31  Per Bothner  <per@bothner.com>
 
 	* Compilation.java (process): Defer setting ERROR_SEEN, since some

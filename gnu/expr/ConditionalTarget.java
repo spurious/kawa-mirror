@@ -1,6 +1,7 @@
 package gnu.expr;
 
 import gnu.bytecode.*;
+import gnu.kawa.reflect.LazyType;
 import gnu.mapping.Values;
 
 /** This is the Target of a boolean expression, in a conditional context.
@@ -96,7 +97,8 @@ public class ConditionalTarget extends Target
 	return;
       case 'L':  case '[':
           if (language.booleanValue(null) == 0) {
-              if (Type.javalangBooleanType.compare(stackType) == -3)
+              if (Type.javalangBooleanType.compare(stackType) == -3
+                  && ! LazyType.maybeLazy(stackType))
                   comp.compileConstant(null);
               else {
                   code.emitInvokeStatic(isTrueMethod);

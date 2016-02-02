@@ -3,6 +3,7 @@
 
 package gnu.expr;
 import gnu.lists.Convert;
+import gnu.mapping.Lazy;
 
 /** Override gnu.lists.Convert to use Kawa number and Char classes. */
 
@@ -74,7 +75,15 @@ public class KawaConvert extends Convert
     }
 
     public static boolean isTrue(Object value) {
-        return value != null &&
-            ! (value instanceof Boolean && ! ((Boolean) value).booleanValue());
+        for (;;) {
+            if (value instanceof Boolean)
+                return ((Boolean) value).booleanValue();
+            else if (value == null)
+                return false;
+            else if (value instanceof Lazy)
+                value = ((Lazy) value).getValue();
+            else
+                return true;
+        }
     }
 }

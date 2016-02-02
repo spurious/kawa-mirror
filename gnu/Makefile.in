@@ -623,6 +623,7 @@ GNU_KAWA_LISPEXPR_JSOURCES = \
   kawa/lispexpr/ReaderIgnoreRestOfLine.java \
   kawa/lispexpr/ReaderMacro.java \
   kawa/lispexpr/ReaderMisc.java \
+  kawa/lispexpr/ReaderNestedComment.java \
   kawa/lispexpr/ReaderParens.java \
   kawa/lispexpr/ReaderQuote.java \
   kawa/lispexpr/ReaderString.java \

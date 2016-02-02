@@ -111,6 +111,7 @@ public class Q2 extends Scheme
     ReaderDispatch rdispatch = ReaderDispatch.create(rt, false);
     rt.set('#', rdispatch);
     rdispatch.set(' ', ReaderIgnoreRestOfLine.getInstance());
+    rdispatch.set('[', new ReaderNestedComment('#', '[', ']', '#'));
     //For now, allow #t #f #!eof etc.
     //Also want to allow #!/ at start of file as comment start.
     //rdispatch.set('!', ReaderIgnoreRestOfLine.getInstance());

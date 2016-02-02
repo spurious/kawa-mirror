@@ -1,7 +1,7 @@
 "abc" # 5 6
 "\n-+-\n"
 # This is a comment.
-10 * 3 # more comment.
+10#[comment2]# * 3 # more comment.
 
 "\n-+-\n"
 

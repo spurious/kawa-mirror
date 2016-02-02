@@ -1,3 +1,7 @@
+2016-02-02  Per Bothner  <per@bothner.com>
+
+	* Q2.java (createReadTable): Implement nested comments.
+
 2016-01-30  Per Bothner  <per@bothner.com>
 
 	No longer use Q2Apply to evaluate "phrases".

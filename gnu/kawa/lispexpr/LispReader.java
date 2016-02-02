@@ -66,7 +66,8 @@ public class LispReader extends Lexer
     /** Read a #|...|#-style comment (which may contain other nested comments).
      * Assumes the initial "#|" has already been read.
      */
-    final public void readNestedComment (char c1, char c2)
+    final public void readNestedComment (char start1, char start2,
+                                         char end1, char end2)
         throws java.io.IOException, SyntaxException {
         int commentNesting = 1;
         int startLine = port.getLineNumber();
@@ -78,19 +79,19 @@ public class LispReader extends Lexer
             int c = read ();
             if (buf != null)
                 buf.append((char) c);
-            if (c == '|') {
+            if (c == end1) {
                 c = read();
                 if (buf != null)
                     buf.append((char) c);
-                if (c == c1)
+                if (c == end2)
                     commentNesting--;
-            } else if (c == c1) {
+            } else if (c == start1) {
                 c = read();
-                if (c == c2)
+                if (c == start2)
                     commentNesting++;
             }
             if (c < 0) {
-                eofError("unexpected end-of-file in " + c1 + c2
+                eofError("unexpected end-of-file in " + start1 + start2
                          + " comment starting here",
                          startLine + 1, startColumn - 1);
                 return;

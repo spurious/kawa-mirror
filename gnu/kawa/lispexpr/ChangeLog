@@ -1,3 +1,13 @@
+2016-02-02  Per Bothner  <per@bothner.com>
+
+	Support more flexible nested comment syntax.
+	* LispReader.java (readNestedComment): Add explicit character end pair
+	parameters rather than requiring to be the start pair reversed.
+	* ReaderNestedComment.java: New class - extends ReadTableEntry,
+	* ReaderDispatch.java: Use ReaderNestedComment instance.
+	* ReaderDispatchMisc.java: Remove nested comment handling from here.
+	* ReaderExtendedLiteral.java: Update accordingly.
+
 2016-01-31  Per Bothner  <per@bothner.com>
 
 	* ReaderDispatchMisc.java (read): Fix handling of #F.

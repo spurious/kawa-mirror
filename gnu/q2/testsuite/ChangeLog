@@ -1,3 +1,7 @@
+2016-02-02  Per Bothner  <per@bothner.com>
+
+	* comment1.q2: Add a nested comment.
+
 2016-01-30  Per Bothner  <per@bothner.com>
 
 	* comment1.q2: Update to new slightly more restricted apply sementics.

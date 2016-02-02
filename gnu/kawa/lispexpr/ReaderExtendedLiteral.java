@@ -170,7 +170,8 @@ public class ReaderExtendedLiteral extends ReaderConstituent {
                     reader.skip();
                     next = reader.read();
                     if (next == '|') {
-                        ReaderDispatchMisc.readNestedComment(reader);
+                        ReaderNestedComment.getLispInstance()
+                            .readNestedComment(reader);
                     } else
                         readCharRef(reader, next);
                 }

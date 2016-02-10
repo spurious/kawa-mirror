@@ -1,3 +1,8 @@
+2016-02-09  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (sub, sup, msup, xsup): Remove macros, since
+	texinfo-6.0 now has @sub and @sup.
+
 2016-01-30  Per Bothner  <per@bothner.com>
 
 	* kawa.texi: 'import' is preferred over 'define-alias' for classes.

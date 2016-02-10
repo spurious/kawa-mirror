@@ -51,36 +51,12 @@
 @code{@b{\TEXT\}}
 @end macro
 
-@c A kludge - the development version of texinfo supports @sup and @sub.
-@c When using DocBook (used for the online manual) we require this version.
-@c Furthermore some versions of texinfo.tex define a \sup macro.
-@c So temporarily we use @xsup and @msup (for within @math) in place of @sup.
-@ifnotdocbook
-@macro sub{THING}
-@math{_\THING\}
-@end macro
-@macro xsup{THING}
-@math{^\THING\}
-@end macro
-@macro msup{THING}
-^\THING\
-@end macro
-@end ifnotdocbook
-@ifdocbook
-@macro xsup{THING}
-@sup{\THING\}
-@end macro
-@macro msup{THING}
-@sup{\THING\}
-@end macro
-@end ifdocbook
-
 @macro arbno{THING}
-\THING\@xsup{*}
+\THING\@sup{*}
 @end macro
 
 @macro atleastone{THING}
-\THING\@xsup{+}
+\THING\@sup{+}
 @end macro
 
 @macro meta{THING}
@@ -8441,9 +8417,9 @@ additions.
 A quaternion is a number that can be expressed in the form
 @samp{w+xi+yj+zk}, where @code{w}, @code{x}, @code{y}, and @code{z} are
 real, and @code{i}, @code{j}, and @code{k} are imaginary units
-satisfying @math{i@msup{2} = j@msup{2} = k@msup{2} = ijk = -1}.  The magnitude of a
+satisfying @math{i@sup{2} = j@sup{2} = k@sup{2} = ijk = -1}.  The magnitude of a
 quaternion is defined to be its Euclidean norm when viewed as a point in
-@math{R@msup{4}}.
+@math{R@sup{4}}.
 
 The real--part of a quaternion is also called its @samp{scalar}, while
 the i--part, j--part, and k--part taken together are also called its

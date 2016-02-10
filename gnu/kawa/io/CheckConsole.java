@@ -18,6 +18,7 @@ public class CheckConsole {
 
     public static void setHaveConsole(boolean value) {
         haveConsole = value ? 1 : -1;
+        setDomTermVersionInfo();
     }
 
     public static boolean haveConsole() {
@@ -46,17 +47,25 @@ public class CheckConsole {
         return versionInfoDomTerm;
     }
 
+    private static void setDomTermVersionInfo() {
+        String version = domtermProperty;
+        if (version == null && haveConsole())
+            version = domtermEnv;
+        if (version != null) {
+            version = version.trim();
+            if (version.length() > 0)
+                versionInfoDomTerm = version;
+        }
+    }
+
+    static String domtermProperty;
+    static String domtermEnv;
     static String versionInfoDomTerm;
     static {
         try {
-            String version = System.getProperty("org.domterm");
-            if (version == null && haveConsole())
-                version = System.getenv("DOMTERM");
-            if (version != null) {
-                version = version.trim();
-                if (version.length() > 0)
-                    versionInfoDomTerm = version;
-            }
+            domtermProperty = System.getProperty("org.domterm");
+            domtermEnv = System.getenv("DOMTERM");
+            setDomTermVersionInfo();
         } catch (Throwable ex) {
             // ignore
         }

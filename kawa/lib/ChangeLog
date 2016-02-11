@@ -1,3 +1,8 @@
+2016-02-11  Per Bothner  <per@bothner.com>
+
+	* compile_misc.scm (valuesCompile): Optimize 2-argument 'values' call
+	to use the Values2 class.
+
 2016-01-31  Per Bothner  <per@bothner.com>
 
 	* arrays.scm (format-array): New procedure.

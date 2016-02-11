@@ -146,8 +146,15 @@
 (define (valuesCompile exp::gnu.expr.ApplyExp comp::gnu.expr.Compilation
                        target::gnu.expr.Target proc::gnu.mapping.Procedure)
   ::boolean
-  (define pproc (gnu.expr.PrimProcedure
-                 (invoke gnu.expr.Compilation:typeValues 'getDeclaredMethod "makeFromArray" 1)))
+  (define pproc ::gnu.expr.PrimProcedure 
+    (if (exp:isSimple 2 2)
+        (gnu.expr.PrimProcedure 
+         (invoke gnu.expr.Compilation:typeValues 'getDeclaredMethod
+                 "values2" 2)
+         exp:type (gnu.bytecode.Type[] Object Object))
+        (gnu.expr.PrimProcedure 
+         (invoke gnu.expr.Compilation:typeValues 'getDeclaredMethod
+                 "makeFromArray" 1))))
   (pproc:setReturnType exp:type)
   (define ae::gnu.expr.ApplyExp (apply-exp pproc @exp:args))
   (ae:compile comp target)

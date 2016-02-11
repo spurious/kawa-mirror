@@ -143,7 +143,7 @@ InliningTest.case12(long)java.lang.Object: 147 bytes
 InliningTest.case13(gnu.math.IntNum)gnu.math.IntNum: 169 bytes
 InliningTest.case14(char)gnu.math.IntNum: 67 bytes
 InliningTest.callWithValues1(gnu.math.IntNum,gnu.math.IntNum)gnu.lists.Pair: 42 bytes
-InliningTest.callWithValues2(gnu.math.IntNum,gnu.math.IntNum)gnu.lists.Pair: 52 bytes
+InliningTest.callWithValues2(gnu.math.IntNum,gnu.math.IntNum)gnu.lists.Pair: 42 bytes
 InliningTest.callWithValues3(gnu.math.IntNum,gnu.math.IntNum)java.lang.Object: 15 bytes
 InliningTest.mmemq(java.lang.Object,java.lang.Object)java.lang.Object: 52 bytes
 InliningTest.greaterEqual(java.lang.Object,java.lang.Object)boolean: 6 bytes

@@ -130,6 +130,9 @@ public class StackTarget extends Target
 	code.emitSwap();
 	code.emitInvokeVirtual(ClassType.make("gnu.bytecode.Type")
 			       .getDeclaredMethod("coerceFromObject", 1));
+        Type raw = type.getRawType();
+        if (raw != Type.objectType)
+            code.emitCheckcast(raw);
       }
     else
       {

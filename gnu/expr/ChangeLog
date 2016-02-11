@@ -1,3 +1,8 @@
+2016-02-11  Per Bothner  <per@bothner.com>
+
+	* StackTarget.java (emitCoerceFromObject): Add extra cast if
+	needed for OccurrenceType.
+
 2016-02-02  Per Bothner  <per@bothner.com>
 
 	* KawaConvert.java (isTrue): A Lazy value has to be forced.

@@ -1,3 +1,9 @@
+2016-02-12  OKUMURA Yuki <mjt@cltn.org>
+	    Per Bothner  <per@bothner.com>
+
+	* lib-tailcalls.scm: New testcalls with library and --full-tailcalls.
+	* Makefile.am: Update accordingly.
+
 2016-02-11  Per Bothner  <per@bothner.com>
 	    OKUMURA Yuki <mjt@cltn.org>
 

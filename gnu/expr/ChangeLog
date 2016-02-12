@@ -1,3 +1,10 @@
+2016-02-12  Per Bothner  <per@bothner.com>
+
+	* ApplyExp.java (finishTrampoline): Factor out "runUntilDone"
+	and related handling into separate method.
+	* PrimProcedure.java (compileInvoke): Use finishTrampoline.
+	This fixes a bug with runUntilDone not being called.
+
 2016-02-11  Per Bothner  <per@bothner.com>
 
 	* StackTarget.java: Better handling of Lazy values.

@@ -794,12 +794,7 @@ public class PrimProcedure extends MethodProc {
             code.emitPutField(consumerFld);
           }
         code.emitInvokeMethod(method, op_code);
-        if (isTailCall)
-          {
-            comp.loadCallContext();
-            code.emitInvoke(Compilation.typeCallContext
-                            .getDeclaredMethod("runUntilDone", 0));
-          }
+        ApplyExp.finishTrampoline(isTailCall, target, comp);
         if (target instanceof IgnoreTarget)
           {
             // ctx.consumer = saveConsumer

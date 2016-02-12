@@ -398,7 +398,6 @@ public class ApplyExp extends Expression
 	&& (exp.isTailCall() || target instanceof ConsumerTarget)
 	&& ! comp.curLambda.getInlineOnly())
       {
-	ClassType typeContext = Compilation.typeCallContext;
 	exp_func.compile(comp, new StackTarget(Compilation.typeProcedure));
 	// evaluate args to frame-locals vars;  // may recurse!
 	if (args_length <= 4 && exp.isSimple())
@@ -421,21 +420,7 @@ public class ApplyExp extends Expression
 	    code.emitInvoke(Compilation.typeProcedure
 			    .getDeclaredMethod("checkN", 2));
 	  }
-	if (exp.isTailCall())
-	  {
-	    code.emitReturn();
-	  }
-	else if (((ConsumerTarget) target).isContextTarget())
-	  {
-	    comp.loadCallContext();
-	    code.emitInvoke(typeContext.getDeclaredMethod("runUntilDone", 0));
-	  }
-	else
-	  {
-	    comp.loadCallContext();
-	    code.emitLoad(((ConsumerTarget) target).getConsumerVariable());
-	    code.emitInvoke(typeContext.getDeclaredMethod("runUntilValue", 1));
-	  }
+        finishTrampoline(exp.isTailCall(), target, comp);
 	return;
       }
 
@@ -511,6 +496,22 @@ public class ApplyExp extends Expression
     code.emitInvokeVirtual(method);
     target.compileFromStack(comp, Type.pointer_type);
   }
+
+    static void finishTrampoline(boolean isTailCall, Target target, Compilation comp) {
+        CodeAttr code = comp.getCode();
+        ClassType typeContext = Compilation.typeCallContext;
+        if (isTailCall) {
+            code.emitReturn();
+        } else if (target instanceof IgnoreTarget
+                   || ((ConsumerTarget) target).isContextTarget()) {
+            comp.loadCallContext();
+            code.emitInvoke(typeContext.getDeclaredMethod("runUntilDone", 0));
+        } else {
+            comp.loadCallContext();
+            code.emitLoad(((ConsumerTarget) target).getConsumerVariable());
+            code.emitInvoke(typeContext.getDeclaredMethod("runUntilValue", 1));
+        }
+    }
 
   public Expression deepCopy (gnu.kawa.util.IdentityHashTable mapper)
   {

@@ -1406,12 +1406,7 @@ public class ClassType extends ObjectType
         }
         int comp = compare(valueType);
         if (comp >= 0) {
-            if (valueType instanceof ClassType
-                || valueType instanceof ParameterizedType
-                || valueType instanceof TypeVariable)
-                return 2;
-            else
-                return 1;
+            return valueType instanceof ObjectType ? 2 : 1;
         } else
             return comp == -3 ? -1 : 0;
     }

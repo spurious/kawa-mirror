@@ -1,5 +1,7 @@
 2016-02-11  Per Bothner  <per@bothner.com>
 
+	* StackTarget.java: Better handling of Lazy values.
+
 	* StackTarget.java (emitCoerceFromObject): Add extra cast if
 	needed for OccurrenceType.
 

@@ -1087,7 +1087,7 @@ inlining.log: InliningTest.class cycle1.class cycle2.class \
 	$(LIST_CODE_SIZE) map1.class genericMapFormat genericVmapFormat \
 	  listMapFormat stringMapFormat charArrayMapFormat vector1VmapFormat \
 	  vector2VmapFormat >>inlining.log
-	$(LIST_CODE_SIZE) values2.class test1 test2 >>inlining.log
+	$(LIST_CODE_SIZE) values2.class test1 test2 test3 >>inlining.log
 
 check-inlining: inlining.log $(srcdir)/inlining.expected
 	@if $(DIFF) $(srcdir)/inlining.expected inlining.log; \

@@ -1,3 +1,7 @@
+2016-02-11  Per Bothner  <per@bothner.com>
+
+	* MultValuesType.java (isCompatibleWithValue): New method.
+
 2015-10-23  Per Bothner  <per@bothner.com>
 
 	* CompileBuildObject.java: Various fixes and improvements.

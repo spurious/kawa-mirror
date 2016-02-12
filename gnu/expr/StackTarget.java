@@ -49,9 +49,10 @@ public class StackTarget extends Target
         return new StackTarget(type);
     }
 
-    public static void forceLazyIfNeeded(Compilation comp, Type stackType, Type type) {
+    public static Type forceLazyIfNeeded(Compilation comp, Type stackType, Type type) {
 	if (LazyType.maybeLazy(stackType) && ! LazyType.maybeLazy(type))
-            forceLazy(comp, stackType, type);
+            stackType = forceLazy(comp, stackType, type);
+        return stackType;
     }
 
     public static Type forceLazy(Compilation comp, Type stackType, Type type) {
@@ -72,7 +73,13 @@ public class StackTarget extends Target
             }
             CodeAttr code = comp.getCode();
             code.emitInvoke(forceMethod);
-            stackType = stackType instanceof LazyType ? ((LazyType) stackType).getValueType() : Type.objectType;
+            if (stackType instanceof LazyType) {
+                stackType = ((LazyType) stackType).getValueType();
+                if (type.isCompatibleWithValue(Type.objectType) != 2)
+                    code.emitCheckcast(stackType.getRawType());
+            }
+            else
+                stackType = Type.objectType;
         }
         return stackType;
     }
@@ -85,7 +92,7 @@ public class StackTarget extends Target
   static boolean compileFromStack0(Compilation comp, Type stackType, Type type)
   {
     CodeAttr code = comp.getCode();
-    forceLazyIfNeeded(comp, stackType, type);
+    stackType = forceLazyIfNeeded(comp, stackType, type);
 
     if (type == stackType || ! code.reachableHere())
       return true;
@@ -106,10 +113,10 @@ public class StackTarget extends Target
 	    || "java.lang.Cloneable".equals(type.getName()))
 	  return true;
       }
-    else
+    else if (stackType.getImplementationType() instanceof PrimType)
       {
         type.emitConvertFromPrimitive(stackType, code);
-	stackType = code.topType();
+        stackType = code.topType();
       }
     return type.isCompatibleWithValue(stackType) > 1;
   }

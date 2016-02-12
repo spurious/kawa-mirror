@@ -233,6 +233,8 @@ public class LangObjType extends SpecialObjectType implements TypeValue
 
     @Override
     public int isCompatibleWithValue(Type valueType) {
+        if (this == valueType)
+            return 2;
         switch (typeCode) {
         case SEQUENCE_TYPE_CODE:
             if (valueType instanceof ArrayType)

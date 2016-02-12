@@ -1,3 +1,7 @@
+2016-02-11  Per Bothner  <per@bothner.com>
+
+	* LangObjType.java (isCompatibleWithValue): Check if types identical.
+
 2016-02-02  Per Bothner  <per@bothner.com>
 
 	Support more flexible nested comment syntax.

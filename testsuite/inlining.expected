@@ -218,8 +218,9 @@ map1.genericMapFormat(java.lang.Object)gnu.lists.LList: 77 bytes
 map1.genericVmapFormat(java.lang.Object)gnu.lists.FVector: 56 bytes
 map1.listMapFormat(gnu.lists.LList)gnu.lists.LList: 88 bytes
 map1.stringMapFormat(java.lang.CharSequence)gnu.lists.LList: 98 bytes
-map1.charArrayMapFormat(char[])gnu.lists.LList: 85 bytes
+map1.charArrayMapFormat(char[])gnu.lists.LList: 80 bytes
 map1.vector1VmapFormat(gnu.lists.FVector)gnu.lists.FVector: 60 bytes
 map1.vector2VmapFormat(gnu.lists.FVector,gnu.lists.FVector)gnu.lists.FVector: 93 bytes
 values2.test1()void: 7 bytes
 values2.test2()void: 19 bytes
+values2.test3(java.lang.Object)gnu.mapping.Values: 29 bytes

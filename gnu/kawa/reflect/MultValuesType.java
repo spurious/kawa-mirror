@@ -40,6 +40,35 @@ public class MultValuesType extends OccurrenceType {
         return sbuf.toString();
     }
 
+    public int isCompatibleWithValue(Type valueType) {
+        if (valueType instanceof LazyType)
+            valueType = ((LazyType) valueType).getValueType();
+        if (this == valueType)
+            return 2;
+        if (valueType instanceof MultValuesType) {
+            Type[] items = itemTypes;
+            MultValuesType mOther = (MultValuesType) valueType;
+            Type[] itemsOther = mOther.itemTypes;
+            if (items.length != itemsOther.length)
+                return -3;
+            int prev = 2;
+            for (int i = 0; i < items.length; i++) {
+                Type item = items[i];
+                Type itemOther = itemsOther[i];
+                if (item == null) // hack to handle 'unspecified'
+                    item = Type.objectType;
+                int cmp = item.isCompatibleWithValue(itemOther);
+                if (cmp < 0)
+                    return cmp;
+                if (cmp < prev)
+                    prev = cmp;
+            }
+            return prev;
+        }
+        return super.isCompatibleWithValue(valueType);
+    }
+
+    @Override
     public int compare(Type other) {
         if (other instanceof LazyType)
             other = ((LazyType) other).getValueType();

@@ -455,6 +455,8 @@ public abstract class Type
     }
 
     public static int isCompatibleWithValue(Type targetType, Type valueType) {
+        if (targetType == valueType)
+            return 2;
         int comp = targetType.compare(valueType);
         return comp >= 0 ? 1 : comp == -3 ? -1 : 0;
     }

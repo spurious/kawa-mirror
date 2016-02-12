@@ -1,4 +1,9 @@
 2016-02-11  Per Bothner  <per@bothner.com>
+	    OKUMURA Yuki <mjt@cltn.org>
+
+	* values2.java: New test-case,
+
+2016-02-11  Per Bothner  <per@bothner.com>
 
 	* inlining.expected: Update for 2-operand values optimiization.
 

@@ -1,3 +1,7 @@
+2016-02-14  Per Bothner  <per@bothner.com>
+
+	* repl.java: Update copyright year printed by --version.
+
 2016-02-02  Per Bothner  <per@bothner.com>
 
 	* standard/define_autoload.java: Update readNestedComment invocation.

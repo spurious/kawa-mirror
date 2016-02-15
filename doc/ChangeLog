@@ -1,3 +1,7 @@
+2016-02-15  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Source distribution): Document --with-line2 flag.
+
 2016-02-09  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (sub, sup, msup, xsup): Remove macros, since

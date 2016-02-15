@@ -12,7 +12,7 @@ public class TtyInPort extends InPort
 
   protected Procedure prompter;
 
-    private boolean inDomTerm;
+    boolean inDomTerm;
     public void setInDomTerm(boolean v) { inDomTerm = v; }
 
   /** Get the current prompter function. */
@@ -54,14 +54,32 @@ public class TtyInPort extends InPort
     return count;
   }
 
-  public void emitPrompt (String prompt) throws java.io.IOException
-  {
-    if (inDomTerm)
-      prompt = "\033[14u"+prompt+"\033[15u";
-    tie.print(prompt);
-    tie.flush();
-    tie.clearBuffer();
-  }
+    protected void afterFill(int count) throws java.io.IOException {
+        if (tie != null && count > 0)
+            tie.echo(buffer, pos, count);
+    }
+
+    public void emitPrompt(String prompt) throws java.io.IOException {
+        tie.print(prompt);
+        tie.flush();
+        tie.clearBuffer();
+    }
+
+    public String wrapPromptForDomTerm(String prompt) {
+        if (inDomTerm) {
+            boolean haveDomTermEscapes = false;
+            // If we see ESC '[' N N 'u' we already have domterm escapes.
+            for (int i = prompt.length();
+                 --i >= 4 && ! haveDomTermEscapes; ) {
+                if (prompt.charAt(i) == 'u' && prompt.charAt(i-4) == '\033'
+                    && prompt.charAt(i-3) == '[')
+                    haveDomTermEscapes = true;
+            }
+            if (! haveDomTermEscapes)
+                prompt = "\033[14u"+prompt+"\033[15u";
+        }
+        return prompt;
+    }
 
   public void lineStart (boolean revisited) throws java.io.IOException
   {
@@ -80,7 +98,7 @@ public class TtyInPort extends InPort
                       {
                         if (tie != null)
                            tie.freshLine();
-                        emitPrompt(string);
+                        emitPrompt(wrapPromptForDomTerm(string));
                         promptEmitted = true;
                       }
                   }
@@ -120,5 +138,17 @@ public class TtyInPort extends InPort
     promptEmitted = false;
     return count;
   }
-
+    public static TtyInPort make(InputStream in, Path name, OutPort tie) {
+        try {
+            return (TtyInPort)
+                Class.forName("gnu.kawa.io.JLine2InPort")
+                .getConstructor(java.io.InputStream.class,
+                                gnu.kawa.io.Path.class,
+                                gnu.kawa.io.OutPort.class)
+                .newInstance(in, name, tie);
+        } catch (Throwable ex) {
+        }
+        return new TtyInPort(in, name, tie);
+    }
 }
+

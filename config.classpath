@@ -16,6 +16,12 @@ case ${with_jfreesvg} in
   "") ;;
   *) conf_classpath=${with_jfreesvg}${CLASSPATH_SEPARATOR}$conf_classpath ;;
 esac
+case ${with_jline2} in
+  yes) ;;
+  no) ;;
+  "") ;;
+  *) conf_classpath=${with_jline2}${CLASSPATH_SEPARATOR}$conf_classpath ;;
+esac
 case ${with_javafx} in
   yes) ;;
   no) ;;

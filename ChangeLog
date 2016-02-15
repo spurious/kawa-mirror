@@ -1,3 +1,12 @@
+2016-02-14  Per Bothner  <per@bothner.com>
+
+	Add support for JLine2 as a readline alternative.
+	* configure.ac" New --with-jline2 flag.
+	(WITH_JLINE2_ARG. WITH_JLINE2): New argument and conditional.
+	* config.classpath: Adjust classpath based on --with-jline2 flag.
+	* Makefile.am (dist-kawa-@VERSION@.jar): Build jline2 support,
+	without requiring it.
+
 2016-01-26  Per Bothner  <per@bothner.com>
 
 	* configure.ac: Fix case when --with-java-source is defaulted.

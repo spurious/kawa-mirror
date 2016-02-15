@@ -89,11 +89,12 @@ build_triplet = @build@
 host_triplet = @host@
 @WITH_SWING_TRUE@am__append_1 = $(GNU_KAWA_SWINGVIEWS_JSOURCES)
 @WITH_SWT_TRUE@am__append_2 = $(GNU_KAWA_SWTVIEWS_JSOURCES)
-@ENABLE_XML_TRUE@am__append_3 = $(GNU_XML_JSOURCES) $(GNU_KAWA_XML_JSOURCES)
-@ENABLE_XML_TRUE@@WITH_SAX2_TRUE@am__append_4 = $(GNU_KAWA_SAX_JSOURCES)
-@ENABLE_ECHO2_TRUE@am__append_5 = $(GNU_KAWA_ECHO2_JSOURCES)
-@ENABLE_XQUERY_TRUE@am__append_6 = $(GNU_KAWA_XSLT_JSOURCES)
-@WITH_JAVAX_SCRIPT_TRUE@am__append_7 = $(JAVAX_SCRIPT_EXTRA)
+@WITH_JLINE2_TRUE@am__append_3 = kawa/io/JLine2InPort.java
+@ENABLE_XML_TRUE@am__append_4 = $(GNU_XML_JSOURCES) $(GNU_KAWA_XML_JSOURCES)
+@ENABLE_XML_TRUE@@WITH_SAX2_TRUE@am__append_5 = $(GNU_KAWA_SAX_JSOURCES)
+@ENABLE_ECHO2_TRUE@am__append_6 = $(GNU_KAWA_ECHO2_JSOURCES)
+@ENABLE_XQUERY_TRUE@am__append_7 = $(GNU_KAWA_XSLT_JSOURCES)
+@WITH_JAVAX_SCRIPT_TRUE@am__append_8 = $(JAVAX_SCRIPT_EXTRA)
 subdir = gnu
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/config.classpath \
@@ -176,6 +177,7 @@ TOP_BUILDDIR = @TOP_BUILDDIR@
 VERSION = @VERSION@
 WITH_JAVAFX_ARG = @WITH_JAVAFX_ARG@
 WITH_JFREESVG_ARG = @WITH_JFREESVG_ARG@
+WITH_JLINE2_ARG = @WITH_JLINE2_ARG@
 WITH_SERVLET_ARG = @WITH_SERVLET_ARG@
 XQTS_PATH = @XQTS_PATH@
 abs_builddir = @abs_builddir@
@@ -793,7 +795,7 @@ java_sources = $(GNU_LISTS_JSOURCES) $(GNU_TEXT_JSOURCES) \
 	$(GNU_KAWA_LISPEXPR_JSOURCES) $(GNU_KAWA_MODELS_JSOURCES) \
 	$(GNU_ECMASCRIPT_JSOURCES) $(am__append_1) $(am__append_2) \
 	$(am__append_3) $(am__append_4) $(am__append_5) \
-	$(am__append_6) $(am__append_7)
+	$(am__append_6) $(am__append_7) $(am__append_8)
 STANDARD_NAMED_CHARS_URL = http://www.w3.org/2003/entities/2007/w3centities-f.ent
 all: all-am
 

@@ -34,8 +34,8 @@ public class InPort extends Reader implements Printable
     static {
         Path systemInPath = Path.valueOf(systemInFilename);
         if (CheckConsole.haveConsole()) {
-            TtyInPort tin 
-                = new TtyInPort(System.in, systemInPath, OutPort.outInitial);
+            TtyInPort tin
+                = TtyInPort.make(System.in, systemInPath, OutPort.outInitial);
             if (CheckConsole.getDomTermVersionInfo() != null)
                 tin.setInDomTerm(true);
             systemInPort = tin;

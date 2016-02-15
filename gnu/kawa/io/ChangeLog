@@ -1,3 +1,11 @@
+2016-02-14  Per Bothner  <per@bothner.com>
+
+	Add support for JLine2 as a readline alternative.
+	* JLine2InPort.java: New class - extends TtyInPort.
+	* TtyInPort.java (make): New factory method.
+	(afterFill, wrapPromptForDomTerm): New helper methods.
+	* InPort.java: Use new TtyInPort.make factory method/
+
 2016-02-09  Per Bothner  <per@bothner.com>
 
 	* CheckConsole.java: Re-factor so we can re-evaluate domterm status

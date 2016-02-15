@@ -30,6 +30,10 @@ AC_ARG_WITH(javafx,
   AS_HELP_STRING(--with-javafx@<:@=jfxrt.jar@:>@,Enable support for JavaFX))
 WITH_JAVAFX_ARG="${with_javafx}"
 
+AC_ARG_WITH(jline2,
+ AS_HELP_STRING(--with-jline2=<:@=jline2.jar@:>@,Build support JLine2 input editing))
+ WITH_JLINE2_ARG="${with_jline2}"
+
 AC_ARG_WITH(XQTS,
   AS_HELP_STRING(--with-XQTS@<:@=XQTS-path@:>@,Support XQuery Test Suite))
 
@@ -167,6 +171,8 @@ AM_CONDITIONAL(ENABLE_SERVLET,
 AM_CONDITIONAL(WITH_SWING, test "$with_swing" != "no")
 AM_CONDITIONAL(WITH_JFREESVG,
   test "$with_jfreesvg" != "" -a "$with_jfreesvg" != "no")
+AM_CONDITIONAL(WITH_JLINE2,
+  test "$with_jline2" != "" -a "$with_jline2" != "no")
 AM_CONDITIONAL(WITH_JAVAFX,
   test "$with_javafx" != "" -a "$with_javafx" != "no")
 AM_CONDITIONAL(WITH_SWT, test "$with_swt" = "yes")
@@ -199,6 +205,7 @@ AC_SUBST(filesep)
 AC_SUBST(WITH_SERVLET_ARG)
 AC_SUBST(WITH_JFREESVG_ARG)
 AC_SUBST(WITH_JAVAFX_ARG)
+AC_SUBST(WITH_JLINE2_ARG)
 
 AC_SUBST(JAVA)
 AC_SUBST(JAVAC)

@@ -593,6 +593,7 @@ TOP_BUILDDIR
 JAVACFLAGS
 JAVAC
 JAVA
+WITH_JLINE2_ARG
 WITH_JAVAFX_ARG
 WITH_JFREESVG_ARG
 WITH_SERVLET_ARG
@@ -620,6 +621,8 @@ WITH_SWT_FALSE
 WITH_SWT_TRUE
 WITH_JAVAFX_FALSE
 WITH_JAVAFX_TRUE
+WITH_JLINE2_FALSE
+WITH_JLINE2_TRUE
 WITH_JFREESVG_FALSE
 WITH_JFREESVG_TRUE
 WITH_SWING_FALSE
@@ -729,6 +732,7 @@ with_servlet
 with_jfreesvg
 with_android
 with_javafx
+with_jline2
 with_XQTS
 enable_echo2
 enable_jemacs
@@ -1385,6 +1389,8 @@ Optional Packages:
                           Build for the Android platform
   --with-javafx[=jfxrt.jar]
                           Enable support for JavaFX
+  --with-jline2=<:@=jline2.jar]
+                          Build support JLine2 input editing
   --with-XQTS[=XQTS-path] Support XQuery Test Suite
   --with-httpserver       Make use of JDK6's builtin http server
   --with-swing            Assume Swing is available (default on)
@@ -2575,6 +2581,14 @@ fi
 WITH_JAVAFX_ARG="${with_javafx}"
 
 
+# Check whether --with-jline2 was given.
+if test "${with_jline2+set}" = set; then :
+  withval=$with_jline2;
+fi
+
+ WITH_JLINE2_ARG="${with_jline2}"
+
+
 # Check whether --with-XQTS was given.
 if test "${with_XQTS+set}" = set; then :
   withval=$with_XQTS;
@@ -2854,6 +2868,14 @@ else
   WITH_JFREESVG_FALSE=
 fi
 
+ if test "$with_jline2" != "" -a "$with_jline2" != "no"; then
+  WITH_JLINE2_TRUE=
+  WITH_JLINE2_FALSE='#'
+else
+  WITH_JLINE2_TRUE='#'
+  WITH_JLINE2_FALSE=
+fi
+
  if test "$with_javafx" != "" -a "$with_javafx" != "no"; then
   WITH_JAVAFX_TRUE=
   WITH_JAVAFX_FALSE='#'
@@ -2948,6 +2970,12 @@ case ${with_jfreesvg} in
   "") ;;
   *) conf_classpath=${with_jfreesvg}${CLASSPATH_SEPARATOR}$conf_classpath ;;
 esac
+case ${with_jline2} in
+  yes) ;;
+  no) ;;
+  "") ;;
+  *) conf_classpath=${with_jline2}${CLASSPATH_SEPARATOR}$conf_classpath ;;
+esac
 case ${with_javafx} in
   yes) ;;
   no) ;;
@@ -2978,6 +3006,7 @@ case ${with_sax2} in
 esac
 
 XQTS_PATH=${with_XQTS:-XQTS}
+
 
 
 
@@ -3217,6 +3246,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${WITH_JFREESVG_TRUE}" && test -z "${WITH_JFREESVG_FALSE}"; then
   as_fn_error $? "conditional \"WITH_JFREESVG\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${WITH_JLINE2_TRUE}" && test -z "${WITH_JLINE2_FALSE}"; then
+  as_fn_error $? "conditional \"WITH_JLINE2\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${WITH_JAVAFX_TRUE}" && test -z "${WITH_JAVAFX_FALSE}"; then

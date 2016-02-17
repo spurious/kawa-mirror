@@ -764,6 +764,10 @@ Daniel Bonniot @email{bonniot@@users.sf.net}).
 Kawa (like other Free Software projects) has no lack of tasks and projects
 to work on.  Here are some ideas.
 
+The ones marked @i{(GSoC)} are probably most suitable for a Google
+Summer of Code project, in being reasonable size, self-contained, and not
+depending on other tasks.
+
 @subsection Compiler should use class-file reading instead of reflection
 The Kawa compiler currently uses reflection to determine properties
 (such as exported function definitions) from referenced classes.
@@ -772,6 +776,8 @@ This should not be too difficult, since the @code{gnu.bytecode} library
 abstracts over class information read by reflection or class reading.
 
 @subsection Mutually dependent Java and Scheme modules
+
+@i{(GSoC - maybe)}
 
 We'd like a command for compiling compile a list of Java and Scheme
 source files thar may have mutual dependencies.  A good way
@@ -824,15 +830,19 @@ It could be useful for ideas.
 
 @anchor{task-parameterized-types}
 @subsection Parameterized types
+@i{(GSoC)}
+
 Kawa has some limited support for parameterized types, but
 it's not used much.  Improve type inferencing.
 Support definition of parameterized classes.
 Better used of parameterized types for sequence class.
 Support wildcards.  
 (It might be better to have wild-carding be associated with
-declarations, as in Scala, rather than uses.)
+declarations, as in Scala or @uref{http://openjdk.java.net/jeps/8043488,proposed for Java 10}, rather than uses.)
 
 @subsection Function types
+@i{(GSoC)}
+
 Kawa doesn't have true function types: Parameter and result types
 are only handled for ``known'' functions.  Adding first-class
 function types would be a major task, possibly depending on
@@ -899,6 +909,8 @@ framework.  There are existing ports for Scala: either
 or @uref{https://github.com/Bridgewater/scala-notebook, Scala Notebook}.
 
 @subsection XQuery-3.0 functionality
+@i{(GSoC, for some subset)}
+
 It would be nice to update the XQuery (Qexo) support
 to some subset of @uref{http://www.w3.org/TR/xquery-30/,XQuery 3.0}.
 
@@ -925,6 +937,9 @@ One such package to start with might be a
 Full Common Lisp compatibility is nice, but let's walk before we can run.
 
 @subsection JEmacs improvements
+
+@i{(GSoC, for some subset)}
+
 A lot of work is needed to make
 @uref{http://jemacs.sourceforge.net/,JEmacs} useful.
 One could try to import a useful package and see what works and what fails.
@@ -978,6 +993,9 @@ It would be nice to integrate the pretty-printer with the REPL,
 so that window re-sizing re-breaks the output lines.
 It would be nice to enhance the pretty-printer to handle
 variable-width fonts and other ``rich'' text.
+This might best be done in the context of an enhanced
+terminal emulator such as @uref{http://domterm.org,DomTerm}.
+
 Figuring out how to make the output formatter more flexible,
 more efficient, and more customizable are also desirable.
 
@@ -987,7 +1005,34 @@ for integrating server-side and client-side programming using
 a Scheme dialect.  These ideas seem like they would port
 quite well to Kawa.
 
+@subsection Functional Pictures
+
+@i{(GSoC)}
+
+Kawa has functional picture library, using the @code{Paintable}
+and @code{Viewable} interfaces in the @code{gnu.kawa.models} Java package.
+There are bindings to Swing (in @code{gnu.kawa/swindviews}),
+SVG (using JFreeSVG), and SWT (unmaintained).  However,
+it's a very minimal proof-of-concept.
+
+The Racket language has a @uref{https://docs.racket-lang.org/pict/,Pict}
+library, with a lot more functionality;
+it is used by the @uref{https://docs.racket-lang.org/quick/,Racket tutorial}.
+Racket also has a @uref{https://docs.racket-lang.org/teachpack/2htdpimage-guide.html,@code{2htdp/image} library} which should also be studied.
+
+Porting Racket's Pict library directly may not be practical,
+but it should be a good source of design and implementation ideas,
+as well as algorithms.
+
+If you ``print'' a picture in a REPL
+under @uref{http://domterm.org,DomTerm},
+the picture should be converted to HTML, SVG, or PNG
+and inserted in the DomTerm display.
+
 @subsection String localization
+
+@i{(GSoC)}
+
 Support localization by extending the
 @uref{http://srfi.schemers.org/srfi-109/srfi-109.html,SRFI_109}
 syntax, in the manner of (and compatible with)
@@ -1014,6 +1059,9 @@ focus could be GUI programming and perhaps web programming.
 @c (This is similar to values in the XML data model.)
 
 @subsection Better dynamic reload
+
+@i{(GSoC - a bit much doing all of this, but we can
+find more manageable sub-goals)}
 
 Kawa does a lot of optimizations and inlining.  This conflicts
 with being able to ``reload'' a module into an already-running
@@ -1045,6 +1093,9 @@ again requires a textual comparison.
 
 @subsection Decimal arithmetic and repeated decimals
 
+@i{(GSoC. Possibly a bit light for a full Summer project,
+but can be extended or combined with other projects.)}
+
 Exact decimal arithmetic is a variation of exact rational arithmetic,
 but may more user-friendly.  In particular printing using
 decimals is generally nicer than fractions.
@@ -1056,11 +1107,35 @@ We should implement a subclass of @code{RatNum} that generalizes
 @code{BigDecimal} to also handle repeating decimals.
 We need a lexical syntax for repeating decimals.
 Possible ideas: @code{0._81_} or @code{0.#81}.
-If a Scheme number literal is specied as exact and has either
+If a Scheme number literal is specified as exact and has either
 a decimal point or an exponent (for example @code{#e1.25}), then it should
 read as an exact decimal, not a fraction.
 
+@subsection Types for units
+
+@i{(GSoC)}
+
+Kawa support units (such as @code{cm^2} for square centimeters)
+and @ref{Quantities,quantities} (such as @code{4cm^2}).
+We would like to integrate these into the type system, both
+for performance and compile-time type checking.
+
+For syntax we could a pseudo-parameteried type @code{quantity}.  For example:
+@example
+(define a1 ::quantity[cm^2] 4cm^2)
+(* 2.0 a1) ;; @result{} 8cm^2
+(+ 2.0 a1) ;; @i{compile-time error}
+@end example
+The run-time type of the variable @code{a1} should be
+a primitive @code{double}, without object allocation.
+Of course when @code{a1} is converted to an object, we
+create a @code{Quantity}, not a @code{Double}.
+We can build on Kawa's existing framework for
+non-standard primitive types such as @code{character} and @code{ulong}.
+
 @subsection Optional strict typing along with an explicit @code{dynamic} type
+
+@i{(GSoC)}
 
 Kawa currently implements ``optimistic'' typing: The compiler only
 complains if an expression has no values in common with the target type
@@ -1073,10 +1148,10 @@ that the expression type be a subtype of the target type.
 For example it would complain if assigning a @code{number} to an @code{integer}
 unless you used an explicit cast.
 
-To make this easier to deal with we'd want to introduce a new type
-@code{dynamic} similar to
+To make this easier to work with we'd want make use
+of the @ref{dynamic-type,@code{dynamic} type}, similar to what
 @uref{https://msdn.microsoft.com/en-us/library/dd264736.aspx,what
-@code{C#} has}: Any expression can be converted
+@code{C#} does}: Any expression can be converted
 to or from @code{dynamic} without the compiler complaining.
 Similarly, if @code{x} is @code{dynamic} then @code{x:name}
 is allowed by the compiler regardless of @code{name}, with all checking
@@ -14617,6 +14692,7 @@ the actual argument is cast at run time to the named class.
 Also, @code{java.lang.StringBuffer[]} represents
 an array of references to @code{java.lang.StringBuffer} objects.
 
+@anchor{dynamic-type}
 @defvar dynamic
 Used to specify that the type is unknown, and is likely to change
 at run-time.

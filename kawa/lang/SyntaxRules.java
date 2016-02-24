@@ -100,34 +100,38 @@ public class SyntaxRules extends Procedure1
 
                 PatternScope patternScope = PatternScope.push(tr);
                 tr.push(patternScope);
+                try {
+                    while (pattern instanceof SyntaxForm) {
+                        pattern_syntax = (SyntaxForm) pattern;
+                        pattern = pattern_syntax.getDatum();
+                    }
 
-                while (pattern instanceof SyntaxForm) {
-                    pattern_syntax = (SyntaxForm) pattern;
-                    pattern = pattern_syntax.getDatum();
+                    StringBuilder programbuf = new StringBuilder();
+
+                    // In R5RS syntax-rules, the initial name is neither a
+                    // pattern variable or a literal identifier, so ignore it.
+                    if (pattern instanceof Pair) {
+                        Pair p = (Pair) pattern;
+                        programbuf.append((char) ((1 << 3)
+                                                  | SyntaxPattern.MATCH_PAIR));
+                        programbuf.append((char) SyntaxPattern.MATCH_IGNORE);
+                        pattern = p.getCdr();
+                    } else {
+                        // Identifier macro? FIXME
+                        tr.error('e', "pattern does not start with name");
+                        return;
+                    }
+                    SyntaxPattern spattern =
+                        new SyntaxPattern(programbuf, pattern, pattern_syntax,
+                                          ellipsis, literal_identifiers, tr);
+
+                    this.rules[i] =
+                        new SyntaxRule(spattern, template,
+                                       template_syntax, ellipsis, tr);
+                } finally {
+                    PatternScope.pop(tr);
+                    tr.pop();
                 }
-
-                StringBuilder programbuf = new StringBuilder();
-
-                // In R5RS syntax-rules, the initial name is neither a
-                // pattern variable or a literal identifier, so ignore it.
-                if (pattern instanceof Pair) {
-                    Pair p = (Pair) pattern;
-                    programbuf.append((char) ((1 << 3) | SyntaxPattern.MATCH_PAIR));
-                    programbuf.append((char) SyntaxPattern.MATCH_IGNORE);
-                    pattern = p.getCdr();
-                } else {
-                    // Identifier macro? FIXME
-                    tr.error('e', "pattern does not start with name");
-                    return;
-                }
-                SyntaxPattern spattern = new SyntaxPattern(programbuf, pattern,
-                                                           pattern_syntax, ellipsis, literal_identifiers, tr);
-
-                this.rules[i] = new SyntaxRule(spattern, template,
-                                               template_syntax, ellipsis, tr);
-
-                PatternScope.pop(tr);
-                tr.pop();
             } finally {
                 tr.setLine(save_filename, save_line, save_column);
             }

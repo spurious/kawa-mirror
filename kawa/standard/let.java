@@ -111,11 +111,12 @@ public class let extends Syntax {
             tr.pushRenamedAlias(renamedAliases.pop());
 
         tr.push(let);
-        let.setBody(tr.rewrite_body(body));
-
-        tr.pop(let);
-        tr.popRenamedAlias(renamedAliasesCount);
-    
+        try {
+            let.setBody(tr.rewrite_body(body));
+        } finally {
+            tr.pop(let);
+            tr.popRenamedAlias(renamedAliasesCount);
+        }
         return let;
     }
 

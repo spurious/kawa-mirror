@@ -610,6 +610,7 @@ public class Lambda extends Syntax
     Expression[] exps;
     int len;
     Object val;
+    try { // FIXME re-indent
     if (tform != null)
       {
         Expression texp = tr.rewrite_car((Pair) tform[0],
@@ -640,10 +641,12 @@ public class Lambda extends Syntax
       }
     else
       lexp.setCoercedReturnType(rtype);
+    } finally {
     tr.pop(lexp);
     lexp.countDecls();
     tr.popRenamedAlias(numRenamedAlias);
     lexp.countDecls();
+    }
     if (tr.curMethodLambda == lexp)
       tr.curMethodLambda = null;
   }

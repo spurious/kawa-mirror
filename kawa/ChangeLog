@@ -1,3 +1,9 @@
+2016-02-23  Per Bothner  <per@bothner.com>
+
+	* lang/SyntaxRules.java (<init>): Put scope pop in a finally clause.
+	* lang/Lambda.java (rewrite_lambda): Likewise.
+	* standard/let.java (rewrite): Likewise.
+
 2016-02-14  Per Bothner  <per@bothner.com>
 
 	* repl.java: Update copyright year printed by --version.

@@ -1,6 +1,5 @@
 package gnu.kawa.io;
 import java.io.*;
-import gnu.text.*;
 import java.nio.*;
 import java.nio.charset.*;
 

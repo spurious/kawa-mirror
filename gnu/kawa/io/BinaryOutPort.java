@@ -1,6 +1,6 @@
 package gnu.kawa.io;
+
 import java.io.*;
-import gnu.text.*;
 import java.nio.charset.Charset;
 
 /** An OutPort that provides access to an underlying OutputStream.

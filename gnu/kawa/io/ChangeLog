@@ -1,3 +1,7 @@
+2016-02-24  Per Bothner  <per@bothner.com>
+
+	Remove unneeded imports of gnu.text.
+
 2016-02-14  Per Bothner  <per@bothner.com>
 
 	Add support for JLine2 as a readline alternative.

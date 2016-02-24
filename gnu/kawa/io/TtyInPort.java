@@ -1,7 +1,6 @@
 package gnu.kawa.io;
 import java.io.*;
 import gnu.mapping.Procedure;
-import gnu.text.*;
 
 /** An interactive input-port.
     Supports prompting, auto-flush of tied output port, transcripts. */

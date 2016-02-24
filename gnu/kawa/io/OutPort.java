@@ -2,7 +2,7 @@ package gnu.kawa.io;
 import java.io.*;
 import gnu.mapping.Environment;
 import gnu.mapping.ThreadLocation;
-import gnu.text.*;
+import gnu.text.Printable;
 import gnu.lists.*;
 
 /**

@@ -8,6 +8,7 @@ import gnu.lists.*;
 import gnu.bytecode.*;
 import gnu.mapping.EnvironmentKey;
 import gnu.kawa.io.InPort;
+import gnu.kawa.io.TtyInPort;
 import gnu.kawa.reflect.StaticFieldLocation;
 import gnu.text.Lexer;
 import gnu.text.SourceMessages;
@@ -76,6 +77,9 @@ public abstract class LispLanguage extends Language
     ModuleExp mexp = tr.getModule();
     LispReader reader = (LispReader) lexer;
     Compilation saveComp = Compilation.setSaveCurrent(tr);
+    InPort in = reader == null ? null : reader.getPort();
+    if (in instanceof TtyInPort)
+        ((TtyInPort) in).resetAndKeep();
     try
       {
         if (tr.pendingForm != null)
@@ -125,6 +129,8 @@ public abstract class LispLanguage extends Language
       }
     finally
       {
+        if (in instanceof TtyInPort)
+          ((TtyInPort) in).setKeepAll(false);
         Compilation.restoreCurrent(saveComp);
       }
     return true;

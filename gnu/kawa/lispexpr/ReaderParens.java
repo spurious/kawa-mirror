@@ -99,9 +99,18 @@ public final class ReaderParens extends ReadTableEntry
 	    ch = port.read();
 	    if (ch == close)
 	      break;
-	    if (ch < 0)
+	    if (ch < 0) {
+                if (lexer.isTentative()) {
+                    Object value = gnu.lists.Pair.incompleteListMarker;
+                    if (last == null)
+                        list = value;
+                    else
+                        lexer.setCdr(last, value);
+                    return list;
+                }
 	       lexer.eofError("unexpected EOF in list starting here",
 			      startLine + 1, startColumn);
+            }
 	    ReadTableEntry entry;
 	    if (ch == '.')
 	      {

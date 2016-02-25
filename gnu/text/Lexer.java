@@ -12,8 +12,9 @@ import java.io.*;
 
 public class Lexer extends Reader
 {
-  protected InPort port;
-  protected boolean interactive;
+    protected InPort port;
+    protected boolean interactive;
+    protected boolean tentative;
 
   public Lexer(InPort port)
   {
@@ -337,6 +338,9 @@ public class Lexer extends Reader
 
   public boolean isInteractive() { return interactive; }
   public void setInteractive(boolean v) { interactive = v; }
+
+  public boolean isTentative() { return tentative; }
+  public void setTentative(boolean v) { tentative = v; }
 
   /** For building tokens of various kinds. */
   public char[] tokenBuffer = new char[100];

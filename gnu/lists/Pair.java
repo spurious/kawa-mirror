@@ -20,6 +20,10 @@ public class Pair extends LList implements Externalizable
   protected Object car;
   protected Object cdr;
 
+    /** A special pair used to indicate incomplete input. */
+    public static final Pair incompleteListMarker
+        = new ImmutablePair("<incomplete>", LList.Empty);
+
   public Pair (Object carval, Object cdrval)
   {
     car = carval;

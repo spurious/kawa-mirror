@@ -259,6 +259,7 @@ GNU_EXPR_JSOURCES = \
   expr/CheckedTarget.java \
   expr/ClassExp.java \
   expr/ClassInitializer.java \
+  expr/CommandCompleter.java \
   expr/Compilation.java \
   expr/CompiledModule.java \
   expr/ConditionalTarget.java \

@@ -1,5 +1,12 @@
 2016-02-24  Per Bothner  <per@bothner.com>
 
+	* InPort.java (KEEP_ALL): New flag.
+	(setKeepAll, resetAndKeep): New methods.
+	(reserve): Handle KEEP_ALL.
+	* JLine2InPort.java: Add completion support.
+
+2016-02-24  Per Bothner  <per@bothner.com>
+
 	Remove unneeded imports of gnu.text.
 
 2016-02-14  Per Bothner  <per@bothner.com>

@@ -184,6 +184,7 @@ public class InPort extends Reader implements Printable
 
   private static final int EOF_SEEN = 16;
   private static final int IS_CLOSED = 32;
+  private static final int KEEP_ALL = 64;
 
   /** Should we preserve the complete current line?
    * The default is true, but in some cases there can be a performance
@@ -196,6 +197,25 @@ public class InPort extends Reader implements Printable
     else
       flags |= DONT_KEEP_FULL_LINES;
   }
+
+    public void setKeepAll(boolean keep) {
+        if (keep)
+            flags |= KEEP_ALL;
+        else if ((flags & KEEP_ALL) != 0)
+            flags &= ~KEEP_ALL;
+    }
+
+    public void resetAndKeep() {
+        int lineno = getLineNumber();
+        mark(-1);
+        pos = 0;
+        limit = 0;
+        lineStartPos = 0;
+        markPos = 0;
+        highestPos = 0;
+        lineNumber = lineno;
+        flags |= KEEP_ALL;
+    }
 
   /** True if CR and CRLF should be converted to LF. */
   public final boolean getConvertCR () { return (flags & CONVERT_CR) != 0; }
@@ -329,10 +349,18 @@ public class InPort extends Reader implements Printable
   /* Make sure there is enough space for more characters in buffer. */
 
   private void reserve (char[] buffer, int reserve)
-    throws java.io.IOException
   {
     int saveStart;
     reserve += limit;
+    if ((flags & KEEP_ALL) != 0) {
+        if (reserve > buffer.length) {
+            int nlen = (3 * buffer.length) >> 1;
+            if (nlen < reserve)
+                nlen = reserve;
+            buffer = new char[nlen];
+        }
+        saveStart = 0;
+    } else
     if (reserve <= buffer.length)
       saveStart = 0;
     else

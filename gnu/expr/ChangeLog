@@ -1,3 +1,9 @@
+2016-02-24  Per Bothner  <per@bothner.com>
+
+	Add support for command-line completion.
+	* CommandCompleter.java: New class.
+	* NameLookup.java (getCompletingSymbols): New method.
+
 2016-02-12  Per Bothner  <per@bothner.com>
 
 	* ApplyExp.java (finishTrampoline): Factor out "runUntilDone"

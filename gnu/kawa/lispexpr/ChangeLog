@@ -1,3 +1,11 @@
+2016-02-24  Per Bothner  <per@bothner.com>
+
+	* LispLanguage.java (parse): Save entire command if in interactive
+	mode, in case we get a completion request.
+	* ReadTable.java: Treat COMPLETE_REQUEST as a letter.
+	* ReaderParens.java (readList): If we're in tentative mode,
+	on end-of-file append special value rather than throw fatal error.
+
 2016-02-11  Per Bothner  <per@bothner.com>
 
 	* LangObjType.java (isCompatibleWithValue): Check if types identical.

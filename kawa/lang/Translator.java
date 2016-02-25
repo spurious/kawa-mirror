@@ -674,6 +674,26 @@ public class Translator extends Compilation
       pushForm(rewrite(exp, false));
   }
 
+    public int getCompletions(Environment env,
+                              String nameStart, Object property,
+                              String namespaceUri,
+                              List<String> matches) {
+        LocationEnumeration e = env.enumerateAllLocations();
+        int count = 0;
+        while (e.hasMoreElements()) {
+            Location loc = e.nextLocation();
+            Symbol sym = loc.getKeySymbol();
+            String local = sym == null ? null : sym.getLocalPart();
+            if (local != null && local.startsWith(nameStart)
+                && property == loc.getKeyProperty()
+                && namespaceUri == sym.getNamespaceURI()) {
+                count++;
+                matches.add(local);
+            }
+        }
+        return count;
+    }
+
     public Object namespaceResolve(Object name) {
         Object prefix = null;
         Expression part2 = null;
@@ -743,6 +763,25 @@ public class Translator extends Compilation
             return rewrite_pair((Pair) exp, function);
         else if (exp instanceof Symbol && ! selfEvaluatingSymbol(exp)) {
             Symbol s = (Symbol) exp;
+
+            // Check if we're handling a completion request.
+            int complete = s.getLocalName()
+                .indexOf(CommandCompleter.COMPLETE_REQUEST);
+            boolean separate = getLanguage().hasSeparateFunctionNamespace();
+            if (complete >= 0) {
+                List<String> candidates = new ArrayList<String>();
+                String prefix = s.toString().substring(0, complete);
+                Object property = function && separate ? EnvironmentKey.FUNCTION
+                    : null;
+                int symspace = function ? Language.FUNCTION_NAMESPACE
+                    : Language.VALUE_NAMESPACE;
+                getCompletions(env, prefix, property, s.getNamespaceURI(),
+                               candidates);
+                lexical.getCompletingSymbols(prefix, symspace,
+                                             candidates);
+                throw new CommandCompleter(complete, candidates);
+            }
+
             if (s.hasUnknownNamespace()) {
                 String loc = s.getLocalPart();
                 return rewrite_lookup(rewrite(Symbol.valueOf(s.getPrefix()), false),
@@ -821,7 +860,6 @@ public class Translator extends Compilation
                 nameToLookup = exp;
             }
             Symbol symbol = (Symbol) exp;
-            boolean separate = getLanguage().hasSeparateFunctionNamespace();
             if (decl != null) {
                 if (current_scope instanceof TemplateScope && decl.needsContext())
                     cdecl = ((TemplateScope) current_scope).macroContext;

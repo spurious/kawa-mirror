@@ -4,6 +4,7 @@
 package gnu.kawa.lispexpr;
 import gnu.kawa.util.RangeTable;
 import gnu.mapping.*;
+import gnu.expr.CommandCompleter;
 import gnu.expr.Language;
 import gnu.kawa.reflect.StaticFieldLocation;
 import gnu.bytecode.Type;
@@ -237,7 +238,8 @@ public class ReadTable extends RangeTable
 	  entry = (ReadTableEntry) lookup('0', null);
 	else if (Character.isLowerCase((char) ch))
 	  entry = (ReadTableEntry) lookup('a', null);
-	else if (Character.isLetter((char) ch))
+	else if (Character.isLetter((char) ch)
+                 || ch == CommandCompleter.COMPLETE_REQUEST)
 	  entry = (ReadTableEntry) lookup('A', null);
 	else if (Character.isWhitespace((char) ch))
 	  entry = (ReadTableEntry) lookup(' ', null);

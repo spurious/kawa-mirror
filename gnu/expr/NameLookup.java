@@ -201,4 +201,18 @@ public class NameLookup extends GeneralHashTable<Object,Declaration>
     return lookup(symbol, (function ? Language.FUNCTION_NAMESPACE
 			   : Language.VALUE_NAMESPACE));
   }
+
+    public void getCompletingSymbols(String initialPart, int namespace, List<String> candidates) {
+        for (int index = table.length; --index >= 0; ) {
+            for (HashNode node = table[index];
+                 node != null;  node = node.next) {
+                Declaration decl = (Declaration) node.getValue();
+                String symbol = decl.getSymbol().toString();
+                if (symbol.startsWith(initialPart)
+                    && language.hasNamespace(decl, namespace)) {
+                    candidates.add(symbol);
+                }
+            }
+        }
+    }
 }

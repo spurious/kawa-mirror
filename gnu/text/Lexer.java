@@ -339,6 +339,8 @@ public class Lexer extends Reader
   public boolean isInteractive() { return interactive; }
   public void setInteractive(boolean v) { interactive = v; }
 
+  /** True if input may be incomplete or actively edited.
+   * Used for command-completion and on-the-fly error checking. */
   public boolean isTentative() { return tentative; }
   public void setTentative(boolean v) { tentative = v; }
 

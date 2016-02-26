@@ -18,6 +18,9 @@ public class ArrayPrint {
             int size = getSize(arr);
             int nfields = rank == 0 ? 1 : arr.getSize(rank-1);
             int[] fieldw = new int[nfields];
+            int[] indexes = new int[rank];
+            int[] lows = new int[rank];
+            int[] dims = new int[rank];
             String[][] cells = new String[size][];
             boolean[] rightAlign = new boolean[size];
             int icell = 0;
@@ -37,9 +40,12 @@ public class ArrayPrint {
                 }
                 sbuf.append(':');
                 sbuf.append(arr.getSize(r));
+                indexes[r] = low;
+                lows[r] = low;
+                dims[r] = arr.getSize(r);
             }
             if (rank == 0) {
-                String str = print(arr.getRowMajor(0), format);
+                String str = print(arr.get(indexes), format);
                 sbuf.append(' ');
                 sbuf.append(str);
                 return sbuf.toString();
@@ -51,13 +57,19 @@ public class ArrayPrint {
 
             for (int i = 0; i < size; i++) {
                 int col = i % nfields;
-                Object element = arr.getRowMajor(i);
+                Object element = arr.get(indexes);
                 String str = print(element, format);
                 String[] lines = splitLines(str);
                 rightAlign[icell] = element instanceof Number;
                 cells[icell] = lines;
                 icell++;
                 fieldw[col] = columnWidth(lines, fieldw[col]);
+                for (int r = rank; --r >= 0; ) {
+                    indexes[r]++;
+                    if (indexes[r]-lows[r] < dims[r])
+                        break;
+                    indexes[r] = lows[r];
+                }
             }
             int twidth = nfields+1;
             for (int i = 0; i < nfields; i++)

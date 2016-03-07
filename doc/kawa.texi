@@ -839,6 +839,7 @@ Better used of parameterized types for sequence class.
 Support wildcards.  
 (It might be better to have wild-carding be associated with
 declarations, as in Scala or @uref{http://openjdk.java.net/jeps/8043488,proposed for Java 10}, rather than uses.)
+See also @uref{http://openjdk.java.net/jeps/8043488}.
 
 @subsection Function types
 @i{(GSoC)}
@@ -15510,7 +15511,9 @@ each @meta{identifier} in the @meta{library-name-parts},
 @ref{Mangling,mangling} if needed, and concatenating them
 separated by periods.
 For example @code{(org example doc-utils)} becomes
-@code{org.example.doc$Mnutils}.
+@code{org.example.doc-utils}.  (You can't reference the class name
+@code{doc-utils} directly in Java, but the JVM has no problems with it.
+In Java you can use reflection to access classes with such names.)
 
 As a matter of style, @code{module-name} should be the first
 command in a file (after possible comments).  It must appear

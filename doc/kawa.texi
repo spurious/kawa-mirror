@@ -10579,8 +10579,8 @@ This could be useful for annotation, or line numbers:
 
 @example
 @stxdef{enclosed-part}
-    @stxlit{&} enclosed-modifier @stxlit{[} @arbno{@stxref{expression}} @stxlit{]}
-  | @stxlit{&} enclosed-modifier @stxlit{(} @atleastone{@stxref{expression}} @stxlit{)}
+    @stxlit{&} @arbno{@stxref{enclosed-modifier}} @stxlit{[} @arbno{@stxref{expression}} @stxlit{]}
+  | @stxlit{&} @arbno{@stxref{enclosed-modifier}} @stxlit{(} @atleastone{@stxref{expression}} @stxlit{)}
 @end example
 
 An embedded expression has the form @code{&[@var{expression}]}.
@@ -10602,7 +10602,7 @@ is a parenthesized expression:
 
 @example
 @stxdef{enclosed-modifier}
-  @arbno{@stxlit{~} @meta{format-specifier-after-tilde}}
+  @stxlit{~} @meta{format-specifier-after-tilde}
 @end example
 
 Using @ref{Format,@code{format}} allows finer-grained control over the
@@ -14982,8 +14982,9 @@ then its value is doubled.
 
 @display
 @stxdef{method-decl} @stxlit{((}@stxref{method-name} @stxref{formal-arguments}@stxlit{)}
-    @arbno{(@stxref{annotation} | @stxref{opt-return-type} | @stxref{option-pair})} [@stxref{deprecated-return-specifier}] @stxref{method-body}@stxlit{)}
+    @arbno{@stxref{method-option}} [@stxref{deprecated-return-specifier}] @stxref{method-body}@stxlit{)}
 @stxdef{method-name} @stxref{identifier}
+@stxdef{method-option} @stxref{annotation} | @stxref{opt-return-type} | @stxref{option-pair}
 @stxdef{method-body} @stxref{body} | @stxlit{#!abstract} | @stxlit{#!native}
 @stxdef{deprecated-return-specifier} @stxref{identifier}
 @end display

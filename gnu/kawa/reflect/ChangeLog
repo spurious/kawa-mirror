@@ -1,3 +1,9 @@
+2016-03-08  Per Bothner  <per@bothner.com>
+
+	* CompileReflect.java (validateApplySlotGet):
+	If no slot is found, emit warning, not error.
+	Don't emit either if type is 'dynamic'.
+
 2016-02-11  Per Bothner  <per@bothner.com>
 
 	* MultValuesType.java (isCompatibleWithValue): New method.

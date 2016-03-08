@@ -3,6 +3,7 @@ import gnu.mapping.*;
 import gnu.bytecode.*;
 import gnu.expr.*;
 import gnu.lists.FString;
+import gnu.kawa.lispexpr.LangObjType;
 
 public class CompileReflect
 {
@@ -234,8 +235,9 @@ public class CompileReflect
               }
           }
 
-        if (type != Type.pointer_type && comp.warnUnknownMember())
-          comp.error('e', "no slot `"+name+"' in "+ctype.getName());
+        if (type != Type.pointer_type && type != LangObjType.dynamicType
+            && comp.warnUnknownMember())
+          comp.error('w', "no slot `"+name+"' in "+ctype.getName());
       }
 
     String fname = gnu.expr.Compilation.mangleNameIfNeeded(name);

@@ -1,3 +1,7 @@
+2016-03-10  Per Bothner  <per@bothner.com>
+
+	* lang/Translator.java: Update to use ArrayList instead of Vector.
+
 2016-02-24  Per Bothner  <per@bothner.com>
 
 	* lang/Translator.java: Support context-senstive completion.

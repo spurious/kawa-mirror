@@ -1074,7 +1074,7 @@ public class Translator extends Compilation
             if (i < len && state > 1) {
                 DFloNum num = new DFloNum(name.substring(0, i));
                 boolean div = false;
-                Vector vec = new Vector();
+                ArrayList vec = new ArrayList();
                 for (; i < len;) {
                     char ch = name.charAt(i++);
                     if (ch == '*') {
@@ -1103,7 +1103,7 @@ public class Translator extends Compilation
                         }
                         ch = name.charAt(i++);
                     }
-                    vec.addElement(name.substring(unitStart, unitEnd));
+                    vec.add(name.substring(unitStart, unitEnd));
                     boolean expRequired = false;
                     if (ch == '^') {
                         expRequired = true;
@@ -1145,16 +1145,16 @@ public class Translator extends Compilation
                     }
                     if (neg)
                         exp = -exp;
-                    vec.addElement(IntNum.make(exp));
+                    vec.add(IntNum.make(exp));
                 }
                 if (i == len) {
                     int nunits = vec.size() >> 1;
                     Expression[] units = new Expression[nunits];
                     for (i = 0; i < nunits; i++) {
-                        String uname = (String) vec.elementAt(2 * i);
+                        String uname = (String) vec.get(2 * i);
                         Symbol usym = LispLanguage.unitNamespace.getSymbol(uname.intern());
                         Expression uref = tr.rewrite(usym);
-                        IntNum uexp = (IntNum) vec.elementAt(2 * i + 1);
+                        IntNum uexp = (IntNum) vec.get(2 * i + 1);
                         if (uexp.longValue() != 1)
                             uref = new ApplyExp(expt.expt,
                                                 new Expression[] {
@@ -1762,7 +1762,7 @@ public class Translator extends Compilation
   }
 
   /** Storage used by noteAccess and processAccesses. */
-  Vector notedAccess;
+  ArrayList notedAccess;
 
   /** Note that we reference name in a given scope.
    * This may be called when defining a macro, at scan-time,
@@ -1770,9 +1770,9 @@ public class Translator extends Compilation
   public void noteAccess (Object name, ScopeExp scope)
   {
     if (notedAccess == null)
-      notedAccess = new Vector();
-    notedAccess.addElement(name);
-    notedAccess.addElement(scope);
+      notedAccess = new ArrayList();
+    notedAccess.add(name);
+    notedAccess.add(scope);
   }
 
   /** Check references recorded by noteAccess.
@@ -1787,8 +1787,8 @@ public class Translator extends Compilation
     ScopeExp saveScope = current_scope;
     for (int i = 0;  i < sz;  i += 2)
       {
-	Object name = notedAccess.elementAt(i);
-	ScopeExp scope = (ScopeExp) notedAccess.elementAt(i+1);
+	Object name = notedAccess.get(i);
+	ScopeExp scope = (ScopeExp) notedAccess.get(i+1);
 	if (current_scope != scope)
           {
             // I.e. first time do equivalent of setPushCurrentScope

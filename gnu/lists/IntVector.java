@@ -10,6 +10,7 @@ import java.io.*;
 public abstract class IntVector<E> extends PrimIntegerVector<E>
 {
     int[] data;
+    protected static int[] empty = new int[0];
 
     /** Get the allocated length of the data buffer. */
     public int getBufferLength() {

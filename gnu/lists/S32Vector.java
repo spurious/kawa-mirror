@@ -11,7 +11,7 @@ public  class S32Vector extends IntVector<Integer>
     implements IntSequence
 {
     public S32Vector() {
-        data = AbstractSequence.noInts;
+        data = empty;
     }
 
     public S32Vector(int size, int value) {

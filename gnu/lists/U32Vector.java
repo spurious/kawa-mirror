@@ -11,7 +11,7 @@ import gnu.math.UInt;
 public  class U32Vector extends IntVector<UInt>
 {
     public U32Vector() {
-        data = AbstractSequence.noInts;
+        data = empty;
     }
 
     public U32Vector(int size, int value) {

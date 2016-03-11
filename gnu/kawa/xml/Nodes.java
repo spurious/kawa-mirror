@@ -301,25 +301,25 @@ public class Nodes extends Values.FromList<SeqPosition>
     }
 
     public static class NodeVector
-        // should maybe extend IndirectIndexable<SeqPosition> instead
         extends SimpleVector<SeqPosition>
         implements PositionConsumer {
         Object[] odata;
         int[] idata;
-        public GapManager getGapManager() { return super.getGapManager(); }
 
         int id=++counter; static int counter;
         public String toString() { return "NodeVec#"+id+"/sz:"+size(); }
 
-        protected int getGapStart() { return getGapManager().getGapStart(); }
+        int getLastIndex() { return getGapStart() - 1; }
 
         public int getBufferLength() {
             return odata == null ? 0 : odata.length;
         }
 
-        public void setBufferLength(int length) {
+        public void copyBuffer(int length) {
             checkCanWrite();
             int oldLength = odata == null ? 0 : odata.length;
+            if (length == -1)
+                length = oldLength;
             if (oldLength != length) {
                 if (oldLength > length)
                     oldLength = length;
@@ -337,7 +337,7 @@ public class Nodes extends Values.FromList<SeqPosition>
         protected Object getBuffer() { throw new Error(); }
         protected void setBuffer(Object buffer) { throw new Error(); }
 
-        protected SeqPosition getBuffer(int index) {
+        public SeqPosition getRaw(int index) {
             Object obj = odata[index];
             if (obj instanceof SeqPosition)
                 return (SeqPosition) obj;
@@ -345,9 +345,9 @@ public class Nodes extends Values.FromList<SeqPosition>
         }
 
         public AbstractSequence getSeq(int index) {
-            return getSeqBuffer(indexes.intAt(index));
+            return getSeqRaw(effectiveIndex(index));
         }
-        public AbstractSequence getSeqBuffer(int index) {
+        public AbstractSequence getSeqRaw(int index) {
             Object obj = odata[index];
             if (obj instanceof SeqPosition)
                 return ((SeqPosition) obj).sequence;
@@ -355,10 +355,10 @@ public class Nodes extends Values.FromList<SeqPosition>
         }
 
         public int getPos(int index) {
-            return getPosBuffer(indexes.intAt(index));
+            return getPosRaw(effectiveIndex(index));
         }
 
-        public int getPosBuffer(int index) {
+        public int getPosRaw(int index) {
             Object obj = odata[index];
             if (obj instanceof SeqPosition)
                 return ((SeqPosition) obj).ipos;
@@ -372,7 +372,7 @@ public class Nodes extends Values.FromList<SeqPosition>
                 return new SeqPosition(seq, ipos);
         }
 
-        protected void setBuffer(int index, SeqPosition value) {
+        public void setRaw(int index, SeqPosition value) {
             checkCanWrite();
             odata[index] = value;
             idata[index] = 0;
@@ -392,11 +392,15 @@ public class Nodes extends Values.FromList<SeqPosition>
         }
 
         @Override
-        protected NodeVector withIndexes(IntSequence ind) {
+        protected NodeVector newInstance(int newLength) {
             NodeVector nvec = new NodeVector();
-            nvec.odata = this.odata;
-            nvec.idata = this.idata;
-            nvec.indexes = ind;
+            if (newLength < 0) {
+                nvec.odata = this.odata;
+                nvec.idata = this.idata;
+            } else {
+                nvec.odata = new Object[newLength];
+                nvec.idata = new int[newLength];
+            }
             return nvec;
         }
 
@@ -425,11 +429,10 @@ public class Nodes extends Values.FromList<SeqPosition>
             int size = size();
             if (end > size)
                 end = size;
-            IntSequence inds = getIndexesForce();
             for (;  i < end;  i++) {
                 if (out instanceof PositionConsumer) {
                     PositionConsumer pout = (PositionConsumer) out;
-                    int ii = inds.intAt(i);
+                    int ii = effectiveIndex(i);
                     Object obj = odata[ii];
                     if (obj instanceof SeqPosition)
                         pout.writePosition((SeqPosition) obj);
@@ -437,7 +440,7 @@ public class Nodes extends Values.FromList<SeqPosition>
                         pout.writePosition((AbstractSequence) obj, idata[ii]);
                 }
                 else
-                    out.writeObject(getBuffer(i));
+                    out.writeObject(getRaw(i));
             }
         }
     }

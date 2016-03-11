@@ -17,8 +17,10 @@ public abstract class ShortVector<E> extends PrimIntegerVector<E>
         return data.length;
     }
 
-    public void setBufferLength(int length) {
+    public void copyBuffer(int length) {
         int oldLength = data.length;
+        if (length == -1)
+            length = oldLength;
         if (oldLength != length) {
             short[] tmp = new short[length];
             System.arraycopy(data, 0, tmp, 0,
@@ -31,31 +33,27 @@ public abstract class ShortVector<E> extends PrimIntegerVector<E>
 
     protected void setBuffer(Object buffer) { data = (short[]) buffer; }
 
-    public final short shortAt(int index) {
-        if (indexes != null)
-            index = indexes.intAt(index);
+    public final short getShort(int index) {
+        return data[effectiveIndex(index)];
+    }
+
+    public final short getShortRaw(int index) {
         return data[index];
     }
 
-    public final short shortAtBuffer(int index) {
-        return data[index];
-    }
-
-    public final void setShortAt(int index, short value) {
+    public final void setShort(int index, short value) {
         checkCanWrite(); // FIXME maybe inline and fold into following
-        if (indexes != null)
-            index = indexes.intAt(index);
-        data[index] = value;
+        data[effectiveIndex(index)] = value;
     }
 
-    public final void setShortAtBuffer(int index, short value) {
+    public final void setShortRaw(int index, short value) {
         data[index] = value;
     }
 
     public void add(short v) {
         int sz = size();
         addSpace(sz, 1);
-        setShortAt(sz, v);
+        setShort(sz, v);
     }
 
     protected void clearBuffer(int start, int count) {

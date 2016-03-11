@@ -1,3 +1,19 @@
+2016-03-10  Per Bothner  <per@bothner.com>
+
+	Major re-write for more general array support.
+	Rename methods like byteAt to getByte and longAtBuffer to getLongRaw.
+	* SimpleVector.java: Add new 64-bit 'info' field, used for flags,
+	sub-range bounds, or gap bounds. Handle gao management,
+	* IndirectIndexable.java: Removed class - no longer delegating
+	indexing to an indexes mapper class.  Doing it in SimpleVector
+	is less general but more memory- and cache-friendly.
+	* GapManager.java: Removed class - functionality now in SimpleVector.
+	* Arrays.java: New class with static utility methods.
+	* TransformedArray.java: New abstract class.
+	* ComposedArray.java: New class for generalized indexing.
+	* FlattenedArray.java: New class for a flattened (ravel) view.
+	* AVector.java: New interface.
+
 2016-01-19  Per Bothner  <per@bothner.com>
 
 	* GeneralArray.java (getTag): New method.

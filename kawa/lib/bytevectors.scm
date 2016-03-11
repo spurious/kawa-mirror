@@ -12,10 +12,10 @@
   (invoke v 'size))
 
 (define (bytevector-u8-ref (v ::bytevector) (i ::int)) ::int
-  (invoke v 'intAt i))
+  (v:getInt i))
 
 (define (bytevector-u8-set! (v ::bytevector) (i ::int) (x ::int)) ::void
-  (invoke v 'setByteAt i x))
+  (v:setByte i x))
 
 (define (bytevector-copy v::bytevector
                          #!optional (start ::int 0) (end ::int (v:size)))

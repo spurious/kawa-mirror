@@ -31,17 +31,6 @@ public  class S8Vector extends ByteVector<Byte>
         this.data = data;
     }
 
-    /*
-    public S8Vector(Sequence seq) {
-        data = new byte[seq.size()];
-        addAll(seq);
-    }
-    */
-
-    public S8Vector(byte[] data, IntSequence indexes) {
-        this.data = data;
-        this.indexes = indexes;
-    }
 
     /** Makes a copy of (part of) the argument array. */
     public S8Vector(byte[] values, int offset, int length) {
@@ -49,33 +38,26 @@ public  class S8Vector extends ByteVector<Byte>
         System.arraycopy(values, offset, data, 0, length);
     }
 
-    public final int intAtBuffer(int index) {
+    public final int getIntRaw(int index) {
         return (int) data[index];
     }
 
     public final Byte get(int index) {
-        if (indexes != null)
-            index = indexes.intAt(index);
-        return Byte.valueOf(data[index]);
+        return Byte.valueOf(data[effectiveIndex(index)]);
     }
 
-    public final Byte getBuffer(int index) {
+    public final Byte getRaw(int index) {
         return Byte.valueOf(data[index]);
     }
 
     @Override
-    public final void setBuffer(int index, Byte value) {
+    public final void setRaw(int index, Byte value) {
         data[index] = value.byteValue();
     }
 
     @Override
-    protected S8Vector withIndexes(IntSequence ind) {
-        return new S8Vector(data, ind);
-    }
-
-    @Override
-    public S8Vector subList(int fromIx, int toIx) {
-        return new S8Vector(data, indexesSubList(fromIx, toIx));
+    protected S8Vector newInstance(int newLength) {
+        return new S8Vector(newLength < 0 ? data : new byte[newLength]);
     }
 
     public int getElementKind() { return INT_S8_VALUE; }

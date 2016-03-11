@@ -10,15 +10,16 @@ import java.io.*;
 public abstract class IntVector<E> extends PrimIntegerVector<E>
 {
     int[] data;
-    protected static int[] empty = new int[0];
 
     /** Get the allocated length of the data buffer. */
     public int getBufferLength() {
         return data.length;
     }
 
-    public void setBufferLength(int length) {
+    public void copyBuffer(int length) {
         int oldLength = data.length;
+        if (length == -1)
+            length = oldLength;
         if (oldLength != length) {
             int[] tmp = new int[length];
             System.arraycopy(data, 0, tmp, 0,
@@ -31,31 +32,27 @@ public abstract class IntVector<E> extends PrimIntegerVector<E>
 
     protected void setBuffer(Object buffer) { data = (int[]) buffer; }
 
-    public final int intAt(int index) {
-        if (indexes != null)
-            index = indexes.intAt(index);
+    public final int getInt(int index) {
+        return data[effectiveIndex(index)];
+    }
+
+    public final int getIntRaw(int index) {
         return data[index];
     }
 
-    public final int intAtBuffer(int index) {
-        return data[index];
-    }
-
-    public final void setIntAt(int index, int value) {
+    public final void setInt(int index, int value) {
         checkCanWrite(); // FIXME maybe inline and fold into following
-        if (indexes != null)
-            index = indexes.intAt(index);
-        data[index] = value;
+        data[effectiveIndex(index)] = value;
     }
 
-    public final void setIntAtBuffer(int index, int value) {
+    public final void setIntRaw(int index, int value) {
         data[index] = value;
     }
 
     public void add(int v) {
         int sz = size();
         addSpace(sz, 1);
-        setIntAt(sz, v);
+        setInt(sz, v);
     }
 
     protected void clearBuffer(int start, int count) {

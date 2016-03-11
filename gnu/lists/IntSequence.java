@@ -3,20 +3,22 @@
 
 package gnu.lists;
 
+import java.util.List;
+
 public interface IntSequence
-    /* #ifdef JAVA8 */
-    // extends java.util.function.IntUnaryOperator
-    /* #endif */
+    extends Array<Integer>,
+            /* #ifdef JAVA8 */
+            // extends java.util.function.IntUnaryOperator,
+            /* #endif */
+            List<Integer>
 {
-    public int intAt(int index);
+    public int getInt(int index);
 
     public int size();
 
-    public IntSequence subList(int fromIx, int toIx);
-
     /* #ifdef JAVA8 */
     // default int applyAsInt(int operand) {
-    //     return intAt(operand);
+    //     return getInt(operand);
     // }
     /* #endif */
 }

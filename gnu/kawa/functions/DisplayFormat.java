@@ -23,6 +23,7 @@ import gnu.text.Printable;
 // import gnu.kawa.models.Paintable;
 // import gnu.kawa.models.SVGUtils;
 /* #endif */
+import java.util.List;
 /* #ifdef use:java.util.regex */
 import java.util.regex.*;
 /* #endif */
@@ -344,10 +345,11 @@ public class DisplayFormat extends AbstractFormat
       }
     else if (obj instanceof LList && out instanceof OutPort)
       writeList((LList) obj, (OutPort) out);
-    else if (obj instanceof SimpleVector)
+    else if (obj instanceof List)
       {
-	SimpleVector vec = (SimpleVector) obj;
-	String tag = vec.getTag();
+	List vec = (List) obj;
+	String tag =
+            vec instanceof SimpleVector ? ((SimpleVector) vec).getTag() : null;
 	String start, end;
 	if (language == 'E')
 	  {
@@ -363,14 +365,24 @@ public class DisplayFormat extends AbstractFormat
 	  ((OutPort) out).startLogicalBlock(start, false, end);
 	else
 	  write (start, out);
-	int endpos = vec.size() << 1;
-	for (int ipos = 0;  ipos < endpos;  ipos += 2)
-	  {
-	    if (ipos > 0 && out instanceof OutPort)
-	      ((OutPort) out).writeSpaceFill();
-	    if (! vec.consumeNext(ipos, out))
-	      break;
-	  }
+        if (vec instanceof SimpleVector) {
+            int endpos = vec.size() << 1;
+            for (int ipos = 0;  ipos < endpos;  ipos += 2) {
+                if (ipos > 0 && out instanceof OutPort)
+                    ((OutPort) out).writeSpaceFill();
+                if (! ((SimpleVector) vec).consumeNext(ipos, out))
+                    break;
+            }
+        } else {
+            boolean first = true;
+            for (Object el : vec) {
+                if (first)
+                    first = false;
+                else if (out instanceof OutPort)
+                    ((OutPort) out).writeSpaceFill();
+                writeObject(el, out);
+            }
+        }
 	if (out instanceof OutPort)
 	  ((OutPort) out).endLogicalBlock(end);
 	else

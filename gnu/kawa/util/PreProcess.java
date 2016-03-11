@@ -49,7 +49,7 @@ public class PreProcess
         +"/$TAG$=Bit/$tag$=b/$ptype$=boolean/$BTYPE$=Boolean"
         +"/$CNAME$=BitVector/$SUPER$=SimpleVector<Boolean>/$KIND$=BOOLEAN"
         +"/$RETURN_IF_UNEQUAL$(v1,v2)=return v1 && ! v2 ? 1 : -1"
-        +"/$WRITE(i,out)=out.writeBoolean(booleanAt(i))/$ZERO$=false",
+        +"/$WRITE(i,out)=out.writeBoolean(getBoolean(i))/$ZERO$=false",
         "BYTE",
         "/+BYTE/$DESC$=signed or unsigned 8-bit integers (bytes)"
         +"/$TAG$=Byte/$ptype$=byte/$BTYPE$=E"
@@ -70,12 +70,12 @@ public class PreProcess
         "/+F32/$DESC$=32-bit floats"
         +"/$TAG$=F32/$ptype$=float/$BTYPE$=Float"
         +"/$CNAME$=F32Vector/$SUPER$=SimpleVector<Float>/$KIND$=FLOAT"
-        +"/$WRITE(i,out)=out.writeFloat(floatAt(i))",
+        +"/$WRITE(i,out)=out.writeFloat(getFloat(i))",
         "F64",
         "/+F64/$DESC$=64-bit doubles"
         +"/$TAG$=F64/$ptype$=double/$BTYPE$=Double"
         +"/$CNAME$=F64Vector/$SUPER$=SimpleVector<Double>/$KIND$=DOUBLE"
-        +"/$WRITE(i,out)=out.writeDouble(doubleAt(i))",
+        +"/$WRITE(i,out)=out.writeDouble(getDouble(i))",
         "S8",
         "/+S8/$DESC$=signed 8-bit integers (bytes)"
         +"/$TAG$=S8/$ptype$=byte/$BTYPE$=Byte/$KIND$=INT_S8"
@@ -92,7 +92,7 @@ public class PreProcess
         "/+S64/$DESC$=signed 64-bit integers (longs)"
         +"/$TAG$=S64/$ptype$=long/$BTYPE$=Long/$KIND$=INT_S64"
         +"/$CNAME$=S64Vector/$SUPER$=LongVector<Long>"
-        +"/$WRITE(i,out)=out.writeLong(longAt(i))",
+        +"/$WRITE(i,out)=out.writeLong(getLong(i))",
         "U8",
         "/+U8/$DESC$=unsigned 8-bit integers (bytes)"
         +"/$TAG$=U8/$ptype$=byte/$BTYPE$=UByte/$KIND$=INT_U8"
@@ -105,12 +105,12 @@ public class PreProcess
         "/+U32/$DESC$=unsigned 32-bit integers (ints)"
         +"/$TAG$=U32/$ptype$=int/$BTYPE$=UInt/$KIND$=INT_U32"
         +"/$CNAME$=U32Vector/$SUPER$=IntVector<UInt>/$MASK$= & 0xffffffffL"
-        +"/$WRITE(i,out)=Sequences.writeUInt(intAt(i), out)",
+        +"/$WRITE(i,out)=Sequences.writeUInt(getInt(i), out)",
         "U64",
         "/+U64/$DESC$=unsigned 64-bit integers (longs)"
         +"/$TAG$=U64/$ptype$=long/$BTYPE$=ULong/$KIND$=INT_U64"
         +"/$CNAME$=U64Vector/$SUPER$=LongVector<ULong>"
-        +"/$WRITE(i,out)=Sequences.writeULong(longAt(i), out)"
+        +"/$WRITE(i,out)=Sequences.writeULong(getLong(i), out)"
         +"/$RETURN_IF_UNEQUAL(v1,v2)=return (v1^0x8000000000000000L) > (v2^0x8000000000000000L) ? 1 : -1",
     };
 

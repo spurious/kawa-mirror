@@ -49,17 +49,6 @@ public @Abstract class $CNAME$ extends $SUPER$
         this.data = data;
     }
 
-    /*
-    public $TAG$Vector(Sequence seq) {
-        data = new $ptype$[seq.size()];
-        addAll(seq);
-    }
-    */
-
-    public $TAG$Vector($ptype$[] data, IntSequence indexes) {
-        this.data = data;
-        this.indexes = indexes;
-    }
 
     /** Makes a copy of (part of) the argument array. */
     public $TAG$Vector($ptype$[] values, int offset, int length) {
@@ -103,8 +92,10 @@ public @Abstract class $CNAME$ extends $SUPER$
         return data.length;
     }
 
-    public void setBufferLength(int length) {
+    public void copyBuffer(int length) {
         int oldLength = data.length;
+        if (length == -1)
+            length = oldLength;
         if (oldLength != length) {
             $ptype$[] tmp = new $ptype$[length];
             System.arraycopy(data, 0, tmp, 0,
@@ -119,76 +110,68 @@ public @Abstract class $CNAME$ extends $SUPER$
 
     /* #endif */
     /* #ifdef BIT|BYTE|SHORT|INT|LONG|F32|F64 */
-    public final $ptype$ $ptype$At(int index) {
-        if (indexes != null)
-            index = indexes.intAt(index);
-        return data[index];
+    public final $ptype$ get$Ptype$(int index) {
+        return data[effectiveIndex(index)];
     }
 
-    public final $ptype$ $ptype$AtBuffer(int index) {
+    public final $ptype$ get$Ptype$Raw(int index) {
         return data[index];
     }
 
     /* #endif */
     /* #ifdef S8|S16|U8|U16|LONG */
-    public final int intAtBuffer(int index) {
+    public final int getIntRaw(int index) {
         return (int) data[index]$MASK$;
     }
 
     /* #endif */
     /* #ifdef S32|U32 */
-    public final long longAtBuffer(int index) {
+    public final long getLongRaw(int index) {
         return (long) data[index]$MASK$;
     }
 
     /* #endif */
     /* #ifdef OBJECT */
     public final E get(int index) {
-        if (indexes != null)
-            index = indexes.intAt(index);
-        return (E) data[index];
+        return (E) data[effectiveIndex(index)];
     }
 
-    public final E getBuffer(int index) {
+    public final E getRaw(int index) {
         return (E) data[index];
     }
 
     /* #endif */
     /* #ifdef BIT|S8|S16|S32|S64|U8|U16|U32|U64|F32|F64 */
     public final $BTYPE$ get(int index) {
-        if (indexes != null)
-            index = indexes.intAt(index);
-        return $BTYPE$.valueOf(data[index]);
+        return $BTYPE$.valueOf(data[effectiveIndex(index)]);
     }
 
-    public final $BTYPE$ getBuffer(int index) {
+    public final $BTYPE$ getRaw(int index) {
         return $BTYPE$.valueOf(data[index]);
     }
 
     /* #endif */
     /* #ifdef BIT|BYTE|SHORT|INT|LONG|F32|F64 */
-    public final void set$Ptype$At(int index, $ptype$ value) {
+    public final void set$Ptype$(int index, $ptype$ value) {
         checkCanWrite(); // FIXME maybe inline and fold into following
-        if (indexes != null)
-            index = indexes.intAt(index);
-        data[index] = value;
+        data[effectiveIndex(index)] = value;
     }
 
-    public final void set$Ptype$AtBuffer(int index, $ptype$ value) {
+    public final void set$Ptype$Raw(int index, $ptype$ value) {
         data[index] = value;
     }
 
     /* #endif */
     /* #ifdef OBJECT */
     @Override
-    public final void setBuffer(int index, $BTYPE$ value) {
+    public final void setRaw(int index, $BTYPE$ value) {
         data[index] = value;
     }
 
     /* #endif */
     /* #ifdef BIT|S8|S16|S32|S64|U8|U16|U32|U64|F32|F64 */
     @Override
-    public final void setBuffer(int index, $BTYPE$ value) {
+    public final void setRaw(int index, $BTYPE$ value) {
         data[index] = value.$ptype$Value();
     }
 
@@ -197,7 +180,7 @@ public @Abstract class $CNAME$ extends $SUPER$
     public void add($ptype$ v) {
         int sz = size();
         addSpace(sz, 1);
-        set$Ptype$At(sz, v);
+        set$Ptype$(sz, v);
     }
 
     /* #endif */
@@ -211,17 +194,12 @@ public @Abstract class $CNAME$ extends $SUPER$
     /* #endif */
     /* #ifdef OBJECT|BIT|S8|S16|S32|S64|U8|U16|U32|U64|F32|F64 */
     @Override
-    protected $CNAME$ withIndexes(IntSequence ind) {
-        return new $CNAME$(data, ind);
+    protected $CNAME$ newInstance(int newLength) {
+        return new $CNAME$(newLength < 0 ? data : new $ptype$[newLength]);
     }
 
     /* #endif */
     /* #ifdef BIT|S8|S16|S32|S64|U8|U16|U32|U64|F32|F64 */
-    @Override
-    public $CNAME$ subList(int fromIx, int toIx) {
-        return new $CNAME$(data, indexesSubList(fromIx, toIx));
-    }
-
     public int getElementKind() { return $KIND$_VALUE; }
 
     public String getTag() { return "$tag$"; }
@@ -229,7 +207,7 @@ public @Abstract class $CNAME$ extends $SUPER$
     /* #endif */
     /* #ifdef OBJECT */
     public final void fill(int start, int end, E new_value) {
-        if (indexes == null)
+        if (isVerySimple())
             java.util.Arrays.fill(data, start, end, new_value);
         else
             super.fill(start, end, new_value);
@@ -265,10 +243,8 @@ public @Abstract class $CNAME$ extends $SUPER$
             return false;
         Object[] this_data = data;
         Object[] obj_data = obj_vec.data;
-        IntSequence inds1 = getIndexesForce();
-        IntSequence inds2 = obj_vec.getIndexesForce();
         for (int i = 0;  i < n;  i++) {
-            if (! (this_data[inds1.intAt(i)].equals(obj_data[inds2.intAt(i)])))
+            if (! (this_data[effectiveIndex(i)].equals(obj_data[obj_vec.effectiveIndex(i)])))
                 return false;
         }
         return true;
@@ -288,12 +264,10 @@ public @Abstract class $CNAME$ extends $SUPER$
         $ptype$[] arr2 = vec2.data;
         int n1 = size();
         int n2 = vec2.size();
-        IntSequence inds1 = getIndexesForce();
-        IntSequence inds2 = vec2.getIndexesForce();
         int n = n1 > n2 ? n2 : n1;
         for (int i = 0;  i < n;  i++) {
-            $ptype$ v1 = arr1[inds1.intAt(i)];
-            $ptype$ v2 = arr2[inds2.intAt(i)];
+            $ptype$ v1 = arr1[effectiveIndex(i)];
+            $ptype$ v2 = arr2[effectiveIndex(i)];
             if (v1 != v2)
                 $RETURN_IF_UNEQUAL$(v1,v2);
         }
@@ -349,7 +323,7 @@ public @Abstract class $CNAME$ extends $SUPER$
             System.arraycopy(src.data, sseg, data, dseg, count);
         } else {
             for (int i = 0; i < count; i++)
-                setByteAt(index+i, src.byteAt(start+i));
+                setByte(index+i, src.getByte(start+i));
         }
     }
 
@@ -373,7 +347,7 @@ public @Abstract class $CNAME$ extends $SUPER$
         }
         public int read() {
             return pos >= size ? -1 :
-                (0xff & bvec.byteAt(pos++));
+                (0xff & bvec.getByte(pos++));
         }
         public boolean markSupported() { return true; }
         public void mark(int readLimit) { mark = pos; }
@@ -398,7 +372,7 @@ public @Abstract class $CNAME$ extends $SUPER$
         } else {
             buf = new byte[length];
             for (int i = 0; i < length; i++)
-                buf[i] = byteAt(start+i);
+                buf[i] = getByte(start+i);
         }
         return Strings.toUtf8(buf, start, length);
     }

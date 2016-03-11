@@ -32,17 +32,6 @@ public  class U16Vector extends ShortVector<UShort>
         this.data = data;
     }
 
-    /*
-    public U16Vector(Sequence seq) {
-        data = new short[seq.size()];
-        addAll(seq);
-    }
-    */
-
-    public U16Vector(short[] data, IntSequence indexes) {
-        this.data = data;
-        this.indexes = indexes;
-    }
 
     /** Makes a copy of (part of) the argument array. */
     public U16Vector(short[] values, int offset, int length) {
@@ -50,33 +39,26 @@ public  class U16Vector extends ShortVector<UShort>
         System.arraycopy(values, offset, data, 0, length);
     }
 
-    public final int intAtBuffer(int index) {
+    public final int getIntRaw(int index) {
         return (int) data[index] & 0xffff;
     }
 
     public final UShort get(int index) {
-        if (indexes != null)
-            index = indexes.intAt(index);
-        return UShort.valueOf(data[index]);
+        return UShort.valueOf(data[effectiveIndex(index)]);
     }
 
-    public final UShort getBuffer(int index) {
+    public final UShort getRaw(int index) {
         return UShort.valueOf(data[index]);
     }
 
     @Override
-    public final void setBuffer(int index, UShort value) {
+    public final void setRaw(int index, UShort value) {
         data[index] = value.shortValue();
     }
 
     @Override
-    protected U16Vector withIndexes(IntSequence ind) {
-        return new U16Vector(data, ind);
-    }
-
-    @Override
-    public U16Vector subList(int fromIx, int toIx) {
-        return new U16Vector(data, indexesSubList(fromIx, toIx));
+    protected U16Vector newInstance(int newLength) {
+        return new U16Vector(newLength < 0 ? data : new short[newLength]);
     }
 
     public int getElementKind() { return INT_U16_VALUE; }

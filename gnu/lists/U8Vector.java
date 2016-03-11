@@ -32,17 +32,6 @@ public  class U8Vector extends ByteVector<UByte>
         this.data = data;
     }
 
-    /*
-    public U8Vector(Sequence seq) {
-        data = new byte[seq.size()];
-        addAll(seq);
-    }
-    */
-
-    public U8Vector(byte[] data, IntSequence indexes) {
-        this.data = data;
-        this.indexes = indexes;
-    }
 
     /** Makes a copy of (part of) the argument array. */
     public U8Vector(byte[] values, int offset, int length) {
@@ -50,33 +39,26 @@ public  class U8Vector extends ByteVector<UByte>
         System.arraycopy(values, offset, data, 0, length);
     }
 
-    public final int intAtBuffer(int index) {
+    public final int getIntRaw(int index) {
         return (int) data[index] & 0xff;
     }
 
     public final UByte get(int index) {
-        if (indexes != null)
-            index = indexes.intAt(index);
-        return UByte.valueOf(data[index]);
+        return UByte.valueOf(data[effectiveIndex(index)]);
     }
 
-    public final UByte getBuffer(int index) {
+    public final UByte getRaw(int index) {
         return UByte.valueOf(data[index]);
     }
 
     @Override
-    public final void setBuffer(int index, UByte value) {
+    public final void setRaw(int index, UByte value) {
         data[index] = value.byteValue();
     }
 
     @Override
-    protected U8Vector withIndexes(IntSequence ind) {
-        return new U8Vector(data, ind);
-    }
-
-    @Override
-    public U8Vector subList(int fromIx, int toIx) {
-        return new U8Vector(data, indexesSubList(fromIx, toIx));
+    protected U8Vector newInstance(int newLength) {
+        return new U8Vector(newLength < 0 ? data : new byte[newLength]);
     }
 
     public int getElementKind() { return INT_U8_VALUE; }

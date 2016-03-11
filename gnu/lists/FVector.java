@@ -35,17 +35,6 @@ public  class FVector<E> extends SimpleVector<E>
         this.data = data;
     }
 
-    /*
-    public FVector(Sequence seq) {
-        data = new Object[seq.size()];
-        addAll(seq);
-    }
-    */
-
-    public FVector(Object[] data, IntSequence indexes) {
-        this.data = data;
-        this.indexes = indexes;
-    }
 
     /** Makes a copy of (part of) the argument array. */
     public FVector(Object[] values, int offset, int length) {
@@ -85,8 +74,10 @@ public  class FVector<E> extends SimpleVector<E>
         return data.length;
     }
 
-    public void setBufferLength(int length) {
+    public void copyBuffer(int length) {
         int oldLength = data.length;
+        if (length == -1)
+            length = oldLength;
         if (oldLength != length) {
             Object[] tmp = new Object[length];
             System.arraycopy(data, 0, tmp, 0,
@@ -100,17 +91,15 @@ public  class FVector<E> extends SimpleVector<E>
     protected void setBuffer(Object buffer) { data = (Object[]) buffer; }
 
     public final E get(int index) {
-        if (indexes != null)
-            index = indexes.intAt(index);
-        return (E) data[index];
+        return (E) data[effectiveIndex(index)];
     }
 
-    public final E getBuffer(int index) {
+    public final E getRaw(int index) {
         return (E) data[index];
     }
 
     @Override
-    public final void setBuffer(int index, Object value) {
+    public final void setRaw(int index, Object value) {
         data[index] = value;
     }
 
@@ -121,12 +110,12 @@ public  class FVector<E> extends SimpleVector<E>
     }
 
     @Override
-    protected FVector<E> withIndexes(IntSequence ind) {
-        return new FVector<E>(data, ind);
+    protected FVector<E> newInstance(int newLength) {
+        return new FVector<E>(newLength < 0 ? data : new Object[newLength]);
     }
 
     public final void fill(int start, int end, E new_value) {
-        if (indexes == null)
+        if (isVerySimple())
             java.util.Arrays.fill(data, start, end, new_value);
         else
             super.fill(start, end, new_value);
@@ -158,10 +147,8 @@ public  class FVector<E> extends SimpleVector<E>
             return false;
         Object[] this_data = data;
         Object[] obj_data = obj_vec.data;
-        IntSequence inds1 = getIndexesForce();
-        IntSequence inds2 = obj_vec.getIndexesForce();
         for (int i = 0;  i < n;  i++) {
-            if (! (this_data[inds1.intAt(i)].equals(obj_data[inds2.intAt(i)])))
+            if (! (this_data[effectiveIndex(i)].equals(obj_data[obj_vec.effectiveIndex(i)])))
                 return false;
         }
         return true;
@@ -173,12 +160,10 @@ public  class FVector<E> extends SimpleVector<E>
         Object[] arr2 = vec2.data;
         int n1 = size();
         int n2 = vec2.size();
-        IntSequence inds1 = getIndexesForce();
-        IntSequence inds2 = vec2.getIndexesForce();
         int n = n1 > n2 ? n2 : n1;
         for (int i = 0;  i < n;  i++) {
-            Object v1 = arr1[inds1.intAt(i)];
-            Object v2 = arr2[inds2.intAt(i)];
+            Object v1 = arr1[effectiveIndex(i)];
+            Object v2 = arr2[effectiveIndex(i)];
             if (v1 != v2)
                 {int d = ((Comparable) v1).compareTo((Comparable) v2); if (d != 0)  return d; };
         }

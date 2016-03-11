@@ -17,8 +17,10 @@ public abstract class ByteVector<E> extends PrimIntegerVector<E>
         return data.length;
     }
 
-    public void setBufferLength(int length) {
+    public void copyBuffer(int length) {
         int oldLength = data.length;
+        if (length == -1)
+            length = oldLength;
         if (oldLength != length) {
             byte[] tmp = new byte[length];
             System.arraycopy(data, 0, tmp, 0,
@@ -31,31 +33,27 @@ public abstract class ByteVector<E> extends PrimIntegerVector<E>
 
     protected void setBuffer(Object buffer) { data = (byte[]) buffer; }
 
-    public final byte byteAt(int index) {
-        if (indexes != null)
-            index = indexes.intAt(index);
+    public final byte getByte(int index) {
+        return data[effectiveIndex(index)];
+    }
+
+    public final byte getByteRaw(int index) {
         return data[index];
     }
 
-    public final byte byteAtBuffer(int index) {
-        return data[index];
-    }
-
-    public final void setByteAt(int index, byte value) {
+    public final void setByte(int index, byte value) {
         checkCanWrite(); // FIXME maybe inline and fold into following
-        if (indexes != null)
-            index = indexes.intAt(index);
-        data[index] = value;
+        data[effectiveIndex(index)] = value;
     }
 
-    public final void setByteAtBuffer(int index, byte value) {
+    public final void setByteRaw(int index, byte value) {
         data[index] = value;
     }
 
     public void add(byte v) {
         int sz = size();
         addSpace(sz, 1);
-        setByteAt(sz, v);
+        setByte(sz, v);
     }
 
     protected void clearBuffer(int start, int count) {
@@ -111,7 +109,7 @@ public abstract class ByteVector<E> extends PrimIntegerVector<E>
             System.arraycopy(src.data, sseg, data, dseg, count);
         } else {
             for (int i = 0; i < count; i++)
-                setByteAt(index+i, src.byteAt(start+i));
+                setByte(index+i, src.getByte(start+i));
         }
     }
 
@@ -135,7 +133,7 @@ public abstract class ByteVector<E> extends PrimIntegerVector<E>
         }
         public int read() {
             return pos >= size ? -1 :
-                (0xff & bvec.byteAt(pos++));
+                (0xff & bvec.getByte(pos++));
         }
         public boolean markSupported() { return true; }
         public void mark(int readLimit) { mark = pos; }
@@ -160,7 +158,7 @@ public abstract class ByteVector<E> extends PrimIntegerVector<E>
         } else {
             buf = new byte[length];
             for (int i = 0; i < length; i++)
-                buf[i] = byteAt(start+i);
+                buf[i] = getByte(start+i);
         }
         return Strings.toUtf8(buf, start, length);
     }

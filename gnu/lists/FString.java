@@ -37,11 +37,6 @@ public class FString extends AbstractCharVector<Char>
     data = values;
   }
 
-    public FString(char[] data, IntSequence indexes) {
-        this.data = data;
-        this.indexes = indexes;
-    }
-
   public FString (String str)
   {
     data = str.toCharArray();
@@ -99,13 +94,15 @@ public class FString extends AbstractCharVector<Char>
 
     /** Create a empty string, but with a given initial buffer size. */
     public static FString alloc(int sz) {
+        if (sz > MAX_GAP_SIZE)
+            sz = MAX_GAP_SIZE;
         FString str = new FString(sz);
-        str.indexes = GapManager.getEmptyInstance(str);
+        str.setGapBounds(0, sz);
         return str;
     }
 
-    public final Char getBuffer(int index) {
-        throw unsupported("getBuffer");
+    public final Char getRaw(int index) {
+        throw unsupported("getRaw "+index);
     }
 
     public final Char get(int index) {
@@ -163,13 +160,9 @@ public class FString extends AbstractCharVector<Char>
         return old;
     }
 
-    public void setAt(int index, Char value) {
-        setCharacterAt(index, value.intValue());
-    }
-
     @Override
-    public final void setBuffer(int index, Char value) {
-        throw unsupported("setBuffer");
+    public final void setRaw(int index, Char value) {
+        setCharacterAt(index, value.intValue());
     }
 
     public final int characterAt(int index) {
@@ -182,7 +175,7 @@ public class FString extends AbstractCharVector<Char>
    */
   public char[] toCharArray()
   {
-    if (indexes == null || indexes == cantWriteMarker)
+    if (isVerySimple())
         return data;
     int seq_length = size();
     char[] arr = new char[seq_length];
@@ -236,24 +229,12 @@ public class FString extends AbstractCharVector<Char>
         data[where] = c1;
         if (c2 > 0)
             data[where+1] = c2;
-        if (beforeMarkers) {
-            // Adjust markers at insertion point to be after inserted next.
-            GapManager manager = getGapManager();
-            int oldPos = (manager.getGapStart()-len) << 1;
-            manager.adjustPositions(oldPos, oldPos + 1, len << 1);
-        }
     }
 
     public void insert(int where, String str, boolean beforeMarkers) {
         int len = str.length();
         addSpace(where, len);
         str.getChars(0, len, data, where);
-        if (beforeMarkers) {
-            // Adjust markers at insertion point to be after inserted next.
-            GapManager manager = getGapManager();
-            int oldPos = (manager.getGapStart()-len) << 1;
-            manager.adjustPositions(oldPos, oldPos + 1, len << 1);
-        }
     }
 
   /** Append arguments to this FString.
@@ -270,8 +251,8 @@ public class FString extends AbstractCharVector<Char>
         Object arg = args[i];
         count += ((CharSequence) arg).length();
       }
-    //if (data.length < total)      setBufferLength(total);
-    getGapManager().gapReserve(this, sz, count);
+    //if (data.length < total)      copyBuffer(total);
+    gapReserve(sz, count);
     
     for (int i = startIndex; i < args.length; ++i)
       {
@@ -284,22 +265,22 @@ public class FString extends AbstractCharVector<Char>
     }
 
     public String substring(int start, int end) {
-        if (indexes == null)
+        if (isVerySimple())
             return new String(data, start, end - start);
-        return new StringBuilder().append(this, start, end).toString();
+        // FIXME aybe also optimize isSubRange() case
+        else
+            return new StringBuilder().append(this, start, end).toString();
     }
 
   public CharSeq subSequence(int start, int end)
   {
+    // FIXME should maybe share?  Or use Strings.substring?
     return new FString(this, start, end-start);
   }
 
     public void setCharAt(int index, char ch) {
         checkCanWrite(); // FIXME maybe inline and fold into following
-        if (indexes != null) {
-            index = indexes.intAt(index);
-        }
-        data[index] = ch;
+        data[effectiveIndex(index)] = ch;
     }
 
     public void setCharacterAt(int index, int ch) {
@@ -339,33 +320,34 @@ public class FString extends AbstractCharVector<Char>
         int srcLength = srcEnd - srcStart;
         int dstLength = dstEnd - dstStart;
         int grow = srcLength - dstLength;
-        if (grow > 0)
-            addSpace(dstEnd, grow);
+        if (grow > 0) {
+            gapReserve(dstEnd, grow);
+        }
         if (src instanceof FString) {
             FString fsrc = (FString) src;
-            // Try to get the destination segment before getting the
-            // source segment read-only, in case src.data == this.data.
-            int dstart = getSegment(dstStart, srcLength);
-            int sstart;
-            if (dstart >= 0
-                && (sstart = fsrc.getSegmentReadOnly(srcStart, srcLength)) >= 0) {
-                System.arraycopy(fsrc.data, sstart, data, dstart, srcLength);
+            int sstart = fsrc.getSegmentReadOnly(srcStart, srcLength);
+            if (sstart >= 0) {
+                System.arraycopy(fsrc.data, sstart, data, dstStart, srcLength);
                 if (grow < 0)
                     delete(dstEnd+grow, dstEnd);
+                else if (grow > 0)
+                    setGapBounds(getGapStart() + grow, getGapEnd());
                 return;
             }
-            else if (fsrc.data == data)
-                src = src.toString();
-        } else {
-            src = src.toString(); // just in case
+        }
+        if (! Sequences.copyInPlaceIsSafe(this, src)) {
+            src = src.subSequence(srcStart, srcEnd).toString();
+            srcEnd = srcLength;
+            srcStart = 0;
         }
         if (grow < 0)
             delete(dstEnd+grow, dstEnd);
-        IntSequence ind = getIndexesForce();
+        else if (grow > 0)
+            setGapBounds(getGapStart()+grow, getGapEnd());
         int i = dstStart;
         int j = srcStart;
         for (; j < srcEnd; i++, j++) {
-            data[ind.intAt(i)] = src.charAt(j);
+            data[i] = src.charAt(j);
         }
     }
 
@@ -382,7 +364,7 @@ public class FString extends AbstractCharVector<Char>
     public void fill(int fromIndex, int toIndex, char value) {
         if (fromIndex < 0 || toIndex > size())
             throw new IndexOutOfBoundsException();
-        if (indexes == null) { // Minor optimization
+        if (isVerySimple()) { // Minor optimization
             char[] d = data; // Move to local to help optimizer.
             for (int i = fromIndex;  i < toIndex;  i++)
                 d[i] = value;
@@ -432,10 +414,9 @@ public class FString extends AbstractCharVector<Char>
     }
 
     @Override
-    protected FString withIndexes(IntSequence ind) {
-        return new FString(data, ind);
+    protected FString newInstance(int newLength) {
+        return new FString(newLength < 0 ? data : new char[newLength]);
     }
-
 
   public int getElementKind()
   {
@@ -528,7 +509,6 @@ public class FString extends AbstractCharVector<Char>
 
     public void writeTo(int start, int count, Appendable dest)
         throws IOException {
-        IntSequence ind = indexes;
         if (dest instanceof Writer) {
             Writer wr = (Writer) dest;
             while (count > 0) {

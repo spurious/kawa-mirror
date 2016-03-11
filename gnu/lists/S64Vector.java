@@ -31,17 +31,6 @@ public  class S64Vector extends LongVector<Long>
         this.data = data;
     }
 
-    /*
-    public S64Vector(Sequence seq) {
-        data = new long[seq.size()];
-        addAll(seq);
-    }
-    */
-
-    public S64Vector(long[] data, IntSequence indexes) {
-        this.data = data;
-        this.indexes = indexes;
-    }
 
     /** Makes a copy of (part of) the argument array. */
     public S64Vector(long[] values, int offset, int length) {
@@ -50,28 +39,21 @@ public  class S64Vector extends LongVector<Long>
     }
 
     public final Long get(int index) {
-        if (indexes != null)
-            index = indexes.intAt(index);
-        return Long.valueOf(data[index]);
+        return Long.valueOf(data[effectiveIndex(index)]);
     }
 
-    public final Long getBuffer(int index) {
+    public final Long getRaw(int index) {
         return Long.valueOf(data[index]);
     }
 
     @Override
-    public final void setBuffer(int index, Long value) {
+    public final void setRaw(int index, Long value) {
         data[index] = value.longValue();
     }
 
     @Override
-    protected S64Vector withIndexes(IntSequence ind) {
-        return new S64Vector(data, ind);
-    }
-
-    @Override
-    public S64Vector subList(int fromIx, int toIx) {
-        return new S64Vector(data, indexesSubList(fromIx, toIx));
+    protected S64Vector newInstance(int newLength) {
+        return new S64Vector(newLength < 0 ? data : new long[newLength]);
     }
 
     public int getElementKind() { return INT_S64_VALUE; }
@@ -84,7 +66,7 @@ public  class S64Vector extends LongVector<Long>
         int i = nextIndex(iposStart);
         int end = nextIndex(iposEnd);
         for (;  i < end;  i++)
-            out.writeLong(longAt(i));
+            out.writeLong(getLong(i));
     }
 
     public int compareTo(Object obj) {
@@ -93,12 +75,10 @@ public  class S64Vector extends LongVector<Long>
         long[] arr2 = vec2.data;
         int n1 = size();
         int n2 = vec2.size();
-        IntSequence inds1 = getIndexesForce();
-        IntSequence inds2 = vec2.getIndexesForce();
         int n = n1 > n2 ? n2 : n1;
         for (int i = 0;  i < n;  i++) {
-            long v1 = arr1[inds1.intAt(i)];
-            long v2 = arr2[inds2.intAt(i)];
+            long v1 = arr1[effectiveIndex(i)];
+            long v2 = arr2[effectiveIndex(i)];
             if (v1 != v2)
                 return v1 > v2 ? 1 : -1;
         }

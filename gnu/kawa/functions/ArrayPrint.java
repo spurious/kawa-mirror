@@ -64,12 +64,7 @@ public class ArrayPrint {
                 cells[icell] = lines;
                 icell++;
                 fieldw[col] = columnWidth(lines, fieldw[col]);
-                for (int r = rank; --r >= 0; ) {
-                    indexes[r]++;
-                    if (indexes[r]-lows[r] < dims[r])
-                        break;
-                    indexes[r] = lows[r];
-                }
+                gnu.lists.Arrays.incrementIndexes(indexes, arr);
             }
             int twidth = nfields+1;
             for (int i = 0; i < nfields; i++)

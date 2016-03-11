@@ -17,10 +17,10 @@
   (invoke v 'size))
 
 (define (s8vector-ref (v :: <s8vector>) (i :: <int>)) :: byte
-  (v:byteAt i))
+  (v:getByte i))
 
 (define (s8vector-set! (v :: <s8vector>) (i :: <int>) (x ::byte)) :: <void>
-  (invoke v 'setByteAt i x))
+  (v:setByte i x))
 
 (define (s8vector->list (v :: <s8vector>)) :: <list>
   (invoke-static <list> 'makeList v))
@@ -53,10 +53,10 @@
   (invoke v 'size))
 
 (define (u8vector-ref (v :: <u8vector>) (i :: <int>)) :: ubyte
-  (v:byteAt i))
+  (v:getByte i))
 
 (define (u8vector-set! v::<u8vector> i::int x::ubyte) :: <void>
-  (invoke v 'setByteAt i x))
+  (v:setByte i x))
 
 (define (u8vector->list (v :: <u8vector>)) :: <list>
   (invoke-static <list> 'makeList v))
@@ -77,10 +77,10 @@
   (invoke v 'size))
 
 (define (s16vector-ref (v :: <s16vector>) (i :: <int>)) ::short
-  (v'shortAt i))
+  (v:getShort i))
 
 (define (s16vector-set! (v :: <s16vector>) (i :: <int>) (x ::short)) :: <void>
-  (invoke v 'setShortAt i x))
+  (v:setShort i x))
 
 (define (s16vector->list (v :: <s16vector>)) :: <list>
   (invoke-static <list> 'makeList v))
@@ -101,10 +101,10 @@
   (invoke v 'size))
 
 (define (u16vector-ref (v :: <u16vector>) (i :: <int>)) ::ushort
-  (v:shortAt i))
+  (v:getShort i))
 
 (define (u16vector-set! (v :: <u16vector>) (i :: <int>) (x ::ushort)) :: <void>
-  (invoke v 'setShortAt i x))
+  (v:setShort i x))
 
 (define (u16vector->list (v :: <u16vector>)) :: <list>
   (invoke-static <list> 'makeList v))
@@ -125,10 +125,10 @@
   (invoke v 'size))
 
 (define (s32vector-ref (v :: <s32vector>) (i :: <int>)) ::int
-  (v:intAt i))
+  (v:getInt i))
 
 (define (s32vector-set! (v :: <s32vector>) (i :: <int>) (x :: <int>)) :: <void>
-  (invoke v 'setIntAt i x))
+  (v:setInt i x))
 
 (define (s32vector->list (v :: <s32vector>)) :: <list>
   (invoke-static <list> 'makeList v))
@@ -149,10 +149,10 @@
   (invoke v 'size))
 
 (define (u32vector-ref (v :: <u32vector>) (i :: <int>)) ::uint
-  (v:intAt i))
+  (v:getInt i))
 
 (define (u32vector-set! (v :: <u32vector>) (i :: <int>) (x ::uint)) ::void
-  (invoke v 'setIntAt i x))
+  (v:setInt i x))
 
 (define (u32vector->list (v :: <u32vector>)) :: <list>
   (invoke-static <list> 'makeList v))
@@ -173,10 +173,10 @@
   (invoke v 'size))
 
 (define (s64vector-ref (v :: <s64vector>) (i :: <int>)) ::long
-  (v:longAt i))
+  (v:getLong i))
 
 (define (s64vector-set! (v :: <s64vector>) (i :: <int>) (x :: <long>)) :: <void>
-  (invoke v 'setLongAt i x))
+  (v:setLong i x))
 
 (define (s64vector->list (v :: <s64vector>)) :: <list>
   (invoke-static <list> 'makeList v))
@@ -197,10 +197,10 @@
   (invoke v 'size))
 
 (define (u64vector-ref (v :: <u64vector>) (i :: <int>)) ::ulong
-  (v:longAt i))
+  (v:getLong i))
 
 (define (u64vector-set! (v :: <u64vector>) (i :: <int>) (x ::ulong)) ::void
-  (invoke v 'setLongAt i x))
+  (v:setLong i x))
 
 (define (u64vector->list (v :: <u64vector>)) :: <list>
   (invoke-static <list> 'makeList v))
@@ -221,10 +221,10 @@
   (invoke v 'size))
 
 (define (f32vector-ref (v :: <f32vector>) (i :: <int>)) :: <float>
-  (invoke v 'floatAt i))
+  (v:getFloat i))
 
 (define (f32vector-set! (v :: <f32vector>) (i :: <int>) (x :: <float>)) :: <void>
-  (invoke v 'setFloatAt i x))
+  (v:setFloat i x))
 
 (define (f32vector->list (v :: <f32vector>)) :: <list>
   (invoke-static <list> 'makeList v))
@@ -245,10 +245,10 @@
   (invoke v 'size))
 
 (define (f64vector-ref (v :: <f64vector>) (i :: <int>)) :: <double>
-  (invoke v 'doubleAt i))
+  (v:getDouble i))
 
 (define (f64vector-set! (v :: <f64vector>) (i :: <int>) (x :: <double>)) :: <void>
-  (invoke v 'setDoubleAt i x))
+  (v:setDouble i x))
 
 (define (f64vector->list (v :: <f64vector>)) :: <list>
   (invoke-static <list> 'makeList v))

@@ -7,7 +7,7 @@ package gnu.lists;
  * I.e if you have a position, it gets automatically updated after
  * insertions and deletions. */
 
-public class StableManager extends GapManager
+public class StableManager
 {
   SimpleVector base;
   /** This array maps from the exported ipos values (indexes in the positions
@@ -76,8 +76,8 @@ public class StableManager extends GapManager
 
   public StableManager(SimpleVector base)
   {
-    super(base);
     this.base = base;
+    base.gapReserveGeneric(base.size(), 0); // To force to GAP mode.
     positions = new int[16];
     positions[START_POSITION] = 0;
     positions[END_POSITION] = (base.getBufferLength() << 1) | 1;
@@ -88,13 +88,6 @@ public class StableManager extends GapManager
 	free = i;
       }
   }
-
-    public StableManager(SimpleVector base, GapManager old) {
-        this(base);
-        this.gapStart = old.gapStart;
-        this.gapEnd = old.gapEnd;
-    }
-
 
   protected int allocPositionIndex()
   {
@@ -121,8 +114,10 @@ public class StableManager extends GapManager
   {
     if (index == 0 && ! isAfter)
       return START_POSITION;
-    else if (isAfter && index == size())
+    else if (isAfter && index == base.size())
       return END_POSITION;
+    int gapStart = base.getGapStart();
+    int gapEnd = base.getGapEnd();
     if (index > gapStart || (index == gapStart && isAfter))
       index += gapEnd - gapStart;
     int ipos = allocPositionIndex();
@@ -139,8 +134,9 @@ public class StableManager extends GapManager
   {
     int ppos = positions[ipos];
     int index = ppos >>> 1;
+    int gapStart = base.getGapStart();
     if (index >= gapStart)
-      index += gapEnd - gapStart;
+        index += base.getGapEnd() - gapStart;
     return index < base.getBufferLength();
   }
 
@@ -148,6 +144,8 @@ public class StableManager extends GapManager
   {
     int ppos = positions[ipos];
     int index = ppos >>> 1;
+    int gapStart = base.getGapStart();
+    int gapEnd = base.getGapEnd();
     if (index >= gapStart)
       index += gapEnd - gapStart;
     if (index >= base.getBufferLength())
@@ -164,6 +162,8 @@ public class StableManager extends GapManager
   public int nextIndex (int ipos)
   {
     int index = positions[ipos] >>> 1;
+    int gapStart = base.getGapStart();
+    int gapEnd = base.getGapEnd();
     if (index > gapStart)
       index -= gapEnd - gapStart;
     return index;
@@ -191,66 +191,48 @@ public class StableManager extends GapManager
     return ipos;
   }
 
-  public void fillPosRange(int fromPos, int toPos, Object value)
-  {
-    fillPosRange(positions[fromPos], positions[toPos], value);
-  }
-
-  protected void shiftGap(SimpleVector base, int newGapStart)
-  {
-    int oldGapStart = gapStart;
-    int delta = newGapStart - oldGapStart;
-    int low, high, adjust;
-    if (delta > 0)
-      {
-	low = gapEnd;
-	high = low + delta;
-	adjust = (oldGapStart - low) << 1;
-	// The position corresponding to the new endGap should be adjusted
-	// only if it has the isAfter (low-order) bit is clear.
-	low = low << 1;
-	high = high << 1;
-      }
-    else if (newGapStart == oldGapStart)
-      return;
-    else // newGapStart < gapStart:
-      {
-	// Positions at the newgapEnd should be adjust only if isAfter.
-	low = (newGapStart << 1) + 1;
-	high = (oldGapStart << 1) + 1;
-	adjust = (gapEnd - oldGapStart) << 1;
-      }
-    super.shiftGap(base, newGapStart);
-
-    adjustPositions(low, high, adjust);
-  }
-
-  /** Adjust gap to 'where', and make sure it is least `needed'
-   * elements long. */
-  protected void gapReserve(SimpleVector base, int where, int needed)
-  {
-    int oldGapEnd = gapEnd;
-    int oldGapStart = gapStart;
-    if (needed > oldGapEnd - oldGapStart)
-      {
-        int oldLength = base.size();
-        super.gapReserve(base, where, needed);
-        int newLength = base.size();
-        if (where == oldGapStart) // Optimization.
-          adjustPositions(oldGapEnd << 1, (newLength << 1) | 1,
-                          (newLength - oldLength) << 1);
-        else
-          {
-            // We do adjustPositions twice which is wasteful but simple.
-            // Adjust positions as if there were no gap.
-            adjustPositions(oldGapEnd << 1, (oldLength << 1) | 1, (oldGapStart - oldGapEnd) << 1);
-            // Adjust positions for new gap.
-            adjustPositions(gapStart << 1, (newLength << 1) | 1, (gapEnd - gapStart) << 1);
-          }
-      }
-    else if (where != gapStart)
-        shiftGap(base, where);
-  }
+    /** Adjust gap to 'where', and make sure it is least `needed'
+     * elements long. */
+    protected void gapReserve(SimpleVector base, int where, int needed) {
+        int oldGapEnd = base.getGapEnd();
+        int oldGapStart = base.getGapStart();
+        int oldLength = base.getBufferLength();
+        base.gapReserveGeneric(where, needed);
+        if (needed > oldGapEnd - oldGapStart) {
+            int newLength = base.getBufferLength();
+            if (where == oldGapStart) // Optimization.
+                adjustPositions(oldGapEnd << 1, (newLength << 1) | 1,
+                                (newLength - oldLength) << 1);
+            else {
+                // We do adjustPositions twice which is wasteful but simple.
+                // Adjust positions as if there were no gap.
+                adjustPositions(oldGapEnd << 1, (oldLength << 1) | 1, (oldGapStart - oldGapEnd) << 1);
+                // Adjust positions for new gap.
+                int gapStart = base.getGapStart();
+                int gapEnd = base.getGapEnd();
+                adjustPositions(gapStart << 1, (newLength << 1) | 1, (gapEnd - gapStart) << 1);
+            }
+        } else if (where != oldGapStart) {
+            int delta = where - oldGapStart;
+            int low, high, adjust;
+            if (delta > 0) {
+                low = oldGapEnd;
+                high = low + delta;
+                adjust = (oldGapStart - low) << 1;
+                // The position corresponding to the new endGap should be
+                // adjusted only if it has the isAfter (low-order) bit is clear.
+                low = low << 1;
+                high = high << 1;
+            }
+            else { // newGapStart < oldGapStart:
+                // Positions at the newgapEnd should be adjust only if isAfter.
+                low = (where << 1) + 1;
+                high = (oldGapStart << 1) + 1;
+                adjust = (oldGapEnd - oldGapStart) << 1;
+            }
+            adjustPositions(low, high, adjust);
+        }
+    }
 
   /** Add a delta to all positions elements that point into a given range.
    * Assume {@code x==positions[i]}, then if
@@ -355,31 +337,22 @@ public class StableManager extends GapManager
   /* DEBUGGING
   void checkInvariants()
   {
-    if (free==-2)
-      {
-        for (int i = positions.length;  --i > END_POSITION; )
-          {
-            int pos = positions[i];
-            if (pos != FREE_POSITION && pos < 0)
-              {
-                throw new Error();
-              }
+      boolean wasChained = free >= -1;
+      if (wasChained)
+           unchainFreelist();
+      int gapStart2 = base.getGapStart() << 1;
+      int gapEnd2 = base.getGapEnd() << 1;
+      for (int i = positions.length; --i >= 0; )  {
+          int pos = positions[i];
+          if (pos == FREE_POSITION)
+              continue;
+          if (pos < 0 || nextIndex(i) > base.size()
+              || (pos > gapStart2 && pos <= gapEnd2)) {
+              throw new Error("bad position#"+i+": "+pos+" gapStart:"+base.getGapStart()+" gapEnd:"+base.getGapEnd()+" bufLen:"+base.getBufferLength());
           }
       }
-    else
-      {
-        int n = positions.length-2;
-        int i = free;
-        while (i != -1)
-          {
-            if (--n < 0)
-              throw new Error("cycle");
-            int next = positions[i];
-            if (i < 2)
-              throw new Error();
-            i = next;
-          }
-      }
+      if (wasChained)
+          chainFreelist();
   }
   */
 }

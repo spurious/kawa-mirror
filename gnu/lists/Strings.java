@@ -152,31 +152,56 @@ public class Strings
         }
     }
 
+    /** Make a read-only substring, generalized to arbitrary index sequences. */
     public static CharSequence indirectIndexed(CharSequence base,
                                                IntSequence indexes) {
-        if (base instanceof FString) {
-            return (FString) ((FString) base).select(indexes);
-        }
         if (indexes instanceof Range.IntRange) {
             Range.IntRange range = (Range.IntRange) indexes;
             if (range.getStepInt() == 1) {
                 int start = range.getStartInt();
-                int bsize = base.length();
-                if (start < 0 || start > bsize)
+                int end = base.length();
+                if (start < 0 || start > end)
                     throw new IndexOutOfBoundsException();
-                if (range.isUnbounded())
-                    return SubCharSeq.valueOf(base, start, bsize);
-                int size = range.size();
-                if (start+size < 0 || start+size > bsize)
-                    throw new IndexOutOfBoundsException();
-                return SubCharSeq.valueOf(base, start, start+size);
+                if (! range.isUnbounded()) {
+                    int size = range.size();
+                    if (start+size < 0 || start+size > end)
+                        throw new IndexOutOfBoundsException();
+                    end = start+size;
+                }
+                return Strings.substring(base, start, end);
             }
         }
         int len = indexes.size();
         StringBuilder sbuf = new StringBuilder(len);
         for (int i = 0; i < len; i++)
-            sbuf.append(base.charAt(indexes.intAt(i)));
+            sbuf.append(base.charAt(indexes.getInt(i)));
         return sbuf.toString();
+    }
+
+    public static CharSequence substring(CharSequence base,
+                                         int start, int end) {
+        if (base instanceof FString) {
+            FString fstr = (FString) base;
+            if (fstr.isVerySimple() || fstr.isSubRange())
+                return (CharSequence) Sequences.copy(fstr, start, end, false);
+        }
+        if (base instanceof String) {
+            return ((String) base).substring(start, end);
+        } else {
+            int len = end - start;
+            StringBuilder sbuf = new StringBuilder(len);
+            if (base instanceof CharSeq) {
+                try {
+                    ((CharSeq) base).writeTo(start, len, sbuf);
+                } catch (Throwable ex) {
+                    throw new RuntimeException(ex);
+                }
+            } else {
+                for (int i = start; i < end; i++)
+                    sbuf.append(base.charAt(i));
+            }
+            return sbuf.toString();
+        }
     }
 
     public static String toUtf8(byte[] bytes, int start, int length) {

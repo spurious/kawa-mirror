@@ -28,20 +28,16 @@ public class Blob
         this.charset = charset;
     }
 
-    public Blob(byte[] data, IntSequence indexes) {
-        this.data = data;
-        this.indexes = indexes;
-    }
-
     public static Blob wrap(byte[] data, int size) {
-        return new Blob(data, new Range.IntRange(0, 1, size));
+        Blob blob = new Blob(data);
+        blob.setInfoField(size, 0,
+            SimpleVector.SUBRANGE_FLAG|SimpleVector.READ_ONLY_FLAG);
+        return blob;
     }
 
     public U8Vector asPlainBytevector() {
-        if (indexes == null || indexes == cantWriteMarker) {
-            U8Vector vec = new U8Vector(data);
-            vec.indexes = indexes;
-            return vec;
+        if (isVerySimple()) {
+            return new U8Vector(data);
         } else {
             int sz = size();
             byte[] b = new byte[sz];

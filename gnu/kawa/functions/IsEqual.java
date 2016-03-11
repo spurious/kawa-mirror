@@ -198,6 +198,36 @@ public class IsEqual extends gnu.mapping.Procedure2
             }
             return ! (e1.hasNext() || e2.hasNext());
         }
+        if (arg1 instanceof gnu.lists.Array || arg2 instanceof gnu.lists.Array) {
+            if (! (arg1 instanceof gnu.lists.Array
+                   && arg2 instanceof gnu.lists.Array))
+                return false;
+            gnu.lists.Array arr1 = ( gnu.lists.Array) arg1;
+            gnu.lists.Array arr2 = ( gnu.lists.Array) arg2;
+            int rank = arr1.rank();
+            if (rank != arr2.rank()
+                || arr1.getElementKind() != arr2.getElementKind())
+                return false;
+            int[] indexes = new int[rank];
+            int size = 1;
+            for (int r = rank; --r >= 0; ) {
+                int low = arr1.getLowBound(r);
+                int dim = arr1.getSize(r);
+                indexes[r] = low;
+                size = size * dim;
+                if (dim != arr2.getSize(r)
+                    || low != arr1.getLowBound(r))
+                    return false;
+            }
+            if (noteEqual(arg1, arg2, map))
+                return true;
+            for (int i = 0; i < size; i++) {
+                if (! apply(arr1.get(indexes), arr2.get(indexes), map))
+                    return false;
+                gnu.lists.Arrays.incrementIndexes(indexes, arr1);
+            }
+            return true;
+        }
 
         boolean is1Array = arg1.getClass().isArray();
         boolean is2Array = arg2.getClass().isArray();

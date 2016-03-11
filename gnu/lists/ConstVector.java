@@ -13,12 +13,12 @@ import java.util.*;
 public class ConstVector<E> extends FVector<E>
 {
     public ConstVector() {
-        indexes = cantWriteMarker;
+        info |= READ_ONLY_FLAG;
     }
 
     public ConstVector(Object[] data) {
         super(data);
-        indexes = cantWriteMarker;
+        info |= READ_ONLY_FLAG;
     }
 
   public ConstVector(java.util.List seq)

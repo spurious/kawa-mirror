@@ -1,5 +1,5 @@
 ;; -*- coding: utf-8 -*-
-(test-begin "arrays" 178)
+(test-begin "arrays" 204)
 
 ;;; array test
 ;;; 2001 Jussi Piitulainen
@@ -427,6 +427,65 @@
 	     1))
 
 ;;; Kawa-specific tests
+
+(let* ((arr (make-array (shape 0 2 1 5) @[100 <: 108]))
+       (a1 (array-index-ref arr 1 [2 <: 5]))
+       (a2 (array-index-share arr 1 [2 <=: 4]))
+       (v1 (array->vector arr))
+       (v2 (array-flatten arr)))
+  (test-equal 8 (array-size arr))
+  (test-equal #(105 106 107) (vector @a1))
+  (test-equal #(105 106 107) a2)
+  (test-equal #(100 101 102 103 104 105 106 107) v1)
+  (test-equal #(100 101 102 103 104 105 106 107) v2)
+  (set! (arr 1 3) 206)
+  (test-equal #(105 106 107) a1)
+  (test-equal #(105 206 107) a2)
+  (test-error (set! (a1 0) 99))
+  (test-equal 107 (arr 1 4))
+  (set! (a2 2) 207)
+  (test-equal #(100 101 102 103 104 105 206 207) v1)
+  (test-equal #(100 101 102 103 104 105 106 107) v2)
+  (test-equal #(105 106 107) a1)
+  (test-equal #(105 206 207) a2)
+  (test-equal 207 (arr 1 4))
+)
+;; Similar but use plain array (rather than range) for selection
+(let* ((arr (make-array (shape 0 2 1 5) @[100 <: 108]))
+       (a1 (array-index-ref arr 1 [2 3 4]))
+       (a2 (array-index-share arr 1 [2 3 4])))
+  (test-equal #(105 106 107) a1)
+  (test-equal #(105 106 107) a2)
+  (set! (arr 1 3) 206)
+  (test-equal #(105 106 107) a1)
+  (test-equal #(105 206 107) a2)
+  (test-error (set! (a1 0) 99))
+  (test-equal 107 (arr 1 4))
+  (set! (a2 2) 207)
+  (test-equal #(105 106 107) a1)
+  (test-equal #(105 206 207) a2)
+  (test-equal 207 (arr 1 4))
+  (array-fill! a2 42)
+  (test-equal #(100 101 102 103 104 42 42 42)
+   (array-flatten arr)))
+
+(test-equal #2a:2@1:3((9 8 7) (10 9 8))
+            (build-array [2 [1 <: 4]]
+                         (lambda (ind)
+                           (let ((x (ind 0)) (y (ind 1)))
+                             (+ 10 x (- y))))))
+
+(test-equal &{&-
+#2a@10:2:3
+║10│ 9│8║
+╟──┼──┼─╢
+║11│10│9║
+╚══╧══╧═╝
+} (format-array
+   (build-array [[10 <: 12] 3]
+                (lambda (ind)
+                  (let ((x (ind 0)) (y (ind 1)))
+                    (- x y))))))
 
 (test-equal &{&-
 ╔#2a:2:3╗

@@ -35,17 +35,6 @@ public  class F32Vector extends SimpleVector<Float>
         this.data = data;
     }
 
-    /*
-    public F32Vector(Sequence seq) {
-        data = new float[seq.size()];
-        addAll(seq);
-    }
-    */
-
-    public F32Vector(float[] data, IntSequence indexes) {
-        this.data = data;
-        this.indexes = indexes;
-    }
 
     /** Makes a copy of (part of) the argument array. */
     public F32Vector(float[] values, int offset, int length) {
@@ -58,8 +47,10 @@ public  class F32Vector extends SimpleVector<Float>
         return data.length;
     }
 
-    public void setBufferLength(int length) {
+    public void copyBuffer(int length) {
         int oldLength = data.length;
+        if (length == -1)
+            length = oldLength;
         if (oldLength != length) {
             float[] tmp = new float[length];
             System.arraycopy(data, 0, tmp, 0,
@@ -72,46 +63,40 @@ public  class F32Vector extends SimpleVector<Float>
 
     protected void setBuffer(Object buffer) { data = (float[]) buffer; }
 
-    public final float floatAt(int index) {
-        if (indexes != null)
-            index = indexes.intAt(index);
-        return data[index];
+    public final float getFloat(int index) {
+        return data[effectiveIndex(index)];
     }
 
-    public final float floatAtBuffer(int index) {
+    public final float getFloatRaw(int index) {
         return data[index];
     }
 
     public final Float get(int index) {
-        if (indexes != null)
-            index = indexes.intAt(index);
+        return Float.valueOf(data[effectiveIndex(index)]);
+    }
+
+    public final Float getRaw(int index) {
         return Float.valueOf(data[index]);
     }
 
-    public final Float getBuffer(int index) {
-        return Float.valueOf(data[index]);
-    }
-
-    public final void setFloatAt(int index, float value) {
+    public final void setFloat(int index, float value) {
         checkCanWrite(); // FIXME maybe inline and fold into following
-        if (indexes != null)
-            index = indexes.intAt(index);
-        data[index] = value;
+        data[effectiveIndex(index)] = value;
     }
 
-    public final void setFloatAtBuffer(int index, float value) {
+    public final void setFloatRaw(int index, float value) {
         data[index] = value;
     }
 
     @Override
-    public final void setBuffer(int index, Float value) {
+    public final void setRaw(int index, Float value) {
         data[index] = value.floatValue();
     }
 
     public void add(float v) {
         int sz = size();
         addSpace(sz, 1);
-        setFloatAt(sz, v);
+        setFloat(sz, v);
     }
 
     protected void clearBuffer(int start, int count) {
@@ -121,13 +106,8 @@ public  class F32Vector extends SimpleVector<Float>
     }
 
     @Override
-    protected F32Vector withIndexes(IntSequence ind) {
-        return new F32Vector(data, ind);
-    }
-
-    @Override
-    public F32Vector subList(int fromIx, int toIx) {
-        return new F32Vector(data, indexesSubList(fromIx, toIx));
+    protected F32Vector newInstance(int newLength) {
+        return new F32Vector(newLength < 0 ? data : new float[newLength]);
     }
 
     public int getElementKind() { return FLOAT_VALUE; }
@@ -140,7 +120,7 @@ public  class F32Vector extends SimpleVector<Float>
         int i = nextIndex(iposStart);
         int end = nextIndex(iposEnd);
         for (;  i < end;  i++)
-            out.writeFloat(floatAt(i));
+            out.writeFloat(getFloat(i));
     }
 
     public int compareTo(Object obj) {
@@ -149,12 +129,10 @@ public  class F32Vector extends SimpleVector<Float>
         float[] arr2 = vec2.data;
         int n1 = size();
         int n2 = vec2.size();
-        IntSequence inds1 = getIndexesForce();
-        IntSequence inds2 = vec2.getIndexesForce();
         int n = n1 > n2 ? n2 : n1;
         for (int i = 0;  i < n;  i++) {
-            float v1 = arr1[inds1.intAt(i)];
-            float v2 = arr2[inds2.intAt(i)];
+            float v1 = arr1[effectiveIndex(i)];
+            float v2 = arr2[effectiveIndex(i)];
             if (v1 != v2)
                 return v1 > v2 ? 1 : -1;
         }

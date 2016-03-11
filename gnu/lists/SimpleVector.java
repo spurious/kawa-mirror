@@ -1,4 +1,4 @@
-// Copyright (c) 2001, 2002, 2003, 2008  Per M.A. Bothner and Brainfood Inc.
+// Copyright (c) 2001, 2002, 2003, 2008, 2016  Per M.A. Bothner and Brainfood Inc.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.lists;
@@ -6,64 +6,181 @@ import java.io.*;
 import java.util.*;
 
 /** A generic simple vector.
- * <p>
- * This uses a simple data array along with an optional index mapper.
- * If {@code indexes} (the index mapper) is null, then {@code get(i)}
- * is {@code data[i]}.
- * Otherwise, {@code get(i)} is  {@code data[indexes.intAt(i)]}.
- * This allows general indirection and selection: Typically {@code indexes}
- * will be a {@code Range} but it can be any {@code IntSequence}.
- * <p>
- * If the sequence change size, then {@code indexes} is restricted
- * to either a {@code GapManager} or a {@code StableManager} (which
- * extends {@code GapManager}).  Those are usually created lazily: A plain
- * {@code GapManager} on the first insertion or deletion;
- * a {@code StableManager} if a Marker is requested.
- * <p>
- * If {@code indexes} is the special object {@code cantWriteMarker}
- * then this sequence is immutable.
  */
 
-public abstract class SimpleVector<E> extends IndirectIndexable<E>
-    implements Array<E>, Externalizable, RandomAccess
+public abstract class SimpleVector<E> extends AbstractSequence<E>
+    implements AVector<E>, Externalizable, RandomAccess
 {
-    protected GapManager getGapManager() {
-        IntSequence ind = indexes;
-        if (ind instanceof GapManager)
-            return (GapManager) ind;
-        if (ind != null) {
-            checkCanWrite();
-            String msg = indexes == cantWriteMarker ?
-                "can't adjust size of constant vector" :
-                "can't adjust size of indirect vector";
-            throw new UnsupportedOperationException(msg);
-        }
-        GapManager manager = new GapManager(this);
-        indexes = manager;
-        return manager;
+    // 1-bit sign; 25-bit offset; 6-bit flags; 32-bit size;
+    protected long info = 0x8000000000000000L;
+    public static final int MAX_GAP_SIZE = (1 << 25) - 1;
+    /** If isSimple(), the values are all the values of the guffer.
+     * In this case getSize() == getBufferLength(); */
+    protected final boolean isVerySimple() { return info < 0; }
+    /** The values are buffer[offset <: offset+size]. */
+    protected final boolean isSubRange() {
+        return (info & SUBRANGE_FLAG) != 0; }
+    /** The values are buffer[0 <: size] ++ buffer[gapEnd <: ],
+     * where gapEnd = size + offset */
+    protected final boolean isGapBuffer() {
+        return (info & GAP_FLAG) != 0; }
+    protected final void setInfoField(int size, int offset, long flags) {
+        info = (0xFFFFFFFFL & (long) size) | ((long) offset << 38) | flags;
+    }
+    protected final int getGapStart() { return getSizeBits(); }
+    protected final int getGapEnd() { return getSizeBits()+getOffsetBits(); }
+    protected final void setGapBounds(int gapStart, int gapEnd, long flags) {
+        setInfoField(gapStart, gapEnd-gapStart, flags|GAP_FLAG);
+    }
+    protected final void setGapBounds(int gapStart, int gapEnd) {
+        setInfoField(gapStart, gapEnd-gapStart, (info & 0x3F00000000l) | GAP_FLAG);
+    }
+    protected final int getSizeBits() { return (int) info; }
+    protected final int getOffsetBits() { return (int) (info >> 38); }
+    protected static final long READ_ONLY_FLAG = 0x100000000L;
+    protected static final long SHARED_FLAG = 0x200000000L;
+    protected static final long COPY_ON_WRITE = 0x400000000L;
+    // Could define GAP_FLAG in terms ! SUBRANGE_FLAG && !isVerySimple()
+    protected static final long SUBRANGE_FLAG = 0x1000000000L;
+    protected static final long GAP_FLAG = 0x2000000000L;
+
+    public int size() {
+        int len = getBufferLength();
+        if (isVerySimple())
+            return len;
+        if ((info & SUBRANGE_FLAG) != 0)
+            return getSizeBits();
+        else // gap
+            return len - getOffsetBits();
     }
 
-    protected StableManager getStableManager() {
-        IntSequence ind = indexes;
-        if (ind instanceof StableManager)
-            return (StableManager) ind;
-        StableManager manager;
-        if (ind instanceof GapManager) {
-            manager = new StableManager(this, (GapManager) ind);
-        } else if (ind != null) {
-            checkCanWrite();
-            String msg = indexes == cantWriteMarker ?
+    public int effectiveIndex(int index) {
+        if (isVerySimple())
+            return index;
+        if ((info & SUBRANGE_FLAG) != 0) {
+            // offset is start index
+            if (index >= getSizeBits())
+                throw new IndexOutOfBoundsException();
+            return index + getOffsetBits();
+        } else {
+            // gapStart is 32-bit size "size"; gapSize is 24-bit offset
+            if (index >= getSizeBits())
+                index += getOffsetBits();
+            return index;
+        }
+    }
+
+    protected void gapReserve(int where, int needed) {
+        gapReserveGeneric(where, needed);
+    }
+    protected final void gapReserveGeneric(int where, int needed) {
+        if ((info & (READ_ONLY_FLAG|SHARED_FLAG)) != 0) {
+            String msg = (info & (READ_ONLY_FLAG)) != 0 ?
                 "can't adjust size of constant vector" :
                 "can't adjust size of indirect vector";
-            throw new UnsupportedOperationException(msg);
-        } else
-            manager = new StableManager(this);
-        indexes = manager;
-        return manager;
+            throw new UnsupportedOperationException(msg+" info:"+Long.toHexString(info));
+        }
+        int sz = size();
+        int blen = getBufferLength();
+        if ((info & (COPY_ON_WRITE)) != 0) // FIXME handled by checkCanWrite ?
+            doCopyOnWrite(size()); // FIXME does needless moves
+        if (isVerySimple()) {
+            setGapBounds(sz, sz);
+        } else if ((info & SUBRANGE_FLAG) != 0) {
+            // FIXME
+        }
+        int gapStart = getSizeBits();
+        int gapSize = getOffsetBits();
+        int gapEnd = gapStart + gapSize;
+        if (needed > gapEnd - gapStart) {
+            // Need to resize.
+            int oldLength = getBufferLength();
+            int newLength = oldLength < 16 ? 16 : 2 * oldLength; // FIXME
+            int size = oldLength - (gapEnd - gapStart);
+            int minLength = size + needed;
+            if (newLength < minLength)
+                newLength = minLength;
+            int newGapEnd = newLength - size + where;
+            resizeShift(gapStart, gapEnd, where, newGapEnd);
+            setGapBounds(where, newGapEnd);
+        }
+        else if (where != gapStart) {
+            int delta = where - gapStart;
+            if (delta > 0)
+                shift(gapEnd, gapStart, delta);
+            else if (delta < 0)
+                shift(where, gapEnd + delta, - delta);
+            else
+                return;
+            setGapBounds(where, gapEnd+delta);
+        }
+    }
+
+    /** Used to grow and maybe move gap. */
+    void resizeShift(int oldGapStart, int oldGapEnd,
+                            int newGapStart, int newGapEnd) {
+        //base.checkCanWrite();
+        int oldGapSize = oldGapEnd - oldGapStart;
+        int newGapSize = newGapEnd - newGapStart;
+        int oldLength = getBufferLength();
+        int newLength = oldLength - oldGapSize + newGapSize;
+        if (newLength > oldLength) {
+            copyBuffer(newLength);
+            //size = newLength; // ???
+        }
+        int gapDelta = oldGapStart - newGapStart;
+        if (gapDelta >= 0) {
+            int endLength = oldLength - oldGapEnd;
+            shift(oldGapEnd, newLength - endLength, endLength);
+            if (gapDelta > 0)
+                shift(newGapStart, newGapEnd, gapDelta);
+        } else {
+            int endLength = newLength - newGapEnd;
+            shift(oldLength-endLength, newGapEnd, endLength);
+            shift(oldGapEnd, oldGapStart, newGapStart-oldGapStart);
+        }
+        clearBuffer(newGapStart, newGapSize);
     }
 
     protected abstract void setBuffer(Object obj);
-    public abstract void setBufferLength(int length);
+    public abstract int getBufferLength();
+    public abstract void copyBuffer(int length);
+    protected abstract SimpleVector newInstance(int newSize);
+
+    public SimpleVector<E> asImmutable() {
+        if ((info & READ_ONLY_FLAG) != 0)
+            return this;
+        if (isVerySimple()) {
+            SimpleVector<E> tmp = newInstance(-1);
+            this.info |= COPY_ON_WRITE;
+            tmp.info |= READ_ONLY_FLAG;
+            return tmp;
+        }
+        return Arrays.flattenCopy(this, false);
+    }
+
+    protected void checkCanWrite () {
+        long fl = info;
+        if ((fl & COPY_ON_WRITE) != 0) {
+            doCopyOnWrite(size());
+        }
+        if ((fl & READ_ONLY_FLAG) != 0)
+            throw new UnsupportedOperationException("write not allowed to read-only "+(rank()==1 ? "sequence" : "array"));
+    }
+
+    protected void doCopyOnWrite(int sz) {
+        long fl = info;
+        Object old = getBuffer();
+        // FIXME inefficient copy
+        copyBuffer(sz);
+        if ((fl & SUBRANGE_FLAG) != 0) {
+            System.arraycopy(old, getOffsetBits(),
+                             getBuffer(), 0, sz);
+            info = -1;
+        }
+        fl &= ~COPY_ON_WRITE;
+        info = fl;
+    }
 
     /** Get sub-range of this vector, starting at given index.
      * @return {@code (size<<32)|where}
@@ -74,39 +191,57 @@ public abstract class SimpleVector<E> extends IndirectIndexable<E>
      *   but we try to do better.
      */
     public long getSegment(int index) {
-        IntSequence ind = indexes;
         int sz = size();
         int where, size;
-        Range.IntRange range;
-        if (ind == null || ind == cantWriteMarker) {
+        if (isVerySimple()) {
             where = index;
-            size = sz - where;
-        } else if (ind instanceof Range.IntRange
-                   && (range = (Range.IntRange) ind).getStepInt() == 1) {
-            int istart = range.getStartInt();
-            where = index + istart;
-            size = ind.size() - index;
-        } else if (ind instanceof GapManager) {
-            GapManager gman = (GapManager) ind;
-            int gapStart = gman.getGapStart();
+            size = sz - index;
+        } else if ((info & SUBRANGE_FLAG) != 0) {
+            // values are buffer[offset <: offset+size]
+            int istart = getOffsetBits();
+            where = istart + index;
+            size = sz - index;
+        } else {
+            int gapStart = getGapStart();
+            int gEnd = getGapEnd();
             if (index < gapStart) {
                 where = index;
-                size = gapStart-index;
+                size = gapStart - index;
             } else {
-                where = index + gman.getGapEnd() - gapStart;
+                where = index + getGapEnd() - gapStart;
                 size = getBufferLength() - where;
             }
-        } else {
-            where = ind.intAt(index);
-            size = index < sz ? 1 : 0;
         }
         return ((long) size << 32) | (long) where;
     }
 
     public int getSegment(int index, int len) {
-        IntSequence ind = indexes;
-        if (ind instanceof GapManager)
-            return ((GapManager) ind).getSegment(this, index, len, false);
+        if (isGapBuffer()) {
+            int sz = size();
+            if (index < 0 || index > sz)
+                return -1;
+            if (index < 0)
+                index = 0;
+            else if (index + len > sz)
+                len = sz - index;
+            // if (len < 0 || index + len > size)
+            //   return -1;
+            int gapStart = getGapStart();
+            if (index + len <= gapStart)
+                return index;
+            if (index >= gapStart)
+                return index + (getGapEnd() - gapStart);
+            if ((info & READ_ONLY_FLAG) != 0)
+                return -1;
+            // Shift the gap depending in which direction needs least copying.
+            if (gapStart - index > (len >> 1)) {
+                gapReserve(index + len, 0);
+                return index;
+            } else {
+                gapReserve(index, 0);
+                return index + (getGapEnd() - gapStart);
+            }
+        }
         return getSegmentReadOnly(index, len);
     }
 
@@ -121,7 +256,7 @@ public abstract class SimpleVector<E> extends IndirectIndexable<E>
     }
 
     // Should isAfterPos, nextPos, getPosNext ... be moved to
-    // IndirectIndexable or to AbstractSequence?  FIXME
+    // AbstractSequence?  FIXME
 
   protected boolean isAfterPos(int ipos) {
       return (ipos & 1) != 0;
@@ -129,39 +264,10 @@ public abstract class SimpleVector<E> extends IndirectIndexable<E>
 
    protected abstract Object getBuffer();
 
-    public E get(int index) {
-        if (indexes != null)
-            index = indexes.intAt(index);
-        return getBuffer(index);
-    }
-
   public E getRowMajor (int i)
   {
     return get(i);
   }
-
-  protected abstract E getBuffer(int index);
-
-    public E set(int index, E value) {
-        checkCanWrite(); // FIXME maybe inline and fold into following
-        if (indexes != null) {
-            index = indexes.intAt(index);
-        }
-        E old = getBuffer(index);
-        setBuffer(index, value);
-        return old;
-    }
-
-    @Override
-    public void setAt(int index, E value) {
-        checkCanWrite(); // FIXME maybe inline and fold into following
-        if (indexes != null) {
-            index = indexes.intAt(index);
-        }
-        setBuffer(index, value);
-    }
-
-    protected abstract void setBuffer(int index, E value);
 
     /* #ifdef JAVA8 */
     // @Override
@@ -173,7 +279,7 @@ public abstract class SimpleVector<E> extends IndirectIndexable<E>
     //         int where = (int) result;
     //         int size = (int) (result >> 32);
     //         for (int i = 0; i < size; i++)
-    //             action.accept(getBuffer(where+i));
+    //             action.accept(getRaw(where+i));
     //         len -= size;
     //         index += size;
     //     }
@@ -182,9 +288,8 @@ public abstract class SimpleVector<E> extends IndirectIndexable<E>
 
     public void fill(E value) {
         checkCanWrite();
-        IntSequence ind = getIndexesForce();
         for (int i = size();  --i >= 0; )
-            setBuffer(ind.intAt(i), value);
+            setRaw(effectiveIndex(i), value);
     }
 
   public void shift(int srcStart, int dstStart, int count)
@@ -203,7 +308,7 @@ public abstract class SimpleVector<E> extends IndirectIndexable<E>
     @Override
     public void add(int index, E o) {
         addSpace(index, 1);
-        setBuffer(index, o);
+        setRaw(index, o);
     }
 
     protected int addPos(int ipos, E value) {
@@ -217,13 +322,17 @@ public abstract class SimpleVector<E> extends IndirectIndexable<E>
 
     /** Insert count unspecified elements at index. */
     protected void addSpace(int index, int count) {
-        getGapManager().insertUnspecified(this, index, count);
+        gapReserve(index, count);
+        setGapBounds(getGapStart() + count, getGapEnd());
     }
 
     public void delete(int start, int end) {
-        GapManager manager = getGapManager();
+        gapReserve(start, 0);
+        int gapStart = getSizeBits();
+        int gapSize = getOffsetBits();
+        int gapEnd = gapStart + gapSize;
         int count = end-start;
-        manager.delete(this, start, count);
+        setGapBounds(start, gapEnd + count);
         clearBuffer(start, count);
     }
 
@@ -254,25 +363,10 @@ public abstract class SimpleVector<E> extends IndirectIndexable<E>
 
     public void writeExternal(ObjectOutput out) throws IOException {
         out.writeObject(getBuffer());
-        out.writeObject(indexes);
     }
 
     public void readExternal(ObjectInput in)
         throws IOException, ClassNotFoundException {
         setBuffer(in.readObject());
-        indexes = (IntSequence) in.readObject();
     }
-
-  public Array transpose(int[] lowBounds, int[] dimensions,
-			 int offset0, int[] factors)
-  {
-    GeneralArray array = new GeneralArray();
-    array.strides = factors;
-    array.dimensions = dimensions;
-    array.lowBounds = lowBounds;
-    array.offset = offset0;
-    array.base = this;
-    array.simple = false;
-    return array;
-  }
 }

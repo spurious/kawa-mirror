@@ -35,17 +35,6 @@ public  class F64Vector extends SimpleVector<Double>
         this.data = data;
     }
 
-    /*
-    public F64Vector(Sequence seq) {
-        data = new double[seq.size()];
-        addAll(seq);
-    }
-    */
-
-    public F64Vector(double[] data, IntSequence indexes) {
-        this.data = data;
-        this.indexes = indexes;
-    }
 
     /** Makes a copy of (part of) the argument array. */
     public F64Vector(double[] values, int offset, int length) {
@@ -58,8 +47,10 @@ public  class F64Vector extends SimpleVector<Double>
         return data.length;
     }
 
-    public void setBufferLength(int length) {
+    public void copyBuffer(int length) {
         int oldLength = data.length;
+        if (length == -1)
+            length = oldLength;
         if (oldLength != length) {
             double[] tmp = new double[length];
             System.arraycopy(data, 0, tmp, 0,
@@ -72,46 +63,40 @@ public  class F64Vector extends SimpleVector<Double>
 
     protected void setBuffer(Object buffer) { data = (double[]) buffer; }
 
-    public final double doubleAt(int index) {
-        if (indexes != null)
-            index = indexes.intAt(index);
-        return data[index];
+    public final double getDouble(int index) {
+        return data[effectiveIndex(index)];
     }
 
-    public final double doubleAtBuffer(int index) {
+    public final double getDoubleRaw(int index) {
         return data[index];
     }
 
     public final Double get(int index) {
-        if (indexes != null)
-            index = indexes.intAt(index);
+        return Double.valueOf(data[effectiveIndex(index)]);
+    }
+
+    public final Double getRaw(int index) {
         return Double.valueOf(data[index]);
     }
 
-    public final Double getBuffer(int index) {
-        return Double.valueOf(data[index]);
-    }
-
-    public final void setDoubleAt(int index, double value) {
+    public final void setDouble(int index, double value) {
         checkCanWrite(); // FIXME maybe inline and fold into following
-        if (indexes != null)
-            index = indexes.intAt(index);
-        data[index] = value;
+        data[effectiveIndex(index)] = value;
     }
 
-    public final void setDoubleAtBuffer(int index, double value) {
+    public final void setDoubleRaw(int index, double value) {
         data[index] = value;
     }
 
     @Override
-    public final void setBuffer(int index, Double value) {
+    public final void setRaw(int index, Double value) {
         data[index] = value.doubleValue();
     }
 
     public void add(double v) {
         int sz = size();
         addSpace(sz, 1);
-        setDoubleAt(sz, v);
+        setDouble(sz, v);
     }
 
     protected void clearBuffer(int start, int count) {
@@ -121,13 +106,8 @@ public  class F64Vector extends SimpleVector<Double>
     }
 
     @Override
-    protected F64Vector withIndexes(IntSequence ind) {
-        return new F64Vector(data, ind);
-    }
-
-    @Override
-    public F64Vector subList(int fromIx, int toIx) {
-        return new F64Vector(data, indexesSubList(fromIx, toIx));
+    protected F64Vector newInstance(int newLength) {
+        return new F64Vector(newLength < 0 ? data : new double[newLength]);
     }
 
     public int getElementKind() { return DOUBLE_VALUE; }
@@ -140,7 +120,7 @@ public  class F64Vector extends SimpleVector<Double>
         int i = nextIndex(iposStart);
         int end = nextIndex(iposEnd);
         for (;  i < end;  i++)
-            out.writeDouble(doubleAt(i));
+            out.writeDouble(getDouble(i));
     }
 
     public int compareTo(Object obj) {
@@ -149,12 +129,10 @@ public  class F64Vector extends SimpleVector<Double>
         double[] arr2 = vec2.data;
         int n1 = size();
         int n2 = vec2.size();
-        IntSequence inds1 = getIndexesForce();
-        IntSequence inds2 = vec2.getIndexesForce();
         int n = n1 > n2 ? n2 : n1;
         for (int i = 0;  i < n;  i++) {
-            double v1 = arr1[inds1.intAt(i)];
-            double v2 = arr2[inds2.intAt(i)];
+            double v1 = arr1[effectiveIndex(i)];
+            double v2 = arr2[effectiveIndex(i)];
             if (v1 != v2)
                 return v1 > v2 ? 1 : -1;
         }

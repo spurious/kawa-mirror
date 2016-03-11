@@ -850,6 +850,7 @@ public class Scheme extends LispLanguage {
 
       defProcStFld("array?", "kawa.lib.arrays");
       defProcStFld("array-rank", "kawa.lib.arrays");
+      defProcStFld("array-size", "kawa.lib.arrays");
       defProcStFld("make-array", "kawa.lib.arrays");
       defProcStFld("array", "kawa.lib.arrays");
       defProcStFld("array-start", "kawa.lib.arrays");
@@ -857,7 +858,20 @@ public class Scheme extends LispLanguage {
       defProcStFld("shape", "kawa.lib.arrays");
       defProcStFld("array-ref", "gnu.kawa.functions.ArrayRef", "arrayRef");
       defProcStFld("array-set!", "gnu.kawa.functions.ArraySet", "arraySet");
+      defProcStFld("array-fill!", "kawa.lib.arrays");
+      defProcStFld("array-copy!", "kawa.lib.arrays");
       defProcStFld("share-array", "kawa.lib.arrays");
+      defProcStFld("array-index-ref", "kawa.lib.arrays");
+      defProcStFld("array-index-share", "kawa.lib.arrays");
+      defProcStFld("array-transform", "kawa.lib.arrays");
+      defProcStFld("array-reshape", "kawa.lib.arrays");
+      defProcStFld("array-flatten", "kawa.lib.arrays");
+      defProcStFld("array->vector", "kawa.lib.arrays");
+      defProcStFld("index-array", "kawa.lib.arrays");
+      defProcStFld("build-array", "kawa.lib.arrays");
+      // array->mutable-array arr -- or plain array-copy
+      // array-map
+      // list*->array and array->list*
       defProcStFld("format-array", "kawa.lib.arrays");
 
       for (int i = uniformVectorTags.length;  --i >= 0; )

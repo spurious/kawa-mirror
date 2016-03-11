@@ -1,3 +1,7 @@
+2016-03-10  Per Bothner  <per@bothner.com>
+
+	* arrays.scm: A bunch of new array procedures.
+
 2016-02-11  Per Bothner  <per@bothner.com>
 
 	* compile_misc.scm (valuesCompile): Optimize 2-argument 'values' call

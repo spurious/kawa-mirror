@@ -147,7 +147,6 @@
   (! cstart ::int (java.lang.Character:offsetByCodePoints str 0 start))
   (! send (if (>= end 0) end (gnu.lists.Strings:sizeInCodePoints str)))
   (cond ((? fstr::gnu.lists.FString str)
-         (gnu.lists.FString? str)
          (let ((cend (if (< end 0) (fstr:length)
                          (java.lang.Character:offsetByCodePoints str 0 end))))
            (fstr:delete cstart cend)

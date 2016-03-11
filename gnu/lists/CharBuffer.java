@@ -13,71 +13,23 @@ import gnu.text.Char;
 
 public class CharBuffer extends FString
 {
+    StableManager manager;
     public CharBuffer(FString str) {
         super((CharSequence) str);
-        indexes = new StableManager(this);
+        manager = new StableManager(this);
     }
 
     public CharBuffer(int initialSize) {
         super(initialSize);
-        indexes = new StableManager(this);
+        setGapBounds(0, initialSize);
+        manager = new StableManager(this);
     }
 
     protected CharBuffer() {
-        indexes = new StableManager(this);
+        manager = new StableManager(this);
     }
 
     public int length() { return size(); }
-
-    /* REDUNDANT - but perhaps needs to be optimized
-  public String substring (int start, int end)
-  {
-    int sz = size();
-    if (start < 0 || end < start || end > sz)
-      throw new IndexOutOfBoundsException();
-    int len = end - start;
-    start = getSegment(start, len);
-    return new String(getArray(), start, len);
-  }
-    */
-
-    /* REDUNDANT - but perhaps needs to be optimized
-  public CharSeq subSequence(int start, int end)
-  {
-    int sz = size();
-    if (start < 0 || end < start || end > sz)
-      throw new IndexOutOfBoundsException();
-    return SubCharSeq.valueOf(this,
-                          base.createPos(start, false),
-                          base.createPos(end, true));
-  }
-*/
-
-    /* REDUNDANT - but perhaps needs to be optimized
-  public void fill(int fromIndex, int toIndex, char value)
-  {
-    char[] array = string.data;
-    int i = fromIndex;
-    int limit = gapStart < toIndex ? gapStart : toIndex;
-    for (;  i < limit;  i++)
-      array[i] = value;
-    int gapSize = gapEnd - gapStart;
-    i = limit + gapSize;
-    limit += toIndex;
-    for (;  i < limit;  i++)
-      array[i] = value;
-  }
-
-  / ** Set all the elements to a given character. * /
-  public final void fill (char value)
-  {
-    char[] array = string.data;
-    for (int i = array.length;  --i >= gapEnd; )
-      array[i] = value;
-    for (int i = gapStart;  --i >= 0; )
-      array[i] = value;
-  }
-    */
 
   public char[] getArray() { return (char[]) getBuffer(); }
 
@@ -110,6 +62,48 @@ public class CharBuffer extends FString
       */
   }
 
+    @Override public int startPos() { return manager.startPos(); }
+    @Override public int endPos() { return manager.endPos(); }
+    @Override public boolean isAfterPos(int ipos) { return manager.isAfterPos(ipos); }
+    @Override public boolean hasNext(int ipos) { return manager.hasNext(ipos); }
+    @Override public int nextPos(int ipos) { return manager.nextPos(ipos); }
+    @Override public int copyPos(int ipos) { return manager.copyPos(ipos); }
+    @Override public int nextIndex(int ipos) {
+        return manager.nextIndex(ipos);
+    }
+    @Override public void releasePos(int ipos) { manager.releasePos(ipos); }
+
+    @Override public int createPos(int index, boolean isAfter) {
+        return manager.createPos(index, isAfter);
+    }
+
+    @Override
+    public void insert(int where, int ch, boolean beforeMarkers) {
+        super.insert(where, ch, beforeMarkers);
+        if (beforeMarkers) {
+            // Adjust markers at insertion point to be after inserted next.
+            int len = ch >= 0x10000 ? 2 : 1;
+            int oldPos = (getGapStart()-len) << 1;
+            manager.adjustPositions(oldPos, oldPos + 1, len << 1);
+        }
+    }
+
+    @Override
+    public void insert(int where, String str, boolean beforeMarkers) {
+        super.insert(where, str, beforeMarkers);
+        if (beforeMarkers) {
+            // Adjust markers at insertion point to be after inserted next.
+            int len = str.length();
+            int oldPos = (getGapStart()-len) << 1;
+            manager.adjustPositions(oldPos, oldPos + 1, len << 1);
+        }
+    }
+
+    @Override
+    protected void gapReserve(int where, int needed) {
+        manager.gapReserve(this, where, needed);
+    }
+
   public String toString()
   {
     int len = size();
@@ -137,9 +131,8 @@ public class CharBuffer extends FString
   public void dump()
   {
     System.err.println("Buffer Content dump.  size:"+size()+"  buffer:"+getArray().length);
-    StableManager manager = (StableManager) indexes;
-    int gapStart = manager.getGapStart();
-    int gapEnd = manager.getGapEnd();
+    int gapStart = getGapStart();
+    int gapEnd = getGapEnd();
     int[] positions = manager.positions;
     int free = manager.free;
     System.err.print("before gap: \"");
@@ -164,12 +157,9 @@ public class CharBuffer extends FString
             int p = pos>>1;
             if (p > gapStart)
                 p -= gapEnd-gapStart;
-	  System.err.println("position#"+i+": "+p+" isAfter:"+(pos&1));
+	  System.err.println("position#"+i+": [raw:"+pos+"]="+p+" isAfter:"+(pos&1));
         }
       }
   }
 
-    // Needed for SwingBuffer:
-    public int nextIndex(int ipos) { return super.nextIndex(ipos); }
-    public void releasePos(int ipos) { super.releasePos(ipos); }
 }

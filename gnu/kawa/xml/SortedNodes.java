@@ -52,7 +52,7 @@ public class SortedNodes extends Nodes {
             return 0;
         // Optimize for the already sorted case, or secondarily for good
         // locality.  So use the gapStart as the initial "mid-point".
-        int lastIndex = vector.getGapStart() - 1;
+        int lastIndex = vector.getLastIndex();
         int cmp = lastIndex < 0 ? -1 : compareIndex(lastIndex, seq, ipos);
         if (cmp < 0) {
             // The new node is after all nodes up to gapStart.

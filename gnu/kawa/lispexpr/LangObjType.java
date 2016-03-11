@@ -842,20 +842,20 @@ public class LangObjType extends SpecialObjectType implements TypeValue
         switch (typeCode) {
         case S8VECTOR_TYPE_CODE:
         case U8VECTOR_TYPE_CODE:
-            return "byteAt";
+            return "getByte";
         case S16VECTOR_TYPE_CODE:
         case U16VECTOR_TYPE_CODE:
-            return "shortAt";
+            return "getShort";
         case S32VECTOR_TYPE_CODE:
         case U32VECTOR_TYPE_CODE:
-            return "intAt";
+            return "getInt";
         case S64VECTOR_TYPE_CODE:
         case U64VECTOR_TYPE_CODE:
-            return "longAt";
+            return "getLong";
         case F32VECTOR_TYPE_CODE:
-            return "floatAt";
+            return "getFloat";
         case F64VECTOR_TYPE_CODE:
-            return "doubleAt";
+            return "getDouble";
         }
         return null;
     }
@@ -864,8 +864,7 @@ public class LangObjType extends SpecialObjectType implements TypeValue
          String gname = elementGetterMethodName();
          if (gname == null)
              return null;
-         return "set" + Character.toUpperCase(gname.charAt(0))
-             + gname.substring(1);
+         return "set" + gname.substring(3);
     }
 
     public static final ClassType typeLangObjType =

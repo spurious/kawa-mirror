@@ -67,6 +67,10 @@
 @emph{Performance note:}
 @end macro
 
+@macro CompatibilityNote
+@emph{Compatibility:}
+@end macro
+
 @ifinfo
 @macro vari{THING}
 @var{\THING\1}
@@ -11936,10 +11940,45 @@ The result of @code{stream-cons} is an eager immutable pair whose
 @node Arrays
 @section Multi-dimensional Arrays
 
-Arrays are heterogeneous data structures whose elements are indexed by
-integer sequences of fixed length.  The length of a valid index sequence
-is the rank or the number of dimensions of an array. The shape of an
-array consists of bounds for each index.
+Arrays are heterogeneous data structures that generaize vectors to multiple
+indexes or dimensions.  Instead of a single integer index,
+there are multiple indexes:  An index is a vector of integers;
+the length of a valid index sequence
+is the rank or the number of dimensions of an array.
+
+@example
+(define arr1 (
+@end example
+
+Multi-dimensional arrays are specified
+by @uref{http://srfi.schemers.org/srfi-25/srfi-25.html,SRFI-25}.
+In Kawa, a one-dimensional array whose lower bound is 0 is also a sequence.
+Furthermore, if such an array is simple (not created @code{share-array})
+it will be implemented using a @code{<vector>}.
+Uniform vectors and strings are also arrays in Kawa.
+For example:
+@example
+(share-array
+ (f64vector 1.0 2.0 3.0 4.0 5.0 6.0)
+ (shape 0 2 0 3)
+ (lambda (i j) (+ (* 2 i) j)))
+@end example
+evaluates to a two-dimensionsal array of @code{<double>}:
+@example
+#2a((1.0 2.0 3.0) (3.0 4.0 5.0))
+@end example
+
+@deffn Procedure array? obj
+Returns @code{#t} if @var{obj} is an array, otherwise returns @code{#f}.
+@end deffn
+
+@subsection Array shape
+
+The @dfn{shape} of an array consists of bounds for each index.
+
+@c a simple-array is either a SimpleVector or a GeneralArray
+@c a generic vector implements AVector
+@c a stored-array is a simple-array or a transform (view) of a simple-array
 
 The lower bound @var{b} and the upper bound @var{e} of a dimension are
 exact integers with @code{(<= @var{b} @var{e})}. A valid index along the
@@ -11952,9 +11991,8 @@ The size of an array is the product of the lengths of its dimensions.
 A shape is specified as an even number of exact integers. These are
 alternately the lower and upper bounds for the dimensions of an array.
 
-@deffn Procedure array? obj
-Returns @code{#t} if @var{obj} is an array, otherwise returns @code{#f}.
-@end deffn
+An array whose rank is 1, and where the (single) lower bound is 0
+is a sequence.
 
 @deffn Procedure shape bound ...
 Returns a shape. The sequence @var{bound} ... must consist of an even number
@@ -11974,20 +12012,6 @@ corresponding upper bound, where @var{k} satisfies @code{(<=  0 @var{k})}
 and @code{(< @var{k} @var{d})}.
 @end deffn
 
-@deffn Procedure make-array shape
-@deffnx Procedure make-array shape obj
-Returns a newly allocated array whose shape is given by@var{ shape}.
-If @var{obj} is provided, then each element is initialized to it.
-Otherwise the initial contents of each element is unspecified.
-The array does not retain a reference to @var{shape}.
-@end deffn
-
-@deffn Procedure array shape obj ...
-Returns a new array whose shape is given by @var{shape} and the initial
-contents of the elements are @var{obj} ... in row major order. The array does
-not retain a reference to @var{shape}.
-@end deffn
-
 @deffn Procedure array-rank array
 Returns the number of dimensions of @var{array}.
 @example
@@ -11998,12 +12022,75 @@ Returns 2.
 @end deffn
 
 @deffn Procedure array-start array k
-Returns the lower bound for the index along dimension @var{k}.
+Returns the lower bound (inclusive) for the index along dimension @var{k}.
+This is most commonly 0.
 @end deffn
 
 @deffn Procedure array-end array k
 Returns the upper bound for the index along dimension @var{k}.
+The bound is exclusive - i.e. the first integer higher
+than the last legal index.
 @end deffn
+
+@deffn Procedure array-size array
+Return the total number of elements of @var{array}.
+This is the product of @code{(- (array-end @var{array} @var{k}) (array-start @var{array} @var{k}))} for every valid @var{k}.
+@end deffn
+
+@subsection Array literals
+
+@subsection Array construction
+
+See also @code{array-reshape}
+
+@deffn Procedure array shape obj ...
+Returns a new array whose shape is given by @var{shape} and the initial
+contents of the elements are @var{obj} ... in row major order. The array does
+not retain a reference to @var{shape}.
+@end deffn
+
+@deffn Procedure make-array shape
+@deffnx Procedure make-array shape value...
+Returns a newly allocated array whose shape is given by @var{shape}.
+If @var{value} is provided, then each element is initialized to it.
+If there is more than one @var{value}, they are used in order, starting
+over then the @var{value}s are exhausted.
+If there is no @var{value}, the initial contents of each element is
+unspecified.  (Actually, it is the @code{#!null}.)
+The array does not retain a reference to @var{shape}.
+
+@CompatibilityNote{} Guile has an incompatible @code{make-array} procedure.
+@end deffn
+
+@deffn Procedure build-array shape procedure
+Construct a ``virtual array'' of teh given @var{shape},
+which uses no storage for the elements.
+Instead, elements are calculated on-demand by calling @var{procedure},
+which takes a single argument, an index vector.
+
+There is no caching or memoization.
+
+@example
+#|kawa:1|# @kbd{(build-array [[10 <: 12] 3]}
+#|(---:2|# @kbd{  (lambda (ind)}
+#|(---:3|# @kbd{    (let ((x (ind 0)) (y (ind 1)))}
+#|(---:4|# @kbd{      (- x y))))}
+#2a@@10:2:3
+║10│ 9│8║
+╟──┼──┼─╢
+║11│10│9║
+╚══╧══╧═╝
+@end example
+@end deffn
+
+@deffn Procedure index-array shape
+Return a new immutable array of the specified @var{shape}
+where each element is the corresponding row-major index.
+Same as @code{(array-reshape [0 <: @var{size}] @var{shape})}
+where @var{size} is the @code{array-size} of the resulting array.
+@end deffn
+
+@subsection Array indexing
 
 @deffn Procedure array-ref array k ...
 @deffnx Procedure array-ref array index
@@ -12012,7 +12099,7 @@ The sequence @var{k} ... must be a valid index to @var{array}.
 In the second form, @var{index} must be either a vector or a
 0-based 1-dimensional array containing @var{k} ....
 @example
-(array-ref (array (shape 0 2 0 3)
+(array-ref (array [2 3]
               'uno 'dos 'tres
               'cuatro 'cinco 'seis)
    1 0)
@@ -12027,6 +12114,30 @@ Returns @code{cuatro}.
 @end example
 Returns @code{(3 1 4)}.
 @end deffn
+
+@deffn Procedure array-index-ref array index ...
+@end deffn
+
+@subsection Modifying arrays
+
+You can use @code{set!} to modify one or multiple elements.
+To modify a single element:
+@example
+(set! (@var{arr} @var{index} ...) @var{new-value})
+@end example
+is equivalent to
+@example
+(array-set! @var{arr} @var{index} ... @var{new-value})
+@end example
+You can set a slice (or all of the elements).
+In that case:
+@example
+(set! (@var{arr} @var{index} ...) @var{new-array})
+@end example
+is equivalent to:
+@example
+(array-copy! (array-index-share @var{arr} @var{index} ...) @var{new-array})
+@end example
 
 @deffn Procedure array-set! array k ... obj
 @deffnx Procedure array-set! array index obj
@@ -12043,6 +12154,54 @@ In the second form, @var{index} must be either a vector or a
    (array-ref a 4 4 4))
 @end example
 Returns @code{"huuhkaja"}.
+
+@CompatibilityNote{} SRFI-47, Guile and Scheme-48 have @code{array-set!} with a
+different argument order.
+@end deffn
+
+@deffn Procedure array-copy! dst src
+@CompatibilityNote{} Guile has a @code{array-copy!} with the reversed
+argument order.
+@end deffn
+
+@deffn Procedure array-fill! array value
+Set all the values @var{array} to @var{value}.
+@end deffn
+
+@subsection Transformations and views
+
+A view or transform of an array is an array @var{a@sub{2}}
+whose elements come from some other array @var{a@sub{1}},
+given some transform function @var{T} that maps @var{a@sub{2}} indexes
+to @var{a@sub{1}} indexes.
+Specifically @code{(array-ref @var{a@sub{2}} @var{indexes})}
+is @code{(array-ref @var{a@sub{1}} (@var{T} @var{indexes}))}.
+Modifying @var{a@sub{2}} causes @var{a@sub{1}} to be modified;
+modifying @var{a@sub{1}} may modify @var{a@sub{2}}
+(depending on the transform function).
+The shape of @var{a@sub{2}} is in generally different than that of @var{a@sub{1}}.
+
+@deffn Procedure array-transform array shape transform
+This is a general mechanism for creating a view.
+The result is a new array with the given @var{shape}.
+Accessing this new array is implemented by calling the @var{transform}
+function on the index vector, which must return a new index vector
+valid for indexing the orifinal @var{array}.
+@end deffn
+
+@deffn Procedure array-index-share array index ...
+@end deffn
+
+@deffn Procedure array-reshape array shape
+Creates a new array @var{narray} of the given @var{shape},
+such that @code{(array->vector @var{array})} and
+@code{(array->vector @var{narray})} are equivalent.
+I.e. the @var{i}'th element in row-major-order of @var{narray}
+is the the @var{i}'th element in row-major-order of @var{array}.
+Hence @code{(array-size @var{narray})} (as specied from the @var{shape})
+must be equal to @code{(array-size @var{array})}.
+The resulting @var{narray} is a view such that modifying @var{array}
+also modifies @var{narray} and vice versa.
 @end deffn
 
 @deffn Procedure share-array array shape proc
@@ -12079,24 +12238,21 @@ away, together with any complexity that the user introduced in their
 procedure.
 @end deffn
 
-Multi-dimensional arrays are specified
-by @uref{http://srfi.schemers.org/srfi-25/srfi-25.html,SRFI-25}.
-In Kawa, a one-dimensional array whose lower bound is 0 is also a sequence.
-Furthermore, if such an array is simple (not created @code{share-array})
-it will be implemented using a @code{<vector>}.
-Uniform vectors and strings are also arrays in Kawa.
-For example:
-@example
-(share-array
- (f64vector 1.0 2.0 3.0 4.0 5.0 6.0)
- (shape 0 2 0 3)
- (lambda (i j) (+ (* 2 i) j)))
-@end example
-evaluates to a two-dimensionsal array of @code{<double>}:
-@example
-#2a((1.0 2.0 3.0) (3.0 4.0 5.0))
-@end example
+@deffn Procedure array-flatten array
+@deffnx Procedure array->vector array
+Return a vector consisting of the elements of the @var{array}
+in row-major-order.
 
+The result of @code{array-flatten} is fresh (mutable) copy, not a view.
+The result of @code{array->vector} is a view: If @var{array} is mutable,
+then modifying @var{array} changes the flattened result and vice versa.
+@ c If @var{array} is ``simple'',  @code{array->vector} returns the original vector.
+@end deffn
+
+@subsection Miscellaneous
+
+@deffn Procedure format-array value [element-format]
+@end deffn
 
 @node Hash tables
 @section Hash tables
@@ -14625,7 +14781,7 @@ and @code{gnu.lists.FString} for mutable strings.
 Both of these implement the interface @code{java.lang.CharSequence}.
 In the future, we may change the representation for strings
 containing ``surrogate characters'', for efficient indexing.)
-(Compatibility note: Previous versions of Kawa implemented
+(Compatibility note: Previous versions of Kawa
 always used @code{gnu.lists.FString}.)
 @end defvar
 

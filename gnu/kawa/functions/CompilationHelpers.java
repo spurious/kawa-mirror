@@ -105,15 +105,18 @@ public class CompilationHelpers
                        && ((isString = ctype.isSubclass(Compilation.typeCharSequence))
                            || ctype.isSubclass(Compilation.typeList))
                        && nargs == 1) {
+                args[1] = visitor.visit(args[1], null);
                 Type itype = args[1].getType();
                 int listIndexCompat = LangObjType.sequenceType
                     .isCompatibleWithValue(itype);
                 int intIndexCompat = Type.intType
                     .isCompatibleWithValue(itype);
-                if (listIndexCompat < 0 && intIndexCompat < 0)
+                if (listIndexCompat < 0 && intIndexCompat < 0) {
+                    if (ClassType.make("gnu.lists.Array")
+                        .isCompatibleWithValue(itype) < 0)
                     visitor.getCompilation()
                         .error('w', "index is neither integer or sequence");
-                else if (listIndexCompat > 0) {
+                } else if (listIndexCompat > 0) {
                     // maybe optimize later
                 } else if (intIndexCompat > 0 & isString) {
                     Method method = ClassType.make("gnu.lists.Strings")
@@ -132,7 +135,7 @@ public class CompilationHelpers
                     if (ltype != null
                         && (retType = ltype.getElementType()) != null)
                         mname = ltype.elementGetterMethodName();
-            
+
                     // We search for a "get(int)" method, rather than just using
                     // typeList.getDeclaredMethod("get", 1) to see if we make a
                     // a virtual call rather than an interface call.

@@ -21,17 +21,12 @@ public class CharVector extends AbstractCharVector<Character>
         data = values;
     }
 
-    public CharVector(char[] data, IntSequence indexes) {
-        this.data = data;
-        this.indexes = indexes;
-    }
-
-    public final Character getBuffer(int index) {
+    public final Character getRaw(int index) {
         return data[index];
     }
 
     @Override
-    public final void setBuffer(int index, Character value) {
+    public final void setRaw(int index, Character value) {
         data[index] = value.charValue();
     }
 
@@ -39,9 +34,9 @@ public class CharVector extends AbstractCharVector<Character>
         return obj instanceof CharVector && equals(this, (CharVector) obj);
     }
 
-    @Override
-    protected CharVector withIndexes(IntSequence ind) {
-        return new CharVector(data, ind);
+   @Override
+    protected CharVector newInstance(int newLength) {
+        return new CharVector(newLength < 0 ? data : new char[newLength]);
     }
 
     public int getElementKind() { return CHAR_VALUE; }

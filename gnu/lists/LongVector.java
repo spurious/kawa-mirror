@@ -17,8 +17,10 @@ public abstract class LongVector<E> extends PrimIntegerVector<E>
         return data.length;
     }
 
-    public void setBufferLength(int length) {
+    public void copyBuffer(int length) {
         int oldLength = data.length;
+        if (length == -1)
+            length = oldLength;
         if (oldLength != length) {
             long[] tmp = new long[length];
             System.arraycopy(data, 0, tmp, 0,
@@ -31,35 +33,31 @@ public abstract class LongVector<E> extends PrimIntegerVector<E>
 
     protected void setBuffer(Object buffer) { data = (long[]) buffer; }
 
-    public final long longAt(int index) {
-        if (indexes != null)
-            index = indexes.intAt(index);
+    public final long getLong(int index) {
+        return data[effectiveIndex(index)];
+    }
+
+    public final long getLongRaw(int index) {
         return data[index];
     }
 
-    public final long longAtBuffer(int index) {
-        return data[index];
-    }
-
-    public final int intAtBuffer(int index) {
+    public final int getIntRaw(int index) {
         return (int) data[index];
     }
 
-    public final void setLongAt(int index, long value) {
+    public final void setLong(int index, long value) {
         checkCanWrite(); // FIXME maybe inline and fold into following
-        if (indexes != null)
-            index = indexes.intAt(index);
-        data[index] = value;
+        data[effectiveIndex(index)] = value;
     }
 
-    public final void setLongAtBuffer(int index, long value) {
+    public final void setLongRaw(int index, long value) {
         data[index] = value;
     }
 
     public void add(long v) {
         int sz = size();
         addSpace(sz, 1);
-        setLongAt(sz, v);
+        setLong(sz, v);
     }
 
     protected void clearBuffer(int start, int count) {

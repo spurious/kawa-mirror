@@ -329,13 +329,16 @@ GNU_LISTS_JSOURCES = \
   lists/AbstractFormat.java \
   lists/AbstractSequence.java \
   lists/Array.java \
+  lists/Arrays.java \
   lists/AttributePredicate.java \
+  lists/AVector.java \
   lists/BitVector.java \
   lists/Blob.java \
   lists/ByteVector.java \
   lists/CharBuffer.java \
   lists/CharSeq.java \
   lists/CharVector.java \
+  lists/ComposedArray.java \
   lists/ConstVector.java \
   lists/Consumer.java \
   lists/ConsumerWriter.java \
@@ -349,14 +352,13 @@ GNU_LISTS_JSOURCES = \
   lists/F32Vector.java \
   lists/F64Vector.java \
   lists/FilterConsumer.java \
+  lists/FlattenedArray.java \
   lists/FString.java \
   lists/FVector.java \
-  lists/GapManager.java \
   lists/GeneralArray.java \
   lists/GeneralArray1.java \
   lists/ItemPredicate.java \
   lists/ImmutablePair.java \
-  lists/IndirectIndexable.java \
   lists/IndirectIndexedSeq.java \
   lists/IntSequence.java \
   lists/IntVector.java \
@@ -385,6 +387,7 @@ GNU_LISTS_JSOURCES = \
   lists/SubSequence.java \
   lists/StableManager.java \
   lists/Strings.java \
+  lists/TransformedArray.java \
   lists/TreeList.java \
   lists/TreePosition.java \
   lists/U8Vector.java \

@@ -4,6 +4,8 @@ import gnu.text.Char;
 import java.io.*;
 import java.util.*;
 
+/** A substring view of a CharSequence. */
+
 public class SubCharSeq extends AbstractSequence<Char>
     implements CharSeq, RandomAccess, Externalizable
 {
@@ -15,13 +17,6 @@ public class SubCharSeq extends AbstractSequence<Char>
         this.base = base;
         this.start = start;
         this.end = end;
-    }
-    public static CharSequence valueOf(CharSequence base, int start, int end) {
-        if (base instanceof FString) {
-            FString fbase = (FString) base;
-            return new FString(fbase.data, fbase.indexesSubList(start, end));
-        }
-        return new SubCharSeq(base, start, end);
     }
 
   /** Get length of string, in characters.

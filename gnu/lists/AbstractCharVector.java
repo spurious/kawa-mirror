@@ -18,8 +18,10 @@ public abstract class AbstractCharVector<E>
         return data.length;
     }
 
-    public void setBufferLength(int length) {
+    public void copyBuffer(int length) {
         int oldLength = data.length;
+        if (length == -1)
+            length = oldLength;
         if (oldLength != length) {
             char[] tmp = new char[length];
             System.arraycopy(data, 0, tmp, 0,
@@ -42,12 +44,10 @@ public abstract class AbstractCharVector<E>
     protected void setBuffer(Object buffer) { data = (char[]) buffer; }
 
     public final char charAt(int index) {
-        if (indexes != null)
-            index = indexes.intAt(index);
-        return data[index];
+        return data[effectiveIndex(index)];
     }
 
-    public final char charAtBuffer(int index) {
+    public final char getCharRaw(int index) {
         return data[index];
     }
 
@@ -64,7 +64,7 @@ public abstract class AbstractCharVector<E>
         int len = srcEnd - srcBegin;
         if (len <= 0)
             return;
-        if (indexes == null) 
+        if (isVerySimple())
             System.arraycopy(data, srcBegin, dst, dstBegin, len);
         else {
             for (int i = 0; i < len;  i++)
@@ -84,10 +84,9 @@ public abstract class AbstractCharVector<E>
         char[] val = data;
         int len = size();
         int hash = 0;
-        IntSequence inds = indexes;
-        if (inds != null) {
+        if (! isVerySimple()) {
             for (int i = 0;  i < len;  i++)
-                hash = 31 * hash + val[inds.intAt(i)];
+                hash = 31 * hash + val[effectiveIndex(i)];
         } else {
             for (int i = 0;  i < len;  i++)
                 hash = 31 * hash + val[i];
@@ -120,7 +119,7 @@ public abstract class AbstractCharVector<E>
                                 int length) {
         // Needlessly conservative - could use the 'else' case also
         // if both indexes are simple ranges starting at 0 stepping by 1.
-        if (cv1.indexes != null || cv2.indexes != null) {
+        if (! cv1.isVerySimple() || ! cv2.isVerySimple()) {
             for (int i = 0; i < length; i++) {
                 char c1 = cv1.charAt(i);
                 char c2 = cv2.charAt(i);

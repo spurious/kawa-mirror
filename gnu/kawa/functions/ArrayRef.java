@@ -18,7 +18,7 @@ public class ArrayRef extends ProcedureN
     int[] indexes = new int[dims];
     for (int i = 0;  i < dims;  i++)
       {
-	indexes[i] = ((Number) index.get(i)).intValue();
+        indexes[i] = index.getInt(i);
       }
     return array.get(indexes);
   }

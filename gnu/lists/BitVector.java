@@ -35,17 +35,6 @@ public  class BitVector extends SimpleVector<Boolean>
         this.data = data;
     }
 
-    /*
-    public BitVector(Sequence seq) {
-        data = new boolean[seq.size()];
-        addAll(seq);
-    }
-    */
-
-    public BitVector(boolean[] data, IntSequence indexes) {
-        this.data = data;
-        this.indexes = indexes;
-    }
 
     /** Makes a copy of (part of) the argument array. */
     public BitVector(boolean[] values, int offset, int length) {
@@ -58,8 +47,10 @@ public  class BitVector extends SimpleVector<Boolean>
         return data.length;
     }
 
-    public void setBufferLength(int length) {
+    public void copyBuffer(int length) {
         int oldLength = data.length;
+        if (length == -1)
+            length = oldLength;
         if (oldLength != length) {
             boolean[] tmp = new boolean[length];
             System.arraycopy(data, 0, tmp, 0,
@@ -72,46 +63,40 @@ public  class BitVector extends SimpleVector<Boolean>
 
     protected void setBuffer(Object buffer) { data = (boolean[]) buffer; }
 
-    public final boolean booleanAt(int index) {
-        if (indexes != null)
-            index = indexes.intAt(index);
-        return data[index];
+    public final boolean getBoolean(int index) {
+        return data[effectiveIndex(index)];
     }
 
-    public final boolean booleanAtBuffer(int index) {
+    public final boolean getBooleanRaw(int index) {
         return data[index];
     }
 
     public final Boolean get(int index) {
-        if (indexes != null)
-            index = indexes.intAt(index);
+        return Boolean.valueOf(data[effectiveIndex(index)]);
+    }
+
+    public final Boolean getRaw(int index) {
         return Boolean.valueOf(data[index]);
     }
 
-    public final Boolean getBuffer(int index) {
-        return Boolean.valueOf(data[index]);
-    }
-
-    public final void setBooleanAt(int index, boolean value) {
+    public final void setBoolean(int index, boolean value) {
         checkCanWrite(); // FIXME maybe inline and fold into following
-        if (indexes != null)
-            index = indexes.intAt(index);
-        data[index] = value;
+        data[effectiveIndex(index)] = value;
     }
 
-    public final void setBooleanAtBuffer(int index, boolean value) {
+    public final void setBooleanRaw(int index, boolean value) {
         data[index] = value;
     }
 
     @Override
-    public final void setBuffer(int index, Boolean value) {
+    public final void setRaw(int index, Boolean value) {
         data[index] = value.booleanValue();
     }
 
     public void add(boolean v) {
         int sz = size();
         addSpace(sz, 1);
-        setBooleanAt(sz, v);
+        setBoolean(sz, v);
     }
 
     protected void clearBuffer(int start, int count) {
@@ -121,13 +106,8 @@ public  class BitVector extends SimpleVector<Boolean>
     }
 
     @Override
-    protected BitVector withIndexes(IntSequence ind) {
-        return new BitVector(data, ind);
-    }
-
-    @Override
-    public BitVector subList(int fromIx, int toIx) {
-        return new BitVector(data, indexesSubList(fromIx, toIx));
+    protected BitVector newInstance(int newLength) {
+        return new BitVector(newLength < 0 ? data : new boolean[newLength]);
     }
 
     public int getElementKind() { return BOOLEAN_VALUE; }
@@ -140,7 +120,7 @@ public  class BitVector extends SimpleVector<Boolean>
         int i = nextIndex(iposStart);
         int end = nextIndex(iposEnd);
         for (;  i < end;  i++)
-            out.writeBoolean(booleanAt(i));
+            out.writeBoolean(getBoolean(i));
     }
 
     public int compareTo(Object obj) {
@@ -149,12 +129,10 @@ public  class BitVector extends SimpleVector<Boolean>
         boolean[] arr2 = vec2.data;
         int n1 = size();
         int n2 = vec2.size();
-        IntSequence inds1 = getIndexesForce();
-        IntSequence inds2 = vec2.getIndexesForce();
         int n = n1 > n2 ? n2 : n1;
         for (int i = 0;  i < n;  i++) {
-            boolean v1 = arr1[inds1.intAt(i)];
-            boolean v2 = arr2[inds2.intAt(i)];
+            boolean v1 = arr1[effectiveIndex(i)];
+            boolean v2 = arr2[effectiveIndex(i)];
             if (v1 != v2)
                 return v1 && ! v2 ? 1 : -1;
         }

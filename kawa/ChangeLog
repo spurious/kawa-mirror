@@ -1,3 +1,8 @@
+2016-03-11  Jamison Hope  <jrh@theptrgroup.com>
+
+	* GuiConsole.java (init): On MacOS (at least) the call to setVisible
+	must be done on the event thread.
+
 2016-03-10  Per Bothner  <per@bothner.com>
 
 	* standard/Scheme.java: Add a bunch of array procedures.

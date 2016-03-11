@@ -59,7 +59,8 @@ public class GuiConsole extends JFrame
     //pack();
     setLocation(100 * window_number, 50 * window_number);
     setSize(700,500);
-    setVisible(true);
+    EventQueue.invokeLater(new Runnable() {
+            public void run() { setVisible(true); }});
   }
 
   public GuiConsole(Language language, Environment penvironment, boolean shared)

@@ -1,3 +1,8 @@
+2016-03-11  Per Bothner  <per@bothner.com>
+
+	* CharBuffer.java (delete): Remove unneeded and wrong override.
+	Fixes bug reported by Jamison Hope.
+
 2016-03-10  Per Bothner  <per@bothner.com>
 
 	Major re-write for more general array support.

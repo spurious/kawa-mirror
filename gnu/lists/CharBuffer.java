@@ -33,13 +33,6 @@ public class CharBuffer extends FString
 
   public char[] getArray() { return (char[]) getBuffer(); }
 
-  public void delete(int start, int end)
-  {
-    int ipos = createPos(start, false);
-    removePos(ipos, end-start);
-    releasePos(ipos);
-  }
-
   public void consume(int start, int count, Consumer dest)
   {
       throw new Error();

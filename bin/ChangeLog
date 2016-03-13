@@ -1,3 +1,11 @@
+2016-03-12  Per Bothner  <per@bothner.com>
+
+	Enable "binary distributions" using jawa.sh and jline2.
+	* kawa.sh.in: Enable better path searching.
+	Assume jline library is in ../lib.
+	* Makefile.am (KAWALIB): Update.
+	* kawapath.c: Likewise.
+
 2016-01-19  Per Bothner  <per@bothner.com>
 
 	* kawa.c (main): Fix previous change.

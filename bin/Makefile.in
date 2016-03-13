@@ -299,7 +299,7 @@ kawa_LDADD = $(READLINE_LIB_PATH) -lreadline $(LIBHISTORY) $(kawa_EXTRA_LIBS)
 kawa_SOURCES = kawa.c kawapath.c
 cgi_servlet_SOURCES = cgi-servlet.c kawapath.c
 KAWAJAR = kawa-$(VERSION).jar
-KAWALIB = $(datadir)/java/$(KAWAJAR)
+KAWALIB = $(datadir)/kawa/lib/$(KAWAJAR)
 CDEFS = -DJAVA='"$(JAVA)"' -DKAWALIB='"$(KAWALIB)"' -DKAWAJAR='"$(KAWAJAR)"' -DEXTRAPATH='"@conf_classpath@"'
 CLEANFILES = kawa$(EXEEXT) tmp *.stamp
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)

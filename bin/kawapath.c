@@ -22,13 +22,13 @@ get_classpath(const char *progname)
 	{
 	  /* If kawa is executed "in place" as $builddir/bin/kawa
 	     (i.e. not the installed $bindir/kawa), then the kawajar
-	     is $buildir/kawa-$version.jar.  Since it's nice to be able to
+	     is $buildir/lib/kawa-$version.jar.  Since it's nice to be able to
 	     execute in place, look for it there first.  If we're executing
 	     an installed kawa then the jar won't be there. */
 	  char *buf = malloc (strlen(progname) + strlen(kawajar) + 5);
 	  if (buf != NULL)
 	    {
-	      sprintf(buf, "%.*s/../%s", rp - progname, progname, kawajar);
+	      sprintf(buf, "%.*s/../lib/%s", rp - progname, progname, kawajar);
 	      if (access (buf, R_OK) == 0)
 		path = buf;
 	    }

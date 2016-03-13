@@ -1,6 +1,13 @@
 #!@KAWA_SHELL@
-thisfile=`which $0`
-thisdir=`dirname $thisfile`
+thisfile=`type -p $0`
+case "$thisfile" in
+  "") echo "installation error - can't find path to $0"; exit -1 ;;
+  /*) ;;
+  *) thisfile="$PWD/$thisfile"  ;;
+esac
+while test -L "$thisfile"; do thisfile=$(readlink -f "$thisfile"); done
+thisdir=`dirname "$thisfile"`
+kawadir=`echo "$thisdir" | sed -e 's|/bin$||'`
 if [ "$#" -eq 0 ]
 then
    command_line="$0"
@@ -16,9 +23,9 @@ test -t 0 || no_console="--no-console"
 @ENABLE_KAWA_FRONTEND_TRUE@  export LD_LIBRARY_PATH
 @ENABLE_KAWA_FRONTEND_TRUE@  exec $thisdir/kawa "$@"
 
-# The next line is munged during installation:
-KAWALIB=${KAWALIB-"`@CYGPATH_W@ "$thisdir/../kawa-@VERSION@.jar"`"}
-CLASSPATH="${KAWALIB}@CLASSPATH_SEPARATOR@@conf_classpath@${CLASSPATH}"
+KAWALIB=${KAWALIB-"`@CYGPATH_W@ $kawadir/lib/kawa-@VERSION@.jar`"}
+CLASSPATH="${KAWALIB}@CLASSPATH_SEPARATOR@@run_classpath@${CLASSPATH}"
+@WITH_JLINE2_TRUE@CLASSPATH="${CLASSPATH}@CLASSPATH_SEPARATOR@$kawadir/lib/jline.jar"
 export CLASSPATH
 
 # This ugly duplication is so we only have to use arrays (which are

@@ -1,3 +1,11 @@
+2016-03-12  Per Bothner  <per@bothner.com>
+
+	Enable "binary distributions" using jawa.sh and jline2.
+	* Makefile.am (kawa-$(VERSION).zip): New rule.
+	The jat files are now in the lib subdirectory.
+	* config.classpath: New variable run_classpath does not include jline.
+	* configure.ac (run_classpath): New variable.
+
 2016-02-14  Per Bothner  <per@bothner.com>
 
 	Add support for JLine2 as a readline alternative.

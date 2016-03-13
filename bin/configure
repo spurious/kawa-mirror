@@ -4664,6 +4664,13 @@ case ${with_android} in
   "") ;;
   *) conf_classpath=${with_android}${CLASSPATH_SEPARATOR}$conf_classpath ;;
 esac
+run_classpath=${conf_classpath}
+case ${with_jline2} in
+  yes) ;;
+  no) ;;
+  "") ;;
+  *) conf_classpath=${with_jline2}${CLASSPATH_SEPARATOR}$conf_classpath ;;
+esac
 
 
 

@@ -600,6 +600,7 @@ WITH_SERVLET_ARG
 filesep
 pathsep
 CLASSPATH_SEPARATOR
+run_classpath
 conf_classpath
 SAX2_PREPROCESS
 XQTS_PATH
@@ -2970,12 +2971,6 @@ case ${with_jfreesvg} in
   "") ;;
   *) conf_classpath=${with_jfreesvg}${CLASSPATH_SEPARATOR}$conf_classpath ;;
 esac
-case ${with_jline2} in
-  yes) ;;
-  no) ;;
-  "") ;;
-  *) conf_classpath=${with_jline2}${CLASSPATH_SEPARATOR}$conf_classpath ;;
-esac
 case ${with_javafx} in
   yes) ;;
   no) ;;
@@ -2997,6 +2992,13 @@ case ${with_android} in
   "") ;;
   *) conf_classpath=${with_android}${CLASSPATH_SEPARATOR}$conf_classpath ;;
 esac
+run_classpath=${conf_classpath}
+case ${with_jline2} in
+  yes) ;;
+  no) ;;
+  "") ;;
+  *) conf_classpath=${with_jline2}${CLASSPATH_SEPARATOR}$conf_classpath ;;
+esac
 
 
 case ${with_sax2} in
@@ -3006,6 +3008,7 @@ case ${with_sax2} in
 esac
 
 XQTS_PATH=${with_XQTS:-XQTS}
+
 
 
 

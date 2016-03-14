@@ -7,11 +7,6 @@ public class Future<T> extends Thread implements Lazy<T>
 {
   public RunnableClosure<T> closure;
 
-  public Future (Procedure action, CallContext parentContext)
-  {
-    closure = new RunnableClosure<T> (action, parentContext);
-  }
-
   public Future (Procedure action,
 		 InPort in, OutPort out, OutPort err)
   {

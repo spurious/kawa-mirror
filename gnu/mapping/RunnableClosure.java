@@ -34,7 +34,7 @@ public class RunnableClosure<T>
     this.name=name;
   }
 
-  public RunnableClosure (Procedure action, CallContext parentContext)
+  public RunnableClosure (Procedure action)
   {
     setName("r"+nrunnables++);
     this.action = action;
@@ -43,15 +43,10 @@ public class RunnableClosure<T>
   public RunnableClosure (Procedure action,
 			  InPort in, OutPort out, OutPort err)
   {
-    this(action, CallContext.getInstance());
+    this(action);
     this.in = in;
     this.out = out;
     this.err = err;
-  }
-
-  public RunnableClosure (Procedure action)
-  {
-    this(action, CallContext.getInstance());
   }
 
   /** Get the CallContext we use for this Thread. */

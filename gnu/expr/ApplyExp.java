@@ -28,6 +28,7 @@ public class ApplyExp extends Expression
   public static final int TAILCALL = NEXT_AVAIL_FLAG;
   public static final int INLINE_IF_CONSTANT = NEXT_AVAIL_FLAG << 1;
   public static final int MAY_CONTAIN_BACK_JUMP = NEXT_AVAIL_FLAG << 2;
+  public static final int IS_SUPER_INIT = NEXT_AVAIL_FLAG << 3;
 
   /** Containing LambdaExp. */
   LambdaExp context;
@@ -189,6 +190,10 @@ public class ApplyExp extends Expression
   public void compile (Compilation comp, Target target)
   {
     compile(this, comp, target, true);
+    if (getFlag(IS_SUPER_INIT)) {
+        ((ClassExp) comp.currentScope().currentLambda().getOuter())
+            .compileCallInitMethods(comp);
+    }
   }
 
   public static void compile (ApplyExp exp, Compilation comp, Target target)

@@ -543,22 +543,16 @@ public class ClassExp extends LambdaExp
                     // See if bodyFirst is a this(...) or super(...) call.
                     ClassType calledInit = checkForInitCall(bodyFirst);
                     ClassType superClass = instanceType.getSuperclass();
-                    if (calledInit != null) {
-                        bodyFirst.compileWithPosition(comp, Target.Ignore);
-                    } else if (superClass != null) {
+                    if (calledInit == null && superClass != null) {
                         // Call default super constructor if there isn't
                         // an explicit call to a super constructor.
                         invokeDefaultSuperConstructor(superClass, comp, this);
+                        compileCallInitMethods(comp);
                     }
+                    else if (calledInit != instanceType)
+                        ((ApplyExp) bodyFirst).setFlag(ApplyExp.IS_SUPER_INIT);
                     child.enterFunction(comp);
-                    if (calledInit != instanceType)
-                        comp.callInitMethods(getCompiledClassType(comp),
-                                             new ArrayList<ClassType>(10));
-                    if (calledInit != null)
-                        // Skip bodyFirst since we already compiled it.
-                        Expression.compileButFirst(child.body, comp);
-                    else
-                        child.compileBody(comp);
+                    child.compileBody(comp);
                 } else {
                     child.enterFunction(comp);
                     child.compileBody(comp);
@@ -680,6 +674,10 @@ public class ClassExp extends LambdaExp
             comp.curClass = saveClass;
             comp.method = saveMethod;
         }
+    }
+    void compileCallInitMethods(Compilation comp) {
+        comp.callInitMethods(getCompiledClassType(comp),
+                             new ArrayList<ClassType>(10));
     }
 
     /**

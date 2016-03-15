@@ -1,3 +1,17 @@
+2016-03-14  Per Bothner  <per@bothner.com>
+
+	Fix Savannah bug #47412 "Can't use define in the constructor of a
+	subclass".
+	* ClassExp.java (compileMember): Change logic for compiling
+	super/this constructors in their place in the Expresson structure.
+	This handles constructors in LetExpr creates for <body> blocks.
+	(compileCallInitMethods): New helper method.
+	* LambdaExp.java (getBodyFirstExpression): Handle LetExp.
+	(compileBody): Set and restore currentScope.
+	* ApplyExp.java (IS_SUPER_INIT): New flag.
+	(compile): Compile "$finit$" calls if IS_SUPER_INIT.
+	* Expression.java (compileButFirst): Remove no-longer-used method.
+
 2016-02-24  Per Bothner  <per@bothner.com>
 
 	Add support for command-line completion.

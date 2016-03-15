@@ -1,3 +1,8 @@
+2016-03-14  Per Bothner  <per@bothner.com>
+
+	* sva47412.scm: New test for Savannah bug #47412
+	"Can't use define in the constructor of a subclass".
+
 2016-02-12  OKUMURA Yuki <mjt@cltn.org>
 	    Per Bothner  <per@bothner.com>
 

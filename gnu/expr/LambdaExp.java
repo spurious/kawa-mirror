@@ -1686,8 +1686,11 @@ public class LambdaExp extends ScopeExp {
         }
         else
             target = Target.pushValue(getReturnType());
+        ScopeExp savedScope = comp.currentScope();
+        comp.current_scope = this;
         body.compileWithPosition(comp, target,
                                  body.getLineNumber() > 0 ? body : this);
+        comp.current_scope = savedScope;
         comp.callContextVar = callContextSave;
     }
 
@@ -2015,12 +2018,17 @@ public class LambdaExp extends ScopeExp {
      */
     public Expression getBodyFirstExpression() {
         Expression bodyFirst = body;
-        while (bodyFirst instanceof BeginExp) {
-            BeginExp bbody = (BeginExp) bodyFirst;
-            if (bbody.length == 0)
-                bodyFirst = null;
-            else
-                bodyFirst = bbody.exps[0];
+        for (;;) {
+            if (bodyFirst instanceof BeginExp) {
+                BeginExp bbody = (BeginExp) bodyFirst;
+                if (bbody.length == 0)
+                    bodyFirst = null;
+                else
+                    bodyFirst = bbody.exps[0];
+            } else if (bodyFirst instanceof LetExp) {
+                bodyFirst = ((LetExp) bodyFirst).getBody();
+            } else
+                break;
         }
         return bodyFirst;
     }

@@ -1,3 +1,7 @@
+2016-03-16  Okumura Yuki <mjt@cltn.org>
+
+	* IntSequence.java: Fix thinko.
+
 2016-03-11  Per Bothner  <per@bothner.com>
 
 	* CharBuffer.java (delete): Remove unneeded and wrong override.

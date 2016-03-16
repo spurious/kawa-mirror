@@ -8,7 +8,7 @@ import java.util.List;
 public interface IntSequence
     extends Array<Integer>,
             /* #ifdef JAVA8 */
-            // extends java.util.function.IntUnaryOperator,
+            // java.util.function.IntUnaryOperator,
             /* #endif */
             List<Integer>
 {

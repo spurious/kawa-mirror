@@ -1,3 +1,8 @@
+2016-03-18  Per Bothner  <per@bothner.com>
+
+	* Path.java (coerceToPathOrNull): Fix check for absolute filename
+	on Windows.
+
 2016-02-24  Per Bothner  <per@bothner.com>
 
 	* InPort.java (KEEP_ALL): New flag.

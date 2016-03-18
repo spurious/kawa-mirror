@@ -74,6 +74,10 @@ implements javax.tools.FileObject
             return null;
         char ch0;
         if (str.startsWith("file:")
+            || (File.separatorChar == '\\'
+                && str.length() >= 2
+                && str.charAt(1) == ':'
+                && Character.isLetter(str.charAt(0)))
             || (str.length() > 0
                 && ((ch0 = str.charAt(0)) == '.'
                     || ch0 == File.separatorChar)))

@@ -1,10 +1,16 @@
 A GRAB-BAG OF IDEAS AND THINGS TO DO, SOME QUITE OLD
 
+Consider using Unsafe.defineAnonymousClass
+
 Optimize splicing of methods calls.
 Remove createVarargsArrayIfNeeded logic from PrimProcedure.
 
 Document:
   in-http-server and in-servlet cond-expand options.
+
+SRFI-46
+
+KawaScriptEngine should implement javax.script.Invocable
 
 Use Parboiled as parser library?  https://github.com/sirthias/parboiled/wiki
 

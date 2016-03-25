@@ -1,3 +1,8 @@
+2016-03-25  Per Bothner  <per@bothner.com>
+
+	* strings.scm: Fix various type errors.
+	* vectors.scm: Add splice operator for varargs call.
+
 2016-03-10  Per Bothner  <per@bothner.com>
 
 	* arrays.scm: A bunch of new array procedures.

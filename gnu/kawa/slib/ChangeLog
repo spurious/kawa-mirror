@@ -1,3 +1,7 @@
+2016-03-25  Per Bothner  <per@bothner.com>
+
+	* srfi14.scm: Use splice operator for calling varargs function.
+
 2015-12-21  Per Bothner  <per@bothner.com>
 
 	* swing.scm: Move a number of procedures from here to ...

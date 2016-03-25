@@ -149,4 +149,4 @@
                         ls))))))
   (if (= 0 vecs:length)
       (vector-for-each-one f vec)
-      (vector-for-each-generic f vec vecs)))
+      (vector-for-each-generic f vec @vecs)))

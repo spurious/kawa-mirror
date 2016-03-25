@@ -94,14 +94,14 @@
    str (start end) (cstart cend)
    (let loop ((result ::list '())
               (i ::string-cursor (as string-cursor cend)))
-     (if (string-cursor<=? i start)
+     (if (string-cursor<=? i (as string-cursor start))
          result
          (let ((prev (string-cursor-prev str i)))
            (loop (make <pair> (string-cursor-ref str prev) result) prev))))))
 
 (define (list->string (lst ::list)) ::string
   (let* ((len ::int (lst:size))
-	 (result ::string (make gnu.lists.FString len)))
+	 (result ::abstract-string (make gnu.lists.FString len)))
     (do ((i ::int 0 (+ i 1)))
 	((>= i len) result)
       (let ((pair ::pair lst))
@@ -249,8 +249,8 @@
                            (if (= nrst 2) (rst 1) -1)))
         (else
          (define n::int (+ nrst 1))
-         (define cursors::int[] (int[] length: n))
-         (define ends::int[] (int[] length: n))
+         (define cursors::string-cursor[] (string-cursor[] length: n))
+         (define ends::string-cursor[] (string-cursor[] length: n))
          (define chs::gnu.text.Char[] (gnu.text.Char[] length: n))
          (set! (cursors 0) (string-cursor-start str1))
          (set! (ends 0) (string-cursor-end str1))
@@ -275,8 +275,8 @@
 (define (string-map proc str1::string #!rest rst::string[])::string
   (define nrst rst:length)
   (define n::int (+ nrst 1))
-  (define cursors::int[] (int[] length: n))
-  (define ends::int[] (int[] length: n))
+  (define cursors::string-cursor[] (string-cursor[] length: n))
+  (define ends::string-cursor[] (string-cursor[] length: n))
   (define chs::gnu.text.Char[] (gnu.text.Char[] length: n))
   (define len1 (str1:length))
   (define result (gnu.lists.FString:alloc len1))

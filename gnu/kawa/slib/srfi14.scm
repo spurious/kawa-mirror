@@ -782,12 +782,12 @@ character parameter as its true value, e.g.
 (define (char-set-adjoin (cs ::char-set) #!rest (chars ::character[]))
   ::char-set
   "Add the CHAR_i characters to character set CS."
-  (char-set-adjoin! (char-set-copy cs) chars))
+  (char-set-adjoin! (char-set-copy cs) @chars))
 
 (define (char-set-delete (cs ::char-set) #!rest (chars ::character[]))
   ::char-set
   "Delete the CHAR_i characters from character set CS."
-  (char-set-delete! (char-set-copy cs) chars))
+  (char-set-delete! (char-set-copy cs) @chars))
 
 (define (char-set-adjoin! (cs ::char-set)
                           #!rest (chars ::character[]))
@@ -852,7 +852,7 @@ its first argument and the union of all the other arguments), and
 requires at least one argument. Its boundary case is:
   (char-set-difference cs) => cs"
   (if (= 0 csets:length) cs1
-      (let ((rest (char-set-union csets)))
+      (let ((rest (char-set-union @csets)))
         (char-set-intersection cs1 (char-set-complement rest)))))
 
 (define (char-set-xor #!rest (csets ::char-set[])) ::char-set
@@ -910,7 +910,7 @@ allowed, but not required, to side-effect its first argument."
   "Set difference for character sets, linear-update variant. It is
 allowed, but not required, to side-effect its first argument."
   (if (= 0 csets:length) cs1
-      (let ((rest (char-set-union csets)))
+      (let ((rest (char-set-union @csets)))
         (char-set-intersection! cs1 (char-set-complement rest)))))
 
 (define (char-set-xor! #!rest (csets ::char-set[])) ::char-set

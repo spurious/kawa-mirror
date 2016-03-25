@@ -535,10 +535,37 @@ public class ApplyExp extends Expression
   }
 
     public void visitArgs(InlineCalls visitor) {
+        visitArgs(visitor, null);
+    }
+    public void visitArgs(InlineCalls visitor, LambdaExp lexp) {
         int nargs = args.length;
-        args = visitor.visitExps(args, nargs,
-                                 isAppendValues() ? null
-                                 : InlineCalls.ValueNeededType.instance);
+        Type dtype = isAppendValues() ? null
+            : InlineCalls.ValueNeededType.instance;
+        // For simplicity, for now.
+        Declaration param = lexp == null
+            || firstKeywordArgIndex != 0
+            || lexp.keywords != null
+            ? null
+            : lexp.firstDecl();
+        for (int i = 0;  i < nargs && visitor.getExitValue() == null;  i++) {
+            while (param != null
+                   && (param.isThisParameter()
+                       || param.getFlag(Declaration.PATTERN_NESTED)))
+                param = param.nextDecl();
+            Type ptype = dtype;
+            if (param != null && i < lexp.min_args+lexp.opt_args
+                && (firstSpliceArg < 0 || i > firstSpliceArg))
+                ptype = param.getType();
+            else if (param != null
+                     && param.getFlag(Declaration.IS_REST_PARAMETER)) {
+                Type vtype = param.getType();
+                if (vtype instanceof ArrayType)
+                    ptype = ((ArrayType) vtype).getComponentType();
+            }
+            args[i] = visitor.visitAndUpdate(args[i], ptype);
+            if (param != null && ! param.getFlag(Declaration.IS_REST_PARAMETER))
+                param = param.nextDecl();
+        }
     }
 
   protected <R,D> void visitChildren(ExpVisitor<R,D> visitor, D d)

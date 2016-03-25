@@ -1796,7 +1796,7 @@ public class LambdaExp extends ScopeExp {
             if (inlined != null)
                 return visitor.visit(inlined, required);
         }
-        exp.visitArgs(visitor);
+        exp.visitArgs(visitor, this);
         int args_length = exp.args.length;
         int spliceCount = exp.spliceCount();
         int nonSpliceCount = args_length - spliceCount;

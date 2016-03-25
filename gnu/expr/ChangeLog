@@ -1,3 +1,10 @@
+2016-03-25  Per Bothner  <per@bothner.com>
+
+	Type-check arguments against LambdaExp formal parameters.
+	* ApplyExp.java (visitArgs): New overload takes optional LambdaExp.
+	Use it to type-check arguments.
+	* LambdaExp (validateApply): Pass self to visitArgs
+
 2016-03-14  Per Bothner  <per@bothner.com>
 
 	Fix Savannah bug #47412 "Can't use define in the constructor of a

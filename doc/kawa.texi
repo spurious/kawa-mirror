@@ -15476,14 +15476,6 @@ When Kawa compiles the module source, the result is the
 @dfn{module class}.  Each exported definition is translated to
 a public field in the module class.
 
-You can declare a class using @code{define-simple-class}
-with the same name as the module class, for example the
-following in a file named @code{foo.scm}:
-@example
-(define-simple-class foo ...)
-@end example
-In this case the defined class will serve dual-purpose as the module class.
-
 @subsection Name visibility
 
 The definitions that a module exports are accessible to other modules.
@@ -15743,7 +15735,27 @@ arbitrary names.  Therefore, the name of a field that represents a
 Scheme variable is "mangled" (@pxref{Mangling}) into an acceptable Java name.
 The implementation can recover the original name of a field @code{X}
 as @code{((gnu.mapping.Named) X).getName()} because all the standard
-compiler-generate field types implemented the @code{Named} interface.
+compiler-generated field types implement the @code{Named} interface.
+
+@anchor{dual-purpose-class}
+@subsection Same class for module and defined class
+
+You can declare a class using @code{define-simple-class}
+with the same name as the module class, for example the
+following in a file named @code{foo.scm}:
+@example
+(define-simple-class foo ...)
+@end example
+In this case the defined class will serve dual-purpose as the module class.
+
+To avoid confusion, in this case you must not specify
+@code{module-extends}, @code{module-implements}, or @code{(module-static #t)}.
+Also, the defined class should not have public static members.
+In that case it works out pretty well: public static members
+represent bindings exported by the module; other non-private members
+``belong'' to the defined class.
+
+In this case @code{(module-static 'init-run)} is implied.
 
 @anchor{static-or-non-modules}
 @subsection Static vs non-static modules
@@ -15774,16 +15786,16 @@ or using the @code{module-static} special form.
 
 @table @code
 @item --module-static
-If no @code{module-static} is specified, generate a static module
+Generate a static module
 (as if @code{(module-static #t)} were specified).
 This is (now) the default.
 @item --module-nonstatic
 @itemx --no-module-static
-If no @code{module-static} is specified, generate a non-static module
+Generate a non-static module
 (as if @code{(module-static #f)} were specified).
 This used to be the default.
 @item --module-static-run
-If no @code{module-static} is specified, generate a static module
+Generate a static module
 (as if @code{(module-static 'init-run)} were specified).
 @end table
 
@@ -15797,7 +15809,8 @@ static module, @emph{all} definitions will be static.
 If @code{'init-run} is specified, in addition the module body
 is evaluated in the class's static initializer.
 (Otherwise, it is run the first time it is @code{require}'d.)
-Otherwise, the module is an instance module.  However, the @var{name}s
+Otherwise, the module is an instance module.  If there is a non-empty
+list of @var{name}s then the module is an instance module, but the @var{name}s
 that are explicitly listed will be compiled to static fields and methods.
 If @code{#f} is specified, then all exported names will
 be compiled to non-static (instance) fields and methods.
@@ -15814,6 +15827,9 @@ If one of the command-line flags
 @code{--module-static}, or @code{--module-static-run} was specified,
 then the default is @code{#f}, @code{#f}, @code{#t}, or @code{'init-run},
 respectively.
+@item
+If the module class is @ref{dual-purpose-class,dual-purpose}
+then @code{(module-static 'init-run)} is implied.
 @item
 Otherwise the default is @code{(module-static #t)}.
 (It used to be @code{(module-static #f)} in older Kawa versions.)

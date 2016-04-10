@@ -257,7 +257,11 @@ public class ModuleInfo {
             } catch (Exception ex) {
             }
         }
-        return ModuleManager.getInstance().findWithClassName(type.getName());
+        return findWithClassName(type.getName());
+    }
+
+    public static ModuleInfo findWithClassName(String className) {
+        return ModuleManager.getInstance().findWithClassName(className);
     }
 
     public static void register(Object instance) {

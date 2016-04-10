@@ -307,10 +307,11 @@ SCRIPTS_TO_RUN = case-warnings.scm uninit1.scm \
   sva39060.scm sva39150.scm sva39945.scm sva39940.scm sva39947.scm \
   sva40077.scm sva40494.scm sva40649.scm sva40729.scm sva40814.scm \
   sva42377.scm sva42382.scm sva42689.scm sva42722.scm sva43131.scm \
-  sva43750.scm sva47412.scm
+  sva43750.scm sva47412.scm sva46728.scm
 
 # Files needed for SCRIPTS_TO_RUN
-AUX_FOR_SCRIPTS_TO_RUN = aux-libs.scm
+AUX_FOR_SCRIPTS_TO_RUN = aux-libs.scm sva46728x.scm sva46728z.scm
+BUILD_BEFORE_SCRIPTS_TO_RUN = sva46728x.class sva46728z.class
 MISC_TESTS_WITH_SRFI64 = \
   srfi-16-test.scm srfi-38-test.scm srfi-64-test.scm srfi-69-test.scm \
   srfi-101-test.scm srfi-108-test.scm srfi-109-test.scm resolve-uri.scm 
@@ -572,8 +573,8 @@ check1:  check-num check-arr check-java-array check-lazy check-lib \
 check2:  check-scm check-r7rs check-misc check-mac check-obj check-polytype \
   check-case
 
-check-run-test-scripts:
-	CLASSPATH=$(top_builddir) $(JAVA) gnu.kawa.util.RunTestScript \
+check-run-test-scripts: $(BUILD_BEFORE_SCRIPTS_TO_RUN)
+	CLASSPATH=$(top_builddir):. $(JAVA) gnu.kawa.util.RunTestScript \
 	  `for test in $(SCRIPTS_TO_RUN); do echo $(srcdir)/$$test; done`
 
 testing.zip: $(srcdir)/testing.scm

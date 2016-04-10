@@ -43,7 +43,7 @@ public class ThisExp extends ReferenceExp
 
   public ThisExp(ScopeExp context)
   {
-    super(THIS_NAME);
+    this();
     this.context = context;
   }
 
@@ -72,7 +72,11 @@ public class ThisExp extends ReferenceExp
       {
         // This is an extension used by define_syntax.
         CodeAttr code = comp.getCode();
-        if (comp.method.getStaticFlag())
+        ModuleExp module;
+        if (context instanceof ModuleExp
+            && (module = (ModuleExp) context).staticInitRun()) {
+            code.emitPushString(module.getMinfo().getClassName());
+        } else if (comp.method.getStaticFlag())
           code.emitGetStatic(comp.moduleInstanceMainField);
         else
           code.emitPushThis();

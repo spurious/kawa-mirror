@@ -1,3 +1,13 @@
+2016-04-09  Per Bothner  <per@bothner.com>
+
+	Change default for "dual-purpose" module class to 'init-run.
+	Multiple cleanups and impliications in 'init-run case,
+	including not implementing RunnableModule or run method.
+	A ThisExp used for macro context in 'init-run is now a class name,
+	rather than an instance.
+	This fixes Savannah bug #46728 "java.lang.VerifyError when class
+	that inherits another class is the same name as the file on kawa 2.1".
+
 2016-03-25  Per Bothner  <per@bothner.com>
 
 	Type-check arguments against LambdaExp formal parameters.

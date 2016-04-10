@@ -1,3 +1,9 @@
+2016-04-09  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Module classes): More about "dual-purpose" module classes.
+	Note they are (now) implicitly 'init-run.
+	Also some typo fixes.
+
 2016-03-08  Per Bothner  <per@bothner.com>
 
 	* kawa.texi: Minor tweaks to work around texinfo.tex limitations.

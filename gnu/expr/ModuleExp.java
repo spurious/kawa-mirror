@@ -357,6 +357,10 @@ public class ModuleExp extends LambdaExp
 
     ModuleInfo info;
 
+    public ModuleInfo getMinfo() {
+        return info;
+    }
+
     public String getNamespaceUri() { return info.uri; }
 
     public final ClassType getSuperType() {
@@ -386,6 +390,7 @@ public class ModuleExp extends LambdaExp
     public boolean staticInitRun() {
         return (isStatic()
                 && (getFlag(STATIC_RUN_SPECIFIED)
+                    || getFlag(USE_DEFINED_CLASS)
                     || Compilation.moduleStatic == Compilation.MODULE_STATIC_RUN));
     }
 

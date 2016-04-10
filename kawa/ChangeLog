@@ -1,3 +1,11 @@
+2016-04-09  Per Bothner  <per@bothner.com>
+
+	* lang/Macro.java:
+	A ThisExp used for macro context in 'init-run is now a class name,
+	rather than an instance.
+	This fixes Savannah bug #46728 "java.lang.VerifyError when class
+	that inherits another class is the same name as the file on kawa 2.1".
+
 2016-03-11  Jamison Hope  <jrh@theptrgroup.com>
 
 	* GuiConsole.java (init): On MacOS (at least) the call to setVisible

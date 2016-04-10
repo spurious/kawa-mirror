@@ -1279,7 +1279,8 @@ public class Compilation implements SourceLocator
       }
     if (makeRunnable())
       type.addInterface(typeRunnable);
-    type.addInterface(typeRunnableModule);
+    if (! module.staticInitRun())
+        type.addInterface(typeRunnableModule);
     type.setSuper(sup);
 
     module.compiledType = type;
@@ -2234,7 +2235,15 @@ public class Compilation implements SourceLocator
     LambdaExp saveLambda = curLambda;
     curLambda = module;
     Type[] arg_types;
-    if (module.isHandlingTailCalls()) // Is this ever false?
+    String runName = "run";
+    int runFlags = Access.PUBLIC+Access.FINAL;
+    if (module.staticInitRun())
+      {
+	arg_types = Type.typeArray0;
+        runName = "$runBody$";
+        runFlags = Access.PRIVATE|Access.STATIC;
+      }
+    else if (module.isHandlingTailCalls()) // Is this ever false?
       {
 	arg_count = 1;
 	arg_types = new Type[1];
@@ -2258,9 +2267,8 @@ public class Compilation implements SourceLocator
     Variable heapFrame = module.heapFrame;
     boolean staticModule = module.isStatic();
     Method apply_method;
-    
-    apply_method = curClass.addMethod ("run", arg_types, Type.voidType,
-				       Access.PUBLIC+Access.FINAL);
+    apply_method = curClass.addMethod(runName, arg_types, Type.voidType,
+                                      runFlags);
     method = apply_method;
     // For each parameter, assign it to its proper slot.
     // If a parameter !isSimple(), we cannot assign it to a local slot,
@@ -2275,7 +2283,8 @@ public class Compilation implements SourceLocator
     module.heapFrame = module.isStatic() ? null : module.thisVariable;
     module.allocChildClasses(this);
 
-    if (module.isHandlingTailCalls() || usingCPStyle())
+    if (! module.staticInitRun()
+        && (module.isHandlingTailCalls() || usingCPStyle()))
       {
 	callContextVar = new Variable ("$ctx", typeCallContext);
 	module.getVarScope().addVariableAfter(thisDecl, callContextVar);
@@ -2342,10 +2351,8 @@ public class Compilation implements SourceLocator
             dumpInitializers(init);
           }
 
-	if (module.staticInitRun())
-	  {
-	    code.emitGetStatic(moduleInstanceMainField);
-	    code.emitInvoke(typeModuleBody.getDeclaredMethod("run", 0));
+	if (module.staticInitRun()) {
+	    code.emitInvoke(apply_method);
 	  }
 	code.emitReturn();
 

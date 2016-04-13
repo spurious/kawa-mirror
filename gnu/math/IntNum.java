@@ -1281,6 +1281,10 @@ public class IntNum extends RatNum implements Externalizable
     return num;
   }
 
+    public static IntNum make(int[] words) {
+        return make(words, words.length);
+    }
+
     public static IntNum make(long value) {
         return valueOf(value);
     }
@@ -1626,7 +1630,7 @@ public class IntNum extends RatNum implements Externalizable
   }
 
   /**
-   * @serialData If the value is in the range (int)0xC000000 .. 0x7fffffff
+   * @serialData If the value is in the range (int)0xC0000000 .. 0x7fffffff
    * (inclusive) write out the value (using writeInt).
    * Otherwise, write (using writeInt) (0x80000000|nwords), where nwords is
    * the number of words following.  The words are the minimal

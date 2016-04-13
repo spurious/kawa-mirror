@@ -1,4 +1,4 @@
-(test-init "Objects" 145)
+(test-init "Objects" 146)
 
 ;; Force procedure to be applied without being inlined:
 (define-syntax force-eval
@@ -211,6 +211,9 @@
 (define ts1 (make <MyTimestamp> 10 1))
 (define ts2 (make <MyTimestamp> 10 2))
 (test #t < (my-compare ts1 ts2) 0)
+
+(test #(2147483648 21474836482147483648 #x7fffffff #x80000000 -1073741825 -1073741824 -1073741823)
+      'misc-ints misc-ints)
 
 ;; Based on Savannah bug#11822, contributed by Dean Ferreyra.
 ;; (Other parts of this testcase are in module1.scm and module3.scm.)

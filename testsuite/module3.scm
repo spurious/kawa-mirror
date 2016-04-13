@@ -6,7 +6,7 @@
 	       namespace-syntax-call list-length-4 my-compare test3-import2
 	       test3-import1 get3-mod0-v2 set3-mod0-v2 counter-test-result
 	       pa-new pa-getter pa-setter pa-length iarr-set mB test1-import0
-               macro2 all-zeros)
+               macro2 all-zeros misc-ints)
 
 (define (get3-mod0-v1) :: <object> mod0-v1)
 (define (set3-mod0-v1 x) (set! mod0-v1 x))
@@ -107,3 +107,6 @@
 (macro1 macro2)
 
 (define (all-zeros) '#1=(0 . #1#))
+
+(define misc-ints
+  (vector 2147483648 21474836482147483648 #x7fffffff #x80000000 -1073741825 -1073741824 -1073741823))

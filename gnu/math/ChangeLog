@@ -1,3 +1,10 @@
+2016-04-13  Per Bothner  <per@bothner.com>
+
+	* IntNum.make (make(int[])): Restore factory method incorrectly removed
+	on 2015-05-10.  This method is needed for literals.  This fixes
+	Savannah bug #47688 'Macros involving integer literals outside the
+	range of int cause "no method to construct ClassType gnu.math.IntNum"'.
+
 2015-08-16  Per Bothner  <per@bothner.com>
 
 	* IntNum.java (valueOfUnsigned(int)): New method.

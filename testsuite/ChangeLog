@@ -1,3 +1,10 @@
+2016-04-13  Per Bothner  <per@bothner.com>
+
+	* module3.scm, obj-test.scm: Add tests for bigger integer literals.
+	Specifically tests for Savannah bug #47688 'Macros involving integer
+	literals outside the range of int cause "no method to construct
+	ClassType gnu.math.IntNum"'.
+
 2016-04-09  Per Bothner  <per@bothner.com>
 
 	* sva46728.scm,  sva46728x.scm,  sva46728z.scm: New test

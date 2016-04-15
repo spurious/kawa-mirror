@@ -1,6 +1,11 @@
 2016-04-14  Per Bothner  <per@bothner.com>
+ 	    Tom B <tombousso@gmail.com>
 
-	* inlining.expected: Update adter recent change - which ended up
+	* sva47651.scm: New testcase for Savannah bug #47651
+	"Scope issue calling for-each from a class method".
+	* Makefile.am (SCRIPTS_TO_RUN): Update accordingly.
+
+	* inlining.expected: Update after recent change - which ended up
 	having the bonus of converting a method call to a tail-call jump.
 
 2016-04-13  Per Bothner  <per@bothner.com>

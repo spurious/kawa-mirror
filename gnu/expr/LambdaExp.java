@@ -1806,57 +1806,6 @@ public class LambdaExp extends ScopeExp {
                                                   nonSpliceCount);
         if (msg != null)
             return visitor.noteError(msg);
-        int conv = getCallConvention();
-        Compilation comp = visitor.getCompilation();
-        Method method;
-        // Mostly duplicates logic with ApplyExp.compile.
-        if (comp.inlineOk(this) && isClassMethod()
-            && (conv <= Compilation.CALL_WITH_CONSUMER
-                || (conv == Compilation.CALL_WITH_TAILCALLS))
-            && (method = getMethod(nonSpliceCount, spliceCount)) != null) {
-            // This is an optimization to expand a call to a method in the
-            // same ClassExp.  The result is a call to a PrimProcedure instead.
-            // This isn't just an optimization, since the re-write is
-            // needed to ensure that if we're in an inner lambda that the
-            // $this$ declaration is captured in a closure.  (See the
-            // 'new ThisExp(d)' below.)  Otherwise, we could could defer this
-            // optimization to ApplyExp.compile.  (Conversely, we can't do the
-            // latter optimization here instead, because we may not have called
-            // addMethodFor yet - since (except in the case of class methods)
-            // that happens later, after FindCapturedVars.  Yuck.)
-            boolean isStatic = nameDecl.isStatic();
-            if (! isStatic && getOuter() instanceof ClassExp) {
-                ClassExp cl = (ClassExp) getOuter();
-                if (cl.isMakingClassPair()) {
-                }
-            }
-            PrimProcedure mproc = new PrimProcedure(method, this);
-            Expression[] margs;
-            if (isStatic)
-                margs = exp.args;
-            else {
-                LambdaExp curLambda = visitor.getCurrentLambda();
-                for (;;) {
-                    if (curLambda == null)
-                        return visitor.noteError("internal error: missing "+this);
-                    if (curLambda.getOuter() == getOuter()) // I.e. same class.
-                        break;
-                    curLambda = curLambda.outerLambda();
-                }
-                Declaration d = curLambda.firstDecl();
-                if (d==null || ! d.isThisParameter())
-                    return visitor.noteError("calling non-static method "
-                                             +getName()+" from static method "
-                                             +curLambda.getName());
-                int nargs = exp.getArgCount();
-                margs = new Expression[1 + nargs];
-                System.arraycopy(exp.getArgs(), 0, margs, 1, nargs);
-                margs[0] = new ThisExp(d);
-            }
-            ApplyExp nexp = new ApplyExp(mproc, margs);
-            nexp.adjustSplice(exp, isStatic ? 0 : 1);
-            return nexp.setLine(exp);
-        }
         return exp;
     }
 

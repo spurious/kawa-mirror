@@ -415,9 +415,27 @@ public class FindCapturedVars extends ExpExpVisitor<Void>
                 rexp.setBinding(ndecl);
                 return;
             }
-
-            if (! decl.isFluid())
-              heapLambda.setImportsLexVars();
+ 
+            if (decl.context instanceof ClassExp) {
+                if (heapLambda.getOuter() == decl.context)
+                    return;
+                ScopeExp methodLambda = heapLambda;
+                while (methodLambda != null) {
+                    ScopeExp outer = methodLambda.getOuter();
+                    if (outer == decl.context) {
+                        Declaration thisDecl = methodLambda.firstDecl();
+                        if (thisDecl != null && thisDecl.isThisParameter()) {
+                            capture(thisDecl, null);
+                            return;
+                        }
+                        break;
+                    }
+                    methodLambda = outer;
+                }
+            }
+            if (! decl.isFluid()) {
+                heapLambda.setImportsLexVars();
+            }
 	    LambdaExp parent = heapLambda.outerLambda();
 	    for (LambdaExp outer = parent;  outer != declLambda && outer != null; )
 	      {

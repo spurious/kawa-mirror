@@ -1,3 +1,8 @@
+2016-04-14  Per Bothner  <per@bothner.com>
+
+	* inlining.expected: Update adter recent change - which ended up
+	having the bonus of converting a method call to a tail-call jump.
+
 2016-04-13  Per Bothner  <per@bothner.com>
 
 	* module3.scm, obj-test.scm: Add tests for bigger integer literals.

@@ -194,7 +194,7 @@ pidigits.pidigits(int,java.io.PrintStream)void: 125 bytes
 pidigits$Transformation.next()void: 59 bytes
 pidigits$Transformation.extract(int)int: 41 bytes
 pidigits$Transformation.compose(pidigits$Transformation)pidigits$Transformation: 110 bytes
-pidigits$PiDigitSpigot.next()int: 50 bytes
+pidigits$PiDigitSpigot.next()int: 49 bytes
 pidigits$PiDigitSpigot.digit()int: 9 bytes
 pidigits$PiDigitSpigot.isSafe(int)boolean: 18 bytes
 pidigits$PiDigitSpigot.produce(int)pidigits$Transformation: 27 bytes

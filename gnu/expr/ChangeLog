@@ -1,3 +1,15 @@
+2016-04-14  Per Bothner  <per@bothner.com>
+
+	* LambdaExp.java (validateApply): Remove intra-class method-call
+	optimization, which duplicates optimization in ApplyExp.compile.
+	* FindCapturedVars.java (capture): Make some compensatory changes.
+	This fixes Savannah bug #47651 "Scope issue calling for-each from a
+	class method".  (The actual test-case failed because the removed code
+	in validateApply depends on the scope-chain, which was brokedn by the
+	inlining of for-each and not yet restored by ChainLambdas.  It
+	might have been more logical to make sure the scope-chain is always
+	valid, but removing redundant code is always good anyway.)
+
 2016-04-09  Per Bothner  <per@bothner.com>
 
 	Change default for "dual-purpose" module class to 'init-run.

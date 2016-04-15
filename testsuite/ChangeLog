@@ -1,5 +1,5 @@
 2016-04-14  Per Bothner  <per@bothner.com>
- 	    Tom B <tombousso@gmail.com>
+ 	    Tom Bousso <tombousso@gmail.com>
 
 	* sva47651.scm: New testcase for Savannah bug #47651
 	"Scope issue calling for-each from a class method".

@@ -1,3 +1,8 @@
+2016-04-16  Per Bothner  <per@bothner.com>
+
+	* ConsumerTarget.java (compileWrite): Fix incorrect consition.
+	This fixes handling of unsignedIntType, for one.
+
 2016-04-14  Per Bothner  <per@bothner.com>
 
 	* LambdaExp.java (validateApply): Remove intra-class method-call

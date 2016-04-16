@@ -261,12 +261,13 @@ public class ConsumerTarget extends Target
   {
     Type stackType = exp.getType();
     Type implType = stackType.getImplementationType();
-    if ((implType instanceof PrimType && ! implType.isVoid()
-         && stackType != LangPrimType.characterType
-         && stackType != LangPrimType.characterOrEofType
-         && stackType != LangPrimType.unsignedLongType
-         && stackType != LangPrimType.unsignedIntType)
-        || gnu.kawa.reflect.OccurrenceType.itemCountIsOne(implType))
+    if (implType instanceof PrimType
+        ? (! implType.isVoid()
+           && stackType != LangPrimType.characterType
+           && stackType != LangPrimType.characterOrEofType
+           && stackType != LangPrimType.unsignedLongType
+           && stackType != LangPrimType.unsignedIntType)
+        : gnu.kawa.reflect.OccurrenceType.itemCountIsOne(implType))
       {
         // Optimization to avoid a 'swap'.
         comp.getCode().emitLoad(this.consumer);

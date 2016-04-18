@@ -1052,10 +1052,13 @@ install-bytecode-jar: lib/bytecode-@BYTECODE_VERSION@.jar
 	cd $(DESTDIR)$(javadir) && rm -f bytecode.jar \
 	  && $(LN_S) bytecode-@BYTECODE_VERSION@.jar bytecode.jar
 
-uninstall-local: uninstall-jar uninstall-exec-bindir
+uninstall-local: uninstall-jar uninstall-exec-bindir uninstall-data
 uninstall-jar:
-	rm -f $(DESTDIR)$(javadir)/kawa-@VERSION@.jar \
-	  $(DESTDIR)$(javadir)/kawa.jar
+	rm -f $(DESTDIR)$(datadir)/kawa/lib/$(KAWAJAR) \
+	  $(DESTDIR)$(datadir)/kawa/lib/kawa.jar
+
+uninstall-data:
+	rm -f $(DESTDIR)$(datadir)/kawa/bin/kawa
 
 uninstall-exec-bindir:
 	rm -f $(DESTDIR)$(bindir)/kawa $(DESTDIR)$(bindir)/qexo

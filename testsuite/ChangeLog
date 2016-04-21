@@ -1,3 +1,10 @@
+2016-04-21  Tom Bousso <tombousso@gmail.com>
+            Per Bothner  <per@bothner.com>
+
+	* svn47725.scm: New test for Savannah bug #47725
+	"Same method candidate found twice causing warning".
+	* Makefile.am: Update.
+
 2016-04-14  Per Bothner  <per@bothner.com>
  	    Tom Bousso <tombousso@gmail.com>
 

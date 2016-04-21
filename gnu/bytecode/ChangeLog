@@ -1,3 +1,8 @@
+2016-04-21  Per Bothner  <per@bothner.com>
+
+	* Type.java (isSame): New static convenience method.
+	* ParameterizedType.java (equals): New method.
+
 2016-02-11  Per Bothner  <per@bothner.com>
 
 	* ClassType.java (isCompatibleWithValue): Return 2 (no coercion needed)

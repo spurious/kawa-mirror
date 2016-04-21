@@ -77,8 +77,8 @@ public class ClassMethods extends Procedure2
 		  pt1 = ((TypeVariable) pt1).getRawType();
 	      if (pt2 instanceof TypeVariable)
 		  pt2 = ((TypeVariable) pt2).getRawType();
-	      if (pt1 != pt2)
-		break;
+              if (! Type.isSame(pt1, pt2))
+                  break;
 	    }
 	  if (k >= 0)
 	    continue;

@@ -552,6 +552,11 @@ public abstract class Type
     return true;
   }
 
+    public static boolean isSame(Type t1, Type t2) {
+        return t1 == t2
+            || (t1 != null && t2 != null && t1.equals(t2));
+    }
+
   public void emitIsInstance (CodeAttr code)
   {
     code.emitInstanceof(this);

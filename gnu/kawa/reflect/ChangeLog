@@ -1,3 +1,9 @@
+2016-04-21  Per Bothner  <per@bothner.com>
+
+	* ClassMethods.java (removeRedundantMethods): Use new Type.isSame.
+	This fixes Savannah bug #47725 "Same method candidate found twice
+	causing warning".
+
 2016-03-08  Per Bothner  <per@bothner.com>
 
 	* CompileReflect.java (validateApplySlotGet):

@@ -115,6 +115,27 @@ public class ParameterizedType extends ObjectType
 	return rawType.compare(other);
     }
 
+    public boolean equals(Object other) {
+        if (other == this)
+            return true;
+        if (! (other instanceof ParameterizedType))
+            return false;
+        ParameterizedType pother = (ParameterizedType) other;
+        if (! Type.isSame(rawType, pother.rawType))
+            return false;
+        int n = typeArgumentTypes.length;
+        Type[] otherArgumentTypes = pother.typeArgumentTypes;
+        if (n != otherArgumentTypes.length)
+            return false;
+        while (--n >= 0) {
+            if (! Type.isSame(typeArgumentTypes[n],
+                              pother.typeArgumentTypes[n])
+                || getTypeArgumentBound(n) != pother.getTypeArgumentBound(n))
+                return false;
+        }
+        return true;
+    }
+
     public ParameterizedType(ClassType rawType, Type... typeArgumentTypes) {
         this.rawType = rawType;
         this.typeArgumentTypes = typeArgumentTypes;

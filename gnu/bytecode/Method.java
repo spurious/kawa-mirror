@@ -60,13 +60,13 @@ public class Method implements AttrContainer, Member {
     /** Make a generic "clone" method.
      * This is used for array types.
      */
-    public static Method makeCloneMethod(Type returnType) {
+    static Method makeCloneMethod(Type returnType) {
         Method method = new Method();
         method.name = "clone";
         method.access_flags = Access.PUBLIC;
         method.arg_types = Type.typeArray0;
         method.return_type = returnType;
-        method.classfile = Type.pointer_type;
+        method.classfile = Type.objectType;
         return method;
     }
 
@@ -368,7 +368,8 @@ public class Method implements AttrContainer, Member {
 
     public String toString() {
         StringBuffer sbuf = new StringBuffer(100);
-        sbuf.append(getDeclaringClass().getName());
+        ClassType declaring = getDeclaringClass();
+        sbuf.append(declaring != null ? declaring.getName() : "???");
         sbuf.append('.');
         sbuf.append(name);
         if (arg_types != null) {

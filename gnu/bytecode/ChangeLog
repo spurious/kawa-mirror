@@ -1,3 +1,10 @@
+2016-04-24  Per Bothner  <per@bothner.com>
+
+	* Method.java (makeCloneMethod): Set classfile from Type.objectType
+	rather than Type.pointer_type which is not initialized when
+	makeCloneMethod is called.  Also make the method non-public.
+	This fixes Savannah bug #47772 "Array clone doesn't work".
+
 2016-04-21  Per Bothner  <per@bothner.com>
 
 	* Type.java (isSame): New static convenience method.

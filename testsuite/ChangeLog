@@ -1,3 +1,9 @@
+2016-04-24  Per Bothner  <per@bothner.com>
+	    Tom Bousso <tombousso@gmail.com>
+
+	* java-array-test.scm: Add test for array clone.  This tests
+	Savannah bug #47772 "Array clone doesn't work".
+
 2016-04-21  Tom Bousso <tombousso@gmail.com>
             Per Bothner  <per@bothner.com>
 

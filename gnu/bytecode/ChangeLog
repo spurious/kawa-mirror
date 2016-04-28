@@ -1,3 +1,7 @@
+2016-04-28  Tom Bousso <tombousso@gmail.com>
+
+	* TypeVariable.java (equals): New method.
+
 2016-04-24  Per Bothner  <per@bothner.com>
 
 	* Method.java (makeCloneMethod): Set classfile from Type.objectType

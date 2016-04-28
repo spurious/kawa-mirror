@@ -49,4 +49,12 @@ public class TypeVariable extends ObjectType {
 
     @Override
     public String getSignature () { return getRawType().getSignature(); }
+
+    public boolean equals(Object other) {
+        if (! (other instanceof TypeVariable))
+            return false;
+        TypeVariable tvother = (TypeVariable) other;
+        return Type.isSame(rawType, tvother.rawType)
+            && getName().equals(tvother.getName());
+    }
 }

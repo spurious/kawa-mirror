@@ -557,13 +557,21 @@ public class LitTable implements ObjectOutput
 	Type elementType = ((ArrayType) literal.type).getComponentType();
 	code.emitPushInt(len);
 	code.emitNewArray(elementType);
+        int numNonNull = 0;
+        for (int i = 0;  i < len;  i++) {
+	    if (((Literal) literal.argValues[i]).value != null)
+                numNonNull++;
+        }
+        if (numNonNull > 0)
+            code.emitDup(literal.type);
 	store(literal, ignore, code);
 	for (int i = 0;  i < len;  i++)
 	  {
 	    Literal el = (Literal) literal.argValues[i];
 	    if (el.value == null)
 	      continue;
-	    code.emitDup(elementType);
+            if (--numNonNull > 0)
+                code.emitDup(literal.type);
 	    code.emitPushInt(i);
 	    emit(el, false);
 	    code.emitArrayStore(elementType);

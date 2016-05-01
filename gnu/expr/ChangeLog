@@ -1,3 +1,7 @@
+2016-05-01  Per Bothner  <per@bothner.com>
+
+	* LitTable.java (emit): Fix compilation of Object[] literals.
+
 2016-04-16  Per Bothner  <per@bothner.com>
 
 	* ConsumerTarget.java (compileWrite): Fix incorrect consition.

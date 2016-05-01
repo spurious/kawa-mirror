@@ -130,9 +130,7 @@ public class IsEqual extends gnu.mapping.Procedure2
     }
 
     public static boolean apply (Object arg1, Object arg2) {
-        Map<Object,ArrayList<Object>> map =
-            new IdentityHashMap<Object,ArrayList<Object>>();
-        return apply(arg1, arg2, map);
+        return apply(arg1, arg2, null);
     }
 
     public static boolean apply (Object arg1, Object arg2,
@@ -163,6 +161,9 @@ public class IsEqual extends gnu.mapping.Procedure2
             }
             return true;
         }
+
+        if (map == null)
+            map = new IdentityHashMap<Object,ArrayList<Object>>();
 
         if (arg1 instanceof LList || arg2 instanceof LList) {
             if (! (arg1 instanceof Pair && arg2 instanceof Pair))

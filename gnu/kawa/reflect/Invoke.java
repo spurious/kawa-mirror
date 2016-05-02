@@ -2,8 +2,8 @@ package gnu.kawa.reflect;
 import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.bytecode.*;
-import gnu.lists.ConstVector;
 import gnu.lists.FString;
+import gnu.lists.FVector;
 import java.lang.reflect.Array;
 import gnu.kawa.lispexpr.ClassNamespace; // FIXME
 import gnu.kawa.lispexpr.LangObjType;
@@ -181,7 +181,7 @@ public class Invoke extends ProcedureN
                 index++;
               }
             if (dtype == LangObjType.constVectorType)
-                return new ConstVector((Object[]) arr);
+                return FVector.makeConstant((Object[]) arr);
             return arr;
           }
       }

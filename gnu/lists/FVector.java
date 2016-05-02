@@ -52,6 +52,16 @@ public  class FVector<E> extends SimpleVector<E>
     public static FVector make(Object... data) {
         return new FVector(data);
     }
+    public static <E> FVector<E> makeConstant(E... data) {
+        FVector<E> vec = new FVector(data);
+        vec.setReadOnly();
+        return vec;
+    }
+
+    public void replaceAll(E[] data) {
+        this.data = data;
+        this.info = VERY_SIMPLE_FLAG;
+    }
 
     public void copyFrom (int index, FVector<E> src, int start, int end) {
         int count = end-start;

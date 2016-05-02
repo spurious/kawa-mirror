@@ -12,7 +12,7 @@ public abstract class SimpleVector<E> extends AbstractSequence<E>
     implements AVector<E>, Externalizable, RandomAccess
 {
     // 1-bit sign; 25-bit offset; 6-bit flags; 32-bit size;
-    protected long info = 0x8000000000000000L;
+    protected long info = VERY_SIMPLE_FLAG;
     public static final int MAX_GAP_SIZE = (1 << 25) - 1;
     /** If isSimple(), the values are all the values of the guffer.
      * In this case getSize() == getBufferLength(); */
@@ -43,6 +43,15 @@ public abstract class SimpleVector<E> extends AbstractSequence<E>
     // Could define GAP_FLAG in terms ! SUBRANGE_FLAG && !isVerySimple()
     protected static final long SUBRANGE_FLAG = 0x1000000000L;
     protected static final long GAP_FLAG = 0x2000000000L;
+    protected static final long VERY_SIMPLE_FLAG = 0x8000000000000000L;
+
+    public boolean isReadOnly() {
+        return (info & READ_ONLY_FLAG) != 0;
+    }
+
+    public void setReadOnly() {
+        info |= READ_ONLY_FLAG;
+    }
 
     public int size() {
         int len = getBufferLength();

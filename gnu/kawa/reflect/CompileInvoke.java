@@ -10,10 +10,6 @@ import gnu.math.IntNum;
 import java.lang.reflect.Array;
 
 public class CompileInvoke {
-    public static final Method newConstVectorMethod =
-        Compilation.typeConstVector
-        .getDeclaredMethod("<init>", new Type[] { Compilation.objArrayType });
-
     public static Expression validateApplyInvoke
         (ApplyExp exp, InlineCalls visitor, Type required, Procedure proc) {
         Invoke iproc = (Invoke) proc;
@@ -179,16 +175,6 @@ public class CompileInvoke {
             exp.visitArgs(visitor);
             return exp;
         }
-        if (type instanceof TypeValue && kind == 'N') {
-            Procedure constructor = ((TypeValue) type).getConstructor();
-            if (constructor != null) {
-                Expression[] xargs = new Expression[nargs-1];
-                System.arraycopy(args, 1, xargs, 0, nargs-1);
-                ApplyExp xapp = new ApplyExp(constructor, xargs);
-                xapp.adjustSplice(exp, -1);
-                return visitor.visit(xapp.setLine(exp), required);
-            }
-        }
         ClassType caller = comp == null ? null
             : comp.curClass != null ? comp.curClass
             : comp.mainClass;
@@ -225,16 +211,16 @@ public class CompileInvoke {
                     tailArgs = nargs-1;
                     methods[0] = new PrimProcedure(defcons, iproc.language);
                     args[0] = new QuoteExp(ctype.getReflectClass());
-                } else{
-                    Expression[] xargs = new Expression[nargs];
-                    System.arraycopy(args, 1, xargs, 1, nargs-1);
-                    xargs[0] = new QuoteExp(Compilation.objArrayType);
-                    ApplyExp mkArray = new ApplyExp(exp.getFunction(), xargs);
-                    mkArray.adjustSplice(exp, 0);
-                    return visitor.visit(new ApplyExp(iproc,
-                                                      new Expression[] {
-                                                          new QuoteExp(Compilation.typeConstVector),
-                                                          mkArray.setLine(exp)}).setLine(exp), required);
+                }
+            }
+            if (type instanceof TypeValue) {
+                Procedure constructor = ((TypeValue) type).getConstructor();
+                if (constructor != null) {
+                    Expression[] xargs = new Expression[nargs-1];
+                    System.arraycopy(args, 1, xargs, 0, nargs-1);
+                    ApplyExp xapp = new ApplyExp(constructor, xargs);
+                    xapp.adjustSplice(exp, -1);
+                    return visitor.visit(xapp.setLine(exp), required);
                 }
             }
             if (exp.firstSpliceArg >= 0) {// FIXME

@@ -14,6 +14,7 @@ import gnu.kawa.reflect.CompileInvoke;
 import gnu.kawa.reflect.Invoke;
 import gnu.kawa.reflect.LazyType;
 import gnu.lists.Blob;
+import gnu.lists.FVector;
 import gnu.lists.Sequences;
 import gnu.lists.U8Vector;
 import java.util.*;
@@ -102,7 +103,7 @@ public class LangObjType extends SpecialObjectType implements TypeValue
                     VECTOR_TYPE_CODE);
 
   public static final LangObjType constVectorType =
-    new LangObjType("constant-vector", "gnu.lists.ConstVector",
+    new LangObjType("constant-vector", "gnu.lists.FVector",
                     CONST_VECTOR_TYPE_CODE);
 
   public static final LangObjType s8vectorType =
@@ -304,7 +305,6 @@ public class LangObjType extends SpecialObjectType implements TypeValue
       case U64VECTOR_TYPE_CODE:
       case F32VECTOR_TYPE_CODE:
       case F64VECTOR_TYPE_CODE:
-      case CONST_VECTOR_TYPE_CODE:
       case REGEX_TYPE_CODE:
         implementationType.emitIsInstance(comp.getCode());
         target.compileFromStack(comp,
@@ -377,7 +377,6 @@ public class LangObjType extends SpecialObjectType implements TypeValue
 
   public static Class coerceToClass (Object obj)
   {
-    obj = Promise.force(obj);
     Class coerced = coerceToClassOrNull(obj);
     if (coerced == null && obj != null)
       throw new ClassCastException("cannot cast "+obj+" to type");
@@ -427,6 +426,17 @@ public class LangObjType extends SpecialObjectType implements TypeValue
        throw new ClassCastException("cannot cast "+obj+" to type");
     return coerced;
   }
+
+    public static FVector coerceToConstVector(Object obj) {
+        obj = Promise.force(obj);
+        if (obj instanceof FVector) {
+            FVector vec = (FVector) obj;
+            if (vec.isReadOnly())
+                return vec;
+            throw new ClassCastException("vector is not constant-vector");
+        }
+       throw new ClassCastException("cannot cast "+obj+" to constant-vector");
+    }
 
   public static Procedure coerceToProcedureOrNull(Object value)
   {
@@ -493,8 +503,9 @@ public class LangObjType extends SpecialObjectType implements TypeValue
         return typeLangObjType.getDeclaredMethod("coerceDFloNum", 1);
       case U8VECTOR_TYPE_CODE:
         return typeLangObjType.getDeclaredMethod("coerceToU8Vector", 1);
-      case VECTOR_TYPE_CODE:
       case CONST_VECTOR_TYPE_CODE:
+        return typeLangObjType.getDeclaredMethod("coerceToConstVector", 1);
+      case VECTOR_TYPE_CODE:
       case S8VECTOR_TYPE_CODE:
       case S16VECTOR_TYPE_CODE:
       case U16VECTOR_TYPE_CODE:
@@ -638,8 +649,9 @@ public class LangObjType extends SpecialObjectType implements TypeValue
         return coerceDFloNum(obj);
       case SEQUENCE_TYPE_CODE:
           return Sequences.coerceToSequence(obj);
-      case VECTOR_TYPE_CODE:
       case CONST_VECTOR_TYPE_CODE:
+          return coerceToConstVector(obj);
+      case VECTOR_TYPE_CODE:
       case S8VECTOR_TYPE_CODE:
       case U8VECTOR_TYPE_CODE:
       case S16VECTOR_TYPE_CODE:
@@ -755,7 +767,6 @@ public class LangObjType extends SpecialObjectType implements TypeValue
   {
     switch (typeCode)
       {
-      case CONST_VECTOR_TYPE_CODE:
       case VECTOR_TYPE_CODE:
       case S8VECTOR_TYPE_CODE:
       case S16VECTOR_TYPE_CODE:
@@ -804,6 +815,8 @@ public class LangObjType extends SpecialObjectType implements TypeValue
         return new PrimProcedure("gnu.kawa.io.URIPath", "makeURI", 1);
       case VECTOR_TYPE_CODE:
         return new PrimProcedure("gnu.lists.FVector", "make", 1);
+      case CONST_VECTOR_TYPE_CODE:
+          return new PrimProcedure("gnu.lists.FVector", "makeConstant", 1); 
       case LIST_TYPE_CODE:
         return gnu.kawa.functions.MakeList.list;
       case STRING_TYPE_CODE:

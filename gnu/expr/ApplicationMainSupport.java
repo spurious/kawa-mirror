@@ -68,7 +68,7 @@ public class ApplicationMainSupport
     
         Object[] array = new Object[nargs];
         System.arraycopy(args, arg_start, array, 0, nargs);
-        commandLineArguments = new ConstVector(array);  // FIXME scsh has list
+        commandLineArguments = FVector.makeConstant(array);  // FIXME scsh has list
     }
 
   public static boolean processSetProperty (String arg)

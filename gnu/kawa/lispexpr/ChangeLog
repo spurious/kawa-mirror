@@ -1,3 +1,8 @@
+2016-05-01  Per Bothner  <per@bothner.com>
+
+	* LangObjType.java (constVectorType): The ConstVector type was removed,
+	so now read-only FVectors.
+
 2016-02-24  Per Bothner  <per@bothner.com>
 
 	* LispLanguage.java (parse): Save entire command if in interactive

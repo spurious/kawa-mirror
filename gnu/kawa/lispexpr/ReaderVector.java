@@ -6,7 +6,6 @@ import gnu.text.*;
 import gnu.kawa.io.InPort;
 import gnu.mapping.Values;
 import gnu.lists.FVector;
-import gnu.lists.ConstVector;
 import gnu.lists.LList;
 import gnu.lists.Pair;
 
@@ -38,7 +37,7 @@ public class ReaderVector extends ReadTableEntry
     int startColumn = port.getColumnNumber()-1;
      try
        {
-         ConstVector result = new ConstVector();
+         FVector result = new FVector();
          lexer.bindSharedObject(sharingIndex, result);
 
          ReadTable rtable = ReadTable.getCurrent();
@@ -54,7 +53,8 @@ public class ReaderVector extends ReadTableEntry
 	       break;
              last = lexer.readValuesAndAppend(ch, rtable, last);
 	   }
-         result.setDataBackDoor(((LList) head.getCdr()).toArray());
+         result.replaceAll(((LList) head.getCdr()).toArray());
+         result.setReadOnly();
 	 return result;
 
        }

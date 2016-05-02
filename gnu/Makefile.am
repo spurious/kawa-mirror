@@ -95,7 +95,6 @@ GNU_LISTS_JSOURCES = \
   lists/CharSeq.java \
   lists/CharVector.java \
   lists/ComposedArray.java \
-  lists/ConstVector.java \
   lists/Consumer.java \
   lists/ConsumerWriter.java \
   lists/Consumable.java \

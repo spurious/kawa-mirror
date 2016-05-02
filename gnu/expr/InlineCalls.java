@@ -17,9 +17,9 @@ import java.lang.reflect.InvocationTargetException;
 
 import gnu.kawa.functions.MakePromise;
 import gnu.kawa.lispexpr.LangPrimType;
-import gnu.lists.ConstVector;
 import gnu.lists.EmptyList;
 import gnu.lists.PairWithPosition;
+import gnu.lists.SimpleVector;
 
 import java.util.List;
 import java.util.HashMap;
@@ -482,7 +482,7 @@ public class InlineCalls extends ExpExpVisitor<Type> {
             for (int j = 0; j < exp.clauses[i].datums.length; j++) {
                 Expression dexp = exp.clauses[i].datums[j];
                 Object d = ((QuoteExp) dexp).getValue();
-                if (d instanceof ConstVector
+                if (d instanceof SimpleVector
                         || (!(d instanceof EmptyList) && d instanceof PairWithPosition)) {
                     comp.error('w', "List and vectors will never be matched in a case clause", dexp);
                 }

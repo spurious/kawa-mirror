@@ -351,7 +351,7 @@ public class Quote extends Syntax {
             if (max_state == 0)
                 result = vector;
             else if (max_state == 1)
-                result = new ConstVector<Object>(buffer);
+                result = FVector.<Object>makeConstant(buffer);
             else {
                 Expression[] args = new Expression[n];
                 int firstSpliceArg = -1;
@@ -441,6 +441,6 @@ public class Quote extends Syntax {
     static final Method consXMethod = quoteType.getDeclaredMethod("consX$V", 1);
     static final Method appendMethod = quoteType.getDeclaredMethod("append$V", 1);
     static final Method makePairMethod = Compilation.typePair.getDeclaredMethod("make", 2);
-    static final Method makeVectorMethod = ClassType.make("gnu.lists.ConstVector")
-        .getDeclaredMethod("make", 1);
+    static final Method makeVectorMethod = ClassType.make("gnu.lists.FVector")
+        .getDeclaredMethod("makeConstant", 1);
 }

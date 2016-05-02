@@ -19,9 +19,9 @@ import gnu.kawa.functions.IsEqv;
 import gnu.kawa.io.OutPort;
 import gnu.kawa.lispexpr.LangObjType;
 import gnu.kawa.lispexpr.LangPrimType;
-import gnu.lists.ConstVector;
 import gnu.lists.EmptyList;
 import gnu.lists.PairWithPosition;
+import gnu.lists.SimpleVector;
 import gnu.mapping.CallContext;
 import gnu.math.IntNum;
 import gnu.text.Char;
@@ -191,7 +191,7 @@ public class CaseExp extends Expression {
                 Expression dexp = clause.datums[j];
                 Object d = calculateDatumValue(dexp);
 
-                if (!integer && d instanceof ConstVector
+                if (!integer && d instanceof SimpleVector
                         || (!(d instanceof EmptyList) && d instanceof PairWithPosition)) {
                     continue;
                 }

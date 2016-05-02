@@ -26,10 +26,6 @@ public class vector_append extends ProcedureN
         return new FVector(appendToArray(args));
     }
 
-    public static ConstVector appendToConstVector(Object... args) {
-        return new ConstVector(appendToArray(args));
-    }
-
   public static Object[] appendToArray(Object[] args)
   {
     int length = 0;

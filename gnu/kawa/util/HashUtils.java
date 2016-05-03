@@ -1,6 +1,7 @@
 package gnu.kawa.util;
 
 import java.util.List;
+import gnu.lists.Array;
 
 /** Various static helper methods for calculating hash-codes.
  * These are designed to tolerate cyclic data structrues, by using
@@ -19,7 +20,7 @@ public class HashUtils {
     }
 
     /** Generic hash method.
-     * See BoundedHash for a discussion of the parameters.
+     * See BoundedHashable for a discussion of the parameters.
      */
     public static int boundedHash(Object object, int seed, int limit) {
         // Check CharSequence first, because we want FString to use the
@@ -35,6 +36,8 @@ public class HashUtils {
             return ((BoundedHashable) object).boundedHash(seed, limit);
         else if (object instanceof List)
             return boundedHash((List) object, seed, limit);
+        else if (object instanceof Array)
+            return boundedHash((Array) object, seed, limit);
         return hashInt(seed, object == null ? 0 : object.hashCode());
     }
 
@@ -69,6 +72,26 @@ public class HashUtils {
             seed = murmur3step(seed, boundedHash(obj, 0, sublimit));
         }
         return murmur3finish(seed, count);
+    }
+
+    public static int boundedHash(Array arr, int seed, int limit) {
+        int rank = arr.rank();
+        int[] indexes = new int[rank];
+        int size = 1;
+        for (int r = 0; r < rank; r++) {
+            indexes[r] = arr.getLowBound(r);
+            size *= arr.getSize(r);
+        }
+        int count = 0;
+        int sublimit = limit >> 1;
+        for (int i = 0; i < size; i++) {
+            if (++count > limit)
+                break;
+            Object element = arr.get(indexes);
+            seed = murmur3step(seed, boundedHash(element, 0, sublimit));
+            gnu.lists.Arrays.incrementIndexes(indexes, arr);
+        }
+       return murmur3finish(seed, count);
     }
 
     public static int murmur3step(int h1/*seed*/, int k1/*datum*/) {

@@ -43,6 +43,23 @@ public class Arrays {
         return (E) arr.getRaw(rowMajorToEffectiveIndex(arr, index));
     }
 
+    public static int hashCode(Array arr) {
+        int rank = arr.rank();
+        int[] indexes = new int[rank];
+        int size = 1;
+        for (int r = 0; r < rank; r++) {
+            indexes[r] = arr.getLowBound(r);
+            size *= arr.getSize(r);
+        }
+        int hash = 1;
+        for (int i = 0; i < size; i++) {
+            Object element = arr.get(indexes);
+            hash = 31*hash + (element==null ? 0 : element.hashCode());
+            gnu.lists.Arrays.incrementIndexes(indexes, arr);
+        }
+        return hash;
+    }
+
     public static Array<Integer> asIntArrayOrNull(Object obj) {
         if (obj instanceof Array) {
             Array arr = (Array) obj;

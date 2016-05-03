@@ -1,3 +1,8 @@
+2016-05-02  Per Bothner  <per@bothner.com>
+
+	* HashUtils.java (boundedHash): Extend to Array objects.
+	(boundedHash(Array,int,int)): New method.
+
 2015-08-10  Jamison Hope  <jrh@theptrgroup.com>
 
 	* PreProcess.java (handleArg): Fix typo: repeatedly search for

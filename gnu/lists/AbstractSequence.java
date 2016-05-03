@@ -811,6 +811,8 @@ public abstract class AbstractSequence<E>
 
   public int hashCode()
   {
+    if (rank() != 1 && this instanceof Array)
+        return Arrays.hashCode((Array) this);
     // Implementation specified by the Collections specification.
     int hash = 1;
     for (int i = startPos(); (i = nextPos(i)) != 0;  )

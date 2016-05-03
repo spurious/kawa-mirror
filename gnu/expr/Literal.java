@@ -71,7 +71,7 @@ public class Literal
 
     public Literal(Object value, String name, LitTable litTable) {
         this(value, Type.make(value.getClass()));
-        litTable.literalTable.put (value, this);
+        litTable.put (value, this);
         assign(name, litTable);
     }
 
@@ -79,14 +79,14 @@ public class Literal
      * The field must be static and already exist. */
     public Literal(Object value, Field field, LitTable litTable) {
         this(value, field.getType());
-        litTable.literalTable.put(value, this);
+        litTable.put(value, this);
         this.field = field;
         flags = WRITTEN|EMITTED;
     }
 
     public Literal(Object value, Type type, LitTable litTable) {
         this(value, type);
-        litTable.literalTable.put (value, this);
+        litTable.put (value, this);
     }
 
     Literal(Object value, Type type) {

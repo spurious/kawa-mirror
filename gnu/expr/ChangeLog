@@ -1,3 +1,11 @@
+2016-05-02  Per Bothner  <per@bothner.com>
+
+	Use a modified equals test rather than identity for matching literals.
+	* LitTable.java: Change to extend GeneralHashTable.
+	(hash, matches): Override, to a modified equals comparision.
+	(literalTable): Remove field.
+	(class LitEquals): New class extends IsEqual.
+
 2016-05-01  Per Bothner  <per@bothner.com>
 
 	* LitTable.java (emit): Fix compilation of Object[] literals.

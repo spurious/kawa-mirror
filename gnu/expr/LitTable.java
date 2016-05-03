@@ -1,6 +1,9 @@
 package gnu.expr;
 import java.io.*;
 import gnu.bytecode.*;
+import gnu.kawa.functions.IsEqual;
+import gnu.kawa.util.GeneralHashTable;
+import gnu.kawa.util.HashUtils;
 import java.lang.reflect.Array;
 import java.util.*;
 import gnu.mapping.*;
@@ -12,16 +15,11 @@ import java.util.regex.*;
  * Implements ObjectOutput, because we use externalization to determine
  * how literals get compiled into code that re-creates the literal. */
 
-public class LitTable implements ObjectOutput
+public class LitTable extends GeneralHashTable<Object,Object>
+    implements ObjectOutput
 {
   Compilation comp;
   ClassType mainClass;
-
-  /* #ifdef use:java.util.IdentityHashMap */ 
-  IdentityHashMap literalTable = new IdentityHashMap(100);
-  /* #else */
-  // Hashtable literalTable = new Hashtable(100);
-  /* #endif */
 
   /** A table mapping objects to public static final field literals.
    * When we a need a literal for a value that is an instance of some
@@ -46,6 +44,16 @@ public class LitTable implements ObjectOutput
     this.comp = comp;
     this.mainClass = comp.mainClass;
   }
+
+    @Override
+    public int hash(Object key) {
+        return HashUtils.boundedHash(key);
+    }
+
+    @Override
+    protected boolean matches(Object key1, Object key2) {
+        return litEquals.apply(key1, key2, null);
+    }
 
   public void emit() throws IOException
   {
@@ -74,7 +82,7 @@ public class LitTable implements ObjectOutput
       }
 
     // For speedier garbage collection.
-    literalTable = null;
+    clear();
     literalsCount = 0;
   }
 
@@ -185,14 +193,6 @@ public class LitTable implements ObjectOutput
   {
     Literal lit = findLiteral(obj);
 
-    // Usually a no-op, but if the literalTable is a Hashtable (rather
-    // than an IdentityHashMap) then we might find a literal whose
-    // value is equals to obj, but not identical.  This can lead to trouble,
-    // e.g. if one is a Pair and the other is a PairWithPosition.
-    /* #ifndef use:java.util.IdentityHashMap */
-    // obj = lit.value;
-    /* #endif */
-
     if ((lit.flags & (Literal.WRITTEN|Literal.WRITING)) != 0)
       {
 	// It is referenced more than once, so we we need a Field
@@ -292,7 +292,7 @@ public class LitTable implements ObjectOutput
   {
     if (value == null)
       return Literal.nullLiteral;
-    Literal literal = (Literal) literalTable.get(value);
+    Literal literal = (Literal) get(value);
     if (literal != null)
       return literal;
     if (comp.immediate)
@@ -346,7 +346,7 @@ public class LitTable implements ObjectOutput
       }
 
     if (literal != null)
-      literalTable.put(value, literal);
+      put(value, literal);
     else
       literal = new Literal (value, valueType, this);
     return literal;
@@ -702,4 +702,26 @@ public class LitTable implements ObjectOutput
       }
   }
 
+    /** A modified equality predicate.
+     * Mostly same as IsEqual (Scheme equal? predicate),
+     * but the classes have to match.  Also Symbol is handled specially.
+     * This allows combining equivalent literals in the source code.
+     */
+    static class LitEquals extends IsEqual {
+        public LitEquals() { super(null, "(equals-for-literals)"); }
+
+        public boolean apply (Object arg1, Object arg2,
+                              Map<Object,ArrayList<Object>> map) {
+            if (arg1 == arg2)
+                return true;
+            if (arg1 == null || arg2 == null
+                // Symbols can be equals even if not == due to namespaces
+                || arg1 instanceof Symbol
+                || arg1.getClass() != arg2.getClass())
+                return false;
+
+            return super.apply(arg1, arg2, map);
+        }
+    }
+    static final LitEquals litEquals = new LitEquals();
 }

@@ -35,7 +35,7 @@ public class IsEqual extends gnu.mapping.Procedure2
     return exact1 == exact2 && num1.equals(num2);
   }
 
-    static boolean arrayEquals (Object arg1, Object arg2,
+    boolean arrayEquals (Object arg1, Object arg2,
                                 Map<Object,ArrayList<Object>> map) {
     int len1 = Array.getLength(arg1);
     int len2 = Array.getLength(arg2);
@@ -129,11 +129,11 @@ public class IsEqual extends gnu.mapping.Procedure2
         return false;
     }
 
-    public static boolean apply (Object arg1, Object arg2) {
+   public boolean apply (Object arg1, Object arg2) {
         return apply(arg1, arg2, null);
     }
 
-    public static boolean apply (Object arg1, Object arg2,
+    public boolean apply (Object arg1, Object arg2,
                                  Map<Object,ArrayList<Object>> map) {
         arg1 = Promise.force(arg1);
         arg2 = Promise.force(arg2);
@@ -234,7 +234,7 @@ public class IsEqual extends gnu.mapping.Procedure2
         boolean is2Array = arg2.getClass().isArray();
         if (is1Array || is2Array)
             return is1Array && is2Array &&
-                IsEqual.arrayEquals(arg1, arg2, map);
+                arrayEquals(arg1, arg2, map);
 
         return arg1.equals(arg2);
     }

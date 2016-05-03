@@ -1,6 +1,11 @@
+2016-05-03  Per Bothner  <per@bothner.com>
+
+	* HashUtils.java (boundedHash): Extend to primitive Java arrays.
+	(boundedHashArray): New method.
+
 2016-05-02  Per Bothner  <per@bothner.com>
 
-	* HashUtils.java (boundedHash): Extend to Array objects.
+	* HashUtils.java (boundedHash): Extend to multi-dimensional Arrays.
 	(boundedHash(Array,int,int)): New method.
 
 2015-08-10  Jamison Hope  <jrh@theptrgroup.com>

@@ -30,15 +30,19 @@ public class HashUtils {
         // consistency we want the same algorithm for all CharSequences.
         // We do want to apply to Murmur3 hashInt algorithm for better
         // distribution of the bits produced by hashCode.
+        if (object == null)
+            return hashInt(seed, 0);
         if (object instanceof CharSequence)
             ; // fall through to default
         else if (object instanceof BoundedHashable)
             return ((BoundedHashable) object).boundedHash(seed, limit);
         else if (object instanceof List)
             return boundedHash((List) object, seed, limit);
+        else if (object.getClass().isArray())
+            return boundedHashArray(object, seed, limit);
         else if (object instanceof Array)
             return boundedHash((Array) object, seed, limit);
-        return hashInt(seed, object == null ? 0 : object.hashCode());
+        return hashInt(seed, object.hashCode());
     }
 
     public static int hashInt(int seed, int value) {
@@ -70,6 +74,19 @@ public class HashUtils {
             if (++count > limit)
                 break;
             seed = murmur3step(seed, boundedHash(obj, 0, sublimit));
+        }
+        return murmur3finish(seed, count);
+    }
+
+    public static int boundedHashArray(Object object, int seed, int limit) {
+        int count = 0;
+        int sublimit = limit >> 1;
+        int length = java.lang.reflect.Array.getLength(object);
+        for (int i = 0; i < length; i++) {
+            if (++count > limit)
+                break;
+            Object element = java.lang.reflect.Array.get(object, i);
+            seed = murmur3step(seed, boundedHash(element, 0, sublimit));
         }
         return murmur3finish(seed, count);
     }

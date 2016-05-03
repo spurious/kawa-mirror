@@ -1,5 +1,7 @@
 2016-05-03  Per Bothner  <per@bothner.com>
 
+	* LitTable.java (findLiteral): Remove redundant put operation.
+
 	* LitTable.java (hash, matches): If immediate, use identity,
 	rather than a "equality".
 

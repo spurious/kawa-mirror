@@ -349,9 +349,7 @@ public class LitTable extends GeneralHashTable<Object,Object>
 	  }
       }
 
-    if (literal != null)
-      put(value, literal);
-    else
+    if (literal == null)
       literal = new Literal (value, valueType, this);
     return literal;
   }

@@ -70,10 +70,10 @@ public class DFloNum extends RealNum implements Externalizable
     return (long) value;
   }
 
-  public int hashCode ()
-  {
-    return (int)value;
-  }
+    public int hashCode() {
+        long v = Double.doubleToLongBits(value);
+        return (int)(v^(v>>>32));
+    }
 
   public boolean equals (Object obj)
   {

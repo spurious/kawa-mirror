@@ -1,3 +1,8 @@
+2016-05-02  Per Bothner  <per@bothner.com>
+
+	* DFloNum.java (hashCode): Changed to match specification
+	for Double.hashCode.
+
 2016-04-13  Per Bothner  <per@bothner.com>
 
 	* IntNum.make (make(int[])): Restore factory method incorrectly removed

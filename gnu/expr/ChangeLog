@@ -1,3 +1,8 @@
+2016-05-03  Per Bothner  <per@bothner.com>
+
+	* LitTable.java (hash, matches): If immediate, use identity,
+	rather than a "equality".
+
 2016-05-02  Per Bothner  <per@bothner.com>
 
 	Use a modified equals test rather than identity for matching literals.

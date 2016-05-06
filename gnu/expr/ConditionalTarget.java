@@ -60,6 +60,7 @@ public class ConditionalTarget extends Target
                 zero = null;
             }
             if (zero != null && language.booleanValue(zero) > 0) {
+                code.emitPop(1);
                 code.emitGoto(ifTrue);
                 return;
             }

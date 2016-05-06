@@ -1,3 +1,14 @@
+2016-05-05  Per Bothner  <per@bothner.com>
+
+	* svn47725.scm: Renamed to sva47725.scm.
+
+2016-05-05  Nathan S. <natesash@gmail.com>
+	    Per Bothner  <per@bothner.com>
+
+	* sva47863.scm: New test for Savannah bug #47863 "InternalError
+	in compilation seemingly related to if (int)".
+	However, changed to also test that 0 is true.
+
 2016-04-24  Per Bothner  <per@bothner.com>
 	    Tom Bousso <tombousso@gmail.com>
 

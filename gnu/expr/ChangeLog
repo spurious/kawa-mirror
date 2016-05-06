@@ -1,3 +1,9 @@
+2016-05-05  Per Bothner  <per@bothner.com>
+
+	* ConditionalTarget.java (compileFromStack): Add missing emitPop
+	when compiling always-true primitive numbers.  This fixes Savannah
+	bug #47863 "InternalError in compilation seemingly related to if (int)".
+
 2016-05-03  Per Bothner  <per@bothner.com>
 
 	* LitTable.java (findLiteral): Remove redundant put operation.

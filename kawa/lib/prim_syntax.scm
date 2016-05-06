@@ -10,7 +10,7 @@
 (import (only (kawa standard let) (let %let)))
 (import (only (kawa standard set_b) (set set!)))
 (import (only (kawa standard begin) begin))
-(import (only (kawa standard SchemeCompilation) mlambda))
+(import (only (kawa standard SchemeCompilation) lambda mlambda))
 
 (%define-syntax define-syntax
   (syntax-rules ($lookup$)

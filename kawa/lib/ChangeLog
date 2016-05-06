@@ -1,3 +1,9 @@
+2016-05-05  Per Bothner  <per@bothner.com>
+
+	* prim_syntax.scm: Import lambda (for define-syntax).
+	This fixes Savannah bug #47862
+	"define-syntax does not accept formals when inside a define-library".
+
 2016-03-25  Per Bothner  <per@bothner.com>
 
 	* strings.scm: Fix various type errors.

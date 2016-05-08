@@ -593,7 +593,9 @@ TOP_BUILDDIR
 JAVACFLAGS
 JAVAC
 JAVA
-WITH_JLINE2_ARG
+WITH_JLINE_PATH
+WITH_JLINE3
+WITH_JLINE2
 WITH_JAVAFX_ARG
 WITH_JFREESVG_ARG
 WITH_SERVLET_ARG
@@ -622,6 +624,8 @@ WITH_SWT_FALSE
 WITH_SWT_TRUE
 WITH_JAVAFX_FALSE
 WITH_JAVAFX_TRUE
+WITH_JLINE3_FALSE
+WITH_JLINE3_TRUE
 WITH_JLINE2_FALSE
 WITH_JLINE2_TRUE
 WITH_JFREESVG_FALSE
@@ -734,6 +738,7 @@ with_jfreesvg
 with_android
 with_javafx
 with_jline2
+with_jline3
 with_XQTS
 enable_echo2
 enable_jemacs
@@ -1392,6 +1397,8 @@ Optional Packages:
                           Enable support for JavaFX
   --with-jline2=<:@=jline2.jar]
                           Build support JLine2 input editing
+  --with-jline3=<:@=jline3.jar]
+                          Build support JLine3 input editing
   --with-XQTS[=XQTS-path] Support XQuery Test Suite
   --with-httpserver       Make use of JDK6's builtin http server
   --with-swing            Assume Swing is available (default on)
@@ -2587,7 +2594,13 @@ if test "${with_jline2+set}" = set; then :
   withval=$with_jline2;
 fi
 
- WITH_JLINE2_ARG="${with_jline2}"
+
+
+# Check whether --with-jline3 was given.
+if test "${with_jline3+set}" = set; then :
+  withval=$with_jline3;
+fi
+
 
 
 # Check whether --with-XQTS was given.
@@ -2869,12 +2882,20 @@ else
   WITH_JFREESVG_FALSE=
 fi
 
- if test "$with_jline2" != "" -a "$with_jline2" != "no"; then
+ if test "$with_jline2" != "" -a "$with_jline2" != "no" || test "$with_jline3" != "" -a "$with_jline3" != "no"; then
   WITH_JLINE2_TRUE=
   WITH_JLINE2_FALSE='#'
 else
   WITH_JLINE2_TRUE='#'
   WITH_JLINE2_FALSE=
+fi
+
+ if test "$with_jline3" != "" -a "$with_jline3" != "no"; then
+  WITH_JLINE3_TRUE=
+  WITH_JLINE3_FALSE='#'
+else
+  WITH_JLINE3_TRUE='#'
+  WITH_JLINE3_FALSE=
 fi
 
  if test "$with_javafx" != "" -a "$with_javafx" != "no"; then
@@ -2950,6 +2971,12 @@ else
 fi
 
 
+if test "$with_jline3" != "" -a "$with_jline3" != "no"
+then WITH_JLINE_PATH="${with_jline3}"
+elif test "$with_jline2" != "" -a "$with_jline2" != "no"
+then WITH_JLINE_PATH="${with_jline2}"
+fi
+
 JEMACS_VERSION=`echo $VERSION | sed  -e 's/^1/0/'`
 BYTECODE_VERSION="$VERSION"
 
@@ -2999,6 +3026,12 @@ case ${with_jline2} in
   "") ;;
   *) conf_classpath=${with_jline2}${CLASSPATH_SEPARATOR}$conf_classpath ;;
 esac
+case ${with_jline3} in
+  yes) ;;
+  no) ;;
+  "") ;;
+  *) conf_classpath=${with_jline3}${CLASSPATH_SEPARATOR}$conf_classpath ;;
+esac
 
 
 case ${with_sax2} in
@@ -3008,6 +3041,8 @@ case ${with_sax2} in
 esac
 
 XQTS_PATH=${with_XQTS:-XQTS}
+
+
 
 
 
@@ -3051,7 +3086,7 @@ if test -z "$ENABLE_KAWA_FRONTEND_TRUE"; then :
 
 fi
 
-ac_config_files="$ac_config_files Makefile gnu/bytecode/Makefile gnu/math/Makefile gnu/Makefile gnu/kawa/servlet/Makefile gnu/brl/Makefile gnu/kawa/brl/Makefile gnu/kawa/slib/Makefile gnu/commonlisp/lang/Makefile gnu/commonlisp/lisp/Makefile gnu/commonlisp/testsuite/Makefile gnu/jemacs/lang/Makefile gnu/jemacs/buffer/Makefile gnu/jemacs/lisp/Makefile gnu/jemacs/testsuite/Makefile gnu/jemacs/swing/Makefile gnu/jemacs/swt/Makefile kawa/Makefile kawa/lib/Makefile gnu/q2/lang/Makefile gnu/q2/testsuite/Makefile gnu/xquery/util/Makefile gnu/xquery/lang/Makefile gnu/xquery/testsuite/Makefile gnu/kawa/android/Makefile gnu/kawa/javafx/Makefile doc/Makefile testsuite/Makefile"
+ac_config_files="$ac_config_files Makefile gnu/bytecode/Makefile gnu/math/Makefile gnu/Makefile gnu/kawa/servlet/Makefile gnu/brl/Makefile gnu/kawa/brl/Makefile gnu/kawa/slib/Makefile gnu/commonlisp/lang/Makefile gnu/commonlisp/lisp/Makefile gnu/commonlisp/testsuite/Makefile gnu/jemacs/lang/Makefile gnu/jemacs/buffer/Makefile gnu/jemacs/lisp/Makefile gnu/jemacs/testsuite/Makefile gnu/jemacs/swing/Makefile gnu/jemacs/swt/Makefile kawa/Makefile kawa/lib/Makefile gnu/q2/lang/Makefile gnu/q2/testsuite/Makefile gnu/xquery/util/Makefile gnu/xquery/lang/Makefile gnu/xquery/testsuite/Makefile gnu/kawa/android/Makefile gnu/kawa/javafx/Makefile doc/Makefile testsuite/Makefile bin/kawa.bat"
 
 ac_config_files="$ac_config_files bin/kawa.sh"
 
@@ -3253,6 +3288,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${WITH_JLINE2_TRUE}" && test -z "${WITH_JLINE2_FALSE}"; then
   as_fn_error $? "conditional \"WITH_JLINE2\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${WITH_JLINE3_TRUE}" && test -z "${WITH_JLINE3_FALSE}"; then
+  as_fn_error $? "conditional \"WITH_JLINE3\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${WITH_JAVAFX_TRUE}" && test -z "${WITH_JAVAFX_FALSE}"; then
@@ -3887,6 +3926,7 @@ do
     "gnu/kawa/javafx/Makefile") CONFIG_FILES="$CONFIG_FILES gnu/kawa/javafx/Makefile" ;;
     "doc/Makefile") CONFIG_FILES="$CONFIG_FILES doc/Makefile" ;;
     "testsuite/Makefile") CONFIG_FILES="$CONFIG_FILES testsuite/Makefile" ;;
+    "bin/kawa.bat") CONFIG_FILES="$CONFIG_FILES bin/kawa.bat" ;;
     "bin/kawa.sh") CONFIG_FILES="$CONFIG_FILES bin/kawa.sh" ;;
     "bin/qexo") CONFIG_FILES="$CONFIG_FILES bin/qexo" ;;
 

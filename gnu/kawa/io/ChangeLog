@@ -1,3 +1,8 @@
+2016-05-07  Per Bothner  <per@bothner.com>
+
+	* JLine2InPort.java: Extend so it works with either JLine3
+	proptotype as well as with JLine2.
+
 2016-03-18  Per Bothner  <per@bothner.com>
 
 	* Path.java (coerceToPathOrNull): Fix check for absolute filename

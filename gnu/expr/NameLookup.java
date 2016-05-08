@@ -202,7 +202,8 @@ public class NameLookup extends GeneralHashTable<Object,Declaration>
 			   : Language.VALUE_NAMESPACE));
   }
 
-    public void getCompletingSymbols(String initialPart, int namespace, List<String> candidates) {
+    public void getCompletingSymbols(String initialPart, int namespace,
+                                     List<? super String> candidates) {
         for (int index = table.length; --index >= 0; ) {
             for (HashNode node = table[index];
                  node != null;  node = node.next) {

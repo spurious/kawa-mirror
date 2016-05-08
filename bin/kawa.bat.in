@@ -24,8 +24,9 @@ goto endcheckJava
 if "%_JAVACMD%" == "" set _JAVACMD=java.exe
 :endcheckJava
 
-if "%KAWA_VERSION%" == "" set KAWA_VERSION=%DEFAULT_KAWA_VERSION%
-set KAWA_PATH=%KAWA_HOME%\kawa-%KAWA_VERSION%.jar
-set EXTRA_PATH=%DEFAULT_EXTRA_PATH%
+if "%KAWA_VERSION%" == "" set KAWA_VERSION=@VERSION@
+set KAWA_PATH=%KAWA_HOME%\lib\kawa-%KAWA_VERSION%.jar
+rem ??? set EXTRA_PATH=@DEFAULT_EXTRA_PATH@
+set EXTRA_PATH=%KAWA_HOME%\lib\jline.jar
 
 "%_JAVACMD%" -classpath "%EXTRA_PATH%%KAWA_PATH%" kawa.repl %*%

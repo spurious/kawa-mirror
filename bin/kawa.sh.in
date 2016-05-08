@@ -24,6 +24,7 @@ test -t 0 || no_console="--no-console"
 @ENABLE_KAWA_FRONTEND_TRUE@  exec $thisdir/kawa "$@"
 
 KAWALIB=${KAWALIB-"`@CYGPATH_W@ $kawadir/lib/kawa-@VERSION@.jar`"}
+# MSYS: KAWALIB=${KAWALIB-"`cd $kawadir/lib/; pwd -W`@CLASSPATH_SEPARATOR@kawa-@VERSION@.jar`"}
 CLASSPATH="${KAWALIB}@CLASSPATH_SEPARATOR@@run_classpath@${CLASSPATH}"
 @WITH_JLINE2_TRUE@CLASSPATH="${CLASSPATH}@CLASSPATH_SEPARATOR@$kawadir/lib/jline.jar"
 export CLASSPATH

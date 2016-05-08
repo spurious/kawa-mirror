@@ -107,7 +107,7 @@ DIST_COMMON = $(srcdir)/Makefile.am $(top_srcdir)/configure \
 am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno config.status.lineno
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
-CONFIG_CLEAN_FILES = bin/kawa.sh bin/qexo
+CONFIG_CLEAN_FILES = bin/kawa.bat bin/kawa.sh bin/qexo
 CONFIG_CLEAN_VPATH_FILES =
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
@@ -193,10 +193,11 @@ am__define_uniq_tagged_files = \
 ETAGS = etags
 CTAGS = ctags
 CSCOPE = cscope
-am__DIST_COMMON = $(srcdir)/Makefile.in $(top_srcdir)/bin/kawa.sh.in \
-	$(top_srcdir)/bin/qexo.in AUTHORS COPYING ChangeLog INSTALL \
-	NEWS README TODO compile config.guess config.sub depcomp \
-	install-sh missing mkinstalldirs
+am__DIST_COMMON = $(srcdir)/Makefile.in $(top_srcdir)/bin/kawa.bat.in \
+	$(top_srcdir)/bin/kawa.sh.in $(top_srcdir)/bin/qexo.in AUTHORS \
+	COPYING ChangeLog INSTALL NEWS README TODO compile \
+	config.guess config.sub depcomp install-sh missing \
+	mkinstalldirs
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 distdir = $(PACKAGE)-$(VERSION)
 top_distdir = $(distdir)
@@ -289,7 +290,9 @@ TOP_BUILDDIR = @TOP_BUILDDIR@
 VERSION = @VERSION@
 WITH_JAVAFX_ARG = @WITH_JAVAFX_ARG@
 WITH_JFREESVG_ARG = @WITH_JFREESVG_ARG@
-WITH_JLINE2_ARG = @WITH_JLINE2_ARG@
+WITH_JLINE2 = @WITH_JLINE2@
+WITH_JLINE3 = @WITH_JLINE3@
+WITH_JLINE_PATH = @WITH_JLINE_PATH@
 WITH_SERVLET_ARG = @WITH_SERVLET_ARG@
 XQTS_PATH = @XQTS_PATH@
 abs_builddir = @abs_builddir@
@@ -375,6 +378,8 @@ KAWAJAR = kawa-@VERSION@.jar
 KAWALIB = $(datadir)/kawa/lib/$(KAWAJAR)
 META_ScriptEngineFactory = META-INF/services/javax.script.ScriptEngineFactory
 @WITH_JAVAX_SCRIPT_TRUE@META_INF_FILES = $(META_ScriptEngineFactory)
+@WITH_JLINE3_FALSE@JLINE_VERSION_MAJOR = 2
+@WITH_JLINE3_TRUE@JLINE_VERSION_MAJOR = 3
 EXTRA_DIST = debian/control debian/rules debian/changelog debian/dirs \
   config.guess config.sub install-sh ./mkinstalldirs \
   patch-source-list selected-java-source \
@@ -414,9 +419,13 @@ JAVADOC_EXTRA_PATH = $(JAVADOC_ECLIPSE_JARS):$(JAVADOC_ANT_JARS)
 @WITH_HTTPSERVER_TRUE@PREPROCESS_HTTPSERVER = +use:com.sun.net.httpserver
 @WITH_JFREESVG_FALSE@PREPROCESS_JFREESVG = -with:JFreeSVG
 @WITH_JFREESVG_TRUE@PREPROCESS_JFREESVG = +with:JFreeSVG
+@WITH_JLINE2_TRUE@PREPROCESS_JLINE2 = +with:jline2
+@WITH_JLINE2_FALSE@PREPROCESS_SLINE2 = -with:jline2
+@WITH_JLINE3_TRUE@PREPROCESS_JLINE3 = +with:jline3
+@WITH_JLINE3_FALSE@PREPROCESS_SLINE3 = -with:jline3
 @ENABLE_XML_FALSE@PREPROCESS_XML = -enable:XML
 @ENABLE_XML_TRUE@PREPROCESS_XML = +enable:XML
-JAVA_PREPROCESS_OPTIONS = @JAVA_SOURCE_SELECTOR@ $(PREPROCESS_HTTPSERVER) $(PREPROCESS_XML) $(PREPROCESS_JFREESVG)
+JAVA_PREPROCESS_OPTIONS = @JAVA_SOURCE_SELECTOR@ $(PREPROCESS_HTTPSERVER) $(PREPROCESS_XML) $(PREPROCESS_JFREESVG) $(PREPROCESS_JLINE2) $(PREPROCESS_JLINE3)
 GENERATED_SIMPLEVECTOR_FILES = \
   $(srcdir)/gnu/lists/FVector.java \
   $(srcdir)/gnu/lists/BitVector.java \
@@ -477,6 +486,8 @@ $(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
 $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
 	$(am__cd) $(srcdir) && $(ACLOCAL) $(ACLOCAL_AMFLAGS)
 $(am__aclocal_m4_deps):
+bin/kawa.bat: $(top_builddir)/config.status $(top_srcdir)/bin/kawa.bat.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
 bin/kawa.sh: $(top_builddir)/config.status $(top_srcdir)/bin/kawa.sh.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 bin/qexo: $(top_builddir)/config.status $(top_srcdir)/bin/qexo.in
@@ -944,21 +955,22 @@ dist-kawa-$(VERSION).jar: dist
 	  && tar xzf ../$(distdir).tar.gz \
 	  && rm -f ./patch-source-list \
 	  && ./kawa-$(VERSION)/configure --with-java-source=7 \
-	    --with-jline2=@WITH_JLINE2_ARG@ \
+	    --with-jline$(JLINE_VERSION_MAJOR)=@WITH_JLINE_PATH@ \
 	    --with-servlet=@WITH_SERVLET_ARG@ --with-javafx=@WITH_JAVAFX_ARG@ \
-	  && CLASSPATH=@conf_classpath@.$(CLASSPATH_SEPARATOR)$$CLASSPATH $(MAKE) \
+	  && CLASSPATH=@conf_classpath@.$(CLASSPATH_SEPARATOR)$$CLASSPATH $(MAKE) all \
 	  && mv lib/kawa-$(VERSION).jar ../dist-kawa-$(VERSION).jar \
 	  && cd .. && rm -rf tmpdir
 
 kawa.zip: kawa-$(VERSION).zip
-kawa-$(VERSION).zip: dist-kawa-$(VERSION).jar
+kawa-$(VERSION).zip: dist-kawa-$(VERSION).jar bin/kawa.bat
 	mkdir -p kawa-$(VERSION) kawa-$(VERSION)/lib  kawa-$(VERSION)/bin
 	cd kawa-$(VERSION)/lib; \
 	  $(LN_S) ../../dist-kawa-$(VERSION).jar kawa-$(VERSION).jar; \
-	  $(LN_S) @WITH_JLINE2_ARG@ jline.jar
+	  $(LN_S) @WITH_JLINE_PATH@ jline.jar
 	cd kawa-$(VERSION)/bin; \
-	  $(LN_S) ../../bin/kawa.sh kawa
-	zip $@ kawa-$(VERSION)/bin/kawa kawa-$(VERSION)/lib/kawa-$(VERSION).jar kawa-$(VERSION)/lib/jline.jar
+	  $(LN_S) ../../bin/kawa.sh kawa; \
+	  $(LN_S) ../../bin/kawa.bat kawa.bat
+	zip $@ kawa-$(VERSION)/bin/kawa kawa-$(VERSION)/bin/kawa.bat kawa-$(VERSION)/lib/kawa-$(VERSION).jar kawa-$(VERSION)/lib/jline.jar
 
 lib/jemacs-$(JEMACS_VERSION).jar:
 	srcdir=`(cd $(srcdir); /bin/pwd)` \
@@ -1042,7 +1054,7 @@ install-jar:
 	cd $(DESTDIR)$(datadir)/kawa/lib && rm -f kawa.jar \
 	  && $(LN_S) $(KAWAJAR) kawa.jar
 @WITH_JLINE2_TRUE@	cd $(DESTDIR)$(datadir)/kawa/lib && \
-@WITH_JLINE2_TRUE@	  $(LN_S) @WITH_JLINE2_ARG@ jline.jar
+@WITH_JLINE2_TRUE@	  $(LN_S) @WITH_JLINE_PATH@ jline.jar
 
 install-bytecode-jar: lib/bytecode-@BYTECODE_VERSION@.jar
 	@$(NORMAL_INSTALL)
@@ -1079,7 +1091,7 @@ all: lib/kawa-@VERSION@.jar lib/kawart-@VERSION@.jar $(JLINE_LINK)
 
 @WITH_JLINE2_TRUE@lib/jline.jar:
 @WITH_JLINE2_TRUE@	mkdir -p lib
-@WITH_JLINE2_TRUE@	$(LN_S) @WITH_JLINE2_ARG@ lib/jline.jar
+@WITH_JLINE2_TRUE@	$(LN_S) @WITH_JLINE_PATH@ lib/jline.jar
 
 $(srcdir)/patch-source-list: $(top_srcdir)/configure
 	(cd $(srcdir); \
@@ -1142,10 +1154,10 @@ $(srcdir)/gnu/lists/U64Vector.java: $(srcdir)/gnu/lists/PrimVector.template
 clean-generated-simplevector-files:
 	-rm -f $(GENERATED_SIMPLEVECTOR_FILES)
 
-bin/kawa.bat: $(srcdir)/bin/kawa.bat.in
-	sed -e 's|%DEFAULT_KAWA_VERSION%|$(VERSION)|' \
-	    -e 's|%DEFAULT_EXTRA_PATH%|'`echo '$(conf_classpath)'| sed -e 's|[\]|\\\\|g' -e 's|\&|\\&|g'`'|' \
-	  <$(srcdir)/bin/kawa.bat.in > bin/kawa.bat
+#bin/kawa.bat: $(srcdir)/bin/kawa.bat.in
+#	sed -e 's|@VERSION@|$(VERSION)|' \
+#	    -e 's|@DEFAULT_EXTRA_PATH@|'`echo '$(conf_classpath)'| sed -e 's|[\]|\\\\|g' -e 's|\&|\\&|g'`'|' \
+#	  <$(srcdir)/bin/kawa.bat.in > bin/kawa.bat
 
 distall:  distcheck dist-kawa-@VERSION@.jar kawa-doc-$(VERSION).tar.gz
 # Consider also:

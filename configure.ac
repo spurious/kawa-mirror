@@ -32,7 +32,9 @@ WITH_JAVAFX_ARG="${with_javafx}"
 
 AC_ARG_WITH(jline2,
  AS_HELP_STRING(--with-jline2=<:@=jline2.jar@:>@,Build support JLine2 input editing))
- WITH_JLINE2_ARG="${with_jline2}"
+
+AC_ARG_WITH(jline3,
+ AS_HELP_STRING(--with-jline3=<:@=jline3.jar@:>@,Build support JLine3 input editing))
 
 AC_ARG_WITH(XQTS,
   AS_HELP_STRING(--with-XQTS@<:@=XQTS-path@:>@,Support XQuery Test Suite))
@@ -172,7 +174,9 @@ AM_CONDITIONAL(WITH_SWING, test "$with_swing" != "no")
 AM_CONDITIONAL(WITH_JFREESVG,
   test "$with_jfreesvg" != "" -a "$with_jfreesvg" != "no")
 AM_CONDITIONAL(WITH_JLINE2,
-  test "$with_jline2" != "" -a "$with_jline2" != "no")
+  test "$with_jline2" != "" -a "$with_jline2" != "no" || test "$with_jline3" != "" -a "$with_jline3" != "no")
+AM_CONDITIONAL(WITH_JLINE3,
+  test "$with_jline3" != "" -a "$with_jline3" != "no")
 AM_CONDITIONAL(WITH_JAVAFX,
   test "$with_javafx" != "" -a "$with_javafx" != "no")
 AM_CONDITIONAL(WITH_SWT, test "$with_swt" = "yes")
@@ -183,6 +187,12 @@ AM_CONDITIONAL(WITH_HTTPSERVER, test "$with_httpserver" = "yes")
 AM_CONDITIONAL(WITH_XQTS, test "$with_XQTS" != "" -a "$with_XQTS" != "no")
 AM_CONDITIONAL(ENABLE_KAWA_FRONTEND, test "$enable_kawa_frontend" = "yes")
 AM_CONDITIONAL(ON_WINDOWS, test "$CLASSPATH_SEPARATOR" = ";")
+
+if test "$with_jline3" != "" -a "$with_jline3" != "no"
+then WITH_JLINE_PATH="${with_jline3}"
+elif test "$with_jline2" != "" -a "$with_jline2" != "no"
+then WITH_JLINE_PATH="${with_jline2}"
+fi
 
 JEMACS_VERSION=`echo $VERSION | sed  -e 's/^1/0/'`
 BYTECODE_VERSION="$VERSION"
@@ -206,7 +216,9 @@ AC_SUBST(filesep)
 AC_SUBST(WITH_SERVLET_ARG)
 AC_SUBST(WITH_JFREESVG_ARG)
 AC_SUBST(WITH_JAVAFX_ARG)
-AC_SUBST(WITH_JLINE2_ARG)
+AC_SUBST(WITH_JLINE2)
+AC_SUBST(WITH_JLINE3)
+AC_SUBST(WITH_JLINE_PATH)
 
 AC_SUBST(JAVA)
 AC_SUBST(JAVAC)
@@ -250,7 +262,8 @@ AC_CONFIG_FILES([Makefile gnu/bytecode/Makefile gnu/math/Makefile
   gnu/xquery/testsuite/Makefile
   gnu/kawa/android/Makefile
   gnu/kawa/javafx/Makefile
-  doc/Makefile testsuite/Makefile])
+  doc/Makefile testsuite/Makefile
+  bin/kawa.bat])
 AC_CONFIG_FILES([bin/kawa.sh],[chmod +x bin/kawa.sh])
 AC_CONFIG_FILES([bin/qexo],[chmod +x bin/qexo])
 AC_OUTPUT

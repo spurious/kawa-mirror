@@ -44,3 +44,9 @@ case ${with_jline2} in
   "") ;;
   *) conf_classpath=${with_jline2}${CLASSPATH_SEPARATOR}$conf_classpath ;;
 esac
+case ${with_jline3} in
+  yes) ;;
+  no) ;;
+  "") ;;
+  *) conf_classpath=${with_jline3}${CLASSPATH_SEPARATOR}$conf_classpath ;;
+esac

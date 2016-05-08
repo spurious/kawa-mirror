@@ -82,6 +82,12 @@ kawa-doc.tar.gz: kawa-doc-$(VERSION).tar.gz
 kawa-doc-$(VERSION).tar.gz:  doc/kawa.texi
 	cd doc; $(MAKE) ../kawa-doc-$(VERSION).tar.gz
 
+if WITH_JLINE3
+JLINE_VERSION_MAJOR=3
+else
+JLINE_VERSION_MAJOR=2
+endif
+
 dist-kawa-$(VERSION).jar: dist
 	srcdir=`(cd $(srcdir); /bin/pwd)` \
 	  && rm -rf tmpdir \
@@ -90,21 +96,22 @@ dist-kawa-$(VERSION).jar: dist
 	  && tar xzf ../$(distdir).tar.gz \
 	  && rm -f ./patch-source-list \
 	  && ./kawa-$(VERSION)/configure --with-java-source=7 \
-	    --with-jline2=@WITH_JLINE2_ARG@ \
+	    --with-jline$(JLINE_VERSION_MAJOR)=@WITH_JLINE_PATH@ \
 	    --with-servlet=@WITH_SERVLET_ARG@ --with-javafx=@WITH_JAVAFX_ARG@ \
-	  && CLASSPATH=@conf_classpath@.$(CLASSPATH_SEPARATOR)$$CLASSPATH $(MAKE) \
+	  && CLASSPATH=@conf_classpath@.$(CLASSPATH_SEPARATOR)$$CLASSPATH $(MAKE) all \
 	  && mv lib/kawa-$(VERSION).jar ../dist-kawa-$(VERSION).jar \
 	  && cd .. && rm -rf tmpdir
 
 kawa.zip: kawa-$(VERSION).zip
-kawa-$(VERSION).zip: dist-kawa-$(VERSION).jar
+kawa-$(VERSION).zip: dist-kawa-$(VERSION).jar bin/kawa.bat
 	mkdir -p kawa-$(VERSION) kawa-$(VERSION)/lib  kawa-$(VERSION)/bin
 	cd kawa-$(VERSION)/lib; \
 	  $(LN_S) ../../dist-kawa-$(VERSION).jar kawa-$(VERSION).jar; \
-	  $(LN_S) @WITH_JLINE2_ARG@ jline.jar
+	  $(LN_S) @WITH_JLINE_PATH@ jline.jar
 	cd kawa-$(VERSION)/bin; \
-	  $(LN_S) ../../bin/kawa.sh kawa
-	zip $@ kawa-$(VERSION)/bin/kawa kawa-$(VERSION)/lib/kawa-$(VERSION).jar kawa-$(VERSION)/lib/jline.jar
+	  $(LN_S) ../../bin/kawa.sh kawa; \
+	  $(LN_S) ../../bin/kawa.bat kawa.bat
+	zip $@ kawa-$(VERSION)/bin/kawa kawa-$(VERSION)/bin/kawa.bat kawa-$(VERSION)/lib/kawa-$(VERSION).jar kawa-$(VERSION)/lib/jline.jar
 
 lib/jemacs-$(JEMACS_VERSION).jar:
 	srcdir=`(cd $(srcdir); /bin/pwd)` \
@@ -227,7 +234,7 @@ install-jar:
 	  && $(LN_S) $(KAWAJAR) kawa.jar
 if WITH_JLINE2
 	cd $(DESTDIR)$(datadir)/kawa/lib && \
-	  $(LN_S) @WITH_JLINE2_ARG@ jline.jar
+	  $(LN_S) @WITH_JLINE_PATH@ jline.jar
 endif
 
 install-bytecode-jar: lib/bytecode-@BYTECODE_VERSION@.jar
@@ -268,7 +275,7 @@ JLINE_LINK = lib/jline.jar
 
 lib/jline.jar:
 	mkdir -p lib
-	$(LN_S) @WITH_JLINE2_ARG@ lib/jline.jar
+	$(LN_S) @WITH_JLINE_PATH@ lib/jline.jar
 endif
 
 JAVA_SOURCE = @JAVA_SOURCE@
@@ -282,6 +289,16 @@ if WITH_JFREESVG
 PREPROCESS_JFREESVG = +with:JFreeSVG
 else
 PREPROCESS_JFREESVG = -with:JFreeSVG
+endif
+if WITH_JLINE2
+PREPROCESS_JLINE2 = +with:jline2
+else
+PREPROCESS_SLINE2 = -with:jline2
+endif
+if WITH_JLINE3
+PREPROCESS_JLINE3 = +with:jline3
+else
+PREPROCESS_SLINE3 = -with:jline3
 endif
 if ENABLE_XML
 PREPROCESS_XML = +enable:XML
@@ -297,7 +314,7 @@ $(srcdir)/patch-source-list: $(top_srcdir)/configure
 gnu/kawa/util/PreProcess.class: $(srcdir)/gnu/kawa/util/PreProcess.java
 	$(JAVAC) -d . $(srcdir)/gnu/kawa/util/PreProcess.java
 
-JAVA_PREPROCESS_OPTIONS = @JAVA_SOURCE_SELECTOR@ $(PREPROCESS_HTTPSERVER) $(PREPROCESS_XML) $(PREPROCESS_JFREESVG)
+JAVA_PREPROCESS_OPTIONS = @JAVA_SOURCE_SELECTOR@ $(PREPROCESS_HTTPSERVER) $(PREPROCESS_XML) $(PREPROCESS_JFREESVG) $(PREPROCESS_JLINE2) $(PREPROCESS_JLINE3)
 
 selected-java-source: Makefile $(srcdir)/patch-source-list
 	if test ! -e selected-java-source -o \
@@ -379,10 +396,10 @@ endif
 noinst_SCRIPTS = bin/kawa.sh
 bin_SCRIPTS = bin/qexo $(KAWASCRIPTS_KAWA)
 
-bin/kawa.bat: $(srcdir)/bin/kawa.bat.in
-	sed -e 's|%DEFAULT_KAWA_VERSION%|$(VERSION)|' \
-	    -e 's|%DEFAULT_EXTRA_PATH%|'`echo '$(conf_classpath)'| sed -e 's|[\]|\\\\|g' -e 's|\&|\\&|g'`'|' \
-	  <$(srcdir)/bin/kawa.bat.in > bin/kawa.bat
+#bin/kawa.bat: $(srcdir)/bin/kawa.bat.in
+#	sed -e 's|@VERSION@|$(VERSION)|' \
+#	    -e 's|@DEFAULT_EXTRA_PATH@|'`echo '$(conf_classpath)'| sed -e 's|[\]|\\\\|g' -e 's|\&|\\&|g'`'|' \
+#	  <$(srcdir)/bin/kawa.bat.in > bin/kawa.bat
 
 distall:  distcheck dist-kawa-@VERSION@.jar kawa-doc-$(VERSION).tar.gz
 # Consider also:

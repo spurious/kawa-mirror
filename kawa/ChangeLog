@@ -1,3 +1,7 @@
+2016-05-07  Per Bothner  <per@bothner.com>
+
+	* lang/Translator.java (getCompletions): Tweak parameter type.
+
 2016-04-09  Per Bothner  <per@bothner.com>
 
 	* lang/Macro.java:

@@ -1,3 +1,7 @@
+2016-05-07  Per Bothner  <per@bothner.com>
+
+	* NameLookup.java (getCompletingSymbols): Tweak parameter type.
+
 2016-05-05  Per Bothner  <per@bothner.com>
 
 	* ConditionalTarget.java (compileFromStack): Add missing emitPop

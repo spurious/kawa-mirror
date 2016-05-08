@@ -677,7 +677,7 @@ public class Translator extends Compilation
     public int getCompletions(Environment env,
                               String nameStart, Object property,
                               String namespaceUri,
-                              List<String> matches) {
+                              List<? super String> matches) {
         LocationEnumeration e = env.enumerateAllLocations();
         int count = 0;
         while (e.hasMoreElements()) {

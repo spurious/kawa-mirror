@@ -11946,14 +11946,14 @@ there are multiple indexes:  An index is a vector of integers;
 the length of a valid index sequence
 is the rank or the number of dimensions of an array.
 
-@example
-(define arr1 (
-@end example
+@c @example
+@c (define arr1 (
+@c @end example
 
 Multi-dimensional arrays are specified
 by @uref{http://srfi.schemers.org/srfi-25/srfi-25.html,SRFI-25}.
 In Kawa, a one-dimensional array whose lower bound is 0 is also a sequence.
-Furthermore, if such an array is simple (not created @code{share-array})
+Furthermore, if such an array is simple (not created by @code{share-array})
 it will be implemented using a @code{<vector>}.
 Uniform vectors and strings are also arrays in Kawa.
 For example:

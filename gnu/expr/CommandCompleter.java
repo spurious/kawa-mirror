@@ -5,6 +5,7 @@ import gnu.text.*;
 import java.util.List;
 
 /** Handle command completion based on expression context.
+ * The main entrypoint is the complete method.
  */
 
 public class CommandCompleter extends RuntimeException {
@@ -21,6 +22,17 @@ public class CommandCompleter extends RuntimeException {
     @Override
     public Throwable fillInStackTrace() { return this; }
 
+    /** Parse a partial expression containing a completion request.
+     *
+     * The port cin contains the partial command followed by the
+     * special COMPLETE_REQUEST character, possibly follewed by more context.
+     * When the symbol resolver sees a symbol ending with (or more generally
+     * containing) the COMPLETE_REQUEST character, it looks for potentially
+     * matching definitions whose prefix match the symbol.  Note we can
+     * look for matches within the actual lexical context of the prefix.
+     * The potential matches are bundled in a List, which is used to
+     * construct a CommandCompleter exception, which we catch in this method.
+     */
     public static int complete(CharArrayInPort cin,
                                List<CharSequence> candidates) {
         Compilation comp = Compilation.getCurrent();

@@ -1,5 +1,7 @@
 SUFFIXES = .pdf
 
+all:
+
 kawa.txt:  $(srcdir)/kawa.texi version.texi
 	$(MAKEINFO) -I$(srcdir) \
 	    --no-split --no-headers --paragraph-indent=asis $< -o - \

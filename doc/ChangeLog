@@ -1,3 +1,8 @@
+2016-05-07  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (all): New rule does nothing.
+	This is to avoid 'make all' failing if makeinfo is older than 6.0.
+
 2016-04-09  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Module classes): More about "dual-purpose" module classes.

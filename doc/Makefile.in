@@ -140,7 +140,6 @@ AM_V_texidevnull = $(am__v_texidevnull_@AM_V@)
 am__v_texidevnull_ = $(am__v_texidevnull_@AM_DEFAULT_V@)
 am__v_texidevnull_0 = > /dev/null
 am__v_texidevnull_1 = 
-INFO_DEPS = $(srcdir)/kawa.info
 am__TEXINFO_TEX_DIR = $(srcdir)
 DVIS = kawa.dvi
 PDFS = kawa.pdf
@@ -305,6 +304,7 @@ TEXI2PDF = texi2pdf
 man_MANS = kawa.1 qexo.1
 EXTRA_DIST = scm2java.html kawa.man qexo.man mdate-sh
 info_TEXINFOS = kawa.texi
+INFO_DEPS = 
 MAINTAINERCLEANFILES = kawa.txt *.info 
 HTML_HOME = $$HOME/public_html
 all: all-am
@@ -792,8 +792,6 @@ uninstall-man: uninstall-man1
 
 .PRECIOUS: Makefile
 
-
-all:
 
 kawa.txt:  $(srcdir)/kawa.texi version.texi
 	$(MAKEINFO) -I$(srcdir) \

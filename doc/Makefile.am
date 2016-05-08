@@ -1,7 +1,5 @@
 SUFFIXES = .pdf
 
-all:
-
 kawa.txt:  $(srcdir)/kawa.texi version.texi
 	$(MAKEINFO) -I$(srcdir) \
 	    --no-split --no-headers --paragraph-indent=asis $< -o - \
@@ -40,6 +38,7 @@ clean-local:
 
 EXTRA_DIST = scm2java.html kawa.man qexo.man mdate-sh
 info_TEXINFOS = kawa.texi
+INFO_DEPS =
 MAINTAINERCLEANFILES = kawa.txt *.info 
 
 # Redundant if configured with  --enable-maintainer-mode.

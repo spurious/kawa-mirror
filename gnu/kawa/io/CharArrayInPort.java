@@ -18,11 +18,11 @@ public class CharArrayInPort extends InPort
 
   public static CharArrayInPort make(CharSequence seq)
   {
+    int len = seq.length();
     if (seq instanceof FString)
-        return ((FString) seq).openReader(0, seq.length());
+        return ((FString) seq).openReader(0, len);
     else
       {
-        int len = seq.length();
         char[] buf = new char[len];
         /* #ifdef use:java.lang.CharSequence */
         if (seq instanceof String)

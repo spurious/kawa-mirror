@@ -19,10 +19,13 @@ public class ULong extends UnsignedPrim implements Comparable<ULong> {
     }
 
     public int compareTo(ULong other) {
-        // JAVA8: Long.compareUnsigned(ival, other.ival);
+        /* #ifdef JAVA8 */
+        // return Long.compareUnsigned(ival, other.ival);
+        /* #else */
         long x = ival + Long.MIN_VALUE;
         long y = other.ival + Long.MIN_VALUE;
         return x < y ? -1 : x == y ? 0 : 1;
+        /* #endif */
    }
 
     public static String toString(long ival) {

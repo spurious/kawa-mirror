@@ -1,3 +1,8 @@
+2016-05-19  Per Bothner  <per@bothner.com>
+
+	* UInt.java (compareTo): If Java 8 use Integer.compareUnsigned.
+	* ULong.java (compareTo): If Java 8 use Long.compareUnsigned.
+
 2016-05-02  Per Bothner  <per@bothner.com>
 
 	* DFloNum.java (hashCode): Changed to match specification

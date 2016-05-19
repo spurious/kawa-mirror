@@ -28,10 +28,13 @@ public class UInt extends UnsignedPrim implements Comparable<UInt> {
     }
 
     public int compareTo(UInt other) {
-        // JAVA8: Integer.compareUnsigned(ival, other.ival);
+        /* #ifdef JAVA8 */
+        // return Integer.compareUnsigned(ival, other.ival);
+        /* #else */
         int x = ival + Integer.MIN_VALUE;
         int y = other.ival + Integer.MIN_VALUE;
         return x < y ? -1 : x == y ? 0 : 1;
+        /* #endif */
     }
 
     public String toString() { return toString(ival); }

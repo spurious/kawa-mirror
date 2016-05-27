@@ -1,3 +1,9 @@
+2016-05-27  Per Bothner  <per@bothner.com>
+
+	* errors-arr.scm: Test for bad multi-dimensional array indexing.
+	* inlining-test.scm: Array indexing tests.
+	* inlining.expected, Makefile.am: Update accordingly.
+
 2016-05-05  Per Bothner  <per@bothner.com>
 
 	* svn47725.scm: Renamed to sva47725.scm.

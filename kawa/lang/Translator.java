@@ -1252,6 +1252,18 @@ public class Translator extends Compilation
             tr.error('w', "error loading class " + cname + " - " + ex.getMessage() + " not found");
         } catch (Exception ex) {
         }
+        if (name.startsWith("array")) {
+            int nlen = name.length();
+            if (nlen == 5)
+                return makeQuoteExp(GenArrayType.generalInstance);
+            try {
+                rank = Integer.parseInt(name.substring(5));
+                if (rank >= 0)
+                    return makeQuoteExp(new GenArrayType(rank, Type.objectType));
+            } catch (Throwable ex) {
+            }
+        }
+
         return null;
     }
 

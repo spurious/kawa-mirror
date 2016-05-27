@@ -8,6 +8,7 @@ import gnu.kawa.reflect.Invoke;
 import gnu.kawa.reflect.ArrayGet;
 import gnu.kawa.reflect.ArraySet;
 import gnu.kawa.reflect.LazyType;
+import gnu.kawa.lispexpr.GenArrayType;
 import gnu.kawa.lispexpr.LangObjType;
 import gnu.math.*;
 import gnu.text.Char;
@@ -89,9 +90,11 @@ public class CompilationHelpers
             ClassType ctype = ptype instanceof ClassType ? (ClassType) ptype
                 : ptype instanceof ParameterizedType
                 ? ((ParameterizedType) ptype).getRawType()
-                : null;
+                : Type.objectType;
             ApplyExp result = null;
-            boolean isString;
+            boolean isString = ctype.isSubclass(Compilation.typeCharSequence);
+            boolean isSequence = ctype.isSubclass(Compilation.typeList);
+            boolean isArray = ctype.isSubclass(GenArrayType.typeArray);
             if (CompileReflect.checkKnownClass(ptype, comp) < 0)
                 ; // This might be more cleanly handled at the type specifier. FIXME
             else if (ptype.isSubtype(Compilation.typeType)
@@ -101,55 +104,156 @@ public class CompilationHelpers
                 Type elementType = ((ArrayType) ptype).getComponentType();
                 exp.setFuncArgs(new ArrayGet(elementType), args);
                 result = exp;
-            } else if (ctype != null
-                       && ((isString = ctype.isSubclass(Compilation.typeCharSequence))
-                           || ctype.isSubclass(Compilation.typeList))
-                       && nargs == 1) {
-                args[1] = visitor.visit(args[1], null);
-                Type itype = args[1].getType();
-                int listIndexCompat = LangObjType.sequenceType
-                    .isCompatibleWithValue(itype);
-                int intIndexCompat = Type.intType
-                    .isCompatibleWithValue(itype);
-                if (listIndexCompat < 0 && intIndexCompat < 0) {
-                    if (ClassType.make("gnu.lists.Array")
-                        .isCompatibleWithValue(itype) < 0)
-                    visitor.getCompilation()
-                        .error('w', "index is neither integer or sequence");
-                } else if (listIndexCompat > 0) {
-                    // maybe optimize later
-                } else if (intIndexCompat > 0 & isString) {
-                    Method method = ClassType.make("gnu.lists.Strings")
-                        .getDeclaredMethod("characterAt", 2);
-                    PrimProcedure prproc =
-                        new PrimProcedure(method, LangPrimType.characterType,
-                                          null);
+            } else if (exp.isSimple()
+                       && (((isString || isSequence) && nargs == 1)
+                           || isArray)) {
+                int rank =
+                    isString || isSequence ? 1
+                    : ptype instanceof GenArrayType
+                    ? ((GenArrayType) ptype).rank()
+                    : -1;
+                Type elementType = Type.objectType;
+                if (ptype instanceof GenArrayType)
+                    elementType = ((GenArrayType) ptype).getComponentType();
+                // rank of result = sum of ranks of arguments
+                int resultRank = 0;
+                for (int i = 1; i <= nargs; i++) {
+                    args[i] = visitor.visit(args[i], null);
+                    Type itype = args[1].getType();
+                    int listIndexCompat = LangObjType.sequenceType
+                        .isCompatibleWithValue(itype);
+                    // maybe only compute these if needed - FIXME
+                    int intIndexCompat = Type.intType
+                        .isCompatibleWithValue(itype);
+                    int arrayIndexCompat = GenArrayType.typeArray
+                        .isCompatibleWithValue(itype);
+                    if (resultRank >= 0 && intIndexCompat <= 0) {
+                        int r;
+                        if (listIndexCompat > 0)
+                            resultRank++;
+                        else if (ptype instanceof GenArrayType
+                                 && (r = ((GenArrayType) ptype).rank()) >= 0)
+                            resultRank += r;
+                        else
+                            resultRank = -1;
+                    }
+                    if (listIndexCompat < 0 && intIndexCompat < 0
+                        && arrayIndexCompat < 0) {
+                        visitor.getCompilation()
+                            .error('w', "index is neither integer, sequence, or array");
+                        resultRank = -1;
+                    } else if (intIndexCompat > 0) {
+                        if (isString && nargs == 1) {
+                            Method method = ClassType.make("gnu.lists.Strings")
+                                .getDeclaredMethod("characterAt", 2);
+                            PrimProcedure prproc =
+                                new PrimProcedure(method, LangPrimType.characterType,
+                                                  null);
+                            result = exp.setFuncArgs(prproc, args);
+                        } else if (nargs == 1 && isSequence) {
+                            String mname = "get";
+                            Type retType = null; // FIXME combine with elementType variable
+                            String cname = ctype.getName();
+                            LangObjType ltype = null;
+                            if (cname.startsWith("gnu.lists."))
+                                ltype = LangObjType.getInstanceFromClass(cname);
+                            if (ltype != null
+                                && (retType = ltype.getElementType()) != null)
+                                mname = ltype.elementGetterMethodName();
+                            else if (ltype == LangObjType.vectorType
+                                     && ptype instanceof ParameterizedType
+                                     && ((ParameterizedType) ptype).getTypeArgumentTypes().length == 1)
+                                retType = ((ParameterizedType) ptype).getTypeArgumentType(0);
+                            // We search for a "get(int)" method, rather than just using
+                            // typeList.getDeclaredMethod("get", 1) to see if we make a
+                            // a virtual call rather than an interface call.
+                            Method get = ctype
+                                .getMethod(mname, new Type[] { Type.intType  });
+                            ParameterizedType prtype =
+                                ptype instanceof ParameterizedType ?
+                                ((ParameterizedType) ptype) :
+                                null;
+                            PrimProcedure prproc =
+                                new PrimProcedure(get, 'V', language, prtype);
+                            if (retType != null)
+                                prproc.setReturnType(retType);
+                            result = exp.setFuncArgs(prproc, args);
+                        }
+                    } else if (arrayIndexCompat > 0) {
+                    } else if (listIndexCompat > 0) {
+                        // maybe optimize later
+                    }
+                }
+                if (rank >= 0 && rank != nargs) {
+                    StringBuilder msg = new StringBuilder();
+                    if (isSequence || isString)
+                        msg.append(isString ? "string" : "sequence")
+                            .append(" requires 1 index");
+                    else
+                        msg.append("array has rank ").append(rank);
+                    msg.append(" but there are ");
+                    msg.append(nargs).append(" indexes");
+                    visitor.getCompilation().error('w', msg.toString());
+                } 
+                else if (isArray && resultRank == 0 && result == null) {
+                    char sig1 = elementType.getSignature().charAt(0);
+                    String mname;
+                    if (elementType instanceof PrimType)
+                        mname = sig1 == 'I' ? "getInt" : "effectiveIndex";
+                    else
+                        mname = "get";
+                    Method meth = nargs == 1
+                        ? ctype.getMethod(mname, new Type[] {Type.intType})
+                        : ctype
+                        .getDeclaredMethod(mname, nargs > 3 ? 4 : nargs);
+                    PrimProcedure prproc = new PrimProcedure(meth);
                     result = exp.setFuncArgs(prproc, args);
-                } else if (intIndexCompat > 0) {
-                    String mname = "get";
+                    if (mname == "effectiveIndex") {
+                        switch (sig1) {
+                        case 'Z': mname = "getBooleanRaw"; break;
+                        case 'C': mname = "getCharRaw"; break;
+                        case 'B': mname = "getByteRaw"; break;
+                        case 'S': mname = "getShortRaw"; break;
+                        case 'J': mname = "getLongRaw"; break;
+                        case 'F': mname = "getFloatRaw"; break;
+                        case 'D': mname = "getDoubleRaw"; break;
+                        default: throw new InternalError();
+                        }
+                        meth = GenArrayType.typeArray
+                            .getDeclaredMethod(mname, 1);
+                        comp.letStart();
+                        Declaration tdecl = comp.letVariable((String) null,
+                                                             ptype, args[0]);
+                        tdecl.setFlag(Declaration.ALLOCATE_ON_STACK);
+                        tdecl.setCanRead(true);
+                        args[0] = new ReferenceExp(tdecl);
+                        ReferenceExp aref = new ReferenceExp(tdecl);
+                        aref.setFlag(ReferenceExp.ALLOCATE_ON_STACK_LAST);
+                        prproc = new PrimProcedure(meth);
+                        prproc.setReturnType(elementType);
+                        result = new ApplyExp(prproc, aref, result);
+                        Expression let = comp.letDone(result).setLine(exp);
+                        return visitor.visit(let, required);
+                    } else
+                        prproc.setReturnType(elementType);
+                }
+                if (isArray && ! isString && result == null) {
+                    PrimProcedure prproc =
+                        new PrimProcedure("gnu.lists.ComposedArray",
+                                          "generalIndex",
+                                          3);
+                    Expression[] xargs = new Expression[nargs+2];
+                    xargs[0] = args[0];
+                    xargs[1] = QuoteExp.falseExp;
+                    System.arraycopy(args, 1, xargs, 2, nargs);
+                    result = exp.setFuncArgs(prproc, xargs);
                     Type retType = null;
-                    String cname = ctype.getName();
-                    LangObjType ltype = null;
-                    if (cname.startsWith("gnu.lists."))
-                        ltype = LangObjType.getInstanceFromClass(cname);
-                    if (ltype != null
-                        && (retType = ltype.getElementType()) != null)
-                        mname = ltype.elementGetterMethodName();
-
-                    // We search for a "get(int)" method, rather than just using
-                    // typeList.getDeclaredMethod("get", 1) to see if we make a
-                    // a virtual call rather than an interface call.
-                    Method get = ctype
-                        .getMethod(mname, new Type[] { Type.intType  });
-                    ParameterizedType prtype =
-                        ptype instanceof ParameterizedType ?
-                        ((ParameterizedType) ptype) :
-                        null;
-                    PrimProcedure prproc =
-                        new PrimProcedure(get, 'V', language, prtype);
+                    if (resultRank > 0) {
+                        retType = new GenArrayType(resultRank, elementType);
+                    } else if (resultRank == 0 && elementType != Type.objectType)
+                        retType = elementType;
                     if (retType != null)
-                        prproc.setReturnType(retType);
-                    result = exp.setFuncArgs(prproc, args);
+                        result = Compilation.makeCoercion(result, retType);
                 }
             }
             if (result != null) {

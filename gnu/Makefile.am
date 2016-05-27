@@ -371,6 +371,7 @@ GNU_KAWA_LISPEXPR_JSOURCES = \
   kawa/lispexpr/BracketApply.java \
   kawa/lispexpr/ClassNamespace.java \
   kawa/lispexpr/DefineNamespace.java \
+  kawa/lispexpr/GenArrayType.java \
   kawa/lispexpr/LangObjType.java \
   kawa/lispexpr/LangPrimType.java \
   kawa/lispexpr/LispLanguage.java \

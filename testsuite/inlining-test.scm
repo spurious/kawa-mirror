@@ -533,3 +533,25 @@
 
 (define (index-str3 x::string i::int)
   (index-seq x i))
+
+(define (index-garr1 x::array2 i::int j::int)
+  (x i j))
+
+(define (index-garr2 x::array2 i::int j::int)
+  (+ (x j i) 100))
+
+(define (index-garr3 x::array2[double] i::int j::int)
+  (x i j))
+
+(define (index-garr4 x::array2[long] i::int j::int)
+  (+ (x j i) 100))
+
+(define (index-garr5 x::array[double] i::int j::int)
+  (x i j))
+
+(define (index-garr6 x::array i::int j::int)
+  (x i j))
+
+(define (index-garr7 x::array[int] i::int j::int)
+  (x i j))
+

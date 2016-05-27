@@ -66,6 +66,10 @@ public class BracketApply extends Syntax
 	    params[i] = type1;
 	    pairCdr = pp.getCdr();
 	}
+        if (val instanceof GenArrayType && length == 1) {
+            int rank = ((GenArrayType) val).rank();
+            return new QuoteExp(new GenArrayType(rank, params[0]));
+        }
 	return new QuoteExp(new ParameterizedType((ClassType) ClassType.make(clas), params));
     }
     if (pair.getCdr() != LList.Empty)

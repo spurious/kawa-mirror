@@ -173,6 +173,13 @@ InliningTest.indexSeq(java.util.List,int)java.lang.Object: 8 bytes
 InliningTest.indexStr1(java.lang.CharSequence,int)int: 6 bytes
 InliningTest.indexStr2(java.lang.CharSequence,int)java.lang.Object: 12 bytes
 InliningTest.indexStr3(java.lang.CharSequence,int)java.lang.Object: 25 bytes
+InliningTest.indexGarr1(gnu.lists.Array,int,int)java.lang.Object: 9 bytes
+InliningTest.indexGarr2(gnu.lists.Array,int,int)java.lang.Object: 18 bytes
+InliningTest.indexGarr3(gnu.lists.Array,int,int)double: 16 bytes
+InliningTest.indexGarr4(gnu.lists.Array,int,int)long: 20 bytes
+InliningTest.indexGarr5(gnu.lists.Array,int,int)double: 16 bytes
+InliningTest.indexGarr6(gnu.lists.Array,int,int)java.lang.Object: 9 bytes
+InliningTest.indexGarr7(gnu.lists.Array,int,int)int: 9 bytes
 InliningTest.incrementS8a()void: 9 bytes
 InliningTest.incrementArrS8(byte[],int)void: 9 bytes
 InliningTest.incrementU8a()void: 13 bytes

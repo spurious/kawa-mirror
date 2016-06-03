@@ -29,15 +29,19 @@ CLASSPATH="${KAWALIB}@CLASSPATH_SEPARATOR@@run_classpath@${CLASSPATH}"
 @WITH_JLINE2_TRUE@CLASSPATH="${CLASSPATH}@CLASSPATH_SEPARATOR@$kawadir/lib/jline.jar"
 export CLASSPATH
 
-# This ugly duplication is so we only have to use arrays (which are
-# non-Posix and non-portable) if there is a -D or -J option.
+# This ugly duplication is so we only have to use arrays and substrings
+# (which are non-Posix and non-portable) if there is a -D or -J option.
 case "$1" in
     -D* | -J*)
         i=0
         for arg in "$@"; do
             case "$arg" in
-                -D* | -J*)
+                -D*)
                     jvm_args[i++]="$arg"
+                    shift
+                ;;
+                -J*)
+                    jvm_args[i++]="${arg:2}"
                     shift
                 ;;
                 *) break

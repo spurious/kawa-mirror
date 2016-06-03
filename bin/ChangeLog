@@ -1,3 +1,7 @@
+2016-06-03  Per Bothner  <per@bothner.com>
+
+	* kawa.sh.in: Fix handling of -J option.
+
 2016-05-07  Per Bothner  <per@bothner.com>
 
 	* kawa.bat.in: Now kawa.bar is created by configure, not make.

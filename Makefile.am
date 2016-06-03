@@ -102,8 +102,11 @@ dist-kawa-$(VERSION).jar: dist
 	  && mv lib/kawa-$(VERSION).jar ../dist-kawa-$(VERSION).jar \
 	  && cd .. && rm -rf tmpdir
 
-kawa.zip: kawa-$(VERSION).zip
-kawa-$(VERSION).zip: dist-kawa-$(VERSION).jar bin/kawa.bat
+ZIP_VERSION = $(VERSION)
+kawa.zip: kawa-$(ZIP_VERSION).zip
+kawa-snapshot.zip:
+	$(MAKE) kawa.zip ZIP_VERSION=$(VERSION)-`date +%Y%m%d`
+kawa-$(ZIP_VERSION).zip: dist-kawa-$(VERSION).jar bin/kawa.bat
 	mkdir -p kawa-$(VERSION) kawa-$(VERSION)/lib  kawa-$(VERSION)/bin
 	cd kawa-$(VERSION)/lib; \
 	  $(LN_S) ../../dist-kawa-$(VERSION).jar kawa-$(VERSION).jar; \

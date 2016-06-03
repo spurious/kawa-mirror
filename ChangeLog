@@ -1,3 +1,7 @@
+2016-06-03  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (kawa-snapshot.zip): New rule.
+
 2016-05-07  Per Bothner  <per@bothner.com>
 
 	* configure.ac: Support --with-jline3 flag in addition to jline2.

@@ -380,6 +380,7 @@ META_ScriptEngineFactory = META-INF/services/javax.script.ScriptEngineFactory
 @WITH_JAVAX_SCRIPT_TRUE@META_INF_FILES = $(META_ScriptEngineFactory)
 @WITH_JLINE3_FALSE@JLINE_VERSION_MAJOR = 2
 @WITH_JLINE3_TRUE@JLINE_VERSION_MAJOR = 3
+ZIP_VERSION = $(VERSION)
 EXTRA_DIST = debian/control debian/rules debian/changelog debian/dirs \
   config.guess config.sub install-sh ./mkinstalldirs \
   patch-source-list selected-java-source \
@@ -960,9 +961,10 @@ dist-kawa-$(VERSION).jar: dist
 	  && CLASSPATH=@conf_classpath@.$(CLASSPATH_SEPARATOR)$$CLASSPATH $(MAKE) all \
 	  && mv lib/kawa-$(VERSION).jar ../dist-kawa-$(VERSION).jar \
 	  && cd .. && rm -rf tmpdir
-
-kawa.zip: kawa-$(VERSION).zip
-kawa-$(VERSION).zip: dist-kawa-$(VERSION).jar bin/kawa.bat
+kawa.zip: kawa-$(ZIP_VERSION).zip
+kawa-snapshot.zip:
+	$(MAKE) kawa.zip ZIP_VERSION=$(VERSION)-`date +%Y%m%d`
+kawa-$(ZIP_VERSION).zip: dist-kawa-$(VERSION).jar bin/kawa.bat
 	mkdir -p kawa-$(VERSION) kawa-$(VERSION)/lib  kawa-$(VERSION)/bin
 	cd kawa-$(VERSION)/lib; \
 	  $(LN_S) ../../dist-kawa-$(VERSION).jar kawa-$(VERSION).jar; \

@@ -1127,9 +1127,12 @@ public abstract class Language
         boolean isStatic = (fld.getModifiers() & Access.STATIC) != 0;
         if (isAlias) {
             fdecl.setIndirectBinding(true);
-            if (ftype instanceof ClassType
-                && ((ClassType) ftype).isSubclass("gnu.mapping.DynamicLocation"))
-                fdecl.setFlag(Declaration.IS_DYNAMIC);
+            if (ftype instanceof ClassType) {
+                ClassType cftype = (ClassType) ftype;
+                if (cftype.isSubclass("gnu.mapping.DynamicLocation")
+                    || cftype.isSubclass("gnu.mapping.ThreadLocation"))
+                    fdecl.setFlag(Declaration.IS_DYNAMIC);
+            }
         }
         else if (isFinal && ftype instanceof ClassType) {
             if (ftype.isSubtype(Compilation.typeProcedure))

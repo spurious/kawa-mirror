@@ -1,3 +1,8 @@
+2016-06-02  Per Bothner  <per@bothner.com>
+
+	* Language.java (declFromField): Set IS_DYNAMIC if field is a
+	ThreadLocation, which avoids a warning if assigning to say *print-base*.
+
 2016-05-07  Per Bothner  <per@bothner.com>
 
 	* NameLookup.java (getCompletingSymbols): Tweak parameter type.

@@ -1,3 +1,7 @@
+2016-06-02  Per Bothner  <per@bothner.com>
+
+	* GenArrayType.java (emitCoerceFromObject): Remove method.
+
 2016-05-27  Per Bothner  <per@bothner.com>
 
 	* GenArrayType.java: New type for multi-dimensional arrays.

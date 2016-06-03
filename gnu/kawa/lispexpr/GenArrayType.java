@@ -87,10 +87,6 @@ public class GenArrayType extends ParameterizedType implements TypeValue {
         return sb.toString();
     }
 
-    public void emitCoerceFromObject(CodeAttr code) {
-        code.emitCheckcast(implementationType);
-    }
-
     public void emitIsInstance(Variable incoming,
                                Compilation comp, Target target) {
          gnu.kawa.reflect.InstanceOf.emitIsInstance(this, incoming, comp, target);

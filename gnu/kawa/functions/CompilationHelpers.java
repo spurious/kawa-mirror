@@ -280,13 +280,17 @@ public class CompilationHelpers
             ClassType ctype;
             if (argType instanceof ArrayType)
                 return new SetArrayExp(arg, (ArrayType) argType);
-            Type implType = argType.getImplementationType();
-            if (implType instanceof ClassType
-                && ((ClassType) implType).isSubclass(Compilation.typeList)) {
-                if (exp instanceof SetListExp)
-                    return exp;
-                else
-                    return new SetListExp(exp.getFunction(), (ObjectType) argType, args);
+            Type implType = argType.getRawType();
+            if (implType instanceof ClassType) {
+                ClassType cimplType = (ClassType) implType;
+                if (cimplType.isSubclass(Compilation.typeList)
+                    || cimplType.isSubclass(GenArrayType.typeArray)) {
+                    if (exp instanceof SetListExp)
+                        return exp;
+                    else
+                        return new SetListExp(exp.getFunction(),
+                                              (ObjectType) argType, args);
+                }
             }
             if (arg instanceof ReferenceExp) {
                 Declaration decl = ((ReferenceExp) arg).getBinding();

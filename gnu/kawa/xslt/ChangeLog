@@ -1,3 +1,7 @@
+2016-06-02  Per Bothner  <per@bothner.com>
+
+	* XSLT.java (parse): Returns false if missing body (i.e. EOF).
+
 2014-08-28  Per Bothner  <per@bothner.com>
 
 	* Makefile.am: Fold into gnu/Makefile.am.

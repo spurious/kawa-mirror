@@ -49,6 +49,8 @@ public class XSLT extends XQuery
     comp.setState(Compilation.BODY_PARSED);
 
     XQParser xqparser = new XQParser(null, comp.getMessages(), this);
+    if (comp.mainLambda.body == null)
+        return false;
     XQResolveNames resolver = new XQResolveNames(comp);
     resolver.functionNamespacePath = xqparser.functionNamespacePath;
     resolver.parser = xqparser;

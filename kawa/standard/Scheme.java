@@ -515,6 +515,8 @@ public class Scheme extends LispLanguage {
       defProcStFld("default-prompter", "kawa.lib.ports");
       defProcStFld("input-port-prompter", "kawa.lib.ports");
       defProcStFld("set-input-port-prompter!", "kawa.lib.ports");
+      defAliasStFld("input-prompt1", "gnu.kawa.io.TtyInPort", "prompt1");
+      defAliasStFld("input-prompt2", "gnu.kawa.io.TtyInPort", "prompt2");
       defProcStFld("base-uri", "kawa.lib.misc");
 
       defProcStFld("syntax-error", "kawa.standard.syntax_error",

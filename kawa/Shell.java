@@ -173,9 +173,7 @@ public class Shell
     OutPort perr;
     if (inp instanceof TtyInPort) // Interactive?
       {
-	Procedure prompter = language.getPrompter();
-	if (prompter != null)
-	  ((TtyInPort)inp).setPrompter(prompter);
+        ((TtyInPort)inp).setPrompter(new Prompter());
         perr = OutPort.errDefault();
       }
     else
@@ -249,6 +247,7 @@ public class Shell
       {
         // Nothing - we'll just lose some minor functionality.
       }
+    java.lang.reflect.Method parserMethod = getJLineParserMethod(inp);
     Environment saveEnv = Environment.setSaveCurrent(env);
     try
       {
@@ -257,8 +256,13 @@ public class Shell
 	    int opts = Language.PARSE_FOR_EVAL|Language.PARSE_ONE_LINE|Language.PARSE_INTERACTIVE_MODULE;
 	    try
 	      {
-		Compilation comp = language.parse(lexer, opts, null);
-                boolean sawError;
+                Compilation comp;
+                if (parserMethod != null)
+                    comp = (Compilation) parserMethod.invoke(null, language, lexer);
+                else {
+                    comp = language.parse(lexer, opts, null);
+                }
+		boolean sawError;
                 if (interactive) {
                   sawError = messages.checkErrors(perr, 20);
                   perr.flush();
@@ -273,16 +277,11 @@ public class Shell
                     comp.lexical.pop(comp.mainLambda);
                     continue;
                 }
-
-                int ch = inp.peek();
-                if (ch == '\n')
-                    inp.skip();
-
-		if (! ModuleExp.evalModule(env, ctx, comp, url, perr))
+                if (! ModuleExp.evalModule(env, ctx, comp, url, perr))
 		  throw new SyntaxException(messages);
                 if (out instanceof Writer)
                   ((Writer) out).flush();
-		if (ch < 0)
+		if (inp.eofSeen())
 		  break;
 	      }
             catch (Error e)
@@ -306,6 +305,19 @@ public class Shell
       }
     return null;
   }
+
+    static java.lang.reflect.Method getJLineParserMethod(InPort in) {
+        Class cls = in.getClass();
+        try {
+            if (cls.getName().equals("gnu.kawa.io.JLine2InPort")) {
+                cls = Class.forName("gnu.kawa.io.JLine2InPort$KawaParsedLine");
+                return cls.getDeclaredMethod("parse",
+                                             Language.class, Lexer.class);
+            }
+        } catch (Throwable ex) {
+        }
+        return null;
+    }
 
   public static void printError (Throwable ex, SourceMessages messages,
                                  OutPort perr)
@@ -574,6 +586,12 @@ public class Shell
             else
                 messages.printAll(perr, 20);
             return null;
+        }
+    }
+
+    static class Prompter extends Procedure1 {
+        public Object apply1 (Object arg) {
+            return ((TtyInPort) arg).defaultPrompt();
         }
     }
 }

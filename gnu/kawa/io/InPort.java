@@ -754,6 +754,10 @@ public class InPort extends Reader implements Printable
         }
     }
 
+    public boolean eofSeen() {
+        return (flags & EOF_SEEN) != 0;
+    }
+
     public boolean ready() throws java.io.IOException {
         synchronized (lock) {
             return pos < limit || (flags & EOF_SEEN) != 0 || sourceReady();

@@ -1,3 +1,7 @@
+2016-06-02  Per Bothner  <per@bothner.com>
+
+	* Lexer.java (interactive): Make private.
+
 2016-02-24  Per Bothner  <per@bothner.com>
 
 	* Lexer.java (tentative): New boolean.

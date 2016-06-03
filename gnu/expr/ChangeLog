@@ -1,5 +1,10 @@
 2016-06-02  Per Bothner  <per@bothner.com>
 
+	* Language.java (setCurrentLanguage): Update prompt1 and prompt2
+	dynamic variables from language defaults.
+	(getPrompter): Remove method.
+	(getPrimaryPrompt, getSecondaryPrompt): New methods.
+
 	* Language.java (declFromField): Set IS_DYNAMIC if field is a
 	ThreadLocation, which avoids a warning if assigning to say *print-base*.
 

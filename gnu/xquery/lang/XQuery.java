@@ -897,12 +897,11 @@ public class XQuery extends Language
     return Type.make(clas);
   }
 
-  @Override
-  public Procedure getPrompter()
-  {
-    return new Prompter();
-  }
-
+    @Override
+    public String getPrimaryPrompt() { return "<!--%N-->"; }
+    @Override
+    public String getSecondaryPrompt() { return "{%P.%N} "; }
+ 
   /*
   static boolean isPunctuation (char ch)
   {
@@ -1031,23 +1030,5 @@ public class XQuery extends Language
                             type.toString());
       }
     return value;
-  }
-}
-
-class Prompter extends Procedure1
-{
-  public Object apply1 (Object arg)
-  {
-    InPort port = (InPort) arg;
-    int line = port.getLineNumber() + 1;
-    char state = port.readState;
-    if (state == '\n')
-      state = ' ';
-    if (state == '<')
-      return "<!--" + line + "-->";
-    else if (state == ':')
-      return "-(:" + line + "c:) ";
-    else
-      return "(: " + line + state + ":) ";
   }
 }

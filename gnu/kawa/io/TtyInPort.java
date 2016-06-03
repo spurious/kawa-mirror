@@ -1,6 +1,7 @@
 package gnu.kawa.io;
 import java.io.*;
 import gnu.mapping.Procedure;
+import gnu.mapping.ThreadLocation;
 
 /** An interactive input-port.
     Supports prompting, auto-flush of tied output port, transcripts. */
@@ -10,6 +11,11 @@ public class TtyInPort extends InPort
   protected OutPort tie;
 
   protected Procedure prompter;
+
+    public static final ThreadLocation<String> prompt1
+        = new ThreadLocation<String>("prompt1");
+    public static final ThreadLocation<String> prompt2
+        = new ThreadLocation<String>("prompt2");
 
     boolean inDomTerm;
     public void setInDomTerm(boolean v) { inDomTerm = v; }
@@ -27,6 +33,85 @@ public class TtyInPort extends InPort
   {
     this.prompter = prompter;
   }
+
+    /** Saved length of the expanded primary prompt. */
+    int prompt1Length = 0;
+
+    /** Default prompt calculation expands the prompt1 or prompt2 template. */
+    public String defaultPrompt() {
+        if (readState == '\n')
+            return "";
+        int line = getLineNumber() + 1;
+        if (readState == ' ') {
+            String pattern = prompt1.get("");
+            String str = expandPrompt(pattern, 0, line, "");
+            prompt1Length = str.length();
+            return str;
+        } else {
+            String pattern = prompt2.get("");
+            String m = new String(new char[] { readState });
+            String str = expandPrompt(pattern, prompt1Length, line, m);
+            return str;
+        }
+    }
+
+    /** Expand a prompt1 or prompt2 template to yield an actual prompt. */
+    public String expandPrompt(String pattern, int padToWidth, int line,
+                               String message) {
+        StringBuilder sb = new StringBuilder();
+        int plen = pattern.length();
+        int padChar = -1;
+        int padPos = -1;
+        for (int i = 0; i < plen; ) {
+            char ch = pattern.charAt(i++);
+            if (ch == '%' && i < plen) {
+                ch = pattern.charAt(i++);
+                int count = -1;
+                while (ch >= '0' && ch <= '9') {
+                    count = (count < 0 ? 0 : 10 * count)
+                        + (ch - '0');
+                    ch = pattern.charAt(i++);
+                }
+                switch (ch) {
+                case '%':
+                    sb.append(ch);
+                    break;
+                case 'N':
+                    sb.append(line);
+                    break;
+                case 'M':
+                    if (message != null)
+                        sb.append(message);
+                    break;
+                case 'P':
+                    if (count >= 0)
+                        padToWidth = count;
+                    if (i < plen) {
+                        padChar = pattern.charAt(i++);
+                        // FIXME check surrogate
+                    }
+                    padPos = sb.length();
+                    break;
+                default:
+                    
+                    i--;
+                }
+            } else
+                sb.append(ch);
+        }
+       String  str = sb.toString();
+        // More precise calculation when using JLine3 - this
+        // doesn't handle ANSI escape, wide characters, or surrogate
+        int cols = str.length();
+        if (padToWidth > cols) {
+            int padCharCols = 1;
+            int padCount = (padToWidth - cols) / padCharCols;
+            while (--padCount >= 0)
+                sb.insert(padPos, (char) padChar); // FIXME if wide
+            str = sb.toString();
+        }
+        return str;
+   }
 
   public TtyInPort (InputStream in, Path name, OutPort tie)
   {
@@ -64,6 +149,9 @@ public class TtyInPort extends InPort
         tie.clearBuffer();
     }
 
+    public String wrapPromptForAnsi(String prompt) {
+        return "\033[48;5;120m" + prompt + "\033[0m";
+    }
     public String wrapPromptForDomTerm(String prompt) {
         if (inDomTerm) {
             boolean haveDomTermEscapes = false;
@@ -80,36 +168,32 @@ public class TtyInPort extends InPort
         return prompt;
     }
 
-  public void lineStart (boolean revisited) throws java.io.IOException
-  {
-    if (! revisited)
-      {
-        promptEmitted = false;
-        if (prompter != null)
-          {
-            try
-              {
-                Object prompt = prompter.apply1(this);
-                if (prompt != null)
-                  {
-                    String string = prompt.toString();
-                    if (string != null && string.length() > 0)
-                      {
-                        if (tie != null)
-                           tie.freshLine();
-                        emitPrompt(wrapPromptForDomTerm(string));
-                        promptEmitted = true;
+  public void lineStart(boolean revisited) throws java.io.IOException {
+      if (! revisited) {
+          promptEmitted = false;
+          if (prompter != null) {
+              try {
+                  Object prompt = readState == '\n' ? null
+                      : readState == ' ' ? prompter.apply1(this)
+                      : defaultPrompt();
+                  if (prompt != null) {
+                      String string = prompt.toString();
+                      if (string != null && string.length() > 0) {
+                          if (tie != null)
+                              tie.freshLine();
+                          emitPrompt(wrapPromptForDomTerm(string));
+                          promptEmitted = true;
                       }
                   }
+              } catch (Throwable ex) {
+                  throw new java.io.IOException("Error when evaluating prompt:"
+                                                + ex);
               }
-            catch (Throwable ex)
-              { throw new java.io.IOException("Error when evaluating prompt:"
-                                              + ex); }
           }
-        if (tie != null && ! promptEmitted) {
-            tie.flush();
-            tie.clearBuffer();
-        }
+          if (tie != null && ! promptEmitted) {
+              tie.flush();
+              tie.clearBuffer();
+          }
       }
   }
 

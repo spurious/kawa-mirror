@@ -11,6 +11,7 @@ import gnu.text.SourceMessages;
 import gnu.kawa.io.CharArrayInPort;
 import gnu.kawa.io.InPort;
 import gnu.kawa.io.OutPort;
+import gnu.kawa.io.TtyInPort;
 import gnu.kawa.reflect.*;
 import gnu.kawa.functions.GetNamedPart;
 import java.lang.reflect.Constructor;
@@ -45,18 +46,20 @@ public abstract class Language
   public static void setCurrentLanguage (Language language)
   {
     current.set(language);
+    TtyInPort.prompt1.setGlobal(language.getPrimaryPrompt());
+    TtyInPort.prompt2.setGlobal(language.getSecondaryPrompt());
   }
 
   public static Language setSaveCurrent (Language language)
   {
     Language save = current.get();
-    current.set(language);
+    setCurrentLanguage(language);
     return save;
   }
 
   public static void restoreCurrent (Language saved)
   {
-    current.set(saved);
+    setCurrentLanguage(saved);
   }
 
   /**
@@ -1198,18 +1201,8 @@ public abstract class Language
       Environment.setGlobal(Environment.getCurrent());
   }
 
-  public Procedure getPrompter()
-  {
-    Object property = null;
-    if (hasSeparateFunctionNamespace())
-      property = EnvironmentKey.FUNCTION;
-    Procedure prompter = (Procedure) getEnvironment()
-      .get(getSymbol("default-prompter"), property, null);
-    if (prompter != null)
-      return prompter;
-    else
-      return new SimplePrompter();
-  }
+    public String getPrimaryPrompt() { return "> "; }
+    public String getSecondaryPrompt() { return "- "; }
 
   /** Return the result of evaluating a string as a source expression. */
   public final Object eval (String string) throws Throwable

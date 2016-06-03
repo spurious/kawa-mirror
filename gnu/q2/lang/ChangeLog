@@ -1,3 +1,12 @@
+2016-06-02  Per Bothner  <per@bothner.com>
+
+	* Q2.java (getPrompter): Remove method.
+	(getPrimaryPrompt, getSecondaryPrompt): New method.
+	(class Prompter): Remove class.
+	* Q2Read.java (readParens, readIndentCommand): Maybe throw eofError
+	if missing operand or paren.
+	* Q2Translator.java (partition): Likewise.
+
 2016-02-02  Per Bothner  <per@bothner.com>
 
 	* Q2.java (createReadTable): Implement nested comments.

@@ -346,15 +346,8 @@
 (define (input-port-column-number port)
   (+ 1 (port-column port)))
 
-(define (default-prompter port)
-  (let ((state (input-port-read-state port)))
-    (if (char=? state #\Newline)
-	""
-	(string-append (if (char=? state #\Space)
-			   "#|kawa:"
-			   (string-append "#|" (make-string 1 state) "---:"))
-		       (number->string (input-port-line-number port))
-		       "|# "))))
+(define (default-prompter port::gnu.kawa.io.TtyInPort)
+  (port:defaultPrompt))
 
 (define (set-input-port-prompter!
 	 (port :: <gnu.kawa.io.TtyInPort>) (prompter :: <procedure>))

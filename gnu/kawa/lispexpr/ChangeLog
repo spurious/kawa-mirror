@@ -1,5 +1,8 @@
 2016-06-02  Per Bothner  <per@bothner.com>
 
+	* LispLanguage.java (parse): Skip ending newline.
+	(getPrimaryPrompt, getSecondaryPrompt): New methods.
+
 	* GenArrayType.java (emitCoerceFromObject): Remove method.
 
 2016-05-27  Per Bothner  <per@bothner.com>

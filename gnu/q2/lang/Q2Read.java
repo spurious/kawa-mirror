@@ -62,8 +62,8 @@ public class Q2Read extends LispReader
    * After return, the read position is before the first non-WS character
    * of the next command (on the next line); curIndentation has been
    * updated to that of the initial whitespace of that line; and a
-   * mark() has been set of the start of the line.
-   * Exception: If singleLine, return position is *before* newline,
+   * mark() has been set at the start of the line. 
+ar  * Exception: If singleLine, returned position is *before* newline,
    * and mark is not set.
    */
   Object readIndentCommand (boolean singleLine)
@@ -88,6 +88,7 @@ public class Q2Read extends LispReader
 	  break;
         if (ch == '\r' || ch == '\n')
           {
+            Operator rhsNeeded = null;
 	    if (singleLine)
 	      {
 		if (prev instanceof Symbol && ! Q2.instance.selfEvaluatingSymbol(prev))
@@ -96,22 +97,24 @@ public class Q2Read extends LispReader
 		    Expression func = ((Translator) comp).rewrite(prev, true);
 		    Declaration decl;
 		    Object value;
-		    if (func instanceof ReferenceExp
+                    if (func instanceof ReferenceExp
 			&& (decl = ((ReferenceExp) func).getBinding()) != null
 			&& (value = decl.getConstantValue()) instanceof Operator
 			&& (((Operator) value).flags & Operator.RHS_NEEDED) != 0)
 		      
-		      ;
+                        rhsNeeded = (Operator) value;
 		    else
 		      break;
 		  }
 		else
 		  break;
 	      }
-	    ch = read();
+	    ch = read(); // re-read newline
             port.mark(Integer.MAX_VALUE);
             resetNeeded = true;
 	    int subIndentation = skipIndentation(); // skipHorSpace.
+            if (subIndentation == -1 && rhsNeeded != null)
+                eofError("missing right operand after "+rhsNeeded.getName());
             LList qresult = LList.Empty;
             curIndentation = subIndentation;
             for (;;)
@@ -176,7 +179,7 @@ public class Q2Read extends LispReader
 
   boolean singleLine()
   {
-    return interactive && nesting <= 1;
+    return isInteractive() && nesting <= 1;
   }
 
   public Object readCommand ()
@@ -431,14 +434,23 @@ public class Q2Read extends LispReader
     {
       Q2Read reader = (Q2Read) in;
       char saveReadState = reader.pushNesting('(');
+      int startLine = reader.getLineNumber();
+      int startColumn = reader.getColumnNumber();
       try
         {
           Object result = reader.readIndentCommand(false);
 	  InPort port = reader.getPort();
-          if (port.peek() == ')')
+          int ch = port.peek();
+          if (ch == ')')
             port.skip();
-          else
-            reader.error("missing ')'");
+          else {
+              String msg = "missing ')' after '(' starting here";
+              if (ch < 0)
+                  reader.eofError(msg, startLine + 1, startColumn);
+              else
+                  reader.error('e', port.getName(), startLine + 1, startColumn,
+                               msg);
+          }
           if (reader.resetNeeded)
             {
               reader.resetNeeded = false;

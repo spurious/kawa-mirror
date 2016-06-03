@@ -1,3 +1,15 @@
+2016-06-02  Per Bothner  <per@bothner.com>
+
+	Add support for using JLine3.  Relatedly, re-do prompt handling.
+	* JLine2InPort.java: Add support for version 3 of JLine library.
+	Specifically handle multiline inputs.
+	* TtyInPort.java (prompt1, prompt2): New ThreadLocations static.
+	(defaultPrompt, expandPrompt): Expand a prompt pattern.
+	(lineStart): Don't call prompter procedure for continuation lines.
+	(wrapPromptForAnsi): Add styling for prompt.
+	* InPort.java (eofSeen): New method.
+	* CharArrayInPort.java (make(CharSequence,String)): New overload.
+
 2016-05-07  Per Bothner  <per@bothner.com>
 
 	* JLine2InPort.java: Extend so it works with either JLine3

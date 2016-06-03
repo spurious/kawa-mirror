@@ -1,3 +1,10 @@
+2016-06-02  Per Bothner  <per@bothner.com>
+
+	* Shell.java (run): Add hook for using JLine.
+	Change setting of prompt and newline handling.
+	(class Prompter): New static member class.
+	* standard/Scheme.java: Defineinput-prompt1 and input-prompt2.
+
 2016-05-27  Per Bothner  <per@bothner.com>
 
 	* lang/Translator.java (checkDefaultBinding): Handle "arrayRANK".

@@ -98,10 +98,11 @@ public class Q2 extends Scheme
 
   public boolean appendBodyValues () { return true; }
 
-  public Procedure getPrompter()
-  {
-    return new Prompter();
-  }
+    @Override
+    public String getPrimaryPrompt() { return "#|Q2:%N|# "; }
+
+    @Override
+    public String getSecondaryPrompt() { return "#|%P.%N|# "; }
 
   public ReadTable createReadTable ()
   {
@@ -144,16 +145,5 @@ public class Q2 extends Scheme
       return 8 * (numTabs1 - numTabs2);
     else
       return Integer.MIN_VALUE;
-  }
-}
-
-class Prompter extends Procedure1
-{
-  public Object apply1 (Object arg)
-  {
-    InPort port = (InPort) arg;
-    int line = port.getLineNumber() + 1;
-    char state = port.readState;
-    return "#|Q2"+state+line+"|# ";
   }
 }

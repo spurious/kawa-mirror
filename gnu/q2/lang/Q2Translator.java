@@ -72,8 +72,12 @@ public class Q2Translator extends SchemeCompilation
             Operator topop = (Operator) st.get(stsz-1);
             while (op.lprio <= topop.rprio)
               {
+                PairWithPosition oppair = (PairWithPosition) st.get(stsz-2);
+                if ((topop.flags & Operator.RHS_NEEDED) != 0
+                      && larg == LList.Empty)
+                    tr.error('e', "missing right operand after "+topop.getName(), oppair);
                 larg = topop.combine((LList) st.get(stsz-3), larg,
-                                     (PairWithPosition) st.get(stsz-2));
+                                     oppair);
                 stsz -= 3;
                 st.setSize(stsz);
                 topop = (Operator) st.get(stsz-1);

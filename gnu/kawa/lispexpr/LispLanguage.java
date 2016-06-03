@@ -103,7 +103,8 @@ public abstract class LispLanguage extends Language
             while (ch == ' ' || ch == '\t'|| ch == '\r');
             if (ch == ')')
               lexer.fatal("An unexpected close paren was read.");
-            lexer.unread(ch);
+            if (ch != '\n')
+                lexer.unread(ch);
             tr.scanForm(sexp, mexp);
             if ((options & PARSE_ONE_LINE) != 0)
               {
@@ -335,4 +336,10 @@ public abstract class LispLanguage extends Language
             return t;
         return super.getTypeFor(clas);
     }
+
+    @Override
+    public String getPrimaryPrompt() { return "#|kawa:%N|# "; }
+
+    @Override
+    public String getSecondaryPrompt() { return "#|%P.%N|# "; }
 }

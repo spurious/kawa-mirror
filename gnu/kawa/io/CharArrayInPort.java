@@ -16,26 +16,28 @@ public class CharArrayInPort extends InPort
     int limitIndex;
     int start, end; // currently only used if string!=null
 
-  public static CharArrayInPort make(CharSequence seq)
-  {
-    int len = seq.length();
-    if (seq instanceof FString)
-        return ((FString) seq).openReader(0, len);
-    else
-      {
-        char[] buf = new char[len];
-        /* #ifdef use:java.lang.CharSequence */
+    public static CharArrayInPort make(CharSequence seq) {
+        if (seq instanceof FString)
+            return ((FString) seq).openReader(0, seq.length());
+        else
+            return make(seq, "");
+    }
+
+    public static CharArrayInPort make(CharSequence seq, CharSequence suffix) {
+        int len1 = seq.length();
+        int len2 = suffix.length();
+        char[] buf = new char[len1+len2];
         if (seq instanceof String)
-          ((String) seq).getChars(0, len, buf, 0);
+          ((String) seq).getChars(0, len1, buf, 0);
         else if (! (seq instanceof CharSeq))
-          for (int i = len; --i >= 0; )
+          for (int i = len1; --i >= 0; )
             buf[i] = seq.charAt(i);
         else
-        /* #endif */
-          ((CharSeq) seq).getChars(0, len, buf, 0);
-        return new CharArrayInPort(buf, len);
-      }
-  }
+          ((CharSeq) seq).getChars(0, len1, buf, 0);
+        for (int i = len2; --i >= 0; )
+            buf[i+len1] = suffix.charAt(i);
+        return new CharArrayInPort(buf, len1+len2);
+    }
 
   public CharArrayInPort (char[] buffer, int len)
   {

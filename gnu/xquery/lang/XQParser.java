@@ -1243,9 +1243,9 @@ public class XQParser extends Lexer
 
   public void setInteractive(boolean v)
   {
-    if (interactive != v)
+    if (isInteractive() != v)
       if (v) nesting--; else nesting++;
-    interactive = v;
+    super.setInteractive(v);
   }
   
   private static final int priority(int opcode)
@@ -3871,7 +3871,7 @@ public class XQParser extends Lexer
         if (command == MODULE_NAMESPACE_TOKEN
             && libraryModuleNamespace != null )
           error('e', "duplicate module declaration");
-        else if (seenDeclaration && ! interactive)
+        else if (seenDeclaration && ! isInteractive())
           error('e', "namespace declared after function/variable/option");
 	next = skipSpace(nesting != 0);
 	if (next >= 0)
@@ -4044,7 +4044,7 @@ public class XQParser extends Lexer
 	return BeginExp.canonicalize(inits);
 
       case DEFAULT_COLLATION_TOKEN:
-	if (defaultCollator != null && ! interactive)
+	if (defaultCollator != null && ! isInteractive())
           error('e', "duplicate default collation declaration", "XQST0038");
         val = parseURILiteral();
         if (val instanceof Expression) // an ErrorExp
@@ -4072,7 +4072,7 @@ public class XQParser extends Lexer
           error('e',
                 "duplicate default namespace declaration",
                 "XQST0066");
-        else if (seenDeclaration && ! interactive)
+        else if (seenDeclaration && ! isInteractive())
           error('e', "default namespace declared after function/variable/option");
 	getRawToken();
 	if (match("namespace"))
@@ -4114,7 +4114,7 @@ public class XQParser extends Lexer
 	    warnOldVersion("obsolate '=' in boundary-space declaration");
 	    getRawToken();
 	  }
-        if (boundarySpaceDeclarationSeen && ! interactive)
+        if (boundarySpaceDeclarationSeen && ! isInteractive())
           syntaxError("duplicate 'declare boundary-space' seen", "XQST0068");
         boundarySpaceDeclarationSeen = true;
 	if (match("preserve"))
@@ -4133,7 +4133,7 @@ public class XQParser extends Lexer
 
       case DECLARE_CONSTRUCTION_TOKEN:
 	getRawToken();
-        if (constructionModeDeclarationSeen && ! interactive)
+        if (constructionModeDeclarationSeen && ! isInteractive())
           syntaxError("duplicate 'declare construction' seen", "XQST0067");
         constructionModeDeclarationSeen = true;
 	if (match("strip"))
@@ -4147,7 +4147,7 @@ public class XQParser extends Lexer
 
       case DECLARE_COPY_NAMESPACES_TOKEN:
 	getRawToken();
-        if (copyNamespacesDeclarationSeen && ! interactive)
+        if (copyNamespacesDeclarationSeen && ! isInteractive())
           syntaxError("duplicate 'declare copy-namespaces' seen", "XQST0055");
         copyNamespacesDeclarationSeen = true;
 	if (match("preserve"))
@@ -4172,7 +4172,7 @@ public class XQParser extends Lexer
       case DEFAULT_ORDER_TOKEN:
         getRawToken();
         boolean sawEmpty = match("empty");
-        if (emptyOrderDeclarationSeen && ! interactive)
+        if (emptyOrderDeclarationSeen && ! isInteractive())
           syntaxError("duplicate 'declare default empty order' seen", "XQST0069");
         emptyOrderDeclarationSeen = true;
         if (sawEmpty)
@@ -4209,7 +4209,7 @@ public class XQParser extends Lexer
 	return QuoteExp.voidExp;
 
       case DECLARE_ORDERING_TOKEN:
-        if (orderingModeSeen && ! interactive)
+        if (orderingModeSeen && ! isInteractive())
           syntaxError("duplicate 'declare ordering' seen", "XQST0065");
         orderingModeSeen = true;
 	getRawToken();
@@ -4278,7 +4278,7 @@ public class XQParser extends Lexer
         return QuoteExp.voidExp;
 
       case DECLARE_BASE_URI_TOKEN:
-        if (baseURIDeclarationSeen && ! interactive)
+        if (baseURIDeclarationSeen && ! isInteractive())
           syntaxError("duplicate 'declare base-uri' seen", "XQST0032");
         baseURIDeclarationSeen = true;
         val = parseURILiteral();
@@ -4386,7 +4386,7 @@ public class XQParser extends Lexer
   public Expression declError (String message)
     throws java.io.IOException, SyntaxException
   {
-    if (interactive)
+    if (isInteractive())
       return syntaxError(message);
     error(message);
     for (;;)
@@ -4407,7 +4407,7 @@ public class XQParser extends Lexer
     throws java.io.IOException, SyntaxException
   {
     error('e', message, code);
-    if (interactive)
+    if (isInteractive())
       {
 	curToken = 0;
 	curValue = null;

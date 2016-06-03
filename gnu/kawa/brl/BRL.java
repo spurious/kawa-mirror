@@ -111,26 +111,10 @@ public class BRL extends Scheme
     return rt;
   }
 
-  public Procedure getPrompter()
-  {
-    return new Prompter();
-  }
+    @Override
+    public String getPrimaryPrompt() { return "<!--BRL:%N-->"; }
+
+    @Override
+    public String getSecondaryPrompt() { return  "<!--%P.:%N-->"; }
 }
 
-class Prompter extends Procedure1
-{
-  public Object apply1 (Object arg)
-  {
-    InPort port = (InPort) arg;
-    int line = port.getLineNumber() + 1;
-    char state = port.readState;
-    if (state == ']')
-      return "<!--BRL:"+line+"-->";
-    else
-      {
-	if (state == '\n')
-	  state = '-';
-	return "#|--BRL:"+line+state+"|#";
-      }
-  }
-}

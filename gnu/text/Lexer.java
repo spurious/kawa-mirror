@@ -13,7 +13,7 @@ import java.io.*;
 public class Lexer extends Reader
 {
     protected InPort port;
-    protected boolean interactive;
+    private boolean interactive;
     protected boolean tentative;
 
   public Lexer(InPort port)

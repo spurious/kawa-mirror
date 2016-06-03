@@ -309,8 +309,8 @@ public class Shell
     static java.lang.reflect.Method getJLineParserMethod(InPort in) {
         Class cls = in.getClass();
         try {
-            if (cls.getName().equals("gnu.kawa.io.JLine2InPort")) {
-                cls = Class.forName("gnu.kawa.io.JLine2InPort$KawaParsedLine");
+            if (cls.getName().equals("gnu.kawa.io.JLineInPort")) {
+                cls = Class.forName("gnu.kawa.io.JLineInPort$KawaParsedLine");
                 return cls.getDeclaredMethod("parse",
                                              Language.class, Lexer.class);
             }

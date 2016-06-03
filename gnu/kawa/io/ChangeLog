@@ -1,5 +1,8 @@
 2016-06-02  Per Bothner  <per@bothner.com>
 
+	* JLine2InPort.java: Rename to ...
+	* JLineInPort.java ... because we primarily support JLine version 3.
+
 	Add support for using JLine3.  Relatedly, re-do prompt handling.
 	* JLine2InPort.java: Add support for version 3 of JLine library.
 	Specifically handle multiline inputs.

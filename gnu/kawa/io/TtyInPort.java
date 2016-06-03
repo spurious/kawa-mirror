@@ -224,7 +224,7 @@ public class TtyInPort extends InPort
     public static TtyInPort make(InputStream in, Path name, OutPort tie) {
         try {
             return (TtyInPort)
-                Class.forName("gnu.kawa.io.JLine2InPort")
+                Class.forName("gnu.kawa.io.JLineInPort")
                 .getConstructor(java.io.InputStream.class,
                                 gnu.kawa.io.Path.class,
                                 gnu.kawa.io.OutPort.class)

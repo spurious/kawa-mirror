@@ -569,7 +569,7 @@ if WITH_SWT
 java_sources += $(GNU_KAWA_SWTVIEWS_JSOURCES)
 endif
 if WITH_JLINE2
-java_sources += kawa/io/JLine2InPort.java
+java_sources += kawa/io/JLineInPort.java
 endif
 if ENABLE_XML
 java_sources += $(GNU_XML_JSOURCES) $(GNU_KAWA_XML_JSOURCES)

@@ -30,9 +30,9 @@ import org.jline.terminal.TerminalBuilder;
 // import jline.console.completer.Completer;
 /* #endif */
 
-/** A variation of TtyInPort that uses the JLine2 library for input editing. */
+/** A variation of TtyInPort that uses the JLine library for input editing. */
 
-public class JLine2InPort extends TtyInPort
+public class JLineInPort extends TtyInPort
     implements Completer
                /* #ifdef with:jline3 */
                , Parser
@@ -50,7 +50,7 @@ public class JLine2InPort extends TtyInPort
     private int charsRest;
     Language language;
 
-    public JLine2InPort(InputStream in, Path name, OutPort tie)
+    public JLineInPort(InputStream in, Path name, OutPort tie)
         throws java.io.IOException {
         super(in, name, tie);
         /* #ifdef with:jline3 */
@@ -173,12 +173,12 @@ public class JLine2InPort extends TtyInPort
     }
 
     public static class KawaParsedLine implements ParsedLine {
-        JLine2InPort inp;
+        JLineInPort inp;
         Compilation comp;
         String source;
         int cursor;
 
-        public KawaParsedLine(JLine2InPort inp, Compilation comp, String source, int cursor) {
+        public KawaParsedLine(JLineInPort inp, Compilation comp, String source, int cursor) {
             this.inp = inp;
             this.comp = comp;
             this.source = source;
@@ -189,7 +189,7 @@ public class JLine2InPort extends TtyInPort
         public static Compilation parse(Language language, Lexer lexer)
             throws java.io.IOException {
 	    int opts = Language.PARSE_FOR_EVAL|Language.PARSE_ONE_LINE|Language.PARSE_INTERACTIVE_MODULE;
-            JLine2InPort inp = (JLine2InPort) lexer.getPort();
+            JLineInPort inp = (JLineInPort) lexer.getPort();
             if (inp.tie != null)
                 inp.tie.freshLine();
             int line = inp.getLineNumber() + 1;

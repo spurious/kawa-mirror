@@ -1,5 +1,9 @@
 2016-06-03  Per Bothner  <per@bothner.com>
 
+	* configure.in (AC_INIT): Set version to 2.1.9.
+	* bin/configure.in (AC_INIT): Likewise.
+	* build.xml (version.release): Likewise.
+
 	* Makefile.am (kawa-snapshot.zip): New rule.
 
 2016-05-07  Per Bothner  <per@bothner.com>

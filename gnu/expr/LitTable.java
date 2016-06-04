@@ -45,11 +45,18 @@ public class LitTable extends GeneralHashTable<Object,Object>
     this.mainClass = comp.mainClass;
   }
 
+    private Object hashKeyCache = null;
+    private int hashCodeCache;
+
     @Override
     public int hash(Object key) {
-        if (comp.immediate)
-            return System.identityHashCode(key);
-        return HashUtils.boundedHash(key);
+        if (key == hashKeyCache)
+            return hashCodeCache;
+        int h = comp.immediate ? System.identityHashCode(key)
+            : HashUtils.boundedHash(key);
+        hashKeyCache = key;
+        hashCodeCache = h;
+        return h;
     }
 
     @Override
@@ -297,6 +304,7 @@ public class LitTable extends GeneralHashTable<Object,Object>
     if (value == null)
       return Literal.nullLiteral;
     Literal literal = (Literal) get(value);
+    int valueHash = hash(value); // gets cached value
     if (literal != null)
       return literal;
     if (comp.immediate)
@@ -332,7 +340,9 @@ public class LitTable extends GeneralHashTable<Object,Object>
 			      continue;
 			    Literal lit = new Literal (litValue, fld, this);
 			    staticTable.put(litValue, null, lit);
-			    if (value == litValue)
+                            int litHash = hash(litValue); // gets cached value
+                            if (valueHash == litHash
+                                && matches(litValue, value))
 			      literal = lit;
 			  }
 			catch (Exception ex)

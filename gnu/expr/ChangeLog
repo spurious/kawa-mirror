@@ -1,3 +1,9 @@
+2016-06-04  Per Bothner  <per@bothner.com>
+
+	* LitTable.java (findLiteral): Use 'matches' rather than '=='
+	to see if value matches a static field.
+	Also, do some caching of hash codes.
+
 2016-06-02  Per Bothner  <per@bothner.com>
 
 	* Language.java (setCurrentLanguage): Update prompt1 and prompt2

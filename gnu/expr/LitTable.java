@@ -329,7 +329,8 @@ public class LitTable extends GeneralHashTable<Object,Object>
 		for (Field fld = fldType.getFields();
 		     fld != null;  fld = fld.getNext())
 		  {
-		    if ((fld.getModifiers() & needed_mod) == needed_mod)
+		    if ((fld.getModifiers() & needed_mod) == needed_mod
+                        && ! (fld.getType() instanceof PrimType))
 		      {
 			try
 			  {

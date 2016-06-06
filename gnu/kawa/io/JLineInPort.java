@@ -89,23 +89,52 @@ public class JLineInPort extends TtyInPort
             throw new RuntimeException(ex);
         }
     }
+
+    @Override
+    public ParsedLine parseForComplete(String line, int cursor)
+        throws SyntaxError {
+        int buflen = line.length();
+        char[] tbuf = new char[buflen + 1];
+        line.getChars(0, cursor, tbuf, 0);
+        tbuf[cursor] = CommandCompleter.COMPLETE_REQUEST;
+        line.getChars(cursor, buflen, tbuf, cursor+1);
+        CharArrayInPort cin = new CharArrayInPort(tbuf);
+        try {
+            SourceMessages messages = new SourceMessages();
+            Lexer lexer = language.getLexer(cin, messages);
+            lexer.setInteractive(true);
+            lexer.setTentative(true);
+            Compilation comp =
+                language.parse(lexer,
+                               Language.PARSE_FOR_EVAL|Language.PARSE_INTERACTIVE_MODULE,
+                               null);
+            language.resolve(comp);
+            return new KawaParsedLine(this, comp, line, cursor);
+        } catch (SyntaxException ex) {
+            if (cin.eofSeen())
+                throw new EOFError(-1, -1, "unexpected end-of-file", "");
+            throw ex;
+        } catch (CommandCompleter ex) {
+            return new KawaParsedLine(this, ex, line, cursor);
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    @Override
     public void complete(LineReader reader, final ParsedLine commandLine,
                          List<Candidate> candidates) {
-        String buffer = commandLine.line();
-        int cursor = commandLine.cursor();
-        List<CharSequence> scandidates = new ArrayList<CharSequence>();
-        int buflen = buffer.length();
-        char[] tbuf = new char[buflen + 1 + pos];
-        System.arraycopy(this.buffer, 0, tbuf, 0, pos);
-        buffer.getChars(0, cursor, tbuf, pos);
-        tbuf[pos+cursor] = CommandCompleter.COMPLETE_REQUEST;
-        buffer.getChars(cursor, buflen, tbuf, pos+cursor+1);
-        CharArrayInPort cin = new CharArrayInPort(tbuf);
-        int r = CommandCompleter.complete(cin, scandidates);
-        for (CharSequence cstr : scandidates) {
-            String str = cstr.toString();
-            candidates.add(new Candidate(str, str,
-                                         null, null, null, null, true));
+        KawaParsedLine kline = (KawaParsedLine) commandLine;
+        if (kline.ex != null) {
+            CommandCompleter ex = kline.ex;
+            java.util.Collections.sort(ex.candidates);
+            kline.word = ex.word;
+            kline.wordCursor = ex.wordCursor;
+            for (CharSequence cstr : ex.candidates) {
+                String str = cstr.toString();
+                candidates.add(new Candidate(str, str,
+                                             null, null, null, null, true));
+            }
         }
     }
     /* #else */
@@ -177,12 +206,23 @@ public class JLineInPort extends TtyInPort
         Compilation comp;
         String source;
         int cursor;
+        String word;
+        int wordCursor;
+        CommandCompleter ex;
 
         public KawaParsedLine(JLineInPort inp, Compilation comp, String source, int cursor) {
             this.inp = inp;
             this.comp = comp;
             this.source = source;
             this.cursor = cursor;
+        }
+
+        public KawaParsedLine(JLineInPort inp, CommandCompleter ex, String source, int cursor) {
+            this.inp = inp;
+            this.comp = ex.getCompilation();
+            this.source = source;
+            this.cursor = cursor;
+            this.ex = ex;
         }
 
         // This method is called using reflection
@@ -221,11 +261,11 @@ public class JLineInPort extends TtyInPort
             
         }
         public String word() {
-            return null;
+            return word;
         }
 
         public int wordCursor() {
-            return 0;
+            return wordCursor;
         }
 
         public int wordIndex() {

@@ -779,7 +779,8 @@ public class Translator extends Compilation
                                candidates);
                 lexical.getCompletingSymbols(prefix, symspace,
                                              candidates);
-                throw new CommandCompleter(complete, candidates);
+                throw new CommandCompleter(complete, candidates,
+                                           prefix, prefix.length(), this);
             }
 
             if (s.hasUnknownNamespace()) {

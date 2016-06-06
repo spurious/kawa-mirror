@@ -1,5 +1,8 @@
 2016-06-05  Per Bothner  <per@bothner.com>
 
+	* JLineInPort.java: Major changes to tab-completion for jline3.
+	(parseForComplete): New method.
+
 	* DomTermErrorStream.java: Renamed to ...
 	* TermErrorStream.java: and add support for generic ANSI terminals.
 

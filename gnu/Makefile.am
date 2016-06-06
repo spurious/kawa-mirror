@@ -237,7 +237,6 @@ GNU_KAWA_IO_JSOURCES = \
   kawa/io/CharArrayInPort.java \
   kawa/io/CharArrayOutPort.java \
   kawa/io/CheckConsole.java \
-  kawa/io/DomTermErrorStream.java \
   kawa/io/FilePath.java \
   kawa/io/InPort.java \
   kawa/io/LogWriter.java \
@@ -247,6 +246,7 @@ GNU_KAWA_IO_JSOURCES = \
   kawa/io/NBufferedInputStream.java \
   kawa/io/PrettyWriter.java \
   kawa/io/QueueReader.java \
+  kawa/io/TermErrorStream.java \
   kawa/io/TtyInPort.java \
   kawa/io/URIPath.java \
   kawa/io/URLPath.java \

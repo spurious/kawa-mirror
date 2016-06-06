@@ -13,10 +13,10 @@ import gnu.bytecode.ClassType;
 import gnu.kawa.servlet.HttpRequestContext;
 import gnu.kawa.io.CharArrayInPort;
 import gnu.kawa.io.CheckConsole;
-import gnu.kawa.io.DomTermErrorStream;
 import gnu.kawa.io.InPort;
 import gnu.kawa.io.OutPort;
 import gnu.kawa.io.Path;
+import gnu.kawa.io.TermErrorStream;
 import gnu.kawa.io.WriterManager;
 import gnu.kawa.util.ExitCalled;
 import kawa.lang.SyntaxPattern;
@@ -814,8 +814,13 @@ public class repl extends Procedure0or1 {
         String dversion = CheckConsole.getDomTermVersionInfo();
         if (dversion != null) {
             if (dversion.indexOf("err-handled;") < 0)
-                DomTermErrorStream.setSystemErr();
+                TermErrorStream.setSystemErr(false);
+        } else if (isAnsiTerminal()) {
+            TermErrorStream.setSystemErr(true);
         }
+    }
+    private static boolean isAnsiTerminal() {
+        return CheckConsole.haveConsole(); // FIXME
     }
 
     private static void startGuiConsole() {

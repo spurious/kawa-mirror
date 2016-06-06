@@ -1,3 +1,8 @@
+2016-06-05  Per Bothner  <per@bothner.com>
+
+	* DomTermErrorStream.java: Renamed to ...
+	* TermErrorStream.java: and add support for generic ANSI terminals.
+
 2016-06-02  Per Bothner  <per@bothner.com>
 
 	* JLine2InPort.java: Rename to ...

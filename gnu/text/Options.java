@@ -66,22 +66,26 @@ public class Options
     return info;
   }
 
+    public static Boolean booleanValue(String argument) {
+   	if (argument == null
+            || argument.equals("1")
+            || argument.equals("on")
+            || argument.equals("yes")
+            || argument.equals("true"))
+            return Boolean.TRUE;
+        if (argument.equals("0")
+            || argument.equals("off")
+            || argument.equals("no")
+            || argument.equals("false"))
+            return Boolean.FALSE;
+	return null;
+    }
+
   static Object valueOf (OptionInfo info, String argument)
   {
     if ((info.kind & BOOLEAN_OPTION) != 0)
       {
-    	if (argument == null
-	    || argument.equals("1")
-	    || argument.equals("on")
-	    || argument.equals("yes")
-	    || argument.equals("true"))
-	  return Boolean.TRUE;
-	if (argument.equals("0")
-	    || argument.equals("off")
-	    || argument.equals("no")
-	    || argument.equals("false"))
-	  return Boolean.FALSE;
-	return null;
+        return booleanValue(argument);
       }
     return argument;
   }

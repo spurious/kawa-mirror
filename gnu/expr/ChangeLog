@@ -1,3 +1,13 @@
+2016-06-11  Per Bothner  <per@bothner.com>
+
+	Handle setting prompt1 and prompt2 templates from command-line.
+	* ApplicationMainSupport.java (propertyField): Bind console:prompt1
+	and console:prompt2.
+	* Language.java (setCurrentLanguage): Only initialize prompt1 and
+	prompt2 ThreadLocations if they haven't been set yet.
+	* Language.java (declFromField): Tweak 06-02 change so we also
+	set IS_DYNAMIC given an appropriate ParameterizedType.
+
 2016-06-05  Per Bothner  <per@bothner.com>
 
 	* CommandCompleter.java (word, wordCursor, comp): New fields.

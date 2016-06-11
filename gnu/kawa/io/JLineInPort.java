@@ -246,7 +246,7 @@ public class JLineInPort extends TtyInPort
             inp.prompt = prompt;
             LineReader jlreader = inp.jlreader;
             jlreader.setVariable(LineReader.LINE_OFFSET, line);
-            String pattern2 = prompt2.get("");
+            String pattern2 = CheckConsole.prompt2.get("");
             jlreader.setVariable(LineReader.SECONDARY_PROMPT_PATTERN,
                                  inp.wrapPromptForAnsi(pattern2));
             inp.readState = saveState;

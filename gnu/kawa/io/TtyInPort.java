@@ -12,11 +12,6 @@ public class TtyInPort extends InPort
 
   protected Procedure prompter;
 
-    public static final ThreadLocation<String> prompt1
-        = new ThreadLocation<String>("prompt1");
-    public static final ThreadLocation<String> prompt2
-        = new ThreadLocation<String>("prompt2");
-
     boolean inDomTerm;
     public void setInDomTerm(boolean v) { inDomTerm = v; }
 
@@ -43,12 +38,12 @@ public class TtyInPort extends InPort
             return "";
         int line = getLineNumber() + 1;
         if (readState == ' ') {
-            String pattern = prompt1.get("");
+            String pattern = CheckConsole.prompt1.get("");
             String str = expandPrompt(pattern, 0, line, "");
             prompt1Length = str.length();
             return str;
         } else {
-            String pattern = prompt2.get("");
+            String pattern = CheckConsole.prompt2.get("");
             String m = new String(new char[] { readState });
             String str = expandPrompt(pattern, prompt1Length, line, m);
             return str;
@@ -56,7 +51,7 @@ public class TtyInPort extends InPort
     }
 
     /** Expand a prompt1 or prompt2 template to yield an actual prompt. */
-    public String expandPrompt(String pattern, int padToWidth, int line,
+    public static String expandPrompt(String pattern, int padToWidth, int line,
                                String message) {
         StringBuilder sb = new StringBuilder();
         int plen = pattern.length();

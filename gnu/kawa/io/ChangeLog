@@ -1,3 +1,12 @@
+2016-06-11  Per Bothner  <per@bothner.com>
+
+	Handle setting prompt1 and prompt2 templates from command-line.
+	* TtyInPort.java (prompt1, prompt2): Move to ...
+	* CheckConsole.java: ... here to avoid class initialization
+	order problem.
+	* TtyInPort.java (expandPrompt): Make static.
+	* JLineInPort.java: Update.
+
 2016-06-05  Per Bothner  <per@bothner.com>
 
 	* JLineInPort.java: Major changes to tab-completion for jline3.

@@ -1,6 +1,7 @@
 package gnu.kawa.io;
 
 import gnu.lists.Consumer;
+import gnu.mapping.ThreadLocation;
 
 /** Helper class to decide if we have an interactive console.
  * This needs to be separate from InPort, since the latter uses haveConsole
@@ -32,6 +33,12 @@ public class CheckConsole {
         // return true;
         /* #endif */
     }
+
+    public static final ThreadLocation<String> prompt1
+        = new ThreadLocation<String>("prompt1");
+
+    public static final ThreadLocation<String> prompt2
+        = new ThreadLocation<String>("prompt2");
 
     /** Check if parameter is a DomTerm console. */
     public static boolean forDomTerm(Consumer out) {

@@ -9,6 +9,7 @@ import gnu.lists.*;
 import gnu.text.Lexer;
 import gnu.text.SourceMessages;
 import gnu.kawa.io.CharArrayInPort;
+import gnu.kawa.io.CheckConsole;
 import gnu.kawa.io.InPort;
 import gnu.kawa.io.OutPort;
 import gnu.kawa.io.TtyInPort;
@@ -46,20 +47,22 @@ public abstract class Language
   public static void setCurrentLanguage (Language language)
   {
     current.set(language);
-    TtyInPort.prompt1.setGlobal(language.getPrimaryPrompt());
-    TtyInPort.prompt2.setGlobal(language.getSecondaryPrompt());
+    if (CheckConsole.prompt1.get(null) == null)
+        CheckConsole.prompt1.set(language.getPrimaryPrompt());
+    if (CheckConsole.prompt2.get(null) == null)
+        CheckConsole.prompt2.set(language.getSecondaryPrompt());
   }
 
   public static Language setSaveCurrent (Language language)
   {
     Language save = current.get();
-    setCurrentLanguage(language);
+    current.set(language);
     return save;
   }
 
   public static void restoreCurrent (Language saved)
   {
-    setCurrentLanguage(saved);
+    current.set(saved);
   }
 
   /**
@@ -1130,8 +1133,9 @@ public abstract class Language
         boolean isStatic = (fld.getModifiers() & Access.STATIC) != 0;
         if (isAlias) {
             fdecl.setIndirectBinding(true);
-            if (ftype instanceof ClassType) {
-                ClassType cftype = (ClassType) ftype;
+            Type frtype = ftype.getRawType();
+            if (frtype instanceof ClassType) {
+                ClassType cftype = (ClassType) frtype;
                 if (cftype.isSubclass("gnu.mapping.DynamicLocation")
                     || cftype.isSubclass("gnu.mapping.ThreadLocation"))
                     fdecl.setFlag(Declaration.IS_DYNAMIC);

@@ -2693,6 +2693,12 @@ Sets the JVM property @var{variable-name} to @var{variable-value},
 using the @code{setProperty} method of @code{java.lang.System}.
 @end table
 
+@table @code
+@item @code{console:prompt1=@var{prompt1}}
+@itemx @code{console:prompt2=@var{prompt2}}
+Initialize @ref{input-prompt1,@code{input-promp1} and @code{input-prompt2}}, respectively.
+@end table
+
 @subsection Options for controlling output formatting
 
 @table @code
@@ -14110,31 +14116,85 @@ omitted it defaults to the value returned by @code{(current-output-port)}.
 while R6RS added @code{flush-output-port}. They have the same effect.)
 @end deffn
 
+@subsection Prompts for interactive consoles (REPLs)
 
-@subsection Line numbers and other input port properties
+When an interactive input port is used for a read-eval-print-loop (REPL
+or console) it is traditional for the REPL to print a short
+@dfn{prompt} string to signal that the user is expected to type
+an expression.  These prompts strings can be customized.
 
-An interactive input port has a prompt procedure associated with it.
-The prompt procedure is called before a new line is read.  It is passed
-the port as an argument, and returns a string, which gets printed as a prompt.
+@anchor{input-prompt1}
+@defvar input-prompt1
+@defvarx input-prompt2
+These are fluid variable whose values are string templates
+with placeholders similar to @code{printf}-style format.
+The placeholders are expanded (depending on the current state),
+and the resulting string printed in front of the input line.
 
-@deffn Procedure input-port-prompter port
-Get the prompt procedure associated with @var{port}.
-@end deffn
+The @code{input-prompt1} is used normally.  For multi-line input commands
+(for example if the first line is incomplete), @code{input-prompt1}
+is used for the first line of each command, while @code{input-prompt2} is
+used for subsequent ``continuation'' lines.
+
+The following placeholders are handled:
+@table @asis
+@item @code{%%}
+A literal @samp{%}.
+@item @code{%@var{N}}
+The current line number.  This is @code{(+ 1 (port-line @var{port}))}.
+@item @code{%@var{N}P@var{c}}
+Insert padding at this possion, repeating the following
+  character @code{@var{c}} as needed to bring the total number of columns
+of the prompt to that specified by the digits @code{@var{N}}.
+@item @code{%P@var{c}}
+Same as @code{%@var{N}P@var{c}}, but @code{@var{N}} defaults to the number
+of columns in the initial prompt from the expansion of @code{input-prompt1}.
+This is only meaningful when expanding @code{input-prompt2} for
+contiuation lines.
+@item @code{%@var{M}}
+Insert a ``message'' string.
+Not normally used by Kawa, but supported by JLine.
+@end table
+
+These variables can be initialized by the command-line
+arguments @code{console:prompt1=@var{prompt1}} and
+@code{console:prompt2=@var{prompt2}}, respectively.  If these are
+not specified, languages-specific defaults are used.
+For example for Scheme the default value of @code{input-prompt1}
+is @code{"#|kawa:%N|# "} and @code{input-prompt2} is @code{"#|$P.%N| "}.
+These have the form of Scheme comments, to make it easier to cut-and-paste.
+@end defvar
+
+For greater flexibility, you can also set a prompter procedure.
 
 @deffn Procedure set-input-port-prompter! port prompter
 Set the prompt procedure associated with @var{port} to @var{prompter},
 which must be a one-argument procedure taking an input port,
 and returning a string.
+The procedure is called before reading the first line of a command;
+its return value is used as the first-line prompt.
+
+The prompt procedure can have side effects.
+In Bash shell terms: It combines the features of @code{PROMPT_COMMAND}
+and @code{PS1}.
+
+The initial @var{prompter} is @code{default-prompter},
+which returns the expansion of @code{input-prompt1}.
+@end deffn
+
+@deffn Procedure input-port-prompter port
+Get the prompt procedure associated with @var{port}.
 @end deffn
 
 @deffn Procedure default-prompter port
-The default prompt procedure.  It returns @code{"#|kawa:@var{L}|# "}, where
-@var{L} is the current line number of @var{port}.
-When reading a continuation line, the result
-is @code{"#|@var{C}---:@var{L}|# "}, where @code{C} is the character returned
-by @code{(input-port-read-state @var{port})}.
-The prompt has the form of a comment to make it easier to cut-and-paste.
+The default prompt procedure.
+Normally (i.e. when @code{input-port-read-state} is a space)
+returns @code{input-prompt1} after expanding the @code{%}-placeholders.
+Can also expand @code{input-prompt2} when @code{input-port-read-state}
+is not whitespace.
 @end deffn
+
+@subsection Line numbers and other input port properties
 
 @deffn Function port-column input-port
 @deffnx Function port-line input-port

@@ -1,3 +1,7 @@
+2016-06-12  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Ports): Document new features for setting prompts.
+
 2016-05-07  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (all): New rule does nothing.

@@ -96,7 +96,8 @@ dist-kawa-$(VERSION).jar: dist
 	  && tar xzf ../$(distdir).tar.gz \
 	  && rm -f ./patch-source-list \
 	  && ./kawa-$(VERSION)/configure --with-java-source=7 \
-	    --with-jline$(JLINE_VERSION_MAJOR)=@WITH_JLINE_PATH@ \
+	    --with-domterm="@WITH_DOMTERM_ARG@" \
+	    --with-jline$(JLINE_VERSION_MAJOR)="@WITH_JLINE_PATH@" \
 	    --with-servlet=@WITH_SERVLET_ARG@ --with-javafx=@WITH_JAVAFX_ARG@ \
 	  && CLASSPATH=@conf_classpath@.$(CLASSPATH_SEPARATOR)$$CLASSPATH $(MAKE) all \
 	  && mv lib/kawa-$(VERSION).jar ../dist-kawa-$(VERSION).jar \
@@ -110,11 +111,12 @@ kawa-$(ZIP_VERSION).zip: dist-kawa-$(VERSION).jar bin/kawa.bat
 	mkdir -p kawa-$(VERSION) kawa-$(VERSION)/lib  kawa-$(VERSION)/bin
 	cd kawa-$(VERSION)/lib; \
 	  $(LN_S) ../../dist-kawa-$(VERSION).jar kawa-$(VERSION).jar; \
+	  $(LN_S) @WITH_DOMTERM_ARG@ domterm.jar; \
 	  $(LN_S) @WITH_JLINE_PATH@ jline.jar
 	cd kawa-$(VERSION)/bin; \
 	  $(LN_S) ../../bin/kawa.sh kawa; \
 	  $(LN_S) ../../bin/kawa.bat kawa.bat
-	zip $@ kawa-$(VERSION)/bin/kawa kawa-$(VERSION)/bin/kawa.bat kawa-$(VERSION)/lib/kawa-$(VERSION).jar kawa-$(VERSION)/lib/jline.jar
+	zip $@ kawa-$(VERSION)/bin/kawa kawa-$(VERSION)/bin/kawa.bat kawa-$(VERSION)/lib/kawa-$(VERSION).jar kawa-$(VERSION)/lib/jline.jar kawa-$(VERSION)/lib/domterm.jar
 
 lib/jemacs-$(JEMACS_VERSION).jar:
 	srcdir=`(cd $(srcdir); /bin/pwd)` \
@@ -235,6 +237,10 @@ install-jar:
 	  $(DESTDIR)$(datadir)/kawa/lib/$(KAWAJAR)
 	cd $(DESTDIR)$(datadir)/kawa/lib && rm -f kawa.jar \
 	  && $(LN_S) $(KAWAJAR) kawa.jar
+if WITH_DOMTERM
+	cd $(DESTDIR)$(datadir)/kawa/lib && \
+	  $(LN_S) @WITH_DOMTERM_ARG@ domterm.jar
+endif
 if WITH_JLINE2
 	cd $(DESTDIR)$(datadir)/kawa/lib && \
 	  $(LN_S) @WITH_JLINE_PATH@ jline.jar
@@ -271,7 +277,7 @@ kawa/Version.java: $(srcdir)/kawa/Version.java.in $(srcdir)/configure.ac
 	sed -e 's|VERSION|@VERSION@'"$$SVN_REVISION|" <$(srcdir)/kawa/Version.java.in >$@
 
 all-recursive:  kawa/Version.java selected-java-source $(GENERATED_SIMPLEVECTOR_FILES)
-all: lib/kawa-@VERSION@.jar lib/kawart-@VERSION@.jar $(JLINE_LINK)
+all: lib/kawa-@VERSION@.jar lib/kawart-@VERSION@.jar $(JLINE_LINK) $(DOMTERM_LINK)
 
 if WITH_JLINE2
 JLINE_LINK = lib/jline.jar
@@ -279,6 +285,12 @@ JLINE_LINK = lib/jline.jar
 lib/jline.jar:
 	mkdir -p lib
 	$(LN_S) @WITH_JLINE_PATH@ lib/jline.jar
+endif
+if WITH_DOMTERM
+DOMTERM_LINK = lib/domterm.jar
+lib/domterm.jar:
+	mkdir -p lib
+	$(LN_S) @WITH_DOMTERM_ARG@ lib/domterm.jar
 endif
 
 JAVA_SOURCE = @JAVA_SOURCE@

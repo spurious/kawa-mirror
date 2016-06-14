@@ -1,5 +1,8 @@
 2016-06-14  Per Bothner  <per@bothner.com>
 
+	* Makefile.am: Add domterm.jar to kawa.zip.
+	* bin/kawa.sh.in: Add dmterm.jar to classpath.
+
 	* configure.ac: Implement new --with-domterm option.
 	* config.classpath: Update classpath.
 

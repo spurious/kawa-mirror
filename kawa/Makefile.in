@@ -89,6 +89,7 @@ build_triplet = @build@
 host_triplet = @host@
 @WITH_AWT_TRUE@am__append_1 = $(java_WITH_AWT)
 @WITH_JAVAX_SCRIPT_TRUE@am__append_2 = $(JAVAX_SCRIPT_EXTRA)
+@WITH_DOMTERM_TRUE@am__append_3 = DomTermBackend.java
 subdir = kawa
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/config.classpath \
@@ -229,6 +230,7 @@ SHELL = @SHELL@
 STRIP = @STRIP@
 TOP_BUILDDIR = @TOP_BUILDDIR@
 VERSION = @VERSION@
+WITH_DOMTERM_ARG = @WITH_DOMTERM_ARG@
 WITH_JAVAFX_ARG = @WITH_JAVAFX_ARG@
 WITH_JFREESVG_ARG = @WITH_JFREESVG_ARG@
 WITH_JLINE2 = @WITH_JLINE2@
@@ -399,7 +401,8 @@ KAWA_STANDARD_JAVA_FILES = \
 java_sources = Shell.java repl.java Version.java SourceMethodType.java \
 	SourceType.java TelnetInputStream.java TelnetOutputStream.java \
 	Telnet.java TelnetRepl.java $(KAWA_LANG_JAVA_FILES) \
-	$(KAWA_STANDARD_JAVA_FILES) $(am__append_1) $(am__append_2)
+	$(KAWA_STANDARD_JAVA_FILES) $(am__append_1) $(am__append_2) \
+	$(am__append_3)
 EXTRA_DIST = Version.java.in $(java_WITH_AWT) $(JAVAX_SCRIPT_EXTRA)
 EXTRA_CLEAN = lang/*.class standard/*.class
 PACKAGE_FNAME = kawa-repl

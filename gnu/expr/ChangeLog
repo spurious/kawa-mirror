@@ -1,3 +1,8 @@
+2016-06-14  Per Bothner  <per@bothner.com>
+
+	* ApplicationMainSupport.java (propertyField): Bind console:use-jline
+	and console:use-domterm.
+
 2016-06-11  Per Bothner  <per@bothner.com>
 
 	Handle setting prompt1 and prompt2 templates from command-line.

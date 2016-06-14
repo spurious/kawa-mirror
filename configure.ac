@@ -33,6 +33,10 @@ WITH_JAVAFX_ARG="${with_javafx}"
 AC_ARG_WITH(jline2,
  AS_HELP_STRING(--with-jline2=<:@=jline2.jar@:>@,Build support JLine2 input editing))
 
+AC_ARG_WITH(domterm,
+ AS_HELP_STRING(--with-domterm=<:@=domterm.jar@:>@,Build support for DomTerm))
+ WITH_DOMTERM_ARG="${with_domterm}"
+
 AC_ARG_WITH(jline3,
  AS_HELP_STRING(--with-jline3=<:@=jline3.jar@:>@,Build support JLine3 input editing))
 
@@ -177,6 +181,8 @@ AM_CONDITIONAL(WITH_JLINE2,
   test "$with_jline2" != "" -a "$with_jline2" != "no" || test "$with_jline3" != "" -a "$with_jline3" != "no")
 AM_CONDITIONAL(WITH_JLINE3,
   test "$with_jline3" != "" -a "$with_jline3" != "no")
+AM_CONDITIONAL(WITH_DOMTERM,
+  test "$with_domterm" != "" -a "$with_domterm" != "no")
 AM_CONDITIONAL(WITH_JAVAFX,
   test "$with_javafx" != "" -a "$with_javafx" != "no")
 AM_CONDITIONAL(WITH_SWT, test "$with_swt" = "yes")
@@ -219,6 +225,7 @@ AC_SUBST(WITH_JAVAFX_ARG)
 AC_SUBST(WITH_JLINE2)
 AC_SUBST(WITH_JLINE3)
 AC_SUBST(WITH_JLINE_PATH)
+AC_SUBST(WITH_DOMTERM_ARG)
 
 AC_SUBST(JAVA)
 AC_SUBST(JAVAC)

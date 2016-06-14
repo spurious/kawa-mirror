@@ -16,7 +16,8 @@ public class OutPort extends PrintConsumer implements Printable
   static final int FLUSH_ON_FINALIZE = 1;
   static final int CLOSE_ON_FINALIZE = 2;
   static final int IS_CLOSED = 4;
-  int finalizeAction;
+  static final int IS_DOMTERM = 8;
+    int flags;
 
   // To keep track of column-numbers, we use a helper class.
   // Otherwise, it is too painful, as there is no documented
@@ -96,11 +97,11 @@ public class OutPort extends PrintConsumer implements Printable
 
     static BinaryOutPort outInitial
         = BinaryOutPort.makeStandardPort(System.out, "/dev/stdout");
-    static { outInitial.finalizeAction = FLUSH_ON_FINALIZE; }
+    static { outInitial.flags = FLUSH_ON_FINALIZE; }
 
     private static BinaryOutPort errInitial
         = BinaryOutPort.makeStandardPort(System.err, "/dev/stderr");
-    static { errInitial.finalizeAction = FLUSH_ON_FINALIZE; }
+    static { errInitial.flags = FLUSH_ON_FINALIZE; }
 
     public static BinaryOutPort getSystemOut() { return outInitial; }
     public static BinaryOutPort getSystemErr() { return errInitial; }
@@ -155,7 +156,7 @@ public class OutPort extends PrintConsumer implements Printable
                           ? new OutputStreamWriter(strm)
                           : new OutputStreamWriter(strm, conv.toString()),
                           path);
-        op.finalizeAction = CLOSE_ON_FINALIZE;
+        op.flags = CLOSE_ON_FINALIZE;
         return op;
     }
 
@@ -400,7 +401,12 @@ public class OutPort extends PrintConsumer implements Printable
     unregisterRef = null;
   }
 
-    public boolean isOpen() { return (finalizeAction & IS_CLOSED) == 0; }
+    public boolean isOpen() { return (flags & IS_CLOSED) == 0; }
+    public boolean isDomTerm() { return (flags & IS_DOMTERM) != 0; }
+    public void setDomTerm(boolean v) {
+        if (v) flags |= IS_DOMTERM;
+        else flags &= ~IS_DOMTERM;
+    }
 
   @Override
   public void close()
@@ -422,7 +428,7 @@ public class OutPort extends PrintConsumer implements Printable
       }
     WriterManager.instance.unregister(unregisterRef);
     unregisterRef = null;
-    finalizeAction = IS_CLOSED;
+    flags = IS_CLOSED;
   }
 
   /** True if the port should be automatically closed on exit.
@@ -434,9 +440,9 @@ public class OutPort extends PrintConsumer implements Printable
 
   public void finalize ()
   {
-    if ((finalizeAction & FLUSH_ON_FINALIZE) != 0)
+    if ((flags & FLUSH_ON_FINALIZE) != 0)
       flush();
-    if ((finalizeAction & CLOSE_ON_FINALIZE) != 0)
+    if ((flags & CLOSE_ON_FINALIZE) != 0)
       close();
     else
       closeThis();

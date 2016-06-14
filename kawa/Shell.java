@@ -257,9 +257,13 @@ public class Shell
 	    try
 	      {
                 Compilation comp;
-                if (parserMethod != null)
-                    comp = (Compilation) parserMethod.invoke(null, language, lexer);
-                else {
+                if (parserMethod != null) {
+                    try {
+                        comp = (Compilation) parserMethod.invoke(null, language, lexer);
+                    } catch (java.lang.reflect.InvocationTargetException ex) {
+                        throw ex.getTargetException();
+                    }
+                } else {
                     comp = language.parse(lexer, opts, null);
                 }
 		boolean sawError;

@@ -37,6 +37,12 @@ case ${with_android} in
   "") ;;
   *) conf_classpath=${with_android}${CLASSPATH_SEPARATOR}$conf_classpath ;;
 esac
+case ${with_domterm} in
+  yes) ;;
+  no) ;;
+  "") ;;
+  *) conf_classpath=${with_domterm}${CLASSPATH_SEPARATOR}$conf_classpath ;;
+esac
 run_classpath=${conf_classpath}
 case ${with_jline2} in
   yes) ;;

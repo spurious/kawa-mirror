@@ -593,6 +593,7 @@ TOP_BUILDDIR
 JAVACFLAGS
 JAVAC
 JAVA
+WITH_DOMTERM_ARG
 WITH_JLINE_PATH
 WITH_JLINE3
 WITH_JLINE2
@@ -624,6 +625,8 @@ WITH_SWT_FALSE
 WITH_SWT_TRUE
 WITH_JAVAFX_FALSE
 WITH_JAVAFX_TRUE
+WITH_DOMTERM_FALSE
+WITH_DOMTERM_TRUE
 WITH_JLINE3_FALSE
 WITH_JLINE3_TRUE
 WITH_JLINE2_FALSE
@@ -738,6 +741,7 @@ with_jfreesvg
 with_android
 with_javafx
 with_jline2
+with_domterm
 with_jline3
 with_XQTS
 enable_echo2
@@ -1397,6 +1401,8 @@ Optional Packages:
                           Enable support for JavaFX
   --with-jline2=<:@=jline2.jar]
                           Build support JLine2 input editing
+  --with-domterm=<:@=domterm.jar]
+                          Build support for DomTerm
   --with-jline3=<:@=jline3.jar]
                           Build support JLine3 input editing
   --with-XQTS[=XQTS-path] Support XQuery Test Suite
@@ -2596,6 +2602,14 @@ fi
 
 
 
+# Check whether --with-domterm was given.
+if test "${with_domterm+set}" = set; then :
+  withval=$with_domterm;
+fi
+
+ WITH_DOMTERM_ARG="${with_domterm}"
+
+
 # Check whether --with-jline3 was given.
 if test "${with_jline3+set}" = set; then :
   withval=$with_jline3;
@@ -2898,6 +2912,14 @@ else
   WITH_JLINE3_FALSE=
 fi
 
+ if test "$with_domterm" != "" -a "$with_domterm" != "no"; then
+  WITH_DOMTERM_TRUE=
+  WITH_DOMTERM_FALSE='#'
+else
+  WITH_DOMTERM_TRUE='#'
+  WITH_DOMTERM_FALSE=
+fi
+
  if test "$with_javafx" != "" -a "$with_javafx" != "no"; then
   WITH_JAVAFX_TRUE=
   WITH_JAVAFX_FALSE='#'
@@ -3019,6 +3041,12 @@ case ${with_android} in
   "") ;;
   *) conf_classpath=${with_android}${CLASSPATH_SEPARATOR}$conf_classpath ;;
 esac
+case ${with_domterm} in
+  yes) ;;
+  no) ;;
+  "") ;;
+  *) conf_classpath=${with_domterm}${CLASSPATH_SEPARATOR}$conf_classpath ;;
+esac
 run_classpath=${conf_classpath}
 case ${with_jline2} in
   yes) ;;
@@ -3041,6 +3069,7 @@ case ${with_sax2} in
 esac
 
 XQTS_PATH=${with_XQTS:-XQTS}
+
 
 
 
@@ -3292,6 +3321,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${WITH_JLINE3_TRUE}" && test -z "${WITH_JLINE3_FALSE}"; then
   as_fn_error $? "conditional \"WITH_JLINE3\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${WITH_DOMTERM_TRUE}" && test -z "${WITH_DOMTERM_FALSE}"; then
+  as_fn_error $? "conditional \"WITH_DOMTERM\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${WITH_JAVAFX_TRUE}" && test -z "${WITH_JAVAFX_FALSE}"; then

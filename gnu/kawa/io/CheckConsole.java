@@ -2,6 +2,7 @@ package gnu.kawa.io;
 
 import gnu.lists.Consumer;
 import gnu.mapping.ThreadLocation;
+import gnu.text.Options;
 
 /** Helper class to decide if we have an interactive console.
  * This needs to be separate from InPort, since the latter uses haveConsole
@@ -40,10 +41,29 @@ public class CheckConsole {
     public static final ThreadLocation<String> prompt2
         = new ThreadLocation<String>("prompt2");
 
+    public static final ThreadLocation useJLine
+        = new ThreadLocation("use-jline");
+
+    public static final ThreadLocation useDomTerm
+        = new ThreadLocation("use-domterm");
+
+    public static int useJLine() { return getBoolean(useJLine); }
+    public static int useDomTerm() { return getBoolean(useDomTerm); }
+
+    private static int getBoolean(ThreadLocation loc) {
+        Object val = loc.get(null);
+        if (val == null)
+            return 0;
+        String sval = val.toString();
+        Boolean bval = Options.booleanValue(val.toString());
+        return bval == null ? 0 :
+            bval.booleanValue() ? 1 : -1;
+    }
+
     /** Check if parameter is a DomTerm console. */
     public static boolean forDomTerm(Consumer out) {
-        return out == OutPort.getSystemOut()
-            && getDomTermVersionInfo() != null;
+        return out instanceof OutPort
+            && ((OutPort) out).isDomTerm();
     }
 
     /** Return DomTerm version info, or null if not running under DomTerm.

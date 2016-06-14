@@ -26,6 +26,8 @@ import org.jline.reader.SyntaxError;
 import org.jline.reader.impl.DefaultParser;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
+import org.jline.terminal.impl.ExternalTerminal;
+import java.nio.charset.Charset;
 /* #else */
 // import jline.console.completer.Completer;
 /* #endif */
@@ -42,6 +44,7 @@ public class JLineInPort extends TtyInPort
     LineReader jlreader;
     org.jline.terminal.Terminal terminal;
     String prompt;
+    SourceMessages messages;
     /* #else */
     // jline.console.ConsoleReader jlreader;
     /* #endif */
@@ -50,22 +53,43 @@ public class JLineInPort extends TtyInPort
     private int charsRest;
     Language language;
 
+    /* #ifdef with:jline3 */
     public JLineInPort(InputStream in, Path name, OutPort tie)
         throws java.io.IOException {
+        this(in, name, tie, TerminalBuilder.terminal());
+    }
+    private static Terminal makeTerminal(InputStream in, OutputStream out) throws IOException {
+          Terminal terminal = new ExternalTerminal("Kawa", "xterm-256color",
+                                                   in, out,
+                                                   /* or maybe just "UTF-8" ?? */
+                                                   Charset.defaultCharset().name());
+          terminal.getAttributes().setOutputFlag(org.jline.terminal.Attributes.OutputFlag.ONLCR, true);
+          terminal.getAttributes().setOutputFlag(org.jline.terminal.Attributes.OutputFlag.OPOST, true);
+          return terminal;
+    }
+
+    public JLineInPort(InputStream in, Path name, OutputStream out, OutPort tie)
+        throws java.io.IOException {
+        this(in, name, tie, makeTerminal(in, out));
+    }
+    public JLineInPort(InputStream in, Path name, OutPort tie, Terminal terminal)
+        throws java.io.IOException {
         super(in, name, tie);
-        /* #ifdef with:jline3 */
-        Terminal terminal = TerminalBuilder.terminal();
         jlreader = LineReaderBuilder.builder()
             .terminal(terminal)
             .completer(this)
             .parser(this)
             .build();
         language = Language.getDefaultLanguage();
-        /* #else */
-        // jlreader = new jline.console.ConsoleReader();
-        // jlreader.addCompleter(this);
-        /* #endif */
     }
+    /* #else */
+    // public JLineInPort(InputStream in, Path name, OutPort tie)
+    //     throws java.io.IOException {
+    //     super(in, name, tie);
+    //     jlreader = new jline.console.ConsoleReader();
+    //     jlreader.addCompleter(this);
+    // }
+    /* #endif */
 
     /* #ifdef with:jline3 */
     public ParsedLine parse(String line, int cursor) throws SyntaxError {
@@ -73,8 +97,7 @@ public class JLineInPort extends TtyInPort
         cin.setLineNumber(this.getLineNumber());
         cin.setPath(this.getPath());
         try {
-            SourceMessages messages = new SourceMessages();
-            Lexer lexer = language.getLexer(cin, messages);
+            Lexer lexer = language.getLexer(cin, this.messages);
             lexer.setInteractive(true);
             Compilation comp =
                 language.parse(lexer,
@@ -82,8 +105,10 @@ public class JLineInPort extends TtyInPort
                                null);
             return new KawaParsedLine(this, comp, line, cursor);
         } catch (SyntaxException ex) {
-            if (cin.eofSeen())
+            if (cin.eofSeen()) {
+                messages.clear();
                 throw new EOFError(-1, -1, "unexpected end-of-file", "");
+            }
             throw ex;
         } catch (IOException ex) {
             throw new RuntimeException(ex);
@@ -250,6 +275,7 @@ public class JLineInPort extends TtyInPort
             jlreader.setVariable(LineReader.SECONDARY_PROMPT_PATTERN,
                                  inp.wrapPromptForAnsi(pattern2));
             inp.readState = saveState;
+            inp.messages = lexer.getMessages();
             try {
                 jlreader.readLine(inp.prompt, null, null, null);
                 KawaParsedLine parsedLine = (KawaParsedLine) jlreader.getParsedLine();

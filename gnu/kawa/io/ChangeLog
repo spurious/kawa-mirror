@@ -1,3 +1,14 @@
+2016-06-14  Per Bothner  <per@bothner.com>
+
+	* CheckConsole.java (useJLine): New ThreadLocation; new method.
+	(useDomTerm): New ThreadLocation; new method.
+	(forDomTerm): Use isDomTerm method rather than checking outInitial.
+	* JLineInPort.java: Various tweaks and small fixes.
+	* TtyInPort.java (make): Only create a JLineInPort if useJLine.
+	* OutPort.java (finalizeAction): Rename field to flags.
+	(IS_DOMTERM): New flag constant.
+	(isDomTerm, setDomTerm): New methods.
+
 2016-06-11  Per Bothner  <per@bothner.com>
 
 	Handle setting prompt1 and prompt2 templates from command-line.

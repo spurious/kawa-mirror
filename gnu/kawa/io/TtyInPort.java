@@ -1,7 +1,6 @@
 package gnu.kawa.io;
 import java.io.*;
 import gnu.mapping.Procedure;
-import gnu.mapping.ThreadLocation;
 
 /** An interactive input-port.
     Supports prompting, auto-flush of tied output port, transcripts. */
@@ -145,7 +144,7 @@ public class TtyInPort extends InPort
     }
 
     public String wrapPromptForAnsi(String prompt) {
-        return "\033[48;5;120m" + prompt + "\033[0m";
+        return "\033[38;5;120m" + prompt + "\033[39m";
     }
     public String wrapPromptForDomTerm(String prompt) {
         if (inDomTerm) {
@@ -216,17 +215,20 @@ public class TtyInPort extends InPort
     promptEmitted = false;
     return count;
   }
+
     public static TtyInPort make(InputStream in, Path name, OutPort tie) {
-        try {
-            return (TtyInPort)
-                Class.forName("gnu.kawa.io.JLineInPort")
-                .getConstructor(java.io.InputStream.class,
-                                gnu.kawa.io.Path.class,
-                                gnu.kawa.io.OutPort.class)
-                .newInstance(in, name, tie);
-        } catch (Throwable ex) {
+        if (CheckConsole.useJLine() >= 0) {
+            try {
+                return (TtyInPort)
+                    Class.forName("gnu.kawa.io.JLineInPort")
+                    .getConstructor(java.io.InputStream.class,
+                                    gnu.kawa.io.Path.class,
+                                    gnu.kawa.io.OutPort.class)
+                    .newInstance(in, name, tie);
+            } catch (Throwable ex) {
+                //ex.printStackTrace();
+            }
         }
         return new TtyInPort(in, name, tie);
     }
 }
-

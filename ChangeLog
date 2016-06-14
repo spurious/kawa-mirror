@@ -1,3 +1,8 @@
+2016-06-14  Per Bothner  <per@bothner.com>
+
+	* configure.ac: Implement new --with-domterm option.
+	* config.classpath: Update classpath.
+
 2016-06-03  Per Bothner  <per@bothner.com>
 
 	* configure.in (AC_INIT): Set version to 2.1.9.

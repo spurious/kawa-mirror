@@ -55,7 +55,7 @@ public class CharArrayOutPort extends OutPort
    */
   public void close ()
   {
-    finalizeAction = IS_CLOSED;
+    flags = IS_CLOSED;
   }
 
   /** No point in registering this port with a WriterManager. */

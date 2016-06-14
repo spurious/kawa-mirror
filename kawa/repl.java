@@ -686,7 +686,9 @@ public class repl extends Procedure0or1 {
             getLanguage();
             iArg = getArgs(args, iArg);
             checkInitFile();
-            if (! CheckConsole.haveConsole())
+            if (! CheckConsole.haveConsole()
+                // || CheckConsole.useDomTerm() > 0
+                )
                 startGuiConsole();
             else {
                 boolean ok = Shell.run(Language.getDefaultLanguage(),
@@ -813,17 +815,38 @@ public class repl extends Procedure0or1 {
         checkedDomTerm = true;
         String dversion = CheckConsole.getDomTermVersionInfo();
         if (dversion != null) {
+            OutPort.getSystemOut().setDomTerm(true);
             if (dversion.indexOf("err-handled;") < 0)
                 TermErrorStream.setSystemErr(false);
-        } else if (isAnsiTerminal()) {
-            TermErrorStream.setSystemErr(true);
         }
+        /*else if (isAnsiTerminal())
+            TermErrorStream.setSystemErr(true);
+        */
     }
     private static boolean isAnsiTerminal() {
         return CheckConsole.haveConsole(); // FIXME
     }
 
+    private static Throwable startJfxConsole() {
+        try {
+            Object replBackend =
+                Class.forName("kawa.DomTermBackend").newInstance();
+            Class.forName("org.domterm.javafx.WebTerminalApp")
+                .getMethod("startApp",
+                           Class.forName("org.domterm.Backend"),
+                           String[].class)
+                .invoke(null, replBackend, null);
+            return null;
+        } catch (Throwable ex) {
+            return ex;
+        }
+    }
+
     private static void startGuiConsole() {
+        if (CheckConsole.useDomTerm() >= 0) {
+            if (startJfxConsole() == null)
+                return;
+        }
         // Do this instead of just new GuiConsole in case we have
         // configured --without-awt.
         try {

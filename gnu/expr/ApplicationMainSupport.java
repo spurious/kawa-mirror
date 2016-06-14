@@ -130,6 +130,8 @@ public class ApplicationMainSupport
       { "display:toolkit", "gnu.kawa.models.Display", "myDisplay" },
       { "console:prompt1", "gnu.kawa.io.CheckConsole", "prompt1" },
       { "console:prompt2", "gnu.kawa.io.CheckConsole", "prompt2" },
+      { "console:use-jline", "gnu.kawa.io.CheckConsole", "useJLine" },
+      { "console:use-domterm", "gnu.kawa.io.CheckConsole", "useDomTerm" },
       null
     };
 }

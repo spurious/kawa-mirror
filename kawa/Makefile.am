@@ -115,6 +115,9 @@ endif
 if WITH_JAVAX_SCRIPT
 java_sources += $(JAVAX_SCRIPT_EXTRA)
 endif
+if WITH_DOMTERM
+java_sources += DomTermBackend.java
+endif
 
 EXTRA_DIST = Version.java.in $(java_WITH_AWT) $(JAVAX_SCRIPT_EXTRA)
 EXTRA_CLEAN = lang/*.class standard/*.class

@@ -834,8 +834,8 @@ public class repl extends Procedure0or1 {
             Class.forName("org.domterm.javafx.WebTerminalApp")
                 .getMethod("startApp",
                            Class.forName("org.domterm.Backend"),
-                           String[].class)
-                .invoke(null, replBackend, null);
+                           String.class, String[].class)
+                .invoke(null, replBackend, "Kawa (DomTerm)", null);
             return null;
         } catch (Throwable ex) {
             return ex;

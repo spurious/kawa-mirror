@@ -1,5 +1,7 @@
 2016-06-14  Per Bothner  <per@bothner.com>
 
+	* repl.java (startJfxConsole): Change to set window title.
+
 	New option to run a REPL in a JavaFX DomTerm window.
 	* DomTermBackend.java: New class, extends org.domterm.Backend.
 	It wraps a Kawa REPL.

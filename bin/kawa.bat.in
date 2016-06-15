@@ -27,6 +27,6 @@ if "%_JAVACMD%" == "" set _JAVACMD=java.exe
 if "%KAWA_VERSION%" == "" set KAWA_VERSION=@VERSION@
 set KAWA_PATH=%KAWA_HOME%\lib\kawa-%KAWA_VERSION%.jar
 rem ??? set EXTRA_PATH=@DEFAULT_EXTRA_PATH@
-set KAWA_EXTRA_PATH=%KAWA_HOME%\lib\jline.jar
+set KAWA_EXTRA_PATH="%KAWA_HOME%\lib\jline.jar;%KAWA_HOME%\lib\domterm.jar"
 
 "%_JAVACMD%" -classpath "%KAWA_PATH%;%KAWA_EXTRA_PATH%" kawa.repl %*%

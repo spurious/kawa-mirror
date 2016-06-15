@@ -16,6 +16,8 @@ public class DomTermBackend extends Backend implements Runnable {
     Appendable inOut;
     OutputStream inOutS;
     boolean usingJLine;
+    TtyInPort in_p;
+    java.lang.reflect.Method setSizeMethod;
 
     public DomTermBackend(Language language, Environment penvironment,
                           boolean shared) {
@@ -31,20 +33,22 @@ public class DomTermBackend extends Backend implements Runnable {
                                    Path.valueOf("/dev/stdout"));
         outp.setDomTerm(true);
         Path inPath = Path.valueOf("/dev/stdin");
-        TtyInPort in_p = null;
         int useJLine = CheckConsole.useJLine();
         if (useJLine >= 0) {
             try {
                 PipedInputStream in = new PipedInputStream();
 
                 inOutS = new PipedOutputStream(in);
+                Class JLineClass = Class.forName("gnu.kawa.io.JLineInPort");
                 in_p = (TtyInPort)
-                    Class.forName("gnu.kawa.io.JLineInPort")
+                    JLineClass
                     .getConstructor(java.io.InputStream.class,
                                     gnu.kawa.io.Path.class,
                                     java.io.OutputStream.class,
                                     gnu.kawa.io.OutPort.class)
                     .newInstance(in, (Path) inPath, (OutputStream) (new Utf8WriterOutputStream(outp)), (OutPort) outp);
+                setSizeMethod =
+                    JLineClass.getMethod("setSize", Integer.TYPE, Integer.TYPE);
                 usingJLine = true;
             } catch (Throwable ex) {
                 inOutS = null;
@@ -81,8 +85,11 @@ public class DomTermBackend extends Backend implements Runnable {
             sendInputMode(usingJLine ? 'c' : 'p');
             setAutomaticNewline(true);
         } catch (Throwable ex) { ex.printStackTrace(); }
+        if (this.nrows >= 0)
+            setWindowSize(nrows, ncols, pixw, pixh);
         Shell.run(language, env);
     }
+    public volatile int nrows = -1, ncols = -1, pixw, pixh;
 
     public void run(Writer out) throws Exception {
         this.termWriter = out;
@@ -103,4 +110,20 @@ public class DomTermBackend extends Backend implements Runnable {
             throw new RuntimeException(ex);
         }
     }
+
+    @Override
+    public void setWindowSize(int nrows, int ncols, int pixw, int pixh) {
+        this.nrows = nrows;
+        this.ncols = ncols;
+        this.pixw = pixw;
+        this.pixh = pixh;
+        if (in_p != null && setSizeMethod != null) {
+            try {
+                setSizeMethod.invoke(in_p, ncols, nrows);
+            } catch (Throwable ex) {
+                // ignore
+            }
+        }
+    }
+
 }

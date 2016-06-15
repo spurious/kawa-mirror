@@ -1,9 +1,13 @@
 2016-06-14  Per Bothner  <per@bothner.com>
 
+	Pass windows size events from DomTem to JLine.
+	* JLineInPort.java (setSIze): New method.
+
 	* CheckConsole.java (useJLine): New ThreadLocation; new method.
 	(useDomTerm): New ThreadLocation; new method.
 	(forDomTerm): Use isDomTerm method rather than checking outInitial.
 	* JLineInPort.java: Various tweaks and small fixes.
+
 	* TtyInPort.java (make): Only create a JLineInPort if useJLine.
 	* OutPort.java (finalizeAction): Rename field to flags.
 	(IS_DOMTERM): New flag constant.

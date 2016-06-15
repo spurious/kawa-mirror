@@ -1,5 +1,8 @@
 2016-06-14  Per Bothner  <per@bothner.com>
 
+	Pass windows size events from DomTem to JLine.
+	* DomTermBackend.java (setWindowSize): Override.
+
 	* repl.java (startJfxConsole): Change to set window title.
 
 	New option to run a REPL in a JavaFX DomTerm window.

@@ -24,6 +24,7 @@ import org.jline.reader.Parser;
 import org.jline.reader.UserInterruptException;
 import org.jline.reader.SyntaxError;
 import org.jline.reader.impl.DefaultParser;
+import org.jline.terminal.Size;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
 import org.jline.terminal.impl.ExternalTerminal;
@@ -81,6 +82,7 @@ public class JLineInPort extends TtyInPort
             .parser(this)
             .build();
         language = Language.getDefaultLanguage();
+        this.terminal = terminal;
     }
     /* #else */
     // public JLineInPort(InputStream in, Path name, OutPort tie)
@@ -224,6 +226,12 @@ public class JLineInPort extends TtyInPort
         /* #else */
         // jlreader.setPrompt(prompt);
         /* #endif */
+    }
+
+    public void setSize(int ncols, int nrows) {
+        Terminal term = terminal;
+        if (term != null)
+            term.setSize(new Size(ncols, nrows));
     }
 
     public static class KawaParsedLine implements ParsedLine {

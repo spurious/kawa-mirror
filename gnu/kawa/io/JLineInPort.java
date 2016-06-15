@@ -21,6 +21,7 @@ import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
 import org.jline.reader.ParsedLine;
 import org.jline.reader.Parser;
+import org.jline.reader.Parser.ParseContext;
 import org.jline.reader.UserInterruptException;
 import org.jline.reader.SyntaxError;
 import org.jline.reader.impl.DefaultParser;
@@ -94,7 +95,10 @@ public class JLineInPort extends TtyInPort
     /* #endif */
 
     /* #ifdef with:jline3 */
-    public ParsedLine parse(String line, int cursor) throws SyntaxError {
+    public ParsedLine parse(String line, int cursor,
+                            ParseContext context) throws SyntaxError {
+        if (context == ParseContext.COMPLETE)
+            return parseForComplete(line, cursor);
         CharArrayInPort cin = CharArrayInPort.make(line, "\n");
         cin.setLineNumber(this.getLineNumber());
         cin.setPath(this.getPath());
@@ -117,8 +121,7 @@ public class JLineInPort extends TtyInPort
         }
     }
 
-    @Override
-    public ParsedLine parseForComplete(String line, int cursor)
+    ParsedLine parseForComplete(String line, int cursor)
         throws SyntaxError {
         int buflen = line.length();
         char[] tbuf = new char[buflen + 1];

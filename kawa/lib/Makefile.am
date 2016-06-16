@@ -56,6 +56,9 @@ java_SCM= $(java_SCM_ALWAYS) $(scm_WITH_SWING)
 else
 java_SCM= $(java_SCM_ALWAYS)
 endif
+if WITH_DOMTERM
+java_SCM += kawa/domterm.scm
+endif
 
 # Used to generate makekawa.bat in ../.. .
 list-sources:

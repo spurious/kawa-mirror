@@ -2,6 +2,7 @@ package kawa;
 
 import org.domterm.*;
 import org.domterm.util.DomTermErrorWriter;
+import org.domterm.util.StyleSheets;
 import org.domterm.util.Utf8WriterOutputStream;
 import java.io.*;
 import gnu.expr.*;
@@ -17,7 +18,10 @@ public class DomTermBackend extends Backend implements Runnable {
     OutputStream inOutS;
     boolean usingJLine;
     TtyInPort in_p;
+    PipedInputStream inPipe; // only if usingJLine
     java.lang.reflect.Method setSizeMethod;
+    public static final ThreadLocation<DomTermBackend> instance
+        = new ThreadLocation<DomTermBackend>("domterm-backend");
 
     public DomTermBackend(Language language, Environment penvironment,
                           boolean shared) {
@@ -34,11 +38,12 @@ public class DomTermBackend extends Backend implements Runnable {
         outp.setDomTerm(true);
         Path inPath = Path.valueOf("/dev/stdin");
         int useJLine = CheckConsole.useJLine();
+        instance.set(this);
         if (useJLine >= 0) {
             try {
-                PipedInputStream in = new PipedInputStream();
+                inPipe = new PipedInputStream();
 
-                inOutS = new PipedOutputStream(in);
+                inOutS = new PipedOutputStream(inPipe);
                 Class JLineClass = Class.forName("gnu.kawa.io.JLineInPort");
                 in_p = (TtyInPort)
                     JLineClass
@@ -46,7 +51,7 @@ public class DomTermBackend extends Backend implements Runnable {
                                     gnu.kawa.io.Path.class,
                                     java.io.OutputStream.class,
                                     gnu.kawa.io.OutPort.class)
-                    .newInstance(in, (Path) inPath, (OutputStream) (new Utf8WriterOutputStream(outp)), (OutPort) outp);
+                    .newInstance(inPipe, (Path) inPath, (OutputStream) (new Utf8WriterOutputStream(outp)), (OutPort) outp);
                 setSizeMethod =
                     JLineClass.getMethod("setSize", Integer.TYPE, Integer.TYPE);
                 usingJLine = true;
@@ -126,4 +131,34 @@ public class DomTermBackend extends Backend implements Runnable {
         }
     }
 
+    public static void loadStyleSheet(String name, String fname)
+            throws IOException {
+        String command = StyleSheets.loadStyleSheetRequest(name, fname);
+        Writer commandWriter;
+        InPort breader;
+        DomTermBackend backend = instance.get(null);
+        if (backend != null) {
+            breader = backend.usingJLine ? new BinaryInPort(backend.inPipe)
+                : backend.in_p;
+            commandWriter = backend.termWriter;
+        } else {
+            OutPort outDefault = OutPort.getSystemOut();
+            InPort inDefault = InPort.inDefault();
+            if (! outDefault.isDomTerm() || ! (inDefault instanceof TtyInPort))
+                return; // ERROR
+            commandWriter = outDefault;
+            breader = inDefault;
+        }
+        commandWriter.write(command);
+        commandWriter.flush();
+        breader.mark(1);
+        int ch = breader.read();
+        if (ch == 0x9D) {
+            String response = breader.readLine();
+            //System.err.println("loadStyleSheet response: "+response);
+        }
+        if (ch >= 0)
+            breader.reset();
+        //System.err.println("(no response received)");
+    }
 }

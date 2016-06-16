@@ -1,5 +1,9 @@
 2016-06-16  Per Bothner  <per@bothner.com>
 
+	* kawa/domterm.scm: New module.
+	(domterm-load-stylesheet): New procedure.
+	* Makefile.am: Update accordingly.
+
 	* syntax.scm (%simple-construct-builder): Allow syntax like
 	'&T[EXP]' as roughly the same as '&T[EXP]{}' or '&T{&[EXP]}'.
 

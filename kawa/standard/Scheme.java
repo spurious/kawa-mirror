@@ -518,6 +518,7 @@ public class Scheme extends LispLanguage {
       defAliasStFld("input-prompt1", "gnu.kawa.io.CheckConsole", "prompt1");
       defAliasStFld("input-prompt2", "gnu.kawa.io.CheckConsole", "prompt2");
       defProcStFld("base-uri", "kawa.lib.misc");
+      defProcStFld("domterm-load-stylesheet", "kawa.lib.kawa.domterm");
 
       defProcStFld("syntax-error", "kawa.standard.syntax_error",
                    "syntax_error");

@@ -87,6 +87,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
+@WITH_DOMTERM_TRUE@am__append_1 = kawa/domterm.scm
 subdir = kawa/lib
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/config.classpath \
@@ -290,8 +291,9 @@ EXTRA_DIST = $(java_SCM_ALWAYS) $(scm_WITH_SWING) \
   scheme/inexact-exports scheme/lazy-exports \
   scheme/process-context-exports scheme/time-exports scheme/write-exports
 
-@WITH_SWING_FALSE@java_SCM = $(java_SCM_ALWAYS)
-@WITH_SWING_TRUE@java_SCM = $(java_SCM_ALWAYS) $(scm_WITH_SWING)
+@WITH_SWING_FALSE@java_SCM = $(java_SCM_ALWAYS) $(am__append_1)
+@WITH_SWING_TRUE@java_SCM = $(java_SCM_ALWAYS) $(scm_WITH_SWING) \
+@WITH_SWING_TRUE@	$(am__append_1)
 PACKAGE_FNAME = kawa-lib
 SCM_COMPILE_FLAGS = --warn-undefined-variable --warn-unknown-member --warn-as-error
 EXTRA_CLEAN = */*.class */*/*.class

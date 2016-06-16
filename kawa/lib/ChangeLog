@@ -1,3 +1,8 @@
+2016-06-16  Per Bothner  <per@bothner.com>
+
+	* syntax.scm (%simple-construct-builder): Allow syntax like
+	'&T[EXP]' as roughly the same as '&T[EXP]{}' or '&T{&[EXP]}'.
+
 2016-06-02  Per Bothner  <per@bothner.com>
 
 	* ports.scm (default-prompter): Change implementation.

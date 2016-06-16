@@ -309,13 +309,15 @@
        (let ((cname (datum->syntax #'name (%symbol->construct (syntax->datum #'name)))))
          #`(define-syntax #,cname
              (syntax-rules ()
-               ((#,cname . args)
+               ((_ . args)
                 (%simple-construct-builder constructor text-collector () . args))))))
       ((_ name constructor)
        #`(define-simple-constructor name constructor $string$)))))
 
 (define-syntax %simple-construct-builder
   (syntax-rules ($<<$ $>>$)
+    ((%simple-construct-builder fun mkstr () arg $>>$)
+     (fun arg))
     ((%simple-construct-builder fun mkstr (seen ...) $<<$ . rest)
      (fun (mkstr seen ... $<<$ . rest)))
     ((%simple-construct-builder fun mkstr (seen ...) $>>$ . rest)

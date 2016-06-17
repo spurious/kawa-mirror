@@ -136,6 +136,7 @@ public class QueueReader extends Reader
   public synchronized void appendEOF ()
   {
     EOFseen = true;
+    notifyAll();
   }
 
   protected void reserveSpace (int len)

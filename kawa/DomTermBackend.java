@@ -33,10 +33,10 @@ public class DomTermBackend extends Backend implements Runnable {
 
     @Override
     public void reportEvent(String name, String str) {
-        if (name.equals("KEY") && str.equals("67 \"\\u0003\"") // ctrl-C
+        if (name.equals("KEY") && str.equals("-3 \"\\u0003\"") // ctrl-C
             && in_p.sigIntHandler != null)
             in_p.sigIntHandler.run();
-        else if (name.equals("KEY") && str.equals("68 \"\\u0004\"") // ctrl-D
+        else if (name.equals("KEY") && str.equals("-4 \"\\u0004\"") // ctrl-D
                  && inIn != null) {
             inIn.appendEOF();
         } else

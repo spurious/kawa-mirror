@@ -31,6 +31,18 @@ public class DomTermBackend extends Backend implements Runnable {
         this(Language.getDefaultLanguage(), Environment.getCurrent(), false);
     }
 
+    @Override
+    public void reportEvent(String name, String str) {
+        if (name.equals("KEY") && str.equals("67 \"\\u0003\"") // ctrl-C
+            && in_p.sigIntHandler != null)
+            in_p.sigIntHandler.run();
+        else if (name.equals("KEY") && str.equals("68 \"\\u0004\"") // ctrl-D
+                 && inIn != null) {
+            inIn.appendEOF();
+        } else
+            super.reportEvent(name, str);
+    }
+
     public void run() {
         Writer errWriter = new DomTermErrorWriter(termWriter);
         OutPort outp = new OutPort(termWriter, true, true,
@@ -93,6 +105,11 @@ public class DomTermBackend extends Backend implements Runnable {
         if (this.nrows >= 0)
             setWindowSize(nrows, ncols, pixw, pixh);
         Shell.run(language, env);
+        try {
+            termWriter.write("\033[99;99u");
+        } catch (Throwable ex) {
+            // ignore
+        }
     }
     public volatile int nrows = -1, ncols = -1, pixw, pixh;
 

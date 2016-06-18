@@ -1,3 +1,11 @@
+2016-06-17  Per Bothner  <per@bothner.com>
+
+	Improve handling of Ctrl-C (interrupt) and Ctrl-D (end-of-file).
+	* DomTermBackend.java (reportEvent): New method.
+	(run): Write end-of-file sequence to DomTerm.
+	* Shell.java (class SigIntHandler): New class, implements Runnable.
+	(run): Set up SIGINT handlers.
+
 2016-06-16  Per Bothner  <per@bothner.com>
 
 	Add support for (re-)loading stylesheet under DomTerm.

@@ -519,6 +519,7 @@ GNU_KAWA_UTIL_JSOURCES = \
   kawa/util/HashUtils.java \
   kawa/util/RangeTable.java \
   kawa/util/RunTestScript.java \
+  kawa/util/Signals.java \
   kawa/util/WeakHashNode.java \
   kawa/util/WeakIdentityHashMap.java
 

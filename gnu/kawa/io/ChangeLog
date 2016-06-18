@@ -1,5 +1,7 @@
 2016-06-17  Per Bothner  <per@bothner.com>
 
+	* TtyInPort.java (signIntHandler): New field.
+
 	* QueueReader.java (appendEOF): Add missing notifyAll call.
 
 2016-06-15  Per Bothner  <per@bothner.com>

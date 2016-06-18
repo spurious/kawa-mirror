@@ -14,6 +14,9 @@ public class TtyInPort extends InPort
     boolean inDomTerm;
     public void setInDomTerm(boolean v) { inDomTerm = v; }
 
+    /** Callback when SIGINT or ctrl-C is typed. */
+    public Runnable sigIntHandler;
+
   /** Get the current prompter function. */
 
   public Procedure getPrompter () { return prompter; }

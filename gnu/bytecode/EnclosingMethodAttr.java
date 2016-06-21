@@ -63,11 +63,14 @@ public class EnclosingMethodAttr extends Attribute
     dst.print("  class: ");
     dst.printOptionalIndex(class_index);
     CpoolEntry centry = constants.getForced(class_index, ConstantPool.CLASS);
-    dst.print(((CpoolClass) centry).getStringName());
-    dst.print(", method: ");
-    dst.printOptionalIndex(method_index);
-    centry = constants.getForced(method_index, ConstantPool.NAME_AND_TYPE);
-    centry.print(dst, 0);
+    dst.print(((CpoolClass) centry).getClassName());
+    if (method_index != 0)
+      {
+        dst.print(", method: ");
+        dst.printOptionalIndex(method_index);
+        centry = constants.getForced(method_index, ConstantPool.NAME_AND_TYPE);
+        centry.print(dst, 0);
+      }
     dst.println();
   }
 

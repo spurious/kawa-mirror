@@ -90,12 +90,20 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-@ENABLE_JEMACS_TRUE@am__append_1 = $(JEMACS_SUBDIRS)
-@ENABLE_BRL_TRUE@@ENABLE_XML_TRUE@am__append_2 = $(BRL_SUBDIRS)
-@ENABLE_XML_TRUE@@ENABLE_XQUERY_TRUE@am__append_3 = $(XQUERY_SUBDIRS)
-@WITH_ANDROID_TRUE@am__append_4 = $(ANDROID_SUBDIRS)
-@WITH_JAVAFX_TRUE@am__append_5 = $(JAVAFX_SUBDIRS)
-@ENABLE_KAWA_FRONTEND_TRUE@am__append_6 = bin
+@WITH_SWING_TRUE@am__append_1 = $(GNU_KAWA_SWINGVIEWS_JSOURCES)
+@WITH_SWT_TRUE@am__append_2 = $(GNU_KAWA_SWTVIEWS_JSOURCES)
+@WITH_JLINE2_TRUE@am__append_3 = $(GNU_KAWA_IO_JLINE_JSOURCES)
+@ENABLE_XML_TRUE@am__append_4 = $(GNU_XML_JSOURCES) $(GNU_KAWA_XML_JSOURCES) $(GNU_KAWA_LISPEXPR_XML_JSOURCES)
+@ENABLE_XML_TRUE@@WITH_SAX2_TRUE@am__append_5 = $(GNU_KAWA_SAX_JSOURCES)
+@ENABLE_ECHO2_TRUE@am__append_6 = $(GNU_KAWA_ECHO2_JSOURCES)
+@ENABLE_XQUERY_TRUE@am__append_7 = $(GNU_KAWA_XSLT_JSOURCES)
+@WITH_JAVAX_SCRIPT_TRUE@am__append_8 = $(JAVAX_SCRIPT_EXTRA)
+@ENABLE_JEMACS_TRUE@am__append_9 = $(JEMACS_SUBDIRS)
+@ENABLE_BRL_TRUE@@ENABLE_XML_TRUE@am__append_10 = $(BRL_SUBDIRS)
+@ENABLE_XML_TRUE@@ENABLE_XQUERY_TRUE@am__append_11 = $(XQUERY_SUBDIRS)
+@WITH_ANDROID_TRUE@am__append_12 = $(ANDROID_SUBDIRS)
+@WITH_JAVAFX_TRUE@am__append_13 = $(JAVAFX_SUBDIRS)
+@ENABLE_KAWA_FRONTEND_TRUE@am__append_14 = bin
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/config.classpath \
@@ -194,10 +202,10 @@ ETAGS = etags
 CTAGS = ctags
 CSCOPE = cscope
 am__DIST_COMMON = $(srcdir)/Makefile.in $(top_srcdir)/bin/kawa.bat.in \
-	$(top_srcdir)/bin/kawa.sh.in $(top_srcdir)/bin/qexo.in AUTHORS \
-	COPYING ChangeLog INSTALL NEWS README TODO compile \
-	config.guess config.sub depcomp install-sh missing \
-	mkinstalldirs
+	$(top_srcdir)/bin/kawa.sh.in $(top_srcdir)/bin/qexo.in \
+	$(top_srcdir)/source-list AUTHORS COPYING ChangeLog INSTALL \
+	NEWS README TODO compile config.guess config.sub depcomp \
+	install-sh missing mkinstalldirs
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 distdir = $(PACKAGE)-$(VERSION)
 top_distdir = $(distdir)
@@ -348,6 +356,588 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
+GNU_EXPR_JSOURCES = \
+  gnu/expr/AccessExp.java \
+  gnu/expr/ANormalize.java \
+  gnu/expr/ApplicationMainSupport.java \
+  gnu/expr/ApplyExp.java \
+  gnu/expr/BeginExp.java \
+  gnu/expr/BindingInitializer.java \
+  gnu/expr/BlockExp.java \
+  gnu/expr/BuiltinEnvironment.java \
+  gnu/expr/CanFinishMap.java \
+  gnu/expr/CatchClause.java \
+  gnu/expr/ChainLambdas.java \
+  gnu/expr/CheckedTarget.java \
+  gnu/expr/ClassExp.java \
+  gnu/expr/ClassInitializer.java \
+  gnu/expr/CommandCompleter.java \
+  gnu/expr/Compilation.java \
+  gnu/expr/CompiledModule.java \
+  gnu/expr/ConditionalTarget.java \
+  gnu/expr/ConsumerTarget.java \
+  gnu/expr/Declaration.java \
+  gnu/expr/ErrorExp.java \
+  gnu/expr/ExitExp.java \
+  gnu/expr/Expression.java \
+  gnu/expr/ExpExpVisitor.java \
+  gnu/expr/ExpVisitor.java \
+  gnu/expr/FindCapturedVars.java \
+  gnu/expr/FindTailCalls.java \
+  gnu/expr/FluidLetExp.java \
+  gnu/expr/GenericProc.java \
+  gnu/expr/IfExp.java \
+  gnu/expr/CaseExp.java \
+  gnu/expr/IgnoreTarget.java \
+  gnu/expr/Initializer.java \
+  gnu/expr/Inlineable.java \
+  gnu/expr/InlineCalls.java \
+  gnu/expr/KawaConvert.java \
+  gnu/expr/Keyword.java \
+  gnu/expr/LambdaExp.java \
+  gnu/expr/LangExp.java \
+  gnu/expr/Language.java \
+  gnu/expr/LetExp.java \
+  gnu/expr/Literal.java \
+  gnu/expr/LitTable.java \
+  gnu/expr/ModuleBody.java \
+  gnu/expr/ModuleContext.java \
+  gnu/expr/ModuleInfo.java \
+  gnu/expr/ModuleManager.java \
+  gnu/expr/ModuleMethod.java \
+  gnu/expr/ModuleMethodWithContext.java \
+  gnu/expr/ModuleSet.java \
+  gnu/expr/ModuleExp.java \
+  gnu/expr/NameLookup.java \
+  gnu/expr/PairClassType.java \
+  gnu/expr/ResolveNames.java \
+  gnu/expr/ObjectExp.java \
+  gnu/expr/QuoteExp.java \
+  gnu/expr/PrimProcedure.java \
+  gnu/expr/ProcInitializer.java \
+  gnu/expr/PushApply.java \
+  gnu/expr/ReferenceExp.java \
+  gnu/expr/RunnableModule.java \
+  gnu/expr/ScopeExp.java \
+  gnu/expr/SetExp.java \
+  gnu/expr/SourceName.java \
+  gnu/expr/Special.java \
+  gnu/expr/StackTarget.java \
+  gnu/expr/Symbols.java \
+  gnu/expr/SynchronizedExp.java \
+  gnu/expr/Target.java \
+  gnu/expr/ThisExp.java \
+  gnu/expr/TryExp.java \
+  gnu/expr/TypeValue.java \
+  gnu/expr/VarValueTracker.java
+
+JAVAX_SCRIPT_EXTRA = \
+  gnu/expr/AbstractScriptEngineFactory.java \
+  gnu/expr/KawaScriptBindings.java \
+  gnu/expr/KawaScriptEngine.java
+
+GNU_LISTS_JSOURCES = \
+  gnu/lists/AbstractCharVector.java \
+  gnu/lists/AbstractFormat.java \
+  gnu/lists/AbstractSequence.java \
+  gnu/lists/Array.java \
+  gnu/lists/Arrays.java \
+  gnu/lists/AttributePredicate.java \
+  gnu/lists/AVector.java \
+  gnu/lists/BitVector.java \
+  gnu/lists/Blob.java \
+  gnu/lists/ByteVector.java \
+  gnu/lists/CharBuffer.java \
+  gnu/lists/CharSeq.java \
+  gnu/lists/CharVector.java \
+  gnu/lists/ComposedArray.java \
+  gnu/lists/Consumer.java \
+  gnu/lists/ConsumerWriter.java \
+  gnu/lists/Consumable.java \
+  gnu/lists/Convert.java \
+  gnu/lists/ElementPredicate.java \
+  gnu/lists/EmptyList.java \
+  gnu/lists/EofClass.java \
+  gnu/lists/ExtPosition.java \
+  gnu/lists/ExtSequence.java \
+  gnu/lists/F32Vector.java \
+  gnu/lists/F64Vector.java \
+  gnu/lists/FilterConsumer.java \
+  gnu/lists/FlattenedArray.java \
+  gnu/lists/FString.java \
+  gnu/lists/FVector.java \
+  gnu/lists/GeneralArray.java \
+  gnu/lists/GeneralArray1.java \
+  gnu/lists/ItemPredicate.java \
+  gnu/lists/ImmutablePair.java \
+  gnu/lists/IndirectIndexedSeq.java \
+  gnu/lists/IntSequence.java \
+  gnu/lists/IntVector.java \
+  gnu/lists/LList.java \
+  gnu/lists/LListPosition.java \
+  gnu/lists/LongVector.java \
+  gnu/lists/NodePredicate.java \
+  gnu/lists/Pair.java \
+  gnu/lists/PairWithPosition.java \
+  gnu/lists/PositionConsumer.java \
+  gnu/lists/PositionManager.java \
+  gnu/lists/PrimIntegerVector.java \
+  gnu/lists/PrintConsumer.java \
+  gnu/lists/Range.java \
+  gnu/lists/RAPair.java \
+  gnu/lists/S8Vector.java \
+  gnu/lists/S16Vector.java \
+  gnu/lists/S32Vector.java \
+  gnu/lists/S64Vector.java \
+  gnu/lists/SeqPosition.java \
+  gnu/lists/Sequence.java \
+  gnu/lists/Sequences.java \
+  gnu/lists/ShortVector.java \
+  gnu/lists/SimpleVector.java \
+  gnu/lists/SubCharSeq.java \
+  gnu/lists/SubSequence.java \
+  gnu/lists/StableManager.java \
+  gnu/lists/Strings.java \
+  gnu/lists/TransformedArray.java \
+  gnu/lists/TreeList.java \
+  gnu/lists/TreePosition.java \
+  gnu/lists/U8Vector.java \
+  gnu/lists/U16Vector.java \
+  gnu/lists/U32Vector.java \
+  gnu/lists/U64Vector.java \
+  gnu/lists/UnescapedData.java \
+  gnu/lists/VoidConsumer.java \
+  gnu/lists/XConsumer.java
+
+GNU_MAPPING_JSOURCES = \
+  gnu/mapping/CallContext.java \
+  gnu/mapping/ConstrainedLocation.java \
+  gnu/mapping/DynamicLocation.java \
+  gnu/mapping/Environment.java \
+  gnu/mapping/EnvironmentKey.java \
+  gnu/mapping/Future.java \
+  gnu/mapping/HasNamedParts.java \
+  gnu/mapping/HasSetter.java \
+  gnu/mapping/IndirectableLocation.java \
+  gnu/mapping/InheritingEnvironment.java \
+  gnu/mapping/KeyPair.java \
+  gnu/mapping/Lazy.java \
+  gnu/mapping/LazyPropertyKey.java \
+  gnu/mapping/Location.java \
+  gnu/mapping/LocationEnumeration.java \
+  gnu/mapping/LocationProc.java \
+  gnu/mapping/MethodProc.java \
+  gnu/mapping/Named.java \
+  gnu/mapping/NamedLocation.java \
+  gnu/mapping/Namespace.java \
+  gnu/mapping/PlainLocation.java \
+  gnu/mapping/Procedure.java \
+  gnu/mapping/Procedure0.java \
+  gnu/mapping/Procedure0or1.java \
+  gnu/mapping/Procedure1.java \
+  gnu/mapping/Procedure1or2.java \
+  gnu/mapping/Procedure2.java \
+  gnu/mapping/Procedure3.java \
+  gnu/mapping/Procedure4.java \
+  gnu/mapping/ProcedureN.java \
+  gnu/mapping/ProcLocation.java \
+  gnu/mapping/Promise.java \
+  gnu/mapping/PropertyKey.java \
+  gnu/mapping/PropertyLocation.java \
+  gnu/mapping/PropertySet.java \
+  gnu/mapping/ReadOnlyLocation.java \
+  gnu/mapping/RunnableClosure.java \
+  gnu/mapping/Setter.java \
+  gnu/mapping/Setter0.java \
+  gnu/mapping/Setter1.java \
+  gnu/mapping/SharedLocation.java \
+  gnu/mapping/SimpleEnvironment.java \
+  gnu/mapping/SimpleSymbol.java \
+  gnu/mapping/Symbol.java \
+  gnu/mapping/Table2D.java \
+  gnu/mapping/ThreadLocation.java \
+  gnu/mapping/UnboundLocationException.java \
+  gnu/mapping/Values.java \
+  gnu/mapping/ValueStack.java \
+  gnu/mapping/WrappedException.java \
+  gnu/mapping/WrongArguments.java \
+  gnu/mapping/WrongType.java
+
+GNU_TEXT_JSOURCES = \
+  gnu/text/CaseConvertFormat.java \
+  gnu/text/Char.java \
+  gnu/text/CompoundFormat.java \
+  gnu/text/DelimitSubstitutionFormat.java \
+  gnu/text/EnglishIntegerFormat.java \
+  gnu/text/FlushFormat.java \
+  gnu/text/IntegerFormat.java \
+  gnu/text/Lexer.java \
+  gnu/text/LiteralFormat.java \
+  gnu/text/NamedCharTable.java \
+  gnu/text/Options.java \
+  gnu/text/PadFormat.java \
+  gnu/text/Printable.java \
+  gnu/text/ReportFormat.java \
+  gnu/text/ResourceStreamHandler.java \
+  gnu/text/RomanIntegerFormat.java \
+  gnu/text/SourceLocator.java \
+  gnu/text/SourceError.java \
+  gnu/text/SourceMessages.java \
+  gnu/text/StandardNamedChars.java \
+  gnu/text/StringCursor.java \
+  gnu/text/SyntaxException.java
+
+GNU_KAWA_FUNCTIONS_JSOURCES = \
+  gnu/kawa/functions/AddOp.java \
+  gnu/kawa/functions/AppendValues.java \
+  gnu/kawa/functions/Apply.java \
+  gnu/kawa/functions/ApplyToArgs.java \
+  gnu/kawa/functions/ApplyWithValues.java \
+  gnu/kawa/functions/Arithmetic.java \
+  gnu/kawa/functions/ArithOp.java \
+  gnu/kawa/functions/Arrays.java \
+  gnu/kawa/functions/ArrayPrint.java \
+  gnu/kawa/functions/ArrayRef.java \
+  gnu/kawa/functions/ArraySet.java \
+  gnu/kawa/functions/BitwiseOp.java \
+  gnu/kawa/functions/CallCC.java \
+  gnu/kawa/functions/CallWithValues.java \
+  gnu/kawa/functions/CompilationHelpers.java \
+  gnu/kawa/functions/CompileArith.java \
+  gnu/kawa/functions/CompileNamedPart.java \
+  gnu/kawa/functions/CompileMisc.java \
+  gnu/kawa/functions/CompileProcess.java \
+  gnu/kawa/functions/CompileValues.java \
+  gnu/kawa/functions/ConstantFunction0.java \
+  gnu/kawa/functions/Convert.java \
+  gnu/kawa/functions/CurryExp.java \
+  gnu/kawa/functions/Curry1.java \
+  gnu/kawa/functions/DisplayFormat.java \
+  gnu/kawa/functions/DivideOp.java \
+  gnu/kawa/functions/GetModuleClass.java \
+  gnu/kawa/functions/GetNamedInstancePart.java \
+  gnu/kawa/functions/GetNamedPart.java \
+  gnu/kawa/functions/IntegerFormat.java \
+  gnu/kawa/functions/IsEq.java \
+  gnu/kawa/functions/IsEqual.java \
+  gnu/kawa/functions/IsEqv.java \
+  gnu/kawa/functions/LProcess.java \
+  gnu/kawa/functions/MakeDynamic.java \
+  gnu/kawa/functions/MakeList.java \
+  gnu/kawa/functions/MakeProcedure.java \
+  gnu/kawa/functions/MakePromise.java \
+  gnu/kawa/functions/MakeSplice.java \
+  gnu/kawa/functions/Map.java \
+  gnu/kawa/functions/MultiplyOp.java \
+  gnu/kawa/functions/NamedPart.java \
+  gnu/kawa/functions/Not.java \
+  gnu/kawa/functions/NumberCompare.java \
+  gnu/kawa/functions/NumberPredicate.java \
+  gnu/kawa/functions/RunProcess.java \
+  gnu/kawa/functions/SetNamedPart.java \
+  gnu/kawa/functions/Setter.java \
+  gnu/kawa/functions/UnicodeUtils.java \
+  gnu/kawa/functions/ValuesMap.java \
+  gnu/kawa/functions/Format.java \
+  gnu/kawa/functions/LispFormat.java \
+  gnu/kawa/functions/LispRealFormat.java \
+  gnu/kawa/functions/ObjectFormat.java \
+  gnu/kawa/functions/ParseFormat.java
+
+GNU_KAWA_IO_JSOURCES = \
+  gnu/kawa/io/BinaryInPort.java \
+  gnu/kawa/io/BinaryOutPort.java \
+  gnu/kawa/io/CharArrayInPort.java \
+  gnu/kawa/io/CharArrayOutPort.java \
+  gnu/kawa/io/CheckConsole.java \
+  gnu/kawa/io/FilePath.java \
+  gnu/kawa/io/InPort.java \
+  gnu/kawa/io/LogWriter.java \
+  gnu/kawa/io/NullReader.java \
+  gnu/kawa/io/Path.java \
+  gnu/kawa/io/OutPort.java \
+  gnu/kawa/io/NBufferedInputStream.java \
+  gnu/kawa/io/PrettyWriter.java \
+  gnu/kawa/io/QueueReader.java \
+  gnu/kawa/io/TermErrorStream.java \
+  gnu/kawa/io/TtyInPort.java \
+  gnu/kawa/io/URIPath.java \
+  gnu/kawa/io/URLPath.java \
+  gnu/kawa/io/WriterManager.java
+
+GNU_KAWA_ECHO2_JSOURCES = \
+  gnu/kawa/echo2/Echo2AppInstance.java \
+  gnu/kawa/echo2/Echo2Display.java \
+  gnu/kawa/echo2/Echo2Servlet.java \
+  gnu/kawa/echo2/Echo2Window.java
+
+GNU_KAWA_REFLECT_JSOURCES = \
+  gnu/kawa/reflect/ArrayGet.java \
+  gnu/kawa/reflect/ArrayLength.java \
+  gnu/kawa/reflect/ArrayMake.java \
+  gnu/kawa/reflect/ArrayNew.java \
+  gnu/kawa/reflect/ArraySet.java \
+  gnu/kawa/reflect/ClassMemberLocation.java \
+  gnu/kawa/reflect/ClassMethods.java \
+  gnu/kawa/reflect/CompileArrays.java \
+  gnu/kawa/reflect/CompileBuildObject.java \
+  gnu/kawa/reflect/CompileInvoke.java \
+  gnu/kawa/reflect/CompileReflect.java \
+  gnu/kawa/reflect/FieldLocation.java \
+  gnu/kawa/reflect/InstanceOf.java \
+  gnu/kawa/reflect/Invoke.java \
+  gnu/kawa/reflect/LazyType.java \
+  gnu/kawa/reflect/MakeAnnotation.java \
+  gnu/kawa/reflect/MultValuesType.java \
+  gnu/kawa/reflect/OccurrenceType.java \
+  gnu/kawa/reflect/ProceduralProxy.java \
+  gnu/kawa/reflect/SingletonType.java \
+  gnu/kawa/reflect/SlotGet.java \
+  gnu/kawa/reflect/SlotSet.java \
+  gnu/kawa/reflect/StaticFieldLocation.java \
+  gnu/kawa/reflect/StaticGet.java \
+  gnu/kawa/reflect/StaticSet.java \
+  gnu/kawa/reflect/Throw.java \
+  gnu/kawa/reflect/TypeSwitch.java
+
+GNU_KAWA_UTIL_JSOURCES = \
+  gnu/kawa/util/AbstractHashTable.java \
+  gnu/kawa/util/AbstractWeakHashTable.java \
+  gnu/kawa/util/BoundedHashable.java \
+  gnu/kawa/util/ExitCalled.java \
+  gnu/kawa/util/FixupHtmlToc.java \
+  gnu/kawa/util/GeneralHashTable.java \
+  gnu/kawa/util/IdentityHashTable.java \
+  gnu/kawa/util/IntHashTable.java \
+  gnu/kawa/util/HashNode.java \
+  gnu/kawa/util/HashUtils.java \
+  gnu/kawa/util/RangeTable.java \
+  gnu/kawa/util/RunTestScript.java \
+  gnu/kawa/util/Signals.java \
+  gnu/kawa/util/WeakHashNode.java \
+  gnu/kawa/util/WeakIdentityHashMap.java
+
+GNU_KAWA_LISPEXPR_XML_JSOURCES = \
+  gnu/kawa/lispexpr/MakeXmlElement.java \
+  gnu/kawa/lispexpr/ReaderXmlElement.java \
+  gnu/kawa/lispexpr/ResolveNamespace.java
+
+GNU_KAWA_LISPEXPR_JSOURCES = \
+  gnu/kawa/lispexpr/BracketApply.java \
+  gnu/kawa/lispexpr/ClassNamespace.java \
+  gnu/kawa/lispexpr/DefineNamespace.java \
+  gnu/kawa/lispexpr/GenArrayType.java \
+  gnu/kawa/lispexpr/LangObjType.java \
+  gnu/kawa/lispexpr/LangPrimType.java \
+  gnu/kawa/lispexpr/LispLanguage.java \
+  gnu/kawa/lispexpr/LispPackage.java \
+  gnu/kawa/lispexpr/LispReader.java \
+  gnu/kawa/lispexpr/ReaderColon.java \
+  gnu/kawa/lispexpr/ReaderConstituent.java \
+  gnu/kawa/lispexpr/ReaderDispatch.java \
+  gnu/kawa/lispexpr/ReaderDispatchMacro.java \
+  gnu/kawa/lispexpr/ReaderDispatchMisc.java \
+  gnu/kawa/lispexpr/ReaderDispatchSyntaxQuote.java \
+  gnu/kawa/lispexpr/ReaderExtendedLiteral.java \
+  gnu/kawa/lispexpr/ReaderIgnoreRestOfLine.java \
+  gnu/kawa/lispexpr/ReaderMacro.java \
+  gnu/kawa/lispexpr/ReaderMisc.java \
+  gnu/kawa/lispexpr/ReaderNestedComment.java \
+  gnu/kawa/lispexpr/ReaderParens.java \
+  gnu/kawa/lispexpr/ReaderQuote.java \
+  gnu/kawa/lispexpr/ReaderString.java \
+  gnu/kawa/lispexpr/ReaderTypespec.java \
+  gnu/kawa/lispexpr/ReaderVector.java \
+  gnu/kawa/lispexpr/ReadTable.java \
+  gnu/kawa/lispexpr/ReadTableEntry.java \
+  gnu/kawa/lispexpr/SeqSizeType.java
+
+GNU_KAWA_MODELS_JSOURCES = \
+  gnu/kawa/models/Box.java \
+  gnu/kawa/models/Button.java \
+  gnu/kawa/models/Column.java \
+  gnu/kawa/models/Display.java \
+  gnu/kawa/models/DrawImage.java \
+  gnu/kawa/models/DrawShape.java \
+  gnu/kawa/models/FillShape.java \
+  gnu/kawa/models/Label.java \
+  gnu/kawa/models/Model.java \
+  gnu/kawa/models/ModelListener.java \
+  gnu/kawa/models/MenuItem.java \
+  gnu/kawa/models/Paintable.java \
+  gnu/kawa/models/Row.java \
+  gnu/kawa/models/Spacer.java \
+  gnu/kawa/models/SVGUtils.java \
+  gnu/kawa/models/Text.java \
+  gnu/kawa/models/Viewable.java \
+  gnu/kawa/models/WeakListener.java \
+  gnu/kawa/models/Window.java \
+  gnu/kawa/models/WithComposite.java \
+  gnu/kawa/models/WithPaint.java \
+  gnu/kawa/models/WithTransform.java
+
+GNU_KAWA_SWINGVIEWS_JSOURCES = \
+  gnu/kawa/swingviews/SwingButton.java \
+  gnu/kawa/swingviews/SwingContent.java \
+  gnu/kawa/swingviews/SwingDisplay.java \
+  gnu/kawa/swingviews/SwingFrame.java \
+  gnu/kawa/swingviews/SwingPaintable.java
+
+GNU_KAWA_SWTVIEWS_JSOURCES = \
+  gnu/kawa/swtviews/SwtDisplay.java
+
+GNU_ECMASCRIPT_JSOURCES = \
+  gnu/ecmascript/Reserved.java \
+  gnu/ecmascript/BinaryOp.java \
+  gnu/ecmascript/Convert.java \
+  gnu/ecmascript/Lexer.java \
+  gnu/ecmascript/Parser.java \
+  gnu/ecmascript/Prompter.java
+
+GNU_XML_JSOURCES = \
+  gnu/xml/NamedChildrenFilter.java \
+  gnu/xml/NamespaceBinding.java \
+  gnu/xml/NodeTree.java \
+  gnu/xml/TextUtils.java \
+  gnu/xml/XMLFilter.java \
+  gnu/xml/XMLParser.java \
+  gnu/xml/XMLPrinter.java \
+  gnu/xml/XName.java
+
+GNU_KAWA_XML_JSOURCES = \
+  gnu/kawa/xml/AncestorAxis.java \
+  gnu/kawa/xml/AncestorOrSelfAxis.java \
+  gnu/kawa/xml/AttributeAxis.java \
+  gnu/kawa/xml/Attributes.java \
+  gnu/kawa/xml/AttributeType.java \
+  gnu/kawa/xml/Base64Binary.java \
+  gnu/kawa/xml/BinaryObject.java \
+  gnu/kawa/xml/ChildAxis.java \
+  gnu/kawa/xml/Children.java \
+  gnu/kawa/xml/CoerceNodes.java \
+  gnu/kawa/xml/CommentConstructor.java \
+  gnu/kawa/xml/CompileXmlFunctions.java \
+  gnu/kawa/xml/DescendantAxis.java \
+  gnu/kawa/xml/DescendantOrSelfAxis.java \
+  gnu/kawa/xml/Document.java \
+  gnu/kawa/xml/DocumentConstructor.java \
+  gnu/kawa/xml/ElementType.java \
+  gnu/kawa/xml/Focus.java \
+  gnu/kawa/xml/FollowingAxis.java \
+  gnu/kawa/xml/FollowingSiblingAxis.java \
+  gnu/kawa/xml/HexBinary.java \
+  gnu/kawa/xml/HttpPrinter.java \
+  gnu/kawa/xml/IntersectNodes.java \
+  gnu/kawa/xml/IteratorItems.java \
+  gnu/kawa/xml/KAttr.java \
+  gnu/kawa/xml/KCDATASection.java \
+  gnu/kawa/xml/KCharacterData.java \
+  gnu/kawa/xml/KComment.java \
+  gnu/kawa/xml/KDocument.java \
+  gnu/kawa/xml/KElement.java \
+  gnu/kawa/xml/KNode.java \
+  gnu/kawa/xml/KProcessingInstruction.java \
+  gnu/kawa/xml/KText.java \
+  gnu/kawa/xml/ListItems.java \
+  gnu/kawa/xml/MakeAttribute.java \
+  gnu/kawa/xml/MakeCDATA.java \
+  gnu/kawa/xml/MakeElement.java \
+  gnu/kawa/xml/MakeProcInst.java \
+  gnu/kawa/xml/MakeResponseHeader.java \
+  gnu/kawa/xml/MakeText.java \
+  gnu/kawa/xml/MakeUnescapedData.java \
+  gnu/kawa/xml/MakeWithBaseUri.java \
+  gnu/kawa/xml/NodeCompare.java \
+  gnu/kawa/xml/NodeConstructor.java \
+  gnu/kawa/xml/Nodes.java \
+  gnu/kawa/xml/NodeSetType.java \
+  gnu/kawa/xml/NodeType.java \
+  gnu/kawa/xml/Notation.java \
+  gnu/kawa/xml/OutputAsXML.java \
+  gnu/kawa/xml/ParentAxis.java \
+  gnu/kawa/xml/PrecedingAxis.java \
+  gnu/kawa/xml/PrecedingSiblingAxis.java \
+  gnu/kawa/xml/ProcessingInstructionType.java \
+  gnu/kawa/xml/SelfAxis.java \
+  gnu/kawa/xml/SortNodes.java \
+  gnu/kawa/xml/SortedNodes.java \
+  gnu/kawa/xml/TreeScanner.java \
+  gnu/kawa/xml/UnionNodes.java \
+  gnu/kawa/xml/UntypedAtomic.java \
+  gnu/kawa/xml/WriteTo.java \
+  gnu/kawa/xml/XDataType.java \
+  gnu/kawa/xml/XInteger.java \
+  gnu/kawa/xml/XIntegerType.java \
+  gnu/kawa/xml/XString.java \
+  gnu/kawa/xml/XStringType.java \
+  gnu/kawa/xml/XTimeType.java \
+  gnu/kawa/xml/XmlNamespace.java
+
+GNU_KAWA_SAX_JSOURCES = \
+  gnu/kawa/sax/ContentConsumer.java \
+  gnu/kawa/sax/KawaXMLReader.java
+
+GNU_KAWA_XSLT_JSOURCES = \
+  gnu/kawa/xslt/ApplyTemplates.java \
+  gnu/kawa/xslt/TemplateTable.java \
+  gnu/kawa/xslt/XSLT.java \
+  gnu/kawa/xslt/XslTranslator.java
+
+
+# These Java sources are not built or used when using configure+make, only
+# when using Ant - but they still should go into the distribution tar file.
+GNU_KAWA_ANT_JSOURCES = \
+  gnu/kawa/ant/LineStripperSet.java \
+  gnu/kawa/ant/LineCommenterSet.java \
+  gnu/kawa/ant/XCopy.java \
+  gnu/kawa/ant/Kawac.java
+
+GNU_KAWA_IO_JLINE_JSOURCES = \
+  gnu/kawa/io/JLineInPort.java
+
+GNU_ALWAYS_JSOURCES = \
+  $(GNU_LISTS_JSOURCES) \
+  $(GNU_TEXT_JSOURCES) \
+  $(GNU_MAPPING_JSOURCES) \
+  $(GNU_EXPR_JSOURCES) \
+  $(GNU_KAWA_IO_JSOURCES) \
+  $(GNU_KAWA_UTIL_JSOURCES) \
+  $(GNU_KAWA_REFLECT_JSOURCES) \
+  $(GNU_KAWA_FUNCTIONS_JSOURCES) \
+  $(GNU_KAWA_LISPEXPR_JSOURCES) \
+  $(GNU_KAWA_MODELS_JSOURCES) \
+  $(GNU_ECMASCRIPT_JSOURCES)
+
+gnu_java_sources = $(GNU_ALWAYS_JSOURCES) $(am__append_1) \
+	$(am__append_2) $(am__append_3) $(am__append_4) \
+	$(am__append_5) $(am__append_6) $(am__append_7) \
+	$(am__append_8)
+dist_gnu_jsources = \
+  $(GNU_ALWAYS_JSOURCES) \
+  $(GNU_KAWA_SWINGVIEWS_JSOURCES) \
+  $(GNU_KAWA_SWINGVIEWS_JSOURCES) \
+  $(GNU_KAWA_SWTVIEWS_JSOURCES) \
+  $(GNU_KAWA_IO_JLINE_JSOURCES) \
+  $(GNU_XML_JSOURCES) \
+  $(GNU_KAWA_XML_JSOURCES) \
+  $(GNU_KAWA_LISPEXPR_XML_JSOURCES) \
+  $(GNU_KAWA_SAX_JSOURCES) \
+  $(GNU_KAWA_ECHO2_JSOURCES) \
+  $(GNU_KAWA_XSLT_JSOURCES) \
+  $(JAVAX_SCRIPT_EXTRA)
+
+GNU_EXTRA_DIST = \
+  $(dist_gnu_jsources) \
+  gnu/kawa/util/PreProcess.java \
+  gnu/expr/package.html \
+  gnu/mapping/package.html \
+  gnu/lists/package.html \
+  gnu/lists/PrimVector.template \
+  gnu/text/package.html \
+  gnu/kawa/reflect/package.html \
+  $(GNU_KAWA_ANT_JSOURCES)
+
+CLASSPATH = .$(CLASSPATH_SEPARATOR)$(srcdir)$(CLASSPATH_SEPARATOR)@conf_classpath@$$CLASSPATH
 FIXED_SUBDIRS = doc testsuite gnu/bytecode gnu/math \
   gnu \
   kawa gnu/kawa/slib gnu/kawa/servlet \
@@ -361,9 +951,9 @@ JEMACS_SUBDIRS = gnu/jemacs/lang gnu/jemacs/buffer gnu/jemacs/lisp \
   gnu/jemacs/testsuite gnu/jemacs/swing gnu/jemacs/swt
 
 XQUERY_SUBDIRS = gnu/xquery/util gnu/xquery/lang gnu/xquery/testsuite
-SUBDIRS = $(FIXED_SUBDIRS) $(am__append_1) $(am__append_2) \
-	$(am__append_3) $(am__append_4) $(am__append_5) \
-	$(am__append_6)
+SUBDIRS = $(FIXED_SUBDIRS) $(am__append_9) $(am__append_10) \
+	$(am__append_11) $(am__append_12) $(am__append_13) \
+	$(am__append_14)
 DIST_SUBDIRS = $(FIXED_SUBDIRS) \
   $(ANDROID_SUBDIRS) \
   $(BRL_SUBDIRS) \
@@ -386,13 +976,14 @@ EXTRA_DIST = debian/control debian/rules debian/changelog debian/dirs \
   config.guess config.sub install-sh ./mkinstalldirs \
   patch-source-list selected-java-source \
   build.xml build.properties \
+  $(GNU_EXTRA_DIST) \
   gnu/jemacs/jar-manifest gnu/jemacs/status.html \
   kawa/Version.java jar-manifest Make-rules classes-to-skip-for-runtime \
   bin/configure.ac bin/configure bin/Makefile.am bin/Makefile.in \
   bin/ChangeLog bin/kawa.bat.in bin/kawa.c bin/kawapath.c bin/cgi-servlet.c \
   bin/kawa.sh.in bin/qexo.in
 
-MOSTLYCLEANFILES = tmp* *.o bin/*.o *.stamp classes.list classes-rt.list
+MOSTLYCLEANFILES = tmp* *.o bin/*.o *.stamp gnu/*/*.class gnu/*/*/*.class classes.list classes-rt.list
 CLEANFILES = *.jar lib/*.jar *.zip bin/qexo kawa/Version.java $(META_ScriptEngineFactory)
 DISTCLEANFILES = selected-java-source bin/kawa.sh bin/kawa.bat
 MAINTAINERCLEANFILES = \
@@ -453,12 +1044,18 @@ GENERATED_SIMPLEVECTOR_FILES = \
 @ON_WINDOWS_TRUE@KAWASCRIPTS_KAWA = bin/kawa.bat bin/kawa.sh
 noinst_SCRIPTS = bin/kawa.sh
 bin_SCRIPTS = bin/qexo $(KAWASCRIPTS_KAWA)
+
+#bin/kawa.bat: $(srcdir)/bin/kawa.bat.in
+#	sed -e 's|@VERSION@|$(VERSION)|' \
+#	    -e 's|@DEFAULT_EXTRA_PATH@|'`echo '$(conf_classpath)'| sed -e 's|[\]|\\\\|g' -e 's|\&|\\&|g'`'|' \
+#	  <$(srcdir)/bin/kawa.bat.in > bin/kawa.bat
+STANDARD_NAMED_CHARS_URL = http://www.w3.org/2003/entities/2007/w3centities-f.ent
 all: all-recursive
 
 .SUFFIXES:
 am--refresh: Makefile
 	@:
-$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(top_srcdir)/source-list $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
@@ -480,6 +1077,7 @@ Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	    echo ' cd $(top_builddir) && $(SHELL) ./config.status $@ $(am__depfiles_maybe)'; \
 	    cd $(top_builddir) && $(SHELL) ./config.status $@ $(am__depfiles_maybe);; \
 	esac;
+$(top_srcdir)/source-list $(am__empty):
 
 $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
 	$(SHELL) ./config.status --recheck
@@ -925,6 +1523,11 @@ uninstall-am: uninstall-binSCRIPTS uninstall-local
 .PRECIOUS: Makefile
 
 
+gnu-classes.stamp: $(gnu_java_sources)
+	$(JAVAC) -d $(top_builddir) -classpath "$(CLASSPATH)" $(JAVACFLAGS) $?
+	echo timestamp > gnu/java-classes.stamp
+	echo timestamp > kawa-jar.stamp
+
 classes.list: ./kawa-jar.stamp
 	$(FIND) gnu kawa -name '*.class' -print >classes.list
 
@@ -1165,10 +1768,22 @@ $(srcdir)/gnu/lists/U64Vector.java: $(srcdir)/gnu/lists/PrimVector.template
 clean-generated-simplevector-files:
 	-rm -f $(GENERATED_SIMPLEVECTOR_FILES)
 
-#bin/kawa.bat: $(srcdir)/bin/kawa.bat.in
-#	sed -e 's|@VERSION@|$(VERSION)|' \
-#	    -e 's|@DEFAULT_EXTRA_PATH@|'`echo '$(conf_classpath)'| sed -e 's|[\]|\\\\|g' -e 's|\&|\\&|g'`'|' \
-#	  <$(srcdir)/bin/kawa.bat.in > bin/kawa.bat
+$(srcdir)/gnu/text/StandardNamedChars.java:
+	wget -nv -O - $(STANDARD_NAMED_CHARS_URL) \
+	| sed -n -e 's|&#38;|\&|' \
+	      -e '/ENTITY/s/^.*ENTITY *\([^ ]*\) *"\([^"]*\)" *>\(.*\)$$/    t.put("\1"\2);\3/p' \
+	| sed -e 's|<!--\(.*\)-->|  // \1|' \
+	      -e 's|&#x\([0-9a-fA-F]*\);|, 0x\1|g' \
+	      -e 's|&#0*\([0-9a-fA-F]*\);|, \1|g' \
+	      -e '1i\' \
+	      -e '// DO NOT EDIT: This file is automatically generated by gnu/text/Makefile.\' \
+	      -e 'package gnu.text;\' \
+	      -e 'public class StandardNamedChars {\' \
+	      -e '  public static final NamedCharTable instance = new NamedCharTable();\' \
+	      -e '  static { NamedCharTable t = instance;' \
+	      -e '$$a\' \
+	      -e '}}' \
+	> $@
 
 distall:  distcheck dist-kawa-@VERSION@.jar kawa-doc-$(VERSION).tar.gz
 # Consider also:

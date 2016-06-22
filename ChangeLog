@@ -1,3 +1,9 @@
+2016-06-22  Per Bothner  <per@bothner.com>
+
+	* Makefile.am: Pull most of logic from gnu/Makefile.am here.
+	This is a step to having fewer Makefiles.
+	(source-list): New separate list of files, for inclusion.
+
 2016-06-14  Per Bothner  <per@bothner.com>
 
 	* Makefile.am: Add domterm.jar to kawa.zip.

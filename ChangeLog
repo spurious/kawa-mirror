@@ -1,5 +1,11 @@
 2016-06-22  Per Bothner  <per@bothner.com>
 
+	* Makefile.am: Merge the Makefiles of gnu/math, gnu/commonlisp/lang,
+	gnu/xquery/lang, gnu/xquery/util, gnu/q2/lang, and kawa into
+	source.list and the top-level Makefile.
+	(tmp-sources1.list): Build list of source file names for '@' argument
+	passed to javac, to limit command-line length.
+
 	* Makefile.am: Pull most of logic from gnu/Makefile.am here.
 	This is a step to having fewer Makefiles.
 	(source-list): New separate list of files, for inclusion.

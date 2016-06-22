@@ -55,7 +55,7 @@ public class StringUtils
     return coerceToString(node, "upper-case", 1, "").toUpperCase();
   }
 
-  static double asDouble (Object value)
+  public static double asDouble (Object value)
   {
     if (! (value instanceof Number))
       value = NumberValue.numberValue(value);

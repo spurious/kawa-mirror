@@ -254,18 +254,15 @@ AC_CONFIG_LINKS(
 AM_COND_IF([ENABLE_KAWA_FRONTEND],
         [AC_CONFIG_SUBDIRS([bin])])
 
-AC_CONFIG_FILES([Makefile gnu/bytecode/Makefile gnu/math/Makefile
+AC_CONFIG_FILES([Makefile gnu/bytecode/Makefile
   gnu/Makefile gnu/kawa/servlet/Makefile
   gnu/brl/Makefile gnu/kawa/brl/Makefile
-  gnu/kawa/slib/Makefile
-  gnu/commonlisp/lang/Makefile
+  kawa/lib/Makefile gnu/kawa/slib/Makefile
   gnu/commonlisp/lisp/Makefile gnu/commonlisp/testsuite/Makefile
   gnu/jemacs/lang/Makefile gnu/jemacs/buffer/Makefile
   gnu/jemacs/lisp/Makefile gnu/jemacs/testsuite/Makefile
   gnu/jemacs/swing/Makefile gnu/jemacs/swt/Makefile
-  kawa/Makefile kawa/lib/Makefile
-  gnu/q2/lang/Makefile gnu/q2/testsuite/Makefile
-  gnu/xquery/util/Makefile gnu/xquery/lang/Makefile
+  gnu/q2/testsuite/Makefile
   gnu/xquery/testsuite/Makefile
   gnu/kawa/android/Makefile
   gnu/kawa/javafx/Makefile

@@ -4,17 +4,17 @@ include $(top_srcdir)/source-list
 
 CLASSPATH = .$(CLASSPATH_SEPARATOR)$(srcdir)$(CLASSPATH_SEPARATOR)@conf_classpath@$$CLASSPATH
 
-FIXED_SUBDIRS = doc testsuite gnu/bytecode gnu/math \
+FIXED_SUBDIRS = doc testsuite gnu/bytecode \
   gnu \
-  kawa gnu/kawa/slib gnu/kawa/servlet \
-  gnu/commonlisp/lang gnu/commonlisp/lisp gnu/commonlisp/testsuite \
-  gnu/q2/lang gnu/q2/testsuite
+  kawa/lib gnu/kawa/slib gnu/kawa/servlet \
+  gnu/commonlisp/lisp gnu/commonlisp/testsuite \
+  gnu/q2/testsuite
 ANDROID_SUBDIRS = gnu/kawa/android
 BRL_SUBDIRS = gnu/brl gnu/kawa/brl
 JAVAFX_SUBDIRS = gnu/kawa/javafx
 JEMACS_SUBDIRS = gnu/jemacs/lang gnu/jemacs/buffer gnu/jemacs/lisp \
   gnu/jemacs/testsuite gnu/jemacs/swing gnu/jemacs/swt
-XQUERY_SUBDIRS = gnu/xquery/util gnu/xquery/lang gnu/xquery/testsuite
+XQUERY_SUBDIRS = gnu/xquery/testsuite
 
 SUBDIRS = $(FIXED_SUBDIRS)
 if ENABLE_JEMACS
@@ -59,13 +59,21 @@ if WITH_JAVAX_SCRIPT
 META_INF_FILES = $(META_ScriptEngineFactory)
 endif
 
-gnu-classes.stamp: $(gnu_java_sources)
-	$(JAVAC) -d $(top_builddir) -classpath "$(CLASSPATH)" $(JAVACFLAGS) $?
-	echo timestamp > gnu/java-classes.stamp
+misc-classes.stamp: $(java_sources) tmp-sources1.list
+	$(JAVAC) -d $(top_builddir) -classpath "$(CLASSPATH)" $(JAVACFLAGS) @tmp-sources1.list
+	echo timestamp > misc-classes.stamp
 	echo timestamp > kawa-jar.stamp
 
 classes.list: ./kawa-jar.stamp
 	$(FIND) gnu kawa -name '*.class' -print >classes.list
+
+tmp-sources1.list: source-list
+	(for f in $(sources_gnu_core); do echo $(srcdir)/$$f; done) >tmp-list
+	(for f in $(sources_gnu_misc); do echo $(srcdir)/$$f; done) >>tmp-list
+	(for f in $(sources_gnu_selected); do echo $(srcdir)/$$f; done) >>tmp-list
+	(for f in $(sources_kawa_core); do echo $(srcdir)/$$f; done) >>tmp-list
+	(for f in $(sources_kawa_selected); do echo $(srcdir)/$$f; done) >>tmp-list
+	mv tmp-list $@
 
 classes-rt.list: ./kawa-jar.stamp $(srcdir)/classes-to-skip-for-runtime 
 	$(FIND) gnu kawa -name '*.class' -print | grep -v -f $(srcdir)/classes-to-skip-for-runtime >classes-rt.list
@@ -161,14 +169,14 @@ EXTRA_DIST = debian/control debian/rules debian/changelog debian/dirs \
   config.guess config.sub install-sh ./mkinstalldirs \
   patch-source-list selected-java-source \
   build.xml build.properties \
-  $(GNU_EXTRA_DIST) \
+  $(MISC_EXTRA_DIST) \
   gnu/jemacs/jar-manifest gnu/jemacs/status.html \
   kawa/Version.java jar-manifest Make-rules classes-to-skip-for-runtime \
   bin/configure.ac bin/configure bin/Makefile.am bin/Makefile.in \
   bin/ChangeLog bin/kawa.bat.in bin/kawa.c bin/kawapath.c bin/cgi-servlet.c \
   bin/kawa.sh.in bin/qexo.in
 
-MOSTLYCLEANFILES = tmp* *.o bin/*.o *.stamp gnu/*/*.class gnu/*/*/*.class classes.list classes-rt.list
+MOSTLYCLEANFILES = tmp* *.o bin/*.o *.stamp */*.class */*/*.class */*/*/*.class classes.list classes-rt.list
 CLEANFILES = *.jar lib/*.jar *.zip bin/qexo kawa/Version.java $(META_ScriptEngineFactory)
 DISTCLEANFILES = selected-java-source bin/kawa.sh bin/kawa.bat
 MAINTAINERCLEANFILES = \

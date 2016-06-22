@@ -1,5 +1,9 @@
 ;; Utility functions primarily for XQuery and XSLT.
 
+(module-name (xquery Xutils))
+
+(require <kawa.lib.prim_syntax>)
+
 (module-compile-options full-tailcalls: #t)
 
 (define-alias BooleanValue gnu.xquery.util.BooleanValue)

@@ -1372,7 +1372,7 @@ public class XQParser extends Lexer
 	func = makeFunctionExp("gnu.kawa.xml.NodeCompare", "$Ls", "<<");
 	break;
       case OP_RANGE_TO:
-	func = makeFunctionExp("gnu.xquery.util.Xutils", "integerRange");
+	func = makeFunctionExp("kawa.lib.xquery.Xutils", "integerRange");
 	break;
       case OP_UNION:
 	func = makeFunctionExp("gnu.kawa.xml.UnionNodes", "unionNodes");
@@ -3539,7 +3539,7 @@ public class XQParser extends Lexer
     comp.pop(lexp);
     lexp.body = body;
     Expression[] args = { lexp, inits[0]};  // SIC
-    return new ApplyExp(makeFunctionExp("gnu.xquery.util.Xutils",
+    return new ApplyExp(makeFunctionExp("kawa.lib.xquery.Xutils",
 					isEvery ? "every" : "some"),
 			args);
   }

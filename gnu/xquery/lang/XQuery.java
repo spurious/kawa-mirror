@@ -570,11 +570,11 @@ public class XQuery extends Language
 
     defProcStFld("unescaped-data", "gnu.kawa.xml.MakeUnescapedData", "unescapedData");
     defProcStFld("item-at", "gnu.xquery.util.ItemAt", "itemAt");
-    defProcStFld("count", "gnu.xquery.util.Xutils", "count$Mnvalues");
+    defProcStFld("count", "kawa.lib.xquery.Xutils", "count$Mnvalues");
     define_method("sum", "gnu.xquery.util.Reduce", "sum"); // Overloaded
     defProcStFld("avg", "gnu.xquery.util.Average", "avg");
-    defProcStFld("sublist", "gnu.xquery.util.Xutils", "sublist"); // deprecated
-    defProcStFld("subsequence", "gnu.xquery.util.Xutils", "sublist");
+    defProcStFld("sublist", "kawa.lib.xquery.Xutils", "sublist"); // deprecated
+    defProcStFld("subsequence", "kawa.lib.xquery.Xutils", "sublist");
     define_method("empty", "gnu.xquery.util.SequenceUtils",
 		  "isEmptySequence");
     define_method("exists", "gnu.xquery.util.SequenceUtils",

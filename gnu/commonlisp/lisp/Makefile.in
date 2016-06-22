@@ -453,10 +453,7 @@ elisp-classes.stamp: $(java_ELISP)
 	$(KAWA_COMPILER) --elisp -C $?
 	echo timestamp > elisp-classes.stamp
 	echo timestamp > $(TO_TOPDIR)/kawa-jar.stamp
-all: Makefile ../../../kawa/java-classes.stamp scm-classes.stamp clisp-classes.stamp $(@GCJ_COMPILED_SELECTED@)
-
-../../../kawa/java-classes.stamp:
-	cd ../../../kawa; $(MAKE)
+all: Makefile scm-classes.stamp clisp-classes.stamp $(@GCJ_COMPILED_SELECTED@)
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

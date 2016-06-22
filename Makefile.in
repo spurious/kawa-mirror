@@ -96,14 +96,18 @@ host_triplet = @host@
 @ENABLE_XML_TRUE@am__append_4 = $(GNU_XML_JSOURCES) $(GNU_KAWA_XML_JSOURCES) $(GNU_KAWA_LISPEXPR_XML_JSOURCES)
 @ENABLE_XML_TRUE@@WITH_SAX2_TRUE@am__append_5 = $(GNU_KAWA_SAX_JSOURCES)
 @ENABLE_ECHO2_TRUE@am__append_6 = $(GNU_KAWA_ECHO2_JSOURCES)
-@ENABLE_XQUERY_TRUE@am__append_7 = $(GNU_KAWA_XSLT_JSOURCES)
-@WITH_JAVAX_SCRIPT_TRUE@am__append_8 = $(JAVAX_SCRIPT_EXTRA)
-@ENABLE_JEMACS_TRUE@am__append_9 = $(JEMACS_SUBDIRS)
-@ENABLE_BRL_TRUE@@ENABLE_XML_TRUE@am__append_10 = $(BRL_SUBDIRS)
-@ENABLE_XML_TRUE@@ENABLE_XQUERY_TRUE@am__append_11 = $(XQUERY_SUBDIRS)
-@WITH_ANDROID_TRUE@am__append_12 = $(ANDROID_SUBDIRS)
-@WITH_JAVAFX_TRUE@am__append_13 = $(JAVAFX_SUBDIRS)
-@ENABLE_KAWA_FRONTEND_TRUE@am__append_14 = bin
+@ENABLE_XML_TRUE@@ENABLE_XQUERY_TRUE@am__append_7 = $(GNU_XQUERY_LANG_JSOURCES) $(GNU_XQUERY_UTIL_JSOURCES) $(GNU_KAWA_XSLT_JSOURCES)
+@ENABLE_XML_TRUE@@ENABLE_XQUERY_TRUE@@WITH_JAVAX_SCRIPT_TRUE@am__append_8 = $(GNU_XQUERY_SCRIPT_JSOURCES)
+@WITH_JAVAX_SCRIPT_TRUE@am__append_9 = $(JAVAX_SCRIPT_EXTRA)
+@WITH_JAVAX_SCRIPT_TRUE@am__append_10 = $(KAWA_WITH_SCRIPT)
+@WITH_AWT_TRUE@am__append_11 = $(KAWA_WITH_AWT_JSOURCES)
+@WITH_DOMTERM_TRUE@am__append_12 = $(KAWA_WITH_DOMTERM)
+@ENABLE_JEMACS_TRUE@am__append_13 = $(JEMACS_SUBDIRS)
+@ENABLE_BRL_TRUE@@ENABLE_XML_TRUE@am__append_14 = $(BRL_SUBDIRS)
+@ENABLE_XML_TRUE@@ENABLE_XQUERY_TRUE@am__append_15 = $(XQUERY_SUBDIRS)
+@WITH_ANDROID_TRUE@am__append_16 = $(ANDROID_SUBDIRS)
+@WITH_JAVAFX_TRUE@am__append_17 = $(JAVAFX_SUBDIRS)
+@ENABLE_KAWA_FRONTEND_TRUE@am__append_18 = bin
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/config.classpath \
@@ -563,6 +567,45 @@ GNU_MAPPING_JSOURCES = \
   gnu/mapping/WrongArguments.java \
   gnu/mapping/WrongType.java
 
+GNU_MATH_JSOURCES = \
+  gnu/math/BaseUnit.java \
+  gnu/math/BitOps.java \
+  gnu/math/CComplex.java \
+  gnu/math/Complex.java \
+  gnu/math/CQuantity.java \
+  gnu/math/CQuaternion.java \
+  gnu/math/DateTime.java \
+  gnu/math/DComplex.java \
+  gnu/math/DFloNum.java \
+  gnu/math/Dimensions.java \
+  gnu/math/DQuantity.java \
+  gnu/math/DQuaternion.java \
+  gnu/math/Duration.java \
+  gnu/math/ExponentialFormat.java \
+  gnu/math/FixedRealFormat.java \
+  gnu/math/IntFraction.java \
+  gnu/math/IntNum.java \
+  gnu/math/MPN.java \
+  gnu/math/MulUnit.java \
+  gnu/math/NamedUnit.java \
+  gnu/math/Numeric.java \
+  gnu/math/Quantity.java \
+  gnu/math/Quaternion.java \
+  gnu/math/RatNum.java \
+  gnu/math/RealNum.java \
+  gnu/math/UByte.java \
+  gnu/math/UInt.java \
+  gnu/math/ULong.java \
+  gnu/math/Unit.java \
+  gnu/math/UnsignedPrim.java \
+  gnu/math/UShort.java
+
+GNU_Q2_LANG_JSOURCES = \
+  gnu/q2/lang/Operator.java \
+  gnu/q2/lang/Q2.java \
+  gnu/q2/lang/Q2Read.java \
+  gnu/q2/lang/Q2Translator.java
+
 GNU_TEXT_JSOURCES = \
   gnu/text/CaseConvertFormat.java \
   gnu/text/Char.java \
@@ -895,10 +938,168 @@ GNU_KAWA_ANT_JSOURCES = \
 GNU_KAWA_IO_JLINE_JSOURCES = \
   gnu/kawa/io/JLineInPort.java
 
-GNU_ALWAYS_JSOURCES = \
+GNU_COMMONLISP_LANG_JSOURCES = \
+  gnu/commonlisp/lang/Lisp2.java \
+  gnu/commonlisp/lang/Lisp2Compilation.java \
+  gnu/commonlisp/lang/defvar.java \
+  gnu/commonlisp/lang/defun.java \
+  gnu/commonlisp/lang/function.java \
+  gnu/commonlisp/lang/OrdinaryLambda.java \
+  gnu/commonlisp/lang/prog1.java \
+  gnu/commonlisp/lang/setq.java \
+  gnu/commonlisp/lang/Symbols.java \
+  gnu/commonlisp/lang/UnwindProtect.java \
+  gnu/commonlisp/lang/CommonLisp.java
+
+GNU_XQUERY_LANG_JSOURCES = \
+  gnu/xquery/lang/XQuery.java \
+  gnu/xquery/lang/XQParser.java \
+  gnu/xquery/lang/XQResolveNames.java
+
+GNU_XQUERY_UTIL_JSOURCES = \
+  gnu/xquery/util/ArithOp.java \
+  gnu/xquery/util/Average.java \
+  gnu/xquery/util/BooleanValue.java \
+  gnu/xquery/util/CastableAs.java \
+  gnu/xquery/util/CastAs.java \
+  gnu/xquery/util/Compare.java \
+  gnu/xquery/util/CompileMisc.java \
+  gnu/xquery/util/Debug.java \
+  gnu/xquery/util/DistinctValues.java \
+  gnu/xquery/util/IntegerRange.java \
+  gnu/xquery/util/ItemAt.java \
+  gnu/xquery/util/MinMax.java \
+  gnu/xquery/util/NamedCollator.java \
+  gnu/xquery/util/NodeUtils.java \
+  gnu/xquery/util/NumberValue.java \
+  gnu/xquery/util/OrderedMap.java \
+  gnu/xquery/util/OrderedTuples.java \
+  gnu/xquery/util/QNameUtils.java \
+  gnu/xquery/util/Reduce.java \
+  gnu/xquery/util/RelativeStep.java \
+  gnu/xquery/util/RelativeStepFilter.java \
+  gnu/xquery/util/SequenceUtils.java \
+  gnu/xquery/util/StringUtils.java \
+  gnu/xquery/util/TimeUtils.java \
+  gnu/xquery/util/ValuesFilter.java \
+  gnu/xquery/util/XQException.java
+
+GNU_XQUERY_SCRIPT_JSOURCES = \
+  gnu/xquery/lang/XQueryScriptEngineFactory.java
+
+KAWA_JSOURCES = \
+  kawa/repl.java \
+  kawa/Shell.java \
+  kawa/SourceMethodType.java \
+  kawa/SourceType.java \
+  kawa/TelnetInputStream.java \
+  kawa/TelnetOutputStream.java \
+  kawa/Telnet.java \
+  kawa/TelnetRepl.java \
+  kawa/Version.java
+
+KAWA_LANG_JSOURCES = \
+  kawa/lang/AnyPat.java \
+  kawa/lang/AutoloadProcedure.java \
+  kawa/lang/AutoloadSyntax.java \
+  kawa/lang/BindDecls.java \
+  kawa/lang/CalledContinuation.java \
+  kawa/lang/CompileFile.java \
+  kawa/lang/Continuation.java \
+  kawa/lang/EqualPat.java \
+  kawa/lang/Eval.java \
+  kawa/lang/GenericError.java\
+  kawa/lang/GetFieldProc.java \
+  kawa/lang/Lambda.java \
+  kawa/lang/ListPat.java \
+  kawa/lang/ListRepeatPat.java \
+  kawa/lang/Macro.java \
+  kawa/lang/NamedException.java \
+  kawa/lang/PairPat.java \
+  kawa/lang/Pattern.java \
+  kawa/lang/PatternScope.java \
+  kawa/lang/Quote.java \
+  kawa/lang/RecordConstructor.java \
+  kawa/lang/Record.java \
+  kawa/lang/SetFieldProc.java \
+  kawa/lang/SyntaxForm.java \
+  kawa/lang/SyntaxForms.java \
+  kawa/lang/Syntax.java \
+  kawa/lang/SyntaxPattern.java \
+  kawa/lang/SyntaxRule.java \
+  kawa/lang/SyntaxRules.java \
+  kawa/lang/SyntaxTemplate.java \
+  kawa/lang/TemplateScope.java \
+  kawa/lang/Translator.java \
+  kawa/lang/VarListPat.java
+
+KAWA_STANDARD_JSOURCES = \
+  kawa/standard/append.java \
+  kawa/standard/begin.java \
+  kawa/standard/char_ready_p.java \
+  kawa/standard/constant_fold.java \
+  kawa/standard/define_alias.java \
+  kawa/standard/define_autoload.java \
+  kawa/standard/define_class.java \
+  kawa/standard/define.java \
+  kawa/standard/define_library.java \
+  kawa/standard/define_member_alias.java \
+  kawa/standard/define_syntax.java \
+  kawa/standard/define_unit.java \
+  kawa/standard/export.java \
+  kawa/standard/expt.java \
+  kawa/standard/fluid_let.java \
+  kawa/standard/IfFeature.java \
+  kawa/standard/ImportFromLibrary.java \
+  kawa/standard/Include.java \
+  kawa/standard/let.java \
+  kawa/standard/let_syntax.java \
+  kawa/standard/load.java \
+  kawa/standard/location.java \
+  kawa/standard/make.java \
+  kawa/standard/MatchDef.java \
+  kawa/standard/module_compile_options.java \
+  kawa/standard/module_extends.java \
+  kawa/standard/module_implements.java \
+  kawa/standard/module_name.java \
+  kawa/standard/module_static.java \
+  kawa/standard/object.java \
+  kawa/standard/prim_method.java \
+  kawa/standard/read_line.java \
+  kawa/standard/require.java \
+  kawa/standard/Scan.java \
+  kawa/standard/SchemeCompilation.java \
+  kawa/standard/Scheme.java \
+  kawa/standard/set_b.java \
+  kawa/standard/sleep.java \
+  kawa/standard/syntax_case.java \
+  kawa/standard/syntax_error.java \
+  kawa/standard/syntax.java \
+  kawa/standard/syntax_rules.java \
+  kawa/standard/thisRef.java \
+  kawa/standard/TracedProcedure.java \
+  kawa/standard/try_catch.java \
+  kawa/standard/vector_append.java \
+  kawa/standard/with_compile_options.java
+
+KAWA_WITH_AWT_JSOURCES = \
+  kawa/GuiConsole.java \
+  kawa/GuiInPort.java \
+  kawa/ReplPane.java \
+  kawa/ReplDocument.java \
+  kawa/ReplPaneOutPort.java
+
+KAWA_WITH_SCRIPT = \
+  kawa/standard/SchemeScriptEngineFactory.java
+
+KAWA_WITH_DOMTERM = \
+  kawa/DomTermBackend.java
+
+sources_gnu_core = \
   $(GNU_LISTS_JSOURCES) \
   $(GNU_TEXT_JSOURCES) \
   $(GNU_MAPPING_JSOURCES) \
+  $(GNU_MATH_JSOURCES) \
   $(GNU_EXPR_JSOURCES) \
   $(GNU_KAWA_IO_JSOURCES) \
   $(GNU_KAWA_UTIL_JSOURCES) \
@@ -908,12 +1109,25 @@ GNU_ALWAYS_JSOURCES = \
   $(GNU_KAWA_MODELS_JSOURCES) \
   $(GNU_ECMASCRIPT_JSOURCES)
 
-gnu_java_sources = $(GNU_ALWAYS_JSOURCES) $(am__append_1) \
-	$(am__append_2) $(am__append_3) $(am__append_4) \
-	$(am__append_5) $(am__append_6) $(am__append_7) \
-	$(am__append_8)
-dist_gnu_jsources = \
-  $(GNU_ALWAYS_JSOURCES) \
+sources_gnu_misc = \
+  $(GNU_COMMONLISP_LANG_JSOURCES) \
+  $(GNU_Q2_LANG_JSOURCES)
+
+sources_kawa_core = \
+  $(KAWA_JSOURCES) \
+  $(KAWA_LANG_JSOURCES) \
+  $(KAWA_STANDARD_JSOURCES)
+
+sources_gnu_selected = $(am__append_1) $(am__append_2) $(am__append_3) \
+	$(am__append_4) $(am__append_5) $(am__append_6) \
+	$(am__append_7) $(am__append_8) $(am__append_9)
+sources_kawa_selected = $(am__append_10) $(am__append_11) \
+	$(am__append_12)
+java_sources = $(sources_gnu_core) $(sources_gnu_misc) $(sources_kawa_core) $(sources_gnu_selected) $(sources_kawa_selected)
+dist_jsources = \
+  $(sources_gnu_core) \
+  $(sources_gnu_misc) \
+  $(sources_kawa_core) \
   $(GNU_KAWA_SWINGVIEWS_JSOURCES) \
   $(GNU_KAWA_SWINGVIEWS_JSOURCES) \
   $(GNU_KAWA_SWTVIEWS_JSOURCES) \
@@ -924,25 +1138,33 @@ dist_gnu_jsources = \
   $(GNU_KAWA_SAX_JSOURCES) \
   $(GNU_KAWA_ECHO2_JSOURCES) \
   $(GNU_KAWA_XSLT_JSOURCES) \
+  $(GNU_XQUERY_LANG_JSOURCES) \
+  $(GNU_XQUERY_UTIL_JSOURCES) \
+  $(GNU_XQUERY_SCRIPT_JSOURCES) \
+  $(KAWA_WITH_AWT_JSOURCES) \
+  $(KAWA_WITH_SCRIPT) \
+  $(KAWA_WITH_DOMTERM) \
   $(JAVAX_SCRIPT_EXTRA)
 
-GNU_EXTRA_DIST = \
-  $(dist_gnu_jsources) \
+MISC_EXTRA_DIST = \
+  $(dist_jsources) \
   gnu/kawa/util/PreProcess.java \
   gnu/expr/package.html \
   gnu/mapping/package.html \
+  gnu/math/package.html \
   gnu/lists/package.html \
   gnu/lists/PrimVector.template \
   gnu/text/package.html \
   gnu/kawa/reflect/package.html \
+  kawa/Version.java.in \
   $(GNU_KAWA_ANT_JSOURCES)
 
 CLASSPATH = .$(CLASSPATH_SEPARATOR)$(srcdir)$(CLASSPATH_SEPARATOR)@conf_classpath@$$CLASSPATH
-FIXED_SUBDIRS = doc testsuite gnu/bytecode gnu/math \
+FIXED_SUBDIRS = doc testsuite gnu/bytecode \
   gnu \
-  kawa gnu/kawa/slib gnu/kawa/servlet \
-  gnu/commonlisp/lang gnu/commonlisp/lisp gnu/commonlisp/testsuite \
-  gnu/q2/lang gnu/q2/testsuite
+  kawa/lib gnu/kawa/slib gnu/kawa/servlet \
+  gnu/commonlisp/lisp gnu/commonlisp/testsuite \
+  gnu/q2/testsuite
 
 ANDROID_SUBDIRS = gnu/kawa/android
 BRL_SUBDIRS = gnu/brl gnu/kawa/brl
@@ -950,10 +1172,10 @@ JAVAFX_SUBDIRS = gnu/kawa/javafx
 JEMACS_SUBDIRS = gnu/jemacs/lang gnu/jemacs/buffer gnu/jemacs/lisp \
   gnu/jemacs/testsuite gnu/jemacs/swing gnu/jemacs/swt
 
-XQUERY_SUBDIRS = gnu/xquery/util gnu/xquery/lang gnu/xquery/testsuite
-SUBDIRS = $(FIXED_SUBDIRS) $(am__append_9) $(am__append_10) \
-	$(am__append_11) $(am__append_12) $(am__append_13) \
-	$(am__append_14)
+XQUERY_SUBDIRS = gnu/xquery/testsuite
+SUBDIRS = $(FIXED_SUBDIRS) $(am__append_13) $(am__append_14) \
+	$(am__append_15) $(am__append_16) $(am__append_17) \
+	$(am__append_18)
 DIST_SUBDIRS = $(FIXED_SUBDIRS) \
   $(ANDROID_SUBDIRS) \
   $(BRL_SUBDIRS) \
@@ -976,14 +1198,14 @@ EXTRA_DIST = debian/control debian/rules debian/changelog debian/dirs \
   config.guess config.sub install-sh ./mkinstalldirs \
   patch-source-list selected-java-source \
   build.xml build.properties \
-  $(GNU_EXTRA_DIST) \
+  $(MISC_EXTRA_DIST) \
   gnu/jemacs/jar-manifest gnu/jemacs/status.html \
   kawa/Version.java jar-manifest Make-rules classes-to-skip-for-runtime \
   bin/configure.ac bin/configure bin/Makefile.am bin/Makefile.in \
   bin/ChangeLog bin/kawa.bat.in bin/kawa.c bin/kawapath.c bin/cgi-servlet.c \
   bin/kawa.sh.in bin/qexo.in
 
-MOSTLYCLEANFILES = tmp* *.o bin/*.o *.stamp gnu/*/*.class gnu/*/*/*.class classes.list classes-rt.list
+MOSTLYCLEANFILES = tmp* *.o bin/*.o *.stamp */*.class */*/*.class */*/*/*.class classes.list classes-rt.list
 CLEANFILES = *.jar lib/*.jar *.zip bin/qexo kawa/Version.java $(META_ScriptEngineFactory)
 DISTCLEANFILES = selected-java-source bin/kawa.sh bin/kawa.bat
 MAINTAINERCLEANFILES = \
@@ -1523,13 +1745,21 @@ uninstall-am: uninstall-binSCRIPTS uninstall-local
 .PRECIOUS: Makefile
 
 
-gnu-classes.stamp: $(gnu_java_sources)
-	$(JAVAC) -d $(top_builddir) -classpath "$(CLASSPATH)" $(JAVACFLAGS) $?
-	echo timestamp > gnu/java-classes.stamp
+misc-classes.stamp: $(java_sources) tmp-sources1.list
+	$(JAVAC) -d $(top_builddir) -classpath "$(CLASSPATH)" $(JAVACFLAGS) @tmp-sources1.list
+	echo timestamp > misc-classes.stamp
 	echo timestamp > kawa-jar.stamp
 
 classes.list: ./kawa-jar.stamp
 	$(FIND) gnu kawa -name '*.class' -print >classes.list
+
+tmp-sources1.list: source-list
+	(for f in $(sources_gnu_core); do echo $(srcdir)/$$f; done) >tmp-list
+	(for f in $(sources_gnu_misc); do echo $(srcdir)/$$f; done) >>tmp-list
+	(for f in $(sources_gnu_selected); do echo $(srcdir)/$$f; done) >>tmp-list
+	(for f in $(sources_kawa_core); do echo $(srcdir)/$$f; done) >>tmp-list
+	(for f in $(sources_kawa_selected); do echo $(srcdir)/$$f; done) >>tmp-list
+	mv tmp-list $@
 
 classes-rt.list: ./kawa-jar.stamp $(srcdir)/classes-to-skip-for-runtime 
 	$(FIND) gnu kawa -name '*.class' -print | grep -v -f $(srcdir)/classes-to-skip-for-runtime >classes-rt.list

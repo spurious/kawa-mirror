@@ -15,7 +15,7 @@
 @SET_MAKE@
 
 # This should be merged into ../Makefile.am
-# However, first we need to make sure gnu/java-classes.stamp
+# However, first we need to make sure misc-classes.stamp
 # is built at the right time, so more cleanup is needed first.
 VPATH = @srcdir@
 am__is_gnu_make = { \
@@ -418,7 +418,7 @@ uninstall-am:
 
 
 all:
-	cd .. && $(MAKE) gnu-classes.stamp
+	cd .. && $(MAKE) misc-classes.stamp
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

@@ -205,6 +205,45 @@ GNU_MAPPING_JSOURCES = \
   gnu/mapping/WrongArguments.java \
   gnu/mapping/WrongType.java
 
+GNU_MATH_JSOURCES =\
+  gnu/math/BaseUnit.java \
+  gnu/math/BitOps.java \
+  gnu/math/CComplex.java \
+  gnu/math/Complex.java \
+  gnu/math/CQuantity.java \
+  gnu/math/CQuaternion.java \
+  gnu/math/DateTime.java \
+  gnu/math/DComplex.java \
+  gnu/math/DFloNum.java \
+  gnu/math/Dimensions.java \
+  gnu/math/DQuantity.java \
+  gnu/math/DQuaternion.java \
+  gnu/math/Duration.java \
+  gnu/math/ExponentialFormat.java \
+  gnu/math/FixedRealFormat.java \
+  gnu/math/IntFraction.java \
+  gnu/math/IntNum.java \
+  gnu/math/MPN.java \
+  gnu/math/MulUnit.java \
+  gnu/math/NamedUnit.java \
+  gnu/math/Numeric.java \
+  gnu/math/Quantity.java \
+  gnu/math/Quaternion.java \
+  gnu/math/RatNum.java \
+  gnu/math/RealNum.java \
+  gnu/math/UByte.java \
+  gnu/math/UInt.java \
+  gnu/math/ULong.java \
+  gnu/math/Unit.java \
+  gnu/math/UnsignedPrim.java \
+  gnu/math/UShort.java
+
+GNU_Q2_LANG_JSOURCES = \
+  gnu/q2/lang/Operator.java \
+  gnu/q2/lang/Q2.java \
+  gnu/q2/lang/Q2Read.java \
+  gnu/q2/lang/Q2Translator.java
+
 GNU_TEXT_JSOURCES = \
   gnu/text/CaseConvertFormat.java \
   gnu/text/Char.java \
@@ -536,10 +575,168 @@ GNU_KAWA_ANT_JSOURCES =\
 GNU_KAWA_IO_JLINE_JSOURCES =\
   gnu/kawa/io/JLineInPort.java
 
-GNU_ALWAYS_JSOURCES = \
+GNU_COMMONLISP_LANG_JSOURCES =\
+  gnu/commonlisp/lang/Lisp2.java \
+  gnu/commonlisp/lang/Lisp2Compilation.java \
+  gnu/commonlisp/lang/defvar.java \
+  gnu/commonlisp/lang/defun.java \
+  gnu/commonlisp/lang/function.java \
+  gnu/commonlisp/lang/OrdinaryLambda.java \
+  gnu/commonlisp/lang/prog1.java \
+  gnu/commonlisp/lang/setq.java \
+  gnu/commonlisp/lang/Symbols.java \
+  gnu/commonlisp/lang/UnwindProtect.java \
+  gnu/commonlisp/lang/CommonLisp.java
+
+GNU_XQUERY_LANG_JSOURCES =\
+  gnu/xquery/lang/XQuery.java \
+  gnu/xquery/lang/XQParser.java \
+  gnu/xquery/lang/XQResolveNames.java
+
+GNU_XQUERY_UTIL_JSOURCES =\
+  gnu/xquery/util/ArithOp.java \
+  gnu/xquery/util/Average.java \
+  gnu/xquery/util/BooleanValue.java \
+  gnu/xquery/util/CastableAs.java \
+  gnu/xquery/util/CastAs.java \
+  gnu/xquery/util/Compare.java \
+  gnu/xquery/util/CompileMisc.java \
+  gnu/xquery/util/Debug.java \
+  gnu/xquery/util/DistinctValues.java \
+  gnu/xquery/util/IntegerRange.java \
+  gnu/xquery/util/ItemAt.java \
+  gnu/xquery/util/MinMax.java \
+  gnu/xquery/util/NamedCollator.java \
+  gnu/xquery/util/NodeUtils.java \
+  gnu/xquery/util/NumberValue.java \
+  gnu/xquery/util/OrderedMap.java \
+  gnu/xquery/util/OrderedTuples.java \
+  gnu/xquery/util/QNameUtils.java \
+  gnu/xquery/util/Reduce.java \
+  gnu/xquery/util/RelativeStep.java \
+  gnu/xquery/util/RelativeStepFilter.java \
+  gnu/xquery/util/SequenceUtils.java \
+  gnu/xquery/util/StringUtils.java \
+  gnu/xquery/util/TimeUtils.java \
+  gnu/xquery/util/ValuesFilter.java \
+  gnu/xquery/util/XQException.java
+
+GNU_XQUERY_SCRIPT_JSOURCES =\
+  gnu/xquery/lang/XQueryScriptEngineFactory.java
+
+KAWA_JSOURCES =\
+  kawa/repl.java \
+  kawa/Shell.java \
+  kawa/SourceMethodType.java \
+  kawa/SourceType.java \
+  kawa/TelnetInputStream.java \
+  kawa/TelnetOutputStream.java \
+  kawa/Telnet.java \
+  kawa/TelnetRepl.java \
+  kawa/Version.java
+
+KAWA_LANG_JSOURCES = \
+  kawa/lang/AnyPat.java \
+  kawa/lang/AutoloadProcedure.java \
+  kawa/lang/AutoloadSyntax.java \
+  kawa/lang/BindDecls.java \
+  kawa/lang/CalledContinuation.java \
+  kawa/lang/CompileFile.java \
+  kawa/lang/Continuation.java \
+  kawa/lang/EqualPat.java \
+  kawa/lang/Eval.java \
+  kawa/lang/GenericError.java\
+  kawa/lang/GetFieldProc.java \
+  kawa/lang/Lambda.java \
+  kawa/lang/ListPat.java \
+  kawa/lang/ListRepeatPat.java \
+  kawa/lang/Macro.java \
+  kawa/lang/NamedException.java \
+  kawa/lang/PairPat.java \
+  kawa/lang/Pattern.java \
+  kawa/lang/PatternScope.java \
+  kawa/lang/Quote.java \
+  kawa/lang/RecordConstructor.java \
+  kawa/lang/Record.java \
+  kawa/lang/SetFieldProc.java \
+  kawa/lang/SyntaxForm.java \
+  kawa/lang/SyntaxForms.java \
+  kawa/lang/Syntax.java \
+  kawa/lang/SyntaxPattern.java \
+  kawa/lang/SyntaxRule.java \
+  kawa/lang/SyntaxRules.java \
+  kawa/lang/SyntaxTemplate.java \
+  kawa/lang/TemplateScope.java \
+  kawa/lang/Translator.java \
+  kawa/lang/VarListPat.java
+
+KAWA_STANDARD_JSOURCES =\
+  kawa/standard/append.java \
+  kawa/standard/begin.java \
+  kawa/standard/char_ready_p.java \
+  kawa/standard/constant_fold.java \
+  kawa/standard/define_alias.java \
+  kawa/standard/define_autoload.java \
+  kawa/standard/define_class.java \
+  kawa/standard/define.java \
+  kawa/standard/define_library.java \
+  kawa/standard/define_member_alias.java \
+  kawa/standard/define_syntax.java \
+  kawa/standard/define_unit.java \
+  kawa/standard/export.java \
+  kawa/standard/expt.java \
+  kawa/standard/fluid_let.java \
+  kawa/standard/IfFeature.java \
+  kawa/standard/ImportFromLibrary.java \
+  kawa/standard/Include.java \
+  kawa/standard/let.java \
+  kawa/standard/let_syntax.java \
+  kawa/standard/load.java \
+  kawa/standard/location.java \
+  kawa/standard/make.java \
+  kawa/standard/MatchDef.java \
+  kawa/standard/module_compile_options.java \
+  kawa/standard/module_extends.java \
+  kawa/standard/module_implements.java \
+  kawa/standard/module_name.java \
+  kawa/standard/module_static.java \
+  kawa/standard/object.java \
+  kawa/standard/prim_method.java \
+  kawa/standard/read_line.java \
+  kawa/standard/require.java \
+  kawa/standard/Scan.java \
+  kawa/standard/SchemeCompilation.java \
+  kawa/standard/Scheme.java \
+  kawa/standard/set_b.java \
+  kawa/standard/sleep.java \
+  kawa/standard/syntax_case.java \
+  kawa/standard/syntax_error.java \
+  kawa/standard/syntax.java \
+  kawa/standard/syntax_rules.java \
+  kawa/standard/thisRef.java \
+  kawa/standard/TracedProcedure.java \
+  kawa/standard/try_catch.java \
+  kawa/standard/vector_append.java \
+  kawa/standard/with_compile_options.java
+
+KAWA_WITH_AWT_JSOURCES =\
+  kawa/GuiConsole.java \
+  kawa/GuiInPort.java \
+  kawa/ReplPane.java \
+  kawa/ReplDocument.java \
+  kawa/ReplPaneOutPort.java
+
+KAWA_WITH_SCRIPT =\
+  kawa/standard/SchemeScriptEngineFactory.java
+
+KAWA_WITH_DOMTERM =\
+  kawa/DomTermBackend.java
+
+sources_gnu_core = \
   $(GNU_LISTS_JSOURCES) \
   $(GNU_TEXT_JSOURCES) \
   $(GNU_MAPPING_JSOURCES) \
+  $(GNU_MATH_JSOURCES) \
   $(GNU_EXPR_JSOURCES) \
   $(GNU_KAWA_IO_JSOURCES) \
   $(GNU_KAWA_UTIL_JSOURCES) \
@@ -548,34 +745,60 @@ GNU_ALWAYS_JSOURCES = \
   $(GNU_KAWA_LISPEXPR_JSOURCES) \
   $(GNU_KAWA_MODELS_JSOURCES) \
   $(GNU_ECMASCRIPT_JSOURCES)
-gnu_java_sources = $(GNU_ALWAYS_JSOURCES)
+
+sources_gnu_misc = \
+  $(GNU_COMMONLISP_LANG_JSOURCES) \
+  $(GNU_Q2_LANG_JSOURCES)
+
+sources_kawa_core =\
+  $(KAWA_JSOURCES) \
+  $(KAWA_LANG_JSOURCES) \
+  $(KAWA_STANDARD_JSOURCES)
+
+sources_gnu_selected =
+sources_kawa_selected =
 if WITH_SWING
-gnu_java_sources += $(GNU_KAWA_SWINGVIEWS_JSOURCES)
+sources_gnu_selected += $(GNU_KAWA_SWINGVIEWS_JSOURCES)
 endif
 if WITH_SWT
-gnu_java_sources += $(GNU_KAWA_SWTVIEWS_JSOURCES)
+sources_gnu_selected += $(GNU_KAWA_SWTVIEWS_JSOURCES)
 endif
 if WITH_JLINE2
-gnu_java_sources += $(GNU_KAWA_IO_JLINE_JSOURCES)
+sources_gnu_selected += $(GNU_KAWA_IO_JLINE_JSOURCES)
 endif
 if ENABLE_XML
-gnu_java_sources += $(GNU_XML_JSOURCES) $(GNU_KAWA_XML_JSOURCES) $(GNU_KAWA_LISPEXPR_XML_JSOURCES)
+sources_gnu_selected += $(GNU_XML_JSOURCES) $(GNU_KAWA_XML_JSOURCES) $(GNU_KAWA_LISPEXPR_XML_JSOURCES)
 if WITH_SAX2
-gnu_java_sources += $(GNU_KAWA_SAX_JSOURCES)
+sources_gnu_selected += $(GNU_KAWA_SAX_JSOURCES)
 endif
 endif
 if ENABLE_ECHO2
-gnu_java_sources += $(GNU_KAWA_ECHO2_JSOURCES)
+sources_gnu_selected += $(GNU_KAWA_ECHO2_JSOURCES)
 endif
+if ENABLE_XML
 if ENABLE_XQUERY
-gnu_java_sources += $(GNU_KAWA_XSLT_JSOURCES)
+sources_gnu_selected += $(GNU_XQUERY_LANG_JSOURCES) $(GNU_XQUERY_UTIL_JSOURCES) $(GNU_KAWA_XSLT_JSOURCES)
+if WITH_JAVAX_SCRIPT
+sources_gnu_selected += $(GNU_XQUERY_SCRIPT_JSOURCES)
+endif
+endif
 endif
 if WITH_JAVAX_SCRIPT
-gnu_java_sources += $(JAVAX_SCRIPT_EXTRA)
+sources_gnu_selected += $(JAVAX_SCRIPT_EXTRA)
+sources_kawa_selected += $(KAWA_WITH_SCRIPT)
 endif
+if WITH_AWT
+sources_kawa_selected += $(KAWA_WITH_AWT_JSOURCES)
+endif
+if WITH_DOMTERM
+sources_kawa_selected += $(KAWA_WITH_DOMTERM)
+endif
+java_sources = $(sources_gnu_core) $(sources_gnu_misc) $(sources_kawa_core) $(sources_gnu_selected) $(sources_kawa_selected)
 
-dist_gnu_jsources = \
-  $(GNU_ALWAYS_JSOURCES) \
+dist_jsources = \
+  $(sources_gnu_core) \
+  $(sources_gnu_misc) \
+  $(sources_kawa_core) \
   $(GNU_KAWA_SWINGVIEWS_JSOURCES) \
   $(GNU_KAWA_SWINGVIEWS_JSOURCES) \
   $(GNU_KAWA_SWTVIEWS_JSOURCES) \
@@ -586,16 +809,24 @@ dist_gnu_jsources = \
   $(GNU_KAWA_SAX_JSOURCES) \
   $(GNU_KAWA_ECHO2_JSOURCES) \
   $(GNU_KAWA_XSLT_JSOURCES) \
+  $(GNU_XQUERY_LANG_JSOURCES) \
+  $(GNU_XQUERY_UTIL_JSOURCES) \
+  $(GNU_XQUERY_SCRIPT_JSOURCES) \
+  $(KAWA_WITH_AWT_JSOURCES) \
+  $(KAWA_WITH_SCRIPT) \
+  $(KAWA_WITH_DOMTERM) \
   $(JAVAX_SCRIPT_EXTRA)
 
-GNU_EXTRA_DIST = \
-  $(dist_gnu_jsources) \
+MISC_EXTRA_DIST = \
+  $(dist_jsources) \
   gnu/kawa/util/PreProcess.java \
   gnu/expr/package.html \
   gnu/mapping/package.html \
+  gnu/math/package.html \
   gnu/lists/package.html \
   gnu/lists/PrimVector.template \
   gnu/text/package.html \
   gnu/kawa/reflect/package.html \
+  kawa/Version.java.in \
   $(GNU_KAWA_ANT_JSOURCES)
 

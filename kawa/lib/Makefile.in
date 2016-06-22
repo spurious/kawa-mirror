@@ -88,6 +88,7 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 @WITH_DOMTERM_TRUE@am__append_1 = kawa/domterm.scm
+@ENABLE_XML_TRUE@@ENABLE_XQUERY_TRUE@am__append_2 = $(scm_WITH_XQUERY)
 subdir = kawa/lib
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/config.classpath \
@@ -285,15 +286,17 @@ java_SCM_ALWAYS = \
   trace.scm
 
 scm_WITH_SWING = windows.scm
-EXTRA_DIST = $(java_SCM_ALWAYS) $(scm_WITH_SWING) \
+scm_WITH_XQUERY = xquery/Xutils.scm
+EXTRA_DIST = $(java_SCM_ALWAYS) $(scm_WITH_SWING) $(scm_WITH_XQUERY) \
   scheme/base-exports scheme/char-exports scheme/complex-exports \
   scheme/cxr-exports scheme/eval-exports scheme/file-exports \
   scheme/inexact-exports scheme/lazy-exports \
   scheme/process-context-exports scheme/time-exports scheme/write-exports
 
-@WITH_SWING_FALSE@java_SCM = $(java_SCM_ALWAYS) $(am__append_1)
+@WITH_SWING_FALSE@java_SCM = $(java_SCM_ALWAYS) $(am__append_1) \
+@WITH_SWING_FALSE@	$(am__append_2)
 @WITH_SWING_TRUE@java_SCM = $(java_SCM_ALWAYS) $(scm_WITH_SWING) \
-@WITH_SWING_TRUE@	$(am__append_1)
+@WITH_SWING_TRUE@	$(am__append_1) $(am__append_2)
 PACKAGE_FNAME = kawa-lib
 SCM_COMPILE_FLAGS = --warn-undefined-variable --warn-unknown-member --warn-as-error
 EXTRA_CLEAN = */*.class */*/*.class

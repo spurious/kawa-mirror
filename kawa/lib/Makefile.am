@@ -45,7 +45,8 @@ java_SCM_ALWAYS =\
   trace.scm
 
 scm_WITH_SWING = windows.scm
-EXTRA_DIST = $(java_SCM_ALWAYS) $(scm_WITH_SWING) \
+scm_WITH_XQUERY = xquery/Xutils.scm
+EXTRA_DIST = $(java_SCM_ALWAYS) $(scm_WITH_SWING) $(scm_WITH_XQUERY) \
   scheme/base-exports scheme/char-exports scheme/complex-exports \
   scheme/cxr-exports scheme/eval-exports scheme/file-exports \
   scheme/inexact-exports scheme/lazy-exports \
@@ -58,6 +59,11 @@ java_SCM= $(java_SCM_ALWAYS)
 endif
 if WITH_DOMTERM
 java_SCM += kawa/domterm.scm
+endif
+if ENABLE_XML
+if ENABLE_XQUERY
+java_SCM += $(scm_WITH_XQUERY)
+endif
 endif
 
 # Used to generate makekawa.bat in ../.. .

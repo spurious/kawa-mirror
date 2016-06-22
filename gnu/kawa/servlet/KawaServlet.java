@@ -41,17 +41,9 @@ extends HttpServlet
     throws ServletException, IOException
   {
     CallContext ctx = CallContext.getInstance();
-    HttpRequestContext hctx = HttpRequestContext.instance.get();
-    Context sctx;
-    if (hctx instanceof Context)
-      sctx = (Context) hctx;
-    else
-      {
-        sctx = new Context();
-        Context.setInstance(sctx);
-      }
-    sctx.init(this, request, response);
+    Context sctx = new Context(this, request, response);
     ctx.consumer = sctx.getConsumer();
+    Context.setInstance(sctx);
     // FIXME should path be relative to context?
     Path.setCurrentPath(Path.valueOf(request.getRequestURL().toString()));
     ctx.values = Values.noArgs;
@@ -100,6 +92,7 @@ extends HttpServlet
       }
     finally
       {
+        Context.setInstance(null);
         sctx.servlet = null;
         sctx.request = null;
         sctx.response = null;
@@ -115,8 +108,8 @@ extends HttpServlet
     ServletContext context;
     Map<String,Object> requestParameters;
 
-    public void init(HttpServlet servlet, HttpServletRequest request,
-                     HttpServletResponse response)
+    public Context(HttpServlet servlet, HttpServletRequest request,
+                   HttpServletResponse response)
     {
       if (response == null)
         throw new Error("init with null response");
@@ -317,7 +310,7 @@ extends HttpServlet
     public List<String> getRequestHeaders (String name)
     {
       java.util.Enumeration<java.lang.String> e = request.getHeaders(name);
-      List<String> list = new ArrayList();
+      List<String> list = new ArrayList<String>();
       while (e.hasMoreElements())
         {
           list.add(e.nextElement());

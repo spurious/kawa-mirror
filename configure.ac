@@ -259,9 +259,7 @@ AC_CONFIG_FILES([Makefile gnu/bytecode/Makefile
   gnu/brl/Makefile gnu/kawa/brl/Makefile
   kawa/lib/Makefile gnu/kawa/slib/Makefile
   gnu/commonlisp/lisp/Makefile gnu/commonlisp/testsuite/Makefile
-  gnu/jemacs/lang/Makefile gnu/jemacs/buffer/Makefile
   gnu/jemacs/lisp/Makefile gnu/jemacs/testsuite/Makefile
-  gnu/jemacs/swing/Makefile gnu/jemacs/swt/Makefile
   gnu/q2/testsuite/Makefile
   gnu/xquery/testsuite/Makefile
   gnu/kawa/android/Makefile

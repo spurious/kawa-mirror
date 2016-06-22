@@ -100,14 +100,17 @@ host_triplet = @host@
 @ENABLE_XML_TRUE@@ENABLE_XQUERY_TRUE@@WITH_JAVAX_SCRIPT_TRUE@am__append_8 = $(GNU_XQUERY_SCRIPT_JSOURCES)
 @WITH_JAVAX_SCRIPT_TRUE@am__append_9 = $(JAVAX_SCRIPT_EXTRA)
 @WITH_JAVAX_SCRIPT_TRUE@am__append_10 = $(KAWA_WITH_SCRIPT)
-@WITH_AWT_TRUE@am__append_11 = $(KAWA_WITH_AWT_JSOURCES)
-@WITH_DOMTERM_TRUE@am__append_12 = $(KAWA_WITH_DOMTERM)
-@ENABLE_JEMACS_TRUE@am__append_13 = $(JEMACS_SUBDIRS)
-@ENABLE_BRL_TRUE@@ENABLE_XML_TRUE@am__append_14 = $(BRL_SUBDIRS)
-@ENABLE_XML_TRUE@@ENABLE_XQUERY_TRUE@am__append_15 = $(XQUERY_SUBDIRS)
-@WITH_ANDROID_TRUE@am__append_16 = $(ANDROID_SUBDIRS)
-@WITH_JAVAFX_TRUE@am__append_17 = $(JAVAFX_SUBDIRS)
-@ENABLE_KAWA_FRONTEND_TRUE@am__append_18 = bin
+@ENABLE_JEMACS_TRUE@am__append_11 = $(GNU_JEMACS_LANG_JSOURCES) $(GNU_JEMACS_BUFFER_JSOURCES)
+@ENABLE_JEMACS_TRUE@@WITH_SWING_TRUE@am__append_12 = $(GNU_JEMACS_SWING_JSOURCES)
+@ENABLE_JEMACS_TRUE@@WITH_SWT_TRUE@am__append_13 = $(GNU_JEMACS_SWT_JSOURCES)
+@WITH_AWT_TRUE@am__append_14 = $(KAWA_WITH_AWT_JSOURCES)
+@WITH_DOMTERM_TRUE@am__append_15 = $(KAWA_WITH_DOMTERM)
+@ENABLE_JEMACS_TRUE@am__append_16 = $(JEMACS_SUBDIRS)
+@ENABLE_BRL_TRUE@@ENABLE_XML_TRUE@am__append_17 = $(BRL_SUBDIRS)
+@ENABLE_XML_TRUE@@ENABLE_XQUERY_TRUE@am__append_18 = $(XQUERY_SUBDIRS)
+@WITH_ANDROID_TRUE@am__append_19 = $(ANDROID_SUBDIRS)
+@WITH_JAVAFX_TRUE@am__append_20 = $(JAVAFX_SUBDIRS)
+@ENABLE_KAWA_FRONTEND_TRUE@am__append_21 = bin
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/config.classpath \
@@ -439,6 +442,66 @@ JAVAX_SCRIPT_EXTRA = \
   gnu/expr/AbstractScriptEngineFactory.java \
   gnu/expr/KawaScriptBindings.java \
   gnu/expr/KawaScriptEngine.java
+
+GNU_JEMACS_LANG_JSOURCES = \
+  gnu/jemacs/lang/AddOp.java \
+  gnu/jemacs/lang/CatchableException.java \
+  gnu/jemacs/lang/defcustom.java \
+  gnu/jemacs/lang/defgroup.java \
+  gnu/jemacs/lang/DivideOp.java \
+  gnu/jemacs/lang/ELisp.java \
+  gnu/jemacs/lang/lambda.java \
+  gnu/jemacs/lang/NumberCompare.java \
+  gnu/jemacs/lang/Print.java \
+  gnu/jemacs/lang/SaveExcursion.java \
+  gnu/jemacs/lang/While.java
+
+GNU_JEMACS_BUFFER_JSOURCES = \
+  gnu/jemacs/buffer/Buffer.java \
+  gnu/jemacs/buffer/BufferLocal.java \
+  gnu/jemacs/buffer/BufferWriter.java \
+  gnu/jemacs/buffer/CancelledException.java \
+  gnu/jemacs/buffer/Command.java \
+  gnu/jemacs/buffer/EFrame.java \
+  gnu/jemacs/buffer/EKeymap.java \
+  gnu/jemacs/buffer/EMenu.java \
+  gnu/jemacs/buffer/EToolkit.java \
+  gnu/jemacs/buffer/EWindow.java \
+  gnu/jemacs/buffer/InfProcessMode.java \
+  gnu/jemacs/buffer/InputStreamHandler.java \
+  gnu/jemacs/buffer/Marker.java \
+  gnu/jemacs/buffer/Mode.java \
+  gnu/jemacs/buffer/ProcessMode.java \
+  gnu/jemacs/buffer/ReplMode.java \
+  gnu/jemacs/buffer/SelfInsertCommand.java \
+  gnu/jemacs/buffer/Signal.java \
+  gnu/jemacs/buffer/TelnetMode.java
+
+GNU_JEMACS_SWING_JSOURCES = \
+  gnu/jemacs/swing/BufferContent.java \
+  gnu/jemacs/swing/IgnoreAction.java \
+  gnu/jemacs/swing/Modeline.java \
+  gnu/jemacs/swing/SwingBuffer.java \
+  gnu/jemacs/swing/SwingFrame.java \
+  gnu/jemacs/swing/SwingMenu.java \
+  gnu/jemacs/swing/SwingToolkit.java \
+  gnu/jemacs/swing/SwingWindow.java \
+  gnu/jemacs/swing/TooLongAction.java
+
+GNU_JEMACS_SWT_JSOURCES = \
+  gnu/jemacs/swt/BufferContent.java \
+  gnu/jemacs/swt/BufferContentReader.java \
+  gnu/jemacs/swt/CommandDialog.java \
+  gnu/jemacs/swt/LineOffsets.java \
+  gnu/jemacs/swt/SwtBuffer.java \
+  gnu/jemacs/swt/SwtCharBuffer.java \
+  gnu/jemacs/swt/SwtFrame.java \
+  gnu/jemacs/swt/SwtHelper.java \
+  gnu/jemacs/swt/SwtKeyMapper.java \
+  gnu/jemacs/swt/SwtMenu.java \
+  gnu/jemacs/swt/SwtToolkit.java \
+  gnu/jemacs/swt/SwtWindow.java \
+  gnu/jemacs/swt/SwtWindowWidget.java
 
 GNU_LISTS_JSOURCES = \
   gnu/lists/AbstractCharVector.java \
@@ -1120,24 +1183,29 @@ sources_kawa_core = \
 
 sources_gnu_selected = $(am__append_1) $(am__append_2) $(am__append_3) \
 	$(am__append_4) $(am__append_5) $(am__append_6) \
-	$(am__append_7) $(am__append_8) $(am__append_9)
-sources_kawa_selected = $(am__append_10) $(am__append_11) \
-	$(am__append_12)
+	$(am__append_7) $(am__append_8) $(am__append_9) \
+	$(am__append_11) $(am__append_12) $(am__append_13)
+sources_kawa_selected = $(am__append_10) $(am__append_14) \
+	$(am__append_15)
 java_sources = $(sources_gnu_core) $(sources_gnu_misc) $(sources_kawa_core) $(sources_gnu_selected) $(sources_kawa_selected)
 dist_jsources = \
   $(sources_gnu_core) \
   $(sources_gnu_misc) \
   $(sources_kawa_core) \
+  $(GNU_JEMACS_LANG_JSOURCES) \
+  $(GNU_JEMACS_BUFFER_JSOURCES) \
+  $(GNU_JEMACS_SWING_JSOURCES) \
+  $(GNU_JEMACS_SWT_JSOURCES) \
   $(GNU_KAWA_SWINGVIEWS_JSOURCES) \
   $(GNU_KAWA_SWINGVIEWS_JSOURCES) \
   $(GNU_KAWA_SWTVIEWS_JSOURCES) \
   $(GNU_KAWA_IO_JLINE_JSOURCES) \
-  $(GNU_XML_JSOURCES) \
   $(GNU_KAWA_XML_JSOURCES) \
   $(GNU_KAWA_LISPEXPR_XML_JSOURCES) \
   $(GNU_KAWA_SAX_JSOURCES) \
   $(GNU_KAWA_ECHO2_JSOURCES) \
   $(GNU_KAWA_XSLT_JSOURCES) \
+  $(GNU_XML_JSOURCES) \
   $(GNU_XQUERY_LANG_JSOURCES) \
   $(GNU_XQUERY_UTIL_JSOURCES) \
   $(GNU_XQUERY_SCRIPT_JSOURCES) \
@@ -1152,6 +1220,8 @@ MISC_EXTRA_DIST = \
   gnu/expr/package.html \
   gnu/mapping/package.html \
   gnu/math/package.html \
+  gnu/jemacs/buffer/package.html \
+  gnu/jemacs/lang/package.html \
   gnu/lists/package.html \
   gnu/lists/PrimVector.template \
   gnu/text/package.html \
@@ -1169,13 +1239,11 @@ FIXED_SUBDIRS = doc testsuite gnu/bytecode \
 ANDROID_SUBDIRS = gnu/kawa/android
 BRL_SUBDIRS = gnu/brl gnu/kawa/brl
 JAVAFX_SUBDIRS = gnu/kawa/javafx
-JEMACS_SUBDIRS = gnu/jemacs/lang gnu/jemacs/buffer gnu/jemacs/lisp \
-  gnu/jemacs/testsuite gnu/jemacs/swing gnu/jemacs/swt
-
+JEMACS_SUBDIRS = gnu/jemacs/testsuite
 XQUERY_SUBDIRS = gnu/xquery/testsuite
-SUBDIRS = $(FIXED_SUBDIRS) $(am__append_13) $(am__append_14) \
-	$(am__append_15) $(am__append_16) $(am__append_17) \
-	$(am__append_18)
+SUBDIRS = $(FIXED_SUBDIRS) $(am__append_16) $(am__append_17) \
+	$(am__append_18) $(am__append_19) $(am__append_20) \
+	$(am__append_21)
 DIST_SUBDIRS = $(FIXED_SUBDIRS) \
   $(ANDROID_SUBDIRS) \
   $(BRL_SUBDIRS) \

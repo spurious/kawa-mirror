@@ -1,3 +1,10 @@
+2016-06-22  Per Bothner  <per@bothner.com>
+
+	Remove the Makefiles from lang, buffer, swing, swt subdirectorirs.
+	Merge file lists into top-level source-list.
+	* buffer/emacs.scm: Move to lisp directory.
+	* lang/MiscOps.scm, lang/NmberOps.scm: Likewise.
+
 2005-04-17  Per Bothner  <per@bothner.com>
 
 	* Makefile.am: Removed.  Now top-level recurses directly into our

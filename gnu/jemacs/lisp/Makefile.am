@@ -4,11 +4,10 @@ include $(top_srcdir)/Make-rules
 
 java_ELISP = primitives.el alist.el simple.el keymap.el keydefs.el hanoi.el \
   rect.el editfns.el subr.el autoloads.el
+java_SCM = emacs.scm MiscOps.scm NumberOps.scm
 
 PACKAGE_FNAME = gnu-jemacs-lisp
-EXTRA_GCJ_COMPILED = elisp-classes.stamp
-EXTRA_GCJ_INPUTS = *.class
 
-EXTRA_DIST = $(java_ELISP)
+EXTRA_DIST = $(java_ELISP) $(java_SCM)
 
-all: Makefile elisp-classes.stamp $(@GCJ_COMPILED_SELECTED@)
+all: Makefile scm-classes.stamp elisp-classes.stamp

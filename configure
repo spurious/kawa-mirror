@@ -3115,7 +3115,7 @@ if test -z "$ENABLE_KAWA_FRONTEND_TRUE"; then :
 
 fi
 
-ac_config_files="$ac_config_files Makefile gnu/bytecode/Makefile gnu/Makefile gnu/kawa/servlet/Makefile gnu/brl/Makefile gnu/kawa/brl/Makefile kawa/lib/Makefile gnu/kawa/slib/Makefile gnu/commonlisp/lisp/Makefile gnu/commonlisp/testsuite/Makefile gnu/jemacs/lang/Makefile gnu/jemacs/buffer/Makefile gnu/jemacs/lisp/Makefile gnu/jemacs/testsuite/Makefile gnu/jemacs/swing/Makefile gnu/jemacs/swt/Makefile gnu/q2/testsuite/Makefile gnu/xquery/testsuite/Makefile gnu/kawa/android/Makefile gnu/kawa/javafx/Makefile doc/Makefile testsuite/Makefile bin/kawa.bat"
+ac_config_files="$ac_config_files Makefile gnu/bytecode/Makefile gnu/Makefile gnu/kawa/servlet/Makefile gnu/brl/Makefile gnu/kawa/brl/Makefile kawa/lib/Makefile gnu/kawa/slib/Makefile gnu/commonlisp/lisp/Makefile gnu/commonlisp/testsuite/Makefile gnu/jemacs/lisp/Makefile gnu/jemacs/testsuite/Makefile gnu/q2/testsuite/Makefile gnu/xquery/testsuite/Makefile gnu/kawa/android/Makefile gnu/kawa/javafx/Makefile doc/Makefile testsuite/Makefile bin/kawa.bat"
 
 ac_config_files="$ac_config_files bin/kawa.sh"
 
@@ -3941,12 +3941,8 @@ do
     "gnu/kawa/slib/Makefile") CONFIG_FILES="$CONFIG_FILES gnu/kawa/slib/Makefile" ;;
     "gnu/commonlisp/lisp/Makefile") CONFIG_FILES="$CONFIG_FILES gnu/commonlisp/lisp/Makefile" ;;
     "gnu/commonlisp/testsuite/Makefile") CONFIG_FILES="$CONFIG_FILES gnu/commonlisp/testsuite/Makefile" ;;
-    "gnu/jemacs/lang/Makefile") CONFIG_FILES="$CONFIG_FILES gnu/jemacs/lang/Makefile" ;;
-    "gnu/jemacs/buffer/Makefile") CONFIG_FILES="$CONFIG_FILES gnu/jemacs/buffer/Makefile" ;;
     "gnu/jemacs/lisp/Makefile") CONFIG_FILES="$CONFIG_FILES gnu/jemacs/lisp/Makefile" ;;
     "gnu/jemacs/testsuite/Makefile") CONFIG_FILES="$CONFIG_FILES gnu/jemacs/testsuite/Makefile" ;;
-    "gnu/jemacs/swing/Makefile") CONFIG_FILES="$CONFIG_FILES gnu/jemacs/swing/Makefile" ;;
-    "gnu/jemacs/swt/Makefile") CONFIG_FILES="$CONFIG_FILES gnu/jemacs/swt/Makefile" ;;
     "gnu/q2/testsuite/Makefile") CONFIG_FILES="$CONFIG_FILES gnu/q2/testsuite/Makefile" ;;
     "gnu/xquery/testsuite/Makefile") CONFIG_FILES="$CONFIG_FILES gnu/xquery/testsuite/Makefile" ;;
     "gnu/kawa/android/Makefile") CONFIG_FILES="$CONFIG_FILES gnu/kawa/android/Makefile" ;;

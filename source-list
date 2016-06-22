@@ -78,6 +78,66 @@ JAVAX_SCRIPT_EXTRA = \
   gnu/expr/KawaScriptBindings.java \
   gnu/expr/KawaScriptEngine.java
 
+GNU_JEMACS_LANG_JSOURCES =\
+  gnu/jemacs/lang/AddOp.java \
+  gnu/jemacs/lang/CatchableException.java \
+  gnu/jemacs/lang/defcustom.java \
+  gnu/jemacs/lang/defgroup.java \
+  gnu/jemacs/lang/DivideOp.java \
+  gnu/jemacs/lang/ELisp.java \
+  gnu/jemacs/lang/lambda.java \
+  gnu/jemacs/lang/NumberCompare.java \
+  gnu/jemacs/lang/Print.java \
+  gnu/jemacs/lang/SaveExcursion.java \
+  gnu/jemacs/lang/While.java
+
+GNU_JEMACS_BUFFER_JSOURCES =\
+  gnu/jemacs/buffer/Buffer.java \
+  gnu/jemacs/buffer/BufferLocal.java \
+  gnu/jemacs/buffer/BufferWriter.java \
+  gnu/jemacs/buffer/CancelledException.java \
+  gnu/jemacs/buffer/Command.java \
+  gnu/jemacs/buffer/EFrame.java \
+  gnu/jemacs/buffer/EKeymap.java \
+  gnu/jemacs/buffer/EMenu.java \
+  gnu/jemacs/buffer/EToolkit.java \
+  gnu/jemacs/buffer/EWindow.java \
+  gnu/jemacs/buffer/InfProcessMode.java \
+  gnu/jemacs/buffer/InputStreamHandler.java \
+  gnu/jemacs/buffer/Marker.java \
+  gnu/jemacs/buffer/Mode.java \
+  gnu/jemacs/buffer/ProcessMode.java \
+  gnu/jemacs/buffer/ReplMode.java \
+  gnu/jemacs/buffer/SelfInsertCommand.java \
+  gnu/jemacs/buffer/Signal.java \
+  gnu/jemacs/buffer/TelnetMode.java
+
+GNU_JEMACS_SWING_JSOURCES =\
+  gnu/jemacs/swing/BufferContent.java \
+  gnu/jemacs/swing/IgnoreAction.java \
+  gnu/jemacs/swing/Modeline.java \
+  gnu/jemacs/swing/SwingBuffer.java \
+  gnu/jemacs/swing/SwingFrame.java \
+  gnu/jemacs/swing/SwingMenu.java \
+  gnu/jemacs/swing/SwingToolkit.java \
+  gnu/jemacs/swing/SwingWindow.java \
+  gnu/jemacs/swing/TooLongAction.java
+
+GNU_JEMACS_SWT_JSOURCES =\
+  gnu/jemacs/swt/BufferContent.java \
+  gnu/jemacs/swt/BufferContentReader.java \
+  gnu/jemacs/swt/CommandDialog.java \
+  gnu/jemacs/swt/LineOffsets.java \
+  gnu/jemacs/swt/SwtBuffer.java \
+  gnu/jemacs/swt/SwtCharBuffer.java \
+  gnu/jemacs/swt/SwtFrame.java \
+  gnu/jemacs/swt/SwtHelper.java \
+  gnu/jemacs/swt/SwtKeyMapper.java \
+  gnu/jemacs/swt/SwtMenu.java \
+  gnu/jemacs/swt/SwtToolkit.java \
+  gnu/jemacs/swt/SwtWindow.java \
+  gnu/jemacs/swt/SwtWindowWidget.java
+
 GNU_LISTS_JSOURCES = \
   gnu/lists/AbstractCharVector.java \
   gnu/lists/AbstractFormat.java \
@@ -787,6 +847,15 @@ if WITH_JAVAX_SCRIPT
 sources_gnu_selected += $(JAVAX_SCRIPT_EXTRA)
 sources_kawa_selected += $(KAWA_WITH_SCRIPT)
 endif
+if ENABLE_JEMACS
+sources_gnu_selected += $(GNU_JEMACS_LANG_JSOURCES) $(GNU_JEMACS_BUFFER_JSOURCES)
+if WITH_SWING
+sources_gnu_selected += $(GNU_JEMACS_SWING_JSOURCES)
+endif
+if WITH_SWT
+sources_gnu_selected += $(GNU_JEMACS_SWT_JSOURCES)
+endif
+endif
 if WITH_AWT
 sources_kawa_selected += $(KAWA_WITH_AWT_JSOURCES)
 endif
@@ -799,16 +868,20 @@ dist_jsources = \
   $(sources_gnu_core) \
   $(sources_gnu_misc) \
   $(sources_kawa_core) \
+  $(GNU_JEMACS_LANG_JSOURCES) \
+  $(GNU_JEMACS_BUFFER_JSOURCES) \
+  $(GNU_JEMACS_SWING_JSOURCES) \
+  $(GNU_JEMACS_SWT_JSOURCES) \
   $(GNU_KAWA_SWINGVIEWS_JSOURCES) \
   $(GNU_KAWA_SWINGVIEWS_JSOURCES) \
   $(GNU_KAWA_SWTVIEWS_JSOURCES) \
   $(GNU_KAWA_IO_JLINE_JSOURCES) \
-  $(GNU_XML_JSOURCES) \
   $(GNU_KAWA_XML_JSOURCES) \
   $(GNU_KAWA_LISPEXPR_XML_JSOURCES) \
   $(GNU_KAWA_SAX_JSOURCES) \
   $(GNU_KAWA_ECHO2_JSOURCES) \
   $(GNU_KAWA_XSLT_JSOURCES) \
+  $(GNU_XML_JSOURCES) \
   $(GNU_XQUERY_LANG_JSOURCES) \
   $(GNU_XQUERY_UTIL_JSOURCES) \
   $(GNU_XQUERY_SCRIPT_JSOURCES) \
@@ -823,6 +896,8 @@ MISC_EXTRA_DIST = \
   gnu/expr/package.html \
   gnu/mapping/package.html \
   gnu/math/package.html \
+  gnu/jemacs/buffer/package.html \
+  gnu/jemacs/lang/package.html \
   gnu/lists/package.html \
   gnu/lists/PrimVector.template \
   gnu/text/package.html \

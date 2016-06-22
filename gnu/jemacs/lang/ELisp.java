@@ -85,17 +85,17 @@ public class ELisp extends Lisp2
       {
 	// Force it to be loaded now, so we can over-ride let* length etc.
 	loadClass("gnu.commonlisp.lisp.PrimOps");
-	loadClass("gnu.jemacs.lang.NumberOps");
-	loadClass("gnu.jemacs.lang.MiscOps");
+	loadClass("gnu.jemacs.lisp.NumberOps");
+	loadClass("gnu.jemacs.lisp.MiscOps");
 
-        defProcStFld("emacs", "gnu.jemacs.buffer.emacs");
+        defProcStFld("emacs", "gnu.jemacs.lisp.emacs");
       }
     catch (java.lang.ClassNotFoundException ex)
       {
 	// Ignore - happens while building this directory.
       }
 
-    defSntxStFld("if", "gnu.jemacs.lang.MiscOps", "if");
+    defSntxStFld("if", "gnu.jemacs.lisp.MiscOps", "if");
     defProcStFld("invoke", "gnu.kawa.reflect.Invoke", "invoke");
 
     defProcStFld("+", "gnu.jemacs.lang.AddOp", "$Pl");
@@ -143,8 +143,8 @@ public class ELisp extends Lisp2
     defun("eq", new gnu.kawa.functions.IsEq(this, "eq"));
     defun("equal", new gnu.kawa.functions.IsEqual(this, "equal"));
     defun("typep", new gnu.kawa.reflect.InstanceOf(this));
-    defProcStFld("princ", "gnu.jemacs.lang.MiscOps");
-    defProcStFld("prin1", "gnu.jemacs.lang.MiscOps");
+    defProcStFld("princ", "gnu.jemacs.lisp.MiscOps");
+    defProcStFld("prin1", "gnu.jemacs.lisp.MiscOps");
     LocationEnumeration e = Scheme.builtin().enumerateAllLocations();
     while (e.hasMoreElements())
       {
@@ -153,7 +153,7 @@ public class ELisp extends Lisp2
     try
       {
 	loadClass("gnu.jemacs.lisp.primitives");
-	loadClass("gnu.jemacs.buffer.emacs");
+	loadClass("gnu.jemacs.lisp.emacs");
 	loadClass("gnu.jemacs.lisp.simple");
 	loadClass("gnu.jemacs.lisp.autoloads");
 	loadClass("gnu.jemacs.lisp.keymap");

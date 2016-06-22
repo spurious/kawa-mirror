@@ -12,7 +12,7 @@ FIXED_SUBDIRS = doc testsuite gnu/bytecode \
 ANDROID_SUBDIRS = gnu/kawa/android
 BRL_SUBDIRS = gnu/brl gnu/kawa/brl
 JAVAFX_SUBDIRS = gnu/kawa/javafx
-JEMACS_SUBDIRS = gnu/jemacs/testsuite
+JEMACS_SUBDIRS = gnu/jemacs/lisp gnu/jemacs/testsuite
 XQUERY_SUBDIRS = gnu/xquery/testsuite
 
 SUBDIRS = $(FIXED_SUBDIRS)

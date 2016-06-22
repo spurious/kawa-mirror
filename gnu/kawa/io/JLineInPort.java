@@ -2,17 +2,12 @@ package gnu.kawa.io;
 
 import java.io.*;
 import java.util.List;
-/* #ifdef with:jline3 */
-import java.util.ArrayList;
-import java.util.List;
-/* #endif */
 import gnu.expr.CommandCompleter;
 import gnu.expr.Compilation;
 import gnu.expr.Language;
 import gnu.text.Lexer;
 import gnu.text.SourceMessages;
 import gnu.text.SyntaxException;
-/* #ifdef with:jline3 */
 import org.jline.reader.Candidate;
 import org.jline.reader.Completer;
 import org.jline.reader.EndOfFileException;
@@ -30,32 +25,23 @@ import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
 import org.jline.terminal.impl.ExternalTerminal;
 import java.nio.charset.Charset;
-/* #else */
-// import jline.console.completer.Completer;
-/* #endif */
+import java.util.ArrayList;
+import java.util.List;
 
 /** A variation of TtyInPort that uses the JLine library for input editing. */
 
 public class JLineInPort extends TtyInPort
-    implements Completer
-               /* #ifdef with:jline3 */
-               , Parser
-               /* #endif */
+    implements Completer, Parser
 {
-    /* #ifdef with:jline3 */
     LineReader jlreader;
     org.jline.terminal.Terminal terminal;
     String prompt;
     SourceMessages messages;
-    /* #else */
-    // jline.console.ConsoleReader jlreader;
-    /* #endif */
     String stringRest;
     /** Remaining available characters in stringRest. */
     private int charsRest;
     Language language;
 
-    /* #ifdef with:jline3 */
     public JLineInPort(InputStream in, Path name, OutPort tie)
         throws java.io.IOException {
         this(in, name, tie, TerminalBuilder.terminal());
@@ -85,16 +71,7 @@ public class JLineInPort extends TtyInPort
         language = Language.getDefaultLanguage();
         this.terminal = terminal;
     }
-    /* #else */
-    // public JLineInPort(InputStream in, Path name, OutPort tie)
-    //     throws java.io.IOException {
-    //     super(in, name, tie);
-    //     jlreader = new jline.console.ConsoleReader();
-    //     jlreader.addCompleter(this);
-    // }
-    /* #endif */
 
-    /* #ifdef with:jline3 */
     public ParsedLine parse(String line, int cursor,
                             ParseContext context) throws SyntaxError {
         if (context == ParseContext.COMPLETE)
@@ -167,20 +144,6 @@ public class JLineInPort extends TtyInPort
             }
         }
     }
-    /* #else */
-    // public int complete(String buffer, int cursor,
-    //                     List<CharSequence> scandidates) {
-    //     int buflen = buffer.length();
-    //     char[] tbuf = new char[buflen + 1 + pos];
-    //     System.arraycopy(this.buffer, 0, tbuf, 0, pos);
-    //     buffer.getChars(0, cursor, tbuf, pos);
-    //     tbuf[pos+cursor] = CommandCompleter.COMPLETE_REQUEST;
-    //     buffer.getChars(cursor, buflen, tbuf, pos+cursor+1);
-    //     CharArrayInPort cin = new CharArrayInPort(tbuf);
-    //     int r = CommandCompleter.complete(cin, scandidates);
-    //     return r >= 0 ? cursor - r : r;
-    // }
-    /* #endif */
 
     @Override
     protected int fill(int len) throws java.io.IOException {
@@ -189,7 +152,6 @@ public class JLineInPort extends TtyInPort
         if (charsRest > 0)
             line = stringRest;
         else {
-            /* #ifdef with:jline3 */
             try {
                 line = jlreader.readLine(prompt, null, null, null);
             } catch (UserInterruptException ex) {
@@ -198,9 +160,6 @@ public class JLineInPort extends TtyInPort
                 promptEmitted = false;  // Disable redundant newline.
                 return -1;
             }
-            /* #else */
-            // line = jlreader.readLine();
-            /* #endif */
             if (line == null)
                 return -1;
             charsRest = line.length();
@@ -224,11 +183,7 @@ public class JLineInPort extends TtyInPort
 
     @Override
     public void emitPrompt(String prompt) throws java.io.IOException {
-        /* #ifdef with:jline3 */
         this.prompt = prompt;
-        /* #else */
-        // jlreader.setPrompt(prompt);
-        /* #endif */
     }
 
     public void setSize(int ncols, int nrows) {

@@ -31,7 +31,8 @@ public class CommandCompleter extends RuntimeException {
     @Override
     public Throwable fillInStackTrace() { return this; }
 
-    /* #ifndef with:jline3 */
+    // Obsolete - was #ifndef with:jline3
+    /* #ifdef false */
     // /** Parse a partial expression containing a completion request.
     //  *
     //  * The port cin contains the partial command followed by the

@@ -151,7 +151,7 @@ Kawa has many @ref{Features,useful features}.
 
 Kawa is also a useful @ref{Framework,framework} for implementing
 other programming languages on the Java platform.
-It has has many useful utility classes.
+It has many useful utility classes.
 
 This documents version @value{VERSION}, updated @value{UPDATED}.
 See the summary

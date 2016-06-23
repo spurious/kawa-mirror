@@ -176,7 +176,7 @@ EXTRA_DIST = debian/control debian/rules debian/changelog debian/dirs \
   bin/kawa.sh.in bin/qexo.in
 
 MOSTLYCLEANFILES = tmp* *.o bin/*.o *.stamp */*.class */*/*.class */*/*/*.class classes.list classes-rt.list
-CLEANFILES = *.jar lib/*.jar *.zip bin/qexo kawa/Version.java $(META_ScriptEngineFactory)
+CLEANFILES = *.jar lib/*.jar *.zip bin/kawa bin/qexo kawa/Version.java $(META_ScriptEngineFactory)
 DISTCLEANFILES = selected-java-source bin/kawa.sh bin/kawa.bat
 MAINTAINERCLEANFILES = \
   $(GENERATED_SIMPLEVECTOR_FILES) $(srcdir)/patch-source-list
@@ -423,7 +423,13 @@ if ON_WINDOWS
 # kawa.sh is still needed for 'make check', even on Windows.
 KAWASCRIPTS_KAWA = bin/kawa.bat bin/kawa.sh
 else
+if ENABLE_KAWA_FRONTEND
 KAWASCRIPTS_KAWA = bin/kawa.sh
+else
+KAWASCRIPTS_KAWA = bin/kawa.sh bin/kawa
+bin/kawa: bin/kawa.sh
+	cd bin && $(LN_S) kawa.sh kawa
+endif
 endif
 noinst_SCRIPTS = bin/kawa.sh
 bin_SCRIPTS = bin/qexo $(KAWASCRIPTS_KAWA)

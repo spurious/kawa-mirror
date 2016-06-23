@@ -1,4 +1,8 @@
+if ENABLE_KAWA_FRONTEND
 bin_PROGRAMS = kawa cgi-servlet
+else
+bin_PROGRAMS = cgi-servlet
+endif
 
 READLINE_INCLUDE_PATH =
 READLINE_LIB_PATH =

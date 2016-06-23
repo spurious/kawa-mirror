@@ -1,5 +1,8 @@
 2016-06-22  Per Bothner  <per@bothner.com>
 
+	* Makefile.am: Make bin/kawa a link to bin/kawa.sh if not using the
+	C/readline front-end.
+
 	Generated Makefile.in and configure removed from repository.
 	* autogen.sh: Script to generates those files.
 

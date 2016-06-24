@@ -5,7 +5,8 @@
 (define-alias <frame> <gnu.jemacs.buffer.EFrame>)
 (define-alias <keymap> <gnu.jemacs.buffer.EKeymap>)
 (define-alias <toolkit> <gnu.jemacs.buffer.EToolkit>)
-(require <gnu.commonlisp.lisp.PrimOps>)
+(import (except gnu.commonlisp.lisp.PrimOps princ prin1))
+(import (except gnu.jemacs.lisp.MiscOps message))
 
 (define (set-size (win :: <java.awt.Component>) (w :: <int>) (h :: <int>))
   (invoke win w h))
@@ -359,7 +360,7 @@
          #!optional
          (n  1)
          (buffer  :: <buffer> (current-buffer)))
-  <int>
+  ::<int>
   (if (eq? n '()) (set! n 1))
   (+ 1 (as <int> (invoke buffer 'forwardLine (- n 1) (invoke buffer 'getDot)))))
 

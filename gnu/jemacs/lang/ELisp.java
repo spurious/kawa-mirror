@@ -164,7 +164,11 @@ public class ELisp extends Lisp2
       {
 	// Ignore - happens while building this directory.
       }
-  }
+    catch (java.lang.NoClassDefFoundError ex)
+      {
+	// Likewise
+      }
+ }
 
   public static ELisp getInstance()
   {

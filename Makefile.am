@@ -61,6 +61,8 @@ endif
 misc-classes.stamp: $(java_sources) tmp-sources1.list
 	$(JAVAC) -d $(top_builddir) -classpath "$(CLASSPATH)" $(JAVACFLAGS) @tmp-sources1.list
 	echo timestamp > misc-classes.stamp
+
+kawa-jar.stamp: misc-classes.stamp kawa/Version.class
 	echo timestamp > kawa-jar.stamp
 
 classes.list: ./kawa-jar.stamp
@@ -343,8 +345,11 @@ $(srcdir)/patch-source-list: $(top_srcdir)/configure
 	$(FIND) . -name '*.java' -exec grep -lE ' #endif ' '{}' ';') \
 	  | sed -e 's|./||' | sort > $@
 
-gnu/kawa/util/PreProcess.class: $(srcdir)/gnu/kawa/util/PreProcess.java
-	$(JAVAC) -d . $(srcdir)/gnu/kawa/util/PreProcess.java
+kawa/Version.class: kawa/Version.java
+	$(JAVAC) -d . $^
+
+gnu/kawa/util/PreProcess.class: gnu/kawa/util/PreProcess.java
+	$(JAVAC) -d . $^
 
 JAVA_PREPROCESS_OPTIONS = @JAVA_SOURCE_SELECTOR@ $(PREPROCESS_HTTPSERVER) $(PREPROCESS_XML) $(PREPROCESS_JFREESVG) $(PREPROCESS_JLINE2) $(PREPROCESS_JLINE3)
 

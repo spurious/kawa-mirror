@@ -692,8 +692,7 @@ KAWA_JSOURCES =\
   kawa/TelnetInputStream.java \
   kawa/TelnetOutputStream.java \
   kawa/Telnet.java \
-  kawa/TelnetRepl.java \
-  kawa/Version.java
+  kawa/TelnetRepl.java
 
 KAWA_LANG_JSOURCES = \
   kawa/lang/AnyPat.java \

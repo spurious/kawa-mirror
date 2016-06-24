@@ -1,3 +1,9 @@
+2016-06-24  Per Bothner  <per@bothner.com>
+
+	* source-list: Don't include kawa/Version.java, because it could
+	be in either srcdir or builddir, which complicates things.
+	* Makefile.am: Update to build Version.class separately.
+
 2016-06-22  Per Bothner  <per@bothner.com>
 
 	* Makefile.am: Make bin/kawa a link to bin/kawa.sh if not using the

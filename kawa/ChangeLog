@@ -1,3 +1,7 @@
+2016-06-25  Per Bothner  <per@bothner.com>
+
+	* repl.java: After --http-start wait for console input and exit.
+
 2016-06-18  Per Bothner  <per@bothner.com>
 
 	* DomTermBackend.java (reportEvent): Minor update.

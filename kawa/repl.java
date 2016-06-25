@@ -535,6 +535,16 @@ public class repl extends Procedure0or1 {
                 }
                 try {
                     gnu.kawa.servlet.KawaHttpHandler.startServer(port);
+                    /* #ifdef JAVA6 */
+                    Console console;
+                    if (CheckConsole.haveConsole()
+                        && (console = System.console()) != null) {
+                        if (console.readLine() != null) {
+                            System.err.println("kawa: HttpServer shutting down");
+                            System.exit(0);
+                        }
+                    }
+                    /* #endif */
                 } catch (NoClassDefFoundError ex) {
                     System.err.println("kawa: HttpServer classes not found");
                     System.exit(-1);

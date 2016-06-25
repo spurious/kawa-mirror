@@ -1,3 +1,7 @@
+2016-06-25  Per Bothner  <per@bothner.com>
+
+	* Path.java (readAllBytes): Handle case if unknown content-length.
+
 2016-06-22  Per Bothner  <per@bothner.com>
 
 	* JLineInPort.java: Remove obsolete support for JLine version 2.

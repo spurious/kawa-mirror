@@ -327,13 +327,21 @@ implements javax.tools.FileObject
         if (len > Integer.MAX_VALUE - 8)
             throw new Error("path contents too big");
         int ilen = (int) len;
-        byte[] buffer = new byte[ilen];
+        byte[] buffer = new byte[ilen < 0 ? 8192 : ilen];
         int sofar = 0;
         InputStream in = openInputStream();
-        while (sofar < ilen) {
-            int cnt = in.read(buffer, sofar, ilen-sofar);
-            if (cnt <= 0)
+        while (sofar < ilen || ilen < 0) {
+            if (sofar == buffer.length) {
+                byte[] tmp = new byte[(sofar * 3) >> 1];
+                System.arraycopy(buffer, 0, tmp, 0, sofar);
+                buffer = tmp;
+            }
+            int cnt = in.read(buffer, sofar, buffer.length-sofar);
+            if (cnt <= 0) {
+                if (ilen < 0)
+                    break;
                 throw new IOException("unable to read enture file");
+            }
             sofar += cnt;
         }
         return buffer;

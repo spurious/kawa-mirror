@@ -248,6 +248,12 @@ public class HttpPrinter extends FilterConsumer
       }
   }
 
+    public boolean ignoring() {
+        return base != null ? base.ignoring()
+            : writer != null ? writer.ignoring()
+            : false;
+    }
+
   /** Try to reset (delete) any response generated so far.
    * @param headersAlso if response headers should also be reset.
    * @return true on success, false if it's too late.

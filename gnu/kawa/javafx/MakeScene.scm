@@ -1,8 +1,11 @@
 (require gnu.kawa.javafx.GroupObjectBuilder)
 
+(module-compile-options warn-undefined-variable: #t
+                        warn-invoke-unknown-method: #t)
+
 (define-simple-class MakeScene ()
   (title ::java.lang.String)
-  (group ::javafx.scene.Group access: 'private)
+  (children ::java.util.List access: 'private)
   (root ::javafx.scene.Parent access: 'private)
   (camera ::javafx.scene.Camera access: 'private)
   (camera-assigned ::boolean access: 'private)
@@ -28,29 +31,27 @@
   ((setWidth x::double)::void (set! width x))
   ((setHeight x::double)::void (set! height x))
   ((setRoot r::javafx.scene.Parent)::void
-   (if group
+   (if children
        (primitive-throw (java.lang.IllegalArgumentException "setting root after adding children")))
    (set! root r))
-  ((getGroup)::javafx.scene.Group
-   (cond ((not group)
+  ((getChildren)::java.util.List
+   (cond ((not children)
           (if root
               (primitive-throw (java.lang.IllegalArgumentException "adding children after setting root")))
-          (set! group (javafx.scene.Group))))
-   group)
+          (set! children (java.util.ArrayList))))
+   children)
   ((add n::javafx.scene.Node)
-   (if (and group root)
-       (set! root #!null))
-   ((getGroup):children:add n)
-   (if (and (javafx.scene.Parent? n) (not group))
-       (setRoot n)))
+   (cond (children
+          (set! root #!null)
+          (children:add n))
+         (else
+           ((getChildren):add n)
+           (if (javafx.scene.Parent? n)
+               (set! root n)))))
   ((setNodes n::java.util.List)::void
-   (let ((ch (getGroup):children))
-     ;;(ch:addAll n))
-     (let ((k (n:size)))
-       (do ((i ::int 0 (+ i 1))) ((= i k))
-         (ch:add (n:get i))))))
+   ((getChildren):addAll n))
   ((build)::javafx.scene.Scene
-   (! r (if root root (getGroup)))
+   (! r (if root root (javafx.scene.Group (getChildren))))
    (! sc (javafx.scene.Scene r width height depthBuffer))
    (if camera-assigned
        (sc:setCamera camera))

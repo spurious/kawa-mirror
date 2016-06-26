@@ -1,3 +1,7 @@
+2016-06-26  Per Bothner  <per@bothner.com>
+
+	* MakeScene.scm (MakeScene): Don't create Group until actually needed.
+
 2016-06-25  Per Bothner  <per@bothner.com>
 
 	* MakeScene.scm:  Don't use deprecated javafx.scene.SceneBuilder.

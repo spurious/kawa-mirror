@@ -83,9 +83,7 @@ public class KawaAutoHandler
         for (;;)
           {
             int sl = xpath.lastIndexOf('/');
-            if (sl < 0)
-              break;
-            xpath = xpath.substring(0, sl);
+            xpath = sl < 0 ? "." : xpath.substring(0, sl);
             upath = xpath + "/+default+";
             url = hctx.getResourceURL(upath);
             if (url != null)
@@ -94,6 +92,8 @@ public class KawaAutoHandler
                 absPath = Path.valueOf(url);
                 break;
               }
+            if (sl < 0)
+              break;
           }
       }
     else

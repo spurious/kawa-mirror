@@ -102,12 +102,18 @@ public class KawaHttpHandler
       uriRoot = "/" + uriRoot;
     server.createContext(uriRoot, new KawaHttpHandler(resourceRoot));
   }
-  public static void startServer(int port) throws IOException
+
+  public static void startServer(int port, PrintStream printPortHere)
+        throws IOException
   {
     HttpServer server = getServerInstance();
     server.bind(new InetSocketAddress(port), serverBacklog);
     server.setExecutor(null); // creates a default executor
     server.start();
+    port = server.getAddress().getPort();
+    if (printPortHere != null)
+        printPortHere.println("Started web server on port "+port
+                              +".  Browse http://127.0.0.1:"+port+"/");
   }
 
   public static class Context extends HttpRequestContext

@@ -534,7 +534,8 @@ public class repl extends Procedure0or1 {
                     port = -1; // never seen.
                 }
                 try {
-                    gnu.kawa.servlet.KawaHttpHandler.startServer(port);
+                    gnu.kawa.servlet.KawaHttpHandler
+                        .startServer(port, System.err);
                     /* #ifdef JAVA6 */
                     Console console;
                     if (CheckConsole.haveConsole()

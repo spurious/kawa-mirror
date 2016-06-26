@@ -1,3 +1,8 @@
+2016-06-26  Per Bothner  <per@bothner.com>
+
+	* KawaHttpHandler.java (startServer): Add extra parameter for
+	optionally printing a message with the port number.
+
 2016-06-25  Per Bothner  <per@bothner.com>
 
 	* KawaAutoHandler.java (getModule): Handle +default+ file at top level.

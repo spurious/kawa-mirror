@@ -1,3 +1,7 @@
+2016-06-26  Per Bothner  <per@bothner.com>
+
+	* repl.java: For --http-start, print message with port number.
+
 2016-06-25  Per Bothner  <per@bothner.com>
 
 	* repl.java: After --http-start wait for console input and exit.

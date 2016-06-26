@@ -1,3 +1,8 @@
+2016-06-26  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (kawa-snapshot.zip): Include the Kawa manual in
+	epub3 format, as well as scripts and advice for reading it.
+
 2016-06-24  Per Bothner  <per@bothner.com>
 
 	* source-list: Don't include kawa/Version.java, because it could

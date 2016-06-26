@@ -266,6 +266,6 @@ AC_CONFIG_FILES([Makefile gnu/bytecode/Makefile
   gnu/kawa/javafx/Makefile
   doc/Makefile testsuite/Makefile
   bin/kawa.bat])
-AC_CONFIG_FILES([bin/kawa.sh],[chmod +x bin/kawa.sh])
+AC_CONFIG_FILES([bin/kawa.sh bin/browse-kawa-manual],[chmod +x bin/kawa.sh bin/browse-kawa-manual])
 AC_CONFIG_FILES([bin/qexo],[chmod +x bin/qexo])
 AC_OUTPUT

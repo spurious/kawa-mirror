@@ -1,0 +1,29 @@
+body {
+  background: #fffff5;
+  margin: 0pt;
+  padding: 0pt;
+  color: #333;
+  font-family: verdana, helvetica, sans-serif;
+  line-height: 1.2; }
+
+div.navcol {
+  background: #ac7;
+  margin: 0pt;
+  padding: 0.1ex 0pt;
+}
+div.navbar {
+  margin: 0pt;
+  padding: 0pt;
+}
+div.navcol a { padding: 0px 0.3ex; text-decoration: none; border: thin solid black; background-color: lightblue; }
+div.navheader table, div.navheader tr, div.navheader th { 
+  display: block;
+}
+
+div.navheader td { 
+  display: block;
+}
+
+div.navheader {  border: 2px red }
+
+a.single-column-selector { display: none }

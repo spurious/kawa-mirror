@@ -1,3 +1,8 @@
+2016-06-26  Per Bothner  <per@bothner.com>
+
+	* browse-kawa-manual.in: New script for starting up a JavaFX WebView
+	to browse the epub form of the manual.
+
 2016-06-14  Per Bothner  <per@bothner.com>
 
 	* kawa.bat.in: Add domterm.jar to EXTRA_PATH.

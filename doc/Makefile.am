@@ -34,11 +34,16 @@ qexo.1: $(srcdir)/qexo.man
 	tar cf - $(KAWA_HTMLDIR)/*.html kawa.pdf|gzip -c --best >$@
 
 clean-local:
-	-rm -rf $(KAWA_HTMLDIR) tpm-qexo1 tpm-qexo1 kawa.1 qexo.1
+	-rm -rf $(KAWA_HTMLDIR) tpm-qexo1 tpm-qexo1 kawa.1 qexo.1 kawa-manual.epub web ebook
 
-EXTRA_DIST = scm2java.html kawa.man qexo.man mdate-sh
+EXTRA_DIST = scm2java.html kawa.man qexo.man mdate-sh +default+ README-epub \
+  style/docbook-to-html.xsl style/kawa-epub.xsl style/kawa.xsl \
+  style/kawa-1col.css style/kawa-ebook.css style/kawa-l.css \
+  style/kawa-r.css style/kawa.css style/top-navbar.css \
+  style/kawa-logo.png
 info_TEXINFOS = kawa.texi
 INFO_DEPS =
+MOSTLYCLEANFILES = kawa.xml
 MAINTAINERCLEANFILES = kawa.txt *.info 
 
 # Redundant if configured with  --enable-maintainer-mode.
@@ -54,3 +59,82 @@ install-html:
 	cp kawa_toc.html $(HTML_HOME)/kawa/index.html
 	sed -e 's|HREF="kawa_|HREF="kawa/kawa_|g' -e 's|HREF="../|HREF="|g' \
 		<kawa_toc.html >$(HTML_HOME)/kawa.html
+
+
+kawa.xml: $(srcdir)/kawa.texi
+	$(MAKEINFO) -I=$(srcdir) --docbook $(srcdir)/kawa.texi -o - | \
+	sed \
+	-e 's|_002d|-|g' \
+	-e 's|<book id="-" lang="en">|<book id="book" lang="en"><?dbhtml filename="toc.html"?>|' \
+	-e 's|<chapter label="" id="Top">|<chapter label="Top" id="Top"><?dbhtml filename="index.html"?>|' \
+	-e 's|id="Tutorial">|\0<?dbhtml filename="tutorial/index.html"?>|' \
+	-e 's|id="Tutorial---\([^"]*\)">|\0<?dbhtml filename="tutorial/\1.html"?>|' \
+	-e 's|<title>Compiling to byte-code or an executable</title>|\0<titleabbrev>Compiling</titleabbrev>|' \
+	-e 's|<title>Scheme Extensions and Language Reference</title>|\0<titleabbrev>Language Reference</titleabbrev>|' \
+	-e 's|<title>Summary of Kawa Scheme Features</title>|\0<titleabbrev>Feature Summary</titleabbrev>|' \
+	-e 's|<title>Input, output, and file handling</title>|\0<titleabbrev>Input, output, files</titleabbrev>|' \
+	-e 's|<title>How to start up and run Kawa</title>|\0<titleabbrev>Usage Reference (running Kawa)</titleabbrev>|' \
+	-e 's|<title>Technical Support for Kawa</title>|\0<titleabbrev>Technical Support</titleabbrev>|' \
+	-e 's|<title>Quantities and Numbers</title>|\0<titleabbrev>Numbers</titleabbrev>|' \
+	-e 's|<title>Features of Kawa Scheme</title>|\0<titleabbrev>Scheme Features</titleabbrev>|' \
+	-e 's|<title>Building and installing Kawa</title>|\0<titleabbrev>Building and installing</titleabbrev>|' \
+	-e 's|<title>The Kawa Scheme system</title>|\0<titleabbrev>Kawa Home</titleabbrev>|' \
+	-e '/@ifnotdocbook/,/@end ifnotdocbook/d' \
+	> kawa.xml
+
+XSLT = xsltproc
+HTML_TARGET_DIRECTORY = $(builddir)/web
+# Either override this, or set up a symlink to the DocBook XSL stylesheets.
+DOCBOOK_XSL_DIR = ../../docbook-xsl
+
+$(HTML_TARGET_DIRECTORY)/index.html: kawa.xml Makefile
+	$(XSLT) --path $(DOCBOOK_XSL_DIR)/html \
+	  --stringparam base.dir $(HTML_TARGET_DIRECTORY)  \
+	  --stringparam chunker.output.doctype-public "-//W3C//DTD HTML 4.01 Transitional//EN" \
+	  --stringparam chunker.output.encoding UTF-8 \
+	  --stringparam generate.section.toc.level 0 \
+	  --stringparam generate.index 1 \
+	  --stringparam use.id.as.filename 1 \
+	  --stringparam chunker.output.indent yes \
+	  --stringparam chunk.first.sections 1 \
+	  --stringparam chunk.section.depth 1 \
+	  --stringparam chapter.autolabel 0 \
+	  --stringparam chunk.fast 1 \
+	  --stringparam toc.max.depth 4 \
+	  --stringparam toc.list.type ul \
+	  --stringparam toc.section.depth 3 \
+	  --stringparam chunk.separate.lots 1 \
+	  --stringparam chunk.tocs.and.lots 1 \
+	  style/kawa.xsl kawa.xml
+	mkdir -p $(HTML_TARGET_DIRECTORY)/style
+	cp $(srcdir)/style/kawa-logo.png $(srcdir)/style/*.css \
+	  $(HTML_TARGET_DIRECTORY)/style
+
+# There is some weuid bug causing "tutorial/XXX.xhtml" to be
+# treated as "XXX.xhtml", so use "tutorial-XXX.xhtml" instead.
+kawa-manual.epub: kawa.xml Makefile
+	sed \
+	  -e 's|<?dbhtml filename="tutorial/\([^".]*\)\.html|<?dbhtml filename="tutorial-\1.xhtml|'\
+	  -e 's|<?dbhtml filename="\([^"]*\)\.html|<?dbhtml filename="\1.xhtml|'\
+	  < $< >/tmp/ekawa.xml
+	cat </tmp/ekawa.xml| \
+	$(XSLT) --path $(DOCBOOK_XSL_DIR)/epub3$(pathsep)$(srcdir) \
+	  --stringparam base.dir ebook/OEBPS/ \
+	  --stringparam html.stylesheet kawa.css \
+	  --stringparam chunker.output.encoding UTF-8 \
+	  --stringparam generate.section.toc.level 0 \
+	  --stringparam generate.index 1 \
+	  --stringparam use.id.as.filename 1 \
+	  --stringparam chunker.output.indent yes \
+	  --stringparam chunk.first.sections 1 \
+	  --stringparam chunk.section.depth 1 \
+	  --stringparam chapter.autolabel 0 \
+	  --stringparam chunk.fast 1 \
+	  --stringparam toc.max.depth 4 \
+	  --stringparam toc.list.type ul \
+	  --stringparam toc.section.depth 3 \
+	  --stringparam chunk.separate.lots 1 \
+	  --stringparam chunk.tocs.and.lots 1 \
+	  style/kawa-epub.xsl -
+	cp style/kawa-ebook.css ebook/OEBPS/kawa.css
+	cd ebook && zip -r -X ../kawa-manual.epub mimetype META-INF OEBPS

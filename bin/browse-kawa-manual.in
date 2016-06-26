@@ -1,0 +1,32 @@
+#!/bin/sh
+#|
+# This is a hybrid shell/Scheme script for browsing Kawa's documentation.
+# It reads (and uncompresses) the documentation in ../doc/kawa-manual.epub.
+#
+thisfile=`type -p $0`
+case "$thisfile" in
+  "") echo "installation error - can't find path to $0"; exit -1 ;;
+  /*) ;;
+  *) thisfile="$PWD/$thisfile"  ;;
+esac         
+while test -L "$thisfile"; do thisfile=$(readlink -f "$thisfile"); done
+KAWA_HOME=`echo $(dirname $thisfile) | sed -e 's|/bin$||'`
+if test -n "$JAVA_HOME"; then
+    JAVA="${JAVA_HOME}/bin/java"
+else
+    JAVA=${JAVA-java}
+fi
+exec ${JAVA-"java"} -jar ${KAWA_HOME}/lib/kawa-@VERSION@.jar $thisfile
+|#
+
+(require 'javafx-defs)
+(javafx-application)
+
+(javafx-scene
+ title: "Kawa documentation"
+ width: 700 height: 600  ;;fill: Color: "#666970"
+ (let* ((browser (javafx.scene.web.WebView))
+        (web-engine (browser:getEngine))
+        (manual-url (resource-url "../doc/kawa-manual.epub")))
+   (web-engine:load &{jar:&[manual-url]!/OEBPS/index.xhtml})
+   browser))

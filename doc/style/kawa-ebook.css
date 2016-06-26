@@ -1,0 +1,25 @@
+@namespace "http://www.w3.org/1999/xhtml";
+
+span.ignore { display: none }
+
+code[class="literal"] strong { color: purple }
+p[class="synopsis"] code strong { color: purple }
+p[class="synopsis"] code[class="function"] { color: purple }
+p[class="synopsis"] code[class="varname"] { color: purple }
+
+p[class="synopsis"][kind="Procedure"] code[class="function"]:before,
+  p[class="synopsis"][kind="Predicate"] code[class="function"]:before,
+  p[class="synopsis"][kind="Constructor"] code[class="function"]:before,
+  p[class="synopsis"][kind="Syntax"] code[class="function"]:before
+{ content: "("; font-weight: bold; font-family: monospace; color: purple; }
+p[class="synopsis"][kind="Procedure"]:after,
+  p[class="synopsis"][kind="Predicate"]:after,
+  p[class="synopsis"][kind="Constructor"]:after,
+  p[class="synopsis"][kind="Syntax"]:after
+{ content: ")"; font-weight: bold; font-family: monospace; color: purple }
+
+p.synopsis span.kind { float: right; padding-left: 2em }
+p.synopsis span.kind:before { content: "[" }
+p.synopsis span.kind:after { content: "]" }
+p.synopsis > code { font-weight: bold; }
+blockquote { margin-left: 40px; margin-right: 40px }

@@ -125,16 +125,25 @@ ZIP_VERSION = $(VERSION)
 kawa.zip: kawa-$(ZIP_VERSION).zip
 kawa-snapshot.zip:
 	$(MAKE) kawa.zip ZIP_VERSION=$(VERSION)-`date +%Y%m%d`
-kawa-$(ZIP_VERSION).zip: dist-kawa-$(VERSION).jar bin/kawa.bat
-	mkdir -p kawa-$(VERSION) kawa-$(VERSION)/lib  kawa-$(VERSION)/bin
+kawa-$(ZIP_VERSION).zip: dist-kawa-$(VERSION).jar doc/kawa-manual.epub bin/kawa.bat
+	mkdir -p kawa-$(VERSION) kawa-$(VERSION)/lib  kawa-$(VERSION)/bin kawa-$(VERSION)/doc
 	cd kawa-$(VERSION)/lib; \
 	  $(LN_S) ../../dist-kawa-$(VERSION).jar kawa-$(VERSION).jar; \
 	  $(LN_S) @WITH_DOMTERM_ARG@ domterm.jar; \
 	  $(LN_S) @WITH_JLINE_PATH@ jline.jar
+	docsrcdir="`cd $(srcdir); pwd`/doc"; \
+	  cd kawa-$(VERSION)/doc; \
+	  $(LN_S) ../../doc/kawa-manual.epub kawa-manual.epub; \
+	  $(LN_S) $$docsrcdir/README-epub README-epub; \
+	  $(LN_S) $$docsrcdir/+default+ +default+
 	cd kawa-$(VERSION)/bin; \
 	  $(LN_S) ../../bin/kawa.sh kawa; \
+	  $(LN_S) ../../bin/browse-kawa-manual browse-kawa-manual; \
 	  $(LN_S) ../../bin/kawa.bat kawa.bat
-	zip $@ kawa-$(VERSION)/bin/kawa kawa-$(VERSION)/bin/kawa.bat kawa-$(VERSION)/lib/kawa-$(VERSION).jar kawa-$(VERSION)/lib/jline.jar kawa-$(VERSION)/lib/domterm.jar
+	zip $@ kawa-$(VERSION)/bin/kawa -r kawa-$(VERSION)
+
+doc/kawa-manual.epub: doc/kawa.texi
+	cd doc && $(MAKE) kawa-manual.epub
 
 lib/jemacs-$(JEMACS_VERSION).jar:
 	srcdir=`(cd $(srcdir); /bin/pwd)` \

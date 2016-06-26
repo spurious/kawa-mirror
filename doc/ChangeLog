@@ -1,3 +1,21 @@
+2016-06-26  Per Bothner  <per@bothner.com>
+
+	* Makefile.am: Add rules for making web and epub documentation.
+	Before they were in a Makefile on the fsf website.
+	* README-epub: Documentation on the documentation.
+	* +default+: A web server script for reading kawa-manual.epub.
+	* style/docbook-to-html.xsl, style/kawa-epub.xsl, style/kawa.xsl:
+	XSLT stylesheets for converting the DocBook version of the manual
+	to either web pages or EPUB3.
+	* style/kawa-1col.css, style/kawa-ebook.css, style/kawa-l.css,
+	style/kawa-r.css, style/kawa.css, style/top-navbar.css:
+	CSS stylesheets for the web pages or epub.
+	* Compliance.html: Remove ancient file.
+
+2016-06-26  Jakub Jankiewicz
+
+	* style/kawa-logo.png: Kawa logo
+
 2016-06-12  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Ports): Document new features for setting prompts.

@@ -18243,6 +18243,12 @@ You can also use XQuery:
     else "There was no query string."@}</p>
 @end example
 
+The @code{+default+} script in the @code{doc} directory is
+useful for reading the Kawa documentation using a browser.
+The script uses the @code{jar:} URL scheme to automatically extract
+and uncompress the pages from @code{doc/kawa-manual.epub},
+which is in EPUB3 format.  Read the script for usage instructions.
+
 @node Self-configuring page scripts, Servlets, Server-side scripts, XML tools
 @section Self-configuring web page scripts
 
@@ -19152,6 +19158,9 @@ For more information and examples read this (slightly older)
 @uref{http://per.bothner.com/blog/2011/JavaFX-using-Kawa-intro/,introduction},
 and
 @uref{http://localhost/per/blog/2011/JavaFX-using-Kawa-animation/,this on animation}.
+
+The @code{browse-kawa-manual} script in the @code{bin} directory
+uses JavaFX WebView to create a window for browsing the Kawa documentation.
 
 @subsection Using JavaFX with JDK 7
 JDK 8 ships with JavaFX, and it is in the default @code{CLASSPATH}.

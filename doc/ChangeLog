@@ -1,5 +1,8 @@
 2016-06-26  Per Bothner  <per@bothner.com>
 
+	* kawa.texi (Server-side scripts): Mention doc/+default+ script.
+	(Building JavaFX applications): Mention browse-kawa-manual.
+
 	* Makefile.am: Add rules for making web and epub documentation.
 	Before they were in a Makefile on the fsf website.
 	* README-epub: Documentation on the documentation.

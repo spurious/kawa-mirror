@@ -1,3 +1,9 @@
+2016-06-25  Per Bothner  <per@bothner.com>
+
+	* MakeScene.scm:  Don't use deprecated javafx.scene.SceneBuilder.
+	Also if child is already a single Parent, we don't want
+	to wrap it in a Group.
+
 2015-02-20  Per Bothner  <per@bothner.com>
 
 	* MakeScene.scm:  Simplify since #!null is now false.

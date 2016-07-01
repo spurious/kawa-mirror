@@ -1,3 +1,7 @@
+2016-07-01  Jamison Hope  <jrh@theptrgroup.com>
+
+	* build.xml: Fix for relocated JEmacs files.
+
 2016-06-26  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (kawa-snapshot.zip): Include the Kawa manual in

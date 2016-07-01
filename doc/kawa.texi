@@ -14121,7 +14121,7 @@ while R6RS added @code{flush-output-port}. They have the same effect.)
 When an interactive input port is used for a read-eval-print-loop (REPL
 or console) it is traditional for the REPL to print a short
 @dfn{prompt} string to signal that the user is expected to type
-an expression.  These prompts strings can be customized.
+an expression.  These prompt strings can be customized.
 
 @anchor{input-prompt1}
 @defvar input-prompt1

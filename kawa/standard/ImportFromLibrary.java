@@ -194,7 +194,9 @@ public class ImportFromLibrary extends Syntax
             Map<Symbol, Expression> decls =
                 new LinkedHashMap<Symbol, Expression>();
             SimpleSymbol name1 = (SimpleSymbol) cdrPair.getCar();
-            String str1 = name1.getName();
+            String prefix = name1.getName();
+            if (prefix.length() > 0)
+                prefix = prefix + '.';
             rest = cdrPair.getCdr();
             if (rest == LList.Empty) {
                 tr.error('e', "class-prefix must be followed by class-names");
@@ -207,7 +209,7 @@ public class ImportFromLibrary extends Syntax
                 if (part2 instanceof SimpleSymbol) {
                     dname = (SimpleSymbol) part2;
                     String str2 = dname.getName();
-                    cname = name1+"."+str2;
+                    cname = prefix+str2;
                 } else if (part2 instanceof Pair
                            && Translator.listLength(part2) == 2) {
                     Pair rpair1 = (Pair) part2;
@@ -216,7 +218,7 @@ public class ImportFromLibrary extends Syntax
                     Object rname2 = rpair2.getCar();
                     if (rname1 instanceof SimpleSymbol
                         && rname2 instanceof SimpleSymbol) {
-                        cname = name1 + "." + ((SimpleSymbol) rname1).getName();
+                        cname = prefix + ((SimpleSymbol) rname1).getName();
                         dname = (SimpleSymbol) rname2;
                     }
                 }

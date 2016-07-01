@@ -1,3 +1,8 @@
+2016-07-01  Per Bothner  <per@bothner.com>
+
+	* standard/ImportFromLibrary.java (scanImportSet): Support 'class'
+	import set form for the default package (i.e. empty prefix).
+
 2016-06-26  Per Bothner  <per@bothner.com>
 
 	* repl.java: For --http-start, print message with port number.

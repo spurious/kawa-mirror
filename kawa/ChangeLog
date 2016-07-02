@@ -1,5 +1,9 @@
 2016-07-01  Per Bothner  <per@bothner.com>
 
+	* Shell.java (defaultPrompter): New static instance of Prompter.
+	(run): Use it.
+	* standard/Scheme.java: Redefine define-prompter.
+
 	* standard/ImportFromLibrary.java (scanImportSet): Support 'class'
 	import set form for the default package (i.e. empty prefix).
 

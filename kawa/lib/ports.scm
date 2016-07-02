@@ -346,9 +346,6 @@
 (define (input-port-column-number port)
   (+ 1 (port-column port)))
 
-(define (default-prompter port::gnu.kawa.io.TtyInPort)
-  (port:defaultPrompt))
-
 (define (set-input-port-prompter!
 	 (port :: <gnu.kawa.io.TtyInPort>) (prompter :: <procedure>))
   (invoke port 'setPrompter prompter))

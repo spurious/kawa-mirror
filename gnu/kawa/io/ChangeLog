@@ -1,3 +1,11 @@
+2016-07-01  Per Bothner  <per@bothner.com>
+
+	* TtyInPort.java: Some changes in prompt handling.
+	Better support for DomTerm.
+	(promptTemplate1, promptTemplate2): New convenience methods.
+	(expandPrompt): Handle %{...%} escapes.  Return width.
+	* JLineInPort.java: Use promptTemplate1 and promptTemplate2.
+
 2016-06-25  Per Bothner  <per@bothner.com>
 
 	* Path.java (readAllBytes): Handle case if unknown content-length.

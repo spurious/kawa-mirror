@@ -186,6 +186,11 @@ public class JLineInPort extends TtyInPort
         this.prompt = prompt;
     }
 
+    @Override
+    public String expandPrompt(String pattern, int padToWidth, int line,
+                               String message, int[] width) {
+        return pattern;
+    }
     public void setSize(int ncols, int nrows) {
         Terminal term = terminal;
         if (term != null)
@@ -233,13 +238,12 @@ public class JLineInPort extends TtyInPort
             } catch (Throwable ex) {
             }
             String prompt = p == null ? "["+line+"] " : p.toString();
-            prompt = inp.wrapPromptForAnsi(prompt);
             inp.prompt = prompt;
             LineReader jlreader = inp.jlreader;
             jlreader.setVariable(LineReader.LINE_OFFSET, line);
-            String pattern2 = CheckConsole.prompt2.get("");
+            String pattern2 = inp.promptTemplate2();
             jlreader.setVariable(LineReader.SECONDARY_PROMPT_PATTERN,
-                                 inp.wrapPromptForAnsi(pattern2));
+                                 pattern2);
             inp.readState = saveState;
             inp.messages = lexer.getMessages();
             try {

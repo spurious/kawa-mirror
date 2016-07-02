@@ -1,3 +1,7 @@
+2016-07-01  Per Bothner  <per@bothner.com>
+
+	* ports.scm (default-prompter!): Remove - now defined in kawa/Shell.
+
 2016-06-16  Per Bothner  <per@bothner.com>
 
 	* kawa/domterm.scm: New module.

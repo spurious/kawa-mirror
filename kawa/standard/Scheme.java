@@ -512,7 +512,7 @@ public class Scheme extends LispLanguage {
       defProcStFld("set-input-port-line-number!", "kawa.lib.ports");
       defProcStFld("input-port-column-number", "kawa.lib.ports");
       defProcStFld("input-port-read-state", "kawa.lib.ports");
-      defProcStFld("default-prompter", "kawa.lib.ports");
+      defProcStFld("default-prompter", "kawa.Shell", "defaultPrompter");
       defProcStFld("input-port-prompter", "kawa.lib.ports");
       defProcStFld("set-input-port-prompter!", "kawa.lib.ports");
       defAliasStFld("input-prompt1", "gnu.kawa.io.CheckConsole", "prompt1");

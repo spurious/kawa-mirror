@@ -34,31 +34,47 @@ public class TtyInPort extends InPort
     /** Saved length of the expanded primary prompt. */
     int prompt1Length = 0;
 
+    public String promptTemplate1() {
+        String str = CheckConsole.prompt1.get("");
+        if (inDomTerm && ! haveDomTermEscapes(str))
+            str = "%{\033[14u%}"+str+"%{\033[15u%}";
+        return str;
+    }
+
+    public String promptTemplate2() {
+        String str = CheckConsole.prompt2.get("");
+        if (inDomTerm && ! haveDomTermEscapes(str))
+            str = "%{\033[24u%}"+str+"%{\033[18u\033[15u%}";
+        return str;
+    }
+
     /** Default prompt calculation expands the prompt1 or prompt2 template. */
     public String defaultPrompt() {
         if (readState == '\n')
             return "";
         int line = getLineNumber() + 1;
         if (readState == ' ') {
-            String pattern = CheckConsole.prompt1.get("");
-            String str = expandPrompt(pattern, 0, line, "");
-            prompt1Length = str.length();
+            String pattern = promptTemplate1();
+            int[] width = new int[1];
+            String str = expandPrompt(pattern, 0, line, "", width);
+            prompt1Length = width[0];
             return str;
         } else {
-            String pattern = CheckConsole.prompt2.get("");
+            String pattern = promptTemplate2();
             String m = new String(new char[] { readState });
-            String str = expandPrompt(pattern, prompt1Length, line, m);
-            return str;
+            return expandPrompt(pattern, prompt1Length, line, m, null);
         }
     }
 
     /** Expand a prompt1 or prompt2 template to yield an actual prompt. */
-    public static String expandPrompt(String pattern, int padToWidth, int line,
-                               String message) {
+    public String expandPrompt(String pattern, int padToWidth, int line,
+                               String message, int[] width) {
         StringBuilder sb = new StringBuilder();
         int plen = pattern.length();
+        int cols = 0;
         int padChar = -1;
         int padPos = -1;
+        int escapeStartCol = -1;
         for (int i = 0; i < plen; ) {
             char ch = pattern.charAt(i++);
             if (ch == '%' && i < plen) {
@@ -72,13 +88,18 @@ public class TtyInPort extends InPort
                 switch (ch) {
                 case '%':
                     sb.append(ch);
+                    cols++;
                     break;
                 case 'N':
+                    int oldw = sb.length();
                     sb.append(line);
+                    cols += sb.length() - oldw;
                     break;
                 case 'M':
-                    if (message != null)
+                    if (message != null) {
                         sb.append(message);
+                        cols += message.length();
+                    }
                     break;
                 case 'P':
                     if (count >= 0)
@@ -89,24 +110,34 @@ public class TtyInPort extends InPort
                     }
                     padPos = sb.length();
                     break;
-                default:
-                    
+                case '{':
+                    escapeStartCol = cols;
+                    break;
+                case '}':
+                    cols = escapeStartCol;
+                    escapeStartCol = -1;
+                    break;
+               default:
                     i--;
                 }
-            } else
+            } else {
+                cols += 1; // width of chi
+                if (Character.isLowSurrogate(ch))
+                    cols--;
                 sb.append(ch);
+            }
         }
-       String  str = sb.toString();
-        // More precise calculation when using JLine3 - this
-        // doesn't handle ANSI escape, wide characters, or surrogate
-        int cols = str.length();
+        String str = sb.toString();
         if (padToWidth > cols) {
             int padCharCols = 1;
             int padCount = (padToWidth - cols) / padCharCols;
+            cols += padCount;
             while (--padCount >= 0)
                 sb.insert(padPos, (char) padChar); // FIXME if wide
             str = sb.toString();
         }
+        if (width != null)
+            width[0] = cols;
         return str;
    }
 
@@ -149,23 +180,18 @@ public class TtyInPort extends InPort
     public String wrapPromptForAnsi(String prompt) {
         return "\033[38;5;120m" + prompt + "\033[39m";
     }
-    public String wrapPromptForDomTerm(String prompt) {
-        if (inDomTerm) {
-            boolean haveDomTermEscapes = false;
-            // If we see ESC '[' N N 'u' we already have domterm escapes.
-            for (int i = prompt.length();
-                 --i >= 4 && ! haveDomTermEscapes; ) {
-                if (prompt.charAt(i) == 'u' && prompt.charAt(i-4) == '\033'
-                    && prompt.charAt(i-3) == '[')
-                    haveDomTermEscapes = true;
+
+    /** If we see ESC '[' N N 'u' we already have domterm escapes. */
+    public static boolean haveDomTermEscapes(String prompt) {
+        for (int i = prompt.length(); --i >= 4 ; ) {
+            if (prompt.charAt(i) == 'u' && prompt.charAt(i-4) == '\033'
+                && prompt.charAt(i-3) == '[')
+                return true;
             }
-            if (! haveDomTermEscapes)
-                prompt = "\033[14u"+prompt+"\033[15u";
-        }
-        return prompt;
+        return false;
     }
 
-  public void lineStart(boolean revisited) throws java.io.IOException {
+    public void lineStart(boolean revisited) throws java.io.IOException {
       if (! revisited) {
           promptEmitted = false;
           if (prompter != null) {
@@ -178,7 +204,7 @@ public class TtyInPort extends InPort
                       if (string != null && string.length() > 0) {
                           if (tie != null)
                               tie.freshLine();
-                          emitPrompt(wrapPromptForDomTerm(string));
+                          emitPrompt(string);
                           promptEmitted = true;
                       }
                   }

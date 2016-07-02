@@ -174,7 +174,7 @@ public class Shell
     OutPort perr;
     if (inp instanceof TtyInPort) // Interactive?
       {
-        ((TtyInPort)inp).setPrompter(new Prompter());
+        ((TtyInPort)inp).setPrompter(defaultPrompter);
         perr = OutPort.errDefault();
       }
     else
@@ -618,6 +618,7 @@ public class Shell
         }
     }
 
+    public static final Procedure1 defaultPrompter = new Prompter();
     static class Prompter extends Procedure1 {
         public Object apply1 (Object arg) {
             return ((TtyInPort) arg).defaultPrompt();

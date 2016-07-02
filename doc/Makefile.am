@@ -88,7 +88,7 @@ HTML_TARGET_DIRECTORY = $(builddir)/web
 DOCBOOK_XSL_DIR = ../../docbook-xsl
 
 $(HTML_TARGET_DIRECTORY)/index.html: kawa.xml Makefile
-	$(XSLT) --path $(DOCBOOK_XSL_DIR)/html \
+	$(XSLT) --path $(DOCBOOK_XSL_DIR)/html$(pathsep)$(srcdir)/style \
 	  --stringparam base.dir $(HTML_TARGET_DIRECTORY)  \
 	  --stringparam chunker.output.doctype-public "-//W3C//DTD HTML 4.01 Transitional//EN" \
 	  --stringparam chunker.output.encoding UTF-8 \
@@ -105,7 +105,7 @@ $(HTML_TARGET_DIRECTORY)/index.html: kawa.xml Makefile
 	  --stringparam toc.section.depth 3 \
 	  --stringparam chunk.separate.lots 1 \
 	  --stringparam chunk.tocs.and.lots 1 \
-	  style/kawa.xsl kawa.xml
+	  kawa.xsl kawa.xml
 	mkdir -p $(HTML_TARGET_DIRECTORY)/style
 	cp $(srcdir)/style/kawa-logo.png $(srcdir)/style/*.css \
 	  $(HTML_TARGET_DIRECTORY)/style
@@ -116,9 +116,8 @@ kawa-manual.epub: kawa.xml Makefile
 	sed \
 	  -e 's|<?dbhtml filename="tutorial/\([^".]*\)\.html|<?dbhtml filename="tutorial-\1.xhtml|'\
 	  -e 's|<?dbhtml filename="\([^"]*\)\.html|<?dbhtml filename="\1.xhtml|'\
-	  < $< >/tmp/ekawa.xml
-	cat </tmp/ekawa.xml| \
-	$(XSLT) --path $(DOCBOOK_XSL_DIR)/epub3$(pathsep)$(srcdir) \
+	  < $< | \
+	$(XSLT) --path $(DOCBOOK_XSL_DIR)/epub3$(pathsep)$(srcdir)/style \
 	  --stringparam base.dir ebook/OEBPS/ \
 	  --stringparam html.stylesheet kawa.css \
 	  --stringparam chunker.output.encoding UTF-8 \
@@ -135,6 +134,6 @@ kawa-manual.epub: kawa.xml Makefile
 	  --stringparam toc.section.depth 3 \
 	  --stringparam chunk.separate.lots 1 \
 	  --stringparam chunk.tocs.and.lots 1 \
-	  style/kawa-epub.xsl -
+	  kawa-epub.xsl -
 	cp style/kawa-ebook.css ebook/OEBPS/kawa.css
 	cd ebook && zip -r -X ../kawa-manual.epub mimetype META-INF OEBPS

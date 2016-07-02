@@ -1,3 +1,8 @@
+2016-07-01  Per Bothner  <per@bothner.com>
+
+	* Makefile.am; Change --path to xsltproc invocation.
+	This allows things to work when srcdir is not ".".
+
 2016-06-26  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Server-side scripts): Mention doc/+default+ script.

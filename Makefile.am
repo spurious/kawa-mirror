@@ -130,6 +130,7 @@ kawa-$(ZIP_VERSION).zip: dist-kawa-$(VERSION).jar doc/kawa-manual.epub bin/kawa.
 	cd kawa-$(VERSION)/lib; \
 	  $(LN_S) ../../dist-kawa-$(VERSION).jar kawa-$(VERSION).jar; \
 	  $(LN_S) @WITH_DOMTERM_ARG@ domterm.jar; \
+	  $(LN_S) @WITH_SERVLET_ARG@ servlet.jar; \
 	  $(LN_S) @WITH_JLINE_PATH@ jline.jar
 	docsrcdir="`cd $(srcdir); pwd`/doc"; \
 	  cd kawa-$(VERSION)/doc; \
@@ -141,6 +142,9 @@ kawa-$(ZIP_VERSION).zip: dist-kawa-$(VERSION).jar doc/kawa-manual.epub bin/kawa.
 	  $(LN_S) ../../bin/browse-kawa-manual browse-kawa-manual; \
 	  $(LN_S) ../../bin/kawa.bat kawa.bat
 	zip $@ kawa-$(VERSION)/bin/kawa -r kawa-$(VERSION)
+
+upload-kawa.snapshot.zip:
+	gnupload --replace --to ftp.gnu.org:kawa --symlink-regex kawa-$(VERSION)-`date +%Y%m%d`.zip
 
 doc/kawa-manual.epub: doc/kawa.texi
 	cd doc && $(MAKE) kawa-manual.epub

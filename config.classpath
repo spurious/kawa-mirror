@@ -4,18 +4,6 @@ case ${host} in
   *) CLASSPATH_SEPARATOR="$PATH_SEPARATOR"
 esac
 
-case ${with_servlet} in
-  yes) ;;
-  no) ;;
-  "") ;;
-  *) conf_classpath=${with_servlet}${CLASSPATH_SEPARATOR}$conf_classpath ;;
-esac
-case ${with_jfreesvg} in
-  yes) ;;
-  no) ;;
-  "") ;;
-  *) conf_classpath=${with_jfreesvg}${CLASSPATH_SEPARATOR}$conf_classpath ;;
-esac
 case ${with_javafx} in
   yes) ;;
   no) ;;
@@ -37,13 +25,29 @@ case ${with_android} in
   "") ;;
   *) conf_classpath=${with_android}${CLASSPATH_SEPARATOR}$conf_classpath ;;
 esac
+run_classpath=${conf_classpath}
+case ${with_servlet} in
+  yes) ;;
+  no) ;;
+  "") ;;
+  *)
+    conf_classpath=${with_servlet}${CLASSPATH_SEPARATOR}$conf_classpath
+    run_classpath='$kawadir/lib/servlet.jar'${CLASSPATH_SEPARATOR}"$run_classpath"
+    ;;
+esac
+case ${with_jfreesvg} in
+  yes) ;;
+  no) ;;
+  "") ;;
+  *) conf_classpath=${with_jfreesvg}${CLASSPATH_SEPARATOR}$conf_classpath ;;
+esac
 case ${with_domterm} in
   yes) ;;
   no) ;;
   "") ;;
-  *) conf_classpath=${with_domterm}${CLASSPATH_SEPARATOR}$conf_classpath ;;
+  *) conf_classpath=${with_domterm}${CLASSPATH_SEPARATOR}$conf_classpath
+     run_classpath='$kawadir/lib/domterm.jar'${CLASSPATH_SEPARATOR}"$run_classpath"
 esac
-run_classpath=${conf_classpath}
 case ${with_jline2} in
   yes) ;;
   no) ;;
@@ -54,5 +58,7 @@ case ${with_jline3} in
   yes) ;;
   no) ;;
   "") ;;
-  *) conf_classpath=${with_jline3}${CLASSPATH_SEPARATOR}$conf_classpath ;;
+  *) conf_classpath=${with_jline3}${CLASSPATH_SEPARATOR}$conf_classpath
+     run_classpath='$kawadir/lib/jline.jar'${CLASSPATH_SEPARATOR}"$run_classpath"
+    ;;
 esac

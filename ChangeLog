@@ -1,3 +1,9 @@
+2016-07-01  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (kawa-snapshot.zip): Add lib/servlet.jar.
+	* bin/kawa.sh.in: Simplify - just use run_classpath.
+	* config.classpath: Update run_classpath for using links in lib.
+
 2016-07-01  Jamison Hope  <jrh@theptrgroup.com>
 
 	* build.xml: Fix for relocated JEmacs files.

@@ -1,3 +1,7 @@
+2016-07-11  Per Bothner  <per@bothner.com>
+
+	* browse-kawa-manual.in: Update to use frameset version of manual.
+
 2016-06-26  Per Bothner  <per@bothner.com>
 
 	* browse-kawa-manual.in: New script for starting up a JavaFX WebView

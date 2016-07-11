@@ -119,11 +119,13 @@ kawa-manual.epub: kawa.xml Makefile
 	  < $< | \
 	$(XSLT) --path $(DOCBOOK_XSL_DIR)/epub3$(pathsep)$(srcdir)/style \
 	  --stringparam base.dir ebook/OEBPS/ \
+	  --stringparam html.script kawa-ebook.js \
 	  --stringparam html.stylesheet kawa.css \
 	  --stringparam chunker.output.encoding UTF-8 \
 	  --stringparam generate.section.toc.level 0 \
 	  --stringparam generate.index 1 \
 	  --stringparam use.id.as.filename 1 \
+	  --stringparam autotoc.label.in.hyperlink 0 \
 	  --stringparam chunker.output.indent yes \
 	  --stringparam chunk.first.sections 1 \
 	  --stringparam chunk.section.depth 1 \
@@ -136,4 +138,6 @@ kawa-manual.epub: kawa.xml Makefile
 	  --stringparam chunk.tocs.and.lots 1 \
 	  kawa-epub.xsl -
 	cp style/kawa-ebook.css ebook/OEBPS/kawa.css
+	cp style/kawa-ebook.js ebook/OEBPS/kawa-ebook.js
+	cp with-frames.html ebook/OEBPS/with-frames.html
 	cd ebook && zip -r -X ../kawa-manual.epub mimetype META-INF OEBPS

@@ -1,3 +1,15 @@
+2016-07-11  Per Bothner  <per@bothner.com>
+
+	Generate navigation sidebar for epub manual using JavaScript.
+	* style/kawa-ebook.js: New code for building, inserting and updating
+	a navigation sidebar, when requested.  This code is not enabled
+	by default  i.e. when just browsing index.xhtml.
+	* style/kawa-ebook.css: New stylesheet - similar to web site.
+	* +default+: Update to request sidebar. Handle .js/.css.
+	* Makefile.am: updates for building kawa-manual.epub.
+	* README-epub: Remove note about lack of sidebar.
+	* with-frames.html: Frameset version, as oppused to using iframe.
+
 2016-07-01  Per Bothner  <per@bothner.com>
 
 	* Makefile.am; Change --path to xsltproc invocation.

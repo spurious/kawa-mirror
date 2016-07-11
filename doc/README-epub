@@ -10,9 +10,6 @@ The web page script +default+ in this directory is another way to
 browse the documentation using Kawa's builtin web server and your
 favorite browser (no plugin needed).  Instructions are in the script.
 
-When you read the epub version using browse-kawa-manual or the +default+
-web script you don't get the nice navigation side-bar of the web site.
-(Most ebook readers automatically provide that.)  This will hopefully
-be improved.  You can generate the web-page-style html files from
-the source with 'cd doc && make web/index.html', but this requires
+You can generate the web-page-style html files from the source
+with 'cd doc && make web/index.html', but this requires
 various tools including xsltproc and the docbook style sheets.

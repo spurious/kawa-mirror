@@ -23,3 +23,50 @@ p.synopsis span.kind:before { content: "[" }
 p.synopsis span.kind:after { content: "]" }
 p.synopsis > code { font-weight: bold; }
 blockquote { margin-left: 40px; margin-right: 40px }
+
+body.mainbar {
+    background: #fffff5;
+    padding-left: 25%;
+}
+iframe {
+    position: fixed;
+    top: 0em; right: 0em; bottom: 0em; left: 0em;
+    height: 100%;
+    width: 25%;
+    overflow: auto;
+    border: none
+}
+
+div.toc ul[toc-detail] {
+    display: none
+}
+div.toc a[toc-current] {
+  font-weight: bold
+}
+div.toc li {
+  display: block;
+  text-indent: 0;
+  text-align: left;
+  border: solid;
+  border-width: 1px 0px 0px 1px;
+  border-color: #AAA #666 #666 #AAA;
+  list-style: none }            // Remove triangle from H2
+div.toc ul
+{
+margin: 0;
+padding: 0;
+list-style-type: none;
+}
+div.toc li { background-color: lightblue;  padding: 0px 4px;}
+div.toc li { margin: 0 ; }
+div.toc a { display: block; text-decoration: none }
+
+div.toc nav {padding: 0; margin: 0 }
+div.toc ul {padding: 0; margin: 0 }
+
+div.toc ul ul, div.toc ul ul { margin-left: 1em; }
+div.toc a:hover
+{
+color: #fff;
+background-color: #69C;
+}

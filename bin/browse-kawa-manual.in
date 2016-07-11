@@ -24,9 +24,12 @@ exec ${JAVA-"java"} -jar ${KAWA_HOME}/lib/kawa-@VERSION@.jar $thisfile
 
 (javafx-scene
  title: "Kawa documentation"
- width: 700 height: 600  ;;fill: Color: "#666970"
+ width: 800 height: 700  ;;fill: Color: "#666970"
  (let* ((browser (javafx.scene.web.WebView))
         (web-engine (browser:getEngine))
         (manual-url (resource-url "../doc/kawa-manual.epub")))
-   (web-engine:load &{jar:&[manual-url]!/OEBPS/index.xhtml})
+   ;; Using an <iframe> for the sidebar on WebView doesn't work for some
+   ;; unknown reason so we use the <frameset> version instead.
+   ;; (web-engine:load &{jar:&[manual-url]!/OEBPS/index.xhtml})
+   (web-engine:load &{jar:&[manual-url]!/OEBPS/with-frames.html})
    browser))

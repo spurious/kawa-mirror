@@ -1,5 +1,5 @@
 #| A -*- scheme -*- web server script for the Kawa documentation.
- | The documentation is exacted from the kawa-manual.epub ebook.
+ | The documentation is extracted from the kawa-manual.epub ebook.
  |
  | Usage:
  | Start the server with the command:
@@ -21,14 +21,19 @@
  |#
 
 (define local-path ((request-local-path):toString))
+(define response-type
+  (cond
+   ((local-path:endsWith ".css") 'text/css)
+   ((local-path:endsWith ".js") 'application/javascript)
+   (else 'application/xhtml+xml)))
 
 (cond ((string=? local-path "") ;; translate default "" to "index.xhtml"
        (values
         (response-status 301)
-        (response-header '|Location| "index.xhtml")))
+        (response-header '|Location| "index.xhtml?sidebar")))
       (else
        (values
-        (response-content-type 'application/xhtml+xml)
+        (response-content-type response-type)
         (try-catch
          &<{jar:&(resource-url "kawa-manual.epub")!/OEBPS/&[local-path]}
          (ex java.lang.Throwable

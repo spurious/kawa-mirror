@@ -58,9 +58,16 @@ if WITH_JAVAX_SCRIPT
 META_INF_FILES = $(META_ScriptEngineFactory)
 endif
 
-misc-classes.stamp: $(java_sources) tmp-sources1.list
-	$(JAVAC) -d $(top_builddir) -classpath "$(CLASSPATH)" $(JAVACFLAGS) @tmp-sources1.list
+misc-classes.stamp: $(java_sources)
+	if test -f misc-classes.stamp; then \
+	  $(JAVAC) -d $(top_builddir) -classpath "$(CLASSPATH)" $(JAVACFLAGS) $?; \
+	else \
+	  $(MAKE) javac-all; \
+	fi
 	echo timestamp > misc-classes.stamp
+
+javac-all: tmp-sources1.list
+	$(JAVAC) -d $(top_builddir) -classpath "$(CLASSPATH)" $(JAVACFLAGS) @tmp-sources1.list
 
 kawa-jar.stamp: misc-classes.stamp kawa/Version.class
 	echo timestamp > kawa-jar.stamp
@@ -68,7 +75,7 @@ kawa-jar.stamp: misc-classes.stamp kawa/Version.class
 classes.list: ./kawa-jar.stamp
 	$(FIND) gnu kawa -name '*.class' -print >classes.list
 
-tmp-sources1.list: source-list
+tmp-sources1.list: source-list Makefile
 	(for f in $(sources_gnu_core); do echo $(srcdir)/$$f; done) >tmp-list
 	(for f in $(sources_gnu_misc); do echo $(srcdir)/$$f; done) >>tmp-list
 	(for f in $(sources_gnu_selected); do echo $(srcdir)/$$f; done) >>tmp-list

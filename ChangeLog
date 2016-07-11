@@ -1,3 +1,10 @@
+2016-07-11  Per Bothner  <per@bothner.com>
+
+	* Makefile.am: Some tweaks for faster re-compilation.
+	Specifically, don't make javac look at all files when only
+	some are changed.  The downside is we could run into command line
+	limits more easily, so we use the @filelist method for clean builds.
+
 2016-07-01  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (kawa-snapshot.zip): Add lib/servlet.jar.

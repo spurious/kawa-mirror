@@ -1,3 +1,9 @@
+2016-07-11  Per Bothner  <per@bothner.com>
+
+	* KawaAutoHandler.java (getModule): Don't enter ModuleInfo in cache
+	until class is actually created.  Otherwise, we can get
+	NullPointerException for non-sources files (resources).
+
 2016-06-26  Per Bothner  <per@bothner.com>
 
 	* KawaHttpHandler.java (startServer): Add extra parameter for

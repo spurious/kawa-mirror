@@ -126,8 +126,6 @@ public class KawaAutoHandler
     if (minfo.checkCurrent(mmanager, now))
       return mcontext.findInstance(minfo);
 
-    mmap.put(path, minfo);
-
     InputStream resourceStream = absPath.openInputStream();
     if (! (resourceStream instanceof BufferedInputStream))
       // Not just a performance issue, since we need marks to be supported
@@ -236,6 +234,7 @@ public class KawaAutoHandler
       }
 
     minfo.setModuleClass(cl);
+    mmap.put(path, minfo);
 
     //if (saveClass)  FIXME
     //  comp.outputClass(context.getRealPath("WEB-INF/classes")+'/');

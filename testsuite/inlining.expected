@@ -165,7 +165,7 @@ InliningTest.lshiftS64(long,int)long: 4 bytes
 InliningTest.lshiftU32(int,int)int: 4 bytes
 InliningTest.lshiftU64(long,int)long: 4 bytes
 InliningTest.indexS16(int)short: 8 bytes
-InliningTest.indexU8v1(int)byte: 15 bytes
+InliningTest.indexU8v1(int)int: 15 bytes
 InliningTest.indexU8i1(int)int: 15 bytes
 InliningTest.indexU8i2(int)int: 5 bytes
 InliningTest.indexF32(int)float: 8 bytes

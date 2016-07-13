@@ -1,3 +1,7 @@
+2016-07-12  Per Bothner  <per@bothner.com>
+
+	* inlining.expected: Update for API change for unsigned byte and short.
+
 2016-05-27  Per Bothner  <per@bothner.com>
 
 	* errors-arr.scm: Test for bad multi-dimensional array indexing.

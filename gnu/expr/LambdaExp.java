@@ -1009,7 +1009,7 @@ public class LambdaExp extends ScopeExp {
             = (getFlag(SEQUENCE_RESULT)
                || getCallConvention () >= Compilation.CALL_WITH_CONSUMER)
             ? Type.voidType
-            : getReturnType().getImplementationType();
+            : getReturnType().promoteIfUnsigned().getImplementationType();
         int extraArg = (closureEnvType != null && closureEnvType != ctype) ? 1 : 0;
 
         String rtypeEnc = comp.getLanguage().encodeType(getReturnType());
@@ -1036,7 +1036,8 @@ public class LambdaExp extends ScopeExp {
             if (var != null && var.isThisParameter())
                 var = var.nextDecl();
             for (int itype = 0; itype < plainArgs; var = var.nextDecl()) {
-                atypes[extraArg + itype++] = var.getType().getImplementationType();
+                atypes[extraArg + itype++] =
+                    var.getType().promoteIfUnsigned().getImplementationType();
                 String encType = comp.getLanguage().encodeType(var.getType());
                 if (encType == null /* || not interesting */)
                     encType = "";

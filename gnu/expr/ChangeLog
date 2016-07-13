@@ -1,3 +1,13 @@
+2016-07-12  Per Bothner  <per@bothner.com>
+
+	* LambdaExp.java (addMethodFor): Fix nonportability for unsigned types.
+	Recent JVM/Java SE version appears to have changed how bytes and
+	short are passed between methods.  Before it worked when a method was
+	declared to return a byte, but which was zero-truncated before
+	returning.  You did't have to truncate the result before pushing
+	on the JVM stack.  That doesn't seem to work reliably any more.
+	The fix is to change the return type (and parameter types) to int.
+
 2016-06-22  Per Bothner  <per@bothner.com>
 
 	* CommandCompleter.java: Remove obsolete support for JLine version 2.

@@ -249,6 +249,13 @@ public abstract class Type
     return size < 4 ? intType : this;
   }
 
+  public Type promoteIfUnsigned() {
+      return (size < 4 && this instanceof PrimType
+              && ((PrimType) this).isUnsigned()
+              ? intType
+              : this);
+  }
+
   public final int getSize() { return size; }
   public int getSizeInWords () { return size > 4 ? 2 : 1; }
 

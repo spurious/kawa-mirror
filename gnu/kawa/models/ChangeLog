@@ -1,3 +1,8 @@
+2016-07-13  Per Bothner  <per@bothner.com>
+
+	* SVGUtils.java: Re-write to use VectorGraphics2D library
+	instead of JFreeSVG.
+
 2015-12-21  Per Bothner  <per@bothner.com>
 
 	* SVGUtils.java: New file.

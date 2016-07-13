@@ -1,5 +1,12 @@
 2016-07-13  Per Bothner  <per@bothner.com>
 
+	Replace use of JFreeSVG with VectorGraphics2D library.
+	The former is strict GPL, which could be a problem.
+	* configure.ac: Replace --with-with_jfreesvg by --with-vectorgraphics2d.
+	* config.classpath: Update accordingly.
+	* Makefile.am: Link in and copy new library.
+	* bin/kawa.bat.in: Add new library.
+
 	* Makefile.am (kawa/Version.java): Update check for Subversion.
 
 2016-07-11  Per Bothner  <per@bothner.com>

@@ -309,7 +309,7 @@ uninstall-bytecode-jar:
 	  $(DESTDIR)$(javadir)/bytecode.jar
 
 kawa/Version.java: $(srcdir)/kawa/Version.java.in $(srcdir)/configure.ac
-	test -f $(srcdir)/.svn/entries \
+	test -f $(srcdir)/.svn/wc.db \
 	&& SVN_REVISION=`cd $(srcdir) && svnversion 2>/dev/null` \
 	&& test -n "$$SVN_REVISION" \
 	&& SVN_REVISION=" (revision $${SVN_REVISION})"; \

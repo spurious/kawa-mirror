@@ -506,6 +506,7 @@ GNU_KAWA_MODELS_JSOURCES = \
   gnu/kawa/models/ModelListener.java \
   gnu/kawa/models/MenuItem.java \
   gnu/kawa/models/Paintable.java \
+  gnu/kawa/models/PBox.java \
   gnu/kawa/models/Row.java \
   gnu/kawa/models/Spacer.java \
   gnu/kawa/models/SVGUtils.java \

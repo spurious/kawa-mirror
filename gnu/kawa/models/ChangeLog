@@ -1,5 +1,9 @@
 2016-07-13  Per Bothner  <per@bothner.com>
 
+	* DrawImage.java: Now implements RenderedImage.
+	* PBox.java: New class for combining Paintables.
+	* WithTransform.java (identityTransform): New constant.
+
 	* SVGUtils.java: Remove undesuirable translation.
 
 	* SVGUtils.java: Re-write to use VectorGraphics2D library

@@ -7,6 +7,8 @@ public class WithTransform implements Paintable
   Paintable paintable;
   AffineTransform transform;
 
+    public static final AffineTransform identityTransform = new AffineTransform();
+
   public WithTransform(Paintable paintable, AffineTransform transform)
   {
     this.paintable = paintable;

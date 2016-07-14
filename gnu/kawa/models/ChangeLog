@@ -1,5 +1,7 @@
 2016-07-13  Per Bothner  <per@bothner.com>
 
+	* SVGUtils.java: Remove undesuirable translation.
+
 	* SVGUtils.java: Re-write to use VectorGraphics2D library
 	instead of JFreeSVG.
 

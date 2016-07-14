@@ -24,7 +24,6 @@ public class SVGUtils {
             VectorGraphics2D g2 = new VectorGraphics2D();
             /*(int)Math.ceil(bounds.getWidth()), (int)Math.ceil(bounds.getHeight()));*/
             g2.setPaint(Color.BLACK);
-            g2.translate(-bounds.getMinX(), -bounds.getMinY());
             p.paint(g2);
             SVGProcessor svgProcessor = new SVGProcessor();
             Document document = svgProcessor.getDocument(g2.getCommands(), new PageSize(bounds));

@@ -1,3 +1,8 @@
+2016-07-14  Per Bothner  <per@bothner.com>
+
+	* TermErrorStream.java (write): Don't write error markers
+	if byte array is empty.
+
 2016-07-01  Per Bothner  <per@bothner.com>
 
 	* TtyInPort.java: Some changes in prompt handling.

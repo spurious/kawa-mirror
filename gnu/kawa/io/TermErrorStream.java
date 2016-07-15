@@ -79,11 +79,13 @@ public class TermErrorStream extends PrintStream {
 
     @Override
     public void write(byte buf[], int off, int len) {
-        synchronized (out) {
-            out.write(startErrMarker, 0, startErrMarker.length);
-            out.write(buf, off, len);
-            out.write(endErrMarker, 0, endErrMarker.length);
-            out.flush();
+        if (len > 0) {
+            synchronized (out) {
+                out.write(startErrMarker, 0, startErrMarker.length);
+                out.write(buf, off, len);
+                out.write(endErrMarker, 0, endErrMarker.length);
+                out.flush();
+            }
         }
     }
 }

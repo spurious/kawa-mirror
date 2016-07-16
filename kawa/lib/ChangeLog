@@ -1,6 +1,11 @@
+2016-07-15  Per Bothner  <per@bothner.com>
+
+	* kawa/pictures.scm: New library.  Some procedures moved from
+	gnu/kawa/slib.scm.
+
 2016-07-14  Per Bothner  <per@bothner.com>
 
-	* syntax.scm (defmacro): Generalize 06-16 change to allow &T[E1 E2].
+	* syntax.scm (defmacro): Generalize 06-16 change to allow '&T[E1 E2]'.
 
 2016-07-01  Per Bothner  <per@bothner.com>
 

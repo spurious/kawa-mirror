@@ -1,3 +1,11 @@
+(import (except (kawa pictures)
+                polygon))
+
+(export make-Point circle polygon fill draw with-paint $construct$:P
+        button Button Image image-read image-width image-height color-red
+        with-composite
+        composite-src-over composite-src rotation with-transform Label Text Row Column set-content Window run-application)
+
 (define-syntax process-keywords
   (syntax-rules ()
 		((process-keywords obj args handle-keyword handle-non-keyword)
@@ -34,19 +42,6 @@
       (let ((pt :: <complex> ((primitive-array-get <object>) more-points i)))
 	(path:lineTo ((real-part pt):doubleValue)
 		     ((imag-part pt):doubleValue))))))
-
-(define (fill (shape :: <java.awt.Shape>)) ::  <gnu.kawa.models.Paintable>
-  (make <gnu.kawa.models.FillShape> shape))
-
-(define (draw (shape :: <java.awt.Shape>)) ::  <gnu.kawa.models.Paintable>
-  (make <gnu.kawa.models.DrawShape> shape))
-
-(define (with-paint  (paint  :: <java.awt.Color>)
-		     (pic ::  <gnu.kawa.models.Paintable>))
-  (make  <gnu.kawa.models.WithPaint> pic paint))
-
-(define (with-composite  #!rest (arguments :: <Object[]>))
-  (gnu.kawa.models.WithComposite:make arguments))
 
 (define (composite-src-over #!optional (alpha :: <float> 1.0))
   :: <java.awt.Composite>
@@ -116,15 +111,6 @@
   (syntax-rules ()
     ((text-field . args)
      (make <gnu.kawa.models.DrawImage> . args))))
-
-(define (image-read (uri :: path)) :: <java.awt.image.BufferedImage>
-  (javax.imageio.ImageIO:read (uri:openInputStream)))
-
-(define (image-width (image  :: <java.awt.image.BufferedImage>)) :: <int>
-  (*:getWidth image))
-
-(define (image-height (image  :: <java.awt.image.BufferedImage>)) :: <int>
-  (*:getHeight image))
 
 (define-private (label-keyword (instance :: <gnu.kawa.models.Label>)
 				(name :: <java.lang.String>)
@@ -226,6 +212,13 @@
 	 (invoke (<gnu.kawa.models.Display>:getInstance) 'makeWindow)))
     (process-keywords instance args window-keyword window-non-keyword)
     instance))
+
+(define (with-paint  (paint  :: <java.awt.Color>)
+		     (pic ::  <gnu.kawa.models.Paintable>))
+  (make  <gnu.kawa.models.WithPaint> pic paint))
+
+(define (with-composite  #!rest (arguments :: <Object[]>))
+  (gnu.kawa.models.WithComposite:make arguments))
 
 (define-syntax run-application
   (syntax-rules ()

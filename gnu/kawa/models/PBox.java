@@ -1,7 +1,9 @@
 package gnu.kawa.models;
 
 import java.awt.Graphics2D;
+import java.awt.Shape;
 import java.awt.geom.*;
+import java.awt.image.BufferedImage;
 
 /** Used to compose Paintables "next to" each other.
  * They be put in a row (X-axis), in a column (Y-axis),
@@ -89,10 +91,24 @@ public class PBox implements Paintable {
     public Paintable transform(AffineTransform tr) {
         return new WithTransform(this, tr);
     }
-    public static PBox makeHBox(Paintable... args) {
-        return new PBox('X', args);
+    public static PBox makeHBox(Object... args) {
+        return new PBox('X', asPaintableAll(args));
     }
-    public static PBox makeVBox(Paintable... args) {
-        return new PBox('Y', args);
+    public static PBox makeVBox(Object... args) {
+        return new PBox('Y', asPaintableAll(args));
+    }
+    public static Paintable asPaintable(Object arg) {
+        if (arg instanceof BufferedImage)
+            return new DrawImage((BufferedImage) arg);
+        if (arg instanceof Shape)
+            return new DrawShape((Shape) arg);
+        return (Paintable) arg;
+    }
+    public static Paintable[] asPaintableAll(Object[] args) {
+        int np = args.length;
+        Paintable[] p = new Paintable[np];
+        for (int i = 0; i < np; i++)
+            p[i] = asPaintable(args[i]);
+        return p;
     }
 }

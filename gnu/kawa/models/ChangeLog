@@ -1,3 +1,8 @@
+2016-07-15  Per Bothner  <per@bothner.com>
+
+	* PBox.java (makeHBox, makeVBox): Generalize to Images and Shapes.
+	(asPaintable, asPaintableAll): Helper methods.
+
 2016-07-13  Per Bothner  <per@bothner.com>
 
 	* DrawImage.java: Now implements RenderedImage.

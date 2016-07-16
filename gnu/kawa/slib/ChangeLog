@@ -1,3 +1,7 @@
+2016-07-15  Per Bothner  <per@bothner.com>
+
+	* gui.scm: Moved many functions to new (kawa pictures) library.
+
 2016-03-25  Per Bothner  <per@bothner.com>
 
 	* srfi14.scm: Use splice operator for calling varargs function.

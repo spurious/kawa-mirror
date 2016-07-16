@@ -574,6 +574,7 @@
         <file name="bytevectors.scm"/>
         <file name="arrays.scm"/>
         <file name="system.scm"/>
+        <file name="kawa/pictures.scm"/>
         <file name="kawa/string-cursors.scm"/>
         <file name="kawa/quaternions.scm"/>
         <file name="kawa/rotations.scm"/>

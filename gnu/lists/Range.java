@@ -5,7 +5,7 @@ import gnu.kawa.functions.MultiplyOp;
 import gnu.math.IntNum;
 import java.io.*;
 
-public class Range<E> extends AbstractSequence<E> implements Sequence<E> {
+public class Range<E> extends AbstractSequence<E> implements AVector<E> {
     E start;
     Object step;
     int size;

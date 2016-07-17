@@ -1,3 +1,8 @@
+2016-07-17  Per Bothner  <per@bothner.com>
+
+	* IntSequence.java: Implement AVector rather than List *and* Array.
+	* Range.java: Impplement AVector - i.e. Array as well as Sequence.
+
 2016-05-02  Per Bothner  <per@bothner.com>
 
 	* Arrays.java (hashCode(Array)): New static method.

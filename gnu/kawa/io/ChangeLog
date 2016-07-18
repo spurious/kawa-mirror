@@ -1,3 +1,9 @@
+2016-07-18  Per Bothner  <per@bothner.com>
+
+	* WriterManager.java (run): Call flush rather than finalize on ports.
+	This is safer, since otherwise we can get races because other threads
+	might still be active and try to access the port.
+
 2016-07-17  Per Bothner  <per@bothner.com>
 
 	REPL input causing SyntaxException was not being added to history.

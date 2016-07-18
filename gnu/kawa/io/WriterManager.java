@@ -64,7 +64,7 @@ public final class WriterManager implements Runnable
           {
             try
               {
-                ((OutPort) port).finalize();
+                ((OutPort) port).flush();
               }
             catch (Exception ex)
               {

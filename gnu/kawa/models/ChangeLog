@@ -1,5 +1,7 @@
 2016-07-18  Per Bothner  <per@bothner.com>
 
+	* SVGUtils.java: Clean up and fix PreProcess problems.
+
 	* StandardColor.java: New class.
 	* PBox.java (makeZBox): New factory method.
 

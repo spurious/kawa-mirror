@@ -390,7 +390,7 @@ public class TestMisc
     evalTest("+ +", "*** syntax error - <string>:1:4: missing expression [XPST0003]");
 
     evalTest("declare namespace x1='XXX",
-	     "*** caught SyntaxException - <string>:1:22: "
+	     "*** syntax error - <string>:1:22: "
 	     + "unexpected end-of-file in string starting here [XPST0003]");
 
     evalTest("unescaped-data('<?--->'),let $x:=unescaped-data('an &amp;oslash;') return <b>{unescaped-data('<![CDATA[saw]]>')} {$x}</b>",

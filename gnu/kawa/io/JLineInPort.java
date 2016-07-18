@@ -86,13 +86,11 @@ public class JLineInPort extends TtyInPort
                 language.parse(lexer,
                                Language.PARSE_FOR_EVAL|Language.PARSE_INTERACTIVE_MODULE,
                                null);
-            return new KawaParsedLine(this, comp, line, cursor);
-        } catch (SyntaxException ex) {
-            if (cin.eofSeen()) {
+            if (comp.getState() == Compilation.ERROR_SEEN && cin.eofSeen()) {
                 messages.clear();
                 throw new EOFError(-1, -1, "unexpected end-of-file", "");
             }
-            throw ex;
+            return new KawaParsedLine(this, comp, line, cursor);
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }
@@ -248,6 +246,8 @@ public class JLineInPort extends TtyInPort
             inp.messages = lexer.getMessages();
             try {
                 jlreader.readLine(inp.prompt, null, null, null);
+                if (inp.tie != null)
+                    inp.tie.setColumnNumber(0);
                 KawaParsedLine parsedLine = (KawaParsedLine) jlreader.getParsedLine();
                 inp.setLineNumber(line - 1 + parsedLine.lineCount());
                 return parsedLine.comp;

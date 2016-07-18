@@ -771,8 +771,13 @@ public abstract class Language
       }
     if (info != null)
       info.setCompilation(tr);
-    if (! parse(tr, options))
-      return null;
+    try {
+        if (! parse(tr, options))
+            return null;
+    } catch (gnu.text.SyntaxException ex) {
+        tr.setState(Compilation.ERROR_SEEN);
+        return tr;
+    }
     if (tr.getState() == Compilation.PROLOG_PARSING)
       tr.setState(Compilation.PROLOG_PARSED);
     else

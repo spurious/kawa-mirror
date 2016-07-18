@@ -1,3 +1,7 @@
+2016-07-17  Per Bothner  <per@bothner.com>
+
+	* Language.java (parse): Catch SyntaxException.
+
 2016-07-12  Per Bothner  <per@bothner.com>
 
 	* LambdaExp.java (addMethodFor): Fix nonportability for unsigned types.

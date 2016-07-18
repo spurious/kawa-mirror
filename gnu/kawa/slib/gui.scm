@@ -3,7 +3,7 @@
 
 (export make-Point circle polygon fill draw with-paint $construct$:P
         button Button Image image-read image-width image-height color-red
-        with-composite
+        with-composite as-color
         composite-src-over composite-src rotation with-transform Label Text Row Column set-content Window run-application)
 
 (define-syntax process-keywords
@@ -212,10 +212,6 @@
 	 (invoke (<gnu.kawa.models.Display>:getInstance) 'makeWindow)))
     (process-keywords instance args window-keyword window-non-keyword)
     instance))
-
-(define (with-paint  (paint  :: <java.awt.Color>)
-		     (pic ::  <gnu.kawa.models.Paintable>))
-  (make  <gnu.kawa.models.WithPaint> pic paint))
 
 (define (with-composite  #!rest (arguments :: <Object[]>))
   (gnu.kawa.models.WithComposite:make arguments))

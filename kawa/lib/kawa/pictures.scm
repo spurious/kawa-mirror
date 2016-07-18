@@ -14,10 +14,15 @@
 (define (make-Dimension w::double h::double) (Dimension width: w height: h))
 (define-simple-constructor D make-Dimension)
 
+(define (picture-bounds picture)
+  ((gnu.kawa.models.PBox:asPaintable picture):getBounds2D))
+
 (define (hbox #!rest args  :: <object[]>)
   (gnu.kawa.models.PBox:makeHBox @args))
 (define (vbox #!rest args  :: <object[]>)
   (gnu.kawa.models.PBox:makeVBox @args))
+(define (zbox  #!rest args  :: <object[]>)
+  (gnu.kawa.models.PBox:makeZBox @args))
 
 (define-private (line-path do-close::boolean (initial ::java.awt.geom.Point2D) #!rest (more-points :: <object[]>))
   (let ((path :: <java.awt.geom.GeneralPath>
@@ -68,3 +73,22 @@
 
 (define (image-height (image  :: <java.awt.image.BufferedImage>)) :: <int>
   (*:getHeight image))
+
+(define (->paint value) :: <java.awt.Paint>
+  (cond ((instance? value <java.awt.Paint>)
+	 value)
+	((instance? value <java.lang.Integer>)
+	 (make <java.awt.Color> (java.lang.Integer:intValue value)))
+	((instance? value <gnu.math.IntNum>)
+	 (make <java.awt.Color> (gnu.math.IntNum:intValue value)))
+	(else
+         (let ((c (gnu.kawa.models.StandardColor:valueOf (value:toString))))
+           (if (eq? c #!null)
+               (primitive-throw (java.lang.ClassCastException (format "value ~a cannot be converted to a paint" value))))
+           c))))
+
+(define (->picture value)
+  (gnu.kawa.models.PBox:asPaintable value))
+
+(define (with-paint paint pic)
+  (gnu.kawa.models.WithPaint (->picture pic) (->paint paint)))

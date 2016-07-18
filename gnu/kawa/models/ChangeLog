@@ -1,3 +1,8 @@
+2016-07-18  Per Bothner  <per@bothner.com>
+
+	* StandardColor.java: New class.
+	* PBox.java (makeZBox): New factory method.
+
 2016-07-15  Per Bothner  <per@bothner.com>
 
 	* PBox.java (makeHBox, makeVBox): Generalize to Images and Shapes.

@@ -17,7 +17,7 @@ public class PBox implements Paintable {
 
     double[] translations;
 
-    private PBox(char axis, Paintable... paintables) {
+    private PBox(char axis, Paintable[] paintables) {
         this.axis = axis;
         this.paintables = paintables;
         init();
@@ -96,6 +96,9 @@ public class PBox implements Paintable {
     }
     public static PBox makeVBox(Object... args) {
         return new PBox('Y', asPaintableAll(args));
+    }
+    public static PBox makeZBox(Object... args) {
+        return new PBox('Z', asPaintableAll(args));
     }
     public static Paintable asPaintable(Object arg) {
         if (arg instanceof BufferedImage)

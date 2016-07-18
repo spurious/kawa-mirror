@@ -509,6 +509,7 @@ GNU_KAWA_MODELS_JSOURCES = \
   gnu/kawa/models/PBox.java \
   gnu/kawa/models/Row.java \
   gnu/kawa/models/Spacer.java \
+  gnu/kawa/models/StandardColor.java \
   gnu/kawa/models/SVGUtils.java \
   gnu/kawa/models/Text.java \
   gnu/kawa/models/Viewable.java \

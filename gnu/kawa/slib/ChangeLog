@@ -1,3 +1,7 @@
+2016-07-18  Per Bothner  <per@bothner.com>
+
+	* gui.scm (with-paint): Moved to (kawa pictures).
+
 2016-07-15  Per Bothner  <per@bothner.com>
 
 	* gui.scm: Moved many functions to new (kawa pictures) library.

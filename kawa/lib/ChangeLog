@@ -1,3 +1,8 @@
+2016-07-18  Per Bothner  <per@bothner.com>
+
+	* kawa/pictures.scm (with-paint): Moved from gui.scm.
+	 (picture-bounds, zbox, ->paint, ->picture): New procedures.
+
 2016-07-15  Per Bothner  <per@bothner.com>
 
 	* kawa/pictures.scm: New library.  Some procedures moved from

@@ -6,10 +6,10 @@ package gnu.lists;
 import java.util.List;
 
 public interface IntSequence
-    extends /* #ifdef JAVA8 */
-            // java.util.function.IntUnaryOperator,
+    extends AVector<Integer>
+            /* #ifdef JAVA8 */
+            // , java.util.function.IntUnaryOperator
             /* #endif */
-            AVector<Integer>
 {
     public int getInt(int index);
 

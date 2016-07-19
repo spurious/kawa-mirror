@@ -1,3 +1,7 @@
+2016-07-19  Per Bothner  <per@bothner.com>
+
+	* StandardColor.java: Don't hyphenate or camel-case goldenrod.
+
 2016-07-18  Per Bothner  <per@bothner.com>
 
 	* SVGUtils.java: Clean up and fix PreProcess problems.

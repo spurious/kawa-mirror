@@ -45,7 +45,7 @@ public class StandardColor extends Color {
     public static final StandardColor cyan = add("cyan", 0x00FFFF);
     public static final StandardColor darkBlue = add("dark-blue", 0x00008B);
     public static final StandardColor darkCyan = add("dark-cyan", 0x008B8B);
-    public static final StandardColor darkGoldenRod = add("dark-golden-rod", 0xB8860B);
+    public static final StandardColor darkGoldenrod = add("dark-goldenrod", 0xB8860B);
     public static final StandardColor darkGray = add("dark-gray", 0xA9A9A9);
     public static final StandardColor darkGreen = add("dark-green", 0x006400);
     public static final StandardColor darkGrey = add("dark-grey", 0xA9A9A9);
@@ -74,7 +74,7 @@ public class StandardColor extends Color {
     public static final StandardColor gainsboro = add("gainsboro", 0xDCDCDC);
     public static final StandardColor ghostWhite = add("ghost-white", 0xF8F8FF);
     public static final StandardColor gold = add("gold", 0xFFD700);
-    public static final StandardColor goldenRod = add("golden-rod", 0xDAA520);
+    public static final StandardColor goldenrod = add("goldenrod", 0xDAA520);
     public static final StandardColor gray = add("gray", 0x808080);
     public static final StandardColor green = add("green", 0x008000);
     public static final StandardColor greenYellow = add("green-yellow", 0xADFF2F);
@@ -92,7 +92,7 @@ public class StandardColor extends Color {
     public static final StandardColor lightBlue = add("light-blue", 0xADD8E6);
     public static final StandardColor lightCoral = add("light-coral", 0xF08080);
     public static final StandardColor lightCyan = add("light-cyan", 0xE0FFFF);
-    public static final StandardColor lightGoldenRodYellow = add("light-golden-rod-yellow", 0xFAFAD2);
+    public static final StandardColor lightGoldenrodYellow = add("light-goldenrod-yellow", 0xFAFAD2);
     public static final StandardColor lightGray = add("light-gray", 0xD3D3D3);
     public static final StandardColor lightGreen = add("light-green", 0x90EE90);
     public static final StandardColor lightGrey = add("light-grey", 0xD3D3D3);
@@ -130,7 +130,7 @@ public class StandardColor extends Color {
     public static final StandardColor orange = add("orange", 0xFFA500);
     public static final StandardColor orangeRed = add("orange-red", 0xFF4500);
     public static final StandardColor orchid = add("orchid", 0xDA70D6);
-    public static final StandardColor paleGoldenRod = add("pale-golden-rod", 0xEEE8AA);
+    public static final StandardColor paleGoldenrod = add("pale-goldenrod", 0xEEE8AA);
     public static final StandardColor paleGreen = add("pale-green", 0x98FB98);
     public static final StandardColor paleTurquoise = add("pale-turquoise", 0xAFEEEE);
     public static final StandardColor paleVioletRed = add("pale-violet-red", 0xDB7093);

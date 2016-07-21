@@ -1,3 +1,9 @@
+2016-07-20  Jamison Hope  <jrh@theptrgroup.com>
+
+	* build.xml (script-factory-scheme, script-factory-xquery): Make
+	sure META-INF/services directory exists before writing to
+	META-INF/services/javax.script.ScriptEngineFactory file.
+
 2016-07-13  Per Bothner  <per@bothner.com>
 
 	Replace use of JFreeSVG with VectorGraphics2D library.

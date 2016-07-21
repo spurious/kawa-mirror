@@ -855,11 +855,13 @@
   </target>
 
   <target name="script-factory-scheme" if="${-needs-scripting-inf}">
+    <mkdir dir="META-INF/services"/>
     <echo message="kawa.standard.SchemeScriptEngineFactory #Scheme&#xA;"
           append="true"
           file="META-INF/services/javax.script.ScriptEngineFactory"/>
   </target>
   <target name="script-factory-xquery" if="${-needs-scripting-inf-xquery}">
+    <mkdir dir="META-INF/services"/>
     <echo message="gnu.xquery.lang.XQueryScriptEngineFactory #XQuery&#xA;"
           append="true"
           file="META-INF/services/javax.script.ScriptEngineFactory"/>

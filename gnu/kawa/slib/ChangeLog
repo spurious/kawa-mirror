@@ -1,3 +1,7 @@
+2016-07-22  Per Bothner  <per@bothner.com>
+
+	* gui.scm (with-transform, with-composite): Moved to pictures.
+
 2016-07-18  Per Bothner  <per@bothner.com>
 
 	* gui.scm (with-paint): Moved to (kawa pictures).

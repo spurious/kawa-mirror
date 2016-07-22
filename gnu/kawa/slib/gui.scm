@@ -58,10 +58,6 @@
 (define (rotation (theta :: <double>)) :: <java.awt.geom.AffineTransform>
   (java.awt.geom.AffineTransform:getRotateInstance theta))
 
-(define (with-transform  (transform  :: <java.awt.geom.AffineTransform>)
-		     (pic ::  <gnu.kawa.models.Paintable>))
-  (gnu.kawa.models.WithTransform:new pic transform))
-
 (define-constant color-red :: <java.awt.Color>
   (static-field <java.awt.Color> 'red))
 
@@ -212,9 +208,6 @@
 	 (invoke (<gnu.kawa.models.Display>:getInstance) 'makeWindow)))
     (process-keywords instance args window-keyword window-non-keyword)
     instance))
-
-(define (with-composite  #!rest (arguments :: <Object[]>))
-  (gnu.kawa.models.WithComposite:make arguments))
 
 (define-syntax run-application
   (syntax-rules ()

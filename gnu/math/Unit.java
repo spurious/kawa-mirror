@@ -211,6 +211,8 @@ public abstract class Unit extends Quantity
   public static final Unit pt = define("pt", 0.0003527778, meter);
   public static final Unit pica = define("pica", 0.004233333, meter);
   public static final Unit radian = define("rad", 1.0, Unit.Empty);
+  public static final Unit degree = define("deg", Math.PI/180, Unit.Empty);
+  public static final Unit gradian = define("grad", Math.PI/200, Unit.Empty);
 
   public static final NamedUnit date =
     new NamedUnit("date", NON_COMBINABLE, duration);

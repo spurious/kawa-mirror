@@ -1,3 +1,7 @@
+2016-07-22  Per Bothner  <per@bothner.com>
+
+	* Unit.java (degree, gradian): New units.
+
 2016-05-19  Per Bothner  <per@bothner.com>
 
 	* UInt.java (compareTo): If Java 8 use Integer.compareUnsigned.

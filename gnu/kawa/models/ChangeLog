@@ -1,3 +1,7 @@
+2016-07-22  Per Bothner  <per@bothner.com>
+
+	* WithComposite.java: Use symbol as shorthand for standard Composites.
+
 2016-07-19  Per Bothner  <per@bothner.com>
 
 	* StandardColor.java: Don't hyphenate or camel-case goldenrod.

@@ -1,4 +1,9 @@
-2016-07-18  Per Bothner  <per@bothner.com>
+2016-07-22  Per Bothner  <per@bothner.com>
+
+	* kawa/pictures.scm (rectangle, with-transform,
+	rotate, scale, translate, affine-transform): New procedures.
+
+(2016-07-18  Per Bothner  <per@bothner.com>
 
 	* kawa/pictures.scm (with-paint): Moved from gui.scm.
 	 (picture-bounds, zbox, ->paint, ->picture): New procedures.

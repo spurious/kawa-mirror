@@ -1,6 +1,10 @@
 package gnu.kawa.models;
+
 import java.awt.*;
 import java.awt.geom.*;
+import java.awt.image.BufferedImage;
+import java.util.HashMap;
+import java.util.Map;
 
 public class WithComposite implements Paintable
 {
@@ -29,7 +33,9 @@ public class WithComposite implements Paintable
     int n = 0;
     for (int i = arguments.length;  --i >= 0; )
       {
-	if (arguments[i] instanceof Paintable)
+	Object arg = arguments[i];
+	if (arg instanceof Paintable || arg instanceof Shape
+            || arg instanceof BufferedImage)
 	  n++;
       }
     Paintable[] paintable = new Paintable[n];
@@ -39,16 +45,24 @@ public class WithComposite implements Paintable
     for (int i = 0;  i < arguments.length;  i++)
       {
 	Object arg = arguments[i];
-	if (arg instanceof Paintable)
+	if (arg instanceof Paintable || arg instanceof Shape
+            || arg instanceof BufferedImage)
 	  {
-	    paintable[j] = (Paintable) arguments[i];
+            paintable[j] = PBox.asPaintable(arg);
 	    composite[j] = comp;
 	    j++;
 	  }
-	else
+	else if (arg instanceof Composite)
 	  {
 	    comp = (Composite) arg;
 	  }
+        else
+        {
+            String name = arg.toString().toLowerCase().replace("-", "");
+            comp = namedComposites.get(name);
+            if (comp == null)
+                throw new IllegalArgumentException("unknown composite "+name);
+        }
       }
     return make(paintable, composite);
       
@@ -98,4 +112,12 @@ public class WithComposite implements Paintable
       transformed[i] = paintable[i].transform(tr);
     return WithComposite.make(transformed, composite);
   }
+
+    static Map<String,Composite> namedComposites = new HashMap<String,Composite>();
+    static {
+        namedComposites.put("clear", AlphaComposite.Clear);
+        namedComposites.put("dstover", AlphaComposite.DstOver);
+        namedComposites.put("src", AlphaComposite.Src);
+        namedComposites.put("srcover", AlphaComposite.SrcOver);
+    }
 }

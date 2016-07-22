@@ -24,6 +24,20 @@
 (define (zbox  #!rest args  :: <object[]>)
   (gnu.kawa.models.PBox:makeZBox @args))
 
+(define (rectangle p1::java.awt.geom.Point2D #!optional (p2 #!null))
+  ::java.awt.geom.Rectangle2D
+  (let ((x p1:x)
+        (y p1:y))
+    (cond ((eq? p2 #!null)
+           (java.awt.geom.Rectangle2D$Double 0 0 x y))
+          ((java.awt.geom.Dimension2D? p2)
+           (let ((p ::java.awt.geom.Dimension2D p2))
+             (java.awt.geom.Rectangle2D$Double x y
+                                               (+ x p:width) (+ y p:height))))
+          (else
+           (let ((p ::java.awt.geom.Point2D p2))
+             (java.awt.geom.Rectangle2D$Double x y p:x p:y))))))
+
 (define-private (line-path do-close::boolean (initial ::java.awt.geom.Point2D) #!rest (more-points :: <object[]>))
   (let ((path :: <java.awt.geom.GeneralPath>
 	      (make <java.awt.geom.GeneralPath>))
@@ -54,16 +68,23 @@
 (define (polygon initial #!rest (more-points :: object[]))
   (line-path #t initial @more-points))
 
-(define (circle radius::float)
-  (let ((negrad (- radius))
-        (diam (* 2.0 radius)))
-    (java.awt.geom.Ellipse2D:Float negrad negrad diam diam)))
+(define (circle radius::float
+                #!optional (center::java.awt.geom.Point2D &P[0 0]))
+  (let ((diam (* 2.0 radius)))
+    (java.awt.geom.Ellipse2D:Double (- center:x radius) (- center:y radius)
+                                    diam diam)))
 
-(define (fill (shape :: <java.awt.Shape>)) ::  <gnu.kawa.models.Paintable>
-  (make <gnu.kawa.models.FillShape> shape))
+;; TODO: (define (ellipse dimension #!optional center)
+
+(define-procedure fill
+  (lambda (shape ::java.awt.Shape) ::  <gnu.kawa.models.Paintable>
+    (gnu.kawa.models.FillShape shape))
+  (lambda (paint (shape :: <java.awt.Shape>))
+    (with-paint paint (gnu.kawa.models.FillShape shape))))
 
 (define (draw (shape :: <java.awt.Shape>)) ::  <gnu.kawa.models.Paintable>
   (make <gnu.kawa.models.DrawShape> shape))
+;; TODO: (draw stroke-or-paint-specifier ... shape)
 
 (define (image-read (uri :: path)) :: <java.awt.image.BufferedImage>
   (javax.imageio.ImageIO:read (uri:openInputStream)))
@@ -90,5 +111,75 @@
 (define (->picture value)
   (gnu.kawa.models.PBox:asPaintable value))
 
+(define (->transform tr)
+  (->java.awt.geom.AffineTransform tr))
+
 (define (with-paint paint pic)
   (gnu.kawa.models.WithPaint (->picture pic) (->paint paint)))
+
+(define (with-transform tr pic)
+  (let ((tr (->transform tr)))
+    (cond ((java.awt.Shape? pic)
+           (tr:createTransformedShape pic))
+          ((java.awt.geom.AffineTransform? pic)
+           (let ((trcopy (java.awt.geom.AffineTransform
+                          (->java.awt.geom.AffineTransform tr))))
+             (trcopy:concatenate pic)
+             trcopy))
+          ((java.awt.geom.Point2D? pic)
+           (let ((dst (java.awt.geom.Point2D$Double)))
+             (tr:transform (->java.awt.geom.Point2D pic) dst)))
+          (else
+           (gnu.kawa.models.WithTransform:new (->picture pic) tr)))))
+
+(define (with-composite  #!rest (arguments :: <Object[]>))
+  (gnu.kawa.models.WithComposite:make arguments))
+
+(define-private (angle-to-radian val::java.lang.Number)::double
+  (cond ((gnu.math.DQuantity? val)
+         (let* ((qval ::gnu.math.DQuantity val)
+                (unit (qval:unit))
+                (dval (qval:doubleValue)))
+           (cond ((eq? unit gnu.math.Unit:Empty)
+                  (* dval (/ java.lang.Math:PI 180)))
+                 ((or (eq? unit gnu.math.Unit:degree)
+                      (eq? unit gnu.math.Unit:radian)
+                      (eq? unit gnu.math.Unit:gradian))
+                  dval)
+                 ((error "invalid unit for angle")))))
+        ((gnu.math.RealNum? val)
+         (* val (/ java.lang.Math:PI 180)))
+        ((gnu.math.Numeric? val)
+         (error "not a real number for angle"))
+        (else
+         (* (val:doubleValue) (/ java.lang.Math:PI 180)))))
+
+(define-procedure rotate
+  (lambda (angle) (java.awt.geom.AffineTransform:getRotateInstance
+                   (angle-to-radian angle)))
+  (lambda (angle picture)
+    (with-transform (rotate angle) picture)))
+
+(define-procedure scale
+  (lambda (sc::java.awt.geom.Point2D)
+    (java.awt.geom.AffineTransform:getScaleInstance sc:x sc:y))
+  (lambda (sc::real)
+    (java.awt.geom.AffineTransform:getScaleInstance sc sc))
+  (lambda (sc picture)
+     (with-transform (scale sc) picture)))
+
+(define-procedure translate
+  (lambda (delta::java.awt.geom.Point2D)
+    (java.awt.geom.AffineTransform:getTranslateInstance delta:x delta:y))
+  (lambda (delta::java.awt.geom.Point2D picture)
+     (with-transform (translate delta) picture)))
+  
+(define-procedure affine-transform
+  (lambda (m00::double m10::double
+           m01::double m11::double
+           m02::double m12::double)
+    (java.awt.geom.AffineTransform m00 m10 m01 m11 m02 m12))
+  (lambda (px::java.awt.geom.Point2D
+           py::java.awt.geom.Point2D
+           p0::java.awt.geom.Point2D)
+    (java.awt.geom.AffineTransform px:x px:y py:x py:y p0:x p0:y)))

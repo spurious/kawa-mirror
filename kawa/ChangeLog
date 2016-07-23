@@ -1,3 +1,7 @@
+2016-07-22  Per Bothner  <per@bothner.com>
+
+	* ReplPane.java (PaintableView.paint): Fix translation.
+
 2016-07-01  Per Bothner  <per@bothner.com>
 
 	* Shell.java (defaultPrompter): New static instance of Prompter.

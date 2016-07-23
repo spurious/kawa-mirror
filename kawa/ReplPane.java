@@ -167,12 +167,13 @@ class PaintableView extends View
   public void paint(Graphics g, Shape a)
   {
     Graphics2D g2 = (Graphics2D) g;
-    Rectangle bounds = a.getBounds();
+    Rectangle2D abounds = a.getBounds2D();
     AffineTransform saveTransform = g2.getTransform();
     Paint savePaint = g2.getPaint();
     try
       {
-        g2.translate(bounds.x, bounds.y);
+        g2.translate(abounds.getX()-bounds.getX(),
+                     abounds.getY()-bounds.getY());
         g2.setPaint(Color.BLACK); // FIXME
         p.paint(g2);
       }

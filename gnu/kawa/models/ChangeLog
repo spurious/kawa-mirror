@@ -1,5 +1,9 @@
 2016-07-26  Per Bothner  <per@bothner.com>
 
+	Rename Paintable to Picture.
+
+2016-07-26  Per Bothner  <per@bothner.com>
+
 	Re-implement conversion to SVG without using external library.
 	* PictureVisitor.java: New visitor class.
 	* PictureToSvg.java: New class, extends PictureVisitor.

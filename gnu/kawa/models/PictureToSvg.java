@@ -233,7 +233,7 @@ public class PictureToSvg extends PictureVisitor {
         AffineTransform tr = n <= 1 || pic.axis == 'Z' ? null
             : new AffineTransform();
         for (int i = 0; i < n; i++) {
-            Paintable child = pic.children[i];
+            Picture child = pic.children[i];
             double offset = pic.translations[i];
             if (i > 0 && pic.axis != 'Z') {
                 if (pic.axis == 'X')
@@ -259,9 +259,9 @@ public class PictureToSvg extends PictureVisitor {
     }
     @Override
     public void visitWithTransform(WithTransform pic) {
-        visitWithTransform(pic.paintable, pic.transform);
+        visitWithTransform(pic.picture, pic.transform);
     }
-    public void visitWithTransform(Paintable pic, AffineTransform tr) {
+    public void visitWithTransform(Picture pic, AffineTransform tr) {
         out.startElement(svgTag("g"));
         writeAttribute("transform", transformAttribute(tr), out);
         pic.visit(this);

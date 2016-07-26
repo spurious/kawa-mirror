@@ -9,7 +9,7 @@ import java.awt.geom.*;
 public class SVGUtils {
     public static boolean haveToSvg = true;
 
-    public static String toSVG(Paintable p) {
+    public static String toSVG(Picture p) {
         CharArrayOutPort cout = new CharArrayOutPort();
         XMLPrinter xout = new XMLPrinter(cout);
         PictureToSvg.writeSVGElementStart(p.getBounds2D(), xout);

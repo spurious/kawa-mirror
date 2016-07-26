@@ -8,17 +8,17 @@ public class PictureVisitor {
     public void visitDrawImage(DrawImage pic) {
     }
     public void visitWithPaint(WithPaint pic) {
-        pic.paintable.visit(this);
+        pic.picture.visit(this);
     }
     public void visitWithTransform(WithTransform pic) {
-        pic.paintable.visit(this);
+        pic.picture.visit(this);
     }
     public void visitWithComposite(WithComposite pic) {
-        for (Paintable child : pic.children)
+        for (Picture child : pic.children)
             child.visit(this);
     }
     public void visitPBox(PBox pic) {
-        for (Paintable child : pic.children)
+        for (Picture child : pic.children)
             child.visit(this);
     }
 }

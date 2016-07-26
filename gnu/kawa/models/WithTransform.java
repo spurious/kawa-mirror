@@ -2,16 +2,16 @@ package gnu.kawa.models;
 import java.awt.*;
 import java.awt.geom.*;
 
-public class WithTransform implements Paintable
+public class WithTransform implements Picture
 {
-  Paintable paintable;
+  Picture picture;
   AffineTransform transform;
 
     public static final AffineTransform identityTransform = new AffineTransform();
 
-  public WithTransform(Paintable paintable, AffineTransform transform)
+  public WithTransform(Picture picture, AffineTransform transform)
   {
-    this.paintable = paintable;
+    this.picture = picture;
     this.transform = transform;
   }
 
@@ -21,7 +21,7 @@ public class WithTransform implements Paintable
     try
       {
 	graphics.transform(transform);
-	paintable.paint(graphics);
+	picture.paint(graphics);
       }
     finally
       {
@@ -31,15 +31,15 @@ public class WithTransform implements Paintable
 
   public Rectangle2D getBounds2D()
   {
-    return transform.createTransformedShape(paintable.getBounds2D())
+    return transform.createTransformedShape(picture.getBounds2D())
       .getBounds2D();
   }
 
-  public Paintable transform (AffineTransform tr)
+  public Picture transform (AffineTransform tr)
   {
     AffineTransform combined = new AffineTransform(transform);
     combined.concatenate(tr);
-    return new WithTransform(paintable, combined);
+    return new WithTransform(picture, combined);
   }
     public void visit(PictureVisitor visitor) {
         visitor.visitWithTransform(this);

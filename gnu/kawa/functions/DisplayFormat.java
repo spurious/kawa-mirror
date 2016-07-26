@@ -19,7 +19,7 @@ import gnu.kawa.io.PrettyWriter;
 import gnu.kawa.xml.XmlNamespace;
 import gnu.kawa.lispexpr.LispLanguage;
 import gnu.text.Printable;
-import gnu.kawa.models.Paintable;
+import gnu.kawa.models.Picture;
 import gnu.kawa.models.SVGUtils;
 import java.util.List;
 /* #ifdef use:java.util.regex */
@@ -415,10 +415,10 @@ public class DisplayFormat extends AbstractFormat
           write("\007", out);
       }
     /* #endif */
-    else if (obj instanceof Paintable && ! getReadableOutput()
+    else if (obj instanceof Picture && ! getReadableOutput()
              && CheckConsole.forDomTerm(out))
     {
-        write("\033]72;"+SVGUtils.toSVG((Paintable) obj)+"\007", out);
+        write("\033]72;"+SVGUtils.toSVG((Picture) obj)+"\007", out);
     }
     else if (obj == Values.empty && getReadableOutput())
       write("#!void", out);

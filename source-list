@@ -505,7 +505,7 @@ GNU_KAWA_MODELS_JSOURCES = \
   gnu/kawa/models/Model.java \
   gnu/kawa/models/ModelListener.java \
   gnu/kawa/models/MenuItem.java \
-  gnu/kawa/models/Paintable.java \
+  gnu/kawa/models/Picture.java \
   gnu/kawa/models/PictureToSvg.java \
   gnu/kawa/models/PictureVisitor.java \
   gnu/kawa/models/PBox.java \
@@ -526,7 +526,7 @@ GNU_KAWA_SWINGVIEWS_JSOURCES =\
   gnu/kawa/swingviews/SwingContent.java \
   gnu/kawa/swingviews/SwingDisplay.java \
   gnu/kawa/swingviews/SwingFrame.java \
-  gnu/kawa/swingviews/SwingPaintable.java
+  gnu/kawa/swingviews/SwingPicture.java
 
 GNU_KAWA_SWTVIEWS_JSOURCES =\
   gnu/kawa/swtviews/SwtDisplay.java

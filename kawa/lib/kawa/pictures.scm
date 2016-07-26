@@ -15,7 +15,7 @@
 (define-simple-constructor D make-Dimension)
 
 (define (picture-bounds picture)
-  ((gnu.kawa.models.PBox:asPaintable picture):getBounds2D))
+  ((gnu.kawa.models.PBox:asPicture picture):getBounds2D))
 
 (define (hbox #!rest args  :: <object[]>)
   (gnu.kawa.models.PBox:makeHBox @args))
@@ -77,12 +77,12 @@
 ;; TODO: (define (ellipse dimension #!optional center)
 
 (define-procedure fill
-  (lambda (shape ::java.awt.Shape) ::  <gnu.kawa.models.Paintable>
+  (lambda (shape ::java.awt.Shape) ::  <gnu.kawa.models.Picture>
     (gnu.kawa.models.FillShape shape))
   (lambda (paint (shape :: <java.awt.Shape>))
     (with-paint paint (gnu.kawa.models.FillShape shape))))
 
-(define (draw (shape :: <java.awt.Shape>)) ::  <gnu.kawa.models.Paintable>
+(define (draw (shape :: <java.awt.Shape>)) ::  <gnu.kawa.models.Picture>
   (make <gnu.kawa.models.DrawShape> shape))
 ;; TODO: (draw stroke-or-paint-specifier ... shape)
 
@@ -115,7 +115,7 @@
            c))))
 
 (define (->picture value)
-  (gnu.kawa.models.PBox:asPaintable value))
+  (gnu.kawa.models.PBox:asPicture value))
 
 (define (->transform tr)
   (->java.awt.geom.AffineTransform tr))

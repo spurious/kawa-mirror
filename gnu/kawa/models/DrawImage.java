@@ -8,7 +8,7 @@ import gnu.mapping.WrappedException;
 import java.net.URL;
 
 public class DrawImage extends Model
-    implements Paintable, java.io.Serializable, RenderedImage
+    implements Picture, java.io.Serializable, RenderedImage
 {
   BufferedImage image;
   Path src;
@@ -59,7 +59,7 @@ public class DrawImage extends Model
     return new Rectangle2D.Float(0, 0, w, h);
   }
 
-  public Paintable transform (AffineTransform tr)
+  public Picture transform (AffineTransform tr)
   {
     return new WithTransform(this, tr);
   }

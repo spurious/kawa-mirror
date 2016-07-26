@@ -2,7 +2,7 @@ package gnu.kawa.models;
 import java.awt.*;
 import java.awt.geom.*;
 
-public class FillShape implements Paintable
+public class FillShape implements Picture
 {
   Shape shape;
 
@@ -23,7 +23,7 @@ public class FillShape implements Paintable
     return shape.getBounds2D();
   }
 
-  public Paintable transform (AffineTransform tr)
+  public Picture transform (AffineTransform tr)
   {
     return new FillShape(tr.createTransformedShape(shape));
   }

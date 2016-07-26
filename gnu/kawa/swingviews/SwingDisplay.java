@@ -90,9 +90,9 @@ public class SwingDisplay extends Display
   {
     if (component instanceof Component)
       return new ComponentModel((Component) component);
-    if (component instanceof Paintable)
+    if (component instanceof Picture)
       // Kludge - should create a Viewable.  FIXME.
-      return new ComponentModel(new SwingPaintable((Paintable) component));
+      return new ComponentModel(new SwingPicture((Picture) component));
     return super.coerceToModel(component);
   }
 }

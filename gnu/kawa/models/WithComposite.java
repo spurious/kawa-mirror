@@ -6,20 +6,20 @@ import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
 
-public class WithComposite implements Paintable
+public class WithComposite implements Picture
 {
-  Paintable[] children;
+  Picture[] children;
   Composite[] composite;
 
-  public static WithComposite make(Paintable paintable, Composite composite)
+  public static WithComposite make(Picture picture, Composite composite)
   {
     WithComposite comp = new WithComposite();
-    comp.children = new Paintable[] { paintable };
+    comp.children = new Picture[] { picture };
     comp.composite = new Composite[] { composite };
     return comp;
   }
 
-  public static WithComposite make(Paintable[] children,
+  public static WithComposite make(Picture[] children,
 				   Composite[] composite)
   {
     WithComposite comp = new WithComposite();
@@ -34,21 +34,21 @@ public class WithComposite implements Paintable
     for (int i = arguments.length;  --i >= 0; )
       {
 	Object arg = arguments[i];
-	if (arg instanceof Paintable || arg instanceof Shape
+	if (arg instanceof Picture || arg instanceof Shape
             || arg instanceof BufferedImage)
 	  n++;
       }
-    Paintable[] children = new Paintable[n];
+    Picture[] children = new Picture[n];
     Composite[] composite = new Composite[n];
     Composite comp = null;
     int j = 0;
     for (int i = 0;  i < arguments.length;  i++)
       {
 	Object arg = arguments[i];
-	if (arg instanceof Paintable || arg instanceof Shape
+	if (arg instanceof Picture || arg instanceof Shape
             || arg instanceof BufferedImage)
 	  {
-            children[j] = PBox.asPaintable(arg);
+            children[j] = PBox.asPicture(arg);
 	    composite[j] = comp;
 	    j++;
 	  }
@@ -116,10 +116,10 @@ public class WithComposite implements Paintable
     return bounds;
   }
 
-  public Paintable transform (AffineTransform tr)
+  public Picture transform (AffineTransform tr)
   {
     int n = children.length;
-    Paintable[] transformed =  new Paintable[n];
+    Picture[] transformed =  new Picture[n];
     for (int i = 0;  i < n;  i++)
       transformed[i] = children[i].transform(tr);
     return WithComposite.make(transformed, composite);

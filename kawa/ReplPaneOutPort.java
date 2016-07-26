@@ -5,7 +5,7 @@ import javax.swing.text.*;
 import gnu.mapping.*;
 import gnu.kawa.io.OutPort;
 import gnu.kawa.io.Path;
-import gnu.kawa.models.Paintable;
+import gnu.kawa.models.Picture;
 import gnu.kawa.models.Viewable;
 import gnu.kawa.swingviews.SwingDisplay;
 
@@ -53,11 +53,11 @@ public class ReplPaneOutPort extends OutPort
       {
         write((Component) v);
       }
-    else if (v instanceof Paintable)
+    else if (v instanceof Picture)
       {
         MutableAttributeSet style = new SimpleAttributeSet();
-        style.addAttribute(AbstractDocument.ElementNameAttribute, ReplPane.PaintableElementName);
-        style.addAttribute(ReplPane.PaintableAttribute, v);
+        style.addAttribute(AbstractDocument.ElementNameAttribute, ReplPane.PictureElementName);
+        style.addAttribute(ReplPane.PictureAttribute, v);
         write(" ", style);
       }
     else if (v instanceof Viewable)

@@ -5,10 +5,9 @@ import java.awt.event.*;
 import java.awt.geom.*;
 import javax.swing.*;
 import javax.swing.text.*;
-import gnu.mapping.*;
 import gnu.kawa.io.OutPort;
 import gnu.kawa.models.Viewable;
-import gnu.kawa.models.Paintable;
+import gnu.kawa.models.Picture;
 import gnu.kawa.swingviews.SwingDisplay;
 
 /** A JTextPane for a read-eval-print-loop.  Also creates an
@@ -86,11 +85,11 @@ public class ReplPane extends JTextPane
   }
 
   public static final String ViewableElementName = "Viewable";
-  public static final String PaintableElementName = "Paintable";
+  public static final String PictureElementName = "Picture";
   public static final Object ViewableAttribute =
     new String(ViewableElementName);
-  public static final Object PaintableAttribute =
-    new String(PaintableElementName);
+  public static final Object PictureAttribute =
+    new String(PictureElementName);
 }
 
 class ReplEditorKit extends StyledEditorKit {
@@ -136,10 +135,10 @@ class ReplEditorKit extends StyledEditorKit {
                   }
                 });
             }
-          else if (kind == ReplPane.PaintableElementName)
+          else if (kind == ReplPane.PictureElementName)
             {
               AttributeSet attr = elem.getAttributes();
-              return new PaintableView(elem, (Paintable) attr.getAttribute(ReplPane.PaintableAttribute));
+              return new PictureView(elem, (Picture) attr.getAttribute(ReplPane.PictureAttribute));
             }
           return styledFactory.create(elem);
         }
@@ -153,15 +152,15 @@ class ReplEditorKit extends StyledEditorKit {
   }
 }
 
-class PaintableView extends View
+class PictureView extends View
 {
-  Paintable p;
+  Picture p;
   Rectangle2D bounds;
-  public PaintableView (Element elem, Paintable paintable)
+  public PictureView(Element elem, Picture picture)
   {
     super(elem);
-    this.p = paintable;
-    this.bounds = paintable.getBounds2D();
+    this.p = picture;
+    this.bounds = picture.getBounds2D();
   }
 
   public void paint(Graphics g, Shape a)

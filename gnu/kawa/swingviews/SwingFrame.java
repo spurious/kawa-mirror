@@ -50,8 +50,8 @@ implements gnu.kawa.models.Window
       }
     else if (contents instanceof Viewable)
       ((Viewable) contents).makeView(getDisplay(), getContentPane());
-    else if (contents instanceof Paintable)
-      getContentPane().add(new SwingPaintable((Paintable) contents));
+    else if (contents instanceof Picture)
+      getContentPane().add(new SwingPicture((Picture) contents));
     else if (contents != null)
       getContentPane().add((Component) contents);
   }

@@ -4,18 +4,18 @@ import java.awt.geom.*;
 import gnu.kawa.models.*;
 import javax.swing.*;
 
-/** Embeds a Paintable object in a JPanel,. */
+/** Embeds a Picture object in a JPanel,. */
 
-public class SwingPaintable extends JPanel
+public class SwingPicture extends JPanel
 {
-  Paintable paintable;
+  Picture picture;
   Dimension dim;
 
-  public SwingPaintable (Paintable paintable)
+  public SwingPicture (Picture picture)
   {
-    this.paintable = paintable;
+    this.picture = picture;
 
-    Rectangle2D rect = paintable.getBounds2D();
+    Rectangle2D rect = picture.getBounds2D();
     int h = (int) Math.ceil(rect.getHeight());
     int w = (int) Math.ceil(rect.getWidth());
     dim = new Dimension(w, h);
@@ -24,7 +24,7 @@ public class SwingPaintable extends JPanel
   public void paint(Graphics g)
   {
     // FIXME may need to transform position
-    paintable.paint((Graphics2D) g);
+    picture.paint((Graphics2D) g);
   }
 
   public java.awt.Dimension getPreferredSize ()

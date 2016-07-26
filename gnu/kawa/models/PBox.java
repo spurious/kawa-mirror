@@ -5,19 +5,19 @@ import java.awt.Shape;
 import java.awt.geom.*;
 import java.awt.image.BufferedImage;
 
-/** Used to compose Paintables "next to" each other.
+/** Used to compose Pictures "next to" each other.
  * They be put in a row (X-axis), in a column (Y-axis),
  * or on top of each other with same origin (Z-axis).
  */
 
-public class PBox implements Paintable {
+public class PBox implements Picture {
     char axis; // X, Y, or Z
-    Paintable[] children;
+    Picture[] children;
     Rectangle2D bounds;
 
     double[] translations;
 
-    private PBox(char axis, Paintable[] children) {
+    private PBox(char axis, Picture[] children) {
         this.axis = axis;
         this.children = children;
         init();
@@ -88,30 +88,30 @@ public class PBox implements Paintable {
         }
     }
 
-    public Paintable transform(AffineTransform tr) {
+    public Picture transform(AffineTransform tr) {
         return new WithTransform(this, tr);
     }
     public static PBox makeHBox(Object... args) {
-        return new PBox('X', asPaintableAll(args));
+        return new PBox('X', asPictureAll(args));
     }
     public static PBox makeVBox(Object... args) {
-        return new PBox('Y', asPaintableAll(args));
+        return new PBox('Y', asPictureAll(args));
     }
     public static PBox makeZBox(Object... args) {
-        return new PBox('Z', asPaintableAll(args));
+        return new PBox('Z', asPictureAll(args));
     }
-    public static Paintable asPaintable(Object arg) {
+    public static Picture asPicture(Object arg) {
         if (arg instanceof BufferedImage)
             return new DrawImage((BufferedImage) arg);
         if (arg instanceof Shape)
             return new DrawShape((Shape) arg);
-        return (Paintable) arg;
+        return (Picture) arg;
     }
-    public static Paintable[] asPaintableAll(Object[] args) {
+    public static Picture[] asPictureAll(Object[] args) {
         int np = args.length;
-        Paintable[] p = new Paintable[np];
+        Picture[] p = new Picture[np];
         for (int i = 0; i < np; i++)
-            p[i] = asPaintable(args[i]);
+            p[i] = asPicture(args[i]);
         return p;
     }
     public void visit(PictureVisitor visitor) {

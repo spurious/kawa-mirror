@@ -2,14 +2,14 @@ package gnu.kawa.models;
 import java.awt.*;
 import java.awt.geom.*;
 
-public class WithPaint implements Paintable
+public class WithPaint implements Picture
 {
-  Paintable paintable;
+  Picture picture;
   Paint paint;
 
-  public WithPaint(Paintable paintable, Paint paint)
+  public WithPaint(Picture picture, Paint paint)
   {
-    this.paintable = paintable;
+    this.picture = picture;
     this.paint = paint;
   }
 
@@ -19,7 +19,7 @@ public class WithPaint implements Paintable
     try
       {
 	graphics.setPaint(paint);
-	paintable.paint(graphics);
+	picture.paint(graphics);
       }
     finally
       {
@@ -29,12 +29,12 @@ public class WithPaint implements Paintable
 
   public Rectangle2D getBounds2D()
   {
-    return paintable.getBounds2D();
+    return picture.getBounds2D();
   }
 
-  public Paintable transform (AffineTransform tr)
+  public Picture transform (AffineTransform tr)
   {
-    return new WithPaint(paintable.transform(tr), paint);
+    return new WithPaint(picture.transform(tr), paint);
   }
 
     public void visit(PictureVisitor visitor) {

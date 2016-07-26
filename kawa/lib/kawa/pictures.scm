@@ -86,13 +86,19 @@
   (make <gnu.kawa.models.DrawShape> shape))
 ;; TODO: (draw stroke-or-paint-specifier ... shape)
 
+(define-procedure image
+  (lambda (#!key src)
+    (gnu.kawa.models.DrawImage src: src))
+  (lambda (image ::java.awt.image.BufferedImage)
+    (gnu.kawa.models.DrawImage image)))
+
 (define (image-read (uri :: path)) :: <java.awt.image.BufferedImage>
   (javax.imageio.ImageIO:read (uri:openInputStream)))
 
-(define (image-width (image  :: <java.awt.image.BufferedImage>)) :: <int>
+(define (image-width (image  ::java.awt.image.RenderedImage)) ::int
   (*:getWidth image))
 
-(define (image-height (image  :: <java.awt.image.BufferedImage>)) :: <int>
+(define (image-height (image  ::java.awt.image.RenderedImage)) ::int
   (*:getHeight image))
 
 (define (->paint value) :: <java.awt.Paint>

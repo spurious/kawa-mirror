@@ -105,7 +105,7 @@
 
 (define-syntax Image
   (syntax-rules ()
-    ((text-field . args)
+    ((_ . args)
      (make <gnu.kawa.models.DrawImage> . args))))
 
 (define-private (label-keyword (instance :: <gnu.kawa.models.Label>)

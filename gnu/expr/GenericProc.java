@@ -65,7 +65,7 @@ public class GenericProc extends MethodProc
     if (n < minArgs || count==0)
       minArgs = n;
     n = method.maxArgs();
-    if (n == -1 || n > maxArgs)
+    if ((n < 0 || n > maxArgs) && maxArgs >= 0)
       maxArgs = n;
     count = ++oldCount;
   }

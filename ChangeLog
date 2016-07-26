@@ -1,3 +1,9 @@
+2016-07-26  Per Bothner  <per@bothner.com>
+
+	Re-implement conversion to SVG without using external library.
+	* configure.ac, config.classpath: Remove --with-vectorgraphics2d option.
+	* Makefile.am, bin/kawa.bat.in: Remove use of VectorGraphics2D.
+
 2016-07-20  Jamison Hope  <jrh@theptrgroup.com>
 
 	* build.xml (script-factory-scheme, script-factory-xquery): Make

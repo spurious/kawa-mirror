@@ -179,5 +179,7 @@ public class DrawImage extends Model
         }
         return names;
     }
+    public void visit(PictureVisitor visitor) {
+        visitor.visitDrawImage(this);
+    }
 }
-

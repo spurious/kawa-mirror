@@ -123,7 +123,6 @@ dist-kawa-$(VERSION).jar: dist
 	  && ./kawa-$(VERSION)/configure --with-java-source=7 \
 	    --with-domterm="@WITH_DOMTERM_ARG@" \
 	    --with-jline$(JLINE_VERSION_MAJOR)="@WITH_JLINE_PATH@" \
-	    --with-vectorgraphics2d="@WITH_VECTORGRAPHICS2D_ARG@" \
 	    --with-servlet=@WITH_SERVLET_ARG@ --with-javafx=@WITH_JAVAFX_ARG@ \
 	  && CLASSPATH=@conf_classpath@.$(CLASSPATH_SEPARATOR)$$CLASSPATH $(MAKE) all JAVAC="$(JAVAC) -source 7 -target 7" \
 	  && mv lib/kawa-$(VERSION).jar ../dist-kawa-$(VERSION).jar \
@@ -139,7 +138,6 @@ kawa-$(ZIP_VERSION).zip: dist-kawa-$(VERSION).jar doc/kawa-manual.epub bin/kawa.
 	  $(LN_S) ../../dist-kawa-$(VERSION).jar kawa-$(VERSION).jar; \
 	  $(LN_S) @WITH_DOMTERM_ARG@ domterm.jar; \
 	  $(LN_S) @WITH_SERVLET_ARG@ servlet.jar; \
-	  $(LN_S) @WITH_VECTORGRAPHICS2D_ARG@ VectorGraphics2D.jar; \
 	  $(LN_S) @WITH_SERVLET_ARG@ servlet.jar; \
 	  $(LN_S) @WITH_JLINE_PATH@ jline.jar
 	docsrcdir="`cd $(srcdir); pwd`/doc"; \
@@ -291,10 +289,6 @@ if WITH_JLINE2
 	cd $(DESTDIR)$(datadir)/kawa/lib && \
 	  $(LN_S) @WITH_JLINE_PATH@ jline.jar
 endif
-if WITH_VECTORGRAPHICS2D
-	cd $(DESTDIR)$(datadir)/kawa/lib && \
-	  $(LN_S) @WITH_VECTORGRAPHICS2D_ARG@ VectorGraphics2D.jar
-endif
 
 install-bytecode-jar: lib/bytecode-@BYTECODE_VERSION@.jar
 	@$(NORMAL_INSTALL)
@@ -327,7 +321,7 @@ kawa/Version.java: $(srcdir)/kawa/Version.java.in $(srcdir)/configure.ac
 	sed -e 's|VERSION|@VERSION@'"$$SVN_REVISION|" <$(srcdir)/kawa/Version.java.in >$@
 
 all-recursive:  kawa/Version.java selected-java-source $(GENERATED_SIMPLEVECTOR_FILES)
-all: lib/kawa-@VERSION@.jar lib/kawart-@VERSION@.jar $(JLINE_LINK) $(DOMTERM_LINK) $(SERVLET_LINK) $(VECTORGRAPHICS2D_LINK)
+all: lib/kawa-@VERSION@.jar lib/kawart-@VERSION@.jar $(JLINE_LINK) $(DOMTERM_LINK) $(SERVLET_LINK)
 
 if WITH_JLINE2
 JLINE_LINK = lib/jline.jar
@@ -342,12 +336,6 @@ lib/domterm.jar:
 	mkdir -p lib
 	$(LN_S) @WITH_DOMTERM_ARG@ lib/domterm.jar
 endif
-if WITH_VECTORGRAPHICS2D
-VECTORGRAPHICS2D_LINK = lib/VectorGraphics2D.jar
-lib/VectorGraphics2D.jar:
-	mkdir -p lib
-	$(LN_S) @WITH_VECTORGRAPHICS2D_ARG@ lib/VectorGraphics2D.jar
-endif
 if ENABLE_SERVLET
 SERVLET_LINK = lib/servlet.jar
 lib/servlet.jar:
@@ -361,11 +349,6 @@ if WITH_HTTPSERVER
 PREPROCESS_HTTPSERVER = +use:com.sun.net.httpserver
 else
 PREPROCESS_HTTPSERVER = -use:com.sun.net.httpserver
-endif
-if WITH_VECTORGRAPHICS2D
-PREPROCESS_VECTORGRAPHICS2D = +with:VectorGraphics2D
-else
-PREPROCESS_VECTORGRAPHICS2D = -with:VectorGraphics2D
 endif
 if WITH_JLINE2
 PREPROCESS_JLINE2 = +with:jline2
@@ -394,7 +377,7 @@ kawa/Version.class: kawa/Version.java
 gnu/kawa/util/PreProcess.class: gnu/kawa/util/PreProcess.java
 	$(JAVAC) -d . $^
 
-JAVA_PREPROCESS_OPTIONS = @JAVA_SOURCE_SELECTOR@ $(PREPROCESS_HTTPSERVER) $(PREPROCESS_XML) $(PREPROCESS_VECTORGRAPHICS2D) $(PREPROCESS_JLINE2) $(PREPROCESS_JLINE3)
+JAVA_PREPROCESS_OPTIONS = @JAVA_SOURCE_SELECTOR@ $(PREPROCESS_HTTPSERVER) $(PREPROCESS_XML) $(PREPROCESS_JLINE2) $(PREPROCESS_JLINE3)
 
 selected-java-source: Makefile $(srcdir)/patch-source-list
 	if test ! -e selected-java-source -o \

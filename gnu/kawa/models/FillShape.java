@@ -11,6 +11,8 @@ public class FillShape implements Paintable
     this.shape = shape;
   }
 
+  public Shape getShape() { return shape; }
+
   public void paint (Graphics2D graphics)
   {
     graphics.fill(shape);
@@ -25,4 +27,8 @@ public class FillShape implements Paintable
   {
     return new FillShape(tr.createTransformedShape(shape));
   }
+
+    public void visit(PictureVisitor visitor) {
+        visitor.visitFillShape(this);
+    }
 }

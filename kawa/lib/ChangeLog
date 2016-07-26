@@ -1,3 +1,7 @@
+2016-07-26  Per Bothner  <per@bothner.com>
+
+	* kawa/pictures.scm (image): New procedure.
+
 2016-07-22  Per Bothner  <per@bothner.com>
 
 	* kawa/pictures.scm (rectangle, with-transform,

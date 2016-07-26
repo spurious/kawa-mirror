@@ -20,9 +20,6 @@ AC_ARG_WITH(servlet,
   AS_HELP_STRING(--with-servlet@<:@=servlet-api.jar@:>@,Build support for generating servlets))
 WITH_SERVLET_ARG="${with_servlet}"
 
-AC_ARG_WITH(vectorgraphics2d)
-WITH_VECTORGRAPHICS2D_ARG="${with_vectorgraphics2d}"
-
 AC_ARG_WITH(android,
   AS_HELP_STRING(--with-android@<:@=android.jar@:>@,Build for the Android platform))
 
@@ -175,8 +172,6 @@ AM_CONDITIONAL(ENABLE_XML, test "$enable_xml" = "yes")
 AM_CONDITIONAL(ENABLE_SERVLET,
   test "$enable_servlet" != "" -a "$enable_servlet" != "no")
 AM_CONDITIONAL(WITH_SWING, test "$with_swing" != "no")
-AM_CONDITIONAL(WITH_VECTORGRAPHICS2D,
-  test "$with_vectorgraphics2d" != "" -a "$with_vectorgraphics2d" != "no")
 AM_CONDITIONAL(WITH_JLINE2,
   test "$with_jline2" != "" -a "$with_jline2" != "no" || test "$with_jline3" != "" -a "$with_jline3" != "no")
 AM_CONDITIONAL(WITH_JLINE3,
@@ -220,7 +215,6 @@ AC_SUBST(CLASSPATH_SEPARATOR)
 AC_SUBST(pathsep)
 AC_SUBST(filesep)
 AC_SUBST(WITH_SERVLET_ARG)
-AC_SUBST(WITH_VECTORGRAPHICS2D_ARG)
 AC_SUBST(WITH_JAVAFX_ARG)
 AC_SUBST(WITH_JLINE2)
 AC_SUBST(WITH_JLINE3)

@@ -10,6 +10,7 @@ public class DrawShape implements Paintable
   {
     this.shape = shape;
   }
+  public Shape getShape() { return shape; }
 
   public void paint (Graphics2D graphics)
   {
@@ -25,4 +26,8 @@ public class DrawShape implements Paintable
   {
     return new DrawShape(tr.createTransformedShape(shape));
   }
+
+    public void visit(PictureVisitor visitor) {
+        visitor.visitDrawShape(this);
+    }
 }

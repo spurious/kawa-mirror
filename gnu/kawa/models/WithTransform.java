@@ -41,4 +41,7 @@ public class WithTransform implements Paintable
     combined.concatenate(tr);
     return new WithTransform(paintable, combined);
   }
+    public void visit(PictureVisitor visitor) {
+        visitor.visitWithTransform(this);
+    }
 }

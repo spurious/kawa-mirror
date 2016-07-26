@@ -1,3 +1,22 @@
+2016-07-26  Per Bothner  <per@bothner.com>
+
+	Re-implement conversion to SVG without using external library.
+	* PictureVisitor.java: New visitor class.
+	* PictureToSvg.java: New class, extends PictureVisitor.
+	* SVGUtils.java: Simplify to use PictureToSvg.
+	* Paintable.java (visit): New abstract method.
+	* DrawImage.java (visit): New visit method.
+	* DrawShape.java (visit): Likewise.
+	* FillShape.java (visit): Likewise.
+	* PBox.java (visit): Likewise.
+	* WithComposite.java (visit): Likewise.
+	* WithPaint.java (visit): Likewise.
+	* WithTransform.java (visit): Likewise.
+	* FillShape.java (getShape): New method.
+	* PBox.java (paintables): Rename field to children.
+	* WithComposite.java (paintables): Rename to children.
+	* StandardColor.java (getName): New method.
+
 2016-07-22  Per Bothner  <per@bothner.com>
 
 	* WithComposite.java: Use symbol as shorthand for standard Composites.

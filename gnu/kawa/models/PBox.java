@@ -12,14 +12,14 @@ import java.awt.image.BufferedImage;
 
 public class PBox implements Paintable {
     char axis; // X, Y, or Z
-    Paintable[] paintables;
+    Paintable[] children;
     Rectangle2D bounds;
 
     double[] translations;
 
-    private PBox(char axis, Paintable[] paintables) {
+    private PBox(char axis, Paintable[] children) {
         this.axis = axis;
-        this.paintables = paintables;
+        this.children = children;
         init();
     }
 
@@ -28,10 +28,10 @@ public class PBox implements Paintable {
     }
 
     void init() {
-        int n = paintables.length;
+        int n = children.length;
         if (n == 0)
             return;
-        Rectangle2D prevBounds = paintables[0].getBounds2D();
+        Rectangle2D prevBounds = children[0].getBounds2D();
         double minX = prevBounds.getMinX();
         double maxX = prevBounds.getMaxX();
         double minY = prevBounds.getMinY();
@@ -39,7 +39,7 @@ public class PBox implements Paintable {
         double deltaX = 0, deltaY = 0;
         translations = new double[n];
         for (int i = 1; i < n; i++) {
-            Rectangle2D curBounds = paintables[i].getBounds2D();
+            Rectangle2D curBounds = children[i].getBounds2D();
             double delta = 0;
             if (axis == 'X') {
                 delta = prevBounds.getMaxX() - curBounds.getMinX();
@@ -69,7 +69,7 @@ public class PBox implements Paintable {
     public void paint (Graphics2D graphics) {
         AffineTransform saved = graphics.getTransform();
         try {
-            int n = paintables.length;
+            int n = children.length;
             double prevOffset = 0;
             for (int i = 0; i < n; i++) {
                 double offset = translations[i];
@@ -81,7 +81,7 @@ public class PBox implements Paintable {
                         graphics.translate(0, delta);
                 }
                 prevOffset = offset;
-                paintables[i].paint(graphics);
+                children[i].paint(graphics);
             }
         } finally {
             graphics.setTransform(saved);
@@ -113,5 +113,8 @@ public class PBox implements Paintable {
         for (int i = 0; i < np; i++)
             p[i] = asPaintable(args[i]);
         return p;
+    }
+    public void visit(PictureVisitor visitor) {
+        visitor.visitPBox(this);
     }
 }

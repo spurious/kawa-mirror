@@ -21,6 +21,7 @@ public class StandardColor extends Color {
         map.put(name.replace("-", ""), color);
         return color;
     }
+    public String getName() { return name; }
 
     public static final StandardColor aliceBlue = add("alice-blue", 0xF0F8FF);
     public static final StandardColor antiqueWhite = add("antique-white", 0xFAEBD7);

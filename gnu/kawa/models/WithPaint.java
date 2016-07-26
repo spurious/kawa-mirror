@@ -36,4 +36,8 @@ public class WithPaint implements Paintable
   {
     return new WithPaint(paintable.transform(tr), paint);
   }
+
+    public void visit(PictureVisitor visitor) {
+        visitor.visitWithPaint(this);
+    }
 }

@@ -35,15 +35,6 @@ case ${with_servlet} in
     run_classpath='$kawadir/lib/servlet.jar'${CLASSPATH_SEPARATOR}"$run_classpath"
     ;;
 esac
-case ${with_vectorgraphics2d} in
-  yes) ;;
-  no) ;;
-  "") ;;
-  *)
-    conf_classpath=${with_vectorgraphics2d}${CLASSPATH_SEPARATOR}$conf_classpath
-    run_classpath='$kawadir/lib/VectorGraphics2D.jar'${CLASSPATH_SEPARATOR}"$run_classpath"
-    ;;
-esac
 case ${with_domterm} in
   yes) ;;
   no) ;;

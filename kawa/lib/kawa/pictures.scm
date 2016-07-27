@@ -1,5 +1,6 @@
 (module-name (kawa pictures))
 (require <kawa.lib.prim_syntax>)
+(define-private-alias WithPaint gnu.kawa.models.WithPaint)
 
 (define (make-Point x y) (java.awt.geom.Point2D$Double x y))
 (define-simple-constructor P make-Point)
@@ -82,9 +83,8 @@
   (lambda (paint (shape :: <java.awt.Shape>))
     (with-paint paint (gnu.kawa.models.FillShape shape))))
 
-(define (draw (shape :: <java.awt.Shape>)) ::  <gnu.kawa.models.Picture>
-  (make <gnu.kawa.models.DrawShape> shape))
-;; TODO: (draw stroke-or-paint-specifier ... shape)
+(define (draw #!rest args) ::gnu.kawa.models.Picture
+  (gnu.kawa.models.DrawShape:makeDraw args))
 
 (define-procedure image
   (lambda (#!key src)

@@ -1,5 +1,16 @@
 2016-07-26  Per Bothner  <per@bothner.com>
 
+	Support setting Stroke properties and their use by DrawShape.
+	* DrawShape.java (makeDraw): Factory method from creating
+	DrawShape possibly wrapped in WithPaint.
+	* PBox.java (combine): Convenience method.
+	* PictureToSvg.java: Convert Stroke properties to SVG properties.
+	* WithPaint.java (stroke, propertiesSet): New fields for
+	noting which Stroke-related proprties are set and which inherited.
+	(paint): Handle also updating/merging Stroke.
+
+2016-07-26  Per Bothner  <per@bothner.com>
+
 	Rename Paintable to Picture.
 
 2016-07-26  Per Bothner  <per@bothner.com>

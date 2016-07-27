@@ -14,6 +14,8 @@ import java.io.ByteArrayOutputStream;
 public class PictureToSvg extends PictureVisitor {
     Consumer out;
     Paint paint = StandardColor.black;
+    Stroke stroke;
+    int strokePropertiesSet;
 
     public static final String SVG_NAMESPACE_URI =
         "http://www.w3.org/2000/svg";
@@ -171,9 +173,39 @@ public class PictureToSvg extends PictureVisitor {
             }
             writeAttribute(filling ? "fill" : "stroke", cname, out);
         } else {
-            // FIXME
+            // FIXME handle other types of Paint
+            writeAttribute(filling ? "fill" : "stroke", "black", out);
         }
         writeAttribute(filling ? "stroke" : "fill", "none", out);
+    }
+
+    private void writeStroke(Stroke stroke, int propertiesSet) {
+        System.err.println("writeStroke props:"+propertiesSet+" str:"+stroke);
+        if (stroke instanceof BasicStroke) {
+            BasicStroke bstroke = (BasicStroke) stroke;
+            if ((propertiesSet & WithPaint.STROKE_WIDTH_SET) != 0)
+                writeAttribute("stroke-width", bstroke.getLineWidth(), out);
+            if ((propertiesSet & WithPaint.STROKE_LINECAP_SET) != 0) {
+                String str = "error-value";
+                switch (bstroke.getEndCap()) {
+                case BasicStroke.CAP_BUTT: str = "butt"; break;
+                case BasicStroke.CAP_ROUND: str = "round"; break;
+                case BasicStroke.CAP_SQUARE: str = "square"; break;
+                }
+                writeAttribute("stroke-linecap", str, out);
+            }
+            if ((propertiesSet & WithPaint.STROKE_LINEJOIN_SET) != 0) {
+                String str = "error-value";
+                switch (bstroke.getLineJoin()) {
+                case BasicStroke.JOIN_MITER: str = "miter"; break;
+                case BasicStroke.JOIN_ROUND: str = "round"; break;
+                case BasicStroke.JOIN_BEVEL: str = "bevel"; break;
+                }
+                writeAttribute("stroke-linejoin", str, out);
+            }
+            if ((propertiesSet & WithPaint.STROKE_MITERLIMIT_SET) != 0)
+                writeAttribute("stroke-miterlimit",  bstroke.getMiterLimit(), out);
+        }
     }
 
     @Override
@@ -186,14 +218,30 @@ public class PictureToSvg extends PictureVisitor {
     public void visitDrawShape(DrawShape pic) {
         writeShapeStart(pic.shape, out);
         writePaint(paint, false);
+        writeStroke(stroke, strokePropertiesSet);
         out.endElement();
     }
     @Override
     public void visitWithPaint(WithPaint pic) {
         Paint savePaint = this.paint;
-        this.paint = pic.paint;
+        Stroke saveStroke = this.stroke;
+        int savePropertiesSet = strokePropertiesSet;
+        if (pic.paint != null)
+            this.paint = pic.paint;
+        Stroke nstroke = pic.stroke;
+        if (nstroke != null) {
+            strokePropertiesSet |= pic.propertiesSet;
+            if (saveStroke instanceof BasicStroke
+                && nstroke instanceof BasicStroke
+                && (pic.propertiesSet & WithPaint.STROKE_ALL_SET) != WithPaint.STROKE_ALL_SET)
+                nstroke = WithPaint.merge((BasicStroke) nstroke, pic.propertiesSet,
+                                          (BasicStroke) saveStroke);
+            this.stroke = nstroke;
+        }
         super.visitWithPaint(pic);
         this.paint = savePaint;
+        this.stroke = saveStroke;
+        this.strokePropertiesSet = savePropertiesSet;
     }
     @Override
     public void visitDrawImage(DrawImage image) {

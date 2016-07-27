@@ -4,6 +4,7 @@ import java.awt.Graphics2D;
 import java.awt.Shape;
 import java.awt.geom.*;
 import java.awt.image.BufferedImage;
+import java.util.List;
 
 /** Used to compose Pictures "next to" each other.
  * They be put in a row (X-axis), in a column (Y-axis),
@@ -100,6 +101,13 @@ public class PBox implements Picture {
     public static PBox makeZBox(Object... args) {
         return new PBox('Z', asPictureAll(args));
     }
+    public static Picture combine(List parts) {
+        int nparts = parts.size();
+        Picture[] pics = new Picture[nparts];
+        parts.toArray(pics);
+        return nparts == 1 ? pics[0] : new PBox('Z', pics);
+    }
+
     public static Picture asPicture(Object arg) {
         if (arg instanceof BufferedImage)
             return new DrawImage((BufferedImage) arg);

@@ -180,7 +180,6 @@ public class PictureToSvg extends PictureVisitor {
     }
 
     private void writeStroke(Stroke stroke, int propertiesSet) {
-        System.err.println("writeStroke props:"+propertiesSet+" str:"+stroke);
         if (stroke instanceof BasicStroke) {
             BasicStroke bstroke = (BasicStroke) stroke;
             if ((propertiesSet & WithPaint.STROKE_WIDTH_SET) != 0)

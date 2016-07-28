@@ -687,7 +687,36 @@ public abstract class Language
       }
   }
 
-  /** Flag to tell parse that expression will be evaluated immediately.
+    public final Compilation getCompilation(Lexer lexer, int options, ModuleInfo info) {
+        SourceMessages messages = lexer.getMessages();
+        NameLookup lexical = ((options & PARSE_CURRENT_NAMES) != 0
+                              ? NameLookup.getInstance(getEnvironment(), this)
+                              : new NameLookup(this));
+        boolean immediate = (options & PARSE_IMMEDIATE) != 0;
+        Compilation tr = getCompilation(messages, lexical);
+        if (requirePedantic)
+            tr.setPedantic(true);
+        if (! immediate)
+            tr.mustCompile = true;
+        tr.immediate = immediate;
+        tr.langOptions = options;
+        if ((options & PARSE_EMIT_MAIN) != 0)
+            tr.currentOptions.set("main", null);
+        if ((options & PARSE_EXPLICIT) != 0)
+            tr.explicit = true;
+        if ((options & PARSE_PROLOG) != 0)
+            tr.setState(Compilation.PROLOG_PARSING);
+        ModuleExp module = tr.pushNewModule(lexer);
+        if ((options & PARSE_INTERACTIVE_MODULE) != 0) {
+            tr.setInteractiveName();
+            module.setFlag(ModuleExp.INTERACTIVE);
+        }
+        if (info != null)
+            info.setCompilation(tr);
+        return tr;
+    }
+
+ /** Flag to tell parse that expression will be evaluated immediately.
    * I.e. we're not creating class files for future execution. */
   public static final int PARSE_IMMEDIATE = 1;
   /** Flag to tell parse to use current NameLookup.
@@ -728,14 +757,6 @@ public abstract class Language
 
   public final Compilation parse(InPort port,
                                  gnu.text.SourceMessages messages,
-                                 ModuleInfo info)
-    throws java.io.IOException, gnu.text.SyntaxException
-  {
-    return parse(getLexer(port, messages), Language.PARSE_PROLOG, info);
-  }
-
-  public final Compilation parse(InPort port,
-                                 gnu.text.SourceMessages messages,
                                  int options, ModuleInfo info)
     throws java.io.IOException, gnu.text.SyntaxException
   {
@@ -743,46 +764,25 @@ public abstract class Language
   }
 
   public final Compilation parse(Lexer lexer, int options, ModuleInfo info)
-    throws java.io.IOException, gnu.text.SyntaxException
-  {
-    SourceMessages messages = lexer.getMessages();
-    NameLookup lexical = ((options & PARSE_CURRENT_NAMES) != 0
-                          ? NameLookup.getInstance(getEnvironment(), this)
-                          : new NameLookup(this));
-    boolean immediate = (options & PARSE_IMMEDIATE) != 0;
-    Compilation tr = getCompilation(messages, lexical);
-    if (requirePedantic)
-      tr.setPedantic(true);
-    if (! immediate)
-      tr.mustCompile = true;
-    tr.immediate = immediate;
-    tr.langOptions = options;
-    if ((options & PARSE_EMIT_MAIN) != 0)
-      tr.currentOptions.set("main", null);
-    if ((options & PARSE_EXPLICIT) != 0)
-      tr.explicit = true;
-    if ((options & PARSE_PROLOG) != 0)
-      tr.setState(Compilation.PROLOG_PARSING);
-    ModuleExp module = tr.pushNewModule(lexer);
-    if ((options & PARSE_INTERACTIVE_MODULE) != 0)
-      {
-        tr.setInteractiveName();
-        module.setFlag(ModuleExp.INTERACTIVE);
-      }
-    if (info != null)
-      info.setCompilation(tr);
+      throws java.io.IOException, gnu.text.SyntaxException {
+      Compilation tr = getCompilation(lexer, options, info);
+      return parse(tr) ? tr : null;
+  }
+
+  public final boolean parse(Compilation tr)
+        throws java.io.IOException, gnu.text.SyntaxException {
     try {
-        if (! parse(tr, options))
-            return null;
+        if (! parse(tr, tr.langOptions))
+            return false;
     } catch (gnu.text.SyntaxException ex) {
         tr.setState(Compilation.ERROR_SEEN);
-        return tr;
+        return true;
     }
     if (tr.getState() == Compilation.PROLOG_PARSING)
       tr.setState(Compilation.PROLOG_PARSED);
     else
-      module.classFor(tr);
-    return tr;
+      tr.mainLambda.classFor(tr);
+    return true;
   }
 
   public abstract boolean parse (Compilation comp, int options)
@@ -1293,8 +1293,9 @@ public abstract class Language
     Language saveLang = Language.setSaveCurrent(this);
     try
       {
-	Compilation comp = parse(port, messages, PARSE_FOR_EVAL);
+        Compilation comp = getCompilation(getLexer(port, messages), PARSE_FOR_EVAL, null);
         comp.setEvalName();
+        parse(comp);
 	ModuleExp.evalModule(getEnvironment(), ctx, comp, null, null);
       }
     finally

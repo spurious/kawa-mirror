@@ -1,5 +1,9 @@
 2016-07-28  Per Bothner  <per@bothner.com>
 
+	* Language.java (eval): Call setEvalName before it's too late.
+	(parse, getCompilation): Some re-structuring.
+	This fixes Savannah bug #48652 "Cannot run Scheme.eval multiple times".
+
 	* Compilation.java (mangleSymbolic): Change interface, so we don't
 	mangle '<' or '>' except for method names.
 

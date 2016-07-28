@@ -1,3 +1,8 @@
+2016-07-28  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Objects): Fix two typos. This fixes Savannah bug #48584
+	"Typos on https://www.gnu.org/software/kawa/tutorial/Objects.html".
+
 2016-07-11  Per Bothner  <per@bothner.com>
 
 	Generate navigation sidebar for epub manual using JavaScript.

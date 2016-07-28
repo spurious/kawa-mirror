@@ -2202,11 +2202,11 @@ Instead of colon notation, you can use the @code{field} procedure.
 
 See @ref{Field operations} for details.
 
-@subheading Static fields and method
+@subheading Static fields and methods
 
 Kawa views static properties and methods as
 properties and methods of the class itself.
-To call a status method use the syntax:
+To call a static method use the syntax:
 @example
 (@var{clas}:@var{meth} @var{v1} ... @var{vn})
 @end example

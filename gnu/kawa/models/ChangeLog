@@ -1,3 +1,10 @@
+2016-07-28  Per Bothner  <per@bothner.com>
+
+	Adjust bounding box for stroke width.
+	* PictureVisitor.java (class TrackingState): New class.
+	* SVGUtils.java (toSVG): Adjust bounds for stroke width.
+	(class AdjustBounds): New class, extends TrackingState.
+
 2016-07-26  Per Bothner  <per@bothner.com>
 
 	Support setting Stroke properties and their use by DrawShape.

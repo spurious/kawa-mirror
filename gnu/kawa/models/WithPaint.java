@@ -58,7 +58,7 @@ public class WithPaint implements Picture
             if (stroke != null) {
                 Stroke nstroke = stroke;
                 if (savedStroke instanceof BasicStroke
-                    && stroke instanceof BasicStroke
+                    && nstroke instanceof BasicStroke
                     && (propertiesSet & STROKE_ALL_SET) != STROKE_ALL_SET)
                     nstroke = merge((BasicStroke) stroke, propertiesSet,
                                     (BasicStroke) savedStroke);

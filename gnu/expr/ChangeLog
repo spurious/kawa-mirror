@@ -1,3 +1,8 @@
+2016-07-28  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (mangleSymbolic): Change interface, so we don't
+	mangle '<' or '>' except for method names.
+
 2016-07-25  Per Bothner  <per@bothner.com>
 
 	* GenericProc.java (addAtEnd): Fix error in computing maxArgs.

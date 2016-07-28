@@ -869,12 +869,12 @@ public class Compilation implements SourceLocator
      * Does not handle qualified names.
      */
     public static String mangleClassName(String name) {
-        return mangleSymbolic(name, false, false);
+        return mangleSymbolic(name, 'C', false);
     }
 
     /** Mangle a possibly-qualified class name. */
     public static String mangleQualifiedName(String name) {
-        return mangleSymbolic(name, true, false);
+        return mangleSymbolic(name, 'Q', false);
     }
 
   public static String mangleName (String name)
@@ -884,14 +884,14 @@ public class Compilation implements SourceLocator
 
     /** Mangle according to John Rose's "Symbolic Freedom in the VM".
      * {@linkplain https://blogs.oracle.com/jrose/entry/symbolic_freedom_in_the_vm See this article.}
-     * @param allowDots True if we're mangling a qualified name with dots,
-     *   which should not be mangled.
+     * @param context One of 'C' (class name); 'Q' (qualified name, with dots);
+     *   'F' (field name); 'M' (method name).
      * @param force True if should escape '\\' even if that is the
      *   only disallowed character.  The may cause an already-mangled name
      *   to be doubly mangled.
      */
     public static String mangleSymbolic(String name,
-                                        boolean allowDots, boolean force) {
+                                        char context, boolean force) {
         StringBuilder sbuf = null;
         int len = name.length();
         if (len == 0)
@@ -899,19 +899,18 @@ public class Compilation implements SourceLocator
         int dangerous = 0;
         for (int i = 0; i < len; i++) {
             char ch = name.charAt(i);
-            char ch2;
+            char ch2 = 0;
             switch (ch) {
             case '/':  ch2 = '|'; break;
-            case '.':  ch2 = allowDots ? 0 : ','; break;
+            case '.':  if (context != 'Q') ch2 = ','; break;
             case ';':  ch2 = '?'; break;
             case '$':  ch2 = '%'; break;
-            case '<':  ch2 = '^'; break;
-            case '>':  ch2 = '_'; break;
+            case '<':  if (context == 'M') ch2 = '^'; break;
+            case '>':  if (context == 'M') ch2 = '_'; break;
             case '[':  ch2 = '{'; break;
             case ']':  ch2 = '}'; break;
             case ':':  ch2 = '!'; break;
             case '\\': ch2 = '-'; break;
-            default:   ch2 = 0;
             }
             if (ch2 != 0 && ch != '\\')
                 dangerous++; 

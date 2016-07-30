@@ -29,12 +29,14 @@ function filename(pathname) {
 }
 
 function onMainLoad(evt) {
-    top.mainLoaded = true;
-    if (usingFrameset && top.sidebarLoaded)
-        updateSidebarForFrameset();
-    if (! usingFrameset) {
+    if (usingFrameset) {
+        top.mainLoaded = true;
+        if (top.sidebarLoaded)
+            updateSidebarForFrameset();
+   } else {
         var iframe = document.createElement("iframe");
-        iframe.setAttribute("src", "bk01-toc.xhtml");
+        var mainFilename = filename(location.pathname);
+        iframe.setAttribute("src", "bk01-toc.xhtml?main="+mainFilename);
         var body = document.getElementsByTagName("body")[0];
         body.insertBefore(iframe, body.firstChild);
         body.setAttribute("class", "mainbar");
@@ -120,16 +122,18 @@ function scanToc1(node, current) {
 }
 
 function onSidebarLoad(evt) {
-    top.sidebarLoaded = true;
-    if (! usingFrameset) {
-        mainWindow = usingFrameset ? parent.frames["main"] : parent;
+    if (usingFrameset) {
+        top.sidebarLoaded = true;
+        if (top.mainLoaded)
+            updateSidebarForFrameset();
+    } else {
+        var search = location.search;
+        var mainFilename = search.startsWith("?main=") // FIXME use regex
+            ? search.substring(6) : null;
         var body = document.getElementsByTagName("body")[0];
-        var mainFilename = filename(mainWindow.location.pathname);
         if (mainFilename)
             scanToc1(body, mainFilename);
     }
-    if (usingFrameset && top.mainLoaded)
-        updateSidebarForFrameset();
     var links = document.getElementsByTagName("a");
     for (var i = links.length; --i >= 0; ) {
         var link = links[i];

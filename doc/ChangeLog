@@ -1,5 +1,8 @@
 2016-07-30  Per Bothner  <per@bothner.com>
 
+	* kawa-ebook.js: Avoid cross-frame accesses, at least in iframe mode.
+	These accesses are dis-allowed for file: URLs on Chrome.
+
 	* +default+: Fix content-type for html and png files.
 
 2016-07-28  Per Bothner  <per@bothner.com>

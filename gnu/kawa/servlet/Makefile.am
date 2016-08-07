@@ -6,9 +6,7 @@ if ENABLE_SERVLET
 SERVLET_JSOURCES =\
   CGIServletWrapper.java \
   KawaPageServlet.java \
-  KawaServlet.java \
-  ReplServlet.java \
-  ReplSession.java
+  KawaServlet.java
 SERVLET_SCM = servlets.scm
 endif
 if WITH_HTTPSERVER

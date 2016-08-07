@@ -1125,7 +1125,7 @@ and @ref{Quantities,quantities} (such as @code{4cm^2}).
 We would like to integrate these into the type system, both
 for performance and compile-time type checking.
 
-For syntax we could a pseudo-parameteried type @code{quantity}.  For example:
+For syntax we can use a pseudo-parameterized type @code{quantity}.  For example:
 @example
 (define a1 ::quantity[cm^2] 4cm^2)
 (* 2.0 a1) ;; @result{} 8cm^2
@@ -1660,6 +1660,7 @@ Paul Wilson's @uref{ftp://ftp.cs.utexas.edu/pub/garbage/cs345/schintro-v14/schin
 * Tutorial - Numbers::           Numbers
 * Tutorial - Functions::         Functions
 * Tutorial - Variables::         Variables
+* Tutorial - Pictures::          Pictures
 * Tutorial - Sequences::         Lists and sequences
 * Tutorial - Objects::           Creating and using objects
 * Tutorial - Types::             Types and declarations
@@ -1942,6 +1943,11 @@ You can also declare local variables.  NEED EXAMPLES.
 
 Alternative forms for defining local variables are
 @code{let}, @code{let*}, or @code{letrec}/@code{letrec*}.
+
+@node Tutorial - Pictures
+@section Composable pictures
+
+@c https://www.gnu.org/software/kawa/style/kawa-logo.png
 
 @node Tutorial - Sequences
 @section Lists and sequences
@@ -9099,6 +9105,33 @@ so the above is equivalent to:
 @example
 (define-constant unit:cent (* 0.01 unit:dollar))
 @end example
+@end deffn
+
+@subheading Angles
+
+The following angle units are dimensionless, with no base unit.
+
+Some procedures treat a unit-less real number as if it were in radians
+(which mathematicians prefer);
+some procedures (such as @code{rotate}) treat a unit-less real number
+as if it were in degrees
+(which is common in Web and other standards).
+
+@deffn Unit rad
+A unit for angles specified in radians.
+A full circle is 2*pi radians.
+Note that @code{(= 1.5 1.5rad)} is true,
+while @code{(eqv? 1.5 1.5rad)} is false.
+@end deffn
+
+@deffn Unit deg
+A unit for angles specified in degrees.
+A full circle is 360 degrees.
+@end deffn
+
+@deffn Unit grad
+A unit for angles specified in gradiants.
+A full circle is 400 gradiants.
 @end deffn
 
 @node Logical Number Operations
@@ -19111,6 +19144,7 @@ They run in separate threads.
 @end deffn
 
 @menu
+* Composable pictures::
 * Building JavaFX applications::
 * Building for Android::  Building for Android devices
 * Android view construction::
@@ -19119,6 +19153,199 @@ They run in separate threads.
 * Time-related functions::
 * Low-level functions:: Deprecated low-level functions
 @end menu
+
+@node Composable pictures
+@section Composable pictures
+
+Kawa's @code{pictures} library lets you create geometric shapes
+and images, and combine them in interesting ways.
+The @ref{Tutorial - Pictures,tutorial} gives an introduction.
+The easiest way to use and learn the @code{pictures} library
+is with a suitable REPL.  @i{(To be described.)}
+
+A @dfn{picture} is an object that can be displayed on a screen,
+web-page, or printed page, and combined with other pictures.
+
+A picture has a method printing itself in a graphical context.
+It also has various properties, including a rectangular bounding box,
+which is relative to an origin point.
+
+@subsection Coordinates - points and dimensions
+
+The library works with a two-dimensional grid,
+where each position has an x cordinate and y coordinate.
+Normally, x values increase as you move right on the screen/page,
+while y values increase as you move @emph{down}.
+This convention matches that used by Java 2D, SVG, and many other
+graphics library.  However, note that this is different from the traditional
+mathematical convention of y values increasing as you go up.
+
+By default, one unit is one ``pixel''.  (More precisely,
+it is the @code{px} unit is the CSS specification.)
+
+@deffn Type Point
+A point is a pair consisting of an x and a y coordinate.
+@end deffn
+
+@code{&P[@var{x} @var{y}]}
+
+@deffn Type Dimension
+A dimension value is a pair of a width and a height.
+It is used for the size of pictures in the two dimensions.
+
+In a context that expects a point, a dimension is treated
+as an offset relative to some other point.
+@end deffn
+
+@code{&D[@var{width} @var{height}]}
+
+@subsection Shapes
+
+A shape is a collection of lines and curves.
+Examples include lines, circles, and polygons.
+A shape can be @dfn{stroked}, which you can think of as
+being drawn by a very fancy calligraphic pen that
+follows the lines and curves of the shape.
+
+A @dfn{closed shape} is a shape that is continuous and ends up where it
+started.  This includes circles and polygons.
+A closed shape can be filled, which means the entire ``interior''
+is painted with some color or texture.
+
+A shape is represented by the Java @code{java.awt.Shape} interface.
+The @code{picture} library only provides relatively simple shapes,
+but you can use any methods that create a @code{java.awt.Shape} object.
+
+@deffn Procedure line p1 [p2 ...]
+In the simple case two points are specified, and the result
+is a line that goes from point @var{p1} to @var{p2}.
+If @var{n} points are specied, the result is path consisting of
+@var{n-1} line segments, connecting adjacent arguments.
+(If only a single point is specified, the result is degenerate
+single-point shape.)
+
+All of the points except the first can optionally be specified
+using a @code{dimension}, which is treated an an offset from the previous point:
+@example
+(line &P[30 40] &D[10 5] &D[10 -10])
+@end example
+is the same as:
+@example
+(line &P[30 40] &P[40 45] &P[50 35])
+@end example
+@end deffn
+
+@deffn Procedure polygon p1 [p2 ...]
+Constructs a closed shape from line segments.
+This is the same as calling @code{line} with the same arguments,
+with the addition of a final line segment from the last point
+back to the first point.
+@end deffn
+
+@deffn Procedure rectangle p1 [p2]
+A rectangle is closed polygon of 4 line segments that are
+aternatively parallel to the x-axis and the y-axis.
+I.e. if you rotate a rectangle it is no longer a rectangle by
+this definition, though of course it still has a rectangular shape.
+If @var{p2} is not specified, constructs a rectangle whose upper-left corner
+is @code{&P[0 0]} and whose lower-right corner is @var{p1}.
+If @var{p2} is specified, constructs a rectangle whose upper-left corner
+is @var{p1} and whose lower-right corner is @var{p2}.
+If @var{p2} is a dimension it is considered a relative offset from @var{p1},
+just like for @code{polygon}.
+@end deffn
+
+@deffn Procedure circle radius [center]
+@end deffn
+
+@subsection Colors and paints
+
+A @dfn{paint} is a color pattern used to fill part of the canvas.
+A paint can be a color, a texture (a repliacted pattern), or a gradiant
+(a color that gradually fades to some other color).
+
+A @dfn{color} is defined by red, green, and blue values.
+It may also have an alpha component, which specifies transparency.
+
+@subsection Filling a shape with a color
+
+@deffn Procedure fill shape
+@deffnx Procedure fill color shape
+@end deffn
+
+@subsection Stroking (outlining) a shape
+
+@deffn Procedure draw shape
+@end deffn
+
+@subsection Combining pictures
+
+@subsection Affine transforms
+
+An 2D affine transform is a linear mapping from coordinates to
+coordinates.  It generalizes translation, scaling, flipping, shearing,
+and their composition.  An affine transform maps straight parallel lines
+into other straight parallel lines, so it is only a subset of possible
+mappings - but a very useful subset.
+
+@deffn Procedure affine-transform xx xy yx yy x0 y0
+@deffnx Procedure affine-transform px py p0
+Creates a new affine transform.
+@end deffn
+
+@deffn Procedure with-transform transform picture
+@deffnx Procedure with-transform transform point
+@deffnx Procedure with-transform transform1 transform2
+Creates a transformed picture.
+@end deffn
+
+@deffn Procedure rotate angle
+@deffnx Procedure rotate angle picture
+The one-argument variant creates a new affine transform that rotates
+a picture about the origin by the specified @var{angle}.
+The @var{angle} can be either a quantity (with a unit of
+either @code{rad} radians, @code{deg} (degrees), or @code{grad} (gradians)),
+or it can be a unit-less real number (which is treated as degrees).
+
+The two-argument variant applies the resulting transform to
+the specified picture.  It is equivalent to:
+@example
+(with-transform (rotate @var{angle}) @var{picture})
+@end example
+@end deffn
+
+@deffn Procedure scale factor
+@deffnx Procedure scale factor picture
+Scales the @var{picture} by the given @var{factor}.
+The @var{factor} can be a real number.
+The @var{factor} can also be a point, in which case
+the two cordinates are scaled by a different amount.
+
+The two-argument variant applies the resulting transform to
+the specified picture.  It is equivalent to:
+@example
+(with-transform (scale @var{factor}) @var{picture})
+@end example
+@end deffn
+
+@deffn Procedure translate offset
+@deffnx Procedure translate offset picture
+
+The two-argument variant applies the resulting transform to
+the specified picture.  It is equivalent to:
+@example
+(with-transform (translate @var{offset}) @var{picture})
+@end example
+@end deffn
+
+@subsection Images
+
+@subsection Compositing - Controlling how pictures are combined
+
+@deffn Procedure with-composite [[compose-op] picture] ...
+@end deffn
+
+@subsection Display and exporting pictures 
 
 @node Building JavaFX applications
 @section Building JavaFX applications

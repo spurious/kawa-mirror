@@ -1,3 +1,7 @@
+2016-08-06  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Composable pictures): New section.
+
 2016-07-30  Per Bothner  <per@bothner.com>
 
 	* kawa-ebook.js: Avoid cross-frame accesses, at least in iframe mode.

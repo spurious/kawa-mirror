@@ -1,3 +1,7 @@
+2016-08-07  Per Bothner  <per@bothner.com>
+
+	* Signals.java: Don't ignore old handler returned by doRegister.
+
 2016-06-17  Guillaume Nodet gnodet@gmail.com
             Per Bothner  <per@bothner.com>
 

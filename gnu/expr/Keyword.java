@@ -13,7 +13,7 @@ import java.io.*;
  *
  * @author Per Bothner
  */
-public class Keyword extends Symbol implements Printable, Externalizable {
+public class Keyword extends Symbol implements Externalizable {
     public static final Namespace keywordNamespace = Namespace.create();
 
     static {
@@ -78,12 +78,6 @@ public class Keyword extends Symbol implements Printable, Externalizable {
     @Override
     public final String toString() {
         return getName() + ':';
-    }
-
-    public void print(Consumer out) {
-        Symbols.print(getName(), out);
-        out.write(':');
-
     }
 
     /**

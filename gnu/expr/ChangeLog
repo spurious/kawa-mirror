@@ -2,6 +2,7 @@
 
 	* Keyword.java: Don't implement Printable.
 	(print): Remove method.
+	* Symbols.java (print): Remove method.
 
 2016-07-28  Per Bothner  <per@bothner.com>
 

@@ -74,31 +74,4 @@ public class Symbols
   {
     return make (name);
   }
-
-  public static void print(String name, Consumer out)
-  {
-    boolean readable = (out instanceof OutPort)
-      && ((OutPort)out).printReadable;
-    if (readable)
-      {
-	int len = name.length ();
-	for (int i = 0;  i < len;  i++)
-	  {
-	    char ch = name.charAt (i);
-	    if (!(Character.isLowerCase (ch)
-		  || ch == '!' || ch == '$' || ch == '%' || ch == '&'
-		  || ch == '*' || ch == '/' || ch == ':' || ch == '<'
-		  || ch == '=' || ch == '>' || ch == '?' || ch == '~'
-		  || ch == '_' || ch == '^'
-		  || ((ch == '+' || ch == '-') && (i > 0 || len == 1))
-		  || (Character.isDigit (ch) && i > 0)
-		  || (ch == '.' && (i == 0 || name.charAt (i - 1) == '.'))))
-	      out.write('\\');
-	    out.write(ch);
-	  }
-      }
-    else
-      out.write(name);
-  }
-
 }

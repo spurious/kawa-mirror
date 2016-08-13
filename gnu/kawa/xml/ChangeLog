@@ -1,3 +1,7 @@
+2016-08-12  Per Bothner  <per@bothner.com>
+
+	* Nodes.java (NodeVector.consumePosRange): Fix logic bug.
+
 2016-06-25  Per Bothner  <per@bothner.com>
 
 	* HttpPrinter.java (ignoring): Handle case when base is null.

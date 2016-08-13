@@ -306,9 +306,6 @@ public class Nodes extends Values.FromList<SeqPosition>
         Object[] odata;
         int[] idata;
 
-        int id=++counter; static int counter;
-        public String toString() { return "NodeVec#"+id+"/sz:"+size(); }
-
         int getLastIndex() { return getGapStart() - 1; }
 
         public int getBufferLength() {
@@ -430,9 +427,9 @@ public class Nodes extends Values.FromList<SeqPosition>
             if (end > size)
                 end = size;
             for (;  i < end;  i++) {
+                int ii = effectiveIndex(i);
                 if (out instanceof PositionConsumer) {
                     PositionConsumer pout = (PositionConsumer) out;
-                    int ii = effectiveIndex(i);
                     Object obj = odata[ii];
                     if (obj instanceof SeqPosition)
                         pout.writePosition((SeqPosition) obj);
@@ -440,7 +437,7 @@ public class Nodes extends Values.FromList<SeqPosition>
                         pout.writePosition((AbstractSequence) obj, idata[ii]);
                 }
                 else
-                    out.writeObject(getRaw(i));
+                    out.writeObject(getRaw(ii));
             }
         }
     }

@@ -67,6 +67,7 @@ kawa.xml: $(srcdir)/kawa.texi
 	-e 's|_002d|-|g' \
 	-e 's|<book id="-" lang="en">|<book id="book" lang="en"><?dbhtml filename="toc.html"?>|' \
 	-e 's|<chapter label="" id="Top">|<chapter label="Top" id="Top"><?dbhtml filename="index.html"?>|' \
+	-e 's|<chapter label="1" id="News">|<chapter label="1" id="News"><?dbhtml filename="news.html"?>|' \
 	-e 's|id="Tutorial">|\0<?dbhtml filename="tutorial/index.html"?>|' \
 	-e 's|id="Tutorial---\([^"]*\)">|\0<?dbhtml filename="tutorial/\1.html"?>|' \
 	-e 's|<title>Compiling to byte-code or an executable</title>|\0<titleabbrev>Compiling</titleabbrev>|' \

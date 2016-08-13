@@ -154,8 +154,7 @@ other programming languages on the Java platform.
 It has many useful utility classes.
 
 This documents version @value{VERSION}, updated @value{UPDATED}.
-See the summary
-of @uref{http://www.gnu.org/software/kawa/news.html,recent changes}.
+See the summary of @ref{News,recent changes}.
 
 @c Old versions of makeinfo don't support: @ifnotdocbook
 The Kawa home page (which is currently just an on-line
@@ -175,6 +174,7 @@ Various people and orgnizations @ref{Acknowledgements,have contributed to Kawa}.
 This package has nothing to do with the defunct Kawa commercial Java IDE.
 
 @menu
+* News::                 News- Recent Changes
 * Features::
 * Community::
 * Installation::         Building and installing Kawa
@@ -200,6 +200,10 @@ This package has nothing to do with the defunct Kawa commercial Java IDE.
 * License::
 * Overall Index::	 Index of functions, macros, concepts, and more.
 @end menu
+
+@node News
+@chapter News - Recent Changes
+@include news.texi
 
 @node Features
 @chapter Features

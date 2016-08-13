@@ -1,3 +1,11 @@
+2016-08-13  Per Bothner  <per@bothner.com>
+
+	Include News page in the actual Kawa manual.
+	* news.texi: New file. Converted from htl using pandoc.
+	* kawa.texi: Include news.texi.
+	* style/kawa.xsl: Removing adding extra link to news page.
+	* Makefile.am (kawa.xml): Tweak filename for news page.
+
 2016-08-06  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Composable pictures): New section.

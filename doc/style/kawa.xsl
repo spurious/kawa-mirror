@@ -41,17 +41,6 @@
   </xsl:variable>Kawa: <xsl:value-of select="normalize-space($title)"/>
 </xsl:template>
 
-<xsl:template name="extra.header.navigation">
-  <xsl:variable name="href">
-    <xsl:call-template name="relative.path.link">
-      <xsl:with-param name="target.pathname" select="news.html"/>
-    </xsl:call-template>
-  </xsl:variable>
-  <ul>
-    <li><a href="{$href}news.html">News: Recent changes</a></li>
-  </ul>
-</xsl:template>
-
 <!-- Same as in common/common.xsl except for using $object/title. -->
 <xsl:template name="object.id">
   <xsl:param name="object" select="."/>

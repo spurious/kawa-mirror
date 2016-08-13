@@ -1,0 +1,2846 @@
+These changes are in more-or-less reverse chronological order, with the
+most recent changes first.
+
+See also the list of @uref{../qexo/news.html,Qexo (XQuery)-specific
+changes}.
+
+@subheading In Subversion repository since last release
+@anchor{#in-subversion-repository-since-last-release}
+@itemize
+@item
+Binary releases are now archives that package not only the Kawa
+@code{.jar} files, but also shell/batch scripts for running Kawa, useful
+third-party libraries, and the complete documentation in EPUB format.
+The archives are named @code{kawa-version.zip}.
+@item
+Generated files like @code{Makefile.in} and @code{configure} are no
+longer in the Subversion source code repository, though they are still
+included in the distributed @code{kawa-version.tar.gz} releases. The new
+top-level script @code{autogen.sh} should be run before
+@code{configure}.
+@item
+Kawa traditionally followed Java in allowing you to pass an array with
+the "rest" arguments to a varargs method. (A "varargs" method includes
+Java varargs methods, as well as Kawa methods with a @code{#!rest}
+parameter that is explicitly typed to be an array type.) For example,
+you could write:
+
+@verbatim
+(define args (Object[] 3 "cm"))
+(java.lang.String:format "length:%s%s" args)
+@end verbatim
+
+This is deprecated, and may stop working in a future release. Instead,
+use the splice operator:
+
+@verbatim
+(java.lang.String:format "length:%s%s" @args)
+@end verbatim
+
+@item
+Many enhancements to arrays and vectors:
+
+@itemize
+@item
+Shape specifiers (used when creating an array) can now be one of a
+rank-2 array of low/high-bounds, as in SRFI-25; a vector of upper
+bounds; or a vector of ranges.
+@item
+New type specifiers for array: @code{array} is any array (i.e. any
+@code{gnu.lists.Array}); @code{array@var{N}} is the same restricted to rank
+@code{@var{N}}; @code{array[etype]} or @code{arrayN[etype]} restrict the types
+of elements to @code{etype}.
+
+If the @code{etype} is a primitive type (for example
+@code{array2[double]}) then indexing is optimized to method calls that
+avoid object allocation.
+
+@item
+Generalized array indexing: If A is an array (or a vector), then the
+expression:@*
+@code{(A I J K ...)}@*
+in general evaluates to an array B such that:@*
+@code{(B i1 i2 ... j1 j2 ... k1 k2 ... ...)} is@*
+@code{(A (I i1 i2 ..) (J j1 j2 ...) (K k1 k2 ...) ...)}
+
+If an index I is an integer, it is treated as a zero-index array - a
+scalar.
+
+For example: if @code{(define B (A 2 [4 <: 10]))} then @code{(B i)} is
+@code{(A 2 (+ i 4))}.
+
+@item
+The procedure @code{array-index-ref} is does the above indexing
+explicitly: @code{(array-index-ref A I J K ...)} is
+@code{(A I J K ...)}. The result is a read-only snapshot.
+@item
+The procedure @code{array-index-share} is like @code{array-index-ref}
+but creates a modifiable view into argument array.
+@item
+@code{(build-array shape procedure)} is a general constructor for lazy
+arrays: If @code{A} is the result, then @code{(A i j k ...)} is
+@code{(procedure [I J K ...])}.
+@item
+@code{array-transform} creates a view, with a mapping of the indexes.
+@item
+Other new procedures (like those in trhe Racket math package):
+@code{array-size}, @code{array-fill!}, @code{array-copy!},
+@code{array-transform}, @code{array-reshape}, @code{array-flatten},
+@code{array->vector}, @code{index-array}, @code{build-array}.
+@item
+Add Common Lisp array reader syntax (@code{#rankA}) with
+@uref{https://www.gnu.org/software/guile/manual/html_node/Array-Syntax.html,Guile
+extensions}, including reader sypport for multi-dimensional uniform
+(primitive) arrays. This is also used when printing arrays.
+@item
+New @code{format-array} procedure print an array a tabular 2-dimensional
+(APL-like) format. This format is used by default in the top-level of
+the REPL.
+@end itemize
+
+@item
+Various REPL enhancements and new features:
+
+@itemize
+@item
+Prompts are now normally specified using @code{printf}-style templates.
+The normal prompt template is specified by the @code{input-prompt1}
+variable, while continuation lines use @code{input-prompt2}. These can
+be initialized by command-line options @code{console:prompt1} and
+@code{console:prompt2}, or otherwise use language-specific defaults. You
+can still use @code{set-input-port-prompter!} to set a more general
+prompt-procedure, but it is now only called for the initial line of a
+command, not continuation lines.
+@item
+Various REPL enhancements when using @uref{http://domterm.org/,DomTerm}.
+
+You can load or modify styles with the @code{domterm-load-stylesheet}
+proeure.
+
+@item
+The new @code{--with-jline3} configure option builds support for the
+@uref{https://github.com/jline/jline3,JLine (version 3)} library for
+handling console input, similar to GNU readline.
+@item
+Context-dependent command-completion (tab-completion) works when using
+JLine.
+@end itemize
+
+@item
+Multiple literals that have the same value (as in @code{equal?}) get
+compiled to the same object.
+@item
+The syntax @code{&<[expr]} is now equivalent to @code{&<@{&[expr]@}},
+assuming @code{expr} is an expression that evaluates to a string that
+named an exising file. That file is read is the result is the contents
+of the file (as if by @code{(path-data expr)}).
+
+@end itemize
+
+@subheading Kawa 2.1 (October 26, 2015)
+@anchor{#kawa-2.1-october-26-2015}
+Lots of little changes, and some big changes to sequences and strings.
+
+@itemize
+@item
+Enhancements to the Kawa tutorial.
+@item
+Added @code{parameter} as a new typename, for Scheme parameter objects.
+It can be parameterized (for example @code{parameter[string]}) for
+better type inference when "calling" (reading) the parameter.
+@item
+We now define ``interactive mode'' as a REPL or a source module that
+uses the default global top-level environment @emph{or} a source module
+imported/required by a interactive module. Interactive mode attempts to
+support dynamic re-definition and re-loading of function and other
+definitions. This is a work-in-progres; interactive mode currently uses
+extra indirection to support re-definitions (at a slight performance
+cost).
+@item
+Various changes and fixes in Path/URI handling. Most significantly, the
+resolve argorithm used by @code{resolve-uri} was re-written to use the
+algorithm from RFC-3986, rather than the obsolete RFC-2396 algorithm
+used by @code{java.net.URI.resolve}.
+@item
+Change to mangle class and package name in
+@uref{https://blogs.oracle.com/jrose/entry/symbolic_freedom_in_the_vm,Symbolic
+Freedom} style. This means that class names and class filenames usually
+match the source file, even if special charaters are used, except for a
+small number of disallowed characters. Note this is currently
+@emph{only} used for class and package names.
+@item
+Allow @code{'synchronized} and @code{'strictfp} as access flags for
+methods.
+@item
+You can now have a type-specier for @code{define-variable}.
+
+@item
+Better support for forward references between macros.
+
+@item
+Added unsigned primitive integer types @code{ubyte}, @code{ushort},
+@code{uint}, and @code{ulong}. These are represented at run-time by the
+corresponding signed types, but Kawa generates code to do unsigned
+arithmethic and comparisons. Corresponding boxed classes are
+@code{gnu.math.UByte}, @code{gnu.math.UShort}, @code{gnu.math.UInt}, and
+@code{gnu.math.ULong}.
+
+@item
+Improvements and unification of sequences and strings:
+
+@itemize
+@item
+The new @code{sequence} type generalizes lists, vectors, arrays,
+strings, and more. It is implemented as the @code{java.util.List}
+interface, but strings (@code{java.lang.CharSequence}) and Java arrays
+are compatible with @code{sequence} and converted as needed.
+@item
+The @code{length} function is generalized to arbitrary sequences. (For
+strings it uses the @code{CharSequence.length} method, which returns the
+number of (16-bit) code units. This is different from the
+@code{string-length} function, which returns the number of Unicode code
+points.)
+@item
+A new pseudo-character value @code{#\ignorable-char} is introduced. It
+is ignored in string-construction contexts.
+@item
+The function-call syntax for indexing works for all sequences. If the
+sequence is a string, the result is the Unicode (20-bit) scalar value at
+the specified index. If index references the trailing surrogate of a
+surrogate pair the result is @code{#\ignorable-char}. This allows
+efficient indexing of strings: Handing of surrogate pairs are handled
+automatically as long as @code{#\ignorable-char} is skipped.
+@item
+Indexing of uniform vector types (such as @code{s64vector} or
+@code{f64vector} or @code{u16vector}) now return the ``standard''
+primitive type (such as @code{long} or @code{double}) or the new
+unsigned primitive (such as @code{ushort}). This improves performance
+(since we can generally use primitive types), and improves compatibility
+with Java arrays. Specifically, @code{s64vector} now implements
+@code{Sequence<Long>}, and thus @code{java.util.List<Long>} Note that
+indexing a @code{f64vector} returns a @code{double} which as an object
+is a @code{java.lang.Double}, not the Kawa floating-point type
+@code{gnu.math.DFloNum}. The result is usually the same, but @code{eqv?}
+might return a different result than previously.
+@item
+The arguments to @code{map}, @code{for-each}, and @code{vector-for-each}
+can now be any sequence (including strings and native arrays). The
+arguments to @code{vector-for-each} can now be arbitrary
+@code{java.util.List} values. All of these are inlined. If the sequence
+type is known, more efficient custom code is generated.
+
+@item
+A range represents an enumerable sequence, normally integers, but it is
+represented compactly using the start value, the step (usually 1), and
+size. There is a new convenient syntax for writing a range: if @code{i}
+and @code{j} are integers then @code{[i <=: j]} is the sequence of
+integers starting at @code{i} and ending at @code{j} (inclusive). You
+can also write @code{[i <=: j]} (excludes the upper bound),
+@code{[i >: j]} (counts down to @code{j}, exclusive), and
+@code{[i >=: j]} (counts down to @code{j}, inclusive).
+@item
+You can use a sequences of integers to index a sequence. The result is
+the sequence of the selected elements. In general
+@code{(seq [i0 ... in])} is @code{[(seq i0) ... (seq in)]}. This work
+well with ranges: @code{(seq [i <: j])} is the subsequence of @code{seq}
+from @code{i} to @code{j} (exclusive).
+
+If the @code{seq} is a string (a @code{CharSequence}) then the result is
+also a string. In this case the indexing behavior is slightly different
+in that indexing selects (16-bit) code units, which are combined to a
+string.
+
+@end itemize
+
+@item
+A new @code{dynamic} type is like @code{Object}. However, it forces
+runtime lookup and type-checking, and supresses compile-time type check
+and errors. (This is similar to C#. It is useful as an escape hatch if
+we ever implement traditional strict static type-checking.)
+@item
+Specifying the parameter type or return type of a function or method
+without a '@code{::}' is deprecated and results in a warning.
+
+@item
+In @code{--r7rs} mode: The '@code{l}' exponent suffix of a number
+literal creates a floating-point double, rather than a
+@code{BigInteger}.
+@item
+Added the hyperbolic functions: sinh, cosh, tanh, asinh, acosh, atanh.
+@item
+The @code{equal?} function can now handle cyclic lists and vectors. So
+can @code{equal-hash}.
+@item
+The command-line option @code{--with-arg-count=N} allows finer control
+of command-line-processing. It is used before an ``action'', and
+specifies the @code{N} arguments following the action are set as the
+command-line-arguments. After the action, command-line-processing
+continues following those @code{N} arguments.
+@item
+Added the R6RS module @code{(rnrs arithmetic bitwise)}.
+@item
+The @code{kawa.repl} argument processor now handles @code{-D} options.
+@item
+The new @code{class} sub-form of @code{import} allows you to import
+classes, and give them abbreviated names, like the Java @code{import}
+statement. The new form is more compact and convenient than
+@code{define-alias}.
+
+You can also use a classname directly, as a symbol, instead of writing
+it in the form of a list:
+
+@verbatim
+(import (only java.lang.Math PI))
+@end verbatim
+
+@item
+In the @code{only} clause of the @code{import} syntax you can now
+directly rename, without having to write a @code{rename} clause.
+@item
+Changes in the calling-convention for @code{--full-tailcalls} yields a
+substantial speed-up in some situations.
+@item
+The type of boolean literals @code{#f} and @code{#t} is now primitive
+@code{boolean} rather than @code{java.lang.Boolean}.
+@item
+General multi-dimensional arrays can be indexed with function call
+notation. E.g. @code{(arr i j k)} is equivalent to
+@code{(array-ref a i j k)}. You can also use @code{set!} with either
+@code{array-ref} or function call notation.
+@item
+The @code{#!null} value (Java @code{null}) is now considered false, not
+true. Likewise for non-canonical false Boolean objects (i.e. all
+instances of @code{java.lang.Boolean} for which @code{booleanValue}
+returns false, not just @code{Boolean.FALSE}).
+
+@item
+New standard libraries @code{(kawa base)} and @code{(kawa reflect)}.
+@item
+You can now use patterns in the @code{let} form and related forms.
+
+@item
+Implemented the @uref{http://en.wikipedia.org/wiki/Lambda_lifting,lambda
+lifting} optimzation.
+@item
+An expression that has type T is now considered compatible with a
+context requiring an interface type I only if T implements I (or T is
+Object). (Before they were considered possibly-compatible if T was
+non-final because the run-time class might be a subclass of T that
+implements I.)
+@item
+New @code{--console} flag forces input to be treated as an interactive
+console, with prompting. This is needed on Windows under Emacs, where
+@code{System.console()} gives the wrong result.
+@item
+You can now in a sub-class reference fields from not-yet-compiled
+super-classes. (This doesn't work for methods yet.)
+@item
+The @code{(? name::type value)} operator supports conditional binding.
+The @code{(! name::type value)} operator supports unconditional binding;
+it is similar to @code{define-constant}, but supports patterns.
+
+@item
+More efficient implementation of @code{call-with-values}: If either
+argument is a fixed-arity lambda expression it is inlined. Better
+type-checking of both @code{call-with-values} and @code{values}.
+
+@item
+Jamison Hope enhanced the support for quaternions, primarily the new
+@code{(kawa rotations)} library.
+@end itemize
+
+@subheading Kawa 2.0 (December 2 2014)
+@anchor{#kawa-2.0-december-2-2014}
+There are many new features, but the big one is R7RS compatibility.
+
+@itemize
+@item
+New @code{define-alias} can define aliases for static class members.
+@item
+The treatment of keywords is changing to not be self-evaluating (in
+Scheme). If you want a literal keyword, you should quote it. Unquoted
+keywords should only be used for keyword arguments. (This will be
+enforced in a future release.) The compiler now warns about badly formed
+keyword arguments, for example if a value is missing following a
+keyword.
+@item
+The default is now Java 7, rather than Java 6. This means the checked-in
+source code is pre-processed for Java 7, and future binary releases will
+require Java 7.
+@item
+The behavior of parameters and fluid variables has changed. Setting a
+parameter no longer changes its value in already-running sub-threads.
+The implementation is simpler and should be more efficient.
+
+@item
+The form @code{define-early-constant} is similar to
+@code{define-constant}, but it is evaluated in a module's class
+initializer (or constructor in the case of a non-static definition).
+@item
+Almost all of R7RS is now working:
+
+@itemize
+@item
+Importing a SRFI library can now use the syntax
+@code{(import (srfi N [name]))}
+@item
+The various standard libraries such as @code{(scheme base)} are
+implemented.
+@item
+The functions @code{eval} and @code{load} can now take an
+environment-specifier. Implemented the @code{environment} function.
+@item
+Extended @code{numerator}, @code{denominator}, @code{gcd}, and
+@code{lcm} to inexacts.
+@item
+The full R7RS library functionality is working, including
+@code{define-library} The keyword @code{export} is now a synonym for
+@code{module-export}, and both support the @code{rename} keyword. The
+@code{prefix} option of @code{import} now works.
+
+@item
+The @code{cond-expand} form now supports the @code{library} clause.
+@item
+Implemented @code{make-promise} and @code{delay-force} (equivalent to
+the older name @code{lazy}).
+@item
+Changed @code{include} so that by default it first seaches the directory
+containing the included file, so by default it has the same effect as
+@code{include-relative}. However, you can override the search path with
+the @code{-Dkawa.include.path} property. Also implemented
+@code{include-ci}.
+@item
+Implemented @code{define-values}.
+@item
+Fixed @code{string->number} to correctly handle a radix specifier in the
+string.
+@item
+The @code{read} procedure now returns mutable pairs.
+@item
+If you need to use @code{...} in a @code{syntax-rules} template you can
+use @code{(... template)}, which disables the special meaning of
+@code{...} in @code{template}. (This is an extension of the older
+@code{(... ...)}.)
+@item
+Alternatively, you can can write
+@code{(syntax-rules dots (literals) rules)}. The symbol @code{dots}
+replaces the functionality of @code{...} in the @code{rules}.
+@item
+An underscore @code{_} in a @code{syntax-rules} pattern matches
+anything, and is ignored.
+@item
+The @code{syntax-error} syntax (renamed from @code{%syntax-error})
+allows error reporting in @code{syntax-rules} macros. (The older
+Kawa-specific @code{syntax-error} procedure was renamed to
+@code{report-syntax-error}.)
+@item
+Implemented and documented R7RS exception handling: The syntax
+@code{guard} and the procedures @code{with-exception-handler},
+@code{raise}, and @code{raise-continuable} all work. The @code{error}
+procedure is R7RS-compatible, and the procedures @code{error-object?},
+@code{error-object-message}, @code{error-object-irritants},
+@code{file-error?}, and @code{read-error?} were implemented.
+
+@item
+Implemented @code{emergency-exit}, and modified @code{exit} so
+finally-blocks are executed.
+
+@item
+Implemented @code{exact-integer?}, @code{floor/}, @code{floor-quotient},
+@code{floor-remainder}, @code{truncate/}, @code{truncate-quotient}, and
+@code{truncate-remainder}.
+@item
+The @code{letrec*} syntax is now supported. (It works the same as
+@code{letrec}, which is an allowed extension of @code{letrec}.)
+
+@item
+The functions @code{utf8->string} and @code{string->utf8} are now
+documented in the manual.
+
+@end itemize
+
+@item
+The changes to characters and strings are worth covering separately:
+
+@itemize
+@item
+The @code{character} type is now a new primitive type (implemented as
+@code{int}). This can avoid boxing (object allocation)
+@item
+There is also a new @code{character-or-eof}. (A union of
+@code{character} and the EOF value, except the latter is encoded as -1,
+thus avoiding object allocation.) The functions read-char and
+@code{peek-char} now return a @code{character-or-eof} value.
+@item
+Functions like @code{string-ref} that take a character index would not
+take into account non-BMP characters (those whose value is greater than
+@code{#xffff}, thus requiring two surrogate characters). This was
+contrary to R6RS/R7RS. This has been fixed, though at some performance
+cost . (For example @code{string-ref} and @code{string-length} are no
+longer constant-time.)
+@item
+Implemented a @uref{Strings.html#String-Cursor-API,@code{string-cursor}
+API} (based on Chibi Scheme). Thes allow efficient indexing, based on
+opaque cursors (actually counts of 16-bits @code{char}s).
+@item
+Optimized @code{string-for-each}, which is now the preferred way to
+iterate through a string.
+@item
+Implemented @code{string-map}.
+@item
+New function @code{string-append!} for in-place appending to a mutable
+string.
+@item
+New function @code{string-replace!} for replacing a substring of a
+string with some other string.
+@item
+The SRFI-13 function @code{string-append/shared} is no longer
+automatically visible; you have to @code{(import (srfi :13 strings))} or
+similar.
+@end itemize
+
+@item
+The @code{module-name} form allows the name to be a list, as in a
+R6RS/R7RS-style library name.
+@item
+The syntax @code{@@expression} is a @emph{splicing form}. The
+@code{expression} must evaluate to a sequence (vector, list, array,
+etc). The function application or constructor form is equivalent to all
+the elements of the sequence.
+@item
+The parameter object @code{current-path} returns (or sets) the default
+directory of the current thread.
+@item
+Add convenience procedures and syntax for @uref{Processes.html,working
+with processes}: @code{run-process}, @code{process-exit-wait},
+@code{process-exit-ok?}, @code{&cmd}, @code{&`}, @code{&sh}.
+@item
+The functions @code{path-bytes}, and @code{path-data} can
+@uref{http://www.gnu.org/software/kawa/Reading-and-writing-whole-files.html,read
+or write the entire contents of a file}. Alternatively, you can use the
+short-hand syntax: @code{&<@{pname@}} @code{&>@{pname@}}
+@code{&>>@{pname@}}. These work with "blobs" which may be text or binary
+depending on context.
+@item
+The initial values of @code{(current-output-port)} and
+@code{(current-error-port)} are now hybrid textual/binary ports. This
+means you can call @code{write-bytevector} and @code{write-u8} on them,
+making it possible for an application to write binary data to standard
+output. Similarly, initial value of @code{(current-input-port)} is a
+hybrid textual/binary port, but only if there is no console (standard
+input is not a tty).
+
+@item
+Jamison Hope contributed support for
+@uref{http://en.wikipedia.org/wiki/Quaternion,quaternions}, a
+generalization of complex numbers containing 4 real components.
+
+@item
+Andrea Bernardini contributed an optimized implementation of @code{case}
+expressions. He was sponsored by Google Summer of Code.
+@item
+The @code{kawa.sh} shell script (which is installed as @code{kawa} when
+@emph{not} configuring with @code{--enable-kawa-frontend}) now handles
+@code{-D} and @code{-J} options. The @code{kawa.sh} script is now also
+built when usint Ant.
+@item
+The @code{cond-expand} features @code{java-6} though @code{java-9} are
+now set based on the @code{System} property @code{"java.version"}
+(rather than how Kawa was configured).
+@item
+An Emacs-style @code{coding} declaration allows you to specify the
+encoding of a Scheme source file.
+@item
+The command-line option @code{--debug-syntax-pattern-match} prints
+logging importation to standard error when a @code{syntax-rules} or
+@code{syntax-case} pattern matches.
+@item
+@uref{http://srfi.schemers.org/srfi-60/srfi-60.html,SRFI-60 (Integers as
+Bits)} is now fully implemented.
+
+@item
+Ported @uref{http://srfi.schemers.org/srfi-101/srfi-101.html,SRFI-101}.
+These are immutable (read-only) lists with fast (logarithmic) indexing
+and functional update (i.e. return a modified list). These are
+implemented by a @code{RAPair} class which extends the generic
+@code{pair} type, which means that most code that expects a standard
+list will work on these lists as well.
+
+@item
+The class @code{kawa.lib.kawa.expressions} contains an experimental
+Scheme API for manipulating and validating expressions.
+@item
+Internal: Changed representation used for multiple values to an abstract
+class with multiple implementations.
+
+@item
+Internal: Started converting to more standard Java code formatting and
+indentation conventions, rather than GNU conventions. Some files
+converted; this is ongoing work.
+@item
+Internal: Various I/O-related classes moved to new package
+@code{gnu.kawa.io}.
+
+@item
+Various changes to the @code{configure+make} build framework: A C
+compiler is now only needed if you configure with
+@code{--enable-kawa-frontend}. Improved support for building under
+Windows (using MinGW/MSYS).
+
+@item
+Support for building with @uref{http://gcc.gnu.org/java/,GCJ} was
+removed.
+
+@end itemize
+
+@subheading Kawa 1.14 (October 4, 2013)
+@anchor{#kawa-1.14-october-4-2013}
+@itemize
+@item
+You can pass flags from the @code{kawa} front-end to the @code{java}
+launcher using @code{-J} and @code{-D} flags. The @code{kawa} front-end
+now passes the @code{kawa.command.line} property to Java; this is used
+by the @code{(command-line)} procedure.
+@item
+Various improvements to the shell-script handling, including
+@uref{Scripts.html,re-written documentation}.
+@item
+Some initial support for Java 8.
+
+@item
+More of R7RS is now working:
+
+@itemize
+@item
+After adding list procedures @code{make-list}, @code{list-copy},
+@code{list-set!} all the R7RS list procedures are implemented.
+@item
+Other added procedures: @code{square}, @code{boolean=?},
+@code{string-copy!}, @code{digit-value},
+@code{get-environment-variable}, @code{get-environment-variables},
+@code{current-second}, @code{current-jiffy}, @code{jiffies-per-second},
+and @code{features}.
+@item
+The predicates @code{finite?}, @code{infinite?}, and @code{nan?} are
+generalized to complex numbers.
+@item
+The procedures @code{write}, @code{write-simple}, and
+@code{write-shared} are now consistent with R7RS.
+@item
+String and character comparison functions are generalized to more than
+two arguments (but restricted to strings or characters, respectively).
+@item
+The procedures @code{string-copy}, @code{string->list}, and
+@code{string-fill!} now take optional (start,end)-bounds. All of the
+R7RS string functions are now implemented.
+@item
+Support @code{=>} syntax in @code{case} form.
+@item
+Support backslash-escaped special characters in symbols when inside
+vertical bars, such as @code{'|Hello\nworld|}.
+@item
+The new functions and syntax are documented in the @uref{index.html,Kawa
+manual}; look for the functions in the @uref{Overall-Index.html,index}.
+@end itemize
+
+@item
+Added @code{define-private-alias} keyword.
+@item
+Extended @uref{Strings.html#String-templates,string quasi-literals
+(templates)} as specified by
+@uref{http://srfi.schemers.org/srfi-109/srfi-109.html,SRFI-109}. For
+example, if @code{name} has the value @code{"John"}, then:
+
+@verbatim
+&{Hello &[name]!}
+@end verbatim
+
+evaluates to: @code{"Hello John!"}.
+
+@item
+Named quasi-literal constructors as specified by
+@uref{http://srfi.schemers.org/srfi-108/srfi-108.html,SRFI-108}.
+@item
+A symbol having the form @code{->type} is a type conversion function
+that converts a value to @code{type}.
+@item
+New and improved check for void-valued expressions in a context
+requiring a value. This is controlled by the new option
+@code{--warn-void-used}, which defaults to true.
+
+@item
+The @code{datum->syntax} procedure takes an optional third parameter to
+specify the source location. See @code{testsuite/srfi-108-test.scm} for
+an example.
+@item
+Instead of specifying @code{--main} the command line, you can now
+specify @code{(module-compile-options: main: #t)} in the Scheme file.
+This makes it easier to compile one or more application (main) modules
+along with other modules.
+@item
+A change to the data structure used to detect never-returning procedure
+uses a lot less memory. (Kawa 1.13 implemented a conservative detection
+of when a procedure cannot return. This analysis would sometimes cause
+the Kawa compiler to run out of memory. The improved analysis uses the
+same basic algorithm, but with a more space-efficient ``inverted'' data
+structure.)
+@item
+Multiple fixes to get Emacs Lisp (JEmacs) working (somewhat) again.
+@end itemize
+
+@subheading Kawa 1.13 (December 10, 2012)
+@anchor{#kawa-1.13-december-10-2012}
+@itemize
+@item
+We now do a simple (conservative) analysis of when a procedure cannot
+return. This is combined with earlier and more precise analysis of
+reachable code. Not only does this catch programmer errors better, but
+it also avoids some internal compiler errors, because Kawa could get
+confused by unreachable code.
+@item
+Implement 2-argument version of @code{log} function, as specified by
+R6RS and R7RS (and, prematurely, the Kawa documentation).
+@item
+Implement the R7RS @code{bytevector} functions. The @code{bytevector}
+type is a synonym for older @code{u8vector} type.
+
+@item
+Implement R7RS @code{vector} procedures. Various procedures now take
+(start,end)-bounds.
+
+@item
+Implement most of the R7RS input/output proecdures. Most significant
+enhancement is support for R7RS-conforming binary ports.
+@item
+Various enhancements to the manual, including merging in lots of text
+from R7RS.
+@item
+Improved Android support, including a more convenient Ant script
+contributed by Julien Rousseau. Also, documentation merged into manual.
+@end itemize
+
+@subheading Kawa 1.12 (May 30, 2012)
+@anchor{#kawa-1.12-may-30-2012}
+@itemize
+@item
+Implement a compile-time data-flow framework, similar to Single Static
+Assignment. This enables better type inference, improves some
+warnings/errors, and enables some optimizations.
+
+@item
+Jamison Hope added support for co-variant return types and bridge
+methods for generics.
+@item
+Macros were improved and more standards-conforming:
+@itemize
+@item
+@code{datum->syntax} and @code{syntax->datum} are preferred names for
+@code{datum->syntax-object} and @code{syntax-object->datum}.
+@item
+Implemented @code{bound-identifier=?} and re-wrote implementation of
+@code{free-identifier=?}.
+
+@item
+Implement @code{unsyntax} and @code{unsyntax-splicing}, along with the
+reader prefixes @code{#,} and @code{#,@@}.
+@end itemize
+
+@item
+New and improved lazy evaluation functionality:
+
+@itemize
+@item
+Lazy values (resulting from @code{delay} or @code{future}) are
+implicitly forced as needed. This makes ``lazy programming'' more
+convenient.
+@item
+New type @code{promise}.
+@item
+The semantics of promises (@code{delay} etc) is now compatible with
+@uref{http://srfi.schemers.org/srfi-45/srfi-45.html,SRFI 45}.
+@item
+``Blank promises'' are useful for passing data between processes, logic
+programmming, and more. New functions @code{promise-set-value!},
+@code{promise-set-alias!}, @code{promise-set-exception!}, and
+@code{promise-set-thunk!}.
+@item
+The stream functions of
+@uref{http://srfi.schemers.org/srfi-41/srfi-41.html,SRFI-41} were
+re-implemented to use the new promise functionality.
+@end itemize
+
+@item
+Different functions in the same module can be compiled with or without
+full tailcall support. You can control this by using
+@code{full-tailcalls} in @code{with-compile-options}. You can also
+control @code{full-tailcalls} using @code{module-compile-options}.
+
+@item
+Charles Turner (sponsored by @uref{http://code.google.com/soc/,Google's
+Summer of Code}) enhanced the printer with support for
+@uref{http://srfi.schemers.org/srfi-38/,SRFI-38: External Representation
+for Data With Shared Structure}.
+
+@item
+Optimize tail-recursion in module-level procedures. (We used to only do
+this for internal functions, for reasons that are no longer relevant.)
+
+@item
+Add support for building Kawa on Windows using configure+make
+(autotools) and Cygwin.
+
+@item
+Some support for parameterized (generic) types:
+
+@verbatim
+  Type[Arg1 Arg2 ... ArgN]
+@end verbatim
+
+is more-or-less equivalent to Java's:
+
+@verbatim
+  Type<Arg1, Arg2, ..., ArgN>
+@end verbatim
+
+@item
+New language options @code{--r5rs}, @code{--r6rs}, and @code{--r7rs}
+provide better compatibility with those Scheme standards. (This is a
+work-in-progress.) For example @code{--r6rs} aims to disable Kawa
+extensions that conflict with R6RS. It does not aim to disable all
+extensions, only incompatible extensions. So far these extensions
+disable the colon operator and keyword literals. Selecting @code{--r5rs}
+makes symbols by default case-insensitive.
+
+@item
+The special tokens @code{#!fold-case} and @code{#!no-fold-case} act like
+comments except they enable or disable case-folding of symbols. The old
+@code{symbol-read-case} global is now only checked when a LispReader is
+created, not each time a symbol is read.
+@item
+You can now use square brackets to construct immutable sequences
+(vectors).
+@item
+A record type defined using @code{define-record-type} is now compiled to
+a class that is a member of the module class.
+
+@item
+Annotations are now supported.
+@uref{http://per.bothner.com/blog/2011/Using-JAXB-annotations/,This
+example} shows how to use
+@uref{http://java.sun.com/xml/downloads/jaxb.html,JAXB} annotations to
+automatically convert between between Java objects and XML files.
+@item
+Prevent mutation of vector literals.
+
+@item
+More R6RS procedures: @code{vector-map}, @code{vector-for-each},
+@code{string-for-each}, @code{real-valued?}, @code{rational-valued?},
+@code{integer-valued?}, @code{finite?}, @code{infinite?}, @code{nan?},
+@code{exact-integer-sqrt}.
+
+@item
+@uref{http://srfi.schemers.org/srfi-14/srfi-14.html,SRFI-14} ("character
+sets") and @uref{http://srfi.schemers.org/srfi-41/srfi-41.html,SRFI-41}
+("streams") are now supported, thanks to porting done by Jamison Hope.
+
+@item
+Kawa now runs under JDK 1.7. This mostly involved fixing some errors in
+@code{StackMapTable} generation.
+
+@item
+You can now have a class created by @code{define-simple-class} with the
+same name as the module class. For example
+@code{(define-simple-class foo ...)} in a file @code{foo.scm}. The
+defined class will serve dual-purpose as the module class.
+@item
+Improvements in separating compile-time from run-time code, reducing the
+size of the runtime jar used for compiled code.
+@item
+In the @code{cond-expand} conditional form you can now use
+@code{class-exists:ClassName} as a feature ``name'' to tests that
+@code{ClassName} exists.
+@end itemize
+
+@subheading Kawa 1.11 (November 11, 2010)
+@anchor{#kawa-1.11-november-11-2010}
+@itemize
+@item
+A new Kawa logo, contributed by @uref{http://jcubic.pl,Jakub
+Jankiewicz}.
+@item
+A new @code{--warn-unknown-member} option, which generalizes
+@code{--warn-invoke-unknown-method} to fields as well as methods.
+@item
+A new @uref{ant-kawac.html,@code{kawac} task}, useful for Ant
+@code{build.xml} files, contributed by Jamison Hope.
+@item
+@uref{http://per.bothner.com/blog/2010/AndroidHelloScheme,Updated
+Android support}.
+@item
+New @uref{Enumerations.html,@code{define-enum} macro} contributed by
+Jamison Hope.
+@item
+Access specifiers @code{'final} and @code{'enum} are now allowed in
+@code{define-class} and related forms.
+@item
+Optimized @code{odd?} and @code{even?}.
+@item
+If you specify the type of a @code{#!rest} parameter as an array type,
+that will now be used for the "varargs" method parameter. (Before only
+object arrays did this.)
+@item
+When constructing an object and there is no matching constructor method,
+look for "@code{add}" methods in addition to "@code{set}" methods. Also,
+allow passing constructor args as well as keyword setters.
+@uref{Allocating-objects.html,See here} for the gory details.
+@item
+New @code{expand} function (contributed by Helmut Eller, and enabled by
+@code{(require 'syntax-utils)}) for converting Scheme expressions to
+macro-expanded forms.
+@item
+@uref{Anonymous-classes.html#SAM-conversion,SAM-conversion}: In a
+context that expects a Single Abstract Method (SAM) type (for example
+@code{java.lang.Runnable}), if you pass a lambda you will get an
+@code{object} where the lambda implements the abstract method.
+
+@item
+In interactive mode allow dynamic rebinding of procedures. I.e. if you
+re-define a procedure, the old procedure objects gets modified in-place
+and re-used, rather than creating a new procedure object. Thus calls in
+existing procedures will call the new version.
+
+@item
+Fix various threading issues related to compilation and eval.
+
+@item
+When @code{format} returns a string, return a @code{java.lang.String}
+rather than a @code{gnu.lists.FString}. Also, add some minor
+optimization.
+@item
+Inheritance of environments and fluid variables now work properly for
+all child threads, not just ones created using @code{future}.
+
+@end itemize
+
+@subheading Kawa 1.10 (July 24, 2010)
+@anchor{#kawa-1.10-july-24-2010}
+@itemize
+@item
+Now defaults to using Java 6, when compiling from source. The pre-built
+@code{jar} works with Java 5, but makes use of some Java 6 features
+(@code{javax.script}, built-in HTTP server) if available.
+@item
+You can write @uref{XML-literals.html,XML literals} in Scheme code
+prefixed by a @code{#}, for example:
+
+@verbatim
+#<p>The result is &{result}.</p>
+@end verbatim
+
+@item
+New functions @code{element-name} and @code{attribute-name}.
+@item
+Various @uref{Server-side-scripts.html,Web server improvements}. You
+have the option of using JDK 6's builtin
+@uref{Options.html#Options-for-web-servers,web-server} for
+@uref{Self-configuring-page-scripts.html,auto-configued web pages}.
+Automatic import of web server functions, so you should not need to
+@code{(import 'http)} any more.
+@item
+Kawa @uref{Hash-tables.html,hashtables} now extend @code{java.util.Map}.
+
+@item
+If a source file is specified on the @code{kawa} command line without
+any options, it is read and compiled as a whole module before it is run.
+In contrast, if you want to read and evaluate a source file line-by-line
+you must use the @code{-f} flag.
+
+@item
+You can specify a class name on the @code{kawa} command line:
+
+@verbatim
+$ kawa fully.qualified.name
+@end verbatim
+
+This is like the @code{java} command. but you don't need to specify the
+path to the Kawa runtime library, and you don't need a @code{main}
+method (as long as the class is @code{Runnable}).
+
+@item
+The usual bug-fixes, including better handling of the @code{~F}
+@code{format} directive; and fix in handling of macro hygiene of the
+@code{lambda} (@uref{https://savannah.gnu.org/bugs/index.php?27042,bug
+#27042}).
+
+@item
+Spaces are now optional before and after the '::' in type specifiers.
+The preferred syntax leave no space after the '::', as in:
+
+@verbatim
+(define xx ::int 1)
+@end verbatim
+
+@item
+@code{define-for-syntax} and @code{begin-for-syntax} work.
+
+@item
+You can now use @code{car}, @code{cdr} etc to work with @code{syntax}
+objects that wrap lists, as in SRFI-72.
+
+@item
+You can now define a package alias:
+
+@verbatim
+(define-alias jutil java.util)
+(define mylist :: jutil:List (jutil:ArrayList))
+@end verbatim
+
+@item
+@code{--module-static} is now the default. A new
+@code{--module-nonstatic} (or @code{--no-module-static}) option can be
+used to get the old behavior.
+
+@item
+You can use @code{access:} to specify that a field is @code{'volatile}
+or @code{'transient}.
+
+@item
+You can now have type-specifiers for multiple variables in a @code{do}.
+
+@item
+Imported variables are read-only.
+
+@item
+Exported variables are only made into Locations when needed.
+
+@item
+The letter used for the exponent in a floating-point literal determines
+its type: @code{12s2} is a @code{java.lang.Float}, @code{12d2} is a
+@code{java.lang.Double}, @code{12l2} is a @code{java.math.BigInteger},
+@code{12e2} is a @code{gnu.math.DFloat}.
+
+@item
+Internal: Asking for a @code{.class} file using
+@code{getResourceAsStream} on an @code{ArrayClassLoader} will now open a
+@code{ByteArrayInputStream} on the class bytes.
+
+@item
+A new @code{disassemble} function.
+
+@item
+If @code{exp1} has type @code{int}, the type of @code{(+ exp1 1)} is now
+(32-bit) @code{int}, rather than (unlimited-precision) @code{integer}.
+Similar for @code{long} expressions, other arithmetic operations (as
+appropriate), and other untyped integer literals (as long as they fit in
+32/64 bits respectively).
+
+@item
+Many more oprimization/specializations of arithmetic, especially when
+argument types are known.
+
+@item
+Top-level bindings in a module compiled with @code{--main} are now
+implicitly module-private, unless there is an explicit
+@code{module-export}.
+
+@item
+@uref{http://srfi.schemers.org/srfi-2/srfi-2.html,SRFI-2}
+(@code{and-let*}: an @code{and} with local bindings, a guarded @code{*}
+special form) is now supported.
+
+@item
+The reader now supports shared sub-objects, as in
+@uref{http://srfi.schemers.org/srfi-38/srfi-38.html,SRFI-38} and Common
+Lisp: @code{(#2=(3 4) 9 #2# #2#)}. (Writing shared sub-objects is not
+yet implemented.)
+
+@item
+A module compiled with @code{--main} by default exports no bindings
+(unless overriden by an explicit @code{module-export}).
+
+@item
+Factor out compile-time only code from run-time code. The new
+@code{kawart-version.jar} is smaller because it has less compile-time
+only code. (Work in progress.)
+@item
+More changes for R6RS compatibility:
+
+@itemize
+@item
+The reader now recognizes @code{+nan.0}, @code{+inf.0} and variations.
+
+@item
+The @code{div}, @code{mod}, @code{div0}, @code{mod0},
+@code{div-and-mod}, @code{div0-and-mod0}, @code{inexact} and
+@code{exact} functions were implemented.
+
+@item
+@code{command-line} and @code{exit}.
+
+@end itemize
+
+@end itemize
+
+@subheading Kawa 1.9.90 (August 8, 2009)
+@anchor{#kawa-1.9.90-august-8-2009}
+@itemize
+@item
+Support for @code{javax.script}.
+
+@item
+Support for @uref{Regular-expressions.html,regular expressions}.
+
+@item
+Performance improvements:
+
+@itemize
+@item
+Emit @code{iinc} instruction (to increment a local @code{int} by a
+constant).
+
+@item
+Inline the @code{not} function if the argument is constant.
+
+@item
+If @code{call-with-current-continuation} is only used to exit a block in
+the current method, optimize to a @code{goto}.
+
+@item
+Generate @code{StackMapTable} attributes when targeting Java 6.
+
+@item
+Kawa can now inline a function with multiple calls (without code
+duplication) if all call sites have the same return location
+(continuation). For example: @code{(if p (f a) (f b))}. Also mutually
+tail-recursive functions are inlined, so you get constant stack space
+even without @code{--full-tailcalls}. (Thanks for Helmut Eller for a
+prototype.)
+@end itemize
+
+@item
+A number of changes for R6RS compatibility:
+
+@itemize
+@item
+The @code{char-titlecase}, @code{char-foldcase}, @code{char-title-case?}
+library functions are implemented.
+
+@item
+Imported variables are read-only.
+
+@item
+Support the R6RS @code{import} keyword, including support for renaming.
+
+@item
+Support the R6RS @code{export} keyword (though without support for
+renaming).
+
+@item
+Implemented the @code{(rnrs hashtables)} library.
+
+@item
+Implemented the @code{(rnrs sorting)} library.
+
+@item
+CommonLisp-style keyword syntax is no longer supported (for Scheme): A
+colon followed by an identifier is no longer a keyword (though an
+identifier followed by a colon is still a keyword). (One reason for this
+change is to support SRFI-97.)
+
+@item
+The character names @code{#\delete}, @code{#\alarm}, @code{#\vtab} are
+now supported. The old names @code{#\del}, @code{#\rubout}, and
+@code{#\bel} are deprecated.
+
+@item
+Hex escapes in character literals are supported. These are now printed
+where we before printed octal escapes.
+
+@item
+A hex escape in a string literal should be terminated by a semi-colon,
+but for compatibily any other non-hex-digit will also terminate the
+escape. (A terminating semi-colon will be skipped, though a different
+terminator will be included in the string.)
+
+@item
+A backslash-whitespace escape in a string literal will not only ignore
+the whitespace through the end of the line, but also any initial
+whitespace at the start of the following line.
+
+@item
+The comment prefix @code{#;} skips the following S-expression, as
+specified by
+@uref{http://srfi.schemers.org/srfi-62/srfi-62.html,SRFI-62}.
+
+@item
+All the
+@uref{http://www.r6rs.org/final/html/r6rs-lib/r6rs-lib-Z-H-12.html#node_sec_11.4,R6RS
+exact bitwise arithmetic} functions are now implemented and
+@uref{Logical-Number-Operations.html,documented in the manual}. The new
+standard functions (for example @code{bitwise-and}) are now preferred
+over the old functions (for example @code{logand}).
+
+@item
+If @code{delete-file} fails, throws an exception instead of returning
+@code{#f}.
+
+@end itemize
+
+@item
+The code-base now by default assumes Java 5 (JDK 1.5 or newer), and
+pre-built @code{jar} files will require Java 5. Also, the Kawa source
+code now uses generics, so you need to use a generics-aware
+@code{javac}, passing it the appropriate @code{--target} flag.
+
+@item
+New SRFIs supported:
+
+@itemize
+@item
+@uref{http://srfi.schemers.org/srfi-62/srfi-62.html,SRFI-62} -
+S-expression comments.
+
+@item
+@uref{http://srfi.schemers.org/srfi-64/srfi-64.html,SRFI-64} - Scheme
+API for test suites.
+
+@item
+@uref{http://srfi.schemers.org/srfi-95/srfi-95.html,SRFI-95} - Sorting
+and Merging.
+
+@item
+@uref{http://srfi.schemers.org/srfi-97/srfi-97.html,SRFI-97} - Names for
+SRFI Libraries. This is a naming convention for R6RS @code{import}
+statements to reference SRFI libraries.
+
+@end itemize
+
+@item
+In BRL text outside square brackets (or nested like @code{]this[}) now
+evaluates to @code{UnescapedData}, which a Scheme quoted string
+evaluates to @code{String}, rather than an @code{FString}. (All of the
+mentioned types implement @code{java.lang.CharSequence}.)
+
+@item
+You can now
+@uref{http://per.bothner.com/blog/2009/AndroidHelloScheme/,run Kawa
+Scheme programs on Android}, Google's mobile-phone operating system.
+
+@item
+The macro @code{resource-url} is useful for accessing resources.
+
+@item
+A new command-line option @code{--target} (or @code{-target}) similar to
+@code{javac}'s @code{-target} option.
+
+@item
+If there is no console, by default create a window as if @code{-w} was
+specificed.
+
+@item
+If a class method (defined in @code{define-class},
+@code{define-simple-class} or @code{object}) does not have its parameter
+or return type specified, search the super-classes/interfaces for
+matching methods (same name and number of parameters), and if these are
+consistent, use that type.
+
+@item
+Trying to modify the @code{car} or @code{cdr} of a literal list now
+throws an exception.
+
+@item
+The @code{.zip} archive created by @code{compile-file} is now
+compressed.
+
+@item
+Java5-style varargs-methods are recognized as such.
+
+@item
+When evaluating or loading a source file, we now always compile to
+bytecode, rather than interpreting ``simple'' expressions. This makes
+semantics and performance more consistent, and gives us better exception
+stack traces.
+
+@item
+The Scheme type specifier @code{<integer>} now handles automatic
+conversion from @code{java.math.BigInteger} and the @code{java.lang}
+classes @code{Long}, @code{Integer}, @code{Short}, and @code{Byte}. The
+various standard functions that work on @code{<integer>} (for example
+@code{gcd} and @code{arithmetic-shift}) can be passed (say) a
+@code{java.lang.Integer}. The generic functions such as @code{+} and the
+real function @code{modulo} should also work. (The result is still a
+@code{gnu.math.IntNum}.)
+
+@item
+If a name such as (@code{java.util}) is lexically unbound, and there is
+a known package with that name, return the @code{java.lang.Package}
+instance. Also, the colon operator is extended so that
+@code{package:name} evaluates to the @code{Class} for
+@code{package.name}.
+
+@item
+@code{`prefix:,expression} works - it finds a symbol in @code{prefix}'s
+package (aka namespace), whose local-name is the value of
+@code{expression}.
+
+@item
+A quantity @code{3.0cm} is now syntactic sugar for
+@code{(* 3.0 unit:cm)}. Similarly:@*
+@code{(define-unit name value)}@*
+is equivalent to:@*
+@code{(define-constant unit:name value)}@*
+This means that unit names follow normal name-lookup rules (except being
+in the @code{unit} ``package''), so for example you can have local unit
+definitions.
+
+@item
+You can specify whether a class has public or package access, and
+whether it is translated to an interface or class.
+
+@item
+You can declare an abstract method by writing @code{#!abstract} as its
+body.
+
+@item
+If a name of the form @code{type?} is undefined, but @code{type} is
+defined, then treat the former as
+@code{(lambda (x) (instance? x type))}.
+@item
+A major incompatible (but long-sought) change: Java strings (i.e.
+@code{java.lang.String} values) are now Scheme strings, rather than
+Scheme symbols. Since Scheme strings are mutable, while Java
+@code{String}s are not, we use a different type for mutable strings:
+@code{gnu.lists.FString} (this is not a change). Scheme string literals
+are @code{java.lang.String} values. The common type for Scheme string is
+@code{java.lang.CharSequence} (which was introducted in JDK 1.4).
+
+Scheme symbols are now instances of
+@uref{api/gnu/mapping/Symbol.html,@code{gnu.mapping.Symbol}},
+specifically the @code{SimpleSymbol} class.
+
+@item
+A fully-qualified class name such as @code{java.lang.Integer} now
+evaluates to the corresponding @code{java.lang.Class} object. I.e. it is
+equivalent to the Java term @code{java.lang.Integer.class}. This assumes
+that the name does not have a lexical binding, @emph{and} that it exists
+in the class-path at compile time.
+
+Array class names (such as @code{java.lang.Integer[]}) and primitive
+types (such as @code{int}) also work.
+
+The older angle-bracket syntax @code{<java.lang.Integer>} also works and
+has the same meaning. It also evaluates to a @code{Class}. It used to
+evaluate to a @uref{api/gnu/bytecode/Type.html,@code{Type}}, so this is
+a change.
+
+The name bound by a @code{define-simple-class} now evaluates to a
+@code{Class}, rather than a
+@uref{api/gnu/bytecode/ClassType.html,@code{ClassType}}. A
+@code{define-simple-class} is not allowed to reference non-static
+module-level bindings; for that use @code{define-class}.
+
+@item
+New convenience macro
+@uref{Syntax-and-conditional-compilation.html,@code{define-syntax-case}}.
+
+@end itemize
+
+@subheading Kawa 1.9.1 (January 23, 2007)
+@anchor{#kawa-1.9.1-january-23-2007}
+@itemize
+@item
+Fix some problems building Kawa from source using @code{configure+make}.
+@end itemize
+
+@subheading Kawa 1.9.0 (January 21, 2007)
+@anchor{#kawa-1.9.0-january-21-2007}
+@itemize
+@item
+New types and functions for working with @uref{Paths.html,paths and
+URIs}.
+
+@item
+Reader macros URI, namespace, duration.
+
+@item
+Simplified @uref{Source-distribution.html,build using gcj}, and added
+configure flag --with-gcj-dbtool.
+
+@item
+If two ``word'' values are written, a space is written between them. A
+word is most Scheme values, including numbers and lists. A Scheme string
+is treated as a word by @code{write} but by not @code{display}.
+
+@item
+A new @code{--pedantic} command-line flag. It currently only affects the
+XQuery parser.
+
+@item
+The @code{load-compile} procedure was removed.
+
+@item
+The string printed by the @code{--version} switch now includes the
+Subversion revision and date (but only if Kawa was built using
+@code{make} rather than @code{ant} from a checked-out Subversion tree).
+
+@item
+Kawa development now uses the
+@uref{http://subversion.tigris.org/,Subversion (svn)} version control
+system instead of CVS.
+
+@item
+Show file/line/column on unbound symbols (both when interpreted and when
+compiled).
+
+@item
+Cycles are now allowed between @code{require}'d modules. Also, compiling
+at set of modules that depend on each other can now specified on the
+compilation command line in any order, as long as needed @code{require}
+forms are given.
+
+@item
+The @uref{PathExpressions.html,``colon notation'' has been
+generalized.}. The syntax @code{object:name} generally means to extract
+a component with a given @code{name} from @code{object}, which may be an
+object, a class, or a namespace.
+
+@item
+New command-line options @code{--debug-error-prints-stack-trace} and
+@code{--debug-warning-prints-stack-trace} provide stack trace on static
+error messages.
+
+@item
+The @uref{Software-License.html,license for the Kawa software} has been
+changed to the
+@uref{http://opensource.org/licenses/mit-license.php,X11/MIT license}.
+
+@item
+A much more @uref{Array-operations.html,convenient syntax for working
+with Java arrays}.
+
+The same function-call syntax also works for Scheme vectors, uniform
+vectors, strings, lists - and anything else that implements
+@code{java.util.List}.
+
+@item
+The fields and methods of a class and its bases classes are in scope
+within methods of the class.
+@item
+Unnamed procedures (such as lambda expressions) are printed with the
+source filename and line.
+
+@item
+The numeric compare functions (@code{=}, @code{<=}, etc) and
+@code{number->string} now work when passed standard Java @code{Number}
+objects (such as @code{java.lang.Long} or @code{java.math.BigDecimal}).
+@item
+@uref{http://srfi.schemers.org/srfi-10/srfi-10.html,SRFI-10} is now
+implemented, providing the @code{#,(name args ...)} form. Predefined
+constructor @code{name}s so far are @code{URI} and @code{namespace}. The
+@code{define-reader-ctor} function is available if you
+@code{(require 'srfi-10)}.
+
+@item
+A new @code{--script} option makes it easier to write Unix shell
+scripts.
+
+@item
+Allow general URLs for loading (including the @code{-f} flag),
+compilation and @code{open-input-file}, if the ``file name'' starts with
+a URL ``scheme'' like @code{http:}.
+
+@item
+Classes defined (@emph{e.g.} with @code{define-simple-class}) in a
+module can now mutually reference each other. On the other hand, you can
+no longer @code{define-class} if the class extends a class rather than
+an interface; you must use @code{define-simple-class}.
+
+@item
+@code{KawaPageServlet} now automatically selects language.
+
+@item
+@code{provide} macro.
+@item
+@code{quasisyntax} and the convenience syntax @code{#`}, from
+@uref{http://srfi.schemers.org/srfi-72/srfi-72.html,SRFI-72}.
+@item
+@code{define-for-syntax}, @code{syntax-source}, @code{syntax-line}, and
+@code{syntax-column}, for better compatibility with mzscheme.
+@item
+@uref{http://srfi.schemers.org/srfi-34/srfi-34.html,SRFI-34} (Exception
+Handling for Programs), which implements @code{with-exception-handler},
+@code{guard}, and @code{raise}, is now available, if you
+@code{(require 'srfi-34)}.@*
+Also, @uref{http://srfi.schemers.org/srfi-35/srfi-35.html,SRFI-35}
+(Conditions) is available, if you @code{(require 'srfi-35)}.
+@item
+The @code{case-lambda} form from
+@uref{http://srfi.schemers.org/srfi-16/srfi-16.html,SRFI-16} is now
+implemented more efficiently.
+
+@end itemize
+
+@subheading Kawa 1.8 (October 18, 2005)
+@anchor{#kawa-1.8-october-18-2005}
+@uref{http://srfi.schemers.org/srfi-69/srfi-69.html,SRFI-69 ``Basic hash
+tables''} is now available, if you @code{(require 'hash-table)} or
+@code{(require 'srfi-69)}. This is an optimized and Java-compatible port
+whose default hash function calls the standard @code{hashCode} method.
+
+A @code{define-simple-class} can now have one (or more) explicit
+constructor methods. These have the spcial name @code{*init*}. You can
+call superclass constructors or sibling constructors (@code{this}
+constructor calls) using the (admittedly verbose but powerful)
+@code{invoke-special} form.
+
+The @code{runnable} function creates a @code{Runnable} from a
+@code{Procedure}. It is implemented using the new class
+@code{RunnableClosure}, which is now also used to implement
+@code{future}.
+
+The @code{kawa} command can now be run ``in-place'' from the build
+directory: @code{$build_dir/bin/kawa}.
+
+The special field name @code{class} in @code{(static-name type 'class)}
+or @code{(prefix:.class)} returns the @code{java.lang.Class} object
+corresponding to the @code{type} or @code{prefix}. This is similar to
+the Java syntax.
+
+Contructing an instance (perhaps using @code{make}) of a class defined
+using @code{define-simple-class} in the current module is much more
+efficient, since it no longer uses reflection. (Optimizing classes
+defined using @code{define-class} is more difficult.) The constructor
+function defined by the @code{define-record-type} macro is also
+optimized.
+
+You can now access instance methods using this short-hand:
+@code{(*:methodname instance arg ...)}@*
+This is equivalent to: @code{(invoke instance 'methodname arg ...)}
+
+You can now also access a fields using the same colon-notation as used
+for accessing methods, except you write a dot before the field name:@*
+@code{(type:.fieldname)} @code{ ;; }is like:
+@code{(static-field type 'fieldname)}.@*
+@code{(*:.fieldname instance)} @code{;;} is like:
+@code{(field 'fieldname instance)}@*
+@code{(type:.fieldname instance)} @code{;;} is like:
+@code{(*:.fieldname (as instance type))}@*
+These all work with @code{set!} - for example:
+@code{(set! (*:.fieldname instance) value)}.
+
+In the above uses of colon-notation, a @code{type} can be any one of:@*
+- a namespace prefix bound using @code{define-namespace} to a namespace
+uri of the form @code{"class:classname"};@*
+- a namespace prefix using @code{define-namespace} bound to a
+@code{<classname>} name, which can be a fully-qualified class name or a
+locally-declared class, or an alias (which might be an imported
+class);@*
+- a fully qualified name of a class (that exists at compile-time), as in
+@code{(java.lang.Integer:toHexString 123)}; or@*
+- a @code{<classname>} variable, for example:
+@code{(<list>:list3 11 12 13)}.
+
+New fluid variables @code{*print-base*}, @code{*print-radix*},
+@code{*print-right-margin*}, and @code{*print-miser-width*} can control
+output formatting. (These are based on Common Lisp.)
+
+You can new emit elipsis (@code{...}) in the output of a @code{syntax}
+template using the syntax @code{(... ...)}, as in other
+@code{syntax-case} implementations.
+
+The @code{args-fold} program-argument processor from
+@uref{http://srfi.schemers.org/srfi-37/srfi-37.html,SRFI-37} is
+available after you @code{(require 'args-fold)} or
+@code{(require 'srfi-37)}.
+
+The @code{fluid-let} form now works with lexical bindings, and should be
+more compatible with other Scheme implementations.
+
+@code{(module-export namespace:prefix)} can be used to export a
+namespace prefix.
+
+Static modules are now implemented more similarly to non-static modules.
+Specifically, the module body is not automatically run by the class
+initializer. To get the old behavior, use the new
+@code{--module-static-run} flag. Alternatively, instead of
+@code{(module-static #t)} use @code{(module-static 'init-run)}.
+
+Implement @uref{http://srfi.schemers.org/srfi-39/srfi-39.html,SRFI-39}
+"Parameter-objects". These are like anonymous fluid values and use the
+same implementation. @code{current-input-port},
+@code{current-output-port}, and @code{current-error-port} are now
+parameters.
+
+Infer types of variables declared with a @code{let}.
+
+Character comparisons (such as @code{char-=?}, @code{char-ci<?})
+implemented much more efficiently --- and (if using Java5) work for
+characters not in the Basic Multilingual Plane.
+
+Major re-write of symbol and namespace handling. A
+@uref{api/gnu/mapping/Symbol.html,@code{Symbol}} is now immutable,
+consisting of a "print-name" and a pointer to a
+@uref{api/gnu/mapping/Namespace.html,@code{Namespace}} (package). An
+@uref{api/gnu/mapping/Environment.html,@code{Environment}} is a mapping
+from @code{Symbol} to
+@uref{api/gnu/mapping/Location.html,@code{Location}}.
+
+Rename @code{Interpreter} to
+@uref{api/gnu/expr/Language.html,@code{Language}} and
+@code{LispInterpreter} to
+@uref{api/gnu/kawa/lispexpr/LispLanguage.html,@code{LispLanguage}}.
+
+Constant-time property list operations.
+
+Namespace-prefixes are now always resolved at compile-time, never at
+run-time.
+
+@code{(define-namespace PREFIX <CLASS>)} is loosely the same as
+@code{(define-namespace PREFIX "class:CLASS")} but does the right thing
+for classes defined in this module, including nested or non-simple
+classes.
+
+Macros capture proper scope automatically, not just when using require.
+This allows some internal macros to become private.
+
+Major re-write of the macro-handling and hygiene framework. Usable
+support for @code{syntax-case}; in fact some of the primitives (such as
+@code{if}) are now implemented using @code{syntax-case}.
+@code{(syntax form)} (or the short-cut @code{#!form)} evaluates to a
+syntax object. @code{(define-syntax (mac x) tr)} same as
+@code{(define-syntax mac (lambda (x) tr))}. The following non-hygienic
+forms are equivalent:
+
+@verbatim
+  (define-macro (macro-name (param ...) transformer)
+  (define-macro macro-name (lambda (param ...) transformer))
+  (defmacro macro-name (PARAM ...) transformer)
+@end verbatim
+
+Allow vectors and more general ellipsis-forms in patterns and templates.
+
+A new configure switch @code{--with-java-source=version} allows you to
+tweak the Kawa sources to match Java compiler and libraries you're
+using. The default (and how the sources are distributed) is @code{2}
+(for "Java 2" -- jdk 1.2 or better), but you can also select "@code{1}"
+(for jdk 1.1.x), and "@code{5}" for Java 5 (jdk 1.5). You can also
+specify a jdk version number: "@code{1.4.1}" is equivalent to "2" (for
+now). Note the default source-base is incompatible with Java 5 (or more
+generally JAXB 1.3 or DOM 3), unless you also @code{--disable-xml}.
+
+Configure argument @code{--with-servlet}[@code{=servlet-api.jar}]
+replaces @code{--enable-servlet}.
+
+Function argument in error message are now numbered starting at one.
+Type errors now give better error messages.
+
+A new function calling convention, used for @code{--full-tailcalls}. A
+function call is split up in two parts: A
+@code{match0}/.../@code{matchN} method checks that the actual arguments
+match the expected formal arguments, and leaves them in the per-thread
+@uref{api/gnu/mapping/CallContext.html,@code{CallContext}}. Then after
+the calling function returns, a zero-argument @code{apply()} methods
+evaluates the function body. This new convention has long-term
+advantages (performance, full continuations), but the most immediate
+benefit is better handling of generic (otherloaded) functions. There are
+also improved error messages.
+
+Real numbers, characters, Lisp/Scheme strings
+(@uref{api/gnu/lists/FString.html,@code{FString}}) and symbols all now
+implement the @code{Comparable} interface.
+
+In @code{define-class}/@code{define-simple-class}: [Most of this work
+was funded by @uref{http://www.mercedsystems.com/,Merced Systems}.]
+
+@itemize
+@item
+You can specify
+@code{access: }[@code{'private}|@code{'protected}|@code{'publi}c|@code{'package}]
+to set the Java access permissions of fields and methods.
+@item
+Methods can be static by using the @code{access: 'static} specifier.
+@item
+The reflective routines @code{invoke} , @code{field} ,
+@code{static-field} , @code{slot-ref} , @code{slot-set!} can now access
+non-public methods/fields when appropriate.
+@item
+Such classes are no longer initialized when the containing module is
+loaded.
+@item
+The @code{expr} in @code{init-form: expr} is now evaluated in the outer
+scope.
+@item
+A new @code{init: expr} evalues @code{expr} in the inner scope.
+@item
+An option name following @code{allocation:} can now be a string literal
+or a quoted symbol. The latter is preferred: @code{allocation: 'class}.
+@item
+Added @code{'static} as a synonym for @code{'class} following
+@code{allocation:}.
+@item
+Initialization of static field (@code{allocation: 'class init: expr})
+now works, and is performed at class initialization time.
+@item
+You can use unnamed ``dummy fields'' to add initialization-time actions
+not tied to a field:
+
+@verbatim
+  (define-simple-class Foo ()
+    (:init (perform-some-action)))
+@end verbatim
+
+@end itemize
+
+@subheading Kawa 1.7.90 (2003)
+@anchor{#kawa-1.7.90-2003}
+Various fixes and better error messages in number parsing. Some
+optimizations for the divide function.
+
+New framework for controlling compiler warnings and other features,
+supporting command-line flags, and the Scheme forms
+@code{with-compile-options} and @code{module-compile-options}. The flag
+@code{--warn-undefined-variable} is useful for catching typos.
+Implementation funded by @uref{http://www.mercedsystems.com/,Merced
+Systems}.
+
+New @code{invoke-special} syntax form (implemented by Chris Dean).
+
+New @code{define-variable} form (similar to Common Lisp's
+@code{defvar}).
+
+@subheading Kawa 1.7 (June 7, 2003)
+@anchor{#kawa-1.7-june-7-2003}
+@uref{api/gnu/kawa/servlet/KawaPageServlet.html,@code{KawaPageServlet}}
+allows automatic loading and on-the-fly compilation in a servlet engine.
+See
+@uref{../qexo/simple-xquery-webapp.html,http://www.gnu.org/software/qexo/simple-xquery-webapp.html}.
+
+The default source-base requires various Java 2 features, such as
+collection. However, @code{make-select1} will comment out Java2
+dependencies, allowing you to build Kawa with an older Java
+implementation.
+
+The @code{-f} flag and the load function can take an absolute URL. New
+Scheme functions @code{load-relative} and @code{base-uri}.
+
+Imported implementation of cut and cute from
+@uref{http://srfi.schemers.org/srfi-26/srfi-26.html,SRFI-26} (Notation
+for Specializing Parameters without Currying).
+
+The way top-level definitions (including Scheme procedures) are mapped
+into Java fields is changed to use a mostly reversible mapping. (The
+mapping to method names remains more natural but non-reversible.)
+
+@code{define-alias} of types can now be exported from a module.
+
+New @code{--no-inline} and @code{--inline=none} options.
+
+You can use @code{define-namespace} to define ``namespace aliases''.
+This is used for the new short-hard syntax for method invocation:@*
+@code{(define-namespace Int32 "class:java.lang.Integer")}@*
+@code{(Int32:toHexString 255)} => @code{"ff"}@*
+@code{(Int32:toString (Int32:new "00255"))} => @code{"255"}@*
+Alternatively, you can write:@*
+@code{(java.lang.Integer:toHexString 255)} => @code{"ff"}
+
+@uref{http://srfi.schemers.org/srfi-9/srfi-9.html,SRFI-9}
+(define-record-type) has been implemented, and compiled to a
+@code{define-class}, with efficient code.
+
+The configure option @code{--with-collections} is now the default.
+
+Unknowns are no longer automatically static.
+
+If type not specified in a declaration, don't infer it from it initial
+value. If no return type is specified for a function, default to
+@code{Object}, rather than the return type of the body. (The latter
+leads to undesirable different behaviour if definitions are
+re-arranged.)
+
+You can now define and use classes defined using @code{object},
+@code{define-class}, and @code{define-simple-class} from the
+``interpreter'', as well as the compiler. Also, a bug where inherited
+fields did not get initialized has been fixed.
+
+There are several new procedures useful for servlets.
+
+Numerical comparisions (@code{<}, @code{<=}, etc) now generates
+optimized bytecode if the types of the operands have certain known
+types. including efficient code for @code{<int>}, @code{<long>},
+@code{<double>}, and @code{<integer>}. Much more code can now (with type
+declaration) be written just as efficiently in Scheme as in Java.
+
+There have been some internal re-arranging of how Expressions are
+processed. The Scheme-specific Translator type now inherits from
+Compilation, which replaces the old Parser class. A Complation is now
+allocated much earlier, as part of parsing, and includes a
+SourceMessages object. SourcesMessages now includes (default) line
+number, which is used by Compilation for the "current" line numbers. The
+ExpWalker class includes a SourceMessages instance (which it gets from
+the Compilation). CanInline.inline method now takes ExpWalker parameter.
+Checking of the number or parameters, and mapping known procedures to
+Java methods are now both done during the inlining pass.
+
+The user-visible effect is that Kawa can now emit error mesages more
+cleanly more places; the inlining pass can be more agressive, and can
+emit better error messages, which yields better type information. This
+gives us better code with fewer warnings about unknown methods.
+
+@subheading Changes from Kawa 1.6.98 to 1.6.99.
+@anchor{#changes-from-kawa-1.6.98-to-1.6.99.}
+A new language front-end handles a tiny subset of XSLT. An example is
+the check-format-users test in gnu/xquery/testsuite/Makefile.
+
+There are now converters between SAX2 and Consumer events, and a basic
+implementation of XMLReader based on XMLParser.
+
+The function as-xml prints a value in XML format.
+
+Srfi-0 (cond-expand), srfi-8 (receive), and srfi-25 (multi-dimensional
+arrays) are now implemented. So is srfi-1 (list library), though that
+requires doing (require 'list-lib).
+
+The JEmacs code is being re-organized, splitting out the Swing-dependent
+code into a separate gnu.jemacs.swing package. This should make it
+easier to add JEmacs implementation without Swing.
+
+The class gnu.expr.Interpreter has various new 'eval' methods that are
+useful for evaluating Scheme/BRL/XQuery/... expressions from Java.
+
+Kawa now uses current versions of autoconf, autoamke, and libtool,
+allowing the use of automake file inclusion.
+
+The comparisons @code{<<}, @code{<=}, @code{-}, @code{>}, and @code{=>}
+now compile to optimized Java arithmetic if both operands are
+@code{<int>} or a literal that fits in @code{<int>}.
+
+@subheading Changes from Kawa 1.6.97 to 1.6.98
+@anchor{#changes-from-kawa-1.6.97-to-1.6.98}
+Generated HTML and Postscrpt documents are no longer included in the
+source distribution. Get @code{kawa-doc-version.tar.gz} instead.
+
+(format #t ...) and (format PORT ...) now returns #!void instead of #t.
+
+Support fluid bindings (fluid-let) for any thread, not just Future and
+main.
+
+A Unix script header @code{#!/PROGRAM} is ignored.
+
+You can now take the same Kawa "web" program (written in Scheme,
+KRL/BRL, or XQuery) and run it as either a servlet or a CGI script.
+
+There are a number of new functions for accessing HTTP requests and
+generating HTTP responses.
+
+Kawa now supports a new experimental programming KRL (the "Kawa Report
+Language"). You select this language using --krl on the Kawa command
+link. It allows Scheme code to be inside template files, like HTML
+pages, using a syntax based on BRL (brl.sourceforge.net). However, KRL
+has soem experimental changes to both BRL and standard Scheme. There is
+also a BRL-compatibile mode, selected using --brl, though that currently
+only supports a subset of BRL functions.
+
+If language is not explicitly specified and you're running a source file
+(e.g. "java kawa.repl myscript.xql"), Kawa tried to derive the language
+from the the filename extension (e.g. "xql"). It still defaults to
+Scheme if there is no extension or the extension is unrecognized.
+
+New command-line option --output-format alias --format can be used to
+over-ride the format used to write out top-level (repl, load) values.
+
+XMLPrinter can now print in (non-well-formed-XML) HTML.
+
+@subheading Changes from Kawa 1.6.96 to 1.6.97
+@anchor{#changes-from-kawa-1.6.96-to-1.6.97}
+Changed lots of error messages to use pairs of single quotes rather than
+starting with a backquote (accent grave): 'name' instead of `name'. Many
+newer fonts make the latter look bad, so it is now discouraged.
+
+The types @code{<String>} and @code{<java.lang.String>} new behave
+differently. The type @code{<java.lang.String>} now works just like
+(say) @code{<java.util.Hashtable>}. Converting an object to a
+@code{<java.lang.String>} is done by a simple coercion, so the incoming
+value must be a java.lang.String reference or null. The special type
+@code{<String>} converts any object to a java.string.String by calling
+toString; it also handles null by specially testing for it.
+
+For convenience (and backwards compatibility) Kawa uses the type
+@code{<String>} (rather than @code{<java.lang.String>}) when it sees the
+Java type @code{java.lang}.String, for example in the argument to an
+@code{invoke}.
+
+The default behaviour of '[' and '] was changed back to be token (word)
+constituents, matching R5RS and Common Lisp. However, you can easily
+change this behaviour using the new setBrackMode method or the
+defaultBracketMode static field in ReadTable.
+
+You can now build Kawa from source using the Ant build system (from
+Apache's Jakarta project), as an alternative to using the traditional
+configure+make system. An advantage of Ant is that it works on most Java
+systems, without requiring a Unix shell and commands. Specifically, this
+makes it easy to build Kawa under MS-Windows. Thanks to James White for
+contributing this support.
+
+Added (current-error-port) which does the obvious.
+
+The new let-values and let-values* macros from srfi-11 provide a more
+convenient way to use multiple values.
+
+All the abstract apply* and eval* methods now specify 'throws
+Throwable'. A bunch of code was changed to match. The main visible
+advantage is that the throw and primitive-throw procedures work for any
+Throwable without requiring it to be (confusingly) wrapped.
+
+@subheading Changes from Kawa 1.6.95 to 1.6.96
+@anchor{#changes-from-kawa-1.6.95-to-1.6.96}
+A new compilation flag --servlet generates a Servlet which can be
+deployed in a servlet engin like Tomcat. This is experimental, but it
+seesm to work for both Scheme source and XQuery source.
+
+The interface gnu.lists.CharSequence was renamed to avoid conflitcs with
+the (similar) interface java.lang.CharSequence in JDK 1.4beta.
+
+New --help option (contributed by Andreas Schlapbach).
+
+Changed the code generation used when --full-tailcalls. It now is closer
+to that used by default, in that we don't generate a class for each
+non-inlined procedure. In both cases calling an unknown procedure
+involves executing a switch statement to select a method. In addition to
+generating fewer classes and simplifying one of the more fragile parts
+of Kawa, it is also a step towards how full continuations will be
+implemented.
+
+Changed the convention for name "mangling" - i.e. how Scheme names are
+mapped into Java names. Now, if a Scheme name is a valid Java name it is
+used as is; otherwise a reversible mangling using "$" characters is
+used. Thus the Scheme names @code{'<} and @code{'$Leq} are both mapped
+into the same Java name @code{"$Leq"}. However, other names not
+containing "@code{$}" should no longer clash, including pairs like
+"@code{char-letter?}" and "@code{charLetter?}" and "@code{isCharLetter}"
+which used to be all mapped to "@code{isCharLetter}". Now only names
+containing "@code{$}" can be ambiguous.
+
+If the compiler can determine that all the operands of (+ ...) or (-
+...) are floating-point, then it will generate optimized code using Java
+primitive arithmetic.
+
+Guile-style keyword syntax '#:KEYWORD' is recognized. (Note this
+conflicts with Common Lisp syntax for uninterned symbols.)
+
+New syntax forms define-class and define-simple-class allow you to
+define classes more easily. define-class supports true multiple
+inheritance and first class class values, where each Scheme class is
+compiled to a pair of an inteface and a class. define-simple-class
+generates more efficient and Java-compatible classes.
+
+@subheading Changes from Kawa 1.6.94 to 1.6.95.
+@anchor{#changes-from-kawa-1.6.94-to-1.6.95.}
+A new language "xquery" implements a (so far small subset of) XQuery,
+the draft XML Query languaage.
+
+Various internal (Java API) changes: Changes to gnu.expr.Interpreter to
+make it easier to add non-Lisp-like languages; gnu.lists.Consumer now
+has an endAttribute method that need to be called after each attribute,
+rather than endAttributes that was called after all of them.
+
+If configured with --with-gcj, Kawa builds and intalls a 'gckawa' script
+to simlify linking with needed libraries.
+
+The @code{setter} function is now inlined, and
+@code{(set! (field X 'N) V)} and @code{(set! (static-field <T> "N) V)}
+are now inlined.
+
+If configured @code{--with-gcj}, then a @code{gckawa} helper script is
+installed, to make it easier to link Kawa+gcj-compiled applications.
+
+@subheading Changes from Kawa 1.6.92 to 1.6.94
+@anchor{#changes-from-kawa-1.6.92-to-1.6.94}
+The JEmacs code now depends on CommonLisp, rather than vice versa, which
+means Commonlisp no longer depends on Swing, and can be built with GCJ.
+CommonLisp and JEmacs symbols are now implemented using Binding, not
+String.
+
+@subheading Changes from Kawa 1.6.90 to 1.6.92
+@anchor{#changes-from-kawa-1.6.90-to-1.6.92}
+Kawa now installs as a .jar file (kawa.jar symlinked to
+kawa-VERSION.jar), rather than a collection of .class files.
+
+The Kawa manual includes instructions for how to build Kawa using GCJ,
+and how to compile Scheme code to a native executable using GCJ.
+
+Kawa now has builtin pretty-printer support, using an algorithm from
+Steel Bank Common Lisp converted from Lisp to Java. The high-level
+Common Lisp pretty-printing features are mostly not yet implemented, but
+the low-level support is there. The standard output and error ports
+default to pretty-printing.
+
+A new formatting framework uses the Consumer interface from gnu.lists.
+You can associate a format with an output port. Common Lisp and JEmacs
+finally print using their respective syntaxes.
+
+All output ports (OutPort instances) are now automatically flushed on
+program exit, using a new WriterManager helper class.
+
+The new commmand-line option --debug-print-expr causes the Expression
+for each expression to be printed. The option --debug-print-final-expr
+is similar, but prints Expressions after optimization and just before
+compilation. They are printed using the new pretty-printer.
+
+Changed calling convention for --full-tailcalls to write results to a
+Consumer, usually a TreeList or something to be printed. A top-level
+ModuleBody now uses the same CpsProcedure convention. This is useful for
+generating xml or html.
+
+New libtool support allows kawa to be built as a shared library.
+
+The new configure flag --with-gcj uses gcj to compile Kawa to both
+.class files and native code. This is experimental.
+
+@subheading Changes from Kawa 1.6.70 to 1.6.90
+@anchor{#changes-from-kawa-1.6.70-to-1.6.90}
+The reader (for Scheme and Lisp) has been re-written to be table-driven,
+based on the design of Common Lisp readtables.
+
+The new gnu.lists package has new implementations of sequence-related
+classes. It replaces most of gnu.kawa.util. See the package.html file.
+
+If the expected type of a non-unary @code{+} or @code{-} is @code{<int>}
+or @code{<long>} and the operands are integeral types, then the operands
+will converted to the primitive integer type and the addition or
+subtraction done using primitive arithmetic. Similarly if the expected
+type is @code{<float>} or @code{<long>} and the operands have
+appropriate type. This optimization an make a big performance
+difference. (We still need to also optimize compare operations like
+@code{(< x y)} to really benefit from @code{<int>} declarations of loop
+variables.)
+
+The implementation of procedure closures has been changed to basically
+be the same as top-level procedures (except when --full-tailcalls is
+specified): Each procedure is now an instance of a ModuleMethod, which
+each "frame" is an instance of ModuleBody, just like for top-level
+functions. This sometimes reduces the number of classes generated, but
+more importantly it simplifies the implementation.
+
+A new @uref{api/gnu/xml/package-summary.html,@code{gnu.xml}} package
+contains XML-related code, currently an XML parser and printer, plus
+some XPath support. The class
+@uref{api/gnu/lists/TreeList.html,@code{gnu.lists.TreeList}} (alias
+@code{<document>}) is useful for compactly representing nested
+structures, including XML documents. If you @code{(require 'xml)} you
+will get Scheme interfaces (@code{print-as-xml} and
+@code{parse-xml-from-url}) to these classes.
+
+New package gnu.kawa.functions, for primitive functions (written in
+Java).
+
+The map and for-each procedure is now inlined. This is most especially
+beneficial when it allows the mapped-over procedure to also be inlined,
+such as when that procedure is a lambda expression.
+
+Added documentation on compiling with Jikes. Renamed some classes to
+avoid warning when compiling with Jikes.
+
+The reverse! procedure was added.
+
+Internal changes: * If a variable reference is unknown, create a
+Declaration instance with the IS_UNKNOWN flag to represent an imported
+binding. * The ExpWalker framework for "tree walking" Expressions had a
+bit of reorganization. * New package gnu.kawa.functions, for primitive
+functions (written in Java).
+
+Added a hook for constant-folding and other optimization/inlining at
+traversal (ExpWalker) time. Optimization of + and - procedures to use
+primitive Java operations when the operands are primitive types.
+
+Implementation of SRFI-17. Change the definitions of (set! (f x ...)
+val) to ((setter f) x ... val), rather then the old ((setter f) val x
+...). You can now associate a setter with a procedure, either using
+make-procedure or set-procedure-property!. Also, (setter f) is now
+inlined, when possible.
+
+Internally, Syntax (and hence Macro) no longer extend Declaration.
+
+Various Java-level changes, which may be reflected in Scheme later: *
+gnu.kawa.util.Consumer interface is similar to ObjectOutput and SAX's
+ContentHandler interfaces. * A gnu.expr.ConsumerTarget is used when
+evaluating to an implicit Consumer. * These interfaces will make it easy
+to write functional-style but efficient code for transforming data
+streams, including XML. * gnu.kawa.util.FString is now variable-size.
+
+@subheading Changes from Kawa 1.6.68 to 1.6.70
+@anchor{#changes-from-kawa-1.6.68-to-1.6.70}
+The bare beginnings of Common Lisp support, enabled by the --commonlisp
+(or --clisp) command line option. This is so far little more than a hack
+of the EmacsLisp support, but with lexical scoping and CL-style format.
+
+@subheading Changes from Kawa 1.6.66 to 1.6.68
+@anchor{#changes-from-kawa-1.6.66-to-1.6.68}
+JEmacs news:
+
+@itemize
+@item
+Define emacs-version as Kawa version but with leading 0 instead of 1.
+For example, the current value is "0.6.68 JEmacs".
+@item
+New testsuite directory.
+@item
+Improved autoload framework. Handle ELisp autoload comments.
+@item
+Handle escape and meta-key.
+@item
+Handle lot more of ELisp.
+@item
+Lots more is now done in ELisp, using .el files imported from XEmacs.
+@item
+Incomplete support for setting mark, including using selection.
+@item
+Basic (but incomplete) implementation of (interactive spec).
+@item
+Common Lisp extensions: typep, default arguments.
+@item
+A new status.html file to note what works and what doesn't.
+@end itemize
+
+You can now specify in @code{define} and @code{define-private} the type
+of a variable. If the variable is module-level,
+@code{(define name :: <type> value)} creates a field named
+``@code{name}'' having the specified type and initial value. (If type is
+not specified, the default is not @code{Object}, but rather a
+@code{Binding} that @emph{contains} the variable's value.)
+
+You can now define the type of a module-level variable: In
+(define[-private] :: type expression) New (define-constant name [::
+type] expression) definition form.
+
+A procedure can now have arbitrary properties associated with it. Use
+procedure-property and set-procedure-property! to get and set them.
+
+The new procedure make-procedure creates a generic procedure that may
+contain one or more methods, as well as specified properties.
+
+New declaration form define-base-unit. Both it and define-unit have been
+re-implemented to be module-safe. Basically '(define-unit ft 12in)' is
+sugar for '(define-constant ft$unit (... (* 12 in$unit)))', where
+ft$unit and in$unit are standard identifiers managed by the module
+system. Also, the output syntax for units and quantities is cleaner.
+
+The new declaration (module-export name ...) allows control over the
+names exported from a module. The new declaration (module-static ...)
+allows control over which definitions are static and which are
+non-static. This makes it easier to use a module as a Java class.
+
+Procedures names that accidentally clash with inherited method names
+(such as "run") are now re-named.
+
+Simple aliases (define-aliases defining an alias for a variable name)
+are implemented more efficiently.
+
+The package hierarchy is getter cleaner, with fewer cyclic dependencies:
+The gnu.math package no longer has any dependencies on kawa.* or gnu.*.
+Two classes were moved from gnu.text to other classes, avoiding another
+cyclic package dependency between gnu.text and gnu.mapping. The new
+gnu.kawa.lispexpr is for compile-time handling of Lisp-like languages.
+
+Compliation of literals has been re-done. A class that can be used in a
+literal no longer needs to be declared as Compilable. Instead, you
+declare it as implementaing java.io.Externalizable, and make sure it has
+appropriate methods.
+
+All the standard "data" types (i.e. not procedures or ports) now
+implement java.io.Externalizable, and can thus be serialized. If they
+appear in literals, they can also be compiled.
+
+Created a new class gnu.kawa.util.AbstractString, with the Scheme alias
+@code{<abstract-string>}. The old gnu.kawa.util.FString now extends
+AbstractString. A new class CharBuffer provides an growable buffer, with
+markers (automatically-adjusted positions). Many of the Scheme
+@code{<string>} procedures now work on @code{<abstract-string>}. The
+JEmacs BufferContnat class (contains the characters of a buffer) now
+extends CharBuffer.
+
+Some JEmacs changes to support a "mode" concept, as well as preliminary
+support for inferior-process and telnet modes.
+
+New section in manual / web page for projects using Kawa.
+
+The record feasture (make-record-type etc) how handles "funny" type and
+fields names that need to be "mangled" to Java names.
+
+Re-did implementation of define-alias. For example, you can define
+type-aliases:@*
+@code{(define-alias <marker> <gnu.jemacs.buffer.Marker>)}@*
+and then use <marker> instead of <gnu.jemacs.buffer.Marker>.
+
+@code{(field array 'length)} now works.
+
+@subheading Changes from Kawa 1.6.64 to 1.6.66
+@anchor{#changes-from-kawa-1.6.64-to-1.6.66}
+Added documentation to the manual for Homogeneous numeric vector
+datatypes (SRFI-4).
+
+You can now specify characters using their Unicode value: #\u05d0 is
+alef.
+
+Kawa now uses a more mnemonic name mangling Scheme. For example, a
+Scheme function named @code{<=} would get compiled to method
+@code{$Ls$Eq}.
+
+There is now working and useful module support, thought not all features
+are implemented. The basic idea is that a module can be any class that
+has a default constructor (or all of whose fields and methods are
+static); the public fields and methods of such a class are its exported
+definitions. Compiling a Scheme file produces such a module. Doing:@*
+@code{ (require <classname>)}@*
+will create an anonymous instance of @code{<classname>} (if needed), and
+add all its exported definitions to the current environment. Note that
+if you import a class in a module you are compiling, then an instance of
+the module will be created at compile-time, and imported definitions are
+not re-imported. (For now you must compile a module, you cannot just
+load it.)
+
+The define-private keyword creates a module-local definition.
+
+New syntax to override some properties of the current module:@*
+@code{(module-name <name>)} overrides the default name for a module.@*
+@code{(module-extends <class>)} specifies the super-class.@*
+@code{(module-implements <interface> ...)} specfies the implemented
+interfaces.
+
+The syntax: (require 'keyword) is syntactic sugar for (require
+<classname>) where the classname is find is a "module catalog"
+(currently hard-wired). This provides compatibility with Slib. The Slib
+"features" gen-write, pretty-print, pprint-file, and printf are now
+available in Kawa; more will be added, depending on time and demand. See
+the package directory gnu/kawa/slib for what is available.
+
+@subheading Changes from Kawa 1.6.62 to 1.6.64
+@anchor{#changes-from-kawa-1.6.62-to-1.6.64}
+A lot of improvements to JEmacs (see JEmacs.SourceForge.net).
+
+kawa-compiled-VERSION.zip is replaced by kawa-compiled-VERSION.jar.
+
+You can now use Kawa to generate applets, using the new --applet switch,
+Check the "Applet compilation" section in the manual. Generating an
+application using the --main flag should work again. Neither --applet
+nor --main has Scheme hard-wired any more.
+
+A new macro `(this)' evaluates to the "this object" - the current
+instance of the current class. The current implementation is incomplete,
+and buggy, but it will have to do for now.
+
+The command-line argument -f FILENAME will load the same files types as
+load.
+
+When a source file is compiled, the top-level definitions (procedures,
+variables, and macros) are compiled to final fields on the resulting
+class. This are not automatically entered into the current environment;
+instead that is the responsibility of whoever loads the compiled class.
+This is a major step towards a module system for Kawa.
+
+There is a new form define-private which is like define, except that the
+defined name is not exported from the current module.
+
+A procedure that has optional arguments is now typically compiled into
+multiple methods. If it's a top-level procedure, these will be methods
+in the modules "ModuleBody" class, with the same (mangled) name. The
+compiler can in many cases call the appropriate method directly.
+Usually, each method takes a fixed number of arguments, which means we
+save the overhead of creating an array for the arguments.
+
+A top-level procedure declared using the form (define (NAME ARS ...)
+BODY ..) is assumed to be "constant" if it isn't assigned to in the
+current compilation unit. A call in the same compilation unit will now
+be implemented as a direct method call. This is not done if the prcedure
+is declared with the form: (define NAME (lambda (ARGS ,,,) BODY ...)
+
+gnu.expr.Declaration no longer inherits from gnu.bytecode.Variable.
+
+A gnu.mapping.Environment now resolves hash index collisions using
+"double hashing" and "open addressing" instead of "chaining" through
+Binding. This allows a Binding to appear in multiple Environments.
+
+The classes Sequence, Pair, PairWithPosition, FString, and Char were
+moved from kawa.lang to the new package gnu.kawa.util. It seems that
+these classes (except perhaps Char) belong together. The classes List
+and Vector were also moved, and at the same time renamed to LList and
+FVector, respectively, to avoid clashed with classes in java.util.
+
+New data types and procedures for "uniform vectors" of primitive types
+were implemented. These follow the SRFI-4 specification, which you can
+find at http://srfi.schemers.org/srfi-4/srfi-4.html .
+
+You can now use the syntax @code{name :: type} to specify the type of a
+parameter. For example:@*
+@code{(define (vector-length x :: <vector>) (invoke x 'length))}@*
+The following also works:@*
+@code{(define (vector-length (x :: <vector>)) ...)}.
+
+@code{(define-member-alias name object [fname])} is new syntactic sugar
+for @code{(define-alias name (field object fname))}, where the default
+for @code{fname} is the mangling of @code{name}.
+
+@subheading Changes from Kawa 1.6.60 to 1.6.62
+@anchor{#changes-from-kawa-1.6.60-to-1.6.62}
+The new function `invoke' allows you to call a Java method. All of
+`invoke', `invoke-static' and `make' now select the bets method. They
+are also inlined at compile time in many cases. Specifically, if there
+is a method known to be definitely applicable, based on compile-time
+types of the argument expressions, the compiler will choose the most
+specific such method.
+
+The functions slot-ref, slot-set!, field, and static-field are now
+inlined by the compiler when it can.
+
+Added open-input-string, open-output-string, get-output-string from
+SRFI-6. See http://srfi.schemers.org/srfi-6/srfi-6.html.
+
+The manual has a new section "Mapping Scheme names to Java names", and a
+new chapter "Types". The chapters "Extensions", "Objects and Classes",
+and "Low-level functions" have been extensivley re-organized.
+
+The Kawa license has been simplified. There used to be two licenses: One
+for the packages gnu.*, and one for the packages kawa.*. There latter
+has been replaced by the former. The "License" section of the manual was
+also improved.
+
+@subheading Changes from Kawa 1.6.59 to 1.6.60
+@anchor{#changes-from-kawa-1.6.59-to-1.6.60}
+There is a new package gnu.kawa.reflect. Some classes that used to be in
+kawa.lang or kawa.standard are now there.
+
+The procedures slot-ref and slot-set! are now available. They are
+equivalent to the existing `field', but reading a field `x' will look
+for `getX' method if there is no public `x' field; writing to a field
+will look for `setX'.
+
+The procedure `make' makes it convenient to create new objects.
+
+There is now a teaser screen snapshot of "JEmacs" at
+http://www.bothner.com/~per/papers/jemacs.png.
+
+The html version of the manual now has a primitive index. The manual has
+been slightly re-organized, with a new "Classes and Objects" chapter.
+
+The new functions invoke-static and class-methods allow you to call an
+arbitary Java method. They both take a class specification and a method
+name. The result of class-methods is a generic procedure consisting of
+those methods whose names match. (Instance methods are also matched;
+they are treated the asme as class methods with an extra initial
+argument.) The invoke-static function also takes extra arguments, and
+actually calls the "best"-matching method. An example:
+
+@verbatim
+        (invoke-static <java.lang.Thread> 'sleep 100)
+@end verbatim
+
+Many fewer classes are now generated when compiling a Scheme file. It
+used to be that each top-level procedure got compiled to its own class;
+that is no longer the case. The change should lead to faster startup and
+less resource use, but procedure application will probably be noticably
+slower (though not so much slower as when reflection is used). The
+reason for the slowdown is that we in the general case now do an extra
+method call, plus a not-yet-optimized switch statement. This change is
+part of the new Kawa module system. That will allow the compiler to
+substitute direct methods calls in more cases, which I hope will more
+than make up for the slowdown.
+
+A Scheme procedure is now in general compiled to a Java method whose
+name is a "mangling" of the Scheme procedure's name. If the procedure
+takes a variable number of parameters, then "$V" is added to the name;
+this indicates that the last argument is a Java array containing the
+rest of the arguments. Conversely, calling a Java method whose name ends
+in "$V" passes any excess arguments in the last argument, which must be
+an array type.
+
+Many changes to the "Emacs-emulation" library in gnu.jemacs.buffer: *
+Implemented commands to read and save files. * We ask for file and
+buffer names using a dialog pop-up window. * Split windows correctly, so
+that the windows that are not split keep their sizes, the windows being
+split gets split as specified, and the frame does not change size. Now
+also handles horizonal splits. * Fairly good support for buffer-local
+keymaps and Emacs-style keymap search order. A new class BufferKeymap
+manages the active keymaps of a buffer. Multi-key key-sequences are
+handled. Pending prefix keys are remembered on a per-buffer basis
+(whereas Emacs does it globally).
+
+There is now some low-level support for generic procedures.
+
+The R5RS primitives let-syntax and letrec-syntax for defining local
+syntax extensions (macros) should now work. Also define-syntax works as
+an internal definition. All of these should now be properly "hygienic".
+(There is one known exception: symbols listed among the literals lists
+are matched as raw symbols, rather that checking that the symbol has the
+same binding, if any, as at the defining site.) The plan is to support
+general functions as hygienic rewriters, as in the Chez Scheme
+"syntax-case" system; as one part of that plan, the syntax-case
+primitive is available, but so far without any of the supporting
+machinary to support hygiene.
+
+The read-line procedure was added. This allows you to efficiently read a
+line from an input port. The interface is the same as scsh and Guile.
+
+@subheading Changes from Kawa 1.6.58 to 1.6.59
+@anchor{#changes-from-kawa-1.6.58-to-1.6.59}
+define-alias now works both top-level and inside a function.
+
+Optimized eqv? so if one of the arguments is constant and not Char or
+Numeric, inline it the same way eq? is. (This helps case when the labels
+are symbols, which help the "lattice" benchmark.) ???
+
+The Emacs-related packages are now grouped under a new gnu.jemacs
+package.
+
+Improved framework for catching errors. This means improved error
+messages when passing a parameter of the wrong type. Many standard
+procedures have been improved.
+
+Simplified, documented, and tested (!) procedure for building Kawa from
+source under Windows (95/98/NT).
+
+New macros trace and untrace for tracing procedures. After executing
+(trace PROCEDURE), debugging output will be written (to the standard
+error port) every time PROCEDURE is called, with the parameters and
+return value. Use (untrace PROCEDURE) to turn tracing off.
+
+New utility functions (system-tmpdir) and (make-temporary-file
+[format]).
+
+A new (unfinished) framework supports multiple languages. The
+command-line option --elisp selects Emacs Lisp, while --scheme (the
+default) selects Scheme. (The only difference so far is the reader
+syntax; that will change.)
+
+The `format' function now provides fairly complete functionality for
+CommonLisp-style formatting. (See the Comon Lisp hyperspec at
+http://www.harlequin.com/education/books/HyperSpec/Body/sec_22-3.html.)
+The floating point formatters (~F, ~E, ~G, ~$) now pass the formatst.scm
+test (from Slib, but with some "fixes"; in the testsuite directory).
+Also, output ports now track column numbers, so @code{~T} and @code{~&}
+also work correctly.
+
+A new package gnu.emacs provides various building blocks for building an
+Emacs-like text editor. These classes are only compiled when Kawa is
+configured with the new --with-swing configuration option. This is a
+large initial step towards "JEmacs" - an Emacs re-implemented to use
+Kawa, Java, and Swing, but with full support (using gnu.elisp) for
+traditional Emacs Lisp. For more imformation see
+gnu/emacs/overview.html.
+
+A new configuration option --with-swing can be used if Swing is
+available. It is currently only used in gnu.emacs, but that may change.
+
+@subheading Changes from Kawa 1.6.56 to 1.6.58
+@anchor{#changes-from-kawa-1.6.56-to-1.6.58}
+Kawa is now "properly tail-recursive" if you invoke it with the
+--full-tail-calls flag. (Exception: the eval procedure does not perform
+proper tail calls, in violation of R5RS. This will be fixed in a future
+release.) Code compiled when --full-tail-calls is in effect is also
+properly tail-recursive. Procedures compiled with --full-tail-calls can
+call procedures compiled without it, and vice versa (but of course
+without doing proper tail calls). The default is still
+--no-full-tail-calls, partly because of performance concerns, partly
+because that provides better compatibility with Java conventions and
+tools.
+
+The keywords let (including named let), let*, and letrec support type
+specifiers for the declared variables For example:
+
+@verbatim
+    (let ((lst :: <list> (foo x))) (reverse lst))
+@end verbatim
+
+Square brackets [ ... ] are allowed as a synonym of parentheses ( ... ).
+
+@subheading Changes from Kawa 1.6.55 to 1.6.57
+@anchor{#changes-from-kawa-1.6.55-to-1.6.57}
+A new command-line flag --server PORT specifies that Kawa should run as
+a telnet server on the specified PORT, creating a new read-eval-print
+loop for each connection. This allows you to connect using any telnet
+client program to a remote "Kawa server".
+
+A new front-end program, written in C, that provides editing of input
+lines, using the GNU readline library. This is a friendlier interface
+than the plain "java kawa.repl". However, because kawa.c needs readline
+and suitable networking library support, it is not built by default, but
+only when you configure Kawa with the --enable-kawa-frontend flag.
+
+The way Scheme names are mapped ("mangled") into Java identifiers is now
+more natural. E.g. "foo-bar?" now is mapped to "isFooBar".
+
+New syntax (object (SUPERS ...) FIELD-AND-METHODS ...) for creating a
+new object instance of an anonymous class. Now fairly powerful.
+
+New procedures field and static-field for more convenient field access.
+
+Syntactic sugar: @code{(lambda args <type> body)} ->
+@code{(lambda args (as <type> body))}. This is especially useful for
+declaring methods in classes.
+
+A new synchonized form allows you to synchronize on an arbitrary Java
+object, and execute some forms while having an exclusive lock on the
+object. (The syntax matches that used by Skij.)
+
+@subheading Changes from Kawa 1.6.53 to 1.6.55
+@anchor{#changes-from-kawa-1.6.53-to-1.6.55}
+New --debug-dump-zip option writes out a .zip file for compilation.
+(Useful for debugging Kawa.)
+
+You can now declare parameter types.
+
+Lot of work on more efficient procedure representation and calling
+convention: Inlining, directly callable statics method, plus some
+procedures no longer generate a separate Class.
+
+Local functions that are only called from one locations, except for
+tail-recursion, are now inlined. This inlines do loops, and most "named
+let" loops.
+
+New representation of closures (closures with captured local variables).
+We no longer use an array for the closure. Instead we store the captured
+variables in the Procedure itself. This should be faster (since we can
+use field accesses rather than array indexing, which requires bounds
+checking), and avoids a separate environment object.
+
+If the compiler sees a function call whose (non-lexically-bound) name
+matches an existing (globally-defined) procedure, and that procedure
+instance has a static method named either "apply" or the mangled
+procedure name, them the compiler emits a direct call to that method.
+This can make a very noticable speed difference, though it may violate
+strict Scheme sementics, and some code may break.
+
+Partial support for first-class "location" variables.
+
+@subheading Changes from Kawa 1.6.53 to 1.6.54
+@anchor{#changes-from-kawa-1.6.53-to-1.6.54}
+Created new packages gnu.mapping and gnu.expr. Many classes were moved
+from kawa.lang to the new packages. (This is part of the long-term
+process of splitting Kawa into more manageable chunks, separating the
+Scheme-specific code from the language-independent code, and moving
+classes under the gnu hierarchy.)
+
+You can now write keywords with the colon first (e.g. :KEYWORD), which
+has exactly the same effect and meaning as putting the colon last (e.g.
+KEYWORD:). The latter is preferred is being more consistent with normal
+English use of punctuation, but the former is allowed for compatibility
+with soem other Scheme implementations and Common Lisp.
+
+@subheading Changes from Kawa 1.6.52 to 1.6.53
+@anchor{#changes-from-kawa-1.6.52-to-1.6.53}
+The new package gnu.text contains facilities for reading, formatting,
+and manipulating text. Some classes in kawa.lang where moved to there.
+
+Added string-upcase!, string-downcase!, string-capitalize!,
+string-upcase, string-downcase, and string-capitalize; compatible with
+Slib.
+
+Character constants can now use octal notation (as in Guile). Writing a
+character uses octal format when that seems best.
+
+A format function, similar to that in Common Lisp (and Slib) has been
+added.
+
+The default parameter of a #!optional or #!key parameter can now be
+#!null.
+
+@subheading Changes since Kawa 1.6.51
+@anchor{#changes-since-kawa-1.6.51}
+The "record" feature has been changed to that a "record-type descriptor"
+is now a gnu.bytecode.ClassType (a @code{<record-type>}), rather than a
+java.lang.Class. Thus make-record-type now returns a
+@code{<record-typee>}, not a Class, and @code{record-type-descriptor}
+takes a @code{<record-typee>}, not a Class.
+
+More robust Eval interfaces.
+
+New Lexer abstract class. New ScmRead class (which extends Lexer) now
+contains the Scheme reader (moved from Inport). Now read errors are kept
+in queue, and can be recovered from.
+
+Comparing an exact rational and an inexact real (double) is now done as
+if by first converting the double to exact, to satisfy R5RS.
+
+@subheading Changes since Kawa 1.6.1
+@anchor{#changes-since-kawa-1.6.1}
+The compile virtual method in Expression now takes a Target object,
+representing the "destination". The special ConditionalTarget is used to
+evaluate the test of an 'if expression. This allows us to generate much
+better code for and, or, eq?, not and nested if inside an if.
+
+Added port-line, port-column, and set-port-line! to match Guile.
+
+The Makefiles have been written so all out-of-date .java (or .scm).
+files in a directory are compiled using a single invocation of javac (or
+kawa). Building Kawa should now be much faster. (But note that this
+depends on unreleased recent autoamke changes.)
+
+How the Kawa version number is compiled into Kawa was changed to make it
+easier for people who want to build from source on non-Unix-like
+systems.
+
+A new gnu.ecmascript package contains an extremely incomplete
+implementation of ECMSScript, the ECMA standardized version of
+JavaScript. It includes an ECMAScript lexer (basically complete), parser
+(the framework is there but most of the language is missing), incomplete
+expression evaluation, and a read-eval-print-loop (for testing only).
+
+@subheading Changes in Kawa 1.6.1
+@anchor{#changes-in-kawa-1.6.1}
+Improved Kawa home page with extra links, pointer to Java-generated api
+docs, and homepages for gnu.math and gnu.bytecode.
+
+Implemented system, make-process, and some related procedures.
+
+Added macros for primitive access to object fields, static fields, and
+Java arrays. Added constant-fold syntax, and used it for the other
+macros.
+
+The --main flag compiles Scheme code to an application (containing a
+main method), which can be be invoked directly by a Java interpreter.
+
+Implemented --version (following GNU standards) as kawa.repl
+command-line flag.
+
+@subheading Changes since Kawa 1.5.93
+@anchor{#changes-since-kawa-1.5.93}
+Adding make procedure to create new objects/records.
+
+Extended (set! (f . args) value) to be equivalent to ((setter f) value .
+args). Implemented setter, as well as (setter car) and (setter cdr).
+
+Can now get and set a record field value using an application: (rec
+'fname) gets the value of the field named fname in record rec. (set!
+(rec 'fname) value) sets the value of the field named fname in rec.
+
+A partial re-write of the implementation of input ports and the Scheme
+reader, to fix some problems, add some features, and improve
+performance.
+
+Compiled .class files are now installed in $(datadir)/java, rather than
+$(prefix)/java. By default, that means they are installed in
+/usr/local/shared/java, rather than /usr/local/java.
+
+There is now internal infrastructure to support inlining of procedures,
+and general procedure-specific optimized code generation.
+
+There is better testing that the right number of arguments are passed to
+a procedure, and better error messages when you don't. If the procedure
+is inlined, you get a compile-time error message.
+
+The functions created by primitive-constructor,
+primitive-virtual-method, primitive-static-method, and
+primitive-interface-method are now first-class procedure values. They
+use the Java reflection facily, except when the compiler can directly
+inline them (in which case it generates the same efficient bytecodes as
+before).
+
+New functions instance? (tests type membership) and as (converts).
+
+The kawa.html is now split into several files, one per chapter. The
+table of contents is now kawa_toc.html.
+
+The syntactic form try-catch provides low-level exception handler
+support. It is basically the same as Java's try/catch form, but in
+Scheme syntax. The new procedure primitive-throw throws an exception
+object.
+
+The higher-level catch and throw procedures implement exception handling
+where the handler is specified with a "key" (a symbol). These functions
+were taken from Guile.
+
+The error function has been generalized to take multiple arguments (as
+in Guile). It is now a wrapper around (throw 'misc-error ...).
+
+There is a new "friendly" GUI access to the Kawa command-line. If you
+invoke kawa.repl with the -w flag, a new interaction window is created.
+This is uses the AWT TextArea class. You can create multiple "consoles".
+They can either share top-level enevironments, or have separate
+environments. This window interface has some nice features, including
+editing. Added a scheme-window procedure, which is another way to create
+a window.
+
+@subheading Changes since Kawa 1.5
+@anchor{#changes-since-kawa-1.5}
+The default prompt now shows continuations lines differently.
+
+The copy-file function was added.
+
+The variable port-char-encoding controls how external files are
+converted to/from internal Unicode characters. It also controls whether
+CR and CR-LF are converted to LF.
+
+The reader by default no longer down-cases letters in symbols. A new
+variable symbol-read-case control how case is handled: 'P (the default)
+preserves case; 'U upper-cases letters; 'D or -" down-cases letters; and
+'I inverts case.
+
+The gnu.bytecode package now supports exception handlers. The new
+syntactic form try-finally supports a cleanup hook that is run after
+some other code finishes (normally or abnormally). Try-finally is used
+to implement dynamic-wind and fluid-let.
+
+The environment handling has been improved to support thread-specific
+environments, a thread-safe fluid-let, and multiple top-levels. (The
+latter still needs a bit of work.)
+
+The gnu.bytecode package has been extensively changed. There are new
+classes representing the various standard Attributes, and data
+associated with an attribute is now stored there.
+
+Added new procedures environment-bound? and
+scheme-implementation-version.
+
+Scheme symbols are represented as java.lang.String objects. Interned
+symbols are interned Strings; uninterned symbols are uninterned Strings.
+Note that Java strings literals are automatically interned in JDK 1.1.
+This change makes symbols slightly more efficient, and moves Kawa closer
+to Java.
+
+Ports now use the JDK 1.1 character-based Reader and Writer classes,
+rather than the byte-oriented InputStream and OutputStream classes. This
+supports different reading and writing different character encodings [in
+theory - there is no support yet for other than Ascii or binary files].
+
+An interactive input port now has a prompt function associated with it.
+It is settable with set-input-port-prompter!. The prompt function takes
+one argument (the input port), and returns a prompt string. There are
+also user functions for inquiring about the current line and column
+number of an input port.
+
+The R4RS procedures transcript-on and transcript-off are implemented.
+
+Standard types can be referred to using syntax similar to RScheme. For
+example Scheme strings now have the type @code{<string>} which is
+preferred to "@code{kawa.lang.FString}" (which in addition to being
+longer, is also more suspectible to changes in internal implementation).
+Though these types are first-class values, this is so far mainly useful
+for invoking primitive methods.
+
+@subheading Changes from Kawa 1.4 to 1.5
+@anchor{#changes-from-kawa-1.4-to-1.5}
+Execute a ~/.kawarc.scm file on startup, if it exists.
+
+Add a number of functions for testing, renaming, and deleting files.
+These are meant to be compatible with scsh, Guile, and MIT Scheme:
+file-exists?, file-directory?, file-readable?, file-writable?,
+delete-file, rename-file, create-diretory, and the variable
+home-directory.
+
+Fixed some small bugs, mainly in gnu.math and in load.
+
+Generalize apply to accept an arbitrary Sequence, or a primitive Java
+array.
+
+@subheading Changes from Kawa 1.2 to 1.4
+@anchor{#changes-from-kawa-1.2-to-1.4}
+The codegen package has been renamed gnu.bytecode. The kawa.math package
+has been moved to gnu.math. Both packages have new license: No
+restrictions if you use an unmodified release, but GNU General Public
+License. Let me know if that causes problems. The rest of Kawa still has
+the old license.
+
+Implement defmacro and gentemp.
+
+Implement make-record-type and related functions to create and use new
+record types. A record type is implemented as a java.lang.Class object,
+and this feature depends on the new reflection features of JDK 1.1.
+
+Implement keywords, and extend lambda parameter lists to support
+#!optional #!rest and #!keyword parameters (following DSSSL).
+
+Added more primitives to call arbitrary interface and constructor
+methods.
+
+@subheading Changes from Kawa 1.0 to 1.2
+@anchor{#changes-from-kawa-1.0-to-1.2}
+Added primitives to make it easy to call arbitrary Java methods from
+Scheme.
+
+Exact rational arithetic is now fully implemented. All integer functions
+now believed to correctly handle bignums. Logical operations on exact
+integers have been implemented. These include all the logical functions
+from Guile.
+
+Complex numbers are implemented (except @{,a@}@{sin,cos,tan@}).
+Quantities (with units) are implemented (as in DSSSL).
+
+Eval is available, as specified for R5RS. Also implemented are
+scheme-report-environment, null-environment, and
+interaction-environment.
+
+Internal define is implemented.
+
+Rough support for multiple threads is implemented.
+
+Moved kawa class to kawa/repl. Merged in kawac (compiler) functionality.
+A 'kawa' shell-script is now created. This is now the preferred
+interface to both the interactive evaluator and the compiler (on
+Unix-like systems).
+
+Now builds "without a snag" using Cafe 1.51 under Win95. (Symantec JIT
+(ver 2.00b19) requires disabling JIT - @code{JAVA_COMPCMD=disable}.)
+Compiles under JDK 1.1 beta (with some warnings).
+
+A testsuite (and testing framework) was added.
+
+Documentation moved to doc directory. There is now an internals
+overview, in doc/kawa-tour.ps.
+
+@subheading Changes since 0.4
+@anchor{#changes-since-0.4}
+The numeric classes have been re-written. There is partial support for
+bignums (infinite-precision integers), but divide (for example) has not
+been implemented yet. The representation of bignums uses 2's complement,
+where the "big digits" are laid out so as to be compatible with the mpn
+functions of the GNU Multi-Precision library (gmp). (The intent is that
+a future version of Kawa will support an option to use gmp native
+functions for speed.)
+
+The kawa application takes a number of useful command-line switches.
+
+Basically all of R4RS has been implemented. All the essential forms and
+functions are implemented. Almost all of the optional forms are
+implemented. The exceptions are transcript-on, transcript-off, and the
+functions for complex numbers, and fractions (exact non-integer
+rationals).
+
+Loading a source file with load now wraps the entire file in a lambda
+(named "atFileLevel"). This is for better error reporting, and
+consistency with compile-file.
+
+@subheading Changes since 0.3
+@anchor{#changes-since-0.3}
+The hygienic macros described in the appendix to R4RS are now impemented
+(but only the define-syntax form). They are used to implement the
+standard "do" form.
+
+The R5RS multiple value functions @code{values} and
+@code{call-with-values} are implemented.
+
+Macros (and primitive syntax) can now be autoloaded as well as
+procedures.
+
+New kawac application compiles to one or more .class files.
+
+Compile time errors include line numbers. Uncaught exceptions cause a
+stack trace that includes .scm line numbers. This makes it more
+practical to debug Kawa with a Java debugger.
+
+Quasiquotation is implemented.
+
+Various minor bug fixes and optimizations.
+
+@subheading Changes since 0.2
+@anchor{#changes-since-0.2}
+The biggest single change is that Scheme procedures are now compiled to
+Java bytecodes. This is mainly for efficiency, but it also allows us to
+do tail-recursion-elimination in some cases.
+
+The "codegen" library is included. This is a toolkit that handles most
+of the details needed to generate Java bytecode (.class) files.
+
+The internal structure of Kawa has been extensively re-written,
+especially how syntax transforms, eval, and apply are done, largely due
+to the needs for compilation.
+
+Almost all the R4RS procedures are now implemented, except that there
+are still large gaps in Section 6.5 "Numbers".

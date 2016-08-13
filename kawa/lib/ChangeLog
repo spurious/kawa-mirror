@@ -1,3 +1,8 @@
+2016-08-12  Per Bothner  <per@bothner.com>
+
+	* ports.java(write, display, etc): Don't initailize sharing/cycle
+	table here - it noew happens automatically in DisplayFormat.
+
 2016-07-26  Per Bothner  <per@bothner.com>
 
 	* kawa/pictures.scm (draw): Generalize by using DrawShape:makeDraw.

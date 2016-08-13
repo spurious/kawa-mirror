@@ -59,21 +59,17 @@ public class ObjectFormat extends ReportFormat
   private static void print (Object obj, OutPort out,
 			     boolean readable)
   {
-    boolean saveReadable = out.printReadable;
-    AbstractFormat saveFormat = out.objectFormat;
+    AbstractFormat format
+        = readable ? DisplayFormat.schemeWriteFormat
+        : DisplayFormat.schemeDisplayFormat;
+    Object save = out.pushFormat(format);
     try
       {
-	out.printReadable = readable;
-	AbstractFormat format
-            = readable ? DisplayFormat.schemeWriteFormat
-            : DisplayFormat.schemeDisplayFormat;
-	out.objectFormat = format;
 	format.writeObject(obj, (gnu.lists.Consumer) out);
       }
     finally
       {
-	out.printReadable = saveReadable;
-	out.objectFormat = saveFormat;
+        out.popFormat(save);
       }
   }
 

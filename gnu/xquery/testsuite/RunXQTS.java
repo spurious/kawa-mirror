@@ -142,9 +142,9 @@ public class RunXQTS extends FilterConsumer
       {
         // The tricky part is to make sure that the result can be validated.
         // Specifically, no spaces are allowed in a <test-case>.
-        xqlog.printIndent = -1;
+        xqlog.setIndent(-1);
         xqlog.beginComment();
-        xqlog.printIndent = 0;
+        xqlog.setIndent(0);
         xqlog.writeBreakFill();
         xqlog.write(name); xqlog.write(": ");
         xqlog.write(value);
@@ -168,12 +168,11 @@ public class RunXQTS extends FilterConsumer
             runner.catalog = runner.directory + "/XQTSCatalog.xml";
             System.err.println("catalog: "+runner.catalog);
             XMLPrinter xqlog
-              = new XMLPrinter(new BufferedOutputStream(new FileOutputStream(runner.logFileName)),
-                               FilePath.valueOf(runner.logFileName));
+                = new XMLPrinter(new BufferedOutputStream(new FileOutputStream(runner.logFileName)));
             runner.xqlog = xqlog;
             xqlog.setPrintXMLdecl(true);
             xqlog.setStyle("xml");
-            xqlog.useEmptyElementTag = 1;
+            xqlog.setUseEmptyElementTag(1);
             Object saveIndent = XMLPrinter.indentLoc.setWithSave("pretty");
             xqlog.startDocument();
             XMLPrinter.indentLoc.setRestore(saveIndent);
@@ -587,10 +586,10 @@ public class RunXQTS extends FilterConsumer
     gnu.lists.Consumer save = ctx.consumer;
     CharArrayOutPort out = new CharArrayOutPort();
     XMLPrinter xout = new XMLPrinter(out, false);
-    xout.strict = true;
-    xout.useEmptyElementTag = 1;
-    xout.escapeNonAscii = false;
-    xout.canonicalizeCDATA = true;
+    xout.setExtended(false);
+    xout.setUseEmptyElementTag(1);
+    xout.setEscapeNonAscii(false);
+    xout.setCanonicalizeCDATA(true);
     ctx.consumer = xout;
     try
       {
@@ -760,8 +759,8 @@ public class RunXQTS extends FilterConsumer
           return true;
         int c1 = i1 == len1 ? -1 : arg1.charAt(i1);
         int c2 = i2 == len2 ? -1 : arg2.charAt(i2);
-        if ((c1 == '&' && arg1.charAt(i1+1) == '#' && i1 + 3 < len1)
-            || (c2 == '&' && arg2.charAt(i2+1) == '#' && i2 + 3 < len2))
+        if ((c1 == '&' && i1 + 3 < len1 && arg1.charAt(i1+1) == '#')
+            || (c2 == '&' && i2 + 3 < len2 && arg2.charAt(i2+1) == '#'))
           {
             try
               {
@@ -1218,7 +1217,7 @@ public class RunXQTS extends FilterConsumer
   public void endAttribute()
   {
     super.endAttribute();
-    String attrValue = cout.toSubString(attrValueStart, cout.length()-1);
+    String attrValue = cout.toSubString(attrValueStart, cout.length());
     Symbol sym = (Symbol) attributeType;
     String uri = sym.getNamespaceURI();
     String local = sym.getLocalPart();

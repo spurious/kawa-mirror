@@ -1,12 +1,18 @@
+
 package gnu.lists;
 import gnu.mapping.*;
+import gnu.kawa.io.BinaryOutPort;
 import gnu.kawa.io.CharArrayOutPort;
 import gnu.kawa.io.OutPort;
 import gnu.kawa.io.Path;
+import gnu.kawa.io.PrettyWriter;
 import java.text.FieldPosition;
 
 public abstract class AbstractFormat extends java.text.Format
 {
+    /** True if strings characters to written without escape or quoting. */
+    public boolean textIsCopied() { return false; }
+
   protected void write(String str, Consumer out)
   {
     out.write(str);
@@ -17,20 +23,24 @@ public abstract class AbstractFormat extends java.text.Format
     out.write(v);
   }
 
-  /** Write a long.
-   * The default is to call writeLong on the Consumer. */
-  public void writeLong(long v, Consumer out)
-  {
-    out.writeLong(v);
-  }
+    /** Write a long.
+     * The default is to call writeLong on the Consumer. */
+    public void writeLong(long v, Consumer out) {
+        out.writeLong(v);
+    }
 
-  /** Write an int.
-   * The default is to call writeLong, so sub-classes only need to
-   * override the latter. */
-  public void writeInt(int i, Consumer out)
-  {
-    writeLong(i, out);
-  }
+    /** Write an int. */
+    public void writeInt(int i, Consumer out) {
+        out.writeInt(i);
+    }
+
+    public void writeFloat(float v, Consumer out) {
+        out.writeFloat(v);
+    }
+
+    public void writeDouble(double v, Consumer out) {
+        out.writeDouble(v);
+    }
 
   public void writeBoolean(boolean v, Consumer out)
   {
@@ -62,20 +72,70 @@ public abstract class AbstractFormat extends java.text.Format
 
   public abstract void writeObject(Object v, Consumer out);
 
+    /** Return an OutPort equivalent to the argumement for text output.
+     * I.e. writing CharSequences or characters to either is the same.
+     * Used to optimize process output.
+     */
+    public static OutPort getPassThroughOutPort(Consumer out) {
+        OutPort port = null;
+        for (;;) {
+            if (out instanceof OutPort) {
+                port = (OutPort) out;
+                PrintConsumer formatter = port.formatter;
+                if (formatter instanceof PrettyWriter)
+                    return port;
+                out = formatter;
+            } else if (out instanceof FormatConsumer) {
+                FormatConsumer fcons = (FormatConsumer) out;
+                if (!  fcons.format.textIsCopied())
+                    return null;
+                out = fcons.base;
+            }
+            else
+                return port;
+        }
+    }
+
+    static class FormatConsumer extends PrintConsumer {
+        AbstractFormat format;
+
+        public FormatConsumer(AbstractFormat format, Consumer base) {
+            super(base, false);
+            this.format = format;
+        }
+
+        public void write(String str) { format.write(str, base); }
+        public void write(int v) { format.write(v, base); }
+        public void writeInt(int v) { format.writeInt(v, base); }
+        public void writeLong(long v) { format.writeLong(v, base); }
+        public void writeFloat(float v) { format.writeFloat(v, base); }
+        public void writeDouble(double v) { format.writeDouble(v, base); }
+        public void writeObject(Object v) { format.writeObject(v, base); }
+        public void writeBoolean(boolean v) { format.writeBoolean(v, base); }
+        public void startElement(Object t) { format.startElement(t, base); }
+        public void endElement() { format.endElement(base); }
+        public void startAttribute(Object t) { format.startAttribute(t, base);}
+        public void endAttribute() { format.endAttribute(base); }
+    }
+
+    public PrintConsumer makeConsumer(Consumer next) {
+        return new FormatConsumer(this, next);
+    }
+
   public void format (Object value, Consumer out)
   {
     if (out instanceof OutPort)
       {
 	OutPort pout = (OutPort) out;
-	AbstractFormat saveFormat = pout.objectFormat;
+	PrintConsumer saveFormat = pout.formatter;
 	try
 	  {
-	    pout.objectFormat = this;
+            pout.formatter = makeConsumer(saveFormat);
 	    out.writeObject(value);
 	  }
 	finally
 	  {
-	    pout.objectFormat = saveFormat;
+	    pout.formatter = saveFormat;
 	  }
       }
     else

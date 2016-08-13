@@ -6,6 +6,7 @@ import gnu.kawa.util.IntHashTable;
 import java.io.*;
 import gnu.mapping.ThreadLocation;
 import gnu.lists.LList;
+import gnu.lists.PrintConsumer;
 
 /** 
  * A pretty printer.
@@ -70,10 +71,8 @@ import gnu.lists.LList;
  * @author Charles Turner
  */
 
-public class PrettyWriter extends java.io.Writer
+public class PrettyWriter extends PrintConsumer
 {
-  protected Writer out;
-
   /**
    * Construct a PrettyWriter with {@code prettyPrintingMode = 1}
    * @param out The output to write to
@@ -81,10 +80,9 @@ public class PrettyWriter extends java.io.Writer
    */
   public PrettyWriter(java.io.Writer out)
   {
-    this.out = out;
+    super(out);
     setPrettyPrintingMode(1);
   }
-
   /**
    * Construct a PrettyWriter which breaks on a given line length.
    * If {@code lineLength} is strictly greater than one, 
@@ -96,7 +94,7 @@ public class PrettyWriter extends java.io.Writer
    */
   public PrettyWriter(java.io.Writer out, int lineLength)
   {
-    this.out = out;
+    super(out);
     this.lineLength = lineLength;
     setPrettyPrintingMode(lineLength > 1 ? 1 : 0);
   }
@@ -109,7 +107,7 @@ public class PrettyWriter extends java.io.Writer
    */
   public PrettyWriter(java.io.Writer out, boolean prettyPrintingMode)
   {
-    this.out = out;
+    super(out);
     setPrettyPrintingMode(prettyPrintingMode ? 1 : 0);
   }
 
@@ -165,11 +163,13 @@ public class PrettyWriter extends java.io.Writer
   
   private IntHashTable idhash;
 
-  public void initialiseIDHash ()
-  {
-    Object share = isSharing.get(null);
-    idhash = new IntHashTable();
-  }
+    public boolean initialiseIDHash() {
+        Object share = isSharing.get(null); // FIXME ???
+        if (idhash != null)
+            return false;
+        idhash = new IntHashTable();
+        return true;
+    }
 
   public void clearIDHash()
   {
@@ -181,10 +181,10 @@ public class PrettyWriter extends java.io.Writer
         writeEndOfExpression();
         resolveBackReferences();
         flush();
+        idhash = null;
     }
 
   public int IDHashLookup(Object obj) {
-    if (idhash == null) initialiseIDHash();
     return idhash.lookup(obj);
   }
 
@@ -567,10 +567,10 @@ public class PrettyWriter extends java.io.Writer
     wordEndSeen = false;
   }
 
-  public void clearWordEnd ()
-  {
-    wordEndSeen = false;
-  }
+    @Override
+    protected void clearWordEnd () {
+        wordEndSeen = false;
+    }
 
   /**
    * Write a character to the buffer. If we're pretty printing and the character
@@ -1070,6 +1070,15 @@ public class PrettyWriter extends java.io.Writer
   {
     if (prettyPrintingMode > 0 || sharing) //!!
       enqueueNewline(kind);
+  }
+
+  /** Write a new-line iff the containing section cannot be printed
+   * on one line.  Either all linear-style newlines in a logical
+   * block becomes spaces (if it all fits in a line), or none
+   * of them do. */
+  public void writeBreakLinear()
+  {
+    writeBreak(PrettyWriter.NEWLINE_LINEAR);
   }
 
   public int enqueueIndent (char kind, int amount)
@@ -1810,12 +1819,12 @@ public class PrettyWriter extends java.io.Writer
       }
   }
 
-  public void close()  throws IOException
+  public void close()
   {
     if (out != null)
       { 
 	forcePrettyOutput();
-        out.close();
+        super.close();
         out = null;
       }
     buffer = null;

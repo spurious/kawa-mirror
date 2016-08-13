@@ -1,3 +1,8 @@
+2016-08-12  Per Bothner  <per@bothner.com>
+
+	* Shell.java: Change handling of output-consumer so we never
+	change the OutPort itself.  Instead we get a new new PrintConsumer.
+
 2016-07-22  Per Bothner  <per@bothner.com>
 
 	* ReplPane.java (PaintableView.paint): Fix translation.

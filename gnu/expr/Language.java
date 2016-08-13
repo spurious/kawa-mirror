@@ -495,8 +495,7 @@ public abstract class Language
   {
     OutPort oport = out instanceof OutPort ? (OutPort) out
       : new OutPort(out);
-    oport.objectFormat = getFormat(false);
-    return oport;
+    return getFormat(false).makeConsumer(oport);
   }
 
   public String getName()

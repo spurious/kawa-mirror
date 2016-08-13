@@ -770,10 +770,10 @@ public class XQuery extends Language
   public static final ConstantFunction0 trueFunction
     = new ConstantFunction0("true", trueExp);
 
-  public Consumer getOutputConsumer(java.io.Writer out)
-  {
-    return new XMLPrinter(out, false);
-  }
+    @Override
+    public Consumer getOutputConsumer(java.io.Writer out) {
+        return new XMLPrinter(out);
+    }
 
   static Object[] typeMap =
     { "string", XDataType.stringType,

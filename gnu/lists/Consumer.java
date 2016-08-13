@@ -14,14 +14,12 @@ package gnu.lists;
  */
 
 public interface Consumer
-  /* #ifdef JAVA5 */
   extends Appendable
   /* #ifdef JAVA8 */
   //         , java.util.function.Consumer<Object>,
   //         java.util.function.IntConsumer,
   //         java.util.function.LongConsumer,
   //         java.util.function.DoubleConsumer
-  /* #endif */
   /* #endif */
 {
   public void writeBoolean(boolean v);
@@ -55,19 +53,12 @@ public interface Consumer
 
   public void write(int ch);
   public void write(String string);
-  /* #ifdef use:java.lang.CharSequence */
   public void write(CharSequence string, int start, int length);
-  /* #else */
-  // public void write(String string, int start, int length);
-  /* #endif */
-  
   public void write(char[] buf, int start, int length);
 
-  /* #ifdef JAVA5 */
   public Consumer append (char c);
   public Consumer append (CharSequence csq);
   public Consumer append (CharSequence csq, int start, int end);
-  /* #endif */
 
   /* #ifdef JAVA8 */
   // default public void accept(Object t) { writeObject(t); }

@@ -13,7 +13,7 @@ import java.util.Vector;
  * Used for both CGI scripts (default) and HttpServletResponse (future).
  */
 
-public class HttpPrinter extends FilterConsumer
+public class HttpPrinter extends PrintConsumer
 {
   Vector headers = new Vector();
   /** Used as output buffer if base is null. */
@@ -29,7 +29,7 @@ public class HttpPrinter extends FilterConsumer
   private int elementNesting;
 
   protected OutputStream ostream;
-  OutPort writer;
+  PrintConsumer writer;
 
   public HttpPrinter(OutputStream out)
   {
@@ -37,28 +37,15 @@ public class HttpPrinter extends FilterConsumer
     ostream = out;
   }
 
-  public HttpPrinter(OutPort out)
+  public HttpPrinter(PrintConsumer out)
   {
     super(null);
     writer = out;
   }
 
-  public static HttpPrinter make (OutPort out)
+  public static HttpPrinter make (PrintConsumer out)
   {
     return new HttpPrinter(out);
-  }
-
-  private void writeRaw(String str)
-    throws java.io.IOException
-  {
-    if (writer != null)
-      writer.write(str);
-    else
-      {
-	int len = str.length();
-	for (int i = 0;  i < len;  i++)
-	  ostream.write((byte) str.charAt(i));
-      }
   }
 
   protected void beforeNode ()
@@ -132,7 +119,9 @@ public class HttpPrinter extends FilterConsumer
 	  style = "xhtml";
 	else if ("text/plain".equalsIgnoreCase(sawContentType))
 	  style = "plain";
-	base = XMLPrinter.make(writer, style);
+	XMLPrinter xout = XMLPrinter.make(writer, style);
+        out = xout;
+        base = xout;
         if (seenStartDocument == 0)
           {
             base.startDocument();
@@ -184,7 +173,7 @@ public class HttpPrinter extends FilterConsumer
 
   public void writeObject(Object v)
   {
-    if (v instanceof Consumable && ! (v instanceof UnescapedData))
+    if (v instanceof Consumable)
       ((Consumable) v).consume(this);
     else
       {

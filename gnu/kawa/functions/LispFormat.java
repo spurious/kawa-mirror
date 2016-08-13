@@ -776,20 +776,11 @@ class LispObjectFormat extends ReportFormat
     if (this.minPad == LispFormat.PARAM_FROM_LIST)  start++;
     char padChar = getParam(this.padChar, ' ', args, start);
     if (this.padChar == LispFormat.PARAM_FROM_LIST)  start++;
-    if (base.readable && dst instanceof OutPort
+    if (base.readable && dst instanceof OutPort && minWidth == 0) {
         // PadFormat formats to a temporary StringBuffer (i.e. not a
         // PrettyWriter) so we don't support sharing anyway.
-        // FIXME in ParFormat.
-        && minWidth == 0) {
-        PrettyWriter pdst = ((OutPort) dst).getPrettyWriter();
-        pdst.initialiseIDHash();
-        pdst.setSharing(true);
-        try {
-            return base.format(args, start, dst, fpos);
-        } finally {
-            pdst.setSharing(false);
-            pdst.finishIDHash();
-        }
+        // FIXME in PadFormat.
+        return base.format(args, start, dst, fpos);
     }
     return gnu.text.PadFormat.format(base, args, start, dst,
 				     padChar, minWidth, colInc, minPad,

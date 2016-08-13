@@ -1,3 +1,12 @@
+2016-08-12  Per Bothner  <per@bothner.com>
+
+	A cleaner format/consumer model.
+	* AbstractFormat.java (class FormatConsumer): New static class.
+	(makeConsumer): New method.
+	(getPassThroughOutPort): New static method.
+	* PrintConsumer.java: Add a bucnh of of methods, include
+	some moved from OutPort or PrettyWriter.
+
 2016-07-17  Per Bothner  <per@bothner.com>
 
 	* IntSequence.java: Implement AVector rather than List *and* Array.

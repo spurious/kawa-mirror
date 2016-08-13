@@ -4,6 +4,7 @@
 package gnu.xml;
 import gnu.lists.*;
 import java.io.*;
+import gnu.lists.PrintConsumer;
 import gnu.math.RealNum;
 import gnu.kawa.io.PrettyWriter;
 import gnu.kawa.io.OutPort;
@@ -18,13 +19,10 @@ import gnu.kawa.xml.XmlNamespace;
 
 /** Print an event stream in XML format on a PrintWriter. */
 
-public class XMLPrinter extends OutPort
+public class XMLPrinter extends PrintConsumer
   implements PositionConsumer, XConsumer
 {
-  /** Controls whether to add extra indentation.
-   * -1: don't add indentation; 0: pretty-print (avoid needless newlines);
-   * 1: indent (force). */
-  public int printIndent = -1;
+  protected int printIndent = -1;
   /** When indenting, should attributes be lined up? */
   public boolean indentAttributes;
 
@@ -51,6 +49,8 @@ public class XMLPrinter extends OutPort
   boolean isHtmlOrXhtml = false;
   boolean undeclareNamespaces = false;
   Object style;
+  public boolean extended = true;
+
   /** Fluid parameter to control whether a DOCTYPE declaration is emitted.
    * If non-null, this is the the public identifier. */
   public static final ThreadLocation doctypeSystem
@@ -62,8 +62,6 @@ public class XMLPrinter extends OutPort
     = new ThreadLocation("doctype-public");
   public static final ThreadLocation<String> indentLoc
     = new ThreadLocation<String>("xml-indent");
-
-  public boolean strict;
 
   /** Chain of currently active namespace nodes. */
   NamespaceBinding namespaceBindings = NamespaceBinding.predefinedXML;
@@ -87,19 +85,9 @@ public class XMLPrinter extends OutPort
 
   char savedHighSurrogate; // should perhaps be combined with prev?
 
-  public XMLPrinter (OutPort out, boolean autoFlush)
-  {
-    super(out, autoFlush);
-  }
-
   public XMLPrinter (Writer out, boolean autoFlush)
   {
     super(out, autoFlush);
-  }
-
-  public XMLPrinter (OutputStream out, boolean autoFlush)
-  {
-    super(new OutputStreamWriter(out), true, autoFlush);
   }
 
   public XMLPrinter (Writer out)
@@ -107,19 +95,22 @@ public class XMLPrinter extends OutPort
     super(out);
   }
 
+    public XMLPrinter(Consumer out) {
+        super(out, false);
+    }
+
+    public XMLPrinter(PrintConsumer out) {
+        super((Writer) out, false);
+    }
+
   public XMLPrinter (OutputStream out)
   {
-    super(new OutputStreamWriter(out), false, false);
+    super(new OutputStreamWriter(out));
   }
 
-  public XMLPrinter (OutputStream out, Path path)
+  public static XMLPrinter make(Consumer out, Object style)
   {
-    super(new OutputStreamWriter(out), true, false, path);
-  }
-
-  public static XMLPrinter make(OutPort out, Object style)
-  {
-    XMLPrinter xout = new XMLPrinter(out, true);
+    XMLPrinter xout = new XMLPrinter(out);
     xout.setStyle(style);
     return xout;
   }
@@ -157,6 +148,16 @@ public class XMLPrinter extends OutPort
       escapeText = false;
   }
 
+    public void setEscapeText(boolean v) { escapeText = v; }
+    public void setEscapeNonAscii(boolean v) { escapeNonAscii = v; }
+    public void setCanonicalizeCDATA(boolean v) { canonicalizeCDATA = v; }
+    public void setUseEmptyElementTag(int v) { useEmptyElementTag = v; }
+    public void setExtended(boolean v) { extended = v; }
+    /** Controls whether to add extra indentation.
+     * -1: don't add indentation; 0: pretty-print (avoid needless newlines);
+     * 1: indent (force). */
+    public void setIndent(int v) { printIndent = v; } 
+ 
   boolean mustHexEscape (int v)
   {
     return (v >= 127 && (v <= 159 || escapeNonAscii))
@@ -166,77 +167,61 @@ public class XMLPrinter extends OutPort
       || (v < ' ' && (inAttribute || (v != '\t' && v != '\n')));
   }
 
-  public void write (int v)
-  {
-    closeTag();
-    if (printIndent >= 0)
-      {
-        if ((v == '\r' || v == '\n'))
-          {
-            if (v != '\n' || prev != '\r')
-              writeBreak(PrettyWriter.NEWLINE_MANDATORY);
-            if (inComment > 0)
-              inComment = 1;
-            return;
-          }
-      }
-    if (! escapeText)
-      {
-	bout.write(v);
-	prev = v;
-      }
-    else if (inComment > 0)
-      {
-        if (v == '-')
-          {
-            if (inComment == 1)
-              inComment = 2;
+    public void write(int v) {
+        closeTag();
+        if (printIndent >= 0) {
+            if ((v == '\r' || v == '\n')) {
+                if (v != '\n' || prev != '\r')
+                    writeBreak(PrettyWriter.NEWLINE_MANDATORY);
+                if (inComment > 0)
+                    inComment = 1;
+                return;
+            }
+        }
+        if (! escapeText) {
+            writeRaw(v);
+            prev = v;
+        } else if (inComment > 0) {
+            if (v == '-') {
+                if (inComment == 1)
+                    inComment = 2;
+                else
+                    writeRaw(' ');
+            }
             else
-              bout.write(' ');
-          }
-        else
-          inComment = 1;
-        super.write(v);
-      }
-    else
-      {
-	prev = ';';
-	if (v == '<' && ! (isHtml && inAttribute))
-	  bout.write("&lt;");
-	else if (v == '>')
-	  bout.write("&gt;");
-	else if (v == '&')
-	  bout.write("&amp;");
-	else if (v == '\"' && inAttribute)
-	  bout.write("&quot;");
-	else if (mustHexEscape(v))
-          {
-            int i = v;
-            if (v >= 0xD800)
-              {
-                if (v < 0xDC00)
-                  {
-                    savedHighSurrogate = (char) v;
-                    return;
-                  }
-                else if (v < 0xE000)
-                  { // low surrogate
-                    //if (highSurrogate < 0xDC00 || highSurrogate > 0xE000)
-                    // error();
-                    i = (savedHighSurrogate - 0xD800) * 0x400
-                      + (i - 0xDC00) + 0x10000;
-                    savedHighSurrogate = 0;
-                  }
-              }
-            bout.write("&#x"+Integer.toHexString(i).toUpperCase()+";");
-          }
-	else
-	  {
-	    bout.write(v);
-	    prev = v;
-	  }
-      }
-  }
+                inComment = 1;
+            writeRaw(v);
+        } else {
+            prev = ';';
+            if (v == '<' && ! (isHtml && inAttribute))
+                writeRaw("&lt;");
+            else if (v == '>')
+                writeRaw("&gt;");
+            else if (v == '&')
+                writeRaw("&amp;");
+            else if (v == '\"' && inAttribute)
+                writeRaw("&quot;");
+            else if (mustHexEscape(v)) {
+                int i = v;
+                if (v >= 0xD800) {
+                    if (v < 0xDC00) {
+                        savedHighSurrogate = (char) v;
+                        return;
+                    } else if (v < 0xE000) { // low surrogate
+                        //if (highSurrogate < 0xDC00 || highSurrogate > 0xE000)
+                        // error();
+                        i = (savedHighSurrogate - 0xD800) * 0x400
+                            + (i - 0xDC00) + 0x10000;
+                        savedHighSurrogate = 0;
+                    }
+                }
+                writeRaw("&#x"+Integer.toHexString(i).toUpperCase()+";");
+            } else {
+                writeRaw(v);
+                prev = v;
+            }
+        }
+    }
 
   private void startWord()
   {
@@ -267,14 +252,14 @@ public class XMLPrinter extends OutPort
       {
 	if (printIndent >= 0 && indentAttributes)
           endLogicalBlock("");
-	bout.write('>');
+	writeRaw(">");
 	inStartTag = false;
 	prev = ELEMENT_START;
       }
     else if (needXMLdecl)
       {
 	// should also include encoding declaration FIXME.
-	bout.write("<?xml version=\"1.0\"?>\n");
+	writeRaw("<?xml version=\"1.0\"?>\n");
 	if (printIndent >= 0)
 	  {
 	    startLogicalBlock("", "", 2);
@@ -328,22 +313,19 @@ public class XMLPrinter extends OutPort
   {
   }
 
-  protected void writeQName (Object name)
-  {
-    if (name instanceof Symbol)
-      {
-        Symbol sname = (Symbol) name;
-        String prefix = sname.getPrefix();
-        if (prefix != null && prefix.length() > 0)
-          {
-            bout.write(prefix);
-            bout.write(':');
-          }
-        bout.write(sname.getLocalPart());
-      }
-    else
-      bout.write(name == null ? "{null name}" : (String) name);
-  }
+    protected void writeQName(Object name) {
+        if (name instanceof Symbol) {
+            Symbol sname = (Symbol) name;
+            String prefix = sname.getPrefix();
+            if (prefix != null && prefix.length() > 0) {
+                writeRaw(prefix);
+                writeRaw(':');
+            }
+            writeRaw(sname.getLocalPart());
+        }
+        else
+            writeRaw(name == null ? "{null name}" : (String) name);
+    }
 
   /** Write DOCTYPE using ThreadLocations doctypeSystem and doctypePublic */
   public void writeDoctypeIfDefined (String tagname)
@@ -362,23 +344,20 @@ public class XMLPrinter extends OutPort
       }
   }
 
-  public void writeDoctype (String tagname, String systemId, String publicId)
-  {
-    bout.write("<!DOCTYPE ");
-    bout.write(tagname);
-    if (publicId != null && publicId.length() > 0)
-      {
-        bout.write(" PUBLIC \"");
-        bout.write(publicId);
-        bout.write("\" \"");
-      }
-    else
-      {
-        bout.write(" SYSTEM \"");
-      }
-    bout.write(systemId);
-    bout.write("\">");
-    println();
+    public void writeDoctype(String tagname, String systemId, String publicId)
+    {
+        writeRaw("<!DOCTYPE ");
+        writeRaw(tagname);
+        if (publicId != null && publicId.length() > 0) {
+            writeRaw(" PUBLIC \"");
+            writeRaw(publicId);
+            writeRaw("\" \"");
+        } else {
+            writeRaw(" SYSTEM \"");
+        }
+        writeRaw(systemId);
+        writeRaw("\">");
+        println();
   }
 
   public void startElement(Object type)
@@ -400,7 +379,7 @@ public class XMLPrinter extends OutPort
 			  : PrettyWriter.NEWLINE_LINEAR);
 	startLogicalBlock("", "", 2);
       }
-    bout.write('<');
+    writeRaw('<');
     writeQName(type);
     if (printIndent >= 0 && indentAttributes)
       startLogicalBlock("", "", 2);
@@ -463,20 +442,20 @@ public class XMLPrinter extends OutPort
 	      continue;
             if (uri == null && prefix != null && ! undeclareNamespaces)
               continue;
-	    bout.write(' '); // prettyprint break
+	    writeRaw(' '); // prettyprint break
 	    if (prefix == null)
-	      bout.write("xmlns");
+	      writeRaw("xmlns");
 	    else
 	      {
-		bout.write("xmlns:");
-		bout.write(prefix);
+		writeRaw("xmlns:");
+		writeRaw(prefix);
 	      }
-	    bout.write("=\"");
+	    writeRaw("=\"");
 	    inAttribute = true;
 	    if (uri != null)
 	      write(uri);
 	    inAttribute = false;
-	    bout.write('\"');
+	    writeRaw('\"');
 	  }
 	if (undeclareNamespaces)
 	  {
@@ -489,15 +468,15 @@ public class XMLPrinter extends OutPort
 		String prefix = ns.prefix;
 		if (ns.uri != null && elementBindings.resolve(prefix) == null)
 		  {
-		    bout.write(' '); // prettyprint break
+                    writeRaw(' '); // prettyprint break
 		    if (prefix == null)
-		      bout.write("xmlns");
+		      writeRaw("xmlns");
 		    else
 		      {
-			bout.write("xmlns:");
-			bout.write(prefix);
+			writeRaw("xmlns:");
+			writeRaw(prefix);
 		      }
-		    bout.write("=\"\"");
+		    writeRaw("=\"\"");
 		  }
 	      }
 	  }
@@ -579,7 +558,7 @@ public class XMLPrinter extends OutPort
           }
         if (end == null)
           end = isEmpty && isHtml ? ">" : useEmptyElementTag == 2 ? " />" : "/>";
-        bout.write(end);
+        writeRaw(end);
 	inStartTag = false;
       }
     else
@@ -591,9 +570,9 @@ public class XMLPrinter extends OutPort
 	      writeBreak(printIndent > 0 ? PrettyWriter.NEWLINE_MANDATORY
                          : PrettyWriter.NEWLINE_LINEAR);
 	  }
-	bout.write("</");
+	writeRaw("</");
         writeQName(type);
-	bout.write(">");
+	writeRaw(">");
       }
     if (printIndent >= 0)
       {
@@ -613,16 +592,16 @@ public class XMLPrinter extends OutPort
    * This is only allowed immediately after a startElement. */
   public void startAttribute (Object attrType)
   {
-    if (! inStartTag && strict)
+    if (! inStartTag && ! extended)
       error("attribute not in element", "SENR0001");
     if (inAttribute)
-      bout.write('"');
+      writeRaw('"');
     inAttribute = true;
-    bout.write(' ');
+    writeRaw(' ');
     if (printIndent >= 0)
       writeBreakFill();
-    bout.write(attrType==null ? "{null name}" : attrType.toString());
-    bout.write("=\"");
+    writeRaw(attrType==null ? "{null name}" : attrType.toString());
+    writeRaw("=\"");
     prev = ' ';
   }
 
@@ -632,7 +611,7 @@ public class XMLPrinter extends OutPort
       {
         if (prev != KEYWORD)
           {
-            bout.write('"');
+            writeRaw('"');
             inAttribute = false;
           }
         prev = ' ';
@@ -642,13 +621,13 @@ public class XMLPrinter extends OutPort
   public void writeDouble (double d)
   {
     startWord();
-    bout.write(formatDouble(d));
+    writeRaw(formatDouble(d));
   }
 
   public void writeFloat (float f)
   {
     startWord();
-    bout.write(formatFloat(f));
+    writeRaw(formatFloat(f));
   }
 
   /** Helper to format xs:double according to XPath/XQuery specification. */
@@ -736,7 +715,7 @@ public class XMLPrinter extends OutPort
   {
     if (v instanceof SeqPosition)
       {
-        bout.clearWordEnd();
+        clearWordEnd();
 	SeqPosition pos = (SeqPosition) v;
 	pos.sequence.consumeNext(pos.ipos, this);
         if (pos.sequence instanceof NodeTree)
@@ -757,8 +736,8 @@ public class XMLPrinter extends OutPort
     closeTag();
     if (v instanceof UnescapedData)
       {
-        bout.clearWordEnd();
-	bout.write(((UnescapedData) v).getData());
+        clearWordEnd();
+	writeRaw(((UnescapedData) v).getData());
         prev = '-';
       }
     else if (v instanceof Char)
@@ -784,34 +763,30 @@ public class XMLPrinter extends OutPort
     return false;
   }
 
-  public void write (String str, int start, int length)
-  {
-    if (length > 0)
-      {
-        closeTag();
-        int limit = start + length;
-        int count = 0;
-        while (start < limit)
-          {
-            char c = str.charAt(start++);
-            if (mustHexEscape(c)
-                || (inComment > 0 ? (c == '-' || inComment == 2)
-                    : (c == '<' || c == '>' || c == '&'
-                       || (inAttribute && (c == '"' || c < ' ' )))))
-              {
-                if (count > 0)
-                  bout.write(str, start - 1 - count, count);
-                write(c);
-                count = 0;
-              }
-            else
-              count++;
-          }
-        if (count > 0)
-          bout.write(str, limit - count, count);
-      }
-    prev = '-';
-  }
+   public void write(String str, int start, int length) {
+        if (length > 0) {
+            closeTag();
+            int limit = start + length;
+            int count = 0;
+            while (start < limit) {
+                char c = str.charAt(start++);
+                if (mustHexEscape(c)
+                    || (inComment > 0 ? (c == '-' || inComment == 2)
+                        : (c == '<' || c == '>' || c == '&'
+                           || (inAttribute && (c == '"' || c < ' ' ))))) {
+                    if (count > 0)
+                        writeRaw(str, start - 1 - count, count);
+                    write(c);
+                    count = 0;
+                }
+                else
+                    count++;
+            }
+            if (count > 0)
+                writeRaw(str, limit - count, count);
+        }
+        prev = '-';
+    }
 
   public void write(char[] buf, int off, int len)
   {
@@ -829,7 +804,7 @@ public class XMLPrinter extends OutPort
                        || (inAttribute && (c == '"' || c < ' ' )))))
               {
                 if (count > 0)
-                  bout.write(buf, off - 1 - count, count);
+                  writeRaw(buf, off - 1 - count, count);
                 write(c);
                 count = 0;
               }
@@ -837,7 +812,7 @@ public class XMLPrinter extends OutPort
               count++;
           }
         if (count > 0)
-          bout.write(buf, limit - count, count);
+          writeRaw(buf, limit - count, count);
       }
     prev = '-';
   }
@@ -860,13 +835,13 @@ public class XMLPrinter extends OutPort
 	  writeBreak(printIndent > 0 ? PrettyWriter.NEWLINE_MANDATORY
                      : PrettyWriter.NEWLINE_LINEAR);
       }
-    bout.write("<!--");
+    writeRaw("<!--");
     inComment = 1;
   }
 
   public void endComment ()
   {
-    bout.write("-->");
+    writeRaw("-->");
     prev = COMMENT;
     inComment = 0;
   }
@@ -893,7 +868,7 @@ public class XMLPrinter extends OutPort
         return;
       }
     closeTag();
-    bout.write("<![CDATA[");
+    writeRaw("<![CDATA[");
     int limit = offset+length;
     // Look for and deal with embedded "]]>".  This can't happen with
     // data generated from XML, but maybe somebody generated invalid CDATA.
@@ -902,15 +877,15 @@ public class XMLPrinter extends OutPort
 	if (chars[i] == ']' && chars[i+1] == ']' && chars[i+2] == '>')
 	  {
 	    if (i > offset)
-	      bout.write(chars, offset, i - offset);
-	    print("]]]><![CDATA[]>");
+	      writeRaw(chars, offset, i - offset);
+	    writeRaw("]]]><![CDATA[]>");
 	    offset = i + 3;
 	    length = limit - offset;
 	    i = i + 2;
 	  }
       }
-    bout.write(chars, offset, length);
-    bout.write("]]>");
+    writeRaw(chars, offset, length);
+    writeRaw("]]>");
     prev = '>';
   }
 
@@ -920,11 +895,11 @@ public class XMLPrinter extends OutPort
     if ("xml".equals(target))
       needXMLdecl = false;
     closeTag();
-    bout.write("<?");
-    print(target);
-    print(' ');
-    bout.write(content, offset, length);
-    bout.write("?>");
+    writeRaw("<?");
+    writeRaw(target);
+    writeRaw(' ');
+    writeRaw(content, offset, length);
+    writeRaw("?>");
     prev = PROC_INST;
   }
 

@@ -2,6 +2,7 @@ package gnu.text;
 import java.text.*;
 import java.text.FieldPosition;
 import java.io.Writer;
+import gnu.kawa.io.CharArrayOutPort;
 
 /** Given a Format, pad the formatted result to a specified width. */
 
@@ -62,26 +63,26 @@ public class PadFormat extends ReportFormat
       }
     */
 
-      // FIXME: Should use a CharArrayOutPort instead of a StringBuffer;
-      // dst is already a CharArrayOutPort, re-use it.
-    StringBuffer tbuf = new StringBuffer(200);
-    if (fmt instanceof ReportFormat)
-      start = ((ReportFormat)fmt).format(args, start, tbuf, fpos);
-    else if (fmt instanceof MessageFormat)
-      {
-	// FIXME - only correct if start == 0.
-	fmt.format(args, tbuf, fpos);
-	start = args.length;
+      String text;
+      if (fmt instanceof ReportFormat) {
+          CharArrayOutPort sport = new CharArrayOutPort();
+          start = ((ReportFormat)fmt).format(args, start, sport, fpos);
+          text = sport.toString();
+      } else {
+          StringBuffer tbuf = new StringBuffer(200);
+          if (fmt instanceof MessageFormat) {
+              // FIXME - only correct if start == 0.
+              fmt.format(args, tbuf, fpos);
+              start = args.length;
+          } else {
+              fmt.format(args[start], tbuf, fpos);
+              start++;
+          }
+          text = tbuf.toString();
       }
-    else
-      {
-	fmt.format(args[start], tbuf, fpos);
-	start++;
-      }
-    int len = tbuf.length();
+    int len = text.length();
     int pad = padNeeded(len, minWidth, colInc, minPad);
     int prefix = 0;
-    String text = tbuf.toString();
     if (pad > 0)
       {
 	if (where == -1)

@@ -10,6 +10,7 @@ import gnu.kawa.io.FilePath;
 import gnu.kawa.io.InPort;
 import gnu.kawa.io.OutPort;
 import gnu.kawa.io.Path;
+import gnu.lists.AbstractFormat;
 import gnu.lists.ByteVector;
 import gnu.lists.Consumer;
 import gnu.lists.Strings;
@@ -270,7 +271,12 @@ public class RunProcess extends MethodProc {
             errRedirect = OutPort.errDefault();
         }
         /* #ifdef JAVA7 */
-        if (outRedirect == OutPort.getSystemOut()) {
+        BinaryOutPort sysOut = OutPort.getSystemOut();
+        if (outRedirect == null
+            && AbstractFormat.getPassThroughOutPort(consumer) == sysOut)
+            outRedirect = Redirect.INHERIT;
+        if (outRedirect == sysOut
+            && AbstractFormat.getPassThroughOutPort(sysOut) == sysOut) {
             outRedirect = Redirect.INHERIT;
         }
         if (errRedirect == OutPort.getSystemErr()) {
@@ -314,19 +320,19 @@ public class RunProcess extends MethodProc {
         }
         if (returnBlob) {
             LProcess lproc = new LProcess(proc);
-            if (consumer instanceof OutPort
-                && isDisplayConsumer(consumer)) {
+            OutPort pout = AbstractFormat.getPassThroughOutPort(consumer);
+            if (pout != null) {
                 InputStream in = proc.getInputStream();
-                if (consumer instanceof BinaryOutPort) {
-                    BinaryOutPort bout = (BinaryOutPort) consumer;
+                if (pout instanceof BinaryOutPort) {
+                    BinaryOutPort bout = (BinaryOutPort) pout;
                     byte[] buffer = new byte[2048];
                     for (;;) {
                         int cnt = in.read(buffer, 0, buffer.length);
                         if (cnt < 0)
                             break;
                         bout.writeBytes(buffer, 0, cnt);
-                        bout.flush();
                     }
+                    bout.flush();
                     in.close();
                 }
                 else {
@@ -337,9 +343,9 @@ public class RunProcess extends MethodProc {
                         int cnt = inr.read(buffer, 0, buffer.length);
                         if (cnt < 0)
                             break;
-                        consumer.write(buffer, 0, cnt);
-                        ((OutPort) consumer).flush();
+                        pout.write(buffer, 0, cnt);
                     }
+                    pout.flush();
                     inr.close();
                 }
             }
@@ -349,17 +355,6 @@ public class RunProcess extends MethodProc {
         else {
             consumer.writeObject(proc);
         }
-    }
-
-    public boolean isDisplayConsumer(Consumer out) {
-        if (out instanceof OutPort) {
-            OutPort outp = (OutPort) out;
-            if (outp.objectFormat instanceof DisplayFormat) {
-                return ! ((DisplayFormat) outp.objectFormat)
-                    .getReadableOutput();
-            }
-        }
-        return false;
     }
 
     /** Parse strings into token, handling substitution marks.

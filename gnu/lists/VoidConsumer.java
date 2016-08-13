@@ -16,6 +16,14 @@ public class VoidConsumer extends FilterConsumer
     super(null);
     skipping = true;
   }
+    public VoidConsumer (Consumer out) {
+        super(out);
+        skipping = true;
+    }
+
+    public static VoidConsumer make(Consumer old) {
+        return new VoidConsumer(old);
+    }
 
   /** True if consumer is ignoring rest of element.
    * The producer can use this information to skip ahead. */

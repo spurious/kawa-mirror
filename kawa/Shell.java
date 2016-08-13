@@ -35,21 +35,20 @@ public class Shell
 
   private static Class[] noClasses = { };
   private static  Class[] boolClasses = { Boolean.TYPE };
-  private static  Class[] xmlPrinterClasses
-    = {OutPort.class, Object.class };
+  private static  Class[] lispPushClasses = { OutPort.class, Character.TYPE, Boolean.TYPE };
+  private static  Class[] xmlPrinterClasses = {Consumer.class, Object.class };
   private static  Class[] httpPrinterClasses = {OutPort.class };
-  private static Object portArg = "(port)";
+  private static Object consumerArg = "(consumer)";
 
   /** A table of names of known output formats.
    * For each entry, the first Object is the format name.
    * The next entries are a class name, the name of a static method in that
    * class, and the parameter types (as a Class[] suitable for getMethod).
    * The remain values are arguments (passed to invoke), except that if an
-   * argument is the spacial value portArg, it is replaced by the
-   * destination OutPort. */
+   * argument is the spacial value consumerArg, it is replaced by the
+   * destination Consumer. */
    
-  static Object[][] formats =
-    {
+    static Object[][] formats = {
       { "scheme", "gnu.kawa.functions.DisplayFormat",
 	"getSchemeFormat", boolClasses,
 	Boolean.FALSE },
@@ -74,21 +73,22 @@ public class Shell
       { "readable-commonlisp", "gnu.kawa.functions.DisplayFormat",
 	"getCommonLispFormat", boolClasses,
 	Boolean.TRUE },
-      { "xml", "gnu.xml.XMLPrinter",
-	"make", xmlPrinterClasses,
-	portArg, null },
-      { "html", "gnu.xml.XMLPrinter",
-	"make", xmlPrinterClasses,
-	portArg, "html" },
-      { "xhtml", "gnu.xml.XMLPrinter",
-	"make", xmlPrinterClasses,
-	portArg, "xhtml" },
-      { "cgi", "gnu.kawa.xml.HttpPrinter",
-	"make", httpPrinterClasses,
-	portArg },
-      { "ignore", "gnu.lists.VoidConsumer",
-	"getInstance", noClasses },
-      { null }
+        { "xml", "gnu.xml.XMLPrinter",
+          "make", xmlPrinterClasses,
+          consumerArg, null },
+        { "html", "gnu.xml.XMLPrinter",
+          "make", xmlPrinterClasses,
+          consumerArg, "html" },
+        { "xhtml", "gnu.xml.XMLPrinter",
+          "make", xmlPrinterClasses,
+          consumerArg, "xhtml" },
+        { "cgi", "gnu.kawa.xml.HttpPrinter",
+          "make", httpPrinterClasses,
+          consumerArg },
+        { "ignore", "gnu.lists.VoidConsumer",
+          "make", new Class[] { Consumer.class },
+          consumerArg },
+        { null }
     };
 
   public static String defaultFormatName;
@@ -148,15 +148,14 @@ public class Shell
       {
 	Object args[] = new Object[info.length - 4];
 	System.arraycopy(info, 4, args, 0, args.length);
-	for (int i = args.length;  --i >= 0; )
-	  if (args[i] == portArg)
+        boolean useConsumer = args[0] == consumerArg;
+	for (int i = args.length;  --i >= 0; ) {
+	  if (args[i] == consumerArg)
 	    args[i] = out;
+        }
 	Object format = defaultFormatMethod.invoke(null, args);
 	if (format instanceof AbstractFormat)
-	  {
-	    out.objectFormat = (AbstractFormat) format;
-	    return out;
-	  }
+          return ((AbstractFormat) format).makeConsumer(out);
 	else
 	  return (Consumer) format;
       }
@@ -192,20 +191,8 @@ public class Shell
                                InPort inp, OutPort pout, OutPort perr,
                                SourceMessages messages)
   {
-    Consumer out;
-    AbstractFormat saveFormat = null;
-    if (pout != null)
-      saveFormat = pout.objectFormat;
-    out = getOutputConsumer(pout);
-    try
-      {
-	return run(language, env, inp, out, perr, null, messages);
-      }
-    finally
-      {
-	if (pout != null)
-	  pout.objectFormat = saveFormat;
-      }
+    Consumer out = getOutputConsumer(pout);
+    return run(language, env, inp, out, perr, null, messages);
   }
 
   public static boolean run (Language language,  Environment env,

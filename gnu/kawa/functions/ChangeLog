@@ -1,3 +1,11 @@
+2016-08-12  Per Bothner  <per@bothner.com>
+
+	A cleaner format/consumer model.
+	* DisplayFormat.java: Numerous updates.
+	* LispFormat.java (LispObjectFormat:format): Simplify.
+	Sharing/cycle detection is now initialized in DisplayFormat.
+	* RunProcess.java: Changes to logic for when we can inherit output.
+
 2016-07-13  Per Bothner  <per@bothner.com>
 
 	* DisplayFormat.java (writeObjectRaw): No longer depend on

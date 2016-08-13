@@ -54,7 +54,6 @@ public class CompiledModule
     CallContext ctx = CallContext.getInstance();
     Consumer saveConsumer = ctx.consumer;
     boolean print = ModuleBody.getMainPrintValues();
-    AbstractFormat saveFormat = out.objectFormat;
     ctx.consumer = print ? Shell.getOutputConsumer(out) : new VoidConsumer();
     try
       {
@@ -66,7 +65,6 @@ public class CompiledModule
           ((Writer) ctx.consumer).flush();
 
         ctx.consumer = saveConsumer;
-        out.objectFormat = saveFormat;
       }
   }
 

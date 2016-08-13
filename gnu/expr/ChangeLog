@@ -1,5 +1,9 @@
 2016-08-12  Per Bothner  <per@bothner.com>
 
+	Minor changes for format/PrintConsumer re-write.
+
+2016-08-12  Per Bothner  <per@bothner.com>
+
 	* Keyword.java: Don't implement Printable.
 	(print): Remove method.
 	* Symbols.java (print): Remove method.

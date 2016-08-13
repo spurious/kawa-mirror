@@ -92,6 +92,9 @@ public class DisplayFormat extends AbstractFormat
 
   public boolean getReadableOutput () { return readable; }
 
+    @Override
+    public boolean textIsCopied() { return ! readable; }
+
   @Override
   public void writeBoolean(boolean v, Consumer out)
   {
@@ -133,38 +136,40 @@ public class DisplayFormat extends AbstractFormat
    * sublist, we pop all the posn markers off and tell the pretty printer that
    * it might have to emit an extra ')' if the corresponding posn marker 
    * becomes active.
-   * 
+   *
    * @param value The list on which the method CDR's, termination occurs when
    * this becomes a non-pair or the empty list
    * @param out The output port that is responsible for the pretty printing
    */
-  public void writeList(LList value, OutPort out)
+  public void writeList(LList value, Consumer out)
   {
-    PrettyWriter pout = out.getPrettyWriter();
+    PrettyWriter pout =
+        out instanceof PrintConsumer ? ((PrintConsumer) out).getPrettyWriter()
+        : null;
     // The stack of position markers, populated by CDR'ing further into the list.
     int[] posnStack = null;
     Object[] tailStack = null;
     int stackTail = 0;
     Object list = value;
-    out.startLogicalBlock("(", false, ")");
+    PrintConsumer.startLogicalBlock("(", false, ")", out);
     
     while (list instanceof Pair)
       {
 	Pair pair = (Pair) list;
-	writeObject(pair.getCar(), (Consumer) out);
+	writeObject(pair.getCar(), out);
         list = pair.getCdr();
         if (! getReadableOutput())
           list = Promise.force(list);
         if (list == LList.Empty)
           break;
-        out.writeSpaceFill();
+        PrintConsumer.writeSpaceFill(out);
         if (! (list instanceof Pair))
 	  {
 	    out.write(". ");
 	    writeObject(LList.checkNonList(list), (Consumer) out);
 	    break;
 	  }
-	if (checkSharing >= 0)
+	if (pout != null && checkSharing >= 0)
 	  {
 	    
 	    int hashIndex = pout.IDHashLookup(list);
@@ -194,8 +199,8 @@ public class DisplayFormat extends AbstractFormat
 	      }
 	    else
 	      {
-		out.write(".");
-		out.writeSpaceFill();
+		out.write(". ");
+		pout.writeBreak(PrettyWriter.NEWLINE_FILL);
 		pout.writeBackReference(posn);
 		list = LList.Empty;
 		break;
@@ -208,66 +213,67 @@ public class DisplayFormat extends AbstractFormat
           pout.IDHashRemove(tailStack[stackTail]);
     }
 
-    out.endLogicalBlock(")");
+    PrintConsumer.endLogicalBlock(")", out);
   }
 
-  public void writeObject(Object obj, Consumer out)
-  {
-    PrettyWriter pout = ((OutPort) out).getPrettyWriter();
-    boolean space = false;
-    boolean skip = false;
-    if (out instanceof OutPort
-        && ! (obj instanceof gnu.kawa.xml.UntypedAtomic)
-        && ! (obj instanceof Values)
-        && (getReadableOutput()
-            || ! (obj instanceof Char
-                  /* #ifdef use:java.lang.CharSequence */
-                  || obj instanceof CharSequence
-                  /* #else */
-                  // || obj instanceof String || obj instanceof CharSeq
-                  /* #endif */
-                  || obj instanceof Character)))
-      {
-        ((OutPort) out).writeWordStart();
-        space = true;
-      }
-    boolean removeNeeded = false;
-    if (checkSharing >= 0 && isInteresting(obj))
-      {
-	// The value returned from this hash is the respective index in the
-	// queueInts[] from PrettyWriter to which this object should reference.
-	int hashIndex = pout.IDHashLookup(obj);
-	int posn = pout.IDHashGetFromIndex(hashIndex);
-	if (posn == -1)
-	  {
-	    // Find the position in the queueInts that future (if any) backreferences
-	    // should reference
-	    int nposn = pout.writePositionMarker(false);
-	    // Mark (hash) this object
-	    pout.IDHashPutAtIndex(obj, nposn, hashIndex);
-            removeNeeded = checkSharing == 0;
-	    // Print the object, instead of emitting print-circle notation
-	    skip = false;
-	  }
-	else
-	  // This object is referring to another part of the expression.
-	  {
-	    // Activate the referenced position marker
-	    pout.writeBackReference(posn);
-	    // This object is referring to the structure, we shall not print it and
-	    // instead we shall emit print-circle notation.
-	    skip = true;
-	    // Format a fill space after the #N# token
-	    space = true;
-	  }
-      }
-    if (!skip)
-      writeObjectRaw(obj, out);
-    if (removeNeeded)
-        pout.IDHashRemove(obj);
-    if (space)
-      ((OutPort) out).writeWordEnd();
-  }
+    public void writeObject(Object obj, Consumer out) { 
+        PrettyWriter pout = out instanceof PrintConsumer
+            ? ((PrintConsumer) out).getPrettyWriter()
+            : null;
+        boolean popIDHashNeeded = false;
+        boolean space = false;
+        boolean skip = false;
+        if (out instanceof PrintConsumer
+            && ! (obj instanceof gnu.kawa.xml.UntypedAtomic)
+            && ! (obj instanceof Values)
+            && (getReadableOutput()
+                || ! (obj instanceof Char || obj instanceof Character
+                      || obj instanceof CharSequence))) {
+            ((PrintConsumer) out).writeWordStart();
+            space = true;
+        }
+        boolean removeNeeded = false;
+        try {
+            if (pout != null && checkSharing >= 0 && isInteresting(obj)) {
+                popIDHashNeeded = pout.initialiseIDHash();
+                pout.setSharing(true);
+                // The value returned from this hash is the respective index in the
+                // queueInts[] from PrettyWriter to which this object should reference.
+                int hashIndex = pout.IDHashLookup(obj);
+                int posn = pout.IDHashGetFromIndex(hashIndex);
+                if (posn == -1) {
+                    // Find the position in the queueInts that
+                    // future (if any) backreferences should reference
+                    int nposn = pout.writePositionMarker(false);
+                    // Mark (hash) this object
+                    pout.IDHashPutAtIndex(obj, nposn, hashIndex);
+                    removeNeeded = checkSharing == 0;
+                    // Print the object, instead of emitting print-circle notation
+                    skip = false;
+                } else {
+                    // This object is referring to another part of the expression.
+                    // Activate the referenced position marker
+                    pout.writeBackReference(posn);
+                    // This object is referring to the structure, we shall not
+                    // print it and instead we shall emit print-circle notation.
+                    skip = true;
+                    // Format a fill space after the #N# token
+                    space = true;
+                }
+            }
+            if (!skip)
+                writeObjectRaw(obj, out);
+        } finally {
+            if (removeNeeded)
+                pout.IDHashRemove(obj);
+            if (space)
+                ((PrintConsumer) out).writeWordEnd();
+            if (popIDHashNeeded) {
+                pout.setSharing(true);
+                pout.finishIDHash();
+            }
+        }
+    }
 
   public void writeObjectRaw(Object obj, Consumer out)
   {
@@ -341,8 +347,8 @@ public class DisplayFormat extends AbstractFormat
               out.write(str.charAt(i));
           }
       }
-    else if (obj instanceof LList && out instanceof OutPort)
-      writeList((LList) obj, (OutPort) out);
+    else if (obj instanceof LList)
+      writeList((LList) obj, out);
     else if (obj instanceof List)
       {
 	List vec = (List) obj;
@@ -359,36 +365,33 @@ public class DisplayFormat extends AbstractFormat
 	    start = tag == null ? "#(" : ("#" + tag + "(");
 	    end = ")";
 	  }
-	if (out instanceof OutPort)
-	  ((OutPort) out).startLogicalBlock(start, false, end);
-	else
-	  write (start, out);
-        if (vec instanceof SimpleVector) {
+        PrintConsumer.startLogicalBlock(start, false, end, out);
+        // Using consumeNext for primtives avoids boxing.
+        // However, for objects we want to recurse
+        if (vec instanceof SimpleVector
+            && ((SimpleVector) vec).getTag() != null) {
             int endpos = vec.size() << 1;
             for (int ipos = 0;  ipos < endpos;  ipos += 2) {
-                if (ipos > 0 && out instanceof OutPort)
-                    ((OutPort) out).writeSpaceFill();
+                if (ipos > 0)
+                    PrintConsumer.writeSpaceFill(out);
                 if (! ((SimpleVector) vec).consumeNext(ipos, out))
                     break;
-            }
+                }
         } else {
             boolean first = true;
             for (Object el : vec) {
                 if (first)
                     first = false;
-                else if (out instanceof OutPort)
-                    ((OutPort) out).writeSpaceFill();
+                else
+                    PrintConsumer.writeSpaceFill(out);
                 writeObject(el, out);
             }
         }
-	if (out instanceof OutPort)
-	  ((OutPort) out).endLogicalBlock(end);
-	else
-	  write (end, out);
+	PrintConsumer.endLogicalBlock(end, out);
       }
     else if (obj instanceof Array)
       {
-        if (!getReadableOutput () && out instanceof OutPort
+          if (!getReadableOutput () && out instanceof OutPort // FIXME PrintConsumer?
             && ((OutPort) out).atLineStart()
             && ((OutPort) out).isPrettyPrinting())
             write(ArrayPrint.print(obj, null), out);
@@ -406,11 +409,7 @@ public class DisplayFormat extends AbstractFormat
             write("\033]72;", out);
             escapeForDomTerm = true;
           }
-        Writer wout = out instanceof Writer ? (Writer) out
-          : new ConsumerWriter(out);
-        XMLPrinter xout = new XMLPrinter(wout);
-        xout.writeObject(obj);
-        xout.closeThis();
+        new XMLPrinter(out).writeObject(obj);
         if (escapeForDomTerm)
           write("\007", out);
       }
@@ -480,24 +479,14 @@ public class DisplayFormat extends AbstractFormat
             if (cl.isArray())
               {
                 int len = java.lang.reflect.Array.getLength(obj);
-                if (out instanceof OutPort)
-                  ((OutPort) out).startLogicalBlock("[", false, "]");
-                else
-                  write("[", out);
+                PrintConsumer.startLogicalBlock("[", false, "]", out);
                 for (int i = 0;  i < len;  i++)
                   {
                     if (i > 0)
-                      {
-                        write(" ", out);
-                        if (out instanceof OutPort)
-                          ((OutPort) out).writeBreakFill();
-                      }
+                        PrintConsumer.writeSpaceFill(out);
                     writeObject(java.lang.reflect.Array.get(obj, i), out);
                   }
-                if (out instanceof OutPort)
-                  ((OutPort) out).endLogicalBlock("]");
-                else
-                  write("]", out);
+                PrintConsumer.endLogicalBlock("]", out);
                 return;
               }
             asString = obj.toString();
@@ -551,10 +540,7 @@ public class DisplayFormat extends AbstractFormat
         start = sbuf.toString();
     }
     String end = rank == 0 ? "" : ")";
-    if (out instanceof OutPort)
-      ((OutPort) out).startLogicalBlock(start, false, end);
-    else
-      write (start, out);
+    PrintConsumer.startLogicalBlock(start, false, end, out);
     if (rank > 0)
       {
 	int size = array.getSize(level);
@@ -562,11 +548,7 @@ public class DisplayFormat extends AbstractFormat
 	for (int i = 0;  i < size;  i++)
 	  {
 	    if (i > 0)
-              {
-                write(" ", out);
-                if (out instanceof OutPort)
-                  ((OutPort) out).writeBreakFill();
-              }
+                PrintConsumer.writeSpaceFill(out);
 	    int step;
 	    if (level == rank)
 	      {
@@ -581,10 +563,7 @@ public class DisplayFormat extends AbstractFormat
       }
     else
       writeObject(array.getRowMajor(index), out);
-    if (out instanceof OutPort)
-      ((OutPort) out).endLogicalBlock(end);
-    else
-      write(end, out);
+    PrintConsumer.endLogicalBlock(end, out);
     return count;
   }
 

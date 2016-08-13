@@ -51,13 +51,13 @@ public class TestSuite extends FilterConsumer
   private TestSuite(CharArrayOutPort cout)
   {
     this(cout, new XMLPrinter(cout));
-    xout.escapeText = false;
+    xout.setEscapeText(false);
   }
 
   private TestSuite(CharArrayOutPort cout, XMLPrinter xout)
   {
     super(xout);
-    xout.canonicalizeCDATA = true;
+    xout.setCanonicalizeCDATA(true);
     this.cout = cout;
     this.xout = xout;
   }

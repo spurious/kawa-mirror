@@ -2,8 +2,8 @@
 
 SUFFIXES = .java .class .scm .el .lisp
 
-KAWALIB = ../lib/kawa-$(VERSION).jar
-KAWARTLIB = ../lib/kawart-$(VERSION).jar
+KAWALIB = ../lib/kawa.jar
+KAWARTLIB = ../lib/kawart.jar
 KAWA = ../bin/kawa.sh
 CPJAVA = CLASSPATH="..$(CLASSPATH_SEPARATOR)@conf_classpath@.$(CLASSPATH_SEPARATOR)$$CLASSPATH" $(JAVA)
 CPKAWA = CLASSPATH="@conf_classpath@.$(CLASSPATH_SEPARATOR)$$CLASSPATH" $(KAWA)

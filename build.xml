@@ -47,7 +47,7 @@
   <property name="build.preprocessed" value="${build.dir}"/>
   <property name="build.classes"      value="${build.dir}"/>
   
-  <property name="dist.kawa.jar"    value="${dist.dir}/kawa-${version}.jar"/>
+  <property name="dist.kawa.jar"    value="${dist.dir}/lib/kawa.jar"/>
 
   <condition property="kawa.shell" value="/bin/bash" else="/bin/sh">
     <available file="/bin/bash"/>
@@ -457,7 +457,7 @@
         <filter token="ENABLE_KAWA_FRONTEND_TRUE" value="#"/>
         <filter token="VERSION" value="${version}"/>
         <filter token="CLASSPATH_SEPARATOR" value="${classpath.separator}"/>
-        <filter token="KAWAJAR" value="kawa-${version}.jar"/>
+        <filter token="KAWAJAR" value="kawa.jar"/>
         <filter token="CYGPATH_W" value="echo"/>
         <filter token="KAWA_SHELL" value="${kawa.shell}"/>
         <filter token="conf_classpath" value=""/>

@@ -20,7 +20,7 @@ kawa$(EXEEXT): $(kawa_OBJECTS)
 cgi-servlet$(EXEEXT): $(cgi_servlet_OBJECTS)
 	$(CCLD) -o cgi-servlet$(EXEEXT) $(cgi_servlet_LDFLAGS) $(cgi_servlet_OBJECTS) $(LIBS)
 
-KAWAJAR = kawa-$(VERSION).jar
+KAWAJAR = kawa.jar
 KAWALIB = $(datadir)/kawa/lib/$(KAWAJAR)
 CDEFS = -DJAVA='"$(JAVA)"' -DKAWALIB='"$(KAWALIB)"' -DKAWAJAR='"$(KAWAJAR)"' -DEXTRAPATH='"@conf_classpath@"'
 DEFS = $(CDEFS)

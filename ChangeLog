@@ -1,3 +1,9 @@
+2016-08-14  Per Bothner  <per@bothner.com>
+
+	* Makefile.am: Remove version number for jar file names.
+	* kawa.sh.in: Likewise.
+	* kawa.sh.in: Use JAVA_HOME if it is set.
+
 2016-07-26  Per Bothner  <per@bothner.com>
 
 	Re-implement conversion to SVG without using external library.

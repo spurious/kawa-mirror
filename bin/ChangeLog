@@ -1,3 +1,8 @@
+2016-08-14  Per Bothner  <per@bothner.com>
+
+	* Makefile.am: Remove version number in jar file names.
+	* build.xml: Likewise.
+
 2016-07-11  Per Bothner  <per@bothner.com>
 
 	* browse-kawa-manual.in: Update to use frameset version of manual.

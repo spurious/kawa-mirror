@@ -50,7 +50,7 @@ SED = sed
 CHMOD = chmod
 JAR = jar
 FIND = @FIND@
-KAWAJAR = kawa-@VERSION@.jar
+KAWAJAR = kawa.jar
 KAWALIB = $(datadir)/kawa/lib/$(KAWAJAR)
 
 META_ScriptEngineFactory = META-INF/services/javax.script.ScriptEngineFactory
@@ -86,11 +86,11 @@ tmp-sources1.list: source-list Makefile
 classes-rt.list: ./kawa-jar.stamp $(srcdir)/classes-to-skip-for-runtime 
 	$(FIND) gnu kawa -name '*.class' -print | grep -v -f $(srcdir)/classes-to-skip-for-runtime >classes-rt.list
 
-lib/kawa-@VERSION@.jar: ./kawa-jar.stamp $(META_INF_FILES) classes.list
+lib/kawa.jar: ./kawa-jar.stamp $(META_INF_FILES) classes.list
 	mkdir -p lib
 	$(JAR) cmf $(srcdir)/jar-manifest $@ $(META_INF_FILES) @classes.list
 
-lib/kawart-@VERSION@.jar: ./kawa-jar.stamp classes-rt.list
+lib/kawart.jar: ./kawa-jar.stamp classes-rt.list
 	mkdir -p lib
 	$(JAR) cf $@ @classes-rt.list
 
@@ -113,7 +113,7 @@ else
 JLINE_VERSION_MAJOR=2
 endif
 
-dist-kawa-$(VERSION).jar: dist
+dist-kawa.jar: dist
 	srcdir=`(cd $(srcdir); /bin/pwd)` \
 	  && rm -rf tmpdir \
 	  && mkdir -p tmpdir tmpdir/lib \
@@ -125,17 +125,17 @@ dist-kawa-$(VERSION).jar: dist
 	    --with-jline$(JLINE_VERSION_MAJOR)="@WITH_JLINE_PATH@" \
 	    --with-servlet=@WITH_SERVLET_ARG@ --with-javafx=@WITH_JAVAFX_ARG@ \
 	  && CLASSPATH=@conf_classpath@.$(CLASSPATH_SEPARATOR)$$CLASSPATH $(MAKE) all JAVAC="$(JAVAC) -source 7 -target 7" \
-	  && mv lib/kawa-$(VERSION).jar ../dist-kawa-$(VERSION).jar \
+	  && mv lib/kawa.jar ../dist-kawa.jar \
 	  && cd .. && rm -rf tmpdir
 
 ZIP_VERSION = $(VERSION)
 kawa.zip: kawa-$(ZIP_VERSION).zip
 kawa-snapshot.zip:
 	$(MAKE) kawa.zip ZIP_VERSION=$(VERSION)-`date +%Y%m%d`
-kawa-$(ZIP_VERSION).zip: dist-kawa-$(VERSION).jar doc/kawa-manual.epub bin/kawa.bat
+kawa-$(ZIP_VERSION).zip: dist-kawa.jar doc/kawa-manual.epub bin/kawa.bat
 	mkdir -p kawa-$(VERSION) kawa-$(VERSION)/lib  kawa-$(VERSION)/bin kawa-$(VERSION)/doc
 	cd kawa-$(VERSION)/lib; \
-	  $(LN_S) ../../dist-kawa-$(VERSION).jar kawa-$(VERSION).jar; \
+	  $(LN_S) ../../dist-kawa.jar kawa.jar; \
 	  $(LN_S) @WITH_DOMTERM_ARG@ domterm.jar; \
 	  $(LN_S) @WITH_SERVLET_ARG@ servlet.jar; \
 	  $(LN_S) @WITH_SERVLET_ARG@ servlet.jar; \
@@ -157,7 +157,7 @@ upload-kawa.snapshot.zip:
 doc/kawa-manual.epub: doc/kawa.texi
 	cd doc && $(MAKE) kawa-manual.epub
 
-lib/jemacs-$(JEMACS_VERSION).jar:
+lib/jemacs.jar:
 	srcdir=`(cd $(srcdir); /bin/pwd)` \
 	  && rm -rf tmpdir \
 	  && mkdir tmpdir \
@@ -165,13 +165,13 @@ lib/jemacs-$(JEMACS_VERSION).jar:
 	  && $$srcdir/configure --with-swing \
 	  && $(MAKE) \
 	  && $(JAR) cmf $$srcdir/gnu/jemacs/jar-manifest \
-	      ../lib/jemacs-$(JEMACS_VERSION).jar \
+	      ../lib/jemacs.jar \
 	      `$(FIND) . -name '*.class' -print` \
 	  && cd .. && rm -rf tmpdir
 
-lib/bytecode-$(BYTECODE_VERSION).jar: ./gnu/bytecode/java-classes.stamp
+lib/bytecode.jar: ./gnu/bytecode/java-classes.stamp
 	$(JAR) cmf $(srcdir)/gnu/bytecode/jar-manifest \
-	  lib/bytecode-$(BYTECODE_VERSION).jar \
+	  lib/bytecode.jar \
 	  `$(FIND) gnu/bytecode -name '*.class' -print` 
 
 kawa-@VERSION@-src.zip: kawa-@VERSION@.tar.gz
@@ -182,10 +182,10 @@ kawa-@VERSION@-src.zip: kawa-@VERSION@.tar.gz
 	rm -rf zip-temp
 
 kawa-compiled.zip: kawa-@VERSION@-compiled.zip
-kawa.jar: lib/kawa-@VERSION@.jar
+kawa.jar: lib/kawa.jar
 kawa-src.zip: kawa-@VERSION@-src.zip
-jemacs.jar: lib/jemacs-@JEMACS_VERSION@.jar
-bytecode.jar: lib/bytecode-@BYTECODE_VERSION@.jar
+jemacs.jar: lib/jemacs.jar
+bytecode.jar: lib/bytecode.jar
 
 EXTRA_DIST = debian/control debian/rules debian/changelog debian/dirs \
   config.guess config.sub install-sh ./mkinstalldirs \
@@ -273,10 +273,8 @@ install-jar:
 	@$(NORMAL_INSTALL)
 	$(mkinstalldirs) $(DESTDIR)$(datadir)/kawa \
 	  $(DESTDIR)$(datadir)/kawa/bin $(DESTDIR)$(datadir)/kawa/lib
-	$(INSTALL_DATA) lib/kawa-@VERSION@.jar \
+	$(INSTALL_DATA) lib/kawa.jar \
 	  $(DESTDIR)$(datadir)/kawa/lib/$(KAWAJAR)
-	cd $(DESTDIR)$(datadir)/kawa/lib && rm -f kawa.jar \
-	  && $(LN_S) $(KAWAJAR) kawa.jar
 if WITH_DOMTERM
 	cd $(DESTDIR)$(datadir)/kawa/lib && \
 	  $(LN_S) @WITH_DOMTERM_ARG@ domterm.jar
@@ -290,13 +288,11 @@ if WITH_JLINE2
 	  $(LN_S) @WITH_JLINE_PATH@ jline.jar
 endif
 
-install-bytecode-jar: lib/bytecode-@BYTECODE_VERSION@.jar
+install-bytecode-jar: lib/bytecode.jar
 	@$(NORMAL_INSTALL)
 	$(mkinstalldirs) $(DESTDIR)$(javadir)
-	$(INSTALL_DATA) lib/bytecode-@BYTECODE_VERSION@.jar \
-	  $(DESTDIR)$(javadir)/bytecode-@BYTECODE_VERSION@.jar
-	cd $(DESTDIR)$(javadir) && rm -f bytecode.jar \
-	  && $(LN_S) bytecode-@BYTECODE_VERSION@.jar bytecode.jar
+	$(INSTALL_DATA) lib/bytecode.jar \
+	  $(DESTDIR)$(javadir)/bytecode.jar
 
 uninstall-local: uninstall-jar uninstall-exec-bindir uninstall-data
 uninstall-jar:
@@ -310,7 +306,7 @@ uninstall-exec-bindir:
 	rm -f $(DESTDIR)$(bindir)/kawa $(DESTDIR)$(bindir)/qexo
 
 uninstall-bytecode-jar:
-	rm -f $(DESTDIR)$(javadir)/bytecode-@BYTECODE_VERSION@.jar \
+	rm -f $(DESTDIR)$(javadir)/bytecode.jar \
 	  $(DESTDIR)$(javadir)/bytecode.jar
 
 kawa/Version.java: $(srcdir)/kawa/Version.java.in $(srcdir)/configure.ac
@@ -321,7 +317,7 @@ kawa/Version.java: $(srcdir)/kawa/Version.java.in $(srcdir)/configure.ac
 	sed -e 's|VERSION|@VERSION@'"$$SVN_REVISION|" <$(srcdir)/kawa/Version.java.in >$@
 
 all-recursive:  kawa/Version.java selected-java-source $(GENERATED_SIMPLEVECTOR_FILES)
-all: lib/kawa-@VERSION@.jar lib/kawart-@VERSION@.jar $(JLINE_LINK) $(DOMTERM_LINK) $(SERVLET_LINK)
+all: lib/kawa.jar lib/kawart.jar $(JLINE_LINK) $(DOMTERM_LINK) $(SERVLET_LINK)
 
 if WITH_JLINE2
 JLINE_LINK = lib/jline.jar
@@ -489,6 +485,6 @@ $(srcdir)/gnu/text/StandardNamedChars.java:
 	      -e '}}' \
 	> $@
 
-distall:  distcheck dist-kawa-@VERSION@.jar kawa-doc-$(VERSION).tar.gz
+distall:  distcheck dist-kawa.jar kawa-doc-$(VERSION).tar.gz
 # Consider also:
 # kawa-@VERSION@-src.zip jemacs-@JEMACS_VERSION@.jar bytecode-@BYTECODE_VERSION@.jar

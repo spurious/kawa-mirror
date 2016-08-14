@@ -23,10 +23,16 @@ test -t 0 || no_console="--no-console"
 @ENABLE_KAWA_FRONTEND_TRUE@  export LD_LIBRARY_PATH
 @ENABLE_KAWA_FRONTEND_TRUE@  exec $thisdir/kawa "$@"
 
-KAWALIB=${KAWALIB-"`@CYGPATH_W@ $kawadir/lib/kawa-@VERSION@.jar`"}
-# MSYS: KAWALIB=${KAWALIB-"`cd $kawadir/lib/; pwd -W`@CLASSPATH_SEPARATOR@kawa-@VERSION@.jar`"}
+KAWALIB=${KAWALIB-"`@CYGPATH_W@ $kawadir/lib/kawa.jar`"}
+# MSYS: KAWALIB=${KAWALIB-"`cd $kawadir/lib/; pwd -W`@CLASSPATH_SEPARATOR@kawa.jar`"}
 CLASSPATH="${KAWALIB}@CLASSPATH_SEPARATOR@@run_classpath@${CLASSPATH}"
 export CLASSPATH
+
+if test -n "$JAVA_HOME"; then
+    JAVA="${JAVA_HOME}/bin/java"
+else
+    JAVA=${JAVA-java}
+fi
 
 # This ugly duplication is so we only have to use arrays and substrings
 # (which are non-Posix and non-portable) if there is a -D or -J option.
@@ -47,9 +53,9 @@ case "$1" in
                 ;;
             esac
         done
-        exec ${JAVA-"java"} -Dkawa.command.line="${command_line}" "${jvm_args[@]}" kawa.repl ${no_console} "$@"
+        exec ${JAVA} -Dkawa.command.line="${command_line}" "${jvm_args[@]}" kawa.repl ${no_console} "$@"
         ;;
     *)
-        exec ${JAVA-"java"} -Dkawa.command.line="${command_line}" kawa.repl ${no_console} "$@"
+        exec ${JAVA} -Dkawa.command.line="${command_line}" kawa.repl ${no_console} "$@"
         ;;
 esac

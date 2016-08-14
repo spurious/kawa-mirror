@@ -42,7 +42,7 @@ EXTRA_DIST = scm2java.html kawa.man qexo.man mdate-sh +default+ README-epub \
   style/kawa-r.css style/kawa.css style/top-navbar.css \
   style/kawa-logo.png
 info_TEXINFOS = kawa.texi
-INFO_DEPS =
+kawa_TEXINFOS = news.texi
 MOSTLYCLEANFILES = kawa.xml
 MAINTAINERCLEANFILES = kawa.txt *.info 
 

@@ -1,23 +1,26 @@
 // JavaScript mostly to set up a table-of-contents sidebar.
-// The script has no effect when using an ebook reader (since they typically
-// have they own table-of-contents) or generally if browsing index.xhtml.
-// To enable this code, you have to set the query string "?sidebar"
-// (for an <iframe>), or browse with-frames.html (for a <frameset>).
-// TODO:
-// - When using frameset, and a #PAGE is specified as part of the URL,
-//   load that page.  When navigating, update the location correspondingly.
-//   (This is low priority, since we primarily use framesets with JavaFX
-//   WebView, which doesn't show the location bar.)
+// There are two options for the sidebar:
+// (1) to use an old-fashioned <frameset> browse with-frames.html
+// (2) otherwise using an <iframe> is preferred as it enables
+// cleaner URLs in the location-bar.
+// The <iframe> sidebar can be explicilyt enabled if you use the
+// query string "?sidebar" or "?sidebar=yes";
+// or explicitly disabled with the query "?sidebar=no".
+// The default is to enable the sidebar except when using a ebook-reader
+// (as detected by the property navigator.epubReadingSystem),
+// since ebook-readers generally provide their own table-of-contents.
 
 var fromJar = location.protocol == "jar:";
 var usingFrameset = name =="main" || name=="slider";
 var mainTarget = usingFrameset ? "main" : "_parent";
 var mainWindow = window;
+var sidebarQuery = "";
+
 function withSidebarQuery(href) {
     var h = href.indexOf('#');
     if (h < 0)
         h = href.length;
-    return href.substring(0, h) + "?sidebar" + href.substring(h);
+    return href.substring(0, h) + sidebarQuery + href.substring(h);
 }
 
 function filename(pathname) {
@@ -33,13 +36,16 @@ function onMainLoad(evt) {
         top.mainLoaded = true;
         if (top.sidebarLoaded)
             updateSidebarForFrameset();
-   } else {
-        var iframe = document.createElement("iframe");
-        var mainFilename = filename(location.pathname);
-        iframe.setAttribute("src", "bk01-toc.xhtml?main="+mainFilename);
-        var body = document.getElementsByTagName("body")[0];
-        body.insertBefore(iframe, body.firstChild);
-        body.setAttribute("class", "mainbar");
+    } else {
+        if (useSidebar(location.search)) {
+            var iframe = document.createElement("iframe");
+            var mainFilename = filename(location.pathname);
+            iframe.setAttribute("src", "bk01-toc.xhtml?main="+mainFilename);
+            var body = document.getElementsByTagName("body")[0];
+            body.insertBefore(iframe, body.firstChild);
+            body.setAttribute("class", "mainbar");
+        }
+        sidebarQuery = location.search;
     }
     var links = document.getElementsByTagName("a");
     for (var i = links.length; --i >= 0; ) {
@@ -152,8 +158,15 @@ function onSidebarLoad(evt) {
     }
 }
 
+function useSidebar(search) {
+    if (search.indexOf("sidebar=no") >= 0)
+        return false;
+    if (search.indexOf("sidebar=yes") >= 0 || search == "?sidebar")
+        return true;
+    return ! (navigator && navigator.epubReadingSystem);
+}
 if (location.href.indexOf("bk01-toc.xhtml") >= 0) {
     window.addEventListener("load", onSidebarLoad, false);
-} else if (usingFrameset || location.search == "?sidebar" /* || fromJar */) {
+} else {
     window.addEventListener("load", onMainLoad, false);
 }

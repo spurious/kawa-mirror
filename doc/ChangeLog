@@ -1,3 +1,7 @@
+2016-08-14  Per Bothner  <per@bothner.com>
+
+	* style/kawa-ebook.js: More flexible sidebar control.
+
 2016-08-13  Per Bothner  <per@bothner.com>
 
 	* doc/style/kawa-ebook.js: Set target="_blank" for non-retaive links.

@@ -1192,13 +1192,16 @@ You can get Kawa sources and binaries from the Kawa ftp site
 @uref{ftp://ftp.gnu.org/pub/gnu/kawa/},
 or from a @uref{http://www.gnu.org/order/ftp.html,mirror site}.
 
-The latest release of the Kawa source code is
+The current release of the Kawa source code is
 @uref{ftp://ftp.gnu.org/pub/gnu/kawa/kawa-@value{VERSION}.tar.gz}.
 (To unpack @code{.tar.gz} files Windows users can use
 @uref{http://www.7-zip.org/,7-Zip}, which is Free Software.)
 
-A ready-to-run @code{.jar} archive of the pre-compiled classes is in
-@uref{ftp://ftp.gnu.org/pub/gnu/kawa/kawa-@value{VERSION}.jar}.
+The corresponding pre-compiled release
+is @uref{ftp://ftp.gnu.org/pub/gnu/kawa/kawa-@value{VERSION}.zip}.
+The most recent snapshot is
+@uref{ftp://ftp.gnu.org/pub/gnu/kawa/kawa-latest.zip}.
+Instructions for using either are @ref{Binary distribution,here}.
 
 @subsection Getting the development sources using SVN
 
@@ -1258,48 +1261,106 @@ PATH=$JAVA_HOME/bin:$PATH
 export PATH
 @end example
 
-@node Binary distribution, Source distribution, Running Java, Installation
+@node Binary distribution
 @section Installing and using the binary distribution
 
-The binary release includes only the binary compiled @samp{.class}
-versions of the same @samp{.java} source files in the source release.
-It does not include any documentation, so you probably want the
-source release in addition to the binary release.  The purpose
-of the binary release is just to save you the time and trouble of
-compiling the sources.
+The binary release comes as a @code{.zip} archive that
+includes Kawa itself (as a @code{.jar} file @code{kawa-@var{version}.jar}),
+some third-party helper libraries, @code{kawa} command scripts
+(for GNU/Linux/Unix/MacOS or Windows),
+and documentation (basically this manual).
+
+After downloading (see @ref{Getting Kawa}), extract the files
+from the @code{.zip} archive using a suitable @code{unzip} program,
+which will create a directory @code{kawa-@var{version}},
+with @code{lib}, @code{bin}, and @code{doc} sub-directories.
+In the following, we assume the environment variable @code{KAWA_HOME}
+refers to this directory:
+@example
+unzip ~/Downloads/kawa-@var{version}.zip
+export KAWA_HOME=`pwd`/kawa-@var{version}
+@end example
 
 The binary release requires Java 7 or later.
 If you have an older Java implementation, or build for a mobile
 environment like Android,
 then you will need to get the source distribution.
 
-The binary release comes as a @code{.jar} archive
-@samp{kawa-@value{VERSION}.jar}.
-Copy this archive to some suitable location,
-such as @code{/usr/local/lib/kawa.jar}.
+If you want to use Kawa as part of some other application,
+you just need the @code{$KAWA_HOME/lib/kawa.jar}.
 
-Then, before you can actually run Kawa, you need to set @code{CLASSPATH}
-so it includes the Kawa archive.  On Unix, using a Bourne-style shell:
+@subsubheading Running the @code{kawa} command
+
+To run a Kawa script file or the Kawa read-eval-print-loop
+run the Kawa application.  There are various way to do so.
+
+The recommended way is to execute the @code{$KAWA_HOME/bin/kawa} Bash
+shell script.
+This should work on most Unix-like platforms that have Bash installed,
+including GNU/Linux, BSD, MacOS, and Cygwin/MingW.
+(Please report if you have problems.)
+
+The script assumes that either a suitable @code{java} program is
+in your @code{PATH}; or the @code{JAVA} environment variable
+names a suitable @code{java} executable; or that @code{JAVA_HOME}
+is set so @code{$JAVA_HOME/bin/java} is suitable.
+
+If you want to put @code{kawa} in your search path you can of course do:
 @example
-CLASSPATH=/usr/local/lib/kawa.jar
-export CLASSPATH
+PATH=$KAWA_HOME/bin:$PATH
 @end example
-
-On Windows you need to set @code{classpath} in a DOS console.
+Alternatively you can create a symbolic link in an already-searched directory.
 For example:
 @example
-set classpath=\kawa\kawa-@value{VERSION}.jar
+cd /usr/local/bin
+ln -s $KAWA_HOME/bin/kawa kawa
 @end example
 
-Then to run Kawa do:
+The @code{bin/kawa.bat} script works on Windows.
+
+Both scripts add some helper libraries, including support for input editing.
+
+It is also possible to run Kawa using @code{java} directly:
 @example
+java -jar $KAWA_HOME/lib/kawa.jar
+@end example
+or:
+@example
+CLASSPATH=$KAWA_HOME/lib/kawa.jar
+export CLASSPATH
 java kawa.repl
 @end example
+On Windows:
+@example
+set classpath=%KAWA_HOME%\lib\kawa.jar
+@end example
 
-To run Kawa in a fresh window, you can do:
+To run Kawa in a fresh window use the -w flag:
+@example
+kawa -w
+@end example
+or
 @example
 java kawa.repl -w
 @end example
+
+@subsubheading Reading the documentation
+
+The file @code{doc/kawa-manual.epub} contains the Kawa documention
+packaged as an electronic book, which is readable by most
+e-book readers.  Plugins are also available for common browsers,
+for example @uref{http://www.epubread.com,EPUBReader} for @code{firefox}.
+
+An @code{epub} is essentially a zip archive, which you can unzip:
+@example
+cd $KAWA_HOME/doc
+unzip kawa-manual.epub
+@end example
+Then you can use a plain browser
+with the URL @code{file:$KAWA_HOME/doc/OEBPS/index.xhtml}.
+
+The file @code{$KAWA_HOME/doc/README-epub} gives other alternatives
+for reading the documentation without unziping it.
 
 @node Source distribution,  , Binary distribution, Installation
 @section Installing and using the source distribution

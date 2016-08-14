@@ -41,12 +41,14 @@ function onMainLoad(evt) {
         body.insertBefore(iframe, body.firstChild);
         body.setAttribute("class", "mainbar");
     }
-    if (! usingFrameset && ! fromJar) {
-        var links = document.getElementsByTagName("a");
-        for (var i = links.length; --i >= 0; ) {
-            var link = links[i];
-            var href = link.getAttribute("href");
-            if (href && href.indexOf(':') < 0 && href.indexOf('?') < 0)
+    var links = document.getElementsByTagName("a");
+    for (var i = links.length; --i >= 0; ) {
+        var link = links[i];
+        var href = link.getAttribute("href");
+        if (href) {
+            if (href.indexOf(':') >= 0)
+                link.setAttribute("target", "_blank");
+            else if (! usingFrameset && ! fromJar && href.indexOf('?') < 0)
                 link.setAttribute("href", withSidebarQuery(href));
         }
     }
@@ -138,10 +140,14 @@ function onSidebarLoad(evt) {
     for (var i = links.length; --i >= 0; ) {
         var link = links[i];
         var href = link.getAttribute("href");
-        if (href && href.indexOf(':') < 0 && href.indexOf('?') < 0) {
-            if (! fromJar && ! usingFrameset)
-                link.setAttribute("href", withSidebarQuery(href));
-            link.setAttribute("target", mainTarget);
+        if (href) {
+            if (href.indexOf(':') > 0) {
+                link.setAttribute("target", "_blank");
+            } else if (href.indexOf('?') < 0) {
+                if (! fromJar && ! usingFrameset)
+                    link.setAttribute("href", withSidebarQuery(href));
+                link.setAttribute("target", mainTarget);
+            }
         }
     }
 }

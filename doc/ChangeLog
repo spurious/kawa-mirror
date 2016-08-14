@@ -1,5 +1,7 @@
 2016-08-13  Per Bothner  <per@bothner.com>
 
+	* doc/style/kawa-ebook.js: Set target="_blank" for non-retaive links.
+
 	Include News page in the actual Kawa manual.
 	* news.texi: New file. Converted from htl using pandoc.
 	* kawa.texi: Include news.texi.

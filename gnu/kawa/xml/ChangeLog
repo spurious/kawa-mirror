@@ -1,3 +1,8 @@
+2016-08-14  Per Bothner  <per@bothner.com>
+
+	* HttpPrinter.java (writeoBject): Special handling of Blob.
+	This fixes doc/+default+.
+
 2016-08-12  Per Bothner  <per@bothner.com>
 
 	* HttpPrinter.java: Extend PrintConsumer rather than FilterConsumer.

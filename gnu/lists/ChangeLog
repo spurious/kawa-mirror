@@ -1,3 +1,9 @@
+2016-08-14  Per Bothner  <per@bothner.com>
+
+	* Blob.java: Don't implement Consumble.
+	(consume): Remove method.
+	* ByteVector.java (writeTo): Add one-argument overload
+
 2016-08-12  Per Bothner  <per@bothner.com>
 
 	A cleaner format/consumer model.

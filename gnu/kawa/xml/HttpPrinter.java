@@ -5,6 +5,7 @@ package gnu.kawa.xml;
 import gnu.lists.*;
 import gnu.xml.*;
 import gnu.mapping.*;
+import gnu.kawa.io.BinaryOutPort;
 import gnu.kawa.io.OutPort;
 import java.io.*;
 import java.util.Vector;
@@ -173,6 +174,21 @@ public class HttpPrinter extends PrintConsumer
 
   public void writeObject(Object v)
   {
+      if (v instanceof Blob) {
+          OutputStream outs =
+              writer instanceof BinaryOutPort
+              ? ((BinaryOutPort) writer).getOutputStream()
+              : ostream;
+          if (outs == null)
+              writer.write(v.toString());
+          else
+              try {
+                  ((Blob) v).writeTo(outs);
+              } catch (IOException ex) {
+                  throw new RuntimeException(ex);
+              }
+      }
+      else
     if (v instanceof Consumable)
       ((Consumable) v).consume(this);
     else

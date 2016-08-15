@@ -14,7 +14,7 @@ import java.nio.charset.Charset;
 
 public class Blob
     extends U8Vector
-    implements Consumable, CharSequence
+    implements CharSequence
 {
     private String stringValue;
     Charset charset;
@@ -45,12 +45,6 @@ public class Blob
             vec.copyFrom(0, this, 0, sz);
             return vec;
         }
-    }
-
-    public void consume(Consumer out) {
-        // FIXME Maybe just writeObject(this)
-        // and then have the consumer decide?
-        out.write(toString());
     }
 
     public String toString() {

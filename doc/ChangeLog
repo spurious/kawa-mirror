@@ -1,5 +1,7 @@
 2016-08-14  Per Bothner  <per@bothner.com>
 
+	* +default+: No longer need to add "?sidebar" to the URL.
+
 	* Makefile.am (kawa_TEXINFOS): Make sure news.texi is distibuted.
 
 	* kawa.texi (Binary distribution): Rewrite for new zip distribution.

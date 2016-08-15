@@ -32,7 +32,7 @@
 (cond ((string=? local-path "") ;; translate default "" to "index.xhtml"
        (values
         (response-status 301)
-        (response-header '|Location| "index.xhtml?sidebar")))
+        (response-header '|Location| "index.xhtml")))
       (else
        (values
         (response-content-type response-type)

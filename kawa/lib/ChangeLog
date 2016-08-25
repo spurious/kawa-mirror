@@ -1,3 +1,8 @@
+2016-08-25  Per Bothner  <per@bothner.com>
+
+	* prim_imports.scm: Add import of 'syntax-error'.  This fixes
+	Savannah bug #48888 "warning - no declaration seen for syntax-error".
+
 2016-08-12  Per Bothner  <per@bothner.com>
 
 	* ports.java(write, display, etc): Don't initailize sharing/cycle

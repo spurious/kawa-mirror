@@ -15,6 +15,7 @@
 (import (only (kawa standard SchemeCompilation) lambda))
 (import (only (kawa standard Scheme) not))
 (import (only (kawa standard begin) begin))
+(import (only kawa.standard.syntax_error (syntax_error syntax-error)))
 
 (define-syntax ?
   (syntax-rules ()

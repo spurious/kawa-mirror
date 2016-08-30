@@ -882,7 +882,7 @@ public class ClassType extends ObjectType
     int count = 0;
     String inheritingPackage = null;
     for (ClassType ctype = this;  ctype != null;
-	 ctype = ctype.getSuperclass())
+	 ctype = ctype.isInterface() ? Type.objectType : ctype.getSuperclass())
     {
       String curPackage = ctype.getPackageName();
       for (Method meth = ctype.getDeclaredMethods();
@@ -901,11 +901,7 @@ public class ClassType extends ObjectType
             {
               if (result != null)
                 {
-                  /* #ifdef JAVA2 */
                   result.add(meth);
-                  /* #else */
-                  // result.addElement(meth);
-                  /* #endif */
                 }
               count++;
             }
@@ -915,17 +911,14 @@ public class ClassType extends ObjectType
 
       if (searchSupers == 0)
 	break;
+    }
 
-      if (searchSupers > 1)
-	{
-	  ClassType[] interfaces = ctype.getAllInterfaces();
-	  if (interfaces != null)
-	    {
-	      for (int i = 0;  i < interfaces.length;  i++)
-		count += interfaces[i].getMethods(filter, searchSupers,
-						  result);
-	    }
-	}
+    if (searchSupers > 1) {
+        ClassType[] interfaces = getAllInterfaces();
+        if (interfaces != null) {
+            for (int i = 0;  i < interfaces.length;  i++)
+		count += interfaces[i].getMethods(filter, 0, result);
+        }
     }
     return count;
   }
@@ -1500,11 +1493,16 @@ public class ClassType extends ObjectType
       {
         Method meth = methods[i];
         String mname = meth.getName();
-        Type[] ptypes = meth.getParameterTypes();
-
-        Method mimpl = getMethod(mname, ptypes);
-        if (mimpl != null && ! mimpl.isAbstract())
-          continue;
+        String sig = meth.getSignature();
+        Filter<Method> filter = new Filter<Method>() {
+                 public boolean select(Method m) {
+                     return (! m.isAbstract()
+                             && mname.equals(m.getName())
+                             && sig.equals(m.getSignature()));
+                 }
+            };
+        if (countMethods(filter, 2) > 0)
+            continue;
         if (result != null)
           return null;
         result = meth;

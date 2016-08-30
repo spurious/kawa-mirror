@@ -1,5 +1,12 @@
 2016-08-29  Per Bothner  <per@bothner.com>
 
+	* ClassType.java (checkSingleAbstractMethod): Fix logic to properly
+	search superclasses - specifically Object.  Fixes Savannah
+	bug #48938 "lambda cannot be cast to java.util.Comparator".
+	(getMethods): Search Object as superclass of interfaces.
+	Also fix a performance bug.
+	* Filter.java: Make parameterized.
+
 	* Type.java (promoteIfUnsigned): Fix bug which caused boolean nd char
 	to be propmoted to int.
 

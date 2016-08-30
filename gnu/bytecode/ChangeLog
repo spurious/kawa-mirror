@@ -1,3 +1,8 @@
+2016-08-29  Per Bothner  <per@bothner.com>
+
+	* Type.java (promoteIfUnsigned): Fix bug which caused boolean nd char
+	to be propmoted to int.
+
 2016-07-12  Per Bothner  <per@bothner.com>
 
 	* Type.java (promotedIfUnsigned): New method.

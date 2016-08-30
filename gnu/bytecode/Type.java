@@ -250,10 +250,12 @@ public abstract class Type
   }
 
   public Type promoteIfUnsigned() {
-      return (size < 4 && this instanceof PrimType
-              && ((PrimType) this).isUnsigned()
-              ? intType
-              : this);
+      if (this instanceof PrimType) {
+          char sig1 = signature.charAt(0);
+          if ((sig1 == 'B' || sig1 == 'S') && ((PrimType) this).isUnsigned())
+              return intType;
+      }
+      return this;
   }
 
   public final int getSize() { return size; }

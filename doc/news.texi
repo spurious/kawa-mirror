@@ -38,6 +38,10 @@ use the splice operator:
 @end verbatim
 
 @item
+More options for @ref{Ranges,range objects}.  For example,
+you can write @code{[1 by: 2 <=: 9]}.
+
+@item
 Many enhancements to arrays and vectors:
 
 @itemize

@@ -1,3 +1,7 @@
+2016-08-31  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Ranges): New section.
+
 2016-08-14  Per Bothner  <per@bothner.com>
 
 	* +default+: No longer need to add "?sidebar" to the URL.

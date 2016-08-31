@@ -174,7 +174,7 @@ Various people and orgnizations @ref{Acknowledgements,have contributed to Kawa}.
 This package has nothing to do with the defunct Kawa commercial Java IDE.
 
 @menu
-* News::                 News- Recent Changes
+* News::                 News - Recent Changes
 * Features::
 * Community::
 * Installation::         Building and installing Kawa
@@ -2119,6 +2119,9 @@ You can also use @code{<=:} if you want to include the upper bound:
 
 You can use @code{>=:} or @code{>:} for a decreasing range.
 @code{[5 >=: 1]} or @code{[5 >: 0]} both evaluate to @code{[5 4 3 2 1]}.
+You can also specifify a step value: @code{[1 by: 2 <=: 9]},
+which evaluates to @code{[1 3 5 7 9]}.
+(@ref{Ranges,Details here}.)
 
 @subheading Using vector and ranges indexes
 
@@ -11234,6 +11237,7 @@ See @uref{http://www.ccs.neu.edu/home/dorai/pregexp/index.html,here for details}
 * Vectors::
 * Uniform vectors::
 * Bytevectors::
+* Ranges::
 * Streams:: Lazy lists.
 * Arrays::  Multi-dimensional Arrays
 * Hash tables::
@@ -12012,6 +12016,76 @@ in UTF-8 encoding.
 @end example
 @end deffn
 
+@node Ranges
+@section Ranges
+
+A @dfn{range} is an immutable sequence of values
+that increase ``linearly'' - i.e. by a fixed amount.
+Most commonly it's a sequence of consequtive integers.
+An example of the syntax is @code{[3 <: 7]} which evaluates
+to the sequence @code{[3 4 5 6]}.
+You can specify an explicit increment with a @code{by:} option.
+There are multiple ways to specify when the sequence stops.
+For example @code{[3 by 2 <=: 7]} is the even numbers from
+3 up to 7 (inclusive, because of the @code{<=}).
+
+Ranges are very useful for loop indexes, or selecting a sub-sequence.
+If you have a sequence @var{q} and a range @var{r}, and you
+use the syntax @code{(@var{q} @var{r})} to
+``apply''@var{q} with the argument @var{r},
+is result is to select elements of @var{q} with indexes in @var{r}.
+@example
+("ABCDEFG" [1 by: 2 <: 7])  @result{} "BDF"
+@end example
+
+A range can be @dfn{unbounded}, or non-finite, if you leave off
+the end value.  For example @code{[3 by: 2]} is the odd integers starting at 3.
+
+@display
+@stxdef{unbounded-range}
+  @stxlit{[} @var{start-expression} @stxlit{by:} @var{step-expression} @stxlit{]}
+  | @stxlit{[} @var{start-expression} @stxlit{<:} @stxlit{]}
+@end display
+
+The expression @code{[@var{start} by: @var{step}]} evaluates to an
+infinite sequence of values, starting with @var{start}, and followed by
+@code{(+ @var{start} @var{step})},
+@code{(+ @var{start} (* 2 @var{step}))}, and so on.
+
+The syntax @code{[@var{start-expression} <:]}
+is shorthand for @code{[@var{start-expression} by: 1]}.
+
+@display
+@stxdef{bounded-range} @stxlit{[} @var{start-expression} [@stxlit{by:} @var{step-expression}] @stxref{range-end} @stxlit{]}
+@stxdef{range-end} @stxlit{<:} @var{end-expression}
+  | @stxlit{<=:} @var{end-expression}
+  | @stxlit{>:} @var{end-expression}
+  | @stxlit{>=:} @var{end-expression}
+  | @stxlit{size:} @var{size-expression}
+@end display
+
+A bounded range takes an initial subsequence of the unbounded
+range specified by the @var{start-expression} and optional @var{step-expression}.
+The different @var{end-expression} variants provide different
+ways to specify the initial subsequence.
+
+If @code{size: @var{size}} is specified, then the resulting range
+is the first @var{size} elements of unbounded sequence.
+
+In the @code{<: @var{end}} or @code{<=: @var{end}} cases then
+the sequence counts up: The @var{step} must be positive, and defaults to 1.
+The resulting values are those  @var{x} such that @code{(< @var{x} @var{end})},
+or  @code{(<= @var{x} @var{end})}, respectively.
+
+In the @code{>: @var{end}} or @code{>=: @var{end}} cases then
+the sequence counts down: The @var{step} must be negative, and defaults to -1.
+The resulting values are those  @var{x} such that @code{(> @var{x} @var{end})},
+or  @code{(>= @var{x} @var{end})}, respectively.
+
+The @var{start-expression}, @var{step-expression}, and @var{size-expression}
+must evaluate to real numbers, not necessarily integers.
+For example: @code{[1 by: 0.5 <=: 3.0]} is @code{[1.0 1.5 2.0 2.5 3.0]}.
+
 @node Streams
 @section Streams - lazy lists
 
@@ -12167,7 +12241,7 @@ The array does not retain a reference to @var{shape}.
 @end deffn
 
 @deffn Procedure build-array shape procedure
-Construct a ``virtual array'' of teh given @var{shape},
+Construct a ``virtual array'' of the given @var{shape},
 which uses no storage for the elements.
 Instead, elements are calculated on-demand by calling @var{procedure},
 which takes a single argument, an index vector.
@@ -12176,9 +12250,9 @@ There is no caching or memoization.
 
 @example
 #|kawa:1|# @kbd{(build-array [[10 <: 12] 3]}
-#|(---:2|# @kbd{  (lambda (ind)}
-#|(---:3|# @kbd{    (let ((x (ind 0)) (y (ind 1)))}
-#|(---:4|# @kbd{      (- x y))))}
+#|....:2|# @kbd{  (lambda (ind)}
+#|....:3|# @kbd{    (let ((x (ind 0)) (y (ind 1)))}
+#|....:4|# @kbd{      (- x y))))}
 #2a@@10:2:3
 ║10│ 9│8║
 ╟──┼──┼─╢

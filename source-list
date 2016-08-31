@@ -374,6 +374,7 @@ GNU_KAWA_FUNCTIONS_JSOURCES = \
   gnu/kawa/functions/Not.java \
   gnu/kawa/functions/NumberCompare.java \
   gnu/kawa/functions/NumberPredicate.java \
+  gnu/kawa/functions/RangeUtils.java \
   gnu/kawa/functions/RunProcess.java \
   gnu/kawa/functions/SetNamedPart.java \
   gnu/kawa/functions/Setter.java \

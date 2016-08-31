@@ -18,6 +18,7 @@ public class DivideOp extends ArithOp
 
   public static final DivideOp $Sl = new DivideOp("/", DIVIDE_GENERIC);
   public static final DivideOp idiv = new DivideOp("idiv", QUOTIENT_EXACT);
+  public static final DivideOp iceil = new DivideOp("iceil", QUOTIENT_EXACT);
   public static final DivideOp floorQuotient = new DivideOp("floor-quotient", QUOTIENT);
   public static final DivideOp quotient = new DivideOp("quotient", QUOTIENT);
   public static final DivideOp remainder = new DivideOp("remainder", MODULO);
@@ -28,6 +29,7 @@ public class DivideOp extends ArithOp
   public static final DivideOp mod0 = new DivideOp("mod0", MODULO);
   static {
     idiv.rounding_mode = Numeric.TRUNCATE;
+    iceil.rounding_mode = Numeric.CEILING;
     quotient.rounding_mode = Numeric.TRUNCATE;
     floorQuotient.rounding_mode = Numeric.FLOOR;
     remainder.rounding_mode = Numeric.TRUNCATE;
@@ -52,15 +54,18 @@ public class DivideOp extends ArithOp
     int len = args.length;
     if (len == 0)
       return IntNum.one ();
-    Number result = (Number) args[0];
+    Object result = args[0];
     if (len == 1)
       return apply2(IntNum.one(), result);
-    int code = Arithmetic.classifyValue(result);
     for (int i = 1; i < len; i++)
-      {
-	Object arg2 = args[i];
+        result = apply2(result, args[i]);
+    return result;
+  }
+    public Object apply2 (Object arg1, Object arg2) throws Throwable {
+        Number result;
+        int code1 = Arithmetic.classifyValue(arg1);
 	int code2 = Arithmetic.classifyValue(arg2);
-	code = Arithmetic.leastSpecificCode(code, code2);
+	int code = Arithmetic.leastSpecificCode(code1, code2);
         int scode = code;
         if (code < Arithmetic.INTNUM_CODE && code != Arithmetic.UNKNOWN_CODE)
           {
@@ -101,7 +106,7 @@ public class DivideOp extends ArithOp
 	switch (scode)
 	  {
 	  case Arithmetic.INT_CODE:
-	    int i1 = Arithmetic.asInt(result);
+	    int i1 = Arithmetic.asInt(arg1);
 	    int i2 = Arithmetic.asInt(arg2);
             switch (op)
               {
@@ -116,7 +121,7 @@ public class DivideOp extends ArithOp
 	    break;
 	  case Arithmetic.UINT_CODE:
 	  case Arithmetic.LONG_CODE:
-	    long l1 = Arithmetic.asLong(result);
+	    long l1 = Arithmetic.asLong(arg1);
 	    long l2 = Arithmetic.asLong(arg2);
             if (scode == Arithmetic.UINT_CODE)
               {
@@ -139,7 +144,7 @@ public class DivideOp extends ArithOp
 	    break;
           /* #ifdef JAVA8 */
           // case Arithmetic.ULONG_CODE:
-          //   l1 = Arithmetic.asLong(result);
+          //   l1 = Arithmetic.asLong(arg1);
           //   l2 = Arithmetic.asLong(arg2);
           //   switch (op)
           //     { // FIXME Hacker's Delight has better algorithms than jdk8
@@ -156,19 +161,20 @@ public class DivideOp extends ArithOp
 	  case Arithmetic.INTNUM_CODE:
             switch (op)
               {
+              default:
               case QUOTIENT:
               case QUOTIENT_EXACT:
-                result = IntNum.quotient(Arithmetic.asIntNum(result),
+                result = IntNum.quotient(Arithmetic.asIntNum(arg1),
                                          Arithmetic.asIntNum(arg2),
                                          getRoundingMode());
                 break;
               case MODULO:
-                result = IntNum.remainder(Arithmetic.asIntNum(result),
+                result = IntNum.remainder(Arithmetic.asIntNum(arg1),
                                           Arithmetic.asIntNum(arg2),
                                           getRoundingMode());
                 break;
               case DIVIDE_GENERIC:
-                result = RatNum.make(Arithmetic.asIntNum(result),
+                result = RatNum.make(Arithmetic.asIntNum(arg1),
                                      Arithmetic.asIntNum(arg2));
                 code = result instanceof IntNum ? Arithmetic.INTNUM_CODE
                   : Arithmetic.RATNUM_CODE;
@@ -178,7 +184,7 @@ public class DivideOp extends ArithOp
 	    break;
           /* #ifdef JAVA5 */
 	  case Arithmetic.BIGDECIMAL_CODE:
-	    BigDecimal bd1 = Arithmetic.asBigDecimal(result);
+	    BigDecimal bd1 = Arithmetic.asBigDecimal(arg1);
 	    BigDecimal bd2 = Arithmetic.asBigDecimal(arg2);
             int mprec = 0; // ???
             RoundingMode mround;
@@ -202,6 +208,7 @@ public class DivideOp extends ArithOp
             MathContext mcontext = new MathContext(mprec, mround);
             switch (op)
               {
+              default:
               case DIVIDE_GENERIC:
                 result = bd1.divide(bd2);
                 break;
@@ -220,10 +227,11 @@ public class DivideOp extends ArithOp
 	    break;
           /* #endif */
 	  case Arithmetic.FLONUM_CODE:
-	    double d1 = Arithmetic.asDouble(result);
+	    double d1 = Arithmetic.asDouble(arg1);
 	    double d2 = Arithmetic.asDouble(arg2);
             switch (op)
               {
+              default:
               case DIVIDE_GENERIC:
               case DIVIDE_INEXACT:
                 result = DFloNum.valueOf(d1 / d2);
@@ -244,7 +252,7 @@ public class DivideOp extends ArithOp
 	    break;
 	  case Arithmetic.REALNUM_CODE:
 	  default:
-            Numeric num1 = Arithmetic.asNumeric(result);
+            Numeric num1 = Arithmetic.asNumeric(arg1);
             Numeric num2 = Arithmetic.asNumeric(arg2);
             if (op == MODULO && num2.isZero())
               return num2.isExact() ? num1 : num1.toInexact();
@@ -293,7 +301,6 @@ public class DivideOp extends ArithOp
                 result = Arithmetic.asBigInteger(result);
               }
           }
-      }
     return result;
    }
 

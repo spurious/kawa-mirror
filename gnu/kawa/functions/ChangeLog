@@ -1,3 +1,10 @@
+2016-08-31  Per Bothner  <per@bothner.com>
+
+	* RangeUtils.java: New file - partly based on factory methods in Range.
+	* DisplayFormat.java: Better readable printing of Range objects.
+	* DivideOp.java: Re-factor to add apply method.
+	(iceil): New constant, for QUOTIENT_EXACT and CEILING.
+
 2016-08-12  Per Bothner  <per@bothner.com>
 
 	A cleaner format/consumer model.

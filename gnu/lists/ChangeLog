@@ -1,3 +1,8 @@
+2016-08-31  Per Bothner  <per@bothner.com>
+
+	* Range.java: Move factory method to java/kawa/functions/RangeUtils.java.
+	(isUnbounded): Move public.
+
 2016-08-14  Per Bothner  <per@bothner.com>
 
 	* Blob.java: Don't implement Consumble.

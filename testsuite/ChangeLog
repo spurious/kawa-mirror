@@ -1,3 +1,7 @@
+2016-08-31  Per Bothner  <per@bothner.com>
+
+	* arr-test.scm: Added tests for ranges.
+
 2016-08-29  Sakamoto Osamu <saka1029>
             Per Bothner  <per@bothner.com>
 

@@ -278,11 +278,17 @@
 
 (define-syntax $bracket-list$
   (syntax-rules (<: <=: >: >=:)
-    ((_ x <: y) (invoke-static gnu.lists.Range 'valueOfLT x y))
-    ((_ x <=: y) (invoke-static gnu.lists.Range 'valueOfLE x y))
-    ((_ x >: y) (invoke-static gnu.lists.Range 'valueOfGT x y))
-    ((_ x >=: y) (invoke-static gnu.lists.Range 'valueOfGE x y))
-    ((_ x <:) (invoke-static gnu.lists.Range 'valueOfUnbounded x))
+    ((_ x <: y) (gnu.kawa.functions.RangeUtils:upto x 1 y #f))
+    ((_ x <=: y) (gnu.kawa.functions.RangeUtils:upto x 1 y #t))
+    ((_ x >: y) (gnu.kawa.functions.RangeUtils:downto x -1 y #f))
+    ((_ x >=: y) (gnu.kawa.functions.RangeUtils:downto x -1 y #t))
+    ((_ x by: step <: y) (gnu.kawa.functions.RangeUtils:upto x step y #f))
+    ((_ x by: step <=: y) (gnu.kawa.functions.RangeUtils:upto x step y #t))
+    ((_ x by: step >: y) (gnu.kawa.functions.RangeUtils:downto x step y #f))
+    ((_ x by: step >=: y) (gnu.kawa.functions.RangeUtils:downto x step y #t))
+    ((_ x <:) (gnu.kawa.functions.RangeUtils:valueOfUnbounded x 1))
+    ((_ x by: step) (gnu.kawa.functions.RangeUtils:valueOfUnbounded x step))
+    ((_ x by: step size: sz) (gnu.kawa.functions.RangeUtils:bySize x step sz))
     ((_ . args) (constant-vector . args))))
 
 (cond-expand

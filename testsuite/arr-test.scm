@@ -1,5 +1,5 @@
 ;; -*- coding: utf-8 -*-
-(test-begin "arrays" 204)
+(test-begin "arrays" 215)
 
 ;;; array test
 ;;; 2001 Jussi Piitulainen
@@ -548,5 +548,17 @@
 
 (test-equal &{#2a@1:2:3((a -9 "c") (d 153 "ef"))}
             (format "~w" #2a@1:2:3((a -9 "c") (d 153 "ef"))))
+
+(test-equal [2 5] [2 by: 3 <: 8])
+(test-equal [2 5 8] [2 by: 3 <=: 8])
+(test-equal [2 5 8] [2 by: 3 <: 9])
+(test-equal [2 5 8 11] [2 by: 3 <=: 11])
+(test-equal [2 5 8 11] [2 by: 3 <=: 13])
+(test-equal ([1 by: 2 ] [1 <: 10]) [3 5 7 9 11 13 15 17 19])
+(test-equal [20 20 20 20 20] ([20 by: 0] [0 <: 5]))
+(test-equal [3.0 3.5 4.0 4.5 5.0 5.5 6.0] [3.0 by: 0.5 <=: 6])
+(test-equal [4.0 3.5 3.0] [4.0 by: -0.5 >=: 3.0])
+(test-error [20 by: 2 >: 30])
+(test-error [20 by: -2 <=: 10])
 
 (test-end)

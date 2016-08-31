@@ -1,3 +1,7 @@
+2016-08-31  Per Bothner  <per@bothner.com>
+
+	* IntNum.java (add): Minor optimization.  Check for zero.
+
 2016-07-22  Per Bothner  <per@bothner.com>
 
 	* Unit.java (degree, gradian): New units.

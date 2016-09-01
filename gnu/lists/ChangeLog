@@ -1,3 +1,7 @@
+2016-09-01  Per Bothner  <per@bothner.com>
+
+	* ComposedArray.java: Restructured the logic a bit.
+
 2016-08-31  Per Bothner  <per@bothner.com>
 
 	* Range.java: Move factory method to java/kawa/functions/RangeUtils.java.

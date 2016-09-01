@@ -13,10 +13,12 @@ public class ComposedArray<E> extends TransformedArray<E> {
     int[] dims;
     int[] lowBounds;
 
-    public ComposedArray(Array base, Array<Integer>... mappers) {
+    public ComposedArray(Array base, int rank, int[] dims, int[] lowBounds, Array<Integer>[] mappers) {
         super(base);
+        this.rank = rank;
+        this.dims = dims;
+        this.lowBounds = lowBounds;
         this.mappers = mappers;
-        setup();
     }
 
     @Override public int rank() { return rank; }
@@ -26,30 +28,6 @@ public class ComposedArray<E> extends TransformedArray<E> {
 
     @Override
     public int getSize(int dim) { return dims[dim]; }
-
-    static int rankSum(Array<?>[] mappers) {
-        int rank = 0;
-        for (int i = mappers.length;  --i >= 0; )
-            rank += mappers[i].rank();
-        return rank;
-    }
-
-    void setup() {
-        int k = 0;
-        int n = mappers.length;
-        rank = rankSum(mappers);
-        dims = new int[rank];
-        lowBounds = new int[rank];
-        for (int i = 0; i < n; i++) {
-            Array<Integer> mapper = mappers[i];
-            int mrank = mapper.rank();
-            for (int j = 0;  j < mrank;  j++) {
-                dims[k] = mapper.getSize(j);
-                lowBounds[k] = mapper.getLowBound(j);
-                k++;
-            }
-        }
-    }
 
     @Override
     public final int effectiveIndex() {
@@ -203,14 +181,65 @@ public class ComposedArray<E> extends TransformedArray<E> {
                 arr = ((SimpleVector) arr).asImmutable();
                 shared = true;
             }
+            int[] dimensions = new int[rank];
+            int[] lowBounds = new int[rank];
+            int k = 0;
+            for(int i = 0;  i < nindexes;  i++) {
+                Array<Integer> iarr = aindexes[i];
+                int irank = iarr.rank();
+                int ilow = arr.getLowBound(i);
+                int idim = arr.getSize(i);
+                if (irank == 0) {
+                    int j = iarr.getInt();
+                    j -= ilow;
+                    if (j < 0 || (idim >= 0 && j >= idim)) {
+                        throwBoundException(i, nindexes, arr,
+                                            "value "+(j+ilow));
+                    }
+                } else if (iarr instanceof Range.IntRange) {
+                    Range.IntRange irange = (Range.IntRange) iarr;
+                    int sz = irange.size();
+                    int j = irange.getStartInt();
+                    j -= ilow;
+                    //if (irange.isUnbounded())
+                    //    sz = idim - j;
+                    if (j < 0 || (idim >= 0 && j > idim)
+                        || (j >= 0 && idim >= 0 && j+sz > idim)) {
+                        StringBuilder sbuf = new StringBuilder();
+                        sbuf.append("range [");
+                        sbuf.append(j+ilow);
+                        if (irange.isUnbounded())
+                            sbuf.append(" <:]");
+                        else {
+                            sbuf.append(" <: ");
+                            sbuf.append(sz+j+ilow);
+                            sbuf.append("]");
+                        }
+                        throwBoundException(i, nindexes, arr,
+                                            sbuf.toString());
+                    }
+                    if (irange.isUnbounded()) {
+                        j = irange.getStartInt();
+                        iarr = new Range.IntRange(j, 1, idim - j);
+                        aindexes[i] = iarr;                     
+                    }
+                } else {
+                    // FIXME should we check that every element in iarr
+                    // is in [ilow by: 1 size: idim] ?
+                }
+                for (int j = 0;  j < irank;  j++) {
+                    dimensions[k] = iarr.getSize(j);
+                    lowBounds[k] = iarr.getLowBound(j);
+                    k++;
+                }
+            }
+                    
             // FIXME: replace 'shared' by '(shared || arr.isImmutable())' ?
             if (linear && shared && arr instanceof GeneralArray) {
                 GeneralArray garr = (GeneralArray) arr;
-                int[] dimensions = new int[rank];
-                int[] lowBounds = new int[rank];
                 int offset = garr.offset;
                 int[] strides = new int[rank];
-                int k = 0;
+                k = 0;
                 for(int i = 0;  i < nindexes;  i++) {
                     Array<Integer> iarr = aindexes[i];
                     int irank = iarr.rank();
@@ -219,66 +248,41 @@ public class ComposedArray<E> extends TransformedArray<E> {
                     int idim = garr.dimensions[i];
                     if (iarr.rank() == 0) {
                         int j = iarr.getInt();
-                        j -= ilow;
-                        if (j < 0 || j >= idim) {
-                            throwBoundException(i, nindexes, garr,
-                                                "value "+(j+ilow));
-                        }
-                        offset += istride * j;
+                        offset += istride * (j - ilow);
                     } else { // iarr instanceof Range.IntRange
                         Range.IntRange irange = (Range.IntRange) iarr;
                         int sz = irange.size();
                         int j = irange.getStartInt();
-                        j -= ilow;
-                        if (j < 0 || j > idim
-                            || (j >= 0 && j+sz > idim)) {
-                            StringBuilder sbuf = new StringBuilder();
-                            sbuf.append("range [");
-                            sbuf.append(j+ilow);
-                            if (sz < 0)
-                                sbuf.append(" <:]");
-                            else {
-                                sbuf.append(" <: ");
-                                sbuf.append(sz+j+ilow);
-                                    sbuf.append("]");
-                            }
-                            throwBoundException(i, nindexes, garr,
-                                                sbuf.toString());
-                        }
-                        if (sz < 0)
-                            sz = idim - j;
-                        dimensions[k] = sz;
-                        lowBounds[k] = 0;
                         strides[k] = irange.getStepInt() * istride;
-                        offset += istride * j;
+                        offset += istride * (j - ilow);
                         k++;
                     }
                 }
                 return GeneralArray.make(garr.getBase(), dimensions, lowBounds,
                                          strides, offset);
-             }
-            ComposedArray carr = new ComposedArray(arr, aindexes);
-            if (! shared) {
-                return Arrays.simpleCopy(carr, false);
             }
-            else if (carr.rank() == 1 && carr.getLowBound(0) == 0) {
+            if (shared && rank == 1 && lowBounds[0] == 0) {
                 if (arr instanceof List && aindexes.length == 1
                     && aindexes[0] instanceof IntSequence)
                     return new IndirectIndexedSeq((List) arr,
                                                   (IntSequence) aindexes[0]);
-                return new ComposedArray.AsSequence(carr);
+                return new ComposedArray.AsSequence(arr, rank, dimensions,
+                                                    lowBounds, aindexes);
             }
-            else {
+            ComposedArray carr = new ComposedArray(arr, rank, dimensions,
+                                                   lowBounds, aindexes);
+            if (shared)
                 return carr;
-            }
+            else
+                return Arrays.simpleCopy(carr, false);
         }
     }
 
-   private static void throwBoundException(int i, int nindexes,
-                                           GeneralArray oldMapper,
-                                           String index) {
-        int ilow = oldMapper.lowBounds[i];
-        int idim = oldMapper.dimensions[i];
+    private static void throwBoundException(int i, int nindexes,
+                                            Array oldMapper,
+                                            String index) {
+        int ilow = oldMapper.getLowBound(i);
+        int idim = oldMapper.getSize(i);
         StringBuilder sbuf = new StringBuilder();
         if (nindexes == 0)
             sbuf.append("index " );
@@ -298,11 +302,11 @@ public class ComposedArray<E> extends TransformedArray<E> {
         throw new IndexOutOfBoundsException(sbuf.toString());
     }
 
+    /** Same as ComposedArray but also implements AVector. */
     public static class AsSequence<E>
             extends ComposedArray<E> implements AVector<E> {
-        public AsSequence(ComposedArray old) {
-            super(old.base, old.mappers);
-            setup();
+        public AsSequence(Array base, int rank, int[] dims, int[] lowBounds, Array<Integer>[] mappers) {
+            super(base, rank, dims, lowBounds, mappers);
         }
     }
 }

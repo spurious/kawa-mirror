@@ -48,6 +48,28 @@ public class ReaderDispatchMisc extends ReadTableEntry
       ch = code;
     switch (ch)
       {
+      case '*':
+        name = reader.readTokenString(-1, ReadTable.getCurrent());
+        int nlen = name.length();
+        int len = nlen;
+        if (count >= 0) {
+            if (nlen > count)
+                in.error("too many bits in bit vector");
+            len = count;
+        }
+        boolean[] arr = new boolean[len];
+        char prev = '0';
+        for (int i = 0; i < len; i++) {
+            char c = i < nlen ? name.charAt(i) : prev;
+            prev = c;
+            if (c == '1' || c == 't' || c == 'F')
+                arr[i] = true;
+            else if (! (c == '0' || c == 'f' || c == 'F')) {
+                prev = '0';
+                in.error("invalid character (at offset "+i+") in bitvector");
+            }
+        }
+        return new BitVector(arr);
       case ':':
 	// Handle Guile-style keyword syntax: '#:KEYWORD'
 	// Note this conflicts with Common Lisp uninterned symbols.  FIXME

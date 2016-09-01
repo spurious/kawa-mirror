@@ -61,6 +61,7 @@ public class ReaderDispatch extends ReadTableEntry
     tab.set('\\', entry);
     tab.set('=', entry);
     tab.set('#', entry);
+    tab.set('*', entry);
     /* #ifdef use:java.util.regex */
     tab.set('/', entry);
     /* #endif */

@@ -1,3 +1,9 @@
+2016-08-31  Per Bothner  <per@bothner.com>
+
+	Handle Common Lisp reader syntax for bitvectors.
+	* ReaderDispatchMisc.java (read): Handle "#*".
+	* ReaderDispatch.java (create): Bind "#*".
+
 2016-06-02  Per Bothner  <per@bothner.com>
 
 	* LispLanguage.java (parse): Skip ending newline.

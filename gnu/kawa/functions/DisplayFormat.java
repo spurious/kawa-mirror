@@ -388,6 +388,11 @@ public class DisplayFormat extends AbstractFormat
 	    start = "[";
 	    end = "]";
 	  }
+        else if ("b".equals(tag))
+          {
+            start = "#*";
+            end = "";
+          }
 	else
 	  {
 	    start = tag == null ? "#(" : ("#" + tag + "(");
@@ -396,8 +401,14 @@ public class DisplayFormat extends AbstractFormat
         PrintConsumer.startLogicalBlock(start, false, end, out);
         // Using consumeNext for primtives avoids boxing.
         // However, for objects we want to recurse
-        if (vec instanceof SimpleVector
-            && ((SimpleVector) vec).getTag() != null) {
+        if ("b".equals(tag)) {
+            SimpleVector bvec = (SimpleVector) vec;
+            int blen = vec.size();
+            for (int i = 0; i < blen; i++) {
+                boolean b = bvec.getBooleanRaw(bvec.effectiveIndex(i));
+                out.write(b ? '1' : '0');
+            }
+        } else if (vec instanceof SimpleVector && tag != null) {
             int endpos = vec.size() << 1;
             for (int ipos = 0;  ipos < endpos;  ipos += 2) {
                 if (ipos > 0)

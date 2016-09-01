@@ -1,5 +1,8 @@
 2016-08-31  Per Bothner  <per@bothner.com>
 
+	* DisplayFormat.java (writeObjectRaw): Write BitVector
+	in Common Lisp format.
+
 	* RangeUtils.java: New file - partly based on factory methods in Range.
 	* DisplayFormat.java: Better readable printing of Range objects.
 	* DivideOp.java: Re-factor to add apply method.

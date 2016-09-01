@@ -1,5 +1,8 @@
 2016-08-31  Per Bothner  <per@bothner.com>
 
+	* ArrayPrint.java (putLine): Don't emit newline at end.
+	This fixes a problem with "word" separators and extra spaces.
+
 	* DisplayFormat.java (writeObjectRaw): Write BitVector
 	in Common Lisp format.
 

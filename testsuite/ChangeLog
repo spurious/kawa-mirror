@@ -1,5 +1,7 @@
 2016-08-31  Per Bothner  <per@bothner.com>
 
+	* arr-test.scm: Array pretty-printing no longer ends with a newline.
+
 	* arr-test.scm: Added tests for ranges.
 
 2016-08-29  Sakamoto Osamu <saka1029>

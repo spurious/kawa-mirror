@@ -133,16 +133,17 @@ public class ArrayPrint {
     // hmode meanings: 0: top line; 1: regular; 2: double; 3: bottom
     private static void putLine(int hmode, int[] fieldw, StringBuilder sbuf) {
         int nfields = fieldw.length;
-                sbuf.append("\u2554\u255f\u2560\u255a".charAt(hmode));
-                for (int k = 0; k < nfields; ) {
-                    putChars(sbuf, fieldw[k],
-                             "\u2550\u2500\u2550\u2550".charAt(hmode));
-                    if (++k >= nfields)
-                        break;
-                    sbuf.append("\u2564\u253c\u256a\u2567".charAt(hmode));
-                }
-                sbuf.append("\u2557\u2562\u2563\u255d".charAt(hmode));
-                sbuf.append('\n');
+        sbuf.append("\u2554\u255f\u2560\u255a".charAt(hmode));
+        for (int k = 0; k < nfields; ) {
+            putChars(sbuf, fieldw[k],
+                     "\u2550\u2500\u2550\u2550".charAt(hmode));
+            if (++k >= nfields)
+                break;
+            sbuf.append("\u2564\u253c\u256a\u2567".charAt(hmode));
+        }
+        sbuf.append("\u2557\u2562\u2563\u255d".charAt(hmode));
+        if (hmode != 3)
+            sbuf.append('\n');
     }
 
     static void putSpaces(StringBuilder sbuf, int n) {

@@ -1645,9 +1645,9 @@ public class LispReader extends Lexer
         int[] lowBounds = null;
         boolean error = false;
         int ch = in.read();
-        boolean explicitDim = ch == '@' || ch == ':';
         boolean baddim = false;
-        if (explicitDim) {
+        int explicitDims = 0;
+        if (ch == '@' || ch == ':') {
             for (int r = 0; r < rank; r++) {
                 if (ch == '@') {
                     ch = in.read();
@@ -1663,8 +1663,11 @@ public class LispReader extends Lexer
                         lowBounds = new int[rank];
                     lowBounds[r] = neg ? - low : low;
                     ch = in.read();
+                    if (ch != ':' && r == rank-1)
+                        break;
                 }
                 if (ch == ':') {
+                    explicitDims++;
                     int dim = in.readIntDigits();
                     if (dim < 0) {
                         in.error("expected dimension after ':'");
@@ -1673,18 +1676,18 @@ public class LispReader extends Lexer
                       
                     dimensions[r] = dim;
                     ch = in.read();
-                } else {
+                } else if (ch != '@') {
                     in.error("missing bounds-specifier (seen "+r
                              +" of "+rank+")");
                     error = true;
                     
                 }
             }
-            if (ch == '@' || ch == ':') {
-                in.error("too many bounds-specifiers for rank-"
-                         +rank+" array");
-                error = true;
-            }
+        }
+        if (ch == '@' || ch == ':') {
+            in.error("too many bounds-specifiers for rank-"
+                     +rank+" array");
+            error = true;
         }
         while (ch >= 0 && Character.isWhitespace(ch))
             ch = in.read();
@@ -1693,11 +1696,14 @@ public class LispReader extends Lexer
                                   in.getLineNumber()+1, in.getColumnNumber());
         in.unread(ch);
         Object data = in.readObject();
-        if (! explicitDim) {
+        if (explicitDims == 0) {
             if (! dimensionsFromNested(0, dimensions, data)) {
                 in.error("array value is not a nested true list");
                 error = true;
             }
+        } else if (explicitDims < rank) {
+            in.error("only "+explicitDims+" array lengths specified - must be all "+rank+" or none");
+            error = true;
         }
         if (error)
             return LList.Empty;

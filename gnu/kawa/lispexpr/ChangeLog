@@ -1,3 +1,8 @@
+2016-09-02  Per Bothner  <per@bothner.com>
+
+	* LispReader.java (readGeneralArray): Allow specifying only
+	the lower bounds without specify lengths - as Guile also allows.
+
 2016-08-31  Per Bothner  <per@bothner.com>
 
 	Handle Common Lisp reader syntax for bitvectors.

@@ -1,5 +1,5 @@
 ;; -*- coding: utf-8 -*-
-(test-begin "arrays" 227)
+(test-begin "arrays" 228)
 
 ;;; array test
 ;;; 2001 Jussi Piitulainen
@@ -588,4 +588,11 @@
                              (lambda (ix) (let ((i (ix 0)) (j (ix 1)) (k (ix 2)))
                                             [(+ i 1)
                                              (+ (* 2 (- j 1)) k)]))))
+(test-equal &{&-
+#2u32@2:2@3:2
+║001│002║
+╟───┼───╢
+║002│003║
+╚═══╧═══╝}
+  (format-array  #2u32@2@3((1 2) (2 3)) "~3,'0d"))      
 (test-end)

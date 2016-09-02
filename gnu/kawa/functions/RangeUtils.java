@@ -33,20 +33,7 @@ public class RangeUtils {
         if (iistart != null && iiend != null && iistep != null
             && iistart.inIntRange()
             && IntNum.compare(iistep, Integer.MAX_VALUE) <= 0) {
-            int istart = iistart.intValue();
-            int istep = iistep.intValue();
-            IntNum size = IntNum.sub(iiend, iistart);
-            if (istep != 1)
-                size = IntNum.quotient(size, iistep,
-                                       orEqual ? IntNum.TRUNCATE : IntNum.CEILING);
-            int isize;
-            if (size.sign() < 0)
-                isize = 0;
-            else if (IntNum.compare(size, Integer.MAX_VALUE - (orEqual ? 1 : 0)) > 0)
-                throw new IndexOutOfBoundsException("size too large");
-            else
-                isize = size.intValue() + (orEqual ? 1 : 0);
-            return new IntRange(istart, istep, isize);
+            return Range.upto(iistart, iistep, iiend, orEqual);
         }
         
         Object size = AddOp.$Mn(end, start);
@@ -69,20 +56,7 @@ public class RangeUtils {
         if (iistart != null && iiend != null && iistep != null
             && iistart.inIntRange()
             && IntNum.compare(iistep, Integer.MIN_VALUE) >= 0) {
-            int istart = iistart.intValue();
-            int istep = iistep.intValue();
-            IntNum size = IntNum.sub(iistart, iiend);
-            if (istep != -1)
-                size = IntNum.quotient(size, IntNum.neg(iistep),
-                                       orEqual ? IntNum.TRUNCATE : IntNum.CEILING);
-            int isize;
-            if (size.sign() < 0)
-                isize = 0;
-            else if (IntNum.compare(size, Integer.MAX_VALUE - (orEqual ? 1 : 0)) > 0)
-                throw new IndexOutOfBoundsException("size too large");
-            else
-                isize = size.intValue() + (orEqual ? 1 : 0);
-            return new IntRange(istart, istep, isize);
+            return Range.downto(iistart, iistep, iiend, orEqual);
         }
         
         Object size = AddOp.$Mn(start, end);

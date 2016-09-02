@@ -2,6 +2,7 @@ package gnu.lists;
 
 import gnu.kawa.functions.AddOp;
 import gnu.kawa.functions.MultiplyOp;
+import gnu.math.IntNum;
 import java.io.*;
 
 public class Range<E> extends AbstractSequence<E> implements AVector<E> {
@@ -31,7 +32,9 @@ public class Range<E> extends AbstractSequence<E> implements AVector<E> {
     @Override
     public int size() { return size; }
 
-    public boolean isUnbounded() { return size == -1; }
+    public boolean isUnbounded() { return size < 0; }
+    public boolean isUnspecifiedStart() { return size == -2; }
+    public boolean isUnspecifiedLast() { return isUnbounded(); }
 
     public static class IntRange extends Range<Integer>
         implements IntSequence, Externalizable {
@@ -51,6 +54,7 @@ public class Range<E> extends AbstractSequence<E> implements AVector<E> {
         }
 
         public int getStartInt() { return istart; }
+        public int getLastInt() { return istart + (size - 1) * istep; }
         public int getStepInt() { return istep; }
 
         public int getInt(int index) {
@@ -124,4 +128,38 @@ public class Range<E> extends AbstractSequence<E> implements AVector<E> {
     }
 
     public static final IntRange zeroAndUp = new IntRange(0, 1);
+
+    public static IntRange upto(IntNum iistart, IntNum iistep, IntNum iiend, boolean orEqual) {
+        int istart = iistart.intValue();
+        int istep = iistep.intValue();
+        IntNum size = IntNum.sub(iiend, iistart);
+        if (istep != 1)
+            size = IntNum.quotient(size, iistep,
+                                   orEqual ? IntNum.TRUNCATE : IntNum.CEILING);
+        int isize;
+        if (size.sign() < 0)
+            isize = 0;
+        else if (IntNum.compare(size, Integer.MAX_VALUE - (orEqual ? 1 : 0)) > 0)
+            throw new IndexOutOfBoundsException("size too large");
+        else
+            isize = size.intValue() + (orEqual ? 1 : 0);
+        return new IntRange(istart, istep, isize);
+    }
+    public static IntRange downto(IntNum iistart, IntNum iistep, IntNum iiend, boolean orEqual) {
+        int istart = iistart.intValue();
+        int istep = iistep.intValue();
+        IntNum size = IntNum.sub(iistart, iiend);
+        if (istep != -1)
+            size = IntNum.quotient(size, IntNum.neg(iistep),
+                                   orEqual ? IntNum.TRUNCATE : IntNum.CEILING);
+        int isize;
+        if (size.sign() < 0)
+            isize = 0;
+        else if (IntNum.compare(size, Integer.MAX_VALUE - (orEqual ? 1 : 0)) > 0)
+            throw new IndexOutOfBoundsException("size too large");
+        else
+            isize = size.intValue() + (orEqual ? 1 : 0);
+        return new IntRange(istart, istep, isize);
+    }
 }
+

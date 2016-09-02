@@ -349,30 +349,42 @@ public class DisplayFormat extends AbstractFormat
       }
     else if (obj instanceof LList)
       writeList((LList) obj, out);
-    else if (obj instanceof Range && getReadableOutput()) {
+    else if (obj instanceof Range
+             && (getReadableOutput() || ((Range) obj).isUnspecifiedStart())) {
         Range range = (Range) obj;
         PrintConsumer.startLogicalBlock("[", false, "]", out);
         Object rstart = range.getStart();
         Object rstep = range.getStep();
-        writeObject(rstart, out);
-        IntNum istart = IntNum.asIntNumOrNull(rstart);
         IntNum istep = IntNum.asIntNumOrNull(rstep);
-        int rsize = range.size();
-        if (! range.isUnbounded() && istart != null && istep != null
-            && (istep.isOne() || istep.isMinusOne())) {
-            if (istep.isOne()) {
-                out.write(" <: ");
-                writeObject(IntNum.add(istart, rsize), out);
-            } else {
-                out.write(" >: ");
-                writeObject(IntNum.add(istart, -rsize), out);
+        IntNum istart = IntNum.asIntNumOrNull(rstart);
+        if (range.isUnspecifiedStart()) {
+            if (istep.isOne())
+                out.write("<:");
+            else if (istep.isMinusOne())
+                out.write(">:");
+            else {
+                out.write("by: ");
+                writeObject(rstep, out);
             }
         } else {
-            out.write(" by: ");
-            writeObject(rstep, out);
-            if (! range.isUnbounded()) {
-                out.write(" size: ");
-                out.writeInt(rsize);
+            writeObject(rstart, out);
+            int rsize = range.size();
+            if (! range.isUnbounded() && istart != null && istep != null
+                && (istep.isOne() || istep.isMinusOne())) {
+                if (istep.isOne()) {
+                    out.write(" <: ");
+                    writeObject(IntNum.add(istart, rsize), out);
+                } else {
+                    out.write(" >: ");
+                    writeObject(IntNum.add(istart, -rsize), out);
+                }
+            } else {
+                out.write(" by: ");
+                writeObject(rstep, out);
+                if (! range.isUnbounded()) {
+                    out.write(" size: ");
+                    out.writeInt(rsize);
+                }
             }
         }
 	PrintConsumer.endLogicalBlock("]", out);

@@ -1,3 +1,9 @@
+2016-09-02  Per Bothner  <per@bothner.com>
+
+	* RangeUtils.java (upto, downto): Move IntRange-constructing
+	logic back to Range.java,
+	* DisplayFormat.java: Print pseudo-ranges '[<:]' and '[>:]'.
+
 2016-08-31  Per Bothner  <per@bothner.com>
 
 	* ArrayPrint.java (putLine): Don't emit newline at end.

@@ -3,6 +3,7 @@ package gnu.lists;
 import gnu.mapping.Lazy;
 import gnu.mapping.Promise;
 import java.util.List;
+import gnu.math.IntNum;
 
 /** Indexing "composes" with a set of indexing arrays. */
 
@@ -167,10 +168,29 @@ public class ComposedArray<E> extends TransformedArray<E> {
                 if (iarr == null)
                     throw new ClassCastException("index is not an integer or integer array "+indexes[start+i].getClass().getName());
                 aindexes[i] = iarr;
-                if (! (iarr.rank() == 0
-                       || iarr instanceof Range.IntRange))
-                    linear = false;
-                rank += iarr.rank();
+                int irank = iarr.rank();
+                if (irank != 0) {
+                    if (! (iarr instanceof Range.IntRange))
+                        linear = false;
+                    else {
+                        Range.IntRange r = (Range.IntRange) iarr;
+                        if (r.isUnbounded()) {
+                            int ilow = arr.getLowBound(i);
+                            int idim = arr.getSize(i);
+                            IntNum istart =
+                                IntNum.valueOf(r.size != -2 ? r.istart
+                                               : r.istep >= 0 ? ilow
+                                               : ilow+idim-1);
+                            IntNum istep = IntNum.valueOf(r.istep);
+                            if (r.istep >= 0)
+                                iarr = Range.upto(istart, istep, IntNum.valueOf(ilow+idim), false);
+                            else
+                                iarr = Range.downto(istart, istep, IntNum.valueOf(ilow), true);
+                            aindexes[i] = iarr;
+                        }
+                    }
+                }
+                rank += irank;
             }
             if (! shared && arr instanceof SimpleVector) {
                 if (linear && rank == 1 && nindexes == 1) {
@@ -197,31 +217,18 @@ public class ComposedArray<E> extends TransformedArray<E> {
                                             "value "+(j+ilow));
                     }
                 } else if (iarr instanceof Range.IntRange) {
-                    Range.IntRange irange = (Range.IntRange) iarr;
-                    int sz = irange.size();
-                    int j = irange.getStartInt();
-                    j -= ilow;
-                    //if (irange.isUnbounded())
-                    //    sz = idim - j;
-                    if (j < 0 || (idim >= 0 && j > idim)
-                        || (j >= 0 && idim >= 0 && j+sz > idim)) {
-                        StringBuilder sbuf = new StringBuilder();
-                        sbuf.append("range [");
-                        sbuf.append(j+ilow);
-                        if (irange.isUnbounded())
-                            sbuf.append(" <:]");
-                        else {
-                            sbuf.append(" <: ");
-                            sbuf.append(sz+j+ilow);
-                            sbuf.append("]");
-                        }
-                        throwBoundException(i, nindexes, arr,
-                                            sbuf.toString());
-                    }
-                    if (irange.isUnbounded()) {
-                        j = irange.getStartInt();
-                        iarr = new Range.IntRange(j, 1, idim - j);
-                        aindexes[i] = iarr;                     
+                    Range.IntRange r = (Range.IntRange) iarr;
+                    int ihigh = ilow + idim - 1;
+                    int rsize = r.size();
+                    int rstep = r.getStepInt();
+                    int istart = r.getStartInt();
+                    int ilast = r.getLastInt();
+                    if (rsize != 0 && idim != 0
+                        && (istart < ilow || (idim >= 0 && istart > ihigh)
+                            || ilast < ilow || (idim >= 0 && ilast > ihigh))) {
+                        String msg = "range [" + istart + " <=: " + ilast + "]";
+                        
+                        throwBoundException(i, nindexes, arr, msg);
                     }
                 } else {
                     // FIXME should we check that every element in iarr
@@ -250,10 +257,10 @@ public class ComposedArray<E> extends TransformedArray<E> {
                         int j = iarr.getInt();
                         offset += istride * (j - ilow);
                     } else { // iarr instanceof Range.IntRange
-                        Range.IntRange irange = (Range.IntRange) iarr;
-                        int sz = irange.size();
-                        int j = irange.getStartInt();
-                        strides[k] = irange.getStepInt() * istride;
+                        Range.IntRange r = (Range.IntRange) iarr;
+                        int sz = r.size();
+                        int j = r.getStartInt();
+                        strides[k] = r.getStepInt() * istride;
                         offset += istride * (j - ilow);
                         k++;
                     }

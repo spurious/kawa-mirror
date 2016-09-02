@@ -1,3 +1,10 @@
+2016-09-02  Per Bothner  <per@bothner.com>
+
+	Add support for pseudo-ranges, with unspecified start *and* end.
+	* Range.java (isUnspecifiedStart): New method.
+	(upto, downto): New factor methods - logic moded from RangeUtils.
+	* ComposedArray.java: Resolve pseudo-ranges.
+
 2016-09-01  Per Bothner  <per@bothner.com>
 
 	* ComposedArray.java: Restructured the logic a bit.

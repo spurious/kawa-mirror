@@ -1,3 +1,7 @@
+2016-09-02  Per Bothner  <per@bothner.com>
+
+	* syntax.scm: Implement pseudo-ranges [<:] and [>:].
+
 2016-08-31  Per Bothner  <per@bothner.com>
 
 	* syntax.scm: Add more options for range syntax.

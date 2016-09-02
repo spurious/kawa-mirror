@@ -289,6 +289,8 @@
     ((_ x <:) (gnu.kawa.functions.RangeUtils:valueOfUnbounded x 1))
     ((_ x by: step) (gnu.kawa.functions.RangeUtils:valueOfUnbounded x step))
     ((_ x by: step size: sz) (gnu.kawa.functions.RangeUtils:bySize x step sz))
+    ((_ <:) (gnu.lists.Range$IntRange 0 1 -2))
+    ((_ >:) (gnu.lists.Range$IntRange 0 -1 -2))
     ((_ . args) (constant-vector . args))))
 
 (cond-expand

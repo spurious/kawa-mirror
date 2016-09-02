@@ -1,3 +1,7 @@
+2016-09-02  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Arrays): More array documentation.
+
 2016-08-31  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Ranges): New section.

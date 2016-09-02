@@ -8,6 +8,9 @@ changes}.
 @anchor{#in-subversion-repository-since-last-release}
 @itemize
 @item
+Print bit-vectors using the Common Lisp (and Guile) reader syntax.
+For example @code{#*1100110}. Enhance the reader to read this format.
+@item
 Binary releases are now archives that package not only the Kawa
 @code{.jar} files, but also shell/batch scripts for running Kawa, useful
 third-party libraries, and the complete documentation in EPUB format.
@@ -87,7 +90,7 @@ arrays: If @code{A} is the result, then @code{(A i j k ...)} is
 @item
 @code{array-transform} creates a view, with a mapping of the indexes.
 @item
-Other new procedures (like those in trhe Racket math package):
+Other new procedures (like those in the Racket math package):
 @code{array-size}, @code{array-fill!}, @code{array-copy!},
 @code{array-transform}, @code{array-reshape}, @code{array-flatten},
 @code{array->vector}, @code{index-array}, @code{build-array}.

@@ -3886,12 +3886,11 @@ Syntax'':
 @stxdef{lexeme-datum} @stxref{boolean} | @meta{number}
          | @stxref{character} | @stxref{string} | @stxref{symbol}
 @stxdef{symbol} @stxref{identifier}
-@stxdef{compound-datum} @stxref{list} | @stxref{vector} | @stxref{uniform-vector} | @stxref{extended-string-literal} | @stxref{xml-literal}
+@stxdef{compound-datum} @stxref{list} | @stxref{vector} | @stxref{uniform-vector} | @stxref{array-literal} | @stxref{extended-string-literal} | @stxref{xml-literal}
 @stxdef{list} @stxlit{(}@stxref{datum}*@stxlit{)}
          | @stxlit{(}@stxref{datum}+ @stxlit{.} @stxref{datum}@stxlit{)}
          | @stxref{abbreviation}
 @stxdef{vector} @stxlit{#(}@stxref{datum}*@stxlit{)}
-@stxdef{uniform-vector} TODO
 @end display
 @c FIXME: add to abbrev-prefix: @stxlit{#,} | @stxlit{#,@@}
 
@@ -4036,6 +4035,9 @@ the integer @var{number} and that @var{datum}, which can be
 used by a subsequent @code{#@var{number}#} form.
 @item @stxlit{#}@var{number}@stxlit{#}
 A back-reference, allowing cyclic and shared structure.
+@item @stxlit{#}@var{R}@stxlit{a}@var{datum}
+An @ref{array-literals,array literal},
+for a multi-dimensional array of rank @var{R}.
 @item @stxlit{#b}
 A binary (base-2) number.
 @item @stxlit{#d}
@@ -11671,6 +11673,13 @@ Uniform vectors are vectors whose elements are of the same numeric type.
 The are defined by @uref{http://srfi.schemers.org/srfi-4/srfi-4.html,SRFI-4}.
 The type names (such as @code{s8vector}) are a Kawa extension.
 
+@display
+@stxdef{uniform-vector} @stxlit{#} @stxref{uniform-tag} @stxref{list}
+@stxdef{uniform-tag} @stxlit{f32} | @stxlit{f64}
+    | @stxlit{s8} | @stxlit{s16} | @stxlit{s32} | @stxlit{s64}
+    | @stxlit{u8} | @stxlit{u16} | @stxlit{u32} | @stxlit{u64}
+@end display
+
 @deffn Type s8vector
 The type of uniform vectors where each element can contain
 a signed 8-bit integer.  Represented using an array of @code{byte}.
@@ -12086,6 +12095,11 @@ The @var{start-expression}, @var{step-expression}, and @var{size-expression}
 must evaluate to real numbers, not necessarily integers.
 For example: @code{[1 by: 0.5 <=: 3.0]} is @code{[1.0 1.5 2.0 2.5 3.0]}.
 
+The two pseudo-ranges @code{[<:]} and @code{[>:]} are useful as
+array indexes. They mean ``all of the valid indexes'' of the array being indexed.
+For increasing index values use @code{[<:]}; for decreasing
+index values (i.e. reversing) use @code{[>:]}.
+
 @node Streams
 @section Streams - lazy lists
 
@@ -12128,23 +12142,27 @@ is the rank or the number of dimensions of an array.
 @c (define arr1 (
 @c @end example
 
-Multi-dimensional arrays are specified
-by @uref{http://srfi.schemers.org/srfi-25/srfi-25.html,SRFI-25}.
-In Kawa, a one-dimensional array whose lower bound is 0 is also a sequence.
+Kawa multi-dimensional arrays follows the
+by @uref{http://srfi.schemers.org/srfi-25/srfi-25.html,SRFI-25 specification},
+with additions from Racket's
+@uref{https://docs.racket-lang.org/math/array.html, math.array} package
+and other sources.
+
+An array whose rank is 1, and where the (single) lower bound is 0
+is a sequence.
 Furthermore, if such an array is simple (not created by @code{share-array})
 it will be implemented using a @code{<vector>}.
 Uniform vectors and strings are also arrays in Kawa.
-For example:
-@example
-(share-array
- (f64vector 1.0 2.0 3.0 4.0 5.0 6.0)
- (shape 0 2 0 3)
- (lambda (i j) (+ (* 2 i) j)))
-@end example
-evaluates to a two-dimensionsal array of @code{<double>}:
-@example
-#2a((1.0 2.0 3.0) (3.0 4.0 5.0))
-@end example
+
+A rank-0 array has a single value.  It is essentially a box for that
+value.  Functions that require arrays may treat non-arrays
+as a rank-0 array containing that value.
+
+An array of rank 2 is frequently called a @dfn{matrix}.
+
+Note that Kawa arrays are distinct from Java (native) arrays.
+The latter is a simpler one-dimensional vector-like data structure,
+which is used to implement Kawa arrays and vectors.
 
 @deffn Procedure array? obj
 Returns @code{#t} if @var{obj} is an array, otherwise returns @code{#f}.
@@ -12160,17 +12178,37 @@ The @dfn{shape} of an array consists of bounds for each index.
 
 The lower bound @var{b} and the upper bound @var{e} of a dimension are
 exact integers with @code{(<= @var{b} @var{e})}. A valid index along the
-dimension is an exact integer @var{k} that satisfies both
-@code{(<= @var{b} @var{k})} and @code{(< @var{k} @var{e})}.
+dimension is an exact integer @var{i} that satisfies both
+@code{(<= @var{b} @var{i})} and @code{(< @var{i} @var{e})}.
 The length of the array along the dimension is the difference
 @code{(- @var{e} @var{b})}.
 The size of an array is the product of the lengths of its dimensions.
 
-A shape is specified as an even number of exact integers. These are
-alternately the lower and upper bounds for the dimensions of an array.
-
-An array whose rank is 1, and where the (single) lower bound is 0
-is a sequence.
+A procedure that requires a @var{shape} accepts any of the following:
+@itemize
+@item
+A vector of simple @ref{Ranges,ranges}, one for each
+dimension, all of who are
+bounded (finite), consist of integer values,
+and have a @var{step} of 1.
+Each range, which is usually written as @code{[@var{b} <: @var{e}]},
+expresses the bounds of the corresponding dimension.
+For example @code{[[0 <: 5] [2 <=: 6]]} is the shape
+of a rank-2 array, where the first index can be from 0 to 5 (exclusive),
+while the second index can be from 2 to 6 (inclusive).
+@item
+A vector of simple integers.
+Each integer @var{e} is an upper bound,
+and is equivalent to the range @code{[0 <: @var{e}]}.
+@item
+A vector consisting of a mix of integers and ranges.
+@item
+A rank-2 array @var{S} whose own shape is @code{[2 @var{r}]}.
+For each dimension @var{k}
+(where @code{(<= @var{k} 0)} and @code{(< @var{k} @var{r})}),
+the lower bound @var{b@sub{k}} is @code{(S @var{k} 0)},
+and the upper bound @var{e@sub{k}} is @code{(S @var{k} 1)}.
+@end itemize
 
 @deffn Procedure shape bound ...
 Returns a shape. The sequence @var{bound} ... must consist of an even number
@@ -12188,6 +12226,10 @@ where the element at @var{k 0} contains the lower bound for an index along
 dimension @var{k} and the element at @var{k 1} contains the
 corresponding upper bound, where @var{k} satisfies @code{(<=  0 @var{k})}
 and @code{(< @var{k} @var{d})}.
+
+@code{(shape @@@var{bounds})}
+is equivalent to:
+@code{(array [2 (/ (length @var{bounds}) 2)] @@@var{bounds})}
 @end deffn
 
 @deffn Procedure array-rank array
@@ -12215,7 +12257,143 @@ Return the total number of elements of @var{array}.
 This is the product of @code{(- (array-end @var{array} @var{k}) (array-start @var{array} @var{k}))} for every valid @var{k}.
 @end deffn
 
-@subsection Array literals
+@subsection Array types
+
+@deffn Type array
+@deffnx Type array@var{N}
+@deffnx Type array[@var{etype}]
+@deffnx Type array@var{N}[@var{etype}
+
+The type @code{array} matches all array values.
+The type @code{array@var{N}}, where @var{N} is an integer
+matches array of rank @var{N}.
+For example @code{array2} matches rank-2 array - i.e. matrixes.
+
+You can optionally specify the element type @var{etype}.
+This can be a primitive type.
+For example a @code{array2[double]} is a rank-2 array
+whose elements are @code{double} values.
+@end deffn
+
+@anchor{array-literals}
+@subsection Array literals and printing
+
+An array literal starts with @code{#} followed by its rank,
+followed by a tag that describes the underlying vector (by default @code{a}),
+optionally followed by information about its shape,
+and finally followed by the cells, organized into dimensions using parentheses.
+
+For example, @code{#2a((11 12 13) (21 22 23))} is a rank-2 array (a matrix)
+whose shape is @code{[2 3]} or equivalently @code{[[0 <: 2] [0 <: 3]]}.
+It is pretty-printed as:
+@example
+╔#2a:2:3═╗
+║11│12│13║
+╟──┼──┼──╢
+║21│22│23║
+╚══╧══╧══╝
+@end example
+
+@display
+@stxdef{array-literal} @stxref{array-literal-header} @stxref{datum}
+@stxdef{array-literal-header} @stxlit{#} @var{rank} @stxref{vectag} @arbno{@stxref{array-bound}} 
+@stxdef{array-bound} [@stxlit{@@}@var{lower}]@stxlit{:}@var{length} | @stxlit{@@}@var{lower}
+@stxdef{vectag} @stxlit{a} | @stxref{uniform-tag}
+@end display
+
+The @var{vectag} specifies the type of the elements of the array.
+
+Following the @var{vectag} you can optionally include information
+about the shape: For each dimension you can optionally specify
+the lower bounds (after the character @code{"@@"}),
+followed by the length of the dimension (after the character @code{":"}).
+The shape information is required if a lower bound is non-zero,
+or any length is zero.
+
+The @stxref{datum} contains the elements in a nested-list format:
+a rank-1 array (i.e. vector) uses a single list,
+a rank-2 array uses a list-of-listrs, and so on.
+The elements are in lexicographic order.
+
+A uniform u32 array of rank 2 with index ranges 2..3 and 3..4:
+@example
+#2u32@@2@@3((1 2) (2 3))
+@end example
+
+This syntax follow Common Lisp with
+@uref{https://www.gnu.org/software/guile/manual/html_node/Array-Syntax.html,Guile
+extensions}.  (Note that Guile prints rank-0 arrays with an extra
+set of parentheses.  Kawa follows Common Lisp in not doing so.)
+
+When an array is printed with the @code{write} function,
+the result is an @code{array-literal}.
+Printing with @code{display} formats the array in a rectangular grid
+using the @code{format-array} procedure.
+(Note that @code{format-array} is only used when the output is in column 0,
+because Kawa has very limited support for printing rectangles.)
+
+@deffn Procedure format-array value [element-format]
+Produce a nice ``pretty'' display for @var{value}, which is usually an array.
+
+The top line includes an @code{array-literal-header}.
+The lower bound are only printed if non-zero.
+The dimension lengths are printed if there is zoom, or if one of them is zero.
+@example
+#|kawa:34|# (! arr (array [[1 <=: 2] [1 <=: 3]]
+#|.....35|#   #2a((1 2) (3 4)) 9 #2a((3 4) (5 6))
+#|.....36|#   [42 43] #2a:1:3((8 7 6)) #2a((90 91) (100 101))))
+#|kawa:37|# arr
+╔#2a@@1:2@@1:3════╤═════════╗
+║#2a═╗  │      9│#2a═╗    ║
+║║1│2║  │       │║3│4║    ║
+║╟─┼─╢  │       │╟─┼─╢    ║
+║║3│4║  │       │║5│6║    ║
+║╚═╧═╝  │       │╚═╧═╝    ║
+╟───────┼───────┼─────────╢
+║╔#1a:2╗│#2a:1:3│╔#2a:2:2╗║
+║║42│43║│║8│7│6║│║ 90│ 91║║
+║╚══╧══╝│╚═╧═╧═╝│╟───┼───╢║
+║       │       │║100│101║║
+║       │       │╚═══╧═══╝║
+╚═══════╧═══════╧═════════╝
+@end example
+If @var{element-format} is specified, it is a format string used
+for format each non-array:
+@example
+#|kawa:38|# (format-array arr "~4,2f")
+╔#2a@@1:2@@1:3══╤════════════════╤═══════════════╗
+║╔#2a:2:2══╗  │            9.00│╔#2a:2:2══╗    ║
+║║1.00│2.00║  │                │║3.00│4.00║    ║
+║╟────┼────╢  │                │╟────┼────╢    ║
+║║3.00│4.00║  │                │║5.00│6.00║    ║
+║╚════╧════╝  │                │╚════╧════╝    ║
+╟─────────────┼────────────────┼───────────────╢
+║╔#1a:2╤═════╗│╔#2a:1:3══╤════╗│╔#2a:2:2══════╗║
+║║42.00│43.00║│║8.00│7.00│6.00║│║ 90.00│ 91.00║║
+║╚═════╧═════╝│╚════╧════╧════╝│╟──────┼──────╢║
+║             │                │║100.00│101.00║║
+║             │                │╚══════╧══════╝║
+╚═════════════╧════════════════╧═══════════════╝
+@end example
+If the rank is more than 2, then each ``layer''
+is printed separated by double lines.
+@example
+#|kawa:42|# (array-reshape [1 <=: 24] [3 2 4])
+╔#3a:3:2:4══╗
+║ 1│ 2│ 3│ 4║
+╟──┼──┼──┼──╢
+║ 5│ 6│ 7│ 8║
+╠══╪══╪══╪══╣
+║ 9│10│11│12║
+╟──┼──┼──┼──╢
+║13│14│15│16║
+╠══╪══╪══╪══╣
+║17│18│19│20║
+╟──┼──┼──┼──╢
+║21│22│23│24║
+╚══╧══╧══╧══╝
+@end example
+@end deffn
 
 @subsection Array construction
 
@@ -12236,6 +12414,15 @@ over then the @var{value}s are exhausted.
 If there is no @var{value}, the initial contents of each element is
 unspecified.  (Actually, it is the @code{#!null}.)
 The array does not retain a reference to @var{shape}.
+
+@example
+#|kawa:16|# @kbd{(make-array [2 4] 1 2 3 4 5)}
+╔#2a:2:4╗
+║1│2│3│4║
+╟─┼─┼─┼─╢
+║5│1│2│3║
+╚═╧═╧═╧═╝
+@end example
 
 @CompatibilityNote{} Guile has an incompatible @code{make-array} procedure.
 @end deffn
@@ -12266,16 +12453,44 @@ Return a new immutable array of the specified @var{shape}
 where each element is the corresponding row-major index.
 Same as @code{(array-reshape [0 <: @var{size}] @var{shape})}
 where @var{size} is the @code{array-size} of the resulting array.
+
+@example
+#|kawa:1|# @kbd{(index-array [[1 <: 3] [2 <: 6]])}
+#2a@@1:2@@2:4
+║0│1│2│3║
+╟─┼─┼─┼─╢
+║4│5│6│7║
+╚═╧═╧═╧═╝
+@end example
+
 @end deffn
 
 @subsection Array indexing
+
+If you ``call'' an array as it it were a function,
+it is equivalent to using @code{array-index-ref},
+which is generalization of @code{array-ref}.
+For example, given a rank-2 array @var{arr} with integer indexes @var{i}
+and @var{j}, the following all get the element of @var{arr}
+at index @code{[@var{i} @var{j}]}.
+@example
+(@var{arr} @var{i} @var{j})
+(array-index-ref @var{arr} @var{i} @var{j})
+(array-ref @var{arr} @var{i} @var{j})
+(array-ref @var{arr} [@var{i} @var{j}])
+@end example
+
+Using function-call notation or @code{array-index-ref}
+(but not plain @code{array-ref}) you can do generalized APL-style
+slicing and indirect indexing.
+See under @code{array-index-ref} for examples.
 
 @deffn Procedure array-ref array k ...
 @deffnx Procedure array-ref array index
 Returns the contents of the element of @var{array} at index @var{k} ....
 The sequence @var{k} ... must be a valid index to @var{array}.
-In the second form, @var{index} must be either a vector or a
-0-based 1-dimensional array containing @var{k} ....
+In the second form, @var{index} must be either a vector
+(a 0-based 1-dimensional array) containing @var{k} ....
 @example
 (array-ref (array [2 3]
               'uno 'dos 'tres
@@ -12294,6 +12509,119 @@ Returns @code{(3 1 4)}.
 @end deffn
 
 @deffn Procedure array-index-ref array index ...
+Generalized APL-style array indexing, where each @var{index}
+can be either an array or an integer.
+
+If each @var{index} is an integer, then the result is the same as @code{array-ref}.
+
+Otherwise, the result is an immutable array whose rank is the sum of the ranks of
+each @var{index}.  An integer is treated as rank-0 array.
+
+If @var{marr} is the result of @code{(array-index-ref @var{arr} @var{M@sub{1}} @var{M@sub{2}} ...)} then:
+@example
+(@var{marr} @var{i@sub{11}} @var{i@sub{12}} ... @var{i@sub{21}} @var{i@sub{22}} ...)
+@end example
+is defined as:
+@example
+(@var{arr} (@var{M@sub{1}} @var{i@sub{11}} @var{i@sub{12}} ...) (@var{M@sub{2}} @var{i@sub{21}} @var{i@sub{22}} ...) ...)
+@end example
+Each @var{M@sub{k}} gets as many indexes as its rank.
+If @var{M@sub{k}} is an integer, then it we use
+it directly without any indexing.
+
+Here are some examples, starting with simple indexing.
+@example
+#|kawa:1|# (define arr (array #2a((1 4) (0 4))
+#|.....2|#                    10 11 12 13 20 21 22 23 30 31 32 33))
+#|kawa:3|# arr
+╔#2a@@1:3:4══╗
+║10│11│12│13║
+╟──┼──┼──┼──╢
+║20│21│22│23║
+╟──┼──┼──┼──╢
+║30│31│32│33║
+╚══╧══╧══╧══╝
+#|kawa:4|# (arr 2 3)
+23
+@end example
+If one index is a vector and the rest are scalar integers,
+then the result is a vector:
+@example
+#|kawa:5|# (arr 2 [3 1])
+#(23 21)
+@end example
+You can select a ``sub-matrix'' when all indexes are vectors:
+@example
+#|kawa:6|# (arr [2 1] [3 1 3])
+╔#2a:2:3═╗
+║23│21│23║
+╟──┼──┼──╢
+║13│11│13║
+╚══╧══╧══╝
+@end example
+Using ranges for index vectors selects a rectangular sub-matrix.
+@example
+#|kawa:7|# (arr [1 <: 3] [1 <: 4])
+╔#2a:2:3═╗
+║11│12│13║
+╟──┼──┼──╢
+║21│22│23║
+╚══╧══╧══╝
+@end example
+You can add new dimensions:
+@example
+#|kawa:8|# (arr [2 1] #2a((3 1) (3 2)))
+#3a╤══╗
+║23│21║
+╟──┼──╢
+║23│22║
+╠══╪══╣
+║13│11║
+╟──┼──╢
+║13│12║
+╚══╧══╝
+@end example
+The pseudo-range @code{[<:]} can be used to select all the indexes
+along a dimension.  To select row 2 (1-origin):
+@example
+#|kawa:9|# (arr 2 [<:])
+#(20 21 22 23)
+@end example
+To reverse the order use @code{[>:]}:
+@example
+#|kawa:10|# (arr 2 [>:])
+#(23 22 21 20)
+@end example
+To select column 3:
+@example
+#|kawa:11|# (arr [<:] 3)
+#(13 23 33)
+@end example
+If you actually want a column matrix (i.e. with shape @code{[3 1]}
+you can write can place the index in a single-element vector:
+@example
+#|kawa:12|# (arr [<:] [3])
+#2a╗
+║13║
+╟──╢
+║23║
+╟──╢
+║33║
+╚══╝
+@end example
+To expand that column to 5 colums you can repeat the column index:
+@example
+#|kawa:13|# [3 by: 0 size: 5]
+#(3 3 3 3 3)
+#|kawa:14|# (arr [<:] [3 by: 0 size: 5])
+╔#2a:3:5═╤══╤══╗
+║13│13│13│13│13║
+╟──┼──┼──┼──┼──╢
+║23│23│23│23│23║
+╟──┼──┼──┼──┼──╢
+║33│33│33│33│33║
+╚══╧══╧══╧══╧══╝
+@end example
 @end deffn
 
 @subsection Modifying arrays
@@ -12364,10 +12692,44 @@ This is a general mechanism for creating a view.
 The result is a new array with the given @var{shape}.
 Accessing this new array is implemented by calling the @var{transform}
 function on the index vector, which must return a new index vector
-valid for indexing the orifinal @var{array}.
+valid for indexing the original @var{array}.
+Here is an example (using the same @code{arr} as in
+the @code{array-index-ref} example):
+@example
+#|kawa:1|# (define arr (array #2a((1 4) (0 4))
+#|.....2|#                    10 11 12 13 20 21 22 23 30 31 32 33))
+#|kawa:14|# (array-transform arr #2a((0 3) (1 3) (0 2))
+#|.....15|#   (lambda (ix) (let ((i (ix 0)) (j (ix 1)) (k (ix 2)))
+#|.....16|#                  [(+ i 1)
+#|.....17|#                   (+ (* 2 (- j 1)) k)])))
+#3a:3@@1:2:2
+║10│11║
+╟──┼──╢
+║12│13║
+╠══╪══╣
+║20│21║
+╟──┼──╢
+║22│23║
+╠══╪══╣
+║30│31║
+╟──┼──╢
+║32│33║
+╚══╧══╝
+@end example
+
+The @code{array-transform} is generalization of @code{share-array},
+in that it does not require the @var{transform} to be affine.
+Also note the different calling conversions for the @var{tranform}:
+@code{array-transform} takes a single argument (a vector of indexes),
+and returns a single result (a vector of indexes);
+@code{share-array} takes one argument for each index, and returns
+one value for each index.  The difference is historical.
 @end deffn
 
 @deffn Procedure array-index-share array index ...
+This does the same generalized APL-style indexing
+as @code{array-index-ref}.  However, the resulting array
+is a modifiable view into argument @var{array}.
 @end deffn
 
 @deffn Procedure array-reshape array shape
@@ -12414,6 +12776,15 @@ by setting each index in turn to 1 and others to 0,
 and all to 0 for the constant term; the composition can then be compiled
 away, together with any complexity that the user introduced in their
 procedure.
+
+Here is an example where the @var{array} is a uniform vector:
+@example
+(share-array
+  (f64vector 1.0 2.0 3.0 4.0 5.0 6.0)
+  (shape 0 2 0 3)
+  (lambda (i j) (+ (* 2 i) j)))
+  @result{}  #2f64((1.0 2.0 3.0) (4.0 5.0 6.0))
+@end example
 @end deffn
 
 @deffn Procedure array-flatten array
@@ -12424,7 +12795,12 @@ in row-major-order.
 The result of @code{array-flatten} is fresh (mutable) copy, not a view.
 The result of @code{array->vector} is a view: If @var{array} is mutable,
 then modifying @var{array} changes the flattened result and vice versa.
-@ c If @var{array} is ``simple'',  @code{array->vector} returns the original vector.
+
+If @var{array} is ``simple'',  @code{array->vector} returns the original vector.
+Specifically, if @var{vec} is a vector then:
+@example
+(eq? @var{vec} (array->vector (array-reshape @var{vec} @var{shape})))
+@end example
 @end deffn
 
 @subsection Miscellaneous

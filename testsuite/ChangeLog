@@ -1,3 +1,7 @@
+2016-09-02  Per Bothner  <per@bothner.com>
+
+	* arr-test.scm: More array tests.
+
 2016-08-31  Per Bothner  <per@bothner.com>
 
 	* arr-test.scm: Array pretty-printing no longer ends with a newline.

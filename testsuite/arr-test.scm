@@ -1,5 +1,5 @@
 ;; -*- coding: utf-8 -*-
-(test-begin "arrays" 215)
+(test-begin "arrays" 223)
 
 ;;; array test
 ;;; 2001 Jussi Piitulainen
@@ -561,4 +561,20 @@
 (test-error [20 by: 2 >: 30])
 (test-error [20 by: -2 <=: 10])
 
+(define arr1 (array #2a((1 4) (0 4))
+                    10 11 12 13 20 21 22 23 30 31 32 33))
+(test-equal #2a@1:3:4((10 11 12 13) (20 21 22 23) (30 31 32 33))
+            arr1)
+(test-equal 23 (arr1 2 3))
+(test-equal #(23 21) (arr1 2 [3 1]))
+(test-equal #2a((23 21 23) (13 11 13))
+            (arr1 [2 1] [3 1 3]))
+(test-equal #(23 22 21 20)
+            (arr1 2 [>:]))
+(test-equal #(12 22 32)
+            (arr1 [<:] 2))
+(test-equal #2a((10 11 12 13) (20 21 22 23) (30 31 32 33))
+            (arr1 [<:] [<:]))
+(test-equal #2a((13) (23) (33))
+            (arr1 [<:] [3]))
 (test-end)

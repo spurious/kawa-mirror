@@ -1,5 +1,5 @@
 ;; -*- coding: utf-8 -*-
-(test-begin "arrays" 223)
+(test-begin "arrays" 227)
 
 ;;; array test
 ;;; 2001 Jussi Piitulainen
@@ -569,12 +569,23 @@
 (test-equal #(23 21) (arr1 2 [3 1]))
 (test-equal #2a((23 21 23) (13 11 13))
             (arr1 [2 1] [3 1 3]))
+(test-equal #2a((11 12 13) (21 22 23))
+            (arr1 [1 <: 3] [1 <: 4]))
 (test-equal #(23 22 21 20)
             (arr1 2 [>:]))
 (test-equal #(12 22 32)
             (arr1 [<:] 2))
 (test-equal #2a((10 11 12 13) (20 21 22 23) (30 31 32 33))
             (arr1 [<:] [<:]))
+(test-equal #3a(((23 21) (23 22)) ((13 11) (13 12)))
+            (arr1 [2 1] #2a((3 1) (3 2))))
 (test-equal #2a((13) (23) (33))
             (arr1 [<:] [3]))
+(test-equal #2a((13 13 13 13 13) (23 23 23 23 23) (33 33 33 33 33))
+            (arr1 [<:] [3 by: 0 size: 5]))
+(test-equal #3a:3@1:2:2(((10 11) (12 13)) ((20 21) (22 23)) ((30 31) (32 33)))
+            (array-transform arr1 #2a((0 3) (1 3) (0 2))
+                             (lambda (ix) (let ((i (ix 0)) (j (ix 1)) (k (ix 2)))
+                                            [(+ i 1)
+                                             (+ (* 2 (- j 1)) k)]))))
 (test-end)

@@ -12203,7 +12203,7 @@ and is equivalent to the range @code{[0 <: @var{e}]}.
 @item
 A vector consisting of a mix of integers and ranges.
 @item
-A rank-2 array @var{S} whose own shape is @code{[2 @var{r}]}.
+A rank-2 array @var{S} whose own shape is @code{[@var{r} 2]}.
 For each dimension @var{k}
 (where @code{(<= @var{k} 0)} and @code{(< @var{k} @var{r})}),
 the lower bound @var{b@sub{k}} is @code{(S @var{k} 0)},

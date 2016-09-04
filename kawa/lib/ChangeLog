@@ -1,3 +1,7 @@
+2016-09-03  Per Bothner  <per@bothner.com>
+
+	* kawa/regex.scm (regex-replace*): Add cast needed on Java 9.
+
 2016-09-02  Per Bothner  <per@bothner.com>
 
 	* syntax.scm: Implement pseudo-ranges [<:] and [>:].

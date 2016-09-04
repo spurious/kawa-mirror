@@ -8,6 +8,8 @@ changes}.
 @anchor{#in-subversion-repository-since-last-release}
 @itemize
 @item
+Basic support for Java 9 (though still some issues).
+@item
 Print bit-vectors using the Common Lisp (and Guile) reader syntax.
 For example @code{#*1100110}. Enhance the reader to read this format.
 @item
@@ -139,7 +141,7 @@ compiled to the same object.
 @item
 The syntax @code{&<[expr]} is now equivalent to @code{&<@{&[expr]@}},
 assuming @code{expr} is an expression that evaluates to a string that
-named an exising file. That file is read is the result is the contents
+named an existing file. That file is read is the result is the contents
 of the file (as if by @code{(path-data expr)}).
 
 @end itemize

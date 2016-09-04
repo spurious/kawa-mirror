@@ -16,6 +16,7 @@ public class ClassType extends ObjectType
   public static final int JDK_1_6_VERSION = 50 * 0x10000 + 0;
   public static final int JDK_1_7_VERSION = 51 * 0x10000 + 0;
   public static final int JDK_1_8_VERSION = 52 * 0x10000 + 0;
+  public static final int JAVA_9_VERSION = 53 * 0x10000 + 0;
 
   // An old but generally valid default value.
   int classfileFormatVersion = JDK_1_1_VERSION;
@@ -1492,8 +1493,8 @@ public class ClassType extends ObjectType
     for (int i = 0;  i < nmethods;  i++)
       {
         Method meth = methods[i];
-        String mname = meth.getName();
-        String sig = meth.getSignature();
+        final String mname = meth.getName();
+        final String sig = meth.getSignature();
         Filter<Method> filter = new Filter<Method>() {
                  public boolean select(Method m) {
                      return (! m.isAbstract()

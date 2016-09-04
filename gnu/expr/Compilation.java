@@ -216,6 +216,9 @@ public class Compilation implements SourceLocator
   }
 
   public static int defaultClassFileVersion =
+    /* #ifdef JAVA9 */
+    // ClassType.JAVA_9_VERSION
+    /* #else */
     /* #ifdef JAVA8 */
     // ClassType.JDK_1_8_VERSION
     /* #else */
@@ -229,6 +232,7 @@ public class Compilation implements SourceLocator
     // ClassType.JDK_1_5_VERSION
     /* #else */
     // ClassType.JDK_1_1_VERSION
+    /* #endif */
     /* #endif */
     /* #endif */
     /* #endif */

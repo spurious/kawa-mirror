@@ -1,3 +1,7 @@
+2016-09-03  Per Bothner  <per@bothner.com>
+
+	* PreProcess.java: Add JAVA9 support.
+
 2016-08-07  Per Bothner  <per@bothner.com>
 
 	* Signals.java: Don't ignore old handler returned by doRegister.

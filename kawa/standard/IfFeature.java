@@ -115,10 +115,12 @@ public class IfFeature extends Syntax {
         coreFeatures.add("full-unicode");
 
         String javaVersion = System.getProperty("java.version");
-        if (javaVersion != null && javaVersion.length() >= 3
-            && javaVersion.charAt(0) == '1'
-            && javaVersion.charAt(1) == '.') {
-            switch (javaVersion.charAt(2)) {
+        if (javaVersion != null && javaVersion.length() >= 1) {
+            if (javaVersion.length() >= 3
+                && javaVersion.charAt(0) == '1'
+                && javaVersion.charAt(1) == '.')
+                javaVersion = javaVersion.substring(2);
+            switch (javaVersion.charAt(0)) {
             case '9':
                 coreFeatures.add("java-9");
                 /* fall through */

@@ -1,3 +1,7 @@
+2016-09-03  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (defaultClassFileVersion): Handle JAVA9.
+
 2016-08-12  Per Bothner  <per@bothner.com>
 
 	Minor changes for format/PrintConsumer re-write.

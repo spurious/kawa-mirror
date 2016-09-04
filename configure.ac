@@ -100,13 +100,15 @@ case "/${with_java_source}/" in
     JAVA_SOURCE=7; JAVA_SOURCE_SELECTOR='%java7' ;;
   /8/|/1.8*/) # Java 8
     JAVA_SOURCE=8; JAVA_SOURCE_SELECTOR='%java8' ;;
+  /9/|/1.9*/) # Java 9
+    JAVA_SOURCE=9; JAVA_SOURCE_SELECTOR='%java9' ;;
   /android*/)
         JAVA_SOURCE=android; JAVA_SOURCE_SELECTOR='%android'
         test -z "$with_swing" && with_swing="no"
         test -z "$with_awt" && with_awt="no"
         ;;
   /*/) AC_MSG_ERROR([Invalid version for --with-java-version.
-  (Must be 1, 2, 5, 6, 7, 8, or a JDK version such as 1.5.)]) ;;
+  (Must be 1, 2, 5, 6, 7, 8, 9, or a JDK version such as 1.5.)]) ;;
 esac
 AC_SUBST(JAVA_SOURCE)
 AC_SUBST(JAVA_SOURCE_SELECTOR)
@@ -119,13 +121,13 @@ fi
 
 if test -z "$with_javax_script"; then
   case "$JAVA_SOURCE" in
-  6compat5|6|7|8) with_javax_script="yes";;
+  6compat5|6|7|8|9) with_javax_script="yes";;
   esac
 fi
 
 if test -z "$with_httpserver"; then
   case "$JAVA_SOURCE" in
-  6compat5|6|7|8)
+  6compat5|6|7|8|9)
     test "$with_android" != "" -a "$with_android" != "no" \
       || with_httpserver="yes";;
   esac

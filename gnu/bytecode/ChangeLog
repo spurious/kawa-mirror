@@ -1,3 +1,8 @@
+2016-09-03  Per Bothner  <per@bothner.com>
+
+	* ClassType.java (JAVA_9_VERSION): New constant.
+	* ClassType.java (checkSingleAbstractMethod): Make some locals final.
+
 2016-08-29  Per Bothner  <per@bothner.com>
 
 	* ClassType.java (checkSingleAbstractMethod): Fix logic to properly

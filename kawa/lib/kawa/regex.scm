@@ -87,5 +87,5 @@
 		loop))
 	  (matcher:appendTail sbuf)
 	  (sbuf:toString))
-	(matcher:replaceAll repl))))
+	(matcher:replaceAll (->String repl)))))
 

@@ -5,7 +5,7 @@ package gnu.kawa.io;
 import java.io.*;
 import gnu.mapping.Environment;
 import gnu.mapping.ThreadLocation;
-import gnu.text.Printable;
+import gnu.kawa.format.Printable;
 import gnu.lists.Consumer;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;

@@ -1,4 +1,4 @@
-package gnu.text;
+package gnu.kawa.format;
 
 import gnu.text.*;
 import gnu.lists.UnescapedData;

@@ -9,6 +9,7 @@ import gnu.text.Char;
 import kawa.standard.Scheme;
 import gnu.kawa.functions.*;
 import gnu.bytecode.Type;
+import gnu.kawa.format.AbstractFormat;
 import gnu.kawa.lispexpr.LangPrimType;
 import gnu.kawa.functions.DisplayFormat;
 import gnu.kawa.functions.NumberCompare;

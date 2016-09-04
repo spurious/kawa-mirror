@@ -2,7 +2,7 @@ package kawa.lang;
 import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.lists.*;
-import gnu.text.Printable;
+import gnu.kawa.format.Printable;
 
 /**
  * Abstract class for "syntax" objects.

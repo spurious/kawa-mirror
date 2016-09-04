@@ -7,7 +7,7 @@ import gnu.expr.*;
 import java.util.*;
 import gnu.text.SourceMessages;
 import gnu.kawa.lispexpr.*;
-import gnu.lists.AbstractFormat;
+import gnu.kawa.format.AbstractFormat;
 import gnu.kawa.functions.*;
 import gnu.kawa.io.CharArrayInPort;
 import gnu.kawa.io.InPort;

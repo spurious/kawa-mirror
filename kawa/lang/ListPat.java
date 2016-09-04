@@ -1,6 +1,7 @@
 package kawa.lang;
+
+import gnu.kawa.format.ReportFormat;
 import gnu.lists.*;
-import gnu.text.*;
 
 /** Match a list whose length in in the range [min_length..max_length]. */
 

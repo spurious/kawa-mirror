@@ -1,5 +1,5 @@
 package gnu.expr;
-import gnu.text.Printable;
+import gnu.kawa.format.Printable;
 import java.io.*;
 import gnu.lists.Consumer;
 

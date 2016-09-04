@@ -1,3 +1,17 @@
+2016-09-03  Per Bothner  <per@bothner.com>
+
+	* CaseConvertFormat.java: Moved to gnu.kawa.format.
+	* CompoundFormat.java: Moved to gnu.kawa.format.
+	* DelimitSubstitutionFormat.java: Moved to gnu.kawa.format.
+	* EnglishIntegerFormat.java: Moved to gnu.kawa.format.
+	* FlushFormat.java: Moved to gnu.kawa.format.
+	* IntegerFormat.java: Moved to gnu.kawa.format.
+	* LiteralFormat.java: Moved to gnu.kawa.format.
+	* PadFormat.java: Moved to gnu.kawa.format.
+	* Printable.java: Moved to gnu.kawa.format.
+	* ReportFormat.java: Moved to gnu.kawa.format.
+	* RomanIntegerFormat.java: Moved to gnu.kawa.format.
+
 2016-06-10  Per Bothner  <per@bothner.com>
 
 	* Options.java (booleanValue): New static method.

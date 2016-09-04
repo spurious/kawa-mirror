@@ -1,6 +1,7 @@
 package gnu.kawa.functions;
+
+import gnu.kawa.format.ReportFormat;
 import gnu.math.*;
-import gnu.text.*;
 import java.text.Format;
 import java.text.FieldPosition;
 import java.text.ParseException;

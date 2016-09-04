@@ -1,4 +1,4 @@
-package gnu.text;
+package gnu.kawa.format;
 import java.text.Format;
 import java.text.FieldPosition;
 import java.io.Writer;

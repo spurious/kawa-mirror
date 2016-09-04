@@ -2,11 +2,11 @@
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.kawa.functions;
-import gnu.text.EnglishIntegerFormat;
-import gnu.text.RomanIntegerFormat;
+import gnu.kawa.format.EnglishIntegerFormat;
+import gnu.kawa.format.RomanIntegerFormat;
 import gnu.math.*;
 
-public class IntegerFormat extends gnu.text.IntegerFormat
+public class IntegerFormat extends gnu.kawa.format.IntegerFormat
 {
 
   public IntegerFormat ()

@@ -2,7 +2,7 @@ package kawa.lang;
 import gnu.bytecode.*;
 import gnu.expr.Compilation;
 import gnu.lists.Consumer;
-import gnu.text.Printable;
+import gnu.kawa.format.Printable;
 
 /**
  * A Pattern is used to match against objects.

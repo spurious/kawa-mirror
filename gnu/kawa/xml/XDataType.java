@@ -6,7 +6,7 @@ import gnu.bytecode.*;
 import gnu.mapping.Procedure;
 import gnu.mapping.Values;
 import gnu.expr.*;
-import gnu.text.Printable;
+import gnu.kawa.format.Printable;
 import gnu.math.*;
 import java.math.BigDecimal;
 import gnu.kawa.io.URIPath;

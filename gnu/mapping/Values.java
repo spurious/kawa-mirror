@@ -1,7 +1,7 @@
 package gnu.mapping;
 import java.io.*;
 import gnu.lists.*;
-import gnu.text.Printable;
+import gnu.kawa.format.Printable;
 import java.util.*;
 
 /** Encapsulate multiple values in a single object.

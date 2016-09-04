@@ -140,7 +140,6 @@ GNU_JEMACS_SWT_JSOURCES =\
 
 GNU_LISTS_JSOURCES = \
   gnu/lists/AbstractCharVector.java \
-  gnu/lists/AbstractFormat.java \
   gnu/lists/AbstractSequence.java \
   gnu/lists/Array.java \
   gnu/lists/Arrays.java \
@@ -305,28 +304,31 @@ GNU_Q2_LANG_JSOURCES = \
   gnu/q2/lang/Q2Translator.java
 
 GNU_TEXT_JSOURCES = \
-  gnu/text/CaseConvertFormat.java \
   gnu/text/Char.java \
-  gnu/text/CompoundFormat.java \
-  gnu/text/DelimitSubstitutionFormat.java \
-  gnu/text/EnglishIntegerFormat.java \
-  gnu/text/FlushFormat.java \
-  gnu/text/IntegerFormat.java \
   gnu/text/Lexer.java \
-  gnu/text/LiteralFormat.java \
   gnu/text/NamedCharTable.java \
   gnu/text/Options.java \
-  gnu/text/PadFormat.java \
-  gnu/text/Printable.java \
-  gnu/text/ReportFormat.java \
   gnu/text/ResourceStreamHandler.java \
-  gnu/text/RomanIntegerFormat.java \
   gnu/text/SourceLocator.java \
   gnu/text/SourceError.java \
   gnu/text/SourceMessages.java \
   gnu/text/StandardNamedChars.java \
   gnu/text/StringCursor.java \
   gnu/text/SyntaxException.java
+
+GNU_KAWA_FORMAT_JSOURCES = \
+  gnu/kawa/format/AbstractFormat.java \
+  gnu/kawa/format/CaseConvertFormat.java \
+  gnu/kawa/format/CompoundFormat.java \
+  gnu/kawa/format/DelimitSubstitutionFormat.java \
+  gnu/kawa/format/EnglishIntegerFormat.java \
+  gnu/kawa/format/FlushFormat.java \
+  gnu/kawa/format/IntegerFormat.java \
+  gnu/kawa/format/LiteralFormat.java \
+  gnu/kawa/format/PadFormat.java \
+  gnu/kawa/format/Printable.java \
+  gnu/kawa/format/ReportFormat.java \
+  gnu/kawa/format/RomanIntegerFormat.java
 
 GNU_KAWA_FUNCTIONS_JSOURCES = \
   gnu/kawa/functions/AddOp.java \

@@ -18,8 +18,7 @@ import java.util.Map;
  * just use chars then).
  * The Char class uses hashing to ensure that characters are unique.
  * Thus equal? Char are eq?, which is convenient.
- * Also, using our own class lets us make sure it implements Printable.
- * Finally, we can use 32-bit character values to allow for non-Unicode chars.
+ * Also, we can use 32-bit character values to allow for non-Unicode chars.
  */
 
 public class Char implements Comparable, Externalizable {

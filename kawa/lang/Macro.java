@@ -3,7 +3,7 @@ import gnu.expr.*;
 import gnu.mapping.*;
 import gnu.lists.*;
 import java.io.*;
-import gnu.text.Printable;
+import gnu.kawa.format.Printable;
 
 public class Macro extends Syntax implements Printable, Externalizable
 {

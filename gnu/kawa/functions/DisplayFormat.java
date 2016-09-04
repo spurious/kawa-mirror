@@ -13,12 +13,13 @@ import gnu.expr.Keyword;
 import gnu.kawa.xml.KNode;
 import gnu.xml.XMLPrinter;
 /* #endif */
+import gnu.kawa.format.AbstractFormat;
 import gnu.kawa.io.CheckConsole;
 import gnu.kawa.io.OutPort;
 import gnu.kawa.io.PrettyWriter;
 import gnu.kawa.xml.XmlNamespace;
 import gnu.kawa.lispexpr.LispLanguage;
-import gnu.text.Printable;
+import gnu.kawa.format.Printable;
 import gnu.kawa.models.Picture;
 import gnu.kawa.models.SVGUtils;
 import java.util.List;

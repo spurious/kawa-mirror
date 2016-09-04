@@ -1,9 +1,12 @@
 package kawa.lang;
-import gnu.mapping.*;
+
 import gnu.expr.*;
-import gnu.lists.*;
+import gnu.kawa.format.Printable;
+import gnu.kawa.format.ReportFormat;
 import gnu.kawa.functions.DisplayFormat;
 import gnu.kawa.io.OutPort;
+import gnu.lists.*;
+import gnu.mapping.*;
 import gnu.text.*;
 import java.io.*;
 

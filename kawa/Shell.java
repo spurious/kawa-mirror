@@ -6,6 +6,7 @@ import java.io.*;
 import gnu.lists.*;
 import gnu.bytecode.ArrayClassLoader;
 import gnu.bytecode.ZipLoader;
+import gnu.kawa.format.AbstractFormat;
 import gnu.kawa.io.BinaryInPort;
 import gnu.kawa.io.FilePath;
 import gnu.kawa.io.InPort;

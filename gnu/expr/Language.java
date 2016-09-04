@@ -14,6 +14,7 @@ import gnu.kawa.io.InPort;
 import gnu.kawa.io.OutPort;
 import gnu.kawa.io.TtyInPort;
 import gnu.kawa.reflect.*;
+import gnu.kawa.format.AbstractFormat;
 import gnu.kawa.functions.GetNamedPart;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;

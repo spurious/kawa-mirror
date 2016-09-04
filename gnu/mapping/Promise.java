@@ -1,5 +1,5 @@
 package gnu.mapping;
-import gnu.text.Printable;
+import gnu.kawa.format.Printable;
 import gnu.lists.Consumer;
 import java.io.IOException;
 

@@ -4,18 +4,18 @@
 package gnu.kawa.functions;
 
 import gnu.expr.Keyword;
+import gnu.kawa.format.AbstractFormat;
+import gnu.kawa.format.DelimitSubstitutionFormat;
 import gnu.kawa.io.BinaryInPort;
 import gnu.kawa.io.BinaryOutPort;
 import gnu.kawa.io.FilePath;
 import gnu.kawa.io.InPort;
 import gnu.kawa.io.OutPort;
 import gnu.kawa.io.Path;
-import gnu.lists.AbstractFormat;
 import gnu.lists.ByteVector;
 import gnu.lists.Consumer;
 import gnu.lists.Strings;
 import gnu.mapping.*;
-import gnu.text.DelimitSubstitutionFormat;
 import java.io.*;
 import java.util.*;
 import java.util.Map;

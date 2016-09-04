@@ -1,12 +1,14 @@
 package gnu.kawa.functions;
-import gnu.text.*;
+//import gnu.text.*;
 import gnu.lists.*;
 import java.text.Format;
 import java.text.FieldPosition;
 import java.text.ParseException;
 import gnu.math.*;
+import gnu.kawa.format.*;
 import gnu.kawa.io.OutPort;
 import gnu.kawa.io.PrettyWriter;
+import gnu.text.Char;
 
 /** A representation of a parsed Common Lisp-style format. */
 
@@ -782,9 +784,9 @@ class LispObjectFormat extends ReportFormat
         // FIXME in PadFormat.
         return base.format(args, start, dst, fpos);
     }
-    return gnu.text.PadFormat.format(base, args, start, dst,
-				     padChar, minWidth, colInc, minPad,
-				     where, fpos);
+    return PadFormat.format(base, args, start, dst,
+                            padChar, minWidth, colInc, minPad,
+                            where, fpos);
   }
 }
 

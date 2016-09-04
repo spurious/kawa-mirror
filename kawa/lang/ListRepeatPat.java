@@ -1,7 +1,7 @@
 package kawa.lang;
 import gnu.lists.*;
 import java.io.*;
-import gnu.text.Printable;
+import gnu.kawa.format.Printable;
 
 public class ListRepeatPat extends Pattern implements Printable, Externalizable
 {

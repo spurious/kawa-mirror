@@ -1,9 +1,10 @@
 package gnu.kawa.functions;
 import gnu.text.*;
 import gnu.mapping.*;
+import gnu.kawa.format.AbstractFormat;
+import gnu.kawa.format.ReportFormat;
 import gnu.kawa.io.CharArrayOutPort;
 import gnu.kawa.io.OutPort;
-import gnu.lists.AbstractFormat;
 import kawa.standard.Scheme;
 import java.text.*;
 import java.io.Writer;

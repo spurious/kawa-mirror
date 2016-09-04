@@ -1,8 +1,9 @@
 package kawa.lang;
 import gnu.mapping.*;
 import java.io.*;
-import gnu.text.*;
+import gnu.kawa.format.ReportFormat;
 import gnu.lists.Consumer;
+import gnu.kawa.format.Printable;
 
 /**
  * A pattern that requires an exact match (using equal?).

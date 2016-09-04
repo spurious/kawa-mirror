@@ -1,5 +1,5 @@
-
-package gnu.lists;
+package gnu.kawa.format;
+import gnu.lists.*;
 import gnu.mapping.*;
 import gnu.kawa.io.BinaryOutPort;
 import gnu.kawa.io.CharArrayOutPort;
@@ -7,8 +7,9 @@ import gnu.kawa.io.OutPort;
 import gnu.kawa.io.Path;
 import gnu.kawa.io.PrettyWriter;
 import java.text.FieldPosition;
+import java.text.Format;
 
-public abstract class AbstractFormat extends java.text.Format
+public abstract class AbstractFormat extends Format
 {
     /** True if strings characters to written without escape or quoting. */
     public boolean textIsCopied() { return false; }
@@ -89,7 +90,7 @@ public abstract class AbstractFormat extends java.text.Format
                 FormatConsumer fcons = (FormatConsumer) out;
                 if (!  fcons.format.textIsCopied())
                     return null;
-                out = fcons.base;
+                out = fcons.getBase();
             }
             else
                 return port;
@@ -116,6 +117,7 @@ public abstract class AbstractFormat extends java.text.Format
         public void endElement() { format.endElement(base); }
         public void startAttribute(Object t) { format.startAttribute(t, base);}
         public void endAttribute() { format.endAttribute(base); }
+        Consumer getBase() { return base; }
     }
 
     public PrintConsumer makeConsumer(Consumer next) {

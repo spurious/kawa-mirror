@@ -2,7 +2,7 @@ package gnu.expr;
 import gnu.bytecode.CodeAttr;
 import gnu.bytecode.Type;
 import gnu.mapping.*;
-import gnu.text.Printable;
+import gnu.kawa.format.Printable;
 import gnu.text.SourceLocator;
 import gnu.lists.Consumer;
 import java.io.PrintWriter;

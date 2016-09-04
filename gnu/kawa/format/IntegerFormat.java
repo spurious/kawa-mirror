@@ -1,7 +1,7 @@
 // Copyright (c) 2001, 2003  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
-package gnu.text;
+package gnu.kawa.format;
 import java.text.FieldPosition;
 import java.io.Writer;
 

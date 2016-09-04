@@ -2,7 +2,7 @@ package gnu.expr;
 
 import gnu.lists.Consumer;
 import gnu.mapping.*;
-import gnu.text.Printable;
+import gnu.kawa.format.Printable;
 import java.io.*;
 
 /**

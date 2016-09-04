@@ -237,7 +237,7 @@ public class QuoteExp extends Expression
         Object val = this.value;
         if (val instanceof Expression)
             val = val.toString(); // To avoid cycles.
-        gnu.lists.AbstractFormat format =
+        gnu.kawa.format.AbstractFormat format =
             Language.getDefaultLanguage().getFormat(true);
         Object save = out.pushFormat(format);
         try {

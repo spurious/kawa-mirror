@@ -6,6 +6,7 @@ import gnu.text.*;
 import kawa.standard.Scheme;
 import gnu.bytecode.Type;
 import gnu.commonlisp.lang.*;
+import gnu.kawa.format.AbstractFormat;
 import gnu.kawa.lispexpr.*;
 import gnu.kawa.functions.Arithmetic;
 

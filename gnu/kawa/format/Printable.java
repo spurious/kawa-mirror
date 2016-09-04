@@ -1,4 +1,4 @@
-package gnu.text;
+package gnu.kawa.format;
 import gnu.lists.Consumer;
 
 public interface Printable

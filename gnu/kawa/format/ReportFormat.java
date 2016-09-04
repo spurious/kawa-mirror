@@ -1,9 +1,10 @@
-package gnu.text;
+package gnu.kawa.format;
 import java.text.Format;
 import java.text.FieldPosition;
 import java.io.Writer;
 import java.io.CharArrayWriter;
 import gnu.lists.Consumer;
+import gnu.text.Char;
 
 public abstract class ReportFormat extends Format
 {

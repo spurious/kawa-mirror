@@ -1,7 +1,7 @@
 package kawa.lang;
 import gnu.mapping.*;
 import java.io.*;
-import gnu.text.Printable;
+import gnu.kawa.format.Printable;
 import gnu.lists.Consumer;
 
 /**

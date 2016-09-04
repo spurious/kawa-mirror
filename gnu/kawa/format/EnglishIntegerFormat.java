@@ -1,4 +1,4 @@
-package gnu.text;
+package gnu.kawa.format;
 import java.text.FieldPosition;
 import gnu.lists.*;
 

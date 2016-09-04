@@ -3,7 +3,7 @@ import gnu.kawa.io.CharArrayOutPort;
 import gnu.kawa.io.OutPort;
 import gnu.lists.*;
 import gnu.mapping.*;
-import gnu.text.ReportFormat;
+import gnu.kawa.format.ReportFormat;
 import java.io.OutputStream;
 import java.io.Writer;
 import java.text.MessageFormat;

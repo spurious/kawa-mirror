@@ -1,5 +1,7 @@
 2016-09-03  Per Bothner  <per@bothner.com>
 
+	* AbstractFormat.java: Moved to gnu/kawa/format.
+
 	* AbstractFormat.java (format): Fix logic for non-OutPort case.
 
 2016-09-02  Per Bothner  <per@bothner.com>

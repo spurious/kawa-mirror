@@ -139,7 +139,7 @@ public abstract class AbstractFormat extends java.text.Format
 	  }
       }
     else
-      out.writeObject(value);
+        writeObject(value, out);
   }
 
   public final void writeObject (Object obj, PrintConsumer out)

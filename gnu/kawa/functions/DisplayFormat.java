@@ -1,4 +1,4 @@
-// Copyright (c) 2001, 2002, 2006  Per M.A. Bothner.
+// Copyright (c) 2001, 2002, 2006, 2016  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.kawa.functions;
@@ -6,6 +6,7 @@ import gnu.mapping.*;
 import gnu.lists.*;
 import gnu.math.RatNum;
 import gnu.math.IntNum;
+import gnu.math.UnsignedPrim;
 import java.io.*;
 import gnu.text.Char;
 import gnu.expr.Keyword;
@@ -14,13 +15,18 @@ import gnu.kawa.xml.KNode;
 import gnu.xml.XMLPrinter;
 /* #endif */
 import gnu.kawa.format.AbstractFormat;
+import gnu.kawa.format.GenericFormat;
 import gnu.kawa.io.CheckConsole;
 import gnu.kawa.io.OutPort;
 import gnu.kawa.io.PrettyWriter;
 import gnu.kawa.xml.XmlNamespace;
 import gnu.kawa.lispexpr.LispLanguage;
 import gnu.kawa.format.Printable;
+import gnu.kawa.models.DrawImage;
+import gnu.kawa.models.DrawShape;
 import gnu.kawa.models.Picture;
+import java.awt.Shape;
+import java.awt.image.BufferedImage;
 import gnu.kawa.models.SVGUtils;
 import java.util.List;
 /* #ifdef use:java.util.regex */
@@ -29,8 +35,53 @@ import java.util.regex.*;
 
 /** Handle formatted output for Lisp-like languages. */
 
-public class DisplayFormat extends AbstractFormat
+public class DisplayFormat extends GenericFormat
 {
+    public static GenericFormat standardFormat = new GenericFormat();
+    static {
+        Class thisCls = DisplayFormat.class;
+        // NOTE - order is important: The search order is from
+        // most-recently-added to older, so more specific types come later.
+        // Default - java.lang.Object or null
+        standardFormat.add(thisCls, "writeObjectDefault");
+        // Printable or Consumable
+        standardFormat.add(thisCls, "writePrintableConsumable");
+        // gnu.mapping.Values
+        standardFormat.add(thisCls, "writeValues");
+        // gnu.mapping.Symbol
+        standardFormat.add(thisCls, "writeSymbol");
+        // java.lang.Boolean
+        standardFormat.add(thisCls, "writeBoolean");
+        // java.lang.CharValue or gnu.text.Char
+        standardFormat.add(thisCls, "writeChar");
+        // gnu.mapping.Lazy
+        standardFormat.add(thisCls, "writePromise");
+        // java.net.URI
+        standardFormat.add(thisCls, "writeURI");
+        // gnu.lists.Array
+        standardFormat.add(thisCls, "writeArray");
+        // java.util.List
+        standardFormat.add(thisCls, "writeSequence");
+        // gnu.lists.LList
+        standardFormat.add(thisCls, "writeList");
+        // gnu.lists.Range
+        standardFormat.add(thisCls, "writeRange");
+        // java.lang.CharSequence
+        standardFormat.add(thisCls, "writeCharSeq");
+        // gnu.kawa.xml.KNode
+        /* #ifdef enable:XML */
+        standardFormat.add(thisCls, "writeKNode");
+        /* #endif */
+        // RatNum, UnsignedPrim, Long, Integer, Short, Byte, BigInteger
+        standardFormat.add(thisCls, "writeRational");
+        // Picture, Shape, or BufferedImage
+        standardFormat.add(thisCls, "writePicture");
+        // java.lang.Enum
+        standardFormat.add(thisCls, "writeEnum");
+        // Java native arrays
+        standardFormat.add(thisCls, "writeJavaArray");
+    }
+
   /** Fluid parameter to specify default output base for printing rationals. */
   public static final ThreadLocation outBase
     = new ThreadLocation("out-base");
@@ -66,6 +117,7 @@ public class DisplayFormat extends AbstractFormat
    */
   public DisplayFormat(boolean readable, char language)
   {
+    super(standardFormat);
     this.readable = readable;
     this.language = language;
   }
@@ -91,7 +143,8 @@ public class DisplayFormat extends AbstractFormat
    * Note Emacs has its own sub-class gnu.jemacs.lang.Print. */
   char language;
 
-  public boolean getReadableOutput () { return readable; }
+  @Override
+  public boolean getReadableOutput() { return readable; }
 
     @Override
     public boolean textIsCopied() { return ! readable; }
@@ -101,11 +154,78 @@ public class DisplayFormat extends AbstractFormat
   {
     write (language == 'S' ? (v ? "#t" : "#f") : (v ? "t" : "nil"), out);
   }
+    public static boolean writeBoolean(Object v, AbstractFormat f, Consumer out) {
+        if (! (v instanceof Boolean))
+            return false;
+        f.writeBoolean(((Boolean) v).booleanValue(), out);
+        return true;
+    }
 
-  @Override
-  public void write (int v, Consumer out)
+    public static boolean writeChar(Object v, AbstractFormat f, Consumer out) {
+        boolean readable;
+        char language;
+        if (f instanceof DisplayFormat) {
+            DisplayFormat dformat = (DisplayFormat) f;
+            readable = dformat.readable;
+            language = dformat.language;
+        } else {
+            readable = false;
+            language = 'S';
+        }
+        if (v instanceof Char) {
+             writeChar(((Char) v).intValue(), readable, language, out);
+            return true;
+        } else if (v instanceof Character) {
+            writeChar(((Character) v).charValue(), readable, language, out);
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean writeRational(Object obj, AbstractFormat format,
+                                        Consumer out) {
+        if (obj instanceof RatNum
+            || obj instanceof UnsignedPrim
+            || (obj instanceof Number
+                && (obj instanceof Long
+                    || obj instanceof Integer
+                    || obj instanceof Short
+                    || obj instanceof Byte
+                    || obj instanceof java.math.BigInteger))) {
+            int b = 10;
+            boolean showRadix = false;
+            Object base = outBase.get(null);
+            Object printRadix = outRadix.get(null);
+            if (printRadix != null
+                && (printRadix == Boolean.TRUE
+                    || "yes".equals(printRadix.toString())))
+                showRadix = true;
+            if (base instanceof Number)
+                b = ((IntNum) base).intValue();
+            else if (base != null)
+                b = Integer.parseInt(base.toString());
+            String asString = Arithmetic.asRatNum(obj).toString(b);
+            if (showRadix) {
+                if (b == 16)
+                    out.write("#x");
+                else if (b == 8)
+                    out.write("#o");
+                else if (b == 2)
+                    out.write("#b");
+                else if (b != 10 || ! (obj instanceof IntNum))
+                    out.write("#"+base+"r");
+            }
+            out.write(asString);
+            if (showRadix && b == 10 && obj instanceof IntNum)
+                out.write(".");
+            return true;
+        }
+        return false;
+    }
+
+  public static void writeChar(int v, boolean readable, char language, Consumer out)
   {
-    if (! getReadableOutput ())
+    if (! readable)
       Char.print(v, out);
     else
       {
@@ -117,7 +237,7 @@ public class DisplayFormat extends AbstractFormat
 	  }
 	// else if (language == 'E') ...
 	else
-	  write(Char.toScmReadableString(v), out);
+	  out.write(Char.toScmReadableString(v));
       }
   }
 
@@ -142,24 +262,27 @@ public class DisplayFormat extends AbstractFormat
    * this becomes a non-pair or the empty list
    * @param out The output port that is responsible for the pretty printing
    */
-  public void writeList(LList value, Consumer out)
+  public static boolean writeList(Object list, AbstractFormat format, Consumer out)
   {
+    if (! (list instanceof LList))
+        return false;
     PrettyWriter pout =
         out instanceof PrintConsumer ? ((PrintConsumer) out).getPrettyWriter()
         : null;
+    boolean readable = format instanceof DisplayFormat ? ((DisplayFormat) format).readable : false;
     // The stack of position markers, populated by CDR'ing further into the list.
     int[] posnStack = null;
+    int checkSharing = format instanceof DisplayFormat ? ((DisplayFormat) format).checkSharing : -1;
     Object[] tailStack = null;
     int stackTail = 0;
-    Object list = value;
     PrintConsumer.startLogicalBlock("(", false, ")", out);
     
     while (list instanceof Pair)
       {
 	Pair pair = (Pair) list;
-	writeObject(pair.getCar(), out);
+	format.writeObject(pair.getCar(), out);
         list = pair.getCdr();
-        if (! getReadableOutput())
+        if (! readable)
           list = Promise.force(list);
         if (list == LList.Empty)
           break;
@@ -167,7 +290,7 @@ public class DisplayFormat extends AbstractFormat
         if (! (list instanceof Pair))
 	  {
 	    out.write(". ");
-	    writeObject(LList.checkNonList(list), (Consumer) out);
+	    format.writeObject(LList.checkNonList(list), (Consumer) out);
 	    break;
 	  }
 	if (pout != null && checkSharing >= 0)
@@ -215,7 +338,167 @@ public class DisplayFormat extends AbstractFormat
     }
 
     PrintConsumer.endLogicalBlock(")", out);
+    return true;
   }
+
+    public static boolean writeArray(Object value, AbstractFormat format,
+                                     Consumer out) {
+        if (! (value instanceof Array))
+            return false;
+        if (! format.getReadableOutput()
+            && out instanceof OutPort // FIXME PrintConsumer?
+            && ((OutPort) out).atLineStart()
+            && ((OutPort) out).isPrettyPrinting())
+            out.write(ArrayPrint.print(value, null));
+        else
+            write((Array) value, 0, 0, format, out);
+        return true;
+    }
+
+    public static boolean writeRange(Object value, AbstractFormat format,
+                                     Consumer out) {
+        if (! (value instanceof Range))
+            return false;
+        Range range = (Range) value;
+        if (! (format.getReadableOutput() || range.isUnspecifiedStart()))
+            return writeCharSeq(range, format, out);
+        PrintConsumer.startLogicalBlock("[", false, "]", out);
+        Object rstart = range.getStart();
+        Object rstep = range.getStep();
+        IntNum istep = IntNum.asIntNumOrNull(rstep);
+        IntNum istart = IntNum.asIntNumOrNull(rstart);
+        if (range.isUnspecifiedStart()) {
+            if (istep.isOne())
+                out.write("<:");
+            else if (istep.isMinusOne())
+                out.write(">:");
+            else {
+                out.write("by: ");
+                format.writeObject(rstep, out);
+            }
+        } else {
+            format.writeObject(rstart, out);
+            int rsize = range.size();
+            if (! range.isUnbounded() && istart != null && istep != null
+                && (istep.isOne() || istep.isMinusOne())) {
+                if (istep.isOne()) {
+                    out.write(" <: ");
+                    format.writeObject(IntNum.add(istart, rsize), out);
+                } else {
+                    out.write(" >: ");
+                    format.writeObject(IntNum.add(istart, -rsize), out);
+                }
+            } else {
+                out.write(" by: ");
+                format.writeObject(rstep, out);
+                if (! range.isUnbounded()) {
+                    out.write(" size: ");
+                    out.writeInt(rsize);
+                }
+            }
+        }
+	PrintConsumer.endLogicalBlock("]", out);
+        return true;
+    }
+
+    public static boolean writeJavaArray(Object value, AbstractFormat format,
+                                         Consumer out) {
+        if (value == null || ! value.getClass().isArray())
+            return false;
+        int len = java.lang.reflect.Array.getLength(value);
+        PrintConsumer.startLogicalBlock("[", false, "]", out);
+        for (int i = 0;  i < len;  i++) {
+            if (i > 0)
+                PrintConsumer.writeSpaceFill(out);
+            format.writeObject(java.lang.reflect.Array.get(value, i), out);
+        }
+        PrintConsumer.endLogicalBlock("]", out);
+        return true;
+    }
+
+    public static boolean writeSequence(Object value, AbstractFormat format,
+                                        Consumer out) {
+        if (! (value instanceof List))
+            return false;
+	List vec = (List) value;
+	String tag =
+            vec instanceof SimpleVector ? ((SimpleVector) vec).getTag() : null;
+	String start, end;
+	if (format instanceof DisplayFormat
+            && ((DisplayFormat) format).language == 'E')
+	  {
+	    start = "[";
+	    end = "]";
+	  }
+        else if ("b".equals(tag))
+          {
+            start = "#*";
+            end = "";
+          }
+	else
+	  {
+	    start = tag == null ? "#(" : ("#" + tag + "(");
+	    end = ")";
+	  }
+        PrintConsumer.startLogicalBlock(start, false, end, out);
+        // Using consumeNext for primtives avoids boxing.
+        // However, for objects we want to recurse
+        if ("b".equals(tag)) {
+            SimpleVector bvec = (SimpleVector) vec;
+            int blen = vec.size();
+            for (int i = 0; i < blen; i++) {
+                boolean b = bvec.getBooleanRaw(bvec.effectiveIndex(i));
+                out.write(b ? '1' : '0');
+            }
+        } else if (vec instanceof SimpleVector && tag != null) {
+            int endpos = vec.size() << 1;
+            for (int ipos = 0;  ipos < endpos;  ipos += 2) {
+                if (ipos > 0)
+                    PrintConsumer.writeSpaceFill(out);
+                if (! ((SimpleVector) vec).consumeNext(ipos, out))
+                    break;
+                }
+        } else {
+            boolean first = true;
+            for (Object el : vec) {
+                if (first)
+                    first = false;
+                else
+                    PrintConsumer.writeSpaceFill(out);
+                format.writeObject(el, out);
+            }
+        }
+	PrintConsumer.endLogicalBlock(end, out);
+        return true;
+    }
+
+    public static boolean writeValues(Object value, AbstractFormat format,
+                                      Consumer out) {
+        if (! (value instanceof Values))
+            return false;
+        if (value == Values.empty && format.getReadableOutput())
+             out.write("#!void");
+        else {
+            Values values = (Values) value;
+            for (int it = 0; (it = values.nextPos(it)) != 0; ) {
+                Object val = values.getPosPrevious(it);
+                format.writeObject(val, out);
+            }
+        }
+        return true;
+    }
+    public static boolean writePrintableConsumable
+        (Object value, AbstractFormat format, Consumer out) {
+        if (value instanceof Consumable
+             && (! format.getReadableOutput()
+                 || ! (value instanceof Printable)))
+            ((Consumable) value).consume(out);
+        else if (value instanceof Printable)
+            ((Printable) value).print(out);
+        else
+            return false;
+        return true;
+    }
 
     public void writeObject(Object obj, Consumer out) { 
         PrettyWriter pout = out instanceof PrintConsumer
@@ -263,7 +546,7 @@ public class DisplayFormat extends AbstractFormat
                 }
             }
             if (!skip)
-                writeObjectRaw(obj, out);
+                super.writeObject(obj, out);
         } finally {
             if (removeNeeded)
                 pout.IDHashRemove(obj);
@@ -276,278 +559,22 @@ public class DisplayFormat extends AbstractFormat
         }
     }
 
-  public void writeObjectRaw(Object obj, Consumer out)
+  public static boolean writeObjectDefault(Object obj, AbstractFormat format,
+                                           Consumer out)
   {
-    if (! readable)
-      {
-        obj = Promise.force(obj);
-      }
-    if (obj instanceof Boolean)
-      writeBoolean(((Boolean)obj).booleanValue(), out);
-    else if (obj instanceof Char)
-      write(((Char) obj).intValue(), out);
-    else if (obj instanceof Character)
-      write(((Character) obj).charValue(), out);
-    else if (obj instanceof Symbol)
-      {
-        Symbol sym = (Symbol) obj;
-        Namespace ns = sym.getNamespace();
-        if (ns == XmlNamespace.HTML)
-          {
-            write("html:", out);
-            write(sym.getLocalPart(), out);
-          }
-        else if (ns == LispLanguage.entityNamespace
-                 || ns == LispLanguage.constructNamespace)
-          {
-            write(ns.getPrefix(), out);
-            write(":", out);
-            write(sym.getLocalPart(), out);
-          }
-        else
-          writeSymbol(sym, out, readable);
-      }
-    /* #ifdef use:java.net.URI */
-    /* #ifdef use:java.lang.CharSequence */
-    else if (obj instanceof java.net.URI && getReadableOutput()
-             && out instanceof PrintWriter)
-      {
-        write("#,(URI ", out);
-        Strings.printQuoted(obj.toString(), (PrintWriter) out, 1);
-        out.write(')');
-      }
-    /* #endif */
-    /* #endif */
-    else if
-      /* #ifdef use:java.lang.CharSequence */
-      (obj instanceof CharSequence) 
-      /* #else */
-      // (obj instanceof CharSeq || obj instanceof String) 
-      /* #endif */
-      {
-        /* #ifdef use:java.lang.CharSequence */
-	CharSequence str = (CharSequence) obj;
-        /* #else */
-	// String str = obj.toString();
-        /* #endif */
-	if (getReadableOutput () && out instanceof PrintWriter)
-	  Strings.printQuoted(str, (PrintWriter) out, 1);
-        else if (obj instanceof String)
-          {
-            out.write((String) obj);
-          }
-	else if (obj instanceof CharSeq)
-          {
-            CharSeq seq = (CharSeq) obj;
-            seq.consume(0, seq.size(), out);
-          }
-        else
-          {
-            int len = str.length();
-            for (int i = 0; i < len;  i++)
-              out.write(str.charAt(i));
-          }
-      }
-    else if (obj instanceof LList)
-      writeList((LList) obj, out);
-    else if (obj instanceof Range
-             && (getReadableOutput() || ((Range) obj).isUnspecifiedStart())) {
-        Range range = (Range) obj;
-        PrintConsumer.startLogicalBlock("[", false, "]", out);
-        Object rstart = range.getStart();
-        Object rstep = range.getStep();
-        IntNum istep = IntNum.asIntNumOrNull(rstep);
-        IntNum istart = IntNum.asIntNumOrNull(rstart);
-        if (range.isUnspecifiedStart()) {
-            if (istep.isOne())
-                out.write("<:");
-            else if (istep.isMinusOne())
-                out.write(">:");
-            else {
-                out.write("by: ");
-                writeObject(rstep, out);
-            }
-        } else {
-            writeObject(rstart, out);
-            int rsize = range.size();
-            if (! range.isUnbounded() && istart != null && istep != null
-                && (istep.isOne() || istep.isMinusOne())) {
-                if (istep.isOne()) {
-                    out.write(" <: ");
-                    writeObject(IntNum.add(istart, rsize), out);
-                } else {
-                    out.write(" >: ");
-                    writeObject(IntNum.add(istart, -rsize), out);
-                }
-            } else {
-                out.write(" by: ");
-                writeObject(rstep, out);
-                if (! range.isUnbounded()) {
-                    out.write(" size: ");
-                    out.writeInt(rsize);
-                }
-            }
-        }
-	PrintConsumer.endLogicalBlock("]", out);
-    }
-    else if (obj instanceof List)
-      {
-	List vec = (List) obj;
-	String tag =
-            vec instanceof SimpleVector ? ((SimpleVector) vec).getTag() : null;
-	String start, end;
-	if (language == 'E')
-	  {
-	    start = "[";
-	    end = "]";
-	  }
-        else if ("b".equals(tag))
-          {
-            start = "#*";
-            end = "";
-          }
-	else
-	  {
-	    start = tag == null ? "#(" : ("#" + tag + "(");
-	    end = ")";
-	  }
-        PrintConsumer.startLogicalBlock(start, false, end, out);
-        // Using consumeNext for primtives avoids boxing.
-        // However, for objects we want to recurse
-        if ("b".equals(tag)) {
-            SimpleVector bvec = (SimpleVector) vec;
-            int blen = vec.size();
-            for (int i = 0; i < blen; i++) {
-                boolean b = bvec.getBooleanRaw(bvec.effectiveIndex(i));
-                out.write(b ? '1' : '0');
-            }
-        } else if (vec instanceof SimpleVector && tag != null) {
-            int endpos = vec.size() << 1;
-            for (int ipos = 0;  ipos < endpos;  ipos += 2) {
-                if (ipos > 0)
-                    PrintConsumer.writeSpaceFill(out);
-                if (! ((SimpleVector) vec).consumeNext(ipos, out))
-                    break;
-                }
-        } else {
-            boolean first = true;
-            for (Object el : vec) {
-                if (first)
-                    first = false;
-                else
-                    PrintConsumer.writeSpaceFill(out);
-                writeObject(el, out);
-            }
-        }
-	PrintConsumer.endLogicalBlock(end, out);
-      }
-    else if (obj instanceof Array)
-      {
-          if (!getReadableOutput () && out instanceof OutPort // FIXME PrintConsumer?
-            && ((OutPort) out).atLineStart()
-            && ((OutPort) out).isPrettyPrinting())
-            write(ArrayPrint.print(obj, null), out);
-        else
-            write((Array) obj, 0, 0, out);
-      }
-    /* #ifdef enable:XML */
-    else if (obj instanceof KNode)
-      {
-        boolean escapeForDomTerm = false;
-        if (getReadableOutput())
-          write("#", out);
-        else if (CheckConsole.forDomTerm(out))
-          {
-            write("\033]72;", out);
-            escapeForDomTerm = true;
-          }
-        new XMLPrinter(out).writeObject(obj);
-        if (escapeForDomTerm)
-          write("\007", out);
-      }
-    /* #endif */
-    else if (obj instanceof Picture && ! getReadableOutput()
-             && CheckConsole.forDomTerm(out))
-    {
-        write("\033]72;"+SVGUtils.toSVG((Picture) obj)+"\007", out);
-    }
-    else if (obj == Values.empty && getReadableOutput())
-      write("#!void", out);
-    else if (obj instanceof Consumable
+    boolean readable = format.getReadableOutput();
+    char language = ((DisplayFormat) format).language;
+    if (obj instanceof Consumable
              && (! readable || ! (obj instanceof Printable)))
       ((Consumable) obj).consume(out);
     else if (obj instanceof Printable)
       ((Printable) obj).print(out);
-    else if (obj instanceof RatNum
-             || (obj instanceof Number
-                 && (obj instanceof Long
-                     || obj instanceof Integer
-                     || obj instanceof Short
-                     || obj instanceof Byte
-                     || obj instanceof java.math.BigInteger)))
-      {
-        int b = 10;
-        boolean showRadix = false;
-        Object base = outBase.get(null);
-        Object printRadix = outRadix.get(null);
-        if (printRadix != null
-            && (printRadix == Boolean.TRUE
-                || "yes".equals(printRadix.toString())))
-          showRadix = true;
-        if (base instanceof Number)
-          b = ((IntNum) base).intValue();
-        else if (base != null)
-          b = Integer.parseInt(base.toString());
-        String asString = Arithmetic.asRatNum(obj).toString(b);
-        if (showRadix)
-          {
-            if (b == 16)
-              write("#x", out);
-            else if (b == 8)
-              write("#o", out);
-            else if (b == 2)
-              write("#b", out);
-            else if (b != 10 || ! (obj instanceof IntNum))
-              write("#"+base+"r", out);
-          }
-        write(asString, out);
-        if (showRadix && b == 10 && obj instanceof IntNum)
-          write(".", out);
-      }
-    else if (obj instanceof java.lang.Enum && getReadableOutput())
-      {
-        write(obj.getClass().getName(), out);
-        write(":", out);
-        write(((java.lang.Enum) obj).name(), out);
-      }
     else
       {
-        String asString;
-        if (obj == null)
-          asString = null;
-        else
-          {
-            Class cl = obj.getClass();
-            if (cl.isArray())
-              {
-                int len = java.lang.reflect.Array.getLength(obj);
-                PrintConsumer.startLogicalBlock("[", false, "]", out);
-                for (int i = 0;  i < len;  i++)
-                  {
-                    if (i > 0)
-                        PrintConsumer.writeSpaceFill(out);
-                    writeObject(java.lang.reflect.Array.get(obj, i), out);
-                  }
-                PrintConsumer.endLogicalBlock("]", out);
-                return;
-              }
-            asString = obj.toString();
-          }
-	if (asString == null)
-	  write("#!null", out);
-        else
-          write(asString, out);
+        String asString = obj == null ? null : obj.toString();
+        out.write(asString == null ? "#!null" : asString);
       }
+    return true;
   }
 
   /** Recursive helper method for writing out Array (sub-) objects.
@@ -556,7 +583,7 @@ public class DisplayFormat extends AbstractFormat
    * @param level the recurssion level, from 0 to array.rank()-1.
    * @param out the destination
    */
-  int write(Array array, int index, int level, Consumer out)
+  static int write(Array array, int index, int level, AbstractFormat format, Consumer out)
   {
     int rank = array.rank();
     int count = 0;
@@ -604,17 +631,17 @@ public class DisplayFormat extends AbstractFormat
 	    int step;
 	    if (level == rank)
 	      {
-		writeObject(array.getRowMajor(index), out);
+		format.writeObject(array.getRowMajor(index), out);
 		step = 1;
 	      }
 	    else
-	      step = write(array, index, level, out);
+                step = write(array, index, level, format, out);
 	    index += step;
 	    count += step;
 	  }
       }
     else
-      writeObject(array.getRowMajor(index), out);
+      format.writeObject(array.getRowMajor(index), out);
     PrintConsumer.endLogicalBlock(end, out);
     return count;
   }
@@ -626,39 +653,87 @@ public class DisplayFormat extends AbstractFormat
                     + "|([-+]|[.][.][.])");
   /* #endif */
 
-  void writeSymbol (Symbol sym, Consumer out, boolean readable)
-  {
-    String prefix = sym.getPrefix();
-    Namespace namespace = sym.getNamespace();
-    String uri = namespace == null ? null : namespace.getName();
-    boolean hasUri = uri != null && uri.length() > 0;
-    boolean hasPrefix = prefix != null && prefix.length() > 0;
-    boolean suffixColon = false;
-    if (namespace == Keyword.keywordNamespace)
-      {
-        if (language == 'C' || language == 'E')
-          out.write(':');
-        else
-          suffixColon = true;
-      }
-    else if (hasPrefix || hasUri)
-      {
-        if (hasPrefix)
-          writeSymbol(prefix, out, readable);
-        if (hasUri && (readable || ! hasPrefix))
+    public static boolean writeCharSeq(Object value, AbstractFormat format, Consumer out) {
+        if (! (value instanceof CharSequence))
+            return false;
+	CharSequence str = (CharSequence) value;
+	if (format.getReadableOutput())
+	  Strings.printQuoted(str, out, 1);
+        else if (value instanceof String)
           {
-            out.write('{');
-            out.write(uri);
-            out.write('}');
+            out.write((String) value);
           }
-        out.write(':');
-      }
-    writeSymbol(sym.getName(), out, readable);
-    if (suffixColon)
-      out.write(':');
-  }
+	else if (value instanceof CharSeq)
+          {
+            CharSeq seq = (CharSeq) value;
+            seq.consume(0, seq.size(), out);
+          }
+        else
+          {
+            int len = str.length();
+            for (int i = 0; i < len;  i++)
+              out.write(str.charAt(i));
+          }
+        return true;
+    }
 
-    void writeSymbol (String sym, Consumer out, boolean readable) {
+    public static boolean writeEnum(Object value, AbstractFormat format, Consumer out) {
+        if (value instanceof java.lang.Enum && format.getReadableOutput())  {
+            out.write(value.getClass().getName());
+            out.write(":");
+            out.write(((java.lang.Enum) value).name());
+            return true;
+        }
+        else
+            return false;
+    }
+
+    public static boolean writeSymbol(Object value, AbstractFormat format, Consumer out) {
+        if (! (value instanceof Symbol))
+            return false;
+        Symbol sym = (Symbol) value;
+        Namespace ns = sym.getNamespace();
+        if (ns == XmlNamespace.HTML) {
+            out.write("html:");
+            out.write(sym.getLocalPart());
+        } else if (ns == LispLanguage.entityNamespace
+                   || ns == LispLanguage.constructNamespace) {
+            out.write(ns.getPrefix());
+            out.write(":");
+            out.write(sym.getLocalPart());
+        } else {
+            String prefix = sym.getPrefix();
+            Namespace namespace = sym.getNamespace();
+            String uri = namespace == null ? null : namespace.getName();
+            boolean readable = format.getReadableOutput();
+            boolean hasUri = uri != null && uri.length() > 0;
+            boolean hasPrefix = prefix != null && prefix.length() > 0;
+            boolean suffixColon = false;
+            if (namespace == Keyword.keywordNamespace)  {
+                char language = format instanceof DisplayFormat ? ((DisplayFormat) format).language : 'S';
+                if (language == 'C' || language == 'E')
+                    out.write(':');
+                else
+                    suffixColon = true;
+            } else if (hasPrefix || hasUri) {
+                if (hasPrefix)
+                    writeSymbol(prefix, out, readable);
+                if (hasUri && (readable || ! hasPrefix))
+                {
+                    out.write('{');
+                    out.write(uri);
+                    out.write('}');
+                }
+                out.write(':');
+            }
+            writeSymbol(sym.getName(), out, readable);
+            if (suffixColon)
+                out.write(':');
+        }
+        return true;
+    }
+
+    static void writeSymbol (String sym, Consumer out, boolean readable) {
         /* #ifdef use:java.util.regex */
         /* Use |...| if symbol doesn't follow R5RS conventions
            for identifiers or has a colon in the interior. */
@@ -697,13 +772,13 @@ public class DisplayFormat extends AbstractFormat
                 }
                 out.write('|');
             } else if (len == 0) {
-                write("||", out);
+                out.write("||");
             } else {
                 boolean inVerticalBars = false;
                 for (int i = 0;  i < len;  i++) {
                     char ch = sym.charAt(i);
                     if (ch == '|') {
-                        write(inVerticalBars ? "|\\" : "\\", out);
+                        out.write(inVerticalBars ? "|\\" : "\\");
                         inVerticalBars = false;
                     } else if (! inVerticalBars) {
                         out.write('|');
@@ -717,9 +792,67 @@ public class DisplayFormat extends AbstractFormat
             return;
         }
         /* #endif */
-        write(sym, out);
+        out.write(sym);
     }
 
+    public static boolean writePicture(Object value,
+                                       AbstractFormat format, Consumer out)  {
+        if (format.getReadableOutput())
+            return false;
+        Picture pic;
+        if (value instanceof Shape)
+            pic = new DrawShape((Shape) value);
+        else if (value instanceof BufferedImage)
+            pic = new DrawImage((BufferedImage) value);
+        else if (value instanceof Picture)
+            pic = (Picture) value;
+        else
+            return false;
+        if (! CheckConsole.forDomTerm(out))
+            return writeObjectDefault(value, format, out);
+        out.write("\033]72;"+SVGUtils.toSVG(pic)+"\007");
+        return true;
+    }
+
+    /* #ifdef enable:XML */
+    public static boolean writeKNode(Object value,
+                                     AbstractFormat format, Consumer out) {
+        if (value instanceof KNode) {
+            boolean escapeForDomTerm = false;
+            if (format.getReadableOutput())
+                out.write("#");
+            else if (CheckConsole.forDomTerm(out)) {
+                out.write("\033]72;");
+                escapeForDomTerm = true;
+            }
+            new XMLPrinter(out).writeObject(value);
+            if (escapeForDomTerm)
+                out.write("\007");
+            return true;
+        }
+        return false;
+    }
+    /* #endif */
+
+    public static boolean writePromise(Object value,
+                                       AbstractFormat format, Consumer out) {
+        if (value instanceof Lazy && ! format.getReadableOutput()) {
+            format.writeObject(((Lazy) value).getValue(), out);
+            return true;
+        }
+        return false;
+    }
+    public static boolean writeURI(Object value,
+                                   AbstractFormat format, Consumer out) {
+        if (value instanceof java.net.URI && format.getReadableOutput()) {
+            out.write("#,(URI ");
+            Strings.printQuoted(value.toString(), out, 1);
+            out.write(')');
+            return true;
+        } else
+            return false;
+    }
+ 
     static void writeHexDigits(int i, Consumer out) {
         int high = i >>> 4;
         if (high != 0) {	  
@@ -742,4 +875,5 @@ public class DisplayFormat extends AbstractFormat
     // FIXME Should probably consider empty lists and vectors, as well as FStrings
     return obj instanceof Pair || obj instanceof SimpleVector;
   }
+
 }

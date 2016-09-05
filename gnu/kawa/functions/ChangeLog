@@ -1,3 +1,8 @@
+2016-09-05  Per Bothner  <per@bothner.com>
+
+	* DisplayFormat.java: Restructure to use GenericFormat.
+	Also add DomTerm support for Shape and BufferedImage.
+
 2016-09-02  Per Bothner  <per@bothner.com>
 
 	* RangeUtils.java (upto, downto): Move IntRange-constructing

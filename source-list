@@ -323,6 +323,7 @@ GNU_KAWA_FORMAT_JSOURCES = \
   gnu/kawa/format/DelimitSubstitutionFormat.java \
   gnu/kawa/format/EnglishIntegerFormat.java \
   gnu/kawa/format/FlushFormat.java \
+  gnu/kawa/format/GenericFormat.java \
   gnu/kawa/format/IntegerFormat.java \
   gnu/kawa/format/LiteralFormat.java \
   gnu/kawa/format/PadFormat.java \

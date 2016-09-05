@@ -1,3 +1,8 @@
+2016-09-05  Per Bothner  <per@bothner.com>
+
+	* GenericFormat.java: New class, extends AbstractFormat.
+	* AbstractFormat.java (getReadableOutput): New method.
+
 2016-09-03  Per Bothner  <per@bothner.com>
 
 	New package.

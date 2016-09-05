@@ -14,6 +14,11 @@ public abstract class AbstractFormat extends Format
     /** True if strings characters to written without escape or quoting. */
     public boolean textIsCopied() { return false; }
 
+    /** True if output should be easy to (machine-) read.
+     * I.e. is this format like Scheme 'write' rather than 'display'.
+     */
+    public boolean getReadableOutput() { return false; }
+
   protected void write(String str, Consumer out)
   {
     out.write(str);

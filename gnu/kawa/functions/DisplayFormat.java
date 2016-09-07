@@ -361,7 +361,7 @@ public class DisplayFormat extends GenericFormat
             return false;
         Range range = (Range) value;
         if (! (format.getReadableOutput() || range.isUnspecifiedStart()))
-            return writeCharSeq(range, format, out);
+            return writeSequence(range, format, out);
         PrintConsumer.startLogicalBlock("[", false, "]", out);
         Object rstart = range.getStart();
         Object rstep = range.getStep();

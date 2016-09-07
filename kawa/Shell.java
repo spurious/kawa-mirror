@@ -295,6 +295,7 @@ public class Shell
                     e.printStackTrace(perr);
                 else
                     sigIntHandler.trace.printStackTrace(perr);
+                Thread.interrupted();
               }
             catch (Error e)
               {
@@ -620,7 +621,7 @@ public class Shell
         public SigIntHandler() { this.thread = Thread.currentThread(); }
 
         public void run() {
-            Error ex = new Error("uses interrupt killed "+thread);
+            Error ex = new Error("user interrupt of "+thread);
             ex.setStackTrace(thread.getStackTrace());
             this.trace = ex;
             thread.stop();

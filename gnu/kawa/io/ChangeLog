@@ -1,3 +1,7 @@
+2016-09-08  Per Bothner  <per@bothner.com>
+
+	* JLineInPort.java (parse): Check if Language.parse returned null.
+
 2016-09-07  Per Bothner  <per@bothner.com>
 
 	* OutPort.java (formatter): Make non-public.

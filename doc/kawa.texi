@@ -3153,14 +3153,15 @@ other computation (such as requested by a @samp{-e} of @samp{-f} option).
 
 To close a read-eval-print-loop, you can type the special
 literal @code{#!eof} at top level.  This is recognized as end-of-file.
-Unfortunately, due to thread-related complications, just typing
-an end-of-file character (normally ctrl/D until Unix), will not work.
+Typing an end-of-file character (normally ctrl-D under Unix)
+should also work, but that depends on your operating system
+and terminal interface.
 
 If the read-eval-print-loop
 is in a new window, you can select @samp{Close} from the @samp{File} menu.
 
 To exit the entire Kawa session, call the
-@code{exit} procedure (with 0 or 1 integer arguments).
+@ref{Exiting the current process,@code{exit} procedure} (with 0 or 1 integer arguments).
 
 @node Compiling, , , Running
 @section Compiling to byte-code
@@ -20826,6 +20827,7 @@ you can use @code{out-to: 'inherit}:
 @end example
 @end deffn
 
+@anchor{Exiting the current process}
 @subsection Exiting the current process
 
 @deffn Procedure exit [code]

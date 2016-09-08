@@ -92,6 +92,13 @@ public abstract class LispLanguage extends Language
             if (reader == null)
               break;
             Object sexp = reader.readCommand();
+            // A literal unquoted #!eof
+            if (Translator.listLength(sexp) == 2
+                && Translator.safeCar(sexp) == kawa.standard.begin.begin
+                && Translator.safeCar(Translator.safeCdr(sexp)) == Sequence.eofValue
+                && (options & (PARSE_ONE_LINE|PARSE_INTERACTIVE_MODULE)) != 0) {
+                return false;
+            }
             if (sexp == Sequence.eofValue)
               {
                 if ((options & PARSE_ONE_LINE) != 0)

@@ -1,3 +1,7 @@
+2016-09-08  Per Bothner  <per@bothner.com>
+
+	* LispLanguage.java (parse): Fix handling of unquoted literal #!eof.
+
 2016-09-02  Per Bothner  <per@bothner.com>
 
 	* LispReader.java (readGeneralArray): Allow specifying only

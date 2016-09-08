@@ -86,6 +86,8 @@ public class JLineInPort extends TtyInPort
                 language.parse(lexer,
                                Language.PARSE_FOR_EVAL|Language.PARSE_INTERACTIVE_MODULE,
                                null);
+            if (comp == null)
+                throw new EndOfFileException();
             if (comp.getState() == Compilation.ERROR_SEEN && cin.eofSeen()) {
                 messages.clear();
                 throw new EOFError(-1, -1, "unexpected end-of-file", "");

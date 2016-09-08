@@ -1,3 +1,7 @@
+2016-09-08  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Exiting): Update about ctrl-D, which now should work.
+
 2016-09-02  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Arrays): More array documentation.

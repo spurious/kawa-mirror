@@ -273,10 +273,10 @@ public class RunProcess extends MethodProc {
         /* #ifdef JAVA7 */
         BinaryOutPort sysOut = OutPort.getSystemOut();
         if (outRedirect == null
-            && AbstractFormat.getPassThroughOutPort(consumer) == sysOut)
+            && OutPort.getPassThroughOutPort(consumer) == sysOut)
             outRedirect = Redirect.INHERIT;
         if (outRedirect == sysOut
-            && AbstractFormat.getPassThroughOutPort(sysOut) == sysOut) {
+            && OutPort.getPassThroughOutPort(sysOut) == sysOut) {
             outRedirect = Redirect.INHERIT;
         }
         if (errRedirect == OutPort.getSystemErr()) {
@@ -320,7 +320,7 @@ public class RunProcess extends MethodProc {
         }
         if (returnBlob) {
             LProcess lproc = new LProcess(proc);
-            OutPort pout = AbstractFormat.getPassThroughOutPort(consumer);
+            OutPort pout = OutPort.getPassThroughOutPort(consumer);
             if (pout != null) {
                 InputStream in = proc.getInputStream();
                 if (pout instanceof BinaryOutPort) {

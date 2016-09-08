@@ -11,7 +11,7 @@ import java.text.Format;
 
 public abstract class AbstractFormat extends Format
 {
-    /** True if strings characters to written without escape or quoting. */
+    /** True if strings/characters are written without escape or quoting. */
     public boolean textIsCopied() { return false; }
 
     /** True if output should be easy to (machine-) read.
@@ -78,37 +78,14 @@ public abstract class AbstractFormat extends Format
 
   public abstract void writeObject(Object v, Consumer out);
 
-    /** Return an OutPort equivalent to the argumement for text output.
-     * I.e. writing CharSequences or characters to either is the same.
-     * Used to optimize process output.
-     */
-    public static OutPort getPassThroughOutPort(Consumer out) {
-        OutPort port = null;
-        for (;;) {
-            if (out instanceof OutPort) {
-                port = (OutPort) out;
-                PrintConsumer formatter = port.formatter;
-                if (formatter instanceof PrettyWriter)
-                    return port;
-                out = formatter;
-            } else if (out instanceof FormatConsumer) {
-                FormatConsumer fcons = (FormatConsumer) out;
-                if (!  fcons.format.textIsCopied())
-                    return null;
-                out = fcons.getBase();
-            }
-            else
-                return port;
-        }
-    }
-
-    static class FormatConsumer extends PrintConsumer {
+    public static class FormatConsumer extends PrintConsumer {
         AbstractFormat format;
 
         public FormatConsumer(AbstractFormat format, Consumer base) {
             super(base, false);
             this.format = format;
         }
+        public AbstractFormat getFormat() { return format; }
 
         public void write(String str) { format.write(str, base); }
         public void write(int v) { format.write(v, base); }
@@ -122,7 +99,7 @@ public abstract class AbstractFormat extends Format
         public void endElement() { format.endElement(base); }
         public void startAttribute(Object t) { format.startAttribute(t, base);}
         public void endAttribute() { format.endAttribute(base); }
-        Consumer getBase() { return base; }
+        public Consumer getBase() { return base; }
     }
 
     public PrintConsumer makeConsumer(Consumer next) {
@@ -134,15 +111,14 @@ public abstract class AbstractFormat extends Format
     if (out instanceof OutPort)
       {
 	OutPort pout = (OutPort) out;
-	PrintConsumer saveFormat = pout.formatter;
+	Object saveFormat = pout.pushFormat(this);
 	try
 	  {
-            pout.formatter = makeConsumer(saveFormat);
 	    out.writeObject(value);
 	  }
 	finally
 	  {
-	    pout.formatter = saveFormat;
+            pout.popFormat(saveFormat);
 	  }
       }
     else

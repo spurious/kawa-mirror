@@ -1,3 +1,7 @@
+2016-09-07  Per Bothner  <per@bothner.com>
+
+	* QuoteExp.java (print): Simplify - use AbstractFormat.format.
+
 2016-09-03  Per Bothner  <per@bothner.com>
 
 	* Compilation.java (defaultClassFileVersion): Handle JAVA9.

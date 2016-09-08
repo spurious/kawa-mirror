@@ -239,16 +239,11 @@ public class QuoteExp extends Expression
             val = val.toString(); // To avoid cycles.
         gnu.kawa.format.AbstractFormat format =
             Language.getDefaultLanguage().getFormat(true);
-        Object save = out.pushFormat(format);
-        try {
-            out.writeObject(val);
-            if (type != null) {
-                out.print(" ::");
-                out.print(type.getName());
-            }
-            out.endLogicalBlock(")");
-        } finally {
-            out.popFormat(save);
+        format.format(val, out);
+        if (type != null) {
+            out.print(" ::");
+            out.print(type.getName());
         }
+        out.endLogicalBlock(")");
     }
 }

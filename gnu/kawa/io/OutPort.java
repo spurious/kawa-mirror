@@ -15,7 +15,7 @@ public class OutPort extends PrintConsumer implements Printable
     /** Output gets forwarded to the value of this field.
      * It is initially a PrettyWriter, but other PrintConsumer object
      * can be interjected for custom formatting or other processing. */
-    public PrintConsumer formatter;
+    PrintConsumer formatter;
 
   Path path;
   protected Writer base;
@@ -357,15 +357,6 @@ public class OutPort extends PrintConsumer implements Printable
     formatter.writeWordStart();
   }
 
-    public PrintConsumer pushConsumer(PrintConsumer consumer) {
-        PrintConsumer old = formatter;
-        formatter = consumer;
-        return old;
-    }
-    public void popConsumer(PrintConsumer old) {
-        formatter = old;
-    }
-
     public Object pushFormat(AbstractFormat format) {
         Object old = formatter;
         formatter = format.makeConsumer(formatter);
@@ -429,6 +420,30 @@ public class OutPort extends PrintConsumer implements Printable
     public void setDomTerm(boolean v) {
         if (v) flags |= IS_DOMTERM;
         else flags &= ~IS_DOMTERM;
+    }
+
+    /** Return an OutPort equivalent to the argumement for text output.
+     * I.e. writing CharSequences or characters to either is the same.
+     * Used to optimize process output.
+     */
+    public static OutPort getPassThroughOutPort(Consumer out) {
+        OutPort port = null;
+        for (;;) {
+            if (out instanceof OutPort) {
+                port = (OutPort) out;
+                PrintConsumer formatter = port.formatter;
+                if (formatter instanceof PrettyWriter)
+                    return port;
+                out = formatter;
+            } else if (out instanceof AbstractFormat.FormatConsumer) {
+                AbstractFormat.FormatConsumer fcons = (AbstractFormat.FormatConsumer) out;
+                if (!  fcons.getFormat().textIsCopied())
+                    return null;
+                out = fcons.getBase();
+            }
+            else
+                return port;
+        }
     }
 
   @Override

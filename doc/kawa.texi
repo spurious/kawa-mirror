@@ -1774,15 +1774,15 @@ if not see these @ref{Installation,installation instructions}.
 Running the @code{kawa} command in interactive mode
 is a good way start learning Kawa:
 @example
-$ kawa
-#|kawa:1|# 
+$ @kbd{kawa}
+#|kawa:1|# @kbd{}
 @end example
 If you don't have @code{kawa} but you have a
 Kawa ``jar'' and you have Java installed you can instead do:
 
 @example
-$ java -jar kawa-@var{version-number}.jar
-#|kawa:1|# 
+$ @kbd{java -jar kawa-@var{version-number}.jar}
+#|kawa:1|# @kbd{}
 @end example
 
 The prompt string has the form of a Scheme comment,
@@ -1793,9 +1793,9 @@ For example a quoted string is a simple expression that evaluates to a
 string value, which will print as itself, before printing the next prompt:
 
 @example
-#|kawa:1|# "Hello, world!"
+#|kawa:1|# @kbd{"Hello, world!"}
 Hello, world!
-#|kawa:2|# 
+#|kawa:2|# @kbd{}
 @end example
 @c Thus the Kawa equivalent of the traditional
 @c @uref{http://en.wikipedia.org/wiki/Hello_world,``hello world''} is trivial.
@@ -1827,8 +1827,8 @@ and @code{+} is just a regular function name:
 
 The same prefix notation is used for special operations like assignments:
 @example
-#|kawa:1|# (set! sqrt-of-2 (sqrt 2))
-#|kawa:2|# sqrt-of-2
+#|kawa:1|# @kbd{(set! sqrt-of-2 (sqrt 2))}
+#|kawa:2|# @kbd{sqrt-of-2}
 1.4142135623730951
 @end example
 
@@ -1907,9 +1907,9 @@ Kawa has arbitrary-precision integers.
 Let us implement the @uref{http://en.wikipedia.org/wiki/Factorial,factorial} function.
 Type in the following (we'll look at the syntax shortly):
 @example
-#|kawa:1|# (define (factorial x)
-#|(---:2|#   (if (< x 1) 1
-#|(---:3|#     (* x (factorial (- x 1)))))
+#|kawa:1|# @kbd{(define (factorial x)}
+#|(---:2|# @kbd{  (if (< x 1) 1}
+#|(---:3|# @kbd{    (* x (factorial (- x 1)))))}
 @end example
 
 (The prompt changes to indicate a continuation line.)
@@ -1920,9 +1920,9 @@ and later a JIT compiler may compile it to native code.
 
 A few tests:
 @example
-#|kawa:4|# (list (factorial 3) (factorial 4))
+#|kawa:4|# @kbd{(list (factorial 3) (factorial 4))}
 (6 24)
-#|kawa:5|# (factorial 30)
+#|kawa:5|# @kbd{(factorial 30)}
 265252859812191058636308480000000
 @end example
 
@@ -1988,9 +1988,9 @@ expression to the variable.
 If you prefer, you can use @code{define} instead of @code{!}:
 
 @example
-#|kawa:1|# (define binary-kilo 1024)
-#|kawa:2|# (define binary-mega (* binary-kilo binary-kilo))
-#|kawa:3|# binary-mega
+#|kawa:1|# @kbd{(define binary-kilo 1024)}
+#|kawa:2|# @kbd{(define binary-mega (* binary-kilo binary-kilo))}
+#|kawa:3|# @kbd{binary-mega}
 1048576
 @end example
 
@@ -2130,14 +2130,14 @@ the result is a new sequence (of the same type)
 selecting only the elements matching the index values.
 For example:
 @example
-#|kawa:2|# (vec1 [3 5 2])
+#|kawa:2|# @kbd{(vec1 [3 5 2])}
 #(D F C)
 @end example
 In general, @code{((V1 V2) I)} is @code{(V1 (V2 I))}.
 
 You can use a range to create a slice - a contiguous subset of a list.
 @example
-#|kawa:3|# (vec1 [2 <: 6])
+#|kawa:3|# @kbd{(vec1 [2 <: 6])}
 #(C D E F)
 @end example
 
@@ -2145,8 +2145,8 @@ A range is different from a vector integer in that you can use
 a range as the index in the LHS of a set!:
 
 @example
-#|kawa:4|# (set! (vec1 [2 <: 4]) #(a b c d e))
-#|kawa:5|# vec1
+#|kawa:4|# @kbd{(set! (vec1 [2 <: 4]) #(a b c d e))}
+#|kawa:5|# @kbd{vec1}
 #(A B a b c d e E F)
 @end example
 
@@ -2155,8 +2155,8 @@ then the number of elements in the replacement value.
 I.e. you can do insertion and deletion this way.
 
 @example
-#|kawa:7|# (! str1 (string-copy "ABCDEF"))
-#|kawa:8|# (set! (str1 [2 <: 5]) "98")
+#|kawa:7|# @kbd{(! str1 (string-copy "ABCDEF"))}
+#|kawa:8|# @kbd{(set! (str1 [2 <: 5]) "98")}
 AB98F
 @end example
 
@@ -2306,10 +2306,10 @@ You can use a type to specify that a variable can only have
 values of the specified types:
 
 @example
-#|kawa:5|# (define v ::vector #(3 4 5))
-#|kawa:6|# v
+#|kawa:5|# @kbd{(define v ::vector #(3 4 5))}
+#|kawa:6|# @kbd{v}
 #(3 4 5)
-#|kawa:7|# (set! v 12)
+#|kawa:7|# @kbd{(set! v 12)}
 /dev/stdin:7:1: warning - cannot convert literal (of type gnu.math.IntNum) to vector
 Value (12) for variable 'v' has wrong type (gnu.math.IntNum) (gnu.math.IntNum cannot be cast to gnu.lists.FVector)
 	at atInteractiveLevel$7.run(stdin:7)
@@ -2483,7 +2483,7 @@ result (if there is a non-"void" result).
 @menu
 * Options::      Command-line arguments
 * Scripts::      Running Command Scripts
-* New-Window::   Running a Command Interpreter in a new Window
+* REPL Console:: The REPL (read-eval-print-loop) console
 * Exiting::      Exiting Kawa
 * Compiling::    Compiling to byte-code
 @end menu
@@ -2684,9 +2684,9 @@ the XQuery parser, but that will hopefully change.
 @subsection Options for warnings and errors
 
 @table @code
-@cindex --warn-@var{whatever}
-@cindex --no-warn-@var{whatever}
-@pindex warn-undefined-variable
+@cindex @code{--warn-@var{whatever}}
+@cindex @code{--no-warn-@var{whatever}}
+@pindex @code{warn-undefined-variable}
 @item --warn-undefined-variable
 Emit a warning if the code references a variable which is neither in
 lexical scope nor in the compile-time dynamic (global) environment.
@@ -2775,6 +2775,7 @@ Initialize @ref{input-prompt1,@code{input-promp1} and @code{input-prompt2}}, res
 
 @subsection Options for controlling output formatting
 
+@cindex @sortas{output-format} @code{--output-format}
 @table @code
 @item --output-format @var{format}
 @itemx --format @var{format}
@@ -2940,7 +2941,7 @@ Sets the JVM property @var{variable-name} to @var{variable-value}.
 Equivalent to @code{-J-D@var{variable-name}=@var{variable-value}}.
 @end table
 
-@node Scripts, New-Window, Options, Running
+@node Scripts
 @section Running Command Scripts
 
 If you write a Kawa application it is convenient to be able
@@ -3131,8 +3132,52 @@ However, this is no longer supported, as gcj is no longer
 being actively developed.)
 @end ignore
 
-@node New-Window, Exiting, Scripts, Running
-@section Running a Command Interpreter in a new Window
+@node REPL Console
+@section The REPL (read-eval-print-loop) console
+
+The read-eval-print-loop (REPL) console is a convenient way to
+do simple programming, test out things, and experiment.
+As the name implies, the REPL repeatedly (in a loop)
+prints out a prompt, reads an input command, evaluates it, the prints the result.
+
+The REPL is started out when you invoke the @code{kawa} command
+with no arguments.  For example:
+
+@example
+$ @kbd{kawa}
+#|kawa:1|# @kbd{(define pi (* 2 (asin 1)))}
+#|kawa:2|# @kbd{(list pi (sqrt pi))}
+(3.141592653589793 1.7724538509055159)
+#|kawa:3|# @kbd{}
+@end example
+
+The colors and styles used for the prompt and the user input
+depend on user preference and the capabilities of the console device.
+(If you read this on a color screen you should see pale green for the
+prompt and pale yellow for the user input;
+this matches the defaults for the DomTerm console.)
+
+You can @ref{Prompts,change the prompt string} if you want.
+The default format depends on the (programming) language use;
+the one shown above is used for Scheme.
+It has the form of a comment, which can be convenient for copying
+and pasting lines.
+
+You can @ref{Named output formats,change the output formatting} with
+the @code{--output-format} command-line option.
+
+The basic console has few frills, but should work in any enviroment
+where you have a console or terminal.  It has no dependencies,
+except the kawa @code{.jar} file (and Java):
+@example
+$ @kbd{java kawa-@value{VERSION}.jar}
+#|kawa:2|# @kbd{}
+@end example
+
+On rare occason you may need to specify the @code{--console} flag.
+
+@anchor{New-Window}
+@subsection Running a Command Interpreter in a new Window
 
 An alternative interface runs the Java read-eval-print-loop
 inside a new window. This is in some ways nicer.  One reason
@@ -3145,7 +3190,7 @@ environments or they can share environments.  To try it, do:
 java kawa.repl -w
 @end example
 
-@node Exiting,  , New-Window, Running
+@node Exiting
 @section Exiting Kawa
 Kawa normally keeps running as long as there is an active
 read-eval-print loop still awaiting input or there is an unfinished
@@ -7288,13 +7333,13 @@ along with an infinite set of definitions, for every possible @var{tag}:
 
 @example
 $ kawa --output-format xml
-#|kawa:1|# (define-xml-namespace na "Namespace1")
-#|kawa:2|# (define-xml-namespace nb "Namespace1")
-#|kawa:3|# (define xa (na:em "Info"))
-#|kawa:4|# xa
+#|kawa:1|# @kbd{(define-xml-namespace na "Namespace1")}
+#|kawa:2|# @kbd{(define-xml-namespace nb "Namespace1")}
+#|kawa:3|# @kbd{(define xa (na:em "Info"))}
+#|kawa:4|# @kbd{xa}
 <na:em xmlns:na="Namespace1">Info</na:em>
-#|kawa:5|# (define xb (nb:em "Info"))
-#|kawa:6|# xa
+#|kawa:5|# @kbd{(define xb (nb:em "Info"))}
+#|kawa:6|# @kbd{xa}
 <nb:em xmlns:nb="Namespace1">Info</nb:em>
 @end example
 
@@ -14665,6 +14710,8 @@ omitted it defaults to the value returned by @code{(current-output-port)}.
 while R6RS added @code{flush-output-port}. They have the same effect.)
 @end deffn
 
+@anchor{Prompts}
+@cindex prompts
 @subsection Prompts for interactive consoles (REPLs)
 
 When an interactive input port is used for a read-eval-print-loop (REPL

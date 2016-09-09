@@ -1,5 +1,8 @@
 2016-09-09  Per Bothner  <per@bothner.com>
 
+	* kawa.texi (REPL Console): New section.
+	(New-Window): Merge node into new section.
+
 	Add styling (colors) to doc REPL examples.
 	* Makefile.am (kawa.xml): Insert <prompt> element before <userinput>.
 	* style/docbook-to-html.xsl: Process prompt style.

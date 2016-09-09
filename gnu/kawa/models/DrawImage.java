@@ -182,4 +182,16 @@ public class DrawImage extends Model
     public void visit(PictureVisitor visitor) {
         visitor.visitDrawImage(this);
     }
+
+    // FIXME doesn't belong here
+    public static Picture toPictureOrNull(Object value) {
+        if (value instanceof Shape)
+            return new DrawShape((Shape) value);
+        else if (value instanceof BufferedImage)
+            return new DrawImage((BufferedImage) value);
+        else if (value instanceof Picture)
+            return (Picture) value;
+        else
+            return null;
+    }
 }

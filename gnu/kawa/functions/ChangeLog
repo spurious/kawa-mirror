@@ -1,3 +1,7 @@
+2016-09-09  Per Bothner  <per@bothner.com>
+
+	* DisplayFormat.java: Update for new GenericFormat API.
+
 2016-09-07  Per Bothner  <per@bothner.com>
 
 	* DisplayFormat.java (writeRange): Fix thinko.

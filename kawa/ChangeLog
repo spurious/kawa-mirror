@@ -1,3 +1,8 @@
+2016-09-09  Per Bothner  <per@bothner.com>
+
+	* ReplPaneOutPort.java: Fix handling of Pictures etc to
+	use new GenericFormat framework.
+
 2016-09-07  Per Bothner  <per@bothner.com>
 
 	* Shell.java (run): Improve interrupt (ctrl-c) handling.

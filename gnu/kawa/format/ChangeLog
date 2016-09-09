@@ -1,3 +1,10 @@
+2016-09-09  Per Bothner  <per@bothner.com>
+
+	* GenericFormat.java: More complex logic to allow handlers to
+	indicate two kinds of failure: class-mismatch and other.
+	(TryFormatResult): New enum type.
+	(tryFormat): New method - only check current entries list.
+
 2016-09-07  Per Bothner  <per@bothner.com>
 
 	* AbstractFormat.java (getPassThroughOutPort): Move to OutPort.

@@ -16,6 +16,7 @@ import gnu.xml.XMLPrinter;
 /* #endif */
 import gnu.kawa.format.AbstractFormat;
 import gnu.kawa.format.GenericFormat;
+import gnu.kawa.format.GenericFormat.TryFormatResult;
 import gnu.kawa.io.CheckConsole;
 import gnu.kawa.io.OutPort;
 import gnu.kawa.io.PrettyWriter;
@@ -154,14 +155,14 @@ public class DisplayFormat extends GenericFormat
   {
     write (language == 'S' ? (v ? "#t" : "#f") : (v ? "t" : "nil"), out);
   }
-    public static boolean writeBoolean(Object v, AbstractFormat f, Consumer out) {
+    public static TryFormatResult writeBoolean(Object v, AbstractFormat f, Consumer out) {
         if (! (v instanceof Boolean))
-            return false;
+            return TryFormatResult.INVALID_CLASS;
         f.writeBoolean(((Boolean) v).booleanValue(), out);
-        return true;
+        return TryFormatResult.HANDLED;
     }
 
-    public static boolean writeChar(Object v, AbstractFormat f, Consumer out) {
+    public static TryFormatResult writeChar(Object v, AbstractFormat f, Consumer out) {
         boolean readable;
         char language;
         if (f instanceof DisplayFormat) {
@@ -174,16 +175,16 @@ public class DisplayFormat extends GenericFormat
         }
         if (v instanceof Char) {
              writeChar(((Char) v).intValue(), readable, language, out);
-            return true;
+            return TryFormatResult.HANDLED;
         } else if (v instanceof Character) {
             writeChar(((Character) v).charValue(), readable, language, out);
-            return true;
+            return TryFormatResult.HANDLED;
         }
-        return false;
+        return TryFormatResult.INVALID_CLASS;
     }
 
-    public static boolean writeRational(Object obj, AbstractFormat format,
-                                        Consumer out) {
+    public static TryFormatResult writeRational(Object obj, AbstractFormat format,
+                                                Consumer out) {
         if (obj instanceof RatNum
             || obj instanceof UnsignedPrim
             || (obj instanceof Number
@@ -218,9 +219,9 @@ public class DisplayFormat extends GenericFormat
             out.write(asString);
             if (showRadix && b == 10 && obj instanceof IntNum)
                 out.write(".");
-            return true;
+            return TryFormatResult.HANDLED;
         }
-        return false;
+        return TryFormatResult.INVALID_CLASS;
     }
 
   public static void writeChar(int v, boolean readable, char language, Consumer out)
@@ -262,10 +263,10 @@ public class DisplayFormat extends GenericFormat
    * this becomes a non-pair or the empty list
    * @param out The output port that is responsible for the pretty printing
    */
-  public static boolean writeList(Object list, AbstractFormat format, Consumer out)
+  public static TryFormatResult writeList(Object list, AbstractFormat format, Consumer out)
   {
     if (! (list instanceof LList))
-        return false;
+        return TryFormatResult.INVALID_CLASS;
     PrettyWriter pout =
         out instanceof PrintConsumer ? ((PrintConsumer) out).getPrettyWriter()
         : null;
@@ -338,13 +339,13 @@ public class DisplayFormat extends GenericFormat
     }
 
     PrintConsumer.endLogicalBlock(")", out);
-    return true;
+    return TryFormatResult.HANDLED;
   }
 
-    public static boolean writeArray(Object value, AbstractFormat format,
-                                     Consumer out) {
+    public static TryFormatResult writeArray(Object value, AbstractFormat format,
+                                             Consumer out) {
         if (! (value instanceof Array))
-            return false;
+            return TryFormatResult.INVALID_CLASS;
         if (! format.getReadableOutput()
             && out instanceof OutPort // FIXME PrintConsumer?
             && ((OutPort) out).atLineStart()
@@ -352,13 +353,13 @@ public class DisplayFormat extends GenericFormat
             out.write(ArrayPrint.print(value, null));
         else
             write((Array) value, 0, 0, format, out);
-        return true;
+        return TryFormatResult.HANDLED;
     }
 
-    public static boolean writeRange(Object value, AbstractFormat format,
-                                     Consumer out) {
+    public static TryFormatResult writeRange(Object value, AbstractFormat format,
+                                             Consumer out) {
         if (! (value instanceof Range))
-            return false;
+            return TryFormatResult.INVALID_CLASS;
         Range range = (Range) value;
         if (! (format.getReadableOutput() || range.isUnspecifiedStart()))
             return writeSequence(range, format, out);
@@ -398,13 +399,13 @@ public class DisplayFormat extends GenericFormat
             }
         }
 	PrintConsumer.endLogicalBlock("]", out);
-        return true;
+        return TryFormatResult.HANDLED;
     }
 
-    public static boolean writeJavaArray(Object value, AbstractFormat format,
+    public static TryFormatResult writeJavaArray(Object value, AbstractFormat format,
                                          Consumer out) {
         if (value == null || ! value.getClass().isArray())
-            return false;
+            return TryFormatResult.INVALID_CLASS;
         int len = java.lang.reflect.Array.getLength(value);
         PrintConsumer.startLogicalBlock("[", false, "]", out);
         for (int i = 0;  i < len;  i++) {
@@ -413,13 +414,13 @@ public class DisplayFormat extends GenericFormat
             format.writeObject(java.lang.reflect.Array.get(value, i), out);
         }
         PrintConsumer.endLogicalBlock("]", out);
-        return true;
+        return TryFormatResult.HANDLED;
     }
 
-    public static boolean writeSequence(Object value, AbstractFormat format,
+    public static TryFormatResult writeSequence(Object value, AbstractFormat format,
                                         Consumer out) {
         if (! (value instanceof List))
-            return false;
+            return TryFormatResult.INVALID_CLASS;
 	List vec = (List) value;
 	String tag =
             vec instanceof SimpleVector ? ((SimpleVector) vec).getTag() : null;
@@ -469,13 +470,13 @@ public class DisplayFormat extends GenericFormat
             }
         }
 	PrintConsumer.endLogicalBlock(end, out);
-        return true;
+        return TryFormatResult.HANDLED;
     }
 
-    public static boolean writeValues(Object value, AbstractFormat format,
-                                      Consumer out) {
+    public static TryFormatResult writeValues(Object value, AbstractFormat format,
+                                              Consumer out) {
         if (! (value instanceof Values))
-            return false;
+            return TryFormatResult.INVALID_CLASS;
         if (value == Values.empty && format.getReadableOutput())
              out.write("#!void");
         else {
@@ -485,9 +486,10 @@ public class DisplayFormat extends GenericFormat
                 format.writeObject(val, out);
             }
         }
-        return true;
+        return TryFormatResult.HANDLED;
     }
-    public static boolean writePrintableConsumable
+
+    public static TryFormatResult writePrintableConsumable
         (Object value, AbstractFormat format, Consumer out) {
         if (value instanceof Consumable
              && (! format.getReadableOutput()
@@ -496,8 +498,8 @@ public class DisplayFormat extends GenericFormat
         else if (value instanceof Printable)
             ((Printable) value).print(out);
         else
-            return false;
-        return true;
+            return TryFormatResult.INVALID_CLASS;
+        return TryFormatResult.HANDLED;
     }
 
     public void writeObject(Object obj, Consumer out) { 
@@ -559,11 +561,13 @@ public class DisplayFormat extends GenericFormat
         }
     }
 
-  public static boolean writeObjectDefault(Object obj, AbstractFormat format,
+  public static TryFormatResult writeObjectDefault(Object obj, AbstractFormat format,
                                            Consumer out)
   {
     boolean readable = format.getReadableOutput();
-    char language = ((DisplayFormat) format).language;
+    char language =
+        format instanceof DisplayFormat ? ((DisplayFormat) format).language
+        : 'S';
     if (obj instanceof Consumable
              && (! readable || ! (obj instanceof Printable)))
       ((Consumable) obj).consume(out);
@@ -574,7 +578,7 @@ public class DisplayFormat extends GenericFormat
         String asString = obj == null ? null : obj.toString();
         out.write(asString == null ? "#!null" : asString);
       }
-    return true;
+    return TryFormatResult.HANDLED;
   }
 
   /** Recursive helper method for writing out Array (sub-) objects.
@@ -653,9 +657,9 @@ public class DisplayFormat extends GenericFormat
                     + "|([-+]|[.][.][.])");
   /* #endif */
 
-    public static boolean writeCharSeq(Object value, AbstractFormat format, Consumer out) {
+    public static TryFormatResult writeCharSeq(Object value, AbstractFormat format, Consumer out) {
         if (! (value instanceof CharSequence))
-            return false;
+            return TryFormatResult.INVALID_CLASS;
 	CharSequence str = (CharSequence) value;
 	if (format.getReadableOutput())
 	  Strings.printQuoted(str, out, 1);
@@ -674,23 +678,23 @@ public class DisplayFormat extends GenericFormat
             for (int i = 0; i < len;  i++)
               out.write(str.charAt(i));
           }
-        return true;
+        return TryFormatResult.HANDLED;
     }
 
-    public static boolean writeEnum(Object value, AbstractFormat format, Consumer out) {
-        if (value instanceof java.lang.Enum && format.getReadableOutput())  {
-            out.write(value.getClass().getName());
-            out.write(":");
-            out.write(((java.lang.Enum) value).name());
-            return true;
-        }
-        else
-            return false;
+    public static TryFormatResult writeEnum(Object value, AbstractFormat format, Consumer out) {
+        if (! (value instanceof java.lang.Enum))
+            return TryFormatResult.INVALID_CLASS;
+        if (! format.getReadableOutput())
+            return TryFormatResult.INVALID;
+        out.write(value.getClass().getName());
+        out.write(":");
+        out.write(((java.lang.Enum) value).name());
+        return TryFormatResult.HANDLED;
     }
 
-    public static boolean writeSymbol(Object value, AbstractFormat format, Consumer out) {
+    public static TryFormatResult writeSymbol(Object value, AbstractFormat format, Consumer out) {
         if (! (value instanceof Symbol))
-            return false;
+            return TryFormatResult.INVALID_CLASS;
         Symbol sym = (Symbol) value;
         Namespace ns = sym.getNamespace();
         if (ns == XmlNamespace.HTML) {
@@ -730,7 +734,7 @@ public class DisplayFormat extends GenericFormat
             if (suffixColon)
                 out.write(':');
         }
-        return true;
+        return TryFormatResult.HANDLED;
     }
 
     static void writeSymbol (String sym, Consumer out, boolean readable) {
@@ -795,27 +799,21 @@ public class DisplayFormat extends GenericFormat
         out.write(sym);
     }
 
-    public static boolean writePicture(Object value,
-                                       AbstractFormat format, Consumer out)  {
+    public static TryFormatResult writePicture(Object value,
+                                               AbstractFormat format, Consumer out)  {
+        Picture pic = DrawImage.toPictureOrNull(value);
+        if (pic == null)
+            return TryFormatResult.INVALID_CLASS;
         if (format.getReadableOutput())
-            return false;
-        Picture pic;
-        if (value instanceof Shape)
-            pic = new DrawShape((Shape) value);
-        else if (value instanceof BufferedImage)
-            pic = new DrawImage((BufferedImage) value);
-        else if (value instanceof Picture)
-            pic = (Picture) value;
-        else
-            return false;
+            return TryFormatResult.INVALID;
         if (! CheckConsole.forDomTerm(out))
             return writeObjectDefault(value, format, out);
         out.write("\033]72;"+SVGUtils.toSVG(pic)+"\007");
-        return true;
+        return TryFormatResult.HANDLED;
     }
 
     /* #ifdef enable:XML */
-    public static boolean writeKNode(Object value,
+    public static TryFormatResult writeKNode(Object value,
                                      AbstractFormat format, Consumer out) {
         if (value instanceof KNode) {
             boolean escapeForDomTerm = false;
@@ -828,29 +826,31 @@ public class DisplayFormat extends GenericFormat
             new XMLPrinter(out).writeObject(value);
             if (escapeForDomTerm)
                 out.write("\007");
-            return true;
+            return TryFormatResult.HANDLED;
         }
-        return false;
+        return TryFormatResult.INVALID_CLASS;
     }
     /* #endif */
 
-    public static boolean writePromise(Object value,
+    public static TryFormatResult writePromise(Object value,
                                        AbstractFormat format, Consumer out) {
-        if (value instanceof Lazy && ! format.getReadableOutput()) {
-            format.writeObject(((Lazy) value).getValue(), out);
-            return true;
-        }
-        return false;
+        if (! (value instanceof Lazy))
+            return TryFormatResult.INVALID_CLASS;
+        if (format.getReadableOutput())
+            return TryFormatResult.INVALID;
+        format.writeObject(((Lazy) value).getValue(), out);
+        return TryFormatResult.HANDLED;
     }
-    public static boolean writeURI(Object value,
+    public static TryFormatResult writeURI(Object value,
                                    AbstractFormat format, Consumer out) {
-        if (value instanceof java.net.URI && format.getReadableOutput()) {
-            out.write("#,(URI ");
-            Strings.printQuoted(value.toString(), out, 1);
-            out.write(')');
-            return true;
-        } else
-            return false;
+        if (! (value instanceof java.net.URI))
+            return TryFormatResult.INVALID_CLASS;
+        if (! format.getReadableOutput())
+            return TryFormatResult.INVALID;
+        out.write("#,(URI ");
+        Strings.printQuoted(value.toString(), out, 1);
+        out.write(')');
+        return TryFormatResult.HANDLED;
     }
  
     static void writeHexDigits(int i, Consumer out) {

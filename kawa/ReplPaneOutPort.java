@@ -2,9 +2,15 @@ package kawa;
 import java.awt.Component;
 import javax.swing.*;
 import javax.swing.text.*;
+import gnu.lists.Consumer;
 import gnu.mapping.*;
+import gnu.kawa.format.AbstractFormat;
+import gnu.kawa.format.GenericFormat;
+import gnu.kawa.format.GenericFormat.TryFormatResult;
+import gnu.kawa.functions.DisplayFormat;
 import gnu.kawa.io.OutPort;
 import gnu.kawa.io.Path;
+import gnu.kawa.models.DrawImage;
 import gnu.kawa.models.Picture;
 import gnu.kawa.models.Viewable;
 import gnu.kawa.swingviews.SwingDisplay;
@@ -15,6 +21,19 @@ import gnu.kawa.swingviews.SwingDisplay;
 
 public class ReplPaneOutPort extends OutPort
 {
+    static {
+        Class thisCls = ReplPaneOutPort.class;
+        GenericFormat format = DisplayFormat.standardFormat;
+        format.invalidateCache(java.awt.image.BufferedImage.class);
+        format.invalidateCache(java.awt.Shape.class);
+        format.invalidateCache(gnu.kawa.models.Picture.class);
+        format.invalidateCache(gnu.kawa.models.Viewable.class);
+        format.invalidateCache(java.awt.Component.class);
+        format.add(thisCls, "writePicture");
+        format.add(thisCls, "writeComponent");
+        format.add(thisCls, "writeViewable");
+    }
+
   ReplDocument document;
   AttributeSet style;
   String str="";
@@ -47,29 +66,42 @@ public class ReplPaneOutPort extends OutPort
     write(" ", style);
   }
 
-  public void print(Object v)
-  {
-    if (v instanceof Component)
-      {
-        write((Component) v);
-      }
-    else if (v instanceof Picture)
-      {
-        MutableAttributeSet style = new SimpleAttributeSet();
-        style.addAttribute(AbstractDocument.ElementNameAttribute, ReplPane.PictureElementName);
-        style.addAttribute(ReplPane.PictureAttribute, v);
-        write(" ", style);
-      }
-    else if (v instanceof Viewable)
-      {
+    public static TryFormatResult
+            writeComponent(Object value, AbstractFormat format, Consumer out)  {
+        if (! (value instanceof Component))
+            return TryFormatResult.INVALID_CLASS;
+        if (format.getReadableOutput() || ! (out instanceof ReplPaneOutPort))
+            return TryFormatResult.INVALID;
+        ((ReplPaneOutPort) out).write((Component) value);
+        return TryFormatResult.HANDLED;
+    }
+
+    public static TryFormatResult
+            writeViewable(Object value, AbstractFormat format, Consumer out)  {
+        if (! (value instanceof Viewable))
+            return TryFormatResult.INVALID_CLASS;
+        if (format.getReadableOutput() || ! (out instanceof ReplPaneOutPort))
+            return TryFormatResult.INVALID;
         MutableAttributeSet style = new SimpleAttributeSet();
         style.addAttribute(AbstractDocument.ElementNameAttribute, ReplPane.ViewableElementName);
-        style.addAttribute(ReplPane.ViewableAttribute, v);
-        write(" ", style);
-      }
-    else
-      super.print(v);
-  }
+        style.addAttribute(ReplPane.ViewableAttribute, value);
+        ((ReplPaneOutPort) out).write(" ", style);
+        return TryFormatResult.HANDLED;
+    }
+
+    public static TryFormatResult
+            writePicture(Object value, AbstractFormat format, Consumer out)  {
+        Picture pic = DrawImage.toPictureOrNull(value);
+        if (pic == null)
+            return TryFormatResult.INVALID_CLASS;
+        if (format.getReadableOutput() || ! (out instanceof ReplPaneOutPort))
+            return TryFormatResult.INVALID;
+        MutableAttributeSet style = new SimpleAttributeSet();
+        style.addAttribute(AbstractDocument.ElementNameAttribute, ReplPane.PictureElementName);
+        style.addAttribute(ReplPane.PictureAttribute, pic);
+        ((ReplPaneOutPort) out).write(" ", style);
+        return TryFormatResult.HANDLED;
+    }
 }
 
 class TextPaneWriter extends java.io.Writer

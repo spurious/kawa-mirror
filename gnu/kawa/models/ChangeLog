@@ -1,3 +1,7 @@
+2016-09-09  Per Bothner  <per@bothner.com>
+
+	* DrawImage.java (toPictureOrNull): New utility method.
+
 2016-07-28  Per Bothner  <per@bothner.com>
 
 	Adjust bounding box for stroke width.

@@ -80,6 +80,7 @@ kawa.xml: $(srcdir)/kawa.texi
 	-e 's|<title>Features of Kawa Scheme</title>|\0<titleabbrev>Scheme Features</titleabbrev>|' \
 	-e 's|<title>Building and installing Kawa</title>|\0<titleabbrev>Building and installing</titleabbrev>|' \
 	-e 's|<title>The Kawa Scheme system</title>|\0<titleabbrev>Kawa Home</titleabbrev>|' \
+	-e 's|\([^<>]*\)<userinput>|<prompt>\1</prompt><userinput>|' \
 	-e '/@ifnotdocbook/,/@end ifnotdocbook/d' \
 	> kawa.xml
 

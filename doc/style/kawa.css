@@ -241,4 +241,8 @@ blockquote { margin-left: 40px; margin-right: 40px }
 
 div[class="navcol"] div > ul > li { font-size: larger }
 
+strong.userinput { background-color: #FFFFD0 } /* a pale yellow */
+span.userinput { background-color: #FFFFD0 } /* a pale yellow */
+span.prompt { background-color: #E0FFE0 } /* a pale green */
+
 /* *[accesskey]:after {content:' [' attr(accesskey) ']'} */

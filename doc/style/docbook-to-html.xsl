@@ -191,6 +191,10 @@
       </xsl:if>
 </xsl:template>
 
+<xsl:template match="prompt">
+  <xsl:element name="span" namespace="{$html.namespace}"><xsl:attribute name="class">prompt</xsl:attribute><xsl:apply-templates/></xsl:element>
+</xsl:template>
+
 <xsl:template match="synopsis">
   <xsl:element name="p" namespace="{$html.namespace}"><xsl:attribute name="class"><xsl:value-of select="name(.)"/></xsl:attribute><xsl:attribute name="kind"><xsl:value-of select="phrase[@role='category']/emphasis"/></xsl:attribute>
     <!--kind="phrase[@role='category']/emphasis">-->

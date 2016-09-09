@@ -1,3 +1,10 @@
+2016-09-09  Per Bothner  <per@bothner.com>
+
+	Add styling (colors) to doc REPL examples.
+	* Makefile.am (kawa.xml): Insert <prompt> element before <userinput>.
+	* style/docbook-to-html.xsl: Process prompt style.
+	* style/kawa.css: Add actual styles.
+
 2016-09-08  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Exiting): Update about ctrl-D, which now should work.

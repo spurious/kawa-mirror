@@ -8,7 +8,6 @@ import gnu.kawa.io.InPort;
 import gnu.mapping.*;
 import gnu.math.FixedRealFormat;
 import gnu.lists.*;
-import gnu.text.*;
 
 public class ParseFormat extends Procedure1
 {

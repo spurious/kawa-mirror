@@ -1,3 +1,8 @@
+2016-09-10  Per Bothner  <per@bothner.com>
+
+	* ParseFormat.java: Remove unneeded import.
+	Fixes Savannah bug #49048 "r8947 broken the build on ParseFormat.java".
+
 2016-09-09  Per Bothner  <per@bothner.com>
 
 	* DisplayFormat.java: Update for new GenericFormat API.

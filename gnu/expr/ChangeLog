@@ -1,3 +1,7 @@
+2016-09-21  Per Bothner  <per@bothner.com>
+
+	* QuoteExp.java (print): Some pretty-printing tweaks.
+
 2016-09-07  Per Bothner  <per@bothner.com>
 
 	* QuoteExp.java (print): Simplify - use AbstractFormat.format.

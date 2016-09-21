@@ -233,7 +233,7 @@ public class QuoteExp extends Expression
 
     public void print(OutPort out) {
         out.startLogicalBlock("(Quote", ")", 2);
-        out.writeSpaceLinear();
+        out.writeSpaceFill();
         Object val = this.value;
         if (val instanceof Expression)
             val = val.toString(); // To avoid cycles.
@@ -241,7 +241,8 @@ public class QuoteExp extends Expression
             Language.getDefaultLanguage().getFormat(true);
         format.format(val, out);
         if (type != null) {
-            out.print(" ::");
+            out.writeSpaceFill();
+            out.print("::");
             out.print(type.getName());
         }
         out.endLogicalBlock(")");

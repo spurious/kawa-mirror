@@ -826,9 +826,10 @@ public class repl extends Procedure0or1 {
         checkedDomTerm = true;
         String dversion = CheckConsole.getDomTermVersionInfo();
         if (dversion != null) {
-            OutPort.getSystemOut().setDomTerm(true);
             if (dversion.indexOf("err-handled;") < 0)
                 TermErrorStream.setSystemErr(false);
+            OutPort.getSystemOut().setDomTerm(true);
+            OutPort.getSystemErr().setDomTerm(true);
         }
         /*else if (isAnsiTerminal())
             TermErrorStream.setSystemErr(true);

@@ -7,6 +7,7 @@ import java.io.*;
 import gnu.mapping.ThreadLocation;
 import gnu.lists.LList;
 import gnu.lists.PrintConsumer;
+import gnu.lists.Strings;
 
 /** 
  * A pretty printer.
@@ -123,6 +124,9 @@ public class PrettyWriter extends PrintConsumer
    *  3) is an example of a miser-style printing.
    */
   int miserWidth = 40;
+
+    boolean isDomTerm;
+    public boolean isDomTerm() { return isDomTerm; }
 
   /**
    * This variable is used to determine how the queueInts array should be
@@ -748,6 +752,7 @@ public class PrettyWriter extends PrintConsumer
     private void writeToBase(String str) {
         writeToBase(str, 0, str.length());
     }
+
     private void writeToBase(int ch) {
         try {
             out.write(ch);
@@ -1121,7 +1126,7 @@ public class PrettyWriter extends PrintConsumer
         Object indent = indentLoc.get(null);
         // if (indent == null || indent ...
       }
-    if (prefix != null)
+    if (prefix != null && ! (perLine && isDomTerm()))
       write(prefix);
     if (prettyPrintingMode == 0)
       return;
@@ -1361,9 +1366,9 @@ public class PrettyWriter extends PrintConsumer
     int available = length - fillPtr;
     if (available > 0)
       return available;
-    else if (out != null && fillPtr > lineLength && !sharing)
+    else if (out != null && fillPtr > lineLength && !sharing && ! isDomTerm())
       {
-	if (! maybeOutput(false, false))
+        if (! maybeOutput(false, false))
 	  outputPartialLine();
 	return ensureSpaceInBuffer(want);
       }
@@ -1391,6 +1396,8 @@ public class PrettyWriter extends PrintConsumer
   {
     boolean outputAnything = false;
     //log("maybeOutput("+forceNewlines+"):");  dumpQueue();
+    if (! flushing && isDomTerm())
+        return false;
   loop:
     while (queueSize > 0)
       {
@@ -1398,6 +1405,52 @@ public class PrettyWriter extends PrintConsumer
 	  queueTail = 0;
 	int next = queueTail;
 	int type = getQueueType(next);
+        if (isDomTerm() && flushing) {
+            if (bufferFillPointer > 0 && type != QITEM_NEWLINE_TYPE && type != QITEM_NOP_TYPE) {
+                int count = posnIndex(queueInts[next+QITEM_POSN]);
+                if (count > 0) {
+                    writeToBase(buffer, 0, count);
+                    System.arraycopy(buffer, count, buffer, 0, bufferFillPointer-count);
+                    bufferOffset += count;
+                    bufferFillPointer -= count;
+                    bufferStartColumn += count;
+                }
+            }
+	switch (type)
+	  {
+	  case QITEM_NEWLINE_TYPE:
+            outputAnything = true;
+            outputLine(next, flushing);
+	    break;
+	  case QITEM_INDENTATION_TYPE:
+            if (! isMisering())
+	      {
+		int kind = queueInts[next+QITEM_INDENTATION_KIND];
+		int indent = queueInts[next+QITEM_INDENTATION_AMOUNT];
+                boolean blockRelative = kind == QITEM_INDENTATION_BLOCK;
+                writeToBase("\033]"
+                            +(blockRelative ? "113" : "114")
+                            + ";" + indent + "\007");
+	      }
+	    break;
+	  case QITEM_BLOCK_START_TYPE:
+            String prefix = queueStrings[next + QITEM_BLOCK_START_PREFIX];
+            StringBuilder sbuf = new StringBuilder("\033]110;");
+            if (prefix != null)
+                Strings.printJson(prefix, sbuf);
+            sbuf.append("\007");
+            writeToBase(sbuf.toString());
+            break;
+	  case QITEM_BLOCK_END_TYPE:
+              writeToBase("\033]111\007");
+              break;
+	  case QITEM_TAB_TYPE:
+            // if (isDomTerm()) ??? FIXME
+	    expandTabs(next);
+	    break;
+	  }
+        }
+        else
 	switch (type)
 	  {
 	  case QITEM_NEWLINE_TYPE:
@@ -1444,15 +1497,15 @@ public class PrettyWriter extends PrintConsumer
 		if (flushing && fits == 0)
                   outputPartialLine();
                 else
-                  outputLine(next);
+                  outputLine(next, flushing);
 	      }
 	    break;
 	  case QITEM_INDENTATION_TYPE:
-	    if (! isMisering())
+            if (! isMisering())
 	      {
 		int kind = queueInts[next+QITEM_INDENTATION_KIND];
 		int indent = queueInts[next+QITEM_INDENTATION_AMOUNT];
-		if (kind == QITEM_INDENTATION_BLOCK)
+                if (kind == QITEM_INDENTATION_BLOCK)
 		  indent += getStartColumn();
 		else
 		  indent += posnColumn(queueInts[next+QITEM_POSN]);
@@ -1494,7 +1547,7 @@ public class PrettyWriter extends PrintConsumer
 	    break;
 	  case QITEM_BLOCK_END_TYPE:
 	    //log("reallyEndLogicalBlock: "+blockDepth+" at:"+next);
-	    reallyEndLogicalBlock();
+            reallyEndLogicalBlock();
 	    break;
 	  case QITEM_TAB_TYPE:
 	    expandTabs(next);
@@ -1559,14 +1612,14 @@ public class PrettyWriter extends PrintConsumer
   /** Output a new line.
    * @param newline index of a newline queue item
    */
-  void outputLine (int newline)
+  private void outputLine (int newline, boolean flushing)
   {
     char[] buffer = this.buffer;
     int kind = queueInts[newline + QITEM_NEWLINE_KIND];
     boolean isLiteral = kind == NEWLINE_LITERAL;
     int amountToConsume = posnIndex(queueInts[newline + QITEM_POSN]);
     int amountToPrint;
-    if (isLiteral)
+    if (isLiteral || (isDomTerm() && flushing))
       amountToPrint = amountToConsume;
     else
       {
@@ -1587,7 +1640,6 @@ public class PrettyWriter extends PrintConsumer
       }
     writeToBase(buffer, 0, amountToPrint);
     int lineNumber = this.lineNumber;
-    //log("outputLine#"+lineNumber+": \""+new String(buffer, 0, amountToPrint)+"\" curBlock:"+currentBlock);
     lineNumber++;
     if (! printReadably())
       {
@@ -1607,7 +1659,23 @@ public class PrettyWriter extends PrintConsumer
 	  }
       }
     this.lineNumber = lineNumber;
-    writeToBase('\n');
+    if (isDomTerm() && flushing) {
+        String cmd;
+        switch (kind) {
+        case NEWLINE_FILL:
+        case NEWLINE_SPACE:
+            cmd = "\033]115\007"; break;
+        case NEWLINE_LINEAR:
+            cmd = "\033]116\007"; break;
+        case NEWLINE_MISER:
+            cmd = "\033]117\007"; break;
+        case NEWLINE_LITERAL:
+        default:
+            cmd = "\033]118\007"; break;
+        }
+        writeToBase(cmd);
+    } else
+        writeToBase('\n');
     bufferStartColumn = 0;
     int fillPtr = bufferFillPointer;
     int prefixLen = isLiteral ? getPerLinePrefixEnd() : getPrefixLength();

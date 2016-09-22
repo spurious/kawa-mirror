@@ -1,3 +1,8 @@
+2016-09-21  Per Bothner  <per@bothner.com>
+
+	* Strings.java (toJson): New method.
+	(printQuoted): Some tweaks.
+
 2016-09-03  Per Bothner  <per@bothner.com>
 
 	* AbstractFormat.java: Moved to gnu/kawa/format.

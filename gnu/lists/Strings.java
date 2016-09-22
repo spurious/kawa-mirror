@@ -83,10 +83,21 @@ public class Strings
       }
   }
 
+    public static String toJson(CharSequence str) {
+        StringBuilder sbuf = new StringBuilder();
+        printQuoted(str, sbuf, 3);
+        return sbuf.toString();
+    }
+
+    public static void printJson(CharSequence str, Appendable ps) {
+        printQuoted(str, ps, 3);
+    }
+
     /** Print a string with quotes and escapes.
      * @param escapes The value 0 means only escape '"' and '\\';
      *   the value 1 means escape standard escape characters like '\\b';
-     *   the value 2 means escape all non-asci or control characters.
+     *   the value 2 means escape all non-ascii or control characters;
+     *   the value 3 means follow the JSON standard.
      */
     public static void printQuoted(CharSequence str,
                                    Appendable ps, int escapes) {
@@ -105,15 +116,24 @@ public class Strings
                     { ps.append("\\r"); continue; }
                     else if (ch == '\t')
                     { ps.append("\\t"); continue; }
-                    else if (ch == '\007')
+                    else if (ch == '\007' && escapes < 3)
                     { ps.append("\\a"); continue; }
                     else if (ch == '\b')
                     { ps.append("\\b"); continue; }
-                    else if (ch == '\013')
+                    else if (ch == '\013' && escapes < 3)
                     { ps.append("\\v"); continue; }
                     else if (ch == '\f')
                     { ps.append("\\f"); continue; }
-                    else if (escapes > 1 && (ch < ' ' || ch >= 127))
+                    else if (escapes >= 3 && (ch < ' ' || ch >= 127))
+                    {
+                        ps.append("\\u");
+                        int d = ch;
+                        for (int k = 12; k >= 0; k -= 4) {
+                            ps.append(Character.forDigit((d >> k) & 15, 16));
+                        }
+                        continue;
+                    }
+                    else if (ch < ' ' || (escapes > 1 && ch >= 127))
                     {
                         ps.append("\\x");
                         ps.append(Integer.toHexString(ch));

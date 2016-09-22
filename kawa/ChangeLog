@@ -1,3 +1,8 @@
+2016-09-21  Per Bothner  <per@bothner.com>
+
+	* repl.java (checkDomTerm): Also setDomTerm on system error.
+	* DomTermBackend.java: Likewise.
+
 2016-09-09  Per Bothner  <per@bothner.com>
 
 	* ReplPaneOutPort.java: Fix handling of Pictures etc to

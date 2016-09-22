@@ -1,3 +1,10 @@
+2016-09-21  Per Bothner  <per@bothner.com>
+
+	* PrettyWriter.java: If DomTerm, don't do line-breaking.
+	Instead send DomTerm-speific escape sequences, so DomTerm
+	can do the line-breaking dynamically.
+	* OutPort.java (setDomTerm): Also setDomTerm on PrettyWriter bout.
+
 2016-09-08  Per Bothner  <per@bothner.com>
 
 	* JLineInPort.java (parse): Check if Language.parse returned null.

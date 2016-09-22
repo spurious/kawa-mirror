@@ -420,6 +420,7 @@ public class OutPort extends PrintConsumer implements Printable
     public void setDomTerm(boolean v) {
         if (v) flags |= IS_DOMTERM;
         else flags &= ~IS_DOMTERM;
+        bout.isDomTerm = v;
     }
 
     /** Return an OutPort equivalent to the argumement for text output.

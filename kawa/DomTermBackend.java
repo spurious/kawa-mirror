@@ -47,7 +47,6 @@ public class DomTermBackend extends Backend implements Runnable {
         Writer errWriter = new DomTermErrorWriter(termWriter);
         OutPort outp = new OutPort(termWriter, true, true,
                                    Path.valueOf("/dev/stdout"));
-        outp.setDomTerm(true);
         Path inPath = Path.valueOf("/dev/stdin");
         int useJLine = CheckConsole.useJLine();
         instance.set(this);
@@ -90,8 +89,11 @@ public class DomTermBackend extends Backend implements Runnable {
         in_p.setInDomTerm(true);
         InPort.setInDefault(in_p);
         OutPort.setOutDefault(outp);
-        OutPort.setErrDefault(new OutPort(errWriter, true, true,
-                                          Path.valueOf("/dev/stderr")));
+        OutPort errp = new OutPort(errWriter, true, true,
+                                   Path.valueOf("/dev/stderr"));
+        outp.setDomTerm(true);
+        errp.setDomTerm(true);
+        OutPort.setErrDefault(errp);
         Environment env = Environment.getCurrent();
         /*
         if (shared)

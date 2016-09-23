@@ -1,3 +1,7 @@
+2016-09-23  Per Bothner  <per@bothner.com>
+
+	* PictureVisitor.java (PictureVisitor): Fix logic errors.
+
 2016-09-09  Per Bothner  <per@bothner.com>
 
 	* DrawImage.java (toPictureOrNull): New utility method.

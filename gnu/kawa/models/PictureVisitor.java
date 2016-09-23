@@ -43,7 +43,7 @@ public class PictureVisitor {
             AffineTransform savedTransform = transform;
             try {
                 transform = pic.transform;
-                if (transform != null) {
+                if (savedTransform != null) {
                     transform = new AffineTransform(transform);
                     transform.preConcatenate(savedTransform);
                 }
@@ -59,7 +59,7 @@ public class PictureVisitor {
             Stroke savedStroke = this.stroke;
             int savedPropertiesSet = this.strokePropertiesSet;
             try {
-                if (paint != null)
+                if (pic.paint != null)
                     this.paint = pic.paint;
                 Stroke nstroke = pic.stroke;
                 if (nstroke != null) {
@@ -73,7 +73,7 @@ public class PictureVisitor {
                 }
                 super.visitWithPaint(pic);
             } finally {
-                if (paint != null)
+                if (pic.paint != null)
                     this.paint = savedPaint;
                 if (stroke != null)
                     this.stroke = savedStroke;

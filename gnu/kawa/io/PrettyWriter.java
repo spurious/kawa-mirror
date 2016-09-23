@@ -1,4 +1,4 @@
-// Copyright (c) 2001, 2004, 2006  Per M.A. Bothner.
+// Copyright (c) 2001, 2004, 2006, 2016  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.kawa.io;
@@ -1440,9 +1440,12 @@ public class PrettyWriter extends PrintConsumer
                 Strings.printJson(prefix, sbuf);
             sbuf.append("\007");
             writeToBase(sbuf.toString());
+            pushLogicalBlock(posnColumn(queueInts[next + QITEM_POSN]),
+                             0, 0, 0, 0);
             break;
 	  case QITEM_BLOCK_END_TYPE:
               writeToBase("\033]111\007");
+              blockDepth -= LOGICAL_BLOCK_LENGTH;  // Pop
               break;
 	  case QITEM_TAB_TYPE:
             // if (isDomTerm()) ??? FIXME
@@ -1670,6 +1673,11 @@ public class PrettyWriter extends PrintConsumer
         case NEWLINE_MISER:
             cmd = "\033]117\007"; break;
         case NEWLINE_LITERAL:
+            if (blockDepth == LOGICAL_BLOCK_LENGTH) {
+                cmd = "\n";
+                break;
+            }
+            // else fall through
         default:
             cmd = "\033]118\007"; break;
         }

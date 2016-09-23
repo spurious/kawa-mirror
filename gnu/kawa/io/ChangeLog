@@ -1,3 +1,8 @@
+2016-09-23  Per Bothner  <per@bothner.com>
+
+	* PrettyWriter.java (maybeOutput): Emit plain newline rather than
+	a "required" newline, when not inside a block.
+
 2016-09-21  Per Bothner  <per@bothner.com>
 
 	* PrettyWriter.java: If DomTerm, don't do line-breaking.

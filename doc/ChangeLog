@@ -1,3 +1,8 @@
+2016-09-23  Per Bothner  <per@bothner.com>
+
+	* style/kawa.xsl (html.script, body.attributes): Move to ...
+	* style/kawa-epub.xsl: .. as they are only used with the epub manual.
+
 2016-09-09  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (REPL Console): New section.

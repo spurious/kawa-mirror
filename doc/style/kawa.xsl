@@ -8,7 +8,6 @@
 <!-- Dummy - not actually used, except needs to be non-empty,
      so output.html.stylesheets gets called. -->
 <xsl:param name="html.stylesheet">style/kawa-l.css</xsl:param>
-<xsl:param name="html.script">style/utils.js</xsl:param>
 
 <xsl:template name="output.html.stylesheets">
   <xsl:variable name="href">
@@ -23,16 +22,6 @@
   href="{$href}style/kawa-r.css" media="screen, print, projection, tv"/>
 <link rel="alternate stylesheet" title="Single column, top navigation" href="{$href}style/kawa-1col.css" type="text/css"  media="handheld, screen, print, projection, tv"/>
 </xsl:template>
-
-<xsl:template name="body.attributes">
-  <xsl:attribute name="bgcolor">white</xsl:attribute>
-  <xsl:attribute name="text">black</xsl:attribute>
-  <xsl:attribute name="link">#0000FF</xsl:attribute>
-  <xsl:attribute name="vlink">#840084</xsl:attribute>
-  <xsl:attribute name="alink">#0000FF</xsl:attribute>
-  <xsl:attribute name="onload">javascript:onLoadHandler();</xsl:attribute>
-  <xsl:attribute name="onunload">javascript:onUnloadHandler();</xsl:attribute>
-  </xsl:template>
 
 <!-- Change metatitle (window titlebar) to "Kawa: PAGE-TITLE" -->
 <xsl:template match="*" mode="object.title.markup.textonly">

@@ -16,7 +16,7 @@ if test -n "$JAVA_HOME"; then
 else
     JAVA=${JAVA-java}
 fi
-exec ${JAVA-"java"} -jar ${KAWA_HOME}/lib/kawa-@VERSION@.jar $thisfile
+exec ${JAVA-"java"} -jar ${KAWA_HOME}/lib/kawa.jar $thisfile
 |#
 
 (require 'javafx-defs)

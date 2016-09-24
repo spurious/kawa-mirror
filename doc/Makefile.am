@@ -1,4 +1,6 @@
 SUFFIXES = .pdf
+# We cannot build kawa.dvi because of the png-only images
+DVIS =
 
 kawa.txt:  $(srcdir)/kawa.texi version.texi
 	$(MAKEINFO) -I$(srcdir) \
@@ -36,11 +38,14 @@ qexo.1: $(srcdir)/qexo.man
 clean-local:
 	-rm -rf $(KAWA_HTMLDIR) tpm-qexo1 tpm-qexo1 kawa.1 qexo.1 kawa-manual.epub web ebook
 
+DOC_IMAGES = \
+  images/logo-image-1.png
+
 EXTRA_DIST = scm2java.html kawa.man qexo.man mdate-sh +default+ README-epub \
   style/docbook-to-html.xsl style/kawa-epub.xsl style/kawa.xsl \
   style/kawa-1col.css style/kawa-ebook.css style/kawa-l.css \
   style/kawa-r.css style/kawa.css style/top-navbar.css \
-  style/kawa-logo.png
+  style/kawa-logo.png $(DOC_IMAGES)
 info_TEXINFOS = kawa.texi
 kawa_TEXINFOS = news.texi
 MOSTLYCLEANFILES = kawa.xml
@@ -111,6 +116,8 @@ $(HTML_TARGET_DIRECTORY)/index.html: kawa.xml Makefile
 	mkdir -p $(HTML_TARGET_DIRECTORY)/style
 	cp $(srcdir)/style/kawa-logo.png $(srcdir)/style/*.css \
 	  $(HTML_TARGET_DIRECTORY)/style
+	mkdir -p $(HTML_TARGET_DIRECTORY)/images
+	cp $(DOC_IMAGES) $(HTML_TARGET_DIRECTORY)/images/
 
 # There is some weuid bug causing "tutorial/XXX.xhtml" to be
 # treated as "XXX.xhtml", so use "tutorial-XXX.xhtml" instead.
@@ -142,4 +149,8 @@ kawa-manual.epub: kawa.xml Makefile
 	cp style/kawa-ebook.css ebook/OEBPS/kawa.css
 	cp style/kawa-ebook.js ebook/OEBPS/kawa-ebook.js
 	cp with-frames.html ebook/OEBPS/with-frames.html
+	mkdir -p ebook/OEBPS/images
+	cp $(DOC_IMAGES) ebook/OEBPS/images/
 	cd ebook && zip -r -X ../kawa-manual.epub mimetype META-INF OEBPS
+
+check: kawa.pdf

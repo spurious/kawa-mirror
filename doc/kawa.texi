@@ -998,6 +998,7 @@ For an IDE it is desirable to have both start and end position of an element,
 for example so it can put a squiggly line under an erroneous form.
 
 @subsection Output formatting and pretty printing
+@emph{This part done.}
 It would be nice to integrate the pretty-printer with the REPL,
 so that window re-sizing re-breaks the output lines.
 It would be nice to enhance the pretty-printer to handle
@@ -1013,30 +1014,6 @@ more efficient, and more customizable are also desirable.
 for integrating server-side and client-side programming using
 a Scheme dialect.  These ideas seem like they would port
 quite well to Kawa.
-
-@subsection Functional Pictures
-
-@i{(GSoC)}
-
-Kawa has functional picture library, using the @code{Paintable}
-and @code{Viewable} interfaces in the @code{gnu.kawa.models} Java package.
-There are bindings to Swing (in @code{gnu.kawa/swindviews}),
-SVG (using JFreeSVG), and SWT (unmaintained).  However,
-it's a very minimal proof-of-concept.
-
-The Racket language has a @uref{https://docs.racket-lang.org/pict/,Pict}
-library, with a lot more functionality;
-it is used by the @uref{https://docs.racket-lang.org/quick/,Racket tutorial}.
-Racket also has a @uref{https://docs.racket-lang.org/teachpack/2htdpimage-guide.html,@code{2htdp/image} library} which should also be studied.
-
-Porting Racket's Pict library directly may not be practical,
-but it should be a good source of design and implementation ideas,
-as well as algorithms.
-
-If you ``print'' a picture in a REPL
-under @uref{http://domterm.org,DomTerm},
-the picture should be converted to HTML, SVG, or PNG
-and inserted in the DomTerm display.
 
 @subsection String localization
 
@@ -2767,15 +2744,28 @@ Sets the JVM property @var{variable-name} to @var{variable-value},
 using the @code{setProperty} method of @code{java.lang.System}.
 @end table
 
-@table @code
+@subsection Options for the REPL console
+
+@table @asis
+@item @code{--console}
+@itemx @code{--no-console}
+Usually Kawa can detect when the standard input port is a ``console''
+or ``terminal'', but these are useful for overriding that detection.
+The @code{--console} flag is useful when the standard input is a pipe,
+but you want to direct Kawa to treat it as an interactive terminal.
+The @code{--no-console} flag was useful for older pre-Java-6
+implementations that did not have teh @code{java.lang.Console} class.
+@item @code{console:use-domterm=}[@code{yes}|@code{no}]
+@item @code{console:use-jline=}[@code{yes}|@code{no}]
 @item @code{console:prompt1=@var{prompt1}}
 @itemx @code{console:prompt2=@var{prompt2}}
 Initialize @ref{input-prompt1,@code{input-promp1} and @code{input-prompt2}}, respectively.
 @end table
+See also the @code{--output-format} flag.
 
 @subsection Options for controlling output formatting
 
-@cindex @sortas{output-format} @code{--output-format}
+@cindex @code{--output-format}
 @table @code
 @item --output-format @var{format}
 @itemx --format @var{format}
@@ -3176,19 +3166,94 @@ $ @kbd{java kawa-@value{VERSION}.jar}
 
 On rare occason you may need to specify the @code{--console} flag.
 
+@subsection Input line editing and history
+
+When typing a command in a console it is helpful to go back
+and correct mistakes, repeat and edit previous commands, and so on.
+How well you can do this varies at lot depending on which tools you use.
+Kawa delegates input editing to an external tool.
+The recommended and default input-editing tool
+the the @uref{https://github.com/jline/jline3,JLine3 library},
+which is bundled with Kawa binary distribution.
+
+JLine3 handles the normal editing comands, including arrow keys
+for moving around in the input, and deleting with backspace or delete.
+In general, JLine3 uses te same keybindings as GNU readline,
+which are based on etc Emacs key-bindings.
+
+You can use the up-arrow to move to previous commands in the
+input history and down-arrow to go forwards.
+Control-R (``reverse search'' searches backwards in the history
+for a previous comands that contains the search string.
+
+Multi-line commands are treated as unit by JLine3:
+If Kawa determines that input is ``incomplete'' it will
+ask for continuation lines - and you can go back and edit previous
+lines in the same command.
+An entry in the command history may b multiple lines.
+
+Tab-completion works for Kawa-Scheme identiers: If you type TAB
+after an identifier, Kawa will present a possible of valid completions.
+
+There are multiple alternatives to using JLine3.
+You can use GNU readline (if you configued with @code{--enable-kawa-frontend}).
+You can use a front-end program like @code{rlfe} or @code{fep}.
+You can use Emacs shell or scheme mode.
+You can also use DomTerm in line-edit mode, where the browser handles
+the editing.
+
 @anchor{New-Window}
 @subsection Running a Command Interpreter in a new Window
 
-An alternative interface runs the Java read-eval-print-loop
-inside a new window. This is in some ways nicer.  One reason
-is that it provides better editing.
-(Mouse selection, arrow keys, and ``standard'' control keys should all work.)
+Instead of using an existing terminal window for Kawa's REPL console,
+you can request a new window.
+The command-line options @code{-w} creates a new window.
+Kawa also creates a new window when it needs to create a REPL
+(for example if invoked with no options) and it is not running
+in a console.
 
-You can also create new windows.  They can either have different top-level
-environments or they can share environments.  To try it, do:
+By default the new REPL window uses the DomTerm JavaScript
+toolkit running in a JavaFX WebView window.
+
+If JavaFX/WebView is not available, or if you specify
+
+@anchor{Using DomTerm}
+@subsection Using DomTerm
+
+DomTerm is a family of terminal emulators that use
+the DomTerm JavaScript library.
+
+You can either have Kawa start DomTerm:
 @example
-java kawa.repl -w
+$ kawa @var{options} -w
 @end example
+or start a DomTerm terminal emulator and have it start Kawa:
+@example
+$ domterm kawa @var{options} --
+@end example
+(You can also start a shell in a @code{domterm} window, and then start @code{kawa}.)
+
+Either approach works and both give you the benefits of DomTerm:
+@itemize
+@item
+A xterm/ansi-compatible terminal emulator,
+which mans you can you (for exaple) JLine3 for input editing.
+@item
+You can ``print'' images, @ref{Composable pictures,pictures}, or HTML elements.
+@item
+Pretty-printing is handled by the terminal,
+which means line-breaking is re-computed when window width changes.
+@item
+You can save a session as an HTML file,
+which can be viewed later.
+(Still with dynamic line-breaking and pretty-printing!)
+The file is actually XHTML, so it can be processed with XML-reading tools.
+@item
+Distinct styles for prompts, input, error output and regular output,
+which can be customized with CSS.
+@end itemize
+
+For now it is recommended to use both DomTerm and JLine3.
 
 @node Exiting
 @section Exiting Kawa
@@ -6705,7 +6770,7 @@ If the key is @code{#t}, then a throw to @emph{any} symbol will match
 this call to @code{catch}.
 @end deffn
 
-@deffn procedure throw key arg ...
+@deffn Procedure throw key arg ...
 Invoke the catch form matching @var{key}, passing the @var{arg}s to the
 current @var{handler}.  
 
@@ -14549,7 +14614,7 @@ return character, or a sequence of a carriage return character
 followed by a linefeed character.
 @end deffn
 
-@deffn Pocedure eof-object? obj
+@deffn Procedure eof-object? obj
 Returns @code{#t} if @var{obj} is an end-of-file object,
 otherwise returns @code{#f}.
 
@@ -19720,11 +19785,13 @@ They run in separate threads.
 @node Composable pictures
 @section Composable pictures
 
-Kawa's @code{pictures} library lets you create geometric shapes
+The @code{(kawa pictures)} library lets you create geometric shapes
 and images, and combine them in interesting ways.
 The @ref{Tutorial - Pictures,tutorial} gives an introduction.
+
 The easiest way to use and learn the @code{pictures} library
-is with a suitable REPL.  @i{(To be described.)}
+is with a suitable REPL.  You can use the old Swing-based console
+or any @ref{Using DomTerm,DomTerm}-based terminal emulator.
 
 A @dfn{picture} is an object that can be displayed on a screen,
 web-page, or printed page, and combined with other pictures.
@@ -19732,6 +19799,11 @@ web-page, or printed page, and combined with other pictures.
 A picture has a method printing itself in a graphical context.
 It also has various properties, including a rectangular bounding box,
 which is relative to an origin point.
+
+@c The Racket language has a @uref{https://docs.racket-lang.org/pict/,Pict}
+@c library, with a lot more functionality;
+@c it is used by the @uref{https://docs.racket-lang.org/quick/,Racket tutorial}.
+@c Racket also has a @uref{https://docs.racket-lang.org/teachpack/2htdpimage-guide.html,@code{2htdp/image} library} which should also be studied.
 
 @subsection Coordinates - points and dimensions
 
@@ -19750,7 +19822,10 @@ it is the @code{px} unit is the CSS specification.)
 A point is a pair consisting of an x and a y coordinate.
 @end deffn
 
-@code{&P[@var{x} @var{y}]}
+@deftypefn Literal {} &P@stxlit{[} @var{x} @var{y} @stxlit{]}
+Construct a point value with the specified @var{x} and @var{y} values.
+Both @var{x} and @var{y} are expression that evaluate to real numbers.
+@end deftypefn
 
 @deffn Type Dimension
 A dimension value is a pair of a width and a height.
@@ -19760,7 +19835,11 @@ In a context that expects a point, a dimension is treated
 as an offset relative to some other point.
 @end deffn
 
-@code{&D[@var{width} @var{height}]}
+@deftypefn Literal {} &D@stxlit{[} @var{width} @var{height} @stxlit{]}
+Construct a dmimension value with the specified @var{width}
+and @var{height} values, which are both expression that
+evaluate to real numbers.
+@end deftypefn
 
 @subsection Shapes
 
@@ -19824,16 +19903,39 @@ just like for @code{polygon}.
 @subsection Colors and paints
 
 A @dfn{paint} is a color pattern used to fill part of the canvas.
-A paint can be a color, a texture (a repliacted pattern), or a gradiant
+A paint can be a color, a texture (a replicated pattern), or a gradiant
 (a color that gradually fades to some other color).
 
 A @dfn{color} is defined by red, green, and blue values.
 It may also have an alpha component, which specifies transparency.
 
+@deffn Procedure ->paint value
+Converts @var{value} to a color - or more general a paint.
+Specificlly, the return type @code{java.awt.Paint}.
+The @var{value} can be any one of:
+@itemize
+@item
+A @code{java.awt.Paint}, commonly a @code{java.awt.Color}.
+@item
+A 24-bit integer value is converted to a color.
+Assume the integer is equal
+to a hexadecimal literal of the form @code{#xRRGGBB}.
+Then @code{RR} (bits 16-23) is the intensity of the red component;
+@code{GG} (bits 8-15) is the intensity of the green component; and
+@code{RR} (bits 0-7) is the intensity of the red component.
+@item
+One of the standard HTML/CSS/SVG color names, as a string or symbol.
+See the table in @code{gnu/kawa/models/StandardColor.java} source file.
+@end itemize
+@end deffn
+
+@deffn Procedure with-paint paint picture
+@end deffn
+
 @subsection Filling a shape with a color
 
 @deffn Procedure fill shape
-@deffnx Procedure fill color shape
+@deffnx Procedure fill paint shape
 @end deffn
 
 @subsection Stroking (outlining) a shape
@@ -19902,6 +20004,45 @@ the specified picture.  It is equivalent to:
 @end deffn
 
 @subsection Images
+
+An image is a pictures represented as a rectangular grid of color values.
+An image file is some encoding (usually compressed) of an image,
+and mostly commonly has the extensions @code{png}, @code{gif},
+or @code{jpg}/@code{jpeg}.
+
+A ``native image'' is an instance of @code{java.awt.image.BufferedImage},
+while a ``picture image'' is an instance of @code{gnu.kawa.models.DrawImage}.
+(Both classes implement the @code{java.awt.image.RenderedImage} interface.)
+A @code{BufferedImage} is automatically converted to a @code{DrawImage}
+when needed.
+
+@deffn Procedure image bimage
+@deffnx Procedure image src: path
+
+Creates a picture image, using either an existing native image @var{bimage},
+or an image file specified by @var{path}.
+
+Writing @code{(image src: @var{path})} is roughly the same
+as @code{(image (read-image @var{path}))} except that the former
+has the @var{path} associated with the resulting picture image.
+This can make a difference when the image is used or displayed.
+@end deffn
+
+@deffn Procedure read-path path
+Read an image file from the specified @var{path},
+and returns a native image object (a @code{BufferedImage}).
+@end deffn
+
+@image{images/logo-image-1}
+
+Note that while @code{img1} above is a (native) image,
+the scaled rotated image is not an image object.
+It is a picture - a more complex value that @emph{contains} an image.
+
+@deffn Procedure image-width image
+@deffnx Procedure image-height image
+Return the width or height of the given @var{image}, in pixels.
+@end deffn
 
 @subsection Compositing - Controlling how pictures are combined
 

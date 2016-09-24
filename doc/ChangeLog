@@ -1,5 +1,9 @@
 2016-09-23  Per Bothner  <per@bothner.com>
 
+	* Makefile.am: Changes to support images in manual.
+	* doc/images/logo-image-1.png: new screetshot.
+	* kawa.texi: Improved documentation for pictures and for REPL.
+
 	* style/kawa.xsl (html.script, body.attributes): Move to ...
 	* style/kawa-epub.xsl: .. as they are only used with the epub manual.
 

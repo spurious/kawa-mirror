@@ -219,6 +219,8 @@ div.logo img { border: none; padding: 10px }
 
 code[class="literal"] strong { color: purple }
 p[class="synopsis"] code strong { color: purple }
+/* Kludge to work around weird texinfo formatting for e.g. &P[x y] */
+p.synopsis span.type span.bold strong { color: purple; font-family: monospace }
 p[class="synopsis"] code[class="function"] { color: purple }
 p[class="synopsis"] code[class="varname"] { color: purple }
 

@@ -1,3 +1,7 @@
+2016-09-26  Per Bothner  <per@bothner.com>
+
+	* PictureToSvg.java (writePaint): Remove '-' from StandardColor name.
+
 2016-09-23  Per Bothner  <per@bothner.com>
 
 	* PictureVisitor.java (PictureVisitor): Fix logic errors.

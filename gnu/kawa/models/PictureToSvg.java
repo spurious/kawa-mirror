@@ -154,7 +154,7 @@ public class PictureToSvg extends PictureVisitor {
         if (p instanceof Color) {
             String cname;
             if (p instanceof StandardColor)
-                cname = ((StandardColor) p).getName();
+                cname = ((StandardColor) p).getName().replace("-", "");
             else {
                 Color color = (Color) p;
                 int r = color.getRed();

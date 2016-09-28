@@ -16,7 +16,7 @@
 (define-simple-constructor D make-Dimension)
 
 (define (picture-bounds picture)
-  ((gnu.kawa.models.PBox:asPicture picture):getBounds2D))
+  ((gnu.kawa.models.Pictures:asPicture picture):getBounds2D))
 
 (define (hbox #!rest args  :: <object[]>)
   (gnu.kawa.models.PBox:makeHBox @args))
@@ -87,6 +87,39 @@
 (define (draw #!rest args) ::gnu.kawa.models.Picture
   (gnu.kawa.models.DrawShape:makeDraw args))
 
+(define (border-shape widths picture::gnu.kawa.models.Picture)
+  (let ((bounds (picture:getBounds2D)))
+    (cond ((java.awt.geom.Dimension2D? widths)
+           (let ((d ::java.awt.geom.Dimension2D widths))
+             (gnu.kawa.models.Pictures:borderShape bounds d:height d:width
+                                                   d:height d:width)))
+          ((java.awt.geom.Rectangle2D? widths)
+           (let ((d ::java.awt.geom.Rectangle2D widths))
+             (gnu.kawa.models.Pictures:borderShape bounds
+                                                   (- bounds:y d:y) ; top
+                                                   (- (+ d:x d:width) ; right
+                                                      (+ bounds:x bounds:width))
+                                                   (- bounds:x d:x) ; left
+                                                   (- (+ d:y d:height) ; bottom
+                                                      (+ bounds:y bounds:height)))))                                                  
+          (else
+           (let ((d ::double widths))
+             (gnu.kawa.models.Pictures:borderShape bounds d d d d))))))
+
+(define-procedure border
+  (lambda (widths paint picture)
+    (let ((pic (->picture picture)))
+      (gnu.kawa.models.PBox:makeZBox 
+       (fill paint (border-shape widths pic))
+       pic)))
+  (lambda (widths picture)
+    (let ((pic (->picture picture)))
+      (gnu.kawa.models.PBox:makeZBox 
+       (fill (border-shape widths pic))
+       pic)))
+  (lambda (picture)
+    (border 1.0 picture)))
+
 (define-procedure image
   (lambda (#!key src)
     (gnu.kawa.models.DrawImage src: src))
@@ -116,7 +149,7 @@
            c))))
 
 (define (->picture value)
-  (gnu.kawa.models.PBox:asPicture value))
+  (gnu.kawa.models.Pictures:asPicture value))
 
 (define (->transform tr)
   (->java.awt.geom.AffineTransform tr))
@@ -179,7 +212,42 @@
   (lambda (delta::java.awt.geom.Point2D)
     (java.awt.geom.AffineTransform:getTranslateInstance delta:x delta:y))
   (lambda (delta::java.awt.geom.Point2D picture)
-     (with-transform (translate delta) picture)))
+    (with-transform (translate delta) picture)))
+
+(define-procedure re-center
+  (lambda (xposition yposition picture)
+    (let* ((pic (->picture picture))
+           (bounds (pic:getBounds2D))
+           (xgoal
+            (cond ((eq? xposition 'left)
+                   (bounds:getX))
+                  ((eq? xposition 'right)
+                   (+ (bounds:getX) (bounds:getWidth)))
+                  ((or (eq? xposition 'center) (eq? xposition 'centre))
+                   (+ (bounds:getX) (* 0.5 (bounds:getWidth))))
+                  ((eq? xposition 'origin)
+                   0)
+                  (else (error "invalid x-position specifier" xposition))))
+           (ygoal
+            (cond ((eq? yposition 'top)
+                   (bounds:getY))
+                  ((eq? yposition 'bottom)
+                   (+ (bounds:getY) (bounds:getHeight)))
+                  ((or (eq? yposition 'center) (eq? yposition 'centre))
+                   (+ (bounds:getX) (* 0.5 (bounds:getHeight))))
+                  ((eq? yposition 'origin)
+                   0)
+                  (else (error "invalid y-position specifier" yposition)))))
+      (with-transform (translate &P[(- xgoal) (- ygoal)]) pic)))
+  (lambda (position picture)
+    (cond ((or (eq? position 'left) (eq? position 'right))
+           (re-center position 'center picture))
+          ((or (eq? position 'top) (eq? position 'bottom))
+           (re-center 'center position picture))
+          (else
+           (re-center position position picture))))
+  (lambda (picture)
+    (re-center 'center 'center picture)))
   
 (define-procedure affine-transform
   (lambda (m00::double m10::double

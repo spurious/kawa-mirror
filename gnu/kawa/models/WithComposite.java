@@ -48,7 +48,7 @@ public class WithComposite implements Picture
 	if (arg instanceof Picture || arg instanceof Shape
             || arg instanceof BufferedImage)
 	  {
-            children[j] = PBox.asPicture(arg);
+            children[j] = Pictures.asPicture(arg);
 	    composite[j] = comp;
 	    j++;
 	  }

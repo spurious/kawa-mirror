@@ -510,6 +510,7 @@ GNU_KAWA_MODELS_JSOURCES = \
   gnu/kawa/models/ModelListener.java \
   gnu/kawa/models/MenuItem.java \
   gnu/kawa/models/Picture.java \
+  gnu/kawa/models/Pictures.java \
   gnu/kawa/models/PictureToSvg.java \
   gnu/kawa/models/PictureVisitor.java \
   gnu/kawa/models/PBox.java \

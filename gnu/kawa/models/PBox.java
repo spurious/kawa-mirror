@@ -3,7 +3,6 @@ package gnu.kawa.models;
 import java.awt.Graphics2D;
 import java.awt.Shape;
 import java.awt.geom.*;
-import java.awt.image.BufferedImage;
 import java.util.List;
 
 /** Used to compose Pictures "next to" each other.
@@ -93,13 +92,13 @@ public class PBox implements Picture {
         return new WithTransform(this, tr);
     }
     public static PBox makeHBox(Object... args) {
-        return new PBox('X', asPictureAll(args));
+        return new PBox('X', Pictures.asPictureAll(args));
     }
     public static PBox makeVBox(Object... args) {
-        return new PBox('Y', asPictureAll(args));
+        return new PBox('Y', Pictures.asPictureAll(args));
     }
     public static PBox makeZBox(Object... args) {
-        return new PBox('Z', asPictureAll(args));
+        return new PBox('Z', Pictures.asPictureAll(args));
     }
     public static Picture combine(List parts) {
         int nparts = parts.size();
@@ -108,20 +107,6 @@ public class PBox implements Picture {
         return nparts == 1 ? pics[0] : new PBox('Z', pics);
     }
 
-    public static Picture asPicture(Object arg) {
-        if (arg instanceof BufferedImage)
-            return new DrawImage((BufferedImage) arg);
-        if (arg instanceof Shape)
-            return new DrawShape((Shape) arg);
-        return (Picture) arg;
-    }
-    public static Picture[] asPictureAll(Object[] args) {
-        int np = args.length;
-        Picture[] p = new Picture[np];
-        for (int i = 0; i < np; i++)
-            p[i] = asPicture(args[i]);
-        return p;
-    }
     public void visit(PictureVisitor visitor) {
         visitor.visitPBox(this);
     }

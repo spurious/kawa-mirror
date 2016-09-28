@@ -1,3 +1,8 @@
+2016-09-28  Per Bothner  <per@bothner.com>
+
+	* SwingPicture.java: Add translation to center of JPanel.
+	(setPicture): New method.
+
 2015-07-31  Per Bothner  <per@bothner.com>
 
 	* SwingContent.java: Update for CharBuffer changes.

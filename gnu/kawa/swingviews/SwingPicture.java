@@ -8,27 +8,40 @@ import javax.swing.*;
 
 public class SwingPicture extends JPanel
 {
-  Picture picture;
-  Dimension dim;
+    Picture picture;
+    Dimension dim;
+    Rectangle2D rect;
 
-  public SwingPicture (Picture picture)
-  {
-    this.picture = picture;
+    public SwingPicture(Picture picture) {
+        setPicture(picture);
+    }
 
-    Rectangle2D rect = picture.getBounds2D();
-    int h = (int) Math.ceil(rect.getHeight());
-    int w = (int) Math.ceil(rect.getWidth());
-    dim = new Dimension(w, h);
-  }
+    public Picture getPicture() { return picture; }
+    public void setPicture(Picture picture) {
+        this.picture = picture;
 
-  public void paint(Graphics g)
-  {
-    // FIXME may need to transform position
-    picture.paint((Graphics2D) g);
-  }
+        Rectangle2D rect = picture.getBounds2D();
+        this.rect = rect;
+        int h = (int) Math.ceil(rect.getHeight());
+        int w = (int) Math.ceil(rect.getWidth());
+        dim = new Dimension(w, h);
+        repaint(0, 0, 0, getWidth(), getHeight());
+    }
 
-  public java.awt.Dimension getPreferredSize ()
-  {
-    return dim;
-  }
+    public void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        Graphics2D g2 = (Graphics2D) g;
+        AffineTransform saveTransform = g2.getTransform();
+        try {
+            g2.translate((getWidth() - rect.getWidth()) * 0.5 - rect.getX(),
+                         (getHeight() - rect.getHeight()) * 0.5 - rect.getY());
+            picture.paint(g2);
+        } finally {
+            g2.setTransform(saveTransform);
+        }
+    }
+
+    public java.awt.Dimension getPreferredSize() {
+        return dim;
+    }
 }

@@ -1,3 +1,7 @@
+2016-09-28  Per Bothner  <per@bothner.com>
+
+	* kawa/pictures.scm (rectangle): Fix logic bug.
+
 2016-09-03  Per Bothner  <per@bothner.com>
 
 	* kawa/regex.scm (regex-replace*): Add cast needed on Java 9.

@@ -33,11 +33,12 @@
            (java.awt.geom.Rectangle2D$Double 0 0 x y))
           ((java.awt.geom.Dimension2D? p2)
            (let ((p ::java.awt.geom.Dimension2D p2))
-             (java.awt.geom.Rectangle2D$Double x y
-                                               (+ x p:width) (+ y p:height))))
+             (java.awt.geom.Rectangle2D$Double x y p:width p:height)))
           (else
-           (let ((p ::java.awt.geom.Point2D p2))
-             (java.awt.geom.Rectangle2D$Double x y p:x p:y))))))
+           (let* ((p ::java.awt.geom.Point2D p2)
+                  (w (java.lang.Math:abs (- p:x x)))
+                  (h (java.lang.Math:abs (- p:y y))))
+             (java.awt.geom.Rectangle2D$Double x y w h))))))
 
 (define-private (line-path do-close::boolean (initial ::java.awt.geom.Point2D) #!rest (more-points :: <object[]>))
   (let ((path :: <java.awt.geom.GeneralPath>

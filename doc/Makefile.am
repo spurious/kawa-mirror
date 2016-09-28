@@ -39,7 +39,15 @@ clean-local:
 	-rm -rf $(KAWA_HTMLDIR) tpm-qexo1 tpm-qexo1 kawa.1 qexo.1 kawa-manual.epub web ebook
 
 DOC_IMAGES = \
-  images/logo-image-1.png
+  images/border-1.png \
+  images/logo-image-1.png \
+  images/paint-circ-1.png \
+  images/paint-circ-2.png \
+  images/paint-circ-3.png \
+  images/paint-circ-4.png \
+  images/re-center-1.png \
+  images/re-center-2.png \
+  images/domterm-pictures-1.png
 
 EXTRA_DIST = scm2java.html kawa.man qexo.man mdate-sh +default+ README-epub \
   style/docbook-to-html.xsl style/kawa-epub.xsl style/kawa.xsl \
@@ -95,6 +103,9 @@ HTML_TARGET_DIRECTORY = $(builddir)/web
 DOCBOOK_XSL_DIR = ../../docbook-xsl
 
 $(HTML_TARGET_DIRECTORY)/index.html: kawa.xml Makefile
+	sed \
+	  -e '/<title>Kawa Scheme Tutorial/,/<title>Reference Documentation/s|<imagedata fileref="images/|<imagedata fileref="../images/|' \
+	  < $< | \
 	$(XSLT) --path $(DOCBOOK_XSL_DIR)/html$(pathsep)$(srcdir)/style \
 	  --stringparam base.dir $(HTML_TARGET_DIRECTORY)  \
 	  --stringparam chunker.output.doctype-public "-//W3C//DTD HTML 4.01 Transitional//EN" \
@@ -112,7 +123,7 @@ $(HTML_TARGET_DIRECTORY)/index.html: kawa.xml Makefile
 	  --stringparam toc.section.depth 3 \
 	  --stringparam chunk.separate.lots 1 \
 	  --stringparam chunk.tocs.and.lots 1 \
-	  kawa.xsl kawa.xml
+	  kawa.xsl -
 	mkdir -p $(HTML_TARGET_DIRECTORY)/style
 	cp $(srcdir)/style/kawa-logo.png $(srcdir)/style/*.css \
 	  $(HTML_TARGET_DIRECTORY)/style

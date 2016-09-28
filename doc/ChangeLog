@@ -1,3 +1,8 @@
+2016-09-28  Per Bothner  <per@bothner.com>
+
+	* kawa.texi: More documentation of 'pictures' library.
+	* images/*.png: More screenshots.
+
 2016-09-23  Per Bothner  <per@bothner.com>
 
 	* Makefile.am: Changes to support images in manual.

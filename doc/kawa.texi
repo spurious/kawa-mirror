@@ -1989,7 +1989,29 @@ Alternative forms for defining local variables are
 @node Tutorial - Pictures
 @section Composable pictures
 
-@c https://www.gnu.org/software/kawa/style/kawa-logo.png
+The @code{pictures} library lets you create geometric shapes
+and images, and combine them in interesting ways.
+You first need to import the library:
+@example
+(import (kawa pictures))
+@end example
+The easiest way to use and learn the library
+is with a suitable REPL, where you can type
+expression that evaluate to pictures values,
+and then view the resulting pictures directly on the console.
+The easiest way is to start the @code{kawa} command with the @code{-w}
+flag.  Alternative you can use
+a @ref{Using DomTerm,DomTerm}-based terminal emulator
+such as @code{qtdomterm} (which is shown in the image below),
+and then that the @code{kawa} command.
+
+@image{images/domterm-pictures-1}
+
+The above image shows two simple example: a filled
+circle (radius 30 pixels, color magenta), and a non-filled rotated rectangle
+(color maroonm 3-pixel wide strokes).
+
+See @ref{Composable pictures} for details and more examples.
 
 @node Tutorial - Sequences
 @section Lists and sequences
@@ -19792,13 +19814,34 @@ The @ref{Tutorial - Pictures,tutorial} gives an introduction.
 The easiest way to use and learn the @code{pictures} library
 is with a suitable REPL.  You can use the old Swing-based console
 or any @ref{Using DomTerm,DomTerm}-based terminal emulator.
+You can create a suitable window either by starting @code{kawa}
+with the @code{-w} flag, or by running the @code{kawa} command
+inside an existing DomTerm-based terminal emulator.
+The screenshot below is of the latter,
+using the @code{qtdomterm} terminal emulator.
+@image{images/domterm-pictures-1}
 
 A @dfn{picture} is an object that can be displayed on a screen,
 web-page, or printed page, and combined with other pictures.
 
 A picture has a method printing itself in a graphical context.
-It also has various properties, including a rectangular bounding box,
-which is relative to an origin point.
+It also has various properties.
+
+An important property of a picture is its @dfn{bounding box}.
+This is a rectangle (with edges parallel to the axes) that
+surrounds the contents of the picture.
+Usually the entire visible part of the picture is inside the
+bounding box, but in some cases part of the picture may stick
+outside the bounding box.
+For example when a circle is draw (stroked) with a ``pen'',
+the bounding box is that of the infinitely-thin mathematical circle, so
+``ink'' from the pen that is outside the circle may be outside the bounding box.
+
+A picture has an origin point corresponding to the (0 0) cordinates.
+The origin is commonly by not always inside the bounding box.
+Certain operations (for example @code{hbox}) combine pictures by putting
+them ``next to'' each other, where ``next to'' is defined in
+terms of the bounding box and origin point.
 
 @c The Racket language has a @uref{https://docs.racket-lang.org/pict/,Pict}
 @c library, with a lot more functionality;
@@ -19836,7 +19879,7 @@ as an offset relative to some other point.
 @end deffn
 
 @deftypefn Literal {} &D@stxlit{[} @var{width} @var{height} @stxlit{]}
-Construct a dmimension value with the specified @var{width}
+Construct a dimension value with the specified @var{width}
 and @var{height} values, which are both expression that
 evaluate to real numbers.
 @end deftypefn
@@ -19886,7 +19929,7 @@ back to the first point.
 
 @deffn Procedure rectangle p1 [p2]
 A rectangle is closed polygon of 4 line segments that are
-aternatively parallel to the x-axis and the y-axis.
+alternatively parallel to the x-axis and the y-axis.
 I.e. if you rotate a rectangle it is no longer a rectangle by
 this definition, though of course it still has a rectangular shape.
 If @var{p2} is not specified, constructs a rectangle whose upper-left corner
@@ -19898,6 +19941,8 @@ just like for @code{polygon}.
 @end deffn
 
 @deffn Procedure circle radius [center]
+Creates a circle with the specified @var{radius}.
+If the @var{center} is not specified, it defaults to @code{&P[0 0]}.
 @end deffn
 
 @subsection Colors and paints
@@ -19930,20 +19975,86 @@ See the table in @code{gnu/kawa/models/StandardColor.java} source file.
 @end deffn
 
 @deffn Procedure with-paint paint picture
+Create a new picture that is the ``same'' as @var{picture}
+but use @var{paint} as the default paint.
+For @var{paint} you can use any valid argument to @code{->paint}.
+The default paint (which is the color black if none is specified)
+is used for both @code{fill} (paint interior) and @code{draw} (stroke outline).
+
+@example
+#|kawa:1|# @kbd{(! circ1 (circle 20 &P[20 20]))}
+#|kawa:2|# @kbd{(hbox (fill circ1) (draw circ1))}
+@image{images/paint-circ-1}
+#|kawa:3|# @kbd{(with-paint 'hot-pink (hbox (fill circ1) (draw circ1)))}
+@image{images/paint-circ-2}
+@end example
+Above we use @code{with-paint} to create a cloned picture, which is
+the same as the original @code{hbox}, except for the default paint,
+in this case the color @code{hot-pink}.
+@example
+#|kawa:4|# @kbd{(! circ2 (hbox (fill circ1) (with-paint 'hot-pink (fill circ1))))}
+#|kawa:5|# @kbd{circ2}
+@image{images/paint-circ-3}
+#|kawa:6|# @kbd{(with-paint 'lime-green circ2)}
+@image{images/paint-circ-4}
+@end example
+Here @code{circ2} is an @code{hbox} of two filled circles,
+one that has unspecified paint, and one that is @code{hot-pink}.
+Print @code{circ2} directly uses black for the
+circle with unspecified color,
+but if we wrap @code{circ2} in another @code{with-paint}
+that provides a default that is used for the first circle.
 @end deffn
 
 @subsection Filling a shape with a color
 
 @deffn Procedure fill shape
 @deffnx Procedure fill paint shape
+
+Fill the ``inside'' of @var{shape}.
+If no @var{paint} is specified, uses the current default paint.
+Otherwise, @code{(fill @var{paint} @var{shape})}
+is the same @code{(with-paint @var{paint} (file @var{shape}))}.
 @end deffn
 
 @subsection Stroking (outlining) a shape
 
-@deffn Procedure draw shape
-@end deffn
+@deffn Procedure draw @arbno{option} @atleastone{shape}
 
-@subsection Combining pictures
+Returns a picture that draws the outline of the @var{shape}.
+This is called @dfn{stroking}.
+An @var{option} may be one of:
+@itemize
+@item
+A standard color name, such as @code{'red} or @code{'light-style-blue}.
+This is the color used to draw the shape.
+@item
+A @code{Paint} or @code{Color} object, which is used to draw the shape.
+@item
+A join-specifier, which is a symbol specifying how each curve of the shape is
+connected to the next one.
+The options are @code{'miter-join}, @code{'round-join}, and @code{'bele-join}
+@item
+A end-cap-specifier, which is a symbol specifying how each end of the
+shape is terminated.
+The options are @code{'square-cap}, @code{'round-cap}, or @code{'butt-cap}.
+@item
+A real number specifies the thickness of the stroke.
+@item
+A @code{java.awt.Stroke} object.
+This combines join-specifier, end-cap-specifier, thickness, and more
+in a single object.  The @code{BasicStroke} class can specify dashes,
+though that is not yet supported for SVG output; only AWT or image output.
+@end itemize
+
+@example
+(define lin (line &P[0 0] &P[300 40] &P[200 100] &P[50 70]))
+(define-syntax show-draw
+  (syntax-rules ()
+    ((_ options ... line)
+     (border 12 'bisque (zbox (draw options ... line) line)))))
+@end example
+@end deffn
 
 @subsection Affine transforms
 
@@ -19968,6 +20079,7 @@ Creates a transformed picture.
 @deffnx Procedure rotate angle picture
 The one-argument variant creates a new affine transform that rotates
 a picture about the origin by the specified @var{angle}.
+A positive @var{angle} yields a clockwise rotation.
 The @var{angle} can be either a quantity (with a unit of
 either @code{rad} radians, @code{deg} (degrees), or @code{grad} (gradians)),
 or it can be a unit-less real number (which is treated as degrees).
@@ -20001,6 +20113,66 @@ the specified picture.  It is equivalent to:
 @example
 (with-transform (translate @var{offset}) @var{picture})
 @end example
+@end deffn
+
+@subsection Combining pictures
+
+@deffn Procedure border [size [paint]] picture
+Return a picture that combines @var{picture}
+with a rectangular border (frame) around @var{picture}'s bounding box.
+The @var{size} specifies the thickness of the border:
+it can be real number, in which it is the thickness on all four sides;
+it can be a Dimension, in which case the width is the left and right
+thickness, while the height is the top and bottom thickness;
+or it can be a Rectangle, in which case it is the new bounding box.
+If @var{paint} is specified it is used for the border;
+otherwise the default paint is used.
+The border is painted before (below) the @var{picture} painted.
+The bounding box of the result is that of the border, while
+the origin point is that of the original @var{picture}.
+@example
+#||kawa:2|# @kbd{(border 6 (fill 'pink (circle 30)))}
+@image{images/border-1}
+@end example
+@end deffn
+
+@deffn Procedure re-center [xpos] [ypos] picture
+Translate the @var{picture} is the point specified by @var{xpos}
+and @var{ypos} is the new origin point, adjust the bounding box to match.
+
+The @var{xpos} can have four possible values, all of which are symbols:
+@code{'left} (move the origin to the left edge of the bounding box);
+@code{'right} (move the origin to the left edge of the bounding box);
+@code{'center} (or @code{'centre}) (move the origin to halfway between the left and right edges);
+or @code{'origin} (don't change the location along the x-axis).
+The @var{ypos} can likewise have four possible values:
+@code{'top} (move the origin to the top edge of the bounding box);
+@code{'bottom} (move the origin to the bottom edge of the bounding box);
+@code{'center} (or @code{'centre}) (move the origin to halfway between the
+top and bottom edges);
+or @code{'origin} (don't change the location along the y-axis).
+
+A single @code{'center} argument
+is the same as specifying @code{'center} for both axis; this is the default.
+A single @code{'origin} argument
+is the same as specifying @code{'origin} for both axis;
+this is the same as just @var{picture}.
+@example
+#|kawa:1|# @kbd{(define D (fill 'light-steel-blue (polygon &P[-20 0] &P[0 -20] &P[60 0] &P[0 40])))}
+#|kawa:2|# @kbd{(zbox D (draw 'red (circle 5)))}
+@image{images/re-center-1}
+@end example
+Above we defined @code{D} as a vaguely diamond-shaped quadrilateral.
+A small red circle is added to show the origin point.
+Next we display 5 versions of @code{D} in a line (an @code{hbox}),
+starting with the original @code{D} and 4 calls to @code{re-center}.
+@example
+#|kawa:3|# @kbd{(zbox (hbox D (re-center 'top D) (re-center 'bottom D)}
+#|....:4|# @kbd{              (re-center 'center D) (re-center 'origin D))}
+#|....:5|# @kbd{  (line &P[0 0] &P[300 0]))}
+@image{images/re-center-2}
+@end example
+The line at @var{y=0} shows the effects of @code{re-center}.
 @end deffn
 
 @subsection Images
@@ -20050,6 +20222,13 @@ Return the width or height of the given @var{image}, in pixels.
 @end deffn
 
 @subsection Display and exporting pictures 
+
+Export to SVG file
+
+Display in Swing:
+picture->jpanel
+
+Convert to image (like Racket's 'freeze').
 
 @node Building JavaFX applications
 @section Building JavaFX applications

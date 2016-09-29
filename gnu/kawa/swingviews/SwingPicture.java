@@ -17,6 +17,11 @@ public class SwingPicture extends JPanel
     }
 
     public Picture getPicture() { return picture; }
+
+    public void setPicture(Object picture) {
+        setPicture(Pictures.asPicture(picture));
+    }
+
     public void setPicture(Picture picture) {
         this.picture = picture;
 
@@ -25,6 +30,8 @@ public class SwingPicture extends JPanel
         int h = (int) Math.ceil(rect.getHeight());
         int w = (int) Math.ceil(rect.getWidth());
         dim = new Dimension(w, h);
+        if (! isPreferredSizeSet())
+            setPreferredSize(dim);
         repaint(0, 0, 0, getWidth(), getHeight());
     }
 
@@ -39,9 +46,5 @@ public class SwingPicture extends JPanel
         } finally {
             g2.setTransform(saveTransform);
         }
-    }
-
-    public java.awt.Dimension getPreferredSize() {
-        return dim;
     }
 }

@@ -34,7 +34,7 @@ java_SCM_ALWAYS =\
   system.scm \
   kawa/string-cursors.scm \
   kawa/quaternions.scm kawa/rotations.scm \
-  kawa/pictures.scm \
+  kawa/pictures.scm kawa/process-keywords.scm \
   kawa/hashtable.scm kawa/regex.scm kawa/reflect.scm kawa/base.scm \
   rnrs/hashtables.scm rnrs/lists.scm rnrs/arithmetic/bitwise.scm \
   srfi95.scm rnrs/unicode.scm rnrs/sorting.scm rnrs/programs.scm \
@@ -45,7 +45,7 @@ java_SCM_ALWAYS =\
   scheme/write.scm scheme/r5rs.scm \
   trace.scm
 
-scm_WITH_SWING = windows.scm
+scm_WITH_SWING = windows.scm kawa/swing.scm
 scm_WITH_XQUERY = xquery/Xutils.scm
 EXTRA_DIST = $(java_SCM_ALWAYS) $(scm_WITH_SWING) $(scm_WITH_XQUERY) \
   scheme/base-exports scheme/char-exports scheme/complex-exports \

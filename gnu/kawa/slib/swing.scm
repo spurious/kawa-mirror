@@ -3,12 +3,14 @@
 	       button Button Label Column Row Text Window run-application
 	       Image image-read image-width image-height
 	       rotation with-transform color-red menubar menu menuitem
-	       polygon scroll)
+	       polygon scroll frame picture-jpanel)
 
 (module-compile-options warn-undefined-variable: #t
 			  warn-invoke-unknown-method: #t)
 
 (require 'gui)
+(import (except (kawa pictures) polygon)
+        (kawa swing))
 
 (define (make-action-listener proc)
   :: <java.awt.event.ActionListener>
@@ -16,28 +18,6 @@
 		 'makeActionListener proc))
 
 #|
-(define-private (frame-keyword (frame :: <gnu.kawa.swingviews.SwingFrame>)
-			       (name :: <java.lang.String>)
-			       value)
-  (cond ((eq? name 'title)
-	 (invoke frame 'setTitle value))
-	((eq? name 'menubar)
-	 (invoke frame 'setJMenuBar value))
-	(else (error (format "unknown frame attribute ~s" name)))))
-
-(define-private (frame-non-keyword (frame :: <gnu.kawa.swingviews.SwingFrame>)
-				    arg)
-  :: <void>
-  (invoke frame 'addComponent arg))
-
-(define (frame #!rest args  :: <object[]>)
-  :: <gnu.kawa.swingviews.SwingFrame>
-  (let ((frame (make  <gnu.kawa.swingviews.SwingFrame> #!null #!null #!void)))
-    (process-keywords frame args frame-keyword frame-non-keyword)
-    (invoke frame 'pack)
-    (invoke frame 'setVisible #t)
-    frame))
-
 (define (Window #!rest args  :: <object[]>)
   :: <gnu.kawa.swingviews.SwingFrame>
   (let ((frame (make  <gnu.kawa.swingviews.SwingFrame> #!null #!null #!void)))

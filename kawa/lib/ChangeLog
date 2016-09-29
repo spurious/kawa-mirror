@@ -1,5 +1,12 @@
 2016-09-29  Per Bothner  <per@bothner.com>
 
+	* kawa/swing.scm: New (kawa swing) library.
+	(frame): moved from gnu/kawa/slib/swing.scm.
+	(current-frame: New parameter.
+	(set-frame-size!, show-picture: New procedures.
+	* kawa/process-keywords.scm: New library.
+	* Makefile.am: Update accordingly.
+
 	* kawa/pictures.scm (Dimension): Remove class definition.
 	(make-Dimension): Use new DDimension class instead.
 

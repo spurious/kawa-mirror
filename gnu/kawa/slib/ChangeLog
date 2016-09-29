@@ -1,3 +1,9 @@
+2016-09-29  Per Bothner  <per@bothner.com>
+
+	* gui.scm (process-keywords): Moved to new library file
+	kawa/lib/kawa/process-keywords.scm.
+	* swing.scm (frame): Moved to kawa/lib/kawa/swing.scm.
+
 2016-08-11  Marc Nieper-Wißkirchen <marc@nieper-wisskirchen.de>
 
 	* testing.scm: Fix cond-expand syntax problem.

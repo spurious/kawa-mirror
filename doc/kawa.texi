@@ -19819,7 +19819,11 @@ with the @code{-w} flag, or by running the @code{kawa} command
 inside an existing DomTerm-based terminal emulator.
 The screenshot below is of the latter,
 using the @code{qtdomterm} terminal emulator.
+
 @image{images/domterm-pictures-1}
+
+Another convenient way to view a picture is @code{show-picture},
+which displays the picture in Swing window.
 
 A @dfn{picture} is an object that can be displayed on a screen,
 web-page, or printed page, and combined with other pictures.
@@ -20221,14 +20225,47 @@ Return the width or height of the given @var{image}, in pixels.
 @deffn Procedure with-composite [[compose-op] picture] ...
 @end deffn
 
-@subsection Display and exporting pictures 
+@subsection Displaying and exporting pictures 
 
-Export to SVG file
+@c @subsubsection Export to SVG file
+@c
 
-Display in Swing:
-picture->jpanel
+@subsubsection Display in Swing
 
-Convert to image (like Racket's 'freeze').
+These procedures require @code{(import (kawa swing))} in addtion to
+@code{(import (kawa pictures))}.
+
+The convenience function @code{show-picture} is useful
+for displaying a picture in a new (Swing) window.
+
+@deffn Procedure show-picture picture
+If this is the first call to @code{show-pictures},
+displays @var{picture} in a new top-level window (using the Swing toolkit).
+Sequenent calls to  @code{show-picture} will reuse the window.
+@example
+#|kawa:1|# @kbd{(import (kawa swing) (kawa pictures))}
+#|kawa:2|# @kbd{(show-picture @var{some-picture})}
+#|kawa:3|# @kbd{(set-frame-size! &D[200 200])} ; Adjust window size
+#|kawa:4|# @kbd{(show-picture @var{some-other-picture})}
+@end example
+@end deffn
+
+@deffn Procedure picture->jpanel picture
+Return a @code{JPanel} that displays @var{picture}.
+You can change the displayed picture by:
+@example
+(set! @var{panel}:picture @var{some-other-picture})
+@end example
+@end deffn
+
+@deffn Procedure set-frame-size! size [frame]
+If @var{frame} is specified, set its size.
+Otherwise, remember the size for future @code{show-picture} calls;
+if there is already a @code{show-picture} window, adjust its size.
+@end deffn
+
+@c @subsubsection Convert to image
+@c (like Racket's 'freeze').
 
 @node Building JavaFX applications
 @section Building JavaFX applications

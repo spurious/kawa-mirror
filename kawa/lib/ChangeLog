@@ -1,3 +1,8 @@
+2016-09-29  Per Bothner  <per@bothner.com>
+
+	* kawa/pictures.scm (Dimension): Remove class definition.
+	(make-Dimension): Use new DDimension class instead.
+
 2016-09-28  Per Bothner  <per@bothner.com>
 
 	* kawa/pictures.scm (border, border-shape, re-center): New functions.

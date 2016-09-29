@@ -4,15 +4,7 @@
 
 (define (make-Point x y) (java.awt.geom.Point2D$Double x y))
 (define-simple-constructor P make-Point)
-(define-simple-class Dimension (java.awt.geom.Dimension2D)
-  (w ::double access: 'private)
-  (h ::double access: 'private)
-  ((getWidth) w)
-  ((getHeight) h)
-  ((setWidth wd::double)::void (set! w wd))
-  ((setHeight ht::double)::void (set! h ht))
-  ((setSize wd ht) (set! w wd) (set! h ht)))
-(define (make-Dimension w::double h::double) (Dimension width: w height: h))
+(define (make-Dimension w::double h::double) (gnu.kawa.models.DDimension w h))
 (define-simple-constructor D make-Dimension)
 
 (define (picture-bounds picture)

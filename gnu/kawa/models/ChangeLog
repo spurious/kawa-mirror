@@ -1,3 +1,7 @@
+2016-09-29  Per Bothner  <per@bothner.com>
+
+	* DDimension.java: New class, extends Dimension.
+
 2016-09-28  Per Bothner  <per@bothner.com>
 
 	* PBox.java (sPicture, asPictureAll): Move to ..

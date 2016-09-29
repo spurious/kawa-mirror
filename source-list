@@ -501,6 +501,7 @@ GNU_KAWA_MODELS_JSOURCES = \
   gnu/kawa/models/Box.java \
   gnu/kawa/models/Button.java \
   gnu/kawa/models/Column.java \
+  gnu/kawa/models/DDimension.java \
   gnu/kawa/models/Display.java \
   gnu/kawa/models/DrawImage.java \
   gnu/kawa/models/DrawShape.java \

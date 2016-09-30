@@ -40,7 +40,9 @@ clean-local:
 
 DOC_IMAGES = \
   images/border-1.png \
+  images/image-scaled-1.png \
   images/logo-image-1.png \
+  images/padding-1.png \
   images/paint-circ-1.png \
   images/paint-circ-2.png \
   images/paint-circ-3.png \

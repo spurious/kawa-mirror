@@ -1,10 +1,13 @@
 (module-name (kawa pictures))
 (require <kawa.lib.prim_syntax>)
 (define-private-alias WithPaint gnu.kawa.models.WithPaint)
+(import (class gnu.kawa.models DDimension Picture Pictures StandardColor)
+        (class java.awt.geom AffineTransform)
+        (class java.awt.image BufferedImage RenderedImage))
 
 (define (make-Point x y) (java.awt.geom.Point2D$Double x y))
 (define-simple-constructor P make-Point)
-(define (make-Dimension w::double h::double) (gnu.kawa.models.DDimension w h))
+(define (make-Dimension w::double h::double) (DDimension w h))
 (define-simple-constructor D make-Dimension)
 
 (define (picture-bounds picture)
@@ -79,15 +82,16 @@
 (define (draw #!rest args) ::gnu.kawa.models.Picture
   (gnu.kawa.models.DrawShape:makeDraw args))
 
-(define (border-shape widths picture::gnu.kawa.models.Picture)
+(define (border-shape widths border::boolean picture::gnu.kawa.models.Picture)
   (let ((bounds (picture:getBounds2D)))
     (cond ((java.awt.geom.Dimension2D? widths)
            (let ((d ::java.awt.geom.Dimension2D widths))
-             (gnu.kawa.models.Pictures:borderShape bounds d:height d:width
+             (gnu.kawa.models.Pictures:borderShape bounds border
+                                                   d:height d:width
                                                    d:height d:width)))
           ((java.awt.geom.Rectangle2D? widths)
            (let ((d ::java.awt.geom.Rectangle2D widths))
-             (gnu.kawa.models.Pictures:borderShape bounds
+             (gnu.kawa.models.Pictures:borderShape bounds border
                                                    (- bounds:y d:y) ; top
                                                    (- (+ d:x d:width) ; right
                                                       (+ bounds:x bounds:width))
@@ -96,30 +100,55 @@
                                                       (+ bounds:y bounds:height)))))                                                  
           (else
            (let ((d ::double widths))
-             (gnu.kawa.models.Pictures:borderShape bounds d d d d))))))
+             (gnu.kawa.models.Pictures:borderShape bounds border d d d d))))))
 
 (define-procedure border
   (lambda (widths paint picture)
     (let ((pic (->picture picture)))
       (gnu.kawa.models.PBox:makeZBox 
-       (fill paint (border-shape widths pic))
+       (fill paint (border-shape widths #t pic))
        pic)))
   (lambda (widths picture)
     (let ((pic (->picture picture)))
       (gnu.kawa.models.PBox:makeZBox 
-       (fill (border-shape widths pic))
+       (fill (border-shape widths #t pic))
        pic)))
   (lambda (picture)
     (border 1.0 picture)))
+
+(define-procedure padding
+  (lambda (widths background picture)
+    (let ((pic (->picture picture)))
+      (gnu.kawa.models.PBox:makeZBox 
+       (fill background (border-shape widths #f pic))
+       pic)))
+  (lambda (widths picture)
+    (padding widths StandardColor:transparent picture)))
 
 (define-procedure image
   (lambda (#!key src)
     (gnu.kawa.models.DrawImage src: src))
   (lambda (image ::java.awt.image.BufferedImage)
-    (gnu.kawa.models.DrawImage image)))
+    (gnu.kawa.models.DrawImage image))
+  (lambda (image)
+    (gnu.kawa.models.DrawImage (Pictures:toImage (->picture image)))))
 
 (define (image-read (uri :: path)) :: <java.awt.image.BufferedImage>
   (javax.imageio.ImageIO:read (uri:openInputStream)))
+
+(define (image-write picture path)::void
+  (let* ((fname ::java.lang.String (path:toString))
+         (lname (fname:toLowerCase))
+         (format ::java.lang.String (cond ((lname:endsWith ".gif")
+                        "gif")
+                       ((or (lname:endsWith "jpg") (lname:endsWith ".jpeg"))
+                        "jpg")
+                       (else
+                        "png")))
+         (strm ((gnu.kawa.io.Path:valueOf path):openOutputStream)))
+    (try-finally
+     (javax.imageio.ImageIO:write (->image picture) format strm)
+     (strm:close))))
 
 (define (image-width (image  ::java.awt.image.RenderedImage)) ::int
   (*:getWidth image))
@@ -135,16 +164,22 @@
 	((instance? value <gnu.math.IntNum>)
 	 (make <java.awt.Color> (gnu.math.IntNum:intValue value)))
 	(else
-         (let ((c (gnu.kawa.models.StandardColor:valueOf (value:toString))))
+         (let ((c (StandardColor:valueOf (value:toString))))
            (if (eq? c #!null)
                (primitive-throw (java.lang.ClassCastException (format "value ~a cannot be converted to a paint" value))))
            c))))
 
+(define (->image value) ::RenderedImage
+  (set! value (gnu.mapping.Promise:force value))
+  (if (RenderedImage? value)
+      value
+      (Pictures:toImage (->picture value))))
+      
 (define (->picture value)
   (gnu.kawa.models.Pictures:asPicture value))
 
 (define (->transform tr)
-  (->java.awt.geom.AffineTransform tr))
+  (->AffineTransform tr))
 
 (define (with-paint paint pic)
   (gnu.kawa.models.WithPaint (->picture pic) (->paint paint)))
@@ -153,9 +188,9 @@
   (let ((tr (->transform tr)))
     (cond ((java.awt.Shape? pic)
            (tr:createTransformedShape pic))
-          ((java.awt.geom.AffineTransform? pic)
-           (let ((trcopy (java.awt.geom.AffineTransform
-                          (->java.awt.geom.AffineTransform tr))))
+          ((AffineTransform? pic)
+           (let ((trcopy (AffineTransform
+                          (->AffineTransform tr))))
              (trcopy:concatenate pic)
              trcopy))
           ((java.awt.geom.Point2D? pic)
@@ -187,22 +222,22 @@
          (* (val:doubleValue) (/ java.lang.Math:PI 180)))))
 
 (define-procedure rotate
-  (lambda (angle) (java.awt.geom.AffineTransform:getRotateInstance
+  (lambda (angle) (AffineTransform:getRotateInstance
                    (angle-to-radian angle)))
   (lambda (angle picture)
     (with-transform (rotate angle) picture)))
 
 (define-procedure scale
   (lambda (sc::java.awt.geom.Point2D)
-    (java.awt.geom.AffineTransform:getScaleInstance sc:x sc:y))
+    (AffineTransform:getScaleInstance sc:x sc:y))
   (lambda (sc::real)
-    (java.awt.geom.AffineTransform:getScaleInstance sc sc))
+    (AffineTransform:getScaleInstance sc sc))
   (lambda (sc picture)
      (with-transform (scale sc) picture)))
 
 (define-procedure translate
   (lambda (delta::java.awt.geom.Point2D)
-    (java.awt.geom.AffineTransform:getTranslateInstance delta:x delta:y))
+    (AffineTransform:getTranslateInstance delta:x delta:y))
   (lambda (delta::java.awt.geom.Point2D picture)
     (with-transform (translate delta) picture)))
 
@@ -245,7 +280,7 @@
   (lambda (m00::double m10::double
            m01::double m11::double
            m02::double m12::double)
-    (java.awt.geom.AffineTransform m00 m10 m01 m11 m02 m12))
+    (AffineTransform m00 m10 m01 m11 m02 m12))
   (lambda (px::java.awt.geom.Point2D
            py::java.awt.geom.Point2D
            p0::java.awt.geom.Point2D)

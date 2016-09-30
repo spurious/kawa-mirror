@@ -20121,6 +20121,11 @@ the specified picture.  It is equivalent to:
 
 @subsection Combining pictures
 
+@deffn Procedure hbox picture ...
+@deffnx Procedure vbox picture ...
+@deffnx Procedure zbox picture ...
+@end deffn
+
 @deffn Procedure border [size [paint]] picture
 Return a picture that combines @var{picture}
 with a rectangular border (frame) around @var{picture}'s bounding box.
@@ -20135,14 +20140,34 @@ The border is painted before (below) the @var{picture} painted.
 The bounding box of the result is that of the border, while
 the origin point is that of the original @var{picture}.
 @example
-#||kawa:2|# @kbd{(border 6 (fill 'pink (circle 30)))}
+#|kawa:2|# @kbd{(border 6 (fill 'pink (circle 30)))}
 @image{images/border-1}
 @end example
 @end deffn
 
+@deffn Procedure padding width [background] picture
+This is similar to @code{border},
+but it just adds extra space around @var{picture},
+without painting it.  The @var{size} is specified the same way.
+If @var{background} is specified,
+it becomes the background paint for the entire padded
+rectangle (both @var{picture} and the extra padding).
+@example
+#|kawa:3|# @kbd{(define circ1 (fill 'teal (circle 25)))}
+#|kawa:4|# @kbd{(zbox (line &P[-30 20] &P[150 20])}
+#|kawa:5|# @kbd{  (hbox circ1 (padding 6 'yellow circ1) (padding 6 circ1)))}
+@image{images/padding-1}
+@end example
+This shows a circle drawn three ways:
+as-is; with padding and a background color;
+with padding and a transparent background.
+A line is drawn before (below) the circles to contrast
+the yellow vs transparent backgrounds.
+@end deffn
+
 @deffn Procedure re-center [xpos] [ypos] picture
-Translate the @var{picture} is the point specified by @var{xpos}
-and @var{ypos} is the new origin point, adjust the bounding box to match.
+Translate the @var{picture} such that the point specified by @var{xpos}
+and @var{ypos} is the new origin point, adjusting the bounding box to match.
 
 The @var{xpos} can have four possible values, all of which are symbols:
 @code{'left} (move the origin to the left edge of the bounding box);
@@ -20181,7 +20206,7 @@ The line at @var{y=0} shows the effects of @code{re-center}.
 
 @subsection Images
 
-An image is a pictures represented as a rectangular grid of color values.
+An image is a picture represented as a rectangular grid of color values.
 An image file is some encoding (usually compressed) of an image,
 and mostly commonly has the extensions @code{png}, @code{gif},
 or @code{jpg}/@code{jpeg}.
@@ -20193,6 +20218,7 @@ A @code{BufferedImage} is automatically converted to a @code{DrawImage}
 when needed.
 
 @deffn Procedure image bimage
+@deffnx Procedure image picture
 @deffnx Procedure image src: path
 
 Creates a picture image, using either an existing native image @var{bimage},
@@ -20202,9 +20228,12 @@ Writing @code{(image src: @var{path})} is roughly the same
 as @code{(image (read-image @var{path}))} except that the former
 has the @var{path} associated with the resulting picture image.
 This can make a difference when the image is used or displayed.
+
+If the argument is a @var{picture}, it is converted to an image
+as if by @code{->image}.
 @end deffn
 
-@deffn Procedure read-path path
+@deffn Procedure image-read path
 Read an image file from the specified @var{path},
 and returns a native image object (a @code{BufferedImage}).
 @end deffn
@@ -20215,9 +20244,36 @@ Note that while @code{img1} above is a (native) image,
 the scaled rotated image is not an image object.
 It is a picture - a more complex value that @emph{contains} an image.
 
+@deffn Procedure image-write picture path
+The @var{picture} is converted to an image
+(as if by using @code{->image}) and then it is written
+to the specified @var{path}.
+The format used depends on (the lower-cased string value of) the path:
+A JPG file if the name ends with @code{".jpg"} or @code{".jpeg"};
+a GIF file if the name ends with @code{".gif"};
+a PNG file if the name ends with @code{".png"}.
+(Otherwise, the defalt is PNG, but that might change.)
+@end deffn
+
 @deffn Procedure image-width image
 @deffnx Procedure image-height image
 Return the width or height of the given @var{image}, in pixels.
+@end deffn
+
+@deffn Procedure ->image picture
+Convert @var{picture} to an image (a @code{RenderedImage}).
+If the @var{picture} is an image, return as-is.
+Otherwise, create an empty image (a @code{BufferedImage} whose size is the
+@var{picture}'s bounding box), and ``paint'' the @var{picture} into it.
+@example
+#|kawa:1|# @kbd{(define c (fill (circle 10)))}
+#|kawa:2|# @kbd{(scale 3 (hbox c (->image c)))}
+@image{images/image-scaled-1}
+@end example
+Here we take a circle @code{c}, and convert it to an image.
+Note how when the image is scaled, the pixel artifacts are very noticable.
+Also note how the origin of the image is the top-level corner,
+while the origin of the original circle is its center.
 @end deffn
 
 @subsection Compositing - Controlling how pictures are combined
@@ -20264,8 +20320,10 @@ Otherwise, remember the size for future @code{show-picture} calls;
 if there is already a @code{show-picture} window, adjust its size.
 @end deffn
 
-@c @subsubsection Convert to image
-@c (like Racket's 'freeze').
+@subsubsection Convert to image
+
+You can convert a picture to an image using the @code{->image} procedure,
+or write it to a file using the @code{image-write} procedure.
 
 @node Building JavaFX applications
 @section Building JavaFX applications

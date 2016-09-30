@@ -1,5 +1,9 @@
 2016-09-29  Per Bothner  <per@bothner.com>
 
+	* Pictures.java (toImage): New static method.
+	(borderShape): Generalize to also work for 'padding'.
+	* StandardColor.java (transparent): New pseudo-color.
+
 	* DDimension.java: New class, extends Dimension.
 
 2016-09-28  Per Bothner  <per@bothner.com>

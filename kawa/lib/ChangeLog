@@ -1,5 +1,8 @@
 2016-09-29  Per Bothner  <per@bothner.com>
 
+	* kawa/pictures.scm (padding, image-write, ->image): New procedures.
+	Add add and use some type aliases.
+
 	* kawa/swing.scm: New (kawa swing) library.
 	(frame): moved from gnu/kawa/slib/swing.scm.
 	(current-frame: New parameter.

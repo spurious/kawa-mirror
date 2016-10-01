@@ -113,6 +113,8 @@
 @page
 @end titlepage
 
+@contents
+
 @ifinfo
 @format
 START-INFO-DIR-ENTRY
@@ -20283,8 +20285,34 @@ while the origin of the original circle is its center.
 
 @subsection Displaying and exporting pictures 
 
-@c @subsubsection Export to SVG file
-@c
+@subsubsection Export to SVG
+
+@deffn Procedure picture-write-svg picture path [headers]
+Writes the@var{picture} to the file specified @var{path},
+in SGV (Structered Vector Graphics) format.
+If @var{headers} is true (which is the default)
+first write out the XML and DOCTYPE declarations
+that should be in a well-formed standaline SVG file.
+Otherwise, just write of the @code{<svg>} element.
+(Modern browers should be able to display a file
+consisting of just the @code{<svg>} element,
+as long as it has extension @code{.svg}, @code{.xml}, or @code{.html};
+the latter may add some extra padding.)
+@end deffn
+
+@deffn Procedure picture->svg-node picture
+Returns a SVG representation of @code{picture},
+in the form of an @code{<svg>} element,
+similar to those discussed in @ref{Creating XML nodes}.
+If you convert the @code{<svg>} element to a string,
+you get formatted XML;
+if you @code{write} the @code{<svg>} element
+you get an @ref{XML literals,XML literal} of form @code{"#<svg>...</svg>"}.
+If you @code{display} the @code{<svg>} element
+in a DomTerm terminal you get the picture (as a picture).
+This works because when you display an element in DomTerm
+in get inserted into the display.
+@end deffn
 
 @subsubsection Display in Swing
 

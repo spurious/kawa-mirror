@@ -1,3 +1,9 @@
+2016-10-01  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Composable pictures): Document procedures
+	picture-write-svg and picture->svg-node.
+	* kawa.texi: Add @contents for tex output.
+
 2016-09-29  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Composable pictures): Document Swing features.

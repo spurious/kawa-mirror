@@ -1,3 +1,8 @@
+2016-10-01  Per Bothner  <per@bothner.com>
+
+	* kawa/pictures.scm (picture-write-svg, picture->svg-node):
+	New procedures.
+
 2016-09-29  Per Bothner  <per@bothner.com>
 
 	* kawa/pictures.scm (padding, image-write, ->image): New procedures.

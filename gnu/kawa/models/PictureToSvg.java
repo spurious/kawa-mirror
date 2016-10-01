@@ -33,7 +33,7 @@ public class PictureToSvg extends PictureVisitor {
         return Symbol.make(XLINK_NAMESPACE_URI, name, "xlink");
     }
     public static void writeAttribute(String name, String value, Consumer out) {
-        out.startAttribute(name);
+        out.startAttribute(Symbol.valueOf(name));
         out.write(value);
         out.endAttribute();
     }

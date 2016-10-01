@@ -285,3 +285,12 @@
            py::java.awt.geom.Point2D
            p0::java.awt.geom.Point2D)
     (java.awt.geom.AffineTransform px:x px:y py:x py:y p0:x p0:y)))
+
+(define (picture-write-svg picture (name ::path) #!optional (headers::boolean #t))::void
+  (let ((port (gnu.kawa.io.OutPort:openFile name)))
+    (try-finally
+     (gnu.kawa.models.SVGUtils:toSVG (->picture picture) port headers)
+     (port:close))))
+
+(define (picture->svg-node picture)
+  (gnu.kawa.models.SVGUtils:toSVGNode (->picture picture)))

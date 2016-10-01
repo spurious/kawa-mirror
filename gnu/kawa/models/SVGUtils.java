@@ -1,7 +1,12 @@
 package gnu.kawa.models;
 import gnu.kawa.io.CharArrayOutPort;
+import gnu.lists.PrintConsumer;
 import gnu.lists.Consumer;
+import gnu.kawa.xml.KElement;
+import gnu.kawa.xml.KNode;
 import gnu.mapping.Symbol;
+import gnu.xml.NodeTree;
+import gnu.xml.XMLFilter;
 import gnu.xml.XMLPrinter;
 import java.awt.*;
 import java.awt.geom.*;
@@ -12,13 +17,31 @@ public class SVGUtils {
     public static String toSVG(Picture p) {
         CharArrayOutPort cout = new CharArrayOutPort();
         XMLPrinter xout = new XMLPrinter(cout);
-        Rectangle2D bounds = adjustBounds(p, p.getBounds2D(), null);
-        PictureToSvg.writeSVGElementStart(bounds, xout);
-        PictureToSvg pout = new PictureToSvg(xout);
-        p.visit(pout);
-        xout.endElement();
-        //System.err.println("{SVG:"+cout.toString()+"}");
+        toSVG(p, xout);
         return cout.toString();
+    }
+
+    public static void toSVG(Picture p, PrintConsumer out, boolean headers) {
+        if (headers) {
+            out.println("<?xml version=\"1.0\" standalone=\"no\"?>");
+            out.println("<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\""
+                + "\"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">");
+        }
+        toSVG(p, new XMLPrinter(out));
+    }
+    
+    public static void toSVG(Picture p, Consumer out) {
+        Rectangle2D bounds = adjustBounds(p, p.getBounds2D(), null);
+        PictureToSvg.writeSVGElementStart(bounds, out);
+        PictureToSvg pout = new PictureToSvg(out);
+        p.visit(pout);
+        out.endElement();
+    }
+
+    public static KElement toSVGNode(Picture p) {
+        XMLFilter filter = new XMLFilter(new NodeTree());
+        toSVG(p, filter);
+        return (KElement) KNode.make((NodeTree) filter.out);
     }
 
     public static Rectangle2D adjustBounds(Picture pic, Rectangle2D bounds, AffineTransform transform) {

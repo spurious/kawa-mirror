@@ -1,3 +1,8 @@
+2016-10-01  Per Bothner  <per@bothner.com>
+
+	* SVGUtils.java (toSVG, toSVGNode): New static procedures.
+	* PictureToSvg.java (writeAttribute): Create Symbol.
+
 2016-09-29  Per Bothner  <per@bothner.com>
 
 	* Pictures.java (toImage): New static method.

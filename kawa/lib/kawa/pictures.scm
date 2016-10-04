@@ -14,11 +14,11 @@
   ((gnu.kawa.models.Pictures:asPicture picture):getBounds2D))
 
 (define (hbox #!rest args  :: <object[]>)
-  (gnu.kawa.models.PBox:makeHBox @args))
+  (gnu.kawa.models.PBox:makeBox #\X @args))
 (define (vbox #!rest args  :: <object[]>)
-  (gnu.kawa.models.PBox:makeVBox @args))
+  (gnu.kawa.models.PBox:makeBox #\Y @args))
 (define (zbox  #!rest args  :: <object[]>)
-  (gnu.kawa.models.PBox:makeZBox @args))
+  (gnu.kawa.models.PBox:makeBox #\Z @args))
 
 (define (rectangle p1::java.awt.geom.Point2D #!optional (p2 #!null))
   ::java.awt.geom.Rectangle2D
@@ -105,12 +105,12 @@
 (define-procedure border
   (lambda (widths paint picture)
     (let ((pic (->picture picture)))
-      (gnu.kawa.models.PBox:makeZBox 
+      (gnu.kawa.models.PBox:makeBox #\Z
        (fill paint (border-shape widths #t pic))
        pic)))
   (lambda (widths picture)
     (let ((pic (->picture picture)))
-      (gnu.kawa.models.PBox:makeZBox 
+      (gnu.kawa.models.PBox:makeBox #\Z
        (fill (border-shape widths #t pic))
        pic)))
   (lambda (picture)
@@ -119,7 +119,7 @@
 (define-procedure padding
   (lambda (widths background picture)
     (let ((pic (->picture picture)))
-      (gnu.kawa.models.PBox:makeZBox 
+      (gnu.kawa.models.PBox:makeBox #\Z
        (fill background (border-shape widths #f pic))
        pic)))
   (lambda (widths picture)

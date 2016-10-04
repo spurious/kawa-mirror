@@ -1,3 +1,11 @@
+2016-10-03  Per Bothner  <per@bothner.com>
+
+	* PBox.java (spacing): New field, for additional separation.
+	(<init>): New strucor with 'spacing' parameter.
+	(init): Take spacing into account.
+	(makeBox): New factory method.
+	(makeHBox, makeVBox, makeZBox): Remove factory methods.
+
 2016-10-01  Per Bothner  <per@bothner.com>
 
 	* SVGUtils.java (toSVG, toSVGNode): New static procedures.

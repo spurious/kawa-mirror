@@ -16,10 +16,19 @@ public class PBox implements Picture {
     Rectangle2D bounds;
 
     double[] translations;
+    /** Extra spacing between sub-pictures. */
+    double spacing;
 
     private PBox(char axis, Picture[] children) {
         this.axis = axis;
         this.children = children;
+        init();
+    }
+
+    private PBox(char axis, double spacing, Picture[] children) {
+        this.axis = axis;
+        this.children = children;
+        this.spacing = spacing;
         init();
     }
 
@@ -40,14 +49,15 @@ public class PBox implements Picture {
         translations = new double[n];
         for (int i = 1; i < n; i++) {
             Rectangle2D curBounds = children[i].getBounds2D();
-            double delta = 0;
+            double delta;
             if (axis == 'X') {
-                delta = prevBounds.getMaxX() - curBounds.getMinX();
+                delta = spacing + prevBounds.getMaxX() - curBounds.getMinX();
                 deltaX += delta;
             } else if (axis == 'Y') {
-                delta = prevBounds.getMaxY() - curBounds.getMinY();
+                delta = spacing + prevBounds.getMaxY() - curBounds.getMinY();
                 deltaY += delta;
-            }
+            } else
+                delta = 0;
             translations[i] = delta + translations[i-1];
             double cminX = curBounds.getMinX() + deltaX;
             if (cminX < minX)
@@ -91,23 +101,29 @@ public class PBox implements Picture {
     public Picture transform(AffineTransform tr) {
         return new WithTransform(this, tr);
     }
-    public static PBox makeHBox(Object... args) {
-        return new PBox('X', Pictures.asPictureAll(args));
+
+    public void visit(PictureVisitor visitor) {
+        visitor.visitPBox(this);
     }
-    public static PBox makeVBox(Object... args) {
-        return new PBox('Y', Pictures.asPictureAll(args));
+
+    public static PBox makeBox(char axis, Object... args) {
+        int nargs = args.length;
+        int start = 0;
+        double spacing = 0;
+        if (nargs > 0 && args[0] instanceof Number) {
+            start = 1;
+            spacing = ((Number) args[0]).doubleValue();
+        }
+        Picture[] pictures = new Picture[nargs-start];
+        for (int i = start; i < nargs; i++)
+            pictures[i-start] = Pictures.asPicture(args[i]);
+        return new PBox(axis, spacing, pictures);
     }
-    public static PBox makeZBox(Object... args) {
-        return new PBox('Z', Pictures.asPictureAll(args));
-    }
+
     public static Picture combine(List parts) {
         int nparts = parts.size();
         Picture[] pics = new Picture[nparts];
         parts.toArray(pics);
         return nparts == 1 ? pics[0] : new PBox('Z', pics);
-    }
-
-    public void visit(PictureVisitor visitor) {
-        visitor.visitPBox(this);
     }
 }

@@ -2015,6 +2015,38 @@ circle (radius 30 pixels, color magenta), and a non-filled rotated rectangle
 
 See @ref{Composable pictures} for details and more examples.
 
+@subheading Shapes and coordinates
+
+A @dfn{shape} a geometrical figure consisting of
+one or more curves and lines.  One kind of shape is a circle;
+you can create one with the @code{circle} procedure,
+specifying the radius in ``pixels''.
+
+@example
+#|kawa:1|# @kbd{(import (kawa pictures))}
+#|kawa:2|# @kbd{(circle 30)}
+@image{images/fill-circ-1}
+@end example
+It you print a shape, it will show it as a thin black curve.
+
+A @dfn{point} has two real-numbered parts: the point's x-coordinate,
+and its y-coordinate.
+The x-coordinate increases as you move right along the page/screen,
+while the y-coordinate increases as you move @emph{down}.
+(Unlike traditional mathematics, where
+the y-coordinate increases as you go up.)
+The unit distance is one ``pixel'', which is defined as CSS or HTML.
+You can create a point with @code{&P} operator.
+For example:
+@example
+&P[30 20]
+@end example
+is a a point 30 pixels right and 20 pixels down from the origin point.
+
+The expression @code{(rectangle &P[10 20] &P[50 40])} creates
+a rectangle whose upper left corner is (10,20) and whose
+lower right corner (50,40).
+
 @node Tutorial - Sequences
 @section Lists and sequences
 
@@ -19825,7 +19857,7 @@ using the @code{qtdomterm} terminal emulator.
 @image{images/domterm-pictures-1}
 
 Another convenient way to view a picture is @code{show-picture},
-which displays the picture in Swing window.
+which displays the picture in a Swing window.
 
 A @dfn{picture} is an object that can be displayed on a screen,
 web-page, or printed page, and combined with other pictures.
@@ -19839,12 +19871,12 @@ surrounds the contents of the picture.
 Usually the entire visible part of the picture is inside the
 bounding box, but in some cases part of the picture may stick
 outside the bounding box.
-For example when a circle is draw (stroked) with a ``pen'',
+For example when a circle is drawn (stroked) with a ``pen'',
 the bounding box is that of the infinitely-thin mathematical circle, so
 ``ink'' from the pen that is outside the circle may be outside the bounding box.
 
 A picture has an origin point corresponding to the (0 0) cordinates.
-The origin is commonly by not always inside the bounding box.
+The origin is commonly but not always inside the bounding box.
 Certain operations (for example @code{hbox}) combine pictures by putting
 them ``next to'' each other, where ``next to'' is defined in
 terms of the bounding box and origin point.
@@ -19873,7 +19905,7 @@ A point is a pair consisting of an x and a y coordinate.
 
 @deftypefn Literal {} &P@stxlit{[} @var{x} @var{y} @stxlit{]}
 Construct a point value with the specified @var{x} and @var{y} values.
-Both @var{x} and @var{y} are expression that evaluate to real numbers.
+Both @var{x} and @var{y} are expressions that evaluate to real numbers.
 @end deftypefn
 
 @deffn Type Dimension
@@ -19886,7 +19918,7 @@ as an offset relative to some other point.
 
 @deftypefn Literal {} &D@stxlit{[} @var{width} @var{height} @stxlit{]}
 Construct a dimension value with the specified @var{width}
-and @var{height} values, which are both expression that
+and @var{height} values, which are both expressions that
 evaluate to real numbers.
 @end deftypefn
 
@@ -19916,7 +19948,7 @@ If @var{n} points are specied, the result is path consisting of
 single-point shape.)
 
 All of the points except the first can optionally be specified
-using a @code{dimension}, which is treated an an offset from the previous point:
+using a dimension, which is treated an an offset from the previous point:
 @example
 (line &P[30 40] &D[10 5] &D[10 -10])
 @end example
@@ -19962,7 +19994,7 @@ It may also have an alpha component, which specifies transparency.
 
 @deffn Procedure ->paint value
 Converts @var{value} to a color - or more general a paint.
-Specificlly, the return type @code{java.awt.Paint}.
+Specificlly, the return type is @code{java.awt.Paint}.
 The @var{value} can be any one of:
 @itemize
 @item
@@ -19977,6 +20009,9 @@ Then @code{RR} (bits 16-23) is the intensity of the red component;
 @item
 One of the standard HTML/CSS/SVG color names, as a string or symbol.
 See the table in @code{gnu/kawa/models/StandardColor.java} source file.
+Case is ignored, and you can optionally use hyphens to separate words.
+For example @code{'hot-pink}, @code{'hotpink}, and @code{'hotPink}
+are all the same sRGB color @code{#xFF69B4}.
 @end itemize
 @end deffn
 
@@ -20006,7 +20041,7 @@ in this case the color @code{hot-pink}.
 @end example
 Here @code{circ2} is an @code{hbox} of two filled circles,
 one that has unspecified paint, and one that is @code{hot-pink}.
-Print @code{circ2} directly uses black for the
+Printing @code{circ2} directly uses black for the
 circle with unspecified color,
 but if we wrap @code{circ2} in another @code{with-paint}
 that provides a default that is used for the first circle.
@@ -20032,18 +20067,22 @@ This is called @dfn{stroking}.
 An @var{option} may be one of:
 @itemize
 @item
-A standard color name, such as @code{'red} or @code{'light-style-blue}.
-This is the color used to draw the shape.
-@item
 A @code{Paint} or @code{Color} object, which is used to draw the shape.
+@item
+A standard color name, such as @code{'red} or @code{'medium-slate-blue}.
+This is mapped to a @code{Color}.
 @item
 A join-specifier, which is a symbol specifying how each curve of the shape is
 connected to the next one.
-The options are @code{'miter-join}, @code{'round-join}, and @code{'bele-join}
+The options are @code{'miter-join}, @code{'round-join}, and @code{'bevel-join}.
+The default if none is specified is @code{'miter-join}.
 @item
 A end-cap-specifier, which is a symbol specifying how each end of the
 shape is terminated.
 The options are @code{'square-cap}, @code{'round-cap}, or @code{'butt-cap}.
+The default is @code{'butt-cap}.
+(This follow SCG and HTML Canvas.
+The default in plan Java AWT is a square cap.)
 @item
 A real number specifies the thickness of the stroke.
 @item
@@ -20053,15 +20092,27 @@ in a single object.  The @code{BasicStroke} class can specify dashes,
 though that is not yet supported for SVG output; only AWT or image output.
 @end itemize
 
+Let us illustrate with a sample line @code{lin}
+and a helper macro @code{show-draw}, which adds a border around a shape,
+then draws the given shape with some options, and finally
+re-draws the shape in plain form.
 @example
-(define lin (line &P[0 0] &P[300 40] &P[200 100] &P[50 70]))
-(define-syntax show-draw
-  (syntax-rules ()
-    ((_ options ... line)
-     (border 12 'bisque (zbox (draw options ... line) line)))))
+#|kawa:10|# @kbd{(define lin (line &P[0 0] &P[300 40] &P[200 100] &P[50 70]))}
+#|kawa:11|# @kbd{(define-syntax show-draw}
+#|....:12|# @kbd{  (syntax-rules ()}
+#|....:13|# @kbd{    ((_ options ... shape)}
+#|....:14|# @kbd{     (border 12 'bisque (zbox (draw options ... shape) shape)))))}
+#|....:15|# @kbd{(show-draw 8 'lime lin)}
+@image{images/show-draw-1}
+#|....:16|# @kbd{(show-draw 8 'lime 'round-cap 'round-join lin)}
+@image{images/show-draw-2}
+#|....:17|# @kbd{(show-draw 8 'lime 'square-cap 'bevel-join lin)}
+@image{images/show-draw-3}
 @end example
 @end deffn
-
+Notice how the different cap and join styles change the drawing.
+Also note how the stroke (color lime) extends beyond its bounding box,
+into the surrounding border (color bisque).
 @subsection Affine transforms
 
 An 2D affine transform is a linear mapping from coordinates to
@@ -20073,12 +20124,30 @@ mappings - but a very useful subset.
 @deffn Procedure affine-transform xx xy yx yy x0 y0
 @deffnx Procedure affine-transform px py p0
 Creates a new affine transform.
+The result of applying @code{(affine-transform @var{x@sub{x}} @var{x@sub{y}} @var{y@sub{x}} @var{y@sub{y}} @var{x@sub{0}} @var{y@sub{0}})}
+to the point @code{&P[@var{x} @var{y}]}
+is the transformed point
+@example
+&P[(+ (* @var{x} @var{x@sub{x}}) (* @var{y} @var{y@sub{x}}) @var{x@sub{0}})
+   (+ (* @var{x} @var{x@sub{y}}) (* @var{y} @var{y@sub{y}}) @var{y@sub{0}})]
+@end example
+
+If using point arguments,
+@code{(affine-transform &P[@var{x@sub{x}} @var{x@sub{y}}] &P[@var{y@sub{x}} @var{y@sub{y}}] &P[@var{x@sub{0}} @var{y@sub{0}}])}
+is equivalent to:
+@code{(affine-transform @var{x@sub{x}} @var{x@sub{y}} @var{y@sub{x}} @var{y@sub{y}} @var{x@sub{0}} @var{y@sub{0}})}.
 @end deffn
 
 @deffn Procedure with-transform transform picture
-@deffnx Procedure with-transform transform point
-@deffnx Procedure with-transform transform1 transform2
 Creates a transformed picture.
+@end deffn
+
+@deffn Procedure with-transform transform point
+Apply a transform to a single point, yielding a new point.
+@end deffn
+
+@deffn Procedure with-transform transform1 transform2
+Combine two transforms, yielding the composed transform.
 @end deffn
 
 @deffn Procedure rotate angle
@@ -20101,7 +20170,7 @@ the specified picture.  It is equivalent to:
 @deffnx Procedure scale factor picture
 Scales the @var{picture} by the given @var{factor}.
 The @var{factor} can be a real number.
-The @var{factor} can also be a point, in which case
+The @var{factor} can also be a point or a dimension, in which case
 the two cordinates are scaled by a different amount.
 
 The two-argument variant applies the resulting transform to
@@ -20114,6 +20183,11 @@ the specified picture.  It is equivalent to:
 @deffn Procedure translate offset
 @deffnx Procedure translate offset picture
 
+The single-argument variant creates a transform
+that adds the @var{offset} to each point.
+The @var{offset} can be either a point or a dimension (which
+are treated quivalently).
+
 The two-argument variant applies the resulting transform to
 the specified picture.  It is equivalent to:
 @example
@@ -20123,9 +20197,34 @@ the specified picture.  It is equivalent to:
 
 @subsection Combining pictures
 
-@deffn Procedure hbox picture ...
-@deffnx Procedure vbox picture ...
+@deffn Procedure hbox [spacing] picture ...
+@deffnx Procedure vbox [spacing] picture ...
 @deffnx Procedure zbox picture ...
+Make a combined picture from multiple sub-pictures drawn
+either ``next to'' or ``on top of'' each other.
+
+The case of @code{zbox} is simplest: The sub-pictures are drawn
+in argument order at the same position (origin).  The ``@code{z}'' refers to
+the idea that the pictures are stacked on top of each other along
+the ``Z-axis'' (the one perpendicular to the screen).
+
+The @code{hbox} and @code{vbox} instead place the sub-pictures
+next to each other, in a row or column.
+If @var{spacing} is specified, if must be a real number.
+That much extra spacing is added between each sub-picture.
+
+More precisely: @code{hbox} shifts each sub-picture except the first
+so its left-origin control-point
+(see discussion at @code{re-center}) has the same position
+as the right-origin control point of the previous picture
+@var{plus} the amount of @var{spacing}.
+Similarly, @code{vbox} shifts each sub-picture except the first
+so its top-origin control point has the same position
+as the bottom-origin point of the previous picture, plus @var{spacing}.
+
+The bounding box of the result is the smallest rectangle that
+includes the bounding boxes of the (shifted) sub-pictures.
+The origin of the result is that of the first picture.
 @end deffn
 
 @deffn Procedure border [size [paint]] picture
@@ -20142,7 +20241,7 @@ The border is painted before (below) the @var{picture} painted.
 The bounding box of the result is that of the border, while
 the origin point is that of the original @var{picture}.
 @example
-#|kawa:2|# @kbd{(border 6 (fill 'pink (circle 30)))}
+#|kawa:2|# @kbd{(with-paint 'blue (border &D[8 5] (fill 'pink (circle 30))))}
 @image{images/border-1}
 @end example
 @end deffn
@@ -20188,6 +20287,25 @@ is the same as specifying @code{'center} for both axis; this is the default.
 A single @code{'origin} argument
 is the same as specifying @code{'origin} for both axis;
 this is the same as just @var{picture}.
+
+The 16 control points are shown below, relative to a picture's
+bounding box and the X- and Y-axes.
+The abbreviations have the obvious values, for example
+@code{LC} means @code{'left 'center}.
+@example
+LT    OT  CT      RT
+  ┌────┬──────────┐
+  │    │          │
+  │    │          │
+LC│   OC  C       │RC
+LO├────O──CO──────┤RO
+  │    │          │
+  └────┴──────────┘
+LB    OB  CB       RB   
+@end example
+The result of (for example) @code{(re-center 'left 'center @var{P})}
+is @var{P} translated so the origin is at control point @code{LC}.
+
 @example
 #|kawa:1|# @kbd{(define D (fill 'light-steel-blue (polygon &P[-20 0] &P[0 -20] &P[60 0] &P[0 40])))}
 #|kawa:2|# @kbd{(zbox D (draw 'red (circle 5)))}
@@ -20238,9 +20356,14 @@ as if by @code{->image}.
 @deffn Procedure image-read path
 Read an image file from the specified @var{path},
 and returns a native image object (a @code{BufferedImage}).
+@example
+#|kawa:10|# @kbd{(define img1 (image-read "http://pics.bothner.com/2013/Cats/06t.jpg"))}
+#|kawa:11|# @kbd{img1}
+@image{images/image-cat-1a}
+#|kawa:12|# @kbd{(scale 0.6 (rotate 30 img1))}
+@image{images/image-cat-1b}
+@end example
 @end deffn
-
-@image{images/logo-image-1}
 
 Note that while @code{img1} above is a (native) image,
 the scaled rotated image is not an image object.
@@ -20281,6 +20404,7 @@ while the origin of the original circle is its center.
 @subsection Compositing - Controlling how pictures are combined
 
 @deffn Procedure with-composite [[compose-op] picture] ...
+Limited support - SVG and DomTerm output has not been implemented.
 @end deffn
 
 @subsection Displaying and exporting pictures 
@@ -20288,8 +20412,8 @@ while the origin of the original circle is its center.
 @subsubsection Export to SVG
 
 @deffn Procedure picture-write-svg picture path [headers]
-Writes the@var{picture} to the file specified @var{path},
-in SGV (Structered Vector Graphics) format.
+Writes the @var{picture} to the file specified @var{path},
+in SVG (Structered Vector Graphics) format.
 If @var{headers} is true (which is the default)
 first write out the XML and DOCTYPE declarations
 that should be in a well-formed standaline SVG file.
@@ -20311,7 +20435,7 @@ you get an @ref{XML literals,XML literal} of form @code{"#<svg>...</svg>"}.
 If you @code{display} the @code{<svg>} element
 in a DomTerm terminal you get the picture (as a picture).
 This works because when you display an element in DomTerm
-in get inserted into the display.
+it gets inserted into the display.
 @end deffn
 
 @subsubsection Display in Swing

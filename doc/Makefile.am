@@ -40,8 +40,10 @@ clean-local:
 
 DOC_IMAGES = \
   images/border-1.png \
+  images/fill-circ-1.png \
   images/image-scaled-1.png \
-  images/logo-image-1.png \
+  images/image-cat-1a.png \
+  images/image-cat-1b.png \
   images/padding-1.png \
   images/paint-circ-1.png \
   images/paint-circ-2.png \
@@ -49,6 +51,9 @@ DOC_IMAGES = \
   images/paint-circ-4.png \
   images/re-center-1.png \
   images/re-center-2.png \
+  images/show-draw-1.png \
+  images/show-draw-2.png \
+  images/show-draw-3.png \
   images/domterm-pictures-1.png
 
 EXTRA_DIST = scm2java.html kawa.man qexo.man mdate-sh +default+ README-epub \

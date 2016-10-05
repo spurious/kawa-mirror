@@ -36,13 +36,14 @@ public class DrawShape implements Picture
     }
 
     private static Stroke mergeCap(int value, Stroke old) {
-        return WithPaint.merge(new BasicStroke(1, value, 0),
+        return WithPaint.merge(new BasicStroke(1, value,
+                                               BasicStroke.JOIN_MITER),
                                WithPaint.STROKE_LINECAP_SET,
                                (BasicStroke) old);
     }
 
     private static Stroke mergeJoin(int value, Stroke old) {
-        return WithPaint.merge(new BasicStroke(1, 0, value),
+        return WithPaint.merge(new BasicStroke(1, BasicStroke.CAP_BUTT, value),
                                WithPaint.STROKE_LINEJOIN_SET,
                                (BasicStroke) old);
     }
@@ -94,9 +95,12 @@ public class DrawShape implements Picture
             } else if (arg instanceof Number) {
                 float width = ((Number) arg).floatValue();
                 propertiesSet |= WithPaint.STROKE_WIDTH_SET;
-                stroke = WithPaint.merge(new BasicStroke(width),
-                                         WithPaint.STROKE_WIDTH_SET,
-                                         (BasicStroke) stroke);
+                stroke =
+                    WithPaint.merge(new BasicStroke(width,
+                                                    BasicStroke.CAP_BUTT,
+                                                    BasicStroke.JOIN_MITER),
+                                    WithPaint.STROKE_WIDTH_SET,
+                                    (BasicStroke) stroke);
             } else {
                 throw new IllegalArgumentException("draw: invalid argument type");
             }

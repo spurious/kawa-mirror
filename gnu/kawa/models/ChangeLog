@@ -1,3 +1,10 @@
+2016-10-05  Per Bothner  <per@bothner.com>
+
+	* DrawShape.java: Explicitly set default endcap to CAP_BUTT.
+	This matches SVG and HTML Canvas, but is different from Java2D.
+	* Pictures.java (toImage): Likewise.
+	* SwingPicture.java (paintComponent): Likewise.
+
 2016-10-03  Per Bothner  <per@bothner.com>
 
 	* PBox.java (spacing): New field, for additional separation.

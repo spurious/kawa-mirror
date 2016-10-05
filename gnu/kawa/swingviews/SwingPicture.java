@@ -39,12 +39,15 @@ public class SwingPicture extends JPanel
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g;
         AffineTransform saveTransform = g2.getTransform();
+        Stroke savedStroke = g2.getStroke();
         try {
+            g2.setStroke(Pictures.defaultStroke);
             g2.translate((getWidth() - rect.getWidth()) * 0.5 - rect.getX(),
                          (getHeight() - rect.getHeight()) * 0.5 - rect.getY());
             picture.paint(g2);
         } finally {
             g2.setTransform(saveTransform);
+            g2.setStroke(savedStroke);
         }
     }
 }

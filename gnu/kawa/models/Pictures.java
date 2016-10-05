@@ -28,6 +28,7 @@ public class Pictures {
              new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
          Graphics2D g2 = image.createGraphics();
          g2.setPaint(Color.BLACK);
+         g2.setStroke(defaultStroke);
          g2.translate(- size.getX(), -size.getY());
          picture.paint(g2);
          return image;
@@ -64,4 +65,7 @@ public class Pictures {
             return new Rectangle2D.Double(x0 - left, y0 - top,
                                           w + left + right, h + top + bottom);
     }
+
+    public static final BasicStroke defaultStroke =
+        new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER);
 }

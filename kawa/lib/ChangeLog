@@ -1,3 +1,7 @@
+2016-10-05  Per Bothner  <per@bothner.com>
+
+	* kawa/pictures.scm (translate, scale): Allow dimension argument.
+
 2016-10-03  Per Bothner  <per@bothner.com>
 
 	Support optional 'spacing' between hbox/vbox children.

@@ -228,6 +228,8 @@
     (with-transform (rotate angle) picture)))
 
 (define-procedure scale
+  (lambda (sc::java.awt.geom.Dimension2D)
+    (AffineTransform:getScaleInstance sc:width sc:height))
   (lambda (sc::java.awt.geom.Point2D)
     (AffineTransform:getScaleInstance sc:x sc:y))
   (lambda (sc::real)
@@ -236,9 +238,11 @@
      (with-transform (scale sc) picture)))
 
 (define-procedure translate
+  (lambda (delta::java.awt.geom.Dimension2D)
+    (AffineTransform:getTranslateInstance delta:width delta:height))
   (lambda (delta::java.awt.geom.Point2D)
     (AffineTransform:getTranslateInstance delta:x delta:y))
-  (lambda (delta::java.awt.geom.Point2D picture)
+  (lambda (delta picture)
     (with-transform (translate delta) picture)))
 
 (define-procedure re-center

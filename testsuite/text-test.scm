@@ -181,4 +181,77 @@
   (test-equal "fbdaD" str2)
   (test-equal "abbDdxdef" str1))
 
+(test-begin "pretty-printing")
+
+(import (kawa pprint))
+
+(define (test-pretty-print form width expected)
+  (fluid-let ((*print-right-margin* width))
+    (! swr (java.io.StringWriter))
+    (! out (gnu.kawa.io.OutPort swr #t #f))
+    (out:setPrettyPrinting #t)
+    (pprint form out)
+    (out:println)
+    (out:close)
+    (test-equal expected (swr:toString))))
+
+(define form-1
+  '(define-private (foo fdsf add) (list b 23) (let ((xy (+ dadasd asdasd)) (xz 12)) (list b 22) ABCD (vector 42343 23423423 234324 989))))
+
+(test-pretty-print form-1 30 &{
+    &|(define-private (foo fdsf
+    &|                 add)
+    &|  (list b 23)
+    &|  (let ((xy
+    &|         (+ dadasd asdasd))
+    &|        (xz 12))
+    &|    (list b 22)
+    &|    ABCD
+    &|    (vector 42343 23423423
+    &|     234324 989)))
+})
+(test-pretty-print form-1 50 &{
+    &|(define-private (foo fdsf add)
+    &|  (list b 23)
+    &|  (let ((xy (+ dadasd asdasd)) (xz 12))
+    &|    (list b 22)
+    &|    ABCD
+    &|    (vector 42343 23423423 234324 989)))
+})
+
+(define form-2
+  '(if (equal? fdfds sdfsdf) (cond (aa (list bb)) ((null? cc) dd)) (vector xx sxasxs (+ 454 435) dsadd)))
+
+(test-pretty-print form-2 20 &{
+    &|(if (equal? fdfds
+    &|     sdfsdf)
+    &|    (cond (aa
+    &|           (list
+    &|            bb))
+    &|          ((null?
+    &|            cc)
+    &|           dd))
+    &|    (vector xx
+    &|     sxasxs
+    &|     (+ 454 435)
+    &|     dsadd))
+})
+(test-pretty-print form-2 40 &{
+    &|(if (equal? fdfds sdfsdf)
+    &|    (cond (aa (list bb))
+    &|          ((null? cc) dd))
+    &|    (vector xx sxasxs (+ 454 435)
+    &|     dsadd))
+})
+(test-pretty-print form-2 80 &{
+    &|(if (equal? fdfds sdfsdf)
+    &|    (cond (aa (list bb)) ((null? cc) dd))
+    &|    (vector xx sxasxs (+ 454 435) dsadd))
+})
+(test-pretty-print form-2 200 &{
+    &|(if (equal? fdfds sdfsdf) (cond (aa (list bb)) ((null? cc) dd)) (vector xx sxasxs (+ 454 435) dsadd))
+})
+
+(test-end)
+  
 (test-end)

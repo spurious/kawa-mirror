@@ -1,3 +1,7 @@
+2016-10-11  Per Bothner  <per@bothner.com>
+
+	* PrintConsumer.java (writeBreak): Make public.
+
 2016-09-21  Per Bothner  <per@bothner.com>
 
 	* Strings.java (toJson): New method.

@@ -1,3 +1,9 @@
+2016-10-11  Per Bothner  <per@bothner.com>
+
+	* PrettyWriter.java: Fix two small bugs.
+	* OutPort.java (setPrettyPrinting): New method.
+	* PrettyWriter.java: Make some members private. Tweak logging.
+
 2016-09-23  Per Bothner  <per@bothner.com>
 
 	* PrettyWriter.java (maybeOutput): Emit plain newline rather than

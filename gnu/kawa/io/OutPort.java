@@ -492,11 +492,14 @@ public class OutPort extends PrintConsumer implements Printable
     WriterManager.instance.run();
   }
 
-  public void startLogicalBlock (String prefix, boolean perLine,
-				 String suffix)
-  {
-    bout.startLogicalBlock(prefix, perLine, suffix);
-  }
+    public void setPrettyPrinting (boolean mode) {
+        bout.setPrettyPrinting(mode);
+    }
+
+    public void startLogicalBlock(String prefix, boolean perLine,
+                                  String suffix) {
+        bout.startLogicalBlock(prefix, perLine, suffix);
+    }
 
     public void startLogicalBlock(String prefix, String suffix,
                                   int indent) {
@@ -508,10 +511,9 @@ public class OutPort extends PrintConsumer implements Printable
         }
     }
 
-  public void endLogicalBlock (String suffix)
-  {
-    bout.endLogicalBlock(suffix);
-  }
+    public void endLogicalBlock(String suffix) {
+        bout.endLogicalBlock(suffix);
+    }
 
     public void writeBreak(int kind) {
         bout.writeBreak(kind);

@@ -231,7 +231,7 @@ public class PrettyWriter extends PrintConsumer
    */
   public void setPrettyPrinting (boolean mode)
   {
-    setPrettyPrintingMode(mode ? 0 : 1);
+    setPrettyPrintingMode(mode ? 1 : 0);
   }
 
     /** Should we write directly to out without using buffer?
@@ -353,7 +353,7 @@ public class PrettyWriter extends PrintConsumer
   /** Index in queueInts and queueStrings of oldest enqueued operation. */
   int queueTail;
   /** Number of elements (in queueInts and queueStrings) in use. */
-  int queueSize;
+  private int queueSize;
   /** If >= 0, index (into queueInts) of current unclosed begin-block node.
    * This is a head of a linked linked of queued BLOCK_START for which
    * we haven't seen the matching BLOCK_END  */
@@ -735,6 +735,7 @@ public class PrettyWriter extends PrintConsumer
 
     private void writeToBase(char[] buf, int start, int count) {
         try {
+            //log("writeToBase: "+ gnu.lists.Strings.toJson(new String(buf,start,count)));
             out.write(buf, start, count);
         } catch (IOException ex) {
             throw new RuntimeException(ex);
@@ -743,6 +744,7 @@ public class PrettyWriter extends PrintConsumer
     
     private void writeToBase(String str, int start, int count) {
         try {
+            //log("writeToBase: "+ gnu.lists.Strings.toJson(str.substring(start,start+count)));
             out.write(str, start, count);
         } catch (IOException ex) {
             throw new RuntimeException(ex);
@@ -755,6 +757,7 @@ public class PrettyWriter extends PrintConsumer
 
     private void writeToBase(int ch) {
         try {
+            //log("writeToBase: "+ gnu.lists.Strings.toJson(String.valueOf((char) ch))+"="+ch);
             out.write(ch);
         } catch (IOException ex) {
             throw new RuntimeException(ex);
@@ -916,7 +919,7 @@ public class PrettyWriter extends PrintConsumer
     return scaled > enough ? scaled : enough;
   }
 
-  public void setIndentation (int column)
+  private void setIndentation(int column)
   {
     char[] prefix = this.prefix;
     int prefixLen = prefix.length;
@@ -1395,7 +1398,7 @@ public class PrettyWriter extends PrintConsumer
   boolean maybeOutput(boolean forceNewlines, boolean flushing)
   {
     boolean outputAnything = false;
-    //log("maybeOutput("+forceNewlines+"):");  dumpQueue();
+    //log("maybeOutput("+forceNewlines+","+flushing+"):");  dumpQueue();
     if (! flushing && isDomTerm())
         return false;
   loop:
@@ -1429,7 +1432,7 @@ public class PrettyWriter extends PrintConsumer
 		int indent = queueInts[next+QITEM_INDENTATION_AMOUNT];
                 boolean blockRelative = kind == QITEM_INDENTATION_BLOCK;
                 writeToBase("\033]"
-                            +(blockRelative ? "113" : "114")
+                            +(blockRelative ? "113" : "112")
                             + ";" + indent + "\007");
 	      }
 	    break;
@@ -1617,6 +1620,7 @@ public class PrettyWriter extends PrintConsumer
    */
   private void outputLine (int newline, boolean flushing)
   {
+    //log("outputLine newline:"+newline+" flushing:"+flushing);
     char[] buffer = this.buffer;
     int kind = queueInts[newline + QITEM_NEWLINE_KIND];
     boolean isLiteral = kind == NEWLINE_LITERAL;

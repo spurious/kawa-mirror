@@ -1,3 +1,9 @@
+2016-10-11  Per Bothner  <per@bothner.com>
+
+	* kawa/pprint.scm: Add pretty-printing API,
+	simmilar to Common Lisp and Clojure.
+	* Makefile.am: Update accordingly.
+
 2016-10-05  Per Bothner  <per@bothner.com>
 
 	* kawa/pictures.scm (translate, scale): Allow dimension argument.

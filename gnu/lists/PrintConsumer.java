@@ -106,7 +106,7 @@ public class PrintConsumer extends PrintWriter
         writeBreak(kind);
     }
 
-    protected void writeBreak(int kind) {
+    public void writeBreak(int kind) {
         if (base instanceof PrintConsumer)
             ((PrintConsumer) base).writeBreak(kind);
     }

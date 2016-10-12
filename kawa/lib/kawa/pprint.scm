@@ -94,7 +94,7 @@
 (define (pprint-body body out ::PrintConsumer) ::void
   (pprint-tail body 'linear out))
 
-   (define (pprint-define obj out ::PrintConsumer) ::void
+(define (pprint-define obj out ::PrintConsumer) ::void
   (pprint-logical-block
    prefix: "(" suffix: ")" out: out
    (display (car obj) out)
@@ -116,11 +116,11 @@
    (display " " out)
    ;;(pprint-newline 'miser out)
    (define rest (cdr obj))
-   (cond (and (pair? rest) (symbol? (car rest)))
-         (display (car rest) out)
-         (display " " out)
-         (pprint-newline 'fill out)
-         (set! rest (cdr rest)))
+   (cond ((and (pair? rest) (symbol? (car rest)))
+          (display (car rest) out)
+          (display " " out)
+          (pprint-newline 'fill out)
+          (set! rest (cdr rest))))
    (cond ((and (pair? rest) (list? (car rest)))
           (pprint-logical-block
            prefix: "(" suffix: ")" out: out

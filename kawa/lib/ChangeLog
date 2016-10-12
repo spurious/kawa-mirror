@@ -1,3 +1,7 @@
+2016-10-12  Per Bothner  <per@bothner.com>
+
+	* kawa/pprint.scm (pprint-let): Fix missing parens in cond.
+
 2016-10-11  Per Bothner  <per@bothner.com>
 
 	* kawa/pprint.scm: Add pretty-printing API,

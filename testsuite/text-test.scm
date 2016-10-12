@@ -185,15 +185,19 @@
 
 (import (kawa pprint))
 
-(define (test-pretty-print form width expected)
+(define (format-pretty form width)
   (fluid-let ((*print-right-margin* width))
     (! swr (java.io.StringWriter))
     (! out (gnu.kawa.io.OutPort swr #t #f))
     (out:setPrettyPrinting #t)
     (pprint form out)
-    (out:println)
     (out:close)
-    (test-equal expected (swr:toString))))
+    (swr:toString)))
+
+(define-syntax test-pretty-print
+  (syntax-rules ()
+    ((_ form width expected)
+     (test-equal expected (format-pretty form width)))))
 
 (define form-1
   '(define-private (foo fdsf add) (list b 23) (let ((xy (+ dadasd asdasd)) (xz 12)) (list b 22) ABCD (vector 42343 23423423 234324 989))))
@@ -208,16 +212,15 @@
     &|    (list b 22)
     &|    ABCD
     &|    (vector 42343 23423423
-    &|     234324 989)))
-})
+    &|     234324 989)))})
+
 (test-pretty-print form-1 50 &{
     &|(define-private (foo fdsf add)
     &|  (list b 23)
     &|  (let ((xy (+ dadasd asdasd)) (xz 12))
     &|    (list b 22)
     &|    ABCD
-    &|    (vector 42343 23423423 234324 989)))
-})
+    &|    (vector 42343 23423423 234324 989)))})
 
 (define form-2
   '(if (equal? fdfds sdfsdf) (cond (aa (list bb)) ((null? cc) dd)) (vector xx sxasxs (+ 454 435) dsadd)))
@@ -234,23 +237,39 @@
     &|    (vector xx
     &|     sxasxs
     &|     (+ 454 435)
-    &|     dsadd))
-})
+    &|     dsadd))})
+
 (test-pretty-print form-2 40 &{
     &|(if (equal? fdfds sdfsdf)
     &|    (cond (aa (list bb))
     &|          ((null? cc) dd))
     &|    (vector xx sxasxs (+ 454 435)
-    &|     dsadd))
-})
+    &|     dsadd))})
+
 (test-pretty-print form-2 80 &{
     &|(if (equal? fdfds sdfsdf)
     &|    (cond (aa (list bb)) ((null? cc) dd))
-    &|    (vector xx sxasxs (+ 454 435) dsadd))
-})
+    &|    (vector xx sxasxs (+ 454 435) dsadd))})
+
 (test-pretty-print form-2 200 &{
-    &|(if (equal? fdfds sdfsdf) (cond (aa (list bb)) ((null? cc) dd)) (vector xx sxasxs (+ 454 435) dsadd))
-})
+    &|(if (equal? fdfds sdfsdf) (cond (aa (list bb)) ((null? cc) dd)) (vector xx sxasxs (+ 454 435) dsadd))})
+
+(define form-3
+  '(if (equal? xyz (list asdsads bccc)) (list xyz xyz) (list 987 xy)))
+
+(test-pretty-print form-3 200 &{
+    &|(if (equal? xyz (list asdsads bccc)) (list xyz xyz) (list 987 xy))})
+
+(test-pretty-print form-3 40 &{
+    &|(if (equal? xyz (list asdsads bccc))
+    &|    (list xyz xyz)
+    &|    (list 987 xy))})
+
+(test-pretty-print form-3 30 &{
+    &|(if (equal? xyz
+    &|     (list asdsads bccc))
+    &|    (list xyz xyz)
+    &|    (list 987 xy))})
 
 (test-end)
   

@@ -410,6 +410,9 @@ public class PrettyWriter extends PrintConsumer
   public static final int NEWLINE_SPACE = 'S';
   public static final int NEWLINE_MISER = 'M';
   public static final int NEWLINE_MANDATORY = 'R';  // "required"
+  /** Treat like NEWLINE_LITERAL in terms of ending sections,
+   * but don't actually print anything. */
+  public static final int NEWLINE_DUMMY = 'D';
 
   static final int QITEM_INDENTATION_TYPE = 3;
   static final int QITEM_INDENTATION_SIZE = QITEM_BASE_SIZE + 2;
@@ -1071,7 +1074,7 @@ public class PrettyWriter extends PrintConsumer
 	entry += size;
       }
     if (!sharing) //!!
-      maybeOutput (kind == NEWLINE_LITERAL || kind == NEWLINE_MANDATORY, false);
+      maybeOutput (kind == NEWLINE_LITERAL || kind == NEWLINE_MANDATORY || kind == NEWLINE_DUMMY, false);
   }
 
   public final void writeBreak(int kind)
@@ -1464,7 +1467,7 @@ public class PrettyWriter extends PrintConsumer
             int fits = -1;
 	    switch (queueInts[next+QITEM_NEWLINE_KIND])
 	      {
-	      default: // LINEAR, LITERAL, or MANDATORY:
+	      default: // LINEAR, LITERAL, DUMMY, or MANDATORY:
 		cond = true;
 		break;
 	      case NEWLINE_MISER:
@@ -1626,7 +1629,7 @@ public class PrettyWriter extends PrintConsumer
     boolean isLiteral = kind == NEWLINE_LITERAL;
     int amountToConsume = posnIndex(queueInts[newline + QITEM_POSN]);
     int amountToPrint;
-    if (isLiteral || (isDomTerm() && flushing))
+    if (isLiteral || kind == NEWLINE_DUMMY || (isDomTerm() && flushing))
       amountToPrint = amountToConsume;
     else
       {
@@ -1669,6 +1672,7 @@ public class PrettyWriter extends PrintConsumer
     if (isDomTerm() && flushing) {
         String cmd;
         switch (kind) {
+        case NEWLINE_DUMMY: // FIXME
         case NEWLINE_FILL:
         case NEWLINE_SPACE:
             cmd = "\033]115\007"; break;
@@ -1686,9 +1690,10 @@ public class PrettyWriter extends PrintConsumer
             cmd = "\033]118\007"; break;
         }
         writeToBase(cmd);
-    } else
+    } else if (kind != NEWLINE_DUMMY) {
         writeToBase('\n');
-    bufferStartColumn = 0;
+    }
+    bufferStartColumn = kind != NEWLINE_DUMMY ? 0 : getColumnNumber();
     int fillPtr = bufferFillPointer;
     int prefixLen = isLiteral ? getPerLinePrefixEnd() : getPrefixLength();
     int shift = amountToConsume - prefixLen;
@@ -1874,6 +1879,7 @@ public class PrettyWriter extends PrintConsumer
 
   public void forcePrettyOutput ()
   {
+    enqueueNewline(NEWLINE_DUMMY);
     maybeOutput(false, true);
     if (bufferFillPointer > 0)
       outputPartialLine();
@@ -1902,7 +1908,7 @@ public class PrettyWriter extends PrintConsumer
   public void close()
   {
     if (out != null)
-      { 
+      {
 	forcePrettyOutput();
         super.close();
         out = null;
@@ -2161,6 +2167,7 @@ public class PrettyWriter extends PrintConsumer
 	      {
 	      case NEWLINE_LINEAR:    skind = "linear";    break;
 	      case NEWLINE_LITERAL:   skind = "literal";   break;
+	      case NEWLINE_DUMMY:     skind = "dummy";   break;
 	      case NEWLINE_FILL:      skind = "fill";      break;
 	      case NEWLINE_SPACE:     skind = "space";      break;
 	      case NEWLINE_MISER:     skind = "miser";     break;

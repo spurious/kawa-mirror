@@ -1,3 +1,8 @@
+2016-10-12  Per Bothner  <per@bothner.com>
+
+	* PrettyWriter.java: Define NEWLINE_DUMMY newline type.
+	This prints nothing, but is used to end "sections".
+
 2016-10-11  Per Bothner  <per@bothner.com>
 
 	* PrettyWriter.java: Fix two small bugs.

@@ -49,6 +49,8 @@ DOC_IMAGES = \
   images/paint-circ-2.png \
   images/paint-circ-3.png \
   images/paint-circ-4.png \
+  images/polygon-1.png \
+  images/polyline-1.png \
   images/re-center-1.png \
   images/re-center-2.png \
   images/show-draw-1.png \

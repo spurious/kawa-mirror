@@ -1,3 +1,7 @@
+2016-10-11  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Tutorial - Picture): More fleshed out.
+
 2016-10-05  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Composable pictures): More text and examples.

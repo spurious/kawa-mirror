@@ -2042,10 +2042,101 @@ For example:
 &P[30 20]
 @end example
 is a a point 30 pixels right and 20 pixels down from the origin point.
+To create a circle centered on that point do @code{(center 30 &P[30 20])}.
 
 The expression @code{(rectangle &P[10 20] &P[50 40])} creates
 a rectangle whose upper left corner is (10,20) and whose
 lower right corner (50,40).
+
+A @dfn{dimension} is a pair of a width and height,
+and is written:
+@example
+&D[@var{width} @var{height}]
+@end example
+In addition to being used for sizes,
+a deminsion is also used for relative offsets.
+For example the previous rectangle could also
+be written  @code{(rectangle &P[10 20] &D[40 20])}.
+
+You can you @code{line} to create a line.
+More generally, if you specify @var{n} points you get a
+@dfn{polyline} of @var{n-1} line segments:
+@example
+#|kawa:3|# @kbd{(line &P[10 20] &P[50 60] &P[90 0])}
+@image{images/polyline-1}
+@end example
+The same line using dimensions for relative offsets:
+@example
+#|kawa:4|# @kbd{(line &P[10 20] &D[40 20] &D[40 -60])}
+@end example
+
+A @dfn{closed shape} is one whose end point is the same as its start point.
+The @code{polygon} functions creates one using straight line segments
+@example
+#|kawa:5|# @kbd{(polygon &P[10 20] &P[50 60] &P[90 0])}
+@image{images/polygon-1}
+@end example
+
+@subheading Colors and filling
+
+You can override the default color (black) using the
+@code{with-paint} procedure, which takes a color and a picture
+to produce a new picture:
+@example
+#|kawa:6|# @kbd{(with-paint 'red (circle 32))}
+@end example
+
+The first arguement can be either one of the standard CSS/HTML5 color
+names (such as @code{'red} or @code{'medium-slate-blue}),
+or an integer represent an a sRBG color, usually written
+as a hex literal in the form @code{#xRRGGBB}:
+@example
+#|kawa:7|# @kbd{(with-paint #x0808FF (circle 32))}
+@end example
+
+The name @code{with-paint} refers to that the first argument
+can be not just a color, but a general ``paint'', such as
+a gradient or a background image.  However, we won't go into that.
+
+If the spape is closed, you can ``fill'' its inside:
+@example
+(fill (circle 32))
+@end example
+
+You can change the color using @code{with-paint}:
+@example
+(with-paint 'goldenrod (fill (circle 32)))
+@end example
+or as an extra argument to @code{fill}:
+@example
+(fill 'goldenrod (circle 32))
+@end example
+
+draw TODO
+
+@subheading Images
+An image is a picture represented as a rectangular grid of color values.
+It may be a photograph from a camera, or be created by a painting
+program like Photoshop or gimp.
+You can use @code{image-read} to read an image from a file,
+typically a @code{png} or @code{.jpg}file.
+
+@example
+#|kawa:10|# @kbd{(define img1 (image-read "http://pics.bothner.com/2013/Cats/06t.jpg"))}
+#|kawa:11|# @kbd{img1}
+@image{images/image-cat-1a}
+@end example
+
+@subheading Transforms TODO
+
+@example
+#|kawa:12|# @kbd{(scale 0.6 (rotate 30 img1))}
+@image{images/image-cat-1b}
+@end example
+
+@subheading Combining and adjusting pictures TODO
+
+@subheading Using and combining pictures TODO
 
 @node Tutorial - Sequences
 @section Lists and sequences
@@ -12429,7 +12520,7 @@ This is the product of @code{(- (array-end @var{array} @var{k}) (array-start @va
 @deffn Type array
 @deffnx Type array@var{N}
 @deffnx Type array[@var{etype}]
-@deffnx Type array@var{N}[@var{etype}
+@deffnx Type array@var{N}[@var{etype}]
 
 The type @code{array} matches all array values.
 The type @code{array@var{N}}, where @var{N} is an integer
@@ -19942,8 +20033,8 @@ but you can use any methods that create a @code{java.awt.Shape} object.
 @deffn Procedure line p1 [p2 ...]
 In the simple case two points are specified, and the result
 is a line that goes from point @var{p1} to @var{p2}.
-If @var{n} points are specied, the result is path consisting of
-@var{n-1} line segments, connecting adjacent arguments.
+If @var{n} points are specied, the result is a @dfn{polyline}:
+a path consisting of @var{n-1} line segments, connecting adjacent arguments.
 (If only a single point is specified, the result is degenerate
 single-point shape.)
 

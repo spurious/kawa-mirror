@@ -8,6 +8,12 @@ changes}.
 @anchor{#in-subversion-repository-since-last-release}
 @itemize
 @item
+The @ref{Composable pictures,@code{(kawa pictures}) library} lets
+you create ``picture'' objects,
+display them, transform them, combine them, and more.
+@item
+There is a new @ref{Pretty-printing,API for pretty-printing}.
+@item
 Basic support for Java 9 (though still some issues).
 @item
 Print bit-vectors using the Common Lisp (and Guile) reader syntax.
@@ -47,7 +53,7 @@ More options for @ref{Ranges,range objects}.  For example,
 you can write @code{[1 by: 2 <=: 9]}.
 
 @item
-Many enhancements to arrays and vectors:
+Many enhancements to @ref{Arrays,arrays} and vectors:
 
 @itemize
 @item
@@ -121,12 +127,6 @@ can still use @code{set-input-port-prompter!} to set a more general
 prompt-procedure, but it is now only called for the initial line of a
 command, not continuation lines.
 @item
-Various REPL enhancements when using @uref{http://domterm.org/,DomTerm}.
-
-You can load or modify styles with the @code{domterm-load-stylesheet}
-proeure.
-
-@item
 The new @code{--with-jline3} configure option builds support for the
 @uref{https://github.com/jline/jline3,JLine (version 3)} library for
 handling console input, similar to GNU readline.
@@ -135,6 +135,26 @@ Context-dependent command-completion (tab-completion) works when using
 JLine.
 @end itemize
 
+@item
+Various REPL enhancements when using @uref{http://domterm.org/,DomTerm}.
+@itemize
+@item
+If you ``print'' an XML/HTML node, it gets inserted into the DomTerm
+objects.  You print images, tables, fancy text, and more.
+@item
+If you ``print'' a picture object or a @code{BuferredImage}
+the picture is shown in the DomTerm console.
+@item
+You can load or modify styles with the @code{domterm-load-stylesheet}
+procedure.
+@item
+When pretty-printing, calculation of line-breaks and indentation
+is handled by DomTerm.
+If you change the window width, DomTerm will dynamically
+re-calculate the line-breaks of previous pretten output.
+This works even in the case of a session saved to an HTML
+file, as long as JavaScript is enabled.
+@end itemize
 @item
 Multiple literals that have the same value (as in @code{equal?}) get
 compiled to the same object.

@@ -999,18 +999,6 @@ Kawa currently records the line and column position of syntactic elements.
 For an IDE it is desirable to have both start and end position of an element,
 for example so it can put a squiggly line under an erroneous form.
 
-@subsection Output formatting and pretty printing
-@emph{This part done.}
-It would be nice to integrate the pretty-printer with the REPL,
-so that window re-sizing re-breaks the output lines.
-It would be nice to enhance the pretty-printer to handle
-variable-width fonts and other ``rich'' text.
-This might best be done in the context of an enhanced
-terminal emulator such as @uref{http://domterm.org,DomTerm}.
-
-Figuring out how to make the output formatter more flexible,
-more efficient, and more customizable are also desirable.
-
 @subsection Hop-style web programming
 @uref{http://hop.inria.fr/,Hop} is an interesting design
 for integrating server-side and client-side programming using
@@ -13927,6 +13915,7 @@ A powerful pretty-printer.
 * Reading and writing whole files::
 * Ports::
 * Format:: Formatted Output (Common-Lisp-style)
+* Pretty-printing::
 * Resources::
 @end menu
 
@@ -15504,6 +15493,158 @@ be processed by @code{read}.
 may also print number strings, i.e. passing a number as a string and
 format it accordingly.
 @end table
+
+@node Pretty-printing
+@section Pretty-printing
+
+Pretty-printing is displaying a data structure as text,
+by adding line-breaks and indenttaion so that the visual
+structure of the output corresponds to the logical structure of
+data structure.  This makes it easier to read and understand.
+Pretty-printing takes into account the column width of the output
+so as to avoid using more lines than needed.
+
+Pretty-printing of standard sequences types such as lists and
+vectors is done by default.  For example:
+@example
+#|kawa:11|# @kbd{(set! *print-right-margin* 50)}
+#|kawa:12|# @kbd{'(ABCDEF (aa bb cc dd) (x123456789}
+#|.....13|# @kbd{y123456789 z123456789) ABCDEFG HIJKL)}
+(ABCDEF (aa bb cc dd)
+ (x123456789 y123456789 z123456789) ABCDEFG HIJK)
+@end example
+Setting @code{*print-right-margin*} to 50
+causes output to be limited to 50 columns.
+Notice the top-level list has to be split,
+but sub-lists @code{(aa bb cc dd)}
+and @code{(x123456789 y123456789 z123456789)}
+don't need to be split.
+
+When outputting to a DomTerm REPL,
+then @code{*print-right-margin*} is ignored,
+and the line-breaking is actually handled by DomTerm.
+If you change the window width, DomTerm will dynamically
+re-calculate the line-breaks of previous pretten output.
+This works even in the case of a session saved to an HTML
+file, as long as JavaScript is enabled.
+
+The concepts and terminology are
+based on those of @uref{https://www.cs.cmu.edu/Groups/AI/html/cltl/clm/node253.html,Common Lisp}.
+
+@subsection Pretty-printing Scheme forms
+
+Scheme and Lisp code is traditionally pretty-printed
+slightly differently than plain lists.
+The @code{pprint} procedure assumes the argument
+is a Scheme form, and prints its accordingly.
+For example the special form @code{(let ...)} is printed
+differently from a regular function call @code{(list ...)}.
+
+@deffn Procedure pprint obj [out]
+Assume @var{obj} is a Scheme form, and pretty-print it
+in traditional Scheme format.  For example:
+@example
+#|kawa:1|# @kbd{(import (kawa pprint))}
+#|kawa:2|# @kbd{(define fib-form}
+#|.....3|# @kbd{  '(define (fibonacci n)}
+#|.....4|# @kbd{     (let loop ((i0 0) (i1 1) (n n))}
+#|.....5|# @kbd{       (if (<= n 0) i0}
+#|.....6|# @kbd{           (loop i1 (+ i0 i1) (- n 1))))))}
+#|kawa:7|# @kbd{(set! *print-right-margin* 80)}
+#|kawa:8|# @kbd{(pprint fib-form)}
+(define (fibonacci n)
+  (let loop ((i0 0) (i1 1) (n n)) (if (<= n 0) i0 (loop i1 (+ i0 i1) (- n 1)))))
+#|kawa:9|# @kbd{(set! *print-right-margin* 40)}
+#|kawa:10|# @kbd{(pprint fib-form)}
+(define (fibonacci n)
+  (let loop ((i0 0) (i1 1) (n n))
+    (if (<= n 0)
+        i0
+        (loop i1 (+ i0 i1) (- n 1)))))
+@end example
+
+The @code{pprint} special-cases forms that start with
+@code{define}, @code{if}, @code{lambda}, @code{let},
+and a few more, and formats them with ``traditional'' indentation.
+However, it is not as complete or polished as it should be.
+(It should also use a programmable dispatch table,
+rather than having these special cases hard-wired.
+That is an improvemet for another day.)
+@end deffn
+
+@subsection Generic pretty-printing functions
+
+The following procedures are used to indicate logical blocks,
+and optional newlines.
+
+To access them do:
+@example
+(import (kawa pprint))
+@end example
+
+In the following, @var{out} is the output port, which
+defaults to @code{(current-output-port)}.
+
+@deffn Syntax pprint-logical-block @var{options} @arbno{@stxref{statement}}
+
+Evaluate the @var{statement}s within the context of a new ``logical block''.
+
+
+The @var{options} are one or more of the following:
+@table @asis
+@item @stxlit{prefix:} @var{prefix}
+@itemx @stxlit{per-line:} @var{per-line-prefix}
+Emit @var{prefix} or @var{per-line-prefix} (only one of them can be specified) before the start of the logical block.
+If @var{per-line-prefix} is provided, it is also print for each
+line within the logical block, indented the same.
+These are strings and default to @code{""}.
+@item @stxlit{suffix:} @var{suffix}
+Emit @var{suffix} after the end of the logical block.
+@item @stxlit{out:} @var{out}
+The output file.
+@end table
+
+For example to print a list you might do:
+@example
+(pprint-logical-block prefix: "(" suffix: ")"
+   @i{print contents of list})
+@end example
+
+This macro is equivalent to:
+@example
+(pprint-start-logical-block @var{prefix} @var{is-per-line} @var{suffix} @var{out})
+(try-finally
+  (begin @arbno{@var{statement}})
+  (pprint-end-logical-block @var{suffix} @var{out}))
+@end example
+@end deffn
+
+@deffn Procedure pprint-start-logical-block prefix is-per-line suffix out
+Start a logical block.
+The @var{is-per-line} argument is a boolean to specifiy
+of @var{prefix} is a per-line-prefix or a plain prefix.
+@end deffn
+@deffn Procedure pprint-end-logical-block suffix out
+End a logical block.
+@end deffn
+
+@deffn Procedure pprint-newline kind [out]
+Print a conditional newline, where @var{kind} is one of the
+symbols @code{'fill}, @code{'linear}, @code{'mandatory},
+or @code{'miser}.
+Usually follows printing of a space, as nothing is printed
+if the line is not broken here.
+@end deffn
+
+@deffn Procedure pprint-ident mode amount [out]
+Change how much following lines are indented
+(with the current logical block).
+The @var{amount} is the size of the indentation, in characters.
+The @var{mode} is either @code{'current} (if the
+@var{amount} is relative to the current position),
+or @code{'block} (if the @var{amount} is relative to the
+start (after any @var{prefix}) of the current logical block).
+@end deffn
 
 @node Resources
 @section Resources

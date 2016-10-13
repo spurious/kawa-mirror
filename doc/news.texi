@@ -8,6 +8,12 @@ changes}.
 @anchor{#in-subversion-repository-since-last-release}
 @itemize
 @item
+A binary release is no longer just a Kawa @code{.jar} file,
+but is now a @code{zip} archive that also includes
+shell/batch scripts for running Kawa, useful
+third-party libraries, and the complete documentation in EPUB format.
+The archives are named @code{kawa-version.zip}.
+@item
 The @ref{Composable pictures,@code{(kawa pictures}) library} lets
 you create ``picture'' objects,
 display them, transform them, combine them, and more.
@@ -15,14 +21,6 @@ display them, transform them, combine them, and more.
 There is a new @ref{Pretty-printing,API for pretty-printing}.
 @item
 Basic support for Java 9 (though still some issues).
-@item
-Print bit-vectors using the Common Lisp (and Guile) reader syntax.
-For example @code{#*1100110}. Enhance the reader to read this format.
-@item
-Binary releases are now archives that package not only the Kawa
-@code{.jar} files, but also shell/batch scripts for running Kawa, useful
-third-party libraries, and the complete documentation in EPUB format.
-The archives are named @code{kawa-version.zip}.
 @item
 Generated files like @code{Makefile.in} and @code{configure} are no
 longer in the Subversion source code repository, though they are still
@@ -112,6 +110,10 @@ New @code{format-array} procedure print an array a tabular 2-dimensional
 (APL-like) format. This format is used by default in the top-level of
 the REPL.
 @end itemize
+
+@item
+Print bit-vectors using the Common Lisp (and Guile) reader syntax.
+For example @code{#*1100110}. Enhanced the reader to read this format.
 
 @item
 Various REPL enhancements and new features:

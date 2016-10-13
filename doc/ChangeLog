@@ -1,3 +1,8 @@
+2016-10-13  Per Bothner  <per@bothner.com>
+
+	* kawa.texi: Multiple small improvements.
+	* news.texi: Likewise.
+
 2016-10-12  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Pretty-printing): New section.

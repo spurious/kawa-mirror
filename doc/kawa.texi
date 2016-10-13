@@ -241,9 +241,9 @@ Deployment is easy and flexible.  You just need the Kawa jar file.
 @ref{Macros} and @ref{Named quasi-literals,custom named literals} make it easy
 to extend the syntax, and implement Domain-Specific Languages.
 
-Kawa provides the usual read-eval-print loop, as well as batch modes.
+Kawa provides the usual @ref{REPL Console,read-eval-print loop}, as well as batch modes.
 
-Kawa has builtin pretty-printer support, and fancy formatting.
+Kawa has builtin @ref{Pretty-printing,pretty-printer} support, and fancy formatting.
 
 Kawa supports class-definition facilities, and separately-compiled modules.
 
@@ -251,6 +251,13 @@ You can @ref{Allocating objects,allocate and initialize objects}
 with a compact ``builder'' syntax.  It works out-of-the-box
 (with no run-time overhead) on many classes and APIs,
 but can be customized if need be.
+
+A library for functional @ref{Composable pictures,composable pictures}
+lets you create ``picture'' objects,
+display them, transform them, combine them, convert to
+SVG or images, and more.
+This can be ``printed'' directly in the Kawa console
+(either the DomTerm console or the Swing one).
 
 @ref{Building JavaFX applications,JavaFX programming} is simpler.
 
@@ -263,9 +270,23 @@ Flexible shell-like functionality, including @ref{process literals}.
 with @ref{Self-configuring page scripts,self-configuring web servers}
 and optionally using @ref{Servlets,servlets} and @ref{XML literals}.
 
-Kawa implements the full numeric tower, including infinite-precision
-rational numbers and complex numbers.  It also supports @ref{Quantities}
-with units, such as @code{3cm}.
+Many useful features for mathematics and numerics:
+@itemize
+@item
+The full ``numeric tower'' includes infinite-precision
+rational numbers and complex numbers.
+@item
+Compile-time optimization of arithmetic
+with the use of type declarations and inference.
+@item
+A @ref{Quantities,@dfn{quantity}} is a real number with a unit,
+such as @code{3cm}.
+@item
+@ref{Quaternions} are a 4-dimensional generalization of complex numbers.
+Unsigned primitive integer types (@code{ubyte}, @code{ushort},
+@code{uint}, @code{ulong}) are implemented efficiently without
+object allocation.
+@end itemize
 
 A @ref{Lazy evaluation,lazy value} wraps an expression which is evaluated
 only when it is needed.
@@ -2757,8 +2778,10 @@ Provide better compatibility with the specified Scheme standards.
 For example @code{--r6rs} aims to disable Kawa extensions
 that conflict with R6RS.  It does not aim to disable all extensions,
 only incompatible extensions.
-So far these extensions disable the colon operator and keyword literals,
+These extensions disable the colon operator and keyword literals,
 as well as the use of initial @samp{@@} as a splicing operator.
+The ``@code{l}'' exponent suffix of a number literal creates a
+floating-point double, rather than a @code{BigInteger}.
 Selecting @code{--r5rs} makes symbols by default
 case-insensitive.
 @item --elisp
@@ -2889,7 +2912,7 @@ or ``terminal'', but these are useful for overriding that detection.
 The @code{--console} flag is useful when the standard input is a pipe,
 but you want to direct Kawa to treat it as an interactive terminal.
 The @code{--no-console} flag was useful for older pre-Java-6
-implementations that did not have teh @code{java.lang.Console} class.
+implementations that did not have the @code{java.lang.Console} class.
 @item @code{console:use-domterm=}[@code{yes}|@code{no}]
 @item @code{console:use-jline=}[@code{yes}|@code{no}]
 @item @code{console:prompt1=@var{prompt1}}
@@ -8699,6 +8722,15 @@ arguments.
 @end example
 @end deffn
 
+@deffn Procedure sinh z
+@deffnx Procedure cosh z
+@deffnx Procedure tanh z
+@deffnx Procedure asinh z
+@deffnx Procedure acosh z
+@deffnx Procedure atanh z
+The hyperbolic functions.
+@end deffn
+
 @deffn Procedure square z
 Returns the square of @var{z}.
 This is equivalent to @code{(* @var{z} @var{z})}.
@@ -11530,11 +11562,26 @@ there is usually a function @code{@var{stype}-ref}.  For example:
 (define vec1 (vector 5 6 7 8))
 (vector-ref vec1 2) @result{} 7
 @end example
+
 More concisely, you can use (Kawa-specific) function call syntax:
 @example
 (vec1 3) @result{} 8
 @end example
-The same function call syntax also works for raw Java arrays:
+
+The index can be another sequence, which creates a new sequence
+of the selected indexes:
+@example
+(vec1 [3 0 2 1]) @result{} #(8 5 7 6)
+@end example
+It is convenient to use a @ref{Ranges,@dfn{range}} to select
+a sub-sequence:
+@example
+(vec1 [1 <=: 3]) @result{} #(6 7 8)
+(vec1 [2 <:]) @result{} #(7 8)
+@end example
+
+The same function call syntax also works for raw Java arrays
+(though the index is restricted to an integer, not a sequence or array):
 @example
 (define arr1 (long[] 4 5 6 7))
 (arr1 3) @result{} 7
@@ -11925,6 +11972,19 @@ The type names (such as @code{s8vector}) are a Kawa extension.
     | @stxlit{s8} | @stxlit{s16} | @stxlit{s32} | @stxlit{s64}
     | @stxlit{u8} | @stxlit{u16} | @stxlit{u32} | @stxlit{u64}
 @end display
+
+This example is a literal for a 5-element vector of unsigned short (@code{ushort}) values:
+@example
+(define uvec1 #u16(64000 3200 160 8 0))
+@end example
+
+Since a uniform vector is a sequence, you can use function-call
+notation to index one.  For example:
+@example
+(uvec1 1) @result{} 3200
+@end example
+In this case the result is a primitive unsigned short (@code{ushort}),
+which is converted to a @code{gnu.math.UShort} if an object is needed.
 
 @deffn Type s8vector
 The type of uniform vectors where each element can contain

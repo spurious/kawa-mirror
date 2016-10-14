@@ -575,6 +575,7 @@
         <file name="arrays.scm"/>
         <file name="system.scm"/>
         <file name="kawa/pictures.scm"/>
+        <file name="kawa/process-keywords.scm"/>
         <file name="kawa/string-cursors.scm"/>
         <file name="kawa/quaternions.scm"/>
         <file name="kawa/rotations.scm"/>
@@ -609,6 +610,7 @@
       </filelist>
       <fileset dir="${src.dir}/kawa/lib">
         <include name="windows.scm" if="${with-swing}"/>
+        <include name="kawa/swing.scm" if="${with-swing}"/>
       </fileset>
     </kawac>
   </target>

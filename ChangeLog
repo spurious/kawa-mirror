@@ -1,3 +1,8 @@
+2016-10-13  Jamison Hope  <jrh@theptrgroup.com>
+
+	* build.xml (lib-scm-classes): Update for new libraries (kawa
+	process-keywords) and (kawa swing).
+
 2016-09-03  Per Bothner  <per@bothner.com>
 
 	* configure.ac: Recognize --with-java-source=9.

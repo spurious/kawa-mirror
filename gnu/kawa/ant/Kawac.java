@@ -757,17 +757,50 @@ public class Kawac extends MatchingTask {
   }
 
   private static class MangleFileNameMapper implements FileNameMapper {
-    // A simplified version of Language.mangleNameIfNeeded().
+    // A simplified version of Compilation.mangleSymbolic().  We're
+    // dealing with paths and file extensions, so do not mangle
+    // anything before the last '/', and do not mangle '.'.
     private String mangleNameIfNeeded(String name) {
-      if (name == null || !name.contains("-")) return name;
-      int len = name.length();
-      StringBuffer mangled = new StringBuffer(len);
-      for (int i  = 0; i < len; ++i) {
-        char ch = name.charAt(i);
-        if (ch == '-') mangled.append("$Mn");
-        else mangled.append(ch);
+      if (name == null) return name;
+      StringBuilder sbuf = null;
+      int dirend = name.lastIndexOf('/');
+      String dir = null;
+      String fname = name;
+      if (dirend != -1) {
+        dir = name.substring(0, dirend+1);
+        fname = name.substring(dirend+1);
       }
-      return mangled.toString();
+      int len = fname.length();
+      int dangerous = 0;
+      for (int i = 0; i < len; i++) {
+        char ch = fname.charAt(i);
+        char ch2 = 0;
+        switch (ch) {
+          case ';':  ch2 = '?'; break;
+          case '$':  ch2 = '%'; break;
+          case '[':  ch2 = '{'; break;
+          case ']':  ch2 = '}'; break;
+          case ':':  ch2 = '!'; break;
+          case '\\': ch2 = '-'; break;
+        }
+        if (ch2 != 0 && ch != '\\')
+          dangerous++;
+        if (sbuf != null) {
+          if (ch2 == 0)
+            sbuf.append(ch);
+          else
+            sbuf.append('\\').append(ch2);
+        } else if (ch2 != 0) {
+          sbuf = new StringBuilder();
+          if (dir != null)
+            sbuf.append(dir);
+          if (i != 0)
+            sbuf.append("\\=");
+          sbuf.append(fname, 0, i);
+          sbuf.append('\\').append(ch2);
+        }
+      }
+      return sbuf == null || dangerous == 0 ? name : sbuf.toString();
     }
 
     public String[] mapFileName(String sourceFileName) {

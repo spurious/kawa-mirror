@@ -1,3 +1,8 @@
+2016-10-14  Jamison Hope  <jrh@theptrgroup.com>
+
+	* Kawac.java (getMapper): Update file name mangling to approximate
+	Compilation.mangleClassName().
+
 2015-06-02  Jamison Hope  <jrh@theptrgroup.com>
 
 	* Kawac.java (getMapper): Add file name mangling step to replace

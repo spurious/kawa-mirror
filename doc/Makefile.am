@@ -65,7 +65,9 @@ EXTRA_DIST = scm2java.html kawa.man qexo.man mdate-sh +default+ README-epub \
   style/kawa-logo.png $(DOC_IMAGES)
 info_TEXINFOS = kawa.texi
 kawa_TEXINFOS = news.texi
-MOSTLYCLEANFILES = kawa.xml
+MOSTLYCLEANFILES = kawa.xml \
+  kawa.vr kawa.aux kawa.fn kawa.log kawa.cp kawa.toc \
+  kawa.cps kawa.fns kawa.vrs
 MAINTAINERCLEANFILES = kawa.txt *.info 
 
 # Redundant if configured with  --enable-maintainer-mode.

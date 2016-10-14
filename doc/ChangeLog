@@ -1,5 +1,7 @@
 2016-10-13  Per Bothner  <per@bothner.com>
 
+	* kawa.texi: Document domterm-load-stylesheet. Other changes.
+
 	* Makefile.am (MOSTLYCLEANFILES): Add some TeX temporaries.
 
 	* kawa.texi: Multiple small improvements.

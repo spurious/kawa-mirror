@@ -270,6 +270,12 @@ Flexible shell-like functionality, including @ref{process literals}.
 with @ref{Self-configuring page scripts,self-configuring web servers}
 and optionally using @ref{Servlets,servlets} and @ref{XML literals}.
 
+@ref{Arrays} and sequences have a lot of flexibility:
+Arrays can be multi-dimensional;
+you can use an array as an index (which generalizes slices and permutations);
+you can define a lazy array using a function that maps indexes to values;
+you can re-map the indexes to yield a transformed array.
+
 Many useful features for mathematics and numerics:
 @itemize
 @item
@@ -1338,6 +1344,9 @@ The file @code{doc/kawa-manual.epub} contains the Kawa documention
 packaged as an electronic book, which is readable by most
 e-book readers.  Plugins are also available for common browsers,
 for example @uref{http://www.epubread.com,EPUBReader} for @code{firefox}.
+
+The script @code{bin/browse-kawa-manual} (in the binary
+distribution) also works.  It uses JavaFX WebView.
 
 An @code{epub} is essentially a zip archive, which you can unzip:
 @example
@@ -3395,7 +3404,7 @@ Either approach works and both give you the benefits of DomTerm:
 @itemize
 @item
 A xterm/ansi-compatible terminal emulator,
-which mans you can you (for exaple) JLine3 for input editing.
+which means you can use (for example) JLine3 for input editing.
 @item
 You can ``print'' images, @ref{Composable pictures,pictures}, or HTML elements.
 @item
@@ -3412,6 +3421,19 @@ which can be customized with CSS.
 @end itemize
 
 For now it is recommended to use both DomTerm and JLine3.
+
+@deffn Procedure domterm-load-stylesheet stylesheet [name]
+The string @var{stylesheet} should be a literal CSS stylesheet
+which is downloaded into the current DomTerm console.
+The new stylesheet is given the attribute @code{name=@var{name}},
+where @var{name} defaults to @code{"Kawa"}.  If there is an
+existing stylesheey whose @code{name} attribute is @var{name},
+it is replaced.
+In this example we change the background color to light gray:
+@example
+(domterm-load-stylesheet "div.domterm @{ background-color: lightgray@}")
+@end example
+@end deffn
 
 @node Exiting
 @section Exiting Kawa

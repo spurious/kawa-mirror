@@ -1,3 +1,8 @@
+2016-10-14  Sudarshan S Chawathe <chaw@eip10.org>
+            Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Defining new classes): Fix typos.
+
 2016-10-13  Per Bothner  <per@bothner.com>
 
 	* kawa.texi: Document domterm-load-stylesheet. Other changes.

@@ -16273,7 +16273,7 @@ For example:
 @end table
 
 The scope of the @var{body} of a method includes the @var{field-decl}s
-and @var{field-decl}s of the body, including those inherited from
+and @var{method-decl}s of the class, including those inherited from
 superclasses and implemented interfaces.
 
 If the @var{method-body} is the special form @code{#!abstract},

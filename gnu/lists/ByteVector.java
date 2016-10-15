@@ -84,11 +84,12 @@ public abstract class ByteVector<E> extends PrimIntegerVector<E>
     }
 
     public void writeTo(OutputStream out)
-            throws IOException {
+        throws IOException {
         writeTo(0, size(), out);
     }
+
     public void writeTo(int start, int count, OutputStream out)
-            throws IOException {
+        throws IOException {
         while (count > 0) {
             long result = getSegment(start);
             int where = (int) result;

@@ -52,6 +52,7 @@ public  class FVector<E> extends SimpleVector<E>
     public static FVector make(Object... data) {
         return new FVector(data);
     }
+
     public static <E> FVector<E> makeConstant(E... data) {
         FVector<E> vec = new FVector(data);
         vec.setReadOnly();

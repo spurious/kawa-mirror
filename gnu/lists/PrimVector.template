@@ -69,6 +69,17 @@ public @Abstract class $CNAME$ extends $SUPER$
         return new FVector(data);
     }
 
+    public static <E> FVector<E> makeConstant(E... data) {
+        FVector<E> vec = new FVector(data);
+        vec.setReadOnly();
+        return vec;
+    }
+
+    public void replaceAll(E[] data) {
+        this.data = data;
+        this.info = VERY_SIMPLE_FLAG;
+    }
+
     public void copyFrom (int index, FVector<E> src, int start, int end) {
         int count = end-start;
         int sz = size();
@@ -295,6 +306,11 @@ public @Abstract class $CNAME$ extends $SUPER$
             count -= n;
         }
         return pos - start;
+    }
+
+    public void writeTo(OutputStream out)
+        throws IOException {
+        writeTo(0, size(), out);
     }
 
     public void writeTo(int start, int count, OutputStream out)

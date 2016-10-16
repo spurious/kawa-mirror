@@ -203,7 +203,7 @@ small number of disallowed characters. Note this is currently
 Allow @code{'synchronized} and @code{'strictfp} as access flags for
 methods.
 @item
-You can now have a type-specier for @code{define-variable}.
+You can now have a type-specifier for @code{define-variable}.
 
 @item
 Better support for forward references between macros.

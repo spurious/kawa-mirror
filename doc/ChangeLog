@@ -1,3 +1,8 @@
+2016-10-16  Per Bothner  <per@bothner.com>
+
+	* kawa.texi: Document need for running autogen.sh.
+	* news.texi: Fix old typo.
+
 2016-10-14  Sudarshan S Chawathe <chaw@eip10.org>
             Per Bothner  <per@bothner.com>
 

@@ -1220,6 +1220,12 @@ Use this command instead:
 svn -q checkout http://sourceware.org/svn/kawa/trunk kawa
 @end example
 
+After a checkout you will need to run:
+@example
+./autogen.sh
+@end example
+before proceding with instructions for @ref{Source distribution,building the source distribution}.
+
 Once you have it checked out, you can keep it up-to-date with @code{svn update}.
 
 You can also
@@ -1387,10 +1393,17 @@ the features of the @code{configure}+@code{make} method.
 (See @ref{building-on-Windows-with-make,below} for some notes for building
 on Microsoft Windows.)
 
-In your build directory do:
+If you have a @code{tar.gz} file, first unpack that in your build directory:
 @example
 tar xzf kawa-@value{VERSION}.tar.gz
 cd kawa-@value{VERSION}
+@end example
+
+If you're building from the Subversion repository, you need to
+generate @code{configure} and some other files. This is
+easiest done with the @code{autogen.sh} script:
+@example
+./autogen.sh
 @end example
 
 Then you must configure the sources.  This you can do

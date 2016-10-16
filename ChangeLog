@@ -1,3 +1,9 @@
+2016-10-16  Jamison Hope  <jrh@theptrgroup.com>
+
+	* build.xml (generate-simplevector-files)
+	(clean-generated-simplevector-files): New targets to generate and
+	clean PrimVector.template-based source files.
+
 2016-10-13  Jamison Hope  <jrh@theptrgroup.com>
 
 	* build.xml (lib-scm-classes): Update for new libraries (kawa

@@ -451,6 +451,111 @@
 
   </target>
 
+  <target name="-make-primvector-source">
+    <java classname="gnu.kawa.util.PreProcess">
+      <classpath location="${build.tools}"/>
+      <arg value="%${TAG}"/>
+      <arg value="%UniformVector"/>
+      <arg value="-o"/>
+      <arg value="gnu/lists/${OUT}Vector.java"/>
+      <arg value="gnu/lists/PrimVector.template"/>
+    </java>
+  </target>
+
+  <target name="-maybe-generate-simplevector-files" unless="simplevector-files-uptodate">
+    <antcall target="-make-primvector-source">
+      <param name="TAG" value="OBJECT"/>
+      <param name="OUT" value="F"/>
+    </antcall>
+    <antcall target="-make-primvector-source">
+      <param name="TAG" value="BIT"/>
+      <param name="OUT" value="Bit"/>
+    </antcall>
+    <antcall target="-make-primvector-source">
+      <param name="TAG" value="BYTE"/>
+      <param name="OUT" value="Byte"/>
+    </antcall>
+    <antcall target="-make-primvector-source">
+      <param name="TAG" value="SHORT"/>
+      <param name="OUT" value="Short"/>
+    </antcall>
+    <antcall target="-make-primvector-source">
+      <param name="TAG" value="INT"/>
+      <param name="OUT" value="Int"/>
+    </antcall>
+    <antcall target="-make-primvector-source">
+      <param name="TAG" value="LONG"/>
+      <param name="OUT" value="Long"/>
+    </antcall>
+    <antcall target="-make-primvector-source">
+      <param name="TAG" value="F32"/>
+      <param name="OUT" value="F32"/>
+    </antcall>
+    <antcall target="-make-primvector-source">
+      <param name="TAG" value="F64"/>
+      <param name="OUT" value="F64"/>
+    </antcall>
+    <antcall target="-make-primvector-source">
+      <param name="TAG" value="S8"/>
+      <param name="OUT" value="S8"/>
+    </antcall>
+    <antcall target="-make-primvector-source">
+      <param name="TAG" value="S16"/>
+      <param name="OUT" value="S16"/>
+    </antcall>
+    <antcall target="-make-primvector-source">
+      <param name="TAG" value="S32"/>
+      <param name="OUT" value="S32"/>
+    </antcall>
+    <antcall target="-make-primvector-source">
+      <param name="TAG" value="S64"/>
+      <param name="OUT" value="S64"/>
+    </antcall>
+    <antcall target="-make-primvector-source">
+      <param name="TAG" value="U8"/>
+      <param name="OUT" value="U8"/>
+    </antcall>
+    <antcall target="-make-primvector-source">
+      <param name="TAG" value="U16"/>
+      <param name="OUT" value="U16"/>
+    </antcall>
+    <antcall target="-make-primvector-source">
+      <param name="TAG" value="U32"/>
+      <param name="OUT" value="U32"/>
+    </antcall>
+    <antcall target="-make-primvector-source">
+      <param name="TAG" value="U64"/>
+      <param name="OUT" value="U64"/>
+    </antcall>
+  </target>
+
+  <target name="generate-simplevector-files" depends="build-tools">
+    <uptodate property="simplevector-files-uptodate">
+      <srcfiles file="${src.dir}/gnu/lists/PrimVector.template"/>
+      <srcfiles file="${build.tools}/gnu/kawa/util/PreProcess.class"/>
+      <compositemapper>
+        <mergemapper to="${src.dir}/gnu/lists/FVector.java"/>
+        <mergemapper to="${src.dir}/gnu/lists/BitVector.java"/>
+        <mergemapper to="${src.dir}/gnu/lists/ByteVector.java"/>
+        <mergemapper to="${src.dir}/gnu/lists/ShortVector.java"/>
+        <mergemapper to="${src.dir}/gnu/lists/IntVector.java"/>
+        <mergemapper to="${src.dir}/gnu/lists/LongVector.java"/>
+        <mergemapper to="${src.dir}/gnu/lists/F32Vector.java"/>
+        <mergemapper to="${src.dir}/gnu/lists/F64Vector.java"/>
+        <mergemapper to="${src.dir}/gnu/lists/S8Vector.java"/>
+        <mergemapper to="${src.dir}/gnu/lists/S16Vector.java"/>
+        <mergemapper to="${src.dir}/gnu/lists/S32Vector.java"/>
+        <mergemapper to="${src.dir}/gnu/lists/S64Vector.java"/>
+        <mergemapper to="${src.dir}/gnu/lists/U8Vector.java"/>
+        <mergemapper to="${src.dir}/gnu/lists/U16Vector.java"/>
+        <mergemapper to="${src.dir}/gnu/lists/U32Vector.java"/>
+        <mergemapper to="${src.dir}/gnu/lists/U64Vector.java"/>
+      </compositemapper>
+    </uptodate>
+
+    <antcall target="-maybe-generate-simplevector-files"/>
+  </target>
+
   <target name="kawa.sh" depends="build-settings">
     <copy file="${src.dir}/bin/kawa.sh.in" tofile="bin/kawa.sh">
       <filterset>
@@ -482,7 +587,7 @@
     <exclude name="kawa/GuiInPort.java"/>
   </patternset>
   
-  <target name="java-classes" depends="preprocess">
+  <target name="java-classes" depends="preprocess,generate-simplevector-files">
     <mkdir dir="${build.classes}"/>
     <!-- 
        Javac doesn't "shadow" directories, so there may not be duplicates.
@@ -903,6 +1008,29 @@
        <fileset file="bin/kawa.sh"/>
     </delete>
     <delete dir="META-INF"/>
+  </target>
+
+  <target name="clean-generated-simplevector-files">
+    <delete>
+      <fileset dir="${src.dir}/gnu/lists"
+               includes="FVector.java
+                         BitVector.java
+                         ByteVector.java
+                         ShortVector.java
+                         IntVector.java
+                         LongVector.java
+                         F32Vector.java
+                         F64Vector.java
+                         S8Vector.java
+                         S16Vector.java
+                         S32Vector.java
+                         S64Vector.java
+                         U8Vector.java
+                         U16Vector.java
+                         U32Vector.java
+                         U64Vector.java">
+      </fileset>
+    </delete>
   </target>
 
   <target name="clean-tools">

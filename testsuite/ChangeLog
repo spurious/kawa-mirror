@@ -1,3 +1,7 @@
+2016-10-16  Per Bothner  <per@bothner.com>
+
+	* sva47725.scm: Tweak so it also work with Java-7.
+
 2016-10-11  Per Bothner  <per@bothner.com>
 
 	* text-test.scm: Add tests of pretty-printing using pprint.

@@ -24,7 +24,7 @@ public class SVGUtils {
     public static void toSVG(Picture p, PrintConsumer out, boolean headers) {
         if (headers) {
             out.println("<?xml version=\"1.0\" standalone=\"no\"?>");
-            out.println("<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\""
+            out.println("<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" "
                 + "\"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">");
         }
         toSVG(p, new XMLPrinter(out));

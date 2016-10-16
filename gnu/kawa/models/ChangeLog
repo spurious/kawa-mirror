@@ -1,3 +1,8 @@
+2016-10-16  Per Bothner  <per@bothner.com>
+
+	* SVGUtils.java (toSVG): Add missing space in DOCTYPE header.
+	Fixes bug reported by Sudarshan S Chawathe.
+
 2016-10-05  Per Bothner  <per@bothner.com>
 
 	* DrawShape.java: Explicitly set default endcap to CAP_BUTT.

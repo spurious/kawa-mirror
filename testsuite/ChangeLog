@@ -1,5 +1,7 @@
 2016-10-16  Per Bothner  <per@bothner.com>
 
+	* Makefile.am (LARCENY_TEST_FILES): Add 2 missing test files.
+
 	* sva47725.scm: Tweak so it also work with Java-7.
 
 2016-10-11  Per Bothner  <per@bothner.com>

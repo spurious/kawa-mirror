@@ -705,6 +705,7 @@ LARCENY_TEST_FILES =\
     larceny-tests/tests/scheme/load-test1.scm \
     larceny-tests/tests/scheme/load-test2.scm \
     larceny-tests/tests/scheme/load-test3.scm \
+  larceny-tests/run/process-context.sps larceny-tests/tests/scheme/process-context.sld \
   larceny-tests/run/read.sps larceny-tests/tests/scheme/read.sld \
   larceny-tests/run/repl.sps larceny-tests/tests/scheme/repl.sld\
     larceny-tests/tests/scheme/repl-test2.scm \

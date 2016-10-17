@@ -2,10 +2,10 @@ qdnl Process this with autoconf to create configure
 AC_INIT([kawa],[2.1.9]) dnl Also update bin/configure.ac and build.xml.
 AC_CONFIG_SRCDIR([doc/kawa.texi])
 
-AM_MAINTAINER_MODE
+AM_MAINTAINER_MODE([enable])
 AC_CANONICAL_HOST
 
-AM_INIT_AUTOMAKE
+AM_INIT_AUTOMAKE([info-in-builddir])
 
 dnl AC_ARG_WITH(classpath,[  --with-classpath          Path to Java classes], classpath=$withval, classpath=$$CLASSPATH)
 AC_ARG_ENABLE(kawa-frontend,

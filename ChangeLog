@@ -1,3 +1,9 @@
+2016-10-16  Per Bothner  <per@bothner.com>
+
+	* configure.ac: Make maintainer-mode the default.
+	Put info files in builddir.
+	* Makefile.am (tmp-sources1.list): Also depend on Makefile.am.
+
 2016-10-16  Jamison Hope  <jrh@theptrgroup.com>
 
 	* build.xml (generate-simplevector-files)

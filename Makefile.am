@@ -75,7 +75,7 @@ kawa-jar.stamp: misc-classes.stamp kawa/Version.class
 classes.list: ./kawa-jar.stamp
 	$(FIND) gnu kawa -name '*.class' -print >classes.list
 
-tmp-sources1.list: source-list Makefile
+tmp-sources1.list: source-list Makefile.am
 	(for f in $(sources_gnu_core); do echo $(srcdir)/$$f; done) >tmp-list
 	(for f in $(sources_gnu_misc); do echo $(srcdir)/$$f; done) >>tmp-list
 	(for f in $(sources_gnu_selected); do echo $(srcdir)/$$f; done) >>tmp-list

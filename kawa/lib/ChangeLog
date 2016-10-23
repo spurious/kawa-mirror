@@ -1,3 +1,9 @@
+2016-10-23  Per Bothner  <per@bothner.com>
+
+	* kawa/pictures.scm (image-write): Coerce DrawImage to BufferedImage.
+	This is more efficient, and a work-around for Savannah bug #49367
+	"(kawa pictures) image-write gives exception on pictures".
+
 2016-10-22  Per Bothner  <per@bothner.com>
 
 	* std_syntax.scm: Explicitly import 'syntax' and 'syntax-case'.

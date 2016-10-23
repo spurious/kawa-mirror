@@ -1,7 +1,8 @@
 (module-name (kawa pictures))
 (require <kawa.lib.prim_syntax>)
 (define-private-alias WithPaint gnu.kawa.models.WithPaint)
-(import (class gnu.kawa.models DDimension Picture Pictures StandardColor)
+(import (class gnu.kawa.models
+               DDimension DrawImage Picture Pictures StandardColor)
         (class java.awt.geom AffineTransform)
         (class java.awt.image BufferedImage RenderedImage))
 
@@ -145,9 +146,11 @@
                         "jpg")
                        (else
                         "png")))
+         (img (->image picture))
+         (bimg (if (DrawImage? img) ((->DrawImage img):getImage) img))
          (strm ((gnu.kawa.io.Path:valueOf path):openOutputStream)))
     (try-finally
-     (javax.imageio.ImageIO:write (->image picture) format strm)
+     (javax.imageio.ImageIO:write bimg format strm)
      (strm:close))))
 
 (define (image-width (image  ::java.awt.image.RenderedImage)) ::int

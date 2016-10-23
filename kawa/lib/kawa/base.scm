@@ -17,6 +17,7 @@
   (export syntax
 	  quasisyntax
 	  syntax-case
+          with-syntax
 	  define-syntax-case
 	  identifier?
           $bracket-apply$
@@ -99,7 +100,7 @@
    (only kawa.standard.syntax
          (quasiSyntax quasisyntax) syntax)
 
-   (only (kawa lib std_syntax) identifier?)
+   (only kawa.lib.std_syntax identifier? with-syntax)
 
    (only kawa.lib.syntax
          $bracket-list$

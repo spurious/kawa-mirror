@@ -1,3 +1,9 @@
+2016-10-22  Per Bothner  <per@bothner.com>
+
+	* kawa/base.scm: Also export 'with-syntax'.
+	This fixes a secondary issue reported in Savannah bug #49416
+	"Error macro-expanding with-syntax with ... patterns".
+
 2016-10-12  Per Bothner  <per@bothner.com>
 
 	* kawa/pprint.scm (pprint-let): Fix missing parens in cond.

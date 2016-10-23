@@ -3,7 +3,7 @@
 	       button Button Label Column Row Text Window run-application
 	       Image image-read image-width image-height
 	       rotation with-transform color-red menubar menu menuitem
-	       polygon scroll frame picture-jpanel)
+	       polygon scroll frame picture->jpanel)
 
 (module-compile-options warn-undefined-variable: #t
 			  warn-invoke-unknown-method: #t)

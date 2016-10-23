@@ -13,10 +13,10 @@ public class FillShape implements Picture
 
   public Shape getShape() { return shape; }
 
-  public void paint (Graphics2D graphics)
-  {
-    graphics.fill(shape);
-  }
+    public void paint (Graphics2D graphics) {
+        if (graphics.getPaint() != StandardColor.transparent)
+            graphics.fill(shape);
+    }
 
   public Rectangle2D getBounds2D()
   {

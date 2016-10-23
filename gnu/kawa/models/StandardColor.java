@@ -179,7 +179,7 @@ public class StandardColor extends Color {
     public static final StandardColor yellow = add("yellow", 0xFFFF00);
     public static final StandardColor yellowGreen = add("yellow-green", 0x9ACD32);
     public static final StandardColor transparent =
-        add(new StandardColor("transparent", 0, 0, 0, 255));
+        add(new StandardColor("transparent", 0, 0, 0, 0));
 
     public static StandardColor valueOf(String name) {
         String cname = name.toLowerCase().replace("-", "");

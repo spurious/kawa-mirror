@@ -209,12 +209,16 @@ public class PictureToSvg extends PictureVisitor {
 
     @Override
     public void visitFillShape(FillShape pic) {
+        if (paint == StandardColor.transparent)
+            return;
         writeShapeStart(pic.shape, out);
         writePaint(paint, true);
         out.endElement();
     }
     @Override
     public void visitDrawShape(DrawShape pic) {
+        if (paint == StandardColor.transparent)
+            return;
         writeShapeStart(pic.shape, out);
         writePaint(paint, false);
         writeStroke(stroke, strokePropertiesSet);

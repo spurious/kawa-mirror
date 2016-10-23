@@ -4,7 +4,7 @@
 
 (import (kawa pictures) (kawa process-keywords))
 
-(define (picture-jpanel pic)
+(define (picture->jpanel pic)
  (gnu.kawa.swingviews.SwingPicture (->picture pic)))
 
 (define-private (frame-keyword (frame :: <gnu.kawa.swingviews.SwingFrame>)
@@ -47,7 +47,7 @@
 (define (show-picture picture) ::void
   (define panel ::gnu.kawa.swingviews.SwingPicture (current-picture-panel))
   (cond ((eq? panel #!null)
-         (set! panel (picture-jpanel picture))
+         (set! panel (picture->jpanel picture))
          (current-picture-panel panel))
         (else
          (panel:setPicture picture)))

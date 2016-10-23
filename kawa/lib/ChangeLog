@@ -1,5 +1,10 @@
 2016-10-23  Per Bothner  <per@bothner.com>
 
+	* kawa/swing.scm (picture->panel): Rename to ...
+	(picture->jpanel): new name, which matches documentation.
+	Fixes one of the issues in Savannah bug #49368
+	"very minor typos etc. in (kawa pictures) documentation".
+
 	* kawa/pictures.scm (image-write): Coerce DrawImage to BufferedImage.
 	This is more efficient, and a work-around for Savannah bug #49367
 	"(kawa pictures) image-write gives exception on pictures".

@@ -1,5 +1,9 @@
 2016-10-22  Per Bothner  <per@bothner.com>
 
+	* std_syntax.scm: Explicitly import 'syntax' and 'syntax-case'.
+	This fixes Savannah bug #49416
+	"Error macro-expanding with-syntax with ... patterns".
+
 	* kawa/base.scm: Also export 'with-syntax'.
 	This fixes a secondary issue reported in Savannah bug #49416
 	"Error macro-expanding with-syntax with ... patterns".

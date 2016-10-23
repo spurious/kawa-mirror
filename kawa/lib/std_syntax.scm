@@ -9,6 +9,8 @@
 	       syntax-source syntax-line syntax-column)
 
 (require <kawa.lib.prim_syntax>)
+(import (only kawa.standard.syntax syntax))
+(import (only kawa.standard.syntax_case (syntax_case syntax-case)))
 
 (import (rename (only (kawa standard let) let) (let %let)))
 (import (rename (only (kawa standard define) defineRaw) (defineRaw %define)))

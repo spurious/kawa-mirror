@@ -1,3 +1,8 @@
+2016-10-22  AdriánMedraño Calvo <adrian@medranocalvo.com>
+
+	* sva49416.scm: New testcase for Savannah bug #49416
+	"Error macro-expanding with-syntax with ... patterns".
+
 2016-10-16  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (LARCENY_TEST_FILES): Add 2 missing test files.

@@ -537,8 +537,8 @@ Daniel Bonniot for multiple small improvements
 to gnu.bytecode and gnu.expr.
 
 Jamison Hope for multiple contributions,
-including quaternion support, the SRFI-14 implementation, and Google
-Summer of Code mentoring.
+including quaternion support, the SRFI-14 implementation,
+Ant improvements, and Google Summer of Code mentoring.
 
 Jim White for Ant support and other improvements.
 
@@ -619,8 +619,10 @@ Seth Alves;
 Khairul Azhar;
 Bob Bane;
 Hans Boehm;
+Adrián Medraño Calvo;
 Brian D. Carlstrom;
 Luis Casillas;
+Sudarshan S Chawathe;
 Ken Dickey (format tests);
 Helge Dietert;
 Allan Erskine;
@@ -20183,8 +20185,8 @@ using the @code{qtdomterm} terminal emulator.
 
 @image{images/domterm-pictures-1}
 
-Another convenient way to view a picture is @code{show-picture},
-which displays the picture in a Swing window.
+After @code{(import (kawa swing))} you can use @code{show-picture}
+to display a picture in a Swing window.
 
 A @dfn{picture} is an object that can be displayed on a screen,
 web-page, or printed page, and combined with other pictures.
@@ -20224,7 +20226,7 @@ graphics library.  However, note that this is different from the traditional
 mathematical convention of y values increasing as you go up.
 
 By default, one unit is one ``pixel''.  (More precisely,
-it is the @code{px} unit is the CSS specification.)
+it is the @code{px} unit in the CSS specification.)
 
 @deffn Type Point
 A point is a pair consisting of an x and a y coordinate.
@@ -20408,8 +20410,8 @@ A end-cap-specifier, which is a symbol specifying how each end of the
 shape is terminated.
 The options are @code{'square-cap}, @code{'round-cap}, or @code{'butt-cap}.
 The default is @code{'butt-cap}.
-(This follow SCG and HTML Canvas.
-The default in plan Java AWT is a square cap.)
+(This follows SVG and HTML Canvas.
+The default in plain Java AWT is a square cap.)
 @item
 A real number specifies the thickness of the stroke.
 @item
@@ -20442,7 +20444,7 @@ Also note how the stroke (color lime) extends beyond its bounding box,
 into the surrounding border (color bisque).
 @subsection Affine transforms
 
-An 2D affine transform is a linear mapping from coordinates to
+A 2D affine transform is a linear mapping from coordinates to
 coordinates.  It generalizes translation, scaling, flipping, shearing,
 and their composition.  An affine transform maps straight parallel lines
 into other straight parallel lines, so it is only a subset of possible
@@ -20767,7 +20769,7 @@ it gets inserted into the display.
 
 @subsubsection Display in Swing
 
-These procedures require @code{(import (kawa swing))} in addtion to
+These procedures require @code{(import (kawa swing))} in addition to
 @code{(import (kawa pictures))}.
 
 The convenience function @code{show-picture} is useful

@@ -1,3 +1,9 @@
+2016-10-23  Sudarshan S Chawathe <chaw@eip10.org>
+
+	* kawa.texi (Composable pictures): Various fixes.
+	This fixes Savannah bug #49368
+	"very minor typos etc. in (kawa pictures) documentation".
+
 2016-10-16  Per Bothner  <per@bothner.com>
 
 	* kawa.texi: Document need for running autogen.sh.

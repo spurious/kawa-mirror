@@ -1,3 +1,7 @@
+2016-10-27  Per Bothner  <per@bothner.com>
+
+	* PrettyWriter.java (outputLine): Fix handling of NEWLINE_DUMMY.
+
 2016-10-12  Per Bothner  <per@bothner.com>
 
 	* PrettyWriter.java: Define NEWLINE_DUMMY newline type.

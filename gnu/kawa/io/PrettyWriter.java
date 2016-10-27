@@ -1669,10 +1669,11 @@ public class PrettyWriter extends PrintConsumer
 	  }
       }
     this.lineNumber = lineNumber;
-    if (isDomTerm() && flushing) {
+    if (kind ==  NEWLINE_DUMMY) {
+        // emit nothing
+    } else if (isDomTerm() && flushing) {
         String cmd;
         switch (kind) {
-        case NEWLINE_DUMMY: // FIXME
         case NEWLINE_FILL:
         case NEWLINE_SPACE:
             cmd = "\033]115\007"; break;
@@ -1690,7 +1691,7 @@ public class PrettyWriter extends PrintConsumer
             cmd = "\033]118\007"; break;
         }
         writeToBase(cmd);
-    } else if (kind != NEWLINE_DUMMY) {
+    } else {
         writeToBase('\n');
     }
     bufferStartColumn = kind != NEWLINE_DUMMY ? 0 : getColumnNumber();

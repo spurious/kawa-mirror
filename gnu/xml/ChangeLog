@@ -1,3 +1,8 @@
+2016-10-27  Per Bothner  <per@bothner.com>
+
+	* XMLPrinter.java: Change empty-element handling in default style to
+	HTML-compatible "polyglot" style
+
 2016-08-12  Per Bothner  <per@bothner.com>
 
 	* XMLPrinter.java: Change to extend PrintConsumer rather than OutPort.

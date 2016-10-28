@@ -37,7 +37,7 @@ public class WrappedException extends RuntimeException
    */
   public WrappedException (Throwable e)
   {
-    this(e.toString(), e);
+    this(e == null ? null : e.toString(), e);
   }
 
   /**

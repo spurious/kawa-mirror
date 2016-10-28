@@ -1,3 +1,9 @@
+2016-10-28  Per Bothner  <per@bothner.com>
+
+	* WrappedException.java: Add test against null.
+	This is a fix for the NullPointerException part of Savannah bug
+	#49471 "(kawa pictures) filling a re-centered picture not OK?".
+
 2016-03-13  Per Bothner  <per@bothner.com>
 
 	* RunnableClosure.java (<init>): Remove unused parameter.

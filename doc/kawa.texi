@@ -20234,7 +20234,10 @@ A point is a pair consisting of an x and a y coordinate.
 
 @deftypefn Literal {} &P@stxlit{[} @var{x} @var{y} @stxlit{]}
 Construct a point value with the specified @var{x} and @var{y} values.
-Both @var{x} and @var{y} are expressions that evaluate to real numbers.
+Both @var{x} and @var{y} are expressions that evaluate to real numbers:
+@example
+&P[(+ old-right 10) baseline]
+@end example
 @end deftypefn
 
 @deffn Type Dimension
@@ -20267,6 +20270,12 @@ is painted with some color or texture.
 A shape is represented by the Java @code{java.awt.Shape} interface.
 The @code{picture} library only provides relatively simple shapes,
 but you can use any methods that create a @code{java.awt.Shape} object.
+
+@dfn{Shape} is effectively a sub-type of @dfn{picture},
+though they're represented using using disjoint classes:
+If you use a shape where a picture is required,
+the shape is automatically converted to a picture,
+as if using the @code{draw} procedure.
 
 @deffn Procedure line p1 [p2 ...]
 In the simple case two points are specified, and the result
@@ -20468,7 +20477,10 @@ is equivalent to:
 @end deffn
 
 @deffn Procedure with-transform transform picture
+@deffnx Procedure with-transform transform shape
 Creates a transformed picture.
+
+If the argument is a @var{shape}, then the result is also a shape.
 @end deffn
 
 @deffn Procedure with-transform transform point
@@ -20598,6 +20610,7 @@ the yellow vs transparent backgrounds.
 @deffn Procedure re-center [xpos] [ypos] picture
 Translate the @var{picture} such that the point specified by @var{xpos}
 and @var{ypos} is the new origin point, adjusting the bounding box to match.
+If the @var{picture} is a shape, so is the result.
 
 The @var{xpos} can have four possible values, all of which are symbols:
 @code{'left} (move the origin to the left edge of the bounding box);
@@ -20642,7 +20655,7 @@ is @var{P} translated so the origin is at control point @code{LC}.
 @end example
 Above we defined @code{D} as a vaguely diamond-shaped quadrilateral.
 A small red circle is added to show the origin point.
-Next we display 5 versions of @code{D} in a line (an @code{hbox}),
+Below we display 5 versions of @code{D} in a line (an @code{hbox}),
 starting with the original @code{D} and 4 calls to @code{re-center}.
 @example
 #|kawa:3|# @kbd{(zbox (hbox D (re-center 'top D) (re-center 'bottom D)}

@@ -1,4 +1,4 @@
-2016-10-22  AdriánMedraño Calvo <adrian@medranocalvo.com>
+2016-10-22  Adrián Medraño Calvo <adrian@medranocalvo.com>
 
 	* sva49416.scm: New testcase for Savannah bug #49416
 	"Error macro-expanding with-syntax with ... patterns".

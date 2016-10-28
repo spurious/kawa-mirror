@@ -1,3 +1,9 @@
+2016-10-28  Per Bothner  <per@bothner.com>
+
+	* kawa/pictures.scm (re-center): Return shape if argument is a shape.
+	This is a fix for part of Savannah bug #49471
+	"(kawa pictures) filling a re-centered picture not OK?".
+
 2016-10-23  Per Bothner  <per@bothner.com>
 
 	* kawa/swing.scm (picture->panel): Rename to ...

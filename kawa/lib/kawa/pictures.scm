@@ -272,7 +272,7 @@
                   ((eq? yposition 'origin)
                    0)
                   (else (error "invalid y-position specifier" yposition)))))
-      (with-transform (translate &P[(- xgoal) (- ygoal)]) pic)))
+      (with-transform (translate &P[(- xgoal) (- ygoal)]) picture)))
   (lambda (position picture)
     (cond ((or (eq? position 'left) (eq? position 'right))
            (re-center position 'center picture))

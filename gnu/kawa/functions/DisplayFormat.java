@@ -23,12 +23,14 @@ import gnu.kawa.io.PrettyWriter;
 import gnu.kawa.xml.XmlNamespace;
 import gnu.kawa.lispexpr.LispLanguage;
 import gnu.kawa.format.Printable;
+/* #ifdef use:java.awt */
 import gnu.kawa.models.DrawImage;
 import gnu.kawa.models.DrawShape;
 import gnu.kawa.models.Picture;
 import java.awt.Shape;
 import java.awt.image.BufferedImage;
 import gnu.kawa.models.SVGUtils;
+/* #endif */
 import java.util.List;
 /* #ifdef use:java.util.regex */
 import java.util.regex.*;
@@ -76,7 +78,9 @@ public class DisplayFormat extends GenericFormat
         // RatNum, UnsignedPrim, Long, Integer, Short, Byte, BigInteger
         standardFormat.add(thisCls, "writeRational");
         // Picture, Shape, or BufferedImage
+        /* #ifdef use:java.awt */
         standardFormat.add(thisCls, "writePicture");
+        /* #endif */
         // java.lang.Enum
         standardFormat.add(thisCls, "writeEnum");
         // Java native arrays
@@ -799,6 +803,7 @@ public class DisplayFormat extends GenericFormat
         out.write(sym);
     }
 
+    /* #ifdef use:java.awt */
     public static TryFormatResult writePicture(Object value,
                                                AbstractFormat format, Consumer out)  {
         Picture pic = DrawImage.toPictureOrNull(value);
@@ -811,6 +816,7 @@ public class DisplayFormat extends GenericFormat
         out.write("\033]72;"+SVGUtils.toSVG(pic)+"\007");
         return TryFormatResult.HANDLED;
     }
+    /* #endif */
 
     /* #ifdef enable:XML */
     public static TryFormatResult writeKNode(Object value,

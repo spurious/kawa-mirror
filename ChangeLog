@@ -1,3 +1,10 @@
+2016-10-29  Per Bothner  <per@bothner.com>
+
+	* source-list: Don't build gnu.kawa.models unless WITH_AWT.
+	* Makefile.am (PREPROCESS_AWT): Set (or not) use:java.awt PreProcess
+	option, depending on WITH_AWT.
+	* configure.ac: Option --with-swing defaults to no if --without-awt.
+
 2016-10-16  Per Bothner  <per@bothner.com>
 
 	* configure.ac: Make maintainer-mode the default.

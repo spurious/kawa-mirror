@@ -34,7 +34,7 @@ java_SCM_ALWAYS =\
   system.scm \
   kawa/string-cursors.scm \
   kawa/quaternions.scm kawa/rotations.scm \
-  kawa/pictures.scm kawa/process-keywords.scm kawa/pprint.scm \
+  kawa/process-keywords.scm kawa/pprint.scm \
   kawa/hashtable.scm kawa/regex.scm kawa/reflect.scm kawa/base.scm \
   rnrs/hashtables.scm rnrs/lists.scm rnrs/arithmetic/bitwise.scm \
   srfi95.scm rnrs/unicode.scm rnrs/sorting.scm rnrs/programs.scm \
@@ -46,17 +46,20 @@ java_SCM_ALWAYS =\
   trace.scm
 
 scm_WITH_SWING = windows.scm kawa/swing.scm
+scm_WITH_AWT = kawa/pictures.scm 
 scm_WITH_XQUERY = xquery/Xutils.scm
-EXTRA_DIST = $(java_SCM_ALWAYS) $(scm_WITH_SWING) $(scm_WITH_XQUERY) \
+EXTRA_DIST = $(java_SCM_ALWAYS) $(scm_WITH_AWT) $(scm_WITH_SWING) $(scm_WITH_XQUERY) \
   scheme/base-exports scheme/char-exports scheme/complex-exports \
   scheme/cxr-exports scheme/eval-exports scheme/file-exports \
   scheme/inexact-exports scheme/lazy-exports \
   scheme/process-context-exports scheme/time-exports scheme/write-exports
 
+java_SCM = $(java_SCM_ALWAYS)
+if WITH_AWT
+java_SCM += $(scm_WITH_AWT)
 if WITH_SWING
-java_SCM= $(java_SCM_ALWAYS) $(scm_WITH_SWING)
-else
-java_SCM= $(java_SCM_ALWAYS)
+java_SCM += $(scm_WITH_SWING)
+endif
 endif
 if WITH_DOMTERM
 java_SCM += kawa/domterm.scm

@@ -813,7 +813,6 @@ sources_gnu_core = \
   $(GNU_KAWA_REFLECT_JSOURCES) \
   $(GNU_KAWA_FUNCTIONS_JSOURCES) \
   $(GNU_KAWA_LISPEXPR_JSOURCES) \
-  $(GNU_KAWA_MODELS_JSOURCES) \
   $(GNU_ECMASCRIPT_JSOURCES)
 
 sources_gnu_misc = \
@@ -867,7 +866,7 @@ sources_gnu_selected += $(GNU_JEMACS_SWT_JSOURCES)
 endif
 endif
 if WITH_AWT
-sources_kawa_selected += $(KAWA_WITH_AWT_JSOURCES)
+sources_kawa_selected += $(KAWA_WITH_AWT_JSOURCES) $(GNU_KAWA_MODELS_JSOURCES)
 endif
 if WITH_DOMTERM
 sources_kawa_selected += $(KAWA_WITH_DOMTERM)
@@ -882,6 +881,7 @@ dist_jsources = \
   $(GNU_JEMACS_BUFFER_JSOURCES) \
   $(GNU_JEMACS_SWING_JSOURCES) \
   $(GNU_JEMACS_SWT_JSOURCES) \
+  $(GNU_KAWA_MODELS_JSOURCES) \
   $(GNU_KAWA_SWINGVIEWS_JSOURCES) \
   $(GNU_KAWA_SWINGVIEWS_JSOURCES) \
   $(GNU_KAWA_SWTVIEWS_JSOURCES) \

@@ -354,12 +354,17 @@ endif
 if WITH_JLINE3
 PREPROCESS_JLINE3 = +with:jline3
 else
-PREPROCESS_SLINE3 = -with:jline3
+PREPROCESS_JLINE3 = -with:jline3
 endif
 if ENABLE_XML
 PREPROCESS_XML = +enable:XML
 else
 PREPROCESS_XML = -enable:XML
+endif
+if WITH_AWT
+PREPROCESS_AWT = +use:java.awt
+else
+PREPROCESS_AWT = -use:java.awt
 endif
 
 $(srcdir)/patch-source-list: $(top_srcdir)/configure
@@ -373,7 +378,7 @@ kawa/Version.class: kawa/Version.java
 gnu/kawa/util/PreProcess.class: gnu/kawa/util/PreProcess.java
 	$(JAVAC) -d . $^
 
-JAVA_PREPROCESS_OPTIONS = @JAVA_SOURCE_SELECTOR@ $(PREPROCESS_HTTPSERVER) $(PREPROCESS_XML) $(PREPROCESS_JLINE2) $(PREPROCESS_JLINE3)
+JAVA_PREPROCESS_OPTIONS = @JAVA_SOURCE_SELECTOR@ $(PREPROCESS_HTTPSERVER) $(PREPROCESS_XML) $(PREPROCESS_JLINE2) $(PREPROCESS_JLINE3) $(PREPROCESS_AWT)
 
 selected-java-source: Makefile $(srcdir)/patch-source-list
 	if test ! -e selected-java-source -o \

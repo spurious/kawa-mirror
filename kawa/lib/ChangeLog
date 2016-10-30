@@ -1,5 +1,7 @@
 2016-10-29  Per Bothner  <per@bothner.com>
 
+	* Makefile.am: Don't build kawa/pictures.scm unless WITH_AWT.
+
 	* files.scm (make-temporary-file): Force #\~ to string. Fixes Savannah
 	bug #49475 "make-temporary-file does not interpret ~d properly".
 

@@ -75,6 +75,8 @@ AC_ARG_WITH(java-source,
 
 test -z "${with_java_source}" -a -n "${with_android}" \
   && with_java_source=android
+test -z "${with_swing}" -a "$with_awt" == "no" \
+  && with_swing=no
 
 with_java_source=`echo ${with_java_source} | tr A-Z a-z`
 # Java 7 is the (current) default

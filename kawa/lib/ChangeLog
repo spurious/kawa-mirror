@@ -1,3 +1,9 @@
+2016-10-29  Per Bothner  <per@bothner.com>
+
+	* kawa/base.scm: Also export generate-temporaries datum->syntax syntax->datum.
+	This fixes Savannah bug #49430 "warning - no declaration seen for
+	generate-temporaries, datum->syntax, syntax->datum".
+
 2016-10-28  Per Bothner  <per@bothner.com>
 
 	* kawa/pictures.scm (re-center): Return shape if argument is a shape.

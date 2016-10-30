@@ -18,6 +18,7 @@
 	  quasisyntax
 	  syntax-case
           with-syntax
+          generate-temporaries datum->syntax syntax->datum
 	  define-syntax-case
 	  identifier?
           $bracket-apply$
@@ -100,7 +101,9 @@
    (only kawa.standard.syntax
          (quasiSyntax quasisyntax) syntax)
 
-   (only kawa.lib.std_syntax identifier? with-syntax)
+   (only kawa.lib.std_syntax
+         identifier? with-syntax
+         generate-temporaries datum->syntax syntax->datum)
 
    (only kawa.lib.syntax
          $bracket-list$

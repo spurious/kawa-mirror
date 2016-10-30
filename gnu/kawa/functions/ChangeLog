@@ -1,3 +1,7 @@
+2016-10-29  Per Bothner  <per@bothner.com>
+
+	* DisplayFormat.java (writeKNode): Force xhtml style for KNode.
+
 2016-09-10  Per Bothner  <per@bothner.com>
 
 	* ParseFormat.java: Remove unneeded import.

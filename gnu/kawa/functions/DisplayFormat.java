@@ -823,7 +823,7 @@ public class DisplayFormat extends GenericFormat
                 out.write("\033]72;");
                 escapeForDomTerm = true;
             }
-            new XMLPrinter(out).writeObject(value);
+            XMLPrinter.make(out, "xhtml").writeObject(value);
             if (escapeForDomTerm)
                 out.write("\007");
             return TryFormatResult.HANDLED;

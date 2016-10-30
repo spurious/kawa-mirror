@@ -1,3 +1,8 @@
+2016-10-29  Per Bothner  <per@bothner.com>
+
+	* XMLPrinter.java:  Partly revert previous changes, for compatibility.
+	(HtmlEmptyTags): Add 'command'.
+
 2016-10-27  Per Bothner  <per@bothner.com>
 
 	* XMLPrinter.java: Change empty-element handling in default style to

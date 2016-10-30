@@ -127,7 +127,7 @@ public class XMLPrinter extends PrintConsumer
   public void setStyle (Object style)
   {
     this.style = style;
-    useEmptyElementTag = style == null ? 2 : canonicalize ? 0 : 1;
+    useEmptyElementTag = canonicalize ? 0 : 1;
     if ("html".equals(style))
       {
 	isHtml = true;
@@ -493,17 +493,17 @@ public class XMLPrinter extends PrintConsumer
       }
 
     inStartTag = true;
-    
+
     if (isHtml) {
-        String typeName = getHtmlTag(type, true);
+        String typeName = getHtmlTag(type);
         if ("script".equals(typeName) || "style".equals(typeName))
             escapeText = false;
     }
   }
 
   static final String HtmlEmptyTags
-  = "/area/base/basefont/br/col/embed/frame/hr/img/input/isindex/keygen/link/meta/para/param/source/track/wbr/";
-         
+      = "/area/base/basefont/br/col/command/embed/frame/hr/img/input/isindex/keygen/link/meta/para/param/source/track/wbr/";
+
   public static boolean isHtmlEmptyElementTag(String name)
   {
     int index = HtmlEmptyTags.indexOf(name);
@@ -511,17 +511,17 @@ public class XMLPrinter extends PrintConsumer
       && HtmlEmptyTags.charAt(index+name.length()) == '/';
   }
 
-    protected String getHtmlTag (Object type, boolean emptyAsHtml)
+  protected String getHtmlTag (Object type)
   {
     if (type instanceof Symbol)
       {
         Symbol sym = (Symbol) type;
         String uri =  sym.getNamespaceURI();
         if (uri == XmlNamespace.XHTML_NAMESPACE
-            || (emptyAsHtml && uri == ""))
+            || (isHtmlOrXhtml && uri == ""))
           return sym.getLocalPart();
       }
-    else if (emptyAsHtml)
+    else if (isHtmlOrXhtml)
       return type.toString();
     return null;
   }
@@ -533,7 +533,7 @@ public class XMLPrinter extends PrintConsumer
     Object type = elementNameStack[elementNesting-1];
 
     // typeName is only used for checking certain HTML tags.
-    String typeName = getHtmlTag(type, useEmptyElementTag == 2);
+    String typeName = getHtmlTag(type);
 
     if (inStartTag)
       {

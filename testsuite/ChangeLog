@@ -1,3 +1,7 @@
+2016-10-29  Per Bothner  <per@bothner.com>
+
+	* xml-test.scm: Update for changed XML-xhtml formatting.
+
 2016-10-22  Adrián Medraño Calvo <adrian@medranocalvo.com>
 
 	* sva49416.scm: New testcase for Savannah bug #49416

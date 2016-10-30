@@ -430,7 +430,7 @@ public abstract class KNode extends SeqPosition<Object,NodeTree>
   public String toString ()
   {
     CharArrayOutPort wr = new CharArrayOutPort();
-    XMLPrinter xp = new XMLPrinter(wr);
+    XMLPrinter xp = XMLPrinter.make(wr, "xhtml");
     ((NodeTree) sequence).consumeNext(ipos, xp);
     xp.close();
     wr.close();

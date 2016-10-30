@@ -1,5 +1,8 @@
 2016-10-29  Per Bothner  <per@bothner.com>
 
+	* files.scm (make-temporary-file): Force #\~ to string. Fixes Savannah
+	bug #49475 "make-temporary-file does not interpret ~d properly".
+
 	* kawa/base.scm: Also export generate-temporaries datum->syntax syntax->datum.
 	This fixes Savannah bug #49430 "warning - no declaration seen for
 	generate-temporaries, datum->syntax, syntax->datum".

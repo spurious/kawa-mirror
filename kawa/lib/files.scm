@@ -161,7 +161,7 @@
 (define (make-temporary-file #!optional (format :: <string> "kawa~d.tmp"))
   :: filepath
   (let* ((fmt (format:toString))
-         (tilde (fmt:indexOf #\~))
+         (tilde (fmt:indexOf (->char #\~)))
          (prefix::java.lang.String (if (< tilde 0) fmt (fmt:substring 0 tilde)))
          (suffix (if (< tilde 0) ".tmp" (fmt:substring (+ 2 tilde))))
          (sep (prefix:indexOf java.io.File:separatorChar))

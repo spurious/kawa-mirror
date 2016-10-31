@@ -2091,7 +2091,7 @@ public class Compilation implements SourceLocator
             if (lexer != null)
                 lexer.close();
             lexer = null;
-            setState(messages.seenErrors() ? ERROR_SEEN : BODY_PARSED);
+            setState(BODY_PARSED);
             if (pendingImports != null)
               return;
           }

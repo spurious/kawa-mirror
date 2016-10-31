@@ -1,3 +1,9 @@
+2016-10-30  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (process): Don't set state to ERROR_SEEN
+	if resolve failed. This partially fixes Savannah bug #49431
+	"Missing define-constant and define-early-constant in (kawa base)".
+
 2016-09-21  Per Bothner  <per@bothner.com>
 
 	* QuoteExp.java (print): Some pretty-printing tweaks.

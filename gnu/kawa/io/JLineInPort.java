@@ -182,6 +182,22 @@ public class JLineInPort extends TtyInPort
     }
 
     @Override
+    public String promptTemplate1() {
+        return maybeColorizePrompt(super.promptTemplate1());
+    }
+
+    @Override
+    public String promptTemplate2() {
+        return maybeColorizePrompt(super.promptTemplate2());
+    }
+
+    public String maybeColorizePrompt(String prompt) {
+        if (prompt.indexOf('\033') < 0)
+            prompt = "\033[48;5;194m" + prompt + "\033[0m";
+        return prompt;
+    }
+
+    @Override
     public void emitPrompt(String prompt) throws java.io.IOException {
         this.prompt = prompt;
     }

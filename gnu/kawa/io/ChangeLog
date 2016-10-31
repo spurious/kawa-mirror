@@ -1,3 +1,8 @@
+2016-10-30  Per Bothner  <per@bothner.com>
+
+	* JLineInPort.java (maybeColorizePrompt): Colorize default prompts.
+	(promptTemplate1, promptTemplate2): Override.
+
 2016-10-27  Per Bothner  <per@bothner.com>
 
 	* PrettyWriter.java (outputLine): Fix handling of NEWLINE_DUMMY.

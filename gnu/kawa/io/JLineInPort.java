@@ -192,7 +192,7 @@ public class JLineInPort extends TtyInPort
     }
 
     public String maybeColorizePrompt(String prompt) {
-        if (prompt.indexOf('\033') < 0)
+        if (prompt.indexOf('\033') < 0 && prompt.indexOf("%{") < 0)
             prompt = "\033[48;5;194m" + prompt + "\033[0m";
         return prompt;
     }

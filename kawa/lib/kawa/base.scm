@@ -42,7 +42,8 @@
           integer-length arithmetic-shift ash
 
           define-alias
-	  define-variable
+          define-variable
+          define-constant define-early-constant
 
 	  define-class
 	  define-simple-class
@@ -112,7 +113,7 @@
 	 synchronized)
 
    (only (kawa lib prim_syntax)
-	 try-catch define-constant define-variable)
+	 try-catch define-constant define-early-constant define-variable)
 
    (only (rename (only (kawa standard syntax_case) syntax_case)
 		 (syntax_case syntax-case))

@@ -50,6 +50,9 @@
 @macro stxlit{TEXT}
 @code{@b{\TEXT\}}
 @end macro
+@macro stxlitlbrace{TEXT}
+@code{@b{@{}}
+@end macro
 
 @macro arbno{THING}
 \THING\@sup{*}
@@ -15032,20 +15035,30 @@ used for subsequent ``continuation'' lines.
 
 The following placeholders are handled:
 @table @asis
-@item @code{%%}
+@item @stxlit{%%}
 A literal @samp{%}.
-@item @code{%@var{N}}
+@item @stxlit{%}@var{N}
 The current line number.  This is @code{(+ 1 (port-line @var{port}))}.
-@item @code{%@var{N}P@var{c}}
+@item @stxlit{%}@var{N}P@var{c}
 Insert padding at this possion, repeating the following
   character @code{@var{c}} as needed to bring the total number of columns
 of the prompt to that specified by the digits @code{@var{N}}.
-@item @code{%P@var{c}}
+@item @stxlit{%}P@var{c}
 Same as @code{%@var{N}P@var{c}}, but @code{@var{N}} defaults to the number
 of columns in the initial prompt from the expansion of @code{input-prompt1}.
 This is only meaningful when expanding @code{input-prompt2} for
 contiuation lines.
-@item @code{%@var{M}}
+@item @stxlit{%}@stxlitlbrace{}@var{hidden}@stxlit{%@}}
+Same as @var{hidden}, but the characters of @var{hidden}
+are assumed to have zero visible width.  Can be used for
+@uref{https://en.wikipedia.org/wiki/ANSI_escape_code,ANSI escape sequences}
+to change color or style:
+@example
+(set! input-prompt1 "%@{\e[48;5;51m%@}@{Kawa:%N@} %@{\e[0m%@}")
+@end example
+The above changes both the text and the background color
+(to a pale blue).
+@item @stxlit{%}@var{M}
 Insert a ``message'' string.
 Not normally used by Kawa, but supported by JLine.
 @end table
@@ -15057,6 +15070,13 @@ not specified, languages-specific defaults are used.
 For example for Scheme the default value of @code{input-prompt1}
 is @code{"#|kawa:%N|# "} and @code{input-prompt2} is @code{"#|$P.%N| "}.
 These have the form of Scheme comments, to make it easier to cut-and-paste.
+
+If @code{input-prompt1} (respectively @code{input-prompt2}) does not contain
+an escape sequence (either @code{"%@{} or the escape character @code{"\e"})
+then ANSI escape sequences are added to to highlight the prompt.
+(Under DomTerm this sets the @code{prompt} style, which can be customised
+with CSS but defaults to a light green background;
+if using JLine the background is set to light green.)
 @end defvar
 
 For greater flexibility, you can also set a prompter procedure.

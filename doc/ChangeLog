@@ -1,3 +1,7 @@
+2016-10-30  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Prompts): Small enhancements.
+
 2016-10-28  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Composable pictures): Some small improvements.

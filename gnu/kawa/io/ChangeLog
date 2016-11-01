@@ -1,3 +1,8 @@
+2016-11-01  Per Bothner  <per@bothner.com>
+
+	* JLineInPort.java (KawaParsedLine): Initialize 'word' field to "".
+	This avoids a NullPointerException.
+
 2016-10-31  Per Bothner  <per@bothner.com>
 
 	* PrettyWriter.java: Change DomTerm support to be more like default.

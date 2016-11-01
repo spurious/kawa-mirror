@@ -227,6 +227,7 @@ public class JLineInPort extends TtyInPort
             this.comp = comp;
             this.source = source;
             this.cursor = cursor;
+            this.word = "";
         }
 
         public KawaParsedLine(JLineInPort inp, CommandCompleter ex, String source, int cursor) {

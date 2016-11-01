@@ -356,7 +356,7 @@
   <div class="navfooter">
     <xsl:if test="$children">
       <ul>
-	<xsl:apply-templates select="chapter|sect1|sect2|sect3" mode="footer.toc">
+	<xsl:apply-templates select="part|chapter|sect1|sect2|sect3" mode="footer.toc">
 	  <xsl:with-param name="toc-context" select="."/>
 	</xsl:apply-templates>
       </ul>

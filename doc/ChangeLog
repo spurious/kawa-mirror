@@ -1,5 +1,8 @@
 2016-11-01  Per Bothner  <per@bothner.com>
 
+	* style/docbook-to-html.xsl: Include 'part' (i.e. the Reference Manual)
+	in navfooter.
+
 	* kawa.texi (Source distribution): Document --with-domterm option.
 	Update --with-jline2 options to --with-jline3.
 

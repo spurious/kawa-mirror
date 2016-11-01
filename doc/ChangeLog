@@ -1,3 +1,8 @@
+2016-11-01  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Source distribution): Document --with-domterm option.
+	Update --with-jline2 options to --with-jline3.
+
 2016-10-30  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Prompts): Small enhancements.

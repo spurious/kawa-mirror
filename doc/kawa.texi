@@ -1515,16 +1515,31 @@ make READLINE_INCLUDE_PATH=-I/usr/local/unix/readline/include \
      READLINE_LIB_PATH=-L/usr/local/unix/readline/lib
 @end example
 
-@item @code{--with-jline2}
-@itemx @code{--with-jline2=@var{jline2.jar}}
-Build support for using @uref{https://github.com/jline/jline2,JLine 2},
+@item @code{--with-domterm}
+@itemx @code{--with-domterm=@var{domterm.jar}}
+Compile with extra support for the @ref{Using DomTerm,DomTerm}
+terminal emulator library.  (Some DomTerm support is built-in regardless.)
+
+If you use this option along with @code{--with-javafx}
+then creating a new @ref{REPL Console,REPL} window
+will create a DomTerm window.
+
+As an optional convenience, you can use the @code{domterm.jar}
+in the Kawa binary distribution.
+
+@item @code{--with-jline3}
+@itemx @code{--with-jline3=@var{jline3.jar}}
+Build support for using @uref{https://github.com/jline/jline3,JLine 3},
 which is a library for handling console input, similar to GNU readline.
-If specified, the @var{jline2.jar} is added to the classpath of the
+If specified, the @var{jline3.jar} is added to the classpath of the
 generated @code{kawa.sh} or @code{kawa} shell program.
 
-An advantage of @code{--with-jline2} (compared to
+An advantage of @code{--with-jline3} (compared to
 @code{--enable-kawa-frontend}) is that the former works without native code
 (on most Unix-like platforms), and it does not require a C wrapper program.
+
+As an optional convenience, you can use the @code{jline.jar}
+in the Kawa binary distribution.
 
 @item @code{--with-servlet}
 @itemx @code{--with-servlet=@var{servlet-jar}}
@@ -3405,7 +3420,7 @@ If JavaFX/WebView is not available, or if you specify
 @anchor{Using DomTerm}
 @subsection Using DomTerm
 
-DomTerm is a family of terminal emulators that use
+@uref{http://domterm.org,DomTerm} is a family of terminal emulators that use
 the DomTerm JavaScript library.
 
 You can either have Kawa start DomTerm:

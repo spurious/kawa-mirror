@@ -27,9 +27,6 @@ AC_ARG_WITH(javafx,
   AS_HELP_STRING(--with-javafx@<:@=jfxrt.jar@:>@,Enable support for JavaFX))
 WITH_JAVAFX_ARG="${with_javafx}"
 
-AC_ARG_WITH(jline2,
- AS_HELP_STRING(--with-jline2=<:@=jline2.jar@:>@,Build support JLine2 input editing))
-
 AC_ARG_WITH(domterm,
  AS_HELP_STRING(--with-domterm=<:@=domterm.jar@:>@,Build support for DomTerm))
  WITH_DOMTERM_ARG="${with_domterm}"
@@ -176,8 +173,6 @@ AM_CONDITIONAL(ENABLE_XML, test "$enable_xml" = "yes")
 AM_CONDITIONAL(ENABLE_SERVLET,
   test "$enable_servlet" != "" -a "$enable_servlet" != "no")
 AM_CONDITIONAL(WITH_SWING, test "$with_swing" != "no")
-AM_CONDITIONAL(WITH_JLINE2,
-  test "$with_jline2" != "" -a "$with_jline2" != "no" || test "$with_jline3" != "" -a "$with_jline3" != "no")
 AM_CONDITIONAL(WITH_JLINE3,
   test "$with_jline3" != "" -a "$with_jline3" != "no")
 AM_CONDITIONAL(WITH_DOMTERM,
@@ -195,8 +190,6 @@ AM_CONDITIONAL(ON_WINDOWS, test "$CLASSPATH_SEPARATOR" = ";")
 
 if test "$with_jline3" != "" -a "$with_jline3" != "no"
 then WITH_JLINE_PATH="${with_jline3}"
-elif test "$with_jline2" != "" -a "$with_jline2" != "no"
-then WITH_JLINE_PATH="${with_jline2}"
 fi
 
 JEMACS_VERSION=`echo $VERSION | sed  -e 's/^1/0/'`
@@ -220,7 +213,6 @@ AC_SUBST(pathsep)
 AC_SUBST(filesep)
 AC_SUBST(WITH_SERVLET_ARG)
 AC_SUBST(WITH_JAVAFX_ARG)
-AC_SUBST(WITH_JLINE2)
 AC_SUBST(WITH_JLINE3)
 AC_SUBST(WITH_JLINE_PATH)
 AC_SUBST(WITH_DOMTERM_ARG)

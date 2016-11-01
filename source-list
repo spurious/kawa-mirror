@@ -832,7 +832,7 @@ endif
 if WITH_SWT
 sources_gnu_selected += $(GNU_KAWA_SWTVIEWS_JSOURCES)
 endif
-if WITH_JLINE2
+if WITH_JLINE3
 sources_gnu_selected += $(GNU_KAWA_IO_JLINE_JSOURCES)
 endif
 if ENABLE_XML

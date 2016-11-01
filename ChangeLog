@@ -1,3 +1,9 @@
+2016-11-01  Per Bothner  <per@bothner.com>
+
+	* configure.ac: Remove obsolete --with-jline2 option.
+	* Makefile.am: Update accordingly.
+	* source-list: Update accordingly.
+
 2016-10-29  Per Bothner  <per@bothner.com>
 
 	* source-list: Don't build gnu.kawa.models unless WITH_AWT.

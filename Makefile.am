@@ -107,11 +107,7 @@ kawa-doc.tar.gz: kawa-doc-$(VERSION).tar.gz
 kawa-doc-$(VERSION).tar.gz:  doc/kawa.texi
 	cd doc; $(MAKE) ../kawa-doc-$(VERSION).tar.gz
 
-if WITH_JLINE3
 JLINE_VERSION_MAJOR=3
-else
-JLINE_VERSION_MAJOR=2
-endif
 
 dist-kawa.jar: dist
 	srcdir=`(cd $(srcdir); /bin/pwd)` \
@@ -283,7 +279,7 @@ if ENABLE_SERVLET
 	cd $(DESTDIR)$(datadir)/kawa/lib && \
 	  $(LN_S) @WITH_SERVLET_ARG@ servlet.jar
 endif
-if WITH_JLINE2
+if WITH_JLINE3
 	cd $(DESTDIR)$(datadir)/kawa/lib && \
 	  $(LN_S) @WITH_JLINE_PATH@ jline.jar
 endif
@@ -319,7 +315,7 @@ kawa/Version.java: $(srcdir)/kawa/Version.java.in $(srcdir)/configure.ac
 all-recursive:  kawa/Version.java selected-java-source $(GENERATED_SIMPLEVECTOR_FILES)
 all: lib/kawa.jar lib/kawart.jar $(JLINE_LINK) $(DOMTERM_LINK) $(SERVLET_LINK)
 
-if WITH_JLINE2
+if WITH_JLINE3
 JLINE_LINK = lib/jline.jar
 
 lib/jline.jar:
@@ -345,11 +341,6 @@ if WITH_HTTPSERVER
 PREPROCESS_HTTPSERVER = +use:com.sun.net.httpserver
 else
 PREPROCESS_HTTPSERVER = -use:com.sun.net.httpserver
-endif
-if WITH_JLINE2
-PREPROCESS_JLINE2 = +with:jline2
-else
-PREPROCESS_SLINE2 = -with:jline2
 endif
 if WITH_JLINE3
 PREPROCESS_JLINE3 = +with:jline3
@@ -378,7 +369,7 @@ kawa/Version.class: kawa/Version.java
 gnu/kawa/util/PreProcess.class: gnu/kawa/util/PreProcess.java
 	$(JAVAC) -d . $^
 
-JAVA_PREPROCESS_OPTIONS = @JAVA_SOURCE_SELECTOR@ $(PREPROCESS_HTTPSERVER) $(PREPROCESS_XML) $(PREPROCESS_JLINE2) $(PREPROCESS_JLINE3) $(PREPROCESS_AWT)
+JAVA_PREPROCESS_OPTIONS = @JAVA_SOURCE_SELECTOR@ $(PREPROCESS_HTTPSERVER) $(PREPROCESS_XML) $(PREPROCESS_JLINE3) $(PREPROCESS_AWT)
 
 selected-java-source: Makefile $(srcdir)/patch-source-list
 	if test ! -e selected-java-source -o \

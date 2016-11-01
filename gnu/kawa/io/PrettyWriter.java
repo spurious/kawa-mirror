@@ -996,9 +996,9 @@ public class PrettyWriter extends PrintConsumer
             System.arraycopy(queueStrings, 0, newStrings, 0, queueStrings.length);
           }
         else // shift the old items to the top, and insert from the front of a doubled array
-          {            
+          {
             //log("non-sharing expand: oldLength="+oldLength+" newLength="+newLength+" queueTail="+queueTail);
-            
+
             int queueHead = queueTail + queueSize - oldLength;
             if (queueHead > 0)
               { // Wraps around.
@@ -1402,8 +1402,6 @@ public class PrettyWriter extends PrintConsumer
   {
     boolean outputAnything = false;
     //log("maybeOutput("+forceNewlines+","+flushing+"):");  dumpQueue();
-    if (! flushing && isDomTerm())
-        return false;
   loop:
     while (queueSize > 0)
       {
@@ -1411,7 +1409,7 @@ public class PrettyWriter extends PrintConsumer
 	  queueTail = 0;
 	int next = queueTail;
 	int type = getQueueType(next);
-        if (isDomTerm() && flushing) {
+        if (isDomTerm()) {
             if (bufferFillPointer > 0 && type != QITEM_NEWLINE_TYPE && type != QITEM_NOP_TYPE) {
                 int count = posnIndex(queueInts[next+QITEM_POSN]);
                 if (count > 0) {
@@ -1629,7 +1627,7 @@ public class PrettyWriter extends PrintConsumer
     boolean isLiteral = kind == NEWLINE_LITERAL;
     int amountToConsume = posnIndex(queueInts[newline + QITEM_POSN]);
     int amountToPrint;
-    if (isLiteral || kind == NEWLINE_DUMMY || (isDomTerm() && flushing))
+    if (isLiteral || kind == NEWLINE_DUMMY || isDomTerm())
       amountToPrint = amountToConsume;
     else
       {
@@ -1671,7 +1669,7 @@ public class PrettyWriter extends PrintConsumer
     this.lineNumber = lineNumber;
     if (kind ==  NEWLINE_DUMMY) {
         // emit nothing
-    } else if (isDomTerm() && flushing) {
+    } else if (isDomTerm()) {
         String cmd;
         switch (kind) {
         case NEWLINE_FILL:

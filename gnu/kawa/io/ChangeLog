@@ -1,3 +1,10 @@
+2016-10-31  Per Bothner  <per@bothner.com>
+
+	* PrettyWriter.java: Change DomTerm support to be more like default.
+	Specifically, maybeOutput may do output even if not flushing.
+	While a lineLength limit isn't relevant, it's good writing
+	things out when we can.  It also avoids a bug with setSharing.
+
 2016-10-30  Per Bothner  <per@bothner.com>
 
 	* JLineInPort.java (maybeColorizePrompt): Colorize default prompts.

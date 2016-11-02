@@ -16,6 +16,7 @@ var mainTarget = usingFrameset ? "main" : "_parent";
 var mainWindow = window;
 var sidebarQuery = "";
 var tocFilename = "ToC.xhtml";
+var xhtmlNamespace = "http://www.w3.org/1999/xhtml";
 
 function withSidebarQuery(href) {
     var h = href.indexOf('#');
@@ -142,7 +143,9 @@ function onSidebarLoad(evt) {
         var mainFilename = search.startsWith("?main=") // FIXME use regex
             ? search.substring(6) : null;
         if (mainFilename)
-            scanToc1(body, mainFilename);
+            scanToc1(body,
+                     mainFilename == "ToC.xhtml" ? "index.xhtml"
+                     : mainFilename);
     }
     var links = document.getElementsByTagName("a");
     for (var i = links.length; --i >= 0; ) {
@@ -159,11 +162,11 @@ function onSidebarLoad(evt) {
         }
     }
     if (links.length > 0) {
-        var tocA = document.createElement("a");
+        var tocA = document.createElementNS(xhtmlNamespace, "a");
         tocA.setAttribute("href", "ToC.xhtml");
         tocA.setAttribute("target", mainTarget);
         tocA.appendChild(document.createTextNode("Table of Contents"));
-        var tocLi = document.createElement("li");
+        var tocLi = document.createElementNS(xhtmlNamespace, "li");
         tocLi.appendChild(tocA);
         var indexLi = links[links.length-1].parentNode;
         var indexGrand = indexLi.parentNode.parentNode;
@@ -186,7 +189,8 @@ function useSidebar(search) {
         return true;
     return ! (navigator && navigator.epubReadingSystem);
 }
-if (location.href.indexOf(tocFilename) >= 0) {
+if (location.href.indexOf(tocFilename) >= 0
+    && (location.href.indexOf("?main=") >= 0 || window.name == "slider")) {
     window.addEventListener("load", onSidebarLoad, false);
 } else {
     window.addEventListener("load", onMainLoad, false);

@@ -1,3 +1,8 @@
+2016-11-02  Per Bothner  <per@bothner.com>
+
+	* KawaAutoHandler.java (getModule):  Do setScriptAndLocalPath
+	if module found in cache.
+
 2016-08-06  Per Bothner  <per@bothner.com>
 
 	Remove old experimental REPL wrapper using servlet and AJAX.

@@ -59,13 +59,28 @@ public class KawaAutoHandler
     mcontext.addFlags(ModuleContext.IN_HTTP_SERVER);
     if (hctx.getClass().getName().endsWith("KawaServlet$Context"))
       mcontext.addFlags(ModuleContext.IN_SERVLET);
-    ModuleInfo minfo = (ModuleInfo) mmap.get(path);
+    Object[] cached = (Object[]) mmap.get(path);
+    ModuleInfo minfo;
+    String scriptPath = "";
+    if (cached != null) {
+        minfo = (ModuleInfo) cached[0];
+        scriptPath = (String)  cached[1];
+    } else {
+        minfo = null;
+        scriptPath = path;
+    }
     long now = System.currentTimeMillis();
     ModuleManager mmanager = mcontext.getManager();
     // Avoid checking the disk too much
     if (minfo != null
-        && now - minfo.lastCheckedTime < mmanager.lastModifiedCacheTime)
+        && now - minfo.lastCheckedTime < mmanager.lastModifiedCacheTime) {
+        if (path.startsWith(scriptPath))
+            hctx.setScriptAndLocalPath(scriptPath,
+                                       path.substring(scriptPath.length()));
+        else
+            hctx.setScriptAndLocalPath("", path);
       return mcontext.findInstance(minfo);
+    }
 
     int plen = path.length();
     // Temporarily preset script-path to "" while doing getResourceURL.
@@ -88,7 +103,8 @@ public class KawaAutoHandler
             url = hctx.getResourceURL(upath);
             if (url != null)
               {
-                hctx.setScriptAndLocalPath(path.substring(0, sl+1), path.substring(sl+1));
+                scriptPath = path.substring(0, sl+1);
+                hctx.setScriptAndLocalPath(scriptPath, path.substring(sl+1));
                 absPath = Path.valueOf(url);
                 break;
               }
@@ -98,6 +114,7 @@ public class KawaAutoHandler
       }
     else
       {
+        scriptPath = path;
         hctx.setScriptAndLocalPath(path, "");
       }
 
@@ -234,7 +251,7 @@ public class KawaAutoHandler
       }
 
     minfo.setModuleClass(cl);
-    mmap.put(path, minfo);
+    mmap.put(path, new Object[] {minfo, scriptPath});
 
     //if (saveClass)  FIXME
     //  comp.outputClass(context.getRealPath("WEB-INF/classes")+'/');

@@ -1,3 +1,7 @@
+2016-11-02  Per Bothner  <per@bothner.com>
+
+	* style/kawa-epub.xsl (toc-ref): Override to ToC.xhtml. 
+
 2016-11-01  Per Bothner  <per@bothner.com>
 
 	Numerous tweaks to sidebar styling and links.

@@ -7,4 +7,10 @@
 <xsl:param name="html.namespace">http://www.w3.org/1999/xhtml</xsl:param>
 <xsl:param name="html.script">style/utils.js</xsl:param>
 
+  <xsl:template name="toc-href">
+    <xsl:text>ToC</xsl:text>
+    <xsl:value-of select="$html.ext"/>
+  </xsl:template>
+
+
 </xsl:stylesheet>

@@ -89,7 +89,7 @@ kawa.xml: $(srcdir)/kawa.texi
 	$(MAKEINFO) -I=$(srcdir) --docbook $(srcdir)/kawa.texi -o - | \
 	sed \
 	-e 's|_002d|-|g' \
-	-e 's|<book id="-" lang="en">|<book id="book" lang="en"><?dbhtml filename="toc.html"?>|' \
+	-e 's|<book id="-" lang="en">|<book id="book" lang="en"><?dbhtml filename="top.html"?>|' \
 	-e 's|<chapter label="" id="Top">|<chapter label="Top" id="Top"><?dbhtml filename="index.html"?>|' \
 	-e 's|<chapter label="1" id="News">|<chapter label="1" id="News"><?dbhtml filename="news.html"?>|' \
 	-e 's|id="Tutorial">|\0<?dbhtml filename="tutorial/index.html"?>|' \
@@ -105,6 +105,8 @@ kawa.xml: $(srcdir)/kawa.texi
 	-e 's|<title>Building and installing Kawa</title>|\0<titleabbrev>Building and installing</titleabbrev>|' \
 	-e 's|<title>The Kawa Scheme system</title>|\0<titleabbrev>Kawa Home</titleabbrev>|' \
 	-e 's|\([^<>]*\)<userinput>|<prompt>\1</prompt><userinput>|' \
+	-e 's|<appendix .*id="Overall-Index">|<chapter label="" id="Overall-Index">|' \
+	-e 's|</appendix>|</chapter>|' \
 	-e '/@ifnotdocbook/,/@end ifnotdocbook/d' \
 	> kawa.xml
 
@@ -135,6 +137,7 @@ $(HTML_TARGET_DIRECTORY)/index.html: kawa.xml Makefile
 	  --stringparam chunk.separate.lots 1 \
 	  --stringparam chunk.tocs.and.lots 1 \
 	  kawa.xsl -
+	mv $(HTML_TARGET_DIRECTORY)/bk01-toc.html $(HTML_TARGET_DIRECTORY)/ToC.html
 	mkdir -p $(HTML_TARGET_DIRECTORY)/style
 	cp $(srcdir)/style/kawa-logo.png $(srcdir)/style/*.css \
 	  $(HTML_TARGET_DIRECTORY)/style
@@ -168,6 +171,9 @@ kawa-manual.epub: kawa.xml Makefile
 	  --stringparam chunk.separate.lots 1 \
 	  --stringparam chunk.tocs.and.lots 1 \
 	  kawa-epub.xsl -
+	sed -e '/<footer>/,/<.footer>/d' <ebook/OEBPS/bk01-toc.xhtml \
+	  >ebook/OEBPS/ToC.xhtml
+	rm ebook/OEBPS/bk01-toc.xhtml
 	cp style/kawa-ebook.css ebook/OEBPS/kawa.css
 	cp style/kawa-ebook.js ebook/OEBPS/kawa-ebook.js
 	cp with-frames.html ebook/OEBPS/with-frames.html

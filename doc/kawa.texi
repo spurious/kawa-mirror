@@ -22434,11 +22434,10 @@ notice of modification.  This work is provided as is, with
 no warranty of any kind.
 @end quotation
 
-
 @c I'd prefer to call this node plain "Index", but that causes a clash
 @c with index.html when generating HTML on case-insenstive file systems.
 @node Overall Index,  , License, Top
-@unnumbered Index
+@appendix Index
 @printindex cp
 
 @bye

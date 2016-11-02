@@ -57,7 +57,9 @@ margin: 0;
 padding: 0;
 list-style-type: none;
 }
-div.toc li { background-color: lightblue;  padding: 0px 4px;}
+body.toc-sidebar { background-color: #F4FCFF }
+div.toc { background-color: #F4FCFF }
+div.toc li { padding: 0px 4px;}
 div.toc li { margin: 0 ; }
 div.toc a { display: block; text-decoration: none }
 

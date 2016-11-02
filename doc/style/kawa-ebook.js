@@ -15,6 +15,7 @@ var usingFrameset = name =="main" || name=="slider";
 var mainTarget = usingFrameset ? "main" : "_parent";
 var mainWindow = window;
 var sidebarQuery = "";
+var tocFilename = "ToC.xhtml";
 
 function withSidebarQuery(href) {
     var h = href.indexOf('#');
@@ -40,7 +41,7 @@ function onMainLoad(evt) {
         if (useSidebar(location.search)) {
             var iframe = document.createElement("iframe");
             var mainFilename = filename(location.pathname);
-            iframe.setAttribute("src", "bk01-toc.xhtml?main="+mainFilename);
+            iframe.setAttribute("src", tocFilename+"?main="+mainFilename);
             var body = document.getElementsByTagName("body")[0];
             body.insertBefore(iframe, body.firstChild);
             body.setAttribute("class", "mainbar");
@@ -130,6 +131,8 @@ function scanToc1(node, current) {
 }
 
 function onSidebarLoad(evt) {
+    var body = document.getElementsByTagName("body")[0];
+    body.setAttribute("class", "toc-sidebar");
     if (usingFrameset) {
         top.sidebarLoaded = true;
         if (top.mainLoaded)
@@ -138,7 +141,6 @@ function onSidebarLoad(evt) {
         var search = location.search;
         var mainFilename = search.startsWith("?main=") // FIXME use regex
             ? search.substring(6) : null;
-        var body = document.getElementsByTagName("body")[0];
         if (mainFilename)
             scanToc1(body, mainFilename);
     }
@@ -156,6 +158,25 @@ function onSidebarLoad(evt) {
             }
         }
     }
+    if (links.length > 0) {
+        var tocA = document.createElement("a");
+        tocA.setAttribute("href", "ToC.xhtml");
+        tocA.setAttribute("target", mainTarget);
+        tocA.appendChild(document.createTextNode("Table of Contents"));
+        var tocLi = document.createElement("li");
+        tocLi.appendChild(tocA);
+        var indexLi = links[links.length-1].parentNode;
+        var indexGrand = indexLi.parentNode.parentNode;
+        if (indexGrand.nodeName == "li") //hack
+            indexLi = indexGrand;
+        indexLi.parentNode.insertBefore(tocLi, indexLi.nextSibling);
+    }
+    var divs = document.getElementsByTagName("div");
+    for (var i = divs.length; --i >= 0; ) {
+        var div = divs[i];
+        if (div.getAttribute("class")=="toc-title")
+            div.parentNode.removeChild(div);
+    }
 }
 
 function useSidebar(search) {
@@ -165,7 +186,7 @@ function useSidebar(search) {
         return true;
     return ! (navigator && navigator.epubReadingSystem);
 }
-if (location.href.indexOf("bk01-toc.xhtml") >= 0) {
+if (location.href.indexOf(tocFilename) >= 0) {
     window.addEventListener("load", onSidebarLoad, false);
 } else {
     window.addEventListener("load", onMainLoad, false);

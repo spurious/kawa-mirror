@@ -1,5 +1,15 @@
 2016-11-01  Per Bothner  <per@bothner.com>
 
+	Numerous tweaks to sidebar styling and links.
+	* kawa.texi (Overall Index): Make @appendix, to force outside @part.
+	* Makefile.am: Rename bk01-toc.html to Toc.html.
+	* with-frames.html: Likewise.
+	* style/docbook-to-html.xsl: Add Toc and Index links.
+	* style/kawa.css: Change sidebar color.
+	* style/kawa-ebook.css: Likewise.
+	* style/kawa-ebook.js: Add ToC link.  Enable sidebar styling.
+	* style/kawa-epub.xsl: Remove unused onload/onunload attributes.
+
 	* style/docbook-to-html.xsl: Include 'part' (i.e. the Reference Manual)
 	in navfooter.
 

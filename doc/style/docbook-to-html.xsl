@@ -247,10 +247,11 @@
 
   <div class="toc">
     <ul>
-      <xsl:apply-templates select="/book/part|/book/chapter" mode="chunk-toc">
+      <xsl:apply-templates select="/book/part|/book/chapter|/book/appendix" mode="chunk-toc">
 	<xsl:with-param name="toc-context" select="$toc-context"/>
 	<xsl:with-param name="context-depth" select="count(ancestor::*)"/>
       </xsl:apply-templates>
+      <li><a href="ToC.html">Table of Contents</a></li>
       </ul>
   </div>
 </xsl:template>
@@ -311,9 +312,6 @@
 	  <xsl:with-param name="toc-context" select="$toc-context"/>
 	  <xsl:with-param name="context-depth" select="$context-depth"/>
 	</xsl:apply-templates>
-        <xsl:if test="@id = 'Reference-Documentation'">
-          <li><a href="toc.html">Table of Contents</a></li>
-        </xsl:if>
       </ul>
     </xsl:if>
   </li>
@@ -366,6 +364,7 @@
 	<xsl:apply-templates select="$home/following-sibling::chapter|$root/part" mode="footer.toc">
 	  <xsl:with-param name="toc-context" select="."/>
 	</xsl:apply-templates>
+        <li><b class="toc"><a href="ToC.html">Table of Contents</a></b></li>
       </ul>
     </xsl:if>
 

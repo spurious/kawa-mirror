@@ -145,7 +145,7 @@ html {
 span.ignore { display: none }
 
 div.navcol { 
-  background: #ab7;
+  background: #F4FCFF;
 }
 
 /* Local navigation menu, along the left or right side */
@@ -177,7 +177,7 @@ list-style-type: none;
 div.navcol li { margin: 0 ; }
 div.navbar ul ul, div.navcol ul ul { margin-left: 0.6em; }
 
-div.navbar li { background-color: lightblue;  padding: 0px 4px;}
+div.navbar li { padding: 0px 4px;}
 div.navbar a { display: block; }
 
 div.navcol a {  text-decoration: none; }

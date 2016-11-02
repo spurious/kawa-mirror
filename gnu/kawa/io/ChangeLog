@@ -1,3 +1,8 @@
+2016-11-02  Per Bothner  <per@bothner.com>
+
+	* JLineInPort.java (setInDomTerm): New method.
+	Set DELAY_LINE_WRAP option to JLine3 (personal fork).
+
 2016-11-01  Per Bothner  <per@bothner.com>
 
 	* JLineInPort.java (KawaParsedLine): Initialize 'word' field to "".

@@ -72,6 +72,13 @@ public class JLineInPort extends TtyInPort
         this.terminal = terminal;
     }
 
+    @Override
+    public void setInDomTerm(boolean v) {
+        super.setInDomTerm(v);
+        if (v)
+            jlreader.setOpt(LineReader.Option.DELAY_LINE_WRAP);
+    }
+
     public ParsedLine parse(String line, int cursor,
                             ParseContext context) throws SyntaxError {
         if (context == ParseContext.COMPLETE)

@@ -7,7 +7,7 @@ case "$thisfile" in
 esac
 while test -L "$thisfile"; do thisfile=$(readlink -f "$thisfile"); done
 thisdir=`dirname "$thisfile"`
-kawadir=`echo "$thisdir" | sed -e 's|/bin$||'`
+kawadir=`echo "$thisdir" | sed -e 's|/bin\(/\.\)*$||'`
 if [ "$#" -eq 0 ]
 then
    command_line="$0"

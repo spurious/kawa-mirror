@@ -1,3 +1,7 @@
+2016-11-03  Sudarshan S Chawathe <chaw@eip10.org>
+
+	* kawa.sh.in: Tweak so ./kawa works, even when kawa is not a symlink.
+
 2016-08-14  Per Bothner  <per@bothner.com>
 
 	* Makefile.am: Remove version number in jar file names.

@@ -1,3 +1,7 @@
+2016-11-05  Per Bothner  <per@bothner.com>
+
+	* webtest/README: New file - helps test http serving of static files.
+
 2016-10-29  Per Bothner  <per@bothner.com>
 
 	* xml-test.scm: Update for changed XML-xhtml formatting.

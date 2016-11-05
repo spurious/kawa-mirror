@@ -53,9 +53,9 @@ case "$1" in
                 ;;
             esac
         done
-        exec ${JAVA} -Dkawa.command.line="${command_line}" "${jvm_args[@]}" kawa.repl ${no_console} "$@"
+        exec ${JAVA} -Dkawa.command.line="${command_line}" -Dkawa.home="${kawadir}" "${jvm_args[@]}" kawa.repl ${no_console} "$@"
         ;;
     *)
-        exec ${JAVA} -Dkawa.command.line="${command_line}" kawa.repl ${no_console} "$@"
+        exec ${JAVA} -Dkawa.command.line="${command_line}" -Dkawa.home="${kawadir}" kawa.repl ${no_console} "$@"
         ;;
 esac

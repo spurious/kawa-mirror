@@ -1,3 +1,10 @@
+2016-11-05  Per Bothner  <per@bothner.com>
+
+	* Path.java (probeContentType): Make a bit more general and robust.
+	Since URLConnection.guessContentTypeFromName doesn't understand
+	"jar:" scheme, add special hack for it.
+	Hardwire in some extensions not recognized by guessContentTypeFromName.
+
 2016-11-02  Per Bothner  <per@bothner.com>
 
 	* JLineInPort.java (setInDomTerm): New method.

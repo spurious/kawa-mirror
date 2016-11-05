@@ -448,7 +448,24 @@ implements javax.tools.FileObject
         // contentType = null;
         /* #endif */
         if (contentType == null) {
-            contentType = URLConnection.guessContentTypeFromName(getPath());
+            String p = getPath();
+            if (p == null)
+                p = this.toString();
+            if (p.startsWith("jar:")) {
+                int bang = p.indexOf('!');
+                if (bang > 0)
+                    p = p.substring(bang+1);
+            }
+            contentType = URLConnection.guessContentTypeFromName(p);
+            if (contentType == null) {
+                // guessContentTypeFromName doesn't recognize these
+                if (p.endsWith(".xhtml"))
+                    contentType = "application/xhtml+xml";
+                else if (p.endsWith(".css"))
+                    contentType = "text/css";
+                else if (p.endsWith(".js"))
+                    contentType = "application/javascript";
+            }
         }
         return contentType;
     }

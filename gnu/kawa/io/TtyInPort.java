@@ -37,7 +37,7 @@ public class TtyInPort extends InPort
     public String promptTemplate1() {
         String str = CheckConsole.prompt1.get("");
         if (inDomTerm && ! haveDomTermEscapes(str))
-            str = "%{\033[14u%}"+str+"%{\033[15u%}";
+            str = "%{\033[19u\033[16u%}\u25BC%{\033[17u\033[14u%}"+str+"%{\033[15u%}";
         return str;
     }
 

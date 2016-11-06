@@ -1,5 +1,7 @@
 2016-11-06  Per Bothner  <per@bothner.com>
 
+	* TtyInPort.java (promptTemplate1): Add hide/show button if DomTerm.
+
 	* WriterManager.java (run): Call close rather than flush.
 	Revises previous change (from finalize to flush);
 	let's hope this works ok ...

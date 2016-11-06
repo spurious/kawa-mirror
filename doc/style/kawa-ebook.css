@@ -50,7 +50,7 @@ div.toc li {
   border: solid;
   border-width: 1px 0px 0px 1px;
   border-color: #AAA #666 #666 #AAA;
-  list-style: none }            // Remove triangle from H2
+  list-style: none }     /* Remove triangle from H2 */
 div.toc ul
 {
 margin: 0;

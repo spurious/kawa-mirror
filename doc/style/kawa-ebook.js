@@ -3,15 +3,13 @@
 // (1) to use an old-fashioned <frameset> browse with-frames.html
 // (2) otherwise using an <iframe> is preferred as it enables
 // cleaner URLs in the location-bar.
-// The <iframe> sidebar can be explicilyt enabled if you use the
-// query string "?sidebar" or "?sidebar=yes";
-// or explicitly disabled with the query "?sidebar=no".
+// The <iframe> sidebar can be explicitly enabled if you use the hash
+// "#sidebar" or "#sidebar=yes"; or explicitly disabled with "#sidebar=no".
 // The default is to enable the sidebar except when using a ebook-reader
 // (as detected by the property navigator.epubReadingSystem),
 // since ebook-readers generally provide their own table-of-contents.
 
-var fromJar = location.protocol == "jar:";
-var usingFrameset = name =="main" || name=="slider";
+var usingFrameset = top.frames.length > 1;
 var mainTarget = usingFrameset ? "main" : "_parent";
 var mainWindow = window;
 var sidebarQuery = "";
@@ -25,11 +23,14 @@ function withSidebarQuery(href) {
     return href.substring(0, h) + sidebarQuery + href.substring(h);
 }
 
-function filename(pathname) {
-    var fname = pathname;
+function filename(loc) {
+    var fname = loc.pathname;
     var sl = fname.lastIndexOf("/");
     if (sl >= 0)
         fname = fname.substring(sl+1);
+    var hash = loc.hash;
+    if (hash)
+        fname = fname + hash.replace('#', '*');
     return fname;
 }
 
@@ -38,16 +39,18 @@ function onMainLoad(evt) {
         top.mainLoaded = true;
         if (top.sidebarLoaded)
             updateSidebarForFrameset();
+        top.setHash(location.pathname);
     } else {
-        if (useSidebar(location.search)) {
+        if (useSidebar(location.hash)) {
             var iframe = document.createElement("iframe");
-            var mainFilename = filename(location.pathname);
-            iframe.setAttribute("src", tocFilename+"?main="+mainFilename);
+            var mainFilename = filename(location);
+            iframe.setAttribute("name", "slider");
+            iframe.setAttribute("src", tocFilename+"#main="+mainFilename);
             var body = document.getElementsByTagName("body")[0];
             body.insertBefore(iframe, body.firstChild);
             body.setAttribute("class", "mainbar");
         }
-        sidebarQuery = location.search;
+        sidebarQuery = location.hash;
     }
     var links = document.getElementsByTagName("a");
     for (var i = links.length; --i >= 0; ) {
@@ -56,7 +59,7 @@ function onMainLoad(evt) {
         if (href) {
             if (href.indexOf(':') >= 0)
                 link.setAttribute("target", "_blank");
-            else if (! usingFrameset && ! fromJar && href.indexOf('?') < 0)
+            else if (! usingFrameset && href.indexOf('?') < 0 && href.indexOf('#') < 0)
                 link.setAttribute("href", withSidebarQuery(href));
         }
     }
@@ -76,10 +79,10 @@ function clearTocStyles(node) {
 function updateSidebarForFrameset() {
     var mainWindow = top.frames["main"];
     var sideWindow = top.frames["slider"];
-    var mainFilename = sideWindow.filename(mainWindow.location.pathname);
+    var mainFilename = sideWindow.filename(mainWindow.location);
     var sideBody = sideWindow.document.getElementsByTagName("body")[0];
     mainWindow.clearTocStyles(sideBody);
-    mainWindow.scanToc1(sideBody, mainFilename);
+    mainWindow.scanToc1(sideBody, mainFilename.replace('*', '#'));
 }
 
 function scanToc1(node, current) {
@@ -139,13 +142,13 @@ function onSidebarLoad(evt) {
         if (top.mainLoaded)
             updateSidebarForFrameset();
     } else {
-        var search = location.search;
-        var mainFilename = search.startsWith("?main=") // FIXME use regex
+        var search = location.hash;
+        var mainFilename = search.startsWith("#main=") // FIXME use regex
             ? search.substring(6) : null;
         if (mainFilename)
             scanToc1(body,
                      mainFilename == "ToC.xhtml" ? "index.xhtml"
-                     : mainFilename);
+                     : mainFilename.replace('*', '#'));
     }
     var links = document.getElementsByTagName("a");
     for (var i = links.length; --i >= 0; ) {
@@ -154,8 +157,8 @@ function onSidebarLoad(evt) {
         if (href) {
             if (href.indexOf(':') > 0) {
                 link.setAttribute("target", "_blank");
-            } else if (href.indexOf('?') < 0) {
-                if (! fromJar && ! usingFrameset)
+            } else {
+                if (! usingFrameset)
                     link.setAttribute("href", withSidebarQuery(href));
                 link.setAttribute("target", mainTarget);
             }
@@ -182,16 +185,33 @@ function onSidebarLoad(evt) {
     }
 }
 
-function useSidebar(search) {
-    if (search.indexOf("sidebar=no") >= 0)
+var clickSeen = false;
+function onClick(evt) {
+    if (evt.target
+        && evt.target.nodeName == "a"
+        && evt.target.getAttribute("target") != "_blank")
+        top.clickSeen = true;
+};
+
+function onUnload(evt) {
+    if (! usingFrameset && !top.clickSeen) {
+        var request = new XMLHttpRequest();
+        request.open("GET","(WINDOW-CLOSED)");
+        request.send(null);
+    }
+}
+
+function useSidebar(hash) {
+    if (hash.indexOf("sidebar=no") >= 0)
         return false;
-    if (search.indexOf("sidebar=yes") >= 0 || search == "?sidebar")
+    if (hash.indexOf("sidebar=yes") >= 0 || hash == "#sidebar")
         return true;
     return ! (navigator && navigator.epubReadingSystem);
 }
-if (location.href.indexOf(tocFilename) >= 0
-    && (location.href.indexOf("?main=") >= 0 || window.name == "slider")) {
+if (location.href.indexOf("#main=") >= 0 || window.name == "slider") {
     window.addEventListener("load", onSidebarLoad, false);
 } else {
     window.addEventListener("load", onMainLoad, false);
 }
+window.addEventListener("beforeunload", onUnload, false);
+window.addEventListener("click", onClick, false);

@@ -1,3 +1,12 @@
+2016-11-05  Per Bothner  <per@bothner.com>
+
+	* style/kawa-ebook.js: Use '#' (hash) rather than '?' (query) to
+	control sidebar.  This seems to work better with the "jar:" scheme
+	and generally is more robust.
+	* with-frames.html (setHash): Use to visibly update location bar.
+	(framesetUnloaded): Send message to server on window-close.
+	* style/kawa-ebook.java (onUnload): Likewise.
+
 2016-11-02  Per Bothner  <per@bothner.com>
 
 	* style/kawa-ebook.js: Minor fixes to sidebar generation.

@@ -4,28 +4,29 @@
     <title>Kawa manual</title>
     <link rel="up" href="../index.html">
     <link rel="top" href="../../index.html">
-    <script type="text/javascript">
-      var sliderBgcolor = "#60ECEC";
-      function framesetLoaded() {
-      /*
-        var mainWindow = parent.frames["main"];
-        var sideWindow = parent.frames["slider"];
-        var mainFilename = sideWindow.filename(mainWindow.location.pathname);
-        var sideBody = sideWindow.document.getElementsByTagName("body")[0];
-        mainWindow.clearTocStyles(sideBody);
-      mainWindow.scanToc1(sideBody, mainFilename);
-      */
-      /*
-        var hash=top.location.hash;
-        var main=top.main;
-        var id = hash ? hash.substring(1) : "NC01Mar1";
-        top.slider.sliderSelectId(id);
-      top.slider.focus();
-      */
-      }
-    </script>
+<script type="text/javascript">
+var sliderBgcolor = "#60ECEC";
+function setHash(pathname) {
+    var contextLength = location.pathname.indexOf("with-frames");
+    if (contextLength <= pathname.length)
+        pathname = pathname.substring(contextLength);
+    history.replaceState(null, null, "#"+pathname);
+};
+function framesetLoaded() {
+    var hash=top.location.hash;
+    var main=top.main;
+    if (hash && main) {
+        // FUTURE: load specified file into main frame
+    }
+}
+function framesetUnloaded() {
+    var request = new XMLHttpRequest();
+    request.open("GET","(WINDOW-CLOSED)");
+    request.send(null);
+}
+</script>
   </head>
-  <frameset cols="280,*" onload="top.framesetLoaded()">
+  <frameset cols="280,*" onload="top.framesetLoaded()" onunload="framesetUnloaded()">
     <frame name="slider" src="ToC.xhtml">
     <frame name="main" src="index.xhtml">
   </frameset>

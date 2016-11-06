@@ -1,3 +1,13 @@
+2016-11-06  Per Bothner  <per@bothner.com>
+
+	Some http-server refactoring and additions, intended to help the REPL.
+	* HttpRequestContext.java (handleStaticFile): New static method.
+	* KawaAutoHandler.java (getMethod): Use it.
+	* KawaHttpHandler.java (class StaticFileHandler): New member class.
+	(addHandler): New lower-level method.
+	(addStaticFileHandler): New method, for handling static files.
+	(maybeStopServer): Server shutdown hook.
+
 2016-11-02  Per Bothner  <per@bothner.com>
 
 	* KawaAutoHandler.java (getModule):  Do setScriptAndLocalPath

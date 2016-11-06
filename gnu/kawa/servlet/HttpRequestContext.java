@@ -8,6 +8,7 @@ import java.net.*;
 import java.util.*;
 import gnu.lists.*;
 import gnu.kawa.io.InPort;
+import gnu.kawa.io.Path;
 
 /** A representation of an http request as it is being handled.
  * It abstracts over different http server's API - specially, there are are
@@ -279,4 +280,32 @@ public abstract class HttpRequestContext
 
   public abstract void log (String message);
   public abstract void log (String message, Throwable ex);
+
+    public static void handleStaticFile(HttpRequestContext hctx, Path absPath) throws IOException {
+        String contentType = absPath.probeContentType();
+        if (contentType != null)
+            hctx.setContentType(contentType);
+        OutputStream out = hctx.getResponseStream();
+        try {
+            long len = absPath.getContentLength();
+            InputStream in = absPath.openInputStream();
+            hctx.sendResponseHeaders(200, null, len);
+            byte[] buffer = new byte[4*1024];
+            for (;;) {
+                int n = in.read(buffer);
+                if (n < 0)
+                    break;
+                out.write(buffer, 0, n);
+            }
+            out.close();
+        } catch (Throwable ex) {
+            String msg = "The requested URL "+hctx.getRequestPath()+" was not found on this server.\r\n - "+ex+"\r\n";
+            byte[] bmsg = msg.getBytes();
+            hctx.sendResponseHeaders(404, null, bmsg.length);
+            try {
+                out.write(bmsg);
+            } catch (IOException ex2) {
+            }
+        }
+    }
 }

@@ -178,25 +178,7 @@ public class KawaAutoHandler
                   }
                 return null;
               }
-
-            String contentType = absPath.probeContentType();
-            if (contentType != null)
-                hctx.setContentType(contentType);
-
-            // should set content length.
-            long len = absPath.getContentLength();
-            hctx.sendResponseHeaders(200, null, len);
-            OutputStream out = hctx.getResponseStream();
-            byte[] buffer = new byte[4*1024];
-            for (;;)
-              {
-                int n = resourceStream.read(buffer);
-                if (n < 0)
-                  break;
-                out.write(buffer, 0, n);
-              }
-            resourceStream.close();
-            out.close();
+            HttpRequestContext.handleStaticFile(hctx, absPath);
             return null;
           }
       }

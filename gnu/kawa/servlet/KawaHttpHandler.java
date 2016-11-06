@@ -85,13 +85,19 @@ public class KawaHttpHandler
 
   public static HttpServer serverInstance;
   public static int serverBacklog = 0;
+    static int handlerCount = 0;
   public static HttpServer getServerInstance() throws IOException
   {
     if (serverInstance == null)
       serverInstance = HttpServer.create();
     return serverInstance;
   }
-  public static void addAutoHandler(String uriRoot, String resourceRoot)
+    public static void maybeStopServer() {
+        if (serverInstance != null && --handlerCount <= 0)
+            serverInstance.stop(0);
+    }
+
+    public static void addAutoHandler(String uriRoot, String resourceRoot)
     throws IOException
   {
     HttpServer server = getServerInstance();
@@ -103,7 +109,24 @@ public class KawaHttpHandler
     server.createContext(uriRoot, new KawaHttpHandler(resourceRoot));
   }
 
-  public static void startServer(int port, PrintStream printPortHere)
+    public static HttpContext addHandler(String uriRoot, com.sun.net.httpserver.HttpHandler handler)
+        throws IOException  {
+        HttpServer server = getServerInstance();
+        if (uriRoot.length() == 0 || uriRoot.charAt(0) != '/')
+            uriRoot = "/" + uriRoot;
+        return server.createContext(uriRoot, handler);
+    }
+    public static void addStaticFileHandler(String uriRoot, String pathPrefix, String defaultUrl, boolean closeExit)
+        throws IOException  {
+        StaticFileHandler handler = new StaticFileHandler(pathPrefix, defaultUrl);
+        HttpContext context = addHandler(uriRoot, handler);
+        if (closeExit) {
+            handlerCount++;
+            handler.httpContext = context;
+        }
+    }
+
+  public static HttpServer startServer(int port, PrintStream printPortHere)
         throws IOException
   {
     HttpServer server = getServerInstance();
@@ -114,7 +137,52 @@ public class KawaHttpHandler
     if (printPortHere != null)
         printPortHere.println("Started web server on port "+port
                               +".  Browse http://127.0.0.1:"+port+"/");
+    return server;
   }
+
+    public static class StaticFileHandler implements HttpHandler {
+        String defaultUrl;
+        String pathPrefix;
+        HttpContext httpContext;
+
+        public StaticFileHandler(String pathPrefix, String defaultUrl) {
+            this.defaultUrl = defaultUrl;
+            this.pathPrefix = pathPrefix;
+        }
+        public void windowClosed() {
+            if (httpContext != null) {
+                try {
+                    HttpServer server = httpContext.getServer();
+                    server.removeContext(httpContext);
+                    if (server == serverInstance)
+                        maybeStopServer();
+                } catch (Throwable ex) {
+                }
+            }
+        }
+
+        public void handle(com.sun.net.httpserver.HttpExchange exchange) throws IOException {
+            gnu.kawa.servlet.KawaHttpHandler.Context hctx = new gnu.kawa.servlet.KawaHttpHandler.Context();
+            hctx.setExchange(exchange, null);
+            java.net.URI requestURI = hctx.getRequestURI();
+            String requestStr = requestURI.toString();
+            String contextPath = hctx.getContextPath();
+            if (requestStr.startsWith(contextPath)) {
+                requestStr = requestStr.substring(contextPath.length()-1);
+            }
+            if ("/".equals(requestStr)) { 
+                requestStr = defaultUrl;
+                hctx.setResponseHeader("Location", requestStr);
+                hctx.sendResponseHeaders(301, null, -1);
+                return;
+            }
+            if (requestStr.endsWith("/(WINDOW-CLOSED)")) {
+                windowClosed();
+                return;
+            }
+            HttpRequestContext.handleStaticFile(hctx, Path.valueOf(pathPrefix + requestStr));
+        }
+    };
 
   public static class Context extends HttpRequestContext
   {

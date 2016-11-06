@@ -1,3 +1,9 @@
+2016-11-06  Per Bothner  <per@bothner.com>
+
+	* WriterManager.java (run): Call close rather than flush.
+	Revises previous change (from finalize to flush);
+	let's hope this works ok ...
+
 2016-11-05  Per Bothner  <per@bothner.com>
 
 	* Path.java (probeContentType): Make a bit more general and robust.

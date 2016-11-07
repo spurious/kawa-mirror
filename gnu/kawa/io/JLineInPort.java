@@ -48,9 +48,7 @@ public class JLineInPort extends TtyInPort
     }
     private static Terminal makeTerminal(InputStream in, OutputStream out) throws IOException {
           Terminal terminal = new ExternalTerminal("Kawa", "xterm-256color",
-                                                   in, out,
-                                                   /* or maybe just "UTF-8" ?? */
-                                                   Charset.defaultCharset().name());
+                                                   in, out, "UTF-8");
           terminal.getAttributes().setOutputFlag(org.jline.terminal.Attributes.OutputFlag.ONLCR, true);
           terminal.getAttributes().setOutputFlag(org.jline.terminal.Attributes.OutputFlag.OPOST, true);
           return terminal;

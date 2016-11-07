@@ -1356,8 +1356,9 @@ packaged as an electronic book, which is readable by most
 e-book readers.  Plugins are also available for common browsers,
 for example @uref{http://www.epubread.com,EPUBReader} for @code{firefox}.
 
-The script @code{bin/browse-kawa-manual} (in the binary
-distribution) also works.  It uses JavaFX WebView.
+Even easier is to invoke
+@ref{browse-manual-option,@code{bin/kawa --browse-manual}}
+(or on Windows: @code{bin\kawa.bat --browse-manual}).
 
 An @code{epub} is essentially a zip archive, which you can unzip:
 @example
@@ -1366,9 +1367,6 @@ unzip kawa-manual.epub
 @end example
 Then you can use a plain browser
 with the URL @code{file:$KAWA_HOME/doc/OEBPS/index.xhtml}.
-
-The file @code{$KAWA_HOME/doc/README-epub} gives other alternatives
-for reading the documentation without unziping it.
 
 @node Source distribution,  , Binary distribution, Installation
 @section Installing and using the source distribution
@@ -1604,6 +1602,43 @@ Beyond the base packages, you probably want to install @code{autoconf},
 Cygwin (unlike MinGW) has a current version of @code{makeinfo}, but
 an undiagnosed bug still prevents building @code{kawa.info}.
 You can work around that problem with @code{touch doc/kawa.info}.
+
+@subsection Building the documentation
+
+To build the documentation in a form suitable for a web-site do:
+@example
+cd doc && make web/index.html
+@end example
+
+You can then point your browser at @code{file:/@var{kawa_srcdir}/doc/web/index.html}.
+
+The above requires @code{makeinfo} from the texinfo package,
+and the DocBook XSLT tools.
+
+If you don't have the DocBook XSLT tools (but have @code{makeinfo}),
+you can build a more plain HTML version of the documentation:
+@example
+cd doc && make kawa-html/index.html
+@end example
+
+In this case, point your browser at
+@code{file:/@var{kawa_srcdir}/doc/kawa-html/index.html}.
+
+To build an @code{EPUB} file suitable for ebook readers,
+as well as enabling support for the
+@ref{browse-manual-option,@code{kawa --browse-manual} option}, do:
+
+@example
+cd doc && make kawa-manual.epub
+@end example
+
+The build a @code{pdf} file suitable for printing or online viewing do:
+@example
+cd doc && make kawa.pdf
+@end example
+
+The resulting @code{kawa.pdf} is somewhat unsatisfactory - when viewed online,
+links aren't clickable.  Furthermore, box drawing characters are missing.
 
 @subsection Build Kawa using @code{ant}
 
@@ -2693,8 +2728,8 @@ Kawa processes the command-line arguments in order.
 Options (which either start with @samp{-} or contain a @samp{=})
 may ``use up'' one or more command arguments.
 Some of the options (@samp{-c}, @samp{-e}, @samp{-f}, @samp{-s},
-@samp{-C}, or @samp{--}) are @dfn{action options};
-others set various properties.
+@samp{-C}, @code{-w}, @samp{--}, @code{--browse-manual})
+are @dfn{action options}; others set various properties.
 
 When all the command-line arguments have been ``used up''
 and if no action options have been seen,
@@ -2760,6 +2795,7 @@ preamble before the actual Kawa code.
 One use for this is for Kawa shell scripts (@pxref{Scripts}).
 
 @item -w
+@itemx -w@var{sub-option}
 Creates a new top-level window, and runs an interactive read-eval-print
 in the new window.  See @ref{New-Window}.
 Same as @code{-e (scheme-window #t)}.
@@ -2768,6 +2804,29 @@ You can specify multiple @samp{-w} options, and also use @samp{-s}.
 Prints out some help.
 @item --version
 Prints out the Kawa version number, and then exits.
+
+@anchor{browse-manual-option}
+@item --browse-manual
+@itemx --browse-manual=@var{command}
+Browse a local copy of the documentation (this manual).
+
+This creates a mini web-server that reads
+from @code{doc/kawa-manual.epub}, which is
+included in the binary distributions, but not built by default from source.
+
+If no @var{command} is specified, creates a new window or tab
+in your default web browser.
+If @var{command} is a string containing @code{%U},
+then Kawa replaces @code{%U} with a URL that references itself,
+and then executes the resulting command.
+If @var{command} does not contain @code{%U}, then
+@var{command} becomes @var{command}@code{" %U"}.
+For example to use the Firefox browser to browse the manual do either of:
+@example
+kawa --browse-manual=firefox
+kawa --browse-manual="firefox %U"
+@end example
+
 @item --server @var{portnum}
 Start a server listening from connections on the specified @var{portnum}.
 Each connection using the Telnet protocol causes a new read-eval-print-loop
@@ -2957,7 +3016,7 @@ The @code{--no-console} flag was useful for older pre-Java-6
 implementations that did not have the @code{java.lang.Console} class.
 @item @code{console:type=}@var{console-types}
 @itemx @code{console:use-jline=}[@code{yes}|@code{no}]
-See teh @ref{REPL Console} section.
+See the @ref{REPL Console} section.
 @item @code{console:prompt1=@var{prompt1}}
 @itemx @code{console:prompt2=@var{prompt2}}
 Initialize @ref{input-prompt1,@code{input-promp1} and @code{input-prompt2}}, respectively.
@@ -18793,12 +18852,12 @@ System.out.println(x);
 @subsection Using @code{javax.script} portable Java scripting
 
 Kawa also supports the standard
-@uref{http://docs.oracle.com/javase/7/docs/api/javax/script/package-summary.html,@code{javax.script}} API.
+@uref{http://docs.oracle.com/javase/8/docs/api/javax/script/package-summary.html,@code{javax.script}} API.
 The main advantage of this API is if you want your users to be able to chose
 between multiple scripting languages.  That way you can support Kawa
 without Kawa-specific programming.
 
-For example the standard JDK tool @uref{http://docs.oracle.com/javase/7/docs/technotes/tools/share/jrunscript.html,jrunscript} provides a
+For example the standard JDK tool @uref{http://docs.oracle.com/javase/8/docs/technotes/tools/unix/jrunscript.html,jrunscript} provides a
 read-eval-print-loop for any language that implements the  @code{javax.script}
 API.  It knows nothing about Kawa but can still use it:
 @example
@@ -20954,7 +21013,7 @@ For more information and examples read this (slightly older)
 and
 @uref{http://localhost/per/blog/2011/JavaFX-using-Kawa-animation/,this on animation}.
 
-The @code{browse-kawa-manual} script in the @code{bin} directory
+The @code{browse-kawa-manual} script in the @code{doc} directory (source only)
 uses JavaFX WebView to create a window for browsing the Kawa documentation.
 
 @subsection Using JavaFX with JDK 7

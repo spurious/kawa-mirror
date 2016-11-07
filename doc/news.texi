@@ -14,6 +14,9 @@ shell/batch scripts for running Kawa, useful
 third-party libraries, and the complete documentation in EPUB format.
 The archives are named @code{kawa-version.zip}.
 @item
+The @code{kawa --browse-manual} switch makes it easy to
+@ref{browse-manual-option,browse the local documentation}.
+@item
 The @ref{Composable pictures,@code{(kawa pictures}) library} lets
 you create ``picture'' objects,
 display them, transform them, combine them, and more.
@@ -120,6 +123,12 @@ Various REPL enhancements and new features:
 
 @itemize
 @item
+The @code{-w} switch to create a new REPL window
+can be followed by various sub-options to control @emph{how} and
+where the window is created.
+For example @code{-wbrowser} creates a new window
+using your default web browser.
+@item
 Prompts are now normally specified using @code{printf}-style templates.
 The normal prompt template is specified by the @code{input-prompt1}
 variable, while continuation lines use @code{input-prompt2}. These can
@@ -156,6 +165,8 @@ If you change the window width, DomTerm will dynamically
 re-calculate the line-breaks of previous pretten output.
 This works even in the case of a session saved to an HTML
 file, as long as JavaScript is enabled.
+@item
+Hide/show buttons are emitted as part of the default prompt.
 @end itemize
 @item
 Multiple literals that have the same value (as in @code{equal?}) get

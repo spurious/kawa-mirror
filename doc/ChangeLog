@@ -1,3 +1,10 @@
+2016-11-07  Per Bothner  <per@bothner.com>
+
+	* kawa.texi: Document --browse-manual option.
+	Don't suggest browse-kawa-manual script.  Other polishing.
+	* news.texi: Likewise.
+	* README-epub: Related updates.
+
 2016-11-06  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (REPL Console): Document -w and its (new) sub-options.

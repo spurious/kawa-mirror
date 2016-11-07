@@ -116,11 +116,11 @@ public class KawaHttpHandler
             uriRoot = "/" + uriRoot;
         return server.createContext(uriRoot, handler);
     }
-    public static void addStaticFileHandler(String uriRoot, String pathPrefix, String defaultUrl, boolean closeExit)
+    public static void addStaticFileHandler(String uriRoot, String pathPrefix, String defaultUrl, boolean exitOnClose)
         throws IOException  {
         StaticFileHandler handler = new StaticFileHandler(pathPrefix, defaultUrl);
         HttpContext context = addHandler(uriRoot, handler);
-        if (closeExit) {
+        if (exitOnClose) {
             handlerCount++;
             handler.httpContext = context;
         }

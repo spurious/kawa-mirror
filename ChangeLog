@@ -1,3 +1,10 @@
+2016-11-07  Per Bothner  <per@bothner.com>
+
+	* bin/browse-kawa-manual.in: Move to doc/browse-kawa-manual.
+	It's no longer suggested because of the link issue mentioned.
+	* Makefile.am: No longer include it in snapshots.
+	* configure.ac: Don't configure bin/browse-kawa-manual.in.
+
 2016-11-02  Per Bothner  <per@bothner.com>
 
 	* configure.in (AC_INIT): Set version to 2.1.91.

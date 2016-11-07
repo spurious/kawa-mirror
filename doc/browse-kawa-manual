@@ -3,6 +3,11 @@
 # This is a hybrid shell/Scheme script for browsing Kawa's documentation.
 # It reads (and uncompresses) the documentation in ../doc/kawa-manual.epub.
 #
+# It has ONE MAJOR BUG: Clicking an external link replaces the entire
+# window without any way of getting back.  (It should instead create
+# a new window/tab in your default desktop browser.  Fixing this would
+# require more coding than it is worth.)
+#
 thisfile=`type -p $0`
 case "$thisfile" in
   "") echo "installation error - can't find path to $0"; exit -1 ;;
@@ -10,7 +15,7 @@ case "$thisfile" in
   *) thisfile="$PWD/$thisfile"  ;;
 esac         
 while test -L "$thisfile"; do thisfile=$(readlink -f "$thisfile"); done
-KAWA_HOME=`echo $(dirname $thisfile) | sed -e 's|/bin$||'`
+KAWA_HOME=`echo $(dirname $thisfile) | sed -e 's|/doc$||'`
 if test -n "$JAVA_HOME"; then
     JAVA="${JAVA_HOME}/bin/java"
 else

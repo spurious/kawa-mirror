@@ -143,7 +143,6 @@ kawa-$(ZIP_VERSION).zip: dist-kawa.jar doc/kawa-manual.epub bin/kawa.bat
 	  $(LN_S) $$docsrcdir/+default+ +default+
 	cd kawa-$(VERSION)/bin; \
 	  $(LN_S) ../../bin/kawa.sh kawa; \
-	  $(LN_S) ../../bin/browse-kawa-manual browse-kawa-manual; \
 	  $(LN_S) ../../bin/kawa.bat kawa.bat
 	zip $@ kawa-$(VERSION)/bin/kawa -r kawa-$(VERSION)
 

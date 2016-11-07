@@ -4,14 +4,90 @@ import org.domterm.*;
 import org.domterm.util.DomTermErrorWriter;
 import org.domterm.util.StyleSheets;
 import org.domterm.util.Utf8WriterOutputStream;
-import java.io.*;
+import org.domterm.websocket.DomServer;
 import gnu.expr.*;
 import gnu.mapping.*;
 import gnu.kawa.io.*;
+import java.awt.Desktop;
+import java.io.*;
+import java.net.UnknownHostException;
+import java.net.URI;
 
 /** An implementation of DomTerm's Backend that runs a Kawa REPL. */
 
 public class DomTermBackend extends Backend implements Runnable {
+
+    public static class WebSocketServer extends org.domterm.websocket.DomServer {
+        private static WebSocketServer instance = null;
+
+        public WebSocketServer(int port) throws UnknownHostException {
+            super(port, new String[0]);
+        }
+        @Override
+        protected Backend createBackend() {
+            return new DomTermBackend();
+        }
+        public synchronized static WebSocketServer getInstance() {
+            if (instance == null) {
+                try {
+                    instance = new WebSocketServer(0);
+                } catch (UnknownHostException ex) {
+                    throw new RuntimeException(ex);
+                }
+                instance.start();
+            }
+            return instance;
+        }
+        public static int getInstancePort() {
+            return getInstance().getPort();
+        }
+    }
+
+    public static String startDomTermConsole(String command) throws Throwable {
+        int htport = 0;
+        if (command.startsWith("serve=")) {
+            String portArg = command.substring(6);
+            try {
+                htport = Integer.parseInt(portArg);
+            } catch (NumberFormatException ex) {
+                return "bad port specifier in -w"+command+" option";
+            }
+        }
+        boolean exitOnClose = ! command.startsWith("serve");
+        int wsport = DomTermBackend.WebSocketServer.getInstancePort();
+        DomServer.setExitOnClose(exitOnClose);
+        String defaultUrl = "/repl-client.html#ws=//localhost:"+wsport+"/";
+        String kawaHome = System.getProperty("kawa.home");
+        if (kawaHome == null)
+            return "kawa.home not set";
+        File domtermJar = new File(kawaHome+"/lib/domterm.jar");
+        if (! domtermJar.exists())
+            return domtermJar.toString()+" does not exist";
+        String pathPrefix = "jar:file:" + domtermJar + "!";
+        gnu.kawa.servlet.KawaHttpHandler.addStaticFileHandler("/", pathPrefix, defaultUrl, exitOnClose);
+        com.sun.net.httpserver.HttpServer httpHandler =
+            gnu.kawa.servlet.KawaHttpHandler.startServer(htport, System.err);
+        htport = httpHandler.getAddress().getPort();
+        String webUrl = "http://127.0.0.1:"+htport+"/";
+        if (command.equals("browser")) {
+            if (! Desktop.isDesktopSupported())
+                return "using default desktop browser not supported";
+            Desktop.getDesktop().browse(new URI(webUrl));
+            return null;
+        } else if (command.startsWith("browser=")) {
+            String cmd = command.substring(8);
+            if (cmd.indexOf('%') < 0)
+                cmd = cmd  + " %U";
+            cmd = cmd.replace("%U", webUrl).replace("%W", Integer.toString(wsport));
+            Runtime.getRuntime().exec(cmd);
+            return null;
+        }
+        else if (command.startsWith("serve")) {
+            return null;
+        }
+        return "unrecognized -w subcommand '"+command+"'";
+    }
+
     Language language;
     QueueReader inIn;
     Appendable inOut;
@@ -103,12 +179,13 @@ public class DomTermBackend extends Backend implements Runnable {
         try {
             sendInputMode(usingJLine ? 'c' : 'p');
             setAutomaticNewline(true);
+            termWriter.write("\033]0;Kawa\007");
         } catch (Throwable ex) { ex.printStackTrace(); }
         if (this.nrows >= 0)
             setWindowSize(nrows, ncols, pixw, pixh);
         Shell.run(language, env);
         try {
-            termWriter.write("\033[99;99u");
+            termWriter.close();
         } catch (Throwable ex) {
             // ignore
         }

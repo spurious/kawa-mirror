@@ -1,5 +1,8 @@
 2016-11-06  Per Bothner  <per@bothner.com>
 
+	* CheckConsole.java (useDomTerm): Remove ThreadLocal.
+	(consoleType): New TheadLocal; new static method.
+
 	* JLineInPort.java (makeTerminal): Set charset to UTF-8.
 	This fixes some problems on Windows.
 

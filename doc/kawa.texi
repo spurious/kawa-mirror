@@ -2955,8 +2955,9 @@ The @code{--console} flag is useful when the standard input is a pipe,
 but you want to direct Kawa to treat it as an interactive terminal.
 The @code{--no-console} flag was useful for older pre-Java-6
 implementations that did not have the @code{java.lang.Console} class.
-@item @code{console:use-domterm=}[@code{yes}|@code{no}]
-@item @code{console:use-jline=}[@code{yes}|@code{no}]
+@item @code{console:type=}@var{console-types}
+@itemx @code{console:use-jline=}[@code{yes}|@code{no}]
+See teh @ref{REPL Console} section.
 @item @code{console:prompt1=@var{prompt1}}
 @itemx @code{console:prompt2=@var{prompt2}}
 Initialize @ref{input-prompt1,@code{input-promp1} and @code{input-prompt2}}, respectively.
@@ -3348,7 +3349,7 @@ prompt and pale yellow for the user input;
 this matches the defaults for the DomTerm console.)
 
 You can @ref{Prompts,change the prompt string} if you want.
-The default format depends on the (programming) language use;
+The default format depends on the (programming) language used;
 the one shown above is used for Scheme.
 It has the form of a comment, which can be convenient for copying
 and pasting lines.
@@ -3390,10 +3391,11 @@ Multi-line commands are treated as unit by JLine3:
 If Kawa determines that input is ``incomplete'' it will
 ask for continuation lines - and you can go back and edit previous
 lines in the same command.
-An entry in the command history may b multiple lines.
+You can explicitly create a multi-line command with Escape-Space.
+An entry in the command history may be multiple lines.
 
 Tab-completion works for Kawa-Scheme identiers: If you type TAB
-after an identifier, Kawa will present a possible of valid completions.
+after an identifier, Kawa will present a list of possible completions.
 
 There are multiple alternatives to using JLine3.
 You can use GNU readline (if you configued with @code{--enable-kawa-frontend}).
@@ -3412,10 +3414,67 @@ Kawa also creates a new window when it needs to create a REPL
 (for example if invoked with no options) and it is not running
 in a console.
 
-By default the new REPL window uses the DomTerm JavaScript
-toolkit running in a JavaFX WebView window.
+You have a number of options for how the Window appears and
+what it supports, controlled by text following @code{-w}.
+All except @code{-wswing} (and @code{-wconsole}) use DomTerm,
+so they depend on some kind of web browser technology.
+All except @code{-wswing} by default use  JLine3 input editing,
+if available.
 
-If JavaFX/WebView is not available, or if you specify
+@table @asis
+@item @code{-w}
+Pick the default/preferred console implementation.
+You can specify your preference with the @code{console:type=} option,
+which is followed by one of the options below (without the @code{"-w"} prefix),
+It can also be list of options separated by semi-colons, in which
+case they are tried in order.
+
+The current default (it may change) is as if you specified:
+@example
+console:type="google-chrome;browser;javafx;swing;console"
+@end example
+
+@item @code{-wbrowser}
+Creates a Kawa window or tab in your preferred desktop browser.
+Kawa starts a builtin HTTP and WebSocket server to communicate with the browser.
+@item @code{-wbrowser=@var{command}}
+Uses @var{command} to display the Kawa REPL.
+The @var{command} should include the pattern @code{%U}, which Kawa replaces
+with a URL that it listens to.
+(Alternatively, it can use the pattern @code{%W}, which Kawa replaces
+with the port number of its WebSocket server.  However, this feature may be removed.)
+If the is no @code{%} in the @var{command}, Kawa add @code{" %U"}.
+Thus @code{-wbrowser=firefox} is the same as @code{-wbrowser="firefox %U"}.
+@item @code{-wgoogle-chrome}
+Creates a new Google Chrome window in ``app mode'' - i.e. with no location or menu bar.
+This is the same as @code{-wbrowser="google-chrome --app=%U"}.
+@item @code{-wqtdomterm}
+Uses the @code{QtDomTerm} application.
+Same as @code{-wbrowser="qtdomterm --connect localhost:%W"}, where @code{%W}
+is the port of the WebSocke server that Kawa starts.
+@item @code{-wjavafx}
+Creates a new window using JavaFX WebView, which runs in the same JVM as Kawa.
+While this doesn't currently have much in the way of Kawa-specific menus
+or other features, it has the most potential for adding them in the future.
+However, it does require JavaFX, which is not always available,
+and which does not see a lot of love from Oracle. (It uses an old version of WebKit.)
+@item @code{-wswing}
+Create a console using the Swing toolkit.
+This is the old implementation of @code{-w}.
+It is deprecated because it only supports the builtin Swing line editing.
+(I.e. neither DomTerm or JLine3 features are available, though
+``printing'' @ref{Composable pictures,pictures} does work.)
+@item @code{-wserve}
+@itemx @code{-wserve=}@var{port}
+Starts up an HTTP server (along with a WebSocket server),
+but does not automatically create any browser windows.
+Instead you can use any modern browser to load @code{http://localhost:@var{port}/}.
+If @var{port} is not specified, the systems selects it (and print it out).
+@item @code{-wconsole}
+Same as @code{"--"} - i.e. it uses the existing console.
+@item @code{console:type=}@var{preference-list}
+Specify the behavior of plain @code{-w}.
+@end table
 
 @anchor{Using DomTerm}
 @subsection Using DomTerm
@@ -3444,9 +3503,11 @@ You can ``print'' images, @ref{Composable pictures,pictures}, or HTML elements.
 Pretty-printing is handled by the terminal,
 which means line-breaking is re-computed when window width changes.
 @item
+Hide/show buttons allow you to temporarily hide/unhide the output from a specific command.
+@item
 You can save a session as an HTML file,
 which can be viewed later.
-(Still with dynamic line-breaking and pretty-printing!)
+(Still with dynamic line-breaking and pretty-printing, as well as working hide/show buttons.)
 The file is actually XHTML, so it can be processed with XML-reading tools.
 @item
 Distinct styles for prompts, input, error output and regular output,
@@ -15052,17 +15113,17 @@ The following placeholders are handled:
 @table @asis
 @item @stxlit{%%}
 A literal @samp{%}.
-@item @stxlit{%}@var{N}
+@item @stxlit{%N}
 The current line number.  This is @code{(+ 1 (port-line @var{port}))}.
-@item @stxlit{%}@var{N}P@var{c}
+@item @stxlit{%}@var{n}@stxlit{P}@var{c}
 Insert padding at this possion, repeating the following
   character @code{@var{c}} as needed to bring the total number of columns
-of the prompt to that specified by the digits @code{@var{N}}.
-@item @stxlit{%}P@var{c}
-Same as @code{%@var{N}P@var{c}}, but @code{@var{N}} defaults to the number
+of the prompt to that specified by the digits @code{@var{n}}.
+@item @stxlit{%P}@var{c}
+Same as @code{%@var{n}P@var{c}}, but @code{@var{n}} defaults to the number
 of columns in the initial prompt from the expansion of @code{input-prompt1}.
 This is only meaningful when expanding @code{input-prompt2} for
-contiuation lines.
+continuation lines.
 @item @stxlit{%}@stxlitlbrace{}@var{hidden}@stxlit{%@}}
 Same as @var{hidden}, but the characters of @var{hidden}
 are assumed to have zero visible width.  Can be used for
@@ -15073,7 +15134,7 @@ to change color or style:
 @end example
 The above changes both the text and the background color
 (to a pale blue).
-@item @stxlit{%}@var{M}
+@item @stxlit{%M}
 Insert a ``message'' string.
 Not normally used by Kawa, but supported by JLine.
 @end table

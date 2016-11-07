@@ -1,3 +1,8 @@
+2016-11-06  Per Bothner  <per@bothner.com>
+
+	* ApplicationMainSupport.java: (propertyFields): Add console:type.
+	Remove console:use-domterm.
+
 2016-10-30  Per Bothner  <per@bothner.com>
 
 	* Compilation.java (process): Don't set state to ERROR_SEEN

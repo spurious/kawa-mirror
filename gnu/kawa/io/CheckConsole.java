@@ -44,11 +44,15 @@ public class CheckConsole {
     public static final ThreadLocation useJLine
         = new ThreadLocation("use-jline");
 
-    public static final ThreadLocation useDomTerm
-        = new ThreadLocation("use-domterm");
+    public static String consoleTypeDefault = "google-chrome;browser;javafx;swing;console";
+    public static final ThreadLocation consoleType
+        = new ThreadLocation("type");
 
     public static int useJLine() { return getBoolean(useJLine); }
-    public static int useDomTerm() { return getBoolean(useDomTerm); }
+    public static String consoleType() {
+         Object val = consoleType.get(null);
+         return val == null ? consoleTypeDefault : val.toString();
+    }
 
     private static int getBoolean(ThreadLocation loc) {
         Object val = loc.get(null);

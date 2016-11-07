@@ -6,6 +6,7 @@ import gnu.expr.*;
 import gnu.text.SourceMessages;
 import gnu.text.SyntaxException;
 import gnu.lists.*;
+import java.awt.Desktop;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -378,11 +379,13 @@ public class repl extends Procedure0or1 {
                 something_done = true;
                 if (! usedActionArgCount)
                     return -1;
-            } else if (arg.equals ("-w")) {
+            } else if (arg.startsWith("-w")) {
                 getLanguage();
                 iArg = getArgs(args, iArg);
                 checkInitFile();
-                startGuiConsole();
+                String msg = startGuiConsole(arg.substring(2));
+                if (msg != null)
+                    error(arg+" failed: "+msg);
                 something_done = true;
             } else if (arg.equals ("-d")) {
                 if (iArg == maxArg)
@@ -562,6 +565,14 @@ public class repl extends Procedure0or1 {
             } else if (arg.equals("--servlet")) {
                 defaultParseOptions |= Language.PARSE_FOR_SERVLET;
                 HttpRequestContext.importServletDefinitions = 2;
+            } else if (arg.startsWith("--browse-manual")) {
+                String rest = arg.substring(15);
+                if (rest.length() > 0 && rest.charAt(0) == '=')
+                    rest = rest.substring(1);
+                String msg = browseManual(null, rest);
+                if (msg != null)
+                    error(arg+" failed: "+msg);
+                something_done = true;
             } else if (arg.equals("--debug-dump-zip")) {
                 gnu.expr.ModuleExp.dumpZipPrefix = "kawa-zip-dump-";
             } else if (arg.equals("--enable-anf")) {
@@ -697,10 +708,8 @@ public class repl extends Procedure0or1 {
             getLanguage();
             iArg = getArgs(args, iArg);
             checkInitFile();
-            if (! CheckConsole.haveConsole()
-                // || CheckConsole.useDomTerm() > 0
-                )
-                startGuiConsole();
+            if (! CheckConsole.haveConsole())
+                startGuiConsole("");
             else {
                 boolean ok = Shell.run(Language.getDefaultLanguage(),
                                        Environment.getCurrent());
@@ -854,18 +863,99 @@ public class repl extends Procedure0or1 {
         }
     }
 
-    private static void startGuiConsole() {
-        if (CheckConsole.useDomTerm() >= 0) {
-            if (startJfxConsole() == null)
-                return;
-        }
-        // Do this instead of just new GuiConsole in case we have
-        // configured --without-awt.
+    public static String startGuiConsole(String command) {
         try {
-            Class.forName("kawa.GuiConsole").newInstance();
-        } catch (Exception ex) {
-            System.err.println("failed to create Kawa window: "+ex);
-            System.exit (-1);
+            if ("".equals(command)) {
+                String defaults = CheckConsole.consoleType();
+                String rest = ";"+defaults+";";
+                for (;;) {
+                    int semi = rest.indexOf(';', 1);
+                    if (semi < 0)
+                        break;
+                    String cur = rest.substring(1, semi).trim();
+                    rest = rest.substring(semi);
+                    if (cur.length() > 0
+                        && startGuiConsole(cur) == null)
+                        return null;
+                }
+                return "no window type ("+defaults+") worked";
+            }
+            if ("javafx".equals(command)) {
+                Throwable ex = startJfxConsole();
+                return ex == null ? null : ex.toString();
+            }
+            if ("swing".equals(command)) {
+                Class.forName("kawa.GuiConsole").newInstance();
+                return null;
+            }
+            if ("console".equals(command)) {
+                Shell.run(Language.getDefaultLanguage(), Environment.getCurrent());
+                return null;
+            }
+            if ("google-chrome".equals(command))
+                command = "browser=google-chrome --app=%U";
+            if ("qtdomterm".equals(command))
+                command = "browser=qtdomterm --connect localhost:%W";
+            if (command.startsWith("browser")
+                || (command.equals("serve") || command.startsWith("serve="))) {
+                Object result = Class.forName("kawa.DomTermBackend")
+                    .getMethod("startDomTermConsole", String.class)
+                    .invoke(null, command);
+                return result == null ? null : result.toString();
+            }
+            return "unrecognized -w subcommand '"+command+"'";
+        } catch (Throwable ex) {
+            return "caught exception "+ex.toString();
+        }
+    }
+    public static String browseManual(String path, String browserCommand) {
+        try {
+            String kawaHome = System.getProperty("kawa.home");
+            if (kawaHome == null)
+                return "kawa.home not set";
+            File manualFile = new File(kawaHome+"/doc/kawa-manual.epub");
+            if (! manualFile.exists())
+                return manualFile+" does not exist";
+            if (browserCommand == null || browserCommand.length() == 0)
+                browserCommand = "browser";
+            if (browserCommand.equals("javafx")) {
+                // FIXME ignores 'path' argument
+                String filename = kawaHome+"/bin/browse-kawa-manual";
+                setLanguage("scheme");
+                Shell.runFileOrClass(filename, false, 0);
+                return null;
+            }
+            String defaultUrl = "index.xhtml";
+            //String defaultUrl = "with-frames.html";
+            String pathPrefix = "jar:file:" + manualFile + "!/OEBPS";
+            gnu.kawa.servlet.KawaHttpHandler.addStaticFileHandler("/kawa-manual/",
+                                                                  pathPrefix, defaultUrl, true);
+            int htport = 0;
+            com.sun.net.httpserver.HttpServer httpHandler =
+                gnu.kawa.servlet.KawaHttpHandler.startServer(htport, System.err);
+            htport = httpHandler.getAddress().getPort();
+            if (path == null || path.length() == 0)
+                path = defaultUrl;
+            String webUrl = "http://127.0.0.1:"+htport+"/kawa-manual/" + path;
+            if (browserCommand.equals("google-chrome"))
+                browserCommand = "google-chrome --app=%U";
+             if (browserCommand.equals("browser")) {
+                if (! Desktop.isDesktopSupported())
+                    return "using default desktop browser not supported";
+                Desktop.getDesktop().browse(new URI(webUrl));
+                return null;
+             } else {
+                 if (browserCommand.indexOf('%') < 0)
+                        browserCommand = browserCommand  + " %U";
+                 try {
+                     Runtime.getRuntime().exec(browserCommand.replace("%U", webUrl));
+                 } catch (Throwable ex) {
+                     return "cannot read manual (using command: "+browserCommand+")";
+                 }
+                 return null;   
+            }
+        } catch (Throwable ex) {
+            return "caught exception "+ex.toString();
         }
     }
 }

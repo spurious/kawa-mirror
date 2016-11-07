@@ -1,3 +1,11 @@
+2016-11-06  Per Bothner  <per@bothner.com>
+
+	* DomTermBackend.java (class WebSocketServer): New class.
+	A light wrapper around DomServer.
+	(startDomTermConsole): New method for starting a DomTerm-based REPL.
+	* repl.java (startGuiConsole): Add a lot more flexibility and options.
+	(browseManual): New method, used by new --browse-manual option.
+
 2016-09-21  Per Bothner  <per@bothner.com>
 
 	* repl.java (checkDomTerm): Also setDomTerm on system error.

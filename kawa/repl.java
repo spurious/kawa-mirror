@@ -920,7 +920,7 @@ public class repl extends Procedure0or1 {
                 browserCommand = "browser";
             if (browserCommand.equals("javafx")) {
                 // FIXME ignores 'path' argument
-                String filename = kawaHome+"/bin/browse-kawa-manual";
+                String filename = kawaHome+"/doc/browse-kawa-manual";
                 setLanguage("scheme");
                 Shell.runFileOrClass(filename, false, 0);
                 return null;

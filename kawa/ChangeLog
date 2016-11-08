@@ -1,3 +1,7 @@
+2016-11-07  Per Bothner  <per@bothner.com>
+
+	* repl.java (browseManual): Update path to browse-kawa-manual.
+
 2016-11-06  Per Bothner  <per@bothner.com>
 
 	* DomTermBackend.java (class WebSocketServer): New class.

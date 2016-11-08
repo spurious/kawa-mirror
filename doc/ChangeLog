@@ -1,5 +1,8 @@
 2016-11-07  Per Bothner  <per@bothner.com>
 
+	* Makefile.am (check): Don't build kawa.pdf - too many warnings.
+	Instead build kawa-manual.epub.
+
 	* kawa.texi: Document --browse-manual option.
 	Don't suggest browse-kawa-manual script.  Other polishing.
 	* news.texi: Likewise.

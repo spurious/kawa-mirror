@@ -181,4 +181,4 @@ kawa-manual.epub: kawa.xml Makefile
 	cp $(DOC_IMAGES) ebook/OEBPS/images/
 	cd ebook && zip -r -X ../kawa-manual.epub mimetype META-INF OEBPS
 
-check: kawa.pdf
+check: kawa-manual.epub

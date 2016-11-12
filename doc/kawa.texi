@@ -1287,6 +1287,8 @@ export KAWA_HOME=`pwd`/kawa-@var{version}
 @end example
 
 The binary release requires Java 7 or later.
+Java 8 is recommended. (Java 8 is needed for the JLine input editor,
+which is recommended for the REPL.)
 If you have an older Java implementation, or build for a mobile
 environment like Android,
 then you will need to get the source distribution.

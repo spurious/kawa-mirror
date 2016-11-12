@@ -1,6 +1,8 @@
 2016-11-12  Per Bothner  <per@bothner.com>
 
-	* Makefile.am: Add -q to zip comand, but more diff'able logs.
+	* Makefile.am (check): Remove rule - fails with 'make distcheck'.
+
+	* Makefile.am: Add -q to zip command, for more diff'able logs.
 
 2016-11-07  Per Bothner  <per@bothner.com>
 

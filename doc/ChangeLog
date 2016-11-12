@@ -1,5 +1,7 @@
 2016-11-12  Per Bothner  <per@bothner.com>
 
+	* news.html: Update to reference "Kawa 2.2".
+
 	* Makefile.am (check): Remove rule - fails with 'make distcheck'.
 
 	* Makefile.am: Add -q to zip command, for more diff'able logs.

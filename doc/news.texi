@@ -4,8 +4,11 @@ most recent changes first.
 See also the list of @uref{../qexo/news.html,Qexo (XQuery)-specific
 changes}.
 
-@subheading In Subversion repository since last release
-@anchor{#in-subversion-repository-since-last-release}
+@c @subheading In Subversion repository since last release
+@c @anchor{#in-subversion-repository-since-last-release}
+
+@subheading Kawa 2.2 (November 12, 2016)
+
 @itemize
 @item
 A binary release is no longer just a Kawa @code{.jar} file,

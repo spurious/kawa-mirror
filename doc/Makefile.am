@@ -179,6 +179,6 @@ kawa-manual.epub: kawa.xml Makefile
 	cp with-frames.html ebook/OEBPS/with-frames.html
 	mkdir -p ebook/OEBPS/images
 	cp $(DOC_IMAGES) ebook/OEBPS/images/
-	cd ebook && zip -r -X ../kawa-manual.epub mimetype META-INF OEBPS
+	cd ebook && zip -r -q -X ../kawa-manual.epub mimetype META-INF OEBPS
 
 check: kawa-manual.epub

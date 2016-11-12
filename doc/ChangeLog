@@ -1,3 +1,7 @@
+2016-11-12  Per Bothner  <per@bothner.com>
+
+	* Makefile.am: Add -q to zip comand, but more diff'able logs.
+
 2016-11-07  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (check): Don't build kawa.pdf - too many warnings.

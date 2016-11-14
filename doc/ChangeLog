@@ -1,3 +1,8 @@
+2016-11-13  Jamison Hope  <jrh@theptrgroup.com>
+
+	* kawa.texi (Quaternions): Fix description of z coordinate.
+	This fixes Savannah bug #49596.
+
 2016-11-12  Per Bothner  <per@bothner.com>
 
 	* news.html: Update to reference "Kawa 2.2".

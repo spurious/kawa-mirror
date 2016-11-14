@@ -9069,7 +9069,7 @@ equations:
 @var{w} = @var{r} * cos @var{t}
 @var{x} = @var{r} * sin @var{t} * cos @var{u}
 @var{y} = @var{r} * sin @var{t} * sin @var{u} * cos @var{v}
-@var{z} = @var{r} * sin @var{t} * sin @var{u} * cos @var{v}
+@var{z} = @var{r} * sin @var{t} * sin @var{u} * sin @var{v}
 @end example
 With either notation, zero elements may be omitted.
 

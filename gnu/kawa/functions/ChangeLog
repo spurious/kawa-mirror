@@ -1,3 +1,7 @@
+2016-11-15  Per Bothner  <per@bothner.com>
+
+	* RunProcess.java (doit): Redirect input to INHERIT in some cases.
+
 2016-10-29  Per Bothner  <per@bothner.com>
 
 	* DisplayFormat.java (writeKNode): Force xhtml style for KNode.

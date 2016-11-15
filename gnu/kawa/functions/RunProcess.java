@@ -286,6 +286,10 @@ public class RunProcess extends MethodProc {
             builder.redirectOutput((ProcessBuilder.Redirect)outRedirect);
         if (errRedirect instanceof ProcessBuilder.Redirect)
             builder.redirectError((ProcessBuilder.Redirect)errRedirect);
+        if (inRedirect == null
+            && outRedirect == Redirect.INHERIT
+            && errRedirect == Redirect.INHERIT)
+            builder.redirectInput(Redirect.INHERIT);
         /* #endif */
         final Process proc = builder.start();
         if (inRedirect instanceof Reader) {

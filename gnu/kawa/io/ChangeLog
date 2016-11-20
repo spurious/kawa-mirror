@@ -1,3 +1,7 @@
+2016-11-19  Per Bothner  <per@bothner.com>
+
+	* JLineInPort.java (<init>): Set MOUSE support option.
+
 2016-11-06  Per Bothner  <per@bothner.com>
 
 	* CheckConsole.java (useDomTerm): Remove ThreadLocal.

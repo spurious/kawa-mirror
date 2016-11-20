@@ -870,7 +870,8 @@ public class PrettyWriter extends PrintConsumer
     int suffixLength = getSuffixLength();
     pushLogicalBlock(column, perLineEnd, prefixLength, suffixLength,
 		     lineNumber);
-    setIndentation(column);
+    if (!isDomTerm())
+        setIndentation(column);
     if (prefix != null)
       {
 	blocks[blockDepth + BLOCK_PER_LINE_PREFIX_END] = column;
@@ -1444,8 +1445,11 @@ public class PrettyWriter extends PrintConsumer
                 Strings.printJson(prefix, sbuf);
             sbuf.append("\007");
             writeToBase(sbuf.toString());
-            pushLogicalBlock(posnColumn(queueInts[next + QITEM_POSN]),
-                             0, 0, 0, 0);
+            String suffix = queueStrings[next + QITEM_BLOCK_START_SUFFIX];
+            reallyStartLogicalBlock (posnColumn(queueInts[next + QITEM_POSN]),
+                                     "", suffix);
+	    if (currentBlock == next)
+	      currentBlock = -1;
             break;
 	  case QITEM_BLOCK_END_TYPE:
               writeToBase("\033]111\007");

@@ -1,3 +1,7 @@
+2016-11-20  Per Bothner  <per@bothner.com>
+
+	* PrettyWriter.java: Fix to end-block handling for isDomTerm().
+
 2016-11-19  Per Bothner  <per@bothner.com>
 
 	* JLineInPort.java (<init>): Set MOUSE support option.

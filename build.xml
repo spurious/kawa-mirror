@@ -2,6 +2,11 @@
 <!-- A build file for use by Ant to build Kawa. -->
 <!-- Requires Ant 1.6.3 -->
 <project name="Kawa" default="default" basedir=".">
+  <fail>
+    Kawa's Subversion repository is no longer used.
+    Get the sources using Git instead: clone https://gitlab.com/kashell/Kawa.git
+  </fail>
+
   <property environment="env"/>
 
   <!-- Give the user a chance to override the defaults. -->

@@ -1,5 +1,10 @@
 qdnl Process this with autoconf to create configure
 AC_INIT([kawa],[2.2.1]) dnl Also update bin/configure.ac and build.xml.
+
+echo "Kawa's Subversion repository is no longer used."
+echo "Get the sources using Git instead: clone https://gitlab.com/kashell/Kawa.git"
+exit -1
+
 AC_CONFIG_SRCDIR([doc/kawa.texi])
 
 AC_ARG_ENABLE(obsolete-kawa)
